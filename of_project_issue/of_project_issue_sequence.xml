@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+
+    <data noupdate="1">
+        <!-- Sequences for project.issue -->
+<!-- Migration 9        <record id="seq_type_sale_order" model="ir.sequence.type">
+            <field name="name">Support</field>
+            <field name="code">of.project.issue</field>
+        </record> -->
+
+        <record id="seq_of_project_issue" model="ir.sequence">
+            <field name="name">Support</field>
+            <field name="code">of.project.issue</field>
+            <field name="prefix">SAV</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+    <data>
+        <function model="project.issue" name="_of_set_code" />
+    </data>
+
+</openerp>

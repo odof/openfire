@@ -1,0 +1,154 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_zz_winterhalter
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 8.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-08-06 09:42+0000\n"
+"PO-Revision-Date: 2015-08-06 09:42+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_zz_winterhalter
+#: field:of.parc.installe,installateur_adresse_id:0
+msgid "Adresse installateur"
+msgstr "Adresse installateur"
+
+#. module: of_zz_winterhalter
+#: sql_constraint:of.parc.installe:0
+msgid "Ce numéro de série est déjà utilisé et doit être unique."
+msgstr "Ce numéro de série est déjà utilisé et doit être unique."
+
+#. module: of_zz_winterhalter
+#: view:of.parc.installe:of_zz_winterhalter.of_parc_installe_form_view
+#: view:of.parc.installe:of_zz_winterhalter.of_parc_installe_search_view
+#: field:of.parc.installe,client_id:0
+msgid "Client"
+msgstr "Client"
+
+#. module: of_zz_winterhalter
+#: help:res.partner,of_installateur:0
+msgid "Cocher cette case si ce partenaire est un installateur."
+msgstr "Cocher cette case si ce partenaire est un installateur."
+
+#. module: of_zz_winterhalter
+#: help:res.partner,of_revendeur:0
+msgid "Cocher cette case si ce partenaire est un revendeur."
+msgstr "Cocher cette case si ce partenaire est un revendeur."
+
+#. module: of_zz_winterhalter
+#: view:crm.helpdesk:of_zz_winterhalter.of_produit_installe_sav_lie
+msgid "Communication"
+msgstr "Communication"
+
+#. module: of_zz_winterhalter
+#: field:of.parc.installe,create_uid:0
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: of_zz_winterhalter
+#: field:of.parc.installe,create_date:0
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: of_zz_winterhalter
+#: field:of.parc.installe,date_service:0
+msgid "Date vente"
+msgstr "Date vente"
+
+#. module: of_zz_winterhalter
+#: view:of.parc.installe:of_zz_winterhalter.of_parc_installe_search_view
+msgid "Group By"
+msgstr "Regrouper par"
+
+#. module: of_zz_winterhalter
+#: model:ir.model,name:of_zz_winterhalter.model_crm_helpdesk
+msgid "Helpdesk"
+msgstr "Assistance"
+
+#. module: of_zz_winterhalter
+#: field:of.parc.installe,id:0
+msgid "ID"
+msgstr "ID"
+
+#. module: of_zz_winterhalter
+#: field:of.parc.installe,installateur_id:0
+#: field:res.partner,of_installateur:0
+msgid "Installateur"
+msgstr "Installateur"
+
+#. module: of_zz_winterhalter
+#: field:of.parc.installe,write_uid:0
+msgid "Last Updated by"
+msgstr "Last Updated by"
+
+#. module: of_zz_winterhalter
+#: field:of.parc.installe,write_date:0
+msgid "Last Updated on"
+msgstr "Last Updated on"
+
+#. module: of_zz_winterhalter
+#: field:of.parc.installe,name:0
+msgid "No de série"
+msgstr "No de série"
+
+#. module: of_zz_winterhalter
+#: field:of.parc.installe,note:0
+msgid "Note"
+msgstr "Note"
+
+#. module: of_zz_winterhalter
+#: model:ir.actions.act_window,help:of_zz_winterhalter.action_view_of_parc_installe
+msgid "Parc des produits installés"
+msgstr "Parc des produits installés"
+
+#. module: of_zz_winterhalter
+#: model:ir.actions.act_window,name:of_zz_winterhalter.action_view_of_parc_installe
+#: model:ir.model,name:of_zz_winterhalter.model_of_parc_installe
+#: model:ir.ui.menu,name:of_zz_winterhalter.menu_of_parc_installe
+#: view:of.parc.installe:of_zz_winterhalter.of_parc_installe_search_view
+#: view:of.parc.installe:of_zz_winterhalter.of_parc_installe_tree_view
+msgid "Parc installé"
+msgstr "Parc installé"
+
+#. module: of_zz_winterhalter
+#: model:ir.model,name:of_zz_winterhalter.model_res_partner
+msgid "Partner"
+msgstr "Partenaire"
+
+#. module: of_zz_winterhalter
+#: view:crm.helpdesk:of_zz_winterhalter.of_produit_installe_sav_lie
+#: view:of.parc.installe:of_zz_winterhalter.of_parc_installe_search_view
+#: field:of.parc.installe,product_id:0
+msgid "Produit"
+msgstr "Produit"
+
+#. module: of_zz_winterhalter
+#: field:crm.helpdesk,produit_installe_id:0
+#: view:of.parc.installe:of_zz_winterhalter.of_parc_installe_form_view
+msgid "Produit installé"
+msgstr "Produit installé"
+
+#. module: of_zz_winterhalter
+#: view:of.parc.installe:of_zz_winterhalter.of_parc_installe_search_view
+#: field:of.parc.installe,revendeur_id:0
+#: field:res.partner,of_revendeur:0
+msgid "Revendeur"
+msgstr "Revendeur"
+
+#. module: of_zz_winterhalter
+#: field:of.parc.installe,site_adresse_id:0
+msgid "Site installation"
+msgstr "Site installation"
+
+#. module: of_zz_winterhalter
+#: field:of.parc.installe,tel_site_id:0
+msgid "Téléphone site installation"
+msgstr "Téléphone site installation"
+

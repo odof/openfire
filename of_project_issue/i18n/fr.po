@@ -1,0 +1,11 @@
+
+
+#. module: crm_helpdesk
+#: model:ir.ui.menu,name:crm_helpdesk.menu_help_support_main
+msgid "Assistance et support"
+msgstr "SAV"
+
+#. module: crm_helpdesk
+#: model:ir.actions.act_window,name:crm_helpdesk.crm_case_helpdesk_act111
+msgid "Requêtes d'assistance"
+msgstr "SAV"

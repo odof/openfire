@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+    
+        <function model="of_project_issue" name="_of_finish_install" />
+    
+    </data>
+</openerp>

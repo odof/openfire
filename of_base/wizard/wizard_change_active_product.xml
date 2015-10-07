@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+       <!-- wizard change active product (action activer/désactiver tous produits sélectionnés) -->
+       <record id="view_change_active_product_wizard" model="ir.ui.view">
+            <field name="name">Change activation produits</field>
+            <field name="model">wizard.change.active.product</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Change activation produits">
+                    <group colspan="4">
+                        <field name="action" colspan="2"/>
+                    </group>
+                    <newline/>
+                    <button special="cancel" string="Fermer" icon="gtk-ok"/>
+                    <button name="action_change_active_product" string="Valider" type="object" icon="gtk-convert"/>
+                </form>
+            </field>
+        </record>
+
+        <act_window id="action_chage_active_product_wizard"
+            key2="client_action_multi"
+            name="(Dés)activer produits sélectionnés"
+            res_model="wizard.change.active.product"
+            src_model="product.template"
+            view_mode="form"
+            view_type="form"
+            multi="True"
+            view_id="view_change_active_product_wizard"
+            target="new"/>
+
+    </data>
+</openerp>
