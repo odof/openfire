@@ -81,6 +81,9 @@
             </field>
         </record>
         
+        <!-- Menu OpenService dans barre menu -->
+		<menuitem id="menu_of_openservice" name="OpenService" sequence="0"/>
+		     
 		<!-- Action vue parc installé -->
 		<record id="action_view_of_parc_installe" model="ir.actions.act_window">
 		     <field name="name">Parc installé</field>
@@ -91,12 +94,102 @@
 		     <field name="search_view_id" ref="of_parc_installe_search_view"/>
 		     <field name="help">Parc des produits installés</field>
 		</record>
-       
-		<!-- Menu parc installé (Ventes/SAV/Parc installé) -->
+
+		<!-- Menu parc installé -->
 		<menuitem id="menu_of_parc_installe" action="action_view_of_parc_installe" name="Parc installé" 
-		     parent="base.menu_aftersale" sequence="20"/>
-		     <!--  groups="base.group_extended,base.group_sale_salesman" -->
-		
+		     parent="menu_of_openservice" sequence="10"/>
+		     <!-- parent="base.menu_aftersale" groups="base.group_extended,base.group_sale_salesman" -->
+
+
+		<!-- Menu SAV -->
+	    <record model="ir.actions.act_window" id="of_project_issue_categ_act0">
+	        <field name="name">SAV</field>
+	        <field name="res_model">project.issue</field>
+	        <field name="view_type">form</field>
+	        <field name="view_mode">tree,kanban,calendar,form,pivot,graph</field>
+	        <field name="view_id" eval="False"/>
+	        <field name="domain" eval=""/>
+	        <!-- <field name="search_view_id" ref="view_project_issue_filter"/> -->
+	        <field name="help" type="html">
+	            <p>
+	                The Odoo issues tacker allows you to efficiently manage things
+	                like internal requests, software development bugs, customer
+	                complaints, project troubles, material breakdowns, etc.
+	            </p>
+	        </field>
+	    </record>
+
+		<menuitem id="of_menu_project_issue_track"  parent="menu_of_openservice" action="of_project_issue_categ_act0" sequence="5"/>
+
+
+		<!-- Menu Fournisseurs : on affiche ceux dont le champ supplier est vrai -->
+		<record id="of_action_partner_supplier_form" model="ir.actions.act_window">
+            <field name="name">Fournisseurs</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="domain">[('supplier','=',True)]</field>
+            <field name="context">{}</field>
+            <!-- <field name="search_view_id" ref="view_res_partner_filter"/> -->
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to add a contact in your address book.
+              </p><p>
+                Odoo helps you easily track all activities related to
+                a customer; discussions, history of business opportunities,
+                documents, etc.
+              </p>
+            </field>
+        </record>
+        
+        <!-- Menu Clients : on affiche tous les partenaires qui ne sont pas des fournisseurs ou à la fois fournisseur et client -->
+        <record id="of_action_partner_form" model="ir.actions.act_window">
+            <field name="name">Clients</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="domain">['|',('supplier','=',False),('customer','=',True)]</field>
+            <field name="context">{}</field>
+            <!-- <field name="search_view_id" ref="view_res_partner_filter"/> -->
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to add a contact in your address book.
+              </p><p>
+                Odoo helps you easily track all activities related to
+                a customer; discussions, history of business opportunities,
+                documents, etc.
+              </p>
+            </field>
+        </record>
+        
+        <menuitem id="of_menu_partner_form" parent="menu_of_openservice" action="of_action_partner_form" sequence="15"/>
+        <menuitem id="of_menu_partner_supplier_form" parent="menu_of_openservice" action="of_action_partner_supplier_form" sequence="20"/>
+
+
+		<!-- Menu Produits -->
+		<record id="of_product_template_action" model="ir.actions.act_window">
+            <field name="name">Produits</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.template</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="view_type">form</field>
+            <!-- <field name="view_id" ref="product_template_kanban_view"/> -->
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to define a new product.
+                </p><p>
+                    You must define a product for everything you sell, whether it's a physical product, a consumable or a service you offer to  customers.               
+                </p><p>
+                    The product form contains information to simplify the sale process: price, notes in the quotation, accounting data, procurement methods, etc.
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="of_menu_product_template_action" parent="menu_of_openservice" action="of_product_template_action" sequence="25"/>
+
 		
 		<!-- insertion Produit installé lié et champs supplémentaires Winterhalter dans SAV -->
 		<record id="of_produit_installe_sav_lie" model="ir.ui.view" >
@@ -116,8 +209,7 @@
 		</record>
 		
 		
-		<!-- Lien pour action créer SAV demande d'intervention-->
-		
+		<!-- Lien pour action créer SAV demande d'intervention depuis SAV-->
         <record id="action_open_demande_intervention" model="ir.actions.server">
             <field name="name">Effectuer une demande d'intervention</field>
             <field name="model_id" ref="project_issue.model_project_issue"/>
@@ -132,7 +224,25 @@
             <field name="value" eval="'ir.actions.server,%d'%action_open_demande_intervention"/>
             <field name="object" eval="True"/>
         </record>
-     
+
+
+		<!-- Lien pour action créer SAV depuis parc installé-->
+        <record id="action_open_creer_sav" model="ir.actions.server">
+            <field name="name">Créer un SAV</field>
+            <field name="model_id" ref="project_issue.model_project_issue"/>
+            <field name="state">code</field>
+            <field name="code">action = self.pool['of.parc.installe'].ouvrir_creer_sav(cr, uid, context)</field>
+        </record>
+
+        <record id="action_create_demande_intervention" model="ir.values">
+            <field name="name">Créer un SAV</field>
+            <field name="key2">client_action_multi</field>
+            <field name="model">of.parc.installe</field>
+            <field name="value" eval="'ir.actions.server,%d'%action_open_creer_sav"/>
+            <field name="object" eval="True"/>
+        </record>
+
+
         <!-- Vue partenaire filtre recherche ajout recherche par réf client -->
         <record id="of_res_partner_filter" model="ir.ui.view">
             <field name="name">of.res.partner.filter</field>

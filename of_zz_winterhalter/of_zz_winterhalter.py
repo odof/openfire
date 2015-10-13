@@ -54,10 +54,29 @@ class of_parc_installe(osv.Model):
     }
     
     # Désactiver contrainte car plusieurs no série identique possible _sql_constraints = [('no_serie_uniq', 'unique(name)', 'Ce numéro de série est déjà utilisé et doit être unique.')]
+    def ouvrir_creer_sav(self, cr, uid, context={}):
+        if not context:
+            context = {}
+        res = {
+            'name': 'SAV',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'project.issue',
+            'type': 'ir.actions.act_window',
+            'target': 'current',
+        }
+        if 'active_ids' in context.keys():
+            active_ids = isinstance(context['active_ids'], (int,long)) and [context['active_ids']] or context['active_ids']
+            if active_ids:
+                parc_installe = self.browse(cr, uid, active_ids[0])
+                if parc_installe.client_id:
+                    res['context'] = {'default_partner_id': parc_installe.client_id.id,
+                                      'default_of_produit_installe_id': parc_installe.product_id.id,
+                                      'default_of_type': 'di'}
+        return res
 
 
-
-class poject_issue(osv.Model):
+class project_issue(osv.Model):
     _name = "project.issue"
     _inherit = "project.issue"
 
