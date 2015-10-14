@@ -2,6 +2,10 @@
 <openerp>
     <data>
 
+<!-- *************************************************** -->        
+<!-- ****************** PARC INSTALLÉ ****************** -->
+<!-- *************************************************** -->
+
 		<!-- Parc installé filtre -->    
 		<record id="of_parc_installe_search_view" model="ir.ui.view">
 		    <field name="name">of.parc.installe.search</field>
@@ -80,7 +84,109 @@
 	            </form>
             </field>
         </record>
+
+
+<!-- *************************************************** -->        
+<!-- *************** SAV (project.issue) *************** -->
+<!-- *************************************************** --> 
+
+		<!-- insertion Produit installé lié et champs supplémentaires Winterhalter dans SAV -->
+		<record id="of_produit_installe_sav_lie" model="ir.ui.view" >
+		    <field name="name">of.produit_installe.sav.lie</field>
+		    <field name="model">project.issue</field>
+		    <field name="inherit_id" ref="project_issue.project_issue_form_view"/>
+		    <field name="arch" type="xml" >
+		    	<field name="date" position="after">
+		    		<field name="of_type"/>
+		    	</field>
+		        <field name="email_from" position="after">
+		         	<group string="Produit" colspan="4">
+		            	<field name="of_produit_installe_id"/>
+		            </group>
+		        </field>
+		    </field>
+		</record>
+
+
+<!-- *************************************************** -->        
+<!-- ********** VUE PARTENAIRES (res.partner) ********** -->
+<!-- *************************************************** -->
+
+        <!-- Vue partenaire filtre recherche ajout recherche par réf client -->
+        <record id="of_res_partner_filter" model="ir.ui.view">
+            <field name="name">of.res.partner.filter</field>
+            <field name="model">res.partner</field>
+            <field name="type">search</field>
+            <field name="inherit_id" ref="base.view_res_partner_filter"/>
+            <field name="arch" type="xml">
+            	<field name="name" position="after">
+		            <field name="ref" string="Compte client"/>
+				</field>
+            </field>
+        </record>
         
+		<!-- Ajouter référence client dans liste partenaires -->
+		<record id="of_res_partner_winterhalter_tree" model="ir.ui.view">
+		   	<field name="name">of.res.partner.winterhalter.tree</field>
+		    <field name="model">res.partner</field>
+		    <field name="type">tree</field>
+		    <field name="inherit_id" ref="base.view_partner_tree" />
+		    <field name="arch" type="xml">
+		      	<field name="display_name" position="before">
+		            <field name="ref" string="Compte client"/>
+				</field>
+		    </field>
+		</record>
+		
+		<!-- Mettre revendeur, installateur, payeur, référence client en haut dans formulaire partenaires -->
+		<record id="of_res_partner_winterhalter_form" model="ir.ui.view">
+		    <field name="name">of.res.partner.winterhalter.form</field>
+		    <field name="model">res.partner</field>
+		    <field name="inherit_id" ref="base.view_partner_form"/>
+		    <field name="arch" type="xml">
+		        <field name="user_id" position="after">
+                    <field name="of_revendeur"/>
+                    <field name="of_installateur"/>
+                </field>
+                <field name="website" position="after">
+                    <field name="of_payeur_id" attrs="{'invisible': [('parent_id','!=', False)]}"/>
+                </field>
+                <field name="ref" position="replace"/>
+		         <field name="type" position="before">
+		            <field name="ref" string="Compte client" attrs="{'invisible': [('parent_id','!=', False)]}"/>
+		        </field>
+		        <field name="lang" position="after">
+		            <field name="of_ape"/>
+		        </field>
+		    </field>
+		</record>
+
+
+
+<!-- *************************************************** -->        
+<!-- ********* VUE PRODUITS (product.template) ********* -->
+<!-- *************************************************** -->
+
+		<!-- Produits : ajout produit dangereux et poids ADR (poids produit dangereux) -->
+		<record id="of_product_template_winterhalter_form" model="ir.ui.view">
+		    <field name="name">of.product.template.winterhalter.form</field>
+		    <field name="model">product.template</field>
+		    <field name="inherit_id" ref="product.product_template_only_form_view"/>
+		    <field name="arch" type="xml">
+		        <field name="default_code" position="after">
+		        	<field name="of_est_dangereux"/>
+		        </field>
+		        <div name="weight" position="after">
+		        	<field name="of_poids_adr"/>
+		        </div>
+		    </field>
+		</record>
+
+
+<!-- *************************************************** -->        
+<!-- ********************** MENUS ********************** -->
+<!-- *************************************************** -->   
+                
         <!-- Menu OpenService dans barre menu -->
 		<menuitem id="menu_of_openservice" name="OpenService" sequence="0"/>
 		     
@@ -107,7 +213,7 @@
 	        <field name="res_model">project.issue</field>
 	        <field name="view_type">form</field>
 	        <field name="view_mode">tree,kanban,calendar,form,pivot,graph</field>
-	        <field name="view_id" eval="False"/>
+	        <field name="view_id" ref="project_issue.project_issue_tree_view"/>
 	        <field name="domain" eval=""/>
 	        <!-- <field name="search_view_id" ref="view_project_issue_filter"/> -->
 	        <field name="help" type="html">
@@ -190,26 +296,15 @@
 
         <menuitem id="of_menu_product_template_action" parent="menu_of_openservice" action="of_product_template_action" sequence="25"/>
 
-		
-		<!-- insertion Produit installé lié et champs supplémentaires Winterhalter dans SAV -->
-		<record id="of_produit_installe_sav_lie" model="ir.ui.view" >
-		    <field name="name">of.produit_installe.sav.lie</field>
-		    <field name="model">project.issue</field>
-		    <field name="inherit_id" ref="project_issue.project_issue_form_view"/>
-		    <field name="arch" type="xml" >
-		    	<field name="date" position="after">
-		    		<field name="of_type"/>
-		    	</field>
-		        <field name="email_from" position="after">
-		         	<group string="Produit" colspan="4">
-		            	<field name="of_produit_installe_id"/>
-		            </group>
-		        </field>
-		    </field>
-		</record>
-		
+
+<!-- *************************************************** -->        
+<!-- ********************* ACTIONS ********************* -->
+<!-- *************************************************** -->
+
+		<!-- *** Action dans vue SAV (project.issue) *** -->
 		
 		<!-- Lien pour action créer SAV demande d'intervention depuis SAV-->
+		<!-- Objectif : ouvrir un nouveau SAV depuis un SAV "Appel téléphonique" avec les mêmes paramètres mais avec type à "Demande d'intervention" -->
         <record id="action_open_demande_intervention" model="ir.actions.server">
             <field name="name">Effectuer une demande d'intervention</field>
             <field name="model_id" ref="project_issue.model_project_issue"/>
@@ -226,12 +321,14 @@
         </record>
 
 
+		<!-- *** Action dans vue parc installé (of.parc.installe) *** -->
+
 		<!-- Lien pour action créer SAV depuis parc installé-->
         <record id="action_open_creer_sav" model="ir.actions.server">
             <field name="name">Créer un SAV</field>
             <field name="model_id" ref="project_issue.model_project_issue"/>
             <field name="state">code</field>
-            <field name="code">action = self.pool['of.parc.installe'].ouvrir_creer_sav(cr, uid, context)</field>
+            <field name="code">action = self.pool['of.parc.installe'].action_creer_sav(cr, uid, context)</field>
         </record>
 
         <record id="action_create_demande_intervention" model="ir.values">
@@ -241,71 +338,6 @@
             <field name="value" eval="'ir.actions.server,%d'%action_open_creer_sav"/>
             <field name="object" eval="True"/>
         </record>
-
-
-        <!-- Vue partenaire filtre recherche ajout recherche par réf client -->
-        <record id="of_res_partner_filter" model="ir.ui.view">
-            <field name="name">of.res.partner.filter</field>
-            <field name="model">res.partner</field>
-            <field name="type">search</field>
-            <field name="inherit_id" ref="base.view_res_partner_filter"/>
-            <field name="arch" type="xml">
-            	<field name="name" position="after">
-		            <field name="ref" string="Compte client"/>
-				</field>
-            </field>
-        </record>
-        
-		<!-- Ajouter référence client dans liste partenaires -->
-		<record id="of_res_partner_winterhalter_tree" model="ir.ui.view">
-		   	<field name="name">of.res.partner.winterhalter.tree</field>
-		    <field name="model">res.partner</field>
-		    <field name="type">tree</field>
-		    <field name="inherit_id" ref="base.view_partner_tree" />
-		    <field name="arch" type="xml">
-		      	<field name="display_name" position="before">
-		            <field name="ref" string="Compte client"/>
-				</field>
-		    </field>
-		</record>
-		
-		<!-- Mettre revendeur, installateur, payeur, référence client en haut dans formulaire partenaires -->
-		<record id="of_res_partner_winterhalter_form" model="ir.ui.view">
-		    <field name="name">of.res.partner.winterhalter.form</field>
-		    <field name="model">res.partner</field>
-		    <field name="inherit_id" ref="base.view_partner_form"/>
-		    <field name="arch" type="xml">
-		        <field name="user_id" position="after">
-                    <field name="of_revendeur"/>
-                    <field name="of_installateur"/>
-                </field>
-                <field name="website" position="after">
-                    <field name="of_payeur_id" attrs="{'invisible': [('parent_id','!=', False)]}"/>
-                </field>
-                <field name="ref" position="replace"/>
-		         <field name="type" position="before">
-		            <field name="ref" string="Compte client" attrs="{'invisible': [('parent_id','!=', False)]}"/>
-		        </field>
-		        <field name="lang" position="after">
-		            <field name="of_ape"/>
-		        </field>
-		    </field>
-		</record>
-		
-		<!-- Produits : ajout produit dangereux et poids ADR (poids produit dangereux) -->
-		<record id="of_product_template_winterhalter_form" model="ir.ui.view">
-		    <field name="name">of.product.template.winterhalter.form</field>
-		    <field name="model">product.template</field>
-		    <field name="inherit_id" ref="product.product_template_only_form_view"/>
-		    <field name="arch" type="xml">
-		        <field name="default_code" position="after">
-		        	<field name="of_est_dangereux"/>
-		        </field>
-		        <div name="weight" position="after">
-		        	<field name="of_poids_adr"/>
-		        </div>
-		    </field>
-		</record>
 
     </data>
 </openerp>

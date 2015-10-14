@@ -53,8 +53,11 @@ class of_parc_installe(osv.Model):
         'marge': fields.float(u'Marge', help=u"Marge"),
     }
     
-    # Désactiver contrainte car plusieurs no série identique possible _sql_constraints = [('no_serie_uniq', 'unique(name)', 'Ce numéro de série est déjà utilisé et doit être unique.')]
-    def ouvrir_creer_sav(self, cr, uid, context={}):
+    # Désactiver contrainte car plusieurs no série identique possible
+    #_sql_constraints = [('no_serie_uniq', 'unique(name)', 'Ce numéro de série est déjà utilisé et doit être unique.')]
+    
+    
+    def action_creer_sav(self, cr, uid, context={}):
         if not context:
             context = {}
         res = {
@@ -82,7 +85,7 @@ class project_issue(osv.Model):
 
     _columns = {
         'of_produit_installe_id': fields.many2one('of.parc.installe', 'Produit installé', readonly=False),
-        'of_type': fields.selection([('contacttel',u'Contact téléphonique'), ('di',u'Demande d\'intervention')], 'Type', required=False, help=u"Type de SAV"),
+        'of_type': fields.selection([('contacttel',u'Appel assistance téléphonique'), ('di',u'Demande d\'intervention')], 'Type', required=False, help=u"Type de SAV"),
     }
     
     _defaults = {

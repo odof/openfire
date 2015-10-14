@@ -47,14 +47,36 @@
             <field name="type">tree</field>
             <field name="inherit_id" ref="project_issue.project_issue_tree_view"/>
             <field name="arch" type="xml">
+            	<field name="id" position="replace"/>
                 <field name="name" position="before">
                     <field name="of_code"/>
                 </field>
-                <field name="partner_id" position="after">
-<!-- MG                    <field name="shop_id"/> -->
-<!-- Migration 9                    <field name="categ_parent_id" invisible="1"/>
-                    <field name="categ_id" invisible="1"/> -->
+                <field name="name" position="replace">
+                	<field name="name" string="Requête"/>
                 </field>
+                <field name="partner_id" position="replace">
+                	<field name="partner_id" string="Partenaire"/>
+                </field>
+                <field name="priority" position="replace"/>
+                           
+<!-- Migration 9                <field name="partner_id" position="after">
+                    <field name="shop_id"/>
+                    <field name="categ_parent_id" invisible="1"/>
+                    <field name="categ_id" invisible="1"/>
+                </field>
+-->
+				<field name="project_id" position="replace"/>
+				<field name="create_date" position="replace">
+                	<field name="date"/>
+                </field>
+                <field name="date" position="after">
+                    <field name="date_deadline"/>
+                </field>
+                <field name="user_id" position="replace">
+                	 <field name="user_id" string="Responsable"/>
+                	<field name="priority"/>
+               	</field>
+			
             </field>
         </record>
 
@@ -249,7 +271,7 @@
             header="False"
             />
 
-<!-- Lien pour creer devis -->
+<!-- Lien pour créer devis -->
 
         <record id="action_open_sale_order" model="ir.actions.server">
             <field name="name">Générer devis client</field>

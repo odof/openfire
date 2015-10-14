@@ -29,7 +29,6 @@ import copy
 class project_issue(osv.Model):
     """ Helpdesk Cases """
     
-    _name = "project.issue"
     _description = "Helpdesk"
     _inherit = 'project.issue'
     _rec_name = 'of_code'
@@ -170,6 +169,8 @@ class project_issue(osv.Model):
         'of_code'              : lambda self, cr, uid, context: self.pool['ir.sequence'].get(cr, uid, 'of.project.issue'),
         # MG 'show_partner_shop' : False,
     }
+    
+    _order = "date desc"
 
     # Quand on clique sur le bouton "Ouvrir" dans la liste des SAV pour aller sur le SAV
     def button_open_of_sav(self, cr, uid, ids, *args):
