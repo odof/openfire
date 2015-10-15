@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+
+        <!-- Remplir le champ canal avec les valeurs par défaut -->
+
+        <record id="issue_canal_tel" model="of.project.issue.canal">
+            <field name="name">Téléphone</field>
+        </record>
+        <record id="issue_canal_courriel" model="of.project.issue.canal">
+            <field name="name">Courriel</field>
+        </record>
+        <record id="issue_canal_courrier" model="of.project.issue.canal">
+            <field name="name">Courrier</field>
+        </record>
+        <record id="issue_canal_rencontre" model="of.project.issue.canal">
+            <field name="name">Rencontre directe</field>
+        </record>        
+
+    </data>
+</openerp>

@@ -52,6 +52,7 @@
     "data" : [
         # MG 'security/ir.model.access.csv',
         'of_project_issue.xml',
+        'data/of_project_issue_canal_data.xml'
     ],
     "installable": True,
     'active': False,
