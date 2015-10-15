@@ -91,11 +91,11 @@
                 </field>
                 <field name="user_id" position="before">
                 	<field name="date"/>
-                	<field name="of_categorie"/>
+                	<field name="of_categorie_id"/>
                 	<field name="date_deadline"/>
                 </field>
                 <field name="email_from" position="after">
-                	<field name="of_canal"/>
+                	<field name="of_canal_id"/>
                 </field>
                 <field name="project_id" position="attributes">
                 	<attribute name="invisible">1</attribute>

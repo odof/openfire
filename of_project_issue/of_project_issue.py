@@ -27,27 +27,6 @@ import base64
 import copy
 
 
-# class crm_case_categ(osv.osv):
-#     """ Category of Case """
-#     _name = "crm.case.categ"
-#     _description = "Category of Case"
-#     _columns = {
-#         'name': fields.char('Name', required=True, translate=True),
-#         'section_id': fields.many2one('crm.case.section', 'Sales Team'),
-#         'object_id': fields.many2one('ir.model', 'Object Name'),
-#     }
-# 
-#     def _find_object_id(self, cr, uid, context=None):
-#         """Finds id for case object"""
-#         context = context or {}
-#         object_id = context.get('object_id', False)
-#         ids = self.pool.get('ir.model').search(cr, uid, ['|', ('id', '=', object_id), ('model', '=', context.get('object_name', False))])
-#         return ids and ids[0] or False
-#     _defaults = {
-#         'object_id': _find_object_id
-#     }
-
-
 class project_issue(osv.Model):
     """ Helpdesk Cases """
     
@@ -164,8 +143,8 @@ class project_issue(osv.Model):
         'of_code'               : fields.char('Code', size=64, required=True, readonly=True, select=True), # Migration 9 states={'draft': [('readonly', False)]}, 
         'partner_note'          : fields.related('partner_id', 'comment', string="Note client", type='text', readonly=False),
         'invoice_ids'           : fields.function(_get_partner_invoices, string='Factures du client', method=True, type="one2many", obj='account.invoice', readonly=True),
-        'of_categorie'             : fields.many2one('of.project.issue.categorie', u'Catégorie', required=False, ondelete='restrict'),
-        'of_canal'                 : fields.many2one('of.project.issue.canal', u'Canal', required=False, ondelete='restrict'),
+        'of_categorie_id'       : fields.many2one('of.project.issue.categorie', u'Catégorie', required=False, ondelete='restrict'),
+        'of_canal_id'           : fields.many2one('of.project.issue.canal', u'Canal', required=False, ondelete='restrict'),
         'of_garantie'           : fields.boolean('Garantie'),
         'of_payant_client'      : fields.boolean('Payant client'),
         'of_payant_fournisseur' : fields.boolean('Payant fournisseur'),

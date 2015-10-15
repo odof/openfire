@@ -82,23 +82,22 @@
         <td>Priorité</td>
         <td><para style="terp_default_9">[[ get_priority(o.priority) ]]</para></td>
         <td>Catégorie</td>
-        <td><para style="terp_default_9">[[ o.categ_id and o.categ_id.name or '' ]]</para></td>
+        <td><para style="terp_default_9">[[ o.of_categorie_id and o.of_categorie_id.name or '' ]]</para></td>
       </tr>
       <tr>
         <td>État</td>
         <td><para style="terp_default_9">[[ state_translate(o.stage_id.name) ]]</para></td>
         <td>Canal</td>
-        <td><para style="terp_default_9">[[ o.channel_id and o.channel_id.name or '' ]]</para></td>
+        <td><para style="terp_default_9">[[ o.of_canal_id and o.of_canal_id.name or '' ]]</para></td>
       </tr>
       <tr>
-        <td>Description</td>
+        <td>[[ o._columns['description'].string ]]</td>
         <td><para style="terp_default_9">[[ o.description or '' ]]</para></td>
         <td></td>
         <td></td>
       </tr>
       <tr>
-        <td>Pièces à
-commander</td>
+        <td>[[ o._columns['of_piece_commande'].string ]]</td>
         <td><para style="terp_default_9">[[ o.of_piece_commande or '' ]]</para></td>
         <td></td>
         <td></td>

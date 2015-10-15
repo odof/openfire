@@ -100,8 +100,8 @@
 		    		<field name="of_type"/>
 		    	</field>
 		    	<xpath expr='//form/sheet/group' position="after">
-		            <group string="Produit" colspan="4">
-		            	<field name="of_produit_installe_id"/>
+		            <group string="Produit installé" colspan="4">
+		            	<field name="of_produit_installe_id" string="No de série"/>
 		            	<field name="product_name_id"/>
 		            	<field name="product_category_id"/>
 		            </group>
