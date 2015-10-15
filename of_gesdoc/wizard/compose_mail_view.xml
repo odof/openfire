@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        
+        <!-- wizard for sending a mail: first step -->
+        <record id="view_courrier_wizard" model="ir.ui.view">
+            <field name="name">Envoyer un mailing</field>
+            <field name="model">of.compose.mail</field>
+            <field name="arch" type="xml">
+                <form string="Envoyer un Courrier">
+                    <group>
+                        <separator string="Envoyer un Courrier" colspan="2"/>
+                        <field name="lettre_id"/>
+                        <field name="date_paie"/>
+                        <field name="amount_acompte" />
+                    </group>
+                    <footer>
+                        <button icon='gtk-stop' special="cancel" string="Annuler"/>
+                        <button name="get_lettre" string="Valider" type="object" icon="gtk-apply" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- wizard for sending a mail: second step -->
+        <record id="view_courrier_wizard2" model="ir.ui.view">
+            <field name="name">Envoyer un mailing</field>
+            <field name="model">of.compose.mail</field>
+            <field name="arch" type="xml">
+                <form string="Envoyer un Courrier">
+                    <group>
+                        <separator string="Envoyer un Courrier" colspan="4"/>
+                        <field name="name" string="Libellé" required="1"/>
+                        <separator colspan="4" string="Contenu"/>
+                        <field name="content" colspan="4" nolabel="1" required="1"/>
+                        <separator string="" colspan="4"/>
+                        <group colspan="4" col="6">
+                            <button icon='gtk-stop' special="cancel" string="Annuler"/>
+                            <button name="print_report" string="Imprimer" type="object" icon="gtk-print"/>
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <!-- wizard for sending a mail: second step, with pdf file -->
+        <record id="view_courrier_wizard2_file" model="ir.ui.view">
+            <field name="name">Envoyer un mailing</field>
+            <field name="model">of.compose.mail</field>
+            <field name="arch" type="xml">
+                <form string="Envoyer un Courrier">
+                    <group>
+                        <group invisible="1">
+                            <field name="file_name"/>
+                            <field name="file_url"/>
+                            <field name="len_chp_tmp"/>
+                            <field name="res_file_name"/>
+                        </group>
+                        <separator string="Envoyer un Courrier" colspan="4"/>
+                        <field name="name" string="Libellé" required="1"/>
+                        <field name="file" filename="file_name" readonly="1"/>
+                        <label for="res_file" class="oe_tz_warning" attrs="{'invisible': [('res_file','=',False)]}"/>
+                        <field name="res_file" nolabel="1" filename="res_file_name" attrs="{'invisible': [('res_file','=',False)]}"/>
+                        <field name="chp_tmp_ids" nolabel="1" colspan="2" on_change="onchange_chp_tmp(chp_tmp_ids, len_chp_tmp)">
+                            <tree string="Champs PDF" editable="bottom">
+                                <field name="name"/>
+                                <field name="value_openfire"/>
+                            </tree>
+                        </field>
+                        <separator string="" colspan="2"/>
+                    </group>
+                    <footer>
+                        <button icon='gtk-stop' special="cancel" string="Terminer"/>
+                        <button name="print_report_acrobat" string="Générer Fichier PDF" type="object" icon="gtk-print"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <act_window
+            name="Envoyer un courrier"
+            res_model="of.compose.mail"
+            src_model="res.partner"
+            view_mode="form"    
+            key2="client_print_multi"
+            view_id="view_courrier_wizard"
+            id="action_view_courrier_wizard"
+            target="new"        
+            context="{'model':'res.partner'}"
+        />
+        
+        <act_window
+            name="Envoyer un courrier"
+            res_model="of.compose.mail"
+            src_model="sale.order"
+            view_mode="form"    
+            key2="client_print_multi"
+            view_id="view_courrier_wizard"
+            id="action_view_courrier_wizard_sale"
+            target="new"        
+            context="{'model':'sale.order'}"
+        />
+        
+        <!-- <act_window
+            name="Envoyer un courrier"
+            res_model="of.compose.mail"
+            src_model="crm.lead"
+            view_mode="form"    
+            key2="client_print_multi"
+            view_id="view_courrier_wizard"
+            id="action_view_courrier_wizard_crm"
+            context="{'model':'crm.lead'}"
+        /> -->
+        
+         <act_window
+            name="Envoyer un courrier"
+            res_model="of.compose.mail"
+            src_model="account.invoice"
+            view_mode="form"    
+            key2="client_print_multi"
+            view_id="view_courrier_wizard"
+            id="action_view_courrier_wizard_account"
+            target="new"        
+            context="{'model':'account.invoice'}"
+        />
+            
+
+    </data>
+</openerp>  

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+
+        <!-- page for creating a mail template -->
+        <record model="ir.ui.view" id="of_mail_template_form">
+            <field name="name">of.mail.template.form</field>
+            <field name="model">of.mail.template</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Templates">
+                    <group colspan="4" col="6">
+                        <field name="name" required="1"/>
+                        <field name="model_id" required="1"/>
+                    </group>
+                    <notebook colspan="4">
+                        <page string="Détails des lettres">
+                            <group col="6" colspan="2">
+                                <separator string="Options" colspan="6"/>
+                                <field name="active" required="1" />
+                                <field name="sans_add" />
+                                <field name="sans_header" />
+                            </group>
+                            <newline></newline>
+                            <group col="2" colspan="6">
+                                <field name="imp_cgv" />
+                            </group>
+                            <newline></newline>
+                            <group colspan="2" col="4">
+                                <separator string="Importer un formulaire Acrobat" colspan="4"/>
+                                <field name="file_name" invisible="1"/>
+                                <field name="file" filename="file_name" on_change="onchange_file(file)" colspan="4"/>
+                                <field name="file_url" invisible="1"/>
+                                <field name="file_url_dis" colspan="4"/>
+                                <field name="len_chp" invisible="1"/>
+                                <field name="chp_ids" nolabel="1" on_change="onchange_chp(chp_ids, len_chp)" colspan="4">
+                                    <tree string="Champs" editable="bottom">
+                                        <field name="name"/>
+                                        <field name="value_openfire"/>
+                                    </tree>
+                                </field>
+                            </group>
+                            <group col="2" colspan="4" attrs="{'invisible': [('file','!=',False)]}">
+                                <separator colspan="2" string="Contenu"/>
+                                <notebook  colspan="2">
+                                    <page string="Contenu texte">
+                                        <field name="body_text" nolabel="1"/>
+                                    </page>
+                                </notebook>
+                            </group>
+                        </page>
+                       
+                    </notebook>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="of_mail_template_tree">
+            <field name="name">of.mail.template.tree</field>
+            <field name="model">of.mail.template</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Templates">
+                    <field name="name"/>
+                    <field name="model_id"/>
+                    <field name="active" />
+                    <field name="sans_add" />
+                    <field name="sans_header" />
+                </tree>
+            </field>
+        </record>
+
+        <!-- page for searching a mail template -->
+        <record id="view_of_mail_template_search" model="ir.ui.view">
+           <field name="name">of.mail.template.search</field>
+           <field name="model">of.mail.template</field>
+           <field name="type">search</field>
+           <field name="arch" type="xml">
+               <search string="Templates">
+                    <group>
+                        <field name="name"/>
+                        <field name="model_id"/>
+                        <separator orientation="vertical"/>
+                    </group>
+                    <newline/>
+                    <group expand="0" string="Regrouper par...">
+                        <filter string="Model" domain="[]" context="{'group_by':'model_id'}" icon="terp-accessories-archiver"/>
+                    </group>
+               </search>
+           </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_of_mail_template_tree_all">
+            <field name="name">Modèles de courriers</field>
+            <field name="res_model">of.mail.template</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+            <field name="view_id" ref="of_mail_template_tree" />
+            <field name="search_view_id" ref="view_of_mail_template_search"/>
+        </record>
+
+        <!-- add menu item 'Modèles de courriers' for mail templates' configurations in Ventes-->
+        <menuitem id="menu_of_mail_templates" parent="base.menu_sale_config" action="action_of_mail_template_tree_all"
+                  sequence="100"/>
+        
+        <!-- add menu item 'Modèles de courriers' for mail templates' configurations in Comptabilité-->          
+        <menuitem id="menu_of_mail_templates_compt" parent="account.menu_finance_configuration" action="action_of_mail_template_tree_all"
+                  sequence="100"/>          
+
+    </data>
+</openerp>

@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<document filename="courrier.pdf">
+  <template title="Courrier" author="OpenFire" allowSplitting="20">
+    <pageTemplate id="first">
+      <frame id="first" x1="15.0" y1="42.0" width="539" height="728"/>
+    </pageTemplate>
+  </template>
+  <stylesheet>
+    <blockTableStyle id="Table1">
+      <blockAlignment value="LEFT"/>
+      <blockValign value="TOP"/>
+    </blockTableStyle>
+    <blockTableStyle id="Table2">
+      <blockAlignment value="LEFT"/>
+      <blockValign value="TOP"/>
+    </blockTableStyle>
+    <initialize>
+      <paraStyle name="all" alignment="justify"/>
+    </initialize>
+    <paraStyle name="header" fontName="Helvetica-Bold" fontSize="16.0" leading="20" alignment="CENTER" spaceBefore="6.0" spaceAfter="6.0"/>
+    <paraStyle name="default" fontName="Helvetica" fontSize="10.0" leading="14" alignment="LEFT" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_10" fontName="Helvetica" fontSize="10.0" leading="12" alignment="LEFT" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_bold" fontName="Helvetica-Bold" fontSize="12.0" leading="14" alignment="LEFT" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_14_bold" fontName="Helvetica-Bold" fontSize="14.0" leading="18" alignment="LEFT" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_8" fontName="Helvetica" fontSize="8.0" leading="10" alignment="LEFT" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_3" fontName="Helvetica" fontSize="3.0" leading="3" alignment="LEFT" spaceBefore="0.0" spaceAfter="0.0"/>
+    <paraStyle name="default_centre" fontName="Helvetica" fontSize="12.0" leading="16" alignment="CENTER" spaceBefore="3.0" spaceAfter="3.0"/>
+  </stylesheet>
+  <images/>
+  <story>
+    <para style="default_3">[[repeatIn(objects,'o')]]</para>
+    <para style="default_3">[[setCompany(o.company_id)]]</para>
+    <para style="default_3">[[ setLang(o.lang) ]]</para>
+    <pto>
+    <pto_header>
+        <para style="terp_default_8">
+          <font color="white"> </font>
+        </para>
+        <para style="terp_default_8">
+          <font color="white"> </font>
+        </para>
+        <para style="terp_default_8">
+          <font color="white"> </font>
+        </para>
+        <para style="terp_default_8">
+          <font color="white"> </font>
+        </para>
+    </pto_header>
+    <blockTable colWidths="271.0,250.0,15.0" style="Table1">
+      <tr>
+        <td>
+          <para style="default_3">[[repeatIn(adr_get(o),'addr')]]</para>
+        </td>
+        <td>
+          <para style="default_10">[[ addr['title'] or '' ]] [[ o.name or '' ]]</para>
+          <para style="default_10">[[ addr['street'] or '' ]]</para>
+          <para style="default_10">[[ addr['street2'] or '' ]]</para>
+          <para style="default_10">[[ addr['zip'] or '' ]] [[ addr['city'] or '' ]]</para>
+          <para style="default"><font color="white"> </font></para>
+          <para style="default_10">[[ o.company_id.partner_id.city ]], le [[ time.strftime("%d/%m/%Y", time.localtime()) ]]</para>
+        </td>
+        <td></td>
+      </tr>
+    </blockTable>
+    <para style="default">
+      <font color="white"> </font>
+    </para>
+    <para style="default">
+      <font color="white"> </font>
+    </para>
+    <xpre style="default">[[ data['form']['content'].replace('\r\n', '\n') ]]</xpre>
+    </pto>
+  </story>
+</document>

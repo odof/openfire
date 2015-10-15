@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<document filename="courrier.pdf">
+  <template title="Courrier" author="OpenFire" allowSplitting="20">
+    <pageTemplate id="first">
+      <frame id="first" x1="15.0" y1="42.0" width="539" height="728"/>
+    </pageTemplate>
+  </template>
+  <stylesheet>
+    <blockTableStyle id="Table1">
+      <blockAlignment value="LEFT"/>
+      <blockValign value="TOP"/>
+    </blockTableStyle>
+    <blockTableStyle id="Table2">
+      <blockAlignment value="LEFT"/>
+      <blockValign value="TOP"/>
+    </blockTableStyle>
+    <initialize>
+      <paraStyle name="all" alignment="justify"/>
+    </initialize>
+    <paraStyle name="header" fontName="Helvetica-Bold" fontSize="16.0" leading="20" alignment="CENTER" spaceBefore="6.0" spaceAfter="6.0"/>
+    <paraStyle name="default" fontName="Helvetica" fontSize="10.0" leading="14" alignment="LEFT" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_bold" fontName="Helvetica-Bold" fontSize="12.0" leading="14" alignment="LEFT" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_14_bold" fontName="Helvetica-Bold" fontSize="14.0" leading="18" alignment="LEFT" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_8" fontName="Helvetica" fontSize="8.0" leading="10" alignment="LEFT" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_centre" fontName="Helvetica" fontSize="12.0" leading="16" alignment="CENTER" spaceBefore="3.0" spaceAfter="3.0"/>
+  </stylesheet>
+  <images/>
+  <story>
+    <para style="default_8">[[ repeatIn(objects,'o') ]]</para>
+    <para style="default_8">[[ setLang(o.lang) ]] [[ setCompany(o.company_id) ]]</para>
+    <pto>
+    <xpre style="default">[[ data['form']['content'].replace('\r\n', '\n') ]]</xpre>
+    </pto>
+  </story>
+</document>
