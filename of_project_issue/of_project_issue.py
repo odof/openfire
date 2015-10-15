@@ -26,6 +26,28 @@ import time
 import base64
 import copy
 
+
+# class crm_case_categ(osv.osv):
+#     """ Category of Case """
+#     _name = "crm.case.categ"
+#     _description = "Category of Case"
+#     _columns = {
+#         'name': fields.char('Name', required=True, translate=True),
+#         'section_id': fields.many2one('crm.case.section', 'Sales Team'),
+#         'object_id': fields.many2one('ir.model', 'Object Name'),
+#     }
+# 
+#     def _find_object_id(self, cr, uid, context=None):
+#         """Finds id for case object"""
+#         context = context or {}
+#         object_id = context.get('object_id', False)
+#         ids = self.pool.get('ir.model').search(cr, uid, ['|', ('id', '=', object_id), ('model', '=', context.get('object_name', False))])
+#         return ids and ids[0] or False
+#     _defaults = {
+#         'object_id': _find_object_id
+#     }
+
+
 class project_issue(osv.Model):
     """ Helpdesk Cases """
     
@@ -140,8 +162,10 @@ class project_issue(osv.Model):
 
     _columns = {
         'of_code'               : fields.char('Code', size=64, required=True, readonly=True, select=True), # Migration 9 states={'draft': [('readonly', False)]}, 
-        'partner_note'       : fields.related('partner_id', 'comment', string="Note client", type='text', readonly=False),
-        'invoice_ids'        : fields.function(_get_partner_invoices, string='Factures du client', method=True, type="one2many", obj='account.invoice', readonly=True),
+        'partner_note'          : fields.related('partner_id', 'comment', string="Note client", type='text', readonly=False),
+        'invoice_ids'           : fields.function(_get_partner_invoices, string='Factures du client', method=True, type="one2many", obj='account.invoice', readonly=True),
+        'of_categorie'             : fields.many2one('of.project.issue.categorie', u'Catégorie', required=False, ondelete='restrict'),
+        'of_canal'                 : fields.many2one('of.project.issue.canal', u'Canal', required=False, ondelete='restrict'),
         'of_garantie'           : fields.boolean('Garantie'),
         'of_payant_client'      : fields.boolean('Payant client'),
         'of_payant_fournisseur' : fields.boolean('Payant fournisseur'),
@@ -184,7 +208,17 @@ class project_issue(osv.Model):
                 'res_id': sav_id,
                 'type': 'ir.actions.act_window',
             }
-
+    
+    
+    
+#     def on_change_project(self, cr, uid, ids, project_id, context=None):
+#          if project_id:
+#              project = self.pool.get('project.project').browse(cr, uid, project_id, context=context)
+#              if project and project.partner_id:
+#                  return {'value': {'partner_id': project.partner_id.id}}
+#          return {'value': {'partner_id': False}}
+#     
+    
     # Migration ok
     def onchange_shop_id(self, cr, uid, ids, shop_id, partner_shop_id):
         return {'value': {'show_partner_shop': shop_id != partner_shop_id}}
@@ -559,6 +593,23 @@ class project_issue(osv.Model):
 #         res = self.name_get(cr, access_rights_uid, ids, context)
 #         return res
 
+
+# Catégorie de SAV
+class of_project_issue_categorie(osv.Model):
+    _name = "of.project.issue.categorie"
+    
+    _columns = {
+        'name': fields.char(u'Catégorie', size=32),
+    }
+
+# Canal SAV
+class of_project_issue_canal(osv.Model):
+    _name = "of.project.issue.canal"
+    
+    _columns = {
+        'name': fields.char(u'Catégorie', size=32),
+    }
+   
 
 # Migration ok
 class of_sav_docs(osv.TransientModel):

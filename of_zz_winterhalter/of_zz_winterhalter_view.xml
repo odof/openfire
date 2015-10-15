@@ -99,11 +99,11 @@
 		    	<field name="date" position="after">
 		    		<field name="of_type"/>
 		    	</field>
-		        <field name="email_from" position="after">
-		         	<group string="Produit" colspan="4">
+		    	<xpath expr='//form/sheet/group' position="after">
+		            <group string="Produit" colspan="4">
 		            	<field name="of_produit_installe_id"/>
 		            </group>
-		        </field>
+		        </xpath>
 		    </field>
 		</record>
 
