@@ -156,7 +156,7 @@ class product_template(osv.Model):
     _columns = {
         'of_est_dangereux': fields.boolean(u'Produit dangereux', help=u"Cocher cette case si ce produit est dangereux."),
         'of_poids_adr': fields.float(u'Poids ADR', help=u"Poids ADR"),
-        'of_pas_dans_sage': fields.boolean(u'Pas_dans Sage', help=u"Si ce produit n'est pas dans Sage."),
+        'of_pas_dans_sage': fields.boolean(u'Pas dans Sage', help=u"Si ce produit n'est pas dans Sage."),
     }
     
  

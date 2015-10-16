@@ -205,6 +205,11 @@
                 
         <!-- Menu OpenService dans barre menu -->
 		<menuitem id="menu_of_openservice" name="OpenService" sequence="0"/>
+		
+		<menuitem id="of_sous-menu_openservice" name="OpenService" parent="menu_of_openservice" sequence="5"/>
+		<!-- Menu configuration catégories de produits -->
+		<menuitem id="of_menu_config_openservice" name="Configuration" parent="menu_of_openservice" sequence="100" groups="stock.group_stock_manager"/>
+		
 		     
 		<!-- Action vue parc installé -->
 		<record id="action_view_of_parc_installe" model="ir.actions.act_window">
@@ -219,7 +224,7 @@
 
 		<!-- Menu parc installé -->
 		<menuitem id="menu_of_parc_installe" action="action_view_of_parc_installe" name="Parc installé" 
-		     parent="menu_of_openservice" sequence="10"/>
+		     parent="of_sous-menu_openservice" sequence="10"/>
 		     <!-- parent="base.menu_aftersale" groups="base.group_extended,base.group_sale_salesman" -->
 
 
@@ -241,7 +246,7 @@
 	        </field>
 	    </record>
 
-		<menuitem id="of_menu_project_issue_track"  parent="menu_of_openservice" action="of_project_issue_categ_act0" sequence="5"/>
+		<menuitem id="of_menu_project_issue_track"  parent="of_sous-menu_openservice" action="of_project_issue_categ_act0" sequence="5"/>
 
 
 		<!-- Menu Fournisseurs : on affiche ceux dont le champ supplier est vrai -->
@@ -286,13 +291,13 @@
             </field>
         </record>
         
-        <menuitem id="of_menu_partner_form" parent="menu_of_openservice" action="of_action_partner_form" sequence="15"/>
-        <menuitem id="of_menu_partner_supplier_form" parent="menu_of_openservice" action="of_action_partner_supplier_form" sequence="20"/>
+        <menuitem id="of_menu_partner_form" parent="of_sous-menu_openservice" action="of_action_partner_form" sequence="15"/>
+        <menuitem id="of_menu_partner_supplier_form" parent="of_sous-menu_openservice" action="of_action_partner_supplier_form" sequence="20"/>
 
 
-		<!-- Menu Produits -->
+		<!-- Menu Articles -->
 		<record id="of_product_template_action" model="ir.actions.act_window">
-            <field name="name">Produits</field>
+            <field name="name">Articles</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">product.template</field>
             <field name="view_mode">tree,kanban,form</field>
@@ -310,7 +315,24 @@
             </field>
         </record>
 
-        <menuitem id="of_menu_product_template_action" parent="menu_of_openservice" action="of_product_template_action" sequence="25"/>
+		<menuitem id="of_menu_product_template_action" parent="of_sous-menu_openservice" action="of_product_template_action" sequence="25"/>
+		
+		
+	
+        <record id="of_product_category_action_form" model="ir.actions.act_window">
+            <field name="name">Catégories d'articles</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.category</field>
+            <field name="view_type">form</field>
+<!--             <field name="search_view_id" ref="product.product_category_search_view"/>
+            <field name="view_id" ref="product.product_category_list_view"/> -->
+        </record>
+        
+        <menuitem action="of_product_category_action_form"
+            groups="stock.group_stock_manager"
+            id="menu_of_product_category_action_form"
+            parent="of_menu_config_openservice" sequence="2"/>
+
 
 
 <!-- *************************************************** -->        
