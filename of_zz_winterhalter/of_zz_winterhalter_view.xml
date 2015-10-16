@@ -163,7 +163,7 @@
 		        <group name="sav" position="replace">
 	                <field name="project_issue_ids" nolabel="1" context="{'default_partner_id':id}">
 	                    <tree string="SAV">
-	                        <field name="of_code" string="No dossier"/>
+	                        <field name="of_code" string="Dossier"/>
 	                        <field name="date"/>
 	                        <field name="name" string="Requête"/>
 	                        <field name="of_categorie_id" string="Famille"/>
