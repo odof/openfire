@@ -113,7 +113,7 @@
                 </field>
                 <field name="description" position="replace">
                 	<group>
-                		<field name="description" string="Description" placeholder="Ajouter une note interne ..." groups="base.group_user"/>
+                		<field name="description" placeholder="Ajouter une note interne ..." groups="base.group_user"/>
                     	<field name="of_piece_commande"/>
                     	<field name="of_intervention"/>
                     </group>
@@ -361,18 +361,20 @@
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
 	            <page name="historique" position="inside">
-                    <field name="project_issue_ids" nolabel="1" context="{'default_partner_id':id}">
-                        <tree string="SAV">
-                            <field name="of_code"/>
-                            <field name="name"/>
-                            <field name="date"/>
-                            <field name="date_deadline"/>
-                            <field name="user_id"/>
-                            <field name="priority"/>
-                            <!-- Migration 9 <field name="state"/> -->
-                            <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
-                        </tree>
-                    </field>
+	            	<group name="sav" string="SAV">
+	                    <field name="project_issue_ids" nolabel="1" context="{'default_partner_id':id}">
+	                        <tree string="SAV">
+	                            <field name="of_code"/>
+	                            <field name="name"/>
+	                            <field name="date"/>
+	                            <field name="date_deadline"/>
+	                            <field name="user_id"/>
+	                            <field name="priority"/>
+	                            <!-- Migration 9 <field name="state"/> -->
+	                            <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
+	                        </tree>
+	                    </field>
+                   	</group>
                 </page>
             </field>
         </record>

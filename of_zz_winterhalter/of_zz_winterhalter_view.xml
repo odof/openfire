@@ -160,6 +160,20 @@
 		        <field name="lang" position="after">
 		            <field name="of_ape"/>
 		        </field>
+		        <group name="sav" position="replace">
+	                <field name="project_issue_ids" nolabel="1" context="{'default_partner_id':id}">
+	                    <tree string="SAV">
+	                        <field name="of_code" string="No dossier"/>
+	                        <field name="date"/>
+	                        <field name="name" string="Requête"/>
+	                        <field name="of_categorie_id" string="Famille"/>
+	                        <field name="user_id" string="Responsable"/>
+	                        <field name="of_piece_commande"/>
+	                        <field name="stage_id"/>
+	                        <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
+	                    </tree>
+	                </field>
+                </group>
 		    </field>
 		</record>
 
