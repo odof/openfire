@@ -99,6 +99,9 @@
 		    	<field name="date" position="after">
 		    		<field name="of_type"/>
 		    	</field>
+		    	<field name="user_id" position="replace">
+		    		<field name="user_id" string="Responsable"/>
+		    	</field>		    	
 		    	<xpath expr='//form/sheet/group' position="after">
 		            <group string="Produit installé" colspan="4">
 		            	<field name="of_produit_installe_id" string="No de série"/>
@@ -106,6 +109,11 @@
 		            	<field name="product_category_id"/>
 		            </group>
 		        </xpath>
+		        <field name="of_canal_id" position="replace"/>
+		        <field name="of_garantie" position="replace"/>
+		        <field name="partner_id" position="replace">
+		        	<field name="partner_id"  context="{'show_address': True}"/>
+		        </field>
 		    </field>
 		</record>
 
@@ -167,6 +175,7 @@
 	                        <field name="date"/>
 	                        <field name="name" string="Requête"/>
 	                        <field name="of_categorie_id" string="Famille"/>
+	                        <field name="of_produit_installe_id" string="S/N"/>
 	                        <field name="user_id" string="Responsable"/>
 	                        <field name="of_piece_commande"/>
 	                        <field name="stage_id"/>
@@ -318,7 +327,7 @@
 		<menuitem id="of_menu_product_template_action" parent="of_sous-menu_openservice" action="of_product_template_action" sequence="25"/>
 		
 		
-	
+		<!-- Menu configuration catégories d'articles -->
         <record id="of_product_category_action_form" model="ir.actions.act_window">
             <field name="name">Catégories d'articles</field>
             <field name="type">ir.actions.act_window</field>
