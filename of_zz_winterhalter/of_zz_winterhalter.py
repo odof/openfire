@@ -34,6 +34,7 @@ class of_parc_installe(osv.Model):
     _columns={
         'name': fields.char("No de série", size=64, required=False),
         'date_service': fields.date('Date vente', required=False),
+        'date_installation': fields.date('Date d\'installation', required=False),
         'product_id': fields.many2one('product.product', 'Produit', required=True, ondelete='restrict'),
         'client_id': fields.many2one('res.partner', 'Client', required=True, domain="[('parent_id','=',False)]", ondelete='restrict'),
         'site_adresse_id': fields.many2one('res.partner', 'Site installation', required=False, domain="['|',('parent_id','=',client_id),('id','=',client_id)]", ondelete='restrict'),
@@ -51,6 +52,7 @@ class of_parc_installe(osv.Model):
         'chiffre_aff_ht': fields.float('Chiffre d\'affaire HT', help=u"Chiffre d\'affaire HT"),
         'quantite_vendue': fields.float(u'Quantité vendue', help=u"Quantité vendue"),
         'marge': fields.float(u'Marge', help=u"Marge"),
+        'project_issue_ids': fields.one2many('project.issue', 'of_produit_installe_id', 'SAV'),
     }
     
     # Désactiver contrainte car plusieurs no série identique possible
