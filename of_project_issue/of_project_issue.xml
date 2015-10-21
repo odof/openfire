@@ -53,7 +53,7 @@
         </record>
         
         <record model="ir.ui.view" id="of_crm_case_tree_view_helpdesk">
-            <field name="name">CRM - Helpdesk Support Tree</field>
+            <field name="name">SAV Support Tree</field>
             <field name="model">project.issue</field>
             <field name="type">tree</field>
             <field name="inherit_id" ref="project_issue.project_issue_tree_view"/>
