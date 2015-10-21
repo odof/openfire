@@ -134,8 +134,27 @@
 		        <field name="partner_id" position="replace">
 		        	<field name="partner_id"  context="{'show_address': True}"/>
 		        </field>
+		        <field name="of_piece_commande" position="replace">
+		        	<field name="of_actions_realisees"/>
+		        </field>
+		        <field name="of_intervention" position="replace">
+		        	<field name="of_actions_eff"/>
+		        </field>
+		        
 		    </field>
 		</record>
+
+
+		<!-- Rapport Fiche SAV Winterhalter-->
+		<report
+            auto="True" 
+            id="report_of_project_issue_winterhalter"
+            model="project.issue"
+            name="of_project_issue.sav_winterhalter"
+            rml="of_zz_winterhalter/report/sav.rml"
+            string="Fiche SAV Winterhalter"
+            header="False"/>
+
 
 
 <!-- *************************************************** -->        

@@ -90,8 +90,8 @@ class project_issue(osv.Model):
         'of_type': fields.selection([('contacttel',u'Appel assistance téléphonique'), ('di',u'Demande d\'intervention')], 'Type', required=False, help=u"Type de SAV"),
         'product_name_id': fields.related('of_produit_installe_id', 'product_id', 'name', readonly=True, type='char', string=u'Nom'),
         'product_category_id': fields.related('of_produit_installe_id', 'product_id','categ_id', 'name', readonly=True, type='char', string=u'Catégorie'),
-        'of_intervention': fields.text(u'Action à effectuer'), # Existe déjà, pour renommer champ
-        'of_piece_commande': fields.text(u'Actions réalisées'), # Existe déjà, pour renommer champ
+        'of_actions_eff': fields.text(u'Actions à effectuer'),
+        'of_actions_realisees': fields.text(u'Actions réalisées'),
         'description': fields.text(u'Problématique'), # Existe déjà, pour renommer champ
     }
     
