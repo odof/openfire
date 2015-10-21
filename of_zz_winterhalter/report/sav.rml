@@ -1,0 +1,159 @@
+<?xml version="1.0"?>
+<document filename="report_sav.pdf">
+  <template title="SAV" allowSplitting="20">
+    <pageTemplate id="first">
+      <frame id="first" x1="26.0" y1="42.0" width="539" height="758"/>
+    </pageTemplate>
+  </template>
+  <stylesheet>
+
+    <blockTableStyle id="Table1">
+      <blockAlignment value="LEFT"/>
+      <blockValign value="MIDDLE"/>
+      <lineStyle kind="GRID" colorName="black" thickness="1"/>
+      <blockSpan start="1,0" stop="3,0"/>
+      <blockSpan start="1,1" stop="3,1"/>
+      <blockSpan start="1,5" stop="3,5"/>
+      <blockSpan start="1,6" stop="3,6"/>
+      <blockSpan start="1,7" stop="3,7"/>
+      <blockFont name="Helvetica" size="9.0"/>
+      <blockFont name="Helvetica-Bold" start="0,0" stop="0,7"/>
+      <blockFont name="Helvetica-Bold" start="2,2" stop="2,4"/>
+    </blockTableStyle>
+
+    <blockTableStyle id="Table2">
+      <blockAlignment value="LEFT"/>
+      <blockValign value="MIDDLE"/>
+      <lineStyle kind="GRID" colorName="black" thickness="1"/>
+      <blockFont  name="Helvetica" size="9.0"/>
+      <blockFont name="Helvetica-Bold" start="0,0" stop="0,1"/>
+      <blockFont name="Helvetica-Bold" start="2,0" stop="2,1"/>
+    </blockTableStyle>
+
+    <blockTableStyle id="Table3">
+      <blockAlignment value="LEFT"/>
+      <blockValign value="TOP"/>
+      <lineStyle kind="LINEABOVE" colorName="#000000" start="0,0" stop="-1,0"/>
+    </blockTableStyle>
+
+    <blockTableStyle id="Table4">
+      <blockAlignment value="LEFT"/>
+      <blockValign value="TOP"/>
+      <!-- <lineStyle kind="LINEABOVE" colorName="#000000" start="0,0" stop="-1,0"/> -->
+    </blockTableStyle>
+     
+    <initialize>
+      <paraStyle name="all" alignment="justify"/>
+    </initialize>
+    <paraStyle name="terp_tblheader" fontName="Helvetica-Bold" fontSize="12.0" leading="11" alignment="CENTER" spaceBefore="6.0" spaceAfter="24.0"/>
+    <paraStyle name="terp_default_Bold_12" fontName="Helvetica-Bold" fontSize="12.0" leading="13" alignment="LEFT" spaceBefore="18.0" spaceAfter="6.0"/>
+    <paraStyle name="terp_default_8" fontName="Helvetica" fontSize="8.0" leading="10" alignment="LEFT" spaceBefore="0.0" spaceAfter="0.0"/>
+    <paraStyle name="terp_default_9" fontName="Helvetica" fontSize="9.0" leading="11" alignment="LEFT" spaceBefore="0.0" spaceAfter="0.0"/>
+    <paraStyle name="terp_default_6" fontName="Helvetica" fontSize="6.0" leading="6" alignment="LEFT" spaceBefore="0.0" spaceAfter="0.0"/>
+    <paraStyle name="terp_default_1_2" fontName="Helvetica" fontSize="1.0" leading="1" alignment="LEFT" spaceBefore="0.0" spaceAfter="0.0" textColor="white"/>
+  </stylesheet>
+  <story>
+  <pto>
+  <para style="terp_default_8">[[ repeatIn(objects, 'o') ]]</para>
+  <para style="terp_default_8">[[ setLang(o.partner_id.lang) ]]</para>
+  <para style="terp_tblheader">Support technique [[ get_company_name(o, user) ]] - [[ o.of_code ]] au [[ formatLang(maintenant(), date=True) ]]</para>
+
+  <blockTable colWidths="90.0, 175.0, 90.0, 176.0" style="Table1">
+      <tr>
+        <td>Client</td>
+        <td><para style="terp_default_9">[[ get_client_info(o.partner_id) ]]
+        [[ get_client_tel(o.partner_id) ]]
+        [[ o.email_from ]]</para></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Requête</td>
+        <td><para style="terp_default_9">[[ o.name ]]</para></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Date</td>
+        <td><para style="terp_default_9">[[ o.date and (str(o.date) != '') and formatLang(o.date, date=True) or '' ]]</para></td>
+        <td>Échéance</td>
+        <td><para style="terp_default_9">[[ o.date_deadline and (str(o.date_deadline) != '') and formatLang(o.date_deadline, date=True) or '' ]]</para></td>
+      </tr>
+      <tr>
+        <td>Priorité</td>
+        <td><para style="terp_default_9">[[ get_priority(o.priority) ]]</para></td>
+        <td>Catégorie</td>
+        <td><para style="terp_default_9">[[ o.of_categorie_id and o.of_categorie_id.name or '' ]]</para></td>
+      </tr>
+      <tr>
+        <td>État</td>
+        <td><para style="terp_default_9">[[ state_translate(o.stage_id.name) ]]</para></td>
+        <td>Canal</td>
+        <td><para style="terp_default_9">[[ o.of_canal_id and o.of_canal_id.name or '' ]]</para></td>
+      </tr>
+      <tr>
+        <td>[[ o._columns['description'].string ]]</td>
+        <td><para style="terp_default_9">[[ o.description or '' ]]</para></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>[[ o._columns['of_actions_realisees'].string ]]</td>
+        <td><para style="terp_default_9">[[ o.of_actions_realisees or '' ]]</para></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>[[ o._columns['of_actions_eff'].string ]]</td>
+        <td><para style="terp_default_9">[[ o.of_actions_eff or '' ]]</para></td>
+        <td></td>
+        <td></td>
+      </tr>
+  </blockTable>
+
+  <blockTable colWidths="90.0, 175.0, 90.0, 176.0" style="Table2">
+      <tr>
+        <td>Garantie</td>
+        <td><para style="terp_default_9">[[ o.of_garantie and (o.of_garantie == True) and 'Oui' or 'Non' ]]</para></td>
+        <td>Payant client</td>
+        <td>[[ o.of_payant_client and (o.of_payant_client == True) and 'Oui' or 'Non' ]]</td>
+      </tr>
+      <tr>
+        <td>Responsable</td>
+        <td>[[ o.user_id and o.user_id.name or '' ]]</td>
+        <td>Payant fournisseur</td>
+        <td>[[ o.of_payant_fournisseur and (o.of_payant_fournisseur == True) and 'Oui' or 'Non' ]]</td>
+      </tr>
+  </blockTable>
+
+  <!-- Migration : inhibé car of_planning pas encore migré
+  <para style="terp_default_Bold_12">Intervention(s)</para>
+  <blockTable colWidths="105.0, 45.0, 60.0, 120.0, 201.0" style="Table4">
+      <tr>
+	      <td>Date</td>
+          <td>Durée</td>
+          <td>État</td>
+	      <td>Équipe</td>
+	      <td>Description</td>
+      </tr>
+  </blockTable>
+
+  <section>
+  	  <para style="terp_default_8">[[ repeatIn(o.interventions_liees, 'i') ]]</para>
+  	  <para style="terp_default_8">[[ setLang(i.partner_id.lang) ]]</para>
+  	  <blockTable colWidths="105.0, 45.0, 60.0, 120.0, 201.0" style="Table4">
+	      <tr>
+	          <td>[[ i.date and (str(i.date) != '') and formatLang(i.date, date_time=True) or '' ]]</td>
+	          <td>[[ i.duree and 'h'.join(str(datetime.timedelta(hours=i.duree)).split(':')[:-1]) or '' ]]</td>
+	          <td>[[ i.state or '' ]]</td>
+	          <td>[[ i.poseur_id.name or '' ]]</td>
+	          <td>[[ i.description or '' ]]</td>
+	      </tr>
+  	  </blockTable>
+  </section>
+  -->
+
+  </pto>
+  </story>
+</document>
+  
