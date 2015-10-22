@@ -2,7 +2,6 @@
 
 import base64
 
-# import openerp
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
 import StringIO

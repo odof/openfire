@@ -29,7 +29,7 @@ def get_ch(cr, uid, id, champ=False, table=False):
     return pre
 
 
-class of_compose_mail(osv.AbstractModel):
+class of_compose_mail(osv.TransientModel):
     _name = 'of.compose.mail'
     _description = 'Courrier'
 
@@ -228,6 +228,14 @@ class of_compose_mail(osv.AbstractModel):
             'context': context,
         }
 
+    def _get_model_action_dict(self):
+        return {
+            'res.partner'    : 'of_gesdoc.courriers',
+            'sale.order'     : 'of_gesdoc.courriers_sale',
+            'crm.lead'       : 'of_gesdoc.courriers_crm',
+            'account.invoice': 'of_gesdoc.courriers_account',
+        }
+
     #print a mail in the format pdf
     def print_report(self, cr, uid, ids, context=None):
         if context is None:
@@ -261,32 +269,15 @@ class of_compose_mail(osv.AbstractModel):
 
         #test if user has checked 'sans adresse' and 'sans entete'
         #self._log_event(cr, uid, ids, data, context=context)
-        if(data['model'] == 'res.partner'):
-            if let_obj.sans_add:
-                act = 'courriers_se'
-            else:
-                act = 'courriers'
-        elif(data['model'] == 'sale.order'):
-            if let_obj.sans_add: 
-                act = 'courriers_sale_se'
-            else: 
-                act = 'courriers_sale'
-        elif(data['model'] == 'crm.lead'):
-            if let_obj.sans_add: 
-                act = 'courriers_crm_se'
-            else: 
-                act = 'courriers_crm'
-        elif(data['model'] == 'account.invoice'):
-            if let_obj.sans_add: 
-                act = 'courriers_account_se'
-            else: 
-                act = 'courriers_account'
-        if let_obj.sans_header: 
+        act = self._get_model_action_dict().get(data['model'], '')
+        if let_obj.sans_header:
             act += '_sehead'
+        elif let_obj.sans_add:
+            act += '_se'
         return {
-            'type' : 'ir.actions.report.xml',
-            'report_name':'of_gesdoc.' + act,
-            'datas' : data,
+            'type'       : 'ir.actions.report.xml',
+            'report_name': act,
+            'datas'      : data,
         }
 
     def print_report_acrobat(self, cr, uid, ids, context=None):
