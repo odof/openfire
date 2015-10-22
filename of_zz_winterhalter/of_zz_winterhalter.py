@@ -76,7 +76,7 @@ class of_parc_installe(osv.Model):
                 parc_installe = self.browse(cr, uid, active_ids[0])
                 if parc_installe.client_id:
                     res['context'] = {'default_partner_id': parc_installe.client_id.id,
-                                      'default_of_produit_installe_id': parc_installe.product_id.id,
+                                      'default_of_produit_installe_id': parc_installe.id,
                                       'default_of_type': 'di'}
         return res
 

@@ -124,7 +124,7 @@
                 </field>
                 <field name="description" position="replace">
                 	<group>
-                		<field name="description" placeholder="Ajouter une note interne ..." groups="base.group_user"/>
+                		<field name="description" placeholder="Ajouter une note interne ..." string="Description"/>
                     	<field name="of_piece_commande"/>
                     	<field name="of_intervention"/>
                     </group>
