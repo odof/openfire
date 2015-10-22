@@ -136,9 +136,7 @@
                      <separator string="Description"/>
                 </separator> -->
                 <field name="partner_id" position="replace">
-                    <field name="partner_id" colspan="2"
-                        on_change="onchange_partner_id(partner_id)"
-                        select="1"/>
+                    <field name="partner_id" on_change="on_change_partner_id(partner_id)" required="1" select="1" context="{'show_address': True}"/>
                 </field>
                 <page name="extra_info" position="inside">
                     <group string="Liste de documents">

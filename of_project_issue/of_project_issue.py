@@ -307,7 +307,8 @@ class project_issue(osv.Model):
         return res
     
     # Migration ok
-    def onchange_partner_id(self, cr, uid, ids, partner_id):
+    def on_change_partner_id(self, cr, uid, ids, partner_id):
+        # Pour actualiser la liste des documents liés à au partenaire
         res = super(project_issue, self).onchange_partner_id(cr, uid, ids, partner_id)
         docs = [[5, ]]
         for i in self.liste_docs_partner(cr, uid, partner_id): # On récupère la liste des documents liés au partenaire (factures, ...)

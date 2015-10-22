@@ -88,8 +88,9 @@ class project_issue(osv.Model):
     _columns = {
         'of_produit_installe_id': fields.many2one('of.parc.installe', 'Produit installé', readonly=False),
         'of_type': fields.selection([('contacttel',u'Appel assistance téléphonique'), ('di',u'Demande d\'intervention')], 'Type', required=False, help=u"Type de SAV"),
-        'product_name_id': fields.related('of_produit_installe_id', 'product_id', 'name', readonly=True, type='char', string=u'Nom'),
-        'product_category_id': fields.related('of_produit_installe_id', 'product_id','categ_id', 'name', readonly=True, type='char', string=u'Catégorie'),
+        'product_name_id': fields.many2one('product.product', 'Nom', ondelete='restrict'),
+        #'product_name_id': fields.related('of_produit_installe_id', 'product_id', 'name', readonly=True, type='char', string=u'Nom'),
+        'product_category_id': fields.related('product_name_id', 'categ_id', 'name', readonly=True, type='char', string=u'Catégorie'),
         'of_actions_eff': fields.text(u'Actions à effectuer'),
         'of_actions_realisees': fields.text(u'Actions réalisées'),
         'description': fields.text(u'Problématique'), # Existe déjà, pour renommer champ
@@ -98,6 +99,23 @@ class project_issue(osv.Model):
     _defaults = {
         'of_type': 'contacttel',
     }
+    
+    
+    def on_change_of_produit_installe_id(self, cr, uid, ids, of_produit_installe_id, context=None):
+        if of_produit_installe_id:
+            parc = self.pool.get('of.parc.installe').browse(cr, uid, of_produit_installe_id, context=context)
+            if parc and parc.product_id:
+                return {'value': {'product_name_id': parc.product_id.id}}
+        return
+    
+    def on_change_product_name_id(self, cr, uid, ids, of_produit_installe_id, context=None):
+        # Si un no de série est saisie, on force le produit lié au no de série.
+        # Si pas de no de série, on laisse la possibilité de choisir un article
+        res = False
+        if of_produit_installe_id: # Si no de série existe, on récupère l'article associé
+            res = self.on_change_of_produit_installe_id(cr, uid, ids, of_produit_installe_id, context)
+        return res
+
     
     def ouvrir_demande_intervention(self, cr, uid, context={}):
         # Ouvre une demande d'intervenion depuis un SAV (normalement contact téléphonique) en reprenant les renseignements du SAV en cours.
