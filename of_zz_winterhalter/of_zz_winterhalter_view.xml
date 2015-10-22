@@ -207,6 +207,94 @@
 		        <field name="lang" position="after">
 		            <field name="of_ape"/>
 		        </field>
+		        <field name="child_ids" position="replace">
+		        	<field name="contact_ids" nolabel="1" context="{'default_parent_id': active_id, 'default_street': street, 'default_street2': street2, 'default_city': city, 'default_state_id': state_id, 'default_zip': zip, 'default_country_id': country_id, 'default_supplier': supplier, 'default_customer': customer, 'default_lang': lang,}">
+	                    <tree string="Contact">
+	                        <field name="display_name"/>
+	                        <field name="function"/>
+	                        <field name="type"/>
+	                        <field name="contact_address"/>
+	                    </tree>
+	                    <form string="Contact / Address">
+                            <sheet>
+                                <field name="type" required="1" widget="radio" options="{'horizontal': true}"/>
+                                <hr/>
+                                <group>
+                                    <group attrs="{'invisible': [('type','=', 'contact')]}">
+                                        <label for="street" string="Address"/>
+                                        <div>
+                                            <div class="o_address_format" name="div_address">
+                                                <field name="street" placeholder="Street..." class="o_address_street"/>
+                                                <field name="street2" placeholder="Street 2..." class="o_address_street"/>
+                                                <field name="city" placeholder="City" class="o_address_city"/>
+                                                <field name="state_id" class="o_address_state" placeholder="State" options="{&quot;no_open&quot;: True}" on_change="onchange_state(state_id)" context="{'country_id': country_id, 'zip': zip}"/>
+                                                <field name="zip" placeholder="ZIP" class="o_address_zip"/>
+                                                <field name="country_id" placeholder="Country" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
+                                            </div>
+                                        </div>
+                                    </group>
+                                    <group>
+                                        <field name="name" string="Contact Name" attrs="{'required' : [('type', '=', 'contact')]}"/>
+                                        <field name="title" placeholder="e.g. Mr." attrs="{'invisible': [('type','&lt;&gt;', 'contact')]}"/>
+                                        <field name="function" placeholder="e.g. Sales Director" attrs="{'invisible': [('type','&lt;&gt;', 'contact')]}"/>
+                                        <field name="email"/>
+                                        <field name="phone" widget="phone"/>
+                                        <field name="mobile" widget="phone"/>
+                                        <field name="comment" placeholder="internal note..."/>
+                                    </group>
+                                </group>
+                                <field name="supplier" invisible="True"/>
+                                <field name="customer" invisible="True"/>
+                                <field name="lang" invisible="True"/>
+                            </sheet>
+                        </form>
+	                </field>
+		        </field>
+		        <page name="internal_notes" position="before">
+		        	<page name="contact_livraison" string="Lieu livraison">
+						<field name="livraison_ids" nolabel="1" context="{'default_parent_id': active_id, 'default_street': street, 'default_street2': street2, 'default_city': city, 'default_state_id': state_id, 'default_zip': zip, 'default_country_id': country_id, 'default_supplier': supplier, 'default_customer': customer, 'default_lang': lang,}">
+		                    <tree string="Lieu livraison">
+		                        <field name="display_name"/>
+		                        <field name="function"/>
+		                        <field name="type"/>
+		                        <field name="contact_address"/>
+		                    </tree>
+							<form string="Contact / Address">
+	                            <sheet>
+	                                <field name="type" required="1" widget="radio" options="{'horizontal': true}"/>
+	                                <hr/>
+	                                <group>
+	                                    <group attrs="{'invisible': [('type','=', 'contact')]}">
+	                                        <label for="street" string="Address"/>
+	                                        <div>
+	                                            <div class="o_address_format" name="div_address">
+	                                                <field name="street" placeholder="Street..." class="o_address_street"/>
+	                                                <field name="street2" placeholder="Street 2..." class="o_address_street"/>
+	                                                <field name="city" placeholder="City" class="o_address_city"/>
+	                                                <field name="state_id" class="o_address_state" placeholder="State" options="{&quot;no_open&quot;: True}" on_change="onchange_state(state_id)" context="{'country_id': country_id, 'zip': zip}"/>
+	                                                <field name="zip" placeholder="ZIP" class="o_address_zip"/>
+	                                                <field name="country_id" placeholder="Country" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
+	                                            </div>
+	                                        </div>
+	                                    </group>
+	                                    <group>
+	                                        <field name="name" string="Contact Name" attrs="{'required' : [('type', '=', 'contact')]}"/>
+	                                        <field name="title" placeholder="e.g. Mr." attrs="{'invisible': [('type','&lt;&gt;', 'contact')]}"/>
+	                                        <field name="function" placeholder="e.g. Sales Director" attrs="{'invisible': [('type','&lt;&gt;', 'contact')]}"/>
+	                                        <field name="email"/>
+	                                        <field name="phone" widget="phone"/>
+	                                        <field name="mobile" widget="phone"/>
+	                                        <field name="comment" placeholder="internal note..."/>
+	                                    </group>
+	                                </group>
+	                                <field name="supplier" invisible="True"/>
+	                                <field name="customer" invisible="True"/>
+	                                <field name="lang" invisible="True"/>
+	                            </sheet>
+	                        </form>
+		                </field>
+		        	</page> 
+		        </page> 
 		        <group name="sav" position="replace">
 	                <field name="project_issue_ids" nolabel="1" context="{'default_partner_id':id}">
 	                    <tree string="SAV">
