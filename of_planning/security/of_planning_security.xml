@@ -22,20 +22,5 @@
             <field name="category_id" ref="of_planning_pose_module_category"/>
             <field name="implied_ids" eval="[(4, ref('of_group_planning_pose_user'))]"/>
         </record>
-
-    <!--#############################################______Autorisations des menus______#####################################################-->
-    
-    <!--#############################################______Configuration______#####################################################-->
-
-        <record model='ir.ui.menu' id='menu_of_planning_configuration'>
-            <field name="groups_id" eval="[(6,0,[ref('base.group_hr_manager')])]"/>
-        </record>
-
-        <!--#############################################____Planning Pose____#####################################################-->
-        
-        <record model='ir.ui.menu' id='menu_of_planning_pose'>
-            <field name="groups_id" eval="[(6,0,[ref('of_group_planning_pose_user')])]"/>
-        </record>
-
     </data>
 </openerp>
