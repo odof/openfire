@@ -40,7 +40,7 @@
             </field>
         </record>
        
-       <!-- Ajouter type adresse (livraison, facture, ...) dans liste partenaires -->
+       <!-- Ajouter type adresse (livraison, facture, ...) et fonction dans liste partenaires -->
        <record id="of_res_partner_tree" model="ir.ui.view">
         	<field name="name">of.res.partner.tree</field>
             <field name="model">res.partner</field>
@@ -49,6 +49,7 @@
             <field name="arch" type="xml">
             	<field name="display_name" position="after">
                     <field name="type"/>
+                    <field name="function"/>
 				</field>
             </field>
         </record>
