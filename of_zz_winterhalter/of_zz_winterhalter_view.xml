@@ -351,7 +351,7 @@
 		
 		<menuitem id="of_sous-menu_openservice" name="OpenService" parent="menu_of_openservice" sequence="5"/>
 		<!-- Menu configuration catégories de produits -->
-		<menuitem id="of_menu_config_openservice" name="Configuration" parent="menu_of_openservice" sequence="100" groups="stock.group_stock_manager"/>
+		<menuitem id="of_menu_config_openservice" name="Configuration" parent="menu_of_openservice" sequence="100"/>
 		
 		     
 		<!-- Action vue parc installé -->
@@ -367,8 +367,8 @@
 
 		<!-- Menu parc installé -->
 		<menuitem id="menu_of_parc_installe" action="action_view_of_parc_installe" name="Parc installé" 
-		     parent="of_sous-menu_openservice" sequence="10"/>
-		     <!-- parent="base.menu_aftersale" groups="base.group_extended,base.group_sale_salesman" -->
+		     parent="of_sous-menu_openservice" groups="project.group_project_user" sequence="10"/>
+
 
 
 		<!-- Menu SAV -->
@@ -389,7 +389,7 @@
 	        </field>
 	    </record>
 
-		<menuitem id="of_menu_project_issue_track"  parent="of_sous-menu_openservice" action="of_project_issue_categ_act0" sequence="5"/>
+		<menuitem id="of_menu_project_issue_track"  parent="of_sous-menu_openservice" action="of_project_issue_categ_act0" groups="project.group_project_user" sequence="5"/>
 
 
 		<!-- Menu Fournisseurs : on affiche ceux dont le champ supplier est vrai -->
@@ -472,10 +472,21 @@
         </record>
         
         <menuitem action="of_product_category_action_form"
-            groups="stock.group_stock_manager"
+            groups="project.group_project_manager"
             id="menu_of_product_category_action_form"
             parent="of_menu_config_openservice" sequence="2"/>
 
+        <!-- Menu Planning configuration -->
+        <menuitem id="of_menu_config_openservice_planning" name="Planning interventions" parent="of_menu_config_openservice" sequence="10" groups="of_planning.of_group_planning_pose_manager"/>
+
+        <menuitem name="Employés" id="menu_hr_employee_tree_win" parent="of_menu_config_openservice_planning" sequence="10" action="of_planning.action_hr_employee_tree"/>
+        <menuitem name="Equipes" id="menu_of_planning_equipe_tree_win" parent="of_menu_config_openservice_planning" sequence="20" action="of_planning.action_of_planning_equipe_tree"/>
+        <menuitem name="Erreurs" id="menu_of_planning_pose_raison_tree_win" parent="of_menu_config_openservice_planning" sequence="30" action="of_planning.action_of_planning_pose_raison_tree"/>
+        <menuitem name="Tâches" id="menu_of_planning_tache_tree_win" parent="of_menu_config_openservice_planning" sequence="40" action="of_planning.action_of_planning_tache_tree"/>
+        
+        <!-- Menus Planning -->
+        <menuitem id="menu_of_planning_pose_pose_win" name="Planning des interventions" parent="of_sous-menu_openservice" sequence="8" action="of_planning.action_of_planning_pose_calendar" groups="of_planning.of_group_planning_pose_user"/>
+            
 
 
 <!-- *************************************************** -->        

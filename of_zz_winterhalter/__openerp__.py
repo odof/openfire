@@ -19,6 +19,7 @@ Module spécifique pour Winterhalter
 """,
         "depends" : [
             'of_project_issue',
+            'of_planning',
             'product',
         ],
         "demo_xml" : [ ],

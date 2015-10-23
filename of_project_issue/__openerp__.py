@@ -41,10 +41,6 @@
     # Modules sale, purchase nécessaires pour historique documents
     # of_base nécessaire pour onglet historique dans vue partenaire
 
-    "init_xml" : [ 
-        'of_project_issue_sequence.xml',
-        #'of_init.xml',
-    ],
     "demo_xml" : [ ],
     'css' : [
         "static/src/css/of_project_issue.css",
@@ -52,7 +48,8 @@
     "data" : [
         'security/ir.model.access.csv',
         'of_project_issue.xml',
-        'data/of_project_issue_canal_data.xml'
+        'data/of_project_issue_canal_data.xml',
+        'of_project_issue_sequence.xml',
     ],
     "installable": True,
     'active': False,
