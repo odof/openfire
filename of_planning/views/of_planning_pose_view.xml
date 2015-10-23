@@ -1,0 +1,584 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+
+<!--##########################################################################################################################-->
+<!--#############################################______Historique du client______#############################################-->
+<!--##########################################################################################################################-->
+
+        <record id="of_planning_view_partner_form" model="ir.ui.view">
+            <field name="name">of.planning.partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <page name="historique" position="inside">
+                    <field name="pose_ids" colspan="4" nolabel="1" readonly="1">
+                        <tree string="Plannings">
+                            <field name="poseur_id"/>
+                            <field name="date" string="Date"/>
+                            <field name="duree" string="Durée" widget="float_time"/>
+                            <field name="verif_dispo"/>
+                            <field name="tache" />
+                            <field name="state" />
+                            <field name="name" string="Libellé"/>
+                            <field name="description"/>
+                        </tree>
+                    </field>
+                </page>
+            </field>
+        </record>
+
+<!--##########################################################################################################################-->
+<!--###############################################______Planning de pose______###############################################-->
+<!--##########################################################################################################################-->
+
+<!--##################################################______Recherche______###################################################-->
+        <record id="of_planning_pose_filter" model="ir.ui.view">
+            <field name="name">of.planning.pose.filter</field>
+            <field name="model">of.planning.pose</field>
+            <field name="arch" type="xml">
+                <search string="Recherche">
+                    <group>
+                        <filter string="Brouillon" name="state_brou" icon="terp-folder-violet" domain="[('state','=','Brouillon')]" />
+                        <filter string="Planifié" name="state_plan" icon="terp-folder-yellow" domain="[('state','=','Planifie')]" />
+                        <filter string="Confirmé" name="state_conf" icon="gtk-no" domain="[('state','=','Confirme')]" />
+                        <filter string="Posé" name="state_pose" icon="terp-folder-blue" domain="[('state','=','Pose')]" />
+                        <filter string="Annulé" name="state_annu" icon="terp-dialog-close-red" domain="[('state','=','Annule')]" />
+                        <filter string="Reporté" name="state_report" icon="terp-folder-green" domain="[('state','=','Reporte')]" />
+                        <filter string="Inachevé" name="state_inach" icon="terp-folder-orange" domain="[('state','=','Inacheve')]" />
+                    </group>
+                    <newline/>
+                    <group>
+                        <field name="name" />
+                        <field name="date_from" filter_domain="[('date_deadline','&gt;=',self)]"/>
+                        <field name="date_to" filter_domain="[('date','&lt;=',self)]" />
+                        <field name="duree"/>
+                        <field name="user_id" widget="selection" />
+                        <field name="tache" widget="selection"/>
+                        <field name="category_id" widget="selection"/>
+                        <field name="poseur_id" widget="selection"/>
+                        <field name="partner_id"/>
+                        <field name="company_id" widget="selection"/>
+                    </group>
+                    <newline/>
+                    <group expand="0" string="Regrouper par...">
+                       <filter string="Utilisateur" icon="terp-personal" domain="[]" context="{'group_by' : 'user_id'}" />
+                       <filter string="Tache" icon="terp-folder-blue" domain="[]" context="{'group_by' : 'tache'}" />
+                       <filter string="Equipe" icon="terp-partner" domain="[]" context="{'group_by' : 'poseur_id'}" />
+                       <filter string="Magasin" icon="terp-go-home" domain="[]" context="{'group_by' : 'company_id'}" />
+                   </group>
+                    <newline/>
+                    <group expand="0" string="Recherche avancée">
+                        <field name="id"/>
+                        <field name="description" />
+                        <field name="raison_id" />
+                    </group>
+                 </search>
+            </field>
+        </record>
+
+<!--###################################################______Vue form______###################################################-->
+
+        <record id="of_planning_pose_view_form" model="ir.ui.view" >
+            <field name="name">of.planning.pose.form</field>
+            <field name="model">of.planning.pose</field>
+            <field name="arch" type="xml" >
+                <form string="Nouvelle Intervention" >
+                    <header>
+                        Passer à
+                        <button name="button_poser" string="Posé" states="Confirme" type="object"/>
+                        <button name="button_confirmer" string="Confirmé" states="Planifie" type="object"/>
+                        <button name="button_reporter" string="Reporté" states="Confirme,Planifie" type="object"/>
+                        <button name="button_inachever" string="Inachevé" states="Confirme,Planifie" type="object"/>
+                        <button name="button_annuler" string="Annulé" states="Confirme,Planifie" type="object"/>
+                        <button name="button_planifier" string="Planifié" states="Brouillon" type="object"/>
+                        <button name="button_brouillon" string="Brouillon" states="Pose,Confirme,Annule,Reporte,Inacheve" type="object"/>
+                        <field name="state" widget="statusbar" nolabel="1" statusbar_visible="Brouillon,Planifie,Confirme,Pose" statusbar_colors='{"proforma":"blue","proforma2":"blue"}'/>
+                        <div align="right" style="align:right;padding: 0px 18px 0px 0px;width:100%">
+                            <field name="raison_id" widget="selection" context="{'tz': 'Europe/Paris'}" attrs="{'invisible':[('state', 'not in', ('Reporte','Inacheve'))]}"/>
+                        </div>
+                    </header>
+                    <sheet>
+                        <label align="5.0" colspan="2" string="Horaires de travail"/>
+                        <group col="8" colspan="2">
+                            <field name="hor_md" string="Matin" widget="float_time" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" context="{'tz': 'Europe/Paris'}" />
+                            <span>-</span>
+                            <field name="hor_mf" nolabel="1" widget="float_time" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" context="{'tz': 'Europe/Paris'}" />
+                            <field name="hor_ad" string="Après-midi" widget="float_time" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" context="{'tz': 'Europe/Paris'}" />
+                            <span>-</span>
+                            <field name="hor_af" nolabel="1" widget="float_time" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" context="{'tz': 'Europe/Paris'}" />
+                        </group>
+                        <group col="4" colspan="2">
+                            <field name="hor_sam" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" context="{'tz': 'Europe/Paris'}" />
+                            <field name="hor_dim" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" context="{'tz': 'Europe/Paris'}" />
+                        </group>
+
+                        <group>
+                            <field name="partner_id" domain="[('customer','=',True)]" on_change="onchange_partner_id(partner_id)" colspan="2" context="{'tz': 'Europe/Paris'}" />
+                            <field name="tache" context="{'tz': 'Europe/Paris'}" />
+                            <field name="poseur_id" on_change="onchange_poseur(poseur_id)" context="{'tz': 'Europe/Paris'}" />
+                            <field name="date" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" context="{'tz': 'Europe/Paris'}" />
+                            <field name="duree" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" context="{'tz': 'Europe/Paris'}" string="Durée" widget="float_time"/>
+                            <field name="date_deadline_display" readonly="1"/>
+                            <field name="date_deadline" invisible="1" />
+                            <field name="verif_dispo"/>
+                            <field name="user_id" context="{'tz': 'Europe/Paris'}" />
+                            <field name="company_id" widget="selection"/>
+                            <field name="name" string="Libellé" context="{'tz': 'Europe/Paris'}" />
+                            <label colspan="2" for="description" align="0.00"/>
+                            <field colspan="2" name="description" nolabel="1" context="{'tz': 'Europe/Paris'}" />
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+<!--###################################################______Vue tree______###################################################-->
+
+        <record id="of_planning_pose_view_tree" model="ir.ui.view" >
+            <field name="name">of.planning.pose.tree</field>
+            <field name="model">of.planning.pose</field>
+            <field name="arch" type="xml" >
+                <tree string="Liste des interventions" colors="darkgreen:state=='Planifie';darkolivegreen:state=='Confirme';grey:state=='Annule';darkred:state=='Reporte';darkblue:state=='Pose'">
+                    <field name="name" string="Libellé"/>
+                    <field name="user_id" invisible="1"/>
+                    <field name="date" />
+                    <field name="date_deadline" string="Deadline" invisible="1"/>
+                    <field name="duree" string="Durée" widget="float_time"/>
+                    <field name="poseur_id"/>
+                    <field name="tache" />
+                    <field name="partner_id"/>
+                    <field name="partner_city"/>
+                    <field name="company_id"/>
+                    <field name="state" />
+
+                    <!-- Afficher les fleches pour passer a d'autres statuts -->
+                    <button name="change_state_before" type="object" icon="gtk-go-back" />
+                    <button name="change_state_after" type="object" icon="gtk-go-forward" />
+
+                    <!-- Afficher le icon quand le status est Confirme et Pose -->
+                    <button name="state_conf" type="object" icon="gtk-no" attrs="{'invisible':[('state', '!=', 'Confirme')]}"/>
+                    <button name="state_pose" type="object" icon="gtk-apply" attrs="{'invisible':[('state', '!=', 'Pose')]}"/>
+                    <field name="description" />
+                </tree>
+            </field>
+        </record>
+
+<!--#############################################______Vue calendar_______#####################################################-->
+
+        <record id="of_planning_pose_view_calendar" model="ir.ui.view">
+            <field name="name">of.planning.pose.calendar</field>
+            <field name="model">of.planning.pose</field>
+            <field name="arch" type="xml">
+                <calendar string="Calendrier" date_start="date" color="poseur_id" date_stop="date_deadline">
+                    <field name="name"/>
+                    <field name="state"/>
+                    <!--field name="color" invisible="1"/>
+                    <field name="sidebar_color" invisible="1"/-->
+                </calendar>
+            </field>
+        </record>
+
+<!--#############################################________Vue gant________#####################################################-->
+
+        <record id="of_planning_pose_view_gantt" model="ir.ui.view" >
+            <field name="name">of.planning.pose.gantt</field>
+            <field name="model">of.planning.pose</field>
+            <field name="arch" type="xml" >
+                <gantt color="poseur_id" date_start="date" date_stop="date_deadline" string="Planning" mode="month">
+                    <level object="of.planning.equipe" link="poseur_id" domain="[]">
+                        <field name="name" />
+                        <field name="state"/>
+                    </level>
+                </gantt>
+            </field>
+        </record>
+
+<!--##########################################################################################################################-->
+<!--#############################################_________Taches_________#####################################################-->
+<!--##########################################################################################################################-->
+
+<!--#############################################_______Recherche_________#####################################################-->
+        <record id="of_planning_tache_filter" model="ir.ui.view">
+            <field name="name">of.planning.tache.filter</field>
+            <field name="model">of.planning.tache</field>
+            <field name="arch" type="xml">
+                <search string="Recherche">
+                    <group>
+                        <field name="name" />
+                        <field name="is_crm"/>
+                    </group>
+                    <newline/>
+                    <group expand="0" string="Recherche avancée">
+                        <field name="id"/>
+                        <field name="description" />
+                    </group>
+                 </search>
+            </field>
+        </record>
+
+<!--#############################################_______Vue form_________#####################################################-->
+
+        <record id="of_planning_tache_view_form" model="ir.ui.view" >
+            <field name="name">of.planning.tache.form</field>
+            <field name="model">of.planning.tache</field>
+            <field name="arch" type="xml" >
+                <form string="Nouvelle tâche" >
+                    <group>
+                        <group colspan="2" col="2">
+                            <field name="name" string="Libellé" attrs="{'readonly':[('verr', '=', True)]}"/>
+                            <field name="product_id" string="Produit lié" attrs="{'readonly':[('verr', '=', True)]}"/>
+                            <group colspan="2" col="4">
+                                <field name="category_id"/>
+                                <field name="duree" widget="float_time"/>
+                            </group>
+                            <group colspan="2" col="6" name="options">
+                                <field name="active"/>
+                                <field name="is_crm"/>
+                                <field name="imp_detail"/>
+                            </group>
+                        </group>
+                        <newline></newline>
+                        <group colspan="2" col="2">
+                            <field name="description" attrs="{'readonly':[('verr', '=', True)]}"/>
+                        </group>
+                        <field name="verr" invisible="1"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+<!--#############################################_______Vue tree_________#####################################################-->
+
+        <record id="of_planning_tache_view_tree" model="ir.ui.view" >
+            <field name="name">of.planning.tache.tree</field>
+            <field name="model">of.planning.tache</field>
+            <field name="arch" type="xml" >
+                <tree string="Liste des tâches" >
+                    <field name="name" string="Libellé"/>
+                    <field name="product_id" />
+                    <field name="category_id"/>
+                    <field name="duree" widget="float_time"/>
+                    <field name="description" />
+                </tree>
+            </field>
+        </record>
+
+<!--##########################################################################################################################-->
+<!--##############################################________Equipes________#####################################################-->
+<!--##########################################################################################################################-->
+
+<!--#############################################_______Recherche_________#####################################################-->
+
+        <record id="of_planning_equipe_filter" model="ir.ui.view">
+            <field name="name">of.planning.equipe.filter</field>
+            <field name="model">of.planning.equipe</field>
+            <field name="arch" type="xml">
+                <search string="Recherche">
+                    <group>
+                        <filter name="filter_active" string="Désactivée" icon="terp-accessories-archiver" domain="[('active', '=', 0)]" />
+                        <field name="name" />
+                        <field name="note" />
+                        <field name="category_ids" />
+                    </group>
+                 </search>
+            </field>
+        </record>
+
+<!--#############################################_______Vue form_________#####################################################-->
+
+        <record id="view_of_planning_equipe_tree" model="ir.ui.view">
+            <field name="name">of.planning.equipe.tree</field>
+            <field name="model">of.planning.equipe</field>
+            <field name="arch" type="xml">
+                <tree string="Liste des equipes" >
+                    <field name="name" string="Equipe"/>
+                    <!--field name="cout_horaire" string="Coût horaire"/>
+                    <field name="cout_annuel" string="Coût annuel"/-->
+                    <field name="employee_ids"/>
+                    <field name="note" />
+                    <!--field name="color_id"/-->
+                </tree>
+            </field>
+        </record>
+
+<!--#############################################_______Vue tree_________#####################################################-->
+
+        <record id="view_of_planning_equipe_form" model="ir.ui.view">
+            <field name="name">of.planning.equipe.form</field>
+            <field name="model">of.planning.equipe</field>
+            <field name="arch" type="xml">
+                <form string="Equipe">
+                    <group>
+                        <group colspan="2" col="6">
+                            <field name="name" string="Equipe"/>
+                            <!--field name="cout_horaire" string="Coût horaire" groups="base.group_hr_manager"/>
+                            <field name="cout_annuel" string="Coût annuel" groups="base.group_hr_manager"/-->
+                            <field name="active"></field>
+                            <newline></newline>
+                            <separator string="Horaires de travail" colspan="6"></separator>
+                            <group colspan="6" col="8">
+                                <field name="hor_md" widget="float_time" on_change="onchange_horaires(hor_md, hor_mf, hor_ad, hor_af, context)"/>
+                                <field name="hor_mf" widget="float_time" on_change="onchange_horaires(hor_md, hor_mf, hor_ad, hor_af, context)"/>
+                                <field name="hor_ad" widget="float_time" on_change="onchange_horaires(hor_md, hor_mf, hor_ad, hor_af, context)"/>
+                                <field name="hor_af" widget="float_time" on_change="onchange_horaires(hor_md, hor_mf, hor_ad, hor_af, context)"/>
+                            </group>
+                            <!--field name="color_id"/-->
+                        </group>
+                        <newline/>
+                        <notebook>
+                            <page string="Employés">
+                                <field name="employee_ids" nolabel="1" on_change='onchange_employees(employee_ids)'/>
+                            </page>
+                            <page string="Catégories">
+                                <field name="category_ids" nolabel="1"/>
+                            </page>
+                            <page string="Compétences">
+                                <field name="tache_ids" nolabel="1"/>
+                            </page>
+                            <page string="Description">
+                                <field name="note" />
+                            </page>
+                        </notebook>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+<!--#############################################_______Employee________#####################################################-->
+
+        <!--record id="of_planning_view_employee_form" model="ir.ui.view">
+            <field name="name">hr.employee.form.inherit</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <page string="Personal Information" position="after">
+                    <page string="Coût" groups="base.group_hr_manager">
+                        <field name="jours" string="Jours travaillés par an" on_change="onchange_cout(heures, jours, couts_ids)" />
+                        <field name="heures" string="Heures travaillées par jour" widget="float_time" on_change="onchange_cout(heures, jours, couts_ids)" />
+                        <field name="cout_horaire" string="Coût horaire" />
+                        <field name="cout_annuel" string="Coût annuel" />
+                        <field name="couts_ids" string="Coûts" colspan="4" nolabel="1" mode="tree" on_change="onchange_cout(heures, jours, couts_ids)" >
+                            <form string="-" >
+                            </form>
+                            <tree string="Liste des coûts" editable="bottom" >
+                                <field name="typ_id" on_change="change_name(typ_id, name)" widget="selection"/>
+                                <field name="name" string="Libellé"/>
+                                <field name="montant"/>
+                                <field name="period" string="Périodicité"/>
+                            </tree>
+                        </field>
+                    </page>
+                </page>
+            </field>
+        </record>
+
+        <record id="of_planning_view_employee_tree" model="ir.ui.view">
+            <field name="name">hr.employee.tree.inherit</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_tree"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="cout_horaire" string="Coût horaire" groups="base.group_hr_manager"/>
+                    <field name="cout_annuel" string="Coût annuel" groups="base.group_hr_manager"/>
+                </field>
+            </field>
+        </record-->
+
+<!--#############################################_______Raisons inacheve reporte________#####################################################-->
+
+        <record id="of_planning_pose_raison_form" model="ir.ui.view">
+            <field name="name">of.planning.pose.raison.form</field>
+            <field name="model">of.planning.pose.raison</field>
+            <field name="arch" type="xml">
+                <form string="Raison">
+                    <group>
+                        <field name="name" string="Libellé"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="of_planning_pose_raison_tree" model="ir.ui.view">
+            <field name="name">of.planning.pose.raison.tree</field>
+            <field name="model">of.planning.pose.raison</field>
+            <field name="arch" type="xml">
+                <tree string="Raison">
+                    <field name="name" string="Libellé"/>
+                </tree>
+            </field>
+        </record>
+
+<!--#############################################_______Employee type cout________#####################################################-->
+
+        <!--record id="of_planning_employee_typcout_form" model="ir.ui.view">
+            <field name="name">hr.employee.typcout.form</field>
+            <field name="model">hr.employee.typcout</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Types de coûts">
+                    <field name="name" string="Libellé"/>
+                </form>
+            </field>
+        </record>
+
+        <record id="of_planning_employee_typcout_tree" model="ir.ui.view">
+            <field name="name">hr.employee.typcout.tree</field>
+            <field name="model">hr.employee.typcout</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Types de coûts">
+                    <field name="name" string="Libellé"/>
+                </tree>
+            </field>
+        </record-->
+
+    <!--#############################################_______Res Users________#####################################################-->
+
+        <!--record id="of_planning_view_res_users_form" model="ir.ui.view">
+            <field name="name">of.res.users.planning.form</field>
+            <field name="model">res.users</field>
+            <field name="type">form</field>
+            <field name="priority">2</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+                <field name="active" position="before">
+                     <field name="color_id"/>
+                </field>
+            </field>
+        </record>
+        
+        <record id="view_of_sale_profcommi_user" model="ir.ui.view">
+            <field name="name">of.res.users.planning.tree</field>
+            <field name="model">res.users</field>
+            <field name="type">tree</field>
+            <field name="inherit_id" ref="base.view_users_tree"/>
+            <field name="arch" type="xml">
+                <field name="context_lang" position="after">
+                    <field name="color_id"/>
+                </field>
+            </field>
+        </record-->
+
+<!--##########################################################################################################################-->
+<!--#############################################________Actions_________#####################################################-->
+<!--##########################################################################################################################-->
+
+        <record id="action_of_planning_pose_calendar" model="ir.actions.act_window">
+            <field name="name">Planning d'intervention</field>
+            <field name="res_model">of.planning.pose</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">calendar,form,gantt,tree</field>
+            <field name="context">{'search_default_state_plan':1,'search_default_state_conf':1,'search_default_state_pose':1,'search_default_state_brou':1,'search_default_state_inach':1}</field>
+            <field name="view_id" ref="of_planning_pose_view_calendar"/>
+            <field name="search_view_id" ref="of_planning_pose_filter"/>
+        </record>
+
+<!--#############################################_________Taches_________#####################################################-->
+
+        <record id="action_hr_employee_tree" model="ir.actions.act_window">
+            <field name="name">Employés</field>
+            <field name="res_model">hr.employee</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="hr.view_employee_tree"/>
+        </record>
+        
+        <record id="action_of_planning_equipe_tree" model="ir.actions.act_window">
+            <field name="name">Equipes</field>
+            <field name="res_model">of.planning.equipe</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_of_planning_equipe_tree"/>
+        </record>
+        
+        <record id="action_of_planning_tache_tree" model="ir.actions.act_window">
+            <field name="name">Tâches</field>
+            <field name="res_model">of.planning.tache</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="of_planning_tache_view_tree"/>
+        </record>
+
+   <!--################################################_Raison inacheve reporte_######################################################-->
+
+        <record id="action_of_planning_pose_raison_tree" model="ir.actions.act_window">
+            <field name="name">Erreurs</field>
+            <field name="res_model">of.planning.pose.raison</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="of_planning.of_planning_pose_raison_tree"/>
+        </record>
+        
+    <!--################################################_Type cout employee_######################################################-->
+    
+        <!--record id="action_of_planning_employee_typcout_tree" model="ir.actions.act_window">
+            <field name="name">Types de coûts</field>
+            <field name="res_model">hr.employee.typcout</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="of_planning.of_planning_employee_typcout_tree"/>
+        </record-->
+    
+<!--##########################################################################################################################-->
+<!--#############################################_________Menus__________#####################################################-->
+<!--##########################################################################################################################-->
+
+        <menuitem id="menu_of_planning_configuration" name="Pose" parent="hr.menu_human_resources_configuration" sequence="10"/>
+            <menuitem name="Employés" id="menu_hr_employee_tree" parent="menu_of_planning_configuration" sequence="1" action="action_hr_employee_tree"/>
+            <menuitem name="Equipes" id="menu_of_planning_equipe_tree" parent="menu_of_planning_configuration" sequence="2" action="action_of_planning_equipe_tree"/>
+            <menuitem name="Erreurs" id="menu_of_planning_pose_raison_tree" parent="menu_of_planning_configuration" sequence="3" action="action_of_planning_pose_raison_tree"/>
+            <menuitem name="Tâches" id="menu_of_planning_tache_tree" parent="menu_of_planning_configuration" sequence="3" action="action_of_planning_tache_tree"/>
+            <!--menuitem name="Types de coûts" id="menu_pnanning_of_employee_typcout_tree" parent="menu_of_planning_configuration" sequence="5" action="action_of_planning_employee_typcout_tree"/-->
+
+        <menuitem id="menu_of_planning_pose" name="Planning des interventions" parent="base.menu_base_partner" sequence="10"/>
+            <menuitem id="menu_of_planning_pose_pose" name="Planning calendrier" parent="menu_of_planning_pose" sequence="1" action="action_of_planning_pose_calendar"/>
+            <!--menuitem id="menu_of_planning_pose_global" name="Global" parent="menu_of_planning_pose" sequence="1" action="action_of_planning_pose_calendar"/>
+            <menuitem id="menu_of_planning_pose_po" name="Poêle" parent="menu_of_planning_pose" sequence="4" action="action_of_planning_pose_po_calendar"/>
+            <menuitem id="menu_of_planning_pose_ch" name="Cheminée" parent="menu_of_planning_pose" sequence="4" action="action_of_planning_pose_ch_calendar"/>
+            <menuitem id="menu_of_planning_entretien" name="Ramonage Entretien SAV" parent="menu_of_planning_pose" sequence="5" action="action_of_planning_entretien_calendar"/-->
+
+    <!-- Ajouter menu Envoyer un courrier dans Planning Pose -->
+        <act_window
+            name="Envoyer un courrier"
+            res_model="of.compose.mail"
+            src_model="of.planning.pose"
+            view_mode="form"    
+            key2="client_print_multi"
+            view_id="of_gesdoc.view_courrier_wizard"
+            id="action_view_planning_courrier_wizard_account"
+            context="{'model':'of.planning.pose'}"
+            target="new"
+        />
+        
+    <!-- Ajouter menu Envoyer un courriel dans Planning Pose -->
+        <!-- <act_window
+          name="Envoyer un courriel"
+          res_model="mail.compose.message"
+          src_model="of.planning.pose"
+          view_mode="form"
+          key2="client_print_multi"
+          id="of_planning_email" 
+          target="new"/> -->
+        <!--delete model="ir.actions.act_window" id="of_planning_email"/-->
+        
+        <!-- Creation la facture depuis planning pose -->
+
+        <!--record id="action_of_create_invoice_pose" model="ir.actions.server">
+            <field name="name">Générer les factures</field>
+            <field name="model_id" ref="model_of_planning_pose"/>
+            <field name="state">code</field>
+            <field name="code">action = obj.create_invoice()</field>
+        </record>
+
+        <record id="action_create_invoice_pose" model="ir.values">
+            <field name="name">Générer les factures</field>
+            <field name="key2">client_action_multi</field>
+            <field name="model">of.planning.pose</field>
+            <field name="value" eval="'ir.actions.server,%d'%action_of_create_invoice_pose" />
+            <field name="object" eval="True" />
+        </record-->
+
+    </data>
+</openerp>
