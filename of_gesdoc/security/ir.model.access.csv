@@ -1,7 +1,5 @@
 "id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
 "access_of_mail_template_user","of.mail.template","model_of_mail_template","base.group_user",1,0,0,0
 "access_of_mail_template_manager","of.mail.template","model_of_mail_template","base.group_system",1,1,1,1
-"access_of_compose_mail_user","of.compose.mail","model_of_compose_mail","base.group_user",1,0,0,0
-"access_of_compose_mail_manager","of.compose.mail","model_of_compose_mail","base.group_system",1,1,1,1
 "access_of_gesdoc_chp_user","of.gesdoc.chp","model_of_gesdoc_chp","base.group_user",1,0,0,0
 "access_of_gesdoc_chp_manager","of.gesdoc.chp","model_of_gesdoc_chp","base.group_system",1,1,1,1
