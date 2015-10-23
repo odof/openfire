@@ -185,13 +185,13 @@ class of_planning_pose(osv.Model):
         res = {}
         for pose in self.browse(cr, uid, ids):
             res[pose.id] = False
-            if pose.tache and pose.tache.category_id:
-                res[pose.id] = pose.tache.category_id.id
+            if pose.tache_id and pose.tache_id.category_id:
+                res[pose.id] = pose.tache_id.category_id.id
         return res
     
     def _search_category(self, cr, uid, obj, name, args, context):
         tache_ids = self.pool['of.planning.tache'].search(cr, uid, args, context=context)
-        return [('tache', 'in', tache_ids)]
+        return [('tache_id', 'in', tache_ids)]
 
     _columns = {
         'name'                 : fields.char('Libelle', size=64, required=True),
@@ -207,7 +207,7 @@ class of_planning_pose(osv.Model):
                                                  store={'of.planning.pose'   : (lambda self, cr, uid, ids, *a:ids, ['partner_id'], 10),
                                                         'res.partner'        : (_get_partner_pose_ids, ['address'], 10)}),
         'raison_id'            : fields.many2one('of.planning.pose.raison', 'Raison'),
-        'tache'                : fields.many2one('of.planning.tache', 'Tâche', required=True),
+        'tache_id'             : fields.many2one('of.planning.tache', 'Tâche', required=True),
         'poseur_id'            : fields.many2one('of.planning.equipe', 'Equipe Pose', required=True),
         'state'                : fields.selection([('Brouillon', 'Brouillon'), ('Planifie', 'Planifié'), ('Confirme', 'Confirmé'), ('Pose', 'Posé'), ('Annule', 'Annulé'), ('Reporte', 'Reporté'), ('Inacheve', 'Inachevé')], 'Etat', size=16, readonly=True),
         'company_id'           : fields.many2one('res.company', 'Magasin'),
