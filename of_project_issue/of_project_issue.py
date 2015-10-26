@@ -693,7 +693,7 @@ class res_partner(osv.Model):
            'project_issue_ids': fields.one2many('project.issue', 'partner_id', 'SAV'),
        }
     
-# MG
+# Migration
 #     def _get_courriels(self, cr, uid, ids, *args):
 #         result = {}
 #         for part in self.browse(cr, uid, ids):
@@ -712,7 +712,7 @@ class res_partner(osv.Model):
 #         'courriels': fields.function(_get_courriels, string="Courriels", type='char', size=256),
 #     }
 
-# MG
+# Migration
 # class of_planning_pose(osv.Model):
 #     _name = "of.planning.pose"
 #     _inherit = "of.planning.pose"

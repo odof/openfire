@@ -102,6 +102,7 @@ class project_issue(osv.Model):
     
     
     def on_change_of_produit_installe_id(self, cr, uid, ids, of_produit_installe_id, context=None):
+        # Si le no de série est saisi, on met le produit du no de série du parc installé. 
         if of_produit_installe_id:
             parc = self.pool.get('of.parc.installe').browse(cr, uid, of_produit_installe_id, context=context)
             if parc and parc.product_id:

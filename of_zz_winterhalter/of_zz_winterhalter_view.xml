@@ -110,6 +110,18 @@
 <!-- *************** SAV (project.issue) *************** -->
 <!-- *************************************************** --> 
 
+        <!-- Ajout recherche par no de série de la machine installée -->
+        <record id="of_view_project_issue_filter_win" model="ir.ui.view">
+            <field name="name">of.view.project.issue.filter.win</field>
+            <field name="model">project.issue</field>
+            <field name="inherit_id" ref="project_issue.view_project_issue_filter"/>
+            <field name="arch" type="xml">
+                <field name="partner_id" position="after">
+                    <field name="of_produit_installe_id" string="No série"/>                   
+                </field>
+            </field>
+        </record>
+        
 		<!-- insertion Produit installé lié et champs supplémentaires Winterhalter dans SAV -->
 		<record id="of_produit_installe_sav_lie" model="ir.ui.view" >
 		    <field name="name">of.produit_installe.sav.lie</field>
