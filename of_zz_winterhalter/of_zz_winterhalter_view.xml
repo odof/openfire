@@ -95,7 +95,7 @@
 		                        <field name="of_categorie_id" string="Catégorie"/>
 		                        <field name="of_produit_installe_id" string="S/N"/>
 		                        <field name="user_id" string="Responsable"/>
-		                        <field name="of_piece_commande"/>
+		                        <field name="of_actions_realisees"/>
 		                        <field name="stage_id"/>
 		                        <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
 		                    </tree>
@@ -323,7 +323,7 @@
                                 <field name="of_categorie_id" string="Catégorie"/>
                                 <field name="of_produit_installe_id" string="S/N"/>
                                 <field name="user_id" string="Responsable"/>
-                                <field name="of_piece_commande"/>
+                                <field name="of_actions_realisees"/>
                                 <field name="stage_id"/>
                                 <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
                             </tree>
