@@ -13,18 +13,20 @@
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
                 <page name="historique" position="inside">
-                    <field name="pose_ids" colspan="4" nolabel="1" readonly="1">
-                        <tree string="Plannings">
-                            <field name="poseur_id"/>
-                            <field name="date" string="Date"/>
-                            <field name="duree" string="Durée" widget="float_time"/>
-                            <field name="verif_dispo"/>
-                            <field name="tache_id"/>
-                            <field name="state"/>
-                            <field name="name" string="Libellé"/>
-                            <field name="description"/>
-                        </tree>
-                    </field>
+                    <group name="histo_planning" string="Planning">
+                        <field name="pose_ids" colspan="4" nolabel="1" readonly="1">
+                            <tree string="Plannings">
+                                <field name="poseur_id"/>
+                                <field name="date" string="Date"/>
+                                <field name="duree" string="Durée" widget="float_time"/>
+                                <field name="verif_dispo"/>
+                                <field name="tache_id"/>
+                                <field name="state"/>
+                                <field name="name" string="Libellé"/>
+                                <field name="description"/>
+                            </tree>
+                        </field>
+                    </group>
                 </page>
             </field>
         </record>
@@ -100,6 +102,9 @@
                         </div>
                     </header>
                     <sheet>
+                        <group>
+                            <field name="poseur_id" on_change="onchange_poseur(poseur_id)" context="{'tz': 'Europe/Paris'}"/>
+                        </group>
                         <label align="5.0" colspan="2" string="Horaires de travail"/>
                         <group col="8" colspan="2">
                             <field name="hor_md" string="Matin" widget="float_time" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" context="{'tz': 'Europe/Paris'}"/>
@@ -117,7 +122,6 @@
                         <group>
                             <field name="partner_id" domain="[('customer','=',True)]" on_change="onchange_partner_id(partner_id)" colspan="2" context="{'tz': 'Europe/Paris'}"/>
                             <field name="tache_id" context="{'tz': 'Europe/Paris'}"/>
-                            <field name="poseur_id" on_change="onchange_poseur(poseur_id)" context="{'tz': 'Europe/Paris'}"/>
                             <field name="date" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" context="{'tz': 'Europe/Paris'}"/>
                             <field name="duree" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" context="{'tz': 'Europe/Paris'}" string="Durée" widget="float_time"/>
                             <field name="date_deadline_display" readonly="1"/>

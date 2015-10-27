@@ -92,7 +92,7 @@
 		                        <field name="of_code" string="Dossier"/>
 		                        <field name="date"/>
 		                        <field name="name" string="Requête"/>
-		                        <field name="of_categorie_id" string="Famille"/>
+		                        <field name="of_categorie_id" string="Catégorie"/>
 		                        <field name="of_produit_installe_id" string="S/N"/>
 		                        <field name="user_id" string="Responsable"/>
 		                        <field name="of_piece_commande"/>
@@ -314,19 +314,21 @@
                     </page>
                 </page>
                 <group name="sav" position="replace">
-                    <field name="project_issue_ids" nolabel="1" context="{'default_partner_id':id}">
-                        <tree string="SAV">
-                            <field name="of_code" string="Dossier"/>
-                            <field name="date"/>
-                            <field name="name" string="Requête"/>
-                            <field name="of_categorie_id" string="Famille"/>
-                            <field name="of_produit_installe_id" string="S/N"/>
-                            <field name="user_id" string="Responsable"/>
-                            <field name="of_piece_commande"/>
-                            <field name="stage_id"/>
-                            <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
-                        </tree>
-                    </field>
+                    <group name="sav" string="SAV">
+                        <field name="project_issue_ids" nolabel="1" context="{'default_partner_id':id}">
+                            <tree string="SAV">
+                                <field name="of_code" string="Dossier"/>
+                                <field name="date"/>
+                                <field name="name" string="Requête"/>
+                                <field name="of_categorie_id" string="Catégorie"/>
+                                <field name="of_produit_installe_id" string="S/N"/>
+                                <field name="user_id" string="Responsable"/>
+                                <field name="of_piece_commande"/>
+                                <field name="stage_id"/>
+                                <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
+                            </tree>
+                        </field>
+                    </group>
                 </group>
             </field>
         </record>

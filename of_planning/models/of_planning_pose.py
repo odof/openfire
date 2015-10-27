@@ -194,13 +194,13 @@ class of_planning_pose(osv.Model):
         return [('tache_id', 'in', tache_ids)]
 
     _columns = {
-        'name'                 : fields.char('Libelle', size=64, required=True),
-        'date'                 : fields.datetime('Date de pose', required=True),
+        'name'                 : fields.char(u'Libellé', size=64, required=True),
+        'date'                 : fields.datetime('Date intervention', required=True),
         'date_from'            : fields.function(lambda *a, **k:{}, method=True, type='date', string=u"Date début"),
         'date_to'              : fields.function(lambda *a, **k:{}, method=True, type='date', string="Date fin"),
         'date_deadline'        : fields.datetime('Deadline'),
         'date_deadline_display': fields.related('date_deadline', type='datetime', string="Date Fin", store=False),
-        'duree'                : fields.float('Duree de pose', required=True, digits=(12, 5)),
+        'duree'                : fields.float('Duree intervention', required=True, digits=(12, 5)),
         'user_id'              : fields.many2one('res.users', 'Utilisateur'),
         'partner_id'           : fields.many2one('res.partner', 'Client'),
         'partner_city'         : fields.function(_get_city, method=True, type='char', string='Ville', readonly=False,
@@ -208,7 +208,7 @@ class of_planning_pose(osv.Model):
                                                         'res.partner'        : (_get_partner_pose_ids, ['address'], 10)}),
         'raison_id'            : fields.many2one('of.planning.pose.raison', 'Raison'),
         'tache_id'             : fields.many2one('of.planning.tache', 'Tâche', required=True),
-        'poseur_id'            : fields.many2one('of.planning.equipe', 'Equipe Pose', required=True),
+        'poseur_id'            : fields.many2one('of.planning.equipe', 'Equipe', required=True),
         'state'                : fields.selection([('Brouillon', 'Brouillon'), ('Planifie', 'Planifié'), ('Confirme', 'Confirmé'), ('Pose', 'Posé'), ('Annule', 'Annulé'), ('Reporte', 'Reporté'), ('Inacheve', 'Inachevé')], 'Etat', size=16, readonly=True),
         'company_id'           : fields.many2one('res.company', 'Magasin'),
         'description'          : fields.text('Description'),
@@ -222,7 +222,7 @@ class of_planning_pose(osv.Model):
 #         'sidebar_color'        : fields.related('poseur_id','color_id','color', type='char', help="Couleur pour le menu droit du planning (couleur de base de l'équipe de pose)"),
         'category_id'          : fields.function(_get_category, method=True, type='many2one', obj="hr.employee.category", string=u"Type de tâche", store=False,
                                                  fnct_search=_search_category),
-        'verif_dispo'          : fields.boolean(u'Vérif', help=u"Vérifier la disponibilité de l'équipe de pose sur ce créneau", required=True),
+        'verif_dispo'          : fields.boolean(u'Vérif', help=u"Vérifier la disponibilité de l'équipe sur ce créneau", required=True),
     }
     _defaults = {
         'user_id'    : lambda self, cr, uid, context: uid,
