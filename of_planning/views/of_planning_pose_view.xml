@@ -107,7 +107,7 @@
                         </group>
                         <!-- <label align="5.0" colspan="2" string="Horaires de travail"/> -->
                         <group col="8" colspan="2">
-                            <field name="hor_md" string="Horaires matin" widget="float_time" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" context="{'tz': 'Europe/Paris'}"/>
+                            <field name="hor_md" string="Horaires - Matin" widget="float_time" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" context="{'tz': 'Europe/Paris'}"/>
                             <span>-</span>
                             <field name="hor_mf" nolabel="1" widget="float_time" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" context="{'tz': 'Europe/Paris'}"/>
                             <field name="hor_ad" string="Après-midi" widget="float_time" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" context="{'tz': 'Europe/Paris'}"/>

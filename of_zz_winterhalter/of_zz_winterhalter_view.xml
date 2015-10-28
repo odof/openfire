@@ -515,17 +515,17 @@
 
 		<!-- *** Action dans vue SAV (project.issue) *** -->
 		
-		<!-- Lien pour action créer SAV demande d'intervention depuis SAV-->
+		<!-- Lien pour action créer SAV demande d'intervention depuis SAV -->
 		<!-- Objectif : ouvrir un nouveau SAV depuis un SAV "Appel téléphonique" avec les mêmes paramètres mais avec type à "Demande d'intervention" -->
         <record id="action_open_demande_intervention" model="ir.actions.server">
-            <field name="name">Effectuer une demande d'intervention</field>
+            <field name="name">Demande d'intervention</field>
             <field name="model_id" ref="project_issue.model_project_issue"/>
             <field name="state">code</field>
             <field name="code">action = self.pool['project.issue'].ouvrir_demande_intervention(cr, uid, context)</field>
         </record>
 
         <record id="action_create_demande_intervention" model="ir.values">
-            <field name="name">Effectuer une demande d'intervention</field>
+            <field name="name">Demande d'intervention</field>
             <field name="key2">client_action_multi</field>
             <field name="model">project.issue</field>
             <field name="value" eval="'ir.actions.server,%d'%action_open_demande_intervention"/>
@@ -535,7 +535,7 @@
 
 		<!-- *** Action dans vue parc installé (of.parc.installe) *** -->
 
-		<!-- Lien pour action créer SAV depuis parc installé-->
+		<!-- Lien pour action créer SAV depuis parc installé -->
         <record id="action_open_creer_sav" model="ir.actions.server">
             <field name="name">Créer un SAV</field>
             <field name="model_id" ref="project_issue.model_project_issue"/>
@@ -543,7 +543,7 @@
             <field name="code">action = self.pool['of.parc.installe'].action_creer_sav(cr, uid, context)</field>
         </record>
 
-        <record id="action_create_demande_intervention" model="ir.values">
+        <record id="action_creer_sav" model="ir.values">
             <field name="name">Créer un SAV</field>
             <field name="key2">client_action_multi</field>
             <field name="model">of.parc.installe</field>

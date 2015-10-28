@@ -37,7 +37,7 @@
      - Possibilité de générer un devis ou une demande de prix depuis le SAV (menu droit).
      - Affichage des emails envoyés aux fournisseurs depuis le SAV
     """,
-    "depends" : ['project_issue', 'sale', 'purchase', 'of_base'], # Migration , 'of_appro', 'of_planning'],
+    "depends" : ['project_issue', 'sale', 'purchase', 'of_base', 'of_planning'], # Migration , 'of_appro'],
     # Modules sale, purchase nécessaires pour historique documents
     # of_base nécessaire pour onglet historique dans vue partenaire
 

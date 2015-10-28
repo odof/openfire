@@ -290,7 +290,31 @@
             header="False"
             />
 
-<!-- Lien pour créer devis -->
+
+<!-- *************************************************** -->        
+<!-- ********************* ACTIONS ********************* -->
+<!-- *************************************************** -->
+
+        <!-- *** Action dans sav (project.issue) *** -->
+
+        <!-- Lien pour action créer un rendez-vous depuis SAV -->
+        <record id="action_open_creer_rdv" model="ir.actions.server">
+            <field name="name">Rendez-vous</field>
+            <field name="model_id" ref="of_planning.model_of_planning_pose"/>
+            <field name="state">code</field>
+            <field name="code">action = self.pool['project.issue'].action_creer_rdv(cr, uid, context)</field>
+        </record>
+
+        <record id="action_create_rdv" model="ir.values">
+            <field name="name">Rendez-vous</field>
+            <field name="key2">client_action_multi</field>
+            <field name="model">project.issue</field>
+            <field name="value" eval="'ir.actions.server,%d'%action_open_creer_rdv"/>
+            <field name="object" eval="True"/>
+        </record>
+
+        
+        <!-- Pour créer devis -->
 
         <record id="action_open_sale_order" model="ir.actions.server">
             <field name="name">Générer devis client</field>
@@ -307,7 +331,8 @@
             <field name="object" eval="True"/>
         </record>
  
- <!-- Lien pour créer demande de prix -->
+        
+        <!-- Lien pour créer demande de prix -->
 
         <record id="action_open_purchase_order" model="ir.actions.server">
             <field name="name">Générer commande fournisseur</field>
@@ -324,19 +349,25 @@
             <field name="object" eval="True"/>
         </record>
 
+
+<!-- *************************************************** -->        
+<!-- ****************** PLANNING POSE ****************** -->
+<!-- *************************************************** -->
+
        <!-- insertion SAV lié dans planning pose form -->
- <!--       <record id="of_planning_pose_sav_liee" model="ir.ui.view" >
+       <record id="of_planning_pose_sav_liee" model="ir.ui.view" >
             <field name="name">of.planning.pose.sav.liee</field>
             <field name="model">of.planning.pose</field>
-            <field name="type">form</field>
             <field name="inherit_id" ref="of_planning.of_planning_pose_view_form"/>
             <field name="arch" type="xml" >
-                <field name="tache" position="before">
+                <field name="name" position="before">
                     <field name="sav_id" string="SAV lié"/>
                 </field>
             </field>
         </record>
- -->        
+
+
+        
        <!-- wizard interface courriel SAV -->
  <!--       <record id="view_of_crm_mail_sav_wizard" model="ir.ui.view">
             <field name="name">Interface courriel SAV</field>

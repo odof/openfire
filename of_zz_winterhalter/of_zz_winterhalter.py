@@ -129,7 +129,7 @@ class project_issue(osv.Model):
             'name': 'Demande intervention',
             'view_type': 'form',
             'view_mode': 'form',
-            'res_model': 'product.issue',
+            'res_model': 'project.issue',
             'type': 'ir.actions.act_window',
             'target': 'current',
         }
@@ -151,6 +151,12 @@ class project_issue(osv.Model):
                         'default_of_garantie': project_issue.of_garantie,
                         'default_of_payant_client': project_issue.of_payant_client,
                         'default_of_payant_fournisseur': project_issue.of_payant_fournisseur,
+                        'default_of_categorie_id': project_issue.of_categorie_id.id,
+                        'default_date_deadline': project_issue.date_deadline,
+                        'default_tag_ids': [(6,0,[tag.id for tag in project_issue.tag_ids])],
+                        'default_description': project_issue.description,
+                        'default_of_actions_realisees': project_issue.of_actions_realisees,
+                        'default_of_actions_eff': project_issue.of_actions_eff
                         }
                 else:
                     return False

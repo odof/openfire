@@ -338,6 +338,28 @@ class project_issue(osv.Model):
 #             })
         return res
 
+ 
+    def action_creer_rdv(self, cr, uid, context={}):
+        if not context:
+            context = {}
+        res = {
+            'name': 'Rendez-vous',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'of.planning.pose',
+            'type': 'ir.actions.act_window',
+            'target': 'current',
+        }
+        if 'active_ids' in context.keys():
+            active_ids = isinstance(context['active_ids'], (int,long)) and [context['active_ids']] or context['active_ids']
+            if active_ids:
+                project_issue = self.browse(cr, uid, active_ids[0])
+                res['context'] = {'default_sav_id': project_issue.id}
+                if project_issue.partner_id:
+                    res['context']['default_partner_id'] = project_issue.partner_id.id
+        return res
+
+
     # Migration ok
     def open_purchase_order(self, cr, uid, context={}):
         if not context:
@@ -721,14 +743,14 @@ class res_partner(osv.Model):
 #         'courriels': fields.function(_get_courriels, string="Courriels", type='char', size=256),
 #     }
 
-# Migration
-# class of_planning_pose(osv.Model):
-#     _name = "of.planning.pose"
-#     _inherit = "of.planning.pose"
-#  
-#     _columns = {
-#         'sav_id': fields.many2one('project.issue', 'SAV', readonly=False),
-#     }
+
+class of_planning_pose(osv.Model):
+    _name = "of.planning.pose"
+    _inherit = "of.planning.pose"
+  
+    _columns = {
+        'sav_id': fields.many2one('project.issue', 'SAV', readonly=False),
+    }
 
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
