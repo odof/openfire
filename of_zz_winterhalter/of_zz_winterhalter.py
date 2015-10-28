@@ -88,7 +88,7 @@ class project_issue(osv.Model):
 
     _columns = {
         'of_produit_installe_id': fields.many2one('of.parc.installe', 'Produit installé', readonly=False),
-        'of_type': fields.selection([('contacttel',u'Appel assistance téléphonique'), ('di',u'Demande d\'intervention')], 'Type', required=False, help=u"Type de SAV"),
+        'of_type': fields.selection([('contacttel',u'ASS'), ('di',u'DI')], 'Type', required=False, help=u"Type de SAV"),
         'product_name_id': fields.many2one('product.product', 'Désignation', ondelete='restrict'),
         #'product_name_id': fields.related('of_produit_installe_id', 'product_id', 'name', readonly=True, type='char', string=u'Nom'),
         'product_category_id': fields.related('product_name_id', 'categ_id', 'name', readonly=True, type='char', string=u'Famille'),
