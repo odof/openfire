@@ -162,6 +162,15 @@ class project_issue(osv.Model):
         #                                            }),
         # MG 'interventions_liees': fields.one2many('of.planning.pose', 'sav_id', 'Poses liees', readonly=False),
         # MG 'show_partner_shop'  : fields.function(_get_show_partner_shop, type="boolean", string="Magasin différent"),
+        'of_partner_id_street': fields.related('partner_id', 'street', readonly=True, type='char', string=u'Adresse'),
+        'of_partner_id_street2': fields.related('partner_id', 'street2', readonly=True, type='char', string=u'Complément adresse'),
+        'of_partner_id_zip': fields.related('partner_id', 'zip', readonly=True, type='char', string=u'Code postal'),
+        'of_partner_id_city': fields.related('partner_id', 'city', readonly=True, type='char', string=u'Ville'),
+        'of_partner_id_country': fields.related('partner_id', 'country_id', readonly=True, type='many2one', relation="res.country", string=u'Pays'),
+        'of_partner_id_phone': fields.related('partner_id', 'phone', readonly=True, type='char', string=u'Téléphone'),
+        'of_partner_id_mobile': fields.related('partner_id', 'mobile', readonly=True, type='char', string=u'Mobile'),
+        'of_partner_id_function': fields.related('partner_id', 'function', readonly=True, type='char', string=u'Fonction'),
+        
     }
 
     _defaults = {

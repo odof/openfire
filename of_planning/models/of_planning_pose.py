@@ -208,7 +208,7 @@ class of_planning_pose(osv.Model):
                                                         'res.partner'        : (_get_partner_pose_ids, ['address'], 10)}),
         'raison_id'            : fields.many2one('of.planning.pose.raison', 'Raison'),
         'tache_id'             : fields.many2one('of.planning.tache', 'Tâche', required=True),
-        'poseur_id'            : fields.many2one('of.planning.equipe', 'Equipe', required=True),
+        'poseur_id'            : fields.many2one('of.planning.equipe', 'Intervenant', required=True),
         'state'                : fields.selection([('Brouillon', 'Brouillon'), ('Planifie', 'Planifié'), ('Confirme', 'Confirmé'), ('Pose', 'Posé'), ('Annule', 'Annulé'), ('Reporte', 'Reporté'), ('Inacheve', 'Inachevé')], 'Etat', size=16, readonly=True),
         'company_id'           : fields.many2one('res.company', 'Magasin'),
         'description'          : fields.text('Description'),

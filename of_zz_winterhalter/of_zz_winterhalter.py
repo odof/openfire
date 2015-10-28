@@ -36,6 +36,7 @@ class of_parc_installe(osv.Model):
         'date_service': fields.date('Date vente', required=False),
         'date_installation': fields.date('Date d\'installation', required=False),
         'product_id': fields.many2one('product.product', 'Produit', required=True, ondelete='restrict'),
+        'product_category_id': fields.related('product_id', 'categ_id', 'name', readonly=True, type='char', string=u'Famille'),
         'client_id': fields.many2one('res.partner', 'Client', required=True, domain="[('parent_id','=',False)]", ondelete='restrict'),
         'site_adresse_id': fields.many2one('res.partner', 'Site installation', required=False, domain="['|',('parent_id','=',client_id),('id','=',client_id)]", ondelete='restrict'),
         'revendeur_id': fields.many2one('res.partner', 'Revendeur', required=False,  domain="[('of_revendeur','=',True)]", ondelete='restrict'),
@@ -88,9 +89,9 @@ class project_issue(osv.Model):
     _columns = {
         'of_produit_installe_id': fields.many2one('of.parc.installe', 'Produit installé', readonly=False),
         'of_type': fields.selection([('contacttel',u'Appel assistance téléphonique'), ('di',u'Demande d\'intervention')], 'Type', required=False, help=u"Type de SAV"),
-        'product_name_id': fields.many2one('product.product', 'Nom', ondelete='restrict'),
+        'product_name_id': fields.many2one('product.product', 'Désignation', ondelete='restrict'),
         #'product_name_id': fields.related('of_produit_installe_id', 'product_id', 'name', readonly=True, type='char', string=u'Nom'),
-        'product_category_id': fields.related('product_name_id', 'categ_id', 'name', readonly=True, type='char', string=u'Catégorie'),
+        'product_category_id': fields.related('product_name_id', 'categ_id', 'name', readonly=True, type='char', string=u'Famille'),
         'of_actions_eff': fields.text(u'Actions à effectuer'),
         'of_actions_realisees': fields.text(u'Actions réalisées'),
         'description': fields.text(u'Problématique'), # Existe déjà, pour renommer champ
@@ -180,7 +181,7 @@ class product_template(osv.Model):
         'of_est_dangereux': fields.boolean(u'Produit dangereux', help=u"Cocher cette case si ce produit est dangereux."),
         'of_poids_adr': fields.float(u'Poids ADR', help=u"Poids ADR"),
         'of_pas_dans_sage': fields.boolean(u'Pas dans Sage', help=u"Si ce produit n'est pas dans Sage."),
-        'of_produit_substitue_id': fields.many2one('product.template', 'Article substitué', required=False,  ondelete='restrict'),
+        'of_produit_substitue_id': fields.many2one('product.template', 'Article de substitution', required=False,  ondelete='restrict'),
     }
     
  
