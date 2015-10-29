@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<openerp>
+	<data>
+
+	<template id="snippet_tabs" name="TABS">
+		<section class="section_snippet_tabs">
+ 	   		<div class="container">
+	   		<div class="row">
+				<div class="sidebar-page">
+				
+					<div class="col-md-9 page-content">
+						
+						<div class="tabs-section">
+							
+							<!-- Nav Tabs -->
+							<ul class="nav nav-tabs">
+								<li class="active"><a href="#tab-1"  data-toggle="tab"><i class="fa fa-desktop"></i>Tab Title 1</a></li>
+								<li><a href="#tab-2"  data-toggle="tab"><i class="fa fa-leaf"></i>Tab Title 2</a></li>
+								<li><a href="#tab-3"  data-toggle="tab"><i class="fa fa-rocket"></i>Tab Title 3</a></li>
+							</ul>
+							
+							<!-- Tab panels -->
+							<div class="tab-content-new">
+								<!-- Tab Content 1 -->
+								<div class="tab-pane fade in active" id="tab-1">
+									<p><strong class="accent-color">Odoo</strong> Odoo (formerly known as OpenERP and before that, TinyERP) is a suite of open-source enterprise management applications. Targeting companies of all sizes, the application suite includes billing, accounting, manufacturing, purchasing, warehouse management, and project management.</p>
+									<p>The source code for the OpenObject framework and core ERP modules is curated by the Belgium based Odoo S.A. Additionally, customized programming, support, and other services are provided by an active global community and a network of 500 official partners. The main Odoo components are the OpenObject  framework, about 30 core modules (also called official modules) and more than 3000 community modules.</p>
+									<div class="row">
+										<div class="col-md-6">
+											<ul class="icons-list">
+												<li><i class="fa fa-check-circle"></i> Odoo apps can be easily customized for your unique needs.</li>
+												<li><i class="fa fa-check-circle"></i> Our team and network of 570+ partners.</li>
+												<li><i class="fa fa-check-circle"></i> 2000 developers make it the fastest evolving business software.</li>
+												<li><i class="fa fa-check-circle"></i> You'll always be on top of the latest business with Odoo.</li>
+											</ul>
+										</div>
+										<div class="col-md-6">
+											<ul class="icons-list">
+												<li><i class="fa fa-check-circle"></i> Odoo apps can be easily customized for your unique needs.</li>
+												<li><i class="fa fa-check-circle"></i> Our team and network of 570+ partners.</li>
+												<li><i class="fa fa-check-circle"></i> 2000 developers make it the fastest evolving business software.</li>
+												<li><i class="fa fa-check-circle"></i> You'll always be on top of the latest business with Odoo.</li>
+											</ul>
+										</div>
+									</div>
+								</div>
+								<!-- Tab Content 2 -->
+								<div class="tab-pane fade" id="tab-2">
+									<p><img class="img-thumbnail image-text" style="float:left; width:180px;" alt="" src="/theme_margo/static/src/images/others/bussniss-pic.jpg" /></p>
+									<p><strong class="accent-color">Odoo</strong> Odoo (formerly known as OpenERP and before that, TinyERP) is a suite of open-source enterprise management applications. Targeting companies of all sizes, the application suite includes billing, accounting, manufacturing, purchasing, warehouse management, and project management.</p>
+									<p>The source code for the OpenObject framework and core ERP modules is curated by the Belgium based Odoo S.A. Additionally, customized programming, support, and other services are provided by an active global community and a network of 500 official partners. The main Odoo components are the OpenObject  framework, about 30 core modules (also called official modules) and more than 3000 community modules.</p>
+								</div>
+								<!-- Tab Content 3 -->
+								<div class="tab-pane fade" id="tab-3">
+									<p><strong class="accent-color">Odoo</strong> Odoo (formerly known as OpenERP and before that, TinyERP) is a suite of open-source enterprise management applications. Targeting companies of all sizes, the application suite includes billing, accounting, manufacturing, purchasing, warehouse management, and project management.</p>
+									<p>The source code for the OpenObject framework and core ERP modules is curated by the Belgium based Odoo S.A. Additionally, customized programming, support, and other services are provided by an active global community and a network of 500 official partners. The main Odoo components are the OpenObject  framework, about 30 core modules (also called official modules) and more than 3000 community modules.</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+        	</div>
+        </div>
+        
+      <div class="oe_structure" />
+      </section>
+   </template>
+</data>
+</openerp>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<openerp>
+	<data>
+
+		<template id="snippet_about" name="About Us">
+			<section id="section_snippet_about">
+				<div class="container">
+					<div class="row">
+				            <div class="col-md-7">
+				              <h4 class="classic-title"><span>Welcome To Our Agency</span></h4>
+				              <p> <a title="Simple Tooltip" href="#" class="itl-tooltip" data-placement="top">Odoo</a> (formerly known as OpenERP and before that, TinyERP) is a suite of open-source enterprise management applications. Targeting companies of all sizes, the application suite includes billing, accounting, manufacturing, purchasing, warehouse management, and project management.</p>
+				              <p> The source code for the OpenObject framework and core ERP modules is curated by the Belgium based Odoo S.A. Additionally, customized programming, support, and other services are provided by an active global community and a network of 500 official partners. The main Odoo components are the OpenObject  framework, about 30 core modules (also called official modules) and more than 3000 community modules. </p>
+				            </div>
+				            <div class="col-md-5"> 
+				              <div class="touch-slider" data-slider-navigation="true" data-slider-pagination="true">
+				                <div class="item"><img alt="" src="/theme_margo/static/src/images/others/about_1.png"/></div>
+				                <div class="item"><img alt="" src="/theme_margo/static/src/images/others/about_2.png"/></div>
+				                <div class="item"><img alt="" src="/theme_margo/static/src/images/others/about_1.png"/></div>
+				              </div>
+				            </div>
+					</div>
+				</div>
+			</section>
+		</template>
+
+	</data>
+</openerp>

@@ -1,0 +1,87 @@
+/* pb 8 avec la solution */
+
+ul.oe_menu_editor ul {
+    margin-left: 30px;
+    margin-top: 3px;
+}
+
+/* pb 3 avec la solution */
+.fixed-header {
+	top: 0;
+	position: fixed;  
+	z-index:1030;
+ 
+	 
+}
+
+
+/* utilisre dans le custom.js*/
+.navbar-fixed-top { position: fixed;z-index: 1035;}
+
+
+/*Used for  show style border-top footer */
+footer   {
+	display: block !important;
+	padding-top : 0px !important;
+
+	}
+/**/
+
+footer  
+    .container {
+            margin: 0 auto;
+            margin-top: 20px;
+            padding: 50px 0 30px;
+            border-bottom: none;
+}
+
+/*  lorsque vous cliquer sur deconnecter le background-color sera grid  */
+.navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:focus, .navbar-default .navbar-nav > .open > a:hover {
+    background-color: transparent !important;
+}
+
+
+/* center  logo */
+header a.navbar-brand.logo{
+    padding:  15px;
+}
+/* REDEFINIR CES CLASSE car on a supprimer class modern from snippet team*/
+.team-member .member-socail a i {
+	background-color: transparent;
+	color: #666;
+}
+.team-member .member-socail a:hover i {
+	color: #fff;
+}
+
+.team-member .progress {
+	height: 3px;
+	border-width: 2px;
+	margin-bottom: 6px;
+}
+
+.team-member .progress-label {
+	font-size: 12px;
+	line-height: 2em;
+	font-weight: 700;
+}
+
+.team-member .progress span {
+	display: none;
+}
+
+/**/
+ 
+
+.fa-color-beige { color: #fdb655 !important;}
+.fa-color-blue { color: #00afd1 !important;}
+.fa-color-cyan { color:#27bebe !important;}
+.fa-color-green { color: #94c523 !important;}
+.fa-color-jade { color:#0bb586 !important;}
+.fa-color-orange { color: #f36510 !important;}
+.fa-color-peach { color: #f49237 !important;  }
+.fa-color-pink { color:#f1505b !important;}
+.fa-color-purple { color: #6a3da3 !important;}
+.fa-color-red { color:#ee3733 !important;}
+.fa-color-sky-blue { color:#38cbcb !important;}
+.fa-color-yellow { color: #f8ba01 !important;}

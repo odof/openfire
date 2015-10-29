@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+
+<!-- Customize -->
+
+<template id="theme_customize" inherit_id="website_less.theme_customize" name="theme_magro modal">
+     <xpath expr="div" position="replace">
+        <div id="theme_customize_modal" class="modal fade bs-example-modal-sm">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="loading_backdrop"></div>
+                    <div class="modal-header">
+                        <button type="button" class="close">×</button>
+                        <h4 class="modal-title" id="mySmallModalLabel">Customize your theme</h4>
+                    </div>
+                    <div class="modal-body panel-group clean-panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    
+
+            <div class="panel panel-default clean-panel">
+
+          <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingTwo">
+            <div class="panel-body">
+            
+
+                <h5>Change the layout</h5>
+               
+                    <table name="layout">
+                    <tr>
+                        <td class=" text-center">
+                          <label class="clean-layout-combi center-block">
+                            <h6 class="text-center modal-h6 clean-layout-combi">WIDE VIEW</h6>
+                            <input name="layoutvar" type="radio" data-xmlid=""/>
+                          </label>
+                        </td>
+                        <td class=" text-center">
+                          <label class="clean-layout-combi center-block">
+                            <h6 class="text-center modal-h6 clean-layout-combi">BOXED VIEW</h6>
+                            <input name="layoutvar" type="radio" data-xmlid="theme_margo.option_layout_boxed"/>
+                          </label>
+                       </td>
+                   </tr>
+             </table>
+
+
+            <h5>Patterns</h5>
+
+             <table name="background-shades">
+                <tr>
+                  <td>
+                    <label class="clean-bg-layout-combi">
+                             <img src="/theme_margo/static/src/images/patterns/0.png" alt="LIGHT" class="clean-bg-layout-combi-img"/>
+                            <input id="bgvar-0" name="bgcolorvar" type="radio" data-xmlid="theme_margo.option_bg_0"/>
+                        </label>
+                    </td>
+                    <td>
+                        <label class="clean-bg-layout-combi">
+                             <img src="/theme_margo/static/src/images/patterns/1.png" alt="LIGHT" class="clean-bg-layout-combi-img"/>
+                            <input id="bgvar-1" name="bgcolorvar" type="radio" data-xmlid="theme_margo.option_bg_1"/>
+                        </label>
+                    </td>
+                    <td>
+                        <label class="clean-bg-layout-combi">
+                             <img src="/theme_margo/static/src/images/patterns/2.png" alt="LIGHT" class="clean-bg-layout-combi-img"/>
+                            <input id="bgvar-2" name="bgcolorvar" type="radio" data-xmlid="theme_margo.option_bg_2"/>
+                        </label>
+                    </td>
+                    <td>
+                        <label class="clean-bg-layout-combi">
+                             <img src="/theme_margo/static/src/images/patterns/3.png" alt="LIGHT" class="clean-bg-layout-combi-img"/>
+                            <input id="bgvar-3" name="bgcolorvar" type="radio" data-xmlid="theme_margo.option_bg_3"/>
+                        </label>
+                    </td>  
+                    <td>
+                        <label class="clean-bg-layout-combi">
+                             <img src="/theme_margo/static/src/images/patterns/4.png" alt="LIGHT" class="clean-bg-layout-combi-img"/>
+                            <input id="bgvar-4" name="bgcolorvar" type="radio" data-xmlid="theme_margo.option_bg_4"/>
+                        </label>
+                    </td>  
+                    <td>
+                        <label class="clean-bg-layout-combi">
+                             <img src="/theme_margo/static/src/images/patterns/5.png" alt="LIGHT" class="clean-bg-layout-combi-img"/>
+                            <input id="bgvar-5" name="bgcolorvar" type="radio" data-xmlid="theme_margo.option_bg_5"/>
+                        </label>
+                    </td>         
+                    <td>
+                        <label class="clean-bg-layout-combi">
+                             <img src="/theme_margo/static/src/images/patterns/6.png" alt="LIGHT" class="clean-bg-layout-combi-img"/>
+                            <input id="bgvar-6" name="bgcolorvar" type="radio" data-xmlid="theme_margo.option_bg_6"/>
+                        </label>
+                    </td>                   
+                     <td>
+                        <label class="clean-bg-layout-combi">
+                             <img src="/theme_margo/static/src/images/patterns/7.png" alt="LIGHT" class="clean-bg-layout-combi-img"/>
+                            <input id="bgvar-7" name="bgcolorvar" type="radio" data-xmlid="theme_margo.option_bg_7"/>
+                        </label>
+                    </td>                   
+                    <td>
+                        <label class="clean-bg-layout-combi">
+                             <img src="/theme_margo/static/src/images/patterns/8.png" alt="LIGHT" class="clean-bg-layout-combi-img"/>
+                            <input id="bgvar-8" name="bgcolorvar" type="radio" data-xmlid="theme_margo.option_bg_8"/>
+                        </label>
+                    </td>                    
+                    <td>
+                        <label class="clean-bg-layout-combi">
+                             <img src="/theme_margo/static/src/images/patterns/9.png" alt="LIGHT" class="clean-bg-layout-combi-img"/>
+                            <input id="bgvar-9" name="bgcolorvar" type="radio" data-xmlid="theme_margo.option_bg_9"/>
+                        </label>
+                    </td>                    
+                    
+                    <td>
+                        <label class="clean-bg-layout-combi">
+                             <img src="/theme_margo/static/src/images/patterns/10.png" alt="LIGHT" class="clean-bg-layout-combi-img"/>
+                            <input id="bgvar-10" name="bgcolorvar" type="radio" data-xmlid="theme_margo.option_bg_10"/>
+                        </label>
+                    </td>                    
+                     <td>
+                        <label class="clean-bg-layout-combi">
+                             <img src="/theme_margo/static/src/images/patterns/11.png" alt="LIGHT" class="clean-bg-layout-combi-img"/>
+                            <input id="bgvar-11" name="bgcolorvar" type="radio" data-xmlid="theme_margo.option_bg_11"/>
+                        </label>
+                    </td>                   
+                     <td>
+                        <label class="clean-bg-layout-combi">
+                             <img src="/theme_margo/static/src/images/patterns/12.png" alt="LIGHT" class="clean-bg-layout-combi-img"/>
+                            <input id="bgvar-12" name="bgcolorvar" type="radio" data-xmlid="theme_margo.option_bg_12"/>
+                        </label>
+                    </td>                   
+                     <td>
+                        <label class="clean-bg-layout-combi">
+                             <img src="/theme_margo/static/src/images/patterns/13.png" alt="LIGHT" class="clean-bg-layout-combi-img"/>
+                            <input id="bgvar-13" name="bgcolorvar" type="radio" data-xmlid="theme_margo.option_bg_13"/>
+                        </label>
+                    </td> 
+                    <td>
+                        <label class="clean-bg-layout-combi">
+                             <img src="/theme_margo/static/src/images/patterns/14.png" alt="LIGHT" class="clean-bg-layout-combi-img"/>
+                            <input id="bgvar-14" name="bgcolorvar" type="radio" data-xmlid="theme_margo.option_bg_14"/>
+                        </label>
+                    </td>                                      
+                                                                  
+                </tr>  
+            </table>
+            
+             
+   
+            <h5>12 Predefined Color Skins</h5>
+              <table name="color">
+                <tr>
+                    <td>
+                        <label class="clean-color-combi">
+                            <i class="fa fa-stop fa-2x fa-color-red" />
+                            <input id="colorvar-1" name="colorvar" type="radio" data-xmlid="theme_margo.option_color_red" />
+                        </label>
+                    </td>
+                    <td>
+                        <label class="clean-color-combi">
+                             <i class="fa fa-stop fa-2x fa-color-beige" />
+                            <input id="colorvar-2"  name="colorvar" type="radio" data-xmlid="theme_margo.option_color_beige" />
+                        </label>
+                    </td>
+                     <td>
+                        <label class="clean-color-combi">
+                             <i class="fa fa-stop fa-2x fa-color-blue" />
+                            <input id="colorvar-3"  name="colorvar" type="radio" data-xmlid="theme_margo.option_color_blue" />
+                        </label>
+                    </td>
+                     <td>
+                        <label class="clean-color-combi">
+                             <i class="fa fa-stop fa-2x fa-color-cyan" />
+                            <input id="colorvar-4"  name="colorvar" type="radio" data-xmlid="theme_margo.option_color_cyan" />
+                        </label>
+                    </td>
+                     <td>
+                        <label class="clean-color-combi">
+                             <i class="fa fa-stop fa-2x fa-color-green" />
+                            <input id="colorvar-5"  name="colorvar" type="radio" data-xmlid="theme_margo.option_color_green" />
+                        </label>
+                    </td>
+                    <td>
+                        <label class="clean-color-combi">
+                             <i class="fa fa-stop fa-2x fa-color-jade" />
+                            <input id="colorvar-6"  name="colorvar" type="radio" data-xmlid="theme_margo.option_color_jade" />
+                        </label>
+                    </td> 
+                      <td>
+                        <label class="clean-color-combi">
+                             <i class="fa fa-stop fa-2x fa-color-orange" />
+                            <input id="colorvar-7"  name="colorvar" type="radio" data-xmlid="theme_margo.option_color_orange" />
+                        </label>
+                    </td>    
+                    <td>
+                        <label class="clean-color-combi">
+                             <i class="fa fa-stop fa-2x fa-color-peach" />
+                            <input id="colorvar-8"  name="colorvar" type="radio" data-xmlid="theme_margo.option_color_peach" />
+                        </label>
+                    </td>    
+                   <td>
+                        <label class="clean-color-combi">
+                             <i class="fa fa-stop fa-2x fa-color-pink" />
+                            <input id="colorvar-9"  name="colorvar" type="radio" data-xmlid="theme_margo.option_color_pink" />
+                        </label>
+                    </td>    
+                    <td>
+                        <label class="clean-color-combi">
+                             <i class="fa fa-stop fa-2x fa-color-purple" />
+                            <input id="colorvar-10"  name="colorvar" type="radio" data-xmlid="theme_margo.option_color_purple" />
+                        </label>
+                    </td>  
+                    <td>
+                        <label class="clean-color-combi">
+                             <i class="fa fa-stop fa-2x fa-color-sky-blue" />
+                            <input id="colorvar-11"  name="colorvar" type="radio" data-xmlid="theme_margo.option_color_sky_blue" />
+                        </label>
+                    </td>    
+                    <td>
+                        <label class="clean-color-combi">
+                             <i class="fa fa-stop fa-2x fa-color-yellow" />
+                            <input id="colorvar-12"  name="colorvar" type="radio" data-xmlid="theme_margo.option_color_yellow" />
+                        </label>
+                    </td>  
+                </tr>
+            </table> 
+
+            <!--  Footer Color -->
+            
+          <h5>Choose the footer color</h5>
+              <table name="color">
+                <tr>
+                  <td>
+                        <label class="clean-color-combi">
+                            <i class="fa fa-stop fa-2x"  style="color:#222;"/>
+                            <input id="color-footer-var-main" name="color-footer-var" type="radio" data-xmlid="" />
+                        </label>
+                    </td>
+                    
+                    <td>
+                        <label class="clean-color-combi">
+                            <i class="fa fa-stop fa-2x fa-color-red" />
+                            <input id="color-footer-var-1" name="color-footer-var" type="radio" data-xmlid="theme_margo.option_color_footer_red" />
+                        </label>
+                    </td>
+                    <td>
+                        <label class="clean-color-combi">
+                             <i class="fa fa-stop fa-2x fa-color-beige" />
+                            <input id="color-footer-var-2"  name="color-footer-var" type="radio" data-xmlid="theme_margo.option_color_footer_beige" />
+                        </label>
+                    </td>
+                     <td>
+                        <label class="clean-color-combi">
+                             <i class="fa fa-stop fa-2x fa-color-blue" />
+                            <input id="color-footer-var-3"  name="color-footer-var" type="radio" data-xmlid="theme_margo.option_color_footer_blue" />
+                        </label>
+                    </td>
+                     <td>
+                        <label class="clean-color-combi">
+                             <i class="fa fa-stop fa-2x fa-color-cyan" />
+                            <input id="color-footer-var-4"  name="color-footer-var" type="radio" data-xmlid="theme_margo.option_color_footer_cyan" />
+                        </label>
+                    </td>
+                     <td>
+                        <label class="clean-color-combi">
+                             <i class="fa fa-stop fa-2x fa-color-green" />
+                            <input id="color-footer-var-5"  name="color-footer-var" type="radio" data-xmlid="theme_margo.option_color_footer_green" />
+                        </label>
+                    </td>
+                    <td>
+                        <label class="clean-color-combi">
+                             <i class="fa fa-stop fa-2x fa-color-jade" />
+                            <input id="color-footer-var-6"  name="color-footer-var" type="radio" data-xmlid="theme_margo.option_color_footer_jade" />
+                        </label>
+                    </td> 
+                      <td>
+                        <label class="clean-color-combi">
+                             <i class="fa fa-stop fa-2x fa-color-orange" />
+                            <input id="color-footer-var-7"  name="color-footer-var" type="radio" data-xmlid="theme_margo.option_color_footer_orange" />
+                        </label>
+                    </td>    
+                    <td>
+                        <label class="clean-color-combi">
+                             <i class="fa fa-stop fa-2x fa-color-peach" />
+                            <input id="color-footer-var-8"  name="color-footer-var" type="radio" data-xmlid="theme_margo.option_color_footer_peach" />
+                        </label>
+                    </td>    
+                   <td>
+                        <label class="clean-color-combi">
+                             <i class="fa fa-stop fa-2x fa-color-pink" />
+                            <input id="color-footer-var-9"  name="color-footer-var" type="radio" data-xmlid="theme_margo.option_color_footer_pink" />
+                        </label>
+                    </td>    
+                    <td>
+                        <label class="clean-color-combi">
+                             <i class="fa fa-stop fa-2x fa-color-purple" />
+                            <input id="color-footer-var-10"  name="color-footer-var" type="radio" data-xmlid="theme_margo.option_color_footer_purple" />
+                        </label>
+                    </td>  
+                    <td>
+                        <label class="clean-color-combi">
+                             <i class="fa fa-stop fa-2x fa-color-sky-blue" />
+                            <input id="color-footer-var-11"  name="color-footer-var" type="radio" data-xmlid="theme_margo.option_color_footer_sky_blue" />
+                        </label>
+                    </td>    
+                    <td>
+                        <label class="clean-color-combi">
+                             <i class="fa fa-stop fa-2x fa-color-yellow" />
+                            <input id="color-footer-var-12"  name="color-footer-var" type="radio" data-xmlid="theme_margo.option_color_footer_yellow" />
+                        </label>
+                    </td>  
+                </tr>
+            </table> 
+            
+             
+        </div>
+    </div>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</xpath>
+</template>
+
+
+  <!-- Layout -->
+
+  <template id="option_layout_boxed" name="option_layout_boxed" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/layout_boxed.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>
+
+  <!-- Main Color -->
+
+  <template id="option_color_red" name="option_color_red" inherit_id="website.theme" active="True">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_red.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>
+
+  <template id="option_color_beige" name="option_color_beige" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_beige.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>
+
+  <template id="option_color_blue" name="option_color_blue" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_blue.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>
+  
+  <template id="option_color_cyan" name="option_color_cyan" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_cyan.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>
+
+  <template id="option_color_green" name="option_color_green" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_green.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>
+
+  <template id="option_color_jade" name="option_color_jade" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_jade.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>
+   
+  <template id="option_color_orange" name="option_color_orange" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_orange.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>
+  
+  <template id="option_color_peach" name="option_color_peach" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_peach.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>       
+
+  <template id="option_color_pink" name="option_color_pink" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_pink.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>   
+  
+  <template id="option_color_purple" name="option_color_purple" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_purple.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>   
+  
+  <template id="option_color_sky_blue" name="option_color_sky_blue" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_sky_blue.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>   
+  
+  <template id="option_color_yellow" name="option_color_yellow" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_yellow.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>   
+
+ 
+  <!-- BG Color -->  
+
+  <template id="option_bg_0" name="option_bg_0" inherit_id="website.theme"  active="True">  
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/bg_0.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>
+  
+  <template id="option_bg_1" name="option_bg_1" inherit_id="website.theme"  active="False"> 
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/bg_1.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>
+
+  <template id="option_bg_2" name="option_bg_2" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/bg_2.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>
+
+  <template id="option_bg_3" name="option_bg_3" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/bg_3.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>
+  
+  <template id="option_bg_4" name="option_bg_4" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/bg_4.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>  
+  
+   <template id="option_bg_5" name="option_bg_5" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/bg_5.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>  
+  
+  <template id="option_bg_6" name="option_bg_6" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/bg_6.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>  
+
+  <template id="option_bg_7" name="option_bg_7" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/bg_7.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>  
+       
+   <template id="option_bg_8" name="option_bg_8" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/bg_8.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>  
+   
+   <template id="option_bg_9" name="option_bg_9" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/bg_9.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>  
+   
+   <template id="option_bg_10" name="option_bg_10" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/bg_10.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>  
+   
+  <template id="option_bg_11" name="option_bg_11" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/bg_11.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>  
+    
+  <template id="option_bg_12" name="option_bg_12" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/bg_12.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>  
+    
+   <template id="option_bg_13" name="option_bg_13" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/bg_13.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>  
+   
+   <template id="option_bg_14" name="option_bg_14" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/bg_14.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>  
+  
+  <!-- Footer Color --> 
+   
+  <template id="option_color_footer_red" name="option_color_footer_red" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_footer_red.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>
+
+  <template id="option_color_footer_beige" name="option_color_footer_beige" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_footer_beige.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>
+
+  <template id="option_color_footer_blue" name="option_color_footer_blue" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_footer_blue.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>
+  
+  <template id="option_color_footer_cyan" name="option_color_footer_cyan" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_footer_cyan.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>
+
+  <template id="option_color_footer_green" name="option_color_footer_green" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_footer_green.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>
+
+  <template id="option_color_footer_jade" name="option_color_footer_jade" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_footer_jade.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>
+   
+  <template id="option_color_footer_orange" name="option_color_footer_orange" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_footer_orange.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>
+  
+  <template id="option_color_footer_peach" name="option_color_footer_peach" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_footer_peach.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>       
+
+  <template id="option_color_footer_pink" name="option_color_footer_pink" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_footer_pink.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>   
+  
+  <template id="option_color_footer_purple" name="option_color_footer_purple" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_footer_purple.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>   
+  
+  <template id="option_color_footer_sky_blue" name="option_color_footer_sky_blue" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_footer_sky_blue.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>   
+  
+  <template id="option_color_footer_yellow" name="option_color_footer_yellow" inherit_id="website.theme" active="False">
+    <xpath expr="." position="inside"><link href="/theme_margo/static/src/less/options/color_footer_yellow.less" rel="stylesheet" type="text/less"/></xpath>
+  </template>   
+  
+    
+ 
+</data>
+</openerp>

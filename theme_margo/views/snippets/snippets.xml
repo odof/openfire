@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<openerp>
+  <data>
+
+    <!-- Deactivate default website_less options before adding the theme ones
+    <template id="reset_default_options" inherit_id="website_less.default_options">
+      <xpath expr="//t[@id='default_options']" position="attributes">
+         <attribute name="t-if">False</attribute>
+      </xpath>
+    </template> -->
+ 
+		
+    <template id="snippet_selection" inherit_id="website_less.snippets">
+
+      <xpath expr="//div[@id='snippet_structure']" position="inside">
+     	<t t-snippet="theme_margo.snippet_carousel" t-thumbnail="/theme_margo/static/src/img/ui/snippet_carousel.png" />
+        <t t-snippet="theme_margo.snippet_service" t-thumbnail="/theme_margo/static/src/img/ui/snippet_service.png" />
+        <t t-snippet="theme_margo.snippet_section_one" t-thumbnail="/theme_margo/static/src/img/ui/snippet_section_one.png" />
+        <t t-snippet="theme_margo.snippet_section_two" t-thumbnail="/theme_margo/static/src/img/ui/snippet_section_two.png" />
+        <t t-snippet="theme_margo.snippet_section_three" t-thumbnail="/theme_margo/static/src/img/ui/snippet_section_three.png" />
+        <t t-snippet="theme_margo.snippet_page_title" t-thumbnail="/theme_margo/static/src/img/ui/snippet_page_title.png" />
+  
+      </xpath>
+
+      <xpath expr="//div[@id='snippet_content']" position="inside">
+      
+       </xpath>
+
+     <xpath expr="//div[@id='snippet_feature']" position="inside">
+     
+     <t t-snippet="theme_margo.snippet_action_box" t-thumbnail="/theme_margo/static/src/img/ui/snippet_action_box.png" />
+      <t t-snippet="theme_margo.snippet_pricing" t-thumbnail="/theme_margo/static/src/img/ui/snippet_pricing.png" />
+      <t t-snippet="theme_margo.snippet_team_profiles" t-thumbnail="/theme_margo/static/src/img/ui/snippet_team_profiles.png" />
+      <t t-snippet="theme_margo.snippet_clients" t-thumbnail="/theme_margo/static/src/img/ui/snippet_clients.png" />
+      <t t-snippet="theme_margo.snippet_latest_news" t-thumbnail="/theme_margo/static/src/img/ui/snippet_latest_news.png" />
+      <t t-snippet="theme_margo.snippet_solutions" t-thumbnail="/theme_margo/static/src/img/ui/snippet_solutions.png" />
+      <t t-snippet="theme_margo.snippet_tabs" t-thumbnail="/theme_margo/static/src/img/ui/snippet_tabs.png" />
+      <t t-snippet="theme_margo.snippet_skills" t-thumbnail="/theme_margo/static/src/img/ui/snippet_skills.png" />
+      <t t-snippet="theme_margo.snippet_about" t-thumbnail="/theme_margo/static/src/img/ui/snippet_about.png" />
+     </xpath>
+
+      <xpath expr="//div[@id='snippet_effect']" position="inside">
+        <t t-snippet="theme_margo.snippet_portfolio" t-thumbnail="/theme_margo/static/src/img/ui/snippet_portfolio.png" />
+        <t t-snippet="theme_margo.snippet_parallax_purchase" t-thumbnail="/theme_margo/static/src/img/ui/snippet_parallax_purchase.png" />
+     	<t t-snippet="theme_margo.snippet_parallax_one" t-thumbnail="/theme_margo/static/src/img/ui/snippet_parallax_one.png" />
+      </xpath>
+
+    </template>
+
+  </data>
+</openerp>

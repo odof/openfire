@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<openerp>
+	<data>
+	<template id="homepage" name="Home page" inherit_id="website.homepage">
+	<xpath expr="//div" position="inside">
+      <div class="oe_structure" />
+        <section id="home">
+            
+        </section>            
+        </xpath>
+        </template>
+	</data>
+</openerp>
