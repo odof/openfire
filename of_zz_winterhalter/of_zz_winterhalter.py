@@ -189,5 +189,32 @@ class product_template(osv.Model):
         'of_pas_dans_sage': fields.boolean(u'Pas dans Sage', help=u"Si ce produit n'est pas dans Sage."),
         'of_produit_substitue_id': fields.many2one('product.template', 'Article de substitution', required=False,  ondelete='restrict'),
     }
-    
- 
+
+
+# Pour la génération du pdf "Visite technique" depuis le SAV
+class compose_mail(osv.TransientModel):
+    _inherit = 'of.compose.mail'
+
+    def _get_objects(self, cr, uid, o, data, context):
+        result = super(compose_mail,self)._get_objects(cr, uid, o, data, context)
+        if o._model._name == 'project.issue':
+            result.update({
+                'sav'   : [o],
+            })
+        return result
+
+    def _get_dict_values(self, cr, uid, data, obj, context):
+        result = super(compose_mail,self)._get_dict_values(cr, uid, data, obj, context)
+
+        savs = context['objects'].get('sav',[])
+        for sav in savs:
+            result.update({
+            'pi_of_code'              : sav.of_code or '',
+            'pi_name'                 : sav.name or '',  
+            'pi_description'          : sav.description or '',
+            'pi_of_actions_realisees' : sav.of_actions_realisees or '',
+            'pi_of_actions_eff'       : sav.of_actions_eff or '',
+            })
+        
+        return result
+

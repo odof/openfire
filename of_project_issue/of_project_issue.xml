@@ -426,6 +426,19 @@
                 </page>
             </field>
         </record>
-              
+
+        <!-- Ajoute action générer pdf dans menu "Imprimer" -->
+        <act_window
+            name="Générer un pdf"
+            res_model="of.compose.mail"
+            src_model="project.issue"
+            view_mode="form"    
+            key2="client_print_multi"
+            view_id="of_gesdoc.view_courrier_wizard"
+            id="action_view_courrier_wizard_project_issue"
+            target="new"        
+            context="{'model':'project.issue'}"
+        />
+
     </data>
 </openerp>
