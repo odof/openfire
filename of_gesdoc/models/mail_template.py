@@ -133,7 +133,7 @@ class of_mail_template(osv.Model):
                 raise osv.except_osv(_('Erreur!'), str(e))
         return {'value': {'chp_ids': chps, 'len_chp': len_chp, 'file_url': fname, 'file_url_dis': fname}}
 
-class of_gesdoc_chp(osv.osv):
+class of_gesdoc_chp(osv.Model):
     _name = 'of.gesdoc.chp'
     _description = 'PDF Champs'
 

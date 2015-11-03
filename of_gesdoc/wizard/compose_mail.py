@@ -127,7 +127,7 @@ class of_compose_mail(osv.TransientModel):
 
         res.update({
             'c_title'           : address and address.title.name or 'Madame, Monsieur',
-            'c_name'            : address and address.name or (address.partner_id and address.partner_id.name) or '',
+            'c_name'            : address and (address.name or (address.partner_id and address.partner_id.name)) or '',
             'c_street'          : address and address.street or '',
             'c_street2'         : address and address.street2 or '',
             'c_zip'             : address and address.zip or '',
@@ -136,7 +136,7 @@ class of_compose_mail(osv.TransientModel):
             'c_mobile'          : address and address.mobile or '',
             'c_fax'             : address and address.fax or '',
             'c_email'           : address and address.email or '',
-            'c_adr_pose_name'   : address_pose and address_pose.name or (address_pose.partner_id and address_pose.partner_id.name or '') or '',
+            'c_adr_pose_name'   : address_pose and (address_pose.name or (address_pose.partner_id and address_pose.partner_id.name)) or '',
             'c_adr_pose_street' : address_pose and address_pose.street or '',
             'c_adr_pose_street2': address_pose and address_pose.street2 or '',
             'c_adr_pose_city'   : address_pose and address_pose.city or '',
@@ -350,7 +350,7 @@ class of_compose_mail(osv.TransientModel):
             if len_chp_tmp != 0:
                 raise osv.except_osv('Attention', u'Merci de configurer le mod\u00E8le du courrier pour supprimer ou ajouter les champs')
 
-class of_gesdoc_chp_tmp(osv.AbstractModel):
+class of_gesdoc_chp_tmp(osv.TransientModel):
     _name = 'of.gesdoc.chp.tmp'
     _description = 'PDF champs temporaire'
     

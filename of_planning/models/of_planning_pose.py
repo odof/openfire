@@ -113,7 +113,7 @@ class of_planning_equipe(osv.Model):
                 raise osv.except_osv('Attention', u"L'heure de l'après-midi ne peut pas être inférieure à l'heure du matin")
         return None
 
-class of_planning_pose_raison(osv.osv):
+class of_planning_pose_raison(osv.Model):
     _name = "of.planning.pose.raison"
     _description = "Raisons de pose reportee ou inachevee"
 
