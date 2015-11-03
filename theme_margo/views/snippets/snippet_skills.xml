@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<openerp>
+	<data>
+
+	<template id="snippet_skills" name="Our Skills">
+    <section id="section_snippet_skills">
+ 	   <div class="container">
+	   	<div class="row">
+		   <div class="col-md-6">
+              <h4 class="classic-title"><span>Our Skills</span></h4>
+              	<div class="skill-shortcode">
+                              <div class="skill">
+                                <p>Odoo</p>          
+                                <div class="progress">         
+                                  <div class="progress-bar" role="progressbar"  data-percentage="95">
+                                    <span class="progress-bar-span" >95%</span>
+                                    <span class="sr-only">95% Complete</span>
+                                  </div>
+                                </div>  
+                              </div>
+                              <div class="skill">
+                                <p>Web Design</p>          
+                                <div class="progress">          
+                                  <div class="progress-bar" role="progressbar"  data-percentage="80">
+                                    <span class="progress-bar-span" >80%</span>
+                                    <span class="sr-only">60% Complete</span>
+                                  </div>
+                                </div>  
+                              </div>
+                              <div class="skill">
+                                <p>CSS 3</p>          
+                                <div class="progress">          
+                                  <div class="progress-bar" role="progressbar"  data-percentage="90">
+                                    <span class="progress-bar-span" >90%</span>
+                                    <span class="sr-only">60% Complete</span>
+                                  </div>
+                                </div>  
+                              </div>
+                              <div class="skill">
+                                <p>HTML 5</p>          
+                                <div class="progress">          
+                                  <div class="progress-bar" role="progressbar"  data-percentage="100">
+                                    <span class="progress-bar-span" >100%</span>
+                                    <span class="sr-only">60% Complete</span>
+                                  </div>
+                                </div>  
+                              </div>                              
+                        </div>
+            	</div>
+        	</div>
+        	</div>
+        </section>
+	</template>
+	</data>
+</openerp>

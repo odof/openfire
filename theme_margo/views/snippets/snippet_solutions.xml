@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<openerp>
+	<data>
+	<template id="snippet_solutions" name="Solutions">
+	 <section id="section_snippet_solutions">
+	      <div class="container">
+	          <div class="row">
+	            <div class="col-md-6">
+	              <h4 class="classic-title"><span>Our Solutions </span></h4>
+	              
+	              <div class="panel-group" id="accordion">
+	                <div class="panel panel-default">
+	                  <div class="panel-heading">
+	                    <h4 class="panel-title">
+	                      <a data-toggle="collapse" data-parent="#accordion" href="#collapse-1">
+	                        <i class="fa fa-angle-up control-icon"></i>
+	                        <i class="fa fa-desktop"></i> Fully Responsive Theme
+	                      </a>
+	                    </h4>
+	                  </div>
+	                  <div id="collapse-1" class="panel-collapse collapse in">
+	                    <div class="panel-body">
+	                    <img class="img-thumbnail image-text" style="float:left; width:150px;" alt="" src="/theme_margo/static/src/images/others/bussniss-pic.jpg" />
+	                    <strong class="accent-color">Odoo</strong>
+	                    is a suite of open-source enterprise management applications. Targeting companies of all sizes, the application suite includes billing,
+	                    accounting, manufacturing, purchasing, warehouse management, and project management.
+	                   <p>The source code for the OpenObject framework and core ERP modules is curated by the Belgium based Odoo S.A. Additionally, customized programming, support, and other services are provided by an active global community and a network of 500 official partners</p>
+	                   </div>
+	                  </div>
+	                </div>
+	                
+	                <div class="panel panel-default">
+	                  <div class="panel-heading">
+	                    <h4 class="panel-title">
+	                      <a data-toggle="collapse" data-parent="#accordion" href="#collapse-2" class="collapsed">
+	                        <i class="fa fa-angle-up control-icon"></i>
+	                        <i class="fa fa-gift"></i> Touchable Slider
+	                      </a>
+	                    </h4>
+	                  </div>
+	                  <div id="collapse-2" class="panel-collapse collapse">
+	                    <div class="panel-body">
+	                    <strong>Odoo</strong>
+	                    is a suite of open-source enterprise management applications. Targeting companies of all sizes, the application suite includes billing,
+	                    accounting, manufacturing, purchasing, warehouse management, and project management.
+	                   <p>The source code for the OpenObject framework and core ERP modules is curated by the Belgium based Odoo S.A. Additionally, customized programming, support, and other services are provided by an active global community and a network of 500 official partners</p>
+	            
+	                    </div>
+	                  </div>
+	                </div>
+	                
+	                <div class="panel panel-default">
+	                  <div class="panel-heading">
+	                    <h4 class="panel-title">
+	                      <a data-toggle="collapse" data-parent="#accordion" href="#collapse-23" class="collapsed">
+	                        <i class="fa fa-angle-up control-icon"></i>
+	                        <i class="fa fa-gift"></i> Touchable Slider
+	                      </a>
+	                    </h4>
+	                  </div>
+	                  <div id="collapse-23" class="panel-collapse collapse">
+	                    <div class="panel-body">
+	                    <strong>Odoo</strong>
+	                    is a suite of open-source enterprise management applications. Targeting companies of all sizes, the application suite includes billing,
+	                    accounting, manufacturing, purchasing, warehouse management, and project management.
+	                   <p>The source code for the OpenObject framework and core ERP modules is curated by the Belgium based Odoo S.A. Additionally, customized programming, support, and other services are provided by an active global community and a network of 500 official partners</p>
+	            
+	                    </div>
+	                  </div>
+	                </div>
+	              </div>
+	        	</div>
+ 
+			 
+			 <div class="col-md-6">
+							<h4 class="classic-title"><span>Our Features</span></h4>
+							
+							<div class="row">
+								
+								<div class="col-md-6 service-box service-icon-left-more">
+									<div class="service-icon">
+										<i class="fa fa-magic icon-medium"></i>
+									</div>
+									<div class="service-content">
+										<h4>Photoshop</h4>
+										<p>It is a long <strong class="accent-color">established</strong> fact that a reader will be distracted by the readable content of a page.</p>
+									</div>
+								</div>
+								
+								<div class="col-md-6 service-box service-icon-left-more">
+									<div class="service-icon">
+										<i class="fa fa-users icon-medium"></i>
+									</div>
+									<div class="service-content">
+										<h4>Web Marketing</h4>
+										<p>It is a long <strong class="accent-color">established</strong> fact that a reader will be distracted by the readable content of a page.</p>
+									</div>
+								</div>
+								
+								<div class="col-md-6 service-box service-icon-left-more">
+									<div class="service-icon">
+										<i class="fa fa-globe icon-medium"></i>
+									</div>
+									<div class="service-content">
+										<h4>Web Hosting</h4>
+										<p>It is a long <strong class="accent-color">established</strong> fact that a reader will be distracted by the readable content of a page.</p>
+									</div>
+								</div>
+								
+								<div class="col-md-6 service-box service-icon-left-more">
+									<div class="service-icon">
+										<i class="fa fa-picture-o icon-medium"></i>
+									</div>
+									<div class="service-content">
+										<h4>Phtography</h4>
+										<p>It is a long <strong class="accent-color">established</strong> fact that a reader will be distracted by the readable content of a page.</p>
+									</div>
+								</div>
+								
+								<div class="col-md-6 service-box service-icon-left-more">
+									<div class="service-icon">
+										<i class="fa fa-leaf icon-medium"></i>
+									</div>
+									<div class="service-content">
+										<h4>Product Design</h4>
+										<p>It is a long <strong class="accent-color">established</strong> fact that a reader will be distracted by the readable content of a page.</p>
+									</div>
+								</div>
+								
+								<div class="col-md-6 service-box service-icon-left-more">
+									<div class="service-icon">
+										<i class="fa fa-umbrella icon-medium"></i>
+									</div>
+									<div class="service-content">
+										<h4>Supporting</h4>
+										<p>It is a long <strong class="accent-color">established</strong> fact that a reader will be distracted by the readable content of a page.</p>
+									</div>
+								</div>
+								
+							</div>
+						</div>
+	      </div>
+	    </div>
+	   </section>
+	</template>
+
+	</data>
+</openerp>

@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<openerp>
+	<data>
+
+		<template id="snippet_team_profiles" name="Team Profiles">
+			<section class="snippet_team_profiles">
+		        <div class="section" >
+		            <div class="container">
+
+                    <div class="big-title text-center" data-animation="fadeInDown" data-animation-delay="01">
+                        <h1>Our Great <strong>Team</strong></h1>
+                    </div>
+
+                      <p>  <a title="Simple Tooltip" href="www.odoo.com" class="itl-tooltip" data-placement="top">Odoo</a>  (formerly known as OpenERP and before that, TinyERP) is a suite of open-source enterprise management applications. Targeting companies of all sizes, the application suite includes billing, accounting, manufacturing, purchasing, warehouse management, and project management.</p>
+
+                    <div class="row">
+
+                        <!-- Start Memebr 1 -->
+                        <div class="col-md-3 col-sm-6 col-xs-12" data-animation="fadeIn" data-animation-delay="03">
+                            <div class="team-member">
+                                <!-- Memebr Photo, Name & Position -->
+                                <div class="member-photo">
+                                    <img alt="" src="/theme_margo/static/src/images/team/face_1.jpg" />
+                                    <div class="member-name">Borni Dhifi <span>Consultant</span>
+                                    </div>
+                                </div>
+                                <!-- Memebr Words -->
+                                <div class="member-info">
+                                    <p>I should be incapable of drawing a single stroke at the present moment. </p>
+                                </div>
+                                <!-- Start Progress Bar 1 -->
+                                <div class="progress-label">Odoo</div>
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-primary" data-progress-animation="97%" data-appear-animation-delay="400">
+                                        <span class="percentage">97%</span>
+                                    </div>
+                                </div>
+                                <!-- Start Progress Bar 2 -->
+                                <div class="progress-label">Python</div>
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-primary" data-progress-animation="93%" data-appear-animation-delay="800">
+                                        <span class="percentage">93%</span>
+                                    </div>
+                                </div>
+                                <!-- Start Progress Bar 3 -->
+                                <div class="progress-label">Logo Design</div>
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-primary" data-progress-animation="40%" data-appear-animation-delay="1200">
+                                        <span class="percentage">40%</span>
+                                    </div>
+                                </div>
+                                <!-- Memebr Social Links -->
+                                <div class="member-socail">
+                                    <a class="twitter" href="#"><i class="fa fa-twitter"></i></a>
+                                    <a class="gplus" href="#"><i class="fa fa-google-plus"></i></a>
+                                    <a class="linkedin" href="#"><i class="fa fa-linkedin"></i></a>
+                                    <a class="mail" href="#"><i class="fa fa-envelope"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Memebr 1 -->
+
+                        <!-- Start Memebr 2 -->
+                        <div class="col-md-3 col-sm-6 col-xs-12" data-animation="fadeIn" data-animation-delay="04">
+                            <div class="team-member">
+                                <!-- Memebr Photo, Name & Position -->
+                                <div class="member-photo">
+                                    <img alt="" src="/theme_margo/static/src/images/team/face_2.jpg" />
+                                    <div class="member-name">Karim Rouag <span>Developer</span>
+                                    </div>
+                                </div>
+                                <!-- Memebr Words -->
+                                <div class="member-info">
+                                    <p>I should be incapable of drawing a single stroke at the present moment. </p>
+                                </div>
+                                <!-- Start Progress Bar 1 -->
+                                <div class="progress-label">Odoo</div>
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-primary" data-progress-animation="80%" data-appear-animation-delay="400">
+                                        <span class="percentage">80%</span>
+                                    </div>
+                                </div>
+                                <!-- Start Progress Bar 2 -->
+                                <div class="progress-label">Python</div>
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-primary" data-progress-animation="88%" data-appear-animation-delay="800">
+                                        <span class="percentage">88%</span>
+                                    </div>
+                                </div>
+                                <!-- Start Progress Bar 3 -->
+                                <div class="progress-label">Logo Design</div>
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-primary" data-progress-animation="20%" data-appear-animation-delay="1200">
+                                        <span class="percentage">20%</span>
+                                    </div>
+                                </div>
+                                <!-- Memebr Social Links -->
+                                <div class="member-socail">
+                                    <a class="twitter" href="#"><i class="fa fa-twitter"></i></a>
+                                    <a class="gplus" href="#"><i class="fa fa-google-plus"></i></a>
+                                    <a class="linkedin" href="#"><i class="fa fa-linkedin"></i></a>
+                                    <a class="mail" href="#"><i class="fa fa-envelope"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Memebr 2 -->
+
+                        <!-- Start Memebr 3 -->
+                        <div class="col-md-3 col-sm-6 col-xs-12" data-animation="fadeIn" data-animation-delay="05">
+                            <div class="team-member">
+                                <!-- Memebr Photo, Name & Position -->
+                                <div class="member-photo">
+                                    <img alt="" src="/theme_margo/static/src/images/team/face_3.jpg" />
+                                    <div class="member-name">Hssan Saleh <span>Developer</span>
+                                    </div>
+                                </div>
+                                <!-- Memebr Words -->
+                                <div class="member-info">
+                                    <p>I should be incapable of drawing a single stroke at the present moment. </p>
+                                </div>
+                                <!-- Start Progress Bar 1 -->
+                                <div class="progress-label">Odoo</div>
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-primary" data-progress-animation="60%" data-appear-animation-delay="400">
+                                        <span class="percentage">60%</span>
+                                    </div>
+                                </div>
+                                <!-- Start Progress Bar 2 -->
+                                <div class="progress-label">Python</div>
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-primary" data-progress-animation="50%" data-appear-animation-delay="800">
+                                        <span class="percentage">50%</span>
+                                    </div>
+                                </div>
+                                <!-- Start Progress Bar 3 -->
+                                <div class="progress-label">Logo Design</div>
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-primary" data-progress-animation="90%" data-appear-animation-delay="1200">
+                                        <span class="percentage">90%</span>
+                                    </div>
+                                </div>
+                                <!-- Memebr Social Links -->
+                                <div class="member-socail">
+                                    <a class="twitter" href="#"><i class="fa fa-twitter"></i></a>
+                                    <a class="gplus" href="#"><i class="fa fa-google-plus"></i></a>
+                                    <a class="linkedin" href="#"><i class="fa fa-linkedin"></i></a>
+                                    <a class="mail" href="#"><i class="fa fa-envelope"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Memebr 3 -->
+
+                        <!-- Start Memebr 4 -->
+                        <div class="col-md-3 col-sm-6 col-xs-12" data-animation="fadeIn" data-animation-delay="06">
+                            <div class="team-member">
+                                <!-- Memebr Photo, Name & Position -->
+                                <div class="member-photo">
+                                    <img alt="" src="/theme_margo/static/src/images/team/face_4.jpg" />
+                                    <div class="member-name">Mokhles Sghair <span>Developer</span>
+                                    </div>
+                                </div>
+                                <!-- Memebr Words -->
+                                <div class="member-info">
+                                    <p>I should be incapable of drawing a single stroke at the present moment. </p>
+                                </div>
+                                <!-- Start Progress Bar 1 -->
+                                <div class="progress-label">Odoo</div>
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-primary" data-progress-animation="75%" data-appear-animation-delay="400">
+                                        <span class="percentage">75%</span>
+                                    </div>
+                                </div> 
+                                <!-- Start Progress Bar 2 -->
+                                <div class="progress-label">Python</div>
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-primary" data-progress-animation="65%" data-appear-animation-delay="800">
+                                        <span class="percentage">65%</span>
+                                    </div>
+                                </div>
+                                <!-- Start Progress Bar 3 -->
+                                <div class="progress-label">Logo Design</div>
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-primary" data-progress-animation="80%" data-appear-animation-delay="1200">
+                                        <span class="percentage">80%</span>
+                                    </div>
+                                </div>
+                                <!-- Memebr Social Links -->
+                                <div class="member-socail">
+                                    <a class="twitter" href="#"><i class="fa fa-twitter"></i></a>
+                                    <a class="gplus" href="#"><i class="fa fa-google-plus"></i></a>
+                                    <a class="linkedin" href="#"><i class="fa fa-linkedin"></i></a>
+                                    <a class="mail" href="#"><i class="fa fa-envelope"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Memebr 4 -->
+
+                    </div>
+                    <!-- End Team Members -->
+            </div> 
+       	 </div>
+		</section>
+	</template>
+
+	</data>
+</openerp>

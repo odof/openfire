@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<openerp>
+	<data>
+		<template id="snippet_carousel" name="New Animated Bannar">
+			<section class="snippet_carousel">
+            <div id="my_carousel" class="main-slide carousel slide" data-ride="carousel"  style="height: 500px;">
+                <ol class="carousel-indicators">
+                    <li data-target="#my_carousel" data-slide-to="0" class="active"></li>
+                    <li data-target="#my_carousel" data-slide-to="1"></li>
+                    <li data-target="#my_carousel" data-slide-to="2"></li>
+                </ol>
+                <div class="carousel-inner">
+                    <div class="item active" style="background-image: url('/theme_margo/static/src/images/slider/bg1.jpg')">
+                        <div class="slider-content">
+                        	<div class="row content">
+	                            <div class="col-md-12 text-center">
+	                                <h2 class="animated7 white">
+	                                 <span>Welcome to <strong>Margo</strong></span>
+	                            </h2>
+	                                <h3 class="animated8 white">
+	                            	<span>The ultimate aim of your business</span>
+	                            </h3>	
+	                                <div class="">
+	                                    <a class="animated4 slider btn btn-system btn-large btn-min-block" href="#">Get Now</a><a class="animated4 slider btn btn-default btn-min-block" href="#">Live Demo</a>
+	                                </div>
+	                            </div>
+	                        </div>
+                        </div>
+                    </div>
+                    <div class="item" style="background-image: url('/theme_margo/static/src/images/slider/bg2.jpg')">
+                        <div class="slider-content">
+                        	<div class="row content">
+	                            <div class="col-md-12 text-center">
+	                                <h2 class="animated2 white">
+	                        		   <span>The way of <strong>Success</strong></span>
+	                        	    </h2>
+	                                <h3 class="animated3 white">
+	                            		<span>Why you are waiting</span>
+	                            	</h3>
+	                                <p class="animated4"><a href="#" class="slider btn btn-system btn-large">Check Now</a>
+	                                </p>
+	                            </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item"  style="background-image: url('/theme_margo/static/src/images/slider/bg3.jpg')">
+                        <div class="slider-content">
+                        	<div class="row content">
+	                            <div class="col-md-12 text-center">
+	                                <h2 class="animated4 white">
+	                                <span><strong>Margo</strong> for the highest</span>
+	                            </h2>
+	                                <h3 class="animated5 white">
+	                            	<span>The Key of your Success</span>
+	                            </h3>	
+	                                <p class="animated6"><a href="#" class="slider btn btn-system btn-large">Buy Now</a>
+	                                </p>
+	                            </div>
+	                        </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <a class="left carousel-control" href="#my_carousel" data-slide="prev">
+                    <span><i class="fa fa-angle-left"></i></span>
+                </a>
+                <a class="right carousel-control" href="#my_carousel" data-slide="next">
+                    <span><i class="fa fa-angle-right"></i></span>
+                </a>
+            </div>
+            
+            <div class="oe_structure" />
+            
+			</section>
+		</template>
+
+	</data>
+</openerp>

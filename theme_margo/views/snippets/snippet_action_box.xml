@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<openerp>
+	<data>
+
+		<template id="snippet_action_box" name="Action Box">
+			<section id="sectionsnippet_action_box">
+				<div class="container">
+					<div class="row">
+						<div class="call-action call-action-boxed call-action-style1 clearfix">
+							<div class="button-side" style="margin-top:8px;"><a href="#" class="btn-system btn-large">Purchase It Now</a></div>
+							<h2 class="primary"><strong>Margo</strong> is the best theme to create an awesome website!</h2>
+							<p>The ultimate aim of your business.</p>
+						</div>
+				
+					
+					    <div class="hr1" style="margin-bottom:40px;"></div>
+
+						<div class="call-action call-action-boxed call-action-style2 clearfix">
+							<div class="button-side" style="margin-top:8px;"><a href="#" class="btn-system btn-large"><i class="icon-gift-1"></i> See Features</a> <a href="#" class="btn-system btn-large btn-gray"><i class="icon-basket-2"></i> Purchase It Now</a></div>
+							<h2 class="primary"><strong>Margo</strong> is the best theme to create an awesome website!</h2>
+							<p>The ultimate aim of your business.</p>
+						</div>
+					 
+					
+						<div class="hr1" style="margin-bottom:40px;"></div>
+					
+						<div class="call-action call-action-boxed call-action-style3 clearfix">
+							<div class="button-side" style="margin-top:10px;"><a href="#" class="btn-system border-btn btn-medium btn-wite"><i class="icon-gift-1"></i> See Features</a> <a href="#" class="btn-system border-btn btn-medium"><i class="icon-basket"></i> Purchase It Now</a></div>
+							<h2 class="primary"><strong>Margo</strong> is the best theme to create an awesome website!</h2>
+							<p>The ultimate aim of your business.</p>
+						</div>
+				</div>			
+				</div>
+			</section>
+		</template>
+
+
+	</data>
+</openerp>
