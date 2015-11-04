@@ -160,7 +160,7 @@ class project_issue(osv.Model):
         #                                     store={'project.issue': (lambda self, cr, uid, ids, *a:ids, ['categ_id'], 10),
         #                                            'categ_id'    : (lambda self, cr, uid, ids, *a:self.pool['of.project.issue'].search(cr, uid, [('categ_id','in',ids)]), ['parent_id'], 10),
         #                                            }),
-        # MG 'interventions_liees': fields.one2many('of.planning.pose', 'sav_id', 'Poses liees', readonly=False),
+        'interventions_liees': fields.one2many('of.planning.pose', 'sav_id', 'Poses liees', readonly=False),
         # MG 'show_partner_shop'  : fields.function(_get_show_partner_shop, type="boolean", string="Magasin différent"),
         'of_partner_id_street': fields.related('partner_id', 'street', readonly=True, type='char', string=u'Adresse'),
         'of_partner_id_street2': fields.related('partner_id', 'street2', readonly=True, type='char', string=u'Complément adresse'),
@@ -196,16 +196,7 @@ class project_issue(osv.Model):
                 'res_id': sav_id,
                 'type': 'ir.actions.act_window',
             }
-    
-    
-    
-#     def on_change_project(self, cr, uid, ids, project_id, context=None):
-#          if project_id:
-#              project = self.pool.get('project.project').browse(cr, uid, project_id, context=context)
-#              if project and project.partner_id:
-#                  return {'value': {'partner_id': project.partner_id.id}}
-#          return {'value': {'partner_id': False}}
-#     
+
     
     # Migration ok
     def onchange_shop_id(self, cr, uid, ids, shop_id, partner_shop_id):

@@ -115,12 +115,12 @@
                 	<attribute name="invisible">1</attribute>
                 </field>
                 <field name="task_id" position="after">
-<!--  MG            <field name="shop_id" on_change="onchange_shop_id(shop_id,partner_shop_id)"/>
+<!--  Migration     <field name="shop_id" on_change="onchange_shop_id(shop_id,partner_shop_id)"/>
                     <field name="show_partner_shop" invisible="1"/> -->
                     <field name="of_garantie"/>
                     <field name="of_payant_client"/>
                     <field name="of_payant_fournisseur"/>
-<!-- MG             <field name="partner_shop_id" attrs="{'invisible':[('show_partner_shop','=',False)]}"/> -->
+<!-- Migration      <field name="partner_shop_id" attrs="{'invisible':[('show_partner_shop','=',False)]}"/> -->
                 </field>
                 <field name="description" position="replace">
                 	<group>
@@ -185,11 +185,10 @@
 	                        </form>
 	                    </field>
 	                </group>
-<!--                     <separator colspan="4" string="Interventions" groups="of_planning.of_group_planning_pose_user"/>
-                    <field colspan="4" mode="tree" name="interventions_liees" nolabel="1" widget="one2many_list" 
-                               groups="of_planning.of_group_planning_pose_user">
+                    <group name="of_interventions" string="Interventions" groups="project.group_project_user"/>
+                        <field colspan="4" mode="tree" name="interventions_liees" nolabel="1" widget="one2many_list" groups="project.group_project_user" context="{'default_partner_id':partner_id}">
                             <tree string="Interventions" editable="bottom">
-                                <field name="poseur_id" string="Équipe" on_change="onchange_comm(False, parent.partner_id)"/>
+                                <field name="poseur_id" string="Équipe" on_change="onchange_partner_id(partner_id, context)"/>
                                 <field name="date" string="Date" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)"/>
                                 <field name="duree" string="Durée" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" widget="float_time"/>
                                 <field name="hor_md" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" widget="float_time"/>
@@ -200,14 +199,14 @@
                                 <field name="hor_dim" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)"/>
                                 <field name="date_deadline" invisible="1"/>
                                 <field name="verif_dispo"/>
-                                <field name="tache" />
-                                <field name="state" />
+                                <field name="tache_id"/>
+                                <field name="state"/>
                                 <field name="name" string="Libellé"/>
-                                <field name="description" />
-                                <field name="part_id" invisible="1"/>
+                                <field name="description"/>
+                                <field name="partner_id" invisible="1"/>
                                 <field name="user_id" invisible="1"/>
                             </tree>
-                        </field> -->
+                        </field>
                     <group colspan="4" string="Notes client">
                     	<field name="partner_note" colspan="4" nolabel="1"/>
                     </group>

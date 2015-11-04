@@ -135,7 +135,7 @@ commander</td>
 	      <td>Description</td>
       </tr>
   </blockTable>
-  <!-- Migration : inhibé car of_planning pas encore migré
+
   <section>
   	  <para style="terp_default_8">[[ repeatIn(o.interventions_liees, 'i') ]]</para>
   	  <para style="terp_default_8">[[ setLang(i.partner_id.lang) ]]</para>
@@ -149,7 +149,6 @@ commander</td>
 	      </tr>
   	  </blockTable>
   </section>
-  -->
 
   </pto>
   </story>

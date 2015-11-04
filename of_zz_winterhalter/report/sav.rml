@@ -126,7 +126,6 @@
       </tr>
   </blockTable>
 
-  <!-- Migration : inhibé car of_planning pas encore migré
   <para style="terp_default_Bold_12">Intervention(s)</para>
   <blockTable colWidths="105.0, 45.0, 60.0, 120.0, 201.0" style="Table4">
       <tr>
@@ -151,7 +150,6 @@
 	      </tr>
   	  </blockTable>
   </section>
-  -->
 
   </pto>
   </story>
