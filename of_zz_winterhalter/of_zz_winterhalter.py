@@ -95,6 +95,8 @@ class project_issue(osv.Model):
         'of_actions_eff': fields.text(u'Actions à effectuer'),
         'of_actions_realisees': fields.text(u'Actions réalisées'),
         'description': fields.text(u'Problématique'), # Existe déjà, pour renommer champ
+        'of_contact_sav': fields.char(u'Contact SAV', size=64),
+        'of_tel_sav': fields.char(u'Tél. SAV', size=64)
     }
     
     _defaults = {

@@ -118,7 +118,9 @@
             <field name="inherit_id" ref="project_issue.view_project_issue_filter"/>
             <field name="arch" type="xml">
                 <field name="partner_id" position="after">
-                    <field name="of_produit_installe_id" string="No série"/>                   
+                    <field name="of_contact_sav"/>
+                    <field name="of_tel_sav"/>
+                    <field name="of_produit_installe_id" string="No série"/>
                 </field>
             </field>
         </record>
@@ -132,7 +134,7 @@
             <field name="arch" type="xml">
                 <field name="of_code" position="after">
                     <field name="of_type"/>
-                </field>            
+                </field>
             </field>
         </record>
         
@@ -149,7 +151,11 @@
 		    	</field>
 		    	<field name="user_id" position="replace">
 		    		<field name="user_id" string="Responsable"/>
-		    	</field>		    	
+		    	</field>
+                <field name="tag_ids" position="after">
+                    <field name="of_contact_sav"/>
+                    <field name="of_tel_sav"/>
+                </field>                
 		    	<xpath expr='//form/sheet/group' position="after">
 		            <group string="Produit installé" colspan="4">
 		            	<field name="of_produit_installe_id" string="No de série" on_change="on_change_of_produit_installe_id(of_produit_installe_id)"/>
