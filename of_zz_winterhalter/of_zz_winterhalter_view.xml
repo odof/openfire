@@ -121,6 +121,7 @@
                     <field name="of_contact_sav"/>
                     <field name="of_tel_sav"/>
                     <field name="of_produit_installe_id" string="No série"/>
+                    <field name="description" string="Problématique"/>
                 </field>
             </field>
         </record>
