@@ -24,7 +24,10 @@
         	<field name="context">{}</field>
         </record>
         
-        <!-- Ajouter onglet "Historique" dans formulaire partenaire et type adresse (livraison, facture, ...) dans contacts -->
+        <!-- Vue form prtenaires :
+        Ajouter onglet "Historique" dans formulaire partenaire et type adresse (livraison, facture, ...)
+        Enlever Etat fédéral et mettre code postal avant la ville
+        -->
         <record id="of_base_partner_form" model="ir.ui.view">
             <field name="name">of.base.partner.form</field>
             <field name="model">res.partner</field>
@@ -37,6 +40,14 @@
 		        <xpath expr='//form/sheet/notebook/page/field/kanban/templates/t/div/div/field' position="after">
 		            <t t-if="record.type.raw_value"> (<field name="type"/>)</t>
 		        </xpath>
+                <field name="state_id" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="zip" position="replace"/>
+                <field name="city" position="before">
+                    <field name="zip" placeholder="ZIP" class="o_address_zip" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+                </field>
+                
             </field>
         </record>
        
