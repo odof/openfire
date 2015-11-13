@@ -558,18 +558,37 @@
 		<!-- *** Action dans vue parc installé (of.parc.installe) *** -->
 
 		<!-- Lien pour action créer SAV depuis parc installé -->
-        <record id="action_open_creer_sav" model="ir.actions.server">
+        <record id="of_action_pi_open_creer_sav" model="ir.actions.server">
             <field name="name">Créer un SAV</field>
             <field name="model_id" ref="project_issue.model_project_issue"/>
             <field name="state">code</field>
             <field name="code">action = self.pool['of.parc.installe'].action_creer_sav(cr, uid, context)</field>
         </record>
 
-        <record id="action_creer_sav" model="ir.values">
+        <record id="of_action_pi_creer_sav" model="ir.values">
             <field name="name">Créer un SAV</field>
             <field name="key2">client_action_multi</field>
             <field name="model">of.parc.installe</field>
-            <field name="value" eval="'ir.actions.server,%d'%action_open_creer_sav"/>
+            <field name="value" eval="'ir.actions.server,%d'%of_action_pi_open_creer_sav"/>
+            <field name="object" eval="True"/>
+        </record>
+        
+        
+        <!-- *** Action dans vue partenaires (res.partner) *** -->
+
+        <!-- Lien pour action créer SAV depuis une fiche client -->
+        <record id="of_action_partner_open_creer_sav" model="ir.actions.server">
+            <field name="name">Créer un SAV</field>
+            <field name="model_id" ref="project_issue.model_project_issue"/>
+            <field name="state">code</field>
+            <field name="code">action = self.pool['res.partner'].action_creer_sav(cr, uid, context)</field>
+        </record>
+
+        <record id="action_creer_sav" model="ir.values">
+            <field name="name">Créer un SAV</field>
+            <field name="key2">client_action_multi</field>
+            <field name="model">res.partner</field>
+            <field name="value" eval="'ir.actions.server,%d'%of_action_partner_open_creer_sav"/>
             <field name="object" eval="True"/>
         </record>
 

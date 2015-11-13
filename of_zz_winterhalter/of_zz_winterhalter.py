@@ -181,6 +181,28 @@ class res_partner(osv.Model):
     _sql_constraints = [('ref_uniq', 'unique(ref)', 'Le n° de compte client est déjà utilisé et doit être unique.')]
 
 
+    def action_creer_sav(self, cr, uid, context={}):
+        if not context:
+            context = {}
+        res = {
+            'name': 'SAV',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'project.issue',
+            'type': 'ir.actions.act_window',
+            'target': 'current',
+        }
+        if 'active_ids' in context.keys():
+            active_ids = isinstance(context['active_ids'], (int,long)) and [context['active_ids']] or context['active_ids']
+            if active_ids:
+                partner = self.browse(cr, uid, active_ids[0])
+                res['context'] = {
+                    'default_partner_id': partner.id,
+                    'default_of_type': 'di'
+                }
+        return res
+
+
 class product_template(osv.Model):
     _name = "product.template"
     _inherit = "product.template"
