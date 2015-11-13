@@ -181,6 +181,18 @@
 		    </field>
 		</record>
 
+        <!-- insertion No SAV et No série dans vue kanban -->
+        <record id="of_project_issue_kanban_view" model="ir.ui.view" >
+            <field name="name">of.project.issue.kanban.view</field>
+            <field name="model">project.issue</field>
+            <field name="inherit_id" ref="project_issue.project_issue_kanban_view"/>
+            <field name="arch" type="xml" >
+                <field name="name" position="before">
+                    <field name="of_code"/> <field name="of_produit_installe_id"/><br/>
+                </field>              
+            </field>
+        </record>
+
 
 		<!-- Rapport Fiche SAV Winterhalter (en remplacement de la fiche SAV de of_project_issue) -->
 		<report
