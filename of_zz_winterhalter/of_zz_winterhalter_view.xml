@@ -205,7 +205,7 @@
             <field name="inherit_id" ref="base.view_res_partner_filter"/>
             <field name="arch" type="xml">
             	<field name="name" position="after">
-		            <field name="ref" string="Compte client"/>
+		            <field name="ref" string="Référence"/>
 				</field>
             </field>
         </record>
@@ -218,7 +218,7 @@
 		    <field name="inherit_id" ref="base.view_partner_tree" />
 		    <field name="arch" type="xml">
 		      	<field name="display_name" position="before">
-		            <field name="ref" string="Compte client"/>
+		            <field name="ref" string="Référence"/>
 				</field>
 		    </field>
 		</record>
@@ -239,7 +239,7 @@
                 </field>
                 <field name="ref" position="replace"/>
                 <field name="type" position="before">
-                    <field name="ref" string="Compte client" attrs="{'invisible': [('parent_id','!=', False)]}"/>
+                    <field name="ref" string="Référence" attrs="{'invisible': [('parent_id','!=', False)]}"/>
                 </field>
                 <field name="lang" position="after">
                     <field name="of_ape"/>
