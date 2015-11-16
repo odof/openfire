@@ -43,9 +43,9 @@
                 <field name="state_id" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </field>
-                <field name="zip" position="replace"/>
-                <field name="city" position="before">
-                    <field name="zip" placeholder="ZIP" class="o_address_zip" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+                <field name="city" position="replace"/>
+                <field name="zip" position="after">
+                    <field name="city" class="o_address_city" placeholder="City" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
                 </field>
                 
             </field>

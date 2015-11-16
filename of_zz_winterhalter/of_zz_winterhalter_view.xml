@@ -548,6 +548,19 @@
         <menuitem id="menu_of_planning_pose_pose_win" name="Planning des interventions" parent="of_sous-menu_openservice" sequence="8" action="of_planning.action_of_planning_pose_calendar" groups="of_planning.of_group_planning_pose_user"/>
             
 
+        <!-- Menu configuration catégories de SAV -->
+        <record id="of_project_issue_categorie_action_form" model="ir.actions.act_window">
+            <field name="name">Catégories de SAV</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">of.project.issue.categorie</field>
+            <field name="view_type">form</field>
+        </record>
+        
+        <menuitem action="of_project_issue_categorie_action_form"
+            groups="project.group_project_manager"
+            id="menu_of_project_issue_categorie_action_form"
+            parent="of_menu_config_openservice" sequence="3"/>
+
 
 <!-- *************************************************** -->        
 <!-- ********************* ACTIONS ********************* -->

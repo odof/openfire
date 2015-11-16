@@ -290,6 +290,36 @@
             />
 
 
+
+<!-- *************************************************** -->        
+<!-- ************** SAV CONFIG CATEGORIES ************** -->
+<!-- *************************************************** -->
+
+        <!-- SAV catégories tree -->
+        <record id="of_project_issue_categorie_tree_view" model="ir.ui.view">
+            <field name="name">of.project.issue.categorie.tree.view</field>
+            <field name="model">of.project.issue.categorie</field>
+            <field name="arch" type="xml">
+                <tree string="Catégories SAV">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- SAV catégories form -->
+        <record id="of_project_issue_categorie_form_view" model="ir.ui.view">
+            <field name="name">of.project.issue.categorie.tree.form</field>
+            <field name="model">of.project.issue.categorie</field>
+            <field name="arch" type="xml">
+                <form>
+                    <field name="name"/>
+                </form>
+            </field>
+        </record>
+
+
+
+
 <!-- *************************************************** -->        
 <!-- ********************* ACTIONS ********************* -->
 <!-- *************************************************** -->
