@@ -6,26 +6,26 @@
 <!-- ****************** PARC INSTALLÉ ****************** -->
 <!-- *************************************************** -->
 
-		<!-- Parc installé filtre -->    
-		<record id="of_parc_installe_search_view" model="ir.ui.view">
-		    <field name="name">of.parc.installe.search</field>
-		    <field name="model">of.parc.installe</field>
-		    <field name="arch" type="xml">
-		        <search string="Parc installé">
-		            <field name="name"/>
-		            <field name="product_id"/>
-		            <field name="client_id"/>
-		            <field name="tel_site_id"/>
-		            <field name="date_service"/>
-		            <field name="revendeur_id"/>
-		            <group expand="0" string="Regrouper par">
-		               <filter string="Client" icon="terp-personal" context="{'group_by' : 'client_id'}"/>
-		               <filter string="Produit" icon="terp-personal" context="{'group_by' : 'product_id'}"/>
-		               <filter string="Revendeur" icon="terp-personal" context="{'group_by' : 'revendeur_id'}"/>                  
-		            </group>
-		        </search>
-		    </field>
-		</record>
+        <!-- Parc installé filtre -->
+        <record id="of_parc_installe_search_view" model="ir.ui.view">
+            <field name="name">of.parc.installe.search</field>
+            <field name="model">of.parc.installe</field>
+            <field name="arch" type="xml">
+                <search string="Parc installé">
+                    <field name="name"/>
+                    <field name="product_id"/>
+                    <field name="client_id"/>
+                    <field name="tel_site_id"/>
+                    <field name="date_service"/>
+                    <field name="revendeur_id"/>
+                    <group expand="0" string="Regrouper par">
+                       <filter string="Client" icon="terp-personal" context="{'group_by' : 'client_id'}"/>
+                       <filter string="Produit" icon="terp-personal" context="{'group_by' : 'product_id'}"/>
+                       <filter string="Revendeur" icon="terp-personal" context="{'group_by' : 'revendeur_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
 
         <!-- Parc installé tree -->
         <record id="of_parc_installe_tree_view" model="ir.ui.view">
@@ -48,61 +48,67 @@
             <field name="name">of.parc.installe.form</field>
             <field name="model">of.parc.installe</field>
             <field name="arch" type="xml">
-	            <form>
-	            	<group>
-		            	<group name="cient" string="Client">
-		            		<field name="client_id"/>
-		            		<label for="site_adresse_id" string="Site installation"/>
-			                <div>
-			                    <field name="site_adresse_id" nolabel="1" context="{'show_address': True}"/>
-				                <field name="street_site_id" nolabel="1"/>
-				                <field name="street2_site_id" nolabel="1"/>
-				                <field name="zip_site_id" style="width: 20%" nolabel="1"/>
-				                <field name="city_site_id" style="width: 40%" nolabel="1"/>
-				                <field name="country_site_id" nolabel="1"/>
-				                <field name="tel_site_id" nolabel="1"/>
-				            </div>
-			            </group>
-			            <group name="pose" string="Pose">
-			           		<field name="revendeur_id"/>
-			                <field name="installateur_id"/>
-			                <!-- <field name="installateur_adresse_id" context="{'show_address': True}"/> -->             
-			            </group>
-			        </group>
-			        <group name="produit_installe" string="Produit installé">
-			            <group name="produit">
-			                <field name="product_id"/>
-			                <field name="name"/>
-                            <field name="product_category_id"/>
-			                <field name="date_service"/>
-			                <field name="date_installation"/>
-			                <field name="no_piece"/>
-			            </group>
-			            <group name="produit_infos_supp">
-			          		<field name="chiffre_aff_ht"/>
-			                <field name="quantite_vendue"/>
-			                <field name="marge"/>
-			            </group>
-		            </group>
-		            <group>
-		            	<field name="note"/>
-		            </group>
-		            <group name="sav" string="Historique de la machine">
-		                <field name="project_issue_ids" nolabel="1" context="{'default_partner_id':id}">
-		                    <tree string="SAV">
-		                        <field name="of_code" string="Dossier"/>
-		                        <field name="date"/>
-		                        <field name="name" string="Requête"/>
-		                        <field name="of_categorie_id" string="Famille"/>
-		                        <field name="of_produit_installe_id" string="S/N"/>
-		                        <field name="user_id" string="Responsable"/>
-		                        <field name="of_actions_realisees"/>
-		                        <field name="stage_id"/>
-		                        <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
-		                    </tree>
-		                </field>
-                	</group>
-	            </form>
+                <form>
+                    <sheet string="Parc installé" name="parc_installe">
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="No de série ..."/>
+                                <field name="product_id" placeholder="Article ..."/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group name="cient" string="Client">
+                                <field name="client_id"/>
+                                <label for="site_adresse_id" string="Site installation"/>
+                                <div>
+                                    <field name="site_adresse_id" nolabel="1" context="{'show_address': True}"/>
+                                    <field name="street_site_id" nolabel="1"/>
+                                    <field name="street2_site_id" nolabel="1"/>
+                                    <field name="zip_site_id" style="width: 20%" nolabel="1"/>
+                                    <field name="city_site_id" style="width: 40%" nolabel="1"/>
+                                    <field name="country_site_id" nolabel="1"/>
+                                    <field name="tel_site_id" nolabel="1"/>
+                                </div>
+                            </group>
+                            <group name="pose" string="Pose">
+                                <field name="revendeur_id"/>
+                                <field name="installateur_id"/>
+                                <!-- <field name="installateur_adresse_id" context="{'show_address': True}"/> -->
+                            </group>
+                        </group>
+                        <group name="produit_installe" string="Produit installé">
+                            <group name="produit">
+                                <field name="product_category_id"/>
+                                <field name="date_service"/>
+                                <field name="date_installation"/>
+                                <field name="no_piece"/>
+                            </group>
+                            <group name="produit_infos_supp">
+                                  <field name="chiffre_aff_ht"/>
+                                <field name="quantite_vendue"/>
+                                <field name="marge"/>
+                            </group>
+                        </group>
+                        <group name="note">
+                            <field name="note"/>
+                        </group>
+                        <group name="sav" string="Historique de la machine">
+                            <field name="project_issue_ids" nolabel="1" context="{'default_partner_id':id}">
+                                <tree string="SAV">
+                                    <field name="of_code" string="Dossier"/>
+                                    <field name="date"/>
+                                    <field name="name" string="Requête"/>
+                                    <field name="of_categorie_id" string="Famille"/>
+                                    <field name="of_produit_installe_id" string="S/N"/>
+                                    <field name="user_id" string="Responsable"/>
+                                    <field name="of_actions_realisees"/>
+                                    <field name="stage_id"/>
+                                    <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
             </field>
         </record>
 
@@ -141,45 +147,45 @@
         
         
         
-		<!-- insertion Produit installé lié et champs supplémentaires Winterhalter dans SAV -->
-		<record id="of_produit_installe_sav_lie" model="ir.ui.view" >
-		    <field name="name">of.produit_installe.sav.lie</field>
-		    <field name="model">project.issue</field>
-		    <field name="inherit_id" ref="project_issue.project_issue_form_view"/>
-		    <field name="arch" type="xml" >
-		    	<field name="date" position="after">
-		    		<field name="of_type"/>
-		    	</field>
-		    	<field name="user_id" position="replace">
-		    		<field name="user_id" string="Responsable"/>
-		    	</field>
+        <!-- insertion Produit installé lié et champs supplémentaires Winterhalter dans SAV -->
+        <record id="of_produit_installe_sav_lie" model="ir.ui.view" >
+            <field name="name">of.produit_installe.sav.lie</field>
+            <field name="model">project.issue</field>
+            <field name="inherit_id" ref="project_issue.project_issue_form_view"/>
+            <field name="arch" type="xml" >
+                <field name="date" position="after">
+                    <field name="of_type"/>
+                </field>
+                <field name="user_id" position="replace">
+                    <field name="user_id" string="Responsable"/>
+                </field>
                 <field name="tag_ids" position="after">
                     <field name="of_contact_sav"/>
                     <field name="of_tel_sav"/>
                 </field>                
-		    	<xpath expr='//form/sheet/group' position="after">
-		            <group string="Produit installé" colspan="4">
-		            	<field name="of_produit_installe_id" string="No de série" on_change="on_change_of_produit_installe_id(of_produit_installe_id)"/>
-		            	<field name="product_name_id" on_change="on_change_product_name_id(of_produit_installe_id)"/>
-		            	<field name="product_category_id"/>
-		            </group>
-		        </xpath>
-		        <field name="of_canal_id" position="replace"/>
-		        <field name="of_garantie" position="replace"/>
+                <xpath expr='//form/sheet/group' position="after">
+                    <group string="Produit installé" colspan="4">
+                        <field name="of_produit_installe_id" string="No de série" on_change="on_change_of_produit_installe_id(of_produit_installe_id)"/>
+                        <field name="product_name_id" on_change="on_change_product_name_id(of_produit_installe_id)"/>
+                        <field name="product_category_id"/>
+                    </group>
+                </xpath>
+                <field name="of_canal_id" position="replace"/>
+                <field name="of_garantie" position="replace"/>
                 <field name="of_payant_client" position="replace"/>
                 <field name="of_payant_fournisseur" position="replace"/>
-		        <field name="description" position="replace">
-		        	<field name="description" string="Problématique"/>
-		        </field>
-		        <field name="of_piece_commande" position="replace">
-		        	<field name="of_actions_realisees"/>
-		        </field>
-		        <field name="of_intervention" position="replace">
-		        	<field name="of_actions_eff"/>
-		        </field>
-		        
-		    </field>
-		</record>
+                <field name="description" position="replace">
+                    <field name="description" string="Problématique"/>
+                </field>
+                <field name="of_piece_commande" position="replace">
+                    <field name="of_actions_realisees"/>
+                </field>
+                <field name="of_intervention" position="replace">
+                    <field name="of_actions_eff"/>
+                </field>
+                
+            </field>
+        </record>
 
         <!-- insertion No SAV et No série dans vue kanban -->
         <record id="of_project_issue_kanban_view" model="ir.ui.view" >
@@ -194,8 +200,8 @@
         </record>
 
 
-		<!-- Rapport Fiche SAV Winterhalter (en remplacement de la fiche SAV de of_project_issue) -->
-		<report
+        <!-- Rapport Fiche SAV Winterhalter (en remplacement de la fiche SAV de of_project_issue) -->
+        <report
             auto="True" 
             id="of_project_issue.report_of_project_issue"
             model="project.issue"
@@ -217,26 +223,26 @@
             <field name="type">search</field>
             <field name="inherit_id" ref="base.view_res_partner_filter"/>
             <field name="arch" type="xml">
-            	<field name="name" position="after">
-		            <field name="ref" string="Référence"/>
-				</field>
+                <field name="name" position="after">
+                    <field name="ref" string="Référence"/>
+                </field>
             </field>
         </record>
         
-		<!-- Ajouter référence client dans liste partenaires -->
-		<record id="of_res_partner_winterhalter_tree" model="ir.ui.view">
-		   	<field name="name">of.res.partner.winterhalter.tree</field>
-		    <field name="model">res.partner</field>
-		    <field name="type">tree</field>
-		    <field name="inherit_id" ref="base.view_partner_tree" />
-		    <field name="arch" type="xml">
-		      	<field name="display_name" position="before">
-		            <field name="ref" string="Référence"/>
-				</field>
-		    </field>
-		</record>
-		
-		<!-- Mettre revendeur, installateur, payeur, référence client en haut dans formulaire partenaires
+        <!-- Ajouter référence client dans liste partenaires -->
+        <record id="of_res_partner_winterhalter_tree" model="ir.ui.view">
+               <field name="name">of.res.partner.winterhalter.tree</field>
+            <field name="model">res.partner</field>
+            <field name="type">tree</field>
+            <field name="inherit_id" ref="base.view_partner_tree" />
+            <field name="arch" type="xml">
+                  <field name="display_name" position="before">
+                    <field name="ref" string="Référence"/>
+                </field>
+            </field>
+        </record>
+        
+        <!-- Mettre revendeur, installateur, payeur, référence client en haut dans formulaire partenaires
         ajout onglet lieu de livraison et changer vue contacts kanban en vue liste-->
         <record id="of_res_partner_winterhalter_form" model="ir.ui.view">
             <field name="name">of.res.partner.winterhalter.form</field>
@@ -379,21 +385,21 @@
 <!-- ********* VUE PRODUITS (product.template) ********* -->
 <!-- *************************************************** -->
 
-		<!-- Produits : ajout produit dangereux et poids ADR (poids produit dangereux) -->
-		<record id="of_product_template_winterhalter_form" model="ir.ui.view">
-		    <field name="name">of.product.template.winterhalter.form</field>
-		    <field name="model">product.template</field>
-		    <field name="inherit_id" ref="product.product_template_only_form_view"/>
-		    <field name="arch" type="xml">
-		        <field name="default_code" position="after">
-		        	<field name="of_produit_substitue_id"/>
-		        	<field name="of_est_dangereux"/>
-		        </field>
-		        <div name="weight" position="after">
-		        	<field name="of_poids_adr"/>
-		        </div>
-		    </field>
-		</record>
+        <!-- Produits : ajout produit dangereux et poids ADR (poids produit dangereux) -->
+        <record id="of_product_template_winterhalter_form" model="ir.ui.view">
+            <field name="name">of.product.template.winterhalter.form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+                <field name="default_code" position="after">
+                    <field name="of_produit_substitue_id"/>
+                    <field name="of_est_dangereux"/>
+                </field>
+                <div name="weight" position="after">
+                    <field name="of_poids_adr"/>
+                </div>
+            </field>
+        </record>
 
 
 <!-- *************************************************** -->        
@@ -401,53 +407,53 @@
 <!-- *************************************************** -->   
                 
         <!-- Menu OpenService dans barre menu -->
-		<menuitem id="menu_of_openservice" name="OpenService" sequence="0"/>
-		
-		<menuitem id="of_sous-menu_openservice" name="OpenService" parent="menu_of_openservice" sequence="5"/>
-		<!-- Menu configuration catégories de produits -->
-		<menuitem id="of_menu_config_openservice" name="Configuration" parent="menu_of_openservice" sequence="100"/>
-		
-		     
-		<!-- Action vue parc installé -->
-		<record id="action_view_of_parc_installe" model="ir.actions.act_window">
-		     <field name="name">Parc installé</field>
-		     <field name="type">ir.actions.act_window</field>
-		     <field name="res_model">of.parc.installe</field>
-		     <field name="view_type">form</field>
-		     <field name="view_mode">tree,form</field>
-		     <field name="search_view_id" ref="of_parc_installe_search_view"/>
-		     <field name="help">Parc des produits installés</field>
-		</record>
+        <menuitem id="menu_of_openservice" name="OpenService" sequence="0"/>
+        
+        <menuitem id="of_sous-menu_openservice" name="OpenService" parent="menu_of_openservice" sequence="5"/>
+        <!-- Menu configuration catégories de produits -->
+        <menuitem id="of_menu_config_openservice" name="Configuration" parent="menu_of_openservice" sequence="100"/>
+        
+             
+        <!-- Action vue parc installé -->
+        <record id="action_view_of_parc_installe" model="ir.actions.act_window">
+             <field name="name">Parc installé</field>
+             <field name="type">ir.actions.act_window</field>
+             <field name="res_model">of.parc.installe</field>
+             <field name="view_type">form</field>
+             <field name="view_mode">tree,form</field>
+             <field name="search_view_id" ref="of_parc_installe_search_view"/>
+             <field name="help">Parc des produits installés</field>
+        </record>
 
-		<!-- Menu parc installé -->
-		<menuitem id="menu_of_parc_installe" action="action_view_of_parc_installe" name="Parc installé" 
-		     parent="of_sous-menu_openservice" groups="project.group_project_user" sequence="10"/>
-
-
-
-		<!-- Menu SAV -->
-	    <record model="ir.actions.act_window" id="of_project_issue_categ_act0">
-	        <field name="name">SAV</field>
-	        <field name="res_model">project.issue</field>
-	        <field name="view_type">form</field>
-	        <field name="view_mode">tree,kanban,form,pivot,graph</field>
-	        <field name="view_id" ref="project_issue.project_issue_tree_view"/>
-	        <field name="domain" eval=""/>
-	        <!-- <field name="search_view_id" ref="view_project_issue_filter"/> -->
-	        <field name="help" type="html">
-	            <p>
-	                The Odoo issues tacker allows you to efficiently manage things
-	                like internal requests, software development bugs, customer
-	                complaints, project troubles, material breakdowns, etc.
-	            </p>
-	        </field>
-	    </record>
-
-		<menuitem id="of_menu_project_issue_track"  parent="of_sous-menu_openservice" action="of_project_issue_categ_act0" groups="project.group_project_user" sequence="5"/>
+        <!-- Menu parc installé -->
+        <menuitem id="menu_of_parc_installe" action="action_view_of_parc_installe" name="Parc installé" 
+             parent="of_sous-menu_openservice" groups="project.group_project_user" sequence="10"/>
 
 
-		<!-- Menu Fournisseurs : on affiche ceux dont le champ supplier est vrai -->
-		<record id="of_action_partner_supplier_form" model="ir.actions.act_window">
+
+        <!-- Menu SAV -->
+        <record model="ir.actions.act_window" id="of_project_issue_categ_act0">
+            <field name="name">SAV</field>
+            <field name="res_model">project.issue</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,pivot,graph</field>
+            <field name="view_id" ref="project_issue.project_issue_tree_view"/>
+            <field name="domain" eval=""/>
+            <!-- <field name="search_view_id" ref="view_project_issue_filter"/> -->
+            <field name="help" type="html">
+                <p>
+                    The Odoo issues tacker allows you to efficiently manage things
+                    like internal requests, software development bugs, customer
+                    complaints, project troubles, material breakdowns, etc.
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="of_menu_project_issue_track"  parent="of_sous-menu_openservice" action="of_project_issue_categ_act0" groups="project.group_project_user" sequence="5"/>
+
+
+        <!-- Menu Fournisseurs : on affiche ceux dont le champ supplier est vrai -->
+        <record id="of_action_partner_supplier_form" model="ir.actions.act_window">
             <field name="name">Fournisseurs</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">res.partner</field>
@@ -492,8 +498,8 @@
         <menuitem id="of_menu_partner_supplier_form" parent="of_sous-menu_openservice" action="of_action_partner_supplier_form" sequence="20"/>
 
 
-		<!-- Menu Articles -->
-		<record id="of_product_template_action" model="ir.actions.act_window">
+        <!-- Menu Articles -->
+        <record id="of_product_template_action" model="ir.actions.act_window">
             <field name="name">Articles</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">product.template</field>
@@ -512,10 +518,10 @@
             </field>
         </record>
 
-		<menuitem id="of_menu_product_template_action" parent="of_sous-menu_openservice" action="of_product_template_action" sequence="25"/>
-		
-		
-		<!-- Menu configuration catégories d'articles -->
+        <menuitem id="of_menu_product_template_action" parent="of_sous-menu_openservice" action="of_product_template_action" sequence="25"/>
+        
+        
+        <!-- Menu configuration catégories d'articles -->
         <record id="of_product_category_action_form" model="ir.actions.act_window">
             <field name="name">Catégories d'articles</field>
             <field name="type">ir.actions.act_window</field>
@@ -547,10 +553,10 @@
 <!-- ********************* ACTIONS ********************* -->
 <!-- *************************************************** -->
 
-		<!-- *** Action dans vue SAV (project.issue) *** -->
-		
-		<!-- Lien pour action créer SAV demande d'intervention depuis SAV -->
-		<!-- Objectif : ouvrir un nouveau SAV depuis un SAV "Appel téléphonique" avec les mêmes paramètres mais avec type à "Demande d'intervention" -->
+        <!-- *** Action dans vue SAV (project.issue) *** -->
+        
+        <!-- Lien pour action créer SAV demande d'intervention depuis SAV -->
+        <!-- Objectif : ouvrir un nouveau SAV depuis un SAV "Appel téléphonique" avec les mêmes paramètres mais avec type à "Demande d'intervention" -->
         <record id="action_open_demande_intervention" model="ir.actions.server">
             <field name="name">Demande d'intervention</field>
             <field name="model_id" ref="project_issue.model_project_issue"/>
@@ -567,9 +573,9 @@
         </record>
 
 
-		<!-- *** Action dans vue parc installé (of.parc.installe) *** -->
+        <!-- *** Action dans vue parc installé (of.parc.installe) *** -->
 
-		<!-- Lien pour action créer SAV depuis parc installé -->
+        <!-- Lien pour action créer SAV depuis parc installé -->
         <record id="of_action_pi_open_creer_sav" model="ir.actions.server">
             <field name="name">Créer un SAV</field>
             <field name="model_id" ref="project_issue.model_project_issue"/>
