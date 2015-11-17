@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 from openerp.report import report_sxw
 import time
 import datetime
@@ -40,26 +40,26 @@ class sav(report_sxw.rml_parse):
 
     def get_client_info(self, address):
         address_all = ''
-        if address.title.name and (str(address.title.name) != ''):
+        if address.title.name:
             address_all += address.title.name + ' '
-        if address.name and (str(address.name) != ''):
+        if address.name:
             address_all += address.name + '\n'
-        if address.street and (str(address.street) != ''):
+        if address.street:
             if address_all != '':
                 address_all += '\n' + address.street
             else:
                 address_all += address.street
-        if address.street2 and (str(address.street2) != ''):
+        if address.street2:
             if address_all != '':
                 address_all += '\n' + address.street2
             else:
                 address_all += address.street2
-        if address.zip and (str(address.zip) != ''):
+        if address.zip:
             if address_all != '':
                 address_all += '\n' + address.zip
             else:
                 address_all += address.zip
-        if address.city and (str(address.city) != ''):
+        if address.city:
             if address_all != '':
                 address_all += ' ' + address.city
             else:
