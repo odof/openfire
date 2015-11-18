@@ -62,7 +62,7 @@
       <tr>
         <td>Machine</td>
         <td><para style="terp_default_9">[[ o.product_name_id and o.product_name_id.name_get()[0][1] or '' ]]</para>
-        <para style="terp_default_9">No série : [[ o.of_produit_installe_id and No série o.of_produit_installe_id.name or '' ]]</para>
+        <para style="terp_default_9">No série : [[ o.of_produit_installe_id and o.of_produit_installe_id.name or '' ]]</para>
         </td>
         <td></td>
         <td></td>
