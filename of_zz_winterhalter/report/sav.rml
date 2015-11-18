@@ -13,21 +13,13 @@
       <lineStyle kind="GRID" colorName="black" thickness="1"/>
       <blockSpan start="1,0" stop="3,0"/>
       <blockSpan start="1,1" stop="3,1"/>
-      <blockSpan start="1,5" stop="3,5"/>
+      <blockSpan start="1,2" stop="3,2"/>
       <blockSpan start="1,6" stop="3,6"/>
       <blockSpan start="1,7" stop="3,7"/>
+      <blockSpan start="1,8" stop="3,8"/>
       <blockFont name="Helvetica" size="9.0"/>
-      <blockFont name="Helvetica-Bold" start="0,0" stop="0,7"/>
-      <blockFont name="Helvetica-Bold" start="2,2" stop="2,4"/>
-    </blockTableStyle>
-
-    <blockTableStyle id="Table2">
-      <blockAlignment value="LEFT"/>
-      <blockValign value="MIDDLE"/>
-      <lineStyle kind="GRID" colorName="black" thickness="1"/>
-      <blockFont  name="Helvetica" size="9.0"/>
-      <blockFont name="Helvetica-Bold" start="0,0" stop="0,1"/>
-      <blockFont name="Helvetica-Bold" start="2,0" stop="2,1"/>
+      <blockFont name="Helvetica-Bold" start="0,0" stop="0,8"/>
+      <blockFont name="Helvetica-Bold" start="2,2" stop="2,6"/>
     </blockTableStyle>
 
     <blockTableStyle id="Table3">
@@ -68,6 +60,14 @@
         <td></td>
       </tr>
       <tr>
+        <td>Machine</td>
+        <td><para style="terp_default_9">[[ o.product_name_id and o.product_name_id.name_get()[0][1] or '' ]]</para>
+        <para style="terp_default_9">No série : [[ o.of_produit_installe_id and No série o.of_produit_installe_id.name or '' ]]</para>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
         <td>Requête</td>
         <td><para style="terp_default_9">[[ o.name ]]</para></td>
         <td></td>
@@ -80,16 +80,16 @@
         <td><para style="terp_default_9">[[ o.date_deadline and (str(o.date_deadline) != '') and formatLang(o.date_deadline, date=True) or '' ]]</para></td>
       </tr>
       <tr>
-        <td>Priorité</td>
-        <td><para style="terp_default_9">[[ get_priority(o.priority) ]]</para></td>
         <td>Catégorie</td>
         <td><para style="terp_default_9">[[ o.of_categorie_id and o.of_categorie_id.name or '' ]]</para></td>
+        <td>Priorité</td>
+        <td><para style="terp_default_9">[[ get_priority(o.priority) ]]</para></td>
       </tr>
       <tr>
         <td>État</td>
-        <td><para style="terp_default_9">[[ state_translate(o.stage_id.name) ]]</para></td>
-        <td>Canal</td>
-        <td><para style="terp_default_9">[[ o.of_canal_id and o.of_canal_id.name or '' ]]</para></td>
+        <td><para style="terp_default_9">[[ o.stage_id.name ]]</para></td>
+        <td>Responsable</td>
+        <td>[[ o.user_id and o.user_id.name or '' ]]</td>
       </tr>
       <tr>
         <td>[[ o._columns['description'].string ]]</td>
@@ -108,21 +108,6 @@
         <td><para style="terp_default_9">[[ o.of_actions_eff or '' ]]</para></td>
         <td></td>
         <td></td>
-      </tr>
-  </blockTable>
-
-  <blockTable colWidths="90.0, 175.0, 90.0, 176.0" style="Table2">
-      <tr>
-        <td>Garantie</td>
-        <td><para style="terp_default_9">[[ o.of_garantie and (o.of_garantie == True) and 'Oui' or 'Non' ]]</para></td>
-        <td>Payant client</td>
-        <td>[[ o.of_payant_client and (o.of_payant_client == True) and 'Oui' or 'Non' ]]</td>
-      </tr>
-      <tr>
-        <td>Responsable</td>
-        <td>[[ o.user_id and o.user_id.name or '' ]]</td>
-        <td>Payant fournisseur</td>
-        <td>[[ o.of_payant_fournisseur and (o.of_payant_fournisseur == True) and 'Oui' or 'Non' ]]</td>
       </tr>
   </blockTable>
 

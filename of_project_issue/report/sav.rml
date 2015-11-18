@@ -86,7 +86,7 @@
       </tr>
       <tr>
         <td>État</td>
-        <td><para style="terp_default_9">[[ state_translate(o.stage_id.name) ]]</para></td>
+        <td><para style="terp_default_9">[[ o.stage_id.name ]]</para></td>
         <td>Canal</td>
         <td><para style="terp_default_9">[[ o.channel_id and o.channel_id.name or '' ]]</para></td>
       </tr>

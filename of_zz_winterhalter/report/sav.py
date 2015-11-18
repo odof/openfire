@@ -27,19 +27,10 @@ class sav(report_sxw.rml_parse):
             company = user.company_id.name
         return company
 
-    def state_translate(self, state):
-        if state:
-            if state == 'draft': state = 'Nouveau'
-            elif state == 'open': state = 'En cours'
-            elif state == 'cancel': state = u'Annul\u00E9'
-            elif state == 'done': state = u'Ferm\u00E9'
-            elif state == 'pending': state = 'En attente'
-        else:
-            state = ''
-        return state
-
     def get_client_info(self, address):
         address_all = ''
+        if address.ref:
+            address_all += u"Réf. : " + address.ref + '\n'        
         if address.title.name:
             address_all += address.title.name + ' '
         if address.name:
