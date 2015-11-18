@@ -9,7 +9,6 @@ class sav(report_sxw.rml_parse):
         super(sav, self).__init__(cr, uid, name, context=context)
         self.localcontext.update({
             'get_company_name': self.get_company_name,
-            'state_translate': self.state_translate,
             'get_client_info': self.get_client_info,
             'get_priority': self.get_priority,
             'get_client_tel': self.get_client_tel,
