@@ -153,7 +153,6 @@ class project_issue(osv.Model):
         # MG 'shop_id'            : fields.many2one('sale.shop', 'Magasin'),
         # MG 'partner_shop_id'    : fields.related('partner_id','partner_maga', type="many2one", relation="sale.shop", string="Magasin client", readonly=True),
         'doc_ids'            : fields.one2many('of.sav.docs', 'project_issue_id', string="Liste de documents"),
-        'doc_ids_dis'        : fields.related('doc_ids', type='one2many', relation='of.sav.docs', string="Liste de documents"),
         'fourn_ids'          : fields.function(_get_fournisseurs, string="Fournisseurs", type='one2many', obj='res.partner', readonly=True, domain=[('supplier','=',True)]),
         'fourn_msg_ids'      : fields.function(_get_fourn_messages, string="Historique fournisseur", type='one2many', obj='mail.message'),
         #Migration 9         'categ_parent_id'    : fields.function(_get_categ_parent_id, method=True, string=u"Catégorie parent", type='many2one', relation='crm.case.categ',
@@ -315,9 +314,9 @@ class project_issue(osv.Model):
             docs.append([0, 0, i])
         
         if res and res.has_key('value'):
-            res['value'].update({'doc_ids': docs, 'doc_ids_dis': docs})
+            res['value'].update({'doc_ids': docs})
         else:
-            res = {'value':{'doc_ids': docs, 'doc_ids_dis': docs}}
+            res = {'value':{'doc_ids': docs}}
 # Migration of_magasin pas encore migré
 #         if partner_id:
 #             partner = self.pool['res.partner'].browse(cr, uid, partner_id)

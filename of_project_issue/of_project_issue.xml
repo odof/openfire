@@ -146,11 +146,13 @@
                         <field name="of_partner_id_mobile"/>
                         <field name="of_partner_id_function"/>
                 </field>
+                
+                <xpath expr="//page[@name='extra_info']/group" position="replace"/>
+                
                 <page name="extra_info" position="inside">
                     <group string="Liste de documents">
 	                    <field name="invoice_ids" nolabel="1" colspan="4" invisible="1"/>
-	                    <field name="doc_ids" invisible="1"/>
-	                    <field name="doc_ids_dis" nolabel="1" colspan="4" readonly="1">
+	                    <field name="doc_ids" nolabel="1" colspan="4" readonly="1">
 	                        <tree string="Documents" editable="bottom">
 	                            <field name="date"/>
                                 <field name="number"/>
