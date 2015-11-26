@@ -19,8 +19,9 @@
 #
 ##############################################################################
 
+import openerp
+from openerp import tools, api
 from openerp.osv import fields, osv
-from openerp import SUPERUSER_ID
 
 # Migration : champs rml_footer2 n'existe plus dans Odoo 8
 #class res_company(osv.Model):
@@ -55,3 +56,24 @@ from openerp import SUPERUSER_ID
 #         if not ir_model_access.check_groups(cr, uid, 'base.group_system'):
 #             raise osv.except_osv(('Erreur'), "Vous ne pouvez pas effectuer cette action. Assurez-vous d'avoir les droits d'Administration: Configuration" )
 #         return super(email_template,self).unlink_action(cr, SUPERUSER_ID, ids, context=context)
+
+class res_partner(osv.Model):
+    _inherit = "res.partner"
+
+    @api.model
+    def _get_default_image(self, is_company, colorize=False):
+        # Reecriture de la fonction Odoo pour retirer la couleur de fond aleatoire
+        # Ainsi, chaque nouveau partenaire a les memes image/image_medium/image_small
+        # Ce qui evite de surcharger le filestore
+        img_path = openerp.modules.get_module_resource(
+            'base', 'static/src/img', 'company_image.png' if is_company else 'avatar.png')
+        with open(img_path, 'rb') as f:
+            image = f.read()
+
+        # colorize user avatars
+        if not is_company:
+            # Un rouge orange, cense rappeler la douce chaleur de la flamme
+            # Dans l'atre, les soirs d'hiver, quand le vent glacial rugit au dehors
+            image = tools.image_colorize(image, False, (250, 150, 0))
+
+        return tools.image_resize_image_big(image.encode('base64'))

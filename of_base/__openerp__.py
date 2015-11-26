@@ -34,7 +34,7 @@ Personnalisations des fonctions de base Odoo :
 - Affiche en permanence le nom de la base dans la barre de menu
 """,
     "website" : "www.openfire.fr",
-    "depends" : ["base", "product"], # Migration 8 vers 9 "email_template",
+    "depends" : ["product"], # Migration 8 vers 9 "email_template",
     "category" : "OpenFire",
     "sequence": 100,
     "init_xml" : [
