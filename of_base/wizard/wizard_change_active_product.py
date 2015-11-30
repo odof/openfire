@@ -22,38 +22,33 @@
 
 # Migration ok
 
-from openerp.osv import fields, osv
+from openerp import models, fields, api, _
+from openerp.exceptions import UserError, RedirectWarning, ValidationError
 
-class wizard_change_active_product(osv.TransientModel):
-    """Active/désactive tous produits selectionnes"""
+class wizard_change_active_product(models.TransientModel):
+    u"""Active/désactive tous produits selectionnes"""
     _name = 'wizard.change.active.product'
-    _description = "Active/desactive tous produits selectionnes"
-    _columns={
-        'action': fields.selection([("active","Active les produits sélectionnés"),("desactive","Désactive les produits sélectionnés")], 'Action', required=True),
-    }
-   
-    def action_change_active_product(self, cr, uid, ids, context=None):
-        """Action appelee pour activer/desactiver les produits selectionnes"""
-        if not isinstance(ids, list):
-            ids = [ids]
-        
-        product_ids = context.get('active_ids', []) # Les id des produits sélectionnés
+    _description = u"Active/désactive tous produits selectionnés"
+
+    action = fields.Selection([
+            ("active",u"Active les produits sélectionnés"),
+            ("desactive",u"Désactive les produits sélectionnés")
+        ], string='Action', required=True)
+
+    @api.multi
+    def action_change_active_product(self):
+        u"""Action appelée pour activer/desactiver les produits selectionnés"""
+        product_ids = self._context.get('active_ids', []) # Les id des produits sélectionnés
         
         # Teste si au moins un produit est sélectionné
         if not product_ids:
-            raise osv.except_osv(('Erreur ! (#AP105)'), "Vous devez sélectionner au moins un produit.")
-             
-        wizard = self.browse(cr, uid, ids[0], context=context) # Données du wizard
-        
-        if wizard.action == 'active':
-            actif = True
-        else:
-            actif = False
-            
+            raise UserError(u"Vous devez sélectionner au moins un produit.")
+
+        actif = self.action == 'active'
+
         # Cette fonction peut être appelée de la page produits templates ou des variantes.
         # On récupère l'objet (product_template ou product_product) à modifier dans le contexte.
-        self.pool[context.get('active_model', [])].write(cr, uid, product_ids, {'active': actif})
-        
+        products = self.env[self._context['active_model']].browse(product_ids)
+        products.write({'active': actif})
+
         return {'type': 'ir.actions.act_window_close'}
-
-

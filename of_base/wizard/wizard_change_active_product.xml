@@ -8,13 +8,14 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Change activation produits">
-                    <group colspan="4">
+                    <group>
                         <field name="action" colspan="2"/>
                     </group>
-                    <newline/>
-                    <button special="cancel" string="Fermer" icon="gtk-ok"/>
-                    <button name="action_change_active_product" string="Valider" type="object" icon="gtk-convert"/>
                 </form>
+                <footer>
+                    <button string="Valider" name="action_change_active_product" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
             </field>
         </record>
 
