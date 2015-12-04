@@ -20,8 +20,8 @@
 #
 ##############################################################################
 
+from openerp import models, api
 from openerp.osv import fields, osv
-import time
 
 
 class of_parc_installe(osv.Model):
@@ -214,23 +214,29 @@ class product_template(osv.Model):
         'of_produit_substitue_id': fields.many2one('product.template', 'Article de substitution', required=False,  ondelete='restrict'),
     }
 
+    def search(self, cr, uid, args, offset=0, limit=None, order=None, context=None, count=False):
+        return super(product_template,self).search(cr, uid, args, offset, limit, order, context, count)
 
 # Pour la génération du pdf "Visite technique" depuis le SAV
-class compose_mail(osv.TransientModel):
+class of_compose_mail(models.TransientModel):
     _inherit = 'of.compose.mail'
 
-    def _get_objects(self, cr, uid, o, data, context):
-        result = super(compose_mail,self)._get_objects(cr, uid, o, data, context)
+    @api.model
+    def _get_objects(self, o, data):
+        result = super(of_compose_mail,self)._get_objects(o, data)
         if o._model._name == 'project.issue':
             result.update({
                 'sav'   : [o],
             })
         return result
 
-    def _get_dict_values(self, cr, uid, data, obj, context):
-        result = super(compose_mail,self)._get_dict_values(cr, uid, data, obj, context)
+    @api.model
+    def _get_dict_values(self, data, o, objects=None):
+        if not objects:
+            objects = self._get_objects(o, data)
+        result = super(of_compose_mail,self)._get_dict_values(data, o)
 
-        savs = context['objects'].get('sav',[])
+        savs = objects.get('sav',[])
         for sav in savs:
             result.update({
             'pi_of_code'              : sav.of_code or '',

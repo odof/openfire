@@ -6,51 +6,40 @@
         <record model="ir.ui.view" id="of_mail_template_form">
             <field name="name">of.mail.template.form</field>
             <field name="model">of.mail.template</field>
-            <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Templates">
-                    <group colspan="4" col="6">
-                        <field name="name" required="1"/>
-                        <field name="model_id" required="1"/>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" default_focus="1" placeholder="Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <separator string="Paramètres"/>
+                        <group colspan="2">
+                            <field name="active"/>
+                            <field name="sans_add" attrs="{'invisible': [('file','!=',False)]}"/>
+                            <field name="sans_header" attrs="{'invisible': [('file','!=',False)]}"/>
+                        </group>
+                        <separator string="Importer un formulaire Acrobat"/>
+                        <group colspan="2">
+                            <field name="file_name" invisible="1"/>
+                            <field name="file" filename="file_name"/>
+                        </group>
+                        <group attrs="{'invisible': [('file','=',False)]}">
+                            <field name="chp_ids" nolabel="1" colspan="2">
+                                <tree string="Champs" create="false" delete="false" editable="bottom">
+                                    <field name="name"/>
+                                    <field name="value_openfire"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <group colspan="2" attrs="{'invisible': [('file','!=',False)]}">
+                            <separator string="Contenu" colspan="4"/>
+                            <field name="body_text" nolabel="1" colspan="4"/>
+                        </group>
                     </group>
-                    <notebook colspan="4">
-                        <page string="Détails des lettres">
-                            <group col="6" colspan="2">
-                                <separator string="Options" colspan="6"/>
-                                <field name="active" required="1" />
-                                <field name="sans_add" />
-                                <field name="sans_header" />
-                            </group>
-                            <newline></newline>
-                            <group col="2" colspan="6">
-                                <field name="imp_cgv" />
-                            </group>
-                            <newline></newline>
-                            <group colspan="2" col="4">
-                                <separator string="Importer un formulaire Acrobat" colspan="4"/>
-                                <field name="file_name" invisible="1"/>
-                                <field name="file" filename="file_name" on_change="onchange_file(file)" colspan="4"/>
-                                <field name="file_url" invisible="1"/>
-                                <field name="file_url_dis" colspan="4"/>
-                                <field name="len_chp" invisible="1"/>
-                                <field name="chp_ids" nolabel="1" on_change="onchange_chp(chp_ids, len_chp)" colspan="4">
-                                    <tree string="Champs" editable="bottom">
-                                        <field name="name"/>
-                                        <field name="value_openfire"/>
-                                    </tree>
-                                </field>
-                            </group>
-                            <group col="2" colspan="4" attrs="{'invisible': [('file','!=',False)]}">
-                                <separator colspan="2" string="Contenu"/>
-                                <notebook  colspan="2">
-                                    <page string="Contenu texte">
-                                        <field name="body_text" nolabel="1"/>
-                                    </page>
-                                </notebook>
-                            </group>
-                        </page>
-                       
-                    </notebook>
+                </sheet>
                 </form>
             </field>
         </record>
@@ -58,36 +47,25 @@
         <record model="ir.ui.view" id="of_mail_template_tree">
             <field name="name">of.mail.template.tree</field>
             <field name="model">of.mail.template</field>
-            <field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree string="Templates">
                     <field name="name"/>
-                    <field name="model_id"/>
-                    <field name="active" />
-                    <field name="sans_add" />
-                    <field name="sans_header" />
+                    <field name="file_name"/>
+                    <field name="sans_add"/>
+                    <field name="sans_header"/>
                 </tree>
             </field>
         </record>
 
         <!-- page for searching a mail template -->
         <record id="view_of_mail_template_search" model="ir.ui.view">
-           <field name="name">of.mail.template.search</field>
-           <field name="model">of.mail.template</field>
-           <field name="type">search</field>
-           <field name="arch" type="xml">
-               <search string="Templates">
-                    <group>
-                        <field name="name"/>
-                        <field name="model_id"/>
-                        <separator orientation="vertical"/>
-                    </group>
-                    <newline/>
-                    <group expand="0" string="Regrouper par...">
-                        <filter string="Model" domain="[]" context="{'group_by':'model_id'}" icon="terp-accessories-archiver"/>
-                    </group>
-               </search>
-           </field>
+            <field name="name">of.mail.template.search</field>
+            <field name="model">of.mail.template</field>
+            <field name="arch" type="xml">
+                <search string="Templates">
+                    <field name="name"/>
+                </search>
+            </field>
         </record>
 
         <record model="ir.actions.act_window" id="action_of_mail_template_tree_all">
