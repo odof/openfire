@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        
+
         <!-- wizard for sending a mail: first step -->
         <record id="view_courrier_wizard" model="ir.ui.view">
             <field name="name">Envoyer un mailing</field>
@@ -15,8 +15,8 @@
                         <field name="amount_acompte" />
                     </group>
                     <footer>
-                        <button icon='gtk-stop' special="cancel" string="Annuler"/>
-                        <button name="get_lettre" string="Valider" type="object" icon="gtk-apply" />
+                        <button string="Valider" name="get_lettre" type="object" class="btn-primary"/>
+                        <button string="Annuler" special="cancel" class="btn-default"/>
                     </footer>
                 </form>
             </field>
@@ -33,12 +33,11 @@
                         <field name="name" string="Libellé" required="1"/>
                         <separator colspan="4" string="Contenu"/>
                         <field name="content" colspan="4" nolabel="1" required="1"/>
-                        <separator string="" colspan="4"/>
-                        <group colspan="4" col="6">
-                            <button icon='gtk-stop' special="cancel" string="Annuler"/>
-                            <button name="print_report" string="Imprimer" type="object" icon="gtk-print"/>
-                        </group>
                     </group>
+                    <footer>
+                        <button string="Imprimer" name="print_report" type="object" class="btn-primary"/>
+                        <button string="Annuler" special="cancel" class="btn-default"/>
+                    </footer>
                 </form>
             </field>
         </record>
@@ -52,8 +51,6 @@
                     <group>
                         <group invisible="1">
                             <field name="file_name"/>
-                            <field name="file_url"/>
-                            <field name="len_chp_tmp"/>
                             <field name="res_file_name"/>
                         </group>
                         <separator string="Envoyer un Courrier" colspan="4"/>
@@ -61,17 +58,16 @@
                         <field name="file" filename="file_name" readonly="1"/>
                         <label for="res_file" class="oe_tz_warning" attrs="{'invisible': [('res_file','=',False)]}"/>
                         <field name="res_file" nolabel="1" filename="res_file_name" attrs="{'invisible': [('res_file','=',False)]}"/>
-                        <field name="chp_tmp_ids" nolabel="1" colspan="2" on_change="onchange_chp_tmp(chp_tmp_ids, len_chp_tmp)">
-                            <tree string="Champs PDF" editable="bottom">
+                        <field name="chp_tmp_ids" nolabel="1" colspan="2">
+                            <tree string="Champs PDF" create="false" delete="false" editable="bottom">
                                 <field name="name"/>
                                 <field name="value_openfire"/>
                             </tree>
                         </field>
-                        <separator string="" colspan="2"/>
                     </group>
                     <footer>
-                        <button icon='gtk-stop' special="cancel" string="Terminer"/>
-                        <button name="print_report_acrobat" string="Générer Fichier PDF" type="object" icon="gtk-print"/>
+                        <button string="Générer Fichier PDF" name="print_report_acrobat" type="object" class="btn-primary"/>
+                        <button string="Terminer" special="cancel" class="btn-default"/>
                     </footer>
                 </form>
             </field>
@@ -88,7 +84,7 @@
             target="new"        
             context="{'model':'res.partner'}"
         />
-        
+
         <act_window
             name="Envoyer un courrier"
             res_model="of.compose.mail"
@@ -100,7 +96,7 @@
             target="new"        
             context="{'model':'sale.order'}"
         />
-        
+
         <!-- <act_window
             name="Envoyer un courrier"
             res_model="of.compose.mail"
@@ -111,7 +107,7 @@
             id="action_view_courrier_wizard_crm"
             context="{'model':'crm.lead'}"
         /> -->
-        
+
          <act_window
             name="Envoyer un courrier"
             res_model="of.compose.mail"
@@ -123,7 +119,6 @@
             target="new"        
             context="{'model':'account.invoice'}"
         />
-            
 
     </data>
 </openerp>  

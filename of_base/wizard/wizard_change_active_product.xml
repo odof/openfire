@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-       <!-- wizard change active product (action activer/désactiver tous produits sélectionnés) -->
-       <record id="view_change_active_product_wizard" model="ir.ui.view">
+        <!-- wizard change active product (action activer/désactiver tous produits sélectionnés) -->
+        <record id="view_change_active_product_wizard" model="ir.ui.view">
             <field name="name">Change activation produits</field>
             <field name="model">wizard.change.active.product</field>
             <field name="type">form</field>
@@ -11,11 +11,11 @@
                     <group>
                         <field name="action" colspan="2"/>
                     </group>
+                    <footer>
+                        <button string="Valider" name="action_change_active_product" type="object" class="btn-primary"/>
+                        <button string="Annuler" special="cancel" class="btn-default"/>
+                    </footer>
                 </form>
-                <footer>
-                    <button string="Valider" name="action_change_active_product" type="object" class="btn-primary"/>
-                    <button string="Annuler" special="cancel" class="btn-default"/>
-                </footer>
             </field>
         </record>
 
