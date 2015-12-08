@@ -1,27 +1,12 @@
 # -*- coding: utf-8 -*-
-##############################################################################
-#
-#   OpenERP, Open Source Management Solution
-#   Copyright (C) 2004-2009 Tiny SPRL (<http://tiny.be>). All Rights Reserved
-#   $Id$
-#
-#   This program is free software: you can redistribute it and/or modify
-#   it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation, either version 3 of the License, or
-#   (at your option) any later version.
-#
-#   This program is distributed in the hope that it will be useful,
-#   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#   GNU General Public License for more details.
-#
-#   You should have received a copy of the GNU General Public License
-#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-##############################################################################
 
 from openerp.osv import fields, osv
-import time
+from openerp import models, api
+import pyodbc
+
+import logging
+_logger = logging.getLogger(__name__)
+#import time
 
 
 class of_parc_installe(osv.Model):
@@ -176,9 +161,15 @@ class res_partner(osv.Model):
         'of_ape': fields.char("Code APE", size=16, required=False),
         'contact_ids': fields.one2many('res.partner', 'parent_id', 'Contacts', domain=[('active','=',True),('type','!=','delivery')]),
         'livraison_ids': fields.one2many('res.partner', 'parent_id', 'Lieu livraison', domain=[('active','=',True),('type','=','delivery')]),
+        'of_id_sage_contact': fields.integer("ID Sage des contacts"),
+        'of_id_sage_livraison': fields.integer("ID Sage des lieux de livraison")
     }
     
-    _sql_constraints = [('ref_uniq', 'unique(ref)', 'Le n° de compte client est déjà utilisé et doit être unique.')]
+    _sql_constraints = [
+        ('ref_uniq', 'unique(ref)', 'Le n° de compte client est déjà utilisé et doit être unique.'),
+        ('of_id_sage_contact_uniq', 'unique(of_id_sage_contact)', 'of_id_sage_contact doit être unique.'),
+        ('of_id_sage_livraison_uniq', 'unique(of_id_sage_livraison)', 'of_id_sage_livraison doit être unique.')    
+    ]
 
 
     def action_creer_sav(self, cr, uid, context={}):
@@ -241,4 +232,339 @@ class compose_mail(osv.TransientModel):
             })
         
         return result
+
+
+
+# Pour la synchronisation des données depuis Sage
+class sage(models.AbstractModel):
+    _name="sage"
+    
+    @api.model
+    def synchro_sage(self, dsn, utilisateur, mdp, base):
+        
+        date_modif = '2015-12-03'
+
+        con_string = 'DSN=%s;UID=%s;PWD=%s;DATABASE=%s;' % (dsn, utilisateur, mdp, base)
+        conn = pyodbc.connect(con_string)
+        curs = conn.cursor()
+        
+        res_country_obj = self.env['res.country']
+        
+        #
+        # CLIENTS (sans les contacts/lieu de livraison)
+        #
+         
+        _logger.info('#OFW# Synchronisation des clients depuis Sage')
+        curs.execute("SELECT * FROM "+base+".dbo.F_COMPTET WHERE cbModification>='"+date_modif+"' ORDER BY cbModification ASC;")
+        partenaires = curs.fetchall()
+        #_logger.info("#OFW# Partenaires : %s", partenaires)
+        res_partner_obj = self.env['res.partner']
+        for i in partenaires:
+            #_logger.info("Dans Sage : %s %s %s", i.CT_Num, i.CT_Intitule, i.cbModification)
+            if i.CT_Num.strip():
+                # Il y a un no de compte
+                res_partner_ids = res_partner_obj.search([('ref','=', i.CT_Num),'|',('active', '=', True),('active', '=', False)])
+                value = {'ref': i.CT_Num.strip()}
+                # Si 1ère lettre no compte est F alors est un fournisseur, C client
+                if value['ref'][0].upper() == 'F':
+                    value['customer'] = False
+                    value['supplier'] = True
+                else:
+                    value['customer'] = True
+                    value['supplier'] = False 
+                if i.CT_Intitule.strip():
+                    value['name'] = i.CT_Intitule.strip()
+                else:
+                    _logger.info("#OFW# Erreur partenaire : le client %s n'a pas de nom dans Sage (champ obligatoire dans Odoo). Non créé/modifié dans Odoo.", i.CT_Num)
+                    continue
+                if i.CT_Sommeil:
+                    value['active'] = False
+                else:
+                    value['active'] = True
+                value['street'] = i.CT_Adresse.strip()
+                value['street2'] = i.CT_Complement.strip()
+                value['zip'] = i.CT_CodePostal.strip()
+                value['city'] = i.CT_Ville.strip()
+                value['country_id'] = i.CT_Pays.strip()
+                # On affecte l'id du pays de la liste dans la base Oddo si on le reconnait, sinon on le met en texte après la ville
+                if value['country_id']:
+                    res_country_ids = res_country_obj.search([('name','=ilike', value['country_id'])])
+                    if res_country_ids:
+                        value['country_id'] = res_country_ids[0].id
+                    else:
+                        value['city'] = value['city'] + " - " + value['country_id']
+                        value['country_id'] = ''
+                value['website'] = i.CT_Site.strip()
+                value['phone'] = i.CT_Telephone.strip()
+                value['fax'] = i.CT_Telecopie.strip()
+                value['email'] = i.CT_EMail.strip()
+                value['of_ape'] = i.CT_Ape.strip()
+                
+                if i.CT_NumPayeur.strip():
+                    # Client payeur, on vérifie qu'il existe dans Odoo
+                    res_partner_payeur_ids = res_partner_obj.search([('ref','=', i.CT_NumPayeur.strip())])
+                    
+                    if res_partner_payeur_ids:
+                        value['of_payeur_id'] = res_partner_payeur_ids[0].id
+                    elif value['ref'] != i.CT_NumPayeur.strip():
+                        # Le compte payeur n'existe pas et ce n'est pas le même que le compte. On n'enregistre pas et génère une erreur.
+                        # Si c'était le même et que c'est une création, on doit l'enregistrer une fois que le compte principal a été créé
+                        _logger.info("#OFW# Erreur partenaire : le client %s pointe vers un client payeur (%s) qui n'existe pas dans Odoo. Non créé/modifié dans Odoo.", i.CT_Num, i.CT_NumPayeur)
+                        continue
+
+                #_logger.info('#OFW# value = %s', value)
+                #_logger.info('#OFW# res_partner_ids = %s', res_partner_ids)
+                
+                # Si le client n'existe pas dans Odoo, on le crée, sinon on le met à jour
+                if not res_partner_ids:
+                    res_partner_obj.create(value)
+                    _logger.info("#OFW# Partenaire %s %s créé", i.CT_Num, i.CT_Intitule)
+                    
+                    if value['ref'] == i.CT_NumPayeur.strip():
+                        # Si le compte payeur est le même que le compte que l'on vient de créer, on l'ajoute.
+                        res_partner_payeur_ids = res_partner_obj.search([('ref','=', i.CT_NumPayeur)])
+                        
+                        if res_partner_payeur_ids:
+                            res_partner_payeur_ids.of_payeur_id = res_partner_payeur_ids[0].id
+                
+                elif len(res_partner_ids) == 1:
+                    # Il y a qu'un client dans Odoo avec ce no de compte. On le met à jour.
+                    res_partner_ids.write(value)
+                    _logger.info("#OFW# Partenaire %s %s modifié", i.CT_Num, i.CT_Intitule)
+                
+                else:
+                    # Il existe plusieurs clients dans Odoo avec ce no de compte. On ne sait pas lequel mettre à jour. On passe au suivant en générant une erreur.
+                    _logger.info("#OFW# Erreur : le no de compte client %s (%s) dans Sage existe en plusieurs exemplaires dans Odoo. Non créé/modifié dans Odoo.", i.CT_Num, i.CT_Intitule)
+            
+            else:
+                # Il n'y a pas de no de compte, on ne peut pas enregistrer
+                _logger.info("#OFW# Erreur partenaire : le client %s %s %s %s %s %s n'a pas de no de compte dans Sage. Non créé/modifié dans Odoo.", i.CT_Intitule, i.CT_Adresse, i.CT_Complement, i.CT_CodePostal, i.CT_Ville, i.CT_Site)
+
+
+        #
+        # LIEUX DE LIVRAISON
+        #
+         
+        _logger.info('#OFW# Synchronisation des lieux de livraison depuis Sage')
+        curs.execute("SELECT * FROM "+base+".dbo.F_LIVRAISON WHERE cbModification>='"+date_modif+"' ORDER BY cbModification ASC;")
+        partenaires = curs.fetchall()
+        #_logger.info("#OFW# Livraison : %s", partenaires)
+        for i in partenaires:
+            value = {}
+            #_logger.info("Dans Sage : %s %s %s", i.CT_Num, i.LI_Intitule, i.cbModification)
+            if i.CT_Num.strip(): # Il y a un no de compte parent
+                if i.LI_No: # Si différent de 0
+                    res_partner_ids = res_partner_obj.search([('of_id_sage_livraison','=', i.LI_No),'|',('active', '=', True),('active', '=', False)])
+                else:
+                    res_partner_ids =''
+                
+                value['of_id_sage_livraison'] = i.LI_No
+                value['customer'] = True
+                value['supplier'] = False
+
+                if i.LI_Intitule.strip():
+                    value['name'] = i.LI_Intitule.strip()
+                else:
+                    _logger.info("#OFW# Erreur livraison : le lieu de livraison LI_No %s de la société %s n'a pas de nom dans Sage (champ obligatoire dans Odoo). Non créé/modifié dans Odoo.", i.LI_No, i.CT_Num)                    
+                    continue
+
+                # Parent, on vérifie qu'il existe dans Odoo
+                res_partner_parent_ids = res_partner_obj.search([('ref','=', i.CT_Num.strip())])
+                if res_partner_parent_ids:
+                    value['parent_id'] = res_partner_parent_ids[0].id
+                else:
+                    # Le compte client parent n'existe pas. On n'enregistre pas et génère une erreur.
+                    _logger.info("#OFW# Erreur livraison : le lieu de livraison %s (id sage contact %s) pointe vers un client parent (%s) qui n'existe pas dans Odoo. Non créé/modifié dans Odoo.", value['name'], i.LI_No, i.CT_Num)
+                    continue
+
+                value['type'] = 'delivery'
+                value['street'] = i.LI_Adresse.strip()
+                value['street2'] = i.LI_Complement.strip()
+                value['zip'] = i.LI_CodePostal.strip()
+                value['city'] = i.LI_Ville.strip()
+                value['country_id'] = i.LI_Pays.strip()
+                # On affecte l'id du pays de la liste dans la base Oddo si on le reconnait, sinon on le met en texte après la ville
+                if value['country_id']:
+                    res_country_ids = res_country_obj.search([('name','=ilike', value['country_id'])])
+                    if res_country_ids:
+                        value['country_id'] = res_country_ids[0].id
+                    else:
+                        value['city'] = value['city'] + " - " + value['country_id']
+                        value['country_id'] = ''
+                value['phone'] = i.LI_Telephone.strip()
+                value['fax'] = i.LI_Telecopie.strip()
+                value['email'] = i.LI_EMail.strip()
+                
+                #_logger.info('#OFW# value = %s', value)
+                #_logger.info('#OFW# res_partner_ids = %s', res_partner_ids)
+                
+                # Si le lieu de livraison n'existe pas dans Odoo, on le crée, sinon on le met à jour
+                if not res_partner_ids:
+                    res_partner_obj.create(value)
+                    _logger.info("#OFW# Lieu de livraison %s du client %s créé", value['name'], i.CT_Num)
+                                    
+                elif len(res_partner_ids) == 1:
+                    # Il a qu'un lieu de livraison dans Odoo avec ce no d'indentifiant. On le met à jour.
+                    res_partner_ids.write(value)
+                    _logger.info("#OFW# Livraison %s (id livraison sage %s) du client %s modifié", value['name'], i.LI_No, i.CT_Num)
+               
+                else:
+                     # Il existe plusieurs lieux de livraison dans Odoo avec ce no d'identifiant. On ne sait pas lequel mettre à jour. On passe au suivant en générant une erreur.
+                    _logger.info("#OFW# Erreur livraison : le lieu de livraison %s avec l'id sage livraison %s existe en plusieurs exemplaires dans Odoo. Non créé/modifié dans Odoo.", value['name'], i.LI_No)
+            
+            else:
+                # Il n'y a pas de no de compte parent, on ne peut pas enregistrer
+                _logger.info("#OFW# Erreur livraison : le lieu de livraison %s id sage livraison %s n'a pas de no de compte parent dans Sage. Non créé/modifié dans Odoo.", value['nane'], i.LI_No)
+
+
+        #
+        # CONTACTS (contacts)
+        #
+
+        _logger.info('#OFW# Synchronisation des contacts depuis Sage')
+        curs.execute("SELECT * FROM "+base+".dbo.F_CONTACTT WHERE cbModification>='"+date_modif+"' ORDER BY cbModification ASC;")
+        partenaires = curs.fetchall()
+        #_logger.info("#OFW# Contacts : %s", partenaires)
+        for i in partenaires:
+            value = {}
+            #_logger.info("Dans Sage : %s %s %s", i.CT_Nom, i.CT_Prenom, i.cbModification)
+            if i.CT_Num.strip(): # Il y a un no de compte parent (pour parent_id dans Odoo)
+                if i.CT_No: # Si différent de 0
+                    res_partner_ids = res_partner_obj.search([('of_id_sage_contact','=', i.CT_No),'|',('active', '=', True),('active', '=', False)])
+                else:
+                    res_partner_ids =''
+                
+                value['of_id_sage_contact'] = i.CT_No
+                
+                if i.CT_Nom.strip():
+                    value['name'] = i.CT_Nom.strip()
+                if i.CT_Prenom.strip():
+                    value['name'] = value['name'] + ' ' + i.CT_Prenom.strip()
+                if not value['name']:
+                    _logger.info("#OFW# Erreur contact : le contact CT_No %s de la société %s n'a pas de nom dans Sage (champ obligatoire dans Odoo). Non créé/modifié dans Odoo.", i.CT_No, i.CT_Num)
+                    continue
+                                                                                                                                                
+                # Parent, on vérifie qu'il existe dans Odoo
+                res_partner_parent_ids = res_partner_obj.search([('ref','=', i.CT_Num.strip())])
+                if res_partner_parent_ids:
+                    value['parent_id'] = res_partner_parent_ids[0].id
+                else:
+                    # Le compte client parent n'existe pas. On n'enregistre pas et génère une erreur.
+                    _logger.info("#OFW# Erreur contact : le contact %s (id sage contact %s) pointe vers un client parent (%s) qui n'existe pas dans Odoo. Non créé/modifié dans Odoo.", value['name'], i.CT_No, i.CT_Num)
+                    continue
+
+                value['customer'] = True
+                value['supplier'] = False
+                value['type'] = 'contact'
+                value['phone'] = i.CT_Telephone.strip()
+                value['fax'] = i.CT_Telecopie.strip()
+                value['mobile'] = i.CT_TelPortable.strip()
+                value['email'] = i.CT_EMail.strip()
+                value['function'] = i.CT_Fonction.strip()
+
+                #_logger.info('#OFW# value = %s', value)
+
+                # Si le contact n'existe pas dans Odoo, on le crée, sinon on le met à jour
+                if not res_partner_ids:
+                    res_partner_obj.create(value)
+                    _logger.info("#OFW# Contact %s du client %s créé", value['name'], i.CT_Num)
+
+                elif len(res_partner_ids) == 1:
+                    # Il a qu'un contact dans Odoo avec ce no d'indentifiant. On le met à jour.
+                    res_partner_ids.write(value)
+                    _logger.info("#OFW# Contact %s (id contact sage %s) du client %s modifié", value['name'], i.CT_No, i.CT_Num)
+
+                else:
+                    # Il existe plusieurs contacts dans Odoo avec ce no d'identifiant. On ne sait pas lequel mettre à jour. On passe au suivant en générant une erreur.
+                    _logger.info("#OFW# Erreur contact : le contact %s avec l'id sage contact %s existe en plusieurs exemplaires dans Odoo. Non créé/modifié dans Odoo.", value['name'], i.CT_No)
+
+            else:
+                # Il n'y a pas de no de compte parent, on ne peut pas enregistrer
+                _logger.info("#OFW# Erreur contact : le contact %s %s id sage contact %s n'a pas de no de compte parent dans Sage. Non créé/modifié dans Odoo.", i.CT_Nom, i.CT_Prenom, i.CT_No)
+
+        return True
+
+
+        #
+        # ARTICLES
+        #
+        
+        _logger.info('#OFW# Synchronisation des articles depuis Sage')
+        curs.execute("SELECT * FROM "+base+".dbo.F_ARTICLE WHERE cbModification>='"+date_modif+"' ORDER BY cbModification ASC;")
+        articles = curs.fetchall()
+        _logger.info("*OFW* Articles : %s", articles)
+        res_product_obj = self.env['product.product']
+        for i in articles:
+            #_logger.info("Dans Sage : %s %s %s %s", i.CT_Num, i.CT_Intitule, i.cbModification, i.CT_Site)
+            if i.AR_Ref.strip():
+                # Il y a une référence d'article
+                res_product_ids = res_product_obj.search([('default_code','=', i.Ar_Ref)])
+                value = {'default_code': i.Ar_Ref}
+                if i.Ar_Design.strip():
+                    value['name'] = i.Ar_Design
+                else:
+                    _logger.info("#OFW# Erreur article : l'article %s n'a pas de nom dans Sage (champ obligatoire dans Odoo). Non créé/modifié dans Odoo.", i.Ar_Design)
+                    continue
+                if i.AR_Sommeil:
+                    value['active'] = False
+                else:
+                    value['active'] = True
+                value['type'] = 'stockable product'
+                value['list_price'] = i.AR_PrixVen
+                value['standart_price'] = i.AR_PrixAch
+                value['sale_ok'] = True
+                value['purchase_ok'] = True
+                value['of_est_dangereux'] = i.Produit_dangereux
+                value['country_id'] = i.CT_Pays.strip()
+                # On affecte l'id du pays de la liste dans la base Oddo si on le recoonait, sinon on le met en texte après la ville
+                if value['country_id']:
+                    res_country_ids = res_country_obj.search([('name','=ilike', value['country_id'])])
+                    if res_country_ids:
+                        value['country_id'] = res_country_ids[0].id
+                    else:
+                        value['city'] = value['city'] + " - " + value['country_id']
+                        value['country_id'] = ''
+                value['weight'] = i.AR_PoidsBrut
+                value['of_poids_adr'] = i.Poids_ADR
+                if i.CT_NumPayeur.strip():
+                    # Client payeur, on vérifie qu'il existe dans Odoo
+                    res_partner_payeur_ids = res_partner_obj.search([('ref','=', i.CT_NumPayeur.strip())])
+                    
+                    if res_partner_payeur_ids:
+                        value['of_payeur_id'] = res_partner_payeur_ids[0].id
+                    elif value['ref'] != i.CT_NumPayeur.strip():
+                        # Le compte payeur n'existe pas et ce n'est pas le même que le compte. On n'enregistre pas et génère une erreur.
+                        # Si c'était le même et que c'est une création, on doit l'enregistrer une fois que le compte principal a été créé
+                        _logger.info("#OFW# Erreur partenaire : le client %s pointe vers un client payeur (%s) qui n'existe pas dans Odoo. Non créé/modifié dans Odoo.", i.CT_Num, i.CT_NumPayeur)
+                        continue
+
+                #_logger.info('*OFW* value = %s', value)
+                
+                # On teste si les champs obligatoires pour Odoo sont bien enregistrés. On n'enregistre rien sinon.
+                # Si le clients n'existe pas dans Odoo, on le créer, sinon on le met à jour
+                if not res_partner_ids:
+                    res_partner_obj.create(value)
+                    _logger.info("#OFW# Partenaire %s %s créé", i.CT_Num, i.CT_Intitule)
+                    
+                    if value['ref'] == i.CT_NumPayeur.strip():
+                        # Si le compte payeur est le même que le compte que l'on vient de créer, on l'ajoute.
+                        res_partner_payeur_ids = res_partner_obj.search([('ref','=', i.CT_NumPayeur)])
+                        
+                        if res_partner_payeur_ids:
+                            res_partner_payeur_ids.of_payeur_id = res_partner_payeur_ids[0].id
+                
+                elif len(res_partner_ids) == 1:
+                    # Il n'y a bien qu'un client dans Odoo avec ce no de compte. On le met à jour.
+                    res_partner_ids.write(value)
+                    _logger.info("#OFW# Partenaire %s %s %s modifié", i.CT_Num, i.CT_Intitule, i.CT_Sommeil)
+                
+                else:
+                    # Il existe plusieurs clients dans Odoo avec ce no de compte. On ne sait pas lequel mettre à jour. On passe au suivant en générant une erreur.
+                    _logger.info("#*OFW# Erreur : le no de compte client %s (%s) dans Sage existe en plusieurs exemplaires dans Odoo. Non créé/modifié dans Odoo.", i.CT_Num, i.CT_Intitule)
+            
+            else:
+                # Il n'y a pas de référence d'article, on ne peut pas enregistrer
+                _logger.info("#*OFW# Erreur article : l'article %s, prix vente %s, prix achat %s, code famille %s, n'a pas de référence dans Sage. Non créé/modifié dans Odoo.", i.AR_Design, AR_PrixVen, AR_PrixAchat, FA_CodeFamille)
+        
+        return True
 
