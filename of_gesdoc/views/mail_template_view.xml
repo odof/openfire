@@ -20,6 +20,7 @@
                             <field name="active"/>
                             <field name="sans_add" attrs="{'invisible': [('file','!=',False)]}"/>
                             <field name="sans_header" attrs="{'invisible': [('file','!=',False)]}"/>
+                            <field name="fillable" attrs="{'invisible': [('file','=',False)]}"/>
                         </group>
                         <separator string="Importer un formulaire Acrobat"/>
                         <group colspan="2">
@@ -31,6 +32,8 @@
                                 <tree string="Champs" create="false" delete="false" editable="bottom">
                                     <field name="name"/>
                                     <field name="value_openfire"/>
+                                    <field name="to_export"/>
+                                    <field name="to_import"/>
                                 </tree>
                             </field>
                         </group>

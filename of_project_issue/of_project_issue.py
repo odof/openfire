@@ -471,7 +471,7 @@ class project_issue(osv.Model):
                 'context': context                
             }
         }
-    
+
 # MG
 # class of_project_issue_mail_wizard(osv.TransientModel):
 #     """

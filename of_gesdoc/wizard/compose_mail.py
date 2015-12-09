@@ -163,6 +163,7 @@ class of_compose_mail(models.TransientModel):
                 'date_paie': data['form']['date_paie'],
                 'amount_acompte': data['form']['amount_acompte'],
             }
+            values = self._get_dict_values(data, obj)
 
             if lettre.file:
                 view_ref = 'view_courrier_wizard2_file'
@@ -170,10 +171,10 @@ class of_compose_mail(models.TransientModel):
                 for chp in lettre.chp_ids:
                     res['chp_tmp_ids'].append((0, 0, {
                         'name': chp.name or '',
-                        'value_openfire': chp.value_openfire and self._format_lettre(data, chp.value_openfire, obj) or '',
+                        'value_openfire': chp.to_export and chp.value_openfire and self.format_body(chp.value_openfire % values) or '',
                     }))
             else:
-                res['content'] = self._format_lettre(data, lettre.body_text, obj)
+                res['content'] = self.format_body(lettre.body_text % values)
             self.write(res)
 
         view = self.env.ref('of_gesdoc.' + view_ref)
@@ -255,8 +256,9 @@ class of_compose_mail(models.TransientModel):
             if not attachment:
                 raise UserError(u'Ce modèle de courrier ne contient pas de document pdf')
 
+            # Generation du fichier rempli. Le parametre flatten (True par defaut) retire la possibilite de modifier le document pdf genere
             file_path = attachment_obj._full_path(attachment.store_fname)
-            generated_pdf = pypdftk.fill_form(file_path, datas)
+            generated_pdf = pypdftk.fill_form(file_path, datas, flatten=not self.lettre_id.fillable)
             os.rename(generated_pdf, generated_pdf + '.pdf')
             with open(generated_pdf + '.pdf', "rb") as encode:
                 encoded_file = base64.b64encode(encode.read())

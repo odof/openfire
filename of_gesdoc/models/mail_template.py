@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import base64
-
 from openerp import models, fields, api, _
 
 import StringIO
+import base64
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfdocument import PDFDocument
 from pdfminer.pdftypes import resolve1
@@ -22,6 +21,7 @@ class of_mail_template(models.Model):
     file_name = fields.Char(string='Nom du fichier', size=64)
     file = fields.Binary("Formulaire PDF", attachment=True)
     chp_ids = fields.One2many('of.gesdoc.chp', 'template_id', string='Liste des champs')
+    fillable = fields.Boolean(u"Laisser éditable", help="Autorise la modification du fichier pdf après téléchargement")
 
     @api.one
     def copy(self, default=None):
@@ -30,7 +30,7 @@ class of_mail_template(models.Model):
         return super(of_mail_template, self).copy(default)
 
     @api.onchange('file')
-    def onchange_chp_ids(self):
+    def onchange_file(self):
         chps = [(5, 0)]
         if self.file:
             pf = StringIO.StringIO(base64.decodestring(self.file))
@@ -43,12 +43,13 @@ class of_mail_template(models.Model):
                 name, value = field.get('T'), field.get('V')
                 name = name.decode("unicode-escape", 'ignore').encode("utf-8")
                 if value:
-                    value = value.decode("unicode-escape", 'ignore').encode("utf-8")
+                    value = value.decode("utf-16", 'ignore').encode("utf-8")
                 else:
                     value = ''
                 chps.append((0, 0, {
                     'name': name,
                     'value_openfire': value,
+                    'to_export': True,
                 }))
         self.chp_ids = chps
 
@@ -59,5 +60,7 @@ class of_gesdoc_chp(models.Model):
     name = fields.Char(string='Nom du champ PDF', size=256, required=True, readonly=True)
     value_openfire = fields.Char(string='Valeur OpenFire', size=256)
     template_id = fields.Many2one('of.mail.template', string=u'Modèle Courrier')
+    to_export = fields.Boolean(string='Export', default=True)
+    to_import = fields.Boolean(string='Import')
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

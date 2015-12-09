@@ -205,42 +205,6 @@ class product_template(osv.Model):
         'of_produit_substitue_id': fields.many2one('product.template', 'Article de substitution', required=False,  ondelete='restrict'),
     }
 
-    def search(self, cr, uid, args, offset=0, limit=None, order=None, context=None, count=False):
-        return super(product_template,self).search(cr, uid, args, offset, limit, order, context, count)
-
-# Pour la génération du pdf "Visite technique" depuis le SAV
-class of_compose_mail(models.TransientModel):
-    _inherit = 'of.compose.mail'
-
-    @api.model
-    def _get_objects(self, o, data):
-        result = super(of_compose_mail,self)._get_objects(o, data)
-        if o._model._name == 'project.issue':
-            result.update({
-                'sav'   : [o],
-            })
-        return result
-
-    @api.model
-    def _get_dict_values(self, data, o, objects=None):
-        if not objects:
-            objects = self._get_objects(o, data)
-        result = super(of_compose_mail,self)._get_dict_values(data, o)
-
-        savs = objects.get('sav',[])
-        for sav in savs:
-            result.update({
-            'pi_of_code'              : sav.of_code or '',
-            'pi_name'                 : sav.name or '',  
-            'pi_description'          : sav.description or '',
-            'pi_of_actions_realisees' : sav.of_actions_realisees or '',
-            'pi_of_actions_eff'       : sav.of_actions_eff or '',
-            })
-        
-        return result
-
-
-
 # Pour la synchronisation des données depuis Sage
 class sage(models.AbstractModel):
     _name="sage"
@@ -573,4 +537,3 @@ class sage(models.AbstractModel):
                 _logger.info("#*OFW# Erreur article : l'article %s, prix vente %s, prix achat %s, code famille %s, n'a pas de référence dans Sage. Non créé/modifié dans Odoo.", i.AR_Design, AR_PrixVen, AR_PrixAchat, FA_CodeFamille)
         
         return True
-

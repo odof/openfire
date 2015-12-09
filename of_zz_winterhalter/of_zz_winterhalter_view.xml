@@ -411,6 +411,7 @@
         
         <menuitem id="of_sous-menu_openservice" name="OpenService" parent="menu_of_openservice" sequence="5"/>
         <!-- Menu configuration catégories de produits -->
+        <menuitem id="of_menu_action_openservice" name="Actions" parent="menu_of_openservice" sequence="80"/>
         <menuitem id="of_menu_config_openservice" name="Configuration" parent="menu_of_openservice" sequence="100"/>
         
              
@@ -561,6 +562,11 @@
             id="menu_of_project_issue_categorie_action_form"
             parent="of_menu_config_openservice" sequence="3"/>
 
+        <!-- Menu import pdf -->
+        <menuitem action="of_gesdoc.action_import_mail_menu"
+            id="menu_import_mail"
+            parent="of_menu_action_openservice"
+            sequence="10"/>
 
 <!-- *************************************************** -->        
 <!-- ********************* ACTIONS ********************* -->
