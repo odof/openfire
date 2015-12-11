@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from openerp import models, api
 from openerp.osv import fields, osv
+from openerp import models, api
 import pyodbc
 
 import logging
@@ -167,8 +167,8 @@ class res_partner(osv.Model):
     
     _sql_constraints = [
         ('ref_uniq', 'unique(ref)', 'Le n° de compte client est déjà utilisé et doit être unique.'),
-        ('of_id_sage_contact_uniq', 'unique(of_id_sage_contact)', 'of_id_sage_contact doit être unique.'),
-        ('of_id_sage_livraison_uniq', 'unique(of_id_sage_livraison)', 'of_id_sage_livraison doit être unique.')    
+        #('of_id_sage_contact_uniq', 'unique(of_id_sage_contact)', 'of_id_sage_contact doit être unique.'),
+        #('of_id_sage_livraison_uniq', 'unique(of_id_sage_livraison)', 'of_id_sage_livraison doit être unique.')    
     ]
 
 
@@ -206,6 +206,35 @@ class product_template(osv.Model):
     }
 
 
+# Pour la génération du pdf "Visite technique" depuis le SAV
+class compose_mail(osv.TransientModel):
+    _inherit = 'of.compose.mail'
+
+    def _get_objects(self, cr, uid, o, data, context):
+        result = super(compose_mail,self)._get_objects(cr, uid, o, data, context)
+        if o._model._name == 'project.issue':
+            result.update({
+                'sav'   : [o],
+            })
+        return result
+
+    def _get_dict_values(self, cr, uid, data, obj, context):
+        result = super(compose_mail,self)._get_dict_values(cr, uid, data, obj, context)
+
+        savs = context['objects'].get('sav',[])
+        for sav in savs:
+            result.update({
+            'pi_of_code'              : sav.of_code or '',
+            'pi_name'                 : sav.name or '',  
+            'pi_description'          : sav.description or '',
+            'pi_of_actions_realisees' : sav.of_actions_realisees or '',
+            'pi_of_actions_eff'       : sav.of_actions_eff or '',
+            })
+        
+        return result
+
+
+
 # Pour la synchronisation des données depuis Sage
 class sage(models.AbstractModel):
     _name="sage"
@@ -226,7 +255,7 @@ class sage(models.AbstractModel):
         #
          
         _logger.info('#OFW# Synchronisation des clients depuis Sage')
-        curs.execute("SELECT top 2 * FROM "+base+".dbo.F_COMPTET WHERE cbModification>='"+date_modif+"' ORDER BY cbModification ASC;")
+        curs.execute("SELECT * FROM "+base+".dbo.F_COMPTET WHERE cbModification>='"+date_modif+"' ORDER BY cbModification ASC;")
         partenaires = curs.fetchall()
         #_logger.info("#OFW# Partenaires : %s", partenaires)
         res_partner_obj = self.env['res.partner']
@@ -317,7 +346,7 @@ class sage(models.AbstractModel):
         #
          
         _logger.info('#OFW# Synchronisation des lieux de livraison depuis Sage')
-        curs.execute("SELECT top 2 * FROM "+base+".dbo.F_LIVRAISON WHERE cbModification>='"+date_modif+"' ORDER BY cbModification ASC;")
+        curs.execute("SELECT * FROM "+base+".dbo.F_LIVRAISON WHERE cbModification>='"+date_modif+"' ORDER BY cbModification ASC;")
         partenaires = curs.fetchall()
         #_logger.info("#OFW# Livraison : %s", partenaires)
         for i in partenaires:
@@ -327,13 +356,13 @@ class sage(models.AbstractModel):
                 if i.LI_No: # Si différent de 0
                     res_partner_ids = res_partner_obj.search([('of_id_sage_livraison','=', i.LI_No),'|',('active', '=', True),('active', '=', False)])
                 else:
-                    res_partner_ids =''
+                    res_partner_ids = ''
                 
                 value['of_id_sage_livraison'] = i.LI_No or 0
                 value['customer'] = True
                 value['supplier'] = False
 
-                if i.LI_Intitule.strip():
+                if (i.LI_Intitule or '').strip():
                     value['name'] = i.LI_Intitule.strip()
                 else:
                     _logger.info("#OFW# Erreur livraison : le lieu de livraison LI_No %s de la société %s n'a pas de nom dans Sage (champ obligatoire dans Odoo). Non créé/modifié dans Odoo.", i.LI_No, i.CT_Num)                    
@@ -380,7 +409,7 @@ class sage(models.AbstractModel):
                     _logger.info("#OFW# Livraison %s (id livraison sage %s) du client %s modifié", value['name'], i.LI_No, i.CT_Num)
                
                 else:
-                     # Il existe plusieurs lieux de livraison dans Odoo avec ce no d'identifiant. On ne sait pas lequel mettre à jour. On passe au suivant en générant une erreur.
+                    # Il existe plusieurs lieux de livraison dans Odoo avec ce no d'identifiant. On ne sait pas lequel mettre à jour. On passe au suivant en générant une erreur.
                     _logger.info("#OFW# Erreur livraison : le lieu de livraison %s avec l'id sage livraison %s existe en plusieurs exemplaires dans Odoo. Non créé/modifié dans Odoo.", value['name'], i.LI_No)
             
             else:
@@ -393,7 +422,7 @@ class sage(models.AbstractModel):
         #
 
         _logger.info('#OFW# Synchronisation des contacts depuis Sage')
-        curs.execute("SELECT top 2 * FROM "+base+".dbo.F_CONTACTT WHERE cbModification>='"+date_modif+"' ORDER BY cbModification ASC;")
+        curs.execute("SELECT * FROM "+base+".dbo.F_CONTACTT WHERE cbModification>='"+date_modif+"' ORDER BY cbModification ASC;")
         partenaires = curs.fetchall()
         #_logger.info("#OFW# Contacts : %s", partenaires)
         for i in partenaires:
@@ -423,7 +452,7 @@ class sage(models.AbstractModel):
                     # Le compte client parent n'existe pas. On n'enregistre pas et génère une erreur.
                     _logger.info("#OFW# Erreur contact : le contact %s (id sage contact %s) pointe vers un client parent (%s) qui n'existe pas dans Odoo. Non créé/modifié dans Odoo.", value['name'], i.CT_No, i.CT_Num)
                     continue
-
+                
                 value['customer'] = True
                 value['supplier'] = False
                 value['type'] = 'contact'
@@ -453,27 +482,26 @@ class sage(models.AbstractModel):
                 # Il n'y a pas de no de compte parent, on ne peut pas enregistrer
                 _logger.info("#OFW# Erreur contact : le contact %s %s id sage contact %s n'a pas de no de compte parent dans Sage. Non créé/modifié dans Odoo.", i.CT_Nom, i.CT_Prenom, i.CT_No)
         
-        return True
 
         #
         # ARTICLES
         #
         
         _logger.info('#OFW# Synchronisation des articles depuis Sage')
-        curs.execute("SELECT top 5 * FROM "+base+".dbo.F_ARTICLE WHERE cbModification>='"+date_modif+"' ORDER BY cbModification ASC;")
+        curs.execute("SELECT * FROM "+base+".dbo.F_ARTICLE WHERE cbModification>='"+date_modif+"' ORDER BY cbModification ASC;")
         articles = curs.fetchall()
         #_logger.info("#OFW# Articles : %s", articles)
         res_product_obj = self.env['product.template']
         for i in articles:
-            _logger.info("#OFW# Dans Sage : [%s] %s %s", i.AR_Ref, i.AR_Design, i.cbModification)
+            #_logger.info("#OFW# Dans Sage : [%s] %s %s", i.AR_Ref, i.AR_Design, i.cbModification)
             if i.AR_Ref.strip():
                 # Il y a une référence d'article
-                res_product_ids = res_product_obj.search([('default_code','=', i.AR_Ref)])
+                res_product_ids = res_product_obj.search([('default_code','=', i.AR_Ref),'|',('active', '=', True),('active', '=', False)])
                 value = {'default_code': i.AR_Ref}
                 if (i.AR_Design or '').strip():
                     value['name'] = i.AR_Design.strip()
                 else:
-                    _logger.info("#OFW# Erreur article : l'article %s n'a pas de nom dans Sage (champ obligatoire dans Odoo). Non créé/modifié dans Odoo.", i.AR_Ref)
+                    _logger.info("#OFW# Erreur article : l'article %s n'a pas de nom dans Sage (champ obligatoire dans Odoo). Non créé/modifié dans Odoo.", value['default_code'])
                     continue
                 if i.AR_Sommeil:
                     value['active'] = False
@@ -484,30 +512,69 @@ class sage(models.AbstractModel):
                 value['standard_price'] = (i.AR_PrixAch or '')
                 value['sale_ok'] = True
                 value['purchase_ok'] = True
-                value['of_est_dangereux'] = (i.Produit_dangereux or '')
-                # On affecte l'id du pays de la liste dans la base Oddo si on le recoonait, sinon on le met en texte après la ville
+                if (i.Produit_dangereux or '').upper() == 'OUI': 
+                    value['of_est_dangereux'] = True
+                else:
+                    value['of_est_dangereux'] = False
                 value['weight'] = (i.AR_PoidsBrut or '')
                 value['of_poids_adr'] = (i.Poids_ADR_ or '')
+                # Article de substitution, on vérifie qu'il existe dans Odoo
+                value['of_produit_substitue_id'] = (i.AR_Substitut or '').strip()
+
+                if value['of_produit_substitue_id']:
+                    res_product_substitue_ids = res_product_obj.search([('default_code','=', value['of_produit_substitue_id']),'|',('active', '=', True),('active', '=', False)])
+                    if res_product_substitue_ids:
+                        value['of_produit_substitue_id'] = res_product_substitue_ids[0].id
+                    else:
+                        # L'article n'existe pas. On n'enregistre pas et génère une erreur.
+                        _logger.info("#OFW# Erreur article : l'article de substitution %s de l'article [%s] %s n'existe pas dans Odoo. Non créé/modifié dans Odoo.", value['of_produit_substitue_id'], value['default_code'], value ['name'])
+                        continue
+               
+                # Catégorie de produit, on vérifie qu'elle existe dans Odoo
+                if (i.FA_CodeFamille or '').strip():
+                    res_categ_ids = self.env['product.category'].search([('name','=', (i.FA_CodeFamille or '').strip())])
+                    if res_categ_ids:
+                        value['categ_id'] = res_categ_ids[0].id
+                    else:
+                        # La catégorie n'existe pas. On l'enregistre mais avec la catégorie par défaut d'Odoo.
+                        _logger.info("#OFW# Erreur article : la catégorie %s de l'article [%s] %s n'existe pas dans Odoo. Enregistré mais avec la catégorie d'article par défaut d'Odoo.", (i.FA_CodeFamille or '').strip(), value['default_code'], value['name'])
+                
+                # Unité de mesure
+                value['uom_id'] = i.AR_UniteVen
+                if value['uom_id'] == 2:
+                    value['uom_id'] = self.env.ref('product.product_uom_cm').id
+                elif value['uom_id'] == 3:
+                    value['uom_id'] = self.env.ref('product.product_uom_meter').id
+                elif value['uom_id'] == 4:
+                    value['uom_id'] = self.env.ref('product.product_uom_gram').id
+                elif value['uom_id'] == 5:
+                    value['uom_id'] = self.env.ref('product.product_uom_kgm').id
+                elif value['uom_id'] == 13:
+                    value['uom_id'] = self.env.ref('product.product_uom_hour').id
+                else:
+                    value['uom_id'] = self.env.ref('product.product_uom_unit').id
+
+                value['uom_po_id'] = value['uom_id']
 
                 #_logger.info('#OFW# value = %s', value)
                 
-                # On teste si les champs obligatoires pour Odoo sont bien enregistrés. On n'enregistre rien sinon.
                 # Si l'article n'existe pas dans Odoo, on le créer, sinon on le met à jour
                 if not res_product_ids:
                     res_product_obj.create(value)
-                    _logger.info(u"#OFW# Article [%s] %s créé", i.AR_Ref, i.AR_Design)
+                    _logger.info("#OFW# Article [%s] %s créé", value['default_code'], value['name'])
                     
                 elif len(res_product_ids) == 1:
                     # Il n'y a bien qu'un article dans Odoo avec cette référence. On le met à jour.
                     res_product_ids.write(value)
-                    _logger.info(u"#OFW# Article [%s] %s %s modifié", i.AR_Ref, i.AR_Design)
+                    _logger.info("#OFW# Article [%s] %s modifié", value['default_code'],value['name'])
                 
                 else:
                     # Il existe plusieurs articles dans Odoo avec cette référence. On ne sait pas lequel mettre à jour. On passe au suivant en générant une erreur.
-                    _logger.info(u"#OFW# Erreur : l'article [%s] %s dans Sage existe en plusieurs exemplaires dans Odoo avec cette référence. Non créé/modifié dans Odoo.", i.AR_Ref, i.AR_Design)
+                    _logger.info("#OFW# Erreur : l'article [%s] %s dans Sage existe en plusieurs exemplaires dans Odoo avec cette référence. Non créé/modifié dans Odoo.", value['default_code'], value['name'])
             
             else:
                 # Il n'y a pas de référence d'article, on ne peut pas enregistrer
                 _logger.info("#OFW# Erreur article : l'article %s, prix vente %s, prix achat %s, code famille %s, n'a pas de référence dans Sage. Non créé/modifié dans Odoo.", i.AR_Design, i.AR_PrixVen, i.AR_PrixAchat, i.FA_CodeFamille)
         
         return True
+
