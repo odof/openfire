@@ -149,11 +149,10 @@ class project_issue(osv.Model):
                     return False
         return res
 
-
 class res_partner(osv.Model):
     _name = "res.partner"
     _inherit = "res.partner"
-    
+
     _columns = {
         'of_revendeur': fields.boolean('Revendeur', help="Cocher cette case si ce partenaire est un revendeur."),
         'of_installateur': fields.boolean('Installateur', help="Cocher cette case si ce partenaire est un installateur."),
@@ -164,13 +163,12 @@ class res_partner(osv.Model):
         'of_id_sage_contact': fields.integer("ID Sage des contacts"),
         'of_id_sage_livraison': fields.integer("ID Sage des lieux de livraison")
     }
-    
+
     _sql_constraints = [
         ('ref_uniq', 'unique(ref)', 'Le n° de compte client est déjà utilisé et doit être unique.'),
         #('of_id_sage_contact_uniq', 'unique(of_id_sage_contact)', 'of_id_sage_contact doit être unique.'),
-        #('of_id_sage_livraison_uniq', 'unique(of_id_sage_livraison)', 'of_id_sage_livraison doit être unique.')    
+        #('of_id_sage_livraison_uniq', 'unique(of_id_sage_livraison)', 'of_id_sage_livraison doit être unique.')
     ]
-
 
     def action_creer_sav(self, cr, uid, context={}):
         if not context:
@@ -193,7 +191,6 @@ class res_partner(osv.Model):
                 }
         return res
 
-
 class product_template(osv.Model):
     _name = "product.template"
     _inherit = "product.template"
@@ -204,36 +201,6 @@ class product_template(osv.Model):
         'of_pas_dans_sage': fields.boolean(u'Pas dans Sage', help=u"Si ce produit n'est pas dans Sage."),
         'of_produit_substitue_id': fields.many2one('product.template', 'Article de substitution', required=False,  ondelete='restrict'),
     }
-
-
-# Pour la génération du pdf "Visite technique" depuis le SAV
-class compose_mail(osv.TransientModel):
-    _inherit = 'of.compose.mail'
-
-    def _get_objects(self, cr, uid, o, data, context):
-        result = super(compose_mail,self)._get_objects(cr, uid, o, data, context)
-        if o._model._name == 'project.issue':
-            result.update({
-                'sav'   : [o],
-            })
-        return result
-
-    def _get_dict_values(self, cr, uid, data, obj, context):
-        result = super(compose_mail,self)._get_dict_values(cr, uid, data, obj, context)
-
-        savs = context['objects'].get('sav',[])
-        for sav in savs:
-            result.update({
-            'pi_of_code'              : sav.of_code or '',
-            'pi_name'                 : sav.name or '',  
-            'pi_description'          : sav.description or '',
-            'pi_of_actions_realisees' : sav.of_actions_realisees or '',
-            'pi_of_actions_eff'       : sav.of_actions_eff or '',
-            })
-        
-        return result
-
-
 
 # Pour la synchronisation des données depuis Sage
 class sage(models.AbstractModel):
