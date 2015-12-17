@@ -3,10 +3,12 @@
 from openerp.osv import fields, osv
 from openerp import models, api
 import pyodbc
+import time
+from dateutil.relativedelta import relativedelta
 
 import logging
 _logger = logging.getLogger(__name__)
-#import time
+
 
 
 class of_parc_installe(osv.Model):
@@ -203,16 +205,35 @@ class product_template(osv.Model):
     }
 
 # Pour la synchronisation des données depuis Sage
-class sage(models.AbstractModel):
-    _name="sage"
+class of_sage_winterhalter(models.AbstractModel):
+    
+    _name="of.sage.winterhalter"
     
     @api.model
     def synchro_sage(self, dsn, utilisateur, mdp, base):
         
-        date_modif = '2015-11-03'
+        date_debut_sync = time.strftime('%Y-%m-%d')
+        
+        # On récupère la date de la dernière mise à jour si elle existe
+        ir_values_obj = self.env['ir.values']
+        ir_values = ir_values_obj.search([('name','=', 'dern_sync_sage_winterhalter'),('model', '=', 'of.sage.winterhalter')])
+        
+        if not ir_values:
+            date_dern_modif = '2015-11-01'
+        else:
+            date_dern_modif = ir_values[0].value
 
+        _logger.info('#OFW# Synchronisation depuis Sage depuis le %s', date_dern_modif)
+        
+        # On se connecte à la base Sage de Winterhalter par ODBC
         con_string = 'DSN=%s;UID=%s;PWD=%s;DATABASE=%s;' % (dsn, utilisateur, mdp, base)
-        conn = pyodbc.connect(con_string)
+        
+        try:
+            conn = pyodbc.connect(con_string)
+        except:
+            _logger.error('#OFW# Erreur de connexion à la base Sage')
+            return False
+            
         curs = conn.cursor()
         
         res_country_obj = self.env['res.country']
@@ -222,12 +243,12 @@ class sage(models.AbstractModel):
         #
          
         _logger.info('#OFW# Synchronisation des clients depuis Sage')
-        curs.execute("SELECT * FROM "+base+".dbo.F_COMPTET WHERE cbModification>='"+date_modif+"' ORDER BY cbModification ASC;")
+        curs.execute("SELECT * FROM "+base+".dbo.F_COMPTET WHERE cbModification>='"+date_dern_modif+"' ORDER BY cbModification ASC;")
         partenaires = curs.fetchall()
         #_logger.info("#OFW# Partenaires : %s", partenaires)
         res_partner_obj = self.env['res.partner']
         for i in partenaires:
-            #_logger.info("#OFW# Dans Sage : %s %s %s", i.CT_Num, i.CT_Intitule, i.cbModification)
+            _logger.info("#OFW# Dans Sage : %s %s %s", i.CT_Num, i.CT_Intitule, i.cbModification)
             if i.CT_Num.strip():
                 # Il y a un no de compte
                 res_partner_ids = res_partner_obj.search([('ref','=', i.CT_Num),'|',('active', '=', True),('active', '=', False)])
@@ -313,12 +334,12 @@ class sage(models.AbstractModel):
         #
          
         _logger.info('#OFW# Synchronisation des lieux de livraison depuis Sage')
-        curs.execute("SELECT * FROM "+base+".dbo.F_LIVRAISON WHERE cbModification>='"+date_modif+"' ORDER BY cbModification ASC;")
+        curs.execute("SELECT * FROM "+base+".dbo.F_LIVRAISON WHERE cbModification>='"+date_dern_modif+"' ORDER BY cbModification ASC;")
         partenaires = curs.fetchall()
         #_logger.info("#OFW# Livraison : %s", partenaires)
         for i in partenaires:
             value = {}
-            #_logger.info("#OFW# Dans Sage : %s %s %s", i.CT_Num, i.LI_Intitule, i.cbModification)
+            _logger.info("#OFW# Dans Sage : %s %s %s", i.CT_Num, i.LI_Intitule, i.cbModification)
             if i.CT_Num.strip(): # Il y a un no de compte parent
                 if i.LI_No: # Si différent de 0
                     res_partner_ids = res_partner_obj.search([('of_id_sage_livraison','=', i.LI_No),'|',('active', '=', True),('active', '=', False)])
@@ -389,12 +410,12 @@ class sage(models.AbstractModel):
         #
 
         _logger.info('#OFW# Synchronisation des contacts depuis Sage')
-        curs.execute("SELECT * FROM "+base+".dbo.F_CONTACTT WHERE cbModification>='"+date_modif+"' ORDER BY cbModification ASC;")
+        curs.execute("SELECT * FROM "+base+".dbo.F_CONTACTT WHERE cbModification>='"+date_dern_modif+"' ORDER BY cbModification ASC;")
         partenaires = curs.fetchall()
         #_logger.info("#OFW# Contacts : %s", partenaires)
         for i in partenaires:
             value = {}
-            #_logger.info("#OFW# Dans Sage : %s %s %s", i.CT_Nom, i.CT_Prenom, i.cbModification)
+            _logger.info("#OFW# Dans Sage : %s %s %s", i.CT_Nom, i.CT_Prenom, i.cbModification)
             if i.CT_Num and i.CT_Num.strip(): # Il y a un no de compte parent (pour parent_id dans Odoo)
                 if i.CT_No: # Si différent de 0
                     res_partner_ids = res_partner_obj.search([('of_id_sage_contact','=', i.CT_No),'|',('active', '=', True),('active', '=', False)])
@@ -455,12 +476,12 @@ class sage(models.AbstractModel):
         #
         
         _logger.info('#OFW# Synchronisation des articles depuis Sage')
-        curs.execute("SELECT * FROM "+base+".dbo.F_ARTICLE WHERE cbModification>='"+date_modif+"' ORDER BY cbModification ASC;")
+        curs.execute("SELECT * FROM "+base+".dbo.F_ARTICLE WHERE cbModification>='"+date_dern_modif+"' ORDER BY cbModification ASC;")
         articles = curs.fetchall()
         #_logger.info("#OFW# Articles : %s", articles)
         res_product_obj = self.env['product.template']
         for i in articles:
-            #_logger.info("#OFW# Dans Sage : [%s] %s %s", i.AR_Ref, i.AR_Design, i.cbModification)
+            _logger.info("#OFW# Dans Sage : [%s] %s %s", i.AR_Ref, i.AR_Design, i.cbModification)
             if i.AR_Ref.strip():
                 # Il y a une référence d'article
                 res_product_ids = res_product_obj.search([('default_code','=', i.AR_Ref),'|',('active', '=', True),('active', '=', False)])
@@ -542,6 +563,16 @@ class sage(models.AbstractModel):
             else:
                 # Il n'y a pas de référence d'article, on ne peut pas enregistrer
                 _logger.info("#OFW# Erreur article : l'article %s, prix vente %s, prix achat %s, code famille %s, n'a pas de référence dans Sage. Non créé/modifié dans Odoo.", i.AR_Design, i.AR_PrixVen, i.AR_PrixAchat, i.FA_CodeFamille)
+        
+        # On enregistre la date de mise à jour dans la configuration
+        if not ir_values:
+            ir_values.create({'name': 'dern_sync_sage_winterhalter', 'value': date_debut_sync, 'model': 'of.sage.winterhalter'})
+        else:
+            ir_values[0].write({'name': 'dern_sync_sage_winterhalter', 'value': date_debut_sync, 'model': 'of.sage.winterhalter'})
+        
+        # On ferme la connexion sqlserver
+        curs.close()
+        del curs
         
         return True
 
