@@ -1,0 +1,49 @@
+<?xml version="1.0" ?>
+<openerp>
+	<data>
+
+        <record id="of_liste_docs_form_view" model="ir.ui.view">
+            <field name="name">of.liste.docs.form</field>
+            <field name="model">of.liste.docs</field>
+            <field name="arch" type="xml">
+                <form string="Liste fichiers">
+                	<sheet>
+                	<group col="4">
+                        <separator string="Fichier" colspan="4"/>
+                        <field name="name" select="1"/>
+                        <field name="categorie" select="1"/>
+                        <field name="date" select="1"/>
+                        <field name="file" filename="file_name" colspan="4"/>
+                        <field name="file_name" invisible="1"/>
+                    </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="of_liste_docs_tree_view" model="ir.ui.view">
+            <field name="name">of.liste_docs.tree</field>
+            <field name="model">of.liste.docs</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="categorie"/>
+                    <field name="date"/>
+                    <field name="file_name" invisible="1"/>
+                    <field name="file" filename="file_name"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="action_of_liste_docs_tree" model="ir.actions.act_window">
+            <field name="name">Téléchargement</field>
+            <field name="res_model">of.liste.docs</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="of_liste_docs_tree_view"/>
+        </record>
+        
+        <menuitem action="action_of_liste_docs_tree" id="menu_of_liste_docs" name="Téléchargement" sequence="200"/>
+
+	</data>
+</openerp>
