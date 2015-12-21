@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data noupdate="0">
+
+    <!-- Création groupe utilisateurs intranet -->
+    <record id="of_group_intranet" model="res.groups">
+        <field name="name">Intranet</field>
+        <field name="category_id" ref="base.module_category_extra"/>
+        <field name="comment">Droits OpenFire : donne les droits d'accès à l'intranet</field>
+    </record>
+
+</data>
+</openerp>

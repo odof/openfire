@@ -32,6 +32,7 @@ Personnalisations des fonctions de base Odoo :
 - Ajoute la référence du produit dans la vue liste
 - Affiche en permanence le nom de la base dans la barre de menu
 - Retire la couleur de fond aléatoire de l'image mise par défaut à la création d'un partenaire
+- Ajoute le groupe utilisateur "Intranet"
 """,
     "website" : "www.openfire.fr",
     "depends" : ["product"], # Migration 8 vers 9 "email_template",
@@ -40,6 +41,7 @@ Personnalisations des fonctions de base Odoo :
     "init_xml" : [
     ],
     "data" : [
+        'security/of_group_intranet_security.xml',
         'of_base_view.xml',
         'wizard/wizard_change_active_product.xml',
         'nom_base.xml'
