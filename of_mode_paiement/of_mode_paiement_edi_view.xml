@@ -1,0 +1,37 @@
+<openerp>
+    <data>
+    
+    <!--##########################################################################################################################-->
+    <!--###############################################________Paiements edi________##############################################-->
+    <!--##########################################################################################################################-->
+
+        <!-- Ajouter champs no NNE et ICS dans configuration société -->
+        <record id="of_paiement_edi_company" model="ir.ui.view">
+            <field name="name">of.paiement.edi.company</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="arch" type="xml">
+                <field name="company_registry" position="after">
+                    <field name="of_num_nne"/>
+                    <field name="of_num_ics"/>
+                </field>
+            </field>
+        </record>
+
+        <!-- Ajouter champs SIRET (company_registry), RUM et date mandat dans configuration partenaire -->
+        <record id="of_paiement_edi_partner" model="ir.ui.view">
+            <field name="name">of.paiement.edi.partner</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <field name="property_account_position_id" position="before">
+                    <field name="company_registry"/> <!--  Migration -->
+                    <field name="of_sepa_rum"/>
+                    <field name="of_sepa_date_mandat"/>
+                    <field name="of_sepa_type_prev"/>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</openerp>
