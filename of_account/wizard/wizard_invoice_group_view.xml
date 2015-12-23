@@ -1,0 +1,32 @@
+<openerp>
+    <data>
+
+        <record id="of_invoice_group_view" model="ir.ui.view">
+            <field name="name">of.invoice.group.form</field>
+            <field name="model">of.invoice.group</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Fusionner Factures">
+                    <separator string="Êtes-vous sûr de vouloir fusionner ces factures ?" colspan="4"/>
+                    <p>Veuillez noter que:<br/>
+Les factures seront fusionnées seulement si:<br/>
+* Les factures sont à l'état 'Brouillon'<br/>
+* Les factures ont les mêmes valeurs pour les champs suivants: Journal, Devise, Partenaire, Position Fiscale, Compte, Type de communication<br/>
+Les lignes ne seront jamais fusionnées.<br/>
+                    </p>
+                    <footer>
+                        <button string="Fusionner les factures" name="merge_invoices" type="object" class="btn-primary"/>
+                        <button string="Annuler" special="cancel" class="btn-default"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <act_window id="of_action_account_invoice_group"
+            multi="True"
+            key2="client_action_multi" name="Fusionner Factures"
+            res_model="of.invoice.group" src_model="account.invoice"
+            view_mode="form" target="new" view_type="form" />
+
+    </data>
+</openerp>
