@@ -10,7 +10,6 @@ import logging
 _logger = logging.getLogger(__name__)
 
 
-
 class of_parc_installe(osv.Model):
     """
     Parc installée
@@ -77,13 +76,13 @@ class project_issue(osv.Model):
         'of_produit_installe_id': fields.many2one('of.parc.installe', 'Produit installé', readonly=False),
         'of_type': fields.selection([('contacttel',u'ASS'), ('di',u'DI')], 'Type', required=False, help=u"Type de SAV"),
         'product_name_id': fields.many2one('product.product', 'Désignation', ondelete='restrict'),
-        #'product_name_id': fields.related('of_produit_installe_id', 'product_id', 'name', readonly=True, type='char', string=u'Nom'),
         'product_category_id': fields.related('product_name_id', 'categ_id', 'name', readonly=True, type='char', string=u'Famille'),
         'of_actions_eff': fields.text(u'Actions à effectuer'),
         'of_actions_realisees': fields.text(u'Actions réalisées'),
         'description': fields.text(u'Problématique'), # Existe déjà, pour renommer champ
         'of_contact_sav': fields.char(u'Contact SAV', size=64),
-        'of_tel_sav': fields.char(u'Tél. SAV', size=64)
+        'of_contact_address': fields.related('partner_id', 'contact_address', readonly=True, type='char', string=u'Adresse partenaire'),
+        'of_tel_sav': fields.char(u'Tél. SAV', size=64),
     }
     
     _defaults = {
@@ -573,6 +572,7 @@ class of_sage_winterhalter(models.AbstractModel):
         # On ferme la connexion sqlserver
         curs.close()
         del curs
+        conn.close()
         
         return True
 

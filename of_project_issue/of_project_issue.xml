@@ -314,12 +314,12 @@
             <field name="model">of.project.issue.categorie</field>
             <field name="arch" type="xml">
                 <form>
-                    <field name="name"/>
+                    <group>
+                        <field name="name"/>
+                    </group>
                 </form>
             </field>
         </record>
-
-
 
 
 <!-- *************************************************** -->        

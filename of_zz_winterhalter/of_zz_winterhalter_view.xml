@@ -129,6 +129,9 @@
                     <field name="of_produit_installe_id" string="No série"/>
                     <field name="description" string="Problématique"/>
                 </field>
+                <field name="partner_id" position="replace">
+                    <field name="partner_id" string="Partenaire"/>
+                </field>
             </field>
         </record>
         
@@ -141,6 +144,9 @@
             <field name="arch" type="xml">
                 <field name="of_code" position="after">
                     <field name="of_type"/>
+                </field>
+                <field name="partner_id" position="after">
+                    <field name="of_contact_address"/>
                 </field>
             </field>
         </record>
@@ -236,9 +242,13 @@
             <field name="type">tree</field>
             <field name="inherit_id" ref="base.view_partner_tree" />
             <field name="arch" type="xml">
-                  <field name="display_name" position="before">
+                <field name="display_name" position="before">
                     <field name="ref" string="Référence"/>
                 </field>
+                <field name="type" position="after">
+                    <field name="contact_address"/>
+                </field>
+                
             </field>
         </record>
         
@@ -433,7 +443,7 @@
 
 
         <!-- Menu SAV -->
-        <record model="ir.actions.act_window" id="of_project_issue_categ_act0">
+        <record id="of_project_issue_categ_act0" model="ir.actions.act_window">
             <field name="name">SAV</field>
             <field name="res_model">project.issue</field>
             <field name="view_type">form</field>
@@ -450,7 +460,11 @@
             </field>
         </record>
 
-        <menuitem id="of_menu_project_issue_track"  parent="of_sous-menu_openservice" action="of_project_issue_categ_act0" groups="project.group_project_user" sequence="5"/>
+        <menuitem id="of_menu_project_issue_track"
+            parent="of_sous-menu_openservice"
+            action="of_project_issue_categ_act0"
+            groups="project.group_project_user"
+            sequence="5"/>
 
 
         <!-- Menu Fournisseurs : on affiche ceux dont le champ supplier est vrai -->
@@ -544,11 +558,12 @@
         <menuitem name="Equipes" id="menu_of_planning_equipe_tree_win" parent="of_menu_config_openservice_planning" sequence="20" action="of_planning.action_of_planning_equipe_tree"/>
         <menuitem name="Erreurs" id="menu_of_planning_pose_raison_tree_win" parent="of_menu_config_openservice_planning" sequence="30" action="of_planning.action_of_planning_pose_raison_tree"/>
         <menuitem name="Tâches" id="menu_of_planning_tache_tree_win" parent="of_menu_config_openservice_planning" sequence="40" action="of_planning.action_of_planning_tache_tree"/>
+
         
         <!-- Menus Planning -->
         <menuitem id="menu_of_planning_pose_pose_win" name="Planning des interventions" parent="of_sous-menu_openservice" sequence="8" action="of_planning.action_of_planning_pose_calendar" groups="of_planning.of_group_planning_pose_user"/>
-            
 
+            
         <!-- Menu configuration catégories de SAV -->
         <record id="of_project_issue_categorie_action_form" model="ir.actions.act_window">
             <field name="name">Catégories de SAV</field>
@@ -561,12 +576,30 @@
             groups="project.group_project_manager"
             id="menu_of_project_issue_categorie_action_form"
             parent="of_menu_config_openservice" sequence="3"/>
+        
+        
+        <!-- Menu configuration étiquettes de SAV -->
+        <record id="of_project_issue_tag_action_form" model="ir.actions.act_window">
+            <field name="name">Etiquettes de SAV</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">project.tags</field>
+            <field name="view_type">form</field>
+        </record>
+        
+        <menuitem action="of_project_issue_tag_action_form"
+            groups="project.group_project_manager"
+            id="menu_of_project_issue_tag_action_form"
+            parent="of_menu_config_openservice" sequence="4"/>
+
+
 
         <!-- Menu import pdf -->
         <menuitem action="of_gesdoc.action_import_mail_menu"
             id="menu_import_mail"
             parent="of_menu_action_openservice"
             sequence="10"/>
+
+
 
 <!-- *************************************************** -->        
 <!-- ********************* ACTIONS ********************* -->
