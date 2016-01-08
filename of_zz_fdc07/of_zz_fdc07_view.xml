@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- Ajouter champ service dans vue partenaires -->
+        <record id="of_res_partner_form" model="ir.ui.view">
+            <field name="name">of.res.partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <field name="phone" position="before">
+                    <field name="of_service"/>
+                </field> 
+            </field>
+        </record>
+
+    </data>
+</openerp>
