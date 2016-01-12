@@ -23,8 +23,8 @@
         <menuitem id="menu_of_fdc07" name="FDC 07" sequence="0"/>
         
         <menuitem id="of_sous-menu_fdc07" name="FDC 07" parent="menu_of_fdc07" sequence="5"/>
-        <menuitem id="of_menu_action_openservice" name="Actions" parent="menu_of_fdc07" sequence="80"/>
-        <menuitem id="of_menu_config_openservice" name="Configuration" parent="menu_of_fdc07" sequence="100"/>
+        <menuitem id="of_menu_action_fdc07" name="Actions" parent="menu_of_fdc07" sequence="80"/>
+        <menuitem id="of_menu_config_fdc07" name="Configuration" parent="menu_of_fdc07" sequence="100"/>
 
 
         <!-- Menu partenaires -->
@@ -38,6 +38,18 @@
         </record>
         
         <menuitem id="of_menu_partner_form" parent="of_sous-menu_fdc07" action="of_action_partner_form" sequence="15"/> 
+
+        <!-- Menu configuration catégories de partenaires -->
+        <record id="of_partner_categ_action_form" model="ir.actions.act_window">
+            <field name="name">Catégories de contacts</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">of.partner.categ</field>
+            <field name="view_type">form</field>
+        </record>
+        
+        <menuitem action="of_partner_categ_action_form"
+            id="menu_of_partner_categ_action_form"
+            parent="of_menu_config_fdc07" sequence="10"/>
 
     </data>
 </openerp>
