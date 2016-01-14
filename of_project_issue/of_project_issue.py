@@ -294,17 +294,6 @@ class project_issue(osv.Model):
         docs.sort(key=lambda k: k['date'], reverse=True) # Trie des résultats en fonction de la date
         return docs
 
-    
-    def on_change_project(self, cr, uid, ids, project_id, context=None):
-        # Le on_change_project de project.issue remet à False le partner_id, ce qui pose problème quand on veut créer un SAV depuis une action (ex: créer un SAV depuis le parc installé pour Win...).
-        # Le champ partner_id n'est pas propagé puisqu'il est remis à False si on utilise pas les projets ce qui est notre cas.
-        # On remet le partner_id si la variable default_partner_id est définie et si partner_id est à False
-        
-        res = super(project_issue, self).on_change_project(cr, uid, ids, project_id, context=context)
-        if context and not res['value']['partner_id'] and context.get('default_partner_id', False):
-            res['value']['partner_id'] = context.get('default_partner_id', False)
-        return res
-    
     # Migration ok
     def on_change_partner_id(self, cr, uid, ids, partner_id):
         # Pour actualiser la liste des documents liés à au partenaire
