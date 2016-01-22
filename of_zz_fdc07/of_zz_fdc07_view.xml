@@ -16,10 +16,15 @@
                 </field>
                 <page name="sales_purchases" position="attributes">
                     <attribute name="string">Informations complémentaires</attribute>
+                </page>    
+                <page name="historique" position="inside">
+                    <group name="histo_events" string="Planning">
+                        <field name="meeting_ids" colspan="4" nolabel="1" readonly="1"/>
+                    </group>
                 </page>
             </field>
         </record>
-        
+
 
 <!-- *************************************************** -->        
 <!-- ********************** MENUS ********************** -->
