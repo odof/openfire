@@ -9,8 +9,14 @@
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
                 <field name="phone" position="before">
-                    <field name="of_service"/>
+                    <field name="of_service" attrs="{'invisible': [('company_type','!=', 'company')]}"/>
                 </field> 
+               <field name="of_categ_id" position="replace">
+                    <field name="of_categ_id" attrs="{'invisible': [('company_type','!=', 'company')]}"/>
+                </field>
+                <page name="sales_purchases" position="attributes">
+                    <attribute name="string">Informations complémentaires</attribute>
+                </page>
             </field>
         </record>
         
@@ -37,8 +43,75 @@
             <field name="context">{}</field>
         </record>
         
-        <menuitem id="of_menu_partner_form" parent="of_sous-menu_fdc07" action="of_action_partner_form" sequence="15"/> 
+        <menuitem id="of_menu_partner_form" parent="of_sous-menu_fdc07" action="of_action_partner_form" sequence="15"/>
+        
+        <!-- Menu projets -->
+        <record id="of_open_view_project_all_config" model="ir.actions.act_window">
+            <field name="name">Projets</field>
+            <field name="res_model">project.project</field>
+            <field name="view_type">form</field>
+            <field name="domain">[]</field>
+            <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="project.view_project_project_filter"/>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Create a new project.
+                </p><p>
+                    Organize your activities (plan tasks, track issues, invoice timesheets) for internal, personal or customer projects.
+                </p>
+            </field>
+        </record>
+        
+        <menuitem action="of_open_view_project_all_config" id="of_menu_projects_config" name="Projects" parent="of_sous-menu_fdc07" sequence="15"/>
 
+
+        <!-- Menu calendriers -->
+        <record id="of_action_calendar_event" model="ir.actions.act_window">
+            <field name="name">Plannings</field>
+            <field name="res_model">calendar.event</field>
+            <field name="view_mode">calendar,tree,form</field>
+            <field name="view_id" ref="calendar.view_calendar_event_calendar"/>
+            <field name="search_view_id" ref="calendar.view_calendar_event_search"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to schedule a new meeting.
+              </p><p>
+                The calendar is shared between employees and fully integrated with
+                other applications such as the employee holidays or the business
+                opportunities.
+              </p>
+            </field>
+        </record>
+        
+        <menuitem action="of_action_calendar_event" id="menu_of_calendar_action_form" parent="of_sous-menu_fdc07" sequence="20"/>        
+        
+        
+        <!-- Menu feuilles de temps -->
+        <record id="of_act_hr_timesheet_sheet_my_timesheets" model="ir.actions.act_window">
+            <field name="name">Feuille de temps</field>
+            <field name="res_model">hr_timesheet_sheet.sheet</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+            <field name="search_view_id" ref="hr_timesheet_sheet.view_hr_timesheet_sheet_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                new timesheet.
+              </p><p>
+                You must record timesheets every day and confirm at the end
+                of the week. Once the timesheet is confirmed, it should be
+                validated by a manager.
+              </p><p>
+                Timesheets can also be invoiced to customers, depending on the
+                configuration of each project's related contract.
+              </p>
+            </field>
+        </record>
+
+        <menuitem action="of_act_hr_timesheet_sheet_my_timesheets" id="of_menu_act_hr_timesheet_sheet_my_timesheets" parent="of_sous-menu_fdc07" sequence="25"/>
+        
+    
         <!-- Menu configuration catégories de partenaires -->
         <record id="of_partner_categ_action_form" model="ir.actions.act_window">
             <field name="name">Catégories de contacts</field>
@@ -50,6 +123,30 @@
         <menuitem action="of_partner_categ_action_form"
             id="menu_of_partner_categ_action_form"
             parent="of_menu_config_fdc07" sequence="10"/>
+
+        <!--  Menu employés -->
+        <record id="of_open_view_employee_list_my" model="ir.actions.act_window">
+            <field name="name">Employés</field>
+            <field name="res_model">hr.employee</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+            <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="hr.view_employee_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to add a new employee.
+              </p><p>
+                With just a quick glance on the Odoo employee screen, you
+                can easily find all the information you need for each person;
+                contact data, job position, availability, etc.
+              </p>
+            </field>
+        </record>
+
+        <menuitem action="of_open_view_employee_list_my" id="of_menu_open_view_employee_list_my" sequence="3" parent="of_menu_config_fdc07"/>
+       
 
     </data>
 </openerp>

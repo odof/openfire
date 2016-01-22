@@ -14,10 +14,13 @@
         "description": """
 Module spécifique pour FDC07
 
-- Ajout champs partenaires
+- Ajout/modification champs/menus spécifiques pour FDC 07
 """,
         "depends" : [
             'of_base',
+            'calendar',
+            'hr',
+            'hr_timesheet_sheet',
         ],
         "demo_xml" : [ ],
         "data" : [
