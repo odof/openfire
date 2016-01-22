@@ -173,11 +173,11 @@ class project_issue(osv.Model):
     }
 
     _defaults = {
-        'date'              : lambda *a: time.strftime('%Y-%m-%d %H:%M:00'),
+        'date'                 : lambda *a: time.strftime('%Y-%m-%d %H:%M:00'),
         'of_garantie'          : False,
         'of_payant_client'     : False,
         'of_payant_fournisseur': False,
-        'of_code'              : lambda self, cr, uid, context: self.pool['ir.sequence'].get(cr, uid, 'of.project.issue'),
+        'of_code'              : 'Nouveau',
         # MG 'show_partner_shop' : False,
     }
     
@@ -384,6 +384,11 @@ class project_issue(osv.Model):
                 else:
                     res['context'] = {'default_origin': project_issue.of_code}
         return res
+
+    def create(self, cr, uid, vals, context=None):
+        if vals.get('of_code', 'Nouveau') == 'Nouveau':
+            vals['of_code'] = self.pool['ir.sequence'].next_by_code(cr, uid, 'of.project.issue') or 'New'
+        return super(project_issue, self).create(cr, uid, vals, context=context)
 
     def copy(self, cr, uid, helpdesk_id, default=None, context=None):
         if not default:
