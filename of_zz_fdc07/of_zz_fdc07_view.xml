@@ -40,7 +40,7 @@
         <menuitem id="menu_of_fdc07" name="FDC 07" sequence="0"/>
         
         <menuitem id="of_sous-menu_fdc07" name="FDC 07" parent="menu_of_fdc07" sequence="5"/>
-        <menuitem id="of_menu_action_fdc07" name="Actions" parent="menu_of_fdc07" sequence="80"/>
+        <menuitem id="of_menu_projet_fdc07" name="Projets" parent="menu_of_fdc07" sequence="80"/>
         <menuitem id="of_menu_config_fdc07" name="Configuration" parent="menu_of_fdc07" sequence="100"/>
 
 
@@ -74,7 +74,7 @@
             </field>
         </record>
         
-        <menuitem action="of_open_view_project_all_config" id="of_menu_projects_config" name="Projets" parent="of_sous-menu_fdc07" sequence="15"/>
+        <menuitem action="of_open_view_project_all_config" id="of_menu_projects_config" name="Projets" parent="of_menu_projet_fdc07" sequence="15"/>
 
 
         <!-- Menu calendriers -->
@@ -96,7 +96,33 @@
         </record>
         
         <menuitem action="of_action_calendar_event" id="menu_of_calendar_action_form" parent="of_sous-menu_fdc07" sequence="20"/>        
-        
+
+        <!-- Menu notes -->
+        <record model="ir.actions.act_window" id="of_action_note_note">
+          <field name="name">Notes</field>
+          <field name="res_model">note.note</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">kanban,tree,form</field>
+          <field name="search_view_id" ref="note.view_note_note_filter"/>
+          <field name="context">{}</field>
+          <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to add a personal note.
+              </p><p>
+                Use notes to organize personal tasks or notes. All
+                notes are private; no one else will be able to see them. However
+                you can share some notes with other people by inviting followers
+                on the note. (Useful for meeting minutes, especially if
+                you activate the pad feature for collaborative writings).
+              </p><p>
+                You can customize how you process your notes/tasks by adding,
+                removing or modifying columns.
+              </p>
+            </field>
+        </record>
+
+        <menuitem name="Notes" id="of_menu_note_notes" action="of_action_note_note" parent="of_sous-menu_fdc07" sequence="25" web_icon="note,static/description/icon.png"/>
+  
         
         <!-- Menu feuilles de temps -->
         <record id="of_act_hr_timesheet_sheet_my_timesheets" model="ir.actions.act_window">
@@ -120,9 +146,26 @@
             </field>
         </record>
 
-        <menuitem action="of_act_hr_timesheet_sheet_my_timesheets" id="of_menu_act_hr_timesheet_sheet_my_timesheets" parent="of_sous-menu_fdc07" sequence="25"/>
+        <menuitem action="of_act_hr_timesheet_sheet_my_timesheets" id="of_menu_act_hr_timesheet_sheet_my_timesheets" parent="of_menu_projet_fdc07" sequence="25"/>
+
+
+        <!-- Menu tâches -->
+        <record id="of_action_view_task" model="ir.actions.act_window">
+            <field name="name">Tâches</field>
+            <field name="res_model">project.task</field>
+            <field name="view_mode">kanban,tree,form,calendar,pivot,graph</field>
+            <field name="context">{}</field>
+            <field name="search_view_id" ref="project.view_task_search_form"/>
+            <field name="help" type="html">
+                <p>
+                    Odoo's project management allows you to manage the pipeline of your tasks efficiently. You can track progress, discuss on tasks, attach documents, etc.
+                </p>
+            </field>
+        </record>
         
-    
+        <menuitem action="of_action_view_task" id="of_menu_action_view_task" parent="of_menu_projet_fdc07" sequence="20"/>
+
+
         <!-- Menu configuration catégories de partenaires -->
         <record id="of_partner_categ_action_form" model="ir.actions.act_window">
             <field name="name">Catégories de contacts</field>
