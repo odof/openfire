@@ -11,12 +11,15 @@
                 <field name="phone" position="before">
                     <field name="of_service" attrs="{'invisible': [('company_type','!=', 'company')]}"/>
                 </field> 
-               <field name="of_categ_id" position="replace">
+                <field name="of_categ_id" position="replace">
                     <field name="of_categ_id" attrs="{'invisible': [('company_type','!=', 'company')]}"/>
                 </field>
                 <page name="sales_purchases" position="attributes">
                     <attribute name="string">Informations complémentaires</attribute>
-                </page>    
+                </page>
+                <page name="accounting" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </page>     
                 <page name="historique" position="inside">
                     <group name="histo_events" string="Planning">
                         <field name="meeting_ids" colspan="4" nolabel="1" readonly="1"/>
@@ -68,12 +71,12 @@
             </field>
         </record>
         
-        <menuitem action="of_open_view_project_all_config" id="of_menu_projects_config" name="Projects" parent="of_sous-menu_fdc07" sequence="15"/>
+        <menuitem action="of_open_view_project_all_config" id="of_menu_projects_config" name="Projets" parent="of_sous-menu_fdc07" sequence="15"/>
 
 
         <!-- Menu calendriers -->
         <record id="of_action_calendar_event" model="ir.actions.act_window">
-            <field name="name">Plannings</field>
+            <field name="name">Planning</field>
             <field name="res_model">calendar.event</field>
             <field name="view_mode">calendar,tree,form</field>
             <field name="view_id" ref="calendar.view_calendar_event_calendar"/>
@@ -94,7 +97,7 @@
         
         <!-- Menu feuilles de temps -->
         <record id="of_act_hr_timesheet_sheet_my_timesheets" model="ir.actions.act_window">
-            <field name="name">Feuille de temps</field>
+            <field name="name">Feuilles de temps</field>
             <field name="res_model">hr_timesheet_sheet.sheet</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
