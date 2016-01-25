@@ -19,7 +19,10 @@
                 </page>
                 <page name="accounting" position="attributes">
                     <attribute name="invisible">True</attribute>
-                </page>     
+                </page>
+                <page name="accounting_disabled" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </page>
                 <page name="historique" position="inside">
                     <group name="histo_events" string="Planning">
                         <field name="meeting_ids" colspan="4" nolabel="1" readonly="1"/>
