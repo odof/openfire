@@ -21,6 +21,7 @@ Module spécifique pour FDC07
             'calendar',
             'hr',
             'hr_timesheet_sheet',
+            'hr_holidays',
         ],
         "demo_xml" : [ ],
         "data" : [

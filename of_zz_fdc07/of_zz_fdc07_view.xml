@@ -40,7 +40,8 @@
         <menuitem id="menu_of_fdc07" name="FDC 07" sequence="0"/>
         
         <menuitem id="of_sous-menu_fdc07" name="FDC 07" parent="menu_of_fdc07" sequence="5"/>
-        <menuitem id="of_menu_projet_fdc07" name="Projets" parent="menu_of_fdc07" sequence="80"/>
+        <menuitem id="of_menu_projet_fdc07" name="Projets" parent="menu_of_fdc07" sequence="50"/>
+        <menuitem id="of_menu_conges_fdc07" name="Congés" parent="menu_of_fdc07" sequence="60"/>
         <menuitem id="of_menu_config_fdc07" name="Configuration" parent="menu_of_fdc07" sequence="100"/>
 
 
@@ -165,6 +166,61 @@
         
         <menuitem action="of_action_view_task" id="of_menu_action_view_task" parent="of_menu_projet_fdc07" sequence="20"/>
 
+        <!--  Menu résumé des congés -->
+        <record model="ir.actions.act_window" id="of_open_company_allocation">
+            <field name="name">Résumé des congés</field>
+            <field name="res_model">hr.holidays</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="hr_holidays.view_holiday_simple"/>
+            <field name="context">{
+                'search_default_group_type': 1,
+                'search_default_year': 1 ,
+                'search_default_my_leaves': 1,
+                'needaction_menu_ref':
+                [
+                    'hr_holidays.menu_open_ask_holidays_new',
+                    'hr_holidays.menu_open_allocation_holidays',
+                    'hr_holidays.menu_request_approve_allocation',
+                    'hr_holidays.menu_open_employee_leave',
+                ]
+            }</field>
+            <field name="domain">[('holiday_type','=','employee')]</field>
+            <field name="search_view_id" ref="hr_holidays.view_hr_holidays_filter"/>
+        </record>
+
+        <menuitem name="Résumé des congés" parent="of_menu_conges_fdc07" id="of_menu_open_company_allocation" action="of_open_company_allocation" sequence="10"/>
+
+        <!-- Menu Demande de congés -->
+        <record model="ir.actions.act_window" id="of_open_ask_holidays">
+            <field name="name">Demande de congés</field>
+            <field name="res_model">hr.holidays</field>
+            <field name="view_mode">tree,form,calendar</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="hr_holidays.edit_holiday_new"/>
+            <field name="context">{
+                'default_type': 'remove',
+                'search_default_my_leaves':1,
+                'needaction_menu_ref':
+                [
+                    'hr_holidays.menu_open_company_allocation',
+                ]
+            }</field>
+            <field name="domain">[('type','=','remove')]</field>
+            <field name="search_view_id" ref="hr_holidays.view_hr_holidays_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create a new leave request.
+              </p><p>
+                Once you have recorded your leave request, it will be sent
+                to a manager for validation. Be sure to set the right leave
+                type (recuperation, legal holidays, sickness) and the exact
+                number of open days related to your leave.
+              </p>
+            </field>
+        </record>
+
+        <menuitem parent="of_menu_conges_fdc07" id="of_menu_open_ask_holidays_new" action="of_open_ask_holidays" sequence="20"/>
 
         <!-- Menu configuration catégories de partenaires -->
         <record id="of_partner_categ_action_form" model="ir.actions.act_window">
