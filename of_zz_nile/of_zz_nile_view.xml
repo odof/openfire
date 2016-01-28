@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- Ajouter champ catégorie dans vue form activités feuilles de temps -->
+        <record id="of_hr_timesheet_categ_form" model="ir.ui.view">
+            <field name="name">of.hr.timesheet.categ.form</field>
+            <field name="model">account.analytic.line</field>
+            <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_form"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="of_categ_id"/>
+                </field> 
+            </field>
+        </record>
+        
+        <!-- Ajouter champ catégorie dans vue tree activités feuilles de temps -->
+        <record id="of_hr_timesheet_categ_tree" model="ir.ui.view">
+            <field name="name">of.hr.timesheet.categ.tree</field>
+            <field name="model">account.analytic.line</field>
+            <field name="type">tree</field>
+            <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_tree"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="of_categ_id"/>
+                </field>
+            </field>
+        </record>
+
+
+<!-- ******************************************************************* -->        
+<!-- ********** Activités feuilles de temps CONFIG CATEGORIES ********** -->
+<!-- ******************************************************************* -->
+
+        <!-- Activités feuilles de temps catégories tree -->
+        <record id="of_hr_timesheet_categ_tree_view" model="ir.ui.view">
+            <field name="name">of.hr.timesheet.categ.tree.view</field>
+            <field name="model">of.hr.timesheet.categ</field>
+            <field name="arch" type="xml">
+                <tree string="Catégories de partenaires">
+                    <field name="name"/>
+                    <field name="parent_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Activités feuilles de temps Catégories form -->
+        <record id="of_hr_timesheet_form_view" model="ir.ui.view">
+            <field name="name">of.hr.timesheet.categ.form.view</field>
+            <field name="model">of.hr.timesheet.categ</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="name"/>
+                        <field name="parent_id"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+
+<!-- *************************************************** -->
+<!-- ********************** MENUS ********************** -->
+<!-- *************************************************** -->
+
+        <!-- Menu configuration catégories d'activités feuilles de temps -->
+        <record id="of_hr_timesheet_categ_action_form" model="ir.actions.act_window">
+            <field name="name">Catégories d'activités</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">of.hr.timesheet.categ</field>
+            <field name="view_type">form</field>
+        </record>
+        
+        <menuitem action="of_hr_timesheet_categ_action_form"
+            id="menu_of_hr_timesheet_categ_action_form"
+            groups="base.group_hr_manager"
+            parent="hr_timesheet.menu_hr_timesheet_config" sequence="20"/>
+            
+        <!-- Menu comptes des deuilles de temps du menu configuration que l'on a écrasé avec le menu Catégories d'activités ci-dessus-->
+        <menuitem name="Comptes des feuilles de temps" id="of_menu_hr_timesheet_config" sequence="10"
+            parent="hr_timesheet.menu_hr_timesheet_config" groups="base.group_configuration" action="hr_timesheet.act_hr_timesheet_accounts_form"/>
+
+    </data>
+</openerp>
