@@ -20,8 +20,8 @@
 ##############################################################################
 
 import openerp
-from openerp import tools, api
-from openerp.osv import fields, osv
+from openerp import models, fields, api,tools,  _
+from openerp.osv import expression
 
 # Migration : champs rml_footer2 n'existe plus dans Odoo 8
 #class res_company(osv.Model):
@@ -57,7 +57,7 @@ from openerp.osv import fields, osv
 #             raise osv.except_osv(('Erreur'), "Vous ne pouvez pas effectuer cette action. Assurez-vous d'avoir les droits d'Administration: Configuration" )
 #         return super(email_template,self).unlink_action(cr, SUPERUSER_ID, ids, context=context)
 
-class res_partner(osv.Model):
+class ResPartner(models.Model):
     _inherit = "res.partner"
 
     @api.model
@@ -77,3 +77,100 @@ class res_partner(osv.Model):
             image = tools.image_colorize(image, False, (250, 150, 0))
 
         return tools.image_resize_image_big(image.encode('base64'))
+
+    def _search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False, access_rights_uid=None):
+        # Modification de la fonction search pour que la recherche sur la reference se fasse aussi sur les parents
+        new_args = []
+        for arg in args:
+            if arg[0] != 'ref':
+                new_args.append(arg)
+                continue
+            op = arg[1]
+            negative = op in expression.NEGATIVE_TERM_OPERATORS
+            if negative:
+                op = expression.TERM_OPERATORS_NEGATION[op]
+
+            args_tmp = ['&', ('ref',op,arg[2]), '|', ('parent_id','=',False), ('ref','!=',False)]
+            ids = super(ResPartner, self)._search(cr, models.SUPERUSER_ID, args_tmp, offset=offset, limit=limit, order=order,
+                                                  context=context, count=count, access_rights_uid=access_rights_uid)
+
+            if not ids:
+                new_args.append(expression.TRUE_LEAF if negative else expression.FALSE_LEAF)
+            else:
+                if negative:
+                    new_args.append('not')
+                new_args.append(('id','child_of',ids))
+        return super(ResPartner,self)._search(cr, user, new_args, offset=offset, limit=limit, order=order,
+                                              context=context, count=count, access_rights_uid=access_rights_uid)
+
+    @api.multi
+    def write(self, vals):
+        # Modification de la fonction write pour propager la modification de la reference aux enfants si besoin
+        write_ref = 'ref' in vals
+        if write_ref:
+            # La reference est modifie, il va falloir propager la nouvelle valeur aux enfants
+            ref = vals['ref']
+            partners = [(partner,ref,partner.ref) for partner in self if partner.ref != ref]
+        super(ResPartner,self).write(vals)
+        if write_ref:
+            if not ref:
+                # La reference est effacee sur le partenaire courant, on recupere la nouvelle valeur qui vient du parent
+                partners = [(partner,partner.ref,old_ref) for partner,ref,old_ref in partners if partner.ref != old_ref]
+            to_update_ids = []
+            while partners:
+                partner, ref, old_ref = partners.pop()
+                for child in partner.child_ids:
+                    if not child.ref:
+                        # Le contact n'a pas de reference, on continue le parcours
+                        partners.append((child,ref,old_ref))
+                    elif child.ref == old_ref:
+                        # La reference du contact etait la meme que celle du parent, on efface et on continue le parcours
+                        to_update_ids.append(child.id)
+                        partners.append((child,ref,old_ref))
+                    elif child.ref == ref:
+                        # La reference etait deja a jour, on efface et on s'arrete
+                        to_update_ids.append(child.id)
+            if to_update_ids:
+                self.env['res.partner'].browse(to_update_ids).write({'ref':False})
+        return True
+
+    @api.multi
+    def read(self, fields=None, load='_classic_read'):
+        # Modification de la fonction read pour lire la reference du parent recursivement si la reference n'est pas renseignee
+        if fields and 'ref' in fields and 'parent_id' not in fields:
+            fields = fields + ['parent_id']
+        res = super(ResPartner,self).read(fields=fields, load=load)
+        if not fields or 'ref' in fields:
+            # Si la reference n'est pas definie, on prend celle du parent
+            res_dict = {partner['id']:partner for partner in res}
+
+            # {parent a verifier: [enfants affectes]}
+            to_search = {}
+
+            for partner in res:
+                if partner['ref']:
+                    continue
+                p = partner
+                while p['parent_id']:
+                    pid = p['parent_id']
+                    if isinstance(pid, (list,tuple)):
+                        pid = pid[0]
+                    p = res_dict.get(pid)
+                    if not p:
+                        # Le parent n'est pas inclus dans la lecture, il faut refaire une lecture pour lui
+                        to_search.setdefault(pid,[]).append(partner)
+                        break
+                    if p['ref']:
+                        # Application de la reference du parent au partenaire
+                        partner['ref'] = p['ref']
+                        break
+
+            if to_search:
+                # lecture des references des parents non inclus dans la lecture courante
+                parents = self.env['res.partner'].browse(to_search.keys()).read(['ref'])
+                for parent in parents:
+                    ref = parent['ref']
+                    if ref:
+                        for partner in to_search[parent['id']]:
+                            partner['ref'] = ref
+        return res
