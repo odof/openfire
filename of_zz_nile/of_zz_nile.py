@@ -32,8 +32,8 @@ class of_hr_timesheet_categ(models.Model):
         return res
 
 
-class res_partner(models.Model):
+class account_analytic_line(models.Model):
     
     _inherit = 'account.analytic.line'
     
-    of_categ_id = fields.Many2one('of.hr.timesheet.categ', u'Catégorie', required=False, ondelete='restrict')
+    of_categ_id = fields.Many2one('of.hr.timesheet.categ', u'Catégorie', required=True, ondelete='restrict')

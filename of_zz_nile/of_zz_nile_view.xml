@@ -27,6 +27,21 @@
             </field>
         </record>
 
+        <!-- Ajouter champ catégorie activités dans vue Mes feuilles de temps -->
+        <record id="of_hr_timesheet_sheet_sheet_form" model="ir.ui.view">
+            <field name="name">of.hr.timesheet.sheet.sheet.form</field>
+            <field name="model">hr_timesheet_sheet.sheet</field>
+            <field name="inherit_id" ref="hr_timesheet_sheet.hr_timesheet_sheet_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='name']" position="after">
+                    <field name="of_categ_id"/>
+                </xpath>
+                <xpath expr="//field[@name='timesheet_ids']/form/field[@name='name']" position="after">
+                    <field name="of_categ_id"/>
+                </xpath>
+            </field>
+        </record>
+
 
 <!-- ******************************************************************* -->        
 <!-- ********** Activités feuilles de temps CONFIG CATEGORIES ********** -->

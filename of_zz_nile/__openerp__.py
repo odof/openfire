@@ -18,6 +18,7 @@ Module spécifique pour Nile
 """,
         "depends" : [
             'hr_timesheet',
+            'hr_timesheet_sheet',
         ],
         "demo_xml" : [ ],
         "data" : [
