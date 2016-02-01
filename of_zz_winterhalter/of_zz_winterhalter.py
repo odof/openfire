@@ -165,11 +165,47 @@ class res_partner(osv.Model):
         'of_id_sage_livraison': fields.integer("ID Sage des lieux de livraison")
     }
 
-    _sql_constraints = [
-        ('ref_uniq', 'unique(ref)', 'Le n° de compte client est déjà utilisé et doit être unique.'),
-        #('of_id_sage_contact_uniq', 'unique(of_id_sage_contact)', 'of_id_sage_contact doit être unique.'),
-        #('of_id_sage_livraison_uniq', 'unique(of_id_sage_livraison)', 'of_id_sage_livraison doit être unique.')
-    ]
+#     _sql_constraints = [
+#         #('ref_uniq', 'unique(ref)', 'Le n° de compte client est déjà utilisé et doit être unique.'),
+#         #('of_id_sage_contact_uniq', 'unique(of_id_sage_contact)', 'of_id_sage_contact doit être unique.'),
+#         #('of_id_sage_livraison_uniq', 'unique(of_id_sage_livraison)', 'of_id_sage_livraison doit être unique.')
+#     ]
+
+    @api.model
+    def _check_no_ref_duplicate(self, ref):
+        if not ref:
+            return True
+        parent_id = False
+        cr = self._cr
+        cr.execute("SELECT id,parent_id FROM res_partner WHERE ref = '%s'" % ref)
+        while True:
+            vals = cr.fetchall()
+            ids = []
+            for id,pid in vals:
+                if pid:
+                    if pid not in ids:
+                        ids.append(pid)
+                elif parent_id:
+                    if id != parent_id:
+                        raise osv.except_osv(('Erreur'), u"Le n° de compte client est déjà utilisé et doit être unique. (%s)" % (ref,))
+                else:
+                    parent_id = id
+            if not ids:
+                break
+            cr.execute("SELECT id,parent_id FROM res_partner WHERE id IN %s", (tuple(ids),))
+        return True
+
+    @api.model
+    def _update_refs(self, new_ref, partner_refs):
+        # Avant de mettre a jour les enfants, on verifie que les partenaires avec cette reference ont bien tous un parent commun
+        self._check_no_ref_duplicate(new_ref)
+        return super(res_partner, self)._update_refs(new_ref, partner_refs)
+
+    @api.model
+    def create(self, vals):
+        res = super(res_partner, self).create(vals)
+        self._check_no_ref_duplicate(vals.get('ref'))
+        return res
 
     def action_creer_sav(self, cr, uid, context={}):
         if not context:
