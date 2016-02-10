@@ -50,10 +50,12 @@
             <field name="inherit_id" ref="hr_timesheet.view_hr_timesheet_report_search"/>
             <field name="arch" type="xml">
                 <field name="user_id" position="after">
+                    <field name="of_categ_id"/>
                     <filter string="Catégorie" context="{'group_by':'of_categ_id'}" help="Regrouper par catégorie d'activités"/>
                 </field>
             </field>
         </record>
+
 
 <!-- ******************************************************************* -->        
 <!-- ********** Activités feuilles de temps CONFIG CATEGORIES ********** -->
