@@ -42,6 +42,18 @@
             </field>
         </record>
 
+        <!-- Rapport feuille de présence ajout stats par champ of_categ_id -->
+        <record id="of_view_hr_timesheet_report_search" model="ir.ui.view">
+            <field name="name">of.hr.timesheet.report.search</field>
+            <field name="model">hr.timesheet.report</field>
+            <field name="type">search</field>
+            <field name="inherit_id" ref="hr_timesheet.view_hr_timesheet_report_search"/>
+            <field name="arch" type="xml">
+                <field name="user_id" position="after">
+                    <filter string="Catégorie" context="{'group_by':'of_categ_id'}" help="Regrouper par catégorie d'activités"/>
+                </field>
+            </field>
+        </record>
 
 <!-- ******************************************************************* -->        
 <!-- ********** Activités feuilles de temps CONFIG CATEGORIES ********** -->

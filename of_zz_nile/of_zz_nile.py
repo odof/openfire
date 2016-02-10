@@ -37,3 +37,17 @@ class account_analytic_line(models.Model):
     _inherit = 'account.analytic.line'
     
     of_categ_id = fields.Many2one('of.hr.timesheet.categ', u'Catégorie', required=True, ondelete='restrict')
+
+
+class hr_timesheet_report(models.Model):
+      
+    _inherit = 'hr.timesheet.report'
+      
+    of_categ_id = fields.Many2one('of.hr.timesheet.categ', u'Catégorie', readonly=True)
+    
+    def _select(self):
+        return super(hr_timesheet_report, self)._select() + ', aal.of_categ_id as of_categ_id\n'
+
+    def _group_by(self):
+        return super(hr_timesheet_report, self)._group_by() + ', aal.of_categ_id\n'
+    
