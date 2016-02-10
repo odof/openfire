@@ -1,23 +1,4 @@
 # -*- coding: utf-8 -*-
-##############################################################################
-#
-#    OpenERP, Open Source Management Solution
-#    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as
-#    published by the Free Software Foundation, either version 3 of the
-#    License, or (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU Affero General Public License for more details.
-#
-#    You should have received a copy of the GNU Affero General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-##############################################################################
 
 import openerp
 from openerp import models, fields, api,tools,  _
@@ -80,8 +61,9 @@ class ResPartner(models.Model):
 
     def _add_missing_default_values(self, cr, uid, values, context=None):
         # La reference par defaut est celle du parent
-        if isinstance(values.get('parent_id'), (int,long)) and not values.get('ref') and 'default_ref' not in context:
-            values['ref'] = self.read(cr, uid, values['parent_id'], ['ref'], context=context)['ref']
+        parent_id = values.get('parent_id')
+        if parent_id and isinstance(parent_id, (int,long)) and not values.get('ref') and 'default_ref' not in context:
+            values['ref'] = self.read(cr, uid, parent_id, ['ref'], context=context)['ref']
         return super(ResPartner,self)._add_missing_default_values(cr, uid, values, context=context)
 
     def onchange_parent_id(self, cr, uid, ids, parent_id, context=None):
