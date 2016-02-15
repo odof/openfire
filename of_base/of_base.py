@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import openerp
-from openerp import models, fields, api,tools,  _
-from openerp.osv import expression
+from openerp import models, api,tools
+from openerp.osv import osv
 
 # Migration : champs rml_footer2 n'existe plus dans Odoo 8
 #class res_company(osv.Model):
@@ -41,6 +41,12 @@ from openerp.osv import expression
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
+    # Pour afficher dans le menu déroulant de choix de partenaire l'adresse du contact et pas que le nom 
+    def name_search(self, cr, uid, name, args=None, operator='ilike', context=None, limit=100):
+        if context.get('show_address'):
+            context = dict(context or {}, of_show_address_line=True)
+        return super(ResPartner,self).name_search(cr, uid, name, args, operator, context, limit)
+    
     @api.model
     def _get_default_image(self, is_company, colorize=False):
         # Reecriture de la fonction Odoo pour retirer la couleur de fond aleatoire
@@ -73,7 +79,40 @@ class ResPartner(models.Model):
         return result
 
     @api.model
+    def _check_no_ref_duplicate(self, ref):
+        if not ref:
+            return True
+        parent_id = False
+        cr = self._cr
+        cr.execute("SELECT id,parent_id FROM res_partner WHERE ref = '%s'" % ref)
+        while True:
+            vals = cr.fetchall()
+            ids = []
+            for id,pid in vals:
+                if pid:
+                    if pid not in ids:
+                        ids.append(pid)
+                elif parent_id:
+                    if id != parent_id:
+                        raise osv.except_osv(('Erreur'), u"Le n° de compte client est déjà utilisé et doit être unique. (%s)" % (ref,))
+                else:
+                    parent_id = id
+            if not ids:
+                break
+            cr.execute("SELECT id,parent_id FROM res_partner WHERE id IN %s", (tuple(ids),))
+        return True
+
+    @api.model
+    def create(self, vals):
+        res = super(ResPartner, self).create(vals)
+        self._check_no_ref_duplicate(vals.get('ref'))
+        return res
+
+    @api.model
     def _update_refs(self, new_ref, partner_refs):
+        # Avant de mettre a jour les enfants, on verifie que les partenaires avec cette reference ont bien tous un parent commun
+        self._check_no_ref_duplicate(new_ref)
+        
         to_update_ids = []
         while partner_refs:
             partner, old_ref = partner_refs.pop()
@@ -98,3 +137,5 @@ class ResPartner(models.Model):
         if write_ref:
             self._update_refs(ref, partner_refs)
         return True
+    
+    
