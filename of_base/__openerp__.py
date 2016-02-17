@@ -34,6 +34,7 @@ Personnalisations des fonctions de base Odoo :
 - Retire la couleur de fond aléatoire de l'image mise par défaut à la création d'un partenaire
 - Ajoute le groupe utilisateur "Intranet"
 - Affiche l'adresse du contact dans le menu déroulant de sélection d'un partenaire
+- Affiche l'adresse au format français par défaut quand le pays n'est pas renseigné et non le format US
 """,
     "website" : "www.openfire.fr",
     "depends" : ["product"], # Migration 8 vers 9 "email_template",
