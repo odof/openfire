@@ -35,7 +35,8 @@ class project_issue(osv.Model):
         'of_contact_sav': fields.char(u'Contact SAV', size=64),
         'of_contact_address': fields.related('partner_id', 'contact_address', readonly=True, type='char', string=u'Adresse partenaire'),
         'of_tel_sav': fields.char(u'Tél. SAV', size=64),
-        'of_tags_parent': fields.related('partner_id', 'category_ids', readonly=True, type='many2many', string=u'Etiquettes parent'),
+        'of_tags_partner_id': fields.related('partner_id', 'category_id', readonly=True, type='many2many', relation='res.partner.category', string=u'Étiquettes contact'),
+        'of_tags_partner_id_parent': fields.related('partner_id', 'parent_id', 'category_id', readonly=True, type='many2many', relation='res.partner.category', string=u'Étiquettes parent'),
     }
     
     _defaults = {

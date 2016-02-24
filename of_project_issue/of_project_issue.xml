@@ -94,6 +94,12 @@
             <field name="model">project.issue</field>
             <field name="inherit_id" ref="project_issue.project_issue_form_view"/>
             <field name="arch" type="xml">
+                <xpath expr="//form/sheet/group/group" position="attributes">
+                    <attribute name="string">SAV</attribute>
+                </xpath>
+                <xpath expr="//form/sheet/group/group[2]" position="attributes">
+                    <attribute name="string">Contact</attribute>
+                </xpath>
                 <field name="name" position="replace">
                     <field name="of_code"/>
                     <field name="name" placeholder="Requête ..."/>

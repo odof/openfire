@@ -19,80 +19,12 @@
                         <field name="marge"/>
                     </group>
                 </group>
+                <xpath expr="//field[@name='project_issue_ids']/tree/field[@name='user_id']" position="after">
+                    <field name="of_actions_realisees"/>
+                </xpath>
             </field>
         </record> 
- <!--        <record id="of_parc_installe_form_view" model="ir.ui.view">
-            <field name="name">of.parc.installe.form</field>
-            <field name="model">of.parc.installe</field>
-            <field name="arch" type="xml">
-                <form>
-                    <sheet string="Parc installé" name="parc_installe">
-                        <div class="oe_title">
-                            <h1>
-                                <field name="name" placeholder="No de série ..."/>
-                                <field name="product_id" placeholder="Article ..."/>
-                            </h1>
-                        </div>
-                        <group>
-                            <group name="cient" string="Client">
-                                <field name="client_id"/>
-                                <label for="site_adresse_id" string="Site installation"/>
-                                <div>
-                                    <field name="site_adresse_id" nolabel="1" context="{'show_address': True}"/>
-                                    <field name="street_site_id" nolabel="1"/>
-                                    <field name="street2_site_id" nolabel="1"/>
-                                    <field name="zip_site_id" style="width: 20%" nolabel="1"/>
-                                    <field name="city_site_id" style="width: 40%" nolabel="1"/>
-                                    <field name="country_site_id" nolabel="1"/>
-                                    <field name="tel_site_id" nolabel="1"/>
-                                </div>
-                            </group>
-                            <group name="pose" string="Pose">
-                                <field name="revendeur_id"/>
-                                <field name="installateur_id"/>
-                                <field name="installateur_adresse_id" context="{'show_address': True}"/>
-                            </group>
-                        </group>
-                        <group name="produit_installe" string="Produit installé">
-                            <group name="produit">
-                                <field name="product_category_id"/>
-                                <field name="date_service"/>
-                                <field name="date_installation"/>
-                                <field name="no_piece"/>
-                            </group>
-                            <group name="produit_infos_supp">
-                                  <field name="chiffre_aff_ht"/>
-                                <field name="quantite_vendue"/>
-                                <field name="marge"/>
-                            </group>
-                        </group>
-                        <group name="note">
-                            <field name="note"/>
-                        </group>
-                        <group name="sav" string="Historique de la machine">
-                            <field name="project_issue_ids" nolabel="1" context="{'default_partner_id':id}">
-                                <tree string="SAV">
-                                    <field name="of_code" string="Dossier"/>
-                                    <field name="date"/>
-                                    <field name="name" string="Requête"/>
-                                    <field name="of_categorie_id" string="Famille"/>
-                                    <field name="of_produit_installe_id" string="S/N"/>
-                                    <field name="user_id" string="Responsable"/>
--->
-
-                              <!-- A ajouter à of_zz_winterhalter      <field name="of_actions_realisees"/> -->
-
-<!--
-                                    <field name="stage_id"/>
-                                    <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
-                                </tree>
-                            </field>
-                        </group>
-                    </sheet>
-                </form>
-            </field>
-        </record> -->
-
+ 
 
 <!-- *************************************************** -->        
 <!-- *************** SAV (project.issue) *************** -->
@@ -147,9 +79,10 @@
                     <field name="of_contact_sav"/>
                     <field name="of_tel_sav"/>
                 </field>
-<!--                 <field name="partner_id" position="after">
-                    <field name="of_tags_parent"/>
-                </field> -->
+                <field name="partner_id" position="after">
+                    <field name="of_tags_partner_id" widget="many2many_tags" string=" "/>
+                    <field name="of_tags_partner_id_parent" widget="many2many_tags" string=" "/>
+                </field>
                 <field name="of_canal_id" position="replace"/>
                 <field name="of_garantie" position="replace"/>
                 <field name="of_payant_client" position="replace"/>
@@ -409,7 +342,6 @@
              parent="of_sous-menu_openservice" groups="project.group_project_user" sequence="10"/>
 
 
-
         <!-- Menu SAV -->
         <record id="of_project_issue_categ_act0" model="ir.actions.act_window">
             <field name="name">SAV</field>
@@ -510,8 +442,6 @@
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">product.category</field>
             <field name="view_type">form</field>
-<!--             <field name="search_view_id" ref="product.product_category_search_view"/>
-            <field name="view_id" ref="product.product_category_list_view"/> -->
         </record>
         
         <menuitem action="of_product_category_action_form"
@@ -558,8 +488,6 @@
             groups="project.group_project_manager"
             id="menu_of_project_issue_tag_action_form"
             parent="of_menu_config_openservice" sequence="4"/>
-
-
 
         <!-- Menu import pdf -->
         <menuitem action="of_gesdoc.action_import_mail_menu"
