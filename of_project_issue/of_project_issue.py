@@ -2,8 +2,9 @@
 
 
 # MG from openerp.addons.crm import crm
+import openerp
+from openerp import api, SUPERUSER_ID
 from openerp.osv import fields, osv
-from openerp import SUPERUSER_ID
 import time
 import base64
 import copy
@@ -688,14 +689,26 @@ class of_sav_docs(osv.TransientModel):
             }
 
 # Ajout historique SAV dans vue partenaires
-class res_partner(osv.Model):
-    _name = 'res.partner'
+class ResPartner(osv.Model):
     _inherit = 'res.partner'
-     
-    _columns = {
-           'project_issue_ids': fields.one2many('project.issue', 'partner_id', 'SAV'),
-       }
-    
+
+    @api.multi
+    @api.depends('child_ids.project_issue_ids')
+    def _compute_project_issue_ids(self):
+        issue_obj = self.env['project.issue']
+        for partner in self:
+            partners = [partner]
+
+            ind = 0
+            while ind < len(partners):
+                partners += partners[ind].child_ids
+                ind += 1
+            partner_ids = [p.id for p in partners]
+            partner.project_issue_ids = issue_obj.search([('partner_id','in',partner_ids)])
+
+    project_issue_ids = openerp.fields.One2many('project.issue', compute='_compute_project_issue_ids', string='SAV')
+
+
 # Migration
 #     def _get_courriels(self, cr, uid, ids, *args):
 #         result = {}
