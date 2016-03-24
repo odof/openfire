@@ -118,6 +118,9 @@
                 <field name="partner_id" position="after">
                     <field name="of_produit_installe_id" string="No série"/>
                 </field>
+                <filter name="project" position="after">
+                    <filter string="Famille" icon="terp-personal" context="{'group_by' : 'product_category_id'}"/>
+                </filter>
             </field>
         </record>
         

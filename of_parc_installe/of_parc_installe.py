@@ -74,10 +74,15 @@ class project_issue(osv.Model):
     _name = "project.issue"
     _inherit = "project.issue"
 
+    def _get_product_sav_ids(self, cr, uid, ids, context={}):
+        return self.pool['project.issue'].search(cr, uid, [('product_name_id','in',ids)], context=context)
+
     _columns = {
         'of_produit_installe_id': fields.many2one('of.parc.installe', 'Produit installé', readonly=False),
         'product_name_id': fields.many2one('product.product', 'Désignation', ondelete='restrict'),
-        'product_category_id': fields.related('product_name_id', 'categ_id', 'name', readonly=True, type='char', string=u'Famille'),
+        'product_category_id': fields.related('product_name_id', 'categ_id', 'name', readonly=True, type='char', string=u'Famille',
+                                              store={'project.issue': (lambda self, cr, uid, ids, c={}: ids, ['product_name_id'], 10),
+                                                     'product.product': (_get_product_sav_ids, ['categ_id'], 10)}),
     }
     
     
