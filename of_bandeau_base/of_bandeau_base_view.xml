@@ -6,7 +6,7 @@
 	<data>
 		<template id="assets_backend" name="mydisplaydb" inherit_id="web.assets_backend">
 			<xpath expr="." position="inside">
-				<script type="text/javascript" src="/of_base/static/src/js/nom_base.js"></script>
+				<script type="text/javascript" src="/of_bandeau_base/static/src/js/nom_base.js"></script>
 			</xpath>
 		</template>
 	</data>

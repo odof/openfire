@@ -1,6 +1,6 @@
 // Afficher de façon permanente le nom de la base dans la barre de menu
 
-openerp.of_base = function (instance) {
+openerp.of_bandeau_base = function (instance) {
    
     instance.web.UserMenu.include({
 
