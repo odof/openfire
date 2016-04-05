@@ -188,25 +188,17 @@
 	                    </field>
 	                </group>
                     <group name="of_interventions" string="Interventions" groups="project.group_project_user"/>
-                        <field colspan="4" mode="tree" name="interventions_liees" nolabel="1" widget="one2many_list" groups="project.group_project_user" context="{'default_partner_id':partner_id}">
-                            <tree string="Interventions" editable="bottom">
-                                <field name="poseur_id" string="Équipe" on_change="onchange_partner_id(partner_id, context)"/>
-                                <field name="date" string="Date" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)"/>
-                                <field name="duree" string="Durée" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" widget="float_time"/>
-                                <field name="hor_md" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" widget="float_time"/>
-                                <field name="hor_mf" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" widget="float_time"/>
-                                <field name="hor_ad" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" widget="float_time"/>
-                                <field name="hor_af" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" widget="float_time"/>
-                                <field name="hor_sam" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)"/>
-                                <field name="hor_dim" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)"/>
-                                <field name="date_deadline" invisible="1"/>
-                                <field name="verif_dispo"/>
+                        <field colspan="4" mode="tree" name="interventions_liees" nolabel="1" widget="one2many_list"
+                               groups="project.group_project_user" context="{'default_partner_id':partner_id, 'view_readonly_sav':True}">
+                            <tree string="Interventions">
+                                <field name="poseur_id"/>
                                 <field name="tache_id"/>
+                                <field name="date" string="Date"/>
+                                <field name="duree" string="Durée"/>
+                                <field name="date_deadline" string="Date fin"/>
                                 <field name="state"/>
-                                <field name="name" string="Libellé"/>
+                                <field name="name"/>
                                 <field name="description"/>
-                                <field name="partner_id" invisible="1"/>
-                                <field name="user_id" invisible="1"/>
                             </tree>
                         </field>
                     <group colspan="4" string="Notes client">
@@ -393,9 +385,12 @@
             <field name="model">of.planning.pose</field>
             <field name="inherit_id" ref="of_planning.of_planning_pose_view_form"/>
             <field name="arch" type="xml" >
-                <field name="name" position="before">
-                    <field name="sav_id" string="SAV lié"/>
-                </field>
+                <group name="liens" position="attributes">
+                    <attribute name="invisible">0</attribute>
+                </group>
+                <group name="liens" position="inside">
+                    <field name="sav_id" string="SAV" readonly="context.get('view_readonly_sav')"/>
+                </group>
             </field>
         </record>
 

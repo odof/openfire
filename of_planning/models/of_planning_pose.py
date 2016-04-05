@@ -242,11 +242,19 @@ class of_planning_pose(osv.Model):
                 name.append(address[field])
         return " ".join(name)
 
-    def onchange_partner_id(self, cr, uid, ids, partner_id, context={}):
+    def onchange_partner_id(self, cr, uid, ids, partner_id, tache_id, description, context={}):
         val = {
             'name': partner_id and self._calc_name(cr, uid, partner_id) or "Pose"
         }
         return {'value':val}
+
+    def onchange_tache_id(self, cr, uid, ids, tache_id, partner_id, description):
+        val = {}
+        if tache_id:
+            tache = self.pool['of.planning.tache'].browse(cr, uid, tache_id)
+            if tache.duree:
+                val['duree'] = tache.duree
+        return {'value': val}
 
     def onchange_date(self, cr, uid, ids, date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context=None):
         if (hor_md > 24) or (hor_mf > 24) or (hor_ad > 24) or (hor_af > 24):
@@ -316,7 +324,7 @@ class of_planning_pose(osv.Model):
         value['date_deadline'] = value['date_deadline_display'] = dt_utc.strftime("%Y-%m-%d %H:%M:%S")
         return {'value': value}
     
-    def onchange_poseur(self, cr, uid, ids, poseur_id):
+    def onchange_poseur_id(self, cr, uid, ids, poseur_id):
         equipe_obj = self.pool['of.planning.equipe']
         equipe = equipe_obj.browse(cr, uid, poseur_id)
         if equipe.hor_md and equipe.hor_mf and equipe.hor_ad and equipe.hor_af:
