@@ -24,7 +24,7 @@
     "name" : "OpenFire / SAV",
     "version" : "1.0",
     "author" : "OpenFire",
-    "website" : "http://www.openfire.co",
+    "website" : "http://www.openfire.fr",
     "category" : "Generic Modules/Sales & Purchases",
     "description": """ Modification OpenFire sur le module Odoo project_issue pour la gestion des SAV 
      - Ajout du rapport SAV
@@ -32,7 +32,6 @@
      - Suppression des secondes dans la date SAV
      - Ajout de l'affichage de la liste des documents (devis/commande client, devis/commande fournisseur, facture client) du client
      - Ajout du code SAV avec séquence associée
-     - Ajout du magasin 
      - Ajout de la hiérarchie pour la catégorie du SAV
      - Possibilité de générer un devis ou une demande de prix depuis le SAV (menu droit).
      - Affichage des emails envoyés aux fournisseurs depuis le SAV

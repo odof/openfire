@@ -24,7 +24,7 @@
         	<field name="context">{}</field>
         </record>
         
-        <!-- Vue form prtenaires :
+        <!-- Vue form partenaires :
         Ajouter onglet "Historique" dans formulaire partenaire et type adresse (livraison, facture, ...)
         Enlever Etat fédéral et mettre code postal avant la ville
         -->

@@ -272,8 +272,8 @@ class project_issue(osv.Model):
         return docs
 
     # Migration ok
-    def on_change_partner_id(self, cr, uid, ids, partner_id):
-        # Pour actualiser la liste des documents liés à au partenaire
+    def onchange_partner_id(self, cr, uid, ids, partner_id, context=None):
+        # Pour actualiser l'adresse et la liste des documents liés au partenaire
         res = super(project_issue, self).onchange_partner_id(cr, uid, ids, partner_id)
         docs = [[5, ]]
         for i in self.liste_docs_partner(cr, uid, partner_id): # On récupère la liste des documents liés au partenaire (factures, ...)
@@ -283,6 +283,10 @@ class project_issue(osv.Model):
             res['value'].update({'doc_ids': docs})
         else:
             res = {'value':{'doc_ids': docs}}
+        
+        partner = self.pool.get('res.partner').browse(cr, uid, partner_id, context=context) 
+        res['value'].update({'of_partner_id_address': partner.contact_address, 'of_partner_id_phone': partner.phone, 'of_partner_id_mobile': partner.mobile, 'of_partner_id_function': partner.function})
+    
 # Migration of_magasin pas encore migré
 #         if partner_id:
 #             partner = self.pool['res.partner'].browse(cr, uid, partner_id)

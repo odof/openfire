@@ -140,7 +140,7 @@
                      <separator string="Description"/>
                 </separator> -->
                 <field name="partner_id" position="replace">
-                        <field name="partner_id" on_change="on_change_partner_id(partner_id)" required="1" select="1" context="{'show_address': True}"/>
+                        <field name="partner_id" on_change="onchange_partner_id(partner_id)" required="1" select="1" context="{'show_address': True}"/>
                         <field name="of_partner_id_address"/>
                         <field name="of_partner_id_phone"/>
                         <field name="of_partner_id_mobile"/>
