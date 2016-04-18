@@ -227,7 +227,6 @@ class of_planning_pose_mensuel(osv.TransientModel):
     
     def button_search(self, cr, uid, ids, context=None):
         mod_obj = self.pool.get('ir.model.data')
-        planning_obj = self.pool.get('of.planning.pose')
         view_obj = mod_obj.get_object_reference(cr, uid, 'of_planning', 'of_planning_mensuel_view_form')
         view_id = view_obj and view_obj[1] or False,
         view_id = list(view_id)
