@@ -1,0 +1,5 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_of_product_nomenclature_manager","of_product_nomenclature.manager","model_of_product_nomenclature","of_magasin.of_group_manager_maga",1,1,1,1
+"access_of_product_nomenclature_user","of_product_nomenclature.user","model_of_product_nomenclature","base.group_user",1,0,0,0
+"access_of_product_nomenclature_line_manager","of_product_nomenclature_line.manager","model_of_product_nomenclature_line","of_magasin.of_group_manager_maga",1,1,1,1
+"access_of_product_nomenclature_line_user","of_product_nomenclature_line.user","model_of_product_nomenclature_line","base.group_user",1,0,0,0

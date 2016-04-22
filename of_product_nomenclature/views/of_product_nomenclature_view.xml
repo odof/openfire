@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        
+        <!-- ################## Vues configuration nomenclature ##################-->
+        
+        <!-- Configuration nomenclature produits filtre -->    
+        <record id="of_product_nomenclature_search_view" model="ir.ui.view">
+            <field name="name">of.product.nomenclature.search</field>
+            <field name="model">of.product.nomenclature</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <search string="Nomenclature produits">
+                    <field name="name"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- Configuration nomenclature produits tree -->
+        <record id="of_product_nomenclature_tree_view" model="ir.ui.view">
+            <field name="name">of.product.nomenclature.tree</field>
+            <field name="model">of.product.nomenclature</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Nomenclatures produits">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Configuration nomenclature produits form -->
+        <record id="of_product_nomenclature_form_view" model="ir.ui.view">
+            <field name="name">of.product.nomenclature.form</field>
+            <field name="model">of.product.nomenclature</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <field name="name"/>
+                <field name="of_product_nomenclature_line" colspan="4" nolabel="1">
+                    <tree editable="bottom">
+                        <field name="product_id"/> <!-- on_change="onchange_product_nomenclature_line(product_id,quantite, context)"/> -->
+                        <field name="quantite"/> <!-- on_change="onchange_product_nomenclature_line(product_id,quantite, context)"/> -->
+                        <field name="prix_ht" readonly="1"/>
+                        <field name="total_ht" readonly="1"/>
+                        <field name="sequence" invisible="1"/>
+                    </tree>
+                </field>
+            </field>
+        </record>
+        
+        <!-- Action vue configuration nomenclature produits -->
+        <record id="action_config_of_product_nomenclature" model="ir.actions.act_window">
+            <field name="name">Nomenclature</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">of.product.nomenclature</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="of_product_nomenclature_search_view"/>
+            <field name="help">Nomenclature des produits</field>
+        </record>
+        
+        <!-- Menu configuration nomenclature produits (Ventes/Configuration/Produits/) -->
+        <menuitem id="menu_product_nomenclature" action="action_config_of_product_nomenclature" name="Nomenclature" 
+            parent="product.prod_config_main" sequence="20"/>
+            <!-- groups="of_magasin.of_group_manager_maga,of_magasin.of_group_user" -->
+            
+            
+        <!-- ################## Wizard nomenclature insertion dans devis ##################-->
+        
+        <!-- wizard  -->
+        <record id="view_of_product_nomenclature_wizard" model="ir.ui.view">
+            <field name="name">Nomenclature produits</field>
+            <field name="model">of.product.nomenclature.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Nomenclature">
+                    <group colspan="4" col="4">
+                        <field name="nomenclature_id"/> <!-- on_change="onchange_nomenclature(nomenclature_id)" -->
+                    </group>
+                    <group string="Sélection des composants" colspan="4" col="4" attrs="{'invisible':[('nomenclature_id','=',False)]}">
+                        <field name="nomenclature_line_ids" colspan="4" nolabel="1" context="{'active_id':context.get('active_id')}">
+                            <tree string="Composants">
+                                <field name="selection" invisible="1"/>
+                                <button name="bouton_coche" string="Cocher" type="object" icon="gtk-media-stop" attrs="{'invisible':[('selection','=',True)]}"/>
+                                <button name="bouton_decocher" string="Décocher" type="object" icon="gtk-apply" attrs="{'invisible':[('selection','=',False)]}"/>
+                                <field name="nomenclature_id" invisible="1"/>
+                                <field name="product_id" readonly="1"/>
+                                <field name="quantite" readonly="1"/>
+                                <field name="prix_ht" readonly="1"/>
+                            </tree>
+                            <form>
+                                <field name="product_id" readonly="1"/>
+                                <field name="quantite" readonly="1"/>
+                                <field name="prix_ht" readonly="1"/>
+                            </form>
+                        </field>
+                    </group>
+                    <button name="bouton_coche_tout" string="Cocher tous les articles" type="object" icon="STOCK_ADD" attrs="{'invisible':[('nomenclature_id','=',False)]}"/>
+                    <button name="bouton_decocher_tout" string="Décocher tous les articles" type="object" icon="STOCK_REMOVE" attrs="{'invisible':[('nomenclature_id','=',False)]}"/>
+                    <button name="valider" string="Valider" type="object" icon="gtk-go-forward" attrs="{'invisible':[('nomenclature_id','=',False)]}"/>
+                </form>
+            </field>
+        </record>
+
+        <!-- Action dans la vue des devis/commandes -->
+        <act_window id="action_view_of_product_nomenclature_order"
+            key2="client_action_multi"
+            name="Nomenclature"
+            res_model="of.product.nomenclature.wizard"
+            src_model="sale.order"
+            view_mode="form"
+            view_type="form"
+            view_id="view_of_product_nomenclature_wizard"
+            target="new"/>
+            <!-- groups="of_magasin.of_group_manager_maga,of_magasin.of_group_user" -->
+         <!-- Action dans la vue des devis/commandes -->
+         
+         <act_window id="action_view_of_product_nomenclature_invoice"
+            key2="client_action_multi"
+            name="Nomenclature"
+            res_model="of.product.nomenclature.wizard"
+            src_model="account.invoice"
+            view_mode="form"
+            view_type="form"
+            view_id="view_of_product_nomenclature_wizard"
+            target="new"/>
+            <!-- groups="of_magasin.of_group_manager_maga,of_magasin.of_group_user" -->
+
+     </data>
+</openerp>
