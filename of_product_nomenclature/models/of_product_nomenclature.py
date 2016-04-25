@@ -70,10 +70,11 @@ class wizard_of_product_nomenclature(models.TransientModel):
     _description = u"Sélectionner des composants d'une nomenclature"
     _rec_name = 'nomenclature_id'
     
-    nomenclature_id = fields.Many2one('of.product.nomenclature', 'Nomenclature', required=True)
+    nomenclature_id = fields.Many2one('of.product.nomenclature', 'Nomenclature')
     nomenclature_line_ids = fields.One2many('of.product.nomenclature.line.wizard', 'nomenclature_id', 'Composants lines')
     active_id_model = fields.Char("Document d'origine", default=lambda self: str(self._context['active_id']) + ',' + self._context['active_model'])
-    
+#                                                                 lambda self: "%s,%s" % (self._context['active_id'], self._context['active_model']))
+
     @api.multi
     def valider(self, context):
         "Bouton valider : on copie les composants sélectionner dans le document (devis/commande ou facture)"
@@ -195,15 +196,15 @@ class wizard_of_product_nomenclature_line(models.TransientModel):
     _rec_name = 'product_id'
     
     selection = fields.Boolean(string='Selection composant')
-    nomenclature_id = fields.Many2one('of.product.nomenclature.wizard', 'Nomenclature', required=False, invisible="1")
+    nomenclature_id = fields.Many2one('of.product.nomenclature.wizard', 'Nomenclature', required=False, invisible="1", ondelete="cascade")
     product_id = fields.Many2one('product.product', 'Produit', required=True, readonly="1", ondelete='restrict')
-    quantite = fields.Integer('Quantité', required=True, readonly="1")
+    quantite = fields.Integer('Quantité', required=True, readonly="1", default=1)
     prix_ht = fields.Float('Prix HT', related='product_id.lst_price', readonly="1")
     
     _defaults = {
         'selection': False
     }
-    
+
     @api.multi
     def bouton_coche(self):
         "Coche ligne produit"
@@ -216,7 +217,7 @@ class wizard_of_product_nomenclature_line(models.TransientModel):
             'res_id': self.nomenclature_id.id,
             'target': 'new',
         }
-    
+
     @api.multi
     def bouton_decocher(self):
         "Décoche ligne produit"
@@ -230,3 +231,36 @@ class wizard_of_product_nomenclature_line(models.TransientModel):
             'target': 'new',
         }
 
+class sale_order(models.Model):
+    _inherit = "sale.order"
+
+    @api.multi
+    def action_wizard_nomenclature(self):
+        wizard_obj = self.env['of.product.nomenclature.wizard']
+        wizard_id = wizard_obj.with_context(active_id=self.id, active_ids=[self.id], active_model=self._name).create({}).id
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'of.product.nomenclature.wizard',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_id': wizard_id,
+            'target': 'new',
+            'context': self._context
+        }
+
+class account_invoice(models.Model):
+    _inherit = "account.invoice"
+
+    @api.multi
+    def action_wizard_nomenclature(self):
+        wizard_obj = self.env['of.product.nomenclature.wizard']
+        wizard_id = wizard_obj.with_context(active_id=self.id, active_ids=[self.id], active_model=self._name).create({}).id
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'of.product.nomenclature.wizard',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_id': wizard_id,
+            'target': 'new',
+            'context': self._context
+        }

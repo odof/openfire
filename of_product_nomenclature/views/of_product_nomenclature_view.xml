@@ -74,7 +74,7 @@
             <field name="arch" type="xml">
                 <form string="Nomenclature">
                     <group colspan="4" col="4">
-                        <field name="nomenclature_id"/> <!-- on_change="onchange_nomenclature(nomenclature_id)" -->
+                        <field name="nomenclature_id" required="1"/>
                     </group>
                     <group string="Sélection des composants" colspan="4" col="4" attrs="{'invisible':[('nomenclature_id','=',False)]}">
                         <field name="nomenclature_line_ids" colspan="4" nolabel="1" context="{'active_id':context.get('active_id')}">
@@ -101,29 +101,27 @@
             </field>
         </record>
 
-        <!-- Action dans la vue des devis/commandes -->
-        <act_window id="action_view_of_product_nomenclature_order"
-            key2="client_action_multi"
-            name="Nomenclature"
-            res_model="of.product.nomenclature.wizard"
-            src_model="sale.order"
-            view_mode="form"
-            view_type="form"
-            view_id="view_of_product_nomenclature_wizard"
-            target="new"/>
-            <!-- groups="of_magasin.of_group_manager_maga,of_magasin.of_group_user" -->
-         <!-- Action dans la vue des devis/commandes -->
-         
-         <act_window id="action_view_of_product_nomenclature_invoice"
-            key2="client_action_multi"
-            name="Nomenclature"
-            res_model="of.product.nomenclature.wizard"
-            src_model="account.invoice"
-            view_mode="form"
-            view_type="form"
-            view_id="view_of_product_nomenclature_wizard"
-            target="new"/>
-            <!-- groups="of_magasin.of_group_manager_maga,of_magasin.of_group_user" -->
+        <record id="of_product_nomenclature_view_order_form" model="ir.ui.view">
+            <field name="name">of.nomenclature.sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <button name="print_quotation" position="after">
+                    <button name="action_wizard_nomenclature" string="Insérer une nomenclature" type="object" states="draft"/>
+                </button>
+            </field>
+        </record>
+
+        <record id="of_product_nomenclature_view_invoice_form" model="ir.ui.view">
+            <field name="name">of.nomenclature.account.invoice.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <button name="invoice_open" position="before">
+                    <button name="action_wizard_nomenclature" string="Insérer une nomenclature" type="object" states="draft"/>
+                </button>
+            </field>
+        </record>
 
      </data>
 </openerp>
