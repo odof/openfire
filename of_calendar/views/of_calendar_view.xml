@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Afficher de façon permanente le nom de la base dans la barre de menu -->
+
+<odoo>
+    <template id="of_calendar_assets_backend" name="of_calendar assets" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/of_calendar/static/src/js/web_calendar.js"></script>
+        </xpath>
+    </template>
+</odoo>
