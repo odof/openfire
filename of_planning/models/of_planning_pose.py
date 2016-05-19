@@ -1,33 +1,27 @@
 # -*- coding: utf-8 -*-
 
-from openerp.osv import fields, osv
+from openerp import api, models, fields
+from openerp.osv import fields as fields_old, osv
 import time
 from datetime import datetime, timedelta
 
-class of_planning_tache(osv.Model):
+class of_planning_tache(models.Model):
     _name = "of.planning.tache"
     _description = "Planning OpenFire : Tâches"
-    _columns = {
-        'name'       : fields.char('Libellé', size=64, required=True),
-        'description': fields.text('Description'),
-        'verr'       : fields.boolean(u'Verrouillé'),
-        'product_id' : fields.many2one('product.product', 'Produit'),
-        'active'     : fields.boolean('Actif', required=True),
-        'imp_detail' : fields.boolean(u'Imprimer Détail', help=u"""Impression du détail des tâches dans le planning semaine
-Si cette option n'est pas cochée, seule la tâche le plus souvent effectuée dans la journée apparaîtra"""),
-        'duree'      : fields.float(u'Durée par défaut', digits=(12, 5)),
-        'category_id': fields.many2one('hr.employee.category', u"Catégorie d'employés"),
-        'is_crm'     : fields.boolean('Tache CRM'),
-        'equipe_ids' : fields.many2many('of.planning.equipe', 'equipe_tache_rel', 'tache_id', 'equipe_id', 'Equipes'),
-    }
 
-    _defaults = {
-        'active' : True,
-        'imp_detail': True,
-        'is_crm': False,
-    }
-
-    def unlink(self, cr, uid, ids, context={}):
+    name = fields.Char('Libellé', size=64, required=True)
+    description = fields.Text('Description')
+    verr = fields.Boolean(u'Verrouillé')
+    product_id = fields.Many2one('product.product', 'Produit')
+    active = fields.Boolean('Actif', default=True)
+    imp_detail = fields.Boolean(u'Imprimer Détail', help=u"""Impression du détail des tâches dans le planning semaine
+Si cette option n'est pas cochée, seule la tâche le plus souvent effectuée dans la journée apparaîtra""", default=True)
+    duree = fields.Float(u'Durée par défaut', digits=(12, 5), default=1.0)
+    category_id = fields.Many2one('hr.employee.category', string=u"Catégorie d'employés")
+    is_crm = fields.Boolean(u'Tâche CRM')
+    equipe_ids = fields.Many2many('of.planning.equipe', 'equipe_tache_rel', 'tache_id', 'equipe_id', 'Equipes')
+    
+    def unlink(self, cr, uid, ids, context=None):
         if self.search(cr, uid, [('id','in',ids),('verr','=',True)]):
             raise osv.except_osv('Erreur', 'Vous essayez de supprimer une tâche verrouillée.')
         return super(of_planning_tache, self).unlink(cr, uid, ids, context)
@@ -39,23 +33,8 @@ class of_planning_equipe(osv.Model):
     def copy(self, cr, uid, id, default=None, context=None):
         if not default:
             default = {}
-        default.update({
-            'pose_ids': [],
-        })
+        default['pose_ids'] = []
         return super(of_planning_equipe, self).copy(cr, uid, id, default, context=context)
-
-#     def _calcul_cout(self, cr, uid, ids, name, arg, context=None):
-#         res = {}
-#         for equipe in self.browse(cr, uid, ids):
-#             h = a = 0
-#             for employee in equipe.employee_ids:
-#                 h += employee.cout_horaire
-#                 a += employee.cout_annuel
-#             res[equipe.id] = {
-#                 'cout_horaire': h,
-#                 'cout_annuel' : a,
-#             }
-#         return res
 
     def _get_employee_equipes(self, cr, uid, ids, context=None):
         result = []
@@ -63,63 +42,46 @@ class of_planning_equipe(osv.Model):
             result += emp['equipe_ids']
         return list(set(result))
 
-    _columns = {
-        'name'        : fields.char('Equipe', size=128, required=True),
-        'note'        : fields.text('Description'),
-#         'cout_horaire': fields.function(_calcul_cout, multi='cout',
-#                                         store={'of.planning.equipe'  : (lambda self, cr, uid, ids, *a:ids, ['employee_ids'], 10),
-#                                               'hr.employee'         : (_get_employee_equipes, ['couts_ids', 'heures', 'jours'], 10)},
-#                                         method=True, type='float', string='Cout horaire'),
-#         'cout_annuel' : fields.function(_calcul_cout, multi='cout',
-#                                         store={'of.planning.equipe'  : (lambda self, cr, uid, ids, *a:ids, ['employee_ids'], 10),
-#                                                'hr.employee'         : (_get_employee_equipes, ['couts_ids', 'heures', 'jours'], 10)},
-#                                         method=True, type='float', string='Cout annuel'),
-        'employee_ids': fields.many2many('hr.employee', 'of_planning_employee_rel', 'employee_id', 'equipe_id', 'Employes'),
-        'active'      : fields.boolean('Active'),
-#         'color_id'    : fields.many2one('of.calendar.color','Couleur'),
-        'category_ids': fields.many2many('hr.employee.category', 'equipe_category_rel', 'equipe_id', 'category_id', 'Categories'),
-        'pose_ids'    : fields.one2many('of.planning.pose', 'poseur_id', 'Poses liees'),
-        'tache_ids'   : fields.many2many('of.planning.tache', 'equipe_tache_rel', 'equipe_id', 'tache_id', u'Compétences'),
-        'hor_md'      : fields.float(u'Matin début', required=True, digits=(12, 5)),
-        'hor_mf'      : fields.float('Matin fin', required=True, digits=(12, 5)),
-        'hor_ad'      : fields.float(u'Après-midi début', required=True, digits=(12, 5)),
-        'hor_af'      : fields.float(u'Après-midi fin', required=True, digits=(12, 5)),
-    }
+    name = fields.Char('Equipe', size=128, required=True)
+    note = fields.Text('Description')
+    employee_ids = fields.Many2many('hr.employee', 'of_planning_employee_rel', 'employee_id', 'equipe_id', u'Employés')
+    active = fields.Boolean('Actif', default=True)
+    category_ids = fields.Many2many('hr.employee.category', 'equipe_category_rel', 'equipe_id', 'category_id', u'Catégories')
+    pose_ids = fields.One2many('of.planning.pose', 'poseur_id', u'Poses liées')
+    tache_ids = fields.Many2many('of.planning.tache', 'equipe_tache_rel', 'equipe_id', 'tache_id', u'Compétences')
+    hor_md = fields.Float(u'Matin début', required=True, digits=(12, 5))
+    hor_mf = fields.Float('Matin fin', required=True, digits=(12, 5))
+    hor_ad = fields.Float(u'Après-midi début', required=True, digits=(12, 5))
+    hor_af = fields.Float(u'Après-midi fin', required=True, digits=(12, 5))
 
-    _defaults = {
-        'active': True,
-    }
-    
-    def onchange_employees(self, cr, uid, ids, employee_ids=None):
-        emp_obj = self.pool['hr.employee']
-        category_ids = []
-        if employee_ids and employee_ids[0][0]==6:
-            emp_ids = employee_ids[0][2]
-            for emp in emp_obj.browse(cr, uid, emp_ids):
-                for categ in emp.category_ids:
-                    if categ.id not in category_ids:
-                        category_ids.append(categ.id)
-        return {'value': {'category_ids': category_ids}}
-    
-    def onchange_horaires(self, cr, uid, ids, hor_md=0, hor_mf=0, hor_ad=0, hor_af=0, context=None):
-        if (hor_md != 0) and (hor_mf != 0) and (hor_ad != 0) and (hor_af != 0):
-            if (hor_md > 24) or (hor_mf > 24) or (hor_ad > 24) or (hor_af > 24):
-                raise osv.except_osv('Attention', u"L'heure doit être inférieure ou égale à 24")
-            if(hor_mf < hor_md):
+    @api.onchange('employee_ids')
+    def onchange_employees(self):
+        if not self.category_ids:
+            category_ids = []
+            for employee in self.employee_ids:
+                for category in employee.category_ids:
+                    if category.id not in category_ids:
+                        category_ids.append(category.id)
+            if category_ids:
+                self.category_ids = category_ids
+
+    @api.onchange('hor_md','hor_mf','hor_ad','hor_af')
+    def onchange_horaires(self):
+        hors = (self.hor_md, self.hor_mf, self.hor_ad, self.hor_af)
+        if all(hors):
+            for hor in hors:
+                if hor > 24:
+                    raise osv.except_osv('Attention', u"L'heure doit être inférieure ou égale à 24")
+            if hors[0] > hors[1] or hors[2] > hors[3]:
                 raise osv.except_osv('Attention', u"L'heure de début ne peut pas être supérieure à l'heure de fin")
-            if(hor_af < hor_ad):
-                raise osv.except_osv('Attention', u"L'heure de début ne peut pas être supérieure à l'heure de fin")
-            if(hor_ad < hor_mf):
+            if(hors[1] > hors[2]):
                 raise osv.except_osv('Attention', u"L'heure de l'après-midi ne peut pas être inférieure à l'heure du matin")
-        return None
 
-class of_planning_pose_raison(osv.Model):
+class of_planning_pose_raison(models.Model):
     _name = "of.planning.pose.raison"
     _description = "Raisons de pose reportee ou inachevee"
 
-    _columns = {
-        'name': fields.char('Libelle', size=128, required=True, select=True),
-    }
+    name = fields.Char(u'Libellé', size=128, required=True, select=True)
 
 class of_planning_pose(osv.Model):
     _name = "of.planning.pose"
@@ -194,35 +156,35 @@ class of_planning_pose(osv.Model):
         return [('tache_id', 'in', tache_ids)]
 
     _columns = {
-        'name'                 : fields.char(u'Libellé', size=64, required=True),
-        'date'                 : fields.datetime('Date intervention', required=True),
-        'date_from'            : fields.function(lambda *a, **k:{}, method=True, type='date', string=u"Date début"),
-        'date_to'              : fields.function(lambda *a, **k:{}, method=True, type='date', string="Date fin"),
-        'date_deadline'        : fields.datetime('Deadline'),
-        'date_deadline_display': fields.related('date_deadline', type='datetime', string="Date Fin", store=False),
-        'duree'                : fields.float('Duree intervention', required=True, digits=(12, 5)),
-        'user_id'              : fields.many2one('res.users', 'Utilisateur'),
-        'partner_id'           : fields.many2one('res.partner', 'Client'),
-        'partner_city'         : fields.function(_get_city, method=True, type='char', string='Ville', readonly=False,
-                                                 store={'of.planning.pose'   : (lambda self, cr, uid, ids, *a:ids, ['partner_id'], 10),
-                                                        'res.partner'        : (_get_partner_pose_ids, ['address'], 10)}),
-        'raison_id'            : fields.many2one('of.planning.pose.raison', 'Raison'),
-        'tache_id'             : fields.many2one('of.planning.tache', 'Tâche', required=True),
-        'poseur_id'            : fields.many2one('of.planning.equipe', 'Intervenant', required=True),
-        'state'                : fields.selection([('Brouillon', 'Brouillon'), ('Planifie', 'Planifié'), ('Confirme', 'Confirmé'), ('Pose', 'Posé'), ('Annule', 'Annulé'), ('Reporte', 'Reporté'), ('Inacheve', 'Inachevé')], 'Etat', size=16, readonly=True),
-        'company_id'           : fields.many2one('res.company', 'Magasin'),
-        'description'          : fields.text('Description'),
-        'hor_md'               : fields.float(u'Matin début', required=True, digits=(12, 5)),
-        'hor_mf'               : fields.float('Matin fin', required=True, digits=(12, 5)),
-        'hor_ad'               : fields.float(u'Après-midi début', required=True, digits=(12, 5)),
-        'hor_af'               : fields.float(u'Après-midi fin', required=True, digits=(12, 5)),
-        'hor_sam'              : fields.boolean('Samedi'),
-        'hor_dim'              : fields.boolean('Dimanche'),
-#         'color'                : fields.function(_get_color, type='char', help=u"Couleur utilisée pour le planning. Dépend de l'équipe de pose et de l'état de la pose"),
-#         'sidebar_color'        : fields.related('poseur_id','color_id','color', type='char', help="Couleur pour le menu droit du planning (couleur de base de l'équipe de pose)"),
-        'category_id'          : fields.function(_get_category, method=True, type='many2one', obj="hr.employee.category", string=u"Type de tâche", store=False,
+        'name'                 : fields_old.char(u'Libellé', size=64, required=True),
+        'date'                 : fields_old.datetime('Date intervention', required=True),
+        'date_from'            : fields_old.function(lambda *a, **k:{}, method=True, type='date', string=u"Date début"),
+        'date_to'              : fields_old.function(lambda *a, **k:{}, method=True, type='date', string="Date fin"),
+        'date_deadline'        : fields_old.datetime('Deadline'),
+        'date_deadline_display': fields_old.related('date_deadline', type='datetime', string="Date Fin", store=False),
+        'duree'                : fields_old.float('Duree intervention', required=True, digits=(12, 5)),
+        'user_id'              : fields_old.many2one('res.users', 'Utilisateur'),
+        'partner_id'           : fields_old.many2one('res.partner', 'Client'),
+        'partner_city'         : fields_old.function(_get_city, method=True, type='char', string='Ville', readonly=False,
+                                                     store={'of.planning.pose'   : (lambda self, cr, uid, ids, *a:ids, ['partner_id'], 10),
+                                                            'res.partner'        : (_get_partner_pose_ids, ['address'], 10)}),
+        'raison_id'            : fields_old.many2one('of.planning.pose.raison', 'Raison'),
+        'tache_id'             : fields_old.many2one('of.planning.tache', 'Tâche', required=True),
+        'poseur_id'            : fields_old.many2one('of.planning.equipe', 'Intervenant', required=True),
+        'state'                : fields_old.selection([('Brouillon', 'Brouillon'), ('Planifie', 'Planifié'), ('Confirme', 'Confirmé'), ('Pose', 'Posé'), ('Annule', 'Annulé'), ('Reporte', 'Reporté'), ('Inacheve', 'Inachevé')], 'Etat', size=16, readonly=True),
+        'company_id'           : fields_old.many2one('res.company', 'Magasin'),
+        'description'          : fields_old.text('Description'),
+        'hor_md'               : fields_old.float(u'Matin début', required=True, digits=(12, 5)),
+        'hor_mf'               : fields_old.float('Matin fin', required=True, digits=(12, 5)),
+        'hor_ad'               : fields_old.float(u'Après-midi début', required=True, digits=(12, 5)),
+        'hor_af'               : fields_old.float(u'Après-midi fin', required=True, digits=(12, 5)),
+        'hor_sam'              : fields_old.boolean('Samedi'),
+        'hor_dim'              : fields_old.boolean('Dimanche'),
+#         'color'                : fields_old.function(_get_color, type='char', help=u"Couleur utilisée pour le planning. Dépend de l'équipe de pose et de l'état de la pose"),
+#         'sidebar_color'        : fields_old.related('poseur_id','color_id','color', type='char', help="Couleur pour le menu droit du planning (couleur de base de l'équipe de pose)"),
+        'category_id'          : fields_old.function(_get_category, method=True, type='many2one', obj="hr.employee.category", string=u"Type de tâche", store=False,
                                                  fnct_search=_search_category),
-        'verif_dispo'          : fields.boolean(u'Vérif', help=u"Vérifier la disponibilité de l'équipe sur ce créneau", required=True),
+        'verif_dispo'          : fields_old.boolean(u'Vérif', help=u"Vérifier la disponibilité de l'équipe sur ce créneau", required=True),
     }
     _defaults = {
         'user_id'    : lambda self, cr, uid, context: uid,
@@ -276,7 +238,7 @@ class of_planning_pose(osv.Model):
         # Datetime UTC
         dt_utc = datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
         # Datetime local
-        dt_local = fields.datetime.context_timestamp(cr, uid, dt_utc, context=context)
+        dt_local = fields_old.datetime.context_timestamp(cr, uid, dt_utc, context=context)
 
         weekday = dt_local.weekday()
         if weekday == 5 and not hor_sam:
@@ -395,13 +357,10 @@ class of_planning_pose(osv.Model):
                         raise osv.except_osv('Attention', u'Cette équipe a déjà %s rendez-vous sur ce créneau' % (len(rdv),))
         return super(of_planning_pose, self).write(cr, uid, ids, vals, context=context)
 
-class res_partner(osv.Model):
-    _name = "res.partner"
+class res_partner(models.Model):
     _inherit = "res.partner"
 
-    _columns = {
-        'pose_ids': fields.one2many('of.planning.pose', 'partner_id', 'Plannings de pose'),
-    }
+    pose_ids = fields.One2many('of.planning.pose', 'partner_id', 'Plannings de pose')
 
     def copy(self, cr, uid, id, default=None, context=None):
         if not default:
