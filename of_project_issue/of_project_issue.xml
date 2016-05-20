@@ -296,6 +296,7 @@
             <field name="arch" type="xml">
                 <tree string="Catégories SAV">
                     <field name="name"/>
+                    <field name="parent_id"/>
                     <field name="sequence"/>
                 </tree>
             </field>
@@ -309,6 +310,7 @@
                 <form>
                     <group>
                         <field name="name"/>
+                        <field name="parent_id"/>
                         <field name="sequence"/>
                     </group>
                 </form>

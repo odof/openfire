@@ -174,7 +174,7 @@ class of_compose_mail(models.TransientModel):
                         'value_openfire': chp.to_export and chp.value_openfire and self.format_body(chp.value_openfire % values) or '',
                     }))
             else:
-                res['content'] = self.format_body(lettre.body_text % values)
+                res['content'] = self.format_body((lettre.body_text or '') % values)
             self.write(res)
 
         view = self.env.ref('of_gesdoc.' + view_ref)

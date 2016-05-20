@@ -26,7 +26,7 @@ class of_parc_installe(osv.Model):
         'tel_site_id': fields.related('site_adresse_id', 'phone', readonly=True, type='char', string=u'Téléphone site installation'),
         'street_site_id': fields.related('site_adresse_id', 'street', readonly=True, type='char', string=u'Adresse'),
         'street2_site_id': fields.related('site_adresse_id', 'street2', readonly=True, type='char', string=u'Complément adresse'),
-        'zip_site_id': fields.related('site_adresse_id', 'zip', readonly=True, type='char', string=u'Code postal'),
+        'zip_site_id': fields.related('site_adresse_id', 'zip', readonly=True, type='char', string=u'Code postal', store=True),
         'city_site_id': fields.related('site_adresse_id', 'city', readonly=True, type='char', string=u'Ville'),
         'country_site_id': fields.related('site_adresse_id', 'country_id', readonly=True, type='many2one', relation="res.country", string=u'Pays'),
         'no_piece': fields.char(u'N° pièce', size=64, required=False),

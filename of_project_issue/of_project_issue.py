@@ -2,7 +2,8 @@
 
 
 # MG from openerp.addons.crm import crm
-from openerp.osv import fields, osv
+from openerp.osv import fields as fields_oldapi, osv # Pour l'ancienne API
+from openerp import models, fields, api # Pour la nouvelle API
 from openerp import SUPERUSER_ID
 import time
 import base64
@@ -122,31 +123,31 @@ class project_issue(osv.Model):
         return self.pool['of.project.issue'].search(cr, uid, [('categ_id','in',ids)])
 
     _columns = {
-        'of_code'               : fields.char('Code', size=64, required=True, readonly=True, select=True), # Migration 9 states={'draft': [('readonly', False)]}, 
-        'partner_note'          : fields.related('partner_id', 'comment', string="Note client", type='text', readonly=False),
-        'invoice_ids'           : fields.function(_get_partner_invoices, string='Factures du client', method=True, type="one2many", obj='account.invoice', readonly=True),
-        'of_categorie_id'       : fields.many2one('of.project.issue.categorie', u'Catégorie', required=False, ondelete='restrict'),
-        'of_canal_id'           : fields.many2one('of.project.issue.canal', u'Canal', required=False, ondelete='restrict'),
-        'of_garantie'           : fields.boolean('Garantie'),
-        'of_payant_client'      : fields.boolean('Payant client'),
-        'of_payant_fournisseur' : fields.boolean('Payant fournisseur'),
-        'of_intervention'       : fields.text('Nature de l\'intervention'),
-        'of_piece_commande'     : fields.text('Pièces à commander'),
-        # MG 'shop_id'            : fields.many2one('sale.shop', 'Magasin'),
-        # MG 'partner_shop_id'    : fields.related('partner_id','partner_maga', type="many2one", relation="sale.shop", string="Magasin client", readonly=True),
-        'doc_ids'            : fields.one2many('of.sav.docs', 'project_issue_id', string="Liste de documents"),
-        'fourn_ids'          : fields.function(_get_fournisseurs, string="Fournisseurs", type='one2many', obj='res.partner', readonly=True, domain=[('supplier','=',True)]),
-        'fourn_msg_ids'      : fields.function(_get_fourn_messages, string="Historique fournisseur", type='one2many', obj='mail.message'),
-        #Migration 9         'categ_parent_id'    : fields.function(_get_categ_parent_id, method=True, string=u"Catégorie parent", type='many2one', relation='crm.case.categ',
+        'of_code'               : fields_oldapi.char('Code', size=64, required=True, readonly=True, select=True), # Migration 9 states={'draft': [('readonly', False)]}, 
+        'partner_note'          : fields_oldapi.related('partner_id', 'comment', string="Note client", type='text', readonly=False),
+        'invoice_ids'           : fields_oldapi.function(_get_partner_invoices, string='Factures du client', method=True, type="one2many", obj='account.invoice', readonly=True),
+        'of_categorie_id'       : fields_oldapi.many2one('of.project.issue.categorie', u'Catégorie', required=False, ondelete='restrict'),
+        'of_canal_id'           : fields_oldapi.many2one('of.project.issue.canal', u'Canal', required=False, ondelete='restrict'),
+        'of_garantie'           : fields_oldapi.boolean('Garantie'),
+        'of_payant_client'      : fields_oldapi.boolean('Payant client'),
+        'of_payant_fournisseur' : fields_oldapi.boolean('Payant fournisseur'),
+        'of_intervention'       : fields_oldapi.text('Nature de l\'intervention'),
+        'of_piece_commande'     : fields_oldapi.text('Pièces à commander'),
+        # MG 'shop_id'            : fields_oldapi.many2one('sale.shop', 'Magasin'),
+        # MG 'partner_shop_id'    : fields_oldapi.related('partner_id','partner_maga', type="many2one", relation="sale.shop", string="Magasin client", readonly=True),
+        'doc_ids'            : fields_oldapi.one2many('of.sav.docs', 'project_issue_id', string="Liste de documents"),
+        'fourn_ids'          : fields_oldapi.function(_get_fournisseurs, string="Fournisseurs", type='one2many', obj='res.partner', readonly=True, domain=[('supplier','=',True)]),
+        'fourn_msg_ids'      : fields_oldapi.function(_get_fourn_messages, string="Historique fournisseur", type='one2many', obj='mail.message'),
+        #Migration 9         'categ_parent_id'    : fields_oldapi.function(_get_categ_parent_id, method=True, string=u"Catégorie parent", type='many2one', relation='crm.case.categ',
         #                                     store={'project.issue': (lambda self, cr, uid, ids, *a:ids, ['categ_id'], 10),
         #                                            'categ_id'    : (lambda self, cr, uid, ids, *a:self.pool['of.project.issue'].search(cr, uid, [('categ_id','in',ids)]), ['parent_id'], 10),
         #                                            }),
-        'interventions_liees': fields.one2many('of.planning.pose', 'sav_id', 'Poses liees', readonly=False),
-        # MG 'show_partner_shop'  : fields.function(_get_show_partner_shop, type="boolean", string="Magasin différent"),
-        'of_partner_id_address': fields.related('partner_id', 'contact_address', readonly=True, type='char', string=u'Adresse'),
-        'of_partner_id_phone': fields.related('partner_id', 'phone', readonly=True, type='char', string=u'Téléphone'),
-        'of_partner_id_mobile': fields.related('partner_id', 'mobile', readonly=True, type='char', string=u'Mobile'),
-        'of_partner_id_function': fields.related('partner_id', 'function', readonly=True, type='char', string=u'Fonction'),
+        'interventions_liees': fields_oldapi.one2many('of.planning.pose', 'sav_id', 'Poses liees', readonly=False),
+        # MG 'show_partner_shop'  : fields_oldapi.function(_get_show_partner_shop, type="boolean", string="Magasin différent"),
+        'of_partner_id_address': fields_oldapi.related('partner_id', 'contact_address', readonly=True, type='char', string=u'Adresse'),
+        'of_partner_id_phone': fields_oldapi.related('partner_id', 'phone', readonly=True, type='char', string=u'Téléphone'),
+        'of_partner_id_mobile': fields_oldapi.related('partner_id', 'mobile', readonly=True, type='char', string=u'Mobile'),
+        'of_partner_id_function': fields_oldapi.related('partner_id', 'function', readonly=True, type='char', string=u'Fonction'),
     }
 
     _defaults = {
@@ -456,14 +457,14 @@ class project_issue(osv.Model):
 #     _description = "Interface envoi rappel courriel depuis SAV"
 #     
 #     _columns={
-#         'src': fields.char('De', size=128, required=True),
-#         'dest': fields.char('À', size=128, required=True),
-#         'subject': fields.text('Sujet', required=True),
-#         'body': fields.text('Contenu', required=True),
-#         'model': fields.char('Model', size=64, required=False),
-#         'reply_to': fields.char('Répondre à', size=128, required=False),
-#         'res_id': fields.integer("res_id"),
-#         'context': fields.text('Contexte', required=False)
+#         'src': fields_oldapi.char('De', size=128, required=True),
+#         'dest': fields_oldapi.char('À', size=128, required=True),
+#         'subject': fields_oldapi.text('Sujet', required=True),
+#         'body': fields_oldapi.text('Contenu', required=True),
+#         'model': fields_oldapi.char('Model', size=64, required=False),
+#         'reply_to': fields_oldapi.char('Répondre à', size=128, required=False),
+#         'res_id': fields_oldapi.integer("res_id"),
+#         'context': fields_oldapi.text('Contexte', required=False)
 #     }
 #            
 #     def default_get(self, cr, uid, fields_list=None, context=None):
@@ -539,11 +540,11 @@ class project_issue(osv.Model):
 #         return dict(res)
 # 
 #     _columns = {
-#         'complete_name': fields.function(_name_get_fnc, type="char", string='Catégorie'),
-#         'parent_id': fields.many2one('crm.case.categ', u'Cat\u00E9gorie parent', select=True, ondelete='cascade'),
-#         'child_id': fields.one2many('crm.case.categ', 'parent_id', string=u'Cat\u00E9gories enfants'),
-#         'parent_left': fields.integer('Parent gauche', select=1),
-#         'parent_right': fields.integer(u'Parent droit', select=1),
+#         'complete_name': fields_oldapi.function(_name_get_fnc, type="char", string='Catégorie'),
+#         'parent_id': fields_oldapi.many2one('crm.case.categ', u'Cat\u00E9gorie parent', select=True, ondelete='cascade'),
+#         'child_id': fields_oldapi.one2many('crm.case.categ', 'parent_id', string=u'Cat\u00E9gories enfants'),
+#         'parent_left': fields_oldapi.integer('Parent gauche', select=1),
+#         'parent_right': fields_oldapi.integer(u'Parent droit', select=1),
 #     }
 #     
 #     _constraints = [
@@ -582,26 +583,44 @@ class project_issue(osv.Model):
 
 
 # Catégorie de SAV
-class of_project_issue_categorie(osv.Model):
+class of_project_issue_categorie(models.Model):
     _name = "of.project.issue.categorie"
     
-    _columns = {
-        'name': fields.char(u'Catégorie', size=32),
-        'sequence': fields.integer(u'Séquence', help=u"Ordre d'affichage (plus petit en premier)"),
-    }
+    name = fields.Char(u'Catégorie', size=32)
+    parent_id = fields.Many2one('of.project.issue.categorie', 'Catégorie parente', select=True, ondelete='restrict')
+    sequence = fields.Integer(u'Séquence', help=u"Ordre d'affichage (plus petit en premier)")
+    
+    _constraints = [
+        (models.Model._check_recursion, 'Error ! You can not create recursive category.', ['parent_id'])
+    ]
     
     _order = 'sequence, name'
     _defaults = {
         'sequence' : 10
     }
-
+    
+    # Pour afficher la hiérarchie des catégories
+    @api.multi
+    def name_get(self):
+        if not self._ids:
+            return []
+        res = []
+        for record in self:
+            name = [record.name]
+            parent = record.parent_id
+            while parent:
+                name.append(parent.name)
+                parent = parent.parent_id
+            name = ' / '.join(name[::-1])
+            res.append((record.id, name))
+        return res
 
 # Canal SAV
 class of_project_issue_canal(osv.Model):
     _name = "of.project.issue.canal"
     
     _columns = {
-        'name': fields.char(u'Catégorie', size=32),
+        'name': fields_oldapi.char(u'Catégorie', size=32),
     }
    
 
@@ -612,22 +631,22 @@ class of_sav_docs(osv.TransientModel):
     _description = 'Liste des documents'
     
     _columns = {
-        'name': fields.char('Type du document', size=16),
-        'doc_objet': fields.char('Objet du document', size=32),
-        'date': fields.date('Date'),
-        'number': fields.char(u'Num\u00E9ro', size=64),
-        'partner_id': fields.many2one('res.partner', 'Partner'),
-        'user_id': fields.many2one('res.users', 'Responsable'),
-        'date_due': fields.date(u'Date d\'\u00E9ch\u00E9ance'),
-        'origin': fields.char('Document d\'origine', size=64),
-        'residual': fields.float('Balance', digits=(16, 2)),
-        'amount_untaxed': fields.float('HT', digits=(16, 2)),
-        'amount_total': fields.float('Total', digits=(16, 2)),
-        'state': fields.char('Etat', size=64),
-        'project_issue_id': fields.many2one('project.issue', 'SAV'),
-        'invoice_id': fields.many2one('account.invoice', 'Facture'),
-        'sale_order_id': fields.many2one('sale.order', 'Devis/Commande Client'),
-        'purchase_order_id': fields.many2one('purchase.order', 'Commande Fournisseur'),
+        'name': fields_oldapi.char('Type du document', size=16),
+        'doc_objet': fields_oldapi.char('Objet du document', size=32),
+        'date': fields_oldapi.date('Date'),
+        'number': fields_oldapi.char(u'Num\u00E9ro', size=64),
+        'partner_id': fields_oldapi.many2one('res.partner', 'Partner'),
+        'user_id': fields_oldapi.many2one('res.users', 'Responsable'),
+        'date_due': fields_oldapi.date(u'Date d\'\u00E9ch\u00E9ance'),
+        'origin': fields_oldapi.char('Document d\'origine', size=64),
+        'residual': fields_oldapi.float('Balance', digits=(16, 2)),
+        'amount_untaxed': fields_oldapi.float('HT', digits=(16, 2)),
+        'amount_total': fields_oldapi.float('Total', digits=(16, 2)),
+        'state': fields_oldapi.char('Etat', size=64),
+        'project_issue_id': fields_oldapi.many2one('project.issue', 'SAV'),
+        'invoice_id': fields_oldapi.many2one('account.invoice', 'Facture'),
+        'sale_order_id': fields_oldapi.many2one('sale.order', 'Devis/Commande Client'),
+        'purchase_order_id': fields_oldapi.many2one('purchase.order', 'Commande Fournisseur'),
     }
     
     # Migration ok
@@ -693,7 +712,7 @@ class res_partner(osv.Model):
     _inherit = 'res.partner'
      
     _columns = {
-           'project_issue_ids': fields.one2many('project.issue', 'partner_id', 'SAV'),
+           'project_issue_ids': fields_oldapi.one2many('project.issue', 'partner_id', 'SAV'),
        }
     
 # Migration
@@ -712,7 +731,7 @@ class res_partner(osv.Model):
 #         return result
 #     
 #     _columns = {
-#         'courriels': fields.function(_get_courriels, string="Courriels", type='char', size=256),
+#         'courriels': fields_oldapi.function(_get_courriels, string="Courriels", type='char', size=256),
 #     }
 
 
@@ -721,7 +740,7 @@ class of_planning_pose(osv.Model):
     _inherit = "of.planning.pose"
   
     _columns = {
-        'sav_id': fields.many2one('project.issue', 'SAV', readonly=False),
+        'sav_id': fields_oldapi.many2one('project.issue', 'SAV', readonly=False),
     }
 
 
