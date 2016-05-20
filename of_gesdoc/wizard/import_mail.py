@@ -8,7 +8,7 @@ import base64
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfdocument import PDFDocument
 from pdfminer.pdftypes import resolve1
-
+from pdfminer.utils import decode_text
 
 class of_gesdoc_import(models.TransientModel):
     _name = 'of.gesdoc.import'
@@ -65,7 +65,7 @@ class of_gesdoc_import(models.TransientModel):
             name, value = field.get('T'), field.get('V')
             name = name.decode("unicode-escape", 'ignore').encode("utf-8")
             if value:
-                value = value.decode("utf-16", 'ignore').encode("utf-8")
+                value = decode_text(value).encode("utf-8")
             else:
                 value = ''
             file_vals[name] = value

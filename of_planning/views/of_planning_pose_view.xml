@@ -237,27 +237,34 @@
             <field name="name">of.planning.tache.form</field>
             <field name="model">of.planning.tache</field>
             <field name="arch" type="xml" >
-                <form string="Nouvelle tâche" >
-                    <group>
-                        <group colspan="2" col="2">
-                            <field name="name" string="Libellé" attrs="{'readonly':[('verr', '=', True)]}"/>
-                            <field name="product_id" string="Produit lié" attrs="{'readonly':[('verr', '=', True)]}"/>
-                            <group colspan="2" col="4">
-                                <field name="category_id"/>
-                                <field name="duree" widget="float_time"/>
+                <form class="oe_form_configuration">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" string="Libellé" class="oe_edit_only" attrs="{'readonly':[('verr', '=', True)]}"/>
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group colspan="2" col="2">
+                                <field name="product_id" string="Produit lié" attrs="{'readonly':[('verr', '=', True)]}"/>
+                                <group colspan="2" col="4">
+                                    <field name="category_id"/>
+                                    <field name="duree" widget="float_time"/>
+                                </group>
+                                <group colspan="2" col="6" name="options">
+                                    <field name="active"/>
+                                    <field name="is_crm"/>
+                                    <field name="imp_detail"/>
+                                </group>
                             </group>
-                            <group colspan="2" col="6" name="options">
-                                <field name="active"/>
-                                <field name="is_crm"/>
-                                <field name="imp_detail"/>
+                            <newline></newline>
+                            <group colspan="2" col="2">
+                                <field name="description" attrs="{'readonly':[('verr', '=', True)]}"/>
                             </group>
+                            <field name="verr" invisible="1"/>
                         </group>
-                        <newline></newline>
-                        <group colspan="2" col="2">
-                            <field name="description" attrs="{'readonly':[('verr', '=', True)]}"/>
-                        </group>
-                        <field name="verr" invisible="1"/>
-                    </group>
+                    </sheet>
                 </form>
             </field>
         </record>
@@ -299,7 +306,7 @@
             </field>
         </record>
 
-<!--#############################################_______Vue form_________#####################################################-->
+<!--#############################################_______Vue tree_________#####################################################-->
 
         <record id="view_of_planning_equipe_tree" model="ir.ui.view">
             <field name="name">of.planning.equipe.tree</field>
@@ -316,33 +323,38 @@
             </field>
         </record>
 
-<!--#############################################_______Vue tree_________#####################################################-->
+<!--#############################################_______Vue form_________#####################################################-->
 
         <record id="view_of_planning_equipe_form" model="ir.ui.view">
             <field name="name">of.planning.equipe.form</field>
             <field name="model">of.planning.equipe</field>
             <field name="arch" type="xml">
-                <form string="Equipe">
-                    <group>
+                <form class="oe_form_configuration">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" string="Equipe" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                        </div>
                         <group colspan="2" col="6">
-                            <field name="name" string="Equipe"/>
-                            <!--field name="cout_horaire" string="Coût horaire" groups="base.group_hr_manager"/>
-                            <field name="cout_annuel" string="Coût annuel" groups="base.group_hr_manager"/-->
-                            <field name="active"></field>
-                            <newline></newline>
-                            <separator string="Horaires de travail" colspan="6"></separator>
-                            <group colspan="6" col="8">
-                                <field name="hor_md" widget="float_time" on_change="onchange_horaires(hor_md, hor_mf, hor_ad, hor_af, context)"/>
-                                <field name="hor_mf" widget="float_time" on_change="onchange_horaires(hor_md, hor_mf, hor_ad, hor_af, context)"/>
-                                <field name="hor_ad" widget="float_time" on_change="onchange_horaires(hor_md, hor_mf, hor_ad, hor_af, context)"/>
-                                <field name="hor_af" widget="float_time" on_change="onchange_horaires(hor_md, hor_mf, hor_ad, hor_af, context)"/>
+                            <field name="active"/>
+                            <newline/>
+                            <group name="horaires" col="4">
+                                <separator string="Horaires de travail" colspan="4"/>
+                                <label for="hor_md" string="Matin"/>
+                                <field name="hor_md" nolabel="1" widget="float_time" string="Matin :"/>
+                                <label string="-"/>
+                                <field name="hor_mf" nolabel="1" widget="float_time"/>
+                                <label for="hor_ad" string="Après-midi"/>
+                                <field name="hor_ad" nolabel="1" widget="float_time"/>
+                                <label string="-"/>
+                                <field name="hor_af" nolabel="1" widget="float_time"/>
                             </group>
-                            <!--field name="color_id"/-->
                         </group>
-                        <newline/>
                         <notebook>
                             <page string="Employés">
-                                <field name="employee_ids" nolabel="1" on_change='onchange_employees(employee_ids)'/>
+                                <field name="employee_ids" nolabel="1"/>
                             </page>
                             <page string="Catégories">
                                 <field name="category_ids" nolabel="1"/>
@@ -354,7 +366,7 @@
                                 <field name="note"/>
                             </page>
                         </notebook>
-                    </group>
+                    </sheet>
                 </form>
             </field>
         </record>
