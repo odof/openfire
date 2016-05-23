@@ -13,9 +13,8 @@ class of_compose_mail(models.TransientModel):
         result = super(of_compose_mail,self)._get_dict_values(data, o, objects)
 
         sav = objects.get('sav',[])
-        if sav:
-            result.update({
-                'pi_produit_installe' : sav.of_produit_installe_id and sav.of_produit_installe_id.name or '',
-                'pi_product_name': sav.product_name_id and sav.product_name_id.name_get()[0][1] or '',
-            })
+        result.update({
+            'pi_produit_installe' : sav and sav.of_produit_installe_id and sav.of_produit_installe_id.name or '',
+            'pi_product_name': sav and sav.product_name_id and sav.product_name_id.name_get()[0][1] or '',
+        })
         return result
