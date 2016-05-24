@@ -144,7 +144,7 @@ class of_compose_mail(models.TransientModel):
         tmp = self.read(['lettre_id', 'date_paie', 'amount_acompte'])
         data = {
             'ids' : context.get('active_ids', []),
-            'model' : context.get('model', []),
+            'model' : context.get('active_model', []),
             'form' : tmp and tmp[0] or {},
         }
 

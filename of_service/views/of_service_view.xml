@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+
+<!--##########################################################################################################################-->
+<!--###################################################______Service______####################################################-->
+<!--##########################################################################################################################-->
+
+        <record id="view_of_service_form" model="ir.ui.view">
+            <field name="name">of.service.form</field>
+            <field name="model">of.service</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group col="4">
+                            <field name="partner_id" invisible="context.get('invisible_partner_id')"/>
+                            <separator colspan="4" string="Informations générales"/> 
+                            <field name="tache_id" colspan="4"/>
+                            <field name="template_id"/>
+                            <field name="date_fin"/>
+                            <field name="mois_ids"/>
+                            <field name="jour_ids"/>
+                        </group>
+                        <separator string="Notes"/>
+                        <field name="note"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_of_service_tree" model="ir.ui.view">
+            <field name="name">of.service.tree</field>
+            <field name="model">of.service</field>
+            <field name="arch" type="xml">
+                <tree colors="grey:state=='cancel'">
+                    <field name="partner_id" invisible="context.get('invisible_partner_id')"/>
+                    <field name="partner_zip"/>
+                    <field name="partner_city"/>
+                    <field name="tache_id"/>
+                    <field name="mois_ids"/>
+                    <field name="jour_ids"/>
+                    <field name="note"/>
+                    <field name="template_id"/>
+                    <field name="date_fin"/>
+                    <field name="state" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+       <record id="view_of_service_filter" model="ir.ui.view">
+            <field name="name">of.service.select</field>
+            <field name="model">of.service</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+               <search>
+                   <filter string="En cours" name="filter_progress" icon="STOCK_YES" domain="[('state','=','progress')]" />
+                   <field name="partner_id"/>
+                   <field name="partner_zip" string="CP"/>
+                   <field name="tache_id"/>
+                   <field name="mois_ids"/>
+                   <field name="jour_ids"/>
+                   <field name="date_fin" invisible="1"/>
+                   <field name="date_fin_min" filter_domain="[('date_fin','&gt;=',self)]"/>
+                   <field name="date_fin_max" filter_domain="[('date_fin','&lt;=',self)]" />
+               </search>
+            </field>
+        </record>
+
+<!--##########################################################################################################################-->
+<!--##################################################______Partenaire______##################################################-->
+<!--##########################################################################################################################-->
+
+       <record id="of_res_view_partner_form" model="ir.ui.view">
+            <field name="name">of.res.view.partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <page name="sales_purchases" position="after">
+                    <page string="Service">
+                        <field name="service_ids" colspan="4" nolabel="1">
+                            <tree string="Service" colors="grey:state=='cancel'">
+                                <field name="tache_id"/>
+                                <field name="mois_ids"/>
+                                <field name="jour_ids"/>
+                                <field name="note"/>
+                                <field name="template_id"/>
+                                <field name="date_fin"/>
+                                <field name="state" invisible="1"/>
+                                <button name="%(of_gesdoc.action_view_courrier_wizard)d" icon="gtk-paste" string="Ajouter Contrat" type="action"
+                                        attrs="{'invisible': [('template_id', '=', False)]}"/>
+                            </tree>
+                        </field>
+                    </page>
+                </page>
+            </field>
+        </record>
+
+<!--##########################################################################################################################-->
+<!--#################################################________Actions_________#################################################-->
+<!--##########################################################################################################################-->
+
+        <record id="action_of_service_form" model="ir.actions.act_window">
+            <field name="name">Service</field>
+            <field name="res_model">of.service</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+<!--##########################################################################################################################-->
+<!--#################################################_________Menus__________#################################################-->
+<!--##########################################################################################################################-->
+
+        <menuitem id="menu_of_service" name="Services" parent="base.menu_sales" sequence="105" action="action_of_service_form"/>
+
+    </data>
+</openerp>
