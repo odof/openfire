@@ -271,7 +271,7 @@
             </field>
         </record> -->
 
-<!-- Rapport Fiche SAV -->
+<!-- Rapport Fiche SAV dans le SAV -->
 
         <report
             auto="True" 
@@ -283,7 +283,17 @@
             header="False"
             />
 
+<!-- Rapport Fiche SAV dans le panning pose-->
 
+        <report
+            auto="True"
+            id="report_of_project_issue_planning"
+            model="of.planning.pose"
+            name="of_project_issue.sav_planning"
+            rml="of_project_issue/report/sav.rml"
+            string="Fiche SAV"
+            header="False"
+            />
 
 <!-- *************************************************** -->        
 <!-- ************** SAV CONFIG CATEGORIES ************** -->

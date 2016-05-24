@@ -53,7 +53,7 @@
   </stylesheet>
   <story>
   <pto>
-  <para style="terp_default_8">[[ repeatIn(objects, 'o') ]]</para>
+  <para style="terp_default_8">[[ repeatIn(get_objects(objects), 'o') ]]</para>
   <para style="terp_default_8">[[ setLang(o.partner_id.lang) ]]</para>
   <para style="terp_tblheader">Support technique [[ get_company_name(o, user) ]] - [[ o.of_code ]] au [[ formatLang(maintenant(), date=True) ]]</para>
 

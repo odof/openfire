@@ -14,7 +14,13 @@ class sav(report_sxw.rml_parse):
             'get_client_tel': self.get_client_tel,
             'maintenant': self.maintenant,
             'datetime': datetime,
+            'get_objects': self.get_objects,
         })
+
+    def get_objects(self, objects):
+        if objects._name == 'of.planning.pose':
+            return [obj.sav_id for obj in objects if obj.sav_id]
+        return objects
 
     def maintenant(self):
         return time.strftime('%Y-%m-%d')
@@ -86,3 +92,4 @@ class sav(report_sxw.rml_parse):
 
 
 report_sxw.report_sxw('report.of_project_issue.sav', 'project.issue', 'addons/of_project_issue/report/sav.rml', parser=sav, header=False)
+report_sxw.report_sxw('report.of_project_issue.sav_planning', 'of.planning.pose', 'addons/of_project_issue/report/sav.rml', parser=sav, header=False)
