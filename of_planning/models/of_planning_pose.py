@@ -184,7 +184,7 @@ class of_planning_pose(osv.Model):
 #         'sidebar_color'        : fields_old.related('poseur_id','color_id','color', type='char', help="Couleur pour le menu droit du planning (couleur de base de l'équipe de pose)"),
         'category_id'          : fields_old.function(_get_category, method=True, type='many2one', obj="hr.employee.category", string=u"Type de tâche", store=False,
                                                  fnct_search=_search_category),
-        'verif_dispo'          : fields_old.boolean(u'Vérif', help=u"Vérifier la disponibilité de l'équipe sur ce créneau", required=True),
+        'verif_dispo'          : fields_old.boolean(u'Vérif', help=u"Vérifier la disponibilité de l'équipe sur ce créneau"),
     }
     _defaults = {
         'user_id'    : lambda self, cr, uid, context: uid,
