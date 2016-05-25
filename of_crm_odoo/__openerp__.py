@@ -6,8 +6,11 @@
     "author" : "OpenFire",
     "website" : "http://www.openfire.fr",
     'category': 'Customer Relationship Management',
-    "description": """ Le module OpenFire des plannings de pose.
-Inclut la gestion d'équipes de pose.""",
+    "description": u""" Module OpenFire pour le CRM Odoo.
+---------------------------------
+
+Les pistes utilisent le même jeu d'étiquettes que les partenaires.
+""",
     "depends" : [
         'crm',
     ],
