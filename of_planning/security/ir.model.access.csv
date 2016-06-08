@@ -1,7 +1,7 @@
 "id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
 "access_of_planning_pose_user","of.planning.pose","model_of_planning_pose","base.group_user",1,0,0,0
 "access_of_planning_pose_manager","of.planning.pose","model_of_planning_pose","of_group_planning_pose_manager",1,1,1,1
-"access_of_planning_tache_user_pose","of.planning.tache","model_of_planning_tache","of_group_planning_pose_user",1,0,0,0
+"access_of_planning_tache_user_pose","of.planning.tache","model_of_planning_tache","base.group_user",1,0,0,0
 "access_of_planning_tache_manager_pose","of.planning.tache","model_of_planning_tache","of_group_planning_pose_manager",1,1,1,1
 "access_of_planning_equipe_user","of.planning.equipe","model_of_planning_equipe","of_group_planning_pose_user",1,0,0,0
 "access_of_planning_equipe_manager","of.planning.equipe","model_of_planning_equipe","base.group_hr_manager",1,1,1,1
