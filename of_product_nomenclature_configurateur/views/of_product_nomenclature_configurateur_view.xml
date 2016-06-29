@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        
+<!-- ################## Vues configuration configurateur ##################-->
+           
+        <!-- Configuration nomenclature form -->
+        <record id="of_product_nomenclature_configurateur_form_view" model="ir.ui.view">
+            <field name="name">of.product.nomenclature.configurateur.form</field>
+            <field name="model">of.product.nomenclature</field>
+            <field name="inherit_id" ref="of_product_nomenclature.of_product_nomenclature_form_view"/>            
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='of_product_nomenclature_line']/tree/field[@name='product_id']" position="before">
+                    <field name="bloc_id"/>
+                </xpath>
+            </field>
+        </record>
+        
+        <!-- Configuration nomenclature bloc tree -->
+        <record id="of_product_bloc_tree_view" model="ir.ui.view">
+            <field name="name">of.product.bloc.tree</field>
+            <field name="model">of.product.nomenclature.bloc</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Blocs nomenclatures">
+                    <field name="name"/>
+                    <field name="nb_selection_min"/>
+                    <field name="nb_selection_max"/>
+                    <field name="sequence"/>
+                </tree>
+            </field>
+        </record>
+        
+        <!-- On crée le menu de configuration Nomenclature comme sous-menu -->
+        <menuitem id="of_menu_config_product_nomenclature" name="Nomenclature" parent="product.prod_config_main" sequence="20"/>
+        
+        <!-- On rattache le menu configuration nomenclature au menu créé ci-dessus (Ventes/Configuration/Produits/Nomenclature) -->
+        <menuitem id="of_product_nomenclature.menu_product_nomenclature" action="of_product_nomenclature.action_config_of_product_nomenclature" name="Nomenclature" 
+            parent="of_menu_config_product_nomenclature" sequence="10"/>
+            
+        <!-- Menu configuration des blocs -->
+        <!-- Action vue configuration configurateur produits -->
+        <record id="action_config_of_product_nomenclature_bloc" model="ir.actions.act_window">
+            <field name="name">Bloc</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">of.product.nomenclature.bloc</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <!-- <field name="search_view_id" ref="of_product_nomenclature_bloc_search_view"/> -->
+            <field name="help">Bloc de nomenclature de produits</field>
+        </record>
+        
+        <menuitem id="menu_product_configurateur_bloc" action="action_config_of_product_nomenclature_bloc" name="Blocs" 
+            parent="of_menu_config_product_nomenclature" sequence="20"/>          
+            
+
+<!-- ################## Wizard configurateur insertion dans devis ##################-->
+        
+        <!-- wizard  -->
+        <record id="view_of_product_configurateur_wizard" model="ir.ui.view">
+            <field name="name">Configurateur produits</field>
+            <field name="model">of.product.configurateur.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Nomenclature">
+                    <group colspan="4" col="4">
+                        <field name="nomenclature_id" required="1"/>
+                    </group>
+                    <group string="Sélection des composants" colspan="4" col="4" attrs="{'invisible':[('nomenclature_id','=',False)]}">
+                        <field name="nomenclature_line_ids" colspan="4" nolabel="1" context="{'active_id':context.get('active_id')}">
+                            <tree string="Composants">
+                                <field name="selection" invisible="1"/>
+                                <button name="bouton_coche" string="Cocher" type="object" icon="gtk-media-stop" attrs="{'invisible':[('selection','=',True)]}"/>
+                                <button name="bouton_decocher" string="Décocher" type="object" icon="gtk-apply" attrs="{'invisible':[('selection','=',False)]}"/>
+                                <field name="nomenclature_id" invisible="1"/>
+                                <field name="bloc_id" readonly="1"/>
+                                <field name="product_id" readonly="1"/>
+                                <field name="quantite" readonly="1"/>
+                                <field name="prix_ht" readonly="1"/>
+                            </tree>
+                            <form>
+                                <field name="product_id" readonly="1"/>
+                                <field name="quantite" readonly="1"/>
+                                <field name="prix_ht" readonly="1"/>
+                            </form>
+                        </field>
+                    </group>
+                    <button name="bouton_coche_tout" string="Cocher tous les articles" type="object" icon="STOCK_ADD" attrs="{'invisible':[('nomenclature_id','=',False)]}"/>
+                    <button name="bouton_decocher_tout" string="Décocher tous les articles" type="object" icon="STOCK_REMOVE" attrs="{'invisible':[('nomenclature_id','=',False)]}"/>
+                    <button name="valider" string="Valider" type="object" icon="gtk-go-forward" attrs="{'invisible':[('nomenclature_id','=',False)]}"/>
+                </form>
+            </field>
+        </record>
+
+        <!-- Insertion du bouton "Configurateur" dans vue devis/commandes -->
+        <record id="of_product_configurateur_view_order_form" model="ir.ui.view">
+            <field name="name">of.configurateur.sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <button name="print_quotation" position="after">
+                    <button name="action_wizard_configurateur" string="Configurateur" type="object" states="draft"/>
+                </button>
+            </field>
+        </record>
+        
+        <!-- Insertion du bouton "Configurateur" dans vue factures -->
+        <record id="of_product_configurateur_view_invoice_form" model="ir.ui.view">
+            <field name="name">of.configurateur.account.invoice.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <button name="invoice_open" position="before">
+                    <button name="action_wizard_configurateur" string="Configurateur" type="object" states="draft"/>
+                </button>
+            </field>
+        </record>
+
+     </data>
+</openerp>

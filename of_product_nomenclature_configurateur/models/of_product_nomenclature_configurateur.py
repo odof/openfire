@@ -3,81 +3,74 @@
 from openerp import models, fields, api
 from openerp.exceptions import UserError
  
-class of_product_nomenclature(models.Model):
-    "Gestion des nomenclatures de produits"
+class of_product_nomenclature_bloc(models.Model):
+    "Gestion des blocs de nomenclatures de produits"
     
-    _name = 'of.product.nomenclature'
-    _description = u"Gestion des nomenclatures de produits"
+    _name = 'of.product.nomenclature.bloc'
+    _description = u"Gestion des blocs de nomenclatures de produits"
 
-    name = fields.Char("Nom", size=64, required=False)
-    of_product_nomenclature_line = fields.One2many('of.product.nomenclature.line', 'nomenclature_id', 'Produits nomenclature')
+    name = fields.Char("Nom", size=64, required=True)
+    nb_selection_min = fields.Integer('Nb produit sélection minimum', required=True, help="Nombre minimum de produits du bloc qui doivent être sélectionnés")
+    nb_selection_max = fields.Integer('Nb produit sélection maximum', required=True, help="Nombre maximum de produits du bloc qui doivent être sélectionnés.")
+    sequence = fields.Integer('Séquence', help="Définit l'ordre d'affichage des blocs dans la nomenclature (plus petit au début)")
 
-    _order = 'name'
+    _defaults = {
+        'nb_selection_min': 1,
+        'nb_selection_max': 9999
+    }
+    _order = 'sequence, name'
     _sql_constraints = [('number_uniq', 'unique(name)', 'Il existe déjà un enregistrement avec le même nom.')]
     
     @api.one
     def copy(self, default=None):
-        "Permettre la duplication des nomenclatures produits malgré la contrainte d'unicité du nom (ajout (copie) au nom"
+        "Permettre la duplication des blocs de nomenclatures malgré la contrainte d'unicité du nom (ajout (copie) au nom)"
         if default is None:
             default = {}
         default = default.copy()
         default['name'] = self.name + '(copie)'
-        return super(of_product_nomenclature, self).copy(default)
+        return super(of_product_nomenclature_bloc, self).copy(default)
 
 
 class of_product_nomenclature_line(models.Model):
     "Liste des composants nomenclature produit"
     
-    _name = 'of.product.nomenclature.line'
-    _description = u"Liste des composants d'une nomenclature"
+    _inherit = 'of.product.nomenclature.line'
 
-    @api.depends('prix_ht','quantite')
-    def calcul_total_ht(self):
-        "Fonction du filed function total_ht"
-        for ligne in self:
-            ligne.total_ht = ligne.prix_ht * ligne.quantite
+    bloc_id = fields.Many2one('of.product.nomenclature.bloc', 'Bloc', required=True)
     
-    product_id = fields.Many2one('product.template', 'Produit', required=True, ondelete='restrict')
-    nomenclature_id = fields.Many2one('of.product.nomenclature', 'Nomenclature', required=True)
-    quantite = fields.Integer('Quantité', required=True)
-    prix_ht = fields.Float('Prix HT', related='product_id.lst_price')
-    total_ht = fields.Float('Total HT', compute='calcul_total_ht', method=True, digits=(16, 2))
-    sequence = fields.Integer('Séquence', help="Définit l'ordre d'affichage des produits dans la nomenclature (plus petit au début)")
+    _order = 'bloc_id, sequence'
 
-    _order = 'sequence'
-
-
-    @api.onchange('product_id')
-    def onchange_product_nomenclature_line(self):
-        result = {}
-        produit = self.env['product.template'].browse([self.product_id.id])
-        if produit:
-            result['prix_ht'] = produit[0].lst_price
-        else:
-            result['prix_ht'] = 0
-        self.prix_ht = result['prix_ht']
 
 
 ######################
 ###     Wizard     ###
 ######################
 
-class wizard_of_product_nomenclature(models.TransientModel):
+class wizard_of_product_configurateur(models.TransientModel):
     "Ce wizard permet de mettre des composants d'une nomenclature dans un devis"
     
-    _name = 'of.product.nomenclature.wizard'
-    _description = u"Sélectionner des composants d'une nomenclature"
+    _name = 'of.product.configurateur.wizard'
+    _description = u"Wizard configurateur de produits"
     _rec_name = 'nomenclature_id'
     
     nomenclature_id = fields.Many2one('of.product.nomenclature', 'Nomenclature')
-    nomenclature_line_ids = fields.One2many('of.product.nomenclature.line.wizard', 'nomenclature_id', 'Composants lines', order='sequence')
+    nomenclature_line_ids = fields.One2many('of.product.configurateur.line.wizard', 'nomenclature_id', 'Composants lines', order='sequence_bloc, sequence_article')
     active_id_model = fields.Char("Document d'origine", default=lambda self: str(self._context['active_id']) + ',' + self._context['active_model'])
-#                                                                 lambda self: "%s,%s" % (self._context['active_id'], self._context['active_model']))
 
     @api.multi
     def valider(self, context):
-        "Bouton valider : on copie les composants sélectionner dans le document (devis/commande ou facture)"
+        "Bouton valider : on copie les composants sélectionnés dans le document (devis/commande ou facture)"
          
+        def valider_bloc(erreur, texte):
+            if nb_selection < nb_selection_min or nb_selection > nb_selection_max:
+                erreur = True
+                texte += "Bloc " + nom_bloc + " : "
+                if nb_selection_min == 1 and nb_selection_max == 1:
+                    texte += u"vous devez sélectionner un et un seul article.\n"
+                else:
+                    texte += u"vous devez sélectionner entre " + str(nb_selection_min) + u" et " + str(nb_selection_max) + u" article(s).\n"
+            return erreur, texte
+
         # On récupère le modèle de document (commande/devis, facture) depuis lequel le wizard est appelé et son id.
         # Nous les avons au préalable mis dans le champ active_id_model (valeur par défaut lors de la création du champ)
         if self.active_id_model:
@@ -93,6 +86,42 @@ class wizard_of_product_nomenclature(models.TransientModel):
         if not active_id or not active_model:
             raise UserError("Erreur ! (#NP105)\n\nVous devez sélectionner un document.")
         
+        # On vérifie que les conditions de sélection des produits sont respectées.
+        
+        bloc_id_precedent = ""
+        nb_selection = 0
+        nb_selection_min = "" # Nb d'article minimum que l'on doit sélectionner du bloc en cours
+        nb_selection_max = "" # Idem maximum
+        nom_bloc = ""
+        texte = ""
+        erreur = False
+        
+        # On parcourt la liste des produits du wizard
+        for composant in self.nomenclature_line_ids:
+            # Si nous n'avons pas récupéré les infos des critères de sélection min et max du bloc en cours, on le fait. 
+            if not nb_selection_min:
+                nb_selection_min = composant.bloc_id.nb_selection_min
+                nb_selection_max = composant.bloc_id.nb_selection_max
+                nom_bloc = composant.bloc_id.name
+                bloc_id_precedent = composant.bloc_id.id
+            
+            # Si c'est l'article d'un nouveau bloc, on teste si les conditions du bloc précédent sont respectées
+            if bloc_id_precedent and composant.bloc_id.id != bloc_id_precedent:
+                erreur, texte = valider_bloc(erreur, texte)
+                bloc_id_precedent = composant.bloc_id.id
+                nb_selection = 0
+                nb_selection_min = composant.bloc_id.nb_selection_min
+                nb_selection_max = composant.bloc_id.nb_selection_max
+                nom_bloc = composant.bloc_id.name
+                
+            if composant.selection:
+                nb_selection = nb_selection + 1
+            
+        erreur, texte = valider_bloc(erreur, texte) # On valide le dernier bloc
+        
+        if erreur:
+            raise UserError("Erreur !\n\n" + texte)
+                
         if active_model == 'sale.order':
             ligne_obj = self.env['sale.order.line']
             document = self.env['sale.order'].browse(active_id) # Devis/commande sélectionné
@@ -100,11 +129,12 @@ class wizard_of_product_nomenclature(models.TransientModel):
             ligne_obj = self.env['account.invoice.line']
             document = self.env['account.invoice'].browse(active_id) # Facture sélectionnée
         else:
-            raise UserError("Erreur ! (#NP108)\n\nVous ne pouvez utiliser les nomenclatures que dans un devis (commande à l'état brouillon) ou une facture.")
+            raise UserError("Erreur ! (#NP108)\n\nVous ne pouvez utiliser le configurateur de produits que dans un devis (commande à l'état brouillon) ou une facture.")
                             
         if document.state != 'draft':
-            raise UserError("Erreur ! (#NP110)\n\nVous ne pouvez faire une nomenclature sur que sur un document à l'état brouillon.")
+            raise UserError("Erreur ! (#NP110)\n\nVous ne pouvez utiliser le configurateur de produits que sur un document à l'état brouillon.")
    
+        # On enregistre les produits sélectionnés dans devis/commande/facture
         # On parcourt tous les composants sélectionnés dans le wizard
         for composant in self.nomenclature_line_ids: # Données du wizard
             # Si le composant n'est pas sélectionné, on passe au suivant.
@@ -146,17 +176,18 @@ class wizard_of_product_nomenclature(models.TransientModel):
     
     @api.onchange('nomenclature_id')
     def onchange_nomenclature(self):
+        # On peuple le wizard avec les produits de la nomenclature dès qu'elle est sélectionnée
         if not self.nomenclature_id:
             self.nomenclature_line_ids = [(5,0)]
         nomenclature = self.env['of.product.nomenclature'].browse(self.nomenclature_id.id)
-        line_obj = self.env['of.product.nomenclature.line.wizard']
+        line_obj = self.env['of.product.configurateur.line.wizard']
         result = [(5,0)] # On efface les lignes existantes
         # Dans la nomenclature, ce sont les articles de base (product.template) et non les variantes (product.product)
         # On affiche toutes les variantes du produit de base dans le wizard
         for composant in nomenclature.of_product_nomenclature_line: # Parcourt de tous les articles de base de la nomenclature
             # On parcourt toutes les variantes du produit de base
             for variante in self.env['product.product'].search([('product_tmpl_id', '=', composant.product_id.id)]):
-                valeurs = {'product_id': variante.id, 'quantite': composant.quantite, 'prix_ht': variante.lst_price}
+                valeurs = {'sequence_bloc': composant.bloc_id.sequence, 'sequence_article': composant.sequence, 'bloc_id': composant.bloc_id.id, 'product_id': variante.id, 'quantite': composant.quantite, 'prix_ht': variante.lst_price}
                 result.append((4, line_obj.create(valeurs).id))
         self.nomenclature_line_ids = result
      
@@ -166,7 +197,7 @@ class wizard_of_product_nomenclature(models.TransientModel):
         self.nomenclature_line_ids.write({'selection': True})
         return {
             'type': 'ir.actions.act_window',
-            'res_model': 'of.product.nomenclature.wizard',
+            'res_model': 'of.product.configurateur.wizard',
             'view_type': 'form',
             'view_mode': 'form',
             'res_id': self.id,
@@ -180,7 +211,7 @@ class wizard_of_product_nomenclature(models.TransientModel):
         self.nomenclature_line_ids.write({'selection': False})
         return {
             'type': 'ir.actions.act_window',
-            'res_model': 'of.product.nomenclature.wizard',
+            'res_model': 'of.product.configurateur.wizard',
             'view_type': 'form',
             'view_mode': 'form',
             'res_id': self.id,
@@ -189,18 +220,21 @@ class wizard_of_product_nomenclature(models.TransientModel):
         }
 
 
-class wizard_of_product_nomenclature_line(models.TransientModel):
-    "Liste des composants sélectionnés d'une nomenclature dans le wizard"
+class wizard_of_product_configurateur_line(models.TransientModel):
+    "Liste des composants sélectionnés du configurateur dans le wizard"
     
-    _name = 'of.product.nomenclature.line.wizard'
-    _description = u"Sélection des composants d'une nomenclature"
+    _name = 'of.product.configurateur.line.wizard'
+    _description = u"Wizard configurateur de produits"
     _rec_name = 'product_id'
     
     selection = fields.Boolean(string='Selection composant')
-    nomenclature_id = fields.Many2one('of.product.nomenclature.wizard', 'Nomenclature', required=False, invisible="1", ondelete="cascade")
+    bloc_id = fields.Many2one('of.product.nomenclature.bloc', 'Bloc', required=True)
+    nomenclature_id = fields.Many2one('of.product.configurateur.wizard', 'Nomenclature', required=False, invisible="1", ondelete="cascade")
     product_id = fields.Many2one('product.product', 'Produit', required=True, readonly="1", ondelete='restrict')
     quantite = fields.Integer('Quantité', required=True, readonly="1", default=1)
     prix_ht = fields.Float('Prix HT', related='product_id.lst_price', readonly="1")
+    sequence_bloc = fields.Integer('Séquence bloc')
+    sequence_article = fields.Integer('Séquence article')
     
     _defaults = {
         'selection': False
@@ -212,7 +246,7 @@ class wizard_of_product_nomenclature_line(models.TransientModel):
         self.write({'selection': True})
         return {
             'type': 'ir.actions.act_window',
-            'res_model': 'of.product.nomenclature.wizard',
+            'res_model': 'of.product.configurateur.wizard',
             'view_type': 'form',
             'view_mode': 'form',
             'res_id': self.nomenclature_id.id,
@@ -225,23 +259,24 @@ class wizard_of_product_nomenclature_line(models.TransientModel):
         self.write({'selection': False})
         return {
             'type': 'ir.actions.act_window',
-            'res_model': 'of.product.nomenclature.wizard',
+            'res_model': 'of.product.configurateur.wizard',
             'view_type': 'form',
             'view_mode': 'form',
             'res_id': self.nomenclature_id.id,
             'target': 'new',
         }
 
+
 class sale_order(models.Model):
     _inherit = "sale.order"
 
     @api.multi
-    def action_wizard_nomenclature(self):
-        wizard_obj = self.env['of.product.nomenclature.wizard']
+    def action_wizard_configurateur(self):
+        wizard_obj = self.env['of.product.configurateur.wizard']
         wizard_id = wizard_obj.with_context(active_id=self.id, active_ids=[self.id], active_model=self._name).create({}).id
         return {
             'type': 'ir.actions.act_window',
-            'res_model': 'of.product.nomenclature.wizard',
+            'res_model': 'of.product.configurateur.wizard',
             'view_type': 'form',
             'view_mode': 'form',
             'res_id': wizard_id,
@@ -249,16 +284,17 @@ class sale_order(models.Model):
             'context': self._context
         }
 
+
 class account_invoice(models.Model):
     _inherit = "account.invoice"
 
     @api.multi
-    def action_wizard_nomenclature(self):
-        wizard_obj = self.env['of.product.nomenclature.wizard']
+    def action_wizard_configurateur(self):
+        wizard_obj = self.env['of.product.configurateur.wizard']
         wizard_id = wizard_obj.with_context(active_id=self.id, active_ids=[self.id], active_model=self._name).create({}).id
         return {
             'type': 'ir.actions.act_window',
-            'res_model': 'of.product.nomenclature.wizard',
+            'res_model': 'of.product.configurateur.wizard',
             'view_type': 'form',
             'view_mode': 'form',
             'res_id': wizard_id,

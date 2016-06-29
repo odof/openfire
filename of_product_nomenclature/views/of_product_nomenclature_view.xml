@@ -41,7 +41,7 @@
                         <field name="quantite"/> <!-- on_change="onchange_product_nomenclature_line(product_id,quantite, context)"/> -->
                         <field name="prix_ht" readonly="1"/>
                         <field name="total_ht" readonly="1"/>
-                        <field name="sequence" invisible="1"/>
+                        <field name="sequence"/>
                     </tree>
                 </field>
             </field>
@@ -101,6 +101,7 @@
             </field>
         </record>
 
+        <!-- Insertion du bouton "Insérer une nomenclature" dans vue devis/commandes -->
         <record id="of_product_nomenclature_view_order_form" model="ir.ui.view">
             <field name="name">of.nomenclature.sale.order.form</field>
             <field name="model">sale.order</field>
@@ -112,6 +113,7 @@
             </field>
         </record>
 
+        <!-- Insertion du bouton "Insérer une nomenclature" dans vue factures -->
         <record id="of_product_nomenclature_view_invoice_form" model="ir.ui.view">
             <field name="name">of.nomenclature.account.invoice.form</field>
             <field name="model">account.invoice</field>
