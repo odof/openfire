@@ -23,6 +23,7 @@ Personnalisations des fonctions de base Odoo :
     "init_xml" : [
     ],
     "data" : [
+        'data/report_paperformat.xml',
         'security/of_group_intranet_security.xml',
         'of_base_view.xml',
         'wizard/wizard_change_active_product.xml',
