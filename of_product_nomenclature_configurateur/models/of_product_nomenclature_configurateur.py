@@ -55,7 +55,7 @@ class wizard_of_product_configurateur(models.TransientModel):
     
     nomenclature_id = fields.Many2one('of.product.nomenclature', 'Nomenclature')
     nomenclature_line_ids = fields.One2many('of.product.configurateur.line.wizard', 'nomenclature_id', 'Composants lines', order='sequence_bloc, sequence_article')
-    active_id_model = fields.Char("Document d'origine", default=lambda self: str(self._context['active_id']) + ',' + self._context['active_model'])
+    active_id_model = fields.Char("Document d'origine", default=lambda self: 'active_id' in self._context and str(self._context['active_id']) + ',' + self._context['active_model'])
 
     @api.multi
     def valider(self, context):
@@ -96,7 +96,8 @@ class wizard_of_product_configurateur(models.TransientModel):
         texte = ""
         erreur = False
         
-        # On parcourt la liste des produits du wizard
+        # Vérification des conditions de sélection des produits
+        # On parcourt la liste des produits du wizard 
         for composant in self.nomenclature_line_ids:
             # Si nous n'avons pas récupéré les infos des critères de sélection min et max du bloc en cours, on le fait. 
             if not nb_selection_min:

@@ -9,6 +9,6 @@
     'depends': ['sale', 'account'],
     "data" : [
         'views/of_product_nomenclature_view.xml',
-        #'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
     ],
 }

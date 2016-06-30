@@ -17,8 +17,8 @@
         </record>
         
         <!-- Configuration nomenclature bloc tree -->
-        <record id="of_product_bloc_tree_view" model="ir.ui.view">
-            <field name="name">of.product.bloc.tree</field>
+        <record id="of_product_nomenclature_bloc_tree_view" model="ir.ui.view">
+            <field name="name">of.product.nomenclature.bloc.tree</field>
             <field name="model">of.product.nomenclature.bloc</field>
             <field name="type">tree</field>
             <field name="arch" type="xml">
@@ -28,6 +28,22 @@
                     <field name="nb_selection_max"/>
                     <field name="sequence"/>
                 </tree>
+            </field>
+        </record>
+        
+        <!-- Configuration nomenclature bloc form -->
+        <record id="of_product_nomenclature_bloc_form_view" model="ir.ui.view">
+            <field name="name">of.product.nomenclature.bloc.form</field>
+            <field name="model">of.product.nomenclature.bloc</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="name"/>
+                        <field name="sequence"/>
+                        <field name="nb_selection_min"/>
+                        <field name="nb_selection_max"/>
+                    </group>
+                </form>
             </field>
         </record>
         
@@ -114,6 +130,15 @@
                     <button name="action_wizard_configurateur" string="Configurateur" type="object" states="draft"/>
                 </button>
             </field>
+        </record>
+        
+        <!-- Action pour appeler le wizard -->
+        <record id="action_of_product_configurateur_wizard" model="ir.actions.act_window">
+            <field name="name">Wizard configurateur</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">of.product.configurateur.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
         </record>
 
      </data>

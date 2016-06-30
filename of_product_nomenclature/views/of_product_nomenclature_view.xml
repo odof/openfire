@@ -32,18 +32,22 @@
         <record id="of_product_nomenclature_form_view" model="ir.ui.view">
             <field name="name">of.product.nomenclature.form</field>
             <field name="model">of.product.nomenclature</field>
-            <field name="type">form</field>
             <field name="arch" type="xml">
-                <field name="name"/>
-                <field name="of_product_nomenclature_line" colspan="4" nolabel="1">
-                    <tree editable="bottom">
-                        <field name="product_id"/> <!-- on_change="onchange_product_nomenclature_line(product_id,quantite, context)"/> -->
-                        <field name="quantite"/> <!-- on_change="onchange_product_nomenclature_line(product_id,quantite, context)"/> -->
-                        <field name="prix_ht" readonly="1"/>
-                        <field name="total_ht" readonly="1"/>
-                        <field name="sequence"/>
-                    </tree>
-                </field>
+                <form>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="Nom nomenclature"/></h1>
+                    </div>
+                    <field name="of_product_nomenclature_line" colspan="4">
+                        <tree editable="bottom">
+                            <field name="product_id"/>
+                            <field name="quantite"/>
+                            <field name="prix_ht" readonly="1"/>
+                            <field name="total_ht" readonly="1"/>
+                            <field name="sequence"/>
+                        </tree>
+                    </field>
+                </form>
             </field>
         </record>
         

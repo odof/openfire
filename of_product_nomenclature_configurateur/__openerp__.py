@@ -9,6 +9,6 @@
     'depends': ['of_product_nomenclature'],
     "data" : [
         'views/of_product_nomenclature_configurateur_view.xml',
-        #'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
     ],
 }
