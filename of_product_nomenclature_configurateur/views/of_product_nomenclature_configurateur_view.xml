@@ -76,7 +76,6 @@
         <record id="view_of_product_configurateur_wizard" model="ir.ui.view">
             <field name="name">Configurateur produits</field>
             <field name="model">of.product.configurateur.wizard</field>
-            <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Nomenclature">
                     <group colspan="4" col="4">
@@ -84,7 +83,7 @@
                     </group>
                     <group string="Sélection des composants" colspan="4" col="4" attrs="{'invisible':[('nomenclature_id','=',False)]}">
                         <field name="nomenclature_line_ids" colspan="4" nolabel="1" context="{'active_id':context.get('active_id')}">
-                            <tree string="Composants">
+                            <tree string="Composants" create="false" readonly="1">
                                 <field name="selection" invisible="1"/>
                                 <button name="bouton_coche" string="Cocher" type="object" icon="gtk-media-stop" attrs="{'invisible':[('selection','=',True)]}"/>
                                 <button name="bouton_decocher" string="Décocher" type="object" icon="gtk-apply" attrs="{'invisible':[('selection','=',False)]}"/>
@@ -94,10 +93,10 @@
                                 <field name="quantite" readonly="1"/>
                                 <field name="prix_ht" readonly="1"/>
                             </tree>
-                            <form>
-                                <field name="product_id" readonly="1"/>
-                                <field name="quantite" readonly="1"/>
-                                <field name="prix_ht" readonly="1"/>
+                            <form create="false" readonly="1">
+                                <group>
+                                    <span>Cliquez dans la case/coche verte en début de ligne pour sélectionner/désélectionner un article.</span>
+                                </group>
                             </form>
                         </field>
                     </group>

@@ -3,3 +3,5 @@
 "access_of_product_nomenclature_user","of_product_nomenclature.user","model_of_product_nomenclature","base.group_sale_salesman",1,0,0,0
 "access_of_product_nomenclature_line_manager","of_product_nomenclature_line.manager","model_of_product_nomenclature_line","base.group_sale_manager",1,1,1,1
 "access_of_product_nomenclature_line_user","of_product_nomenclature_line.user","model_of_product_nomenclature_line","base.group_sale_salesman",1,0,0,0
+"access_of_product_nomenclature_portal","of_product_nomenclature.portal","model_of_product_nomenclature","base.group_portal",1,0,0,0
+"access_of_product_nomenclature_line_portal","of_product_nomenclature_line.portal","model_of_product_nomenclature_line","base.group_portal",1,0,0,0

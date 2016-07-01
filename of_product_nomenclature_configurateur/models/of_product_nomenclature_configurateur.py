@@ -73,6 +73,7 @@ class wizard_of_product_configurateur(models.TransientModel):
 
         # On récupère le modèle de document (commande/devis, facture) depuis lequel le wizard est appelé et son id.
         # Nous les avons au préalable mis dans le champ active_id_model (valeur par défaut lors de la création du champ)
+        # Si est à False, c'est que nous venons du site internet.
         if self.active_id_model:
             active_model = self.active_id_model.split(',')
             if len(active_model):
@@ -81,10 +82,13 @@ class wizard_of_product_configurateur(models.TransientModel):
             else:
                 return
         else:
-            raise UserError("Erreur ! (#NP103)\n\nVous devez sélectionner un document sur lequel vous voulez ajouter les éléments d'une nomenclature.")
+            # On vient du site internet
+            active_model = 'res.partner'
+            partner_obj = self.env['res.users'].browse(self._uid).partner_id
+            #raise UserError("Erreur ! (#NP103)\n\nVous devez sélectionner un document sur lequel vous voulez ajouter les éléments d'une nomenclature.")
         
-        if not active_id or not active_model:
-            raise UserError("Erreur ! (#NP105)\n\nVous devez sélectionner un document.")
+        #if not active_id or not active_model:
+        #    raise UserError("Erreur ! (#NP105)\n\nVous devez sélectionner un document.")
         
         # On vérifie que les conditions de sélection des produits sont respectées.
         
@@ -122,19 +126,31 @@ class wizard_of_product_configurateur(models.TransientModel):
         
         if erreur:
             raise UserError("Erreur !\n\n" + texte)
-                
+        
+        # Si on vient du site internet.
+        # On doit créer une commande avec le partnaire de l'utilisateur
+        if active_model == 'res.partner':
+            commande = self.env['sale.order'].create({
+                'partner_id': partner_obj.id,
+            })
+        
         if active_model == 'sale.order':
             ligne_obj = self.env['sale.order.line']
             document = self.env['sale.order'].browse(active_id) # Devis/commande sélectionné
+        elif active_model == 'res.partner':
+            ligne_obj = self.env['sale.order.line']
+            document = self.env['sale.order'].browse(commande.id)
         elif active_model == 'account.invoice':
             ligne_obj = self.env['account.invoice.line']
             document = self.env['account.invoice'].browse(active_id) # Facture sélectionnée
         else:
             raise UserError("Erreur ! (#NP108)\n\nVous ne pouvez utiliser le configurateur de produits que dans un devis (commande à l'état brouillon) ou une facture.")
-                            
+
         if document.state != 'draft':
             raise UserError("Erreur ! (#NP110)\n\nVous ne pouvez utiliser le configurateur de produits que sur un document à l'état brouillon.")
    
+
+        
         # On enregistre les produits sélectionnés dans devis/commande/facture
         # On parcourt tous les composants sélectionnés dans le wizard
         for composant in self.nomenclature_line_ids: # Données du wizard
@@ -169,10 +185,31 @@ class wizard_of_product_configurateur(models.TransientModel):
                 ligne = ligne_obj.create(doc_ligne)
                 ligne._onchange_product_id()
             
+            elif active_model == 'res.partner':
+                # On vient du site internet.
+                doc_ligne['order_id'] = document.id
+                doc_ligne['product_uom_qty'] = composant.quantite
+                if document.order_line:
+                    doc_ligne['sequence'] = document.order_line[-1].sequence # Pour mettre la ligne à la fin du devis
+                # On calcule certaines choses (taux TVA, prix TTC, ...) et on enregistre la ligne
+                ligne = commande.env['sale.order.line'].create(doc_ligne)
+                ligne.product_id_change()
+            
         if active_model == 'account.invoice':
             document._onchange_invoice_line_ids() # On doit faire recalculer le montant des taxes de l'ensemble de la facture
-    
-        return True
+        
+        # On valide le devis si vient du site web
+        if active_model == 'res.partner':
+            commande.action_confirm()
+            
+        if active_model == 'res.partner':
+            return {
+                'type': 'ir.actions.act_url',
+                'url': '/my/home',
+                'target': 'self'
+            }
+        else:
+            return True
     
     
     @api.onchange('nomenclature_id')
