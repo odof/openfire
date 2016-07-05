@@ -53,10 +53,41 @@ class wizard_of_product_configurateur(models.TransientModel):
     _description = u"Wizard configurateur de produits"
     _rec_name = 'nomenclature_id'
     
+    partner_id = fields.Many2one('res.partner', 'Client', readonly="1", domain="[('parent_id','=',False)]", ondelete='restrict')
+    nom_partner = fields.Char('Nom client', related='partner_id.name', readonly="1")
+    adresse_livraison_id = fields.Many2one('res.partner', 'Adresse de livraison', domain="['|',('parent_id','=',partner_id),('id','=',partner_id)]", ondelete='restrict')
     nomenclature_id = fields.Many2one('of.product.nomenclature', 'Nomenclature')
     nomenclature_line_ids = fields.One2many('of.product.configurateur.line.wizard', 'nomenclature_id', 'Composants lines', order='sequence_bloc, sequence_article')
     active_id_model = fields.Char("Document d'origine", default=lambda self: 'active_id' in self._context and str(self._context['active_id']) + ',' + self._context['active_model'])
+    etape = fields.Integer('Etape', required=True, readonly="1", default=1)
 
+    
+    @api.model
+    def default_get(self, fields=None):
+        res = super(wizard_of_product_configurateur, self).default_get(fields)
+        # Si on vient du site internet, on doit récupérer le partenaire de l'utilisateur
+        # Sinon, on vient d'un(e) devis/commande/facture et on passe l'étape où l'on demande l'adresse de livraison 
+        if 'active_id_model' in res and res['active_id_model']:
+            res['etape'] = 2
+        else:
+            res['partner_id'] = self.env['res.users'].browse(self._uid).partner_id.id        
+        return res
+        
+    @api.multi
+    def etape_deux(self):
+        # Si on vient du site internet, on demande l'adresse de livraison
+        self.write ({'etape': 2})
+        
+        return  {
+            'type': 'ir.actions.act_window',
+            'res_model': 'of.product.configurateur.wizard',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_id': self.id,
+            'target': 'new',
+            'context': self._context
+        }
+    
     @api.multi
     def valider(self, context):
         "Bouton valider : on copie les composants sélectionnés dans le document (devis/commande ou facture)"
@@ -84,14 +115,10 @@ class wizard_of_product_configurateur(models.TransientModel):
         else:
             # On vient du site internet
             active_model = 'res.partner'
-            partner_obj = self.env['res.users'].browse(self._uid).partner_id
-            #raise UserError("Erreur ! (#NP103)\n\nVous devez sélectionner un document sur lequel vous voulez ajouter les éléments d'une nomenclature.")
-        
-        #if not active_id or not active_model:
-        #    raise UserError("Erreur ! (#NP105)\n\nVous devez sélectionner un document.")
+            #partner_obj = self.env['res.users'].browse(self._uid).partner_id
         
         # On vérifie que les conditions de sélection des produits sont respectées.
-        
+               
         bloc_id_precedent = ""
         nb_selection = 0
         nb_selection_min = "" # Nb d'article minimum que l'on doit sélectionner du bloc en cours
@@ -131,7 +158,8 @@ class wizard_of_product_configurateur(models.TransientModel):
         # On doit créer une commande avec le partnaire de l'utilisateur
         if active_model == 'res.partner':
             commande = self.env['sale.order'].create({
-                'partner_id': partner_obj.id,
+                'partner_id': self.partner_id.id,
+                'partner_shipping_id': self.adresse_livraison_id.id
             })
         
         if active_model == 'sale.order':
@@ -265,7 +293,7 @@ class wizard_of_product_configurateur_line(models.TransientModel):
     _description = u"Wizard configurateur de produits"
     _rec_name = 'product_id'
     
-    selection = fields.Boolean(string='Selection composant')
+    selection = fields.Boolean(string='Selection composant', default=False)
     bloc_id = fields.Many2one('of.product.nomenclature.bloc', 'Bloc', required=True)
     nomenclature_id = fields.Many2one('of.product.configurateur.wizard', 'Nomenclature', required=False, invisible="1", ondelete="cascade")
     product_id = fields.Many2one('product.product', 'Produit', required=True, readonly="1", ondelete='restrict')
@@ -274,9 +302,9 @@ class wizard_of_product_configurateur_line(models.TransientModel):
     sequence_bloc = fields.Integer('Séquence bloc')
     sequence_article = fields.Integer('Séquence article')
     
-    _defaults = {
-        'selection': False
-    }
+#     _defaults = {
+#         'selection': False
+#     }
 
     @api.multi
     def bouton_coche(self):

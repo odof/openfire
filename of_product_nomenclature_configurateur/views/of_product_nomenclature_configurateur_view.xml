@@ -78,10 +78,17 @@
             <field name="model">of.product.configurateur.wizard</field>
             <field name="arch" type="xml">
                 <form string="Nomenclature">
-                    <group colspan="4" col="4">
-                        <field name="nomenclature_id" required="1"/>
+                    <field name="etape" invisible="1"/>
+                    <group name="partenaire" colspan="4" col="4" attrs="{'invisible':[('etape','>',1)]}">
+                        <field name="partner_id" invisible="1"/>
+                        <field name="nom_partner"/>
+                        <field name="adresse_livraison_id" create="false" attrs="{'required':[('etape','=',1)]}" context="{'show_address': True}"/>
                     </group>
-                    <group string="Sélection des composants" colspan="4" col="4" attrs="{'invisible':[('nomenclature_id','=',False)]}">
+                    <button name="etape_deux" string="Suite >>" type="object" icon="gtk-go-forward" attrs="{'invisible':[('etape','>',1)]}"/>
+                    <group colspan="4" col="4">
+                        <field name="nomenclature_id" attrs="{'required':[('etape','>',1)], 'invisible':[('etape','&lt;',2)]}"/>
+                    </group>
+                    <group string="Sélection des composants" colspan="4" col="4" attrs="{'invisible':['|',('nomenclature_id','=',False),('etape','&lt;',1)]}">
                         <field name="nomenclature_line_ids" colspan="4" nolabel="1" context="{'active_id':context.get('active_id')}">
                             <tree string="Composants" create="false" readonly="1">
                                 <field name="selection" invisible="1"/>
@@ -138,6 +145,7 @@
             <field name="res_model">of.product.configurateur.wizard</field>
             <field name="view_type">form</field>
             <field name="view_mode">form</field>
+            <field name="target">new</field>
         </record>
 
      </data>

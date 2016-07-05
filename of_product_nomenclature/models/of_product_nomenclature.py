@@ -75,7 +75,6 @@ class wizard_of_product_nomenclature(models.TransientModel):
     nomenclature_id = fields.Many2one('of.product.nomenclature', 'Nomenclature')
     nomenclature_line_ids = fields.One2many('of.product.nomenclature.line.wizard', 'nomenclature_id', 'Composants lines', order='sequence')
     active_id_model = fields.Char("Document d'origine", default=lambda self: str(self._context['active_id']) + ',' + self._context['active_model'])
-#                                                                 lambda self: "%s,%s" % (self._context['active_id'], self._context['active_model']))
 
     @api.multi
     def valider(self, context):
