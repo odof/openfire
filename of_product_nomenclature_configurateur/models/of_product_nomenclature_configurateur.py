@@ -131,7 +131,7 @@ class wizard_of_product_configurateur(models.TransientModel):
         # On parcourt la liste des produits du wizard 
         for composant in self.nomenclature_line_ids:
             # Si nous n'avons pas récupéré les infos des critères de sélection min et max du bloc en cours, on le fait. 
-            if not nb_selection_min:
+            if nb_selection_min == "":
                 nb_selection_min = composant.bloc_id.nb_selection_min
                 nb_selection_max = composant.bloc_id.nb_selection_max
                 nom_bloc = composant.bloc_id.name

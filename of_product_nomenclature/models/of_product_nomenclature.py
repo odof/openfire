@@ -10,14 +10,14 @@ class of_product_nomenclature(models.Model):
     _description = u"Gestion des nomenclatures de produits"
 
     name = fields.Char("Nom", size=64, required=True)
-    of_product_nomenclature_line = fields.One2many('of.product.nomenclature.line', 'nomenclature_id', 'Produits nomenclature')
+    of_product_nomenclature_line = fields.One2many('of.product.nomenclature.line', 'nomenclature_id', 'Produits nomenclature', copy=True)
 
     _order = 'name'
     _sql_constraints = [('number_uniq', 'unique(name)', 'Il existe déjà un enregistrement avec le même nom.')]
     
     @api.one
     def copy(self, default=None):
-        "Permettre la duplication des nomenclatures produits malgré la contrainte d'unicité du nom (ajout (copie) au nom"
+        "Permettre la duplication des nomenclatures produits malgré la contrainte d'unicité du nom (ajout (copie) au nom)"
         if default is None:
             default = {}
         default = default.copy()
