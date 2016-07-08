@@ -11,18 +11,21 @@
         <record id="of_view_project_issue_filter" model="ir.ui.view">
             <field name="name">of.view.project.issue.filter</field>
             <field name="model">project.issue</field>
-        	<field name="inherit_id" ref="project_issue.view_project_issue_filter"/>
+            <field name="inherit_id" ref="project_issue.view_project_issue_filter"/>
             <field name="arch" type="xml">
-                    <field name="name" position="replace">
-                        <field name="of_code" string="Code SAV"/>
-                        <field name="name" string="Requête"/>
+                <field name="name" position="replace">
+                    <field name="of_code" string="Code SAV"/>
+                    <field name="name" string="Requête"/>
+                </field>
+                <field name="id" position="replace"/>
+                <field name="user_id" position="replace">
+                    <field name="user_id" string="Responsable"/>
                     </field>
-	            	<field name="id" position="replace"/>
-	                <field name="user_id" position="replace">
-	                	 <field name="user_id" string="Responsable"/>
-	               	</field>
-	               	<field name="project_id" position="replace"/>
-            	
+                <field name="project_id" position="replace"/>
+
+                <filter name="project" position="after">
+                    <filter name="categ_id" string="Catégorie" context="{'group_by' : 'of_categorie_id'}"/>
+                </filter>
  <!--               <filter string="Open" position="replace">
                     <filter icon="terp-camera_test"
                         string="Open"
@@ -43,29 +46,25 @@
                 <field name="partner_id" position="after">
                     <field name="shop_id"/>
                 </field>
-                <filter string="Partner" position="before">
-                    <filter string="Catégorie mère" name="categ_parent_id" icon="terp-stock_symbol-selection" context="{'group_by' : 'categ_parent_id'}"/>
-                    <filter string="Catégorie fille" name="categ_id" icon="terp-stock_symbol-selection" context="{'group_by' : 'categ_id'}"/>
-                </filter>
 -->
             </field>
         </record>
-        
+
         <record model="ir.ui.view" id="of_crm_case_tree_view_helpdesk">
             <field name="name">SAV Support Tree</field>
             <field name="model">project.issue</field>
             <field name="type">tree</field>
             <field name="inherit_id" ref="project_issue.project_issue_tree_view"/>
             <field name="arch" type="xml">
-            	<field name="id" position="replace"/>
+                <field name="id" position="replace"/>
                 <field name="name" position="before">
                     <field name="of_code"/>
                 </field>
                 <field name="name" position="replace">
-                	<field name="name" string="Requête"/>
+                    <field name="name" string="Requête"/>
                 </field>
                 <field name="partner_id" position="replace">
-                	<field name="partner_id" string="Partenaire"/>
+                    <field name="partner_id" string="Partenaire"/>
                 </field>
                 <field name="priority" position="replace"/>
                            
@@ -75,17 +74,17 @@
                     <field name="categ_id" invisible="1"/>
                 </field>
 -->
-				<field name="project_id" position="replace"/>
-				<field name="create_date" position="replace">
-                	<field name="date"/>
+                <field name="project_id" position="replace"/>
+                <field name="create_date" position="replace">
+                    <field name="date"/>
                 </field>
                 <field name="date" position="after">
                     <field name="date_deadline"/>
                 </field>
                 <field name="user_id" position="replace">
-                	 <field name="user_id" string="Responsable"/>
-                	<field name="priority"/>
-               	</field>
+                    <field name="user_id" string="Responsable"/>
+                    <field name="priority"/>
+                </field>
             </field>
         </record>
 
@@ -105,18 +104,18 @@
                     <field name="name" placeholder="Requête ..."/>
                 </field>
                 <field name="user_id" position="before">
-                	<field name="date"/>
-                	<field name="of_categorie_id"/>
-                	<field name="date_deadline"/>
+                    <field name="date"/>
+                    <field name="of_categorie_id"/>
+                    <field name="date_deadline"/>
                 </field>
                 <field name="email_from" position="after">
-                	<field name="of_canal_id"/>
+                    <field name="of_canal_id"/>
                 </field>
                 <field name="project_id" position="attributes">
-                	<attribute name="invisible">1</attribute>
+                    <attribute name="invisible">1</attribute>
                 </field>
                 <field name="task_id" position="attributes">
-                	<attribute name="invisible">1</attribute>
+                    <attribute name="invisible">1</attribute>
                 </field>
                 <field name="task_id" position="after">
 <!--  Migration     <field name="shop_id" on_change="onchange_shop_id(shop_id,partner_shop_id)"/>
@@ -127,10 +126,10 @@
 <!-- Migration      <field name="partner_shop_id" attrs="{'invisible':[('show_partner_shop','=',False)]}"/> -->
                 </field>
                 <field name="description" position="replace">
-                	<group>
-                		<field name="description" placeholder="Ajouter une note interne ..." string="Description"/>
-                    	<field name="of_piece_commande"/>
-                    	<field name="of_intervention"/>
+                    <group>
+                        <field name="description" placeholder="Ajouter une note interne ..." string="Description"/>
+                        <field name="of_piece_commande"/>
+                        <field name="of_intervention"/>
                     </group>
                 </field>
 <!-- Migration 9                <field name="categ_id" position="attributes">
@@ -140,53 +139,53 @@
                      <separator string="Description"/>
                 </separator> -->
                 <field name="partner_id" position="replace">
-                        <field name="partner_id" on_change="onchange_partner_id(partner_id)" required="1" select="1" context="{'show_address': True}"/>
-                        <field name="of_partner_id_address"/>
-                        <field name="of_partner_id_phone"/>
-                        <field name="of_partner_id_mobile"/>
-                        <field name="of_partner_id_function"/>
+                    <field name="partner_id" on_change="onchange_partner_id(partner_id)" required="1" select="1" context="{'show_address': True}"/>
+                    <field name="of_partner_id_address"/>
+                    <field name="of_partner_id_phone"/>
+                    <field name="of_partner_id_mobile"/>
+                    <field name="of_partner_id_function"/>
                 </field>
                 
                 <xpath expr="//page[@name='extra_info']/group" position="replace"/>
                 
                 <page name="extra_info" position="inside">
                     <group string="Liste de documents">
-	                    <field name="invoice_ids" nolabel="1" colspan="4" invisible="1"/>
-	                    <field name="doc_ids" nolabel="1" colspan="4" readonly="1">
-	                        <tree string="Documents" editable="bottom">
-	                            <field name="date"/>
+                        <field name="invoice_ids" nolabel="1" colspan="4" invisible="1"/>
+                        <field name="doc_ids" nolabel="1" colspan="4" readonly="1">
+                            <tree string="Documents" editable="bottom">
+                                <field name="date"/>
                                 <field name="number"/>
-	                            <field name="partner_id"/>
-	                            <field name="user_id"/>
-	                            <field name="date_due"/>
+                                <field name="partner_id"/>
+                                <field name="user_id"/>
+                                <field name="date_due"/>
                                 <field name="origin"/>
-	                            <field name="residual"/>
-	                            <field name="amount_untaxed"/>
-	                            <field name="amount_total"/>
-	                            <field name="state"/>
-	                            <field name="doc_objet" invisible="1"/>
-	                            <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
-	                        </tree>
-	                        <form string="Documents">
+                                <field name="residual"/>
+                                <field name="amount_untaxed"/>
+                                <field name="amount_total"/>
+                                <field name="state"/>
+                                <field name="doc_objet" invisible="1"/>
+                                <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
+                            </tree>
+                            <form string="Documents">
                                 <field name="number"/>
-	                            <field name="partner_id"/>
-	                            <field name="date"/>
-	                            <field name="date_due"/>
-	                            <field name="user_id"/>
+                                <field name="partner_id"/>
+                                <field name="date"/>
+                                <field name="date_due"/>
+                                <field name="user_id"/>
                                 <field name="origin"/>
-	                            <field name="residual"/>
-	                            <field name="amount_untaxed"/>
-	                            <field name="amount_total"/>
-	                            <field name="state"/>
-	                            <field name="doc_objet" invisible="1"/>
-	                            <group colspan="4" col="4">
-	                                <field name="invoice_id" attrs="{'invisible': [('doc_objet', '!=', 'account.invoice')]}"/>
-	                                <field name="sale_order_id" attrs="{'invisible': [('doc_objet', '!=', 'sale.order')]}"/>
-	                                <field name="purchase_order_id" attrs="{'invisible': [('doc_objet', '!=', 'purchase.order')]}"/>
-	                            </group>
-	                        </form>
-	                    </field>
-	                </group>
+                                <field name="residual"/>
+                                <field name="amount_untaxed"/>
+                                <field name="amount_total"/>
+                                <field name="state"/>
+                                <field name="doc_objet" invisible="1"/>
+                                <group colspan="4" col="4">
+                                    <field name="invoice_id" attrs="{'invisible': [('doc_objet', '!=', 'account.invoice')]}"/>
+                                    <field name="sale_order_id" attrs="{'invisible': [('doc_objet', '!=', 'sale.order')]}"/>
+                                    <field name="purchase_order_id" attrs="{'invisible': [('doc_objet', '!=', 'purchase.order')]}"/>
+                                </group>
+                            </form>
+                        </field>
+                    </group>
                     <group name="of_interventions" string="Interventions" groups="project.group_project_user">
                         <field colspan="4" mode="tree" name="interventions_liees" nolabel="1" widget="one2many_list"
                                groups="project.group_project_user" context="{'default_partner_id':partner_id, 'view_readonly_sav':True}">
@@ -203,7 +202,7 @@
                         </field>
                     </group>
                     <group colspan="4" string="Notes client">
-                    	<field name="partner_note" colspan="4" nolabel="1"/>
+                        <field name="partner_note" colspan="4" nolabel="1"/>
                     </group>
                 </page>
 <!--                 <field name="email_cc" position="before">
@@ -434,7 +433,7 @@
                 </form>
             </field>
         </record>  -->       
-        
+
 
         <!-- SAV suppression du filtre par défaut (par responsable)
         NE FONCTIONNE PAS car action en noupdate="1" dans project_issue
@@ -442,28 +441,28 @@
         <!--record model="ir.actions.act_window" id="project_issue.crm_case_helpdesk_act111">
               <field name="context">{}</field>
         </record-->
-        
+
         <!-- Ajout historique SAV dans vue partenaires -->
         <record id="of_project_issue_partner_form_view" model="ir.ui.view">
             <field name="name">of.project.issue.partner.form.view</field>
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
-	            <page name="historique" position="inside">
-	            	<group name="sav" string="SAV">
-	                    <field name="project_issue_ids" nolabel="1" context="{'default_partner_id':id}">
-	                        <tree string="SAV">
-	                            <field name="of_code"/>
-	                            <field name="name"/>
-	                            <field name="date"/>
-	                            <field name="date_deadline"/>
-	                            <field name="user_id"/>
-	                            <field name="priority"/>
-	                            <!-- Migration 9 <field name="state"/> -->
-	                            <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
-	                        </tree>
-	                    </field>
-                   	</group>
+                <page name="historique" position="inside">
+                    <group name="sav" string="SAV">
+                        <field name="project_issue_ids" nolabel="1" context="{'default_partner_id':id}">
+                            <tree string="SAV">
+                                <field name="of_code"/>
+                                <field name="name"/>
+                                <field name="date"/>
+                                <field name="date_deadline"/>
+                                <field name="user_id"/>
+                                <field name="priority"/>
+                                <!-- Migration 9 <field name="state"/> -->
+                                <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
+                            </tree>
+                        </field>
+                    </group>
                 </page>
             </field>
         </record>
