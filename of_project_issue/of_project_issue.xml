@@ -187,7 +187,7 @@
 	                        </form>
 	                    </field>
 	                </group>
-                    <group name="of_interventions" string="Interventions" groups="project.group_project_user"/>
+                    <group name="of_interventions" string="Interventions" groups="project.group_project_user">
                         <field colspan="4" mode="tree" name="interventions_liees" nolabel="1" widget="one2many_list"
                                groups="project.group_project_user" context="{'default_partner_id':partner_id, 'view_readonly_sav':True}">
                             <tree string="Interventions">
@@ -201,6 +201,7 @@
                                 <field name="description"/>
                             </tree>
                         </field>
+                    </group>
                     <group colspan="4" string="Notes client">
                     	<field name="partner_note" colspan="4" nolabel="1"/>
                     </group>
