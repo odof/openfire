@@ -590,16 +590,22 @@ class of_project_issue_categorie(models.Model):
     name = fields.Char(u'Catégorie', size=32)
     parent_id = fields.Many2one('of.project.issue.categorie', 'Catégorie parente', select=True, ondelete='restrict')
     sequence = fields.Integer(u'Séquence', help=u"Ordre d'affichage (plus petit en premier)")
-    
+    parent_left = fields.Integer('Left Parent', select=1)
+    parent_right = fields.Integer('Right Parent', select=1)
+
     _constraints = [
         (models.Model._check_recursion, 'Error ! You can not create recursive category.', ['parent_id'])
     ]
-    
-    _order = 'sequence, name'
+
     _defaults = {
         'sequence' : 10
     }
-    
+
+    _parent_name = "parent_id"
+    _parent_store = True
+    _parent_order = 'sequence, name'
+    _order = 'parent_left'
+
     # Pour afficher la hiérarchie des catégories
     @api.multi
     def name_get(self):
