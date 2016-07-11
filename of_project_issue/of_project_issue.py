@@ -621,6 +621,26 @@ class of_project_issue_categorie(models.Model):
             name = ' / '.join(name[::-1])
             res.append((record.id, name))
         return res
+    
+    @api.multi
+    def _get_children(self):
+        """ Retourne la liste des ids ainsi que leurs enfants et petits-enfants en respectant self._order
+        """
+        domain = ['|' for _ in xrange(len(self.ids)-1)]
+        for categ in self.read(['parent_left','parent_right']):
+            domain += ['&',('parent_left','>=',categ['parent_left']),('parent_right','<=',categ['parent_right'])]
+        return self.search(domain)
+    
+    @api.model
+    def name_search(self, name, args=None, operator='ilike', limit=100):
+        """Pour inclure la recherche sur le nom des parents"""
+        args = list(args or [])
+        if not (name == '' and operator == 'ilike'):
+            args += [(self._rec_name, operator, name)]
+        categs = self.search(args, limit=limit)
+        categs = categs._get_children()
+        res = categs.name_get()
+        return res
 
 # Canal SAV
 class of_project_issue_canal(osv.Model):
