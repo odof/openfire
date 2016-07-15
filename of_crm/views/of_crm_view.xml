@@ -9,7 +9,7 @@
             <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
             <field name="arch" type="xml">
                 <div class="o_address_format" position="after">
-                    <field name="website" widget="url"/>
+                    <field name="of_website" widget="url"/>
                 </div>
             </field>
         </record>
@@ -21,7 +21,7 @@
             <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
             <field name="arch" type="xml">
                 <field name="phone" position="after">
-                    <field name="website" widget="url"/>
+                    <field name="of_website" widget="url"/>
                 </field>
             </field>
         </record>
@@ -56,7 +56,7 @@
                 </field>
                 <field name="team_id" position="after">
                     <field name="priority"/>
-                    <field name="tag_ids"/>
+                    <field name="of_tag_ids"/>
                 </field>
             </field>
         </record>

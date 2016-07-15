@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-import of_crm_odoo
+import of_crm
