@@ -7,7 +7,7 @@ class crm_lead(models.Model):
     _inherit = 'crm.lead'
 
     of_website = fields.Char('Site web', help="Website of Lead", oldname="website")
-    of_tag_ids = fields.Many2many('res.partner.category', 'crm_lead_res_partner_category_rel', 'lead_id', 'category_id', string='Tags', help="Classify and analyze your lead/opportunity categories like: Training, Service", oldname="tag_ids")
+    tag_ids = fields.Many2many('res.partner.category', 'crm_lead_res_partner_category_rel', 'lead_id', 'category_id', string='Tags', help="Classify and analyze your lead/opportunity categories like: Training, Service", oldname="of_tag_ids")
     
     # Récupération du site web à la sélection du partenaire
     def on_change_partner_id(self, cr, uid, ids, partner_id, context=None):
