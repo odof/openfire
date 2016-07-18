@@ -262,7 +262,11 @@ class of_compose_mail(models.TransientModel):
             os.rename(generated_pdf, generated_pdf + '.pdf')
             with open(generated_pdf + '.pdf', "rb") as encode:
                 encoded_file = base64.b64encode(encode.read())
-            self.write({'res_file': encoded_file, 'res_file_name': 'Courrier.pdf'})
+            if self._context['model'] == 'project.issue':
+                res_file_name = datas['sno'] + ' ' + datas['cnom'] + '.pdf'
+            else:
+                res_file_name = 'courrier.pdf'
+            self.write({'res_file': encoded_file, 'res_file_name': res_file_name})
 
         view = self.env.ref('of_gesdoc.view_courrier_wizard2_file')
         return {
