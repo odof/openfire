@@ -262,8 +262,11 @@ class of_compose_mail(models.TransientModel):
             os.rename(generated_pdf, generated_pdf + '.pdf')
             with open(generated_pdf + '.pdf', "rb") as encode:
                 encoded_file = base64.b64encode(encode.read())
-            if self._context['model'] == 'project.issue':
+            # Si c'est un rapport généré depuis un SAV, on prend le no du SAV et le nom du client
+            if self._context['model'] == 'project.issue' and 'cnom' in datas and 'sno' in datas and datas['cnom'] and datas['sno']:
                 res_file_name = datas['sno'] + ' ' + datas['cnom'] + '.pdf'
+            elif self._context['model'] == 'project.issue' and '1_Client_Nom' in datas and '1_num_sav' in datas and datas['1_Client_Nom'] and datas['1_num_sav']:
+                res_file_name = datas['1_num_sav'] + ' ' + datas['1_Client_Nom'] + '.pdf'
             else:
                 res_file_name = 'courrier.pdf'
             self.write({'res_file': encoded_file, 'res_file_name': res_file_name})
