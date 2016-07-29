@@ -145,6 +145,7 @@ class project_issue(osv.Model):
         #                                            }),
         'interventions_liees': fields_oldapi.one2many('of.planning.pose', 'sav_id', 'Poses liees', readonly=False),
         # MG 'show_partner_shop'  : fields_oldapi.function(_get_show_partner_shop, type="boolean", string="Magasin différent"),
+        'of_partner_id_ref': fields_oldapi.related('partner_id', 'ref', readonly=True, type='char', string=u'Réf. contact'),
         'of_partner_id_address': fields_oldapi.related('partner_id', 'contact_address', readonly=True, type='char', string=u'Adresse'),
         'of_partner_id_phone': fields_oldapi.related('partner_id', 'phone', readonly=True, type='char', string=u'Téléphone'),
         'of_partner_id_mobile': fields_oldapi.related('partner_id', 'mobile', readonly=True, type='char', string=u'Mobile'),
@@ -287,7 +288,7 @@ class project_issue(osv.Model):
             res = {'value':{'doc_ids': docs}}
         
         partner = self.pool.get('res.partner').browse(cr, uid, partner_id, context=context) 
-        res['value'].update({'of_partner_id_address': partner.contact_address, 'of_partner_id_phone': partner.phone, 'of_partner_id_mobile': partner.mobile, 'of_partner_id_function': partner.function})
+        res['value'].update({'of_partner_id_ref': partner.ref, 'of_partner_id_address': partner.contact_address, 'of_partner_id_phone': partner.phone, 'of_partner_id_mobile': partner.mobile, 'of_partner_id_function': partner.function})
     
 # Migration of_magasin pas encore migré
 #         if partner_id:
