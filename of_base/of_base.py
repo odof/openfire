@@ -3,6 +3,123 @@
 import openerp
 from openerp import models, api,tools
 from openerp.osv import osv
+from openerp.exceptions import UserError
+
+class OFReadGroup(osv.AbstractModel):
+    _name = 'of.readgroup'
+
+    def read_group(self, cr, uid, domain, fields, groupby, offset=0, limit=None, context=None, orderby=False, lazy=True):
+        u"""
+        Modification de la classe readgroup pour permettre un ajout de champs personnalisés
+        """
+        if context is None:
+            context = {}
+        self.check_access_rights(cr, uid, 'read')
+        query = self._where_calc(cr, uid, domain, context=context)
+        fields = fields or self._columns.keys()
+
+        groupby = [groupby] if isinstance(groupby, basestring) else groupby
+        groupby_list = groupby[:1] if lazy else groupby
+        annotated_groupbys = [
+            self._read_group_process_groupby(cr, uid, gb, query, context=context)
+            for gb in groupby_list
+        ]
+        groupby_fields = [g['field'] for g in annotated_groupbys]
+        order = orderby or ','.join([g for g in groupby_list])
+        groupby_dict = {gb['groupby']: gb for gb in annotated_groupbys}
+
+        self._apply_ir_rules(cr, uid, query, 'read', context=context)
+        for gb in groupby_fields:
+            assert gb in fields, "Fields in 'groupby' must appear in the list of fields to read (perhaps it's missing in the list view?)"
+            groupby_def = self._columns.get(gb) or (self._inherit_fields.get(gb) and self._inherit_fields.get(gb)[2])
+            # Modif OpenFire : Un champ custom peut ne pas être présent en base de données
+            if not getattr(groupby_def, 'of_custom_groupby', False):
+                assert groupby_def and groupby_def._classic_write, "Fields in 'groupby' must be regular database-persisted fields (no function or related fields), or function fields with store=True"
+                if not (gb in self._fields):
+                    # Don't allow arbitrary values, as this would be a SQL injection vector!
+                    raise UserError(_('Invalid group_by specification: "%s".\nA group_by specification must be a list of valid fields.') % (gb,))
+
+        aggregated_fields = [
+            f for f in fields
+            if f not in ('id', 'sequence')
+            if f not in groupby_fields
+            if f in self._fields
+            if self._fields[f].type in ('integer', 'float', 'monetary')
+            if getattr(self._fields[f].base_field.column, '_classic_write', False)
+        ]
+
+        field_formatter = lambda f: (
+            self._fields[f].group_operator or 'sum',
+            self._inherits_join_calc(cr, uid, self._table, f, query, context=context),
+            f,
+        )
+        select_terms = ['%s(%s) AS "%s" ' % field_formatter(f) for f in aggregated_fields]
+
+        for gb in annotated_groupbys:
+            select_terms.append('%s as "%s" ' % (gb['qualified_field'], gb['groupby']))
+
+        groupby_terms, orderby_terms = self._read_group_prepare(cr, uid, order, aggregated_fields, annotated_groupbys, query, context=context)
+        from_clause, where_clause, where_clause_params = query.get_sql()
+        if lazy and (len(groupby_fields) >= 2 or not context.get('group_by_no_leaf')):
+            count_field = groupby_fields[0] if len(groupby_fields) >= 1 else '_'
+        else:
+            count_field = '_'
+        count_field += '_count'
+
+        prefix_terms = lambda prefix, terms: (prefix + " " + ",".join(terms)) if terms else ''
+        prefix_term = lambda prefix, term: ('%s %s' % (prefix, term)) if term else ''
+
+        query = """
+            SELECT min(%(table)s.id) AS id, count(%(table)s.id) AS %(count_field)s %(extra_fields)s
+            FROM %(from)s
+            %(where)s
+            %(groupby)s
+            %(orderby)s
+            %(limit)s
+            %(offset)s
+        """ % {
+            'table': self._table,
+            'count_field': count_field,
+            'extra_fields': prefix_terms(',', select_terms),
+            'from': from_clause,
+            'where': prefix_term('WHERE', where_clause),
+            'groupby': prefix_terms('GROUP BY', groupby_terms),
+            'orderby': prefix_terms('ORDER BY', orderby_terms),
+            'limit': prefix_term('LIMIT', int(limit) if limit else None),
+            'offset': prefix_term('OFFSET', int(offset) if limit else None),
+        }
+        cr.execute(query, where_clause_params)
+        fetched_data = cr.dictfetchall()
+
+        if not groupby_fields:
+            return fetched_data
+
+        # Modif OpenFire : Recherche directe du nom par name_get sur l'objet ciblé
+        #  (la méthode standart Odoo procédait par lecture du champ sur l'objet courant,
+        #   ce qui est impossible dans le cadre d'un champ one2many)
+        for gb in annotated_groupbys:
+            if gb['type'] == 'many2one':
+                gb_field = gb['field']
+                groupby_def = self._columns.get(gb_field) or (self._inherit_fields.get(gb_field) and self._inherit_fields.get(gb_field)[2])
+                rel = groupby_def._obj
+                gb_obj = self.pool[rel]
+                gb_ids = [r[gb_field] for r in fetched_data if r[gb_field]]
+                gb_dict = {d[0]: d for d in gb_obj.name_get(cr, uid, gb_ids, context=context)}
+                for d in fetched_data:
+                    d[gb_field] = gb_dict.get(d[gb_field], False)
+
+        data = map(lambda r: {k: self._read_group_prepare_data(k,v, groupby_dict, context) for k,v in r.iteritems()}, fetched_data)
+        result = [self._read_group_format_result(d, annotated_groupbys, groupby, groupby_dict, domain, context) for d in data]
+        if lazy and groupby_fields[0] in self._group_by_full:
+            # Right now, read_group only fill results in lazy mode (by default).
+            # If you need to have the empty groups in 'eager' mode, then the
+            # method _read_group_fill_results need to be completely reimplemented
+            # in a sane way
+            result = self._read_group_fill_results(cr, uid, domain, groupby_fields[0], groupby[len(annotated_groupbys):],
+                                                       aggregated_fields, count_field, result, read_group_order=order,
+                                                       context=context)
+        return result
+
 
 # Migration : champs rml_footer2 n'existe plus dans Odoo 8
 #class res_company(osv.Model):
