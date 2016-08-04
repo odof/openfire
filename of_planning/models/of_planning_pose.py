@@ -44,7 +44,7 @@ class of_planning_equipe(osv.Model):
 
     name = fields.Char('Equipe', size=128, required=True)
     note = fields.Text('Description')
-    employee_ids = fields.Many2many('hr.employee', 'of_planning_employee_rel', 'employee_id', 'equipe_id', u'Employés')
+    employee_ids = fields.Many2many('hr.employee', 'of_planning_employee_rel', 'equipe_id', 'employee_id', u'Employés')
     active = fields.Boolean('Actif', default=True)
     category_ids = fields.Many2many('hr.employee.category', 'equipe_category_rel', 'equipe_id', 'category_id', u'Catégories')
     pose_ids = fields.One2many('of.planning.pose', 'poseur_id', u'Poses liées')
@@ -86,6 +86,7 @@ class of_planning_pose_raison(models.Model):
 class of_planning_pose(osv.Model):
     _name = "of.planning.pose"
     _description = "Planning de pose OpenFire"
+    _inherit = "of.readgroup"
 
     def _get_city(self, cr, uid, ids, *args):#name, arg, context=None):
         partner_obj = self.pool['res.partner']
@@ -155,6 +156,9 @@ class of_planning_pose(osv.Model):
         tache_ids = self.pool['of.planning.tache'].search(cr, uid, args, context=context)
         return [('tache_id', 'in', tache_ids)]
 
+    def search_gb_employee_id(self, cr, uid, obj, name, args, context):
+        return [('employee_ids', 'in', [args[0][2]])]
+
     _columns = {
         'name'                 : fields_old.char(u'Libellé', size=64, required=True),
         'date'                 : fields_old.datetime('Date intervention', required=True),
@@ -171,6 +175,7 @@ class of_planning_pose(osv.Model):
         'raison_id'            : fields_old.many2one('of.planning.pose.raison', 'Raison'),
         'tache_id'             : fields_old.many2one('of.planning.tache', 'Tâche', required=True),
         'poseur_id'            : fields_old.many2one('of.planning.equipe', 'Intervenant', required=True),
+        'employee_ids'         : fields_old.related('poseur_id', 'employee_ids', type='one2many', relation='hr.employee', string='Intervenants', readonly=True),
         'state'                : fields_old.selection([('Brouillon', 'Brouillon'), ('Planifie', u'Planifié'), ('Confirme', u'Confirmé'),
                                                        ('Pose', u'Réalisé'), ('Annule', u'Annulé'), ('Reporte', u'Reporté'), ('Inacheve', u'Inachevé')],
                                                       'Etat', size=16, readonly=True),
@@ -187,6 +192,8 @@ class of_planning_pose(osv.Model):
         'category_id'          : fields_old.function(_get_category, method=True, type='many2one', obj="hr.employee.category", string=u"Type de tâche", store=False,
                                                  fnct_search=_search_category),
         'verif_dispo'          : fields_old.boolean(u'Vérif', help=u"Vérifier la disponibilité de l'équipe sur ce créneau"),
+        'gb_employee_id'       : fields_old.function(lambda *args: [], fnct_search=search_gb_employee_id,
+                                                     string="Intervenant", type="many2one", relation="hr.employee", of_custom_groupby=True),
     }
     _defaults = {
         'user_id'    : lambda self, cr, uid, context: uid,
@@ -358,6 +365,26 @@ class of_planning_pose(osv.Model):
                     if rdv:
                         raise osv.except_osv('Attention', u'Cette équipe a déjà %s rendez-vous sur ce créneau' % (len(rdv),))
         return super(of_planning_pose, self).write(cr, uid, ids, vals, context=context)
+
+    @api.model
+    def _read_group_process_groupby(self, gb, query):
+        if gb != 'gb_employee_id':
+            return super(of_planning_pose, self)._read_group_process_groupby(gb, query)
+
+        alias, _ = query.add_join(
+            (self._table, 'of_planning_employee_rel', 'poseur_id', 'equipe_id', 'poseur_id'),
+            implicit=False, outer=True,
+        )
+
+        return {
+            'field': gb,
+            'groupby': gb,
+            'type': 'many2one',
+            'display_format': None,
+            'interval': None,
+            'tz_convert': False,
+            'qualified_field': '"%s".employee_id' % (alias,)
+        }
 
 class res_partner(models.Model):
     _inherit = "res.partner"

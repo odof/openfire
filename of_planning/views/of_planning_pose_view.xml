@@ -68,6 +68,7 @@
                        <filter string="Utilisateur" icon="terp-personal" domain="[]" context="{'group_by' : 'user_id'}"/>
                        <filter string="Tache" icon="terp-folder-blue" domain="[]" context="{'group_by' : 'tache_id'}"/>
                        <filter string="Equipe" icon="terp-partner" domain="[]" context="{'group_by' : 'poseur_id'}"/>
+                       <filter string="Intervenant" icon="terp-partner" domain="[]" context="{'group_by' : 'gb_employee_id'}"/>
                        <filter string="Magasin" icon="terp-go-home" domain="[]" context="{'group_by' : 'company_id'}"/>
                    </group>
                     <newline/>
