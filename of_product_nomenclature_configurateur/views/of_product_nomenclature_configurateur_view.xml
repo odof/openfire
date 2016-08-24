@@ -115,7 +115,7 @@
         </record>
 
         <!-- Insertion du bouton "Configurateur" dans vue devis/commandes -->
-        <record id="of_product_configurateur_view_order_form" model="ir.ui.view">
+<!--         <record id="of_product_configurateur_view_order_form" model="ir.ui.view">
             <field name="name">of.configurateur.sale.order.form</field>
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form"/>
@@ -124,10 +124,10 @@
                     <button name="action_wizard_configurateur" string="Configurateur" type="object" states="draft"/>
                 </button>
             </field>
-        </record>
+        </record> -->
         
         <!-- Insertion du bouton "Configurateur" dans vue factures -->
-        <record id="of_product_configurateur_view_invoice_form" model="ir.ui.view">
+<!--         <record id="of_product_configurateur_view_invoice_form" model="ir.ui.view">
             <field name="name">of.configurateur.account.invoice.form</field>
             <field name="model">account.invoice</field>
             <field name="inherit_id" ref="account.invoice_form"/>
@@ -136,17 +136,17 @@
                     <button name="action_wizard_configurateur" string="Configurateur" type="object" states="draft"/>
                 </button>
             </field>
-        </record>
+        </record> -->
         
         <!-- Action pour appeler le wizard -->
-        <record id="action_of_product_configurateur_wizard" model="ir.actions.act_window">
+<!--         <record id="action_of_product_configurateur_wizard" model="ir.actions.act_window">
             <field name="name">Wizard configurateur</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">of.product.configurateur.wizard</field>
             <field name="view_type">form</field>
             <field name="view_mode">form</field>
             <field name="target">new</field>
-        </record>
+        </record> -->
 
      </data>
 </openerp>
