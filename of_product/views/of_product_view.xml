@@ -1,0 +1,21 @@
+<openerp>
+    <data>
+
+<!--##############################################################################-->
+<!--###########################______Product product______###########################-->
+<!--##############################################################################-->
+
+        <!-- Ajout champ frais de port -->
+        <record id="of_product_product_form_view" model="ir.ui.view">
+            <field name="name">of.product.product.form</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="arch" type="xml">
+                <field name="barcode" position="after">
+                    <field name="of_frais_port" widget='monetary'/>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</openerp>
