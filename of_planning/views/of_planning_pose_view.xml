@@ -319,6 +319,7 @@
                     <field name="cout_annuel" string="Coût annuel"/-->
                     <field name="employee_ids"/>
                     <field name="note"/>
+                    <field name="sequence"/>
                     <!--field name="color_id"/-->
                 </tree>
             </field>
@@ -340,6 +341,7 @@
                         </div>
                         <group colspan="2" col="6">
                             <field name="active"/>
+                            <field name="sequence"/>
                             <newline/>
                             <group name="horaires" col="4">
                                 <separator string="Horaires de travail" colspan="4"/>

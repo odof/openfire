@@ -29,6 +29,7 @@ Si cette option n'est pas cochée, seule la tâche le plus souvent effectuée da
 class of_planning_equipe(osv.Model):
     _name = "of.planning.equipe"
     _description = "Equipe de pose"
+    _order = "sequence, name"
 
     def copy(self, cr, uid, id, default=None, context=None):
         if not default:
@@ -53,6 +54,8 @@ class of_planning_equipe(osv.Model):
     hor_mf = fields.Float('Matin fin', required=True, digits=(12, 5))
     hor_ad = fields.Float(u'Après-midi début', required=True, digits=(12, 5))
     hor_af = fields.Float(u'Après-midi fin', required=True, digits=(12, 5))
+    sequence = fields.Integer(u'Séquence', help=u"Ordre d'affichage (plus petit en premier)")
+        
 
     @api.onchange('employee_ids')
     def onchange_employees(self):
