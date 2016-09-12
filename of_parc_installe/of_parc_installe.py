@@ -81,8 +81,13 @@ class project_issue(osv.Model):
         'of_produit_installe_id': fields.many2one('of.parc.installe', 'Produit installé', readonly=False),
         'product_name_id': fields.many2one('product.product', 'Désignation', ondelete='restrict'),
         'product_category_id': fields.related('product_name_id', 'categ_id', 'name', readonly=True, type='char', string=u'Famille',
-                                              store={'project.issue': (lambda self, cr, uid, ids, c={}: ids, ['product_name_id'], 10),
-                                                     'product.product': (_get_product_sav_ids, ['categ_id'], 10)}),
+            store={'project.issue': (lambda self, cr, uid, ids, c={}: ids, ['product_name_id'], 10),
+            'product.product': (_get_product_sav_ids, ['categ_id'], 10)}),
+        'of_parc_installe_client_nom': fields.related('of_produit_installe_id', 'client_id', 'name', readonly=True, type='text', string=u'Client machine installée'),
+        'of_parc_installe_client_adresse': fields.related('of_produit_installe_id', 'client_id', 'contact_address', readonly=True, type='text', string=u'Adresse client'),
+        'of_parc_installe_site_nom': fields.related('of_produit_installe_id', 'site_adresse_id', 'name', readonly=True, type='char', string=u"Lieu d'installation"),
+        'of_parc_installe_site_adresse': fields.related('of_produit_installe_id', 'site_adresse_id', 'contact_address', readonly=True, type='char', string=u"Adresse d'installation"),
+        'of_parc_installe_note': fields.related('of_produit_installe_id', 'note', readonly=True, type='char', string=u'Note machine installée')
     }
     
     
@@ -91,7 +96,14 @@ class project_issue(osv.Model):
         if of_produit_installe_id:
             parc = self.pool.get('of.parc.installe').browse(cr, uid, of_produit_installe_id, context=context)
             if parc and parc.product_id:
-                return {'value': {'product_name_id': parc.product_id.id}}
+                return {'value': {
+                    'product_name_id': parc.product_id.id,
+                    'of_parc_installe_client_nom': parc.client_id.name,
+                    'of_parc_installe_client_adresse': parc.client_id.contact_address,
+                    'of_parc_installe_site_nom': parc.site_adresse_id.name,
+                    'of_parc_installe_site_adresse': parc.site_adresse_id.contact_address,
+                    'of_parc_installe_note': parc.note}
+                }
         return
     
     def on_change_product_name_id(self, cr, uid, ids, of_produit_installe_id, context=None):
