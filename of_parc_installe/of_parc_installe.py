@@ -83,11 +83,11 @@ class project_issue(osv.Model):
         'product_category_id': fields.related('product_name_id', 'categ_id', 'name', readonly=True, type='char', string=u'Famille',
             store={'project.issue': (lambda self, cr, uid, ids, c={}: ids, ['product_name_id'], 10),
             'product.product': (_get_product_sav_ids, ['categ_id'], 10)}),
-        'of_parc_installe_client_nom': fields.related('of_produit_installe_id', 'client_id', 'name', readonly=True, type='text', string=u'Client machine installée'),
+        'of_parc_installe_client_nom': fields.related('of_produit_installe_id', 'client_id', 'name', readonly=True, type='text', string=u'Client produit installé'),
         'of_parc_installe_client_adresse': fields.related('of_produit_installe_id', 'client_id', 'contact_address', readonly=True, type='text', string=u'Adresse client'),
         'of_parc_installe_site_nom': fields.related('of_produit_installe_id', 'site_adresse_id', 'name', readonly=True, type='char', string=u"Lieu d'installation"),
         'of_parc_installe_site_adresse': fields.related('of_produit_installe_id', 'site_adresse_id', 'contact_address', readonly=True, type='char', string=u"Adresse d'installation"),
-        'of_parc_installe_note': fields.related('of_produit_installe_id', 'note', readonly=True, type='char', string=u'Note machine installée')
+        'of_parc_installe_note': fields.related('of_produit_installe_id', 'note', readonly=True, type='char', string=u'Note produit installé')
     }
     
     
