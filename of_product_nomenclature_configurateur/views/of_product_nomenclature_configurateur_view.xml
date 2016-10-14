@@ -39,9 +39,9 @@
                 <form>
                     <group>
                         <field name="name"/>
-                        <field name="sequence"/>
                         <field name="nb_selection_min"/>
                         <field name="nb_selection_max"/>
+                        <field name="sequence"/>
                     </group>
                 </form>
             </field>
