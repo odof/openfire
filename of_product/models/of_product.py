@@ -18,6 +18,7 @@ class of_product_template(models.Model):
 
     @api.depends('product_variant_ids', 'product_variant_ids.of_frais_port')
     def _compute_of_frais_port(self):
+        # Frais de port du product template : si la valeur du frais de port de toutes les variantes est le même, on la prend, sinon zéro.
         for template in self:
             frais_port = ""
             identique = True
@@ -33,5 +34,16 @@ class of_product_template(models.Model):
 
     @api.one
     def _set_of_frais_port(self):
-        #if len(self.product_variant_ids) == 1:
+        # Fixer le frais de port depuis le product template : on met le frais de port pour toutes les variantes.
         self.product_variant_ids.write({'of_frais_port': self.of_frais_port})
+
+
+class of_product_product(models.Model):
+    _inherit = "product.product"
+
+    @api.model
+    def _add_missing_default_values(self, values):
+        # Mettre la référence produit (default_code) du template par défaut lors de la création d'une variante.
+        if 'product_tmpl_id' in values and values['product_tmpl_id']:
+            values['default_code'] = self.env['product.template'].browse(values['product_tmpl_id']).default_code
+        return super(of_product_product, self)._add_missing_default_values(values)
