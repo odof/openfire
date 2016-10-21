@@ -163,6 +163,15 @@ class project_issue(osv.Model):
     
     _order = "date desc"
 
+    def on_change_project(self, cr, uid, ids, project_id, context=None):
+        res = super(project_issue, self).on_change_project(cr, uid, ids, project_id, context=context)
+        if not project_id:
+            value = res['value']
+            for field in ('partner_id', 'email_from'):
+                if field in value:
+                    del value[field]
+        return res
+
     # Quand on clique sur le bouton "Ouvrir" dans la liste des SAV pour aller sur le SAV
     def button_open_of_sav(self, cr, uid, ids, *args):
         sav_id = isinstance(ids, (int, long)) and ids or ids[0]
