@@ -6,6 +6,7 @@ import openerp
 from openerp import SUPERUSER_ID
 from openerp.osv import fields as fields_oldapi, osv # Pour l'ancienne API
 from openerp import models, fields, api # Pour la nouvelle API
+from openerp.osv.expression import NEGATIVE_TERM_OPERATORS, TERM_OPERATORS_NEGATION
 import time
 import base64
 import copy
@@ -645,10 +646,17 @@ class of_project_issue_categorie(models.Model):
     def name_search(self, name, args=None, operator='ilike', limit=100):
         """Pour inclure la recherche sur le nom des parents"""
         args = list(args or [])
+        negation = operator in NEGATIVE_TERM_OPERATORS
+        if negation:
+            operator = TERM_OPERATORS_NEGATION[operator]
         if not (name == '' and operator == 'ilike'):
             args += [(self._rec_name, operator, name)]
-        categs = self.search(args, limit=limit)
+        categs = self.search(args)
         categs = categs._get_children()
+        if negation:
+            categs = self.search([('id', 'not in', categs._ids)], limit=limit)
+        else:
+            categs = categs[:limit]
         res = categs.name_get()
         return res
 
