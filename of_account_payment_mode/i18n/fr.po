@@ -1,0 +1,128 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#   * of_account_payment_mode
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 9.0c\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-10-26 08:16+0000\n"
+"PO-Revision-Date: 2016-10-26 08:16+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_account_payment_mode
+#: model:ir.model.fields,help:of_account_payment_mode.field_of_account_payment_mode_journal_id
+msgid "Bank or Cash Journal for the Payment Mode"
+msgstr "Journal de banque ou de caisse pour le mode de paiement"
+
+#. module: of_account_payment_mode
+#: model:ir.model.fields,field_description:of_account_payment_mode.field_of_account_payment_mode_company_id
+msgid "Company"
+msgstr "Société"
+
+#. module: of_account_payment_mode
+#: model:ir.model,name:of_account_payment_mode.model_account_abstract_payment
+msgid "Contains the logic shared between models which allows to register payments"
+msgstr "Contient la logique partagée entre les modèles qui permet d'enregistrer les paiements"
+
+#. module: of_account_payment_mode
+#: model:ir.model.fields,field_description:of_account_payment_mode.field_of_account_payment_mode_create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: of_account_payment_mode
+#: model:ir.model.fields,field_description:of_account_payment_mode.field_of_account_payment_mode_create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: of_account_payment_mode
+#: code:addons/of_account_payment_mode/models/of_account_payment_mode.py:80
+#, python-format
+msgid "Creating payment with account journal instead of payment mode."
+msgstr "Création d'un paiement avec un journal au lieu d'un mode de paiement."
+
+#. module: of_account_payment_mode
+#: model:ir.model.fields,field_description:of_account_payment_mode.field_of_account_payment_mode_display_name
+msgid "Display Name"
+msgstr "Afficher le nom"
+
+#. module: of_account_payment_mode
+#: model:ir.model.fields,field_description:of_account_payment_mode.field_of_account_payment_mode_id
+msgid "ID"
+msgstr "ID"
+
+#. module: of_account_payment_mode
+#: model:ir.model.fields,field_description:of_account_payment_mode.field_of_account_payment_mode_journal_id
+msgid "Journal"
+msgstr "Journal"
+
+#. module: of_account_payment_mode
+#: model:ir.model.fields,field_description:of_account_payment_mode.field_of_account_payment_mode___last_update
+msgid "Last Modified on"
+msgstr "Dernière modification le"
+
+#. module: of_account_payment_mode
+#: model:ir.model.fields,field_description:of_account_payment_mode.field_of_account_payment_mode_write_uid
+msgid "Last Updated by"
+msgstr "Mis à jour par"
+
+#. module: of_account_payment_mode
+#: model:ir.model.fields,field_description:of_account_payment_mode.field_of_account_payment_mode_write_date
+msgid "Last Updated on"
+msgstr "Mis à jour le"
+
+#. module: of_account_payment_mode
+#: model:ir.model.fields,help:of_account_payment_mode.field_of_account_payment_mode_name
+msgid "Mode of Payment"
+msgstr "Mode de paiement"
+
+#. module: of_account_payment_mode
+#: model:ir.model.fields,field_description:of_account_payment_mode.field_of_account_payment_mode_name
+msgid "Name"
+msgstr "Nom"
+
+#. module: of_account_payment_mode
+#: model:ir.model.fields,field_description:of_account_payment_mode.field_of_account_payment_mode_partner_id
+msgid "Partner"
+msgstr "Partenaire"
+
+#. module: of_account_payment_mode
+#: model:ir.actions.act_window,name:of_account_payment_mode.of_action_payment_mode_form
+#: model:ir.ui.menu,name:of_account_payment_mode.of_menu_action_payment_mode_form
+msgid "Payment Modes"
+msgstr "Modes de paiement"
+
+#. module: of_account_payment_mode
+#: model:ir.model.fields,field_description:of_account_payment_mode.field_account_abstract_payment_of_payment_mode_id
+#: model:ir.model.fields,field_description:of_account_payment_mode.field_account_payment_of_payment_mode_id
+#: model:ir.model.fields,field_description:of_account_payment_mode.field_account_register_payments_of_payment_mode_id
+#: model:ir.model,name:of_account_payment_mode.model_of_account_payment_mode
+#: model:ir.ui.view,arch_db:of_account_payment_mode.of_view_account_payment_mode_form
+#: model:ir.ui.view,arch_db:of_account_payment_mode.of_view_account_payment_search
+msgid "Payment mode"
+msgstr "Mode de paiement"
+
+#. module: of_account_payment_mode
+#: model:ir.model,name:of_account_payment_mode.model_account_payment
+msgid "Payments"
+msgstr "Paiements"
+
+#. module: of_account_payment_mode
+#: model:ir.model,name:of_account_payment_mode.model_account_register_payments
+msgid "Register payments on multiple invoices"
+msgstr "Enregistrez des paiements sur plusieurs factures"
+
+#. module: of_account_payment_mode
+#: model:ir.model.fields,help:of_account_payment_mode.field_of_account_payment_mode_journal_type
+msgid "Select 'Sale' for customer invoices journals. Select 'Purchase' for vendor bills journals. Select 'Cash' or 'Bank' for journals that are used in customer or vendor payments. Select 'General' for miscellaneous operations journals. Select 'Opening/Closing Situation' for entries generated for new fiscal years."
+msgstr "Sélectionnez \"Vente\" pour le journal de ventes. Sélectionnez \"Achats\" pour le journal des achats. Sélectionnez \"Caisse\" ou \"Banque\" pour les journaux qui sont utilisés dans les règlements des clients ou des fournisseurs. Sélectionnez \"Général\" pour les journaux d'opérations diverses. Sélectionnez \"Ouverture / Fermeture\" pour les écritures générées lors des nouveaux exercices."
+
+#. module: of_account_payment_mode
+#: model:ir.model.fields,field_description:of_account_payment_mode.field_of_account_payment_mode_journal_type
+msgid "Type"
+msgstr "Type"

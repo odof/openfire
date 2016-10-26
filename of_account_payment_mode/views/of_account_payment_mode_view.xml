@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!--                  PAYMENT MODES                 -->
+
+        <record id="of_view_account_payment_mode_form" model="ir.ui.view">
+            <field name="name">of.account.payment.mode.form</field>
+            <field name="model">of.account.payment.mode</field>
+            <field name="arch" type="xml">
+                <form string="Payment mode" version="7">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="name"/></h1>
+                        </div>
+                        <group>
+                            <field name="company_id"/>
+                            <field name="journal_id"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="of_action_payment_mode_form" model="ir.actions.act_window">
+            <field name="name">Payment Modes</field>
+            <field name="res_model">of.account.payment.mode</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem action="of_action_payment_mode_form"
+            id="of_menu_action_payment_mode_form" parent="account.account_management_menu" sequence="10"/>
+
+
+        <!--                    PAYMENTS                    -->
+
+        <record id="of_view_account_payment_tree" model="ir.ui.view">
+            <field name="name">account.payment.tree</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_tree"/>
+            <field name="arch" type="xml">
+                <field name="journal_id" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="journal_id" position="after">
+                    <field name="of_payment_mode_id"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="of_view_account_supplier_payment_tree" model="ir.ui.view">
+            <field name="name">account.supplier.payment.tree</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_supplier_payment_tree"/>
+            <field name="arch" type="xml">
+                <field name="journal_id" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="journal_id" position="after">
+                    <field name="of_payment_mode_id"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="of_view_account_payment_search" model="ir.ui.view">
+            <field name="name">account.payment.search</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_search"/>
+            <field name="arch" type="xml">
+                <field name="journal_id" position="before">
+                    <field name="of_payment_mode_id"/>
+                </field>
+                <filter name="gb_journal_id" position="before">
+                    <filter string="Payment mode" domain="[]" context="{'group_by': 'of_payment_mode_id'}"/>
+                </filter>
+            </field>
+        </record>
+
+        <record id="of_view_account_payment_form" model="ir.ui.view">
+            <field name="name">account.payment.form</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_form"/>
+            <field name="arch" type="xml">
+                <field name="journal_id" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="journal_id" position="after">
+                    <field name="of_payment_mode_id" widget="selection" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="of_view_account_payment_graph" model="ir.ui.view">
+            <field name="name">account.payment.graph</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_graph"/>
+            <field name="arch" type="xml">
+                <field name="journal_id" position="after">
+                    <field name="of_payment_mode_id"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="of_view_account_payment_invoice_form" model="ir.ui.view">
+            <field name="name">account.payment.invoice.form</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_invoice_form"/>
+            <field name="arch" type="xml">
+                <field name="journal_id" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="journal_id" position="after">
+                    <field name="of_payment_mode_id" widget="selection"/>
+                </field>
+            </field>
+        </record>
+
+        <!-- Register payment from several invoices -->
+
+        <record id="of_view_account_payment_from_invoices" model="ir.ui.view">
+            <field name="name">account.register.payments.wizard</field>
+            <field name="model">account.register.payments</field>
+            <field name="inherit_id" ref="account.view_account_payment_from_invoices"/>
+            <field name="arch" type="xml">
+                <field name="journal_id" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="journal_id" position="after">
+                    <field name="of_payment_mode_id" widget="selection"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</openerp>
