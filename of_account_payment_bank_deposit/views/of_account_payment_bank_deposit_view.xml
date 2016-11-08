@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- Payment deposits -->
+
+        <record id="of_view_account_payment_bank_deposit_search" model="ir.ui.view">
+            <field name="name">of.account.payment.bank.deposit.search</field>
+            <field name="model">of.account.payment.bank.deposit</field>
+            <field name="arch" type="xml">
+                <search string="Payment deposits">
+                    <field name="name"/>
+                    <field name="journal_id" />
+                    <filter string="date"/>
+                    <separator/>
+                    <filter string="Draft" domain="[('state','=','draft')]" name='state_draft'/>
+                    <filter string="Posted" domain="[('state','=','posted')]" name='state_posted'/>
+                    <separator/>
+                    <filter string="Journal" name="gb_journal_id" domain="[]" context="{'group_by': 'journal_id'}"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="of_view_account_payment_bank_deposit_form" model="ir.ui.view">
+            <field name="name">of.account.payment.bank.deposit.form</field>
+            <field name="model">of.account.payment.bank.deposit</field>
+            <field name="arch" type="xml">
+                <form string="Payment deposit" version="9">
+                    <header>
+                        <button name="post" class="oe_highlight" states="draft" string="Confirm" type="object"/>
+                        <button name="cancel" states="posted" string="Cancel" type="object"/>
+                        <field name="state" widget="statusbar" statusbar_visible="posted"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="name" attrs="{'readonly': [('state', '!=', 'draft')]}"/></h1>
+                        </div>
+                        <group>
+                            <field name="journal_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="date" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="move_id" attrs="{'invisible': [('move_id', '=', False)]}"/>
+                            <separator name="payments" string="Payments"/>
+                            <field name="payment_ids" colspan="4" nolabel="1" widget="many2many"
+                                   options="{'not_delete':True}"
+                                   attrs="{'readonly': [('state', '!=', 'draft')]}"
+                                   domain="['|', ('of_deposit_id','=',False), ('of_deposit_id','=',id)]"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="of_view_account_payment_bank_deposit_tree" model="ir.ui.view">
+            <field name="name">of.account.payment.bank.deposit.tree</field>
+            <field name="model">of.account.payment.bank.deposit</field>
+            <field name="arch" type="xml">
+                <tree string="Payment deposits">
+                    <field name="name"/>
+                    <field name="journal_id"/>
+                    <field name="move_id" attrs="{'invisible': [('move_id', '=', False)]}"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- payment_ids widget="many2many" -->
+
+        <record id="of_action_payment_bank_deposit_form" model="ir.actions.act_window">
+            <field name="name">Payment Deposits</field>
+            <field name="res_model">of.account.payment.bank.deposit</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem action="of_action_payment_bank_deposit_form" id="of_menu_action_payment_bank_deposit_form"
+            parent="account.menu_finance_receivables" sequence="30" groups="account.group_account_user"/>
+
+        <!-- Payments -->
+
+        <record id="of_view_account_payment_tree" model="ir.ui.view">
+            <field name="name">of.account.payment.tree</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_tree"/>
+            <field name="arch" type="xml">
+                <field name="state" position="after">
+                    <field name="of_deposit_id"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="of_view_account_payment_search" model="ir.ui.view">
+            <field name="name">of.account.payment.search</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_search"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search/separator[2]" position="after">
+                    <separator/>
+                    <filter string="Deposited" domain="[('of_deposit_id','!=',False)]" name="deposited"/>
+                    <filter string="Not deposited" domain="[('of_deposit_id','=',False)]" name="not_deposited"/>
+                </xpath>
+                <xpath expr="//filter[@name='gb_journal_id']" position="after">
+                    <filter string="Bank Deposit" domain="[]" context="{'group_by': 'of_deposit_id'}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_view_account_payment_form" model="ir.ui.view">
+            <field name="name">of.account.payment.form</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_form"/>
+            <field name="arch" type="xml">
+                <field name="payment_date" position="after">
+                    <field name="of_deposit_id" attrs="{'invisible': [('state', '=', 'draft')]}"/>
+                </field>
+            </field>
+        </record>
+
+        <act_window
+            id="of_action_deposit_payments"
+            name="Deposit payments"
+            res_model="of.account.payment.bank.deposit"
+            context="{'default_payment_ids':active_ids}"
+            src_model="account.payment"
+            multi="True"
+            view_type="form"
+            view_mode="form"
+            target="new"
+            />
+
+    </data>
+</openerp>

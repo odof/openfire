@@ -1,0 +1,189 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#   * of_account_payment_bank_deposit
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 9.0c\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-11-07 16:52+0000\n"
+"PO-Revision-Date: 2016-11-07 16:52+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.model.fields,field_description:of_account_payment_bank_deposit.field_of_account_payment_bank_deposit_move_id
+msgid "Account move"
+msgstr "Pièce comptable"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.ui.view,arch_db:of_account_payment_bank_deposit.of_view_account_payment_search
+msgid "Bank Deposit"
+msgstr "Remise en banque"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.model.fields,field_description:of_account_payment_bank_deposit.field_account_payment_of_deposit_id
+msgid "Bank deposit"
+msgstr "Remise en banque"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.ui.view,arch_db:of_account_payment_bank_deposit.of_view_account_payment_bank_deposit_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.ui.view,arch_db:of_account_payment_bank_deposit.of_view_account_payment_bank_deposit_form
+msgid "Confirm"
+msgstr "Confirmer"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.model.fields,field_description:of_account_payment_bank_deposit.field_of_account_payment_bank_deposit_create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.model.fields,field_description:of_account_payment_bank_deposit.field_of_account_payment_bank_deposit_create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.model.fields,field_description:of_account_payment_bank_deposit.field_of_account_payment_bank_deposit_date
+msgid "Date"
+msgstr "Date"
+
+#. module: of_account_payment_bank_deposit
+#: code:addons/of_account_payment_bank_deposit/models/of_account_payment_bank_deposit.py:66
+#: code:addons/of_account_payment_bank_deposit/models/of_account_payment_bank_deposit.py:75
+#, python-format
+msgid "Deposit %s"
+msgstr "Remise %s"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.model.fields,field_description:of_account_payment_bank_deposit.field_of_account_payment_bank_deposit_name
+#: model:ir.model.fields,help:of_account_payment_bank_deposit.field_of_account_payment_bank_deposit_name
+msgid "Deposit code"
+msgstr "Numéro de la remise"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.actions.act_window,name:of_account_payment_bank_deposit.of_action_deposit_payments
+msgid "Deposit payments"
+msgstr "Remise de paiements"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.ui.view,arch_db:of_account_payment_bank_deposit.of_view_account_payment_search
+msgid "Deposited"
+msgstr "Remis en banque"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.model.fields,field_description:of_account_payment_bank_deposit.field_of_account_payment_bank_deposit_display_name
+msgid "Display Name"
+msgstr "Afficher le nom"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.ui.view,arch_db:of_account_payment_bank_deposit.of_view_account_payment_bank_deposit_search
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.model.fields,field_description:of_account_payment_bank_deposit.field_of_account_payment_bank_deposit_id
+msgid "ID"
+msgstr "ID"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.model.fields,field_description:of_account_payment_bank_deposit.field_of_account_payment_bank_deposit_journal_id
+#: model:ir.ui.view,arch_db:of_account_payment_bank_deposit.of_view_account_payment_bank_deposit_search
+msgid "Journal"
+msgstr "Journal"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.model.fields,field_description:of_account_payment_bank_deposit.field_of_account_payment_bank_deposit___last_update
+msgid "Last Modified on"
+msgstr "Dernière modification le"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.model.fields,field_description:of_account_payment_bank_deposit.field_of_account_payment_bank_deposit_write_uid
+msgid "Last Updated by"
+msgstr "Mis à jour par"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.model.fields,field_description:of_account_payment_bank_deposit.field_of_account_payment_bank_deposit_write_date
+msgid "Last Updated on"
+msgstr "Mis à jour le"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.ui.view,arch_db:of_account_payment_bank_deposit.of_view_account_payment_search
+msgid "Not deposited"
+msgstr "Non remis en banque"
+
+#. module: of_account_payment_bank_deposit
+#: code:addons/of_account_payment_bank_deposit/models/of_account_payment_bank_deposit.py:123
+#, python-format
+msgid "Payment %s has already been deposited"
+msgstr "Le paiement %s a déjà été remis en banque"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.actions.act_window,name:of_account_payment_bank_deposit.of_action_payment_bank_deposit_form
+#: model:ir.ui.menu,name:of_account_payment_bank_deposit.of_menu_action_payment_bank_deposit_form
+msgid "Payment Deposits"
+msgstr "Remises en banque"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.model,name:of_account_payment_bank_deposit.model_of_account_payment_bank_deposit
+msgid "Payment bank deposit"
+msgstr "Remise en banque de paiements"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.ui.view,arch_db:of_account_payment_bank_deposit.of_view_account_payment_bank_deposit_form
+msgid "Payment deposit"
+msgstr "Remise de paiements"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.ui.view,arch_db:of_account_payment_bank_deposit.of_view_account_payment_bank_deposit_search
+#: model:ir.ui.view,arch_db:of_account_payment_bank_deposit.of_view_account_payment_bank_deposit_tree
+msgid "Payment deposits"
+msgstr "Remises de paiements"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.model,name:of_account_payment_bank_deposit.model_account_payment
+#: model:ir.model.fields,field_description:of_account_payment_bank_deposit.field_of_account_payment_bank_deposit_payment_ids
+#: model:ir.ui.view,arch_db:of_account_payment_bank_deposit.of_view_account_payment_bank_deposit_form
+msgid "Payments"
+msgstr "Paiements"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.ui.view,arch_db:of_account_payment_bank_deposit.of_view_account_payment_bank_deposit_search
+#: selection:of.account.payment.bank.deposit,state:0
+msgid "Posted"
+msgstr "Comptabilisé"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.model.fields,field_description:of_account_payment_bank_deposit.field_of_account_payment_bank_deposit_state
+msgid "Status"
+msgstr "Statut"
+
+#. module: of_account_payment_bank_deposit
+#: selection:of.account.payment.bank.deposit,state:0
+msgid "Unposted"
+msgstr "Unposted"
+
+#. module: of_account_payment_bank_deposit
+#: code:addons/of_account_payment_bank_deposit/models/of_account_payment_bank_deposit.py:104
+#, python-format
+msgid "You can not delete a deposit that is already posted"
+msgstr "Vous ne pouvez pas supprimer une remise en banque confirmée"
+
+#. module: of_account_payment_bank_deposit
+#: code:addons/of_account_payment_bank_deposit/models/of_account_payment_bank_deposit.py:117
+#, python-format
+msgid "You cannot set a payment for several deposits"
+msgstr "Vous ne pouvez pas définir un paiement sur plusieurs remises en banque"
+
+#. module: of_account_payment_bank_deposit
+#: model:ir.ui.view,arch_db:of_account_payment_bank_deposit.of_view_account_payment_bank_deposit_search
+msgid "date"
+msgstr "date"
+

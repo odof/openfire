@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+of_access_account_payment_bank_deposit,of.account.payment.bank.deposit,model_of_account_payment_bank_deposit,account.group_account_user,1,1,1,1
