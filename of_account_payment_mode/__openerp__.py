@@ -2,7 +2,7 @@
 
 {
     'name' : 'OpenFire Payment Modes',
-    'version' : '1.1',
+    'version' : '9.0',
     'summary': 'Use distinct payment modes within journals',
     'sequence': 30,
     'description': """

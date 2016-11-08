@@ -57,6 +57,7 @@
                 <tree string="Payment deposits">
                     <field name="name"/>
                     <field name="journal_id"/>
+                    <field name="date"/>
                     <field name="move_id" attrs="{'invisible': [('move_id', '=', False)]}"/>
                     <field name="state"/>
                 </tree>
@@ -98,7 +99,7 @@
                     <filter string="Deposited" domain="[('of_deposit_id','!=',False)]" name="deposited"/>
                     <filter string="Not deposited" domain="[('of_deposit_id','=',False)]" name="not_deposited"/>
                 </xpath>
-                <xpath expr="//filter[@name='gb_journal_id']" position="after">
+                <xpath expr="//search/filter[9]" position="before">
                     <filter string="Bank Deposit" domain="[]" context="{'group_by': 'of_deposit_id'}"/>
                 </xpath>
             </field>
