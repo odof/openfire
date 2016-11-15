@@ -48,9 +48,47 @@ class of_service(models.Model):
         jours = self.env['of.jours'].search(['|', ('name', operator, value), ('abr', operator, value)])
         return [('jour_ids', 'in', jours.ids)]
 
+    @api.one
+    @api.depends('tache_id','partner_id')
+    def _get_planning_ids(self):
+        planning_obj = self.env['of.planning.pose']
+        for service in self:
+            plannings = planning_obj.search([('tache_id','=',service.tache_id.id),
+                                             ('partner_id','=',service.partner_id.id)], order='date desc')
+            service.planning_ids = plannings
+            service.date_last = plannings and plannings[0].date or False
+
+    @api.model
+    def _search_last_date(self, operator, operand):
+        cr = self._cr
+        print [('date_last', operator, operand)]
+
+        query = ("SELECT s.id\n"
+                 "FROM of_service AS s\n"
+                 "LEFT JOIN of_planning_pose AS p\n"
+                 "  ON p.partner_id = s.partner_id\n"
+                 "  AND p.tache_id = s.tache_id\n")
+
+        if operand:
+            if len(operand) == 10:
+                # Copié depuis osv/expression.py
+                if operator in ('>', '<='):
+                    operand += ' 23:59:59'
+                else:
+                    operand += ' 00:00:00'
+            query += ("GROUP BY s.id\n"
+                      "HAVING MAX(p.date) %s '%s'" % (operator, operand))
+        else:
+            if operator == '=':
+                query += "WHERE p.id IS NULL"
+            else:
+                query += "WHERE p.id IS NOT NULL"
+        cr.execute(query)
+        rows = cr.fetchall()
+        return [('id', 'in', zip(*rows)[0])]
+
     template_id = fields.Many2one('of.mail.template', string='Contrat')
     partner_id = fields.Many2one('res.partner', string='Partenaire', store=True, ondelete='cascade')
-
     tache_id = fields.Many2one('of.planning.tache', string=u'Tâche', required=True)
     name = fields.Char(u"Libellé", related='tache_id.name', store=True)
 
@@ -74,6 +112,8 @@ class of_service(models.Model):
             ('cancel', u'Annulé'),
             ], 'Etat', default='progress')
 
+    planning_ids = fields.One2many('of.planning.pose', compute='_get_planning_ids', string="Interventions")
+    date_last = fields.Date(u'Dernière intervention', compute='_get_planning_ids', search='_search_last_date', help=u"Date de la dernière intervention")
 
 class res_partner(models.Model):
     _inherit = "res.partner"

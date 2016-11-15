@@ -19,11 +19,31 @@
                             <field name="tache_id" colspan="4"/>
                             <field name="template_id"/>
                             <field name="date_fin"/>
-                            <field name="mois_ids"/>
-                            <field name="jour_ids"/>
+                            <field name="mois_ids" nolabel="1" colspan="2"/>
+                            <field name="jour_ids" nolabel="1" colspan="2"/>
                         </group>
                         <separator string="Notes"/>
                         <field name="note"/>
+                        <separator string="Interventions"/>
+                        <field name="planning_ids" nolabel="1" colspan="2">
+                            <tree string="Liste des interventions" colors="darkgreen:state=='Planifie';darkolivegreen:state=='Confirme';grey:state=='Annule';darkred:state=='Reporte';darkblue:state=='Pose'">
+                                <field name="name" string="Libellé"/>
+                                <field name="date"/>
+                                <field name="duree" string="Durée" widget="float_time"/>
+                                <field name="poseur_id"/>
+                                <field name="company_id"/>
+                                <field name="state"/>
+
+                                <!-- Afficher les fleches pour passer a d'autres statuts -->
+                                <button name="change_state_before" type="object" icon="gtk-go-back"/>
+                                <button name="change_state_after" type="object" icon="gtk-go-forward"/>
+
+                                <!-- Afficher le icon quand le status est Confirme et Pose -->
+                                <button name="state_conf" type="object" icon="gtk-no" attrs="{'invisible':[('state', '!=', 'Confirme')]}"/>
+                                <button name="state_pose" type="object" icon="gtk-apply" attrs="{'invisible':[('state', '!=', 'Pose')]}"/>
+                                <field name="description"/>
+                            </tree>
+                        </field>
                     </sheet>
                 </form>
             </field>
@@ -42,6 +62,7 @@
                     <field name="jour_ids"/>
                     <field name="note"/>
                     <field name="template_id"/>
+                    <field name="date_last"/>
                     <field name="date_fin"/>
                     <field name="state" invisible="1"/>
                 </tree>
