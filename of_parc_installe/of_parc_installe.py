@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from openerp.osv import fields, osv
-import time
-
 
 class of_parc_installe(osv.Model):
-    """
-    Parc installée
-    """
+    """Parc installé"""
+
     _name = 'of.parc.installe'
     _description = "Parc installé"
-    
+
     _columns={
         'name': fields.char("No de série", size=64, required=False),
         'date_service': fields.date('Date vente', required=False),
@@ -35,11 +32,11 @@ class of_parc_installe(osv.Model):
         #'marge': fields.float(u'Marge', help=u"Marge"),
         'project_issue_ids': fields.one2many('project.issue', 'of_produit_installe_id', 'SAV'),
     }
-    
+
     # Désactiver contrainte car plusieurs no série identique possible
     #_sql_constraints = [('no_serie_uniq', 'unique(name)', 'Ce numéro de série est déjà utilisé et doit être unique.')]
-    
-    
+
+
     def action_creer_sav(self, cr, uid, context={}):
         if not context:
             context = {}

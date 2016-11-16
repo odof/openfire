@@ -24,6 +24,7 @@
             <field name="arch" type="xml">
                 <tree string="Nomenclatures produits">
                     <field name="name"/>
+                    <field name="sequence"/>
                 </tree>
             </field>
         </record>
@@ -38,6 +39,9 @@
                         <label for="name" class="oe_edit_only"/>
                         <h1><field name="name" placeholder="Nom nomenclature"/></h1>
                     </div>
+                    <group>
+                        <field name="sequence"/>
+                    </group>
                     <field name="of_product_nomenclature_line" colspan="4">
                         <tree editable="bottom">
                             <field name="product_id"/>

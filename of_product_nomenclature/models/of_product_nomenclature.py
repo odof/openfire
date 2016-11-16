@@ -11,6 +11,7 @@ class of_product_nomenclature(models.Model):
 
     name = fields.Char("Nom", size=64, required=True)
     of_product_nomenclature_line = fields.One2many('of.product.nomenclature.line', 'nomenclature_id', 'Produits nomenclature', copy=True)
+    sequence = fields.Integer('Séquence', help="Définit l'ordre d'affichage des nomenclatures dans les listes (plus petit au début)")
 
     _order = 'name'
     _sql_constraints = [('number_uniq', 'unique(name)', 'Il existe déjà un enregistrement avec le même nom.')]
