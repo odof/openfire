@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- tree -->
+        <record id="of_pret_appareil_tree_view" model="ir.ui.view">
+            <field name="name">of.pret.appareil.tree.view</field>
+            <field name="model">of.pret.appareil</field>
+            <field name="arch" type="xml">
+                <tree string="Appareil de prêt">
+                    <field name="name"/>
+                    <field name="modele_id"/>
+                    <field name="note"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- form -->
+        <record id="of_pret_appareil_form_view" model="ir.ui.view">
+            <field name="name">of.pret.appareil.form</field>
+            <field name="model">of.pret.appareil</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="name"/>
+                        <field name="modele_id"/>
+                        <field name="note"/>
+                        <field name="of_pret_appareil_line_ids" nolabel="1" colspan="4">
+                            <tree string="Historique prêts de l'appareil" editable="bottom">
+                                <field name="client_id"/>
+                                <field name="site_adresse_id" context="{'show_address': True}"/>
+                                <field name="date_pret"/>
+                                <field name="date_retour"/>
+                                <field name="note"/>
+                            </tree>
+                            <form string="Historique prêts de l'appareil">
+                                <group>
+                                    <field name="client_id"/>
+                                    <field name="site_adresse_id" context="{'show_address': True}"/>
+                                    <field name="date_pret"/>
+                                    <field name="date_retour"/>
+                                    <field name="note"/>
+                                </group>
+                            </form>
+                        </field>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+
+<!-- *************************************************** -->        
+<!-- ********************** MENUS ********************** -->
+<!-- *************************************************** -->   
+
+        <!-- Menu dans Projets -->
+        <record id="of_pret_appareil_action_form" model="ir.actions.act_window">
+            <field name="name">Prêt d'appareils</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">of.pret.appareil</field>
+            <field name="view_type">form</field>
+        </record>
+
+        <menuitem action="of_pret_appareil_action_form" id="menu_of_pret_appareil_form" name="Prêt d'appareils" sequence="30" parent="project.menu_project_management" groups="project.group_project_user"/>
+
+    </data>
+</openerp>
+
