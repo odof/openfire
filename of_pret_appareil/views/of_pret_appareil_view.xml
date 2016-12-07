@@ -11,6 +11,8 @@
                     <field name="name"/>
                     <field name="modele_id"/>
                     <field name="note"/>
+                    <field name="date_pret"/>
+                    <field name="date_retour"/>
                 </tree>
             </field>
         </record>
@@ -28,7 +30,8 @@
                         <field name="of_pret_appareil_line_ids" nolabel="1" colspan="4">
                             <tree string="Historique prêts de l'appareil" editable="bottom">
                                 <field name="client_id"/>
-                                <field name="site_adresse_id" context="{'show_address': True}"/>
+                                <field name="site_depot_id" context="{'show_address': True}"/>
+                                <field name="site_depot_id_address"/>
                                 <field name="date_pret"/>
                                 <field name="date_retour"/>
                                 <field name="note"/>
@@ -36,7 +39,7 @@
                             <form string="Historique prêts de l'appareil">
                                 <group>
                                     <field name="client_id"/>
-                                    <field name="site_adresse_id" context="{'show_address': True}"/>
+                                    <field name="site_depot_id" context="{'show_address': True}"/>
                                     <field name="date_pret"/>
                                     <field name="date_retour"/>
                                     <field name="note"/>
