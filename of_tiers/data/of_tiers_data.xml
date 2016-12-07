@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<openerp>
+    <data noupdate="1">
+
+        <record id="sequence_customer_account" model="ir.sequence">
+            <field name="name">Compte client</field>
+            <field name="padding" eval="6"/>
+            <field name="prefix">411</field>
+        </record>
+        <record id="sequence_supplier_account" model="ir.sequence">
+            <field name="name">Compte fournisseur</field>
+            <field name="padding" eval="6"/>
+            <field name="prefix">401</field>
+        </record>
+
+    </data>
+</openerp>
