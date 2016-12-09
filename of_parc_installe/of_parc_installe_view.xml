@@ -125,7 +125,7 @@
             </field>
         </record>
         
-        <!-- insertion Produit installé lié et champs supplémentaires Winterhalter dans SAV -->
+        <!-- insertion Produit installé lié et champs supplémentaires dans SAV -->
         <record id="of_produit_installe_sav_lie" model="ir.ui.view" >
             <field name="name">of.produit_installe.sav.lie</field>
             <field name="model">project.issue</field>
@@ -133,8 +133,8 @@
             <field name="arch" type="xml" >
                 <xpath expr='//form/sheet/group' position="after">
                     <group string="Produit installé" colspan="4">
-                        <field name="of_produit_installe_id" string="No de série" on_change="on_change_of_produit_installe_id(of_produit_installe_id)"/>
-                        <field name="product_name_id" on_change="on_change_product_name_id(of_produit_installe_id)"/>
+                        <field name="of_produit_installe_id" string="No de série"/>
+                        <field name="product_name_id"/>
                         <field name="product_category_id"/>
                         <field name="of_parc_installe_client_nom"/>
                         <field name="of_parc_installe_client_adresse"/>

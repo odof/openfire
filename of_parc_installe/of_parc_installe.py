@@ -1,45 +1,37 @@
 # -*- coding: utf-8 -*-
 
-from openerp.osv import fields, osv
+from openerp import models, fields, api
 
-class of_parc_installe(osv.Model):
+class of_parc_installe(models.Model):
     """Parc installé"""
 
     _name = 'of.parc.installe'
     _description = "Parc installé"
 
-    _columns={
-        'name': fields.char("No de série", size=64, required=False),
-        'date_service': fields.date('Date vente', required=False),
-        'date_installation': fields.date('Date d\'installation', required=False),
-        'product_id': fields.many2one('product.product', 'Produit', required=True, ondelete='restrict'),
-        'product_category_id': fields.related('product_id', 'categ_id', 'name', readonly=True, type='char', string=u'Famille'),
-        'client_id': fields.many2one('res.partner', 'Client', required=True, domain="[('parent_id','=',False)]", ondelete='restrict'),
-        'site_adresse_id': fields.many2one('res.partner', 'Site installation', required=False, domain="['|',('parent_id','=',client_id),('id','=',client_id)]", ondelete='restrict'),
-        'revendeur_id': fields.many2one('res.partner', 'Revendeur', required=False,  domain="[('of_revendeur','=',True)]", ondelete='restrict'),
-        'installateur_id': fields.many2one('res.partner', 'Installateur', required=False, domain="[('of_installateur','=',True)]", ondelete='restrict'),
-        'installateur_adresse_id': fields.many2one('res.partner', 'Adresse installateur', required=False, domain="['|',('parent_id','=',installateur_id),('id','=',installateur_id)]", ondelete='restrict'),
-        'note': fields.text('Note'),
-        'tel_site_id': fields.related('site_adresse_id', 'phone', readonly=True, type='char', string=u'Téléphone site installation'),
-        'street_site_id': fields.related('site_adresse_id', 'street', readonly=True, type='char', string=u'Adresse'),
-        'street2_site_id': fields.related('site_adresse_id', 'street2', readonly=True, type='char', string=u'Complément adresse'),
-        'zip_site_id': fields.related('site_adresse_id', 'zip', readonly=True, type='char', string=u'Code postal', store=True),
-        'city_site_id': fields.related('site_adresse_id', 'city', readonly=True, type='char', string=u'Ville'),
-        'country_site_id': fields.related('site_adresse_id', 'country_id', readonly=True, type='many2one', relation="res.country", string=u'Pays'),
-        'no_piece': fields.char(u'N° pièce', size=64, required=False),
-        #'chiffre_aff_ht': fields.float('Chiffre d\'affaire HT', help=u"Chiffre d\'affaire HT"),
-        #'quantite_vendue': fields.float(u'Quantité vendue', help=u"Quantité vendue"),
-        #'marge': fields.float(u'Marge', help=u"Marge"),
-        'project_issue_ids': fields.one2many('project.issue', 'of_produit_installe_id', 'SAV'),
-    }
+    name = fields.Char("No de série", size=64, required=False)
+    date_service = fields.Date("Date vente", required=False)
+    date_installation = fields.Date("Date d'installation", required=False)
+    product_id = fields.Many2one('product.product', 'Produit', required=True, ondelete='restrict')
+    product_category_id = fields.Char(u'Famille', related="product_id.categ_id.name", readonly=True)
+    client_id = fields.Many2one('res.partner', 'Client', required=True, domain="[('parent_id','=',False)]", ondelete='restrict')
+    site_adresse_id = fields.Many2one('res.partner', 'Site installation', required=False, domain="['|',('parent_id','=',client_id),('id','=',client_id)]", ondelete='restrict')
+    revendeur_id = fields.Many2one('res.partner', 'Revendeur', required=False,  domain="[('of_revendeur','=',True)]", ondelete='restrict')
+    installateur_id = fields.Many2one('res.partner', 'Installateur', required=False, domain="[('of_installateur','=',True)]", ondelete='restrict')
+    installateur_adresse_id = fields.Many2one('res.partner', 'Adresse installateur', required=False, domain="['|',('parent_id','=',installateur_id),('id','=',installateur_id)]", ondelete='restrict')
+    note = fields.Text('Note')
+    tel_site_id = fields.Char(u"Téléphone site installation", related='site_adresse_id.phone', readonly=True)
+    street_site_id = fields.Char(u'Adresse', related="site_adresse_id.street", readonly=True)
+    street2_site_id = fields.Char(u'Complément adresse', related="site_adresse_id.street2", readonly=True)
+    zip_site_id = fields.Char(u'Code postal', related="site_adresse_id.zip", readonly=True, store=True)
+    city_site_id = fields.Char(u'<Ville', related="site_adresse_id.city", readonly=True)
+    country_site_id = fields.Many2one('res.country', u'Pays', related="site_adresse_id.country_id", readonly=True)
+    no_piece = fields.Char(u'N° pièce', size=64, required=False)
+    project_issue_ids = fields.One2many('project.issue', 'of_produit_installe_id', 'SAV')
 
-    # Désactiver contrainte car plusieurs no série identique possible
-    #_sql_constraints = [('no_serie_uniq', 'unique(name)', 'Ce numéro de série est déjà utilisé et doit être unique.')]
+    _sql_constraints = [('no_serie_uniq', 'unique(name)', u"Ce numéro de série est déjà utilisé et doit être unique.")]
 
-
-    def action_creer_sav(self, cr, uid, context={}):
-        if not context:
-            context = {}
+    @api.model
+    def action_creer_sav(self):
         res = {
             'name': 'SAV',
             'view_type': 'form',
@@ -48,67 +40,59 @@ class of_parc_installe(osv.Model):
             'type': 'ir.actions.act_window',
             'target': 'current',
         }
-        if 'active_ids' in context.keys():
-            active_ids = isinstance(context['active_ids'], (int,long)) and [context['active_ids']] or context['active_ids']
+        if 'active_ids' in self._context.keys():
+            active_ids = isinstance(self._context['active_ids'], (int,long)) and [self._context['active_ids']] or self._context['active_ids']
             if active_ids:
-                parc_installe = self.browse(cr, uid, active_ids[0])
+                parc_installe = self.browse(active_ids[0])
                 if parc_installe.client_id:
                     res['context'] = {'default_partner_id': parc_installe.client_id.id,
                                       'default_of_produit_installe_id': parc_installe.id,
                                       'default_of_type': 'di'}
         return res
 
-class res_partner(osv.Model):
+
+class res_partner(models.Model):
     _inherit = "res.partner"
 
-    _columns = {
-        'of_revendeur': fields.boolean('Revendeur', help="Cocher cette case si ce partenaire est un revendeur."),
-        'of_installateur': fields.boolean('Installateur', help="Cocher cette case si ce partenaire est un installateur."),
-    }
+    of_revendeur = fields.Boolean('Revendeur', help="Cocher cette case si ce partenaire est un revendeur.")
+    of_installateur = fields.Boolean('Installateur', help="Cocher cette case si ce partenaire est un installateur.")
 
 
-class project_issue(osv.Model):
-    _name = "project.issue"
+class project_issue(models.Model):
     _inherit = "project.issue"
 
     def _get_product_sav_ids(self, cr, uid, ids, context={}):
         return self.pool['project.issue'].search(cr, uid, [('product_name_id','in',ids)], context=context)
 
-    _columns = {
-        'of_produit_installe_id': fields.many2one('of.parc.installe', 'Produit installé', readonly=False),
-        'product_name_id': fields.many2one('product.product', 'Désignation', ondelete='restrict'),
-        'product_category_id': fields.related('product_name_id', 'categ_id', 'name', readonly=True, type='char', string=u'Famille',
-            store={'project.issue': (lambda self, cr, uid, ids, c={}: ids, ['product_name_id'], 10),
-            'product.product': (_get_product_sav_ids, ['categ_id'], 10)}),
-        'of_parc_installe_client_nom': fields.related('of_produit_installe_id', 'client_id', 'name', readonly=True, type='text', string=u'Client produit installé'),
-        'of_parc_installe_client_adresse': fields.related('of_produit_installe_id', 'client_id', 'contact_address', readonly=True, type='text', string=u'Adresse client'),
-        'of_parc_installe_site_nom': fields.related('of_produit_installe_id', 'site_adresse_id', 'name', readonly=True, type='char', string=u"Lieu d'installation"),
-        'of_parc_installe_site_adresse': fields.related('of_produit_installe_id', 'site_adresse_id', 'contact_address', readonly=True, type='char', string=u"Adresse d'installation"),
-        'of_parc_installe_note': fields.related('of_produit_installe_id', 'note', readonly=True, type='char', string=u'Note produit installé')
-    }
-    
-    
-    def on_change_of_produit_installe_id(self, cr, uid, ids, of_produit_installe_id, context=None):
+    of_produit_installe_id = fields.Many2one('of.parc.installe', u'Produit installé', ondelete='restrict', readonly=False)
+    product_name_id = fields.Many2one('product.product', u'Désignation', ondelete='restrict')
+    product_category_id = fields.Char(u'Famille', related="product_name_id.categ_id.name", readonly=True, store=True)
+    of_parc_installe_client_nom = fields.Char(u'Client produit installé', related="of_produit_installe_id.client_id.name", readonly=True)
+    of_parc_installe_client_adresse = fields.Char(u'Adresse client', related="of_produit_installe_id.client_id.contact_address", readonly=True)
+    of_parc_installe_site_nom = fields.Char(u"Lieu d'installation", related="of_produit_installe_id.site_adresse_id.name", readonly=True)
+    of_parc_installe_site_adresse = fields.Char(u"Adresse d'installation", related="of_produit_installe_id.site_adresse_id.contact_address", readonly=True)
+    of_parc_installe_note = fields.Text('Note produit installé', related="of_produit_installe_id.note", readonly=True)
+
+
+    @api.onchange('of_produit_installe_id')
+    def on_change_of_produit_installe_id(self):
         # Si le no de série est saisi, on met le produit du no de série du parc installé. 
-        if of_produit_installe_id:
-            parc = self.pool.get('of.parc.installe').browse(cr, uid, of_produit_installe_id, context=context)
+        if self.of_produit_installe_id:
+            parc = self.env['of.parc.installe'].browse([self.of_produit_installe_id.id])
             if parc and parc.product_id:
-                return {'value': {
-                    'product_name_id': parc.product_id.id,
-                    'of_parc_installe_client_nom': parc.client_id.name,
-                    'of_parc_installe_client_adresse': parc.client_id.contact_address,
-                    'of_parc_installe_site_nom': parc.site_adresse_id.name,
-                    'of_parc_installe_site_adresse': parc.site_adresse_id.contact_address,
-                    'of_parc_installe_note': parc.note}
-                }
-        return
-    
-    def on_change_product_name_id(self, cr, uid, ids, of_produit_installe_id, context=None):
+                self.product_name_id = parc.product_id.id
+#                 self.write({
+#                     'product_name_id': parc.product_id.id,
+#                     'of_parc_installe_client_nom': parc.client_id.name,
+#                     'of_parc_installe_client_adresse': parc.client_id.contact_address,
+#                     'of_parc_installe_site_nom': parc.site_adresse_id.name,
+#                     'of_parc_installe_site_adresse': parc.site_adresse_id.contact_address,
+#                     'of_parc_installe_note': parc.note})
+
+    @api.onchange('product_name_id')
+    def on_change_product_name_id(self):
         # Si un no de série est saisie, on force le produit lié au no de série.
         # Si pas de no de série, on laisse la possibilité de choisir un article
-        res = False
-        if of_produit_installe_id: # Si no de série existe, on récupère l'article associé
-            res = self.on_change_of_produit_installe_id(cr, uid, ids, of_produit_installe_id, context)
-        return res
-    
+        if self.of_produit_installe_id: # Si no de série existe, on récupère l'article associé
+            self.on_change_of_produit_installe_id()
 
