@@ -55,6 +55,18 @@
             </field>
         </record>
 
+    <!-- Action "Générer un pdf" depuis le prêt d'appareils -->
+        <act_window
+            name="Générer un pdf"
+            res_model="of.compose.mail"
+            src_model="of.pret.appareil"
+            view_mode="form"
+            key2="client_print_multi"
+            view_id="of_gesdoc.view_courrier_wizard"
+            id="action_view_pret_appareil_courrier_wizard"
+            context="{'model':'of.pret.appareil'}"
+            target="new"
+        />
 
 <!-- *************************************************** -->        
 <!-- ********************** MENUS ********************** -->

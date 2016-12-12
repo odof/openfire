@@ -40,16 +40,14 @@ class of_parc_installe(models.Model):
             'type': 'ir.actions.act_window',
             'target': 'current',
         }
-        if 'active_ids' in self._context.keys():
-            active_ids = isinstance(self._context['active_ids'], (int,long)) and [self._context['active_ids']] or self._context['active_ids']
-            if active_ids:
-                parc_installe = self.browse(active_ids[0])
-                if parc_installe.client_id:
-                    res['context'] = {'default_partner_id': parc_installe.client_id.id,
-                                      'default_of_produit_installe_id': parc_installe.id,
-                                      'default_of_type': 'di'}
+        active_ids = self._context.get('active_ids')
+        if active_ids:
+            parc_installe = self.browse(active_ids[0])
+            if parc_installe.client_id:
+                res['context'] = {'default_partner_id': parc_installe.client_id.id,
+                                  'default_of_produit_installe_id': parc_installe.id,
+                                  'default_of_type': 'di'}
         return res
-
 
 class res_partner(models.Model):
     _inherit = "res.partner"
