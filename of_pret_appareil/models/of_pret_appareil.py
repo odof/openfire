@@ -8,6 +8,8 @@ class of_pret_appareil(models.Model):
 
     name = fields.Char(u'No de série', required=True)
     modele_id = fields.Many2one('of.product.modele', string='Modèle', required=True, ondelete='restrict', index=True)
+    product_category_id = fields.Many2one('product.category', 'Famille')
+    marque_id = fields.Many2one('of.product.marque', u"Marque")
     note = fields.Text(u'Note')
     of_pret_appareil_line_ids = fields.One2many('of.pret.appareil.line', 'appareil_id', "Prêts de l'appareil")
     date_pret = fields.Date(u'Date dernier prêt', related="of_pret_appareil_line_ids.date_pret", store=True)

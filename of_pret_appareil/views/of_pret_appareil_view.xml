@@ -24,8 +24,10 @@
             <field name="arch" type="xml">
                 <form>
                     <group>
+                        <field name="product_category_id"/>
                         <field name="name"/>
                         <field name="modele_id"/>
+                        <field name="marque_id"/>
                         <field name="note"/>
                         <field name="of_pret_appareil_line_ids" nolabel="1" colspan="4">
                             <tree string="Historique prêts de l'appareil" editable="bottom">

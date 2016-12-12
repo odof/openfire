@@ -21,6 +21,7 @@ Module gestion de prêt d'appareils
         "demo_xml" : [ ],
         "data" : [
             'views/of_pret_appareil_view.xml',
+            'security/ir.model.access.csv',
         ],
         "installable": True,
         'active': False,
