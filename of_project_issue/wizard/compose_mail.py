@@ -21,6 +21,13 @@ class of_compose_mail(models.TransientModel):
 
         sav = objects.get('sav')
         result.update({
+            'sav_of_code'     : sav and sav.of_code,
+            'sav_name'        : sav and sav.name or '',
+            'sav_description' : sav and sav.description or '',
+            'sav_pieces'      : sav and sav.of_piece_commande or '',
+            'sav_intervention': sav and sav.of_intervention or '',
+
+            # Lignes gardées pour compatibilité, mais pi référence désormais les parcs installés
             'pi_of_code'              : sav and sav.of_code,
             'pi_name'                 : sav and sav.name or '',
             'pi_description'          : sav and sav.description or '',
