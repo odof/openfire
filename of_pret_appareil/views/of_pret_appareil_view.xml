@@ -34,6 +34,7 @@
                                 <field name="client_id"/>
                                 <field name="site_depot_id" context="{'show_address': True}"/>
                                 <field name="site_depot_id_address"/>
+                                <field name="sav_id"/>
                                 <field name="date_pret"/>
                                 <field name="date_retour"/>
                                 <field name="note"/>
@@ -42,6 +43,7 @@
                                 <group>
                                     <field name="client_id"/>
                                     <field name="site_depot_id" context="{'show_address': True}"/>
+                                    <field name="sav_id"/>
                                     <field name="date_pret"/>
                                     <field name="date_retour"/>
                                     <field name="note"/>

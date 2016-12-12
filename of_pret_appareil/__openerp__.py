@@ -15,7 +15,7 @@
 Module gestion de prêt d'appareils
 """,
         "depends" : [
-            'project',
+            'project_issue',
             'of_sav_but'
         ],
         "demo_xml" : [ ],

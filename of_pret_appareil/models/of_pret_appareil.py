@@ -26,6 +26,7 @@ class of_pret_appareil_line(models.Model):
     site_depot_id_address = fields.Char('Adresse dépôt', related='site_depot_id.contact_address')
     date_pret = fields.Date(u'Date de prêt', required=True)
     date_retour = fields.Date(u'Date de retour')
+    sav_id = fields.Many2one('project.issue', 'SAV lié')
     note = fields.Text(u'Note')
 
     _order = "date_pret desc, date_retour"
