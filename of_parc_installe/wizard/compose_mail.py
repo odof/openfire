@@ -2,17 +2,22 @@
 
 from openerp import models, api
 
-# Ajout des champs specifiques du SAV Winterhalter
 class of_compose_mail(models.TransientModel):
     _inherit = 'of.compose.mail'
 
     @api.model
     def _get_objects(self, o, data):
         result = super(of_compose_mail,self)._get_objects(o, data)
+        parc = False
         if o._model._name == 'of.parc.installe':
-            result['parc_installe'] = o
+            parc = o
         elif o._model._name == 'project.issue':
-            result['parc_installe'] = o.of_produit_installe_id
+            parc = o.of_produit_installe_id
+
+        if parc:
+            result['parc_installe'] = parc
+            result['address_pose'] = parc.site_adresse_id or parc.client_id
+
         return result
 
     @api.model

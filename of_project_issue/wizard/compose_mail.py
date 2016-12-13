@@ -2,6 +2,9 @@
 
 from openerp import models, api
 
+from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
+from datetime import datetime
+
 # Pour la génération de pdf depuis le SAV
 class of_compose_mail(models.TransientModel):
     _inherit = 'of.compose.mail'
@@ -23,6 +26,7 @@ class of_compose_mail(models.TransientModel):
         result.update({
             'sav_of_code'     : sav and sav.of_code,
             'sav_name'        : sav and sav.name or '',
+            'sav_user'        : sav and sav.user_id and sav.user_id.name or '',
             'sav_description' : sav and sav.description or '',
             'sav_pieces'      : sav and sav.of_piece_commande or '',
             'sav_intervention': sav and sav.of_intervention or '',
@@ -32,4 +36,17 @@ class of_compose_mail(models.TransientModel):
             'pi_name'                 : sav and sav.name or '',
             'pi_description'          : sav and sav.description or '',
         })
+
+        sav_date = sav and sav.date or ''
+        if sav_date:
+            lang_obj = self.env['res.lang']
+
+            partner = objects.get('partner',False)
+            lang_code = self._context.get('lang', partner.lang)
+            lang = lang_obj.search([('code','=', lang_code)])
+
+            date_length = len((datetime.now()).strftime(DEFAULT_SERVER_DATE_FORMAT))
+            sav_date = datetime.strptime(sav_date[:date_length], DEFAULT_SERVER_DATE_FORMAT)
+            sav_date = sav_date.strftime(lang.date_format.encode('utf-8'))
+            result['sav_date'] = sav_date
         return result
