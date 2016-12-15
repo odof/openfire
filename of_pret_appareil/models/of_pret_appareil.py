@@ -16,6 +16,8 @@ class of_pret_appareil(models.Model):
     date_retour = fields.Date(u'Date dernier retour', related="of_pret_appareil_line_ids.date_retour", store=True)
     # Champ partner_id, principalement pour compatibilité avec courriers of_gesdoc
     partner_id = fields.Many2one('res.partner', 'Dernier client', related='of_pret_appareil_line_ids.client_id', readonly=True)
+    sav_lie_id = fields.Char(u'Dernier SAV lié', related="of_pret_appareil_line_ids.sav_id.of_code", store=True)
+
 
 class of_pret_appareil_line(models.Model):
     "Historique prêts appareils"

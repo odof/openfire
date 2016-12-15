@@ -13,6 +13,7 @@
                     <field name="note"/>
                     <field name="date_pret"/>
                     <field name="date_retour"/>
+                    <field name="sav_lie_id"/>
                 </tree>
             </field>
         </record>
