@@ -13,6 +13,7 @@ Ce module apporte une personnalisation de la comptabilité :
 
 - Fonctions pratiques pour la saisie des écritures comptables
 - Fusion de factures brouillon sous condition, sans fusionner les lignes
+- Affichage des paiements et du montant restant dû dans la facture pdf
 """,
     "depends" : [
         'account',
@@ -20,6 +21,7 @@ Ce module apporte une personnalisation de la comptabilité :
     "demo_xml" : [ ],
     'data': [
         'views/of_account_view.xml',
+        'views/report_invoice.xml',
         'wizard/wizard_invoice_group_view.xml',
     ],
     "installable": True,

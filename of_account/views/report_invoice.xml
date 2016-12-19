@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+<template id="of_report_invoice_document" inherit_id="account.report_invoice_document">
+    <xpath expr="//div[@class='col-xs-4 pull-right']/table" position="inside">
+        <t t-set="payments" t-value="json.loads(o.payments_widget)"/>
+        <t t-if="payments">
+            <tr t-foreach="payments['content']" t-as="payment">
+                <td>
+                    <t t-set="payment_entry" t-value="o.env['account.move'].browse(payment['move_id'])"/>
+                    <i><span>Payé le </span><span t-field="payment_entry.date"/></i>
+                </td>
+                <td>
+                    <span class="pull-right text-right"><t t-esc="payment['amount']" t-esc-options='{"widget": "monetary", "display_currency": "o.currency_id"}'/></span>
+                </td>
+            </tr>
+            <tr class="border-black">
+                <td><strong>Montant dû</strong></td>
+                <td class="text-right">
+                     <span t-field="o.residual" t-field-options='{"widget": "monetary", "display_currency": "o.currency_id"}'/>
+                </td>
+            </tr>
+        </t>
+    </xpath>
+</template>
+</data>
+</openerp>
