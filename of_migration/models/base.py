@@ -125,8 +125,8 @@ class import_base(models.AbstractModel):
         cr.execute("SELECT id, name FROM res_partner_address_61 WHERE id_90 IS NULL")
         rows = cr.fetchall()
         if rows:
-            print rows
-            print len(rows)
+#             print rows
+#             print len(rows)
             raise ValueError(u"Une adresse de partenaire n'a pas pu être associée : %s" % (tuple(rows[0]),))
 
     @api.model

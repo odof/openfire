@@ -6,6 +6,9 @@ Ce fichier doit être importé en dernier
 """
 
 from openerp import models, api#, sql_db
+import logging
+
+_logger = logging.getLogger(__name__)
 
 MAGIC_COLUMNS_FIELDS = ['user1.id_90', 'tab.create_date', 'user2.id_90', 'tab.write_date']
 MAGIC_COLUMNS_FROM = ("LEFT JOIN res_users_61 AS user1 ON user1.id=tab.create_uid\n"
@@ -134,12 +137,8 @@ class Main(models.AbstractModel):
 
     @api.model
     def process(self):
-#         # Connection a la base 6.1
-#         db_name = "%s_61" % self._cr.dbname
-#         cr_61 = sql_db.db_connect(db_name)
 
-        self.show_property_fields()
-#         return True
+#         self.show_property_fields()
 
         # Nettoyage de ir_model_data_61
         self._cr.execute("DELETE FROM ir_model_data_61 "
@@ -161,11 +160,12 @@ class Main(models.AbstractModel):
             tables = eval('self.import_module_%s()' % module)
             for table in tables:
                 if self.add_match_column(table+'_61'):
-                    print "-- %s --" % table
+                    _logger.info("-- Migration table : %s --" % table)
                     message = eval('self.import_%s()' % table)
                     # Ajouter dans les logs : 
                     # message
-                    print message
+                    if message:
+                        _logger.info(message)
                     self._cr.commit()
                 else:
                     pass

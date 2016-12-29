@@ -135,42 +135,6 @@ class import_post_process(models.AbstractModel):
 
         self.insert_values('workflow.workitem', values, tables, where_clause)
 
-    @api.model
-    def import_ir_attachment_old(self):
-        """ ETAPES
-        1 - Récupérer les différents fichiers 6.1
-        2 - Calculer leur checksum et renseigner la table ir_attachment_61
-        3 - Renommer et placer les fichiers dans le bon dossier 9.0, si non déjà existant
-        4 - Migrer la table ir_attachment_61 vers ir_attachment
-        """
-        cr = self._cr
-
-        cr.execute('ALTER TABLE "res_partner_bank_61" ADD COLUMN "checksum" character varying(40)')
-
-
-
-        #@todo : Ajouter le matching des pièces jointes existantes...
-        # ... il faudra choisir les objets affectés (le logo de la société est déjà migré...)
-
-        fields_90 = ['res_model', 'res_name', 'db_datas', 'file_size', 'company_id', 'index_content', 'type', 'public',
-                     'store_fname', 'description', 'res_field', 'mimetype', 'name', 'url', 'res_id', 'checksum', 'datas_fname']
-
-        values = {field: "tab."+field for field in fields_90}
-        values.update({
-            'id'        : 'tab.id_90',
-            'company_id': 'comp.id_90',
-            'mimetype'  : 'tab.file_type',
-        })
-
-        # Mapper res_id avec res_model
-
-        tables = [
-            ('tab', 'wkf_workitem_61', False, False, False),
-            ('act', 'wkf_activity_61', 'id', 'tab', 'act_id'),
-            ('inst', 'wkf_instance_61', 'id', 'tab', 'inst_id'),
-            ('subflow', 'wkf_instance_61', 'id', 'tab', 'subflow_id'),
-        ]
-
     def import_ir_attachment(self):
         """ ETAPES
         1 - Migrer la table ir_attachment_61 vers ir_attachment
@@ -183,10 +147,8 @@ class import_post_process(models.AbstractModel):
             r = ''
             try:
                 r = open(file_path + fname,'rb').read().encode('base64')
-#             except (IOError, OSError):
-#                 pass
-            except Exception, e:
-                print 'sniiiiif'
+            except (IOError, OSError):
+                pass
             return r
 
         cr = self._cr
@@ -250,9 +212,6 @@ class import_post_process(models.AbstractModel):
             if not data:
                 missed_count += 1
                 continue
-
-            cr.execute("SELECT id FROM ir_attachment WHERE id = %s" % id_90)
-            print id_90, cr.fetchall()
 
             attachment_obj.browse(id_90).datas = data
         if missed_count:

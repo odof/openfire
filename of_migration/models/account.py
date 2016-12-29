@@ -31,8 +31,6 @@ class import_account(models.AbstractModel):
         """ association des tables account_acount_type.
         Aucune création de ligne n'est effectuée
         """
-#         if not self.add_match_column('account_account_type_61'):
-#             return u"Migration déjà effectuée"
         cr = self._cr
         # Recuperation des xml_id 9.0
         cr.execute("SELECT TEXTCAT(TEXTCAT(module, '.'), name), res_id FROM ir_model_data WHERE model='account.account.type'")
@@ -235,17 +233,6 @@ class import_account(models.AbstractModel):
         self.map_relation_field('product.template', 'taxes_id')
         # Table product_supplier_taxes_rel
         self.map_relation_field('product.template', 'supplier_taxes_id')
-
-#     @api.model
-#     def import_product_taxes_rel(self):
-#         # Table product_taxes_rel
-#         self.map_relation_field('product.product', 'taxes_id')
-# #         self.map_relation_table('product_taxes_rel', 'prod_id', 'product_template', 'tax_id', 'account_tax')
-# 
-#         # Table product_supplier_taxes_rel
-#         self.map_relation_field('product.product', 'supplier_taxes_id')
-# #         self.map_relation_table('product_supplier_taxes_rel', 'prod_id', 'product_template', 'tax_id', 'account_tax')
-
 
     @api.model
     def import_account_bank_statement(self):
@@ -463,11 +450,6 @@ class import_account(models.AbstractModel):
     def import_account_payment_term(self):
         cr = self._cr
 
-#         cr.execute("SELECT * FROM ir_model_data_61 WHERE model='account.payment.term' "
-#                    "AND module='of_mode_paiement' AND name='account_payment_term_facture'")
-#         if not cr.fetchall():
-#             raise u"Ajouter à la main la valeur xml of_mode_paiement.account_payment_term_facture pour la condition de règlement comptant"
-
         cr.execute("SELECT TEXTCAT(TEXTCAT(module, '.'), name), res_id FROM ir_model_data WHERE model='account.payment.term'")
         data_90 = dict(cr.fetchall())
 
@@ -584,7 +566,7 @@ class import_account(models.AbstractModel):
                         else:
                             sequence -= 1
                         preline_data = dict(create_data, id=get_next_id(), sequence=sequence)
-#                         print insert_query % (",".join(str(preline_data[field]) for field in fields_90), )
+
                         cr.execute(insert_query % (",".join(str(preline_data[field]) for field in fields_90), line_data['id']))
 
                         create_data.update({
