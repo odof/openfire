@@ -16,7 +16,7 @@
                     <group name="histo_planning" string="Planning">
                         <field name="pose_ids" colspan="4" nolabel="1" readonly="1">
                             <tree string="Plannings">
-                                <field name="poseur_id"/>
+                                <field name="equipe_id"/>
                                 <field name="date" string="Date"/>
                                 <field name="duree" string="Durée" widget="float_time"/>
                                 <field name="verif_dispo"/>
@@ -53,13 +53,12 @@
                     <newline/>
                     <group>
                         <field name="name"/>
-                        <field name="date_from" filter_domain="[('date_deadline','&gt;=',self)]"/>
-                        <field name="date_to" filter_domain="[('date','&lt;=',self)]"/>
+                        <field name="date"/>
                         <field name="duree"/>
                         <field name="user_id" widget="selection"/>
                         <field name="tache_id" widget="selection"/>
                         <field name="category_id" widget="selection"/>
-                        <field name="poseur_id" widget="selection"/>
+                        <field name="equipe_id" widget="selection"/>
                         <field name="partner_id"/>
                         <field name="company_id" widget="selection"/>
                     </group>
@@ -67,7 +66,7 @@
                     <group expand="0" string="Regrouper par...">
                        <filter string="Utilisateur" icon="terp-personal" domain="[]" context="{'group_by' : 'user_id'}"/>
                        <filter string="Tache" icon="terp-folder-blue" domain="[]" context="{'group_by' : 'tache_id'}"/>
-                       <filter string="Equipe" icon="terp-partner" domain="[]" context="{'group_by' : 'poseur_id'}"/>
+                       <filter string="Equipe" icon="terp-partner" domain="[]" context="{'group_by' : 'equipe_id'}"/>
                        <filter string="Intervenant" icon="terp-partner" domain="[]" context="{'group_by' : 'gb_employee_id'}"/>
                        <filter string="Magasin" icon="terp-go-home" domain="[]" context="{'group_by' : 'company_id'}"/>
                    </group>
@@ -108,16 +107,16 @@
                                 <field name="date_deadline"/>
                             </group>
                             <group col="2">
-                                <field name="poseur_id" on_change="onchange_poseur_id(poseur_id)" context="{'tz': 'Europe/Paris'}" />
-                                <field name="partner_id" domain="[('customer','=',True)]" on_change="onchange_partner_id(partner_id, tache_id, description)" colspan="2" context="{'tz': 'Europe/Paris'}" />
-                                <field name="user_id" context="{'tz': 'Europe/Paris'}" />
+                                <field name="equipe_id" context="{'tz': 'Europe/Paris'}"/>
+                                <field name="partner_id" domain="[('customer','=',True)]" colspan="2" context="{'tz': 'Europe/Paris'}"/>
+                                <field name="user_id" context="{'tz': 'Europe/Paris'}"/>
                                 <field name="company_id" widget="selection"/>
-                                <field name="name" string="Libellé" context="{'tz': 'Europe/Paris'}" />
+                                <field name="name" string="Libellé" context="{'tz': 'Europe/Paris'}"/>
                             </group>
                             <group col="2">
-                                <field name="tache_id" on_change="onchange_tache_id(tache_id, partner_id, description)" context="{'tz': 'Europe/Paris'}" />
-                                <field name="date" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" context="{'tz': 'Europe/Paris'}" />
-                                <field name="duree" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" context="{'tz': 'Europe/Paris'}" string="Durée" widget="float_time"/>
+                                <field name="tache_id" context="{'tz': 'Europe/Paris'}"/>
+                                <field name="date" context="{'tz': 'Europe/Paris'}"/>
+                                <field name="duree" context="{'tz': 'Europe/Paris'}" string="Durée" widget="float_time"/>
                                 <field name="date_deadline_display" readonly="1"/>
                                 <field name="verif_dispo"/>
                             </group>
@@ -127,16 +126,16 @@
                             <group name="horaires" col="4">
                                 <separator string="Horaires de travail" colspan="4"/>
                                 <label for="hor_md" string="Matin"/>
-                                <field name="hor_md" nolabel="1" widget="float_time" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" string="Matin :" context="{'tz': 'Europe/Paris'}"/>
+                                <field name="hor_md" nolabel="1" widget="float_time" string="Matin :" context="{'tz': 'Europe/Paris'}"/>
                                 <label string="-"/>
-                                <field name="hor_mf" nolabel="1" widget="float_time" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" context="{'tz': 'Europe/Paris'}"/>
+                                <field name="hor_mf" nolabel="1" widget="float_time" context="{'tz': 'Europe/Paris'}"/>
                                 <label for="hor_ad" string="Après-midi"/>
-                                <field name="hor_ad" nolabel="1" widget="float_time" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" context="{'tz': 'Europe/Paris'}"/>
+                                <field name="hor_ad" nolabel="1" widget="float_time" context="{'tz': 'Europe/Paris'}"/>
                                 <label string="-"/>
-                                <field name="hor_af" nolabel="1" widget="float_time" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" context="{'tz': 'Europe/Paris'}"/>
+                                <field name="hor_af" nolabel="1" widget="float_time" context="{'tz': 'Europe/Paris'}"/>
                                 <group colspan="4" col="4">
-                                    <field name="hor_sam" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" context="{'tz': 'Europe/Paris'}" />
-                                    <field name="hor_dim" on_change="onchange_date(date, duree, hor_md, hor_mf, hor_ad, hor_af, hor_sam, hor_dim, context)" context="{'tz': 'Europe/Paris'}" />
+                                    <field name="hor_sam" context="{'tz': 'Europe/Paris'}" />
+                                    <field name="hor_dim" context="{'tz': 'Europe/Paris'}" />
                                 </group>
                             </group>
                             <!-- label colspan="4" string="Description" align="0.00"/ -->
@@ -160,7 +159,7 @@
                     <field name="date"/>
                     <field name="date_deadline" string="Deadline" invisible="1"/>
                     <field name="duree" string="Durée" widget="float_time"/>
-                    <field name="poseur_id"/>
+                    <field name="equipe_id"/>
                     <field name="tache_id"/>
                     <field name="partner_id"/>
                     <field name="partner_city"/>
@@ -185,7 +184,7 @@
             <field name="name">of.planning.pose.calendar</field>
             <field name="model">of.planning.pose</field>
             <field name="arch" type="xml">
-                <calendar string="Calendrier" date_start="date" color="poseur_id" date_stop="date_deadline">
+                <calendar string="Calendrier" date_start="date" color="equipe_id" date_stop="date_deadline">
                     <field name="name"/>
                     <field name="state"/>
                     <!--field name="color" invisible="1"/>
@@ -200,8 +199,8 @@
             <field name="name">of.planning.pose.gantt</field>
             <field name="model">of.planning.pose</field>
             <field name="arch" type="xml" >
-                <gantt color="poseur_id" date_start="date" date_stop="date_deadline" string="Planning" mode="month">
-                    <level object="of.planning.equipe" link="poseur_id" domain="[]">
+                <gantt color="equipe_id" date_start="date" date_stop="date_deadline" string="Planning" mode="month">
+                    <level object="of.planning.equipe" link="equipe_id" domain="[]">
                         <field name="name"/>
                         <field name="state"/>
                     </level>
@@ -247,20 +246,17 @@
                             </h1>
                         </div>
                         <group>
-                            <group colspan="2" col="2">
+                            <group>
                                 <field name="product_id" string="Produit lié" attrs="{'readonly':[('verr', '=', True)]}"/>
-                                <group colspan="2" col="4">
-                                    <field name="category_id"/>
-                                    <field name="duree" widget="float_time"/>
-                                </group>
-                                <group colspan="2" col="6" name="options">
-                                    <field name="active"/>
-                                    <field name="is_crm"/>
-                                    <field name="imp_detail"/>
-                                </group>
+                                <field name="category_id"/>
+                                <field name="duree" widget="float_time"/>
                             </group>
-                            <newline></newline>
-                            <group colspan="2" col="2">
+                            <group>
+                                <field name="active"/>
+                                <field name="is_crm"/>
+                                <field name="imp_detail"/>
+                            </group>
+                            <group colspan="2">
                                 <field name="description" attrs="{'readonly':[('verr', '=', True)]}"/>
                             </group>
                             <field name="verr" invisible="1"/>
@@ -339,19 +335,18 @@
                                 <field name="name"/>
                             </h1>
                         </div>
-                        <group colspan="2" col="6">
+                        <group col="4">
                             <field name="active"/>
                             <field name="sequence"/>
-                            <newline/>
-                            <group name="horaires" col="4">
+                            <group name="horaires" colspan="2" col="4">
                                 <separator string="Horaires de travail" colspan="4"/>
                                 <label for="hor_md" string="Matin"/>
                                 <field name="hor_md" nolabel="1" widget="float_time" string="Matin :"/>
-                                <label string="-"/>
+                                <span> - </span>
                                 <field name="hor_mf" nolabel="1" widget="float_time"/>
                                 <label for="hor_ad" string="Après-midi"/>
                                 <field name="hor_ad" nolabel="1" widget="float_time"/>
-                                <label string="-"/>
+                                <span> - </span>
                                 <field name="hor_af" nolabel="1" widget="float_time"/>
                             </group>
                         </group>
@@ -382,7 +377,7 @@
             <field name="inherit_id" ref="hr.view_employee_form"/>
             <field name="arch" type="xml">
                 <page string="Personal Information" position="after">
-                    <page string="Coût" groups="base.group_hr_manager">
+                    <page string="Coût" groups="hr.group_hr_manager">
                         <field name="jours" string="Jours travaillés par an" on_change="onchange_cout(heures, jours, couts_ids)"/>
                         <field name="heures" string="Heures travaillées par jour" widget="float_time" on_change="onchange_cout(heures, jours, couts_ids)"/>
                         <field name="cout_horaire" string="Coût horaire"/>
@@ -408,8 +403,8 @@
             <field name="inherit_id" ref="hr.view_employee_tree"/>
             <field name="arch" type="xml">
                 <field name="name" position="after">
-                    <field name="cout_horaire" string="Coût horaire" groups="base.group_hr_manager"/>
-                    <field name="cout_annuel" string="Coût annuel" groups="base.group_hr_manager"/>
+                    <field name="cout_horaire" string="Coût horaire" groups="hr.group_hr_manager"/>
+                    <field name="cout_annuel" string="Coût annuel" groups="hr.group_hr_manager"/>
                 </field>
             </field>
         </record-->
@@ -548,19 +543,19 @@
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="of_planning.of_planning_employee_typcout_tree"/>
         </record-->
-    
+
 <!--##########################################################################################################################-->
 <!--#############################################_________Menus__________#####################################################-->
 <!--##########################################################################################################################-->
 
-        <menuitem id="menu_of_planning_configuration" name="Pose" parent="hr.menu_human_resources_configuration" groups="base.group_hr_manager" sequence="10"/>
+        <menuitem id="menu_of_planning_configuration" name="Pose" parent="hr.menu_human_resources_configuration" groups="hr.group_hr_manager" sequence="10"/>
             <menuitem name="Employés" id="menu_hr_employee_tree" parent="menu_of_planning_configuration" sequence="1" action="action_hr_employee_tree"/>
             <menuitem name="Equipes" id="menu_of_planning_equipe_tree" parent="menu_of_planning_configuration" sequence="2" action="action_of_planning_equipe_tree"/>
             <menuitem name="Erreurs" id="menu_of_planning_pose_raison_tree" parent="menu_of_planning_configuration" sequence="3" action="action_of_planning_pose_raison_tree"/>
             <menuitem name="Tâches" id="menu_of_planning_tache_tree" parent="menu_of_planning_configuration" sequence="3" action="action_of_planning_tache_tree"/>
             <!--menuitem name="Types de coûts" id="menu_pnanning_of_employee_typcout_tree" parent="menu_of_planning_configuration" sequence="5" action="action_of_planning_employee_typcout_tree"/-->
 
-        <menuitem id="menu_of_planning_pose" name="Planning des interventions" parent="base.menu_base_partner" groups="of_group_planning_pose_user" sequence="10"/>
+        <menuitem id="menu_of_planning_pose" name="Planning des interventions" parent="sales_team.menu_base_partner" groups="of_group_planning_pose_user" sequence="10"/>
             <menuitem id="menu_of_planning_pose_pose" name="Planning calendrier" parent="menu_of_planning_pose" sequence="1" action="action_of_planning_pose_calendar"/>
             <!--menuitem id="menu_of_planning_pose_global" name="Global" parent="menu_of_planning_pose" sequence="1" action="action_of_planning_pose_calendar"/>
             <menuitem id="menu_of_planning_pose_po" name="Poêle" parent="menu_of_planning_pose" sequence="4" action="action_of_planning_pose_po_calendar"/>
@@ -568,7 +563,7 @@
             <menuitem id="menu_of_planning_entretien" name="Ramonage Entretien SAV" parent="menu_of_planning_pose" sequence="5" action="action_of_planning_entretien_calendar"/-->
 
     <!-- Ajouter menu Envoyer un courrier dans Planning Pose -->
-        <act_window
+        <!--act_window
             name="Envoyer un courrier"
             res_model="of.compose.mail"
             src_model="of.planning.pose"
@@ -578,7 +573,7 @@
             id="action_view_planning_courrier_wizard_account"
             context="{'model':'of.planning.pose'}"
             target="new"
-        />
+        /-->
         
     <!-- Ajouter menu Envoyer un courriel dans Planning Pose -->
         <!-- <act_window

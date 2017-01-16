@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
-# Migration ok
-
-from openerp import models, fields, api, _
-from openerp.exceptions import UserError, RedirectWarning, ValidationError
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError, RedirectWarning, ValidationError
 
 class wizard_change_active_product(models.TransientModel):
     u"""Active/désactive tous produits selectionnes"""
@@ -11,8 +9,8 @@ class wizard_change_active_product(models.TransientModel):
     _description = u"Active/désactive tous produits selectionnés"
 
     action = fields.Selection([
-            ("active",u"Active les produits sélectionnés"),
-            ("desactive",u"Désactive les produits sélectionnés")
+            ("active",u"Activer les produits sélectionnés"),
+            ("desactive",u"Désactiver les produits sélectionnés")
         ], string='Action', required=True)
 
     @api.multi

@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 
-from openerp import models, fields, api, _
-from openerp.exceptions import UserError, RedirectWarning, ValidationError
+from odoo import models, fields, api
+from odoo.exceptions import UserError, ValidationError
 
 import StringIO
 import base64

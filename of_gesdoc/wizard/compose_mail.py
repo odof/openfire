@@ -1,10 +1,10 @@
 # -*- encoding: utf-8 -*-
 
-from openerp import models, fields, api, _
-from openerp.exceptions import UserError, RedirectWarning, ValidationError
+from odoo import models, fields, api
+from odoo.exceptions import UserError, ValidationError
 
 import time
-from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
 from datetime import datetime
 import pypdftk
 import os
