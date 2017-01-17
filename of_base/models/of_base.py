@@ -150,10 +150,11 @@ class ResPartner(models.Model):
         return address_format % args
 
     # Pour afficher dans le menu déroulant de choix de partenaire l'adresse du contact et pas que le nom 
-    def name_search(self, name, args=None, operator='ilike', limit=100):
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
         if self._context.get('show_address'):
             self = self.with_context(dict(self._context, of_show_address_line=True))
-        return super(ResPartner, self).name_search(name, args, operator=operator, limit=limit)
+        return super(ResPartner, self).name_search(name=name, args=args, operator=operator, limit=limit)
 
     @api.model
     def _get_default_image(self, partner_type, is_company, parent_id):
