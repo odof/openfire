@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="of_company_multi_logos" model="ir.ui.view"> <!-- record enregistre dans la BDD  -->
+        <field name="name">of.company.view.logotab</field>
+        <field name="model">res.company</field> <!-- le modèle associé à cette vue -->
+        <field name="inherit_id" ref="base.view_company_form" /> <!-- la vue parente de cette vue -->
+        <field name="arch" type="xml">
+            <notebook position="inside"> <!-- la vue parente possède un notebook, on ajoute un onglet -->
+                <page string="Logos" name="other_logos"> <!-- l'onglet en question -->
+                    <field name="of_logo_ids" mode="kanban">
+                        <kanban>
+                            <field name="name"/>
+                            <field name="logo"/>
+                            <templates>
+                                <t t-name="kanban-box"> <!-- une cellule du kanban -->
+                                    <div class="oe_kanban_global_click"> <!-- permet d'accéder au détail de la cellule par un click -->
+                                        <a t-if="!read_only_mode" type="delete" class="fa fa-times pull-right"/> <!-- permet de supprimer une cellule en mode éditer, via une croix en haut à droite -->
+                                        <div class="o_kanban_image"> <!-- image de la cellule -->
+                                            <img t-att-src="'data:image/png;base64,'+record.logo.raw_value"/>
+                                        </div>
+                                        <div class="oe_kanban_details"> <!-- détail, texte de la cellule -->
+                                            <strong><field name="name"/></strong>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                        <form>
+                            <group>
+                                <field name="name"/>
+                                <field name="logo" widget="image"/>
+                            </group>
+                        </form>
+                    </field>
+                </page>
+            </notebook>
+        </field>
+
+    </record>
+</odoo>
