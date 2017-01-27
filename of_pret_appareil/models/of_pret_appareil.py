@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from openerp import models, fields
+from openerp import models, fields, api
 
 class of_pret_appareil(models.Model):
     "Appareils prêtés"
@@ -33,3 +33,23 @@ class of_pret_appareil_line(models.Model):
     note = fields.Text(u'Note')
 
     _order = "date_pret desc, date_retour"
+
+
+class project_issue(models.Model):
+    _inherit = "project.issue"
+
+    def _calcul_si_pret_appareil(self):
+        "field function de of_is_pret_appareil"
+        for ligne in self:
+            if len(ligne.of_pret_appareil_ids) == 0 or ligne.of_pret_appareil_ids[0].date_retour:
+                ligne.of_is_pret_appareil = False
+            else:
+                ligne.of_is_pret_appareil = True
+
+    of_pret_appareil_ids = fields.One2many('of.pret.appareil.line', 'sav_id', u"Prêts d'appareil")
+    of_is_pret_appareil = fields.Boolean(u'Appareil prêté dans le cadre de ce SAV ?', compute='_calcul_si_pret_appareil', help=u"Un appareil a t-il été prêté dans le cadre de ce SAV ?")
+
+    @api.one
+    def void(self):
+        "Sert quand on clique sur un smart button pour qu'il ne se passe rien."
+        return True
