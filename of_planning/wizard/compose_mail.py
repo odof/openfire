@@ -9,8 +9,8 @@ class of_compose_mail(models.TransientModel):
     _inherit = 'of.compose.mail'
 
     @api.model
-    def _get_objects(self, o, data):
-        result = super(of_compose_mail,self)._get_objects(o, data)
+    def _get_objects(self, o):
+        result = super(of_compose_mail,self)._get_objects(o)
         if o._model._name == 'of.planning.pose':
             result.update({
                 'poses'   : [o],
@@ -22,10 +22,10 @@ class of_compose_mail(models.TransientModel):
         return result
 
     @api.model
-    def _get_dict_values(self, data, o, objects=None):
+    def _get_dict_values(self, o, objects=None):
         if not objects:
-            objects = self._get_objects(o, data)
-        result = super(of_compose_mail,self)._get_dict_values(data, o)
+            objects = self._get_objects(o)
+        result = super(of_compose_mail,self)._get_dict_values(o, objects=objects)
 
         poses = objects.get('poses',[])
         equipes_pose = []

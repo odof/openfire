@@ -11,53 +11,19 @@
                     <group>
                         <separator string="Envoyer un Courrier" colspan="2"/>
                         <field name="lettre_id"/>
-                        <field name="date_paie"/>
-                        <field name="amount_acompte" />
                     </group>
-                    <footer>
-                        <button string="Valider" name="get_lettre" type="object" class="btn-primary"/>
-                        <button string="Annuler" special="cancel" class="btn-default"/>
-                    </footer>
-                </form>
-            </field>
-        </record>
-
-        <!-- wizard for sending a mail: second step -->
-        <record id="view_courrier_wizard2" model="ir.ui.view">
-            <field name="name">Envoyer un mailing</field>
-            <field name="model">of.compose.mail</field>
-            <field name="arch" type="xml">
-                <form string="Envoyer un Courrier">
-                    <group>
-                        <separator string="Envoyer un Courrier" colspan="4"/>
-                        <field name="name" string="Libellé" required="1"/>
+                    <!-- Partie courrier classique -->
+                    <group attrs="{'invisible':['|',('lettre_id','=',False),('file','!=',False)]}">
                         <separator colspan="4" string="Contenu"/>
-                        <field name="content" colspan="4" nolabel="1" required="1"/>
+                        <field name="content" colspan="4" nolabel="1" attrs="{'required':[('file','=',False)]}"/>
                     </group>
-                    <footer>
-                        <button string="Imprimer" name="print_report" type="object" class="btn-primary"/>
-                        <button string="Annuler" special="cancel" class="btn-default"/>
-                    </footer>
-                </form>
-            </field>
-        </record>
-
-        <!-- wizard for sending a mail: second step, with pdf file -->
-        <record id="view_courrier_wizard2_file" model="ir.ui.view">
-            <field name="name">Envoyer un mailing</field>
-            <field name="model">of.compose.mail</field>
-            <field name="arch" type="xml">
-                <form string="Envoyer un Courrier">
-                    <group>
+                    <!-- Partie document pdf éditable -->
+                    <group attrs="{'invisible':[('file','=',False)]}">
                         <group invisible="1">
+                            <field name="file"/>
                             <field name="file_name"/>
                             <field name="res_file_name"/>
                         </group>
-                        <separator string="Envoyer un Courrier" colspan="4"/>
-                        <field name="name" string="Libellé" required="1"/>
-                        <field name="file" filename="file_name" readonly="1"/>
-                        <label for="res_file" class="oe_tz_warning" attrs="{'invisible': [('res_file','=',False)]}"/>
-                        <field name="res_file" nolabel="1" filename="res_file_name" attrs="{'invisible': [('res_file','=',False)]}"/>
                         <field name="chp_tmp_ids" nolabel="1" colspan="2">
                             <tree string="Champs PDF" create="false" delete="false" editable="bottom">
                                 <field name="name"/>
@@ -66,8 +32,12 @@
                         </field>
                     </group>
                     <footer>
-                        <button string="Générer Fichier PDF" name="print_report_acrobat" type="object" class="btn-primary"/>
-                        <button string="Terminer" special="cancel" class="btn-default"/>
+                        <button string="Générer Fichier PDF" name="print_report_acrobat" type="object" class="btn-primary"
+                                attrs="{'invisible':[('file','=',False)]}"/>
+                        <button string="Imprimer" name="print_report" type="object" class="btn-primary"
+                                attrs="{'invisible':['|',('lettre_id','=',False),('file','!=',False)]}"/>
+                        <button string="Annuler" special="cancel" class="btn-default"/>
+                        <field name="res_file" nolabel="1" filename="res_file_name" attrs="{'invisible': [('res_file','=',False)]}"/>
                     </footer>
                 </form>
             </field>

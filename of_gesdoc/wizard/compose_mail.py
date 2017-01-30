@@ -14,10 +14,7 @@ class of_compose_mail(models.TransientModel):
     _name = 'of.compose.mail'
     _description = 'Courrier'
 
-    name = fields.Char(string='Sujet', size=64)
     lettre_id = fields.Many2one('of.mail.template', string=u'Modèle')
-    date_paie = fields.Date(string='Date Paiement')
-    amount_acompte = fields.Float(string='Montant Acompte')
     content = fields.Text(string='Contenu')
     file = fields.Binary(related="lettre_id.file", string=u'Modèle PDF', store=False)
     file_name = fields.Char(related="lettre_id.file_name", string='Nom du fichier', size=64)
@@ -25,12 +22,32 @@ class of_compose_mail(models.TransientModel):
     res_file_name = fields.Char(string=u'Nom du fichier résultat', size=64)
     chp_tmp_ids = fields.One2many('of.gesdoc.chp.tmp', 'compose_id', string='Liste des champs')
 
+    @api.model
     def format_body(self, body):
         return (body or u'').encode('utf8', 'ignore')
 
+    @api.onchange('lettre_id')
+    def _onchange_lettre_id(self):
+        lettre = self.lettre_id
+        if not lettre:
+            return
+
+        obj = self.env[self._context.get('active_model')].browse(self._context.get('active_ids'))
+        values = self._get_dict_values(obj)
+
+        if lettre.file:
+            self.chp_tmp_ids = [
+                (0, 0, {
+                    'name': chp.name or '',
+                    'value_openfire': chp.to_export and chp.value_openfire and self.format_body(chp.value_openfire % values) or '',
+                })
+                for chp in lettre.chp_ids
+            ]
+        else:
+            self.content = self.format_body((lettre.body_text or '') % values)
+
     @api.model
-    def _get_objects(self, o, data):
-        # La variable data pourra etre utilisee dans des fonctions heritees, notamment dans of_planning_res pour active_model et active_ids
+    def _get_objects(self, o):
         partner_obj = self.env['res.partner']
 
         partner = o if o._name == 'res.partner' else o.partner_id
@@ -64,13 +81,13 @@ class of_compose_mail(models.TransientModel):
         return result
 
     @api.model
-    def _get_dict_values(self, data, o, objects=None):
-        if not data['ids']:
+    def _get_dict_values(self, o, objects=None):
+        if not o:
             return {}
         lang_obj = self.env['res.lang']
 
         if not objects:
-            objects = self._get_objects(o, data)
+            objects = self._get_objects(o)
         order = objects.get('order',False)
         invoice = objects.get('invoice',False)
         partner = objects.get('partner',False)
@@ -117,12 +134,10 @@ class of_compose_mail(models.TransientModel):
             'c_adr_pose_city'   : address_pose and address_pose.city or '',
             'c_adr_pose_zip'    : address_pose and address_pose.zip or '',
             'date'              : time.strftime('%d/%m/%Y'),
-            'date_paie'         : data['form'].get('date_paie',''),
-            'amount_acompte'    : lang.format('%.2f', data['form'].get('amount_acompte',0), grouping=True)
         })
 
         date_length = len((datetime.now()).strftime(DEFAULT_SERVER_DATE_FORMAT))
-        for date_field in ('date_order', 'date_confirm_order', 'date_invoice', 'date_paie'):
+        for date_field in ('date_order', 'date_confirm_order', 'date_invoice'):
             if not res[date_field]:
                 continue
             # reformatage de la date (copie depuis report_sxw : rml_parse.formatLang())
@@ -130,67 +145,6 @@ class of_compose_mail(models.TransientModel):
             date = date.strftime(lang.date_format.encode('utf-8'))
             res[date_field] = date
         return res
-
-    @api.model
-    def _format_lettre(self, data, content, obj):
-        vals = self._get_dict_values(data, obj)
-        return self.format_body(content % vals)
-
-    @api.multi
-    def get_lettre(self):
-        res = {}
-        lettre_obj = self.env['of.mail.template']
-        context = self._context
-        tmp = self.read(['lettre_id', 'date_paie', 'amount_acompte'])
-        data = {
-            'ids' : context.get('active_ids', []),
-            'model' : context.get('active_model', []),
-            'form' : tmp and tmp[0] or {},
-        }
-
-        data_ids = data['ids']
-        context = dict(context, data_ids = data_ids)
-        context['data_ids'] = data_ids
-        obj = self.env[data['model']].browse(data_ids[0])
-
-        #get information of mail's model when user chooses a model
-        view_ref = 'view_courrier_wizard2'
-        lettre_id = data['form'].get('lettre_id')
-        if lettre_id:
-            lettre = lettre_obj.browse(lettre_id[0])
-            res = {
-                'name': lettre.name,
-                'date_paie': data['form']['date_paie'],
-                'amount_acompte': data['form']['amount_acompte'],
-            }
-            values = self._get_dict_values(data, obj)
-
-            if lettre.file:
-                view_ref = 'view_courrier_wizard2_file'
-                res['chp_tmp_ids'] = []
-                for chp in lettre.chp_ids:
-                    res['chp_tmp_ids'].append((0, 0, {
-                        'name': chp.name or '',
-                        'value_openfire': chp.to_export and chp.value_openfire and self.format_body(chp.value_openfire % values) or '',
-                    }))
-            else:
-                res['content'] = self.format_body((lettre.body_text or '') % values)
-            self.write(res)
-
-        view = self.env.ref('of_gesdoc.' + view_ref)
-
-        return {
-            'name': 'Envoyer un courrier',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'view_id': view and view.id or False,
-            'res_model': 'of.compose.mail',
-            'src_model': data['model'],
-            'type': 'ir.actions.act_window',
-            'target': 'new',
-            'res_id': self.ids and self.ids[0] or False,
-            'context': context,
-        }
 
     def _get_model_action_dict(self):
         return {
@@ -271,7 +225,7 @@ class of_compose_mail(models.TransientModel):
                 res_file_name = 'courrier.pdf'
             self.write({'res_file': encoded_file, 'res_file_name': res_file_name})
 
-        view = self.env.ref('of_gesdoc.view_courrier_wizard2_file')
+        view = self.env.ref('of_gesdoc.view_courrier_wizard')
         return {
             'name': 'Envoyer un courrier',
             'view_type': 'form',
@@ -284,9 +238,6 @@ class of_compose_mail(models.TransientModel):
             'res_id': self.id,
             'context': self._context,
         }
-
-    def close_wizard(self):
-        return {'type': 'ir.actions.act_window_close'}
 
 class of_gesdoc_chp_tmp(models.TransientModel):
     _name = 'of.gesdoc.chp.tmp'
