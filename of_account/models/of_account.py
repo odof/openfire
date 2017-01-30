@@ -3,7 +3,7 @@
 from openerp import models, fields, api, _
 
 # Ajout de la fonction de fusion des factures
-class account_invoice(models.Model):
+class AccountInvoice(models.Model):
     _inherit = "account.invoice"
 
     @api.multi
@@ -149,7 +149,7 @@ class account_invoice(models.Model):
                 todos.write({'invoice_id': new_invoice_id})
         return res
 
-class account_move(models.Model):
+class AccountMove(models.Model):
     _inherit = "account.move"
 
     @api.one
