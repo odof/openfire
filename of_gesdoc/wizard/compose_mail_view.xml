@@ -13,15 +13,13 @@
                         <field name="lettre_id"/>
                     </group>
                     <!-- Partie courrier classique -->
-                    <group attrs="{'invisible':['|',('lettre_id','=',False),('file','!=',False)]}">
+                    <group attrs="{'invisible':['|',('lettre_id','=',False),'&amp;',('chp_tmp_ids','!=',[]),('chp_tmp_ids','!=',False)]}">
                         <separator colspan="4" string="Contenu"/>
-                        <field name="content" colspan="4" nolabel="1" attrs="{'required':[('file','=',False)]}"/>
+                        <field name="content" colspan="4" nolabel="1" attrs="{'required':['|',('chp_tmp_ids','=',[]),('chp_tmp_ids','=',False)]}"/>
                     </group>
                     <!-- Partie document pdf éditable -->
-                    <group attrs="{'invisible':[('file','=',False)]}">
+                    <group attrs="{'invisible':['|',('chp_tmp_ids','=',[]),('chp_tmp_ids','=',False)]}">
                         <group invisible="1">
-                            <field name="file"/>
-                            <field name="file_name"/>
                             <field name="res_file_name"/>
                         </group>
                         <field name="chp_tmp_ids" nolabel="1" colspan="2">
@@ -32,10 +30,8 @@
                         </field>
                     </group>
                     <footer>
-                        <button string="Générer Fichier PDF" name="print_report_acrobat" type="object" class="btn-primary"
-                                attrs="{'invisible':[('file','=',False)]}"/>
-                        <button string="Imprimer" name="print_report" type="object" class="btn-primary"
-                                attrs="{'invisible':['|',('lettre_id','=',False),('file','!=',False)]}"/>
+                        <button string="Générer Fichier PDF" name="print_report_acrobat" type="object" class="btn-primary" attrs="{'invisible':['|',('chp_tmp_ids','=',[]),('chp_tmp_ids','=',False)]}"/>
+                        <button string="Imprimer" name="print_report" type="object" class="btn-primary" attrs="{'invisible':['|',('lettre_id','=',False),'&amp;',('chp_tmp_ids','!=',[]),('chp_tmp_ids','!=',False)]}"/>
                         <button string="Annuler" special="cancel" class="btn-default"/>
                         <field name="res_file" nolabel="1" filename="res_file_name" attrs="{'invisible': [('res_file','=',False)]}"/>
                     </footer>

@@ -16,8 +16,6 @@ class of_compose_mail(models.TransientModel):
 
     lettre_id = fields.Many2one('of.mail.template', string=u'Modèle')
     content = fields.Text(string='Contenu')
-    file = fields.Binary(related="lettre_id.file", string=u'Modèle PDF', store=False)
-    file_name = fields.Char(related="lettre_id.file_name", string='Nom du fichier', size=64)
     res_file = fields.Binary(string=u'Fichier complété', readonly=True)
     res_file_name = fields.Char(string=u'Nom du fichier résultat', size=64)
     chp_tmp_ids = fields.One2many('of.gesdoc.chp.tmp', 'compose_id', string='Liste des champs')
@@ -44,6 +42,7 @@ class of_compose_mail(models.TransientModel):
                 for chp in lettre.chp_ids
             ]
         else:
+            self.chp_tmp_ids = []
             self.content = self.format_body((lettre.body_text or '') % values)
 
     @api.model
