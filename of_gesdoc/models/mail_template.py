@@ -34,19 +34,18 @@ class of_mail_template(models.Model):
     def onchange_file(self):
         chps = [(5, 0)]
         if self.file:
+            pre_vals = self.chp_ids and {chp.name: chp.value_openfire for chp in self.chp_ids} or {}
             pf = StringIO.StringIO(base64.decodestring(self.file))
             parser = PDFParser(pf)
             doc = PDFDocument(parser)
             fields = resolve1(doc.catalog['AcroForm'])['Fields']
-            
+
             for i in fields:
                 field = resolve1(i)
-                name, value = field.get('T'), field.get('V')
-                name = name.decode("unicode-escape", 'ignore').encode("utf-8")
-                if value:
-                    value = decode_text(value).encode("utf-8")
-                else:
-                    value = ''
+                name = field.get('T').decode("unicode-escape", 'ignore')
+                value = pre_vals.get(name) \
+                     or (field.get('V') and decode_text(field['V'])) \
+                     or ''
                 chps.append((0, 0, {
                     'name': name,
                     'value_openfire': value,
