@@ -1023,7 +1023,7 @@ INNER JOIN (
         # /!\ WARNING : Requête de la MORT !!! Calcul de matched_percentage des pièces comptables
         cr.execute("UPDATE account_move AS m\n"
                    "SET matched_percentage = CASE WHEN lines.total_amount = 0 THEN 1 ELSE lines.total_reconciled / lines.total_amount END\n"
-                   "FROM (SELECT recs.move_id, SUM(recs.amount) AS total_amount, SUM(recs.amount_reconciled) AS total_reconciled\n"
+                   "FROM (SELECT recs.move_id, COALESCE(SUM(recs.amount),0) AS total_amount, COALESCE(SUM(recs.amount_reconciled),0) AS total_reconciled\n"
                    "      FROM account_move AS m\n"
                    "      LEFT JOIN (SELECT ml.move_id, ml.id, ml.user_type_id, ABS(ml.debit - ml.credit) AS amount, SUM(rec.amount) AS amount_reconciled\n"
                    "                 FROM account_move_line AS ml\n"
@@ -1038,9 +1038,9 @@ INNER JOIN (
 
         # Calcul de amount_residual et reconciled des écritures comptables
         cr.execute("UPDATE account_move_line AS l\n"
-                   "SET amount_residual = l.debit - l.credit + rec.debit\n,"
+                   "SET amount_residual = l.debit - l.credit + rec.debit,\n"
                    "    reconciled = (l.debit + rec.debit = l.credit)\n"
-                   "FROM (SELECT l.id, SUM(amount) AS debit\n"
+                   "FROM (SELECT l.id, COALESCE(SUM(amount),0) AS debit\n"
                    "      FROM account_move_line AS l\n"
                    "      LEFT JOIN (\n" 
                    "       SELECT credit_move_id AS line_id, amount AS amount FROM account_partial_reconcile\n"

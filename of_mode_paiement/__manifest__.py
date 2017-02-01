@@ -15,7 +15,8 @@
     - Extension des modes de paiement aux paiements client ou fournisseur
     - Ajout règlement factures par LCR et prélèvement SEPA par échange de données informatisées (EDI)""",
     'depends' : [
-        'account'
+        'account',
+        'of_account_payment_mode',
     ],
     'init_xml' : [
         # Migration 'of_init.xml',

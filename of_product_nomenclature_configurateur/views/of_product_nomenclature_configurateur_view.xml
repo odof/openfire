@@ -39,6 +39,7 @@
                 <form>
                     <group>
                         <field name="name"/>
+                        <field name="description"/>
                         <field name="nb_selection_min"/>
                         <field name="nb_selection_max"/>
                         <field name="sequence"/>

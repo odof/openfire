@@ -6,13 +6,13 @@
 ##############################################################################
 
 {
-    'name' : "OpenFire / Module gestion de prêt d'appareils",
+    'name' : "OpenFire / Module gestion de prêt d'appareil",
     'version' : "1.1",
     'author' : "OpenFire",
     'website' : "www.openfire.fr",
     'category' : "OpenFire",
     'description': """
-Module gestion de prêt d'appareils
+Module gestion de prêt d'appareil
 """,
     'depends' : [
         'project_issue',

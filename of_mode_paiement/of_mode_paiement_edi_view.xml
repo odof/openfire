@@ -1,6 +1,20 @@
 <openerp>
     <data>
-    
+ 
+        <!-- Ajouter compte en banque aux modes de paiement -->
+        <record id="of_paiement_edi_payment_mode_form" model="ir.ui.view">
+            <field name="name">of.paiement.edi.payment.mode.form</field>
+            <field name="model">of.account.payment.mode</field>
+            <field name="inherit_id" ref="of_account_payment_mode.of_view_account_payment_mode_form"/>
+            <field name="arch" type="xml">
+                <field name="journal_id" position="after">
+                    <field name="partner_id" invisible="1"/>
+                    <field name="bank_id" domain="[('partner_id','=',partner_id)]"/>
+                </field>
+            </field>
+        </record>
+ 
+ 
     <!--##########################################################################################################################-->
     <!--###############################################________Paiements edi________##############################################-->
     <!--##########################################################################################################################-->
@@ -32,6 +46,73 @@
                 </field>
             </field>
         </record>
+
+        <!-- wizard paiement EDI (paiements par fichier informatique -->
+        <record id="view_paiement_edi_wizard" model="ir.ui.view">
+            <field name="name">Paiement EDI</field>
+            <field name="model">wizard.paiement.edi</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Paiement EDI (par échange de données informatisées)">
+                    <field name="nom_fichier" invisible="1"/>
+                    <field name="aff_bouton_paiement" invisible="1"/>
+                    <field name="aff_bouton_genere_fich" invisible="1"/>
+                    <field name="type_paiement" invisible="1"/>
+                    <field name="journal_id" invisible="1"/>
+                    <group colspan="4" col="1" string="Infos">
+                            <label string="La société, le compte bancaire émetteur et le journal comptable sont ceux du mode de paiement choisi." colspan="4"/>
+                            <label string="Le compte bancaire des tirés est celui du client attaché à la facture." colspan="4"/>
+                            <label string="Pour LCR :" colspan="4"/>
+                            <label string="-> Le fichier génère des lettres de change non acceptées avec encaissement à l'échéance (pas d'escompte), sans cession ou nantissement ou convention Daily." colspan="4"/>
+                            <label string="-> Le n° SIREN se configure pour l'émetteur dans le champs ''Registre de la société'' dans la configuration de la société et pour les clients, dans l'onglet achats/ventes des paramètres clients." colspan="4"/>
+                            <label string="-> Le numéro national émetteur (NNE) se configure dans les paramètres de la société émettrice." colspan="4"/>
+                            <label string="Pour prélèvement SEPA :" colspan="4"/>
+                            <label string="-> Le fichier génère des prélèvements récurrents mandat CORE." colspan="4"/>
+                            <label string="-> Les mandats se configurent dans l'onglet Achats-Ventes du client." colspan="4"/>
+                            <label string="-> L'identifiant créancier SEPA (ICS) se configure dans les paramètres de la société émettrice." colspan="4"/>
+                    </group>
+                    <label string=""/><newline/>
+                    <label string=""/><newline/>
+                    <hr/>
+                    <group colspan="4" col="4">                    
+                        <field name="mode_paiement_id" domain="[('journal_type','=','bank')]" widget="selection"/>
+                        <field name="type_montant_facture"/>
+                        <field name="date_remise"/>
+                        <field name="date_valeur"/>
+                        <field name="date_echeance"/>
+                        <field name="motif"/>
+                    </group>
+                    <group colspan="4" col="1">
+                        <field name="sortie" readonly="1"/>
+                    </group>
+                    <!--  <separator colspan="4"/>
+                    <newline/> -->
+                    <hr/>
+                    <group colspan="4" col="8">
+                        <button special="cancel" string="Annuler" icon="gtk-cancel" attrs="{'invisible':[('aff_bouton_genere_fich','=',False)]}"/>
+                        <button special="cancel" string="Fermer" icon="gtk-ok" attrs="{'invisible':[('aff_bouton_genere_fich','=',True)]}"/>
+                        <button name="action_paiement_lcr" string="Générer fichier LCR" type="object" icon="gtk-convert" attrs="{'invisible':[('aff_bouton_genere_fich','=',False)]}"/>
+                        <button name="action_paiement_sepa_prev" string="Générer fichier prélèvement SEPA" type="object" icon="gtk-convert" attrs="{'invisible':[('aff_bouton_genere_fich','=',False)]}"/>
+                    </group>
+                    <group colspan="2" col="4">
+                        <field name="fichier" filename="nom_fichier" readonly="1" attrs="{'invisible':[('fichier','=','')]}"/>
+                        <button name="action_enregistre_paiements" string="Valider le paiement des factures" type="object" icon="gtk-go-forward" attrs="{'invisible':[('aff_bouton_paiement','=',False)]}"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+     
+        <act_window id="action_view_paiement_edi_wizard"
+            key2="client_action_multi"
+            name="Prélèvement SEPA, LCR par EDI"
+            res_model="wizard.paiement.edi"
+            src_model="account.invoice"
+            view_mode="form"
+            view_type="form"
+            multi="True"
+            view_id="view_paiement_edi_wizard"
+            target="new"
+            groups="account.group_account_manager,account.group_account_user" />
 
     </data>
 </openerp>
