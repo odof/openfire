@@ -62,13 +62,24 @@ class project_issue(models.Model):
     def _get_product_sav_ids(self, cr, uid, ids, context={}):
         return self.pool['project.issue'].search(cr, uid, [('product_name_id','in',ids)], context=context)
 
+    def _search_of_parc_installe_site_adresse(self, operator, value):
+        "Permet la recherche sur l'adresse d'installation de la machine depuis un SAV"
+        cr = self._cr
+        value = '%%%s%%' % value
+        cr.execute("SELECT project_issue.id AS id\n"
+                   "FROM res_partner, of_parc_installe, project_issue\n"
+                   "WHERE (res_partner.street ilike %s OR res_partner.street2 ilike %s OR res_partner.zip ilike %s OR res_partner.city ilike %s)\n"
+                   "  AND res_partner.id = of_parc_installe.site_adresse_id\n"
+                   "  AND of_parc_installe.id = project_issue.of_produit_installe_id", (value, value, value, value))
+        return [('id', 'in', cr.fetchall())]
+
     of_produit_installe_id = fields.Many2one('of.parc.installe', u'Produit installé', ondelete='restrict', readonly=False)
     product_name_id = fields.Many2one('product.product', u'Désignation', ondelete='restrict')
     product_category_id = fields.Char(u'Famille', related="product_name_id.categ_id.name", readonly=True, store=True)
     of_parc_installe_client_nom = fields.Char(u'Client produit installé', related="of_produit_installe_id.client_id.name", readonly=True)
     of_parc_installe_client_adresse = fields.Char(u'Adresse client', related="of_produit_installe_id.client_id.contact_address", readonly=True)
     of_parc_installe_site_nom = fields.Char(u"Lieu d'installation", related="of_produit_installe_id.site_adresse_id.name", readonly=True)
-    of_parc_installe_site_adresse = fields.Char(u"Adresse d'installation", related="of_produit_installe_id.site_adresse_id.contact_address", readonly=True)
+    of_parc_installe_site_adresse = fields.Char(u"Adresse d'installation", related="of_produit_installe_id.site_adresse_id.contact_address", search='_search_of_parc_installe_site_adresse', readonly=True)
     of_parc_installe_note = fields.Text('Note produit installé', related="of_produit_installe_id.note", readonly=True)
 
 

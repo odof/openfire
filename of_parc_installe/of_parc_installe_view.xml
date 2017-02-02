@@ -117,6 +117,7 @@
             <field name="inherit_id" ref="project_issue.view_project_issue_filter"/>
             <field name="arch" type="xml">
                 <field name="partner_id" position="after">
+                    <field name="of_parc_installe_site_adresse"/>
                     <field name="of_produit_installe_id" string="No série"/>
                 </field>
                 <filter name="project" position="after">
