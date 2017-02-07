@@ -64,14 +64,31 @@ class project_issue(models.Model):
 
     def _search_of_parc_installe_site_adresse(self, operator, value):
         "Permet la recherche sur l'adresse d'installation de la machine depuis un SAV"
+        # Deux cas :
+        # - Rechercher tous les SAV qui ont une machine installée mais dont l'adresse d'installation n'est soit pas renseignée, soit vide (1er cas du if)
+        # - Recherche classique sur sur la rue, complément adresse, CP ou la ville (2e cas du if).
+
         cr = self._cr
-        value = '%%%s%%' % value
-        cr.execute("SELECT project_issue.id AS id\n"
-                   "FROM res_partner, of_parc_installe, project_issue\n"
-                   "WHERE (res_partner.street ilike %s OR res_partner.street2 ilike %s OR res_partner.zip ilike %s OR res_partner.city ilike %s)\n"
-                   "  AND res_partner.id = of_parc_installe.site_adresse_id\n"
-                   "  AND of_parc_installe.id = project_issue.of_produit_installe_id", (value, value, value, value))
+        if value == '' and operator == '=': # Si l'opérateur est = et value vide, c'est qu'on vient du filtre personnalisée rechercher les adresses d'installation non renseignée ou vide.
+            value = '%%%s%%' % value
+            cr.execute("SELECT project_issue.id AS id\n"
+                "FROM project_issue\n"
+                "INNER JOIN of_parc_installe ON of_parc_installe.id = project_issue.of_produit_installe_id\n"
+                "LEFT JOIN res_partner ON res_partner.id = of_parc_installe.site_adresse_id\n"
+                "WHERE (res_partner.street = '' OR res_partner.street is null)\n"
+                "  AND (res_partner.street2 = '' OR res_partner.street2 is null)\n"
+                "  AND (res_partner.zip = '' OR res_partner.zip is null)\n"
+                "  AND (res_partner.city = '' OR res_partner.city is null)")
+        else:
+            value = '%%%s%%' % value
+            cr.execute("SELECT project_issue.id AS id\n"
+               "FROM res_partner, of_parc_installe, project_issue\n"
+               "WHERE (res_partner.street ilike %s OR res_partner.street2 ilike %s OR res_partner.zip ilike %s OR res_partner.city ilike %s)\n"
+               "  AND res_partner.id = of_parc_installe.site_adresse_id\n"
+               "  AND of_parc_installe.id = project_issue.of_produit_installe_id", (value, value, value, value))
+
         return [('id', 'in', cr.fetchall())]
+
 
     of_produit_installe_id = fields.Many2one('of.parc.installe', u'Produit installé', ondelete='restrict', readonly=False)
     product_name_id = fields.Many2one('product.product', u'Désignation', ondelete='restrict')
