@@ -623,7 +623,7 @@ class wizard_paiement_edi(models.TransientModel):
             
             # On met le champ type de prélèvement SEPA de chaque client à récurent en cours si était à 1er prélèvement à venir
             if facture.partner_id.of_sepa_type_prev == "FRST":
-                if not partner_obj.write(facture.partner_id.id, {'of_sepa_type_prev': 'RCUR'}):
+                if not facture.partner_id.write({'of_sepa_type_prev': 'RCUR'}):
                     raise UserError(u"Erreur ! (#ED320)\n\nErreur dans l'enregistrement du type de prélèvement SEPA pour : " + facture.partner_id.name + u".\n\nAucun paiement n'a été en conséquence validé.")
                 
         sortie = u"Le paiement des factures a été effectué.\nIl vous reste à transmettre le fichier à votre banque.\n\n-----------------------------------------------\n\n" + sortie
