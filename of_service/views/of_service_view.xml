@@ -13,24 +13,24 @@
             <field name="arch" type="xml">
                 <form>
                     <sheet>
-                        <group col="4">
+                        <group>
                             <field name="partner_id" invisible="context.get('invisible_partner_id')"/>
-                            <separator colspan="4" string="Informations générales"/> 
-                            <field name="tache_id" colspan="4"/>
-                            <field name="template_id"/>
+                            <separator string="Informations générales" colspan="2"/> 
+                            <field name="tache_id"/>
+                            <!-- <field name="template_id"/> -->
                             <field name="date_fin"/>
-                            <field name="mois_ids" nolabel="1" colspan="2"/>
-                            <field name="jour_ids" nolabel="1" colspan="2"/>
+                            <field name="mois_ids" widget="many2many_tags"/>
+                            <field name="jour_ids" widget="many2many_tags"/>
                         </group>
                         <separator string="Notes"/>
                         <field name="note"/>
                         <separator string="Interventions"/>
                         <field name="planning_ids" nolabel="1" colspan="2">
-                            <tree string="Liste des interventions" colors="darkgreen:state=='Planifie';darkolivegreen:state=='Confirme';grey:state=='Annule';darkred:state=='Reporte';darkblue:state=='Pose'">
+                            <tree string="Liste des interventions" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done'">
                                 <field name="name" string="Libellé"/>
                                 <field name="date"/>
                                 <field name="duree" string="Durée" widget="float_time"/>
-                                <field name="poseur_id"/>
+                                <field name="equipe_id"/>
                                 <field name="company_id"/>
                                 <field name="state"/>
 
@@ -38,7 +38,7 @@
                                 <button name="change_state_before" type="object" icon="gtk-go-back"/>
                                 <button name="change_state_after" type="object" icon="gtk-go-forward"/>
 
-                                <!-- Afficher le icon quand le status est Confirme et Pose -->
+                                <!-- Afficher l'icône quand le status est Confirmé et Réalisé -->
                                 <button name="state_conf" type="object" icon="gtk-no" attrs="{'invisible':[('state', '!=', 'Confirme')]}"/>
                                 <button name="state_pose" type="object" icon="gtk-apply" attrs="{'invisible':[('state', '!=', 'Pose')]}"/>
                                 <field name="description"/>
@@ -61,7 +61,7 @@
                     <field name="mois_ids"/>
                     <field name="jour_ids"/>
                     <field name="note"/>
-                    <field name="template_id"/>
+                    <!-- <field name="template_id"/> -->
                     <field name="date_last"/>
                     <field name="date_fin"/>
                     <field name="state" invisible="1"/>
@@ -106,11 +106,11 @@
                                 <field name="mois_ids"/>
                                 <field name="jour_ids"/>
                                 <field name="note"/>
-                                <field name="template_id"/>
+                                <!-- <field name="template_id"/> -->
                                 <field name="date_fin"/>
                                 <field name="state" invisible="1"/>
-                                <button name="%(of_gesdoc.action_view_courrier_wizard)d" icon="gtk-paste" string="Ajouter Contrat" type="action"
-                                        attrs="{'invisible': [('template_id', '=', False)]}"/>
+                                <!--button name="% (of_gesdoc.action_view_courrier_wizard)d" icon="gtk-paste" string="Ajouter Contrat" type="action"
+                                        attrs="{'invisible': [('template_id', '=', False)]}"/-->
                             </tree>
                         </field>
                     </page>
@@ -133,7 +133,7 @@
 <!--#################################################_________Menus__________#################################################-->
 <!--##########################################################################################################################-->
 
-        <menuitem id="menu_of_service" name="Services" parent="base.menu_sales" sequence="105" action="action_of_service_form"/>
+        <menuitem id="menu_of_service" name="Services" parent="sales_team.menu_sales" sequence="105" action="action_of_service_form"/>
 
     </data>
 </openerp>

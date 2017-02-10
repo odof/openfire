@@ -4,9 +4,9 @@
         "version" : "0.9",
         "author" : "OpenFire",
         "website" : "http://www.openfire.fr",
-        "category" : "Generic Modules/Gestion Pose",
-        "description": """ Le module OpenFire des plannings de pose.
-Inclut la gestion d'équipes de pose.""",
+        "category" : "Generic Modules/Gestion des Interventions",
+        "description": """ Le module OpenFire des plannings d'intervention.
+Inclut la gestion d'équipes d'intervention.""",
         "depends" : [
                      'hr',
                      'product',
@@ -29,7 +29,7 @@ Inclut la gestion d'équipes de pose.""",
 #             'wizard/wizard_equipe_semaine.xml',
 #             'of_planning_report.xml',
 #             'wizard/message_invoice.xml',
-            'views/of_planning_pose_view.xml',
+            'views/of_planning_intervention_view.xml',
 #            'wizard/of_planning_pose_mensuel_view.xml',
         ],
         "installable": True,

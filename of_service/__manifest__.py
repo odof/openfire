@@ -9,8 +9,6 @@
     'description': """ Module OpenFire de gestion des services.""",
     'depends' : [
         'of_planning',
-        'of_parc_installe',
-        'of_gesdoc',
     ],
     'init_xml' : [ ],
     'demo_xml' : [ ],
@@ -20,8 +18,7 @@
         'data/of_mois_data.xml',
         'data/of_jour_data.xml',
     ],
-    'installable': False,
-    'active': False,
+    'installable': True,
 }
 
 

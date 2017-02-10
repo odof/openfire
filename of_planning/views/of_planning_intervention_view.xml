@@ -14,7 +14,7 @@
             <field name="arch" type="xml">
                 <page name="historique" position="inside">
                     <group name="histo_planning" string="Planning">
-                        <field name="pose_ids" colspan="4" nolabel="1" readonly="1">
+                        <field name="intervention_ids" colspan="4" nolabel="1" readonly="1">
                             <tree string="Plannings">
                                 <field name="equipe_id"/>
                                 <field name="date" string="Date"/>
@@ -32,23 +32,21 @@
         </record>
 
 <!--##########################################################################################################################-->
-<!--###############################################______Planning de pose______###############################################-->
+<!--############################################______Planning d'intervention______###########################################-->
 <!--##########################################################################################################################-->
 
 <!--##################################################______Recherche______###################################################-->
-        <record id="of_planning_pose_filter" model="ir.ui.view">
-            <field name="name">of.planning.pose.filter</field>
-            <field name="model">of.planning.pose</field>
+        <record id="of_planning_intervention_filter" model="ir.ui.view">
+            <field name="name">of.planning.intervention.filter</field>
+            <field name="model">of.planning.intervention</field>
             <field name="arch" type="xml">
                 <search string="Recherche">
                     <group>
-                        <filter string="Brouillon" name="state_brou" icon="terp-folder-violet" domain="[('state','=','Brouillon')]"/>
-                        <filter string="Planifié" name="state_plan" icon="terp-folder-yellow" domain="[('state','=','Planifie')]"/>
-                        <filter string="Confirmé" name="state_conf" icon="gtk-no" domain="[('state','=','Confirme')]"/>
-                        <filter string="Posé" name="state_pose" icon="terp-folder-blue" domain="[('state','=','Pose')]"/>
-                        <filter string="Annulé" name="state_annu" icon="terp-dialog-close-red" domain="[('state','=','Annule')]"/>
-                        <filter string="Reporté" name="state_report" icon="terp-folder-green" domain="[('state','=','Reporte')]"/>
-                        <filter string="Inachevé" name="state_inach" icon="terp-folder-orange" domain="[('state','=','Inacheve')]"/>
+                        <filter string="Brouillon" name="state_draft" icon="terp-folder-violet" domain="[('state','=','draft')]"/>
+                        <filter string="Confirmé" name="state_confirm" icon="gtk-no" domain="[('state','=','confirm')]"/>
+                        <filter string="Réalisé" name="state_done" icon="terp-folder-blue" domain="[('state','=','done')]"/>
+                        <filter string="Annulé" name="state_cancel" icon="terp-dialog-close-red" domain="[('state','=','cancel')]"/>
+                        <filter string="Reporté" name="state_postponed" icon="terp-folder-green" domain="[('state','=','postponed')]"/>
                     </group>
                     <newline/>
                     <group>
@@ -82,23 +80,21 @@
 
 <!--###################################################______Vue form______###################################################-->
 
-        <record id="of_planning_pose_view_form" model="ir.ui.view" >
-            <field name="name">of.planning.pose.form</field>
-            <field name="model">of.planning.pose</field>
+        <record id="of_planning_intervention_view_form" model="ir.ui.view" >
+            <field name="name">of.planning.intervention.form</field>
+            <field name="model">of.planning.intervention</field>
             <field name="arch" type="xml" >
                 <form string="Nouvelle Intervention" >
                     <header>
                         Passer à
-                        <button name="button_poser" string="Posé" states="Confirme" type="object"/>
-                        <button name="button_confirmer" string="Confirmé" states="Planifie" type="object"/>
-                        <button name="button_reporter" string="Reporté" states="Confirme,Planifie" type="object"/>
-                        <button name="button_inachever" string="Inachevé" states="Confirme,Planifie" type="object"/>
-                        <button name="button_annuler" string="Annulé" states="Confirme,Planifie" type="object"/>
-                        <button name="button_planifier" string="Planifié" states="Brouillon" type="object"/>
-                        <button name="button_brouillon" string="Brouillon" states="Pose,Confirme,Annule,Reporte,Inacheve" type="object"/>
-                        <field name="state" widget="statusbar" nolabel="1" statusbar_visible="Brouillon,Planifie,Confirme,Pose" statusbar_colors='{"proforma":"blue","proforma2":"blue"}'/>
+                        <button name="button_done" string="Réalisé" states="done" type="object"/>
+                        <button name="button_confirm" string="Confirmé" states="draft" type="object"/>
+                        <button name="button_postponed" string="Reporté" states="confirm" type="object"/>
+                        <button name="button_cancel" string="Annulé" states="draft,confirm" type="object"/>
+                        <button name="button_draft" string="Brouillon" states="done,confirm,cancel,postponed" type="object"/>
+                        <field name="state" widget="statusbar" nolabel="1" statusbar_visible="draft,confirm,done" statusbar_colors='{"proforma":"blue","proforma2":"blue"}'/>
                         <div align="right" style="align:right;padding: 0px 18px 0px 0px;width:100%">
-                            <field name="raison_id" widget="selection" context="{'tz': 'Europe/Paris'}" attrs="{'invisible':[('state', 'not in', ('Reporte','Inacheve'))]}"/>
+                            <field name="raison_id" widget="selection" context="{'tz': 'Europe/Paris'}" attrs="{'invisible':[('state', '!=', 'postponed')]}"/>
                         </div>
                     </header>
                     <sheet>
@@ -149,11 +145,11 @@
 
 <!--###################################################______Vue tree______###################################################-->
 
-        <record id="of_planning_pose_view_tree" model="ir.ui.view" >
-            <field name="name">of.planning.pose.tree</field>
-            <field name="model">of.planning.pose</field>
+        <record id="of_planning_intervention_view_tree" model="ir.ui.view" >
+            <field name="name">of.planning.intervention.tree</field>
+            <field name="model">of.planning.intervention</field>
             <field name="arch" type="xml" >
-                <tree string="Liste des interventions" colors="darkgreen:state=='Planifie';darkolivegreen:state=='Confirme';grey:state=='Annule';darkred:state=='Reporte';darkblue:state=='Pose'">
+                <tree string="Liste des interventions" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done'">
                     <field name="name" string="Libellé"/>
                     <field name="user_id" invisible="1"/>
                     <field name="date"/>
@@ -170,9 +166,9 @@
                     <button name="change_state_before" type="object" icon="gtk-go-back"/>
                     <button name="change_state_after" type="object" icon="gtk-go-forward"/>
 
-                    <!-- Afficher le icon quand le status est Confirme et Pose -->
-                    <button name="state_conf" type="object" icon="gtk-no" attrs="{'invisible':[('state', '!=', 'Confirme')]}"/>
-                    <button name="state_pose" type="object" icon="gtk-apply" attrs="{'invisible':[('state', '!=', 'Pose')]}"/>
+                    <!-- Afficher l'icône quand le statut est Confirmé et Réalisé -->
+                    <button name="button_confirm" type="object" icon="gtk-no" attrs="{'invisible':[('state', '!=', 'confirm')]}"/>
+                    <button name="button_done" type="object" icon="gtk-apply" attrs="{'invisible':[('state', '!=', 'done')]}"/>
                     <field name="description"/>
                 </tree>
             </field>
@@ -180,9 +176,9 @@
 
 <!--#############################################______Vue calendar_______#####################################################-->
 
-        <record id="of_planning_pose_view_calendar" model="ir.ui.view">
-            <field name="name">of.planning.pose.calendar</field>
-            <field name="model">of.planning.pose</field>
+        <record id="of_planning_intervention_view_calendar" model="ir.ui.view">
+            <field name="name">of.planning.intervention.calendar</field>
+            <field name="model">of.planning.intervention</field>
             <field name="arch" type="xml">
                 <calendar string="Calendrier" date_start="date" color="equipe_id" date_stop="date_deadline">
                     <field name="name"/>
@@ -195,9 +191,9 @@
 
 <!--#############################################________Vue gant________#####################################################-->
 
-        <record id="of_planning_pose_view_gantt" model="ir.ui.view" >
-            <field name="name">of.planning.pose.gantt</field>
-            <field name="model">of.planning.pose</field>
+        <record id="of_planning_intervention_view_gantt" model="ir.ui.view" >
+            <field name="name">of.planning.intervention.gantt</field>
+            <field name="model">of.planning.intervention</field>
             <field name="arch" type="xml" >
                 <gantt color="equipe_id" date_start="date" date_stop="date_deadline" string="Planning" mode="month">
                     <level object="of.planning.equipe" link="equipe_id" domain="[]">
@@ -411,9 +407,9 @@
 
 <!--#############################################_______Raisons inacheve reporte________#####################################################-->
 
-        <record id="of_planning_pose_raison_form" model="ir.ui.view">
-            <field name="name">of.planning.pose.raison.form</field>
-            <field name="model">of.planning.pose.raison</field>
+        <record id="of_planning_intervention_raison_form" model="ir.ui.view">
+            <field name="name">of.planning.intervention.raison.form</field>
+            <field name="model">of.planning.intervention.raison</field>
             <field name="arch" type="xml">
                 <form string="Raison">
                     <group>
@@ -423,9 +419,9 @@
             </field>
         </record>
 
-        <record id="of_planning_pose_raison_tree" model="ir.ui.view">
-            <field name="name">of.planning.pose.raison.tree</field>
-            <field name="model">of.planning.pose.raison</field>
+        <record id="of_planning_intervention_raison_tree" model="ir.ui.view">
+            <field name="name">of.planning.intervention.raison.tree</field>
+            <field name="model">of.planning.intervention.raison</field>
             <field name="arch" type="xml">
                 <tree string="Raison">
                     <field name="name" string="Libellé"/>
@@ -488,14 +484,14 @@
 <!--#############################################________Actions_________#####################################################-->
 <!--##########################################################################################################################-->
 
-        <record id="action_of_planning_pose_calendar" model="ir.actions.act_window">
+        <record id="action_of_planning_intervention_calendar" model="ir.actions.act_window">
             <field name="name">Planning d'intervention</field>
-            <field name="res_model">of.planning.pose</field>
+            <field name="res_model">of.planning.intervention</field>
             <field name="view_type">form</field>
             <field name="view_mode">calendar,form,gantt,tree</field>
-            <field name="context">{'search_default_state_plan':1,'search_default_state_conf':1,'search_default_state_pose':1,'search_default_state_brou':1,'search_default_state_inach':1}</field>
-            <field name="view_id" ref="of_planning_pose_view_calendar"/>
-            <field name="search_view_id" ref="of_planning_pose_filter"/>
+            <field name="context">{'search_default_state_confirm':1,'search_default_state_done':1,'search_default_state_draft':1}</field>
+            <field name="view_id" ref="of_planning_intervention_view_calendar"/>
+            <field name="search_view_id" ref="of_planning_intervention_filter"/>
         </record>
 
 <!--#############################################_________Taches_________#####################################################-->
@@ -526,12 +522,12 @@
 
    <!--################################################_Raison inacheve reporte_######################################################-->
 
-        <record id="action_of_planning_pose_raison_tree" model="ir.actions.act_window">
+        <record id="action_of_planning_intervention_raison_tree" model="ir.actions.act_window">
             <field name="name">Erreurs</field>
-            <field name="res_model">of.planning.pose.raison</field>
+            <field name="res_model">of.planning.intervention.raison</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="view_id" ref="of_planning.of_planning_pose_raison_tree"/>
+            <field name="view_id" ref="of_planning.of_planning_intervention_raison_tree"/>
         </record>
         
     <!--################################################_Type cout employee_######################################################-->
@@ -548,58 +544,58 @@
 <!--#############################################_________Menus__________#####################################################-->
 <!--##########################################################################################################################-->
 
-        <menuitem id="menu_of_planning_configuration" name="Pose" parent="hr.menu_human_resources_configuration" groups="hr.group_hr_manager" sequence="10"/>
+        <menuitem id="menu_of_planning_configuration" name="Intervention" parent="hr.menu_human_resources_configuration" groups="hr.group_hr_manager" sequence="10"/>
             <menuitem name="Employés" id="menu_hr_employee_tree" parent="menu_of_planning_configuration" sequence="1" action="action_hr_employee_tree"/>
             <menuitem name="Equipes" id="menu_of_planning_equipe_tree" parent="menu_of_planning_configuration" sequence="2" action="action_of_planning_equipe_tree"/>
-            <menuitem name="Erreurs" id="menu_of_planning_pose_raison_tree" parent="menu_of_planning_configuration" sequence="3" action="action_of_planning_pose_raison_tree"/>
+            <menuitem name="Erreurs" id="menu_of_planning_intervention_raison_tree" parent="menu_of_planning_configuration" sequence="3" action="action_of_planning_intervention_raison_tree"/>
             <menuitem name="Tâches" id="menu_of_planning_tache_tree" parent="menu_of_planning_configuration" sequence="3" action="action_of_planning_tache_tree"/>
             <!--menuitem name="Types de coûts" id="menu_pnanning_of_employee_typcout_tree" parent="menu_of_planning_configuration" sequence="5" action="action_of_planning_employee_typcout_tree"/-->
 
-        <menuitem id="menu_of_planning_pose" name="Planning des interventions" parent="sales_team.menu_base_partner" groups="of_group_planning_pose_user" sequence="10"/>
-            <menuitem id="menu_of_planning_pose_pose" name="Planning calendrier" parent="menu_of_planning_pose" sequence="1" action="action_of_planning_pose_calendar"/>
-            <!--menuitem id="menu_of_planning_pose_global" name="Global" parent="menu_of_planning_pose" sequence="1" action="action_of_planning_pose_calendar"/>
-            <menuitem id="menu_of_planning_pose_po" name="Poêle" parent="menu_of_planning_pose" sequence="4" action="action_of_planning_pose_po_calendar"/>
-            <menuitem id="menu_of_planning_pose_ch" name="Cheminée" parent="menu_of_planning_pose" sequence="4" action="action_of_planning_pose_ch_calendar"/>
-            <menuitem id="menu_of_planning_entretien" name="Ramonage Entretien SAV" parent="menu_of_planning_pose" sequence="5" action="action_of_planning_entretien_calendar"/-->
+        <menuitem id="menu_of_planning_intervention" name="Planning des interventions" parent="sales_team.menu_base_partner" groups="of_group_planning_intervention_user" sequence="10"/>
+            <menuitem id="menu_of_planning_intervention_calendar" name="Planning calendrier" parent="menu_of_planning_intervention" sequence="1" action="action_of_planning_intervention_calendar"/>
+            <!--menuitem id="menu_of_planning_intervention_global" name="Global" parent="menu_of_planning_intervention" sequence="1" action="action_of_planning_intervention_calendar"/>
+            <menuitem id="menu_of_planning_intervention_po" name="Poêle" parent="menu_of_planning_intervention" sequence="4" action="action_of_planning_intervention_po_calendar"/>
+            <menuitem id="menu_of_planning_intervention_ch" name="Cheminée" parent="menu_of_planning_intervention" sequence="4" action="action_of_planning_intervention_ch_calendar"/>
+            <menuitem id="menu_of_planning_entretien" name="Ramonage Entretien SAV" parent="menu_of_planning_intervention" sequence="5" action="action_of_planning_entretien_calendar"/-->
 
-    <!-- Ajouter menu Envoyer un courrier dans Planning Pose -->
+    <!-- Ajouter menu Envoyer un courrier dans Planning Intervention -->
         <!--act_window
             name="Envoyer un courrier"
             res_model="of.compose.mail"
-            src_model="of.planning.pose"
+            src_model="of.planning.intervention"
             view_mode="form"    
             key2="client_print_multi"
             view_id="of_gesdoc.view_courrier_wizard"
             id="action_view_planning_courrier_wizard_account"
-            context="{'model':'of.planning.pose'}"
+            context="{'model':'of.planning.intervention'}"
             target="new"
         /-->
         
-    <!-- Ajouter menu Envoyer un courriel dans Planning Pose -->
+    <!-- Ajouter menu Envoyer un courriel dans Planning Intervention -->
         <!-- <act_window
           name="Envoyer un courriel"
           res_model="mail.compose.message"
-          src_model="of.planning.pose"
+          src_model="of.planning.intervention"
           view_mode="form"
           key2="client_print_multi"
           id="of_planning_email" 
           target="new"/> -->
         <!--delete model="ir.actions.act_window" id="of_planning_email"/-->
         
-        <!-- Creation la facture depuis planning pose -->
+        <!-- Creation la facture depuis planning intervention -->
 
-        <!--record id="action_of_create_invoice_pose" model="ir.actions.server">
+        <!--record id="action_of_create_invoice_intervention" model="ir.actions.server">
             <field name="name">Générer les factures</field>
-            <field name="model_id" ref="model_of_planning_pose"/>
+            <field name="model_id" ref="model_of_planning_intervention"/>
             <field name="state">code</field>
             <field name="code">action = obj.create_invoice()</field>
         </record>
 
-        <record id="action_create_invoice_pose" model="ir.values">
+        <record id="action_create_invoice_intervention" model="ir.values">
             <field name="name">Générer les factures</field>
             <field name="key2">client_action_multi</field>
-            <field name="model">of.planning.pose</field>
-            <field name="value" eval="'ir.actions.server,%d'%action_of_create_invoice_pose"/>
+            <field name="model">of.planning.intervention</field>
+            <field name="value" eval="'ir.actions.server,%d'%action_of_create_invoice_intervention"/>
             <field name="object" eval="True"/>
         </record-->
 

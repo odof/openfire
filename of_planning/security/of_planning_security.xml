@@ -4,23 +4,23 @@
 
     <!--###########################################______Création de la categorie______###################################################-->
 
-        <record model="ir.module.category" id="of_planning_pose_module_category">
-            <field name="name">OF Planning Pose</field>
-            <field name="description">Définit les droits d'accès au planning de pose OpenFire.</field>
+        <record model="ir.module.category" id="of_planning_intervention_module_category">
+            <field name="name">OF Planning Intervention</field>
+            <field name="description">Définit les droits d'accès au planning d'intervention OpenFire.</field>
             <field name="sequence">91</field>
         </record>
 
     <!--#############################################______Création des groupes______#####################################################-->
 
-        <record id="of_group_planning_pose_user" model="res.groups">
+        <record id="of_group_planning_intervention_user" model="res.groups">
             <field name="name">Utilisateur</field>
-            <field name="category_id" ref="of_planning_pose_module_category"/>
+            <field name="category_id" ref="of_planning_intervention_module_category"/>
         </record>
 
-        <record id="of_group_planning_pose_manager" model="res.groups">
+        <record id="of_group_planning_intervention_manager" model="res.groups">
             <field name="name">Responsable</field>
-            <field name="category_id" ref="of_planning_pose_module_category"/>
-            <field name="implied_ids" eval="[(4, ref('of_group_planning_pose_user'))]"/>
+            <field name="category_id" ref="of_planning_intervention_module_category"/>
+            <field name="implied_ids" eval="[(4, ref('of_group_planning_intervention_user'))]"/>
         </record>
     </data>
 </openerp>

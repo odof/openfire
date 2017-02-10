@@ -1,9 +1,9 @@
 # -*- encoding: utf-8 -*-
 
-from openerp import api, models, fields
+from odoo import api, models, fields
 
 
-class of_mois(models.Model):
+class OfMois(models.Model):
     _name = 'of.mois'
     _description = u"Mois de l'année"
     _order = 'id'
@@ -12,7 +12,7 @@ class of_mois(models.Model):
     abr = fields.Char(u'Abréviation', size=16)
 
 
-class of_jours(models.Model):
+class OfJours(models.Model):
     _name = 'of.jours'
     _description = "Jours de la semaine"
     _order = 'id'
@@ -21,24 +21,13 @@ class of_jours(models.Model):
     abr = fields.Char(u'Abréviation', size=16)
 
 
-class of_service(models.Model):
+class OfService(models.Model):
     _name = "of.service"
     _description = "Service"
 
-    @api.one
-    @api.depends('mois_ids')
-    def _get_mois_str(self):
-        self.mois_str = " ".join([mois.abr for mois in self.mois_ids])
-
-    @api.one
-    @api.depends('jour_ids')
-    def _get_jour_dis(self):
-        self.jours_str = " ".join([jour.abr for jour in self.jour_ids])
-
     def _get_default_jours(self):
         # Lundi à vendredi comme valeurs par défaut
-        # Pour que les jours apparaissent dans le bon ordre, il faut les envoyer dans l'ordre inverse
-        return [5, 4, 3, 2, 1]
+        return [1, 2, 3, 4, 5]
 
     def _search_mois(self, operator, value):
         mois = self.env['of.mois'].search(['|', ('name', operator, value), ('abr', operator, value)])
@@ -51,7 +40,7 @@ class of_service(models.Model):
     @api.one
     @api.depends('tache_id','partner_id')
     def _get_planning_ids(self):
-        planning_obj = self.env['of.planning.pose']
+        planning_obj = self.env['of.planning.intervention']
         for service in self:
             plannings = planning_obj.search([('tache_id','=',service.tache_id.id),
                                              ('partner_id','=',service.partner_id.id)], order='date desc')
@@ -65,7 +54,7 @@ class of_service(models.Model):
 
         query = ("SELECT s.id\n"
                  "FROM of_service AS s\n"
-                 "LEFT JOIN of_planning_pose AS p\n"
+                 "LEFT JOIN of_planning_intervention AS p\n"
                  "  ON p.partner_id = s.partner_id\n"
                  "  AND p.tache_id = s.tache_id\n")
 
@@ -87,16 +76,13 @@ class of_service(models.Model):
         rows = cr.fetchall()
         return [('id', 'in', zip(*rows)[0])]
 
-    template_id = fields.Many2one('of.mail.template', string='Contrat')
+#    template_id = fields.Many2one('of.mail.template', string='Contrat')
     partner_id = fields.Many2one('res.partner', string='Partenaire', store=True, ondelete='cascade')
     tache_id = fields.Many2one('of.planning.tache', string=u'Tâche', required=True)
     name = fields.Char(u"Libellé", related='tache_id.name', store=True)
 
     mois_ids = fields.Many2many('of.mois', 'service_mois', 'service_id', 'mois_id', string='Mois', required=True)
     jour_ids = fields.Many2many('of.jours', 'service_jours', 'service_id', 'jour_id', string='Jours', required=True, default=_get_default_jours)
-
-    mois_ids_str = fields.Char("Mois", compute='get_mois_str', search='_search_mois')
-    jour_ids_str = fields.Char("Jours", compute='get_jours_str', search='_search_jour')
 
     note = fields.Text('Notes')
     date_fin = fields.Date(u"Date d'échéance")
@@ -112,10 +98,10 @@ class of_service(models.Model):
             ('cancel', u'Annulé'),
             ], 'Etat', default='progress')
 
-    planning_ids = fields.One2many('of.planning.pose', compute='_get_planning_ids', string="Interventions")
+    planning_ids = fields.One2many('of.planning.intervention', compute='_get_planning_ids', string="Interventions")
     date_last = fields.Date(u'Dernière intervention', compute='_get_planning_ids', search='_search_last_date', help=u"Date de la dernière intervention")
 
-class res_partner(models.Model):
+class ResPartner(models.Model):
     _inherit = "res.partner"
 
     service_ids = fields.One2many('of.service', 'partner_id', string='Service')

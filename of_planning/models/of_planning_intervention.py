@@ -7,7 +7,7 @@ from __builtin__ import False
 
 class OfPlanningTache(models.Model):
     _name = "of.planning.tache"
-    _description = "Planning OpenFire : Tâches"
+    _description = u"Planning OpenFire : Tâches"
 
     name = fields.Char(u'Libellé', size=64, required=True)
     description = fields.Text('Description')
@@ -29,7 +29,7 @@ Si cette option n'est pas cochée, seule la tâche le plus souvent effectuée da
 
 class OfPlanningEquipe(models.Model):
     _name = "of.planning.equipe"
-    _description = "Equipe de pose"
+    _description = u"Équipe d'intervention"
     _order = "sequence, name"
 
 #     def _get_employee_equipes(self, cr, uid, ids, context=None):
@@ -38,12 +38,12 @@ class OfPlanningEquipe(models.Model):
 #             result += emp['equipe_ids']
 #         return list(set(result))
 
-    name = fields.Char('Equipe', size=128, required=True)
+    name = fields.Char(u'Équipe', size=128, required=True)
     note = fields.Text('Description')
     employee_ids = fields.Many2many('hr.employee', 'of_planning_employee_rel', 'equipe_id', 'employee_id', u'Employés')
     active = fields.Boolean('Actif', default=True)
     category_ids = fields.Many2many('hr.employee.category', 'equipe_category_rel', 'equipe_id', 'category_id', u'Catégories')
-    pose_ids = fields.One2many('of.planning.pose', 'equipe_id', u'Poses liées', copy=False)
+    intervention_ids = fields.One2many('of.planning.intervention', 'equipe_id', u'Interventions liées', copy=False)
     tache_ids = fields.Many2many('of.planning.tache', 'equipe_tache_rel', 'equipe_id', 'tache_id', u'Compétences')
     hor_md = fields.Float(u'Matin début', required=True, digits=(12, 5))
     hor_mf = fields.Float('Matin fin', required=True, digits=(12, 5))
@@ -75,50 +75,45 @@ class OfPlanningEquipe(models.Model):
             if(hors[1] > hors[2]):
                 raise ValidationError(u"L'heure de l'après-midi ne peut pas être inférieure à l'heure du matin")
 
-class OfPlanningPoseRaison(models.Model):
-    _name = "of.planning.pose.raison"
-    _description = "Raisons de pose reportee ou inachevee"
+class OfPlanningInterventionRaison(models.Model):
+    _name = "of.planning.intervention.raison"
+    _description = u"Raisons d'intervention reportée"
 
     name = fields.Char(u'Libellé', size=128, required=True, select=True)
 
-class OfPlanningPose(models.Model):
-    _name = "of.planning.pose"
-    _description = "Planning de pose OpenFire"
+class OfPlanningIntervention(models.Model):
+    _name = "of.planning.intervention"
+    _description = "Planning d'intervention OpenFire"
     _inherit = "of.readgroup"
 
 #     def _get_color(self, cr, uid, ids, *args):
 #         result = {}
-#         for pose in self.browse(cr, uid, ids):
-#             poseur = pose.equipe_id
-#             cal_color = poseur and poseur.color_id
-#             result[pose.id] = cal_color and (pose.state in ('Brouillon','Planifie') and cal_color.color2 or cal_color.color) or ''
+#         for intervention in self.browse(cr, uid, ids):
+#             equipe = intervention.equipe_id
+#             cal_color = equipe and equipe.color_id
+#             result[intervention.id] = cal_color and (intervention.state == 'draft' and cal_color.color2 or cal_color.color) or ''
 #         return result
 
     name = fields.Char(string=u'Libellé', required=True)
     date = fields.Datetime(string='Date intervention', required=True)
     date_deadline = fields.Datetime(string='Deadline')
     date_deadline_display = fields.Datetime(related='date_deadline', string="Date Fin")
-    duree = fields.Float(string='Duree intervention', required=True, digits=(12, 5))
+    duree = fields.Float(string=u'Durée intervention', required=True, digits=(12, 5))
     user_id = fields.Many2one('res.users', string='Utilisateur', default=lambda self: self.env.uid)
-    partner_id = fields.Many2one('res.partner', string='Client')
+    partner_id = fields.Many2one('res.partner', string='Client', oldname='part_id')
     partner_city = fields.Char(related='partner_id.city')
-    raison_id = fields.Many2one('of.planning.pose.raison', string='Raison')
+    raison_id = fields.Many2one('of.planning.intervention.raison', string='Raison')
     tache_id = fields.Many2one('of.planning.tache', string=u'Tâche', required=True)
-    equipe_id = fields.Many2one('of.planning.equipe', string='Intervenant', required=True, oldname='poseur_id')
+    equipe_id = fields.Many2one('of.planning.equipe', string='Équipe', required=True, oldname='poseur_id')
     employee_ids = fields.Many2many(related='equipe_id.employee_ids', string='Intervenants', readonly=True)
-    state = fields.Selection([('Brouillon', 'Brouillon'), ('Planifie', u'Planifié'), ('Confirme', u'Confirmé'),
-                                                       ('Pose', u'Réalisé'), ('Annule', u'Annulé'), ('Reporte', u'Reporté'), ('Inacheve', u'Inachevé')],
-                                                      'Etat', size=16, readonly=True)
-    # @todo: changer les codes de l'état : draft, planned, confirmed, done, cancel, postponed, incomplete
     state = fields.Selection([
-            ('Brouillon', 'Brouillon'),
-            ('Planifie', u'Planifié'),
-            ('Confirme', u'Confirmé'),
-            ('Pose', u'Réalisé'),
-            ('Annule', u'Annulé'),
-            ('Reporte', u'Reporté'),
-            ('Inacheve', u'Inachevé'),
-        ], string=u'État', index=True, readonly=True, default='Brouillon')
+            ('draft', 'Brouillon'),
+            ('confirm', u'Confirmé'),
+            ('done', u'Réalisé'),
+            ('cancel', u'Annulé'),
+            ('postponed', u'Reporté'),
+        ], string=u'État', index=True, readonly=True, default='draft')
+#     state = fields.Many2one('of.planning.intervention.state', string=u"État")
     company_id = fields.Many2one('res.company', string='Magasin', default=lambda self: self.env.user.company_id.id)
     description = fields.Text(string='Description')
     hor_md = fields.Float(string=u'Matin début', required=True, digits=(12, 5))
@@ -135,8 +130,8 @@ class OfPlanningPose(models.Model):
     gb_employee_id = fields.Many2one(related='equipe_id.employee_ids', string="Intervenants", readonly=True, of_custom_groupby=True),
 
 #    _columns = {
-#         'color'                : fields_old.function(_get_color, type='char', help=u"Couleur utilisée pour le planning. Dépend de l'équipe de pose et de l'état de la pose"),
-#         'sidebar_color'        : fields_old.related('equipe_id','color_id','color', type='char', help="Couleur pour le menu droit du planning (couleur de base de l'équipe de pose)"),
+#         'color'                : fields_old.function(_get_color, type='char', help=u"Couleur utilisée pour le planning. Dépend de l'équipe d'intervention et de l'état de l'intervention"),
+#         'sidebar_color'        : fields_old.related('equipe_id','color_id','color', type='char', help="Couleur pour le menu droit du planning (couleur de base de l'équipe d'intervention)"),
 #    }
     _order = 'date'
 
@@ -148,7 +143,7 @@ class OfPlanningPose(models.Model):
             for field in ('zip','city'):
                 if self.partner_id.get(field):
                     name.append(self.partner_id[field])
-        self.name = name and " ".join(name) or "Pose"
+        self.name = name and " ".join(name) or "Intervention"
 
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
@@ -232,95 +227,88 @@ class OfPlanningPose(models.Model):
             self.hor_af = equipe.hor_af
 
     @api.multi
-    def button_planifier(self):
-        return self.write({'state':'Planifie'})
+    def button_confirm(self):
+        return self.write({'state':'confirm'})
 
     @api.multi
-    def button_confirmer(self):
-        return self.write({'state':'Confirme'})
+    def button_done(self):
+        return self.write({'state':'cone'})
 
     @api.multi
-    def button_poser(self):
-        return self.write({'state':'Pose'})
+    def button_postponed(self):
+        return self.write({'state':'postponed'})
 
     @api.multi
-    def button_reporter(self):
-        return self.write({'state':'Reporte'})
+    def button_cancel(self):
+        return self.write({'state':'cancel'})
 
     @api.multi
-    def button_inachever(self):
-        return self.write({'state':'Inacheve'})
-
-    @api.multi
-    def button_annuler(self):
-        return self.write({'state':'Annule'})
-
-    @api.multi
-    def button_brouillon(self):
-        return self.write({'state':'Brouillon'})
+    def button_draft(self):
+        return self.write({'state':'draft'})
 
     @api.multi
     def change_state_after(self):
         next_state = {
-            'Brouillon': 'Planifie',
-            'Planifie' : 'Confirme',
-            'Confirme' : 'Pose',
-            'Pose'     : 'Annule',
-            'Annule'   : 'Reporte',
-            'Reporte'  : 'Inacheve',
-            'Inacheve' : 'Brouillon',
+            'draft'    : 'confirm',
+            'confirm'  : 'done',
+            'done'     : 'cancel',
+            'cancel'   : 'postponed',
+            'postponed': 'draft',
         }
-        for pose in self:
-            pose.state = next_state[pose.state]
+        for intervention in self:
+            intervention.state = next_state[intervention.state]
         return True
 
     @api.multi
     def change_state_before(self):
         previous_state = {
-            'Brouillon': 'Inacheve',
-            'Planifie' : 'Brouillon',
-            'Confirme' : 'Planifie',
-            'Pose'     : 'Confirme',
-            'Annule'   : 'Pose',
-            'Reporte'  : 'Annule',
-            'Inacheve' : 'Reporte',
+            'draft'    : 'postponed',
+            'confirm'  : 'draft',
+            'done'     : 'confirm',
+            'cancel'   : 'done',
+            'postponed': 'cancel',
         }
-        for pose in self:
-            pose.state = previous_state[pose.state]
+        for intervention in self:
+            intervention.state = previous_state[intervention.state]
         return True
 
     @api.model
     def create(self, vals):
         # Vérification de la disponibilité du créneau
         if vals.get('verif_dispo') and vals.get('date') and vals.get('date_deadline'):
-            rdv = self.search([('equipe_id','=',vals.get('equipe_id')),
-                               ('date','<',vals['date_deadline']),
-                               ('date_deadline','>',vals['date']),
-                               ('state', 'not in', ('Annule','Reporte'))])
+            rdv = self.search([
+                ('equipe_id','=',vals.get('equipe_id')),
+                ('date','<',vals['date_deadline']),
+                ('date_deadline','>',vals['date']),
+                ('state', 'not in', ('cancel','postponed')),
+            ])
             if rdv:
                 raise ValidationError('Attention', u'Cette équipe a déjà %s rendez-vous sur ce créneau' % (len(rdv),))
-        return super(OfPlanningPose, self).create(vals)
+        return super(OfPlanningIntervention, self).create(vals)
 
     @api.multi
     def write(self, vals):
-        # Vérification de la disponibilité du créneau
-        for pose in self:
-            if vals.get('verif_dispo', pose.verif_dispo):
-                if pose.date and pose.date_deadline:
-                    rdv = self.search([('equipe_id', '=', pose.equipe_id.id),
-                                       ('date', '<', pose.date_deadline),
-                                       ('date_deadline', '>', pose.date),
-                                       ('id', '!=', pose.id),
-                                       ('state', 'not in', ('Annule','Reporte'))])
-                    if rdv:
-                        raise ValidationError('Attention', u'Cette équipe a déjà %s rendez-vous sur ce créneau' % (len(rdv),))
-        return super(OfPlanningPose, self).write(vals)
+        super(OfPlanningIntervention, self).write(vals)
+
+        # Vérification de la validité du créneau
+        for intervention in self:
+            if intervention.verif_dispo:
+                rdv = self.search([
+                    ('equipe_id', '=', intervention.equipe_id.id),
+                    ('date', '<', intervention.date_deadline),
+                    ('date_deadline', '>', intervention.date),
+                    ('id', '!=', intervention.id),
+                    ('state', 'not in', ('cancel','postponed')),
+                ])
+                if rdv:
+                    raise ValidationError('Attention', u'Cette équipe a déjà %s rendez-vous sur ce créneau' % (len(rdv),))
+        return True
 
     @api.model
     def _read_group_process_groupby(self, gb, query):
         # Ajout de la possibilité de regrouper par employé
         if gb != 'gb_employee_id':
-            return super(OfPlanningPose, self)._read_group_process_groupby(gb, query)
+            return super(OfPlanningIntervention, self)._read_group_process_groupby(gb, query)
 
         alias, _ = query.add_join(
             (self._table, 'of_planning_employee_rel', 'equipe_id', 'equipe_id', 'equipe_id'),
@@ -340,4 +328,4 @@ class OfPlanningPose(models.Model):
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    pose_ids = fields.One2many('of.planning.pose', 'partner_id', 'Plannings de pose', copy=False)
+    intervention_ids = fields.One2many('of.planning.intervention', 'partner_id', "Plannings d'intervention", copy=False)
