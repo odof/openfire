@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
+<odoo>
     <data>
 
 
@@ -13,14 +13,39 @@
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
                 <page name="historique" position="inside">
-                    <group name="histo_planning" string="Planning">
-                        <field name="intervention_ids" colspan="4" nolabel="1" readonly="1">
-                            <tree string="Plannings">
+                    <group name="histo_interventions" string="Interventions">
+                        <field name="intervention_partner_ids" colspan="4" nolabel="1" attrs="{'invisible': [('parent_id','!=', False)]}">
+                            <tree string="Plannings" editable="bottom">
+                                <field name="address_id" domain="[('parent_id','=',parent.id)]"/>
+                                <field name="tache_id"/>
                                 <field name="equipe_id"/>
                                 <field name="date" string="Date"/>
                                 <field name="duree" string="Durée" widget="float_time"/>
+                                <field name="hor_md" string="AM-" widget="float_time"/>
+                                <field name="hor_mf" string="-AM" widget="float_time"/>
+                                <field name="hor_ad" string="PM-" widget="float_time"/>
+                                <field name="hor_af" string="-PM" widget="float_time"/>
+                                <field name="hor_sam" string="Sam."/>
+                                <field name="hor_dim" string="Dim."/>
                                 <field name="verif_dispo"/>
+                                <field name="state"/>
+                                <field name="name" string="Libellé"/>
+                                <field name="description"/>
+                            </tree>
+                        </field>
+                        <field name="intervention_address_ids" colspan="4" nolabel="1" attrs="{'invisible': [('parent_id','=', False)]}">
+                            <tree string="Plannings">
+                                <field name="equipe_id"/>
                                 <field name="tache_id"/>
+                                <field name="date" string="Date"/>
+                                <field name="duree" string="Durée" widget="float_time"/>
+                                <field name="hor_md" string="AM-" widget="float_time"/>
+                                <field name="hor_mf" string="-AM" widget="float_time"/>
+                                <field name="hor_ad" string="PM-" widget="float_time"/>
+                                <field name="hor_af" string="-PM" widget="float_time"/>
+                                <field name="hor_sam" string="Sam."/>
+                                <field name="hor_dim" string="Dim."/>
+                                <field name="verif_dispo"/>
                                 <field name="state"/>
                                 <field name="name" string="Libellé"/>
                                 <field name="description"/>
@@ -57,7 +82,7 @@
                         <field name="tache_id" widget="selection"/>
                         <field name="category_id" widget="selection"/>
                         <field name="equipe_id" widget="selection"/>
-                        <field name="partner_id"/>
+                        <field name="address_id"/>
                         <field name="company_id" widget="selection"/>
                     </group>
                     <newline/>
@@ -99,12 +124,9 @@
                     </header>
                     <sheet>
                         <group>
-                            <group colspan="4" name="invisible" invisible="1">
-                                <field name="date_deadline"/>
-                            </group>
                             <group col="2">
                                 <field name="equipe_id" context="{'tz': 'Europe/Paris'}"/>
-                                <field name="partner_id" domain="[('customer','=',True)]" colspan="2" context="{'tz': 'Europe/Paris'}"/>
+                                <field name="address_id" domain="[('customer','=',True)]" colspan="2" context="{'tz': 'Europe/Paris'}"/>
                                 <field name="user_id" context="{'tz': 'Europe/Paris'}"/>
                                 <field name="company_id" widget="selection"/>
                                 <field name="name" string="Libellé" context="{'tz': 'Europe/Paris'}"/>
@@ -113,7 +135,7 @@
                                 <field name="tache_id" context="{'tz': 'Europe/Paris'}"/>
                                 <field name="date" context="{'tz': 'Europe/Paris'}"/>
                                 <field name="duree" context="{'tz': 'Europe/Paris'}" string="Durée" widget="float_time"/>
-                                <field name="date_deadline_display" readonly="1"/>
+                                <field name="date_deadline"/>
                                 <field name="verif_dispo"/>
                             </group>
                             <group name="liens" invisible="1">
@@ -157,7 +179,7 @@
                     <field name="duree" string="Durée" widget="float_time"/>
                     <field name="equipe_id"/>
                     <field name="tache_id"/>
-                    <field name="partner_id"/>
+                    <field name="address_id"/>
                     <field name="partner_city"/>
                     <field name="company_id"/>
                     <field name="state"/>
@@ -268,7 +290,7 @@
             <field name="name">of.planning.tache.tree</field>
             <field name="model">of.planning.tache</field>
             <field name="arch" type="xml" >
-                <tree string="Liste des tâches" >
+                <tree string="Liste des taches" >
                     <field name="name" string="Libellé"/>
                     <field name="product_id"/>
                     <field name="category_id"/>
@@ -513,7 +535,7 @@
         </record>
         
         <record id="action_of_planning_tache_tree" model="ir.actions.act_window">
-            <field name="name">Tâches</field>
+            <field name="name">Taches</field>
             <field name="res_model">of.planning.tache</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
@@ -548,7 +570,7 @@
             <menuitem name="Employés" id="menu_hr_employee_tree" parent="menu_of_planning_configuration" sequence="1" action="action_hr_employee_tree"/>
             <menuitem name="Equipes" id="menu_of_planning_equipe_tree" parent="menu_of_planning_configuration" sequence="2" action="action_of_planning_equipe_tree"/>
             <menuitem name="Erreurs" id="menu_of_planning_intervention_raison_tree" parent="menu_of_planning_configuration" sequence="3" action="action_of_planning_intervention_raison_tree"/>
-            <menuitem name="Tâches" id="menu_of_planning_tache_tree" parent="menu_of_planning_configuration" sequence="3" action="action_of_planning_tache_tree"/>
+            <menuitem name="Taches" id="menu_of_planning_tache_tree" parent="menu_of_planning_configuration" sequence="3" action="action_of_planning_tache_tree"/>
             <!--menuitem name="Types de coûts" id="menu_pnanning_of_employee_typcout_tree" parent="menu_of_planning_configuration" sequence="5" action="action_of_planning_employee_typcout_tree"/-->
 
         <menuitem id="menu_of_planning_intervention" name="Planning des interventions" parent="sales_team.menu_base_partner" groups="of_group_planning_intervention_user" sequence="10"/>
@@ -600,4 +622,4 @@
         </record-->
 
     </data>
-</openerp>
+</odoo>
