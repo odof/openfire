@@ -38,12 +38,12 @@ class OfService(models.Model):
         return [('jour_ids', 'in', jours.ids)]
 
     @api.one
-    @api.depends('tache_id','partner_id')
+    @api.depends('tache_id','address_id')
     def _get_planning_ids(self):
         planning_obj = self.env['of.planning.intervention']
         for service in self:
             plannings = planning_obj.search([('tache_id','=',service.tache_id.id),
-                                             ('partner_id','=',service.partner_id.id)], order='date desc')
+                                             ('address_id','=',service.address_id.id)], order='date desc')
             service.planning_ids = plannings
             service.date_last = plannings and plannings[0].date or False
 
@@ -55,7 +55,7 @@ class OfService(models.Model):
         query = ("SELECT s.id\n"
                  "FROM of_service AS s\n"
                  "LEFT JOIN of_planning_intervention AS p\n"
-                 "  ON p.partner_id = s.partner_id\n"
+                 "  ON p.address_id = s.address_id\n"
                  "  AND p.tache_id = s.tache_id\n")
 
         if operand:
@@ -77,32 +77,47 @@ class OfService(models.Model):
         return [('id', 'in', zip(*rows)[0])]
 
 #    template_id = fields.Many2one('of.mail.template', string='Contrat')
-    partner_id = fields.Many2one('res.partner', string='Partenaire', store=True, ondelete='cascade')
-    tache_id = fields.Many2one('of.planning.tache', string=u'Tâche', required=True)
+    partner_id = fields.Many2one('res.partner', string='Partenaire', ondelete='cascade')
+    address_id = fields.Many2one('res.partner', string="Adresse", ondelete='restrict')
+    tache_id = fields.Many2one('of.planning.tache', string='Tache', required=True)
     name = fields.Char(u"Libellé", related='tache_id.name', store=True)
 
     mois_ids = fields.Many2many('of.mois', 'service_mois', 'service_id', 'mois_id', string='Mois', required=True)
     jour_ids = fields.Many2many('of.jours', 'service_jours', 'service_id', 'jour_id', string='Jours', required=True, default=_get_default_jours)
 
     note = fields.Text('Notes')
+    date_next = fields.Date('Prochaine intervention', help=u"Date à partir de laquelle programmer la prochaine intervention", required=True)
     date_fin = fields.Date(u"Date d'échéance")
     date_fin_min = fields.Date(u"Date échéance min", compute='lambda *a, **k:{}')
     date_fin_max = fields.Date("max", compute='lambda *a, **k:{}')
 
     # Partner-related fields
-    partner_zip = fields.Char('Code Postal', size=24, related='partner_id.zip')
-    partner_city = fields.Char('Ville', related='partner_id.city')
+    partner_zip = fields.Char('Code Postal', size=24, related='address_id.zip')
+    partner_city = fields.Char('Ville', related='address_id.city')
 
     state = fields.Selection([
             ('progress', 'En cours'),
             ('cancel', u'Annulé'),
-            ], 'Etat', default='progress')
+            ], u'État', default='progress')
 
     planning_ids = fields.One2many('of.planning.intervention', compute='_get_planning_ids', string="Interventions")
     date_last = fields.Date(u'Dernière intervention', compute='_get_planning_ids', search='_search_last_date', help=u"Date de la dernière intervention")
 
+    @api.onchange('date_next')
+    def _onchange_date_next(self):
+        # Remplissage automatique du mois en fonction de la date de prochaine intervention choisie
+        # /!\ Un simple clic sur le champ date appelle cette fonction, et génère le mois avec la date courante
+        #       avant que l'utilisateur ait confirmé son choix.
+        #     Cette fonction doit donc être autorisée à écraser le mois déjà saisi
+        #     Pour éviter les ennuis, elle est donc restreinte à un usage en mode création de nouveau service uniquement
+        if self.date_next and isinstance(self.id, models.NewId):
+            mois_id = int(self.date_next[5:7])
+            self.mois_ids = [(4,mois_id)]
+
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    service_ids = fields.One2many('of.service', 'partner_id', string='Service')
+    service_address_ids = fields.One2many('of.service', 'address_id', string='Services')
+    service_partner_ids = fields.One2many('of.service', 'partner_id', string='Services du partenaire',
+                                          help="Services liés au partenaire, incluant les services des contacts associés")
 

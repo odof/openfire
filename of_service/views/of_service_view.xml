@@ -14,10 +14,12 @@
                 <form>
                     <sheet>
                         <group>
-                            <field name="partner_id" invisible="context.get('invisible_partner_id')"/>
+                            <field name="partner_id"/>
+                            <field name="address_id"/>
                             <separator string="Informations générales" colspan="2"/> 
                             <field name="tache_id"/>
                             <!-- <field name="template_id"/> -->
+                            <field name="date_next"/>
                             <field name="date_fin"/>
                             <field name="mois_ids" widget="many2many_tags"/>
                             <field name="jour_ids" widget="many2many_tags"/>
@@ -54,7 +56,7 @@
             <field name="model">of.service</field>
             <field name="arch" type="xml">
                 <tree colors="grey:state=='cancel'">
-                    <field name="partner_id" invisible="context.get('invisible_partner_id')"/>
+                    <field name="partner_id"/>
                     <field name="partner_zip"/>
                     <field name="partner_city"/>
                     <field name="tache_id"/>
@@ -63,6 +65,7 @@
                     <field name="note"/>
                     <!-- <field name="template_id"/> -->
                     <field name="date_last"/>
+                    <field name="date_next"/>
                     <field name="date_fin"/>
                     <field name="state" invisible="1"/>
                 </tree>
@@ -77,6 +80,7 @@
                <search>
                    <filter string="En cours" name="filter_progress" icon="STOCK_YES" domain="[('state','=','progress')]" />
                    <field name="partner_id"/>
+                   <field name="address_id"/>
                    <field name="partner_zip" string="CP"/>
                    <field name="tache_id"/>
                    <field name="mois_ids"/>
@@ -99,15 +103,31 @@
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
                 <page name="sales_purchases" position="after">
-                    <page string="Service">
-                        <field name="service_ids" colspan="4" nolabel="1">
+                    <page string="Service" name="service">
+                        <field name="service_partner_ids" nolabel="1" attrs="{'invisible': [('parent_id','!=', False)]}">
+                            <tree string="Service" colors="grey:state=='cancel'">
+                                <field name="address_id" domain="[('parent_id','=',parent.id)]"/>
+                                <field name="tache_id"/>
+                                <field name="mois_ids"/>
+                                <field name="note"/>
+                                <!-- <field name="template_id"/> -->
+                                <field name="date_last" string="Dernière"/>
+                                <field name="date_next" string="Prochaine"/>
+                                <field name="date_fin" string="Échéance"/>
+                                <field name="state" invisible="1"/>
+                                <!--button name="% (of_gesdoc.action_view_courrier_wizard)d" icon="gtk-paste" string="Ajouter Contrat" type="action"
+                                        attrs="{'invisible': [('template_id', '=', False)]}"/-->
+                            </tree>
+                        </field>
+                        <field name="service_address_ids" nolabel="1" attrs="{'invisible': [('parent_id','=', False)]}">
                             <tree string="Service" colors="grey:state=='cancel'">
                                 <field name="tache_id"/>
                                 <field name="mois_ids"/>
-                                <field name="jour_ids"/>
                                 <field name="note"/>
                                 <!-- <field name="template_id"/> -->
-                                <field name="date_fin"/>
+                                <field name="date_last" string="Dernière"/>
+                                <field name="date_next" string="Prochaine"/>
+                                <field name="date_fin" string="Échéance"/>
                                 <field name="state" invisible="1"/>
                                 <!--button name="% (of_gesdoc.action_view_courrier_wizard)d" icon="gtk-paste" string="Ajouter Contrat" type="action"
                                         attrs="{'invisible': [('template_id', '=', False)]}"/-->
