@@ -9,7 +9,7 @@ class of_product_nomenclature_bloc(models.Model):
     _name = 'of.product.nomenclature.bloc'
     _description = u"Gestion des blocs de nomenclatures de produits"
 
-    name = fields.Char("Nom", size=64, required=True)
+    name = fields.Char("Nom", size=64, required=True, translate=True)
     description = fields.Char("Description")
     nb_selection_min = fields.Integer('Nb produit sélection minimum', required=True, help="Nombre minimum de produits du bloc qui doivent être sélectionnés")
     nb_selection_max = fields.Integer('Nb produit sélection maximum', required=True, help="Nombre maximum de produits du bloc qui doivent être sélectionnés.")
