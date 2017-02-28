@@ -767,7 +767,7 @@ class import_account(models.AbstractModel):
     def import_account_invoice(self):
         cr = self._cr
 
-        # Association des account_bank_statement_61 aux nouveaux account_bank_statement 9.0
+        # Association des account_invoice_61 aux nouveaux account_invoice 9.0
         cr.execute("UPDATE account_invoice_61 SET id_90 = nextval('account_invoice_id_seq') WHERE id_90 IS NULL")
 
         fields_90 = ['comment', 'date_due', 'reference', 'reference_type', 'number', 'journal_id', 'currency_id',
@@ -826,7 +826,7 @@ class import_account(models.AbstractModel):
     def import_account_invoice_line(self):
         cr = self._cr
 
-        # Association des account_bank_statement_61 aux nouveaux account_bank_statement 9.0
+        # Association des account_invoice_line_61 aux nouveaux account_invoice_line 9.0
         cr.execute("UPDATE account_invoice_line_61 SET id_90 = nextval('account_invoice_line_id_seq') WHERE id_90 IS NULL")
 
         fields_90 = ['origin', 'sequence', 'price_unit', 'price_subtotal', 'uom_id', 'partner_id',# 'currency_id',
@@ -862,6 +862,42 @@ class import_account(models.AbstractModel):
         ] + MAGIC_COLUMNS_TABLES
 
         self.insert_values('account.invoice.line', values, tables)
+
+        # Table account_invoice_line_tax
+        self.map_relation_field('account.invoice.line', 'invoice_line_tax_ids')
+
+    def import_account_invoice_tax(self):
+        cr = self._cr
+
+        # Association des account_invoice_tax_61 aux nouveaux account_invoice_tax 9.0
+        cr.execute("UPDATE account_invoice_tax_61 SET id_90 = nextval('account_invoice_tax_id_seq') WHERE id_90 IS NULL")
+
+        fields_90 = ['account_id', 'sequence', 'invoice_id', 'manual', 'company_id', 'currency_id', 'amount',
+                     'account_analytic_id', 'tax_id', 'name']
+
+        values = {field: "tab."+field for field in fields_90}
+        values.update({
+            'id'                 : 'tab.id_90',
+            'account_id'         : 'account.id_90',
+            'invoice_id'         : 'inv.id_90',
+            'company_id'         : 'account_90.company_id',
+            'currency_id'        : 'inv_90.currency_id',
+            'account_analytic_id': 'NULL',
+            'tax_id'             : 'tax.id_90',
+        })
+        values.update(MAGIC_COLUMNS_VALUES)
+
+        tables = [
+            ('tab', 'account_invoice_tax_61', False, False, False),
+            ('account', 'account_account_61', 'id', 'tab', 'account_id'),
+            ('account_90', 'account_account', 'id', 'account', 'id_90'),
+            ('inv', 'account_invoice_61', 'id', 'tab', 'invoice_id'),
+            ('inv_90', 'account_invoice', 'id', 'inv', 'id_90'),
+            ('tax', 'account_tax_61', 'base_code_id', 'tab', 'base_code_id')
+
+        ] + MAGIC_COLUMNS_TABLES
+
+        self.insert_values('account.invoice.tax', values, tables)
 
     @api.model
     def import_account_move_line(self):
@@ -1080,6 +1116,7 @@ INNER JOIN (
             'account_fiscal_position_account',
             'account_invoice',
             'account_invoice_line',
+            'account_invoice_tax',
             'account_move_line', # Doit se placer après les factures pour le lien invoice_id
             'account_move_reconcile',
         )

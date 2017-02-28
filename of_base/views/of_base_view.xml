@@ -1,7 +1,14 @@
 <openerp>
     <data>
 
-         <!-- Ajouter des champs à la liste des courriels --> 
+        <!-- Page de connexion : remplacer email par indentifiant (login) -->
+        <template id="of_base_login" name="Connexion indentifiant" inherit_id="web.login">
+            <xpath expr="//div[@class='form-group field-login']/label" position="replace">
+                <label for="login" class="control-label">Login</label>
+            </xpath>
+        </template>
+
+ 		<!-- Ajouter des champs à la liste des courriels --> 
         <record id="of_view_mail_mail_tree" model="ir.ui.view">
             <field name="name">of.mail.mail.tree</field>
             <field name="model">mail.mail</field>

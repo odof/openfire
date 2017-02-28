@@ -116,7 +116,11 @@
             <field name="model">project.issue</field>
             <field name="inherit_id" ref="project_issue.view_project_issue_filter"/>
             <field name="arch" type="xml">
+                <filter name="unassigned" position="after">
+                    <filter string="Lieu ou adresse installation non défini" name="adresseinstallnondef" domain="[('of_parc_installe_site_adresse','=','')]"/>
+                </filter>
                 <field name="partner_id" position="after">
+                    <field name="of_parc_installe_site_adresse"/>
                     <field name="of_produit_installe_id" string="No série"/>
                 </field>
                 <filter name="project" position="after">

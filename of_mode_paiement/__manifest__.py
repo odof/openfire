@@ -22,7 +22,7 @@
         # Migration 'of_init.xml',
     ],
     'data' : [
-        # Migration 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         # Migration 'of_mode_paiement_view.xml',
         'of_mode_paiement_edi_view.xml',
         # Migration 'wizard/wizard_edi_view.xml',
