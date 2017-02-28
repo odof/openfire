@@ -27,7 +27,7 @@
                             <field name="file_name" invisible="1"/>
                             <field name="file" filename="file_name"/>
                         </group>
-                        <group attrs="{'invisible': [('file','=',False)]}">
+                        <group colspan="2" attrs="{'invisible': [('file','=',False)]}">
                             <field name="chp_ids" nolabel="1" colspan="2">
                                 <tree string="Champs" create="false" delete="false" editable="bottom">
                                     <field name="name"/>
@@ -81,7 +81,7 @@
         </record>
 
         <!-- add menu item 'Modèles de courriers' for mail templates' configurations in Ventes-->
-        <menuitem id="menu_of_mail_templates" parent="base.menu_sale_config" action="action_of_mail_template_tree_all"
+        <menuitem id="menu_of_mail_templates" parent="sales_team.menu_sale_config" action="action_of_mail_template_tree_all"
                   sequence="100"/>
         
         <!-- add menu item 'Modèles de courriers' for mail templates' configurations in Comptabilité-->          

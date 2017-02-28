@@ -1,12 +1,12 @@
 # -*- encoding: utf-8 -*-
 
 import time
-from openerp.report import report_sxw
+from odoo.report import report_sxw
 
-class courrier(report_sxw.rml_parse):
+class Courrier(report_sxw.rml_parse):
 
     def __init__(self, cr, uid, name, context):
-        super(courrier, self).__init__(cr, uid, name, context)
+        super(Courrier, self).__init__(cr, uid, name, context)
 
         self.localcontext.update({
             'time': time,
@@ -35,7 +35,7 @@ class courrier(report_sxw.rml_parse):
             result['title'] = False
         return [result]
 
-report_sxw.report_sxw('report.of_gesdoc.courriers', 'res.partner', "addons/of_gesdoc/report/courrier.rml", parser=courrier, header=True)
-report_sxw.report_sxw('report.of_gesdoc.courriers_se', 'res.partner', "addons/of_gesdoc/report/courrier_se.rml", parser=courrier, header=True)
-report_sxw.report_sxw('report.of_gesdoc.courriers_sehead', 'res.partner', "addons/of_gesdoc/report/courrier_sehead.rml", parser=courrier, header=False)
-report_sxw.report_sxw('report.of_gesdoc.courriers_se_sehead', 'res.partner', "addons/of_gesdoc/report/courrier_se.rml", parser=courrier, header=False)
+report_sxw.report_sxw('report.of_gesdoc.courriers', 'res.partner', "addons/of_gesdoc/report/courrier.rml", parser=Courrier, header=True)
+report_sxw.report_sxw('report.of_gesdoc.courriers_se', 'res.partner', "addons/of_gesdoc/report/courrier_se.rml", parser=Courrier, header=True)
+report_sxw.report_sxw('report.of_gesdoc.courriers_sehead', 'res.partner', "addons/of_gesdoc/report/courrier_sehead.rml", parser=Courrier, header=False)
+report_sxw.report_sxw('report.of_gesdoc.courriers_se_sehead', 'res.partner', "addons/of_gesdoc/report/courrier_se.rml", parser=Courrier, header=False)

@@ -1,11 +1,11 @@
 # -*- encoding: utf-8 -*-
 
 import time
-from openerp.report import report_sxw
+from odoo.report import report_sxw
 
-class courrier_crm(report_sxw.rml_parse):
+class CourrierCrm(report_sxw.rml_parse):
     def __init__(self, cr, uid, name, context):
-        super(courrier_crm, self).__init__(cr, uid, name, context)
+        super(CourrierCrm, self).__init__(cr, uid, name, context)
 
         self.localcontext.update({
             'time': time,
@@ -52,8 +52,8 @@ class courrier_crm(report_sxw.rml_parse):
             result[0]['city'] = ''
         return [result[0]]
 
-report_sxw.report_sxw('report.of_gesdoc.courriers_crm', 'crm.lead', "addons/of_gesdoc/report/courrier_crm.rml", parser=courrier_crm, header=True)
-report_sxw.report_sxw('report.of_gesdoc.courriers_crm_se', 'crm.lead', "addons/of_gesdoc/report/courrier_crm_se.rml", parser=courrier_crm, header=True)
-report_sxw.report_sxw('report.of_gesdoc.courriers_crm_sehead', 'crm.lead', "addons/of_gesdoc/report/courrier_crm.rml", parser=courrier_crm, header=False)
-report_sxw.report_sxw('report.of_gesdoc.courriers_crm_se_sehead', 'crm.lead', "addons/of_gesdoc/report/courrier_crm_se.rml", parser=courrier_crm, header=False)
+report_sxw.report_sxw('report.of_gesdoc.courriers_crm', 'crm.lead', "addons/of_gesdoc/report/CourrierCrm.rml", parser=CourrierCrm, header=True)
+report_sxw.report_sxw('report.of_gesdoc.courriers_crm_se', 'crm.lead', "addons/of_gesdoc/report/CourrierCrm_se.rml", parser=CourrierCrm, header=True)
+report_sxw.report_sxw('report.of_gesdoc.courriers_crm_sehead', 'crm.lead', "addons/of_gesdoc/report/CourrierCrm.rml", parser=CourrierCrm, header=False)
+report_sxw.report_sxw('report.of_gesdoc.courriers_crm_se_sehead', 'crm.lead', "addons/of_gesdoc/report/CourrierCrm_se.rml", parser=CourrierCrm, header=False)
 

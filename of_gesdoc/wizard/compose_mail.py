@@ -10,7 +10,7 @@ import pypdftk
 import os
 import base64
 
-class of_compose_mail(models.TransientModel):
+class OfComposeMail(models.TransientModel):
     _name = 'of.compose.mail'
     _description = 'Courrier'
 
@@ -238,7 +238,7 @@ class of_compose_mail(models.TransientModel):
             'context': self._context,
         }
 
-class of_gesdoc_chp_tmp(models.TransientModel):
+class OfGesdocChpTmp(models.TransientModel):
     _name = 'of.gesdoc.chp.tmp'
     _description = 'PDF champs temporaire'
 

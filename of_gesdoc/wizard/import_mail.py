@@ -1,7 +1,6 @@
 # -*- encoding: utf-8 -*-
 
 from odoo import models, fields, api
-from odoo.exceptions import UserError, ValidationError
 
 import StringIO
 import base64
@@ -10,7 +9,7 @@ from pdfminer.pdfdocument import PDFDocument
 from pdfminer.pdftypes import resolve1
 from pdfminer.utils import decode_text
 
-class of_gesdoc_import(models.TransientModel):
+class OfGesdocImport(models.TransientModel):
     _name = 'of.gesdoc.import'
 
     template_id = fields.Many2one('of.mail.template', string=u'Modèle', required=True)

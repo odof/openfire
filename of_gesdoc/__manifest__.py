@@ -22,5 +22,5 @@ Fonctionnalité pour l'instant disponible uniquement pour les SAV, via le module
         'wizard/import_mail_view.xml',
         'security/ir.model.access.csv',
     ],
-    'installable': False,
+    'installable': True,
 }

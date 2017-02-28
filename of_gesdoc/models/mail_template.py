@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from openerp import models, fields, api, _
+from odoo import models, fields, api, _
 
 import StringIO
 import base64
@@ -9,7 +9,7 @@ from pdfminer.pdfdocument import PDFDocument
 from pdfminer.pdftypes import resolve1
 from pdfminer.utils import decode_text
 
-class of_mail_template(models.Model):
+class OfMailTemplate(models.Model):
     "Templates for printing mail"
     _name = "of.mail.template"
     _description = 'Mail Templates'
@@ -28,7 +28,7 @@ class of_mail_template(models.Model):
     def copy(self, default=None):
         default = dict(default or {})
         default['name'] = _('%s (copy)') % self.name
-        return super(of_mail_template, self).copy(default)
+        return super(OfMailTemplate, self).copy(default)
 
     @api.onchange('file')
     def onchange_file(self):
@@ -53,7 +53,7 @@ class of_mail_template(models.Model):
                 }))
         self.chp_ids = chps
 
-class of_gesdoc_chp(models.Model):
+class OfGesdocChp(models.Model):
     _name = 'of.gesdoc.chp'
     _description = 'Champs PDF'
 
