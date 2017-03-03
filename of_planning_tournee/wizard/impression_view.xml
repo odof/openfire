@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        
+        <record id="view_res_imp_wizard" model="ir.ui.view">
+            <field name="name">Impression Documents</field>
+            <field name="model">of.imp.docs</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Impression Documents">
+                    <separator string="Liste des documents" colspan="4"/>
+                    <field name="doc_line_ids" colspan="4" nolabel="1" readonly="1">
+                        <form string="Documents">
+                            <field name="doc_file_name" invisible="1"/>
+                            <field name="doc_file" filename="doc_file_name"/>
+                        </form>
+                        <tree string="Documents">
+                            <field name="doc_file_name" invisible="1"/>
+                            <field name="doc_file" filename="doc_file_name"/>
+                        </tree>
+                    </field>
+                </form>
+            </field>
+        </record>
+        
+        <act_window
+            name="Impression Documents"
+            res_model="of.imp.docs"
+            src_model="of.planning.res"
+            view_mode="form"    
+            view_id="view_res_imp_wizard"
+            id="action_view_res_imp_wizard"
+            target="new"
+        />
+        
+    </data>
+</openerp>  

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+
+        <report
+            auto="False"
+            id="of_planning_res_courrier"
+            model="res.partner"
+            name="of_gesdoc.courriers"  
+            rml="of_gesdoc/report/courrier.rml"
+            string="Contrat"
+            usage="default"
+            menu="False"
+            multi="True"/>
+           
+        <report
+            auto="False"
+            id="of_planning_res_courrier_se"
+            model="res.partner"
+            name="of_gesdoc.courriers_se"  
+            rml="of_gesdoc/report/courrier_se.rml"
+            string="Contrat sans l'adresse"
+            usage="default"
+            menu="False"
+            multi="True"/>
+            
+        <report
+            auto="False"
+            id="of_planning_res_courrier_sehead"
+            model="res.partner"
+            name="of_gesdoc.courriers_sehead"  
+            rml="of_gesdoc/report/courrier_sehead.rml"
+            string="Contrat sans tête"
+            usage="default"
+            menu="False"
+            multi="True"/>
+            
+        <report
+            auto="False"
+            id="of_planning_res_courrier_se_sehead"
+            model="res.partner"
+            name="of_gesdoc.courriers_se_sehead"  
+            rml="of_gesdoc/report/courrier_se.rml"
+            string="Contrat sans l'adresse et sans tête"
+            usage="default"
+            menu="False"
+            multi="True"/>
+
+        <act_window
+            name="Envoyer un courrier"
+            res_model="compose.mail"
+            src_model="of.service"
+            view_mode="form"    
+            key2="client_print_multi"
+            view_id="of_gesdoc.view_courrier_wizard"
+            id="action_view_courrier_wizard_service"
+            target="new"        
+            context="{'model':'of.service'}"
+        />
+    </data>
+</openerp>

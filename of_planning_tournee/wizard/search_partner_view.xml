@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        
+        <record id="view_search_wizard" model="ir.ui.view">
+            <field name="name">Clients Géolocalisés</field>
+            <field name="model">of.search.partner</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Clients Géolocalisés">
+                    <group colspan="4" col="8">
+                        <field name="city" invisible="1"/>
+                        <field name="zip" invisible="1"/>
+                        <field name="ville" on_change="onchange_ville(ville)" colspan="4"/>
+                        <field name="distance" colspan="4"/>
+	                    <field name="epi_lat" colspan="4"/>
+	                    <field name="epi_lon" colspan="4"/>
+	                    <field name="with_service"/>
+	                    <field name="without_service"/>
+	                    <newline/>
+	                    <button name="button_search" string="Chercher" type="object" colspan="8"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+        
+        <act_window
+            name="Clients Géolocalisés"
+            res_model="of.search.partner"
+            src_model="res.partner"
+            view_mode="form"    
+            view_id="view_search_wizard"
+            id="action_view_search_wizard"
+            key2="client_action_multi"
+            target="new"        
+            context="{'model':'res.partner'}"
+        />
+        
+    </data>
+</openerp>  
