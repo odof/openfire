@@ -12,11 +12,67 @@
             <field name="model">of.service</field>
             <field name="arch" type="xml">
                 <form>
+                <header>
+                    <button name="button_progress" string="Activer le service" states="cancel"/>
+                    <button name="button_cancel" string="Désactiver le service" states="progress"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
                     <sheet>
                         <group>
-                            <field name="partner_id"/>
-                            <field name="address_id"/>
-                            <separator string="Informations générales" colspan="2"/> 
+                            <field name="partner_id" invisible="context.get('hide_service_partner_id')"/>
+                            <field name="address_id" invisible="context.get('hide_service_address_id')"/>
+                            <separator string="Informations générales" colspan="2"/>
+                            <field name="tache_id"/>
+                            <!-- <field name="template_id"/> -->
+                            <field name="date_next"/>
+                            <field name="date_fin"/>
+                            <field name="mois_ids" widget="many2many_tags"/>
+                            <field name="jour_ids" widget="many2many_tags"/>
+                        </group>
+                        <separator string="Notes"/>
+                        <field name="note"/>
+                        <separator string="Interventions"/>
+                        <field name="planning_ids" nolabel="1" colspan="2">
+                            <tree string="Liste des interventions" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done'">
+                                <field name="name" string="Libellé"/>
+                                <field name="date"/>
+                                <field name="duree" string="Durée" widget="float_time"/>
+                                <field name="equipe_id"/>
+                                <field name="company_id"/>
+                                <field name="state"/>
+
+                                <!-- Afficher les fleches pour passer a d'autres statuts -->
+                                <button name="change_state_before" type="object" icon="gtk-go-back"/>
+                                <button name="change_state_after" type="object" icon="gtk-go-forward"/>
+
+                                <!-- Afficher l'icône quand le status est Confirmé et Réalisé -->
+                                <button name="state_conf" type="object" icon="gtk-no" attrs="{'invisible':[('state', '!=', 'Confirme')]}"/>
+                                <button name="state_pose" type="object" icon="gtk-apply" attrs="{'invisible':[('state', '!=', 'Pose')]}"/>
+                                <field name="description"/>
+                            </tree>
+                        </field>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_res_partner_of_service_form" model="ir.ui.view">
+            <field name="name">of.partner.service.form</field>
+            <field name="model">of.service</field>
+            <field name="priority" eval="10"/>
+            <field name="arch" type="xml">
+                <form>
+                <header>
+                    <button name="button_progress" string="Activer le service" states="cancel"/>
+                    <button name="button_cancel" string="Désactiver le service" states="progress"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                    <sheet>
+                        <group>
+                            <field name="partner_id" invisible="1"/>
+                            <field name="address_id" invisible="context.get('hide_service_address_id')"
+                                   domain="['|',('id','=',parent.id),('parent_id','=',parent.id)]"/>
+                            <separator string="Informations générales" colspan="2"/>
                             <field name="tache_id"/>
                             <!-- <field name="template_id"/> -->
                             <field name="date_next"/>
@@ -96,15 +152,17 @@
 <!--##################################################______Partenaire______##################################################-->
 <!--##########################################################################################################################-->
 
-       <record id="of_res_view_partner_form" model="ir.ui.view">
-            <field name="name">of.res.view.partner.form</field>
+       <record id="of_service_view_partner_form" model="ir.ui.view">
+            <field name="name">of.service.view.partner.form</field>
             <field name="model">res.partner</field>
             <field name="type">form</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
                 <page name="sales_purchases" position="after">
                     <page string="Service" name="service">
-                        <field name="service_partner_ids" nolabel="1" attrs="{'invisible': [('parent_id','!=', False)]}">
+                        <!-- Affichage des services liés au partenaire -->
+                        <field name="service_partner_ids" nolabel="1" attrs="{'invisible': [('parent_id','!=', False)]}"
+                               context="{'default_address_id':id, 'form_view_get':'of_planning_tournee.view_res_partner_of_service_form'}">
                             <tree string="Service" colors="grey:state=='cancel'">
                                 <field name="address_id" domain="[('parent_id','=',parent.id)]"/>
                                 <field name="tache_id"/>
@@ -114,12 +172,15 @@
                                 <field name="date_last" string="Dernière"/>
                                 <field name="date_next" string="Prochaine"/>
                                 <field name="date_fin" string="Échéance"/>
-                                <field name="state" invisible="1"/>
+                                <field name="state" invisible="0"/>
                                 <!--button name="% (of_gesdoc.action_view_courrier_wizard)d" icon="gtk-paste" string="Ajouter Contrat" type="action"
                                         attrs="{'invisible': [('template_id', '=', False)]}"/-->
                             </tree>
                         </field>
-                        <field name="service_address_ids" nolabel="1" attrs="{'invisible': [('parent_id','=', False)]}">
+
+                        <!-- Affichage des services liés à l'adresse -->
+                        <field name="service_address_ids" nolabel="1" attrs="{'invisible': [('parent_id','=', False)]}"
+                               context="{'hide_service_address_id':True, 'form_view_get':'of_planning_tournee.view_res_partner_of_service_form'}">
                             <tree string="Service" colors="grey:state=='cancel'">
                                 <field name="tache_id"/>
                                 <field name="mois_ids"/>
@@ -128,7 +189,7 @@
                                 <field name="date_last" string="Dernière"/>
                                 <field name="date_next" string="Prochaine"/>
                                 <field name="date_fin" string="Échéance"/>
-                                <field name="state" invisible="1"/>
+                                <field name="state" invisible="0"/>
                                 <!--button name="% (of_gesdoc.action_view_courrier_wizard)d" icon="gtk-paste" string="Ajouter Contrat" type="action"
                                         attrs="{'invisible': [('template_id', '=', False)]}"/-->
                             </tree>

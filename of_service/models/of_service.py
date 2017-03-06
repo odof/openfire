@@ -114,6 +114,22 @@ class OfService(models.Model):
             mois_id = int(self.date_next[5:7])
             self.mois_ids = [(4,mois_id)]
 
+    @api.one
+    def create(self, vals):
+        if vals.get('address_id') and not vals.get('partner_id'):
+            address = self.env['res.partner'].browse(vals['address_id'])
+            partner = address.parent_id or address
+            vals['partner_id'] = partner.id
+        return super(OfService, self).create(vals)
+
+    @api.multi
+    def button_progress(self):
+        self.write({'state': 'progress'})
+
+    @api.multi
+    def button_cancel(self):
+        self.write({'state': 'cancel'})
+
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
