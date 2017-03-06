@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 from odoo import api, models, fields
+from datetime import date
 
 
 class OfMois(models.Model):
@@ -113,6 +114,23 @@ class OfService(models.Model):
         if self.date_next and isinstance(self.id, models.NewId):
             mois_id = int(self.date_next[5:7])
             self.mois_ids = [(4,mois_id)]
+
+    @api.multi
+    def get_next_date(self, date_str):
+        self.ensure_one()
+        mois_ids = [mois.id for mois in self.mois_ids]
+
+        date_date = fields.Date.from_string(max(date_str, self.date_last))
+        date_mois = date_date.month
+        date_annee = date_date.year
+
+        if (date_mois not in mois_ids) and (date_mois+1 in mois_ids):
+            # Le rdv a été pris en avance pour le mois suivant
+            date_mois += 1
+
+        mois = min(mois_ids, key=lambda m: (m<=date_mois, m))
+        annee = date_annee + (mois <= date_mois)
+        return fields.Date.to_string(date(annee, mois, 1))
 
     @api.one
     def create(self, vals):

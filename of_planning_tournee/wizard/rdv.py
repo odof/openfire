@@ -90,7 +90,7 @@ class OfTourneeRdv(models.TransientModel):
     date_recherche = fields.Date(string='À partir du', required=True, default=lambda *a: (date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
     partner_id = fields.Many2one('res.partner', string='Client', required=True, readonly=True, default=_default_partner)
     partner_address_id = fields.Many2one('res.partner', string="Adresse d'intervention", required=True, default=_default_address,
-                                         domain="[('|', ('id', '=', partner_id), ('parent_id', '=', partner_id))]")
+                                         domain="['|', ('id', '=', partner_id), ('parent_id', '=', partner_id)]")
     date_display = fields.Char(string='Jour du RDV', size=64, readonly=True)
     equipe_ids = fields.One2many('of.planning.equipe', compute="_get_equipe_possible", string='Équipes possibles')
     service_id = fields.Many2one('of.service', string='Service client', default=_default_service,
@@ -134,23 +134,53 @@ class OfTourneeRdv(models.TransientModel):
             self.service_ids = False
 
     @api.onchange('service_id')
-    def onchange_service(self):
+    def _onchange_service(self):
         if not self.service_id:
             return
 
-        service = self.service_ids
+        service = self.service_id
         notes = [service.tache_id.name]
-        if service.template_id:
-            notes.append(service.template_id.name)
+#        if service.template_id:
+#            notes.append(service.template_id.name)
         if service.note:
             notes.append(service.note)
 
         self.description = "\n".join(notes)
         self.tache_id = service.tache_id
-        self.partner_address_id = service.partner_address_id
+        self.partner_address_id = service.address_id
+
+    # Note: Séparation en 3 fonctions car, avec une seule fonction button_calcul(self, creneau_suivant=False),
+    #       Odoo place le contexte dans cette variable si elle n'est pas fournie en paramètre ...
+    @api.multi
+    def button_calcul_suivant(self):
+        # Calcule a prochaine intervention à partir de la dernière intervention proposée
+        self.compute(creneau_suivant=True)
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'of.tournee.rdv',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_id': self.id,
+            'target': 'new',
+            'context': self._context
+        }
 
     @api.multi
-    def button_calcul_prochaine(self, creneau_suivant=False):
+    def button_calcul(self):
+        # Calcule a prochaine intervention à partir du lendemain de la date courante
+        self.compute(creneau_suivant=False)
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'of.tournee.rdv',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_id': self.id,
+            'target': 'new',
+            'context': self._context
+        }
+
+    @api.multi
+    def compute(self, creneau_suivant):
         u"""Calcul du prochain créneau disponible
         NOTE : Si un service est sélectionné incluant le samedi et/ou le dimanche,
                ceux-cis seront traités comme des jours normaux du point de vue des équipes
@@ -164,7 +194,7 @@ class OfTourneeRdv(models.TransientModel):
         equipe_obj = self.env['of.planning.equipe']
         tournee_obj = self.env['of.planning.tournee']
         wizard_line_obj = self.env['of.tournee.rdv.line']
-        intervention_obj = self.rnv['of.planning.intervention']
+        intervention_obj = self.env['of.planning.intervention']
 
         address = self.partner_address_id
         service = self.service_id
@@ -268,8 +298,9 @@ class OfTourneeRdv(models.TransientModel):
                 where_params = [equipes._ids]
 
                 if self.mode == 'hors_tournee':
-                    where_calc += "AND id NOT IN %s "
-                    where_params.append(tournees._ids)
+                    if tournees:
+                        where_calc += "AND id NOT IN %s "
+                        where_params.append(tournees._ids)
                 else:
                     where_calc += "AND (is_bloque OR is_complet) "
 
@@ -348,26 +379,26 @@ class OfTourneeRdv(models.TransientModel):
                 propos = min(propos, creneaux[0]) or creneaux[0]
 
                 for intervention_deb, intervention_fin, equipe in creneaux:
-                    description = "%s-%s" % tuple(self.hours_to_strs([intervention_deb, intervention_fin]))
+                    description = "%s-%s" % tuple(hours_to_strs([intervention_deb, intervention_fin]))
 
                     wizard_line_obj.create({
                         'date_flo': intervention_deb,
                         'date_flo_deadline': intervention_fin,
                         'description': description,
 #                            'jour_res_id': plan[3],
-                        'wizard_res_id': self.id,
+                        'wizard_id': self.id,
                         'equipe_id': equipe.id,
                         'intervention_id': False,
                     })
                 for intervention, intervention_deb, intervention_fin in intervention_dates:
-                    description = "%s-%s" % tuple(self.hours_to_strs([intervention_deb, intervention_fin]))
+                    description = "%s-%s" % tuple(hours_to_strs([intervention_deb, intervention_fin]))
 
                     wizard_line_obj.create({
                         'date_flo': intervention_deb,
                         'date_flo_deadline': intervention_fin,
                         'description': description,
 #                            'jour_res_id': plan[3],
-                        'wizard_res_id': self.id,
+                        'wizard_id': self.id,
                         'equipe_id': intervention.equipe_id.id,
                         'intervention_id': intervention.id,
                     })
@@ -393,10 +424,8 @@ class OfTourneeRdv(models.TransientModel):
             if self.service_id:
                 vals['date_next'] = self.service_id.get_next_date(date_date.strftime('%Y-%m-%d'))
             else:
-                vals['date_next'] = "%s-%s-01" % (date_date.year + 1, date_date.month)
-
+                vals['date_next'] = "%s-%02i-01" % (date_date.year + 1, date_date.month)
         self.write(vals)
-        return True
 
     @api.multi
     def _get_service_data(self, mois):
@@ -538,7 +567,7 @@ class OfTourneeRdvLine(models.TransientModel):
     intervention_id = fields.Many2one('of.planning.intervention', string="Planning")
 
     distance = fields.Char(compute="_calc_distances", string='Dist.tot.')
-    dist_prec = fields.Char(compute="__calc_distances", string='Dist.Prec.')
-    dist_suiv = fields.Char(compute="__calc_distances", string='Dist.Suiv')
+    dist_prec = fields.Char(compute="_calc_distances", string='Dist.Prec.')
+    dist_suiv = fields.Char(compute="_calc_distances", string='Dist.Suiv')
 
     _order = "date_flo"
