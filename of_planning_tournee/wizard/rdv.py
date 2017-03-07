@@ -20,7 +20,7 @@ RES_MODES = [
     ('all', u'Tous créneaux, même sur tournées éloignées'),
 ]
 
-def hours_to_strs(hours):
+def hours_to_strs(*hours):
     """ Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'
     """
     return ["%02dh%02d" % (hour, round((hour % 1) * 60)) for hour in hours]
@@ -80,7 +80,7 @@ class OfTourneeRdv(models.TransientModel):
 
     name = fields.Char(string=u'Libellé', size=64, required=False)
     description = fields.Text(string='Description')
-    tache_id = fields.Many2one('of.planning.tache', string='Prestation', required=True, domain="[('category_id.type_planning_pose', '=', 'res')]")
+    tache_id = fields.Many2one('of.planning.tache', string='Prestation', required=True)
     equipe_id = fields.Many2one('of.planning.equipe', string=u"Équipe")
     equipe_id_pre = fields.Many2one('of.planning.equipe', string=u'Équipe', domain="[('tache_ids','in',tache_id)]")
     duree = fields.Float(string=u'Durée', required=True, digits=(12, 5))
@@ -101,9 +101,8 @@ class OfTourneeRdv(models.TransientModel):
     @api.model
     def _get_equipe(self):
         hr_category_obj = self.env['hr.employee.category']
-        categories = hr_category_obj.search([('type_planning_pose', '=', 'res')])
         equipe_ids = []
-        for category in categories:
+        for category in hr_category_obj.search():
             equipe_ids += category.equipe_ids._ids
         equipe_ids = list(set(equipe_ids))
         return equipe_ids
@@ -379,7 +378,7 @@ class OfTourneeRdv(models.TransientModel):
                 propos = min(propos, creneaux[0]) or creneaux[0]
 
                 for intervention_deb, intervention_fin, equipe in creneaux:
-                    description = "%s-%s" % tuple(hours_to_strs([intervention_deb, intervention_fin]))
+                    description = "%s-%s" % tuple(hours_to_strs(intervention_deb, intervention_fin))
 
                     wizard_line_obj.create({
                         'date_flo': intervention_deb,
@@ -391,7 +390,7 @@ class OfTourneeRdv(models.TransientModel):
                         'intervention_id': False,
                     })
                 for intervention, intervention_deb, intervention_fin in intervention_dates:
-                    description = "%s-%s" % tuple(hours_to_strs([intervention_deb, intervention_fin]))
+                    description = "%s-%s" % tuple(hours_to_strs(intervention_deb, intervention_fin))
 
                     wizard_line_obj.create({
                         'date_flo': intervention_deb,
