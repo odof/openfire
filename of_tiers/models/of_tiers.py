@@ -17,6 +17,8 @@ class resPartner(models.Model):
         """
         Création / Mise à jour du compte de tiers des clients.
         """
+        if self._context.get('no_update_partner_account'):
+            return
         data_obj = self.env['ir.model.data']
         ac_obj = self.env['account.account']
 
@@ -63,7 +65,7 @@ class resPartner(models.Model):
 
     @api.model
     def create(self, vals):
-        partner = super(resPartner, self).create(vals)
+        partner = super(resPartner, self.with_context(no_update_partner_account=True)).create(vals)
 
         # Utilisation de l'id du partenaire comme référece client, si option configurée dans la société
         if partner.company_id.of_client_id_ref:
@@ -71,7 +73,7 @@ class resPartner(models.Model):
                 partner.ref = str(partner.id)
 
         # Création des comptes comptables clients/fournisseurs
-        partner._update_account()
+        partner.with_context(no_update_partner_account=False)._update_account()
         return partner
 
     @api.multi
