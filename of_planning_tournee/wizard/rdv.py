@@ -420,11 +420,10 @@ class OfTourneeRdv(models.TransientModel):
             'date_propos_hour': propos[0],
         }
 
-        if not self.date_next:
-            if self.service_id:
-                vals['date_next'] = self.service_id.get_next_date(date_date.strftime('%Y-%m-%d'))
-            else:
-                vals['date_next'] = "%s-%02i-01" % (date_date.year + 1, date_date.month)
+        if self.service_id:
+            vals['date_next'] = self.service_id.get_next_date(date_date.strftime('%Y-%m-%d'))
+        else:
+            vals['date_next'] = "%s-%02i-01" % (date_date.year + 1, date_date.month)
         self.write(vals)
 
     @api.multi
@@ -452,8 +451,9 @@ class OfTourneeRdv(models.TransientModel):
         equipe = self.equipe_id
         date_display = self.date_display
         date_propos_hour = self.date_propos_hour
+        date_date = datetime.strptime(date_display.encode('utf8'), "%A %d %B %Y")
 
-        date_propos_local_datetime_sanszone = datetime.strptime(date_display, "%A %d %B %Y") + timedelta(minutes=round(date_propos_hour*60))
+        date_propos_local_datetime_sanszone = date_date + timedelta(minutes=round(date_propos_hour*60))
         local_dt = tz.localize(date_propos_local_datetime_sanszone, is_dst=None)
         date_propos_utc = local_dt.astimezone(pytz.utc)
         date_propos = date_propos_utc.strftime('%Y-%m-%d %H:%M:%S')
@@ -461,8 +461,8 @@ class OfTourneeRdv(models.TransientModel):
         date_propos_deadline_local_datetime_sanszone = date_propos_local_datetime_sanszone + timedelta(hours=self.duree)
         for planning in self.planning_ids:
             if (not planning.intervention_id) and (planning.equipe_id.id == equipe.id):
-                debut = datetime.combine(datetime.strptime(date_display, "%A %d %B %Y"), datetime.min.time()) + timedelta(hours=planning.date_flo)
-                fin = datetime.combine(datetime.strptime(date_display, "%A %d %B %Y"), datetime.min.time()) + timedelta(hours=planning.date_flo_deadline)
+                debut = datetime.combine(date_date, datetime.min.time()) + timedelta(hours=planning.date_flo)
+                fin = datetime.combine(date_date, datetime.min.time()) + timedelta(hours=planning.date_flo_deadline)
                 if (date_propos_local_datetime_sanszone >= debut) and (date_propos_local_datetime_sanszone <= fin) and \
                     (date_propos_deadline_local_datetime_sanszone >= debut) and (date_propos_deadline_local_datetime_sanszone <= fin):
                     break

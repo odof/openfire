@@ -76,8 +76,8 @@ class OfPlanningIntervention(models.Model):
     def create_tournee(self):
         self.ensure_one()
         tournee_obj = self.env['of.planning.tournee']
-        if self.tache.category_id.type_planning_intervention != 'tournee':
-            return False
+#        if self.tache_id.category_id.type_planning_intervention != 'tournee':
+#            return False
         date_intervention = self.date
         date_jour = isinstance(date_intervention, basestring) and date_intervention[:10] or date_intervention.strftime('%Y-%m-%d')
         address = self.address_id
@@ -90,7 +90,7 @@ class OfPlanningIntervention(models.Model):
             'epi_lat'    : ville.geo_lat,
             'epi_lon'    : ville.geo_lng,
             'adr_id'     : address.id,
-            'ville'      : address.ville and address.ville.id,
+#            'ville'      : address.ville and address.ville.id,
             'zip'        : ville.zip,
             'city'       : ville.city,
             'country_id' : country and country.id,
@@ -125,12 +125,12 @@ class OfPlanningIntervention(models.Model):
         if planning_tournee_ids:
             raise ValidationError(u'La tournée de cette équipe est bloquée')
 
-        intervention_id = super(OfPlanningIntervention, self).create(vals)
+        intervention = super(OfPlanningIntervention, self).create(vals)
         planning_tournee_ids = planning_tournee_obj.search([('date','=',date_jour),
                                                             ('equipe_id','=',vals['equipe_id'])])
         if not planning_tournee_ids:
-            self.browse(intervention_id).create_tournee()
-        return intervention_id
+            intervention.create_tournee()
+        return intervention
 
     @api.multi
     def write(self, vals):
@@ -331,9 +331,9 @@ class OfPlanningTournee(models.Model):
 
             date_local = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(tournee.date))
             start_end_list = [
-                (0, tournee.hor_md),
-                (tournee.hor_mf, tournee.hor_ad),
-                (tournee.hor_af, 24)
+                (0, equipe.hor_md),
+                (equipe.hor_mf, equipe.hor_ad),
+                (equipe.hor_af, 24)
             ]
 
             for intervention in interventions:
