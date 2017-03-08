@@ -132,7 +132,7 @@ class OfService(models.Model):
         annee = date_annee + (mois <= date_mois)
         return fields.Date.to_string(date(annee, mois, 1))
 
-    @api.one
+    @api.model
     def create(self, vals):
         if vals.get('address_id') and not vals.get('partner_id'):
             address = self.env['res.partner'].browse(vals['address_id'])
