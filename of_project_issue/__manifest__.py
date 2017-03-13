@@ -36,7 +36,7 @@
      - Possibilité de générer un devis ou une demande de prix depuis le SAV (menu droit).
      - Affichage des emails envoyés aux fournisseurs depuis le SAV
     """,
-    'depends' : ['project_issue', 'sale', 'purchase', 'of_base', 'of_planning'], # Migration , 'of_appro'],
+    'depends' : ['project_issue', 'sale', 'purchase', 'of_base', 'of_planning', 'of_gesdoc'], # Migration , 'of_appro'],
     # Modules sale, purchase nécessaires pour historique documents
     # of_base nécessaire pour onglet historique dans vue partenaire
 
@@ -45,11 +45,11 @@
     ],
     'data' : [
         'security/ir.model.access.csv',
-        'of_project_issue.xml',
+        'views/of_project_issue.xml',
         'data/of_project_issue_canal_data.xml',
-        'of_project_issue_sequence.xml',
+        'data/of_project_issue_sequence.xml',
     ],
-    'installable': False,
+    'installable': True,
     'active': False,
 }
 

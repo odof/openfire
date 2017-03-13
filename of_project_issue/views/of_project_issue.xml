@@ -67,7 +67,7 @@
                     <field name="partner_id" string="Partenaire"/>
                 </field>
                 <field name="priority" position="replace"/>
-                           
+
 <!-- Migration 9                <field name="partner_id" position="after">
                     <field name="shop_id"/>
                     <field name="categ_parent_id" invisible="1"/>
@@ -88,8 +88,8 @@
             </field>
         </record>
 
-        <record id="of_crm_case_form_view_helpdesk" model="ir.ui.view">
-            <field name="name">CRM - Helpdesk Support Form</field>
+        <record id="of_project_issue_form_view" model="ir.ui.view">
+            <field name="name">SAV Form</field>
             <field name="model">project.issue</field>
             <field name="inherit_id" ref="project_issue.project_issue_form_view"/>
             <field name="arch" type="xml">
@@ -139,16 +139,17 @@
                      <separator string="Description"/>
                 </separator> -->
                 <field name="partner_id" position="replace">
-                    <field name="partner_id" on_change="onchange_partner_id(partner_id)" required="1" select="1" context="{'show_address': True}"/>
-                     <field name="of_partner_id_ref"/>
+                    <!--  <field name="partner_id" on_change="onchange_partner_id(partner_id)" required="1" select="1" context="{'show_address': True}"/> -->
+                    <field name="partner_id" required="1" select="1" context="{'show_address': True}"/>
+                    <field name="of_partner_id_ref"/>
                     <field name="of_partner_id_address"/>
                     <field name="of_partner_id_phone"/>
                     <field name="of_partner_id_mobile"/>
                     <field name="of_partner_id_function"/>
                 </field>
-                
+
                 <xpath expr="//page[@name='extra_info']/group" position="replace"/>
-                
+
                 <page name="extra_info" position="inside">
                     <group string="Liste de documents">
                         <field name="invoice_ids" nolabel="1" colspan="4" invisible="1"/>
@@ -191,7 +192,7 @@
                         <field colspan="4" mode="tree" name="interventions_liees" nolabel="1" widget="one2many_list"
                                groups="project.group_project_user" context="{'default_partner_id':partner_id, 'view_readonly_sav':True}">
                             <tree string="Interventions">
-                                <field name="poseur_id"/>
+                                <field name="equipe_id"/>
                                 <field name="tache_id"/>
                                 <field name="date" string="Date"/>
                                 <field name="duree" string="Durée"/>
@@ -284,19 +285,19 @@
             header="False"
             />
 
-<!-- Rapport Fiche SAV dans le panning pose-->
+<!-- Rapport Fiche SAV dans le panning intervention-->
 
         <report
             auto="True"
             id="report_of_project_issue_planning"
-            model="of.planning.pose"
+            model="of.planning.intervention"
             name="of_project_issue.sav_planning"
             rml="of_project_issue/report/sav.rml"
             string="Fiche SAV"
             header="False"
             />
 
-<!-- *************************************************** -->        
+<!-- *************************************************** -->
 <!-- ************** SAV CONFIG CATEGORIES ************** -->
 <!-- *************************************************** -->
 
@@ -329,7 +330,7 @@
         </record>
 
 
-<!-- *************************************************** -->        
+<!-- *************************************************** -->
 <!-- ********************* ACTIONS ********************* -->
 <!-- *************************************************** -->
 
@@ -338,9 +339,9 @@
         <!-- Lien pour action créer un rendez-vous depuis SAV -->
         <record id="action_open_creer_rdv" model="ir.actions.server">
             <field name="name">Rendez-vous</field>
-            <field name="model_id" ref="of_planning.model_of_planning_pose"/>
+            <field name="model_id" ref="of_planning.model_of_planning_intervention"/>
             <field name="state">code</field>
-            <field name="code">action = self.pool['project.issue'].action_creer_rdv(cr, uid, context)</field>
+            <field name="code">action = env['project.issue'].action_creer_rdv()</field>
         </record>
 
         <record id="action_create_rdv" model="ir.values">
@@ -351,14 +352,14 @@
             <field name="object" eval="True"/>
         </record>
 
-        
+
         <!-- Pour créer devis -->
 
         <record id="action_open_sale_order" model="ir.actions.server">
             <field name="name">Générer devis client</field>
             <field name="model_id" ref="sale.model_sale_order"/>
             <field name="state">code</field>
-            <field name="code">action = self.pool['project.issue'].open_sale_order(cr, uid, context)</field>
+            <field name="code">action = env['project.issue'].open_sale_order()</field>
         </record>
 
         <record id="action_create_sale_order" model="ir.values">
@@ -368,15 +369,15 @@
             <field name="value" eval="'ir.actions.server,%d'%action_open_sale_order"/>
             <field name="object" eval="True"/>
         </record>
- 
-        
+
+
         <!-- Lien pour créer demande de prix -->
 
         <record id="action_open_purchase_order" model="ir.actions.server">
             <field name="name">Générer commande fournisseur</field>
             <field name="model_id" ref="purchase.model_purchase_order"/>
             <field name="state">code</field>
-            <field name="code">action = self.pool['project.issue'].open_purchase_order(cr, uid, context)</field>
+            <field name="code">action = env['project.issue'].open_purchase_order()</field>
         </record>
 
         <record id="action_create_purchase_order" model="ir.values">
@@ -388,15 +389,15 @@
         </record>
 
 
-<!-- *************************************************** -->        
-<!-- ****************** PLANNING POSE ****************** -->
+<!-- *************************************************** -->
+<!-- ************** PLANNING INTERVENTION ************** -->
 <!-- *************************************************** -->
 
-       <!-- insertion SAV lié dans planning pose form -->
-       <record id="of_planning_pose_sav_liee" model="ir.ui.view" >
-            <field name="name">of.planning.pose.sav.liee</field>
-            <field name="model">of.planning.pose</field>
-            <field name="inherit_id" ref="of_planning.of_planning_pose_view_form"/>
+       <!-- insertion SAV lié dans planning intervention form -->
+       <record id="of_planning_intervention_sav_liee" model="ir.ui.view" >
+            <field name="name">of.planning.intervention.sav.liee</field>
+            <field name="model">of.planning.intervention</field>
+            <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
             <field name="arch" type="xml" >
                 <group name="liens" position="attributes">
                     <attribute name="invisible">0</attribute>
@@ -408,7 +409,7 @@
         </record>
 
 
-        
+
        <!-- wizard interface courriel SAV -->
  <!--       <record id="view_of_crm_mail_sav_wizard" model="ir.ui.view">
             <field name="name">Interface courriel SAV</field>
@@ -433,7 +434,7 @@
                     </group>
                 </form>
             </field>
-        </record>  -->       
+        </record>  -->
 
 
         <!-- SAV suppression du filtre par défaut (par responsable)
@@ -473,11 +474,11 @@
             name="Générer un pdf"
             res_model="of.compose.mail"
             src_model="project.issue"
-            view_mode="form"    
+            view_mode="form"
             key2="client_print_multi"
             view_id="of_gesdoc.view_courrier_wizard"
             id="action_view_courrier_wizard_project_issue"
-            target="new"        
+            target="new"
             context="{'model':'project.issue'}"
         />
 

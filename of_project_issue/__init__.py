@@ -1,3 +1,3 @@
-import of_project_issue
+import models
 import report
 import wizard

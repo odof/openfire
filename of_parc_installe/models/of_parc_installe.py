@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from openerp import models, fields, api
+from odoo import models, fields, api
 
 class of_parc_installe(models.Model):
     """Parc installé"""
@@ -59,8 +59,8 @@ class res_partner(models.Model):
 class project_issue(models.Model):
     _inherit = "project.issue"
 
-    def _get_product_sav_ids(self, cr, uid, ids, context={}):
-        return self.pool['project.issue'].search(cr, uid, [('product_name_id','in',ids)], context=context)
+#     def _get_product_sav_ids(self, cr, uid, ids, context={}):
+#         return self.pool['project.issue'].search(cr, uid, [('product_name_id','in',ids)], context=context)
 
     def _search_of_parc_installe_site_adresse(self, operator, value):
         "Permet la recherche sur l'adresse d'installation de la machine depuis un SAV"

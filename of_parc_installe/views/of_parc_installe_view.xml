@@ -128,7 +128,7 @@
                 </filter>
             </field>
         </record>
-        
+
         <!-- insertion Produit installé lié et champs supplémentaires dans SAV -->
         <record id="of_produit_installe_sav_lie" model="ir.ui.view" >
             <field name="name">of.produit_installe.sav.lie</field>
@@ -186,8 +186,8 @@
 
         <!-- Menu parc installé -->
         <menuitem id="menu_of_parc_installe" action="action_view_of_parc_installe" name="Parc installé" 
-             parent="base.menu_sales" groups="project.group_project_user" sequence="100"/>
-          
+             parent="sales_team.menu_sales" groups="project.group_project_user" sequence="100"/>
+
 
 
 <!-- *************************************************** -->
@@ -199,7 +199,7 @@
             <field name="name">Créer un SAV</field>
             <field name="model_id" ref="project_issue.model_project_issue"/>
             <field name="state">code</field>
-            <field name="code">action = self.pool['of.parc.installe'].action_creer_sav(cr, uid, context)</field>
+            <field name="code">action = env['of.parc.installe'].action_creer_sav()</field>
         </record>
 
         <record id="of_action_pi_creer_sav" model="ir.values">

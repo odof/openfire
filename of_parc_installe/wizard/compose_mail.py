@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from openerp import models, api
+from odoo import models, api
 
 class of_compose_mail(models.TransientModel):
     _inherit = 'of.compose.mail'

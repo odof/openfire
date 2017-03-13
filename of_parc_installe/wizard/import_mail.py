@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from openerp import models, api
-from openerp.exceptions import UserError
+from odoo import models, api
+from odoo.exceptions import UserError
 
 class of_gesdoc_import(models.TransientModel):
     _inherit = 'of.gesdoc.import'

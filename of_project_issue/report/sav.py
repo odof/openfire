@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from openerp.report import report_sxw
+from odoo.report import report_sxw
 import time
 import datetime
 
@@ -18,7 +18,7 @@ class sav(report_sxw.rml_parse):
         })
 
     def get_objects(self, objects):
-        if objects._name == 'of.planning.pose':
+        if objects._name == 'of.planning.intervention':
             return [obj.sav_id for obj in objects if obj.sav_id]
         return objects
 
@@ -92,4 +92,4 @@ class sav(report_sxw.rml_parse):
 
 
 report_sxw.report_sxw('report.of_project_issue.sav', 'project.issue', 'addons/of_project_issue/report/sav.rml', parser=sav, header=False)
-report_sxw.report_sxw('report.of_project_issue.sav_planning', 'of.planning.pose', 'addons/of_project_issue/report/sav.rml', parser=sav, header=False)
+report_sxw.report_sxw('report.of_project_issue.sav_planning', 'of.planning.intervention', 'addons/of_project_issue/report/sav.rml', parser=sav, header=False)

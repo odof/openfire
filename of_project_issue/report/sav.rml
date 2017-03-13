@@ -144,7 +144,7 @@ commander</td>
 	          <td>[[ i.date and (str(i.date) != '') and formatLang(i.date, date_time=True) or '' ]]</td>
 	          <td>[[ i.duree and 'h'.join(str(datetime.timedelta(hours=i.duree)).split(':')[:-1]) or '' ]]</td>
 	          <td>[[ i.state or '' ]]</td>
-	          <td>[[ i.poseur_id.name or '' ]]</td>
+	          <td>[[ i.equipe_id.name or '' ]]</td>
 	          <td>[[ i.description or '' ]]</td>
 	      </tr>
   	  </blockTable>
