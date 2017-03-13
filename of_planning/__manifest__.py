@@ -10,6 +10,7 @@ Inclut la gestion d'équipes d'intervention.""",
         "depends" : [
                      'hr',
                      'product',
+                     'sale',
 #                      'of_calendar',
                      'of_base',
                      ],
