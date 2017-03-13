@@ -203,6 +203,8 @@ class OfPlanningEquipe(models.Model):
     _inherit = "of.planning.equipe"
 
     address_id = fields.Many2one('res.partner', string='Adresse')
+    geo_lat = fields.Float(related='address_id.geo_lat')
+    geo_lng = fields.Float(related='address_id.geo_lng')
 
 #     city_id = fields.Many2one('of.commune', string='CP & Ville')
 #     geo_lat = fields.Float('GPS Lat', digits=(12, 12))
@@ -303,7 +305,7 @@ class OfPlanningEquipe(models.Model):
 
 class OfPlanningTournee(models.Model):
     _name = "of.planning.tournee"
-    _description = "Jour RES"
+    _description = "Tournée"
 
     @api.multi
     @api.depends('equipe_id', 'date', 'is_bloque',
@@ -532,23 +534,15 @@ class OfPlanningTournee(models.Model):
     @api.multi
     def open_planification(self):
         self.ensure_one()
-        mod_obj = self.env['ir.model.data']
-        view_id = mod_obj.get_object_reference('of_planning_tournee', 'view_tournee_planification_wizard')[1]
+        plan_obj = self.env['of.tournee.planification']
 
-#        self = self.with_context(dict(self._context, active_ids=self._ids))
-        planif = self.env['of.tournee.planification'].create({'tournee_id': self.id})
-
-        return {
-            'name': 'Planification RDV',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'view_id': [view_id],
-            'res_model': 'of.res.planification',
-            'type': 'ir.actions.act_window',
-            'target': 'new',
-            'res_id': planif.id,
-        }
-
+        planif = plan_obj.create({
+            'tournee_id'       : self.id,
+            'distance_add'     : self.distance + 10.0,
+            'plan_partner_ids' : plan_obj._get_partner_ids(self),
+            'plan_planning_ids': plan_obj._get_planning_ids(self),
+        })
+        return planif._get_show_action()
 
 # class of_planning_controle(osv.TransientModel):
 #     _name = 'of.planning.controle'

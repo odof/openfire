@@ -24,11 +24,11 @@
                      ],
         "init_xml" : [ ],
         "demo_xml" : [ ],
-        "update_xml" : [
+        "data" : [
 #            'security/ir.model.access.csv',
 #            'wizard/add_partner_view.xml',
             'wizard/rdv_view.xml',
-#            'wizard/planification_view.xml',
+            'wizard/planification_view.xml',
 #            'wizard/search_partner_view.xml',
 #            'wizard/impression_view.xml',
             'views/of_planning_tournee_view.xml',

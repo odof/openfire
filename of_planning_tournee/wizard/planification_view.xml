@@ -1,49 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
+<odoo>
     <data>
 
-        <record id="view_res_planification_wizard" model="ir.ui.view">
+        <record id="view_tournee_planification_wizard" model="ir.ui.view">
             <field name="name">Planification de RDV</field>
-            <field name="model">of.res.planification</field>
+            <field name="model">of.tournee.planification</field>
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Planification de RDV">
                     <group name="invisible" invisible="1">
                         <field name="distance_add"/>
-                        <field name="epi_lat"/>
-                        <field name="epi_lon"/>
                         <field name="plan_partner_ids"/>
                         <field name="plan_planning_ids"/>
-                        <field name="len_plannings"/>
+                        <!--field name="len_plannings"/-->
                     </group>
-                    <group colspan="4" col="6">
+                    <group col="6">
                         <separator string="Informations" colspan="6"/>
                         <field name="date_display" readonly="1" colspan="4"/>
                         <field name="equipe_id" readonly="1"/>
                         <field name="zip" readonly="1"/>
                         <field name="city" readonly="1"/>
                         <field name="distance" readonly="1"/>
-                   </group>
-                   <group colspan="4">
-                        <separator string="Planification" colspan="4"/>
-                        <group colspan="3">
-                            <field name="plan_partner_ids_dis1" nolabel="1" colspan="4" on_change="onchange_partners(plan_partner_ids_dis1, plan_partner_ids, plan_planning_ids)"/>
-                            <button name="%(action_view_res_add_partner_wizard)d" colspan="4" string="Ajouter d'autres clients" type="action" icon="gtk-add"/>
-                        </group>
-                        <group colspan="1">
-                            <field name="plan_planning_ids_dis1" nolabel="1" colspan="4" on_change="onchange_plannings(plan_planning_ids_dis1, len_plannings, plan_planning_ids)"/>
-                            <newline/>
-                            <button name="button_plan_auto" colspan="2" type="object" icon="STOCK_SELECT_COLOR" string="Planning Auto"/>
-                            <button name="button_confirm" colspan="2" type="object" icon="gtk-apply" string="Confirmer les RDV"/>
-                        </group>
                     </group>
+                    <group>
+                        <separator string="Planification" colspan="2"/>
+                        <field name="plan_planning_ids_dis1" nolabel="1" colspan="2"/>
+                    </group>
+                    <group>
+                        <separator string="Clients à planifier" colspan="2"/>
+                        <field name="plan_partner_ids_dis1" nolabel="1" colspan="2"/>
+                    </group>
+                    <footer>
+                        <button name="button_plan_auto" type="object" string="Planning Auto" class="btn-primary"/>
+                        <button name="button_confirm" type="object" string="Confirmer les RDV" class="btn-primary"/>
+                        <button string="Fermer" class="btn-default" special="cancel"/>
+                        <!--
+                        <button name="% (action_view_tournee_add_partner_wizard)d" colspan="4" string="Ajouter d'autres clients" type="action" icon="gtk-add"/>
+                        -->
+                    </footer>
                 </form>
             </field>
         </record>
 
-        <record id="view_res_planification_partner_form" model="ir.ui.view">
+        <record id="view_tournee_planification_partner_form" model="ir.ui.view">
             <field name="name">Planification de RDV - partenaire</field>
-            <field name="model">of.res.planification.partner</field>
+            <field name="model">of.tournee.planification.partner</field>
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Client">
@@ -52,91 +53,96 @@
                         <field name="date_flo_deadline" invisible="1"/>
                         <field name="is_changed" invisible="1"/>
                     </group>
-                    <field name="partner_id" readonly="1"/>
-                    <field name="tache" domain="[('id', 'in', [t[1] for t in tache_possible if t[0]==4])]"/>
-                    <field name="partner_adr_id" readonly="1"/>
-                    <field name="date_flo" widget="float_time" on_change="onchange_tache_duree(duree, date_flo)"/>
-                    <field name="phone" readonly="1"/>
-                    <field name="duree" widget="float_time" on_change="onchange_tache_duree(duree, date_flo)"/>
-                    <field name="distance"/>
+                    <group>
+                        <field name="partner_id" readonly="1"/>
+                        <field name="partner_address_id" readonly="1"/>
+                        <field name="tache_id" domain="[('id', 'in', [t[1] for t in tache_possible if t[0]==4])]"/>
+                        <field name="partner_address_id" readonly="1"/>
+                        <field name="date_flo" widget="float_time"/>
+                        <field name="phone" readonly="1"/>
+                        <field name="duree" widget="float_time"/>
+                        <field name="distance"/>
+                    </group>
                 </form>
             </field>
         </record>
 
-        <record id="view_res_planification_partner_tree" model="ir.ui.view">
+        <record id="view_tournee_planification_partner_tree" model="ir.ui.view">
             <field name="name">Planification de RDV - partenaire</field>
-            <field name="model">of.res.planification.partner</field>
+            <field name="model">of.tournee.planification.partner</field>
             <field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree string="Clients">
-                    <field name="partner_adr_id"/>
+                    <field name="partner_address_id"/>
                     <field name="phone"/>
-                    <field name="tache"/>
+                    <field name="tache_id"/>
                     <field name="date_flo" widget="float_time"/>
                     <field name="duree" widget="float_time"/>
                     <field name="distance"/>
                     <field name="dist_prec"/>
                     <field name="dist_suiv"/>
-                    <button name="button_add_plan" string="Ajouter" type="object" icon="gtk-redo"/>
+                    <button name="button_add_plan" string="Ajouter" type="object" icon="fa-check"/>
                 </tree>
             </field>
         </record>
 
-        <record id="view_res_planification_planning_form" model="ir.ui.view">
+        <record id="view_tournee_planification_planning_form" model="ir.ui.view">
             <field name="name">Planification de RDV - planning</field>
-            <field name="model">of.res.planification.planning</field>
+            <field name="model">of.tournee.planification.planning</field>
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Planning">
-                    <field name="partner_adr_id" invisible="1"/>
-                    <field name="tache" invisible="1"/>
-                    <field name="partner_id" invisible="1"/>
-                    <field name="is_occupe" invisible="1"/>
-                    <field name="is_planifie" invisible="1"/>
-                    <field name="date_flo" widget="float_time" attrs="{'readonly': ['|', ('is_occupe', '=', False), ('is_planifie', '=', True)]}"/>
-                    <field name="date_flo_deadline" invisible="1"/>
-                    <field name="duree" widget="float_time"
-                           attrs="{'readonly': ['|', ('is_occupe', '=', False), ('is_planifie', '=', True)], 'required': [('is_occupe', '=', True)]}"/>
-                    <field name="name" readonly="1"/>
-                    <field name="date_next"/>
-                    <field name="service_id"/>
+                    <group>
+                        <field name="partner_address_id" invisible="1"/>
+                        <field name="tache_id" invisible="1"/>
+                        <field name="partner_id" invisible="1"/>
+                        <field name="is_occupe" invisible="1"/>
+                        <field name="is_planifie" invisible="1"/>
+                        <field name="date_flo" widget="float_time" attrs="{'readonly': ['|', ('is_occupe', '=', False), ('is_planifie', '=', True)]}"/>
+                        <field name="date_flo_deadline" invisible="1"/>
+                        <field name="duree" widget="float_time"
+                               attrs="{'readonly': ['|', ('is_occupe', '=', False), ('is_planifie', '=', True)], 'required': [('is_occupe', '=', True)]}"/>
+                        <field name="name" readonly="1"/>
+                        <field name="date_next"/>
+                        <field name="service_id"/>
+                    </group>
                 </form>
             </field>
         </record>
 
-        <record id="view_res_planification_planning_tree" model="ir.ui.view">
+        <record id="view_tournee_planification_planning_tree" model="ir.ui.view">
             <field name="name">Planification de RDV - planning</field>
-            <field name="model">of.res.planification.planning</field>
+            <field name="model">of.tournee.planification.planning</field>
             <field name="type">tree</field>
             <field name="arch" type="xml">
-                <tree colors="green:is_occupe==False;red:is_planifie==True" string="Planning">
+                <tree colors="green:is_occupe==False;red:is_planifie==True" string="Planning" create="false" delete="false">
                     <field name="is_occupe" invisible="1"/>
                     <field name="is_planifie" invisible="1"/>
                     <field name="date_flo" widget="float_time"/>
                     <field name="duree" widget="float_time"/>
                     <field name="name"/>
                     <field name="date_next" string="Suiv."/>
-                    <button name="button_del_plan" type="object" icon="gtk-undo" string="Supprimer le RDV" attrs="{'invisible':['|', ('is_occupe', '=', False), ('is_planifie', '=', True)]}"/>
-                    <button name="button_trier" type="object" icon="gtk-sort-descending" string="Trier les clients à planifier par proximité"/>
-                    <button name="button_confirm" type="object" icon="gtk-apply" string="Confirmer le RDV" attrs="{'invisible':['|', ('is_occupe', '=', False), ('is_planifie', '=', True)]}"/>
+                    <button name="button_trier" type="object" icon="fa-sort-amount-asc" string="Trier les clients à planifier par proximité"/>
+                    <button name="button_confirm" type="object" icon="fa-check" string="Confirmer le RDV" attrs="{'invisible':['|', ('is_occupe', '=', False), ('is_planifie', '=', True)]}"/>
+                    <button name="button_del_plan" type="object" icon="fa-trash-o" string="Supprimer le RDV" attrs="{'invisible':['|', ('is_occupe', '=', False), ('is_planifie', '=', True)]}"/>
                 </tree>
             </field>
         </record>
 
-        <record id="action_res_planification_wizard" model="ir.actions.server">
+        <record id="action_tournee_planification_wizard" model="ir.actions.server">
             <field name="name">Planification RDV</field>
-            <field name="model_id" ref="model_of_res_planification"/>
+            <field name="model_id" ref="model_of_tournee_planification"/>
             <field name="state">code</field>
-            <field name="code">action = self.pool['of.planning.res'].open_res_planification(cr, uid, context.get('active_ids', []), context)</field>
+            <field name="code">action = self.pool['of.planning.tournee'].open_tournee_planification(cr, uid, context.get('active_ids', []), context)</field>
         </record>
 
-        <record id="action_res_wizard" model="ir.values">
+        <record id="action_tournee_wizard" model="ir.values">
             <field name="name">Planification RDV</field>
             <field name="key2">client_action_multi</field>
-            <field name="model">of.planning.res</field>
-            <field name="value" eval="'ir.actions.server,%d'%action_res_planification_wizard" />
+            <field name="model">of.planning.tournee</field>
+            <field name="value" eval="'ir.actions.server,%d'%action_tournee_planification_wizard" />
             <field name="object" eval="True" />
         </record>
 
     </data>
-</openerp>
+</odoo>

@@ -23,7 +23,7 @@ RES_MODES = [
 def hours_to_strs(*hours):
     """ Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'
     """
-    return ["%02dh%02d" % (hour, round((hour % 1) * 60)) for hour in hours]
+    return tuple("%02dh%02d" % (hour, round((hour % 1) * 60)) for hour in hours)
 
 class OfTourneeRdv(models.TransientModel):
     _name = 'of.tournee.rdv'
