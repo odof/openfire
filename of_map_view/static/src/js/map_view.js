@@ -216,6 +216,7 @@ var MapView = View.extend({
         });
     },
     /**
+     *  Records without latitude or without longitude will not be loaded.
      *  @return {Array} records An array of arrays of the form [ [record_fields0], [record_fields1] ... ]
      */
     get_records: function (domain=this.domain) {
@@ -224,8 +225,14 @@ var MapView = View.extend({
 
         return this.dataset.read_slice(_.keys(this.fields_view.fields), {'domain':domain}).then(function(records){
             //console.log(records);
-            self.records = records;
-            return records;
+            var res = []
+            for (var i=0; i<records.length; i++) {
+            	if (records[i][self.record_options.latitude_field] !== 0 && records[i][self.record_options.longitude_field] !== 0) {
+            		res.push(records[i]);
+            	}
+            }
+            self.records = res;
+            return res;
         });
     },
     /**
