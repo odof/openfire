@@ -297,6 +297,31 @@
             header="False"
             />
 
+
+<!--  Menu -->
+
+       <!-- Menu SAV dans ventes -->
+       <record id="action_of_project_issue_view" model="ir.actions.act_window">
+            <field name="name">SAV</field>
+            <field name="res_model">project.issue</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,pivot,graph</field>
+            <field name="view_id" ref="project_issue.project_issue_tree_view"/>
+            <field name="domain" eval=""/>
+            <field name="help" type="html">
+                <p>Service après-vente</p>
+            </field>
+        </record>
+
+        <menuitem id="of_menu_project_issue_ventes"
+            parent="sales_team.menu_sales"
+            action="action_of_project_issue_view"
+            groups="project.group_project_user"
+            sequence="100"/>
+
+
+
+
 <!-- *************************************************** -->
 <!-- ************** SAV CONFIG CATEGORIES ************** -->
 <!-- *************************************************** -->
