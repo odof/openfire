@@ -47,7 +47,8 @@ class OfTourneePlanification(models.TransientModel):
         for service in services:
             partner_services.setdefault(service.partner_id.id,[]).append(service)
 
-        # Nous allons utiliser une requete sql dans un souci de performance
+        # Recherche des partenaires dans la zone géographique
+        # Nous utilisons une requete sql dans un souci de performance
         query = "SELECT DISTINCT id\n" \
                 "FROM res_partner\n" \
                 "WHERE id IN %%s\n" \
@@ -68,11 +69,8 @@ class OfTourneePlanification(models.TransientModel):
                 phone = partner.phone or ''
                 phone += partner.mobile and ((phone and ' || ' or '') + partner.mobile) or ''
                 partners.append((0, 0, {
-                    'partner_id': partner.id,
-                    'partner_address_id': service.address_id.id,
-                    'phone': phone,
+                    'service_id': service.id,
                     'duree': service_tache_duree or 0.0,
-                    'tache_id': service.tache_id.id,
                     'tache_possible': taches._ids,
                 }))
         return partners
@@ -80,8 +78,8 @@ class OfTourneePlanification(models.TransientModel):
     @api.model
     def _get_planning_ids(self, tournee):
         intervention_obj = self.env['of.planning.intervention']
+        service_obj = self.env['of.service']
 
-        # toutes les competences de l'equipe
         if 'tz' not in self._context:
             self = self.with_context(dict(self._context, tz='Europe/Paris'))
 
@@ -115,12 +113,8 @@ class OfTourneePlanification(models.TransientModel):
                     # Ce rdv est inclus dans un autre
                     continue
                 prev_date_deadline = intervention.date_deadline
-                intervention_dates = []
+                data = [intervention]
                 for intervention_date in (intervention.date, intervention.date_deadline):
-                    try:
-                        if len(intervention_date) > 19:
-                            intervention_date = intervention_date[:19]
-                    except: pass
                     date_local = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(intervention_date))
                     # Comme on n'affiche que les heures, il faut s'assurer de rester dans le bon jour
                     #   (pour les interventions étalées sur plusieurs jours)
@@ -130,9 +124,8 @@ class OfTourneePlanification(models.TransientModel):
                     date_local_flo = round(date_local.hour +
                                            date_local.minute / 60.0 +
                                            date_local.second / 3600.0, 5)
-                    intervention_dates.append(date_local_flo)
-                intervention_partner_id = intervention.partner_id and intervention.partner_id.id or False
-                hor_list.append(intervention_dates + [intervention.name, intervention.tache_id.id, intervention.duree, intervention_partner_id])
+                    data.append(date_local_flo)
+                hor_list.append(data)
 
             equipe_hor_list = []   # date_debut, date_fin
             if equipe_hor_mf == equipe_hor_ad:
@@ -147,35 +140,42 @@ class OfTourneePlanification(models.TransientModel):
                 if debut_add >= eh[1]:
                     continue
                 debut_add_str, fini_add_str = hours_to_strs(debut_add, eh[1])
-                while hor_list:
-                    if hor_list[0][0] < eh[1]:
-                        if debut_add < hor_list[0][0]:
-                            debut_str, fini_str = hours_to_strs(debut_add, hor_list[0][0])
-                            plannings.append((0, 0, {
-                                'name': debut_str + '-' + fini_str,
-                                'is_occupe': False,
-                                'is_planifie': False,
-                                'date_flo': debut_add,
-                                'date_flo_deadline': hor_list[0][0],
-                            }))
-                        
-                        plannings.append((0, 0, {
-                            'name': hor_list[0][2],
-                            'is_occupe': True,
-                            'is_planifie': True,
-                            'date_flo': hor_list[0][0],
-                            'date_flo_deadline': hor_list[0][1],
-                            'tache_id': hor_list[0][3],
-                            'duree': hor_list[0][4],
-                            'partner_id': hor_list[0][5],
-                            'partner_address_id': hor_list[0][6],
-                        }))
-                        debut_add = hor_list[0][1]
-                        debut_add_str = hours_to_strs(hor_list[0][1])[0]
 
-                        del hor_list[0]
-                    else:
+                while hor_list:
+                    if hor_list[0][1] >= eh[1]:
                         break
+                    intervention, date_flo, date_flo_deadline = hor_list.pop(0)
+                    if debut_add < date_flo:
+                        debut_str, fin_str = hours_to_strs(debut_add, date_flo)
+                        plannings.append((0, 0, {
+                            'name': "%s-%s" % (debut_str, fin_str),
+                            'is_occupe': False,
+                            'is_planifie': False,
+                            'date_flo': debut_add,
+                            'date_flo_deadline': date_flo,
+                        }))
+
+                    service = service_obj.search([
+                        ('tache_id', '=', intervention.tache_id.id),
+                        ('address_id','=', intervention.address_id.id),
+                        ('state', '=', 'progress')
+                    ])
+
+                    plannings.append((0, 0, {
+                        'name': intervention.name,
+                        'is_occupe': True,
+                        'is_planifie': True,
+                        'date_flo': date_flo,
+                        'date_flo_deadline': date_flo_deadline,
+                        'tache_id': intervention.tache_id.id,
+                        'duree': intervention.duree,
+                        'partner_id': intervention.partner_id and intervention.partner_id.id,
+                        'partner_address_id': intervention.address_id and intervention.address_id.id,
+                        'service_id': service and service[0].id or False,
+                    }))
+                    debut_add = date_flo_deadline
+                    debut_add_str = hours_to_strs(date_flo_deadline)[0]
+
                 if eh[1] > debut_add:
                     plannings.append((0, 0, {
                         'name': debut_add_str + '-' + fini_add_str,
@@ -297,6 +297,7 @@ class OfTourneePlanification(models.TransientModel):
         @param plan_partner_ids: Si defini, seuls les partenaires correspondants pourront etre deplaces
         """
         self.ensure_one()
+        partner_obj = self.env['res.partner']
 
         equipe = self.equipe_id
         plan_partners = []
@@ -341,7 +342,7 @@ class OfTourneePlanification(models.TransientModel):
                     if hor_fin >= planning.date_flo_deadline:
                         break
                     if not date_planifi_list:
-                        new_planning_list.append(self.add_plan(hor_fin, planning.date_flo_deadline, False))
+                        new_planning_list.append(self.make_planning(hor_fin, planning.date_flo_deadline, False))
                         break
 
                     # tester si il y a les dates planifies dans ce creneau
@@ -349,7 +350,7 @@ class OfTourneePlanification(models.TransientModel):
                     if date_planifi_debut < planning.date_flo_deadline:
                         if date_planifi_debut != hor_fin:
                             # L'heure de debut de la tache ne correspond pas au début du creneau : on crée un créneau vide avant la tache
-                            new_planning_list.append(self.add_plan(hor_fin, date_planifi_debut, False))
+                            new_planning_list.append(self.make_planning(hor_fin, date_planifi_debut, False))
                         # Récupération de la ligne du partenaire
                         index = 0
                         for plan_partner in plan_partners:
@@ -357,21 +358,20 @@ class OfTourneePlanification(models.TransientModel):
                                 break
                             index += 1
                         # Creation de la ligne de planning
-                        partner = plan_partner.partner_id
                         address = plan_partner.partner_address_id
-                        libelle = partner.name
+                        libelle = address.name
                         for field in ['zip','city']:
                             if address[field]:
                                 libelle += " "+address[field]
-                        new_planning_list.append(self.add_plan(date_planifi_debut, date_planifi_fin, True,address.id, partner.id
-                                                               , plan_partner.tache_id.id, plan_partner.duree, libelle))
+                        new_planning_list.append(self.make_planning(date_planifi_debut, date_planifi_fin, True,
+                                                                    service=plan_partner.service_id, libelle=libelle))
                         hor_fin = date_planifi_fin
                         del plan_partners[index]
                         del date_planifi_list[0]
                         new_plan_partners.append((3,plan_partner.id))
                     else:
                         # La tache est ulterieure au creneau : on comble l'horaire avec un nouveau creneau vide
-                        new_planning_list.append(self.add_plan(hor_fin, planning.date_flo_deadline, False))
+                        new_planning_list.append(self.make_planning(hor_fin, planning.date_flo_deadline, False))
                         break
 
         last_geo_lat = 0
@@ -384,7 +384,7 @@ class OfTourneePlanification(models.TransientModel):
                 if new_planning[2]['is_occupe']:
                     is_planifi = True
                     plan_plans.append(new_planning)
-                    address = partner.browse(new_planning[2]['partner_address_id'])
+                    address = partner_obj.browse(new_planning[2]['partner_address_id'])
                     last_geo_lat = address.geo_lat or 0
                     last_geo_lng = address.geo_lng or 0
             else:
@@ -413,7 +413,7 @@ class OfTourneePlanification(models.TransientModel):
                 if (new_hor_fin >= planning_deadline):
                     break
                 if not plan_partners:
-                    plan_plans.append(self.add_plan(new_hor_fin, planning_deadline, False))
+                    plan_plans.append(self.make_planning(new_hor_fin, planning_deadline, False))
                     break
                 min_distance = False
 
@@ -430,20 +430,19 @@ class OfTourneePlanification(models.TransientModel):
 
                 if index == -1:
                     # Pas de client disponible pour le creneau restant (ou creneau vide)
-                    plan_plans.append(self.add_plan(new_hor_fin, planning_deadline, False))
+                    plan_plans.append(self.make_planning(new_hor_fin, planning_deadline, False))
                     break
 
                 # Creation de la ligne de planning
                 plan_partner = plan_partners.pop(index)
-                partner = plan_partner.partner_id
                 address = plan_partner.partner_address_id
-                libelle = partner.name
+                libelle = address.name
                 for field in ['zip','city']:
                     if address[field]:
                         libelle += " "+address[field]
 
-                plan_plans.append(self.add_plan(new_hor_fin, (new_hor_fin + plan_partner.duree), True, address.id,
-                                                partner.id, plan_partner.tache_id.id, plan_partner.duree, libelle))
+                plan_plans.append(self.make_planning(new_hor_fin, (new_hor_fin + plan_partner.duree), True, 
+                                                     service=plan_partner.service_id, libelle=libelle))
                 new_hor_fin += plan_partner.duree
                 last_geo_lat = address.geo_lat
                 last_geo_lng = address.geo_lng
@@ -453,8 +452,9 @@ class OfTourneePlanification(models.TransientModel):
             self.write({'plan_planning_ids': plan_plans, 'plan_partner_ids':new_plan_partners})
         return self._get_refresh_action()
 
-    def button_add_plan(self, cr, uid, ids, context=None):
-        return self.button_planifier(False)
+#     @api.multi
+#     def button_add_plan(self):
+#         return self.button_planifier(False)
 
     @api.multi
     def creneau(self, creneau_avant, creneau_apres, start, end):
@@ -470,43 +470,27 @@ class OfTourneePlanification(models.TransientModel):
         return modif_planning
 
     @api.multi
-    def add_plan(self, hor_debut, hor_fin, is_occupe, partner_address_id=False, partner_id=False, tache_id=False, duree=0.0, libelle=False):
-        partner_obj = self.env['res.partner']
-        service_obj = self.env['of.service']
-
+    def make_planning(self, hor_debut, hor_fin, is_occupe, service=False, libelle=False):
         if not libelle:
             libelle = "%s-%s" % hours_to_strs(hor_debut, hor_fin)
-        phone = ''
-        if partner_address_id:
-            address = partner_obj.browse(partner_address_id)
-            phone = [p for p in (address.phone, address.mobile) if p]
-            phone = ' || '.join(phone)
 
-        service_id = False
-        date_next = False
-        if tache_id and partner_address_id:
-            service = service_obj.search([('address_id','=',partner_address_id),('tache_id','=',tache_id),('state','=','progress')])
-            if service:
-                if len(service._ids) > 1:
-                    # Si plusieurs services sont disponibles, ce qui ne devrait pas arriver, on prend le plus en retard
-                    service = min(service, key=lambda s:s.date_next)
-                service_id = service.id
-
-                date_next = service.get_next_date(self.tournee_id.date)
-        return (0, 0, {
-                'date_flo': hor_debut,
-                'date_flo_deadline': hor_fin,
-                'name': libelle,
-                'is_occupe': is_occupe,
-                'is_planifie': False,
-                'partner_address_id': partner_address_id,
-                'phone': phone,
-                'partner_id': partner_id,
-                'tache_id': tache_id,
-                'duree': duree,
-                'service_id': service_id,
-                'date_next': date_next,
-                })
+        data = {
+            'date_flo': hor_debut,
+            'date_flo_deadline': hor_fin,
+            'name': libelle,
+            'is_occupe': is_occupe,
+            'is_planifie': False,
+        }
+        if service:
+            data.update({
+                'service_id': service.id,
+                'tache_id': service.tache_id.id,
+#                'partner_id': service.partner_id.id,
+                'partner_address_id': service.address_id.id,
+                'duree': service.tache_id.duree,
+                'date_next': service.get_next_date(self.tournee_id.date),
+            })
+        return (0, 0, data)
 
     @api.multi
     def button_plan_auto(self):
@@ -514,17 +498,23 @@ class OfTourneePlanification(models.TransientModel):
 
     @api.multi
     def button_confirm(self):
-        intervention_obj = self.env['of.planning.pose']
+        for plan in self:
+            plan.plan_planning_ids.button_confirm()
+        return self._get_refresh_action()
+
+    @api.multi
+    def button_confirm_old(self):
+        intervention_obj = self.env['of.planning.intervention']
 
         if 'tz' not in self._context:
             self = self.with_context(dict(self._context, tz='Europe/Paris'))
 
         for plan in self:
-            if not plan.planning_ids:
+            if not plan.plan_planning_ids:
                 continue
             equipe = plan.equipe_id
-            date_jour = plan.date
-            datetime_val = fields.Date.from_string(date_jour)
+            date_jour = plan.tournee_id.date
+            datetime_val = fields.Datetime.from_string(date_jour)
             local_tz = timezone(self._context['tz'])
             utc = timezone('UTC')
 
@@ -535,7 +525,7 @@ class OfTourneePlanification(models.TransientModel):
                 date_datetime = datetime_val + timedelta(hours=planning.date_flo)
                 date_datetime_local = local_tz.localize(date_datetime)
                 date_datetime_sanszone = date_datetime_local.astimezone(utc)
-                date_string = fields.Datetime.from_string(date_datetime_sanszone)
+                date_string = fields.Datetime.to_string(date_datetime_sanszone)
 
                 partner = planning.partner_id
                 tache = planning.tache_id
@@ -569,10 +559,6 @@ class OfTourneePlanification(models.TransientModel):
                 if planning.service_id and planning.date_next:
                     planning.service_id.write({'date_next': planning.date_next})
         return self._get_refresh_action()
-
-    @api.onchange('plan_planning_ids_dis1')
-    def onchange_plannings(self):
-        self.plan_partner_ids_dis1 = []
 
 #     # interdire la suppression ou addition des lignes de la table avec les RDVs
 #     @api.onchange('plan_planning_ids_dis1')
@@ -958,10 +944,26 @@ class OfTourneePlanificationPartner(models.TransientModel):
     _name = 'of.tournee.planification.partner'
     _description = 'Partenaire de Planification de RDV'
 
+    @api.depends('service_id')
+    def _get_phone(self):
+        for plan_partner in self:
+            address = plan_partner.service_id.address_id
+            # Champs affichés pour le numéro de téléphone, si renseignés
+            phone = (address.phone, address.mobile)
+            plan_partner.phone = ' || '.join([p for p in phone if p])
+
     wizard_id = fields.Many2one('of.tournee.planification', string="Planification", required=True, ondelete='cascade')
-    partner_id = fields.Many2one('res.partner', string='Client', required=True)
-    partner_address_id = fields.Many2one('res.partner', string='Adresse', required=True)
-    tache_id = fields.Many2one('of.planning.tache', string='Intervention', required=True)
+    service_id = fields.Many2one('of.service', string="Service", required=True)
+
+    partner_id = fields.Many2one(related='service_id.partner_id')
+    partner_address_id = fields.Many2one(related='service_id.address_id')
+    tache_id = fields.Many2one(related='service_id.tache_id')
+    phone = fields.Char(compute='_get_phone')
+
+#     partner_id = fields.Many2one('res.partner', string='Client', required=True)
+#     partner_address_id = fields.Many2one('res.partner', string='Adresse', required=True)
+#     tache_id = fields.Many2one('of.planning.tache', string='Intervention', required=True)
+#     phone = fields.Char(string=u'Téléphone', size=128)
 
     tache_possible = fields.Many2many('of.planning.tache', related="wizard_id.tournee_id.equipe_id.tache_ids", string="Intervention Possible")
 
@@ -971,7 +973,6 @@ class OfTourneePlanificationPartner(models.TransientModel):
     dist_suiv = fields.Float(string='Suiv', digits=(12,3))
     date_flo = fields.Float(string='RDV', digits=(12, 5))
     date_flo_deadline = fields.Float(string='Date', digits=(12, 5))
-    phone = fields.Char(string=u'Téléphone', size=128)
     is_changed = fields.Boolean(string=u'Modifié')   # seulement quand on modifie la duree ou la date debut, c'est egale True
 
     @api.multi
@@ -1058,9 +1059,12 @@ class OfTourneePlanificationPlanning(models.TransientModel):
 
     name = fields.Char(u'Libellé', size=128, required=True)
     wizard_id = fields.Many2one('of.tournee.planification', string="Planification")
+    service_id = fields.Many2one('of.service', string="Service")
+
     tache_id = fields.Many2one('of.planning.tache', string='Intervention')
-    partner_id = fields.Many2one('res.partner', string='Client')
+#    partner_id = fields.Many2one('res.partner', string='Client')
     partner_address_id = fields.Many2one('res.partner', string='Adresse')
+
     date_flo = fields.Float(string='RDV', required=True, digits=(12, 5))
     date_flo_deadline = fields.Float(string='Date', required=True, digits=(12, 5))
     duree = fields.Float(string=u'Durée', digits=(12, 5))
@@ -1180,54 +1184,53 @@ class OfTourneePlanificationPlanning(models.TransientModel):
 
         for planning in self:
             if planning.is_planifie:
-                # Ne devrait pas arriver car le bouton confirmer des plannings confirmés est masqué
                 continue
             if not planning.is_occupe:
-                # Ne devrait pas arriver car le bouton confirmer des créneaux est masqué
                 continue
 
             wizard = planning.wizard_id
             equipe = wizard.equipe_id
-            date_date = fields.Date.from_string(wizard.date)
+            date_date = fields.Datetime.from_string(wizard.tournee_id.date)
             local_tz = timezone(self._context['tz'])
             utc = timezone('UTC')
-            verif_existe = False
 
             date_datetime = date_date + timedelta(hours=planning.date_flo)
             date_datetime_local = local_tz.localize(date_datetime)
             date_datetime_sanszone = date_datetime_local.astimezone(utc)
             date_str = fields.Datetime.to_string(date_datetime_sanszone)
 
-            partner = planning.partner_id
-            tache = planning.tache_id
-            description = ''
-            if partner and tache:
-                for service in partner.service_ids:
-                    if tache.id == service.tache_id.id:
-                        description += (tache.name + '\n') + (service.template_id and (service.template_id.name + '\n') or '') + (service.note or '')
-                        break
+            service = planning.service_id
+            address = service.address_id
+            # Champs affichés dans la description de la pose
+            description = (
+                service.tache_id.name,
+                # service.template_id and service.template_id.name,
+                service.note,
+            )
+            description = "\n".join([s for s in description if s])
 
             values = {
                 'hor_md'     : equipe.hor_md,
                 'hor_mf'     : equipe.hor_mf,
                 'hor_ad'     : equipe.hor_ad,
                 'hor_af'     : equipe.hor_af,
-                'part_id'    : partner and partner.id or False,
-                'tache_id'   : tache and tache.id or False,
-                'poseur_id'  : equipe.id,
+                'partner_id' : service.partner_id.id,
+                'address_id' : address.id,
+                'tache_id'   : service.tache_id.id,
+                'equipe_id'  : equipe.id,
                 'date'       : date_str,
                 'duree'      : planning.duree,
                 'user_id'    : self._uid,
-                'company_id' : partner and partner.company_id.id or False,
+                'company_id' : service.partner_id.company_id.id,
                 'name'       : planning.name,
-                'state'      : 'Planifie',
+                'state'      : 'draft',
                 'description': description,
                 'verif_dispo': True,
             }
             intervention_obj.create(values)
 
             # Mise à jour de la date minimale de prochaine intervention dans le service
-            if planning.service_id and planning.date_next:
+            if planning.date_next:
                 planning.service_id.write({'date_next': planning.date_next})
 
             planning.write({'is_planifie': True})

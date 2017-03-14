@@ -93,9 +93,6 @@
             <field name="arch" type="xml">
                 <form string="Planning">
                     <group>
-                        <field name="partner_address_id" invisible="1"/>
-                        <field name="tache_id" invisible="1"/>
-                        <field name="partner_id" invisible="1"/>
                         <field name="is_occupe" invisible="1"/>
                         <field name="is_planifie" invisible="1"/>
                         <field name="date_flo" widget="float_time" attrs="{'readonly': ['|', ('is_occupe', '=', False), ('is_planifie', '=', True)]}"/>
