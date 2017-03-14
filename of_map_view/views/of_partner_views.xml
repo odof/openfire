@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+    <data>
+
+        <!-- Partner Map View -->
+        <record id="of_partner_map_view" model="ir.ui.view">
+            <field name="name">of.partner.map</field>
+            <field name="model">res.partner</field>
+            <field name="arch" type="xml">
+                <map string="Map" class="o_res_partner_map" latitude_field="geo_lat" longitude_field="geo_lng">
+                    <field name="geo_lat" required="1"/>
+                    <field name="geo_lng" required="1"/>
+                    <field name="id"/>
+                    <field name="name" class="oe_map_displayer_header"/>
+                    <field name="street" class="oe_map_displayer_body"/>
+                    <field name="phone" class="oe_map_displayer_body"/>
+                </map>
+            </field>
+        </record>
+
+        <record id="action_partner_map_view" model="ir.actions.act_window.view">
+            <field eval="3" name="sequence"/>
+            <field name="view_mode">map</field>
+            <field name="view_id" ref="of_partner_map_view"/>
+            <field name="act_window_id" ref="base.action_partner_form"/>
+        </record>
+
+        <record id="base.action_partner_form" model="ir.actions.act_window">
+            <field name="view_mode">kanban,tree,form,map</field>
+        </record>
+
+        <record id="base.action_partner_customer_form" model="ir.actions.act_window">
+            <field name="view_mode">kanban,tree,form,map</field>
+        </record>
+
+        <record id="base.action_partner_supplier_form" model="ir.actions.act_window">
+            <field name="view_mode">kanban,tree,form,map</field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,23 @@
+<template>
+
+    <!-- <t t-name="MapView.buttons">
+        <t t-if="!widget.no_leaf and widget.options.action_buttons !== false">
+            <div class="o_map_buttons">
+                <t t-if="widget.options.addable and widget.is_action_enabled('create')">
+                    <button type="button" class="btn btn-primary btn-sm o_map_button_add" accesskey="c">
+                        <t t-esc="widget.options.addable"/>
+                    </button>
+                </t>
+                <button type="button" class="btn btn-primary btn-sm o_map_button_save" accesskey="s">
+                    Save
+                </button>
+                <button type="button" class="btn btn-default btn-sm o_map_button_discard" accesskey="j">
+                    Discard
+                </button>
+            </div>
+        </t>
+    </t> -->
+
+    <!-- map container -->
+    <div t-name="MapView" id="lf_map" style="min-width: 500px; min-height: 500px; width: 100%; height: 100%;"/>
+</template>

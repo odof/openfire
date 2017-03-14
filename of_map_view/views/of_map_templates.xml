@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- inherit from web assets backend -->
+    <template id="assets_backend" name="partner_map assets" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <!-- leaflet lib loading -->
+            <link type="text/css" rel="stylesheet" href="/of_map_view/static/lib/leaflet-1.0.3/leaflet.css" />
+            <script type="text/javascript" src="/of_map_view/static/lib/leaflet-1.0.3/leaflet-src.js"></script>
+            <!-- custom icons -->
+            <link type="text/css" rel="stylesheet" href="/of_map_view/static/lib/MaterialDesign-Webfont-master/css/materialdesignicons.min.css" />
+            <script type="text/javascript" src="/of_map_view/static/lib/leaflet.Icon.Glyph/Leaflet.Icon.Glyph.js"></script>
+            
+            <link rel="stylesheet" href="/of_map_view/static/src/less/map_view.less" />
+            <script type="text/javascript" src="/of_map_view/static/src/js/map_controls.js"></script>
+            <script type="text/javascript" src="/of_map_view/static/src/js/map_record.js"></script>
+            <script type="text/javascript" src="/of_map_view/static/src/js/map_view.js"></script>
+        </xpath>
+    </template>
+    
+</odoo>

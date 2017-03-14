@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <record id="of_company_geo_form" model="ir.ui.view">
+            <field name="name">of.company.geolocation.inherit</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook[last()]" position="inside">
+                    <page string="Geolocation" name="geo_location">
+                        <!-- something to do here -->
+                        <group colspan="2" col="2">
+                            <separator string="Geolocation" colspan="2"/>
+                            <!-- partner localization button -->
+                            <button
+                                string="Geolocate Partners"
+                                name="geo_code_partners"
+                                colspan="2"
+                                icon="fa-check"
+                                type="object"/>
+                            <div>
+                                <span class="oe_inline"> ( Last record :  </span>
+                                <field name="date_last_partner_localization" nolabel="1" class="oe_inline"/>
+                                <span>) </span>
+                            </div>
+                            <!-- company localization button -->
+                            <button
+                                string="Geolocate"
+                                name="geo_code"
+                                colspan="2"
+                                icon="fa-check"
+                                type="object"/>
+                            <div>
+                                <span class="oe_inline"> ( Last record   </span>
+                                <field name="date_last_localization" nolabel="1" class="oe_inline"/>
+                                <span> : Lat : </span>
+                                <field name="geo_lat" nolabel="1" class="oe_inline"/>
+                                <span> ;  Long:  </span>
+                                <field name="geo_lng" nolabel="1" class="oe_inline"/>
+                                <span>) </span>
+                            </div>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+</odoo>

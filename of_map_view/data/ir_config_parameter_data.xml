@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="0">
+
+    <record id="map_default_center_lat" model="ir.config_parameter">
+        <field name="key">Map_Default_Center_Latitude</field>
+        <field name="value">48.056</field>
+    </record>
+    
+    <record id="map_default_center_lng" model="ir.config_parameter">
+        <field name="key">Map_Default_Center_Longitude</field>
+        <field name="value">-2.818</field>
+    </record>
+    
+    <record id="map_default_zoom" model="ir.config_parameter">
+        <field name="key">Map_Default_Zoom</field>
+        <field name="value">8</field>
+    </record>
+    
+    <record id="map_tile_server_address" model="ir.config_parameter">
+        <field name="key">Map_Tile_Server_Address</field>
+        <field name="value">undefined</field>
+    </record>
+    
+</odoo>
