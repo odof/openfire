@@ -81,7 +81,7 @@ class ResPartner(models.Model):
     @api.model
     def create(self, vals):
         partner = super(ResPartner,self).create(vals)
-        if not (partner.geo_lat and partner.geo_lng) and (partner.street or partner.street2) and partner.zip and partner.city and partner.country: 
+        if not (partner.geo_lat and partner.geo_lng) and (partner.street or partner.street2) and partner.zip and partner.city and partner.country_id: 
             partner.geo_code()
         return partner
 
