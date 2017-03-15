@@ -7,8 +7,8 @@
     'category': 'OpenFire modules',
     'summary': 'Map View',
     'description': """
-        creates a new type of view : "map".
-        contains a built-in implementation for res.partner.
+        Creates a new type of view : "map".
+        Contains a built-in implementation for res.partner.
     """,
     'website': 'openfire.fr',
     'depends': ['web','of_geolocalize'],

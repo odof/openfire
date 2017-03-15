@@ -75,6 +75,8 @@ var MapView = View.extend({
 
         this.map = null;
         this.current_record_nb = 0;
+        this.nondisplayable_records = [];
+        this.records = [];
 
         this.fsd = false; // first search done
 
@@ -107,14 +109,21 @@ var MapView = View.extend({
      */
     willStart: function() {
         //console.log("MapView.willStart: ",arguments);
+        var self = this;
         var rendered_prom = this.$el.html(QWeb.render(this.template, this)).promise();
-
-        if (this.options.map_center_and_zoom == null) { // the map will use default config
-            var dmc_prom = this.get_default_map_config().promise();
-            return $.when(this._super(),rendered_prom,dmc_prom);
-        }else{
-            return $.when(this._super(),rendered_prom);
+        var options = {};
+        if (!this.options.map_center_and_zoom) { // the map will use default center and zoom config, found in ir.config_parameter
+        	options.map_center_and_zoom = true;
         }
+        if (!this.options.tile_server_addr) { // the map will use default tile server config, found in ir.config_parameter
+        	options.tile_server_addr = true;
+        }
+
+        var q = true;
+        if (options.map_center_and_zoom || options.tile_server_addr) {
+        	q = this.get_default_map_config(options).promise();
+        }
+        return $.when(this._super(),rendered_prom,q);
     },
     /**
      * Method called after rendering. Mostly used to bind actions, perform asynchronous
@@ -129,7 +138,7 @@ var MapView = View.extend({
         //console.log("MapView.start: ",arguments);
         
         this.$el.addClass(this.fields_view.arch.attrs.class || "o_map_view");
-        var options = {center: this.map_center_and_zoom[0], zoom: this.map_center_and_zoom[1]};
+        var options = {center: this.options.map_center_and_zoom[0], zoom: this.options.map_center_and_zoom[1]};
         var args = {view: this, options};
         this.map = new MapView.Map(args);
 
@@ -183,7 +192,17 @@ var MapView = View.extend({
                 self.update_pager(1);
                 if (self.map.is_attached()) {
                     var opts = self.record_options;
-                    self.map.reset_layer_groups().then(self.map.add_layer_group(records,opts));
+                    self.map.reset_layer_groups().then(function(){
+                    	if (self.current_record_nb === 0) {
+                    		//console.log("no displayable record");
+                    		self.map.nocontent_displayer.update_content();
+                    		self.map.nocontent_displayer.do_toggle(true);
+                    	}else{
+                    		self.map.nocontent_displayer.do_toggle(false);
+                    		self.map.add_layer_group(records,opts);
+                    	}
+                    	//console.log("MapView.load_records: this, displayable, nondisplayable",self,self.records,self.nondisplayable_records);
+                    });
                 }else{
                     throw new Error(_.str.sprintf( _t("the map is not attached to its container")));
                 }; 
@@ -197,23 +216,57 @@ var MapView = View.extend({
             min: this.current_min,
             limit: this._limit
         });
-        
 
         return $.when();
     },
 
     /**
-     *  @return {Array} the default map center and zoom [[lat,lng],zoom]
+     *	
+     *
+     *	@param {Boolean} options.map_center_and_zoom true if we need to query default map center and zoom data
+     *	@param {Boolean} options.tile_server_addr true if we need to query default tile server address
+     *  @return {jQuery.Deferred} 
      */
-    get_default_map_config: function () {
-        //console.log("MapView.get_default_map_config");
+    get_default_map_config: function (options) {
+        //console.log("MapView.get_default_map_config: ",options);
         var self = this;
+        var ir_config = new Model('ir.config_parameter');
+        var dfd_1 = $.Deferred();
+        var dfd_2 = $.Deferred();
+        var p1 = dfd_1.promise();
+        var p2 = dfd_2.promise();
 
-        return this._model.call('get_default_map_config').then(function(results){
-            //console.log(results);
-            self.map_center_and_zoom = results;
-            return self.map_center_and_zoom;
-        });
+        if (options.map_center_and_zoom) {
+        	//console.log('getting map center and zoom');
+        	self.options.map_center_and_zoom = [];
+        	ir_config.call('get_param',['Map_Default_Center_Latitude']).then(function(lat) {
+        		self.options.map_center_and_zoom[0] = [];
+        		self.options.map_center_and_zoom[0][0] = lat;
+        		return ir_config.call('get_param',['Map_Default_Center_Longitude']);
+        	}).then(function(lng) {
+        		self.options.map_center_and_zoom[0][1] = lng;
+        		return ir_config.call('get_param',['Map_Default_Zoom']);
+        	}).then(function(zoom) {
+        		self.options.map_center_and_zoom[1] = zoom;
+        		//console.log('map_center_and_zoom: ',self.options.map_center_and_zoom);
+        		dfd_1.resolve();
+        	});
+        }else{
+        	dfd_1.resolve();
+        }
+        if (options.tile_server_addr) {
+        	//console.log('getting tile server address');
+        	ir_config.call('get_param',['Map_Tile_Server_Address']).then(function(res){
+        		if (res !== 'undefined') {
+        			self.options.tile_server_addr = res;
+        		}
+        		dfd_2.resolve();
+        	});
+        }else{
+        	dfd_2.resolve();
+        }
+
+        return $.when(p1,p2);
     },
     /**
      *  Records without latitude or without longitude will not be loaded.
@@ -222,6 +275,7 @@ var MapView = View.extend({
     get_records: function (domain=this.domain) {
         //console.log("MapView.get_records: ",arguments);
         var self = this;
+        this.nondisplayable_records = [];
 
         return this.dataset.read_slice(_.keys(this.fields_view.fields), {'domain':domain}).then(function(records){
             //console.log(records);
@@ -229,6 +283,8 @@ var MapView = View.extend({
             for (var i=0; i<records.length; i++) {
             	if (records[i][self.record_options.latitude_field] !== 0 && records[i][self.record_options.longitude_field] !== 0) {
             		res.push(records[i]);
+            	}else{
+            		self.nondisplayable_records.push(records[i]);
             	}
             }
             self.records = res;
@@ -302,10 +358,10 @@ var MapView = View.extend({
         }
     },
     /**
-     * No idea what this is for...
+     * No idea what this is for... apparently triggered when the web page gets refreshed?
      */
     do_load_state: function(state, warm) { 
-        console.log("MapView.do_load_state");
+        console.log("MapView.do_load_state: ",state,warm);
         var reload = false;
         if (state.min && this.current_min !== state.min) {
             this.current_min = state.min;
@@ -336,7 +392,7 @@ MapView.Map = Widget.extend({
         minZoom: 7, 
         maxZoom: 19,
         tile_server_addr: TILE_SERVER_ADDR,
-        container_id: 'lf_map',
+        container_id: 'lf_map', // the id of the container for the map
         set_bounds_mode: 'visible',
     }),
     /**
@@ -349,8 +405,6 @@ MapView.Map = Widget.extend({
         this._super(args.view);
         this.options = _.defaults(args.options||{},this.defaults);
         this.view = args.view;
-        this.container_id = this.options.container_id; // the id of the container for the map
-        this.tile_server_addr = this.options.tile_server_addr;
 
         this.layer_groups = []; // List of layer groups. 
         this.current_layer_group_index = 0;
@@ -359,14 +413,14 @@ MapView.Map = Widget.extend({
 
         this.the_map = null; // will be set in this.attach_to_container
         this.cmptry = 0; // used by this.attach_to_container
-        this.attach_to_container(this.container_id,this.tile_server_addr);
+        this.attach_to_container(this.options.container_id,this.options.tile_server_addr);
         //console.log("MapView.Map inited: ", this);
     },
     /**
      *  Instantiate the record displayer for the map. See map_controls.
      */
-    add_displayer: function () {
-        //console.log("MapView.Map.add_displayer");
+    add_record_displayer: function () {
+        //console.log("MapView.Map.add_record_displayer");
         // make sure to only add it once.
         if (!this.record_displayer) {
             this.record_displayer = new map_controls.RecordDisplayer(this.view,this.view.record_options.header_fields,this.view.record_options.body_fields);
@@ -375,6 +429,23 @@ MapView.Map = Widget.extend({
             console.log('this.record_displayer is already set');
         }
         
+        return $.when();
+    },
+    /**
+     *  Instantiate the nocontent displayer for the map. See map_controls.
+     */
+    add_nocontent_displayer: function () {
+    	//console.log("MapView.Map.add_nocontent_displayer");
+        // make sure to only add it once.
+        if (!this.nocontent_displayer) {
+        	var options = {};
+
+        	this.nocontent_displayer = new map_controls.NoContentDisplayer(this.view,options);
+        	this.nocontent_displayer.addTo(this.the_map);
+        }else{
+        	console.log('this.nocontent_displayer is already set');
+        }
+
         return $.when();
     },
     /**
@@ -391,11 +462,17 @@ MapView.Map = Widget.extend({
      */
     on_map_attached: function () {
         //console.log("MapView.Map.on_map_attached");=
-        this.add_displayer();
+        var p1 = this.add_record_displayer();
+        var p2 = this.add_nocontent_displayer();
         //this.add_buttons(); // later, later...
 
-        var v = this.view;
-        v.do_search(v.domain,v.context,v.group_by);
+        var self = this;
+
+        $.when(p1,p2).then(function(){
+        	var v = self.view;
+        	v.do_search(v.domain,v.context,v.group_by);
+        });
+        
     },
     /**
      *  adds a layer group to the map's list of layer groups.
@@ -560,7 +637,7 @@ MapView.Map = Widget.extend({
         //console.log("MapView.Map.attach_to_container");
         var self = this;
         if ($('#'+container_id).length > 0) {
-            this.the_map = L.map(this.container_id, { 
+            this.the_map = L.map(this.options.container_id, { 
                 center: this.options.center, 
                 zoom: this.options.zoom, 
                 minZoom: this.options.minZoom, 

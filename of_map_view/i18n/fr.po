@@ -1,0 +1,86 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_map_view
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-03-15 15:52+0000\n"
+"PO-Revision-Date: 2017-03-15 15:52+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_map_view
+#: model:ir.module.module,description:of_map_view
+msgid ""
+"Creates a new type of view : \"map\"."
+"\n"
+"Contains a built-in implementation for res.partner."
+msgstr ""
+"Créé un nouveau type de vue : \"carte\"."
+"\n"
+"Contient une implémentation pour le modèle res.partner."
+
+#. module: of_map_view
+#. openerp-web
+#: code:addons/of_map_view/static/src/js/map_view.js:40
+#, python-format
+msgid "Create"
+msgstr "Créer"
+
+#. module: of_map_view
+#. openerp-web
+#: code:addons/of_map_view/static/src/js/map_view.js:27
+#: model:ir.ui.view,arch_db:of_map_view.of_partner_map_view
+#, python-format
+msgid "Map"
+msgstr "Carte"
+
+#. module: of_map_view
+#: model:ir.model,name:of_map_view.model_res_partner
+msgid "Partner"
+msgstr "Partenaire"
+
+#. module: of_map_view
+#. openerp-web
+#: code:addons/of_map_view/static/src/js/map_controls.js:97
+#, python-format
+msgid "couldn't find record id#"
+msgstr "impossible de trouver l'enregistrement id#"
+
+#. module: of_map_view
+#. openerp-web
+#: code:addons/of_map_view/static/src/js/map_controls.js:210
+#, python-format
+msgid "no record matching your search was found."
+msgstr "Aucun enregistrement correspondant à votre recherche n'a été trouvé."
+
+#. module: of_map_view
+#. openerp-web
+#: code:addons/of_map_view/static/src/js/map_controls.js:208
+#, python-format
+msgid "record matching your search was found, but it is not displayable on the map (invalid GPS coordinates). "
+msgstr "enregistrement correspondant à votre recherche a été trouvé, mais il n'est pas affichable sur la carte (coordonnées GPS invalides). "
+
+#. module: of_map_view
+#. openerp-web
+#: code:addons/of_map_view/static/src/js/map_controls.js:206
+#, python-format
+msgid "records matching your search were found, but none of them is displayable on the map (invalid GPS coordinates). "
+msgstr "enregistrements correspondant à votre recherche ont été trouvés, mais aucun d'entre eux n'est affichable sur la carte (coordonnées GPS invalides). "
+
+#. module: of_map_view
+#. openerp-web
+#: code:addons/of_map_view/static/src/js/map_view.js:215
+#: code:addons/of_map_view/static/src/js/map_view.js:514
+#: code:addons/of_map_view/static/src/js/map_view.js:529
+#: code:addons/of_map_view/static/src/js/map_view.js:632
+#, python-format
+msgid "the map is not attached to its container"
+msgstr "La carte n'est pas rattachée à son conteneur"
+

@@ -1,7 +1,11 @@
 odoo.define('of_map_view.map_controls', function (require) {
 "use strict";
 
+var core = require('web.core');
 var MapRecord = require('of_map_view.map_record');
+
+var _t = core._t;
+var _lt = core._lt;
 
 L.Control.RecordDisplayer = L.Control.extend({
 	options: {
@@ -150,11 +154,96 @@ L.Control.RecordDisplayer = L.Control.extend({
 	},
 });
 
-L.control.displayer = function(view,header_fields,body_fields,options) {
+L.control.record_displayer = function(view,header_fields,body_fields,options) {
 	return new L.Control.RecordDisplayer(view,header_fields,body_fields,options);
 };
 
-// not implemented yet
+L.Control.NoContentDisplayer = L.Control.extend({
+	options: {
+		position: 'topleft'
+  	},
+  	/**
+	 *	Inits the displayer.
+	 */
+  	initialize: function(view,options) {
+  		L.Util.setOptions(this, options);
+  		this.view = view;
+  	},
+  	/**
+  	 *	Renders the container and hides the control
+  	 */
+  	onAdd: function (map) {
+  		var container_tag = 'div';
+  		var container_class = 'o_nocontent_display_control';
+  		this.container = L.DomUtil.create(container_tag, container_class);
+  		this.container.style.backgroundColor = 'white';
+
+  		this.content = '';
+  		this.do_hide();
+
+		return this.container;
+  	},
+
+  	onRemove: function (map) {
+    	// when removed
+  	},
+  	/**
+  	 *	Empties the container and updates its content
+  	 */
+  	update_content: function() {
+  		this._compute_content();
+
+  		$('.o_nocontent_display_control').empty().append(this.content);
+  	},
+  	/**
+     *  computes the control's content
+     */
+  	_compute_content: function() {
+  		this.content = '';
+  		// number of nondisplayable records
+  		var nb_nd_records = this.view.nondisplayable_records.length;
+  		if (nb_nd_records > 1) { // records were found but none of them is displayable on the map
+  			this.content += nb_nd_records + ' ' + _t('records matching your search were found, but none of them is displayable on the map (invalid GPS coordinates). ');
+  		}else if (nb_nd_records > 0) { // 1 record was found but none of them is displayable on the map
+  			this.content += nb_nd_records + ' ' + _t('record matching your search was found, but it is not displayable on the map (invalid GPS coordinates). ');
+  		}else{
+  			this.content += _t('no record matching your search was found.');
+  		}
+  	},
+
+  	/**
+     *  Displays (make visible) the control
+     */
+    do_show: function () {
+        //console.log("MapView.Marker.do_show");
+        L.DomUtil.removeClass(this.container,'o_hidden');
+        this.visible = true;
+    },
+    /**
+     *  Hides the control
+     */
+    do_hide: function () {
+        //console.log("MapView.Marker.do_hide");
+        L.DomUtil.addClass(this.container,'o_hidden');
+        this.visible = false;
+    },
+    /**
+     *  Displays (make visible) or hides the control
+     *
+     *  @param {Boolean} [display] use true to show the control or false to hide it
+     */
+  	do_toggle: function(display) {
+  		//console.log("NoContentDisplayer.do_toggle: ",display);
+        if (_.isBoolean(display)) {
+            display ? this.do_show() : this.do_hide();
+        } else {
+            L.DomUtil.hasClass(this.container,'o_hidden') ? this.do_show() : this.do_hide();
+        }
+  	},
+
+});
+
+/*// not implemented yet
 L.Control.TopRightButtons = L.Control.extend({
 
 	options: {
@@ -178,10 +267,11 @@ L.Control.TopRightButtons = L.Control.extend({
     	// when removed
   	}
 
-});
+});*/
 
 return {
     RecordDisplayer: L.Control.RecordDisplayer,
+    NoContentDisplayer: L.Control.NoContentDisplayer,
 };
 
 });
