@@ -80,8 +80,8 @@ class OfTourneePlanification(models.TransientModel):
         intervention_obj = self.env['of.planning.intervention']
         service_obj = self.env['of.service']
 
-        if 'tz' not in self._context:
-            self = self.with_context(dict(self._context, tz='Europe/Paris'))
+        if not self._context.get('tz'):
+            self = self.with_context(tz='Europe/Paris')
 
         equipe = tournee.equipe_id
         date_intervention = tournee.date
@@ -506,7 +506,7 @@ class OfTourneePlanification(models.TransientModel):
     def button_confirm_old(self):
         intervention_obj = self.env['of.planning.intervention']
 
-        if 'tz' not in self._context:
+        if not self._context.get('tz'):
             self = self.with_context(dict(self._context, tz='Europe/Paris'))
 
         for plan in self:
@@ -1179,7 +1179,7 @@ class OfTourneePlanificationPlanning(models.TransientModel):
     def button_confirm(self):
         intervention_obj = self.env['of.planning.intervention']
 
-        if 'tz' not in self._context:
+        if not self._context.get('tz'):
             self = self.with_context(dict(self._context, tz='Europe/Paris'))
 
         for planning in self:

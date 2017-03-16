@@ -186,7 +186,7 @@ class OfTourneeRdv(models.TransientModel):
         """
         self.ensure_one()
 
-        if 'tz' not in self._context:
+        if not self._context.get('tz'):
             self = self.with_context(dict(self._context, tz='Europe/Paris'))
         tz = pytz.timezone(self._context['tz'])
 
@@ -439,7 +439,7 @@ class OfTourneeRdv(models.TransientModel):
     @api.multi
     def button_confirm(self):
         self.ensure_one()
-        if 'tz' not in self._context:
+        if not self._context.get('tz'):
             self = self.with_context(dict(self._context, tz='Europe/Paris'))
         tz = pytz.timezone(self._context['tz'])
 
