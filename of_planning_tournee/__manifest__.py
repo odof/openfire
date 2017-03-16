@@ -25,7 +25,7 @@
         "init_xml" : [ ],
         "demo_xml" : [ ],
         "data" : [
-#            'security/ir.model.access.csv',
+            'security/ir.model.access.csv',
 #            'wizard/add_partner_view.xml',
             'wizard/rdv_view.xml',
             'wizard/planification_view.xml',
