@@ -65,6 +65,7 @@
   <story>
   <pto>
   <para style="terp_default_8">[[ setLang(user.lang) ]]</para>
+  <para style="terp_default_8">[[repeatIn(objects.equipe_ids,'e') ]]</para>
   <pto_header>
     <blockTable colWidths="45.0,160.0,95.0,250.0" repeatRows="1" style="Table1">
       <tr>
@@ -83,7 +84,7 @@
       </tr>
     </blockTable>
   </pto_header>
-    <para style="terp_tblheader">[[ get_titre(objects[0].equipe_ids[0]) ]]</para>
+    <para style="terp_tblheader">[[ get_titre(e) ]]</para>
     <para style="terp_default_10">
       <font color="white"> </font>
     </para>
@@ -104,14 +105,14 @@
       </tr>
     </blockTable>
     <section>
-        <para style="terp_default_8">[[repeatIn(get_line(),'l') ]]</para>
+        <para style="terp_default_8">[[repeatIn(get_line(e),'l') ]]</para>
         <blockTable colWidths="45.0,160.0,95.0,250.0" style="Table2">
             <tr>
                 <td>
                     <para style="terp_default_8">[[ get_heure(l) ]]</para>
                 </td>
                 <td>
-                    <para style="terp_default_8"><font color='red'>[[ ((l.state == 'Confirme') and u'\u2022') ]]</font>[[ get_client(l) ]]</para>
+                    <para style="terp_default_8"><font color='red'>[[ ((l.state == 'confirm') and u'\u2022') ]]</font>[[ get_client(l) ]]</para>
                 </td>
                 <td>
                     <para style="of_default_10">[[ l.tache_id.name ]]</para>

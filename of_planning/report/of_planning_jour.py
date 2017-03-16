@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo.report import report_sxw
-from odoo import api, models, fields
+from odoo import fields
 from datetime import datetime
 import time
 import locale
@@ -27,14 +27,13 @@ class OfPlanningJour(report_sxw.rml_parse):
         title = "%s - Planning du %s %s %s %s" % (equipe.name, date_weekday, date_datetime.day, date_month, date_datetime.year)
         return title
 
-    def get_line(self):
-        intervention_obj = self.objects.env['of.planning.intervention']
+    def get_line(self, equipe):
+        intervention_obj = self.env['of.planning.intervention']
 
-        equipe_id = self.objects.equipe_ids._ids[0]
         date_start = self.objects.date_start
 
         # Recherche des taches de cette journee, sauf brouillons, reportees ou annulees
-        domain = [('date_deadline', '>=', date_start), ('date', '<=', date_start), ('equipe_id', '=', equipe_id), ('state', 'in', ('draft', 'confirm', 'done'))]
+        domain = [('date_deadline', '>=', date_start), ('date', '<=', date_start), ('equipe_id', '=', equipe.id), ('state', 'in', ('draft', 'confirm', 'done'))]
         interventions = intervention_obj.search(domain, order='date')
         return interventions
 
