@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<document filename="planning_res.pdf">
+  <template title="Planning RES" allowSplitting="20">
+    <pageTemplate id="first">
+      <frame id="first" x1="16.0" y1="42.0" width="549" height="758"/>
+        <pageGraphics>
+            <setFont name="Helvetica" size="8"/>
+            
+            <drawString x="14" y="10"> [[ formatLang(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),date_time = True) ]]</drawString>
+        </pageGraphics>
+    </pageTemplate>
+  </template>
+  <stylesheet>
+    <blockTableStyle id="Table1">
+      <blockAlignment value="LEFT"/>
+      <blockValign value="TOP"/>
+      <blockBackground colorName="#E6E6FA" start="0,0" stop="5,0"/>
+      <lineStyle kind="LINEBEFORE" colorName="#e6e6e6" start="0,0" stop="0,-1"/>
+      <lineStyle kind="LINEABOVE" colorName="#e6e6e6" start="0,0" stop="0,0"/>
+      <lineStyle kind="LINEBELOW" colorName="#e6e6e6" start="0,-1" stop="0,-1"/>
+      <lineStyle kind="LINEAFTER" colorName="#e6e6e6" start="0,0" stop="0,-1"/>
+      <lineStyle kind="LINEBEFORE" colorName="#e6e6e6" start="1,0" stop="1,-1"/>
+      <lineStyle kind="LINEABOVE" colorName="#e6e6e6" start="1,0" stop="1,0"/>
+      <lineStyle kind="LINEBELOW" colorName="#e6e6e6" start="1,-1" stop="1,-1"/>
+      <lineStyle kind="LINEAFTER" colorName="#e6e6e6" start="1,0" stop="1,-1"/>
+      <lineStyle kind="LINEBEFORE" colorName="#e6e6e6" start="2,0" stop="2,-1"/>
+      <lineStyle kind="LINEABOVE" colorName="#e6e6e6" start="2,0" stop="2,0"/>
+      <lineStyle kind="LINEBELOW" colorName="#e6e6e6" start="2,-1" stop="2,-1"/>
+      <lineStyle kind="LINEAFTER" colorName="#e6e6e6" start="2,0" stop="2,-1"/>
+      <lineStyle kind="LINEBEFORE" colorName="#e6e6e6" start="3,0" stop="3,-1"/>
+      <lineStyle kind="LINEABOVE" colorName="#e6e6e6" start="3,0" stop="3,0"/>
+      <lineStyle kind="LINEBELOW" colorName="#e6e6e6" start="3,-1" stop="3,-1"/>
+      <lineStyle kind="LINEAFTER" colorName="#e6e6e6" start="3,0" stop="3,-1"/>
+    </blockTableStyle>
+    <blockTableStyle id="Table2">
+      <blockAlignment value="LEFT"/>
+      <blockValign value="TOP"/>
+      <lineStyle kind="LINEBEFORE" colorName="#e6e6e6" start="0,0" stop="0,-1"/>
+      <lineStyle kind="LINEABOVE" colorName="#e6e6e6" start="0,0" stop="0,0"/>
+      <lineStyle kind="LINEBELOW" colorName="#e6e6e6" start="0,-1" stop="0,-1"/>
+      <lineStyle kind="LINEAFTER" colorName="#e6e6e6" start="0,0" stop="0,-1"/>
+      <lineStyle kind="LINEBEFORE" colorName="#e6e6e6" start="1,0" stop="1,-1"/>
+      <lineStyle kind="LINEABOVE" colorName="#e6e6e6" start="1,0" stop="1,0"/>
+      <lineStyle kind="LINEBELOW" colorName="#e6e6e6" start="1,-1" stop="1,-1"/>
+      <lineStyle kind="LINEAFTER" colorName="#e6e6e6" start="1,0" stop="1,-1"/>
+      <lineStyle kind="LINEBEFORE" colorName="#e6e6e6" start="2,0" stop="2,-1"/>
+      <lineStyle kind="LINEABOVE" colorName="#e6e6e6" start="2,0" stop="2,0"/>
+      <lineStyle kind="LINEBELOW" colorName="#e6e6e6" start="2,-1" stop="2,-1"/>
+      <lineStyle kind="LINEAFTER" colorName="#e6e6e6" start="2,0" stop="2,-1"/>
+      <lineStyle kind="LINEBEFORE" colorName="#e6e6e6" start="3,0" stop="3,-1"/>
+      <lineStyle kind="LINEABOVE" colorName="#e6e6e6" start="3,0" stop="3,0"/>
+      <lineStyle kind="LINEBELOW" colorName="#e6e6e6" start="3,-1" stop="3,-1"/>
+      <lineStyle kind="LINEAFTER" colorName="#e6e6e6" start="3,0" stop="3,-1"/>
+    </blockTableStyle>
+    <initialize>
+      <paraStyle name="all" alignment="justify"/>
+    </initialize>
+    <paraStyle name="terp_tblheader" fontName="Helvetica-Bold" fontSize="11.0" leading="11" alignment="CENTER" spaceBefore="6.0" spaceAfter="6.0"/>
+    <paraStyle name="terp_tblheader_Details" fontName="Helvetica-Bold" fontSize="10.0" leading="11" alignment="CENTER" spaceBefore="6.0" spaceAfter="6.0"/>
+    <paraStyle name="terp_default_10" fontName="Helvetica" fontSize="10.0" leading="13" alignment="LEFT" spaceBefore="0.0" spaceAfter="0.0"/>
+    <paraStyle name="terp_default_8" fontName="Helvetica" fontSize="8.0" leading="10" alignment="LEFT" spaceBefore="0.0" spaceAfter="0.0"/>
+    <paraStyle name="terp_default_1" fontName="Helvetica" fontSize="1.0" leading="3" alignment="LEFT" spaceBefore="0.0" spaceAfter="0.0"/>
+    <paraStyle name="terp_default_3" fontName="Helvetica" fontSize="3.0" leading="3" alignment="LEFT" spaceBefore="0.0" spaceAfter="0.0"/>
+  </stylesheet>
+  <story>
+  <pto>
+  <para style="terp_default_8">[[ setLang(user.lang) ]]</para>
+  <pto_header>
+    <blockTable colWidths="45.0,160.0,95.0,250.0" repeatRows="1" style="Table1">
+      <tr>
+        <td>
+          <para style="terp_tblheader_Details">Heure</para>
+        </td>
+        <td>
+          <para style="terp_tblheader_Details">Client</para>
+        </td>
+        <td>
+          <para style="terp_tblheader_Details">Tache</para>
+        </td>
+        <td>
+          <para style="terp_tblheader_Details">Intervention</para>
+        </td>
+      </tr>
+    </blockTable>
+  </pto_header>
+    <para style="terp_tblheader">[[ get_titre(objects[0].equipe_ids[0]) ]]</para>
+    <para style="terp_default_10">
+      <font color="white"> </font>
+    </para>
+    <blockTable colWidths="45.0,160.0,95.0,250.0" style="Table1">
+      <tr>
+        <td>
+          <para style="terp_tblheader_Details">Heure</para>
+        </td>
+        <td>
+          <para style="terp_tblheader_Details">Client</para>
+        </td>
+        <td>
+          <para style="terp_tblheader_Details">Tache</para>
+        </td>
+        <td>
+          <para style="terp_tblheader_Details">Intervention</para>
+        </td>
+      </tr>
+    </blockTable>
+    <section>
+        <para style="terp_default_8">[[repeatIn(get_line(),'l') ]]</para>
+        <blockTable colWidths="45.0,160.0,95.0,250.0" style="Table2">
+            <tr>
+                <td>
+                    <para style="terp_default_8">[[ get_heure(l) ]]</para>
+                </td>
+                <td>
+                    <para style="terp_default_8"><font color='red'>[[ ((l.state == 'Confirme') and u'\u2022') ]]</font>[[ get_client(l) ]]</para>
+                </td>
+                <td>
+                    <para style="of_default_10">[[ l.tache_id.name ]]</para>
+                </td>
+                <td>
+                    <para style="terp_default_8">[[ l.description or '' ]]</para>
+                </td>
+            </tr>
+        </blockTable>
+    </section>
+  </pto>
+  </story>
+</document>

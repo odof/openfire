@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- wizard for sending a mail: first step -->
+        <record id="of_planning_report_view_form" model="ir.ui.view">
+            <field name="name">of.planning.report.form</field>
+            <field name="model">of.planning.report</field>
+            <field name="arch" type="xml">
+                <form string="Imprimer le planning des interventions">
+                    <group>
+                        <field name="type"/>
+                        <field name="date_start"/>
+                        <field name="equipe_ids" widget="many2many_tags"/>
+                    </group>
+                    <footer>
+                        <button string="Imprimer" name="button_print" type="object" class="btn-primary"/>
+                        <button string="Annuler" special="cancel" class="btn-default"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_of_planning_report">
+            <field name="name">Impression Interventions</field>
+            <field name="res_model">of.planning.report</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_of_planning_report" parent="menu_of_planning_intervention" action="action_of_planning_report" sequence="100"/>
+
+    </data>
+</openerp>  
