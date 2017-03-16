@@ -175,12 +175,12 @@ class OfPlanningIntervention(models.Model):
         self.ensure_one()
 
         tache = self.tache_id
-        for service in self.address_id.service_ids:
+        for service in self.address_id.service_address_ids:
             if service.tache_id == tache:
                 infos = (
                     self.description,
                     tache.name,
-                    service.template_id and service.template_id.name,
+#                    service.template_id and service.template_id.name,
                     service.note
                 )
                 res = [info for info in infos if info]
@@ -188,13 +188,13 @@ class OfPlanningIntervention(models.Model):
 
     @api.onchange('address_id')
     def _onchange_address_id(self):
-        super(OfPlanningIntervention, self)._onchange_partner_id()
+        super(OfPlanningIntervention, self)._onchange_address_id()
         if self.address_id and self.tache_id:
             self._calc_new_description()
 
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
-        super(OfPlanningIntervention, self).onchange_tache()
+        super(OfPlanningIntervention, self)._onchange_tache_id()
         if self.partner_id and self.tache_id:
             self._calc_new_description()
 
