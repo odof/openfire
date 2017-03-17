@@ -319,7 +319,31 @@
             groups="project.group_project_user"
             sequence="100"/>
 
+        <!-- Menu configuration catégories de SAV dans Ventes/Configuration-->
+        <record id="of_project_issue_categorie_action_form" model="ir.actions.act_window">
+            <field name="name">Catégories de SAV</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">of.project.issue.categorie</field>
+            <field name="view_type">form</field>
+        </record>
 
+        <menuitem action="of_project_issue_categorie_action_form"
+            groups="project.group_project_manager"
+            id="menu_of_project_issue_categorie_action_form"
+            parent="sales_team.menu_sale_config" sequence="100"/>
+
+        <!-- Menu configuration étiquettes de SAV dans Ventes/Configuration -->
+        <record id="of_project_issue_tag_action_form" model="ir.actions.act_window">
+            <field name="name">Etiquettes de SAV</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">project.tags</field>
+            <field name="view_type">form</field>
+        </record>
+
+        <menuitem action="of_project_issue_tag_action_form"
+            groups="project.group_project_manager"
+            id="menu_of_project_issue_tag_action_form"
+            parent="sales_team.menu_sale_config" sequence="100"/>
 
 
 <!-- *************************************************** -->
