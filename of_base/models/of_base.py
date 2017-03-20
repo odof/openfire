@@ -153,7 +153,7 @@ class ResPartner(models.Model):
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
         if self._context.get('show_address'):
-            self = self.with_context(dict(self._context, of_show_address_line=True))
+            self = self.with_context(of_show_address_line=True)
         return super(ResPartner, self).name_search(name=name, args=args, operator=operator, limit=limit)
 
     @api.model

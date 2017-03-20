@@ -312,7 +312,7 @@ class OfPlanningTournee(models.Model):
                  'equipe_id.hor_md', 'equipe_id.hor_mf', 'equipe_id.hor_ad', 'equipe_id.hor_af')
     def _compute_is_complet(self):
         if not self._context.get('tz'):
-            self = self.with_context(dict(self._context, tz='Europe/Paris'))
+            self = self.with_context(tz='Europe/Paris')
         intervention_obj = self.env['of.planning.intervention']
         for tournee in self:
             if tournee.is_bloque:
@@ -371,7 +371,7 @@ class OfPlanningTournee(models.Model):
     @api.depends('date')
     def _get_jour(self):
         if not self._context.get('tz'):
-            self = self.with_context(dict(self._context, tz='Europe/Paris'))
+            self = self.with_context(tz='Europe/Paris')
         for tournee in self:
             jour = ""
             if tournee.date:
@@ -447,7 +447,7 @@ class OfPlanningTournee(models.Model):
     @api.multi
     def _get_dummy_fields(self):
         if not self._context.get('tz'):
-            self = self.with_context(dict(self._context, tz='Europe/Paris'))
+            self = self.with_context(tz='Europe/Paris')
         for tournee in self:
             d = fields.Date.context_today(self)
             tournee.date_min = d

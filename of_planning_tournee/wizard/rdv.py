@@ -187,7 +187,7 @@ class OfTourneeRdv(models.TransientModel):
         self.ensure_one()
 
         if not self._context.get('tz'):
-            self = self.with_context(dict(self._context, tz='Europe/Paris'))
+            self = self.with_context(tz='Europe/Paris')
         tz = pytz.timezone(self._context['tz'])
 
         equipe_obj = self.env['of.planning.equipe']
@@ -440,7 +440,7 @@ class OfTourneeRdv(models.TransientModel):
     def button_confirm(self):
         self.ensure_one()
         if not self._context.get('tz'):
-            self = self.with_context(dict(self._context, tz='Europe/Paris'))
+            self = self.with_context(tz='Europe/Paris')
         tz = pytz.timezone(self._context['tz'])
 
         intervention_obj = self.env['of.planning.intervention']

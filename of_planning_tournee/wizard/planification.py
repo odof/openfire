@@ -507,7 +507,7 @@ class OfTourneePlanification(models.TransientModel):
         intervention_obj = self.env['of.planning.intervention']
 
         if not self._context.get('tz'):
-            self = self.with_context(dict(self._context, tz='Europe/Paris'))
+            self = self.with_context(tz='Europe/Paris')
 
         for plan in self:
             if not plan.plan_planning_ids:
@@ -1180,7 +1180,7 @@ class OfTourneePlanificationPlanning(models.TransientModel):
         intervention_obj = self.env['of.planning.intervention']
 
         if not self._context.get('tz'):
-            self = self.with_context(dict(self._context, tz='Europe/Paris'))
+            self = self.with_context(tz='Europe/Paris')
 
         for planning in self:
             if planning.is_planifie:
