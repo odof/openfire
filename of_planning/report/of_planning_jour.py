@@ -2,29 +2,32 @@
 from odoo.report import report_sxw
 from odoo import fields
 from datetime import datetime
-import time
-import locale
-locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
 
 class OfPlanningJour(report_sxw.rml_parse):
     def __init__(self, cr, uid, name, context):
         super(OfPlanningJour, self).__init__(cr, uid, name, context)
         self.localcontext.update({
             'get_titre': self.get_titre,
-            #'get_equipes': self.get_equipes,
             'get_line': self.get_line,
             'get_heure': self.get_heure,
             'get_client': self.get_client,
-            'tz': 'Europe/Paris',
-            'time': time,
+            'get_local_datetime': self.get_local_datetime,
          })
 
-    def get_titre(self, equipe):
-        date_datetime = fields.Datetime.from_string(self.objects.date_start)
+    def get_local_datetime(self):
+        user = self.localcontext['user']
+        if not user._context.get('tz'):
+            user = user.with_context(tz='Europe/Paris')
+        date = fields.Datetime.context_timestamp(user, datetime.now())
+        date_str = fields.Datetime.to_string(date)
+        return self.formatLang(date_str, date_time=True)
 
-        date_month = date_datetime.strftime("%B").capitalize()
-        date_weekday = date_datetime.strftime("%A")
-        title = "%s - Planning du %s %s %s %s" % (equipe.name, date_weekday, date_datetime.day, date_month, date_datetime.year)
+    def get_titre(self, equipe):
+        date_date = fields.Date.from_string(self.objects.date_start)
+
+        date_month = date_date.strftime("%B").capitalize()
+        date_weekday = date_date.strftime("%A")
+        title = "%s - Planning du %s %s %s %s" % (equipe.name, date_weekday, date_date.day, date_month, date_date.year)
         return title
 
     def get_line(self, equipe):

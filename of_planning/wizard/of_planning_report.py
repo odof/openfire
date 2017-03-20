@@ -1,22 +1,16 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
-from datetime import datetime
-import time
-import locale
-locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
-
-REPORT_TYPES = [('day',u"Journée")]
 
 class OfPlanningReport(models.TransientModel):
     _name = 'of.planning.report'
 
     type = fields.Selection([
         ('day',u"Journée"),
-#        ('week', "Semaine"),
-#        ('week2', u"Semaine (condensé)")
+        ('week', "Semaine"),
+#        ('week2', u"Semaine (condensé)"),
     ], string="Type", required=True, default='day')
-    date_start = fields.Date("Début")
+    date_start = fields.Date("Date")
     equipe_ids = fields.Many2many('of.planning.equipe', string=u"Équipes")
 
     @api.multi
@@ -28,9 +22,15 @@ class OfPlanningReport(models.TransientModel):
             'form' : tmp,
         }
 
+        report_type_name = {
+            'day': 'of_planning.of_planning_jour',
+            'week': 'of_planning.of_planning_semaine',
+            'week2': 'of_planning.of_planning_semaine_condense',
+        }
+
         return {
             'type' : 'ir.actions.report.xml',
-            'report_name':'of_planning.of_planning_jour',
+            'report_name': report_type_name[self.type],
             'datas' : data,
         }
 
