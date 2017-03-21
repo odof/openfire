@@ -111,7 +111,8 @@
             <field name="name">of.service.tree</field>
             <field name="model">of.service</field>
             <field name="arch" type="xml">
-                <tree colors="grey:state=='cancel'">
+                <tree colors="grey:state=='cancel';red:color=='red';gray:color=='gray';blue:color=='blue'">
+                    <field name="color" invisible="1"/>
                     <field name="partner_id"/>
                     <field name="partner_zip"/>
                     <field name="partner_city"/>
@@ -134,7 +135,9 @@
             <field name="type">search</field>
             <field name="arch" type="xml">
                <search>
-                   <filter string="En cours" name="filter_progress" icon="STOCK_YES" domain="[('state','=','progress')]" />
+                   <filter string="En cours" name="filter_progress" domain="[('state','=','progress')]"/>
+                   <field name="date_next" filter_domain="[('date_next','&lt;=',self)]"
+                          string="Prochaine intervention min" context="{'date_next_max': self}"/>
                    <field name="partner_id"/>
                    <field name="address_id"/>
                    <field name="partner_zip" string="CP"/>
@@ -143,7 +146,7 @@
                    <field name="jour_ids"/>
                    <field name="date_fin" invisible="1"/>
                    <field name="date_fin_min" filter_domain="[('date_fin','&gt;=',self)]"/>
-                   <field name="date_fin_max" filter_domain="[('date_fin','&lt;=',self)]" />
+                   <field name="date_fin_max" filter_domain="[('date_fin','&lt;=',self)]"/>
                </search>
             </field>
         </record>

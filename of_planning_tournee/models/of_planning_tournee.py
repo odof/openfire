@@ -44,7 +44,7 @@ class OfPlanningIntervention(models.Model):
         tournee_obj = self.env['of.planning.tournee']
         for intervention in self:
             tournee = tournee_obj.search([('equipe_id', '=', intervention.equipe_id.id), ('date', '=', intervention.date[:10])], limit=1)
-            intervention.planning_tournee_id = tournee and tournee._ids[0] or False
+            intervention.tournee_id = tournee
 
     @api.depends('equipe_id', 'date', 'date_deadline')
     def _compute_tournee_is_complet(self):
@@ -686,3 +686,25 @@ class OfPlanningTournee(models.Model):
 #         'state': fields.selection([('sans_gps', 'sans_gps'), ('sans_tournee', 'sans_tournee'), ('correct', 'correct'), ('attend', 'attend')])
 #     }
 # of_planning_controle_client()
+
+class OfService(models.Model):
+    _inherit = 'of.service'
+
+    def _get_color(self):
+        u""" COULEURS :
+        gris : Service dont l'adresse n'a pas de coordonnées GPS
+        rouge : Service dont la date de dernière intervention est inférieure à la date courante (ou à self._context.get('date_next_max'))
+        bleu : Service dont le dernier rendez-vous est planifié hors tournée
+        noir : Autres services
+        """
+        date_next_max = self._context.get('date_next_max') or fields.Date.today()
+
+        for service in self:
+            if not (service.address_id.geo_lat or service.address_id.geo_lng):
+                service.color = 'gray'
+            elif service.date_next <= date_next_max:
+                service.color = 'red'
+            elif service.planning_ids and not service.planning_ids[0].tournee_id:
+                service.color = 'blue'
+            else:
+                service.color = 'black'

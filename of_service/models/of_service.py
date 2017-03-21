@@ -75,7 +75,23 @@ class OfService(models.Model):
                 query += "WHERE p.id IS NOT NULL"
         cr.execute(query)
         rows = cr.fetchall()
-        return [('id', 'in', zip(*rows)[0])]
+        return [('id', 'in', rows and zip(*rows)[0])]
+
+    def _get_color(self):
+        u""" COULEURS :
+        gris : Service dont l'adresse n'a pas de coordonnées GPS
+        rouge : Service dont la date de dernière intervention est inférieure à la date courante (ou à self._context.get('date_next_max'))
+        noir : Autres services
+        """
+        date_next_max = self._context.get('date_next_max') or fields.Date.today()
+
+        for service in self:
+            if not (service.address_id.geo_lat or service.address_id.geo_lng):
+                service.color = 'gray'
+            elif service.date_next <= date_next_max:
+                service.color = 'red'
+            else:
+                service.color = 'black'
 
 #    template_id = fields.Many2one('of.mail.template', string='Contrat')
     partner_id = fields.Many2one('res.partner', string='Partenaire', ondelete='cascade')
@@ -89,8 +105,6 @@ class OfService(models.Model):
     note = fields.Text('Notes')
     date_next = fields.Date('Prochaine intervention', help=u"Date à partir de laquelle programmer la prochaine intervention", required=True)
     date_fin = fields.Date(u"Date d'échéance")
-    date_fin_min = fields.Date(u"Date échéance min", compute='lambda *a, **k:{}')
-    date_fin_max = fields.Date("max", compute='lambda *a, **k:{}')
 
     # Partner-related fields
     partner_zip = fields.Char('Code Postal', size=24, related='address_id.zip')
@@ -103,6 +117,14 @@ class OfService(models.Model):
 
     planning_ids = fields.One2many('of.planning.intervention', compute='_get_planning_ids', string="Interventions")
     date_last = fields.Date(u'Dernière intervention', compute='_get_planning_ids', search='_search_last_date', help=u"Date de la dernière intervention")
+
+    # Champs de recherche
+    date_fin_min = fields.Date(string=u"Date échéance min", compute='lambda *a, **k:{}')
+    date_fin_max = fields.Date(string=u"Date échéance max", compute='lambda *a, **k:{}')
+    date_controle = fields.Date(string=u"Date de contrôle", compute='lambda *a, **k:{}')
+
+    # Couleur de contrôle
+    color = fields.Char(compute='_get_color', string='Couleur')
 
     @api.onchange('date_next')
     def _onchange_date_next(self):
@@ -147,6 +169,16 @@ class OfService(models.Model):
     @api.multi
     def button_cancel(self):
         self.write({'state': 'cancel'})
+
+    @api.model
+    def search(self, args, offset=0, limit=None, order=None, count=False):
+        res = super(OfService, self).search(args, offset, limit, order, count)
+        return res
+
+    @api.multi
+    def read(self, fields=None, load='_classic_read'):
+        res = super(OfService, self).read(fields, load)
+        return res
 
 class ResPartner(models.Model):
     _inherit = "res.partner"
