@@ -29,7 +29,7 @@
             <field name="target">new</field>
         </record>
 
-        <menuitem id="menu_of_planning_report" parent="menu_of_planning_intervention" action="action_of_planning_report" sequence="100"/>
+        <menuitem id="menu_of_planning_report" name="Impression" parent="menu_of_planning_intervention" action="action_of_planning_report" sequence="100"/>
 
     </data>
 </openerp>  

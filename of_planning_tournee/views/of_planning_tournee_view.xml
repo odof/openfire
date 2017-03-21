@@ -165,8 +165,8 @@
             <field name="context">{'search_default_filter_incomplet':1}</field>
         </record>
 
-        <menuitem name="Préparation des tournées" id="menu_of_planning_tournee_tree" parent="of_planning.menu_of_planning_intervention" sequence="7"
-                  action="action_of_planning_tournee_tree" groups="of_planning.of_group_planning_intervention_user"/>
+        <menuitem name="Tournées" id="menu_of_planning_tournee_tree" parent="of_planning.menu_of_planning_intervention" sequence="7"
+                  action="action_of_planning_tournee_tree"/>
 
 
         <!-- Impression des documents des tournées -->
