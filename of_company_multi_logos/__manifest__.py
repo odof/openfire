@@ -15,6 +15,7 @@
     'depends': [],
     'data': [
         'views/of_company_multi_logos_views.xml',
+        'security/ir.model.access.csv',
     ],
     'installable': True,
     'auto_install': False,
