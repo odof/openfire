@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- Vue partenaire filtre recherche -->
+        <record id="of_res_partner_filter_naissance" model="ir.ui.view">
+            <field name="name">of.res.partner.filter.naissance</field>
+            <field name="model">res.partner</field>
+            <field name="type">search</field>
+            <field name="inherit_id" ref="base.view_res_partner_filter"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="of_date_naissance_char" string="Date anniversaire (MM-JJ)" filter_domain="[('of_date_naissance', '=like', '%'+str(self))]"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="of_res_partner_form_naissance" model="ir.ui.view">
+            <field name="name">of.res.partner.form.naissance</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <field name="company_id" position="after">
+                    <field name="of_date_naissance"/>
+                </field>
+                <xpath expr="//field[@name='child_ids']/form/sheet/group[1]/group/field[@name='mobile']" position="after">
+                    <field name="of_date_naissance"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</openerp>
+
