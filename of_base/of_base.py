@@ -233,22 +233,22 @@ class ResPartner(models.Model):
             return True
         parent_id = False
         cr = self._cr
-        cr.execute("SELECT id,parent_id FROM res_partner WHERE ref = '%s'" % ref)
+        cr.execute("SELECT id, parent_id FROM res_partner WHERE ref = '%s'" % ref)
         while True:
             vals = cr.fetchall()
             ids = []
-            for id,pid in vals:
+            for id, pid in vals:
                 if pid:
                     if pid not in ids:
                         ids.append(pid)
                 elif parent_id:
                     if id != parent_id:
-                        raise osv.except_osv(('Erreur'), u"Le n° de compte client est déjà utilisé et doit être unique. (%s)" % (ref,))
+                        raise osv.except_osv(('Erreur'), u"La référence client est déjà utilisée et doit être unique. (%s)" % (ref,))
                 else:
                     parent_id = id
             if not ids:
                 break
-            cr.execute("SELECT id,parent_id FROM res_partner WHERE id IN %s", (tuple(ids),))
+            cr.execute("SELECT id, parent_id FROM res_partner WHERE id IN %s", (tuple(ids),))
         return True
 
     @api.model

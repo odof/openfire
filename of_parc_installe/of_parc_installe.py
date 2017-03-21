@@ -59,9 +59,6 @@ class res_partner(models.Model):
 class project_issue(models.Model):
     _inherit = "project.issue"
 
-    def _get_product_sav_ids(self, cr, uid, ids, context={}):
-        return self.pool['project.issue'].search(cr, uid, [('product_name_id','in',ids)], context=context)
-
     def _search_of_parc_installe_site_adresse(self, operator, value):
         "Permet la recherche sur l'adresse d'installation de la machine depuis un SAV"
         # Deux cas :
@@ -107,13 +104,6 @@ class project_issue(models.Model):
             parc = self.env['of.parc.installe'].browse([self.of_produit_installe_id.id])
             if parc and parc.product_id:
                 self.product_name_id = parc.product_id.id
-#                 self.write({
-#                     'product_name_id': parc.product_id.id,
-#                     'of_parc_installe_client_nom': parc.client_id.name,
-#                     'of_parc_installe_client_adresse': parc.client_id.contact_address,
-#                     'of_parc_installe_site_nom': parc.site_adresse_id.name,
-#                     'of_parc_installe_site_adresse': parc.site_adresse_id.contact_address,
-#                     'of_parc_installe_note': parc.note})
 
     @api.onchange('product_name_id')
     def on_change_product_name_id(self):
