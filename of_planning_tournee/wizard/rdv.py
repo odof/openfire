@@ -61,10 +61,10 @@ class OfTourneeRdv(models.TransientModel):
         if address_id:
             address = partner_obj.browse(address_id)
             if not (address.geo_lat or address.geo_lng):
-                address = partner_obj.search(['|', ('partner_id', '=', partner.id), ('parent_id', '=', partner.id),
+                address = partner_obj.search(['|', ('id', '=', partner.id), ('parent_id', '=', partner.id),
                                               '|', ('geo_lat', '!=', 0), ('geo_lng', '!=', 0)], limit=1)
                 if not address:
-                    address = partner_obj.search(['|', ('partner_id', '=', partner.id), ('parent_id', '=', partner.id)])
+                    address = partner_obj.search(['|', ('id', '=', partner.id), ('parent_id', '=', partner.id)])
         return address_id
 
     @api.depends('planning_ids', 'planning_ids.equipe_id')
