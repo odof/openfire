@@ -20,7 +20,7 @@
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
-                <field name="company_id" position="after">
+                <field name="website" position="after">
                     <field name="of_date_naissance"/>
                 </field>
                 <xpath expr="//field[@name='child_ids']/form/sheet/group[1]/group/field[@name='mobile']" position="after">
