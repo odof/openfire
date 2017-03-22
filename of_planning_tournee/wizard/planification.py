@@ -187,14 +187,6 @@ class OfTourneePlanification(models.TransientModel):
 
         return plannings
 
-#     def _get_len_plannings(self, cr, uid, ids, name, args, contex=None):
-#         result = {}
-#         for planning in self.read(cr, uid, ids, ['plan_planning_ids']):
-#             result[planning['id']] = planning['plan_planning_ids'] and len(planning['plan_planning_ids']) or 0
-#         return result
-
-
-
     tournee_id = fields.Many2one('of.planning.tournee', string=u'Tournée', required=True)
 
     plan_partner_ids = fields.One2many('of.tournee.planification.partner', 'wizard_id', string='Clients')
@@ -202,11 +194,7 @@ class OfTourneePlanification(models.TransientModel):
     date_display = fields.Char(compute='_get_date_display', string='Jour')
     distance_add = fields.Float(string=u'Éloignement maximum (km)', digits=(12,3))
 
-    plan_partner_ids_dis1 = fields.One2many(related='plan_partner_ids')
-    plan_planning_ids_dis1 = fields.One2many(related='plan_planning_ids')
-
-    zip = fields.Char(related='tournee_id.zip')
-    city = fields.Char(related='tournee_id.city')
+    zip_id = fields.Many2one(related='tournee_id.zip_id')
     distance = fields.Float(related='tournee_id.distance')
     equipe_id = fields.Many2one(related='tournee_id.equipe_id')
 
@@ -933,12 +921,6 @@ class OfTourneePlanification(models.TransientModel):
 #                 new_partners = new_plan_partner_ids_dis[:]
 #             return {'value': {'plan_partner_ids'     : new_partners,
 #                               'plan_partner_ids_dis1': new_partners}}
-
-    @api.multi
-    def write(self, vals):
-        vals.pop('plan_planning_ids_dis1', False)
-        vals.pop('plan_planning_ids_dis2', False)
-        return super(OfTourneePlanification, self).write(vals)
 
 class OfTourneePlanificationPartner(models.TransientModel):
     _name = 'of.tournee.planification.partner'

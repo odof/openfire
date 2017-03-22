@@ -10,25 +10,21 @@
                 <form string="Planification de RDV">
                     <group name="invisible" invisible="1">
                         <field name="distance_add"/>
-                        <field name="plan_partner_ids"/>
-                        <field name="plan_planning_ids"/>
-                        <!--field name="len_plannings"/-->
                     </group>
-                    <group col="6">
-                        <separator string="Informations" colspan="6"/>
-                        <field name="date_display" readonly="1" colspan="4"/>
+                    <group col="4">
+                        <separator string="Informations" colspan="4"/>
+                        <field name="date_display" readonly="1"/>
                         <field name="equipe_id" readonly="1"/>
-                        <field name="zip" readonly="1"/>
-                        <field name="city" readonly="1"/>
+                        <field name="zip_id" readonly="1"/>
                         <field name="distance" readonly="1"/>
                     </group>
                     <group>
                         <separator string="Planification" colspan="2"/>
-                        <field name="plan_planning_ids_dis1" nolabel="1" colspan="2"/>
+                        <field name="plan_planning_ids" nolabel="1" colspan="2"/>
                     </group>
                     <group>
                         <separator string="Clients à planifier" colspan="2"/>
-                        <field name="plan_partner_ids_dis1" nolabel="1" colspan="2"/>
+                        <field name="plan_partner_ids" nolabel="1" colspan="2"/>
                     </group>
                     <footer>
                         <button name="button_plan_auto" type="object" string="Planning Auto" class="btn-primary"/>

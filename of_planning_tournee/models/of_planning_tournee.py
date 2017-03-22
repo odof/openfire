@@ -434,11 +434,8 @@ class OfPlanningTournee(models.Model):
     equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe', required=True)
     epi_lat = fields.Float(string=u'Épicentre Lat', digits=(12, 12), required=True)
     epi_lon = fields.Float(string=u'Épicentre Lon', digits=(12, 12), required=True)
-    address_id = fields.Many2one('res.partner', string=u'Adresse Référence')
-#     commune_id = fields.Many2one('of.commune', 'Code Postal & Ville')
-    zip = fields.Char(string='CP', size=24)
-    city = fields.Char(string='Ville', size=128)
-    country_id = fields.Many2one('res.country', string='Pays')
+
+    zip_id = fields.Many2one('res.better.zip', 'Ville')
     distance = fields.Float(string='Eloignement (km)', digits=(12,4), required=True, default=20.0)
     is_complet = fields.Boolean(compute="_compute_is_complet", string='Complet', store=True)
     is_bloque = fields.Boolean(string=u'Bloqué', help=u'Journée bloquée : ne sera pas proposée à la planification')
@@ -475,36 +472,11 @@ class OfPlanningTournee(models.Model):
     _rec_name = 'date'
     _order = 'date'
 
-    @api.onchange('address_id')
-    def _onchange_address_id(self):
-        if self.address_id:
-            address = self.address_id
-            self.epi_lat = address.geo_lat
-            self.epi_lon = address.geo_lng
-#            self.ville = address.commune_id and address.commune_id.id
-            self.zip = address.zip
-            self.city = address.city
-
-#     @api.onchange('commune_id')
-#     def onchange_ville(self):
-#         if self.address_id:
-#             return
-#         if self.commune_id:
-#             commune = commune_obj.read(cr, uid, ville, ['zip','city','geo_lat','geo_lng'])
-#             self.epi_lat = address.geo_lat
-#             self.epi_lon = address.geo_lng
-#             self.zip = commune.zip
-#             self.city = commune.city
-#             data['zip'] = commune['zip']
-#             data['city'] = commune['city']
-#             data['epi_lat'] = commune['geo_lat']
-#             data['epi_lon'] = commune['geo_lng']
-#         else:
-#             data = {
-#                 'zip' : '',
-#                 'city': '',
-#             }
-#         return {'value':data}
+    @api.onchange('zip_id')
+    def _onchange_zip_id(self):
+        if self.zip_id:
+            self.epi_lat = self.zip_id.geo_lat
+            self.epi_lon = self.zip_id.geo_lng
 
     @api.model
     def create(self, vals):

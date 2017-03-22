@@ -89,10 +89,7 @@
                             <field name="is_confirme"/>
                         </group>
                         <separator string="Epicentre" colspan="4" col="4"/>
-                        <field name="zip" invisible="0"/>
-                        <field name="city" invisible="0"/>
-                        <field name="address_id"/>
-                        <!--field name="ville" attrs="{'readonly': [('adr_id', '!=', False), '|', ('epi_lat', '!=', 0), ('epi_lon', '!=', 0)]}"/-->
+                        <field name="zip_id"/>
                         <separator colspan="4"/>
                         <field name="epi_lat" attrs="{'required': [('is_bloque', '=', False)]}"/>
                         <field name="epi_lon" attrs="{'required': [('is_bloque', '=', False)]}"/>
@@ -112,18 +109,11 @@
             <field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree editable="top" colors="red:(is_complet==True) or (is_bloque==True);grey:(is_confirme==False)">
-                    <field name="zip" invisible="1"/>
-                    <field name="city" invisible="1"/>
                     <!--field name="docs" invisible="1"/-->
                     <field name="date_jour"/>
                     <field name="date"/>
                     <field name="equipe_id"/>
-                    <field name="address_id"/>
-                    <!--
-                    <field name="ville" attrs="{'readonly': [('adr_id', '!=', False), '|', ('epi_lat', '!=', 0), ('epi_lon', '!=', 0)]}"
-                           on_change="onchange_ville(ville)"/-->
-                    <field name="zip"/>
-                    <field name="city"/>
+                    <field name="zip_id"/>
                     <field name="epi_lat" attrs="{'required': [('is_bloque', '=', False)]}"/>
                     <field name="epi_lon" attrs="{'required': [('is_bloque', '=', False)]}"/>
                     <field name="distance" attrs="{'required': [('is_bloque', '=', False)]}"/>
@@ -148,9 +138,7 @@
                         <field name="date_min" filter_domain="[('date','&gt;=',self)]"/>
                         <field name="date_max" filter_domain="[('date','&lt;=',self)]"/>
                         <field name="equipe_id"/>
-                        <field name="zip"/>
-                        <field name="city"/>
-                        <field name="address_id"/>
+                        <field name="zip_id"/>
                     </group>
                  </search>
             </field>

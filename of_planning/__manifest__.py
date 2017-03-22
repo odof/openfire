@@ -8,12 +8,11 @@
         "description": """ Le module OpenFire des plannings d'intervention.
 Inclut la gestion d'équipes d'intervention.""",
         "depends" : [
-                     'hr',
-                     'product',
-                     'sale',
-#                      'of_calendar',
-                     'of_base',
-                     ],
+            'hr',
+            'product',
+            'sale',
+            'of_base',
+        ],
         "init_xml" : [ ],
         "demo_xml" : [ ],
         'css' : [

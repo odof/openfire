@@ -16,12 +16,13 @@
          - RDV pour les clients
          - Recherche géolocalisée des clients (Adresse Livraison)""",
         "depends" : [
-                     'of_planning',
-                     'of_service',
-                     'of_geolocalize',
-#                     'of_gesdoc',
-#                     'of_imports',
-                     ],
+            'of_planning',
+            'of_service',
+            'of_geolocalize',
+#            'of_gesdoc',
+#            'of_imports',
+            'of_base_location',
+        ],
         "init_xml" : [ ],
         "demo_xml" : [ ],
         "data" : [
