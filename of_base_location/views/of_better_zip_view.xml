@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <record model="ir.ui.view" id="of_better_zip_form">
+    <record id="of_better_zip_form" model="ir.ui.view">
         <field name="name">of.res.better.zip.form</field>
         <field name="model">res.better.zip</field>
         <field name="inherit_id" ref="base_location.better_zip_form"/>
@@ -11,6 +11,17 @@
                 <field name="geo_lat"/>
                 <field name="geo_lng"/>
             </group>
+        </field>
+    </record>
+
+    <record id="of_view_better_zip_filter" model="ir.ui.view">
+        <field name="name">of.res.better.zip.select</field>
+        <field name="model">res.better.zip</field>
+        <field name="inherit_id" ref="base_location.view_better_zip_filter"/>
+        <field name="arch" type="xml">
+            <field name="name" position="attributes">
+                <attribute name="filter_domain">[('name','=like',self+'%')]</attribute>
+            </field>
         </field>
     </record>
 

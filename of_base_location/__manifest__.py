@@ -13,7 +13,10 @@ Nécessite l'installation du module base_location_geonames_import du dépôt par
 """,
     'author': "OpenFire",
     'website': 'http://www.akretion.com',
-    'depends': ['base_location_geonames_import'],
+    'depends': [
+        'base_location_geonames_import',
+        'l10n_fr_base_location_geonames_import', # Dépendance inutile pour le module. Sert uniquement à ne pas oublier d'installer ce module
+    ],
     'data': [
         'views/of_better_zip_view.xml',
     ],
