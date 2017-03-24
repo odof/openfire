@@ -206,17 +206,6 @@ class OfPlanningEquipe(models.Model):
     geo_lat = fields.Float(related='address_id.geo_lat')
     geo_lng = fields.Float(related='address_id.geo_lng')
 
-#     city_id = fields.Many2one('of.commune', string='CP & Ville')
-#     geo_lat = fields.Float('GPS Lat', digits=(12, 12))
-#     geo_lng = fields.Float('GPS Lon', digits=(12, 12))
-#     country_id = fields.Many2one('res.country', 'Pays')
-#     street = fields.Char('Rue', size=128)
-#     street2 = fields.Char('Rue (suite)', size=128)
-#     zip = fields.Char('Code Postal', change_default=True, size=24)
-#     city = fields.Char('Ville', size=128)
-#     country_code = fields.Char(related='country_id.code', string='Code pays', readonly=True)
-#     note_log = fields.Char('Info GEO', size=256)
-
     @api.onchange('employee_ids')
     def _onchange_employee_ids(self):
         if self.employee_ids:

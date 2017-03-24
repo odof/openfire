@@ -28,28 +28,8 @@
             <field name="arch" type="xml">
                 <group name="horaires" position="before">
                     <group name="adresse" colspan="2">
-                        <separator string="Adresse départ" colspan="4"></separator>
+                        <separator string="Adresse départ" colspan="2"/>
                         <field name="address_id"/>
-                        <!--
-                        <group colspan="2">
-                            <field name="street" colspan="4"/>
-                            <field name="street2" colspan="4"/>
-                            <field name="geo_lat"/>
-                            <field name="geo_lng"/>
-                        </group>
-                        <group colspan="2">
-                            <field name="ville" colspan="4"
-                                   attrs="{'invisible':[('country_code','!=','FR'),('country_code','!=','')]}"
-                                   on_change="onchange_ville(ville)"/>
-                            <field name="zip"
-                                   attrs="{'invisible':[('country_code','in',('FR','',False)),'|',('ville','!=',''),'&amp;',('zip','=',''),('city','=','')]}"/>
-                            <field name="city"
-                                   attrs="{'invisible':[('country_code','in',('FR','',False)),'|',('ville','!=',''),'&amp;',('zip','=',''),('city','=','')]}"/>
-                            <field name="country_id" on_change="onchange_country_id(country_id)"/>
-                            <field name="country_code" invisible="1"/>
-                        </group>
-                        <field name="note_log" attrs="{'invisible': [('note_log', '=', '')]}" colspan="4"/>
-                        -->
                     </group>
                 </group>
             </field>
