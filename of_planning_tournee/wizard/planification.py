@@ -453,7 +453,7 @@ class OfTourneePlanification(models.TransientModel):
         if creneau_avant:
             start = creneau_avant.date_flo
             modif_planning.append((3, creneau_avant.id))
-        add_creneau = self.add_plan(start, end, False)
+        add_creneau = self.make_planning(start, end, False)
         modif_planning.append(add_creneau)
         return modif_planning
 
@@ -1087,11 +1087,8 @@ class OfTourneePlanificationPlanning(models.TransientModel):
             phone = [p for p in (address.phone, address.mobile) if p]
             phone = ' || '.join(phone)
             add_partner = [(0, 0, {
-                'partner_id': planning.partner_id.id,
-                'partner_address_id': address.id,
-                'phone': phone,
+                'service_id': planning.service_id.id,
                 'duree': planning.duree or 0.0,
-                'tache_id': planning.tache_id and planning.tache_id.id or False,
             })]
             # Supprimer le planning
             modif_planning = [(3, planning.id)]
