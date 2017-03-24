@@ -429,7 +429,7 @@ class OfTourneeRdv(models.TransientModel):
     def _get_service_data(self, mois):
         return {
             'partner_id': self.partner_id.id,
-            'partner_address_id': self.partner_address_id.id,
+            'address_id': self.partner_address_id.id,
             'tache_id': self.tache_id.id,
             'mois_ids': [(4, mois)],
             'date_next': self.date_next,
@@ -477,7 +477,7 @@ class OfTourneeRdv(models.TransientModel):
             'hor_ad': equipe.hor_ad,
             'hor_af': equipe.hor_af,
             'partner_id': self.partner_id.id,
-            'partner_id': self.partner_address_id.id,
+            'address_id': self.partner_address_id.id,
             'tache_id': self.tache_id.id,
             'equipe_id': self.equipe_id.id,
             'date': date_propos,
@@ -501,7 +501,7 @@ class OfTourneeRdv(models.TransientModel):
             if self.service_id:
                 self.service_id.write({'date_next': self.date_next})
             else:
-                service_obj.create(self._get_service_data(self, date_propos_utc.month))
+                service_obj.create(self._get_service_data(date_propos_utc.month))
         return {'type': 'ir.actions.act_window_close'}
 
 
