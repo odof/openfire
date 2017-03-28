@@ -122,20 +122,5 @@
             </field>
         </record>
 
-        <record id="action_tournee_planification_wizard" model="ir.actions.server">
-            <field name="name">Planification RDV</field>
-            <field name="model_id" ref="model_of_tournee_planification"/>
-            <field name="state">code</field>
-            <field name="code">action = self.pool['of.planning.tournee'].open_tournee_planification(cr, uid, context.get('active_ids', []), context)</field>
-        </record>
-
-        <record id="action_tournee_wizard" model="ir.values">
-            <field name="name">Planification RDV</field>
-            <field name="key2">client_action_multi</field>
-            <field name="model">of.planning.tournee</field>
-            <field name="value" eval="'ir.actions.server,%d'%action_tournee_planification_wizard" />
-            <field name="object" eval="True" />
-        </record>
-
     </data>
 </odoo>
