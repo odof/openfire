@@ -15,7 +15,7 @@
                                 string="Geolocate Partners"
                                 name="geo_code_partners"
                                 colspan="2"
-                                icon="fa-check"
+                                icon="fa-bullseye"
                                 type="object"/>
                             <div>
                                 <span class="oe_inline"> ( Last record :  </span>
@@ -27,7 +27,7 @@
                                 string="Geolocate"
                                 name="geo_code"
                                 colspan="2"
-                                icon="fa-check"
+                                icon="fa-bullseye"
                                 type="object"/>
                             <div>
                                 <span class="oe_inline"> ( Last record   </span>

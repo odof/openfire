@@ -96,6 +96,12 @@ class OfService(models.Model):
 #    template_id = fields.Many2one('of.mail.template', string='Contrat')
     partner_id = fields.Many2one('res.partner', string='Partenaire', ondelete='cascade')
     address_id = fields.Many2one('res.partner', string="Adresse", ondelete='restrict')
+    
+    # 3 champs ajoutés pour la vue map
+    geo_lat = fields.Float(related='address_id.geo_lat')
+    geo_lng = fields.Float(related='address_id.geo_lng')
+    partner_name = fields.Char(related='partner_id.name')
+    
     tache_id = fields.Many2one('of.planning.tache', string='Tache', required=True)
     name = fields.Char(u"Libellé", related='tache_id.name', store=True)
 

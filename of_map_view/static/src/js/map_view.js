@@ -14,6 +14,10 @@ var map_controls = require('of_map_view.map_controls');
 var Widget = require('web.Widget');
 var mixins = core.mixins;
 
+/**
+ *	TODO: add warning when using OSM tile server
+ */
+
 //var TILE_SERVER_ADDR = 'http://192.168.1.80/osm_tiles/{z}/{x}/{y}.png';
 var TILE_SERVER_ADDR = '//{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png';
 
@@ -139,7 +143,9 @@ var MapView = View.extend({
         
         this.$el.addClass(this.fields_view.arch.attrs.class || "o_map_view");
         var options = {center: this.options.map_center_and_zoom[0], zoom: this.options.map_center_and_zoom[1]};
+        if (this.options.tile_server_addr) options.tile_server_addr = this.options.tile_server_addr;
         var args = {view: this, options};
+        //console.log("map options: ",options);
         this.map = new MapView.Map(args);
 
         return this._super();
@@ -259,6 +265,7 @@ var MapView = View.extend({
         	ir_config.call('get_param',['Map_Tile_Server_Address']).then(function(res){
         		if (res !== 'undefined') {
         			self.options.tile_server_addr = res;
+        			//console.log("tile server address should be: ",res);
         		}
         		dfd_2.resolve();
         	});
@@ -380,6 +387,15 @@ var MapView = View.extend({
             this.load_records(true);
         }
     },
+    /**
+     * remove the map on destroy() so it doesn't generate an error when trying to load the map view of another model.
+     */
+    destroy: function () {
+    	//console.log("MapView.destroy")
+        this.map.the_map.remove();
+        this.map.the_map = null;
+        return this._super.apply(this, arguments);
+    },
 });
 /**/
 MapView.Map = Widget.extend({
@@ -390,7 +406,7 @@ MapView.Map = Widget.extend({
         center: [48.056,-2.818], // BRETAGNE
         zoom: 8, 
         minZoom: 7, 
-        maxZoom: 19,
+        maxZoom: 18,
         tile_server_addr: TILE_SERVER_ADDR,
         container_id: 'lf_map', // the id of the container for the map
         set_bounds_mode: 'visible',
@@ -548,8 +564,12 @@ MapView.Map = Widget.extend({
                 break;
             default:
                 console.log("given string doesn't match any of the available modes. modes are 'visible', 'current', current_visible' and 'all'");
-        }
+        };
+        //console.log("the_map: ",this.the_map);
         this.the_map.fitBounds(bounds);
+        if (this.the_map.getZoom() === 18) {
+        	this.the_map.setZoom(15);
+        }
     },
 
     /**
@@ -637,13 +657,19 @@ MapView.Map = Widget.extend({
         //console.log("MapView.Map.attach_to_container");
         var self = this;
         if ($('#'+container_id).length > 0) {
-            this.the_map = L.map(this.options.container_id, { 
-                center: this.options.center, 
-                zoom: this.options.zoom, 
-                minZoom: this.options.minZoom, 
-                maxZoom: this.options.maxZoom,
-            });
-            L.tileLayer(tile_server_addr).addTo(this.the_map);
+        	//console.log("this.the_map before test: ",this.the_map);
+
+        	if (this.the_map === null || this.the_map === undefined) {
+	            this.the_map = L.map(this.options.container_id, { 
+	                center: this.options.center, 
+	                zoom: this.options.zoom, 
+	                minZoom: this.options.minZoom, 
+	                maxZoom: this.options.maxZoom,
+	            });
+	            L.tileLayer(tile_server_addr).addTo(this.the_map);
+	        }else{
+	        	console.log("the map has already been initialised");
+	        }
             
             return $.when().then(function(){
                 //console.log('map attached!!!!!! by id. at try number '+(self.cmptry+1));

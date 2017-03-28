@@ -14,7 +14,7 @@
                                 string="Geolocate with Nominatim"
                                 name="geo_code"
                                 colspan="2"
-                                icon="fa-check"
+                                icon="fa-bullseye"
                                 type="object"/>
                             <div>
                                 <span class="oe_inline"> ( Last record :  </span>

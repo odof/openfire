@@ -150,6 +150,22 @@
                </search>
             </field>
         </record>
+        
+        <!-- Service Map View -->
+        <record id="of_service_map_view" model="ir.ui.view">
+            <field name="name">of.service.map</field>
+            <field name="model">of.service</field>
+            <field name="arch" type="xml">
+                <map string="Map" class="o_service_map" latitude_field="geo_lat" longitude_field="geo_lng">
+                    <field name="geo_lat" required="1"/>
+                    <field name="geo_lng" required="1"/>
+                    <field name="id"/>
+                    <field name="partner_name" class="oe_map_displayer_header"/>
+                    <field name="name" class="oe_map_displayer_body"/>
+                    <field name="color" class="oe_map_displayer_body"/>
+                </map>
+            </field>
+        </record>
 
 <!--##########################################################################################################################-->
 <!--##################################################______Partenaire______##################################################-->
@@ -208,9 +224,31 @@
 
         <record id="action_of_service_form" model="ir.actions.act_window">
             <field name="name">Service</field>
+            <field name="type">ir.actions.act_window</field>
             <field name="res_model">of.service</field>
             <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree,map,form</field>
+        </record>
+        
+        <record id="action_service_tree_view" model="ir.actions.act_window.view">
+            <field eval="0" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_of_service_tree"/>
+            <field name="act_window_id" ref="action_of_service_form"/>
+        </record>
+        
+        <record id="action_service_map_view" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">map</field>
+            <field name="view_id" ref="of_service_map_view"/>
+            <field name="act_window_id" ref="action_of_service_form"/>
+        </record>
+        
+        <record id="action_service_form_view" model="ir.actions.act_window.view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_of_service_form"/>
+            <field name="act_window_id" ref="action_of_service_form"/>
         </record>
 
 <!--##########################################################################################################################-->

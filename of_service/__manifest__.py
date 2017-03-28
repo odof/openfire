@@ -9,6 +9,7 @@
     'description': """ Module OpenFire de gestion des services.""",
     'depends' : [
         'of_planning',
+        'of_map_view',
     ],
     'init_xml' : [ ],
     'demo_xml' : [ ],
