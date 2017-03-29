@@ -223,7 +223,7 @@
 <!--##########################################################################################################################-->
 
         <record id="action_of_service_form" model="ir.actions.act_window">
-            <field name="name">Service</field>
+            <field name="name">Services</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">of.service</field>
             <field name="view_type">form</field>
