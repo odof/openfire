@@ -2,16 +2,16 @@
 
 from odoo import models, api
 
-class of_compose_mail(models.TransientModel):
+class OfComposeMail(models.TransientModel):
     _inherit = 'of.compose.mail'
 
     @api.model
     def _get_objects(self, o):
-        result = super(of_compose_mail,self)._get_objects(o)
+        result = super(OfComposeMail,self)._get_objects(o)
         parc = False
-        if o._model._name == 'of.parc.installe':
+        if o._name == 'of.parc.installe':
             parc = o
-        elif o._model._name == 'project.issue':
+        elif o._name == 'project.issue':
             parc = o.of_produit_installe_id
 
         if parc:
@@ -24,7 +24,7 @@ class of_compose_mail(models.TransientModel):
     def _get_dict_values(self, o, objects=None):
         if not objects:
             objects = self._get_objects(o)
-        result = super(of_compose_mail,self)._get_dict_values(o, objects=objects)
+        result = super(OfComposeMail,self)._get_dict_values(o, objects=objects)
 
         sav = objects.get('sav')
         parc = objects.get('parc_installe')

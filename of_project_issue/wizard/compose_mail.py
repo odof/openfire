@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 
-from openerp import models, api
+from odoo import models, api
 
-from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
 from datetime import datetime
 
 # Pour la génération de pdf depuis le SAV
-class of_compose_mail(models.TransientModel):
+class OfComposeMail(models.TransientModel):
     _inherit = 'of.compose.mail'
 
     @api.model
     def _get_objects(self, o):
-        result = super(of_compose_mail,self)._get_objects(o)
-        if o._model._name == 'project.issue':
+        result = super(OfComposeMail,self)._get_objects(o)
+        if o._name == 'project.issue':
             result['sav'] = o
         return result
 
@@ -20,7 +20,7 @@ class of_compose_mail(models.TransientModel):
     def _get_dict_values(self, o, objects=None):
         if not objects:
             objects = self._get_objects(o)
-        result = super(of_compose_mail,self)._get_dict_values(o, objects=objects)
+        result = super(OfComposeMail,self)._get_dict_values(o, objects=objects)
 
         sav = objects.get('sav')
         sav_categ = sav and sav.of_categorie_id

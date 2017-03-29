@@ -22,7 +22,7 @@
 
 {
     'name' : "OpenFire / SAV",
-    'version' : "1.0",
+    'version' : "10.0",
     'author' : "OpenFire",
     'website' : "http://www.openfire.fr",
     'category' : "Generic Modules/Sales & Purchases",

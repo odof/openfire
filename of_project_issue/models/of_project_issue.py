@@ -7,13 +7,13 @@ import base64
 from odoo.exceptions import UserError
 
 
-class project_issue(models.Model):
+class ProjectIssue(models.Model):
     """ Helpdesk Cases """
 
     _description = "Helpdesk"
     _inherit = 'project.issue'
     _rec_name = 'of_code'
-    
+
     # le champ Etat, remplacer par les valeurs traduites
 # Migration
 #     def _of_finish_install(self, cr, uid):
@@ -143,7 +143,7 @@ class project_issue(models.Model):
     #                                     store={'project.issue': (lambda self, cr, uid, ids, *a:ids, ['categ_id'], 10),
     #                                            'categ_id'    : (lambda self, cr, uid, ids, *a:self.pool['of.project.issue'].search(cr, uid, [('categ_id','in',ids)]), ['parent_id'], 10),
     #                                            }),
-    interventions_liees = fields.One2many('of.planning.intervention', 'sav_id', 'Interventions liees', readonly=False)
+    interventions_liees = fields.One2many('of.planning.intervention', 'sav_id', u'Interventions liées', readonly=False)
     # Migration 'show_partner_shop'  : fields_oldapi.function(_get_show_partner_shop, type="boolean", string="Magasin différent"),
     of_partner_id_ref = fields.Char(u'Réf. contact', related='partner_id.ref', readonly=True)
     of_partner_id_address = fields.Char('Adresse', related='partner_id.contact_address', readonly=True)
@@ -164,11 +164,11 @@ class project_issue(models.Model):
         if not self.project_id:
             partner_id = self.partner_id
             email_from = self.email_from
-            super(project_issue, self)._onchange_project_id()
+            super(ProjectIssue, self)._onchange_project_id()
             self.partner_id = partner_id
             self.email_from =  email_from
         else:
-            super(project_issue, self)._onchange_project_id()
+            super(ProjectIssue, self)._onchange_project_id()
 
 
     # Quand on clique sur le bouton "Ouvrir" dans la liste des SAV pour aller sur le SAV
@@ -261,7 +261,7 @@ class project_issue(models.Model):
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
         # Pour actualiser l'adresse et la liste des documents liés au partenaire
-        super(project_issue, self)._onchange_partner_id()
+        super(ProjectIssue, self)._onchange_partner_id()
         docs = [(5, )]
         for i in self.liste_docs_partner(): # On récupère la liste des documents liés au partenaire (factures, ...)
             docs.append((0, 0, i))
@@ -344,7 +344,7 @@ class project_issue(models.Model):
     def create(self, vals):
         if vals.get('of_code', 'Nouveau') == 'Nouveau':
             vals['of_code'] = self.env['ir.sequence'].next_by_code('of.project.issue') or 'New'
-        return super(project_issue, self).create(vals)
+        return super(ProjectIssue, self).create(vals)
 
 
     @api.one
@@ -355,7 +355,7 @@ class project_issue(models.Model):
         default.update({
             'of_code': self.env['ir.sequence'].get('of.project.issue'),
         })
-        return super(project_issue, self).copy(default)
+        return super(ProjectIssue, self).copy(default)
 
     @api.model
     def remind_partner(self, attach=False):
@@ -755,8 +755,8 @@ class ResPartner(models.Model):
 #     }
 
 
-class of_planning_intervention(models.Model):
+class OfPlanningIntervention(models.Model):
     _name = "of.planning.intervention"
     _inherit = "of.planning.intervention"
 
-    sav_id = fields.Many2one('project.issue', 'SAV', readonly=False)
+    sav_id = fields.Many2one('project.issue', string='SAV', readonly=False)

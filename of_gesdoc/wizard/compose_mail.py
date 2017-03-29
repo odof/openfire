@@ -4,8 +4,6 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError, ValidationError
 
 import time
-from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
-from datetime import datetime
 import pypdftk
 import os
 import base64
@@ -116,6 +114,7 @@ class OfComposeMail(models.TransientModel):
         res['user'] = res['user_id'] and res['user_id'].name
         del res['user_id']
 
+        date_format = lang.date_format.encode('utf-8')
         res.update({
             'c_title'           : address and address.title.name or 'Madame, Monsieur',
             'c_name'            : address and (address.name or (address.partner_id and address.partner_id.name)) or '',
@@ -132,16 +131,15 @@ class OfComposeMail(models.TransientModel):
             'c_adr_pose_street2': address_pose and address_pose.street2 or '',
             'c_adr_pose_city'   : address_pose and address_pose.city or '',
             'c_adr_pose_zip'    : address_pose and address_pose.zip or '',
-            'date'              : time.strftime('%d/%m/%Y'),
+            'date'              : time.strftime(date_format),
         })
 
-        date_length = len((datetime.now()).strftime(DEFAULT_SERVER_DATE_FORMAT))
         for date_field in ('date_order', 'date_confirm_order', 'date_invoice'):
             if not res[date_field]:
                 continue
-            # reformatage de la date (copie depuis report_sxw : rml_parse.formatLang())
-            date = datetime.strptime(res[date_field][:date_length], DEFAULT_SERVER_DATE_FORMAT)
-            date = date.strftime(lang.date_format.encode('utf-8'))
+
+            date = fields.Datetime.from_string(res[date_field])
+            date = date.strftime(date_format)
             res[date_field] = date
         return res
 
