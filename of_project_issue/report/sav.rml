@@ -14,19 +14,13 @@
       <blockSpan start="1,0" stop="3,0"/>
       <blockSpan start="1,1" stop="3,1"/>
       <blockSpan start="1,5" stop="3,5"/>
-      <blockSpan start="1,6" stop="3,6"/>
+      <blockSpan start="1,8" stop="3,8"/>
+      <blockSpan start="1,9" stop="3,9"/>
+      <blockSpan start="1,10" stop="3,10"/>
       <blockFont name="Helvetica" size="9.0"/>
-      <blockFont name="Helvetica-Bold" start="0,0" stop="0,6"/>
+      <blockFont name="Helvetica-Bold" start="0,0" stop="0,10"/>
       <blockFont name="Helvetica-Bold" start="2,2" stop="2,4"/>
-    </blockTableStyle>
-
-    <blockTableStyle id="Table2">
-      <blockAlignment value="LEFT"/>
-      <blockValign value="MIDDLE"/>
-      <lineStyle kind="GRID" colorName="black" thickness="1"/>
-      <blockFont  name="Helvetica" size="9.0"/>
-      <blockFont name="Helvetica-Bold" start="0,0" stop="0,1"/>
-      <blockFont name="Helvetica-Bold" start="2,0" stop="2,1"/>
+      <blockFont name="Helvetica-Bold" start="2,6" stop="2,7"/>
     </blockTableStyle>
 
     <blockTableStyle id="Table3">
@@ -82,13 +76,31 @@
         <td>Priorité</td>
         <td><para style="terp_default_9">[[ get_priority(o.priority) ]]</para></td>
         <td>Catégorie</td>
-        <td><para style="terp_default_9">[[ o.categ_id and o.categ_id.name or '' ]]</para></td>
+        <td><para style="terp_default_9">[[ o.of_categorie_id and o.of_categorie_id.name_get()[0][1] or '' ]]</para></td>
       </tr>
       <tr>
         <td>État</td>
         <td><para style="terp_default_9">[[ o.stage_id.name ]]</para></td>
         <td>Canal</td>
-        <td><para style="terp_default_9">[[ o.channel_id and o.channel_id.name or '' ]]</para></td>
+        <td><para style="terp_default_9">[[ o.of_canal_id and o.of_canal_id.name or '' ]]</para></td>
+      </tr>
+      <tr>
+        <td>Étiquettes</td>
+        <td><para style="terp_default_9">[[ get_sav_tags(o.tag_ids) ]]</para></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Garantie</td>
+        <td><para style="terp_default_9">[[ o.of_garantie and (o.of_garantie == True) and 'Oui' or 'Non' ]]</para></td>
+        <td>Payant client</td>
+        <td>[[ o.of_payant_client and (o.of_payant_client == True) and 'Oui' or 'Non' ]]</td>
+      </tr>
+      <tr>
+        <td>Responsable</td>
+        <td>[[ o.user_id and o.user_id.name or '' ]]</td>
+        <td>Payant fournisseur</td>
+        <td>[[ o.of_payant_fournisseur and (o.of_payant_fournisseur == True) and 'Oui' or 'Non' ]]</td>
       </tr>
       <tr>
         <td>Description</td>
@@ -103,22 +115,15 @@ commander</td>
         <td></td>
         <td></td>
       </tr>
+      <tr>
+        <td>Nature de
+l'intervention</td>
+        <td><para style="terp_default_9">[[ o.of_intervention or '' ]]</para></td>
+        <td></td>
+        <td></td>
+      </tr>
   </blockTable>
 
-  <blockTable colWidths="90.0, 175.0, 90.0, 176.0" style="Table2">
-      <tr>
-        <td>Garantie</td>
-        <td><para style="terp_default_9">[[ o.of_garantie and (o.of_garantie == True) and 'Oui' or 'Non' ]]</para></td>
-        <td>Payant client</td>
-        <td>[[ o.of_payant_client and (o.of_payant_client == True) and 'Oui' or 'Non' ]]</td>
-      </tr>
-      <tr>
-        <td>Responsable</td>
-        <td>[[ o.user_id and o.user_id.name or '' ]]</td>
-        <td>Payant fournisseur</td>
-        <td>[[ o.of_payant_fournisseur and (o.of_payant_fournisseur == True) and 'Oui' or 'Non' ]]</td>
-      </tr>
-  </blockTable>
   <para style="terp_default_Bold_12">Intervention(s)</para>
   <blockTable colWidths="531.0" style="Table3">
       <tr>
@@ -138,10 +143,10 @@ commander</td>
 
   <section>
   	  <para style="terp_default_8">[[ repeatIn(o.interventions_liees, 'i') ]]</para>
-  	  <para style="terp_default_8">[[ setLang(i.partner_id.lang) ]]</para>
+	  <para style="terp_default_8">[[ setLang(i.partner_id.lang) ]]</para>
   	  <blockTable colWidths="105.0, 45.0, 60.0, 120.0, 201.0" style="Table4">
 	      <tr>
-	          <td>[[ i.date and (str(i.date) != '') and formatLang(i.date, date_time=True) or '' ]]</td>
+	          <td>[[ i.date and formatLang(i.date, date_time=True) or '' ]]</td>
 	          <td>[[ i.duree and 'h'.join(str(datetime.timedelta(hours=i.duree)).split(':')[:-1]) or '' ]]</td>
 	          <td>[[ i.state or '' ]]</td>
 	          <td>[[ i.equipe_id.name or '' ]]</td>

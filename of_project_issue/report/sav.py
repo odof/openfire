@@ -12,6 +12,7 @@ class sav(report_sxw.rml_parse):
             'get_client_info': self.get_client_info,
             'get_priority': self.get_priority,
             'get_client_tel': self.get_client_tel,
+            'get_sav_tags': self.get_sav_tags,
             'maintenant': self.maintenant,
             'datetime': datetime,
             'get_objects': self.get_objects,
@@ -90,6 +91,14 @@ class sav(report_sxw.rml_parse):
                 tel += address.fax + ' (fax)'
         return tel
 
+    def get_sav_tags(self, tags):
+        noms = ''
+        for tag in tags:
+            if noms != '':
+                noms += ', ' + tag.name
+            else:
+                noms += tag.name
+        return noms
 
 report_sxw.report_sxw('report.of_project_issue.sav', 'project.issue', 'addons/of_project_issue/report/sav.rml', parser=sav, header=False)
 report_sxw.report_sxw('report.of_project_issue.sav_planning', 'of.planning.intervention', 'addons/of_project_issue/report/sav.rml', parser=sav, header=False)
