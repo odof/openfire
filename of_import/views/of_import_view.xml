@@ -1,0 +1,84 @@
+<openerp>
+    <data>
+
+        <!-- ################## Vues import tarif ##################-->
+        
+        <!-- Filtre -->    
+<!--         <record id="of_import_search_view" model="ir.ui.view">
+            <field name="name">of.import.search</field>
+            <field name="model">of.importe</field>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                ...
+            </field>
+        </record> -->
+
+        <!-- Vue tree -->
+        <record id="of_import_tree_view" model="ir.ui.view">
+            <field name="name">of.import.tree</field>
+            <field name="model">of.import</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="date_import"/>
+                    <field name="file_name"/>
+                    <field name="user_id"/>
+                    <field name="state"/>
+                    <field name="nb_total"/>
+                    <field name="nb_ajout"/>
+                    <field name="nb_maj"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Vue form -->
+        <record id="of_import_form_view" model="ir.ui.view">
+            <field name="name">of.import.form</field>
+            <field name="model">of.import</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="name"/>
+                        <field name="prefixe"/>
+                        <field name="file_name" invisible="0"/>
+                        <field name="file" filename="file_name" invisible="0"/>
+                        <field name="debut"/>
+                        <field name="fin"/>
+                        <field name="duree"/>
+                        <field name="state"/>
+                        <field name="date_import"/>
+                        <field name="nb_total"/>
+                        <field name="nb_ajout"/>
+                        <field name="nb_maj"/>
+                        <field name="nb_echoue"/>
+                        <field name="sortie_succes"/>
+                        <field name="sortie_avertissement"/>
+                        <field name="sortie_erreur"/>
+                    </group>
+                    <group>
+                        <button name="bouton_simuler" string="Simuler import" type="object" icon="fa-check"/>
+                        <button name="bouton_importer" string="Importer" type="object" icon="fa-check" confirm="Confirmez-vous l'import (non annulable) ?"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+        
+        
+        <!-- Menus -->
+        
+        <!-- Action vue import -->
+        <record id="action_of_import" model="ir.actions.act_window">
+            <field name="name">Import articles</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">of.import</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help">Importer des articles</field>
+        </record>
+        
+        <!-- Menu import (Ventes/Configuration/Articles/Import articles) -->
+        <menuitem id="menu_of_import" action="action_of_import" name="Import articles" 
+            parent="sale.prod_config_main" sequence="80"/>
+
+    </data>
+</openerp>
