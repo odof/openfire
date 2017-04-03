@@ -143,10 +143,10 @@ l'intervention</td>
 
   <section>
   	  <para style="terp_default_8">[[ repeatIn(o.interventions_liees, 'i') ]]</para>
-	  <para style="terp_default_8">[[ setLang(i.partner_id.lang) ]]</para>
+	  <para style="terp_default_8">[[ setLang(i.user_id.lang) ]]</para>
   	  <blockTable colWidths="105.0, 45.0, 60.0, 120.0, 201.0" style="Table4">
 	      <tr>
-	          <td>[[ i.date and formatLang(i.date, date_time=True) or '' ]]</td>
+	          <td>[[ i.date or '' ]]</td>
 	          <td>[[ i.duree and 'h'.join(str(datetime.timedelta(hours=i.duree)).split(':')[:-1]) or '' ]]</td>
 	          <td>[[ i.state or '' ]]</td>
 	          <td>[[ i.equipe_id.name or '' ]]</td>

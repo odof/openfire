@@ -99,10 +99,10 @@
                 <xpath expr="//form/sheet/group/group[2]" position="attributes">
                     <attribute name="string">Contact</attribute>
                 </xpath>
-                <field name="name" position="replace">
-                    <field name="of_code"/>
-                    <field name="name" placeholder="Requête ..."/>
-                </field>
+                <xpath expr="//div[@class='oe_title']/h1" position="replace">
+                    <h1><field name="of_code"/></h1>
+                    <h1><field name="name" placeholder="Requête ..."/></h1>
+                </xpath>
                 <field name="user_id" position="before">
                     <field name="date"/>
                     <field name="of_categorie_id"/>
