@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 
-from openerp import models, fields, api, _
-from openerp.exceptions import ValidationError
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 
 import traceback
 
@@ -16,13 +16,15 @@ class OfAccountPaymentMode(models.Model):
     partner_id = fields.Many2one(related='company_id.partner_id', string='Partner', store=True)
     journal_type = fields.Selection(related='journal_id.type', string='Type', readonly=True)
 
-    def _auto_init(self, cr, context=None):
+    @api.model_cr_context
+    def _auto_init(self):
         '''
         Create one payment mode by cash/bank journal
         '''
+        cr = self._cr
         cr.execute("SELECT * FROM information_schema.tables WHERE table_name = '%s'" % (self._table,))
         exists = bool(cr.fetchall())
-        res = super(OfAccountPaymentMode, self)._auto_init(cr, context=context)
+        res = super(OfAccountPaymentMode, self)._auto_init()
         if not exists:
             cr.execute("INSERT INTO %s (name, journal_id, company_id, partner_id)\n"
                        "SELECT j.name, j.id, j.company_id, c.partner_id\n"
@@ -37,13 +39,15 @@ class AccountAbstractPayment(models.AbstractModel):
     of_payment_mode_id = fields.Many2one('of.account.payment.mode', string='Payment mode', required=True)
     journal_id = fields.Many2one(related='of_payment_mode_id.journal_id', string='Payment Journal')
 
-    def _auto_init(self, cr, context=None):
+    @api.model_cr_context
+    def _auto_init(self):
+        cr = self._cr
         init_payment_mode = False
         if self._auto:
             cr.execute("SELECT * FROM information_schema.columns WHERE table_name = '%s' AND column_name = 'of_payment_mode_id'" % (self._table,))
             init_payment_mode = not bool(cr.fetchall())
 
-        res = super(AccountAbstractPayment, self)._auto_init(cr, context=context)
+        res = super(AccountAbstractPayment, self)._auto_init()
         if init_payment_mode:
             # Use self.pool as self.env is not yet defined
             comodel_table = self.pool[self._fields['of_payment_mode_id'].comodel_name]._table

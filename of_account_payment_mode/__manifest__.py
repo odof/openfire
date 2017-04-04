@@ -2,7 +2,7 @@
 
 {
     'name' : 'OpenFire Payment Modes',
-    'version' : '9.0',
+    'version' : '10.0',
     'summary': 'Use distinct payment modes within journals',
     'description': """
 OpenFire Payment Modes
@@ -16,7 +16,7 @@ OpenFire Payment Modes
     ],
     'demo': [ ],
     'qweb': [ ],
-    'installable': False,
+    'installable': True,
     'application': False,
     'auto_install': False,
 }
