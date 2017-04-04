@@ -2,7 +2,7 @@
 
 {
     'name' : 'OpenFire Payment Bank Deposit',
-    'version' : '9.0',
+    'version' : '10.0',
     'summary': 'Allow bank deposit',
     'description': """
 OpenFire Payment Bank Deposit
@@ -16,7 +16,7 @@ OpenFire Payment Bank Deposit
     ],
     'demo': [ ],
     'qweb': [ ],
-    'installable': False,
+    'installable': True,
     'application': False,
     'auto_install': False,
 }
