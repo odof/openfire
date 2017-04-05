@@ -14,6 +14,18 @@ class OfMailTemplate(models.Model):
     _name = "of.mail.template"
     _description = 'Mail Templates'
 
+    @api.model
+    def _get_note_fields(self):
+        comp_obj = self.env['of.compose.mail']
+        values = comp_obj._get_dict_values(self.env.user)
+        return "\n".join(["%%(%s)s" % key for key in sorted(values.keys())])
+
+    @api.multi
+    def get_note_fields(self):
+        note_fields = self._get_note_fields()
+        for template in self:
+            template.note_fields = note_fields
+
     name = fields.Char(string='Nom', size=250, required=True)
     active = fields.Boolean(string=u'Actif', default=True)
     sans_add = fields.Boolean(string='Sans adresse')
@@ -23,6 +35,7 @@ class OfMailTemplate(models.Model):
     file = fields.Binary("Formulaire PDF", attachment=True)
     chp_ids = fields.One2many('of.gesdoc.chp', 'template_id', string='Liste des champs')
     fillable = fields.Boolean(u"Laisser éditable", help="Autorise la modification du fichier pdf après téléchargement")
+    note_fields = fields.Text(compute='get_note_fields', string='Liste des valeurs', default=_get_note_fields)
 
     @api.one
     def copy(self, default=None):

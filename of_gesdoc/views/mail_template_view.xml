@@ -41,6 +41,9 @@
                             <separator string="Contenu" colspan="4"/>
                             <field name="body_text" nolabel="1" colspan="4"/>
                         </group>
+                        <group colspan="2">
+                            <field name="note_fields"/>
+                        </group>
                     </group>
                 </sheet>
                 </form>
