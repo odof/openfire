@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 {
-    "name" : "OpenFire / Module d'import",
+    "name" : "OpenFire / Openimport",
     "author" : "OpenFire",
     "website" : "openfire.fr",
     "category" : "'Extra Tools'",
     "description": """
-Module d'import OpenFire.
+Import OpenFire.
 ======================================
 
 Ce module importe :

@@ -8,11 +8,11 @@ class of_import(models.Model):
     _name = 'of.import'
 
     name = fields.Char('Nom', size=64, required=True)
-    date_import = fields.Datetime('Date', required=True, readonly=True, default=lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'))
-    prefixe = fields.Char(u'Préfixe référence article', size=10, help=u"Texte qui précèdera la référence des articles.")
-    debut = fields.Datetime(u'Début', readonly=True)
-    fin = fields.Datetime('Fin', readonly=True)
-    duree = fields.Char(u'Durée', compute="_calcul_duree", size=16, readonly=True, store=True)
+    type_import = fields.Selection([('product.template', 'Produit')], string="Type d'import", required=True)
+    date = fields.Datetime('Date', required=True, default=lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'), help=u"Date qui sera affectée aux imports comme date de valeur.")
+    date_debut_import = fields.Datetime('Début', readonly=True)
+    date_fin_import = fields.Datetime('Fin', readonly=True)
+    prefixe = fields.Char(u'Préfixe référence', size=10, help=u"Texte qui précèdera la référence.")
     user_id = fields.Many2one('res.users', 'Utilisateur', readonly=True, default=lambda self: self._uid)
     file = fields.Binary('Fichier', required=True)
     file_name = fields.Char('Nom du fichier')
@@ -21,18 +21,56 @@ class of_import(models.Model):
     nb_ajout = fields.Integer(u'Ajoutés', readonly=True)
     nb_maj = fields.Integer(u'Mis à jour', readonly=True)
     nb_echoue = fields.Integer(u'Échoués/ignorés', readonly=True)
+    sortie_note = fields.Text('Note', compute='get_sortie_note', readonly=True)
     sortie_succes = fields.Text('Information', readonly=True)
     sortie_avertissement = fields.Text('Avertissements', readonly=True)
     sortie_erreur = fields.Text('Erreurs', readonly=True)
-    type = fields.Char(u'Type import', readonly=True, default='produit')
-
-#     _defaults = {
-#         'date_import': lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'),
-#         'state': 'brouillon',
-#         'user_id': lambda obj, cr, uid, context: uid,
-#         'type': 'produit'
-#     }
     
+    def get_champs_odoo(self, model=''):
+        "Renvoit un dictionnaire contenant les caractériqtiques des champs Odoo en fonction du type d'import sélectionné (champ type_import)"
+
+        if not model:
+            return False
+
+        champs_odoo = {}
+        obj = self.env['ir.model.fields'].search([('model','=', model)])
+
+        for champ in obj:
+            champs_odoo[champ.name] = {
+                'description': champ.field_description,
+                'requis': champ.required,
+                'type': champ.ttype,
+                'relation': champ.relation,
+                'relation_champ': champ.relation_field}
+
+        #required_fields = filter(lambda c:champs_odoo[c]['requis'], champs_odoo.iterkeys())
+        required_fields = [key for key,vals in champs_odoo.iteritems() if vals['requis']]
+        for i in self.env[model].default_get(required_fields):
+            champs_odoo[i]['requis'] = False
+
+        # A REVOIR
+        champs_odoo['product_variant_ids']['requis'] = False
+
+        return champs_odoo
+
+
+    @api.depends('type_import')
+    def get_sortie_note(self):
+        "Met à jour la liste des champs Odoo disponibles pour l'import dans le champ note"
+        for imp in self:
+            sortie_note = ''
+            for champ, valeur in self.get_champs_odoo(self.type_import).items():
+                sortie_note += "- " + valeur['description'] + " : " + champ + '\n'
+            if sortie_note:
+                sortie_note = u"Champs disponibles pour l'import (en-tête de colonne) :\n" + sortie_note
+            imp.sortie_note = sortie_note
+
+    @api.multi
+    def bouton_remettre_brouillon(self):
+        for imp in self:
+            imp.state = 'brouillon'
+        return True
+
     @api.multi
     def bouton_simuler(self):
         self.importer(simuler=True)
@@ -47,25 +85,11 @@ class of_import(models.Model):
     def importer(self, simuler=True):
         
         # Variables de configuration
-        
         frequence_commit = 100 # Enregistrer (commit) tous les n enregistrements
-        
-        champs_odoo = {}
-        champs_odoo['name'] = {'description': u'Nom du produit', 'requis': True, 'type': 'text', 'res_model': '', 'champ_res_model': ''}
-        champs_odoo['default_code'] = {'description': u'Référence produit', 'requis': True, 'type': 'text', 'res_model': '', 'champ_res_model': ''}
-        champs_odoo['list_price'] = {'description': u'Prix de vente', 'requis': True, 'type': 'float', 'res_model': '', 'champ_res_model': ''}
-        champs_odoo['standard_price2'] = {'description': u"Prix d'achat", 'requis': False, 'type': 'float', 'res_model': '', 'champ_res_model': ''}
-        champs_odoo['of_frais_port'] = {'description': u'Frais de port', 'requis': False, 'type': 'float', 'res_model': '', 'champ_res_model': ''}
-        champs_odoo['type'] = {'description': u'Type de produit', 'requis': False, 'type': 'text', 'res_model': '', 'champ_res_model': '', 'valeurs': ('consu', 'service', 'product')} 
-        champs_odoo['sale_ok'] = {'description': u'Peut être vendu', 'requis': False, 'type': 'bool', 'res_model': '', 'champ_res_model': ''}
-        champs_odoo['purchase_ok'] = {'description': u'Peut être acheté', 'requis': False, 'type': 'bool', 'res_model': '', 'champ_res_model': ''}
-        champs_odoo['weight'] = {'description': u'Poids', 'requis': False, 'type': 'float', 'res_model': '', 'champ_res_model': ''}
-        champs_odoo['volume'] = {'description': u'Volume', 'requis': False, 'type': 'float', 'res_model': '', 'champ_res_model': ''}
-        champs_odoo['barcode'] = {'description': u'Code barre', 'requis': False, 'type': 'text', 'res_model': '', 'champ_res_model': ''} 
-        champs_odoo['uom_id'] = {'description': u'Unité de mesure', 'requis': False, 'type': 'one2many', 'res_model': 'product.uom', 'champ_res_model': 'name'}
-        champs_odoo['uom_po_id'] = {'description': u"Unité de mesure d'achat", 'requis': False, 'type': 'one2many', 'res_model': 'product.uom', 'champ_res_model': 'name'}
-        #route_ids
-        #categ_id
+
+        model = self.type_import
+        champs_odoo = self.get_champs_odoo(model)
+        date_debut = time.strftime('%Y-%m-%d %H:%M:%S')
 
         if simuler:
             sortie_succes = sortie_avertissement = sortie_erreur = u"SIMULATION - Rien n'a été créé/modifié.\n" 
@@ -210,7 +234,9 @@ class of_import(models.Model):
                 sortie_avertissement += u"Produit réf. " + cle.decode('utf8', 'ignore') + u" existe en " + str(doublons[cle][0]) + u" exemplaires dans le fichier d'import (lignes " + doublons[cle][1] + u"). Seule la première ligne est importée.\n"
         
         # On enregistre les dernières lignes qui ne l'auraient pas été.
-        self.write({'nb_total': nb_total, 'nb_ajout': nb_ajout, 'nb_maj': nb_maj, 'nb_echoue': nb_echoue, 'sortie_succes': sortie_succes, 'sortie_avertissement': sortie_avertissement, 'sortie_erreur': sortie_erreur})
+        self.write({'nb_total': nb_total, 'nb_ajout': nb_ajout, 'nb_maj': nb_maj, 'nb_echoue': nb_echoue, 'sortie_succes': sortie_succes, 'sortie_avertissement': sortie_avertissement, 'sortie_erreur': sortie_erreur, 'date_debut_import' : date_debut, 'date_fin_import' : time.strftime('%Y-%m-%d %H:%M:%S')})
+        if not simuler:
+            self.write({'state': 'importe'})
         self._cr.commit()
 
         return
