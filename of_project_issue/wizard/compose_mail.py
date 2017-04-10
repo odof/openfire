@@ -25,11 +25,13 @@ class OfComposeMail(models.TransientModel):
         sav = objects.get('sav')
         sav_categ = sav and sav.of_categorie_id
         sav_categ_mere = sav_categ and sav_categ.parent_id
-        while sav_categ_mere.parent_id:
-            sav_categ_mere = sav_categ_mere.parent_id
+        if sav_categ_mere:
+            while sav_categ_mere.parent_id:
+                sav_categ_mere = sav_categ_mere.parent_id
 
         result.update({
             'sav_of_code'      : sav and sav.of_code,
+            'sav_date'         : sav and sav.date[:10] or '',
             'sav_name'         : sav and sav.name or '',
             'sav_user'         : sav and sav.user_id and sav.user_id.name or '',
             'sav_description'  : sav and sav.description or '',
