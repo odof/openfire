@@ -7,24 +7,24 @@ from __builtin__ import False
 
 class OfPlanningTache(models.Model):
     _name = "of.planning.tache"
-    _description = u"Planning OpenFire : Taches"
+    _description = u"Planning OpenFire : Tâches"
 
     name = fields.Char(u'Libellé', size=64, required=True)
     description = fields.Text('Description')
     verr = fields.Boolean(u'Verrouillé')
     product_id = fields.Many2one('product.product', 'Produit')
     active = fields.Boolean('Actif', default=True)
-    imp_detail = fields.Boolean(u'Imprimer Détail', help=u"""Impression du détail des taches dans le planning semaine
-Si cette option n'est pas cochée, seule la tache la plus souvent effectuée dans la journée apparaîtra""", default=True)
+    imp_detail = fields.Boolean(u'Imprimer Détail', help=u"""Impression du détail des tâches dans le planning semaine
+Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée dans la journée apparaîtra""", default=True)
     duree = fields.Float(u'Durée par défaut', digits=(12, 5), default=1.0)
     category_id = fields.Many2one('hr.employee.category', string=u"Catégorie d'employés")
-    is_crm = fields.Boolean(u'Tache CRM')
+    is_crm = fields.Boolean(u'Tâche CRM')
     equipe_ids = fields.Many2many('of.planning.equipe', 'equipe_tache_rel', 'tache_id', 'equipe_id', 'Équipes')
 
     @api.multi
     def unlink(self):
         if self.search([('id','in',self._ids),('verr','=',True)]):
-            raise ValidationError(u'Vous essayez de supprimer une tache verrouillée.')
+            raise ValidationError(u'Vous essayez de supprimer une tâche verrouillée.')
         return super(OfPlanningTache, self).unlink()
 
 class OfPlanningEquipe(models.Model):
@@ -178,7 +178,7 @@ class OfPlanningIntervention(models.Model):
     address_id = fields.Many2one('res.partner', string='Adresse')
     partner_city = fields.Char(related='address_id.city')
     raison_id = fields.Many2one('of.planning.intervention.raison', string='Raison')
-    tache_id = fields.Many2one('of.planning.tache', string='Tache', required=True)
+    tache_id = fields.Many2one('of.planning.tache', string='Tâche', required=True)
     equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe', required=True, oldname='poseur_id')
     employee_ids = fields.Many2many(related='equipe_id.employee_ids', string='Intervenants', readonly=True)
     state = fields.Selection([
@@ -198,7 +198,7 @@ class OfPlanningIntervention(models.Model):
     hor_sam = fields.Boolean(string='Samedi')
     hor_dim = fields.Boolean(string='Dimanche')
 
-    category_id = fields.Many2one(related='tache_id.category_id', string=u"Type de tache")
+    category_id = fields.Many2one(related='tache_id.category_id', string=u"Type de tâche")
     verif_dispo = fields.Boolean(string=u'Vérif', help=u"Vérifier la disponibilité de l'équipe sur ce créneau", default=True)
 #    gb_employee_id = fields.Many2one('hr.employee', compute='lambda *a, **k:{}', search='search_gb_employee_id',
 #                                     string="Intervenant", of_custom_groupby=True),

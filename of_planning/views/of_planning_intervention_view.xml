@@ -88,7 +88,7 @@
                     <newline/>
                     <group expand="0" string="Regrouper par...">
                        <filter string="Utilisateur" icon="terp-personal" domain="[]" context="{'group_by' : 'user_id'}"/>
-                       <filter string="Tache" icon="terp-folder-blue" domain="[]" context="{'group_by' : 'tache_id'}"/>
+                       <filter string="Tâche" icon="terp-folder-blue" domain="[]" context="{'group_by' : 'tache_id'}"/>
                        <filter string="Equipe" icon="terp-partner" domain="[]" context="{'group_by' : 'equipe_id'}"/>
                        <filter string="Intervenant" icon="terp-partner" domain="[]" context="{'group_by' : 'gb_employee_id'}"/>
                        <filter string="Magasin" icon="terp-go-home" domain="[]" context="{'group_by' : 'company_id'}"/>
@@ -227,7 +227,7 @@
         </record>
 
 <!--##########################################################################################################################-->
-<!--#############################################_________Taches_________#####################################################-->
+<!--#############################################_________Tâches_________#####################################################-->
 <!--##########################################################################################################################-->
 
 <!--#############################################_______Recherche_________#####################################################-->
@@ -290,7 +290,7 @@
             <field name="name">of.planning.tache.tree</field>
             <field name="model">of.planning.tache</field>
             <field name="arch" type="xml" >
-                <tree string="Liste des taches" >
+                <tree string="Liste des tâches" >
                     <field name="name" string="Libellé"/>
                     <field name="product_id"/>
                     <field name="category_id"/>
@@ -516,7 +516,7 @@
             <field name="search_view_id" ref="of_planning_intervention_filter"/>
         </record>
 
-<!--#############################################_________Taches_________#####################################################-->
+<!--#############################################_________Tâches_________#####################################################-->
 
         <record id="action_hr_employee_tree" model="ir.actions.act_window">
             <field name="name">Employés</field>
@@ -535,7 +535,7 @@
         </record>
         
         <record id="action_of_planning_tache_tree" model="ir.actions.act_window">
-            <field name="name">Taches</field>
+            <field name="name">Tâches</field>
             <field name="res_model">of.planning.tache</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
@@ -570,7 +570,7 @@
             <menuitem name="Employés" id="menu_hr_employee_tree" parent="menu_of_planning_configuration" sequence="1" action="action_hr_employee_tree"/>
             <menuitem name="Équipes" id="menu_of_planning_equipe_tree" parent="menu_of_planning_configuration" sequence="2" action="action_of_planning_equipe_tree"/>
             <menuitem name="Erreurs" id="menu_of_planning_intervention_raison_tree" parent="menu_of_planning_configuration" sequence="3" action="action_of_planning_intervention_raison_tree"/>
-            <menuitem name="Taches" id="menu_of_planning_tache_tree" parent="menu_of_planning_configuration" sequence="3" action="action_of_planning_tache_tree"/>
+            <menuitem name="Tâches" id="menu_of_planning_tache_tree" parent="menu_of_planning_configuration" sequence="3" action="action_of_planning_tache_tree"/>
             <!--menuitem name="Types de coûts" id="menu_pnanning_of_employee_typcout_tree" parent="menu_of_planning_configuration" sequence="5" action="action_of_planning_employee_typcout_tree"/-->
 
         <menuitem id="menu_of_planning_intervention" name="Interventions" parent="sales_team.menu_base_partner" groups="of_group_planning_intervention_user" sequence="10"/>

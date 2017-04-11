@@ -206,7 +206,7 @@ class OfTourneeRdv(models.TransientModel):
 
         # Récupération des équipes
         if not self.tache_id.equipe_ids:
-            raise UserError(u"Aucune équipe ne peut réaliser cette tache.")
+            raise UserError(u"Aucune équipe ne peut réaliser cette tâche.")
         if self.equipe_id_pre:
             if self.equipe_id_pre in self.tache_id.equipe_ids:
                 equipes = self.equipe_id_pre

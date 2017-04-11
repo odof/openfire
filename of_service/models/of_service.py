@@ -102,7 +102,7 @@ class OfService(models.Model):
     geo_lng = fields.Float(related='address_id.geo_lng')
     partner_name = fields.Char(related='partner_id.name')
     
-    tache_id = fields.Many2one('of.planning.tache', string='Tache', required=True)
+    tache_id = fields.Many2one('of.planning.tache', string=u'Tâche', required=True)
     name = fields.Char(u"Libellé", related='tache_id.name', store=True)
 
     mois_ids = fields.Many2many('of.mois', 'service_mois', 'service_id', 'mois_id', string='Mois', required=True)
