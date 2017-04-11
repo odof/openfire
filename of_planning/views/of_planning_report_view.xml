@@ -2,6 +2,16 @@
 <openerp>
     <data>
 
+        <!-- Attestation ramonage -->
+        <report 
+            auto="False" 
+            id="report_of_planning_attestation_ramonage" 
+            model="of.planning.intervention"
+            name="of_planning.attestation_ramonage"
+            rml="of_planning/report/attestation_ramonage.rml" 
+            string="Attestation Ramonage"/>
+
+
         <!-- wizard for sending a mail: first step -->
         <record id="of_planning_report_view_form" model="ir.ui.view">
             <field name="name">of.planning.report.form</field>

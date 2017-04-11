@@ -1,0 +1,355 @@
+<?xml version="1.0"?>
+<document filename="Attestation ramonage.pdf">
+  <template pageSize="(595.0,842.0)" title="Attestation ramonage" allowSplitting="20" topMargin="0" bottomMargin="0">
+    <pageTemplate id="first">
+      <frame id="first" x1="15.0" y1="0.0" width="539" height="842" topMargin="0" bottomMargin="0"/>
+    </pageTemplate>
+  </template>
+  <stylesheet>
+    <blockTableStyle id="Table1">
+      <blockAlignment value="LEFT"/>
+      <blockValign value="BOTTOM"/>
+      <blockBackground colorName="#C7C7C7" start="0,0" stop="1,0"/>
+      <lineStyle kind="LINEBEFORE" colorName="black" start="0,0" stop="0,0" thickness="2"/>
+      <lineStyle kind="LINEABOVE" colorName="black" start="0,0" stop="0,0" thickness="2"/>
+      <lineStyle kind="LINEBELOW" colorName="black" start="0,0" stop="0,0" thickness="2"/>
+      <lineStyle kind="LINEAFTER" colorName="black" start="0,0" stop="0,0" thickness="2"/>
+    </blockTableStyle>
+   <blockTableStyle id="Table2">
+      <blockAlignment value="LEFT"/>
+      <blockValign value="TOP"/>
+      <blockBottomPadding length="1"/>
+      <blockTopPadding length="1"/>
+    </blockTableStyle>
+   <blockTableStyle id="Table3">
+      <blockAlignment value="LEFT"/>
+      <blockValign value="TOP"/>
+      <lineStyle kind="BOX" colorName="black" thickness="1"/>
+      <blockSpan start="0,2" stop="3,2"/>
+      <blockBottomPadding length="0"/>
+    </blockTableStyle>
+    <initialize>
+      <paraStyle name="all" alignment="justify"/>
+    </initialize>
+    <paraStyle name="header" fontName="Helvetica-Bold" fontSize="16.0" leading="20" alignment="CENTER" spaceBefore="6.0" spaceAfter="6.0"/>
+    <paraStyle name="attestation" fontName="Helvetica-Bold" fontSize="15.0" leading="17" alignment="CENTER" spaceBefore="6.0" spaceAfter="6.0"/>
+    <paraStyle name="default" fontName="Helvetica" fontSize="11.0" leading="21" alignment="LEFT" spaceBefore="1.0" spaceAfter="1.0"/>
+    <paraStyle name="default_reduit" fontName="Helvetica" fontSize="11.0" leading="20" alignment="LEFT" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_grand" fontName="Helvetica" fontSize="11.0" leading="40" alignment="LEFT" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_reduit2_left" fontName="Helvetica" fontSize="11.0" leading="11" alignment="LEFT" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_court" fontName="Helvetica" fontSize="11.0" leading="12" alignment="LEFT" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_bold" fontName="Helvetica-Bold" fontSize="10.0" leading="10" alignment="LEFT" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_14_bold" fontName="Helvetica-Bold" fontSize="14.0" leading="18" alignment="LEFT" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_8" fontName="Helvetica" fontSize="8.0" leading="8" alignment="LEFT" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_23" fontName="Helvetica" fontSize="23.0" leading="23" alignment="LEFT" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_4" fontName="Helvetica" fontSize="4.0" leading="4" alignment="LEFT" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_1" fontName="Helvetica" fontSize="1.0" leading="1" alignment="LEFT" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_bottom" fontName="Helvetica" fontSize="2.0" leading="15" alignment="LEFT" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_8_bold" fontName="Helvetica-Bold" fontSize="8.0" leading="14" alignment="LEFT" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_8_bold_centre" fontName="Helvetica-Bold" fontSize="8.0" leading="14" alignment="CENTER" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_bold_centre" fontName="Helvetica" fontSize="9.0" leading="9" alignment="CENTER" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_9" fontName="Helvetica" fontSize="9.0" leading="12" alignment="LEFT" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="default_9_bold_centre" fontName="Helvetica" fontSize="9.0" leading="9" alignment="CENTER" spaceBefore="3.0" spaceAfter="3.0"/>
+    <paraStyle name="of_footer" fontName="Helvetica" fontSize="11.0" leading="11" alignment="CENTER" spaceBefore="18.5" spaceAfter="0.0"/>
+  </stylesheet>
+  <images/>
+  <story>
+    <para style="default">[[ repeatIn([o for o in objects for _ in (0,1)],'o') ]]</para>
+
+    <para style="default_23">
+      <font color="white"> </font>
+    </para>
+    <blockTable colWidths="539" style="Table1">
+        <tr>
+            <td><para style="attestation">ATTESTATION DE RAMONAGE</para></td>
+        </tr>
+    </blockTable>
+    <para style="default_4">
+      <font color="white"> </font>
+    </para>
+    <blockTable colWidths="539" style="Table2">
+        <tr>
+            <td>
+                <blockTable colWidths="60,479" style="Table2">
+                    <tr>
+                        <td>
+                            <para style="default">Client :</para>
+                        </td>
+                        <td>
+                            <para style="default_reduit2_left">[[ get_client_info(o) ]]</para>
+                        </td>
+                    </tr>
+                </blockTable>
+                <para style="default_1">
+                  <font color="white"> </font>
+                </para>
+                <blockTable colWidths="185,354" style="Table2">
+                    <tr>
+                        <td>
+                            <para style="default">Nom du technicien ramoneur :</para>
+                        </td>
+                        <td>
+                            <para style="default">[[ o.equipe_id.name ]]</para>
+                        </td>
+                    </tr>
+                </blockTable>
+                <blockTable colWidths="75,464" style="Table2">
+                    <tr>
+                        <td>
+                            <para style="default">Prestation :</para>
+                        </td>
+                        <td>
+                            <para style="default">[[ o.tache_id and o.tache_id.product_id and o.tache_id.product_id.name or '' ]]</para>
+                        </td>
+                    </tr>
+                </blockTable>
+                <blockTable colWidths="125,130,50,234" style="Table2">
+                    <tr>
+                        <td>
+                            <para style="default">Date du ramonage :</para>
+                        </td>
+                        <td>
+                            <para style="default">[[ format_date(o.date) ]]</para>
+                        </td>
+                        <td>
+                            <para style="default">Prix :</para>
+                        </td>
+                        <td>
+                            <para style="default">[[ formatLang(get_price_ttc(o), dp='Account') ]]</para>
+                        </td>
+                    </tr>
+                </blockTable>
+                <blockTable colWidths="105,150,104,180" style="Table2">
+                    <tr>
+                        <td>
+                            <para style="default">Heure d'arrivée :</para>
+                        </td>
+                        <td>
+                            <para style="default"></para>
+                        </td>
+                        <td>
+                            <para style="default">Heure départ :</para>
+                        </td>
+                        <td>
+                            <para style="default"></para>
+                        </td>
+                    </tr>
+                </blockTable>
+                <blockTable colWidths="200,339" style="Table2">
+                    <tr>
+                        <td>
+                            <para style="default">Mode de règlement :</para>
+                        </td>
+                        <td>
+                            <para style="default"></para>
+                        </td>
+                    </tr>
+                </blockTable>
+                <blockTable colWidths="180,60,23,60,23,120,73" style="Table2">
+                    <tr>
+                        <td>
+                            <para style="default">Nature du conduit ramoné :</para>
+                        </td>
+                        <td>
+                            <para style="default">Boisseau</para>
+                        </td>
+                        <td>
+                            <illustration width="11" height="11">
+                               <rect x="0" y="0" width="8" height="8"/>
+                            </illustration>
+                        </td>
+                        <td>
+                            <para style="default">Tubage</para>
+                        </td>
+                        <td>
+                            <illustration width="11" height="11">
+                               <rect x="0" y="0" width="8" height="8"/>
+                            </illustration>
+                        </td>
+                        <td>
+                            <para style="default">Conduit métallique</para>
+                        </td>
+                        <td>
+                            <illustration width="11" height="11">
+                               <rect x="0" y="0" width="8" height="8"/>
+                            </illustration>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <para style="default">Conduit desservant appareil :</para>
+                        </td>
+                        <td>
+                            <para style="default">Bûches</para>
+                        </td>
+                        <td>
+                            <illustration width="11" height="11">
+                               <rect x="0" y="0" width="8" height="8"/>
+                            </illustration>
+                        </td>
+                        <td>
+                            <para style="default">Pellets</para>
+                        </td>
+                        <td>
+                            <illustration width="11" height="11">
+                               <rect x="0" y="0" width="8" height="8"/>
+                            </illustration>
+                        </td>
+                        <td>
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <para style="default">Etat du conduit satisfaisant :</para>
+                        </td>
+                        <td>
+                            <para style="default">Oui</para>
+                        </td>
+                        <td>
+                            <illustration width="11" height="11">
+                               <rect x="0" y="0" width="8" height="8"/>
+                            </illustration>
+                        </td>
+                        <td>
+                            <para style="default">Non</para>
+                        </td>
+                        <td>
+                            <illustration width="11" height="11">
+                               <rect x="0" y="0" width="8" height="8"/>
+                            </illustration>
+                        </td>
+                        <td>
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <para style="default">Ramonage effectué par :</para>
+                        </td>
+                        <td>
+                            <para style="default">Le bas</para>
+                        </td>
+                        <td>
+                            <illustration width="11" height="11">
+                               <rect x="0" y="0" width="8" height="8"/>
+                            </illustration>
+                        </td>
+                        <td>
+                            <para style="default">Le haut</para>
+                        </td>
+                        <td>
+                            <illustration width="11" height="11">
+                               <rect x="0" y="0" width="8" height="8"/>
+                            </illustration>
+                        </td>
+                        <td>
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                </blockTable>
+                <blockTable colWidths="200,339" style="Table2">
+                    <tr>
+                        <td>
+                            <para style="default">N° de série de l'appareil :</para>
+                        </td>
+                        <td>
+                            <para style="default"></para>
+                        </td>
+                    </tr>
+                </blockTable>
+                <blockTable colWidths="250,60,23,60,23" style="Table3">
+                    <tr>
+                        <td>
+                            <para style="default">Attention goudron risque d'incendie :</para>
+                        </td>
+                        <td>
+                            <para style="default">Oui</para>
+                        </td>
+                        <td>
+                            <illustration width="11" height="11">
+                               <rect x="0" y="0" width="8" height="8"/>
+                            </illustration>
+                        </td>
+                        <td>
+                            <para style="default">Non</para>
+                        </td>
+                        <td>
+                            <illustration width="11" height="11">
+                               <rect x="0" y="0" width="8" height="8"/>
+                            </illustration>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <para style="default">Débistrage conseillé :</para>
+                        </td>
+                        <td>
+                            <para style="default">Oui</para>
+                        </td>
+                        <td>
+                            <illustration width="11" height="11">
+                               <rect x="0" y="0" width="8" height="8"/>
+                            </illustration>
+                        </td>
+                        <td>
+                            <para style="default">Non</para>
+                        </td>
+                        <td>
+                            <illustration width="11" height="11">
+                               <rect x="0" y="0" width="8" height="8"/>
+                            </illustration>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <para style="default_8">L'entreprise ne peut se porter responsable d'un sinistre suite au non-respect des éléments ci-dessus de même que pour toutes installations non conformes</para>
+                        </td>
+                        <td/>
+                        <td/>
+                    </tr>
+                </blockTable>
+                <blockTable colWidths="200,339" style="Table2">
+                    <tr>
+                        <td>
+                            <para style="default">Observations :</para>
+                        </td>
+                        <td>
+                            <para style="default"></para>
+                        </td>
+                    </tr>
+                </blockTable>
+                <para style="default_grand">
+                      <font color="white"> </font>
+                </para>
+                <blockTable colWidths="35,220,20,220" style="Table2">
+                    <tr>
+                        <td/>
+                        <td>
+                            <para style="default_9">Je soussigné ..................... certifie que mon habitation est achevée depuis plus de 2 ans</para>
+                        </td>
+                        <td/>
+                        <td>
+                            <para style="default_9">Atteste avoir réalisé le ramonage du local à usage d'habitation situé à l'adresse ci-dessus.</para>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td/>
+                        <td>
+                            <para style="default_bold">Signature client</para>
+                        </td>
+                        <td/>
+                        <td>
+                            <para style="default_bold">Signature technicien</para>
+                        </td>
+                    </tr>
+                </blockTable>
+          </td>
+        </tr>
+     </blockTable>
+     <para style="of_footer"><font color="#FF0000">Selon la législation, deux ramonages sont obligatoires par an dont un en hiver.</font></para>
+  </story>
+</document>
