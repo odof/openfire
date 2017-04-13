@@ -40,11 +40,10 @@
                             </form>
                         </field>
 
-                        <field name="equipe_ids" invisible="1"/>
                         <field name="date_propos" invisible="1"/>
                         <separator string="Résultat" colspan="4"/>
                         <field name="name"/>
-                        <field name="equipe_id" domain="[('id', 'in', [equipe[1] for equipe in equipe_ids if equipe[0]==4])]"/>
+                        <field name="equipe_id" domain="[('id', 'in', context.get('equipe_domain',[]))]"/>
                         <field name="date_propos_hour" widget="float_time"/>
                         <field name="date_next"/>
                         <newline/>

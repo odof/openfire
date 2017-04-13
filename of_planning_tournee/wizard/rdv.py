@@ -67,17 +67,6 @@ class OfTourneeRdv(models.TransientModel):
                     address = partner_obj.search(['|', ('id', '=', partner.id), ('parent_id', '=', partner.id)])
         return address_id
 
-    @api.depends('planning_ids', 'planning_ids.equipe_id')
-    def _get_equipe_possible(self):
-        result = {}
-        for res in self:
-            equipes = []
-            for planning in res.planning_ids:
-                if not planning.equipe_id.id in equipes:
-                    equipes.append(planning.equipe_id.id)
-            result[res.id] = equipes
-        return result
-
     name = fields.Char(string=u'Libellé', size=64, required=False)
     description = fields.Text(string='Description')
     tache_id = fields.Many2one('of.planning.tache', string='Prestation', required=True)
@@ -92,21 +81,10 @@ class OfTourneeRdv(models.TransientModel):
     partner_address_id = fields.Many2one('res.partner', string="Adresse d'intervention", required=True, default=_default_address,
                                          domain="['|', ('id', '=', partner_id), ('parent_id', '=', partner_id)]")
     date_display = fields.Char(string='Jour du RDV', size=64, readonly=True)
-    equipe_ids = fields.One2many('of.planning.equipe', compute="_get_equipe_possible", string='Équipes possibles')
     service_id = fields.Many2one('of.service', string='Service client', default=_default_service,
                                  domain="[('partner_id', '=', partner_id), ('state', '=', 'progress')]")
     date_next = fields.Date(string=u'Prochaine intervention', help=u"Date à partir de laquelle programmer la prochaine intervention")
     mode = fields.Selection(RES_MODES, string="Mode de recherche", required=True, default="hors_tournee")
-
-    @api.model
-    def _get_equipe(self):
-        hr_category_obj = self.env['hr.employee.category']
-        equipe_ids = []
-        for category in hr_category_obj.search():
-            equipe_ids += category.equipe_ids._ids
-        equipe_ids = list(set(equipe_ids))
-        return equipe_ids
-
 
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
@@ -148,12 +126,22 @@ class OfTourneeRdv(models.TransientModel):
         self.tache_id = service.tache_id
         self.partner_address_id = service.address_id
 
+    @api.multi
+    def _get_equipe_possible(self):
+        self.ensure_one()
+        equipe_ids = []
+        for planning in self.planning_ids:
+            if not planning.equipe_id.id in equipe_ids:
+                equipe_ids.append(planning.equipe_id.id)
+        return equipe_ids
+
     # Note: Séparation en 3 fonctions car, avec une seule fonction button_calcul(self, creneau_suivant=False),
     #       Odoo place le contexte dans cette variable si elle n'est pas fournie en paramètre ...
     @api.multi
     def button_calcul_suivant(self):
         # Calcule a prochaine intervention à partir de la dernière intervention proposée
         self.compute(creneau_suivant=True)
+        context = dict(self._context, equipe_domain = self._get_equipe_possible())
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'of.tournee.rdv',
@@ -161,13 +149,14 @@ class OfTourneeRdv(models.TransientModel):
             'view_mode': 'form',
             'res_id': self.id,
             'target': 'new',
-            'context': self._context
+            'context': context,
         }
 
     @api.multi
     def button_calcul(self):
         # Calcule a prochaine intervention à partir du lendemain de la date courante
         self.compute(creneau_suivant=False)
+        context = dict(self._context, equipe_domain = self._get_equipe_possible())
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'of.tournee.rdv',
@@ -175,7 +164,7 @@ class OfTourneeRdv(models.TransientModel):
             'view_mode': 'form',
             'res_id': self.id,
             'target': 'new',
-            'context': self._context
+            'context': context,
         }
 
     @api.multi
