@@ -98,7 +98,7 @@
       </tr>
     </blockTable>
   </pto_header>
-    <para style="terp_tblheader">[[ get_titre(e)['title'] ]]</para>
+    <para style="terp_tblheader">[[ get_titre(e) ]]</para>
     <para style="terp_default_10">
       <font color="white"> </font>
     </para>
