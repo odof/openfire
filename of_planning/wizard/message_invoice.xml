@@ -1,0 +1,20 @@
+<openerp>
+    <data>
+        <!-- Imprimer le message de la creation de facture -->
+
+        <record id="of_planning_message_invoice" model="ir.ui.view">
+            <field name="name">of.planning.message.invoice.form</field>
+            <field name="model">of.planning.message.invoice</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Création de la facture">
+                    <field name="name" readonly="1"/>
+                    <footer>
+                        <button string="Sortir" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</openerp>

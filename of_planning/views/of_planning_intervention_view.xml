@@ -606,11 +606,11 @@
         
         <!-- Creation la facture depuis planning intervention -->
 
-        <!--record id="action_of_create_invoice_intervention" model="ir.actions.server">
+        <record id="action_of_create_invoice_intervention" model="ir.actions.server">
             <field name="name">Générer les factures</field>
             <field name="model_id" ref="model_of_planning_intervention"/>
             <field name="state">code</field>
-            <field name="code">action = obj.create_invoice()</field>
+            <field name="code">action = records.create_invoice()</field>
         </record>
 
         <record id="action_create_invoice_intervention" model="ir.values">
@@ -619,7 +619,7 @@
             <field name="model">of.planning.intervention</field>
             <field name="value" eval="'ir.actions.server,%d'%action_of_create_invoice_intervention"/>
             <field name="object" eval="True"/>
-        </record-->
+        </record>
 
     </data>
 </odoo>

@@ -334,6 +334,114 @@ class OfPlanningIntervention(models.Model):
             'qualified_field': '"%s".employee_id' % (alias,)
         }
 
+    @api.multi
+    def _prepare_invoice(self):
+        self.ensure_one()
+
+        msg_succes = u"SUCCES : création de la facture depuis l'intervention %s"
+        msg_erreur = u"ÉCHEC : création de la facture depuis l'intervention %s : %s"
+
+        partner = self.partner_id
+        err = []
+        if not partner:
+            err.append("sans partenaire")
+        product = self.tache_id.product_id
+        if not product:
+            err.append(u"pas de produit lié")
+        elif product.type != 'service':
+            err.append(u"le produit lié doit être de type 'Service'")
+        if err:
+            return (False,
+                   msg_erreur % (self.name, ", ".join(err)))
+        fiscal_position_id = self.env['account.fiscal.position'].get_fiscal_position(partner.id, delivery_id=self.address_id.id)
+        if not fiscal_position_id:
+            return (False,
+                    msg_erreur % (self.name, u"pas de position fiscale définie pour le partenaire ni pour la société"))
+
+        # Préparation de la ligne de facture
+        taxes = product.taxes_id
+        if partner.company_id:
+            taxes = taxes.filtered(lambda r: r.company_id == partner.company_id)
+        taxes = self.env['account.fiscal.position'].browse(fiscal_position_id).map_tax(taxes, product, partner)
+
+        line_account = product.property_account_income_id or product.categ_id.property_account_income_categ_id
+        if not line_account:
+            return (False,
+                    msg_erreur % (self.name, u'Il faut configurer les comptes de revenus pour la catégorie du produit\n'))
+
+        # Mapping des comptes par taxe induit par le module of_account_tax
+        for tax in taxes:
+            line_account = tax.map_account(line_account)
+
+        pricelist = partner.property_product_pricelist
+        company = partner.company_id
+        from_currency = company.currency_id
+
+        if pricelist.discount_policy == 'without_discount':
+            from_currency = company.currency_id
+            price_unit = from_currency.compute(product.lst_price, pricelist.currency_id)
+        else:
+            price_unit = product.with_context(pricelist=pricelist.id).price
+        price_unit = self.env['account.tax']._fix_tax_included_price(price_unit, product.taxes_id, taxes)
+
+        line_data = {
+            'name': product.name_get()[0][1],
+            'origin': 'Intervention',
+            'account_id': line_account.id,
+            'price_unit': price_unit,
+            'quantity': 1.0,
+            'discount': 0.0,
+            'uom_id': product.uom_id.id,
+            'product_id': product.id,
+            'invoice_line_tax_ids': [(6, 0, taxes._ids)],
+        }
+
+        journal_id = self.env['account.invoice'].with_context(company_id=company.id).default_get(['journal_id'])['journal_id']
+        if not journal_id:
+            raise UserError(u"Vous devez définir un journal des ventes pour cette société (%s)." % company.name)
+        invoice_data = {
+            'origin': 'Intervention',
+            'type': 'out_invoice',
+            'account_id': partner.property_account_receivable_id.id,
+            'partner_id': partner.id,
+            'partner_shipping_id': self.address_id.id,
+            'journal_id': journal_id,
+            'currency_id': pricelist.currency_id.id,
+            'fiscal_position_id': fiscal_position_id,
+            'company_id': company.id,
+            'user_id': self._uid,
+            'invoice_line_ids': [(0, 0, line_data)],
+        }
+
+        return (invoice_data,
+                msg_succes % (self.name,))
+
+    @api.multi
+    def create_invoice(self):
+        invoice_obj = self.env['account.invoice']
+
+        msgs = []
+        for intervention in self:
+            invoice_data, msg = intervention._prepare_invoice()
+            msgs.append(msg)
+            if invoice_data:
+                invoice = invoice_obj.create(invoice_data)
+                invoice.compute_taxes()
+                invoice.message_post_with_view('mail.message_origin_link',
+                    values={'self': invoice, 'origin': intervention},
+                    subtype_id=self.env.ref('mail.mt_note').id)
+        msg = "\n".join(msgs)
+
+        return {
+            'name'     : u'Création de la facture',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'of.planning.message.invoice',
+            'type'     : 'ir.actions.act_window',
+            'target'   : 'new',
+            'context'  : {'default_msg': msg}
+        }
+
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
