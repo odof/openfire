@@ -50,7 +50,6 @@ class OfPlanningEquipe(models.Model):
     hor_ad = fields.Float(u'Après-midi début', required=True, digits=(12, 5))
     hor_af = fields.Float(u'Après-midi fin', required=True, digits=(12, 5))
     sequence = fields.Integer(u'Séquence', help=u"Ordre d'affichage (plus petit en premier)")
-        
 
     @api.onchange('employee_ids')
     def onchange_employees(self):
@@ -202,7 +201,7 @@ class OfPlanningIntervention(models.Model):
     verif_dispo = fields.Boolean(string=u'Vérif', help=u"Vérifier la disponibilité de l'équipe sur ce créneau", default=True)
 #    gb_employee_id = fields.Many2one('hr.employee', compute='lambda *a, **k:{}', search='search_gb_employee_id',
 #                                     string="Intervenant", of_custom_groupby=True),
-    gb_employee_id = fields.Many2one(related='equipe_id.employee_ids', string="Intervenants", readonly=True, of_custom_groupby=True),
+    gb_employee_id = fields.Many2one(related='equipe_id.employee_ids', string="Intervenants", readonly=True, of_custom_groupby=True)
 
 #    _columns = {
 #         'color'                : fields_old.function(_get_color, type='char', help=u"Couleur utilisée pour le planning. Dépend de l'équipe d'intervention et de l'état de l'intervention"),
