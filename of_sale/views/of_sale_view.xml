@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Ajout champ frais de port product.product -->
+        <record id="of_sale_view_order_form" model="ir.ui.view">
+            <field name="name">of.sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <field name="date_order" position="attributes">
+                    <attribute name="widget">date</attribute>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</odoo>
