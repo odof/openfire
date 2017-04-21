@@ -2,6 +2,8 @@
 <odoo>
     <data>
 
+        <!-- Taxe -->
+
         <record id="of_view_tax_form" model="ir.ui.view">
             <field name="name">of.account.tax.form</field>
             <field name="model">account.tax</field>
@@ -26,6 +28,8 @@
             </field>
         </record>
 
+        <!-- Position fiscale -->
+
         <record id="of_view_account_position_form" model="ir.ui.view">
             <field name="name">of.account.fiscal.position.form</field>
             <field name="model">account.fiscal.position</field>
@@ -36,6 +40,20 @@
                 </field>
                 <field name="tax_ids" position="before">
                     <field name="default_tax_ids" widget="many2many_tags"/>
+                </field>
+            </field>
+        </record>
+
+        <!-- Bon de commande -->
+
+        <record id="of_account_tax_view_order_form" model="ir.ui.view">
+            <field name="name">of_account_tax.sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <field name="fiscal_position_id" position="replace"/>
+                <field name="confirmation_date" position="after">
+                    <field name="fiscal_position_id" options="{'no_create': True}"/>
                 </field>
             </field>
         </record>
