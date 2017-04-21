@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 
-from openerp import models, fields, api, _
+from odoo import models, fields, api, _
 
 class resCompany(models.Model):
     _inherit = "res.company"
@@ -65,7 +65,7 @@ class resPartner(models.Model):
     def create(self, vals):
         partner = super(resPartner, self).create(vals)
 
-        # Utilisation de l'id du partenaire comme référece client, si option configurée dans la société
+        # Utilisation de l'id du partenaire comme référence client, si option configurée dans la société
         if partner.company_id.of_client_id_ref:
             if not partner.ref:
                 partner.ref = str(partner.id)
@@ -111,3 +111,9 @@ class resPartner(models.Model):
         if account_ids:
             account_obj.browse(account_ids).unlink()
         return True
+
+class AccountConfigSettings(models.TransientModel):
+    _inherit = 'account.config.settings'
+
+    of_client_id_ref = fields.Boolean(related='company_id.of_client_id_ref', string="Utiliser les comptes de tiers comme références clients *",
+        help=u"Affectation automatique de la partie variable du compte de tiers dans la référence du partenaire nouvellement créé")

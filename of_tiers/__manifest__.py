@@ -2,7 +2,7 @@
 
 {
     'name' : 'OpenFire - Comptes de tiers',
-    'version' : '9.0',
+    'version' : '10.0',
     'summary': 'Utilisation de comptes de tiers pour les clients et fournisseurs',
     'description': """
 OpenFire - Comptes de tiers
@@ -17,7 +17,7 @@ Utilisation de comptes de tiers
     ],
     'demo': [ ],
     'qweb': [ ],
-    'installable': False,
+    'installable': True,
     'application': False,
     'auto_install': False,
 }

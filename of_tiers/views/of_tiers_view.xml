@@ -1,23 +1,19 @@
 <?xml version="1.0"?>
-<openerp>
+<odoo>
     <data>
 
         <!-- Ajouter dans configuration société champ choix si no compte client comme référence client par défaut lors de la création d'un partenaire -->
         <record id="of_tiers_client_ref" model="ir.ui.view">
             <field name="name">of.tiers.client.ref</field>
-            <field name="model">res.company</field>
+            <field name="model">account.config.settings</field>
             <field name="type">form</field>
-            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="inherit_id" ref="account.view_account_config_settings"/>
             <field name="arch" type="xml">
-                <page name="configuration" position="inside">
-                    <group>
-                        <group name="partner_grp" string="Partenaire">
-                            <field name="of_client_id_ref"/>
-                        </group>
-                    </group>
-                </page>
+                <field name="tax_calculation_rounding_method" position="after">
+                    <field name="of_client_id_ref"/>
+                </field>
             </field>
         </record>
 
     </data>
-</openerp>
+</odoo>
