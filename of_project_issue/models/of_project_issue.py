@@ -128,6 +128,7 @@ class ProjectIssue(models.Model):
     partner_note = fields.Text("Note client", related='partner_id.comment', readonly=False)
     invoice_ids = fields.One2many('account.invoice', compute='_get_partner_invoices', string='Factures du client', method=True, readonly=True)
     of_categorie_id = fields.Many2one('of.project.issue.categorie', u'Catégorie', required=False, ondelete='restrict')
+    of_categorie_mere_id = fields.Many2one(related="of_categorie_id.pparent_id", string=u'Catégorie mère', store=True)
     of_canal_id = fields.Many2one('of.project.issue.canal', u'Canal', required=False, ondelete='restrict')
     of_garantie = fields.Boolean('Garantie', default=False)
     of_payant_client = fields.Boolean('Payant client', default=False)
@@ -562,11 +563,12 @@ class ProjectIssue(models.Model):
 
 
 # Catégorie de SAV
-class of_project_issue_categorie(models.Model):
+class OfProjectIssueCategorie(models.Model):
     _name = "of.project.issue.categorie"
 
     name = fields.Char(u'Catégorie', size=32)
     parent_id = fields.Many2one('of.project.issue.categorie', 'Catégorie parente', select=True, ondelete='restrict')
+    pparent_id = fields.Many2one('of.project.issue.categorie', string='Catégorie mère', readonly=True)
     sequence = fields.Integer(u'Séquence', help=u"Ordre d'affichage (plus petit en premier)")
     parent_left = fields.Integer('Left Parent', select=1)
     parent_right = fields.Integer('Right Parent', select=1)
@@ -625,6 +627,26 @@ class of_project_issue_categorie(models.Model):
         else:
             categs = categs[:limit]
         res = categs.name_get()
+        return res
+
+    @api.model
+    def create(self, vals):
+        res = super(OfProjectIssueCategorie, self).create(vals)
+        res.pparent_id = res.parent_id and res.parent_id.pparent_id or res
+        return res
+
+    @api.multi
+    def write(self, vals):
+        res = super(OfProjectIssueCategorie, self).write(vals)
+
+        if 'parent_id' in vals:
+            for categ in self:
+                parent = categ
+                while parent.parent_id:
+                    parent = parent.parent_id
+
+                categs = self.search([('parent_left', '>=', categ.parent_left), ('parent_left', '<', categ.parent_right)])
+                categs.write({'pparent_id': parent.id})
         return res
 
 # Canal SAV
