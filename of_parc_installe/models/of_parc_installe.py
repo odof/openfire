@@ -27,6 +27,7 @@ class of_parc_installe(models.Model):
     country_site_id = fields.Many2one('res.country', u'Pays', related="site_adresse_id.country_id", readonly=True)
     no_piece = fields.Char(u'N° pièce', size=64, required=False)
     project_issue_ids = fields.One2many('project.issue', 'of_produit_installe_id', 'SAV')
+    active = fields.Boolean(string=u'Actif', default=True)
 
     _sql_constraints = [('no_serie_uniq', 'unique(name)', u"Ce numéro de série est déjà utilisé et doit être unique.")]
 
