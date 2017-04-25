@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    "name" : "OpenFire / Openimport",
+    "name" : "OpenFire / OpenImport",
     "author" : "OpenFire",
     "website" : "openfire.fr",
     "category" : "'Extra Tools'",
@@ -8,13 +8,9 @@
 Import OpenFire.
 ======================================
 
-Ce module importe :
-
-- produits
+Import OpenFire
 """,
-    "depends" : [
-        'product',
-    ],
+    "depends" : [ ],
     "demo_xml" : [ ],
     'data': [
         'views/of_import_view.xml',

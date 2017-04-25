@@ -63,7 +63,14 @@ class of_import(models.Model):
         for imp in self:
             sortie_note = ''
             for champ, valeur in self.get_champs_odoo(self.type_import).items():
-                sortie_note += "- " + valeur['description'] + " : " + champ + '\n'
+                sortie_note += "- " + valeur['description'] + " : " + champ
+                if valeur['type'] == 'selection':
+                    sortie_note += u" [ valeurs autorisées : "
+                    for cle in dict(self.env[self.type_import]._fields[champ].selection):
+                        sortie_note += cle + " "
+                    sortie_note += ']'
+                sortie_note += '\n'
+                    
             if sortie_note:
                 sortie_note = u"Champs disponibles pour l'import (en-tête de colonne) :\n" + sortie_note
             imp.sortie_note = sortie_note
@@ -138,6 +145,14 @@ class of_import(models.Model):
             # Test si est un champ de l'objet (sinon message d'information que le champ est ignoré à l'import)
             if champ not in champs_odoo:
                 sortie_avertissement += u"Info : colonne \"" + champ.decode('utf8', 'ignore') + u"\" dans le fichier d'import non reconnue. Ignorée lors de l'import.\n"
+            else:
+                # Ajout de la source (id, id externe, nom)
+                if champ.replace(' ', '').lower().endswith('/id'):
+                    champs_odoo[champ]['source'] = 'id'
+                elif champ.replace(' ', '').lower().endswith('/idexterne'):
+                    champs_odoo[champ]['source'] = 'id externe'
+                else:
+                    champs_odoo[champ]['source'] = ''
 
         for champ in doublons:
             # On affiche un message d'avertissement si le champ existe en plusieurs exemplaires et si c'est un champ connu à importer
@@ -175,11 +190,13 @@ class of_import(models.Model):
             for cle in ligne: # Parcours de tous les champs de la ligne
                 if cle in champs_odoo: # On ne récupère que les champs du fichier d'import qui sont des champs de l'objet (on ignore les autres)
                     ligne[cle] = ligne[cle].strip() # Suppression des espaces avant et après
+
                     # Test si le champs est requis
                     if champs_odoo[cle]['requis'] and ligne[cle] == "":
                         sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") vide alors que requis. " + nom_objet.capitalize() + u" non importé.\n"
                         erreur = 1
-                    # Test si est un float correct
+
+                    # Si est un float
                     if champs_odoo[cle]['type'] == 'float':
                         ligne[cle] = ligne[cle].replace(',', '.')
                         try:
@@ -187,7 +204,25 @@ class of_import(models.Model):
                         except ValueError:
                             sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") n'est pas un nombre. " + nom_objet.capitalize() + u" non importé.\n"
                             erreur = 1
-                    valeurs[cle] = ligne[cle]
+
+                    if champs_odoo[cle]['type'] == 'selection':
+                        # C'est un champ sélection. On vérifie que les données sont autorisées
+                        if ligne[cle] not in dict(self.env[model]._fields[cle].selection):
+                            sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[cle]) + u"\" non autorisée. " + nom_objet.capitalize() + u" non importé.\n"
+                            erreur = 1
+
+                    if champs_odoo[cle]['type'] in ('many2one'):
+                        res_ids = self.env[champs_odoo[cle]['relation']].with_context(active_test=False).search([(champs_odoo[cle]['relation_champ'] or 'name', '=', ligne[cle])])
+                        if len(res_ids) == 1:
+                            valeurs[cle] = res_ids.id
+                        elif len(res_ids) > 1:
+                            sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") a plusieurs correspondances. " + nom_objet.capitalize() + u" non importé.\n"
+                            erreur = 1
+                        else:
+                            sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") n'a pas de correspondance. " + nom_objet.capitalize() + u" non importé.\n"
+                            erreur = 1
+                    else:
+                        valeurs[cle] = ligne[cle]
 
             if erreur: # On n'enregistre pas si erreur.
                 nb_echoue = nb_echoue + 1
