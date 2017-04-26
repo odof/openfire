@@ -211,15 +211,24 @@ class of_import(models.Model):
                             sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[cle]) + u"\" non autorisée. " + nom_objet.capitalize() + u" non importé.\n"
                             erreur = 1
 
-                    if champs_odoo[cle]['type'] in ('many2one'):
+                    if champs_odoo[cle]['type'] == 'boolean':
+                        if ligne[cle].upper() in ('1', "TRUE", "VRAI"):
+                            ligne[cle] = True
+                        elif ligne[cle].upper() in ('0', "FALSE", "FAUX"):
+                            ligne[cle] = False
+                        else:
+                            sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[cle]) + u"\" non autorisée (admis 0, 1, True, False, vrai, faux). " + nom_objet.capitalize() + u" non importé.\n"
+                            erreur = 1
+
+                    if champs_odoo[cle]['type'] in ('many2one', 'one2many'):
                         res_ids = self.env[champs_odoo[cle]['relation']].with_context(active_test=False).search([(champs_odoo[cle]['relation_champ'] or 'name', '=', ligne[cle])])
                         if len(res_ids) == 1:
                             valeurs[cle] = res_ids.id
                         elif len(res_ids) > 1:
-                            sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") a plusieurs correspondances. " + nom_objet.capitalize() + u" non importé.\n"
+                            sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[cle]) + u"\" a plusieurs correspondances. " + nom_objet.capitalize() + u" non importé.\n"
                             erreur = 1
                         else:
-                            sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") n'a pas de correspondance. " + nom_objet.capitalize() + u" non importé.\n"
+                            sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[cle]) + u"\" n'a pas de correspondance. " + nom_objet.capitalize() + u" non importé.\n"
                             erreur = 1
                     else:
                         valeurs[cle] = ligne[cle]
