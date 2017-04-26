@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<odoo noupdate="0">
+<odoo noupdate="1">
 
     <record id="map_default_center_lat" model="ir.config_parameter">
         <field name="key">Map_Default_Center_Latitude</field>

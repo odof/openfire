@@ -7,36 +7,63 @@
             <field name="arch" type="xml">
                 <xpath expr="//notebook[last()]" position="inside">
                     <page string="Geolocation" name="geo_location">
+                        <field name="geocoding" invisible="1"/>
                         <!-- something to do here -->
                         <group colspan="2" col="2">
-                            <separator string="Geolocation" colspan="2"/>
-                            <!-- partner localization button -->
-                            <button
-                                string="Geolocate Partners"
-                                name="geo_code_partners"
-                                colspan="2"
-                                icon="fa-bullseye"
-                                type="object"/>
-                            <div>
-                                <span class="oe_inline"> ( Last record :  </span>
-                                <field name="date_last_partner_localization" nolabel="1" class="oe_inline"/>
-                                <span>) </span>
-                            </div>
+                            <separator string="Company Geolocation" colspan="2"/>
                             <!-- company localization button -->
                             <button
-                                string="Geolocate"
+                                string="Geocode Address"
                                 name="geo_code"
                                 colspan="2"
                                 icon="fa-bullseye"
                                 type="object"/>
                             <div>
-                                <span class="oe_inline"> ( Last record   </span>
+                                <span class="oe_inline"> ( Last record :  </span>
                                 <field name="date_last_localization" nolabel="1" class="oe_inline"/>
                                 <span> : Lat : </span>
                                 <field name="geo_lat" nolabel="1" class="oe_inline"/>
                                 <span> ;  Long:  </span>
                                 <field name="geo_lng" nolabel="1" class="oe_inline"/>
                                 <span>) </span>
+                                <div attrs="{'invisible': [('geocoding', '!=', 'failure')]}">
+                                    We couldn't find valid GPS coordinates out of specified address
+                                </div>
+                                <div attrs="{'invisible': [('geocoding', '!=', 'manual')]}">
+                                    This company's GPS coordinates were allocated manually.
+                                </div>
+                            </div>
+                            <separator string="Partners Geolocation" colspan="2"/>
+                            <!-- partner localization button -->
+                            <button name="%(action_of_geocode_partners)d" type='action' string="Geolocate Partners" colspan="2" icon="fa-bullseye"/>
+                            <div>
+                                <span class="oe_inline"> ( Last record :  </span>
+                                <field name="date_last_partner_localization" nolabel="1" class="oe_inline"/>
+                                <span>) </span>
+                                <br/>
+                                <span>Out of a total of </span>
+                                <field name="nb_partners" nolabel="1" class="oe_inline"/>
+                                <span> partners: </span>
+                                <br/>
+                                <div style="padding-left: 8px">
+                                    <field name="nb_geocoded_partners" nolabel="1" class="oe_inline"/>
+                                    <span> whose geocoding was a success on first try (faster algorithm)</span>
+                                    <br/>
+                                    <field name="nb_geocoded_partners_retry" nolabel="1" class="oe_inline"/>
+                                    <span> whose geocoding was a success on another try (greedier algorithm)</span>
+                                    <br/>
+                                    <field name="nb_geocoding_failure" nolabel="1" class="oe_inline"/>
+                                    <span> whose geocoding with our faster algorithm failed</span>
+                                    <br/>
+                                    <field name="nb_geocoding_failure_retry" nolabel="1" class="oe_inline"/>
+                                    <span> whose geocoding failed (even with greedier algorithm) and need to be manually located</span>
+                                    <br/>
+                                    <field name="nb_manually_localized_partners" nolabel="1" class="oe_inline"/>
+                                    <span> have been manually located</span>
+                                    <br/>
+                                    <field name="nb_left_to_geocode" nolabel="1" class="oe_inline"/>
+                                    <span> are yet to be located (through geocoding or manually)</span>
+                                </div>
                             </div>
                         </group>
                     </page>

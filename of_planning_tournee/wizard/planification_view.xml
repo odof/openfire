@@ -68,7 +68,7 @@
             <field name="model">of.tournee.planification.partner</field>
             <field name="type">tree</field>
             <field name="arch" type="xml">
-                <tree string="Clients">
+                <tree string="Clients" create="false">
                     <field name="partner_address_id"/>
                     <field name="phone"/>
                     <field name="tache_id"/>

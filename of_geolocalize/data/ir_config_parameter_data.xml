@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1">
+
+    <record id="nominatim_base_url" model="ir.config_parameter">
+        <field name="key">Nominatim_Base_URL</field>
+        <field name="value">undefined</field>
+    </record>
+
+</odoo>
