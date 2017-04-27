@@ -96,9 +96,6 @@
 
         <!-- AJOUT POUR GEOLOCALISER MANUELLEMENT LES PARTENAIRES POUR QUI LE GEOCODING A RATE, A PARTIR D'UNE SOCIETE -->
 
-        <menuitem name="Partners Geolocation" id="menu_of_geolocalize_geocoding_failure" parent="sales_team.menu_config_address_book" sequence="7"
-                  action="of_geolocalize.action_partner_form_geocoding_failure"/>
-
         <record id="view_partner_tree_geocoding_failure" model="ir.ui.view">
             <field name="name">of.partner.tree.geocoding.failed</field>
             <field name="model">res.partner</field>
@@ -182,4 +179,7 @@
             <field name="view_id" ref="view_partner_tree_geocoding_failure"/>
             <field name="act_window_id" ref="action_partner_form_geocoding_failure"/>
         </record>
+        
+        <menuitem name="Partners Geolocation" id="menu_of_geolocalize_geocoding_failure" parent="sales_team.menu_config_address_book" sequence="7"
+                  action="of_geolocalize.action_partner_form_geocoding_failure"/>
 </odoo>

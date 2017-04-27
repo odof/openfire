@@ -319,16 +319,16 @@ class ResPartner(models.Model):
 
         super(ResPartner,self).write(vals)
 
-        if self.geocoding != 'manual':
-            for key in vals:
-                if key in ('street', 'street2', 'city', 'state_id', 'country_id', 'zip'):
-                    if self.geocoding == 'failure' or self.geocoding == 'failure_retry':
-                        self.reset_geo_values()
-                        self.geo_code_retry()
-                        break
-                    else:
-                        self.reset_geo_values()
-                        self.geo_code()
+        if len(self._ids) == 1:
+            if self.geocoding != 'manual':
+                for key in vals:
+                    if key in ('street', 'street2', 'city', 'state_id', 'country_id', 'zip'):
+                        if self.geocoding == 'failure' or self.geocoding == 'failure_retry':
+                            self.reset_geo_values()
+                            self.geo_code_retry()
+                        else:
+                            self.reset_geo_values()
+                            self.geo_code()
                         break
         return True
 
