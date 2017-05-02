@@ -19,7 +19,7 @@ class of_geocode_partners_popup(models.TransientModel):
     def resolve(self):
         company_ids = self._context['active_ids']
         if not company_ids:
-            return
+            return True
         company = self.env["res.company"].browse(company_ids[0])
         if self.mode == 'not_tried':
             company.geo_code_partners();

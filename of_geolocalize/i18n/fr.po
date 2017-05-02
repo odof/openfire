@@ -337,12 +337,12 @@ msgid "Number of Partners"
 msgstr "Nombre de Partenaires"
 
 #. module: of_geolocalize
-#: model:ir.model.fields,field_description:of_geolocalize.field_res_company_nb_geocoded_partners_retry
+#: model:ir.model.fields,field_description:of_geolocalize.field_res_company_nb_geocoding_success_retry
 msgid "Number of Partners localized using greedier algorithm"
 msgstr "Nombre de Partenaires géolocalisés en utilisant notre algorithme gourmand"
 
 #. module: of_geolocalize
-#: model:ir.model.fields,field_description:of_geolocalize.field_res_company_nb_geocoded_partners
+#: model:ir.model.fields,field_description:of_geolocalize.field_res_company_nb_geocoding_success
 msgid "Number of localized Partners"
 msgstr "Nombre de Partenaires géolocalisés"
 

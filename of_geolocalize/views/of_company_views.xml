@@ -8,6 +8,7 @@
                 <xpath expr="//notebook[last()]" position="inside">
                     <page string="Geolocation" name="geo_location">
                         <field name="geocoding" invisible="1"/>
+                        <field name="nominatim_public" invisible="1"/>
                         <!-- something to do here -->
                         <group colspan="2" col="2">
                             <separator string="Company Geolocation" colspan="2"/>
@@ -17,7 +18,19 @@
                                 name="geo_code"
                                 colspan="2"
                                 icon="fa-bullseye"
-                                type="object"/>
+                                type="object"
+                                attrs="{'invisible': [('nominatim_public','=',True)]}"/>
+                            <button
+                                string="Geocode Address"
+                                name="geo_code"
+                                colspan="2"
+                                icon="fa-bullseye"
+                                type="object"
+                                confirm="WARNING: Nominatim geocoding server base URL is the public one.
+							        To set it to your own geocoding server address, change Nominatim_Base_URL in:
+							         Configuration -> Parameters -> System Parameters .
+							        Do you want to proceed with Nominatim public server?"
+                                attrs="{'invisible': [('nominatim_public','=',False)]}"/>
                             <div>
                                 <span class="oe_inline"> ( Last record :  </span>
                                 <field name="date_last_localization" nolabel="1" class="oe_inline"/>
@@ -35,7 +48,24 @@
                             </div>
                             <separator string="Partners Geolocation" colspan="2"/>
                             <!-- partner localization button -->
-                            <button name="%(action_of_geocode_partners)d" type='action' string="Geolocate Partners" colspan="2" icon="fa-bullseye"/>
+                            <button 
+                            	name="%(action_of_geocode_partners)d" 
+                            	type='action' 
+                            	string="Geolocate Partners" 
+                            	colspan="2" 
+                            	icon="fa-bullseye"
+                            	attrs="{'invisible': [('nominatim_public','=',True)]}"/>
+                            <button 
+                            	name="%(action_of_geocode_partners)d" 
+                            	type='action' 
+                            	string="Geolocate Partners" 
+                            	colspan="2" 
+                            	icon="fa-bullseye"
+                            	confirm="WARNING: Nominatim geocoding server base URL is the public one.
+							        To set it to your own geocoding server address, change Nominatim_Base_URL in:
+							         Configuration -> Parameters -> System Parameters .
+							        Do you want to proceed with Nominatim public server?"
+                            	attrs="{'invisible': [('nominatim_public','=',False)]}"/>
                             <div>
                                 <span class="oe_inline"> ( Last record :  </span>
                                 <field name="date_last_partner_localization" nolabel="1" class="oe_inline"/>
@@ -46,10 +76,10 @@
                                 <span> partners: </span>
                                 <br/>
                                 <div style="padding-left: 8px">
-                                    <field name="nb_geocoded_partners" nolabel="1" class="oe_inline"/>
+                                    <field name="nb_geocoding_success" nolabel="1" class="oe_inline"/>
                                     <span> whose geocoding was a success on first try (faster algorithm)</span>
                                     <br/>
-                                    <field name="nb_geocoded_partners_retry" nolabel="1" class="oe_inline"/>
+                                    <field name="nb_geocoding_success_retry" nolabel="1" class="oe_inline"/>
                                     <span> whose geocoding was a success on another try (greedier algorithm)</span>
                                     <br/>
                                     <field name="nb_geocoding_failure" nolabel="1" class="oe_inline"/>

@@ -15,7 +15,8 @@ class ResCompany(models.Model):
     geo_lng = fields.Float(string='Geo Lng', digits=(16, 5))
     date_last_localization = fields.Date(string='Geolocation Date', readonly=True)
 
-    nominatim_input = fields.Char(string="url sent to Nominatim for geocoding", readonly=True, compute='_compute_nominatim_url', store=False)
+    nominatim_input = fields.Char(string="url sent to Nominatim for geocoding", readonly=True)
+    nominatim_public = fields.Boolean(string="Geocoding server address set to public instance of Nominatim", readonly=True, compute="_check_nominatim_URL", store=False)
     geocoding = fields.Selection([
         ('not_tried',"geocoding wasn't attempted for this partner"),
         ('success',"geocoding was a success for this partner"),
@@ -25,38 +26,43 @@ class ResCompany(models.Model):
 
     date_last_partner_localization = fields.Date(string='Partner Geolocation Date', readonly=True)
     nb_partners = fields.Integer(string='Number of Partners', compute='_compute_partners_localization_stats', store=False, readonly=True)
-    nb_geocoded_partners = fields.Integer(string='Number of localized Partners', compute='_compute_partners_localization_stats', store=False, readonly=True)
-    nb_geocoded_partners_retry = fields.Integer(string='Number of Partners localized using greedier algorithm', compute='_compute_partners_localization_stats', store=False, readonly=True)
+    nb_geocoding_success = fields.Integer(string='Number of localized Partners', compute='_compute_partners_localization_stats', store=False, readonly=True)
+    nb_geocoding_success_retry = fields.Integer(string='Number of Partners localized using greedier algorithm', compute='_compute_partners_localization_stats', store=False, readonly=True)
     nb_manually_localized_partners = fields.Integer(string='Number of manually localized Partners', compute='_compute_partners_localization_stats', store=False, readonly=True)
     nb_left_to_geocode = fields.Integer(string='Number of partners yet to be localized', compute='_compute_partners_localization_stats', store=False, readonly=True)
     nb_geocoding_failure = fields.Integer(string='Number of partners we tried and failed to geocode', compute='_compute_partners_localization_stats', store=False, readonly=True)
     nb_geocoding_failure_retry = fields.Integer(string='Number of partners we tried and failed to geocode using greedier algorithm', compute='_compute_partners_localization_stats', store=False, readonly=True)
 
     @api.multi
+    def _check_nominatim_URL(self):
+        for company in self:
+            company.nominatim_public = self.env['ir.config_parameter'].get_param('Nominatim_Base_URL') == 'https://nominatim.openstreetmap.org/search'
+
+    @api.multi
     def _compute_nominatim_url(self):
         base_url = self.env['ir.config_parameter'].get_param('Nominatim_Base_URL')
-        if base_url == 'undefined':
-            raise UserError(_('The geocoding server base url is currently undefined, please go to system parameters to define it, or contact your administrator.'))
-        else:
-            for company in self:
-                params = company.get_addr_params()
+        for company in self:
+            params = company.get_addr_params()
 
-                query = "?"
-                country = ""
+            query = "?"
+            country = ""
 
-                for p in params:
-                    if p[0] == "country":
-                        country = p[1]
-                    if p[0] == "postalcode" and country.upper() == "FRANCE":
-                        # for french postal codes, taking only the 2 first digits seems to give us better results for some reason
-                        query += urllib.quote_plus(p[0].encode('utf8')) + "=" + urllib.quote_plus(p[1][:2].encode('utf8')) + "&"
-                    else:
-                        query += p[0].encode('utf8') + "=" + urllib.quote_plus((p[1].strip()).encode('utf8')) + "&"
+            for p in params:
+                if p[0] == "country":
+                    country = p[1]
+                if p[0] == "postalcode" and country.upper() == "FRANCE":
+                    # for french postal codes, taking only the 2 first digits seems to give us better results for some reason
+                    query += urllib.quote_plus(p[0].encode('utf8')) + "=" + urllib.quote_plus(p[1][:2].encode('utf8')) + "&"
+                else:
+                    query += p[0].encode('utf8') + "=" + urllib.quote_plus((p[1].strip()).encode('utf8')) + "&"
 
-                company.nominatim_input = base_url + query + 'format=json'
+            company.nominatim_input = base_url + query + 'format=json'
 
     @api.multi
     def get_addr_params(self):
+        """
+        returns a list of tuples containing parameters in order to compute nominatim URL input
+        """
         self.ensure_one()
         result = []
         if (self.street or self.street2):
@@ -117,8 +123,8 @@ class ResCompany(models.Model):
     def _compute_partners_localization_stats(self):
         """
         method to compute some stats to display on a company view.
-        nb_geocoded_partners: number of partner who were geocoded successfully
-        nb_geocoded_partners_retry: number of partner who were geocoded successfully, using greedier algorithm
+        nb_geocoding_success: number of partner who were geocoded successfully
+        nb_geocoding_success_retry: number of partner who were geocoded successfully, using greedier algorithm
         nb_geocoding_failure: number of partner we tried and failed geocoding, and who wern't manually localized
         nb_geocoding_failure_retry: number of partner we tried and failed geocoding with greedier algorithm, and who wern't manually localized
         nb_manually_localized_partners: number of partners who were manually localized
@@ -127,36 +133,61 @@ class ResCompany(models.Model):
         partner_obj = self.env["res.partner"] # on récupère tous les partners
         for company in self:
             partners = partner_obj.search([('company_id', 'child_of', company.id)]) #critère de selection : cette company est associée
-            nb_geocoded_partners = partner_obj.search([('company_id', 'child_of', company.id),('id', 'in', partners._ids),('geocoding', '=', 'success')], count=True)
-            nb_geocoded_partners_retry = partner_obj.search([('company_id', 'child_of', company.id),('id', 'in', partners._ids),('geocoding', '=', 'success_retry')], count=True)
+            nb_geocoding_success = partner_obj.search([('company_id', 'child_of', company.id),('id', 'in', partners._ids),('geocoding', '=', 'success')], count=True)
+            nb_geocoding_success_retry = partner_obj.search([('company_id', 'child_of', company.id),('id', 'in', partners._ids),('geocoding', '=', 'success_retry')], count=True)
             nb_manually_localized_partners = partner_obj.search([('company_id', 'child_of', company.id),('id', 'in', partners._ids),('geocoding', '=', 'manual')], count=True)
             nb_geocoding_failure = partner_obj.search([('company_id', 'child_of', company.id),('id', 'in', partners._ids),('geocoding','=','failure')], count=True)
             nb_geocoding_failure_retry = partner_obj.search([('company_id', 'child_of', company.id),('id', 'in', partners._ids),('geocoding','=','failure_retry')], count=True)
 
             company.nb_partners = len(partners)
-            company.nb_geocoded_partners = nb_geocoded_partners
-            company.nb_geocoded_partners_retry = nb_geocoded_partners_retry
+            company.nb_geocoding_success = nb_geocoding_success
+            company.nb_geocoding_success_retry = nb_geocoding_success_retry
             company.nb_manually_localized_partners =  nb_manually_localized_partners
             company.nb_geocoding_failure = nb_geocoding_failure
             company.nb_geocoding_failure_retry = nb_geocoding_failure_retry
-            company.nb_left_to_geocode = len(partners) - nb_geocoded_partners - nb_geocoded_partners_retry - nb_manually_localized_partners - nb_geocoding_failure - nb_geocoding_failure_retry
+            company.nb_left_to_geocode = len(partners) - nb_geocoding_success - nb_geocoding_success_retry - nb_manually_localized_partners - nb_geocoding_failure - nb_geocoding_failure_retry
 
     @api.multi
     def geo_code(self):
         """
-        Method to geocode a partner's address using Nominatim.
-        Will not try to geocode if geocoding has already been tried (success or failure), unless 'rewrite' parameter is True.
+        Method to geocode a company's address using Nominatim.
         Will not try to geocode if GPS coordinates were manually set.
         """
         for company in self:
-            if (not company.geocoding == 'manual'):
+            if company.geocoding not in ('success','manual') and (company.geo_lat != 0 or company.geo_lng != 0):
+                """
+                if geocoding not in ('success','manual') and the company already has GPS coordinates
+                    -> they were set outside of this module (before installation of the module for example)
+                    therefore we try geocoding the address and set geocoding to 'manual' if geocoding fails
+                """
+                company._compute_nominatim_url()
+                try:
+                    result = json.load(urllib.urlopen(company.nominatim_input))
+                except Exception as e:
+                    raise UserError(_('Cannot contact geolocation servers. Please make sure that your Internet connection is up and running. (error: %s).') % e)
+
+                if result == []:
+                    company.write({
+                        'date_last_localization': fields.Date.context_today(company),
+                        'geocoding': 'manual',
+                        'nominatim_response': "[]"
+                    })
+                else:
+                    company.write({
+                        'geocoding': 'success',
+                        'geo_lat': result[0]['lat'],
+                        'geo_lng': result[0]['lon'],
+                        'date_last_localization': fields.Date.context_today(company),
+                        'nominatim_response': json.dumps(result, indent=3, sort_keys=True, ensure_ascii = False)
+                    })
+            elif (not company.geocoding == 'manual'):
+                company._compute_nominatim_url()
                 try:
                     result = json.load(urllib.urlopen(company.nominatim_input))
                 except Exception as e:
                     raise UserError(_('Cannot contact geolocation servers. Please make sure that your Internet connection is up and running (%s).') % e)
 
                 if result == []:
-                    #print 'result is None'
                     company.write({
                         'geo_lat': 0,
                         'geo_lng': 0,
@@ -193,7 +224,7 @@ class ResCompany(models.Model):
     @api.model
     def create(self, vals):
         company = super(ResCompany,self).create(vals)
-        if ('street' or 'street2') in vals and 'zip' in vals:
+        if (company.street or company.street2) and company.zip and company.city: 
             company.geo_code()
         return company
 
@@ -201,10 +232,20 @@ class ResCompany(models.Model):
     @api.multi
     def write(self, vals):
         super(ResCompany,self).write(vals)
-        if self.geocoding != 'manual':
-            for key in vals:
-                if key in ('street', 'street2', 'city', 'state_id', 'country_id', 'zip'):
-                    self.geo_code()
-                    break
+        if len(self._ids) == 1:
+            if self.geocoding != 'manual':
+                for key in vals:
+                    if key in ('street', 'street2', 'city', 'state_id', 'country_id', 'zip'):
+                        self.reset_geo_values()
+                        self.geo_code()
+                        break
         return True
+    
+    @api.multi
+    def reset_geo_values(self):
+        self.write({
+            'geo_lat': 0,
+            'geo_lng': 0,
+            'geocoding': 'not_tried',
+            })
 

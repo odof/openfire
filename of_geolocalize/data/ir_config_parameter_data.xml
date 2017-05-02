@@ -3,7 +3,7 @@
 
     <record id="nominatim_base_url" model="ir.config_parameter">
         <field name="key">Nominatim_Base_URL</field>
-        <field name="value">undefined</field>
+        <field name="value">https://nominatim.openstreetmap.org/search</field>
     </record>
 
 </odoo>
