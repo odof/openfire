@@ -220,7 +220,7 @@ class of_import(models.Model):
                             sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[cle]) + u"\" non autorisée (admis 0, 1, True, False, vrai, faux). " + nom_objet.capitalize() + u" non importé.\n"
                             erreur = 1
 
-                    if champs_odoo[cle]['type'] in ('many2one', 'one2many'):
+                    if champs_odoo[cle]['type'] == 'many2one':
                         res_ids = self.env[champs_odoo[cle]['relation']].with_context(active_test=False).search([(champs_odoo[cle]['relation_champ'] or 'name', '=', ligne[cle])])
                         if len(res_ids) == 1:
                             valeurs[cle] = res_ids.id
@@ -232,6 +232,39 @@ class of_import(models.Model):
                             erreur = 1
                     else:
                         valeurs[cle] = ligne[cle]
+
+                    if champs_odoo[cle]['type'] == 'one2many':
+                        if model == 'product.template' and cle == 'seller_ids':
+                            res_ids = self.env['res.partner'].search(['&',('name', '=', ligne[cle]),('supplier', '=', True)])
+                            if len(res_ids) == 1:
+                                valeurs[cle] = [(0, 0, {'name': res_ids.id})]
+                            elif len(res_ids) > 1:
+                                sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[cle]).strip() + u"\" a plusieurs correspondances. " + nom_objet.capitalize() + u" non importé.\n"
+                                erreur = 1
+                            else:
+                                sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[cle]).strip() + u"\" n'a pas de correspondance. " + nom_objet.capitalize() + u" non importé.\n"
+                                erreur = 1
+
+                    if champs_odoo[cle]['type'] == 'many2many':
+                        # C'est un many2many
+                        # Ça équivaut à des étiquettes. On peut en importer plusieurs en les séparant par des virgules.
+                        # Ex : étiquette1, étiquette2, étiquette3 
+                        tag_ids = []
+                        if ligne[cle]: # S'il y a des données dans le champ d'import
+                            ligne[cle] = ligne[cle].split(',') # On sépare les étiquettes quand il y a une virgule
+                            for tag in ligne[cle]: # On parcourt les étiquettes à importer
+                                # On regarde si elle existe 
+                                res_ids = self.env[champs_odoo[cle]['relation']].with_context(active_test=False).search([(champs_odoo[cle]['relation_champ'] or 'name', '=', tag.strip())])
+                                if len(res_ids) == 1:
+                                    tag_ids.append(res_ids.id)
+                                elif len(res_ids) > 1:
+                                    sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(tag).strip() + u"\" a plusieurs correspondances. " + nom_objet.capitalize() + u" non importé.\n"
+                                    erreur = 1
+                                else:
+                                    sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(tag).strip() + u"\" n'a pas de correspondance. " + nom_objet.capitalize() + u" non importé.\n"
+                                    erreur = 1
+                        if not erreur:
+                            valeurs[cle] = [(6, 0, tag_ids)]
 
             if erreur: # On n'enregistre pas si erreur.
                 nb_echoue = nb_echoue + 1
