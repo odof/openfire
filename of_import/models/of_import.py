@@ -237,7 +237,7 @@ class of_import(models.Model):
                         if model == 'product.template' and cle == 'seller_ids':
                             res_ids = self.env['res.partner'].search(['&',('name', '=', ligne[cle]),('supplier', '=', True)])
                             if len(res_ids) == 1:
-                                valeurs[cle] = [(0, 0, {'name': res_ids.id})]
+                                valeurs[cle] = [(5, ), (0, 0, {'name': res_ids.id})]
                             elif len(res_ids) > 1:
                                 sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[cle]).strip() + u"\" a plusieurs correspondances. " + nom_objet.capitalize() + u" non importé.\n"
                                 erreur = 1
@@ -253,7 +253,7 @@ class of_import(models.Model):
                         if ligne[cle]: # S'il y a des données dans le champ d'import
                             ligne[cle] = ligne[cle].split(',') # On sépare les étiquettes quand il y a une virgule
                             for tag in ligne[cle]: # On parcourt les étiquettes à importer
-                                # On regarde si elle existe 
+                                # On regarde si elle existe.
                                 res_ids = self.env[champs_odoo[cle]['relation']].with_context(active_test=False).search([(champs_odoo[cle]['relation_champ'] or 'name', '=', tag.strip())])
                                 if len(res_ids) == 1:
                                     tag_ids.append(res_ids.id)
