@@ -33,6 +33,9 @@ class ResPartner(models.Model):
     @api.multi
     def _compute_nominatim_url(self):
         base_url = self.env['ir.config_parameter'].get_param('Nominatim_Base_URL')
+        #TODO: re-refléchir ce fonctionnement
+        if not base_url:
+            base_url = 'https://nominatim.openstreetmap.org/search'
         for partner in self:
             params = partner.get_addr_params()
 
@@ -333,8 +336,9 @@ class ResPartner(models.Model):
             #pass
         
         partner = super(ResPartner,self).create(vals)
-        if (partner.street or partner.street2) and partner.zip and partner.city: 
-            partner.geo_code()
+        if partner.env['ir.config_parameter'].get_param('Deactivate_Geocoding_On_Create') == "0":
+            if (partner.street or partner.street2) and partner.zip and partner.city: 
+                partner.geo_code()
 
         return partner
 

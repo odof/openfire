@@ -5,5 +5,10 @@
         <field name="key">Nominatim_Base_URL</field>
         <field name="value">https://nominatim.openstreetmap.org/search</field>
     </record>
+    
+    <record id="deactivate_geocoding_on_create" model="ir.config_parameter">
+    	<field name="key">Deactivate_Geocoding_On_Create</field>
+    	<field name="value">0</field>
+    </record>
 
 </odoo>

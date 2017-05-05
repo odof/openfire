@@ -20,7 +20,7 @@ Said GPS coordinates can be obtained through geocoding of addresses using Nomina
 ## Usage ##
 
 After installation of the module, first thing we need to do is to set the Nominatim server base URL.  
-To do so, go to Configuration -> Parameters -> system parameters and change the value of Nominatim_Base_URL  
+To do so, go to Configuration -> Parameters -> System Parameters and change the value of Nominatim_Base_URL  
 	the URL should look something like <your geocoding server address>/nominatim/search  
 
 Now we can start geocoding !  
@@ -31,10 +31,13 @@ When its finished, there will most likely be partners for whom geocoding failed.
 Click on 'Geolocate Partners', choose 'Try to geocode all partners not yet localized' and validate.  
 The process takes an even longer time per partner.  
 If there are still partners for whom geocoding failed on second attempt, this means the geocoding server was not able to find the address in the database.  
-Click on 'Geolocate Partners', choose 'Fetch partners who miss golocation' and validate.  
+Click on 'Geolocate Partners', choose 'Fetch partners who miss geolocation' and validate.  
 We get a list view with partners GPS coordinates and addresses.
 From there we can either modify the address (that will trigger a new attempt at geocoding the address) or set the coordinates ourselves.  
 
-This lis view is also accessible through Sales -> Configuration -> Contacts -> Partners Geolocation
+This list view is also accessible through Sales -> Configuration -> Contacts -> Partners Geolocation
 
+if you want to deactivate geocoding on creation of a partner (in case of import for example):
+go to configuration -> Parameters -> System Parameters and change the value of Deactivate_Geocoding_On_Create
+Any value other than "0" will deactivate geocoding on creation of a partner
 
