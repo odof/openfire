@@ -8,7 +8,7 @@ class of_import(models.Model):
     _name = 'of.import'
 
     name = fields.Char('Nom', size=64, required=True)
-    type_import = fields.Selection([('product.template', 'Article')], string="Type d'import", required=True)
+    type_import = fields.Selection([('product.template', 'Article'), ('res.partner', 'Partenaire')], string="Type d'import", required=True)
     date = fields.Datetime('Date', required=True, default=lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'), help=u"Date qui sera affectée aux imports comme date de valeur.")
     date_debut_import = fields.Datetime('Début', readonly=True)
     date_fin_import = fields.Datetime('Fin', readonly=True)
@@ -63,6 +63,8 @@ class of_import(models.Model):
         for imp in self:
             sortie_note = ''
             for champ, valeur in self.get_champs_odoo(self.type_import).items():
+                if champ in ('tz', 'lang'):
+                    continue
                 sortie_note += "- " + valeur['description'] + " : " + champ
                 if valeur['type'] == 'selection':
                     sortie_note += u" [ valeurs autorisées : "
@@ -104,6 +106,12 @@ class of_import(models.Model):
             nom_objet = 'article'              # Libellé pour affichage dans message information/erreur
             champ_primaire = 'default_code'    # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
             champ_reference = 'default_code'   # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
+        elif model == 'res.partner':
+            nom_objet = 'partenaire'              # Libellé pour affichage dans message information/erreur
+            champ_primaire = 'ref'    # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
+            champ_reference = 'ref'   # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
+            res_model, data_account_type_receivable_id = self.env['ir.model.data'].get_object_reference('account','data_account_type_receivable')
+            res_model, data_account_type_payable_id = self.env['ir.model.data'].get_object_reference('account','data_account_type_payable')
 
         champs_odoo = self.get_champs_odoo(model) # On récupère la liste des champs de l'objet (depuis ir.model.fields)
         date_debut = time.strftime('%Y-%m-%d %H:%M:%S')
@@ -221,15 +229,29 @@ class of_import(models.Model):
                             erreur = 1
 
                     if champs_odoo[cle]['type'] == 'many2one':
-                        res_ids = self.env[champs_odoo[cle]['relation']].with_context(active_test=False).search([(champs_odoo[cle]['relation_champ'] or 'name', '=', ligne[cle])])
+                        if model == 'res.partner' and cle == 'property_account_receivable_id':
+                            res_ids = self.env[champs_odoo[cle]['relation']].with_context(active_test=False).search(['&',('code', '=', ligne[cle]), ('internal_type', '=', 'receivable')])
+                        elif model == 'res.partner' and cle == 'property_account_payable_id':
+                            res_ids = self.env[champs_odoo[cle]['relation']].with_context(active_test=False).search(['&',('code', '=', ligne[cle]), ('internal_type', '=', 'payable')])
+                        else:
+                            res_ids = self.env[champs_odoo[cle]['relation']].with_context(active_test=False).search([(champs_odoo[cle]['relation_champ'] or 'name', '=', ligne[cle])])
+
                         if len(res_ids) == 1:
                             valeurs[cle] = res_ids.id
                         elif len(res_ids) > 1:
                             sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[cle]) + u"\" a plusieurs correspondances. " + nom_objet.capitalize() + u" non importé.\n"
                             erreur = 1
                         else:
-                            sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[cle]) + u"\" n'a pas de correspondance. " + nom_objet.capitalize() + u" non importé.\n"
-                            erreur = 1
+                            # si import de partenaires et champ compte comptable (client et fournisseur), on le créer
+                            if model == 'res.partner' and cle == 'property_account_receivable_id' and 'name' in ligne:
+                                if not simuler:
+                                    valeurs[cle] = self.env[champs_odoo[cle]['relation']].create({'name': ligne['name'], 'code': ligne[cle], 'reconcile': True, 'user_type_id': data_account_type_receivable_id})
+                            elif model == 'res.partner' and cle == 'property_account_payable_id' and 'name' in ligne:
+                                if not simuler:
+                                    valeurs[cle] = self.env[champs_odoo[cle]['relation']].create({'name': ligne['name'], 'code': ligne[cle], 'reconcile': True, 'user_type_id': data_account_type_payable_id})
+                            else:
+                                sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[cle]) + u"\" n'a pas de correspondance. " + nom_objet.capitalize() + u" non importé.\n"
+                                erreur = 1
                     else:
                         valeurs[cle] = ligne[cle]
 
@@ -281,7 +303,7 @@ class of_import(models.Model):
                 doublons[ligne[champ_primaire]] = [1, str(i)]
 
             # On regarde si l'enregistrement existe déjà dans la base
-            res_objet_ids = model_obj.search([(champ_primaire,'ilike', ligne[champ_primaire]),'|',('active', '=', True),('active', '=', False)])
+            res_objet_ids = model_obj.search([(champ_primaire,'=', ligne[champ_primaire]),'|',('active', '=', True),('active', '=', False)])
 
             if not res_objet_ids:
                 # L'enregistrement n'existe pas dans la base, on l'importe (création)
