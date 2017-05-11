@@ -16,6 +16,7 @@ class of_import(models.Model):
     user_id = fields.Many2one('res.users', 'Utilisateur', readonly=True, default=lambda self: self._uid)
     file = fields.Binary('Fichier', required=True)
     file_name = fields.Char('Nom du fichier')
+    separateur = fields.Char(u'Séparateur champs', help=u"Caractère séparateur des champs dans le fichier d'import.\nSi non renseigné, le système essaye de le déterminer lui même.\nMettre \\t pour tabulation.")
     state = fields.Selection([('brouillon', 'Brouillon'), ('importe', 'Importé'), ('annule', 'Annulé')], 'État', default='brouillon', readonly=True)
     nb_total = fields.Integer('Nombre total', readonly=True)
     nb_ajout = fields.Integer(u'Ajoutés', readonly=True)
@@ -134,6 +135,17 @@ class of_import(models.Model):
         dialect = csv.Sniffer().sniff(fichier) # Deviner automatiquement les paramètres : caractère séparateur, type de saut de ligne, ...
         fichier = StringIO(fichier)
  
+        # On prend le séparateur indiqué dans le formulaire si est renseigné.
+        # Sinon on prend celui deviné par la bibliothèque csv, et si vierge, on prend le ; par défaut.
+
+        if self.separateur and self.separateur.strip(' '):
+            dialect.delimiter = str(self.separateur.strip(' ').replace('\\t', '\t'))
+        else:
+            if dialect.delimiter and dialect.delimiter.strip(' '):
+                self.separateur = dialect.delimiter.replace('\t', '\\t')
+            else:
+                self.separateur = dialect.delimiter = ';'
+
         # On récupère la 1ère ligne du fichier (liste des champs) pour vérifier si des champs existent en plusieurs exemplaires
         ligne = fichier.readline().strip().split(dialect.delimiter) # Liste des champs de la 1ère ligne du fichier d'import
 
@@ -145,7 +157,7 @@ class of_import(models.Model):
         # Vérification si champs dans fichier d'import en plusieurs exemplaires
         doublons = {}
         for champ in ligne:
-            champ = champ.strip(dialect.quotechar)
+            champ = champ.strip(dialect.quotechar) # On enlève les séparateurs de texte (souvent guillemet ou apostrophe) aux extrimités de la chaine.
             if champ in doublons:
                 doublons[champ] = doublons[champ] + 1
             else:
@@ -178,7 +190,7 @@ class of_import(models.Model):
             prefixe = self.prefixe + '_'
 
         fichier.seek(0, 0) # On remet le pointeur au début du fichier
-        fichier = csv.DictReader(fichier, dialect = dialect) # Renvoit une liste de dictionnaires avec le nom du champ comme clé
+        fichier = csv.DictReader(fichier, dialect = dialect) # Renvoi une liste de dictionnaires avec le nom du champ comme clé
 
         doublons = {} # Variable pour test si enregistrement en plusieurs exemplaires dans fichier d'import
         i = 1 # No de ligne
@@ -213,13 +225,13 @@ class of_import(models.Model):
                             sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") n'est pas un nombre. " + nom_objet.capitalize() + u" non importé.\n"
                             erreur = 1
 
-                    if champs_odoo[cle]['type'] == 'selection':
-                        # C'est un champ sélection. On vérifie que les données sont autorisées
+                    elif champs_odoo[cle]['type'] == 'selection':
+                        # C'est un champ sélection. On vérifie que les données sont autorisées.
                         if ligne[cle] not in dict(self.env[model]._fields[cle].selection):
                             sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[cle]) + u"\" non autorisée. " + nom_objet.capitalize() + u" non importé.\n"
                             erreur = 1
 
-                    if champs_odoo[cle]['type'] == 'boolean':
+                    elif champs_odoo[cle]['type'] == 'boolean':
                         if ligne[cle].upper() in ('1', "TRUE", "VRAI"):
                             ligne[cle] = True
                         elif ligne[cle].upper() in ('0', "FALSE", "FAUX"):
@@ -228,34 +240,33 @@ class of_import(models.Model):
                             sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[cle]) + u"\" non autorisée (admis 0, 1, True, False, vrai, faux). " + nom_objet.capitalize() + u" non importé.\n"
                             erreur = 1
 
-                    if champs_odoo[cle]['type'] == 'many2one':
-                        if model == 'res.partner' and cle == 'property_account_receivable_id':
-                            res_ids = self.env[champs_odoo[cle]['relation']].with_context(active_test=False).search(['&',('code', '=', ligne[cle]), ('internal_type', '=', 'receivable')])
-                        elif model == 'res.partner' and cle == 'property_account_payable_id':
-                            res_ids = self.env[champs_odoo[cle]['relation']].with_context(active_test=False).search(['&',('code', '=', ligne[cle]), ('internal_type', '=', 'payable')])
-                        else:
-                            res_ids = self.env[champs_odoo[cle]['relation']].with_context(active_test=False).search([(champs_odoo[cle]['relation_champ'] or 'name', '=', ligne[cle])])
-
-                        if len(res_ids) == 1:
-                            valeurs[cle] = res_ids.id
-                        elif len(res_ids) > 1:
-                            sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[cle]) + u"\" a plusieurs correspondances. " + nom_objet.capitalize() + u" non importé.\n"
-                            erreur = 1
-                        else:
-                            # si import de partenaires et champ compte comptable (client et fournisseur), on le créer
-                            if model == 'res.partner' and cle == 'property_account_receivable_id' and 'name' in ligne:
-                                if not simuler:
-                                    valeurs[cle] = self.env[champs_odoo[cle]['relation']].create({'name': ligne['name'], 'code': ligne[cle], 'reconcile': True, 'user_type_id': data_account_type_receivable_id})
-                            elif model == 'res.partner' and cle == 'property_account_payable_id' and 'name' in ligne:
-                                if not simuler:
-                                    valeurs[cle] = self.env[champs_odoo[cle]['relation']].create({'name': ligne['name'], 'code': ligne[cle], 'reconcile': True, 'user_type_id': data_account_type_payable_id})
+                    elif champs_odoo[cle]['type'] == 'many2one':
+                        if champs_odoo[cle]['requis'] and ligne[cle] == "": # Si le champ n'est pas obligatoire et qu'il est vide, on l'ignore
+                            if model == 'res.partner' and cle == 'property_account_receivable_id':
+                                res_ids = self.env[champs_odoo[cle]['relation']].with_context(active_test=False).search(['&',('code', '=', ligne[cle]), ('internal_type', '=', 'receivable')])
+                            elif model == 'res.partner' and cle == 'property_account_payable_id':
+                                res_ids = self.env[champs_odoo[cle]['relation']].with_context(active_test=False).search(['&',('code', '=', ligne[cle]), ('internal_type', '=', 'payable')])
                             else:
-                                sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[cle]) + u"\" n'a pas de correspondance. " + nom_objet.capitalize() + u" non importé.\n"
-                                erreur = 1
-                    else:
-                        valeurs[cle] = ligne[cle]
+                                res_ids = self.env[champs_odoo[cle]['relation']].with_context(active_test=False).search([(champs_odoo[cle]['relation_champ'] or 'name', '=', ligne[cle])])
 
-                    if champs_odoo[cle]['type'] == 'one2many':
+                            if len(res_ids) == 1:
+                                valeurs[cle] = res_ids.id
+                            elif len(res_ids) > 1:
+                                sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[cle]) + u"\" a plusieurs correspondances. " + nom_objet.capitalize() + u" non importé.\n"
+                                erreur = 1
+                            else:
+                                # Si import de partenaires et champ compte comptable (client et fournisseur), on le créer.
+                                if model == 'res.partner' and cle == 'property_account_receivable_id' and 'name' in ligne:
+                                    if not simuler:
+                                        valeurs[cle] = self.env[champs_odoo[cle]['relation']].create({'name': ligne['name'], 'code': ligne[cle], 'reconcile': True, 'user_type_id': data_account_type_receivable_id})
+                                elif model == 'res.partner' and cle == 'property_account_payable_id' and 'name' in ligne:
+                                    if not simuler:
+                                        valeurs[cle] = self.env[champs_odoo[cle]['relation']].create({'name': ligne['name'], 'code': ligne[cle], 'reconcile': True, 'user_type_id': data_account_type_payable_id})
+                                else:
+                                    sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[cle]) + u"\" n'a pas de correspondance. " + nom_objet.capitalize() + u" non importé.\n"
+                                    erreur = 1
+
+                    elif champs_odoo[cle]['type'] == 'one2many':
                         if model == 'product.template' and cle == 'seller_ids':
                             res_ids = self.env['res.partner'].search(['&',('name', '=', ligne[cle]),('supplier', '=', True)])
                             if len(res_ids) == 1:
@@ -267,7 +278,7 @@ class of_import(models.Model):
                                 sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[cle]).strip() + u"\" n'a pas de correspondance. " + nom_objet.capitalize() + u" non importé.\n"
                                 erreur = 1
 
-                    if champs_odoo[cle]['type'] == 'many2many':
+                    elif champs_odoo[cle]['type'] == 'many2many':
                         # C'est un many2many
                         # Ça équivaut à des étiquettes. On peut en importer plusieurs en les séparant par des virgules.
                         # Ex : étiquette1, étiquette2, étiquette3 
@@ -287,6 +298,9 @@ class of_import(models.Model):
                                     erreur = 1
                         if not erreur:
                             valeurs[cle] = [(6, 0, tag_ids)]
+
+                    else:
+                        valeurs[cle] = ligne[cle]
 
             if erreur: # On n'enregistre pas si erreur.
                 nb_echoue = nb_echoue + 1
@@ -320,8 +334,8 @@ class of_import(models.Model):
                 try:
                     if not simuler:
                         model_obj.create(valeurs)
+                    nb_ajout = nb_ajout + 1
                     sortie_succes += u"Création " + nom_objet + u" réf. " + (ligne[champ_reference] or ligne[champ_primaire]) + " (ligne " + str(i) + ")\n"
-                    nb_ajout = nb_ajout = + 1
                 except Exception, exp:
                     sortie_erreur += "Ligne " + str(i) + u" : échec création " + nom_objet + u" réf. " + (ligne[champ_reference] or ligne[champ_primaire]) + " - Erreur : " + str(exp) + "\n"
                     nb_echoue = nb_echoue + 1
@@ -331,16 +345,16 @@ class of_import(models.Model):
                 try:
                     if not simuler:
                         res_objet_ids.write(valeurs)
-                    sortie_succes += u"MAJ " + nom_objet +  u" réf. " + (ligne[champ_reference] or ligne[champ_primaire]) + " (ligne " + str(i) + ")\n"
                     nb_maj = nb_maj + 1
+                    sortie_succes += u"MAJ " + nom_objet +  u" réf. " + (ligne[champ_reference] or ligne[champ_primaire]) + " (ligne " + str(i) + ")\n"
                 except Exception, exp:
                     sortie_erreur += "Ligne " + str(i) + u" : échec mise à jour " + nom_objet + u" réf. " + (ligne[champ_reference] or ligne[champ_primaire]) + " - Erreur : " + str(exp) + "\n"
                     nb_echoue = nb_echoue + 1
 
             else:
                 # Il existe plusieurs articles dans la base avec cette référence. On ne sait pas lequel mettre à jour. On passe au suivant en générant une erreur.
-                sortie_erreur += "Ligne " + str(i) + " " + nom_objet + u" réf. " + (ligne[champ_reference] or ligne[champ_primaire]) + u" en plusieurs exemplaire dans la base, on ne sait pas lequel mettre à jour. " + nom_objet.capitalize() + u" non importé.\n"
                 nb_echoue = nb_echoue + 1
+                sortie_erreur += "Ligne " + str(i) + " " + nom_objet + u" réf. " + (ligne[champ_reference] or ligne[champ_primaire]) + u" en plusieurs exemplaire dans la base, on ne sait pas lequel mettre à jour. " + nom_objet.capitalize() + u" non importé.\n"
 
             if nb_total % frequence_commit == 0:
                 self.write({'nb_total': nb_total, 'nb_ajout': nb_ajout, 'nb_maj': nb_maj, 'nb_echoue': nb_echoue, 'sortie_succes': sortie_succes, 'sortie_avertissement': sortie_avertissement, 'sortie_erreur': sortie_erreur})
