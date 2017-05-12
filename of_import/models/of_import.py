@@ -241,7 +241,7 @@ class of_import(models.Model):
                             erreur = 1
 
                     elif champs_odoo[cle]['type'] == 'many2one':
-                        if champs_odoo[cle]['requis'] and ligne[cle] == "": # Si le champ n'est pas obligatoire et qu'il est vide, on l'ignore
+                        if not (champs_odoo[cle]['requis'] and ligne[cle] == ""): # Si le champ n'est pas obligatoire et qu'il est vide, on l'ignore
                             if model == 'res.partner' and cle == 'property_account_receivable_id':
                                 res_ids = self.env[champs_odoo[cle]['relation']].with_context(active_test=False).search(['&',('code', '=', ligne[cle]), ('internal_type', '=', 'receivable')])
                             elif model == 'res.partner' and cle == 'property_account_payable_id':

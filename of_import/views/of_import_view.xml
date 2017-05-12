@@ -87,17 +87,17 @@
         
         <!-- Action vue import -->
         <record id="action_of_import" model="ir.actions.act_window">
-            <field name="name">Import articles</field>
+            <field name="name">OpenImport</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">of.import</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="help">Importer des articles</field>
+            <field name="help">Import OpenFire</field>
         </record>
         
-        <!-- Menu import (Ventes/Configuration/Articles/Import articles) -->
-        <menuitem id="menu_of_import" action="action_of_import" name="Import articles" 
-            parent="sale.prod_config_main" sequence="80"/>
+        <!-- Menu import (Configuration/OpenImport) -->
+        <menuitem id="menu_of_import" action="action_of_import" name="OpenImport" 
+            parent="base.menu_administration" sequence="1"/>
 
     </data>
 </openerp>
