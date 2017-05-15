@@ -19,14 +19,16 @@
             <field name="model">of.import</field>
             <field name="arch" type="xml">
                 <tree>
+                    <field name="type_import"/>
                     <field name="name"/>
                     <field name="date"/>
                     <field name="file_name"/>
-                    <field name="user_id"/>
                     <field name="state"/>
                     <field name="nb_total"/>
                     <field name="nb_ajout"/>
                     <field name="nb_maj"/>
+                    <field name="nb_echoue"/>
+                    <field name="user_id"/>
                 </tree>
             </field>
         </record>

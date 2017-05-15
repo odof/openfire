@@ -177,7 +177,7 @@ class of_import(models.Model):
         for champ in doublons:
             # On affiche un message d'avertissement si le champ existe en plusieurs exemplaires et si c'est un champ connu à importer
             if champ in champs_odoo and doublons[champ] > 1:
-                sortie_erreur += "La colonne \"" + champ + u"\" dans le fichier d'import existe en " + str(doublons[champ]) + u" exemplaires.\n"
+                sortie_erreur += "La colonne \"" + champ.decode('utf8', 'ignore') + u"\" dans le fichier d'import existe en " + str(doublons[champ]) + u" exemplaires.\n"
                 erreur = 1
 
         if erreur: # On arrête si erreur
@@ -209,7 +209,7 @@ class of_import(models.Model):
             valeurs = {}
             for cle in ligne: # Parcours de tous les champs de la ligne
                 if cle in champs_odoo: # On ne récupère que les champs du fichier d'import qui sont des champs de l'objet (on ignore les autres)
-                    ligne[cle] = ligne[cle].strip() # Suppression des espaces avant et après
+                    ligne[cle] = ligne[cle].decode('utf8', 'ignore').strip() # Suppression des espaces avant et après
 
                     # Test si le champs est requis
                     if champs_odoo[cle]['requis'] and ligne[cle] == "":
@@ -241,7 +241,9 @@ class of_import(models.Model):
                             erreur = 1
 
                     elif champs_odoo[cle]['type'] == 'many2one':
-                        if not (champs_odoo[cle]['requis'] and ligne[cle] == ""): # Si le champ n'est pas obligatoire et qu'il est vide, on l'ignore
+                        if ligne[cle] == "" and not champs_odoo[cle]['requis']: # Si le champ n'est pas obligatoire et qu'il est vide, on met une valeur vide.
+                            valeurs[cle] = ""
+                        else:
                             if model == 'res.partner' and cle == 'property_account_receivable_id':
                                 res_ids = self.env[champs_odoo[cle]['relation']].with_context(active_test=False).search(['&',('code', '=', ligne[cle]), ('internal_type', '=', 'receivable')])
                             elif model == 'res.partner' and cle == 'property_account_payable_id':
@@ -263,7 +265,7 @@ class of_import(models.Model):
                                     if not simuler:
                                         valeurs[cle] = self.env[champs_odoo[cle]['relation']].create({'name': ligne['name'], 'code': ligne[cle], 'reconcile': True, 'user_type_id': data_account_type_payable_id})
                                 else:
-                                    sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[cle]) + u"\" n'a pas de correspondance. " + nom_objet.capitalize() + u" non importé.\n"
+                                    sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + ligne[cle] + u"\" n'a pas de correspondance. " + nom_objet.capitalize() + u" non importé.\n"
                                     erreur = 1
 
                     elif champs_odoo[cle]['type'] == 'one2many':
