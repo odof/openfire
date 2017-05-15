@@ -46,6 +46,20 @@ class AccountFiscalPosition(models.Model):
             taxes = self.default_tax_ids
         return super(AccountFiscalPosition, self).map_tax(taxes, product=product, partner=partner)
 
+    @api.model
+    def _get_fpos_by_region(self, country_id=False, state_id=False, zipcode=False, vat_required=False):
+        # Dans le cas où un client n'a pas de pays, on veut quand-même récupérer une position fiscale par défaut
+        if country_id:
+            return self._get_fpos_by_region(self, country_id=country_id, state_id=state_id, zipcode=zipcode, vat_required=zipcode)
+
+        base_domain = [('auto_apply', '=', True), ('vat_required', '=', vat_required)]
+        if self.env.context.get('force_company'):
+            base_domain.append(('company_id', '=', self.env.context.get('force_company')))
+        null_country_dom = [('country_id', '=', False), ('country_group_id', '=', False)]
+
+        fpos = self.search(base_domain + null_country_dom, limit=1)
+        return fpos or False
+
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
