@@ -41,13 +41,17 @@ class OfAccountPaymentBankDeposit(models.Model):
                 for move_line in payment.move_line_ids:
                     if move_line.reconciled:
                         continue
-                    if move_line.debit == 0:
-                        continue
+                    if payment.payment_type == 'inbound':
+                        if move_line.debit == 0:
+                            continue
+                    elif payment.payment_type == 'outbound':
+                        if move_line.credit == 0:
+                            continue
                     if move_line.account_id in (debit_account, payment.writeoff_account_id):
                         continue
 
                     move_lines_dict.setdefault(move_line.account_id, []).append(move_line)
-                    amount_total += move_line.debit
+                    amount_total += move_line.debit - move_line.credit
 
             rec.state = 'posted'
 
@@ -65,20 +69,23 @@ class OfAccountPaymentBankDeposit(models.Model):
                 'move_id'   : move.id,
                 'name'      : _('Deposit %s') % (name,),
                 'account_id': debit_account.id,
-                'debit'     : amount_total,
+                'debit'     : amount_total > 0 and amount_total,
+                'credit'    : amount_total < 0 and -amount_total,
             })
 
             for account, move_lines in move_lines_dict.iteritems():
-                amount = sum(move_line.debit for move_line in move_lines)
-                move_line = move_line_obj.create({
-                    'move_id'   : move.id,
-                    'name'      : _('Deposit %s') % (name,),
-                    'account_id': account.id,
-                    'credit'    : amount,
-                })
+                amount = sum(move_line.debit - move_line.credit for move_line in move_lines)
+                if amount:
+                    move_line = move_line_obj.create({
+                        'move_id'   : move.id,
+                        'name'      : _('Deposit %s') % (name,),
+                        'account_id': account.id,
+                        'credit'    : amount > 0 and amount,
+                        'debit'     : amount < 0 and -amount,
+                    })
 
-                move_line_ids = [ml.id for ml in move_lines] + [move_line.id]
-                move_lines = move_line_obj.browse(move_line_ids)
+                    move_line_ids = [ml.id for ml in move_lines] + [move_line.id]
+                    move_lines = move_line_obj.browse(move_line_ids)
                 move_lines.reconcile()
                 move_lines.compute_full_after_batch_reconcile()
 
