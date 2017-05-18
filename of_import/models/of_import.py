@@ -208,6 +208,9 @@ class of_import(models.Model):
             # On vérifie le contenu des champs
             valeurs = {}
             for cle in ligne: # Parcours de tous les champs de la ligne
+                if model == 'product.template' and cle == 'price':
+                        continue
+
                 if cle in champs_odoo: # On ne récupère que les champs du fichier d'import qui sont des champs de l'objet (on ignore les autres)
                     ligne[cle] = ligne[cle].decode('utf8', 'ignore').strip() # Suppression des espaces avant et après
 
@@ -275,7 +278,10 @@ class of_import(models.Model):
                         if model == 'product.template' and cle == 'seller_ids':
                             res_ids = self.env['res.partner'].search(['&',('name', '=', ligne[cle]),('supplier', '=', True)])
                             if len(res_ids) == 1:
-                                valeurs[cle] = [(5, ), (0, 0, {'name': res_ids.id})]
+                                if 'price' in ligne:
+                                    valeurs[cle] = [(5, ), (0, 0, {'name': res_ids.id, 'price': ligne['price'].replace(',', '.')})]
+                                else:
+                                    valeurs[cle] = [(5, ), (0, 0, {'name': res_ids.id})]
                             elif len(res_ids) > 1:
                                 sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[cle]).strip() + u"\" a plusieurs correspondances. " + nom_objet.capitalize() + u" non importé.\n"
                                 erreur = 1
