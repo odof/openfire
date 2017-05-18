@@ -221,6 +221,7 @@ class of_import(models.Model):
                         ligne[cle] = ligne[cle].replace(',', '.')
                         try:
                             float(ligne[cle])
+                            valeurs[cle] = ligne[cle]
                         except ValueError:
                             sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") n'est pas un nombre. " + nom_objet.capitalize() + u" non importé.\n"
                             erreur = 1
@@ -230,6 +231,8 @@ class of_import(models.Model):
                         if ligne[cle] not in dict(self.env[model]._fields[cle].selection):
                             sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[cle]) + u"\" non autorisée. " + nom_objet.capitalize() + u" non importé.\n"
                             erreur = 1
+                        else:
+                            valeurs[cle] = ligne[cle]
 
                     elif champs_odoo[cle]['type'] == 'boolean':
                         if ligne[cle].upper() in ('1', "TRUE", "VRAI"):
