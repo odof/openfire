@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<template id="of_report_purchaseorder_sans_prix_document" inherit_id="purchase.report_purchaseorder_document">
+    <xpath expr="//div[@class='row mt32 mb32']" position="inside">
+        <div t-if="o.customer_id" class="col-xs-3">
+            <strong>Contremarque:</strong>
+            <p t-field="o.customer_id"/>
+        </div>
+        <div t-if="o.delivery_expected" class="col-xs-3">
+            <strong>Livraison souhaitée:</strong>
+            <p t-field="o.delivery_expected"/>
+        </div>
+    </xpath>
+
+    <!-- Retrait de dates souhaitées si la livraison souhaitée est renseignée -->
+    <xpath expr="//table/thead/tr/th[3]" position="attributes">
+        <attribute name="t-if">not o.delivery_expected</attribute>
+    </xpath>
+    <xpath expr="//table/tbody/tr/td[3]" position="attributes">
+        <attribute name="t-if">not o.delivery_expected</attribute>
+    </xpath>
+
+    <!-- Retrait des prix pour la commande sans prix -->
+    <!-- Interroger docs et non o, car le context de o a été écrasé dans la vue parente -->
+
+    <!-- Titres du tableau -->
+    <xpath expr="//table/thead/tr/th[2]" position="attributes">
+        <attribute name="t-if">not docs._context.get('of_sans_prix')</attribute>
+    </xpath>
+    <xpath expr="//table/thead/tr/th[last()-1]" position="attributes">
+        <attribute name="t-if">not docs._context.get('of_sans_prix')</attribute>
+    </xpath>
+    <xpath expr="//table/thead/tr/th[last()]" position="attributes">
+        <attribute name="t-if">not docs._context.get('of_sans_prix')</attribute>
+    </xpath>
+
+    <!-- Valeurs du tableau -->
+    <xpath expr="//table/tbody/tr/td[2]" position="attributes">
+        <attribute name="t-if">not docs._context.get('of_sans_prix')</attribute>
+    </xpath>
+    <xpath expr="//table/tbody/tr/td[last()-1]" position="attributes">
+        <attribute name="t-if">not docs._context.get('of_sans_prix')</attribute>
+    </xpath>
+    <xpath expr="//table/tbody/tr/td[last()]" position="attributes">
+        <attribute name="t-if">not docs._context.get('of_sans_prix')</attribute>
+    </xpath>
+
+    <!-- Totaux -->
+    <xpath expr="//div[@class='row'][last()]" position="attributes">
+        <attribute name="t-if">not docs._context.get('of_sans_prix')</attribute>
+    </xpath>
+</template>
+
+<template id="of_report_purchaseorder_sans_prix">
+    <t t-call="report.html_container">
+        <t t-set="docs" t-value="docs.with_context(of_sans_prix=True)"/>
+        <t t-foreach="docs" t-as="o">
+            <t t-call="purchase.report_purchaseorder_document" t-lang="o.partner_id.lang"/>
+        </t>
+    </t>
+</template>
+
+</odoo>
