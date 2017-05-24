@@ -8,7 +8,7 @@ class of_import(models.Model):
     _name = 'of.import'
 
     name = fields.Char('Nom', size=64, required=True)
-    type_import = fields.Selection([('product.template', 'Articles'), ('res.partner', 'Partenaires'), ('of.service', 'Services Openfire')], string="Type d'import", required=True)
+    type_import = fields.Selection([('product.template', 'Articles'), ('res.partner', 'Partenaires'), ('res.partner.bank', 'Comptes en banques partenaire'), ('of.service', 'Services Openfire')], string="Type d'import", required=True)
     date = fields.Datetime('Date', required=True, default=lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'), help=u"Date qui sera affectée aux imports comme date de valeur.")
     date_debut_import = fields.Datetime('Début', readonly=True)
     date_fin_import = fields.Datetime('Fin', readonly=True)
@@ -122,7 +122,10 @@ class of_import(models.Model):
             nom_objet = 'service OpenFire'     # Libellé pour affichage dans message information/erreur
             champ_primaire = 'id'              # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
             champ_reference = ''               # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
-
+        elif model == 'res.partner.bank':
+            nom_objet = 'Comptes en banque partenaire'           # Libellé pour affichage dans message information/erreur
+            champ_primaire = 'acc_number'             # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
+            champ_reference = ''            # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
 
         # Initialisation variables
         champs_odoo = self.get_champs_odoo(model) # On récupère la liste des champs de l'objet (depuis ir.model.fields)
@@ -405,7 +408,7 @@ class of_import(models.Model):
                 doublons[ligne[champ_primaire]] = [1, str(i)]
 
             # On regarde si l'enregistrement existe déjà dans la base
-            res_objet_ids = model_obj.search([(champ_primaire,'=', ligne[champ_primaire]),'|',('active', '=', True),('active', '=', False)])
+            res_objet_ids = model_obj.with_context(active_test=False).search([(champ_primaire,'=', ligne[champ_primaire])])
 
             if not res_objet_ids:
                 # L'enregistrement n'existe pas dans la base, on l'importe (création)
