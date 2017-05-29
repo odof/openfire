@@ -37,7 +37,7 @@ class AccountAbstractPayment(models.AbstractModel):
     _inherit = "account.abstract.payment"
 
     of_payment_mode_id = fields.Many2one('of.account.payment.mode', string='Payment mode', required=True)
-    journal_id = fields.Many2one(related='of_payment_mode_id.journal_id', string='Payment Journal')
+    journal_id = fields.Many2one(related='of_payment_mode_id.journal_id', string='Payment Journal', store=True)
 
     @api.model_cr_context
     def _auto_init(self):
