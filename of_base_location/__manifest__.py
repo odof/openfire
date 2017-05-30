@@ -10,6 +10,8 @@
 Ajout des coordonnées GPS à la structure des villes importées
 
 Nécessite l'installation du module base_location_geonames_import du dépôt partner-contact de l'OCA.
+
+Pour faire l'import, aller dans Configuration -> Technique -> Cities/Locations Management -> importer de Geonames
 """,
     'author': "OpenFire",
     'website': 'http://www.akretion.com',

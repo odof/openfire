@@ -2,11 +2,17 @@
 
 from odoo import models, fields, api, _
 
+class SaleOrder(models.Model):
+    _inherit = 'sale.order'
+
+    delivery_expected = fields.Char(string='Livraison Attendue', states={'done':[('readonly', True)]})
+
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
     customer_id = fields.Many2one('res.partner', string='Client')
-    delivery_expected = fields.Char(string='Livraison souhaitée', states={'done':[('readonly', True)]})
+    sale_order_id = fields.Many2one('sale.order', string="Commande d'origine")
+    delivery_expected = fields.Char(string='Livraison Attendue', states={'done':[('readonly', True)]})
 
 class ProcurementOrder(models.Model):
     _inherit = 'procurement.order'
@@ -14,7 +20,13 @@ class ProcurementOrder(models.Model):
     @api.multi
     def _prepare_purchase_order(self, partner):
         res = super(ProcurementOrder, self)._prepare_purchase_order(partner)
-        res['customer_id'] = self._context.get('purchase_customer_id', False)
+        sale_order_id = self._context.get('purchase_sale_order_id', False)
+        if sale_order_id:
+            sale_order = self.env['sale.order'].browse(sale_order_id)
+
+        res['customer_id'] = self._context.get('purchase_customer_id', False) or (sale_order_id and sale_order.partner_id.id)
+        res['sale_order_id'] = sale_order_id
+        res['delivery_expected'] = sale_order_id and sale_order.delivery_expected
         return res
 
     @api.multi
@@ -30,20 +42,25 @@ class ProcurementOrder(models.Model):
             partner = supplier.name
 
             # Recherche du client associé
-            customer_id = False
-            sale_line = procurement.sale_line_id
-            if not sale_line:
-                move = procurement.move_dest_id
-                sale_line = move and move.procurement_id and move.procurement_id.sale_line_id
-            customer_id = sale_line and sale_line.order_id.partner_id.id or False
+            domain = ()
+            regroup_type = 'sale_order' # Récupérer le type de regroupement sélectionné en configuration ('standard', 'sale_order', 'customer')
+            if regroup_type != 'standard':
+                sale_line = procurement.sale_line_id
+                if not sale_line:
+                    move = procurement.move_dest_id
+                    sale_line = move and move.procurement_id and move.procurement_id.sale_line_id
+                sale_order = sale_line and sale_line.order_id or False
+                if regroup_type == 'sale_order':
+                    domain = (('sale_order_id', '=', sale_order.id),)
+                elif regroup_type == 'customer':
+                    domain = (('customer', '=', sale_order and sale_order.partner_id.id),)
 
             gpo = procurement.rule_id.group_propagation_option
             group = (gpo == 'fixed' and procurement.rule_id.group_id) or \
                     (gpo == 'propagate' and procurement.group_id) or False
 
-            domain = (
+            domain += (
                 ('partner_id', '=', partner.id),
-                ('customer_id', '=', customer_id),
                 ('state', '=', 'draft'),
                 ('picking_type_id', '=', procurement.rule_id.picking_type_id.id),
                 ('company_id', '=', procurement.company_id.id),
@@ -58,7 +75,16 @@ class ProcurementOrder(models.Model):
                 po = po[0] if po else False
                 cache[domain] = po
             if not po:
-                vals = procurement.with_context(purchase_customer_id=customer_id)._prepare_purchase_order(partner)
+                proc = procurement
+
+                if regroup_type == 'sale_order':
+                    proc = procurement.with_context(purchase_sale_order_id=sale_order and sale_order.id)
+                elif regroup_type == 'customer':
+                    proc = procurement.with_context(purchase_customer_id=sale_order and sale_order.partner_id.id)
+                else:
+                    proc = procurement
+
+                vals = proc._prepare_purchase_order(partner)
                 po = self.env['purchase.order'].create(vals)
                 name = (procurement.group_id and (procurement.group_id.name + ":") or "") + (procurement.name != "/" and procurement.name or procurement.move_dest_id.raw_material_production_id and procurement.move_dest_id.raw_material_production_id.name or "")
                 message = _("This purchase order has been created from: <a href=# data-oe-model=procurement.order data-oe-id=%d>%s</a>") % (procurement.id, name)

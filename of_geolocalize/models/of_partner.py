@@ -347,7 +347,7 @@ class ResPartner(models.Model):
     def write(self, vals):
         """
         Override
-        Case geocoding_success didn't change and either geo_lat or geo_lng changed: the partner was localized manually.
+        Case geocoding didn't change and either geo_lat or geo_lng changed: the partner was localized manually.
         Case address changed: we will try to geocode the newly set address
         """
         if 'geocoding' not in vals and ('geo_lat' in vals or 'geo_lng' in vals) and vals['geo_lat'] != 0:

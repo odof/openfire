@@ -7,6 +7,7 @@
             <field name="inherit_id" ref="purchase.purchase_order_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='origin']" position="after">
+					<field name="sale_order_id"/>
                     <field name="customer_id"/>
                 </xpath>
                 <xpath expr="//label[@for='date_planned']" position="before">
@@ -45,5 +46,23 @@
                 </xpath>
             </field>
         </record>
+
+    <!--
+	#########################################################################################################
+	###
+	###                       S A L E   V I EW S
+	###
+	#########################################################################################################
+	-->
+    <record id="of_view_order_form_inherit_sale_stock" model="ir.ui.view">
+        <field name="name">of.sale.stock.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='sale_shipping']" position="inside">
+				<field name="delivery_expected"/>
+            </xpath>
+        </field>
+    </record>
 
 </odoo>
