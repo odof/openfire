@@ -8,8 +8,8 @@
 Modifications OpenFire pour les commandes fournisseur
 =====================================================
 
-- Ajout de la date souhaitée de livraison (champ texte)
-- Ajout du client final, auto-alimenté depuis la commande client
+- Ajout de la date souhaitée de livraison (champ texte) pour les commandes client et fournisseur
+- Ajout du client final dans les commandes fournisseur, auto-alimenté depuis la commande client
 - Modification des documents imprimés pour l'ajout de ces informations
 - Ajout de l'impression de la commande fournisseur sans prix
 """,
