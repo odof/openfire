@@ -8,7 +8,7 @@ class of_import(models.Model):
     _name = 'of.import'
 
     name = fields.Char('Nom', size=64, required=True)
-    type_import = fields.Selection([('product.template', 'Articles'), ('res.partner', 'Partenaires'), ('res.partner.bank', 'Comptes en banques partenaire'), ('of.service', 'Services Openfire')], string="Type d'import", required=True)
+    type_import = fields.Selection([('product.template', 'Articles'), ('res.partner', 'Partenaires'), ('crm.lead', u'Pistes/opportunités'), ('res.partner.bank', 'Comptes en banques partenaire'), ('of.service', 'Services Openfire')], string="Type d'import", required=True)
     date = fields.Datetime('Date', required=True, default=lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'), help=u"Date qui sera affectée aux imports comme date de valeur.")
     date_debut_import = fields.Datetime('Début', readonly=True)
     date_fin_import = fields.Datetime('Fin', readonly=True)
@@ -126,6 +126,10 @@ class of_import(models.Model):
             nom_objet = 'Comptes en banque partenaire'           # Libellé pour affichage dans message information/erreur
             champ_primaire = 'acc_number'             # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
             champ_reference = ''            # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
+        elif model == 'crm.lead':
+            nom_objet = u'partenaire/opportunité'     # Libellé pour affichage dans message information/erreur
+            champ_primaire = ''              # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
+            champ_reference = ''               # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
 
         # Initialisation variables
         champs_odoo = self.get_champs_odoo(model) # On récupère la liste des champs de l'objet (depuis ir.model.fields)
@@ -171,7 +175,7 @@ class of_import(models.Model):
         # On récupère la 1ère ligne du fichier (liste des champs) pour vérifier si des champs existent en plusieurs exemplaires
         ligne = fichier.readline().strip().split(dialect.delimiter) # Liste des champs de la 1ère ligne du fichier d'import
 
-        # Vérification si le champ primaire est bien dans le fichier d'import
+        # Vérification si le champ primaire est bien dans le fichier d'import (si le champ primaire est défini)
         if champ_primaire and champ_primaire not in ligne:
             erreur = 1
             sortie_erreur += u"Le champ référence qui permet d'identifier un " + nom_objet + " (" + champ_primaire + u") n'est pas dans le fichier d'import.\n"
@@ -264,13 +268,16 @@ class of_import(models.Model):
                     # Valeur du champ : suppression des espaces avant et après et conversion en utf8.
                     ligne[champ_fichier] = ligne[champ_fichier].decode('utf8', 'ignore').strip()
 
+                    if ligne[champ_fichier].strip().lower() == "#vide":
+                        ligne[champ_fichier] = "#vide"
+
         #
         # VÉRIFICATION DE L'INTÉGRITÉ DE LA VALEUR DES CHAMPS
         # POUR LES CRITÈRES QUI NE DÉPENDENT PAS DU TYPE DU CHAMP
         #
 
                     # si le champs est requis, vérification qu'il est renseigné
-                    if champs_odoo[champ_fichier_sansrel]['requis'] and ligne[champ_fichier] == "":
+                    if champs_odoo[champ_fichier_sansrel]['requis'] and (ligne[champ_fichier] == "" or ligne[champ_fichier] == "#vide"):
                         sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[champ_fichier_sansrel]['description'] + " (" + champ_fichier.decode('utf8', 'ignore') + u") vide alors que requis. " + nom_objet.capitalize() + u" non importé.\n"
                         erreur = 1
 
@@ -319,7 +326,7 @@ class of_import(models.Model):
 
                     # si est un many2one
                     elif champs_odoo[champ_fichier_sansrel]['type'] == 'many2one':
-                        if ligne[champ_fichier] == "" and not champs_odoo[champ_fichier_sansrel]['requis']:
+                        if (ligne[champ_fichier] == "" or ligne[champ_fichier] == "#vide") and not champs_odoo[champ_fichier_sansrel]['requis']:
                             # Si le champ n'est pas obligatoire et qu'il est vide, on met une valeur vide.
                             valeurs[champ_fichier_sansrel] = ""
                         else:
@@ -329,7 +336,10 @@ class of_import(models.Model):
                             elif model == 'res.partner' and champ_fichier == 'property_account_payable_id':
                                 res_ids = self.env[champs_odoo[champ_fichier_sansrel]['relation']].with_context(active_test=False).search(['&',('code', '=', ligne[champ_fichier]), ('internal_type', '=', 'payable')])
                             else:
-                                res_ids = self.env[champs_odoo[champ_fichier_sansrel]['relation']].with_context(active_test=False).search([(champs_odoo[champ_fichier_sansrel]['relation_champ'] or 'name', '=', ligne[champ_fichier])])
+                                if ligne[champ_fichier] == "#vide":
+                                    res_ids = ""
+                                else:
+                                    res_ids = self.env[champs_odoo[champ_fichier_sansrel]['relation']].with_context(active_test=False).search([(champs_odoo[champ_fichier_sansrel]['relation_champ'] or 'name', '=', ligne[champ_fichier])])
 
                             if len(res_ids) == 1:
                                 valeurs[champ_fichier_sansrel] = res_ids.id
@@ -344,6 +354,8 @@ class of_import(models.Model):
                                 elif model == 'res.partner' and champ_fichier == 'property_account_payable_id' and 'name' in ligne:
                                     if not simuler:
                                         valeurs[champ_fichier_sansrel] = self.env[champs_odoo[champ_fichier_sansrel]['relation']].create({'name': ligne['name'], 'code': ligne[champ_fichier], 'reconcile': True, 'user_type_id': data_account_type_payable_id})
+                                elif ligne[champ_fichier] == "#vide":
+                                    valeurs[champ_fichier_sansrel] = ''
                                 else:
                                     sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[champ_fichier_sansrel]['description'] + " (" + champ_fichier.decode('utf8', 'ignore') + u") valeur \"" + ligne[champ_fichier] + u"\" n'a pas de correspondance. " + nom_objet.capitalize() + u" non importé.\n"
                                     erreur = 1
@@ -372,7 +384,7 @@ class of_import(models.Model):
                         # Ça équivaut à des étiquettes. On peut en importer plusieurs en les séparant par des virgules.
                         # Ex : étiquette1, étiquette2, étiquette3 
                         tag_ids = []
-                        if ligne[champ_fichier]: # S'il y a des données dans le champ d'import
+                        if ligne[champ_fichier] and ligne[champ_fichier] != "#vide": # S'il y a des données dans le champ d'import
                             ligne[champ_fichier] = ligne[champ_fichier].split(',') # On sépare les étiquettes quand il y a une virgule
                             for tag in ligne[champ_fichier]: # On parcourt les étiquettes à importer
                                 # On regarde si elle existe.
@@ -386,12 +398,19 @@ class of_import(models.Model):
                                     sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[champ_fichier_sansrel]['description'] + " (" + champ_fichier.decode('utf8', 'ignore') + u") valeur \"" + str(tag).strip() + u"\" n'a pas de correspondance. " + nom_objet.capitalize() + u" non importé.\n"
                                     erreur = 1
                         if not erreur:
-                            valeurs[champ_fichier_sansrel] = [(6, 0, tag_ids)]
+                            if ligne[champ_fichier] == "#vide":
+                                valeurs[champ_fichier_sansrel] = [(5,)]
+                            elif ligne[champ_fichier]:
+                                valeurs[champ_fichier_sansrel] = [(6, 0, tag_ids)]
 
                     # Pour tous les autres types de champ (char, text, date, ...)
                     # On ne fait que prendre sa valeur sans traitement particulier
                     else:
-                        valeurs[champ_fichier_sansrel] = ligne[champ_fichier]
+                        if ligne[champ_fichier] != "#vide":
+                            valeurs[champ_fichier_sansrel] = ligne[champ_fichier]
+                        else:
+                            valeurs[champ_fichier_sansrel] = ''
+
 
             if erreur: # On n'enregistre pas si erreur.
                 nb_echoue = nb_echoue + 1
@@ -399,16 +418,21 @@ class of_import(models.Model):
 
             # On regarde si l'enregistrement a déjà été importé (réf. en plusieurs exemplaires dans le fichier d'import).
             # Si c'est le cas, on l'ignore.
-            if ligne[champ_primaire] in doublons:
-                doublons[ligne[champ_primaire]][0] = doublons[ligne[champ_primaire]][0] + 1
-                doublons[ligne[champ_primaire]][1] = doublons[ligne[champ_primaire]][1] + ", " + str(i)
-                nb_echoue = nb_echoue + 1
-                continue
-            else:
-                doublons[ligne[champ_primaire]] = [1, str(i)]
+            if champ_primaire:
+                if ligne[champ_primaire] in doublons:
+                    doublons[ligne[champ_primaire]][0] = doublons[ligne[champ_primaire]][0] + 1
+                    doublons[ligne[champ_primaire]][1] = doublons[ligne[champ_primaire]][1] + ", " + str(i)
+                    nb_echoue = nb_echoue + 1
+                    continue
+                else:
+                    doublons[ligne[champ_primaire]] = [1, str(i)]
 
-            # On regarde si l'enregistrement existe déjà dans la base
-            res_objet_ids = model_obj.with_context(active_test=False).search([(champ_primaire,'=', ligne[champ_primaire])])
+                # On regarde si l'enregistrement existe déjà dans la base
+                res_objet_ids = model_obj.with_context(active_test=False).search([(champ_primaire,'=', ligne[champ_primaire])])
+            else:
+                res_objet_ids = "" # Si le champ primaire n'est pas défini, on ne fait que des créations.
+
+            libelle_ref = u"réf. " + ligne[champ_reference] if champ_reference else ligne[champ_primaire] if champ_primaire else ligne['name'] if 'name' in ligne else ''
 
             if not res_objet_ids:
                 # L'enregistrement n'existe pas dans la base, on l'importe (création)
@@ -426,9 +450,9 @@ class of_import(models.Model):
                     if not simuler:
                         model_obj.create(valeurs)
                     nb_ajout = nb_ajout + 1
-                    sortie_succes += u"Création " + nom_objet + u" réf. " + (ligne[champ_reference] or ligne[champ_primaire]) + " (ligne " + str(i) + ")\n"
+                    sortie_succes += u"Création " + nom_objet + " " + libelle_ref + " (ligne " + str(i) + ")\n"
                 except Exception, exp:
-                    sortie_erreur += "Ligne " + str(i) + u" : échec création " + nom_objet + u" réf. " + (ligne[champ_reference] or ligne[champ_primaire]) + " - Erreur : " + str(exp) + "\n"
+                    sortie_erreur += "Ligne " + str(i) + u" : échec création " + nom_objet + " " + libelle_ref + " - Erreur : " + str(exp) + "\n"
                     nb_echoue = nb_echoue + 1
 
             elif len(res_objet_ids) == 1:
@@ -437,15 +461,15 @@ class of_import(models.Model):
                     if not simuler:
                         res_objet_ids.write(valeurs)
                     nb_maj = nb_maj + 1
-                    sortie_succes += u"MAJ " + nom_objet +  u" réf. " + (ligne[champ_reference] or ligne[champ_primaire]) + " (ligne " + str(i) + ")\n"
+                    sortie_succes += u"MAJ " + nom_objet +  " " + libelle_ref + " (ligne " + str(i) + ")\n"
                 except Exception, exp:
-                    sortie_erreur += "Ligne " + str(i) + u" : échec mise à jour " + nom_objet + u" réf. " + (ligne[champ_reference] or ligne[champ_primaire]) + " - Erreur : " + str(exp) + "\n"
+                    sortie_erreur += "Ligne " + str(i) + u" : échec mise à jour " + nom_objet + " " + libelle_ref + " - Erreur : " + str(exp) + "\n"
                     nb_echoue = nb_echoue + 1
 
             else:
                 # Il existe plusieurs articles dans la base avec cette référence. On ne sait pas lequel mettre à jour. On passe au suivant en générant une erreur.
                 nb_echoue = nb_echoue + 1
-                sortie_erreur += "Ligne " + str(i) + " " + nom_objet + u" réf. " + (ligne[champ_reference] or ligne[champ_primaire]) + u" en plusieurs exemplaire dans la base, on ne sait pas lequel mettre à jour. " + nom_objet.capitalize() + u" non importé.\n"
+                sortie_erreur += "Ligne " + str(i) + " " + nom_objet + " " + libelle_ref + u" en plusieurs exemplaire dans la base, on ne sait pas lequel mettre à jour. " + nom_objet.capitalize() + u" non importé.\n"
 
             if nb_total % frequence_commit == 0:
                 self.write({'nb_total': nb_total, 'nb_ajout': nb_ajout, 'nb_maj': nb_maj, 'nb_echoue': nb_echoue, 'sortie_succes': sortie_succes, 'sortie_avertissement': sortie_avertissement, 'sortie_erreur': sortie_erreur})
