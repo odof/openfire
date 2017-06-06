@@ -1,0 +1,209 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_external
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-04-04 14:34+0000\n"
+"PO-Revision-Date: 2017-04-04 14:34+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_external_layout_footer
+msgid "- Tel"
+msgstr "- Tél"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_company_settings
+msgid "<br/>\n"
+"                                    <span>Size: </span>"
+msgstr "<br/>\n"
+"                                    <span>Taille: </span>"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_external_layout_footer
+msgid "<br/>\n"
+"                    <span class=\"mt8\">\n"
+"                        this is the default document footer. contact support for customization or go to your company page in \"Advanced settings\" tab.\n"
+"                    </span>"
+msgstr "<br/>\n"
+"                    <span class=\"mt8\">\n"
+"                        Ceci est le pied de page par défaut. Contactez le support pour un paramétrage ou rendez-vous sur la page de votre société dans l'onglet \"Paramètres avancés\".\n"
+"                    </span>"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_external_layout_footer
+msgid "<span>\n"
+"                        company.custom_footer and company.use_of_custom_footer are both set to true. you need to set one of these to false.\n"
+"                    </span>"
+msgstr "<span>\n"
+"                        les cases company.custom_footer et company.use_of_custom_footer sont toutes les deux cochées. Une d'entres elles doit être décochée pour éviter les conflits.\n"
+"                    </span>"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_company_settings
+msgid "<span> Use company custom footer.</span>"
+msgstr "<span> Utiliser le pied de page personnalisé pour cette société.</span>"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_company_settings
+msgid "<span>Content: </span>"
+msgstr "<span>Contenu: </span>"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_external_layout_header
+msgid "<span>Date</span><br/>"
+msgstr "<span>Date</span><br/>"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_external_layout_header
+msgid "<span>Number</span><br/>"
+msgstr "<span>Numéro</span><br/>"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_company_settings
+msgid "Advanced Settings"
+msgstr "Paramètres Avancés"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_external_layout_header
+msgid "Cancelled Invoice<br/>"
+msgstr "Facture Annulée<br/>"
+
+#. module: of_external
+#: model:ir.model,name:of_external.model_res_company
+msgid "Companies"
+msgstr "Sociétés"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_company_settings
+msgid "Company Footer"
+msgstr "Pied de page de la société"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_external_layout_header
+msgid "Draft Invoice<br/>"
+msgstr "Facture Brouillon<br/>"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_external_layout_header
+msgid "Invoice<br/>"
+msgstr "Facture<br/>"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_company_settings
+msgid "Line 1 :"
+msgstr "Ligne 1 :"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_company_settings
+msgid "Line 2 :"
+msgstr "Ligne 2 :"
+
+#. module: of_external
+#: selection:res.company,of_custom_footer_line_1_size:0
+#: selection:res.company,of_custom_footer_line_2_size:0
+msgid "Medium"
+msgstr "Moyen"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_external_layout_header
+msgid "Order"
+msgstr "Bon de Commande"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_external_layout_header
+msgid "PRO-FORMA<br/>"
+msgstr "PRO-FORMA<br/>"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_external_layout_header
+msgid "Quotation"
+msgstr "Devis"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_external_layout_header
+msgid "Refund<br/>"
+msgstr "Avoir<br/>"
+
+#. module: of_external
+#: model:ir.model.fields,field_description:of_external.field_res_company_of_custom_footer_line_1_size
+#: model:ir.model.fields,field_description:of_external.field_res_company_of_custom_footer_line_2_size
+msgid "Size"
+msgstr "Taille"
+
+#. module: of_external
+#: selection:res.company,of_custom_footer_line_1_size:0
+#: selection:res.company,of_custom_footer_line_2_size:0
+msgid "Small"
+msgstr "Petit"
+
+#. module: of_external
+#: selection:res.company,of_custom_footer_line_1_size:0
+#: selection:res.company,of_custom_footer_line_2_size:0
+msgid "Smaller"
+msgstr "Plus petit"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_external_layout_footer
+msgid "TIN:"
+msgstr "TVA :"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_external_layout_header
+msgid "Tel."
+msgstr "Tél."
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_external_layout_header
+msgid "Vendor Bill<br/>"
+msgstr "Facture Fournisseur<br/>"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_external_layout_header
+msgid "Vendor Refund<br/>"
+msgstr "Avoir Fournisseur<br/>"
+
+#. module: of_external
+#: selection:res.company,of_custom_footer_line_1_size:0
+#: selection:res.company,of_custom_footer_line_2_size:0
+msgid "X-Small"
+msgstr "Très petit"
+
+#. module: of_external
+#: model:ir.model.fields,help:of_external.field_res_company_use_of_custom_footer
+msgid "check if you want to use this custom footer for your pdf reports"
+msgstr "cochez si vous voulez utiliser ce pied de page personnalisé pour les rapports PDF"
+
+#. module: of_external
+#: model:ir.model.fields,field_description:of_external.field_res_company_of_custom_footer_line_1
+msgid "line 1"
+msgstr "ligne 1"
+
+#. module: of_external
+#: model:ir.model.fields,field_description:of_external.field_res_company_of_custom_footer_line_2
+msgid "line 2"
+msgstr "ligne 2"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_company_settings
+msgid "replace with desired content for line 1"
+msgstr "remplacer par le contenu voulu pour la ligne 1"
+
+#. module: of_external
+#: model:ir.ui.view,arch_db:of_external.of_company_settings
+msgid "replace with desired content for line 2"
+msgstr "remplacer par le contenu voulu pour la ligne 2"
+
+#. module: of_external
+#: model:ir.model.fields,field_description:of_external.field_res_company_use_of_custom_footer
+msgid "use company custom footer"
+msgstr "utiliser le pied de page personnalisé pour cette sociétéS"
+
