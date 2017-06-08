@@ -1,4 +1,4 @@
-<openerp>
+<odoo>
     <data>
 
 <!--##############################################################################-->
@@ -13,6 +13,7 @@
             <field name="arch" type="xml">
                 <field name="barcode" position="after">
                     <field name="of_frais_port" widget='monetary'/>
+                    <field name="id" groups="base.group_no_one"/>
                 </field>
             </field>
         </record>
@@ -25,9 +26,10 @@
             <field name="arch" type="xml">
                 <field name="barcode" position="after">
                     <field name="of_frais_port" widget='monetary'/>
+                    <field name="id" groups="base.group_no_one"/>
                 </field>
             </field>
         </record>
 
     </data>
-</openerp>
+</odoo>
