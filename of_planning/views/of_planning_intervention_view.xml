@@ -112,8 +112,8 @@
                 <form string="Nouvelle Intervention" >
                     <header>
                         Passer à
-                        <button name="button_done" string="Réalisé" states="done" type="object"/>
                         <button name="button_confirm" string="Confirmé" states="draft" type="object"/>
+                        <button name="button_done" string="Réalisé" states="confirm" type="object"/>
                         <button name="button_postponed" string="Reporté" states="confirm" type="object"/>
                         <button name="button_cancel" string="Annulé" states="draft,confirm" type="object"/>
                         <button name="button_draft" string="Brouillon" states="done,confirm,cancel,postponed" type="object"/>

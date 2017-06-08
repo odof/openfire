@@ -237,7 +237,7 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def button_done(self):
-        return self.write({'state':'cone'})
+        return self.write({'state':'done'})
 
     @api.multi
     def button_postponed(self):
