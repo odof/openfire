@@ -28,7 +28,7 @@ class of_import(models.Model):
     sortie_erreur = fields.Text('Erreurs', readonly=True)
     
     def get_champs_odoo(self, model=''):
-        "Renvoit un dictionnaire contenant les caractéristiques des champs Odoo en fonction du type d'import sélectionné (champ type_import)"
+        "Renvoi un dictionnaire contenant les caractéristiques des champs Odoo en fonction du type d'import sélectionné (champ type_import)"
 
         if not model:
             return {}
@@ -326,10 +326,10 @@ class of_import(models.Model):
 
                     # si est un many2one
                     elif champs_odoo[champ_fichier_sansrel]['type'] == 'many2one':
-                        if (ligne[champ_fichier] == "" or ligne[champ_fichier] == "#vide") and not champs_odoo[champ_fichier_sansrel]['requis']:
+                        if ligne[champ_fichier] == "#vide" and not champs_odoo[champ_fichier_sansrel]['requis']:
                             # Si le champ n'est pas obligatoire et qu'il est vide, on met une valeur vide.
                             valeurs[champ_fichier_sansrel] = ""
-                        else:
+                        elif ligne[champ_fichier] != "":
                             # Si import partenaires et si c'est le compte comptable client ou fournisseur, on regarde si pointe sur un compte comptable existant
                             if model == 'res.partner' and champ_fichier == 'property_account_receivable_id':
                                 res_ids = self.env[champs_odoo[champ_fichier_sansrel]['relation']].with_context(active_test=False).search(['&',('code', '=', ligne[champ_fichier]), ('internal_type', '=', 'receivable')])
@@ -406,11 +406,10 @@ class of_import(models.Model):
                     # Pour tous les autres types de champ (char, text, date, ...)
                     # On ne fait que prendre sa valeur sans traitement particulier
                     else:
-                        if ligne[champ_fichier] != "#vide":
-                            valeurs[champ_fichier_sansrel] = ligne[champ_fichier]
-                        else:
+                        if ligne[champ_fichier] == "#vide":
                             valeurs[champ_fichier_sansrel] = ''
-
+                        elif ligne[champ_fichier] != '':
+                            valeurs[champ_fichier_sansrel] = ligne[champ_fichier]
 
             if erreur: # On n'enregistre pas si erreur.
                 nb_echoue = nb_echoue + 1
@@ -482,8 +481,10 @@ class of_import(models.Model):
         
         # On enregistre les dernières lignes qui ne l'auraient pas été.
         self.write({'nb_total': nb_total, 'nb_ajout': nb_ajout, 'nb_maj': nb_maj, 'nb_echoue': nb_echoue, 'sortie_succes': sortie_succes, 'sortie_avertissement': sortie_avertissement, 'sortie_erreur': sortie_erreur, 'date_debut_import' : date_debut, 'date_fin_import' : time.strftime('%Y-%m-%d %H:%M:%S')})
+
         if not simuler:
             self.write({'state': 'importe'})
+
         self._cr.commit()
 
         return

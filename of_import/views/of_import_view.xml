@@ -40,6 +40,11 @@
             <field name="arch" type="xml">
                 <form>
                     <group>
+                        <group>
+                            <button name="bouton_simuler" string="Simuler import" type="object" icon="fa-check" attrs="{'invisible': [('state','!=','brouillon')]}"/>
+                            <button name="bouton_importer" string="Importer" type="object" icon="fa-check" attrs="{'invisible': [('state','!=','brouillon')]}" confirm="Confirmez-vous l'import (non annulable) ?"/>
+                            <button name="bouton_remettre_brouillon" string="Remettre en brouillon" type="object" icon="fa-check" attrs="{'invisible': [('state','=','brouillon')]}" confirm="Remettre à l'état brouillon ?"/>
+                        </group>
                         <group colspan="4" col="4">
                             <field name="type_import"/>
                             <field name="name"/>
@@ -71,11 +76,6 @@
                             <field name="sortie_avertissement"/>
                             <field name="sortie_erreur"/>
                         </group>
-                    </group>
-                    <group>
-                        <button name="bouton_simuler" string="Simuler import" type="object" icon="fa-check" attrs="{'invisible': [('state','!=','brouillon')]}"/>
-                        <button name="bouton_importer" string="Importer" type="object" icon="fa-check" attrs="{'invisible': [('state','!=','brouillon')]}" confirm="Confirmez-vous l'import (non annulable) ?"/>
-                        <button name="bouton_remettre_brouillon" string="Remettre en brouillon" type="object" icon="fa-check" attrs="{'invisible': [('state','=','brouillon')]}" confirm="Remettre à l'état brouillon ?"/>
                     </group>
                     <group colspan="4" col="4">
                         <field name="sortie_note" nolabel="1" attrs="{'invisible': [('state','!=','brouillon')]}"/>
