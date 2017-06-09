@@ -43,7 +43,17 @@
                         <p t-field="o.date_due"/>
                     </div>
                     <div t-if="o.date_due and o.type == 'out_invoice' and (o.state == 'open' or o.state == 'paid')" style="display: table-cell; width: 4px;"/>
-
+                    
+                    <div t-if="o.user_id" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                        <strong>Salesperson:</strong>
+                        <p>
+                            <span t-field="o.user_id"/><br t-if="o.user_id.phone or o.user_id.mobile"/>
+                            <span t-if="o.user_id.phone" t-field="o.user_id.phone"/><br t-if="o.user_id.phone and o.user_id.mobile"/>
+                            <span t-if="o.user_id.mobile" t-field="o.user_id.mobile"/>
+                        </p>
+                    </div>
+                    <div t-if="o.user_id" style="display: table-cell; width: 4px;"/>
+                    
                     <div t-if="o.reference and o.type == 'in_invoice'" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                         <strong>Doc Ref:</strong>
                         <p t-field="o.reference"/>
@@ -130,7 +140,7 @@
                             <tr class="border-black">
                                 <td><strong>Amount left </strong></td>
                                 <td class="text-right">
-                                     <span t-field="o.residual" t-field-options='{"widget": "monetary", "display_currency": "o.currency_id"}'/>
+                                    <span t-field="o.residual" t-field-options='{"widget": "monetary", "display_currency": "o.currency_id"}'/>
                                 </td>
                             </tr>
                         </t>
@@ -164,7 +174,7 @@
                 </div>
             </div>
 
-            <p t-if="o.comment">
+            <p t-if="o.comment"> 
                 <strong>Comment:</strong>
                 <span t-field="o.comment"/>
             </p>

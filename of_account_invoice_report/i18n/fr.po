@@ -41,6 +41,11 @@ msgstr "Doc Source:"
 
 #. module: of_account_invoice_report
 #: model:ir.ui.view,arch_db:account.report_invoice_document
+msgid "<strong>Salesperson:</strong>"
+msgstr "<strong>Commercial:</strong>"
+
+#. module: of_account_invoice_report
+#: model:ir.ui.view,arch_db:account.report_invoice_document
 msgid "Doc Ref:"
 msgstr "Réf Doc:"
 
@@ -56,8 +61,8 @@ msgstr "Qté"
 
 #. module: of_account_invoice_report
 #: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "Unit Price"
-msgstr "Prix/U"
+msgid ">Unit Price</th>"
+msgstr ">Prix/U</th>"
 
 #. module: of_account_invoice_report
 #: model:ir.ui.view,arch_db:account.report_invoice_document
