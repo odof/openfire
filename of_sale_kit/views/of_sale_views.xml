@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_view_order_form" model="ir.ui.view">
+        <field name="name">of.kit.sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_shipping_id']" position="after">
+                <field name="contains_kit"/>
+                <field name="kit_display_mode" attrs="{'invisible': [('contains_kit','=',False)]}"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']" position="after">
+                <div name="components" class="mt8 mb8" attrs="{'invisible': [('contains_kit','=',False)]}">
+                    <label for="components"/>
+                    <field name="components" mode="tree" readonly="True">
+                        <tree string="Kit components">
+                            <field name="rec_lvl" invisible="1"/>
+                            <field name="is_kit_order_comp" invisible="1"/>
+                            <!-- <field name="order_line_id" invisible="1"/> -->
+                            <!-- <field name="order_line_pricing" invisible="1"/> -->
+                            <field name="parent_id" invisible="1"/>
+                            <field name="child_ids" invisible="1"/>
+                            <field name="bom_path"/>
+                            <field name="product_id"/>
+                            <field name="name"/>
+                            <field name="qty_bom_line"/>
+                            <field name="qty_so_line"/>
+                            <field name="qty_total"/>
+                            <field name="product_uom"/>
+                        </tree>
+                    </field>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="after">
+                <field name="id" groups="base.group_no_one"/>
+                <field name="is_kit_order_line"/>
+                <label for="pricing"/>
+                <div name="pricing_div" attrs="{'invisible': [('is_kit_order_line','=',False)]}">
+                    <field name="pricing" required="False"/>
+                    <div name="hide_prices_message" attrs="{'invisible': [('pricing','=','dynamic')]}">
+                        <i>components prices are not shown when the sale order line pricing is set to 'fixed'</i>
+                    </div>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="after">
+                <field name="unit_compo_price" attrs="{'invisible': [('is_kit_order_line','=',False)]}"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='name']" position="after">
+                <div name="compo_content"
+                        attrs="{'readonly': [('state', 'in', ('done','cancel'))]}">
+                    <div name="components_ids" attrs="{'invisible': [('is_kit_order_line','=',False)]}">
+                        <label for="direct_child_ids"/>
+                        <field name="direct_child_ids" mode="tree"/>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+    
+</odoo>
