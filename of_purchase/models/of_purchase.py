@@ -51,7 +51,7 @@ class ProcurementOrder(models.Model):
                     sale_line = move and move.procurement_id and move.procurement_id.sale_line_id
                 sale_order = sale_line and sale_line.order_id or False
                 if regroup_type == 'sale_order':
-                    domain = (('sale_order_id', '=', sale_order.id),)
+                    domain = (('sale_order_id', '=', sale_order and sale_order.id),)
                 elif regroup_type == 'customer':
                     domain = (('customer', '=', sale_order and sale_order.partner_id.id),)
 
