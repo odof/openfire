@@ -9,7 +9,7 @@ class of_product_nomenclature(models.Model):
     _name = 'of.product.nomenclature'
     _description = u"Gestion des nomenclatures de produits"
 
-    name = fields.Char("Nom", size=64, required=True)
+    name = fields.Char("Nom", size=64, required=True, translate=True)
     of_product_nomenclature_line = fields.One2many('of.product.nomenclature.line', 'nomenclature_id', 'Produits nomenclature', copy=True)
     sequence = fields.Integer('Séquence', help="Définit l'ordre d'affichage des nomenclatures dans les listes (plus petit au début)")
 
