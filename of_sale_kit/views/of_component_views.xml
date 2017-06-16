@@ -21,6 +21,7 @@
                         <field name="parent_id" attrs="{'invisible': [('parent_id','=',False)]}"/>
                         <field name="load_children"
                 			attrs="{'invisible': ['|',('children_loaded','=',True),('is_kit_order_comp','=',False)]}"/>
+                		<field name="customer_lead" attrs="{'invisible': [('is_kit_order_comp','=',True)]}"/>
                     </group>
                     <group  name="Quantities">
                         <field name="qty_bom_line"/>
@@ -28,6 +29,10 @@
                         <field name="nb_units"/>
                         <field name="qty_total"/>
                         <field name="product_uom"/>
+                        <field name="display_qty_changed" invisible="1"/>
+                        <div attrs="{'invisible': [('display_qty_changed','=',False)]}">
+                        	<i>Kit quantities are a bit tricky to update on the fly, please save your changes to recompute its children quantities</i>
+                        </div>
                     </group>
                     <div/>
                     <separator string="Prices" name="Prices" attrs="{'invisible': [('hide_prices','=',True)]}"/>
@@ -72,7 +77,6 @@
                     <field name="rec_lvl"/>
                     <field name="bom_path"/>
                     <!--<field name="order_line_pricing"/>-->
-                    <field name="parent_id"/>
                     <field name="children_loaded"/>
                     <field name="hide_prices"/>
                 </group>

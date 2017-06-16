@@ -35,11 +35,12 @@ class OFBom(models.Model):
         self._check_product_recursion()
         res = []
         for line in self.bom_line_ids:
+            comp_name = line.product_id.name_get()[0][1] or line.product_id.name
             comp = { 
                     'rec_lvl': rec_lvl+1,
                     'bom_path': bom_path ,
                     'product_id': line.product_id.id,
-                    'name': line.product_id.name,
+                    'name': comp_name,
                     #'pricing': 'dynamic', # set pricing of under_kits to dynamic by default
                     #'is_kit_order_comp': True,
                     'qty_bom_line': line.product_qty,

@@ -38,7 +38,7 @@ class OFKitProductTemplate(models.Model):
             boms = self.env['mrp.bom'].search([('product_tmpl_id', 'in', self.ids),('type','=','phantom')])
             if len(boms) == 1:
                 bom = boms[0]
-                print bom
+                #print bom
                 self.current_bom_id = bom['id']
             elif len(boms) > 1:
                 bom = boms[0] # meant to change later

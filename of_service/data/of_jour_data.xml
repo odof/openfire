@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<openerp>
+<odoo>
 <data>
     
     <record id="of_jours_1" model="of.jours">
@@ -32,4 +32,4 @@
     </record>
 
 </data>
-</openerp>
+</odoo>
