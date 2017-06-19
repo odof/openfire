@@ -21,8 +21,8 @@ msgstr "TVA: "
 
 #. module: of_account_invoice_report
 #: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "References: "
-msgstr "Références : "
+msgid "<div><strong>References: </strong></div>"
+msgstr "<div><strong>Références : </strong></div>"
 
 #. module: of_account_invoice_report
 #: model:ir.ui.view,arch_db:account.report_invoice_document

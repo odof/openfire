@@ -17,10 +17,12 @@
     'website': 'openfire.fr',
     'depends': ['sale','mrp'],
     'data': [
-        'views/of_sale_views.xml',
         'views/of_product_views.xml',
-        'views/of_component_views.xml',
+        'views/of_sale_views.xml',
+        'views/of_account_views.xml',
+        #'views/of_component_views.xml',
         'report/of_sale_report_templates.xml',
+        'report/of_account_report_templates.xml',
     ],
     'qweb': [
         

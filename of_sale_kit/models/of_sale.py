@@ -126,7 +126,7 @@ class OFKitSaleOrderLine(models.Model):
 				bom = bom_obj.search([('product_tmpl_id','=',product_tmpl_id.id)], limit=1)
 			if bom:
 				comp_name = self.product_id.name_get()[0][1] or self.product_id.name
-				components = bom.get_components(0,1,comp_name)
+				components = bom.get_components(0,1,comp_name,'sale')
 				if new_vals['pricing'] == 'fixed':
 					for comp in components:
 						comp[2]['hide_prices'] = True
@@ -162,7 +162,7 @@ class OFKitSaleOrderLine(models.Model):
 		"""
 		for line in self:
 			if line.is_kit_order_line:
-				comp_obj = line.env['sale.order.line.comp'].search([('order_line_id','=',self.id)])
+				comp_obj = line.env['sale.order.line.comp'].search([('order_line_id','=',self.id),('children_loaded','=',False)])
 				if line.pricing == 'dynamic':
 					hide_prices = False
 				else:
@@ -175,11 +175,12 @@ class OFKitSaleOrderLine(models.Model):
 		if self.is_kit_order_line:
 			if not self.product_id.is_kit: # a product that is not a kit is being made into a kit
 				# we create a component with current product (for procurements, kits are ignored)
+				comp_name = self.product_id.name_get()[0][1] or self.product_id.name
 				new_comp_vals = {
 					'product_id': self.product_id.id,
 					'rec_lvl': 1,
-					'name': self.name,
-					'bom_path': self.name,
+					'name': comp_name,
+					'bom_path': comp_name,
 					'is_kit_order_comp': False,
 					'qty_bom_line': 1,
 					#'qty_so_line': 1,
@@ -188,12 +189,19 @@ class OFKitSaleOrderLine(models.Model):
                     'unit_cost': self.product_id.standard_price,
                     'customer_lead': self.product_id.sale_delay,
 					}
+				
 				self.update({
 					'direct_child_ids': [(0,0,new_comp_vals)],
 					'pricing': 'dynamic',
+					'price_unit': self.unit_compo_price,
 					})
-		else:
-			self.direct_child_ids = [(5,)]
+			else:
+				pass
+		else: # a product that was a kit is not anymore, we unlink its components
+			self.update({
+				'direct_child_ids': [(5,)],
+				})
+			
 
 	@api.multi
 	def _action_procurement_create(self):
@@ -213,6 +221,8 @@ class OFKitSaleOrderLine(models.Model):
 		line = super(OFKitSaleOrderLine,self).create(vals)
 		if line.is_kit_order_line:
 			line._init_components()
+			if line.pricing == 'dynamic':
+				line.price_unit = line.unit_compo_price
 			#line._refresh_price_unit()
 		return line
 	
@@ -251,7 +261,7 @@ class OFKitSaleOrderLineComponent(models.Model):
 						help="odoo is currently unable to load components of components at once on the fly. \n \
 						check this box to load this component under-components on the fly. \n \
 						if you don't, all components will be loaded when you click 'save' on the order.")
-	children_loaded = fields.Boolean(string="Children loaded", readonly=True)
+	children_loaded = fields.Boolean(string="Children loaded") # no readonly for this or bug double children loading
 	
 	pricing = fields.Selection([
 		('fixed','Fixed'),
@@ -360,7 +370,7 @@ class OFKitSaleOrderLineComponent(models.Model):
 				bom = bom_obj.search([('product_tmpl_id','=',product_tmpl_id.id)], limit=1)
 			if bom:
 				comp_name = self.product_id.name_get()[0][1] or self.product_id.name
-				under_components = bom.get_components(rec_lvl,qty_so_line_parent,bom_path + " -> " + comp_name)
+				under_components = bom.get_components(rec_lvl,qty_so_line_parent,bom_path + " -> " + comp_name,'sale')
 				if hide_prices:
 					for under_comp in under_components:
 						under_comp[2]['hide_prices'] = True
@@ -436,7 +446,7 @@ class OFKitSaleOrderLineComponent(models.Model):
 					bom = bom_obj.search([('product_tmpl_id','=',product_tmpl_id.id)], limit=1)
 				if bom:
 					comp_name = comp.product_id.name_get()[0][1] or comp.product_id.name
-					components = bom.get_components(comp.rec_lvl,comp.qty_so_line,comp.bom_path + " -> " + comp_name)
+					components = bom.get_components(comp.rec_lvl,comp.qty_so_line,comp.bom_path + " -> " + comp_name,'sale')
 					if hide_prices:
 						for under_comp in components:
 							under_comp[2]['hide_prices'] = True
@@ -496,7 +506,7 @@ class OFKitSaleOrderLineComponent(models.Model):
 			else:
 				if comp.children_loaded:
 					so_unit_price = comp.get_prices_rec()
-				else:
+				else: # on the fly
 					bom_obj = self.env['mrp.bom']
 					bom = bom_obj.search([('product_id','=',comp.product_id.id)], limit=1)
 					if not bom:
@@ -516,10 +526,6 @@ class OFKitSaleOrderLineComponent(models.Model):
 				qty *= parent.qty_bom_line
 				parent = parent.parent_id
 			comp.qty_so_line = qty
-			#if comp.parent_id:
-			#	comp.qty_so_line = comp.qty_bom_line * comp.parent_id.qty_so_line
-			#else:
-			#	comp.qty_so_line = comp.qty_bom_line
 	
 	@api.depends('qty_so_line','nb_units')
 	def _compute_qty_total(self):

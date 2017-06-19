@@ -1,62 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!--#############################################################################
-        ##                       SALE ORDER VIEWS
+        ##                      ACCOUNT INVOICE VIEWS
         #############################################################################
      -->
-    <record id="of_view_order_form" model="ir.ui.view">
-        <field name="name">of.kit.sale.order.form</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_form"/>
+    <record id="of_view_invoice_form" model="ir.ui.view">
+        <field name="name">of.kit.account.invoice.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='partner_shipping_id']" position="after">
-                <field name="contains_kit"/>
-                <field name="kit_display_mode" attrs="{'invisible': [('contains_kit','=',False)]}"/>
-            </xpath>
-            <xpath expr="//field[@name='order_line']/tree" position="attributes">
+            <xpath expr="//field[@name='invoice_line_ids']/tree" position="attributes">
                 <!-- Edition des lignes de commande par formulaire -->
                 <attribute name="editable"/>
             </xpath>
-            <xpath expr="//field[@name='order_line']" position="after">
+            <xpath expr="//group/group[2]" position="inside">
+                <field name="contains_kit"/>
+                <field name="kit_display_mode" attrs="{'invisible': [('contains_kit','=',False)]}"/>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']" position="after">
                 <div name="components" class="mt8 mb8" attrs="{'invisible': [('contains_kit','=',False)]}">
                     <label for="components"/>
                     <field name="components" mode="tree" readonly="True">
                         <tree string="Kit components">
                             <field name="rec_lvl" invisible="1"/>
-                            <field name="is_kit_order_comp" invisible="1"/>
-                            <!-- <field name="order_line_id" invisible="1"/> -->
-                            <!-- <field name="order_line_pricing" invisible="1"/> -->
+                            <field name="is_kit_invoice_comp" invisible="1"/>
+                            <!-- <field name="invoice_line_id" invisible="1"/> -->
+                            <!-- <field name="invoice_line_pricing" invisible="1"/> -->
                             <field name="parent_id" invisible="1"/>
                             <field name="child_ids" invisible="1"/>
                             <field name="bom_path"/>
                             <field name="product_id"/>
                             <field name="name"/>
                             <field name="qty_bom_line"/>
-                            <field name="qty_so_line"/>
+                            <field name="qty_inv_line"/>
                             <field name="qty_total"/>
-                            <field name="product_uom"/>
+                            <field name="uom_id"/>
                         </tree>
                     </field>
                 </div>
             </xpath>
-            <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="after">
+        </field>
+    </record>
+    <!--#############################################################################
+        ##                    ACCOUNT INVOICE LINE VIEWS
+        #############################################################################
+     -->
+    <record id="of_view_invoice_line_form" model="ir.ui.view">
+        <field name="name">of.kit.account.invoice.line.form</field>
+        <field name="model">account.invoice.line</field>
+        <field name="inherit_id" ref="account.view_invoice_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
                 <field name="id" groups="base.group_no_one"/>
-                <field name="is_kit_order_line"/>
+                <field name="is_kit_invoice_line"/>
                 <label for="pricing"/>
-                <div name="pricing_div" attrs="{'invisible': [('is_kit_order_line','=',False)]}">
+                <div name="pricing_div" attrs="{'invisible': [('is_kit_invoice_line','=',False)]}">
                     <field name="pricing" required="False"/>
                     <div name="hide_prices_message" attrs="{'invisible': [('pricing','=','dynamic')]}">
                         <i>components prices are not shown when the sale order line pricing is set to 'fixed'</i>
                     </div>
                 </div>
             </xpath>
-            <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="after">
-                <field name="unit_compo_price" attrs="{'invisible': [('is_kit_order_line','=',False)]}"/>
+            <xpath expr="//field[@name='price_unit']" position="after">
+                <field name="unit_compo_price" attrs="{'invisible': [('is_kit_invoice_line','=',False)]}"/>
             </xpath>
-            <xpath expr="//field[@name='order_line']/form//field[@name='name']" position="after">
-                <div name="compo_content"
-                        attrs="{'readonly': [('state', 'in', ('done','cancel'))]}">
-                    <div name="components_ids" attrs="{'invisible': [('is_kit_order_line','=',False)]}">
+            <xpath expr="//field[@name='name']" position="after">
+                <div name="compo_content">
+                    <div name="components_ids" attrs="{'invisible': [('is_kit_invoice_line','=',False)]}">
                         <label for="direct_child_ids"/>
                         <field name="direct_child_ids" mode="tree"/>
                     </div>
@@ -66,16 +76,16 @@
     </record>
     
     <!--#############################################################################
-        ##                   SALE ORDER COMPONENT VIEWS
+        ##                   ACCOUNT INVOICE COMPONENT VIEWS
         #############################################################################
      -->
-    <record id="of_view_sale_comp_form" model="ir.ui.view">
-        <field name="name">of.kit.sale.order.line.comp.form</field>
-        <field name="model">sale.order.line.comp</field>
+    <record id="of_view_account_comp_form" model="ir.ui.view">
+        <field name="name">of.kit.account.invoice.comp.form</field>
+        <field name="model">account.invoice.line.comp</field>
         <field name="arch" type="xml">
             <form string="Sales Order Component">
             <header>
-                <h2>Sale Order Line Component</h2>
+                <h2>Invoice Line Component</h2>
             </header>
             <sheet>
                 <group>
@@ -84,19 +94,18 @@
                     <group name="General Information">
                         <field name="product_id"/>
                         <field name="name"/>
-                        <field name="order_id" required="False"/>
-                        <field name="order_line_id" required="False"/>
+                        <field name="invoice_id" required="False"/>
+                        <field name="invoice_line_id" required="False"/>
                         <field name="parent_id" attrs="{'invisible': [('parent_id','=',False)]}"/>
                         <field name="load_children"
-                            attrs="{'invisible': ['|',('children_loaded','=',True),('is_kit_order_comp','=',False)]}"/>
-                        <field name="customer_lead" attrs="{'invisible': [('is_kit_order_comp','=',True)]}"/>
+                            attrs="{'invisible': ['|',('children_loaded','=',True),('is_kit_invoice_comp','=',False)]}"/>
                     </group>
                     <group  name="Quantities">
                         <field name="qty_bom_line"/>
-                        <field name="qty_so_line"/>
+                        <field name="qty_inv_line"/>
                         <field name="nb_units"/>
                         <field name="qty_total"/>
-                        <field name="product_uom"/>
+                        <field name="uom_id"/>
                         <field name="display_qty_changed" invisible="1"/>
                         <div attrs="{'invisible': [('display_qty_changed','=',False)]}">
                             <i>Kit quantities are a bit tricky to update on the fly, please save your changes to recompute its children quantities</i>
@@ -107,33 +116,33 @@
                     <div/>
                     <group name="Prices" attrs="{'invisible': [('hide_prices','=',True)]}">
                         <!--<field name="pricing" required="False"/>-->
-                        <field name="unit_price" attrs="{'invisible': [('is_kit_order_comp','=',True)]}"/>
-                        <field name="children_price" attrs="{'invisible': [('is_kit_order_comp','=',False)]}"/>
+                        <field name="unit_price" attrs="{'invisible': [('is_kit_invoice_comp','=',True)]}"/>
+                        <field name="children_price" attrs="{'invisible': [('is_kit_invoice_comp','=',False)]}"/>
                         <field name="shown_price"/>
                         <field name="shown_price_total"/>
                     </group>
                 </group>
                 <div name="hide_prices_message" attrs="{'invisible': [('hide_prices','=',False)]}">
-                    <i>prices are not shown when the sale order line pricing is set to 'fixed'</i>
+                    <i>prices are not shown when the invoice line pricing is set to 'fixed'</i>
                 </div>
-                <separator string="Underkit Components" name="Underkit Components" attrs="{'invisible': [('is_kit_order_comp','=',False)]}"/>
-                <field name="child_ids" mode="tree" attrs="{'invisible': [('is_kit_order_comp','=',False)]}">
+                <separator string="Underkit Components" name="Underkit Components" attrs="{'invisible': [('is_kit_invoice_comp','=',False)]}"/>
+                <field name="child_ids" mode="tree" attrs="{'invisible': [('is_kit_invoice_comp','=',False)]}">
                     <tree string="Underkit Components">
                         <field name="product_id"/>
                         <field name="bom_path"/>
                         <field name="rec_lvl" invisible="1"/>
-                        <field name="is_kit_order_comp" invisible="1"/>
-                        <!--<field name="order_line_pricing" invisible="1"/>-->
+                        <field name="is_kit_invoice_comp" invisible="1"/>
+                        <!--<field name="invoice_line_pricing" invisible="1"/>-->
                         <field name="parent_id" invisible="1"/>
                         <field name="child_ids" invisible="1"/>
-                        <!-- <field name="order_line_id"/> -->
+                        <!-- <field name="invoice_line_id"/> -->
                         <field name="name"/>
                         <field name="qty_bom_line"/>
-                        <field name="qty_so_line"/>
+                        <field name="qty_inv_line"/>
                         <field name="qty_total" invisible="1"/>
-                        <field name="product_uom"/>
+                        <field name="uom_id"/>
                         <field name="hide_prices" invisible="1"/>
-                        <field name="unit_price" attrs="{'invisible': ['|',('is_kit_order_comp','=',True),('hide_prices','=',True)]}"/>
+                        <field name="unit_price" attrs="{'invisible': ['|',('is_kit_invoice_comp','=',True),('hide_prices','=',True)]}"/>
                         <field name="shown_price" attrs="{'invisible': [('hide_prices','=',True)]}"/>
                         <field name="shown_price_total" attrs="{'invisible': [('hide_prices','=',True)]}"/>
                     </tree>
@@ -141,10 +150,10 @@
                 <separator string="Developer Mode Information" name="Developer Mode Information" groups="base.group_no_one"/>
                 <group name="Developer Mode Information" groups="base.group_no_one">
                     <field name="id"/>
-                    <field name="is_kit_order_comp"/>
+                    <field name="is_kit_invoice_comp"/>
                     <field name="rec_lvl"/>
                     <field name="bom_path"/>
-                    <!--<field name="order_line_pricing"/>-->
+                    <!--<field name="invoice_line_pricing"/>-->
                     <field name="children_loaded"/>
                     <field name="hide_prices"/>
                 </group>
@@ -152,31 +161,31 @@
             </form>
         </field>
     </record>
-
-    <record id="of_view_sale_comp_tree" model="ir.ui.view">
-        <field name="name">of.kit.sale.order.line.comp.tree</field>
-        <field name="model">sale.order.line.comp</field>
+    
+    <record id="of_view_account_comp_tree" model="ir.ui.view">
+        <field name="name">of.kit.account.invoice.line.comp.tree</field>
+        <field name="model">account.invoice.line.comp</field>
         <field name="arch" type="xml">
             <tree string="Kit components">
                 <field name="rec_lvl" invisible="1"/>
-                <field name="is_kit_order_comp" invisible="1"/>
-                <!-- <field name="order_line_id" invisible="1"/> -->
-                <!--<field name="order_line_pricing" invisible="1"/>-->
+                <field name="is_kit_invoice_comp" invisible="1"/>
+                <!-- <field name="invoice_line_id" invisible="1"/> -->
+                <!--<field name="invoice_line_pricing" invisible="1"/>-->
                 <field name="parent_id" invisible="1"/>
                 <field name="child_ids" invisible="1"/>
                 <field name="bom_path"/>
                 <field name="product_id"/>
                 <field name="name"/>
                 <field name="qty_bom_line"/>
-                <field name="qty_so_line"/>
+                <field name="qty_inv_line"/>
                 <field name="qty_total"/>
-                <field name="product_uom"/>
+                <field name="uom_id"/>
                 <field name="hide_prices" invisible="1"/>
-                <field name="unit_price" attrs="{'invisible': ['|',('is_kit_order_comp','=',True),('hide_prices','=',True)]}"/>
+                <field name="unit_price" attrs="{'invisible': ['|',('is_kit_invoice_comp','=',True),('hide_prices','=',True)]}"/>
                 <field name="shown_price" attrs="{'invisible': [('hide_prices','=',True)]}"/>
-                <!--<field name="shown_price_total" attrs="{'invisible': [('is_kit_order_comp','=',True)]}"/>-->
+                <!--<field name="shown_price_total" attrs="{'invisible': [('is_kit_invoice_comp','=',True)]}"/>-->
             </tree>
         </field>
     </record>
-
+    
 </odoo>

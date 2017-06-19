@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="of_report_invoice_document" inherit_id="account.report_invoice_document">
+        <xpath expr="//span[@t-field='l.name']" position="after">
+            <t t-if="l.is_kit_invoice_line and o.kit_display_mode == 'collapse'">
+                <span t-esc="l.get_kit_descr_collapse()"/>
+            </t>
+        </xpath>
+        <xpath expr="//tr[@t-as='l']" position="inside">
+            <t t-if="l.is_kit_invoice_line and o.kit_display_mode == 'expand'">
+                <t t-set="line_comps" t-value="l.get_all_comps()"/>
+                <t t-foreach="line_comps" t-as="comp">
+                    <tr>
+                        <td>
+                            <t t-foreach="(comp.rec_lvl)-1" t-as="lvl">
+                                <span style="padding: 0 8px;">-</span>
+                            </t>
+                            <span style="padding: 0 8px;">-&gt;</span><span t-field="comp.name"/>
+                        </td>
+                        <td class="text-right">
+                            <span t-field="comp.qty_total"/>
+                            <span t-field="comp.uom_id" groups="product.group_uom"/>
+                        </td>
+                        <td t-if="display_discount" class="text-right">
+                            <span> - </span>
+                        </td>
+                        <td class="text-right">
+                            <span> - </span>
+                        </td>
+                        <td class="text-right">
+                            <span> - </span>
+                        </td>
+                        <td class="text-right">
+                            <span> - </span>
+                        </td>
+                    </tr>
+                </t>
+            </t>
+        </xpath>
+    </template>
+</odoo>
