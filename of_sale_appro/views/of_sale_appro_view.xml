@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Bons de commande -->
+
+        <record id="of_sale_appro_view_move_picking_tree" model="ir.ui.view">
+            <field name="name">of.sale.appro.stock.move.tree</field>
+            <field name="model">stock.move</field>
+            <field name="inherit_id" ref="stock.view_move_picking_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree" position="inside">
+                    <button name="button_create_procurement" type="object" states="confirmed" icon="fa-cogs"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>
