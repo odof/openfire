@@ -12,7 +12,7 @@ class OfPlanningJour(report_sxw.rml_parse):
             'get_heure': self.get_heure,
             'get_client': self.get_client,
             'get_local_datetime': self.get_local_datetime,
-         })
+            })
 
     def get_local_datetime(self):
         user = self.localcontext['user']

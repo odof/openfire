@@ -1,3 +1,3 @@
 # -*- encoding: utf-8 -*-
 
-import of_service
+from . import of_service

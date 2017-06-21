@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo.report import report_sxw
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 from odoo import fields
 
 class OfPlanningSemaine(report_sxw.rml_parse):
@@ -14,7 +14,7 @@ class OfPlanningSemaine(report_sxw.rml_parse):
             'get_heure': self.get_heure,
             'get_client': self.get_client,
             'get_local_datetime': self.get_local_datetime,
-         })
+            })
 
     def set_context(self, objects, data, ids, report_type=None):
         # Ajout des dates de debut et de fin de la recherche dans localcontext

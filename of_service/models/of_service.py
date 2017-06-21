@@ -39,19 +39,18 @@ class OfService(models.Model):
         return [('jour_ids', 'in', jours.ids)]
 
     @api.one
-    @api.depends('tache_id','address_id')
+    @api.depends('tache_id', 'address_id')
     def _get_planning_ids(self):
         planning_obj = self.env['of.planning.intervention']
         for service in self:
-            plannings = planning_obj.search([('tache_id','=',service.tache_id.id),
-                                             ('address_id','=',service.address_id.id)], order='date desc')
+            plannings = planning_obj.search([('tache_id', '=', service.tache_id.id),
+                                             ('address_id', '=', service.address_id.id)], order='date desc')
             service.planning_ids = plannings
             service.date_last = plannings and plannings[0].date or False
 
     @api.model
     def _search_last_date(self, operator, operand):
         cr = self._cr
-        print [('date_last', operator, operand)]
 
         query = ("SELECT s.id\n"
                  "FROM of_service AS s\n"
@@ -96,12 +95,12 @@ class OfService(models.Model):
 #    template_id = fields.Many2one('of.mail.template', string='Contrat')
     partner_id = fields.Many2one('res.partner', string='Partenaire', ondelete='cascade')
     address_id = fields.Many2one('res.partner', string="Adresse", ondelete='restrict')
-    
+
     # 3 champs ajoutés pour la vue map
     geo_lat = fields.Float(related='address_id.geo_lat')
     geo_lng = fields.Float(related='address_id.geo_lng')
     partner_name = fields.Char(related='partner_id.name')
-    
+
     tache_id = fields.Many2one('of.planning.tache', string=u'Tâche', required=True)
     name = fields.Char(u"Libellé", related='tache_id.name', store=True)
 
@@ -117,9 +116,9 @@ class OfService(models.Model):
     partner_city = fields.Char('Ville', related='address_id.city')
 
     state = fields.Selection([
-            ('progress', 'En cours'),
-            ('cancel', u'Annulé'),
-            ], u'État', default='progress')
+        ('progress', 'En cours'),
+        ('cancel', u'Annulé'),
+        ], u'État', default='progress')
 
     planning_ids = fields.One2many('of.planning.intervention', compute='_get_planning_ids', string="Interventions")
     date_last = fields.Date(u'Dernière intervention', compute='_get_planning_ids', search='_search_last_date', help=u"Date de la dernière intervention")
@@ -141,7 +140,7 @@ class OfService(models.Model):
         #     Pour éviter les ennuis, elle est donc restreinte à un usage en mode création de nouveau service uniquement
         if self.date_next and isinstance(self.id, models.NewId):
             mois_id = int(self.date_next[5:7])
-            self.mois_ids = [(4,mois_id)]
+            self.mois_ids = [(4, mois_id)]
 
     @api.multi
     def get_next_date(self, date_str):
@@ -156,7 +155,7 @@ class OfService(models.Model):
             # Le rdv a été pris en avance pour le mois suivant
             date_mois += 1
 
-        mois = min(mois_ids, key=lambda m: (m<=date_mois, m))
+        mois = min(mois_ids, key=lambda m: (m <= date_mois, m))
         annee = date_annee + (mois <= date_mois)
         return fields.Date.to_string(date(annee, mois, 1))
 
@@ -192,4 +191,3 @@ class ResPartner(models.Model):
     service_address_ids = fields.One2many('of.service', 'address_id', string='Services')
     service_partner_ids = fields.One2many('of.service', 'partner_id', string='Services du partenaire',
                                           help="Services liés au partenaire, incluant les services des contacts associés")
-

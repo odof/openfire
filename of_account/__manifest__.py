@@ -18,13 +18,12 @@ Ce module apporte une personnalisation de la comptabilité :
     'depends' : [
         'account',
     ],
-    'demo_xml' : [ ],
+    'demo_xml' : [],
     'data': [
         'views/of_account_view.xml',
         'views/report_invoice.xml',
         'wizard/wizard_invoice_group_view.xml',
     ],
     'installable': False,
-    'active': False,
 }
 # vim:expandtab:smartindent:tabstop=4:sorderttabstop=4:shiftwidth=4:

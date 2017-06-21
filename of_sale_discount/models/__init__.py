@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-import of_sale_discount
+from . import of_sale_discount

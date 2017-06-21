@@ -6,9 +6,9 @@ class OfPlanningReport(models.TransientModel):
     _name = 'of.planning.report'
 
     type = fields.Selection([
-        ('day',u"Journée"),
+        ('day', u"Journée"),
         ('week', "Semaine"),
-#        ('week2', u"Semaine (condensé)"),
+        # ('week2', u"Semaine (condensé)"),
     ], string="Type", required=True, default='day')
     date_start = fields.Date("Date")
     equipe_ids = fields.Many2many('of.planning.equipe', string=u"Équipes")
@@ -33,7 +33,3 @@ class OfPlanningReport(models.TransientModel):
             'report_name': report_type_name[self.type],
             'datas' : data,
         }
-
-        next_state = data['model']
-
-        return next_state

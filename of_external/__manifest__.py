@@ -2,12 +2,12 @@
 
 {
     'name': 'OpenFire External',
-    'author':'OpenFire',
+    'author': 'OpenFire',
     'version': '10.0',
     'category': 'OpenFire modules',
     'summary': 'Default PDF header/footer rendering',
     'description': """
-        
+
     """,
     'website': 'openfire.fr',
     'depends': ['report'],

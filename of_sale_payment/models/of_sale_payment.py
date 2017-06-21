@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
+from odoo import models, fields, api
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -63,7 +63,7 @@ class AccountPayment(models.Model):
                 if order.payment_term_id:
                     amount_to_pay = 0
                     to_pay = order.payment_term_id.compute(order.amount_total)[0]
-                    for _,am in to_pay:
+                    for _, am in to_pay:
                         # Autorisation de 1€ d'ecart entre le montant payé et le montant dû
                         if amount_to_pay - 1 > amount_paid:
                             amount = round(amount_to_pay - amount_paid)

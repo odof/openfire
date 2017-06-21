@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-import of_account_tax
+from . import of_account_tax

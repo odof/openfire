@@ -3,7 +3,7 @@
 import threading
 
 from odoo import models, api, tools
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import ValidationError
 from odoo.modules import get_module_resource
 from odoo.tools import OrderedSet
 
@@ -101,13 +101,13 @@ class OfReadGroup(models.AbstractModel):
                 for d in fetched_data:
                     d[gb_field] = gb_dict.get(d[gb_field], False)
 
-        data = map(lambda r: {k: self._read_group_prepare_data(k,v, groupby_dict) for k,v in r.iteritems()}, fetched_data)
+        data = map(lambda r: {k: self._read_group_prepare_data(k, v, groupby_dict) for k, v in r.iteritems()}, fetched_data)
         result = [self._read_group_format_result(d, annotated_groupbys, groupby, domain) for d in data]
         if lazy:
             # Right now, read_group only fill results in lazy mode (by default).
             # If you need to have the empty groups in 'eager' mode, then the
             # method _read_group_fill_results need to be completely reimplemented
-            # in a sane way 
+            # in a sane way
             result = self._read_group_fill_results(
                 domain, groupby_fields[0], groupby[len(annotated_groupbys):],
                 aggregated_fields, count_field, result, read_group_order=order,
@@ -133,7 +133,7 @@ class ResPartner(models.Model):
         # get the information that will be injected into the display format
         # get the address format
         address_format = self.country_id.address_format or \
-              "%(street)s\n%(street2)s\n%(zip)s %(city)s\n%(country_name)s" # Ligne changée par OpenFire
+            "%(street)s\n%(street2)s\n%(zip)s %(city)s\n%(country_name)s"  # Ligne changée par OpenFire
         args = {
             'state_code': self.state_id.code or '',
             'state_name': self.state_id.name or '',
@@ -149,7 +149,7 @@ class ResPartner(models.Model):
             address_format = '%(company_name)s\n' + address_format
         return address_format % args
 
-    # Pour afficher dans le menu déroulant de choix de partenaire l'adresse du contact et pas que le nom 
+    # Pour afficher dans le menu déroulant de choix de partenaire l'adresse du contact et pas que le nom
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
         if self._context.get('show_address'):
@@ -194,9 +194,9 @@ class ResPartner(models.Model):
     def _add_missing_default_values(self, values):
         # La référence par défaut est celle du parent
         parent_id = values.get('parent_id')
-        if parent_id and isinstance(parent_id, (int,long)) and not values.get('ref') and 'default_ref' not in self._context:
+        if parent_id and isinstance(parent_id, (int, long)) and not values.get('ref') and 'default_ref' not in self._context:
             values['ref'] = self.browse(parent_id).ref
-        return super(ResPartner,self)._add_missing_default_values(values)
+        return super(ResPartner, self)._add_missing_default_values(values)
 
     @api.onchange('parent_id')
     def onchange_parent_id(self):
@@ -214,7 +214,7 @@ class ResPartner(models.Model):
         cr.execute("SELECT id,parent_id FROM res_partner WHERE ref = %s", (ref,))
         while True:
             ids = set()
-            for id,pid in cr.fetchall():
+            for id, pid in cr.fetchall():
                 if pid:
                     ids.add(pid)
                 elif parent_id:
@@ -237,7 +237,7 @@ class ResPartner(models.Model):
     def _update_refs(self, new_ref, partner_refs):
         # Avant de mettre a jour les enfants, on vérifie que les partenaires avec cette référence ont bien tous un parent commun
         self._check_no_ref_duplicate(new_ref)
-        
+
         to_update_ids = []
         while partner_refs:
             partner, old_ref = partner_refs.pop()
@@ -245,9 +245,9 @@ class ResPartner(models.Model):
                 if child.ref == old_ref:
                     # La reference du contact était la même que celle du parent, on met à jour et on continue le parcours
                     to_update_ids.append(child.id)
-                    partner_refs.append((child,old_ref))
+                    partner_refs.append((child, old_ref))
         if to_update_ids:
-            self.env['res.partner'].browse(to_update_ids).write({'ref':new_ref})
+            self.env['res.partner'].browse(to_update_ids).write({'ref': new_ref})
         return True
 
     @api.multi
@@ -257,10 +257,8 @@ class ResPartner(models.Model):
         if write_ref:
             # La référence est modifiée, il va falloir propager la nouvelle valeur aux enfants
             ref = vals['ref']
-            partner_refs = [(partner,partner.ref) for partner in self if partner.ref != ref]
-        super(ResPartner,self).write(vals)
+            partner_refs = [(partner, partner.ref) for partner in self if partner.ref != ref]
+        super(ResPartner, self).write(vals)
         if write_ref:
             self._update_refs(ref, partner_refs)
         return True
-    
-    

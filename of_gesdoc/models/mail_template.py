@@ -4,10 +4,14 @@ from odoo import models, fields, api, _
 
 import StringIO
 import base64
-from pdfminer.pdfparser import PDFParser
-from pdfminer.pdfdocument import PDFDocument
-from pdfminer.pdftypes import resolve1
-from pdfminer.utils import decode_text
+
+try:
+    from pdfminer.pdfparser import PDFParser
+    from pdfminer.pdfdocument import PDFDocument
+    from pdfminer.pdftypes import resolve1
+    from pdfminer.utils import decode_text
+except ImportError:
+    PDFParser = PDFDocument = resolve1 = decode_text = None
 
 class OfMailTemplate(models.Model):
     "Templates for printing mail"
@@ -56,9 +60,9 @@ class OfMailTemplate(models.Model):
             for i in fields:
                 field = resolve1(i)
                 name = field.get('T').decode("unicode-escape", 'ignore')
-                value = pre_vals.get(name) \
-                     or (field.get('V') and decode_text(field['V'])) \
-                     or ''
+                value = pre_vals.get(name)\
+                    or (field.get('V') and decode_text(field['V']))\
+                    or ''
                 chps.append((0, 0, {
                     'name': name,
                     'value_openfire': value,

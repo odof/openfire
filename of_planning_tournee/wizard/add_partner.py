@@ -1,3 +1,4 @@
+"""
 from osv import fields, osv
 from datetime import datetime, timedelta, date, time
 import calendar
@@ -222,3 +223,4 @@ class of_res_add_partner(osv.TransientModel):
     }
     
 of_res_add_partner()
+"""

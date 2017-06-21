@@ -40,11 +40,11 @@ class ProjectIssue(models.Model):
         """ Fonction lancée à l'installation, après la création de la séquence.
             Remplit la colonne 'of_code' pour tous les SAV déjà saisis
         """
-        to_set_of_code = self.sudo().search(['|',('of_code', '=', ''),('of_code', '=', False)])
+        to_set_of_code = self.sudo().search(['|', ('of_code', '=', ''), ('of_code', '=', False)])
         if to_set_of_code:
             seq_obj = self.env['ir.sequence']
             query = "UPDATE project_issue SET of_code='%s' WHERE id=%s"
-            for helpdesk_id in to_set_of_code [::-1]:
+            for helpdesk_id in to_set_of_code[::-1]:
                 of_code = seq_obj.sudo().get('of.project.issue')
                 if not of_code:
                     # La séquence n'a pas été trouvée
@@ -78,26 +78,27 @@ class ProjectIssue(models.Model):
     def _get_fourn_messages(self):
         mail_obj = self.env['mail.message']
         result = {}
-        models = [('purchase.order','name'), ('account.invoice','internal_number')]
+        models = [('purchase.order', 'name'), ('account.invoice', 'internal_number')]
 
         for sav in self.read(['of_code']):
             of_codes = [sav['of_code']]
 
-            mails = mail_obj.search([('model','=',self._name),('res_id','=',sav['id']),('partner_id.supplier','=',True)])
-            model_ids = {model:[] for model,_ in models}
+            mails = mail_obj.search([('model', '=', self._name), ('res_id', '=', sav['id']), ('partner_id.supplier', '=', True)])
+            model_ids = {model: [] for model, _ in models}
 
             while of_codes:
                 of_code = of_codes.pop()
-                for model,of_code_field in models:
-                    mod_ids = self.pool[model].search([('partner_id.supplier','=',True),('origin','like',of_code),('id','not in',model_ids[model])])
+                for model, of_code_field in models:
+                    mod_ids = self.pool[model].search([('partner_id.supplier', '=', True), ('origin', 'like', of_code),
+                                                       ('id', 'not in', model_ids[model])])
                     if mod_ids:
                         model_ids[model] += mod_ids
-                        mails += mail_obj.search([('model','=',model),('res_id','in',mod_ids)])
+                        mails += mail_obj.search([('model', '=', model), ('res_id', 'in', mod_ids)])
                         vals = self.pool[model].read(mod_ids, [of_code_field])
                         of_codes += [v[of_code_field] for v in vals]
             # On remet les mails dans l'ordre
             if mails:
-                mails = mail_obj.search([('id','in',mails)])
+                mails = mail_obj.search([('id', 'in', mails)])
             result[sav['id']] = mails
         return result
 
@@ -123,8 +124,7 @@ class ProjectIssue(models.Model):
         #         result[sav.id] = categ_id
         #     return result
 
-
-    of_code = fields.Char('Code', size=64, required=True, readonly=True, select=True, default='Nouveau') # Migration 9 states={'draft': [('readonly', False)]},
+    of_code = fields.Char('Code', size=64, required=True, readonly=True, select=True, default='Nouveau')  # Migration 9 states={'draft': [('readonly', False)]},
     partner_note = fields.Text("Note client", related='partner_id.comment', readonly=False)
     invoice_ids = fields.One2many('account.invoice', compute='_get_partner_invoices', string='Factures du client', method=True, readonly=True)
     of_categorie_id = fields.Many2one('of.project.issue.categorie', u'Catégorie', required=False, ondelete='restrict')
@@ -136,13 +136,13 @@ class ProjectIssue(models.Model):
     of_intervention = fields.Text("Nature de l'intervention")
     of_piece_commande = fields.Text('Pièces à commander')
     # Migration 'shop_id'            : fields_oldapi.many2one('sale.shop', 'Magasin'),
-    # Migration 'partner_shop_id'    : fields_oldapi.related('partner_id','partner_maga', type="many2one", relation="sale.shop", string="Magasin client", readonly=True),
+    # Migration 'partner_shop_id'    : fields_oldapi.related('partner_id', 'partner_maga', type="many2one", relation="sale.shop", string="Magasin client", readonly=True),
     doc_ids = fields.One2many('of.sav.docs', 'project_issue_id', string="Liste de documents")
-    fourn_ids = fields.One2many('res.partner', compute='_get_fournisseurs', string="Fournisseurs", readonly=True, domain=[('supplier','=',True)])
+    fourn_ids = fields.One2many('res.partner', compute='_get_fournisseurs', string="Fournisseurs", readonly=True, domain=[('supplier', '=', True)])
     fourn_msg_ids = fields.One2many('mail.message', compute='_get_fourn_messages', string="Historique fournisseur")
-    #Migration 9         'categ_parent_id'    : fields_oldapi.function(_get_categ_parent_id, method=True, string=u"Catégorie parent", type='many2one', relation='crm.case.categ',
+    # Migration 9        'categ_parent_id'    : fields_oldapi.function(_get_categ_parent_id, method=True, string=u"Catégorie parent", type='many2one', relation='crm.case.categ',
     #                                     store={'project.issue': (lambda self, cr, uid, ids, *a:ids, ['categ_id'], 10),
-    #                                            'categ_id'    : (lambda self, cr, uid, ids, *a:self.pool['of.project.issue'].search(cr, uid, [('categ_id','in',ids)]), ['parent_id'], 10),
+    #                                            'categ_id'    : (lambda self, cr, uid, ids, *a:self.pool['of.project.issue'].search(cr, uid, [('categ_id', 'in', ids)]), ['parent_id'], 10),
     #                                            }),
     interventions_liees = fields.One2many('of.planning.intervention', 'sav_id', u'Interventions liées', readonly=False)
     # Migration 'show_partner_shop'  : fields_oldapi.function(_get_show_partner_shop, type="boolean", string="Magasin différent"),
@@ -151,7 +151,6 @@ class ProjectIssue(models.Model):
     of_partner_id_phone = fields.Char(u'Téléphone', related='partner_id.phone', readonly=True)
     of_partner_id_mobile = fields.Char(u'Mobile', related='partner_id.mobile', readonly=True)
     of_partner_id_function = fields.Char(u'Fonction', related='partner_id.function', readonly=True)
-
 
     _defaults = {
         'date' : lambda *a: time.strftime('%Y-%m-%d %H:%M:00'),
@@ -167,10 +166,9 @@ class ProjectIssue(models.Model):
             email_from = self.email_from
             super(ProjectIssue, self)._onchange_project_id()
             self.partner_id = partner_id
-            self.email_from =  email_from
+            self.email_from = email_from
         else:
             super(ProjectIssue, self)._onchange_project_id()
-
 
     # Quand on clique sur le bouton "Ouvrir" dans la liste des SAV pour aller sur le SAV
     @api.multi
@@ -184,7 +182,6 @@ class ProjectIssue(models.Model):
                 'res_id': self._ids[0],
                 'type': 'ir.actions.act_window',
             }
-
 
     # Migration magasin non migré
     # @api.onchange('shop_id')
@@ -255,16 +252,15 @@ class ProjectIssue(models.Model):
             #             'state': p_order.state,
             #             'purchase_order_id': p_order.id,
             #         })
-        docs.sort(key=lambda k: k['date'], reverse=True) # Trie des résultats en fonction de la date
+        docs.sort(key=lambda k: k['date'], reverse=True)  # Trie des résultats en fonction de la date
         return docs
-
 
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
         # Pour actualiser l'adresse et la liste des documents liés au partenaire
         super(ProjectIssue, self)._onchange_partner_id()
         docs = [(5, )]
-        for i in self.liste_docs_partner(): # On récupère la liste des documents liés au partenaire (factures, ...)
+        for i in self.liste_docs_partner():  # On récupère la liste des documents liés au partenaire (factures, ...)
             docs.append((0, 0, i))
 
         self.doc_ids = docs
@@ -290,14 +286,13 @@ class ProjectIssue(models.Model):
             'target': 'current',
         }
         if 'active_ids' in self._context.keys():
-            active_ids = isinstance(self._context['active_ids'], (int,long)) and [self._context['active_ids']] or self._context['active_ids']
+            active_ids = isinstance(self._context['active_ids'], (int, long)) and [self._context['active_ids']] or self._context['active_ids']
             if active_ids:
                 project_issue = self.browse(active_ids[0])
                 res['context'] = {'default_sav_id': project_issue.id}
                 if project_issue.partner_id:
                     res['context']['default_partner_id'] = project_issue.partner_id.id
         return res
-
 
     @api.model
     def open_purchase_order(self):
@@ -310,7 +305,7 @@ class ProjectIssue(models.Model):
             'target': 'current',
         }
         if 'active_ids' in self._context.keys():
-            active_ids = isinstance(self._context['active_ids'], (int,long)) and [self._context['active_ids']] or self._context['active_ids']
+            active_ids = isinstance(self._context['active_ids'], (int, long)) and [self._context['active_ids']] or self._context['active_ids']
             if active_ids:
                 project_issue = self.browse(active_ids[0])
                 if project_issue.partner_id:
@@ -331,7 +326,7 @@ class ProjectIssue(models.Model):
             'target': 'current',
         }
         if 'active_ids' in self._context.keys():
-            active_ids = isinstance(self._context['active_ids'], (int,long)) and [self._context['active_ids']] or self._context['active_ids']
+            active_ids = isinstance(self._context['active_ids'], (int, long)) and [self._context['active_ids']] or self._context['active_ids']
             if active_ids:
                 project_issue = self.browse(active_ids[0])
                 if project_issue.partner_id:
@@ -346,7 +341,6 @@ class ProjectIssue(models.Model):
         if vals.get('of_code', 'Nouveau') == 'Nouveau':
             vals['of_code'] = self.env['ir.sequence'].next_by_code('of.project.issue') or 'New'
         return super(ProjectIssue, self).create(vals)
-
 
     @api.one
     @api.returns('self', lambda value: value.id)
@@ -446,9 +440,9 @@ class ProjectIssue(models.Model):
 #         'res_id': fields_oldapi.integer("res_id"),
 #         'context': fields_oldapi.text('Contexte', required=False)
 #     }
-#            
+#
 #     def default_get(self, cr, uid, fields_list=None, context=None):
-#         """ Remplie les champs de l'interface courriel avec les valeurs par défaut"""        
+#         """ Remplie les champs de l'interface courriel avec les valeurs par défaut"""
 #         if not context:
 #             return False
 #         result = {'src': context.get('src', []),
@@ -461,7 +455,7 @@ class ProjectIssue(models.Model):
 #                   }
 #         result.update(super(of_project_issue_mail_wizard, self).default_get(cr, uid, fields_list, context=context))
 #         return result
-# 
+#
 #     def envoyer_courriel(self, cr, uid, ids, context=None):
 #         # On récupère les données du wizard
 #         wizard = self.browse(cr, uid, ids[0], context=context)
@@ -473,12 +467,12 @@ class ProjectIssue(models.Model):
 #         reply_to = wizard.reply_to
 #         res_id = wizard.res_id
 #         attachments = {}
-#         
+#
 #         if not src or not dest or not subject or not body or not model or not res_id:
 #             return False
-#         
+#
 #         body = self.pool['base.action.rule'].format_body(body)
-#         
+#
 #         mail_message = self.pool['mail.message']
 #         mail_message.schedule_with_attach(cr, uid,
 #             src,
@@ -491,21 +485,19 @@ class ProjectIssue(models.Model):
 #             attachments=attachments,
 #             context=context
 #         )
-#         return {'type': 'ir.actions.act_window_close'} 
-
-
+#         return {'type': 'ir.actions.act_window_close'}
 
 # Migration 9 plus crm_case_categ
 # class crm_case_categ(osv.Model):
 #     """ Category of Case """
 #     _name = "crm.case.categ"
 #     _inherit = "crm.case.categ"
-#     
+#
 #     # Migration ok
 #     def name_get(self, cr, uid, ids, context=None):
 #         if not len(ids):
 #             return []
-#         reads = self.read(cr, uid, ids, ['name','parent_id'], context=context)
+#         reads = self.read(cr, uid, ids, ['name', 'parent_id'], context=context)
 #         res = []
 #         for record in reads:
 #             name = record['name']
@@ -513,12 +505,12 @@ class ProjectIssue(models.Model):
 #                 name = record['parent_id'][1]+' / '+name
 #             res.append((record['id'], name))
 #         return res
-# 
+#
 #     # Migration ok
 #     def _name_get_fnc(self, cr, uid, ids, prop, unknow_none, context=None):
 #         res = self.name_get(cr, uid, ids, context=context)
 #         return dict(res)
-# 
+#
 #     _columns = {
 #         'complete_name': fields_oldapi.function(_name_get_fnc, type="char", string='Catégorie'),
 #         'parent_id': fields_oldapi.many2one('crm.case.categ', u'Cat\u00E9gorie parent', select=True, ondelete='cascade'),
@@ -526,25 +518,25 @@ class ProjectIssue(models.Model):
 #         'parent_left': fields_oldapi.integer('Parent gauche', select=1),
 #         'parent_right': fields_oldapi.integer(u'Parent droit', select=1),
 #     }
-#     
+#
 #     _constraints = [
 #         (osv.Model._check_recursion, u'Erreur ! Vous ne pouvez pas cr\u00E9er de cat\u00E9gories r\u00E9cursives', ['parent_id'])
 #     ]
-# 
+#
 #     _parent_name = "parent_id"
 #     _parent_store = True
 #     _parent_order = 'name'
 #     _order = 'parent_left'
-# 
+#
 #     # Migration ok
 #     def _get_children(self, cr, uid, ids, context=None):
 #         """ Retourne la liste des ids ainsi que leurs enfants et petits-enfants en respectant self._order
 #         """
 #         domain = ['|' for _ in xrange(len(ids)-1)]
-#         for categ in self.read(cr, uid, ids, ['parent_left','parent_right'], context=context):
-#             domain += ['&',('parent_left','>=',categ['parent_left']),('parent_right','<=',categ['parent_right'])]
+#         for categ in self.read(cr, uid, ids, ['parent_left', 'parent_right'], context=context):
+#             domain += ['&',('parent_left', '>=',categ['parent_left']),('parent_right', '<=',categ['parent_right'])]
 #         return self.search(cr, uid, domain, context=context)
-# 
+#
 #     # Migration ok
 #     def _name_search(self, cr, user, name='', args=None, operator='ilike', context=None, limit=100, name_get_uid=None):
 #         if args is None:
@@ -560,7 +552,6 @@ class ProjectIssue(models.Model):
 #         ids = self._get_children(cr, user, ids, context=None)
 #         res = self.name_get(cr, access_rights_uid, ids, context)
 #         return res
-
 
 # Catégorie de SAV
 class OfProjectIssueCategorie(models.Model):
@@ -607,8 +598,8 @@ class OfProjectIssueCategorie(models.Model):
         """ Retourne la liste des ids ainsi que leurs enfants et petits-enfants en respectant self._order
         """
         domain = ['|' for _ in xrange(len(self.ids)-1)]
-        for categ in self.read(['parent_left','parent_right']):
-            domain += ['&',('parent_left','>=',categ['parent_left']),('parent_right','<=',categ['parent_right'])]
+        for categ in self.read(['parent_left', 'parent_right']):
+            domain += ['&', ('parent_left', '>=', categ['parent_left']), ('parent_right', '<=', categ['parent_right'])]
         return self.search(domain)
 
     @api.model
@@ -652,10 +643,8 @@ class OfProjectIssueCategorie(models.Model):
 # Canal SAV
 class of_project_issue_canal(models.Model):
     _name = "of.project.issue.canal"
-    
+
     name = fields.Char(u'Catégorie', size=32)
-
-
 
 class of_sav_docs(models.TransientModel):
 
@@ -686,7 +675,8 @@ class of_sav_docs(models.TransientModel):
         if args and len(args) == 1 and len(args[0]) == 3 and args[0][0] == "project_issue_id":
             # Si la liste des docs a été mise à jour il y a moins de 15 s, c'est un appel répétitif, on ne génère pas une nouvelle liste
             if res:
-                self._cr.execute("Select (extract(epoch from now() at time zone 'UTC') - extract(epoch from create_date)) FROM of_sav_docs WHERE id = %s limit 1", (res[0].id,))
+                self._cr.execute("SELECT (extract(epoch from now() at time zone 'UTC') - extract(epoch from create_date)) "
+                                 "FROM of_sav_docs WHERE id = %s limit 1", (res[0].id,))
                 if self._cr.fetchone()[0] < 15:
                     return res
 
@@ -752,12 +742,11 @@ class ResPartner(models.Model):
                 partners += partners[ind].child_ids
                 ind += 1
             partner_ids = [p.id for p in partners]
-            partner.project_issue_ids = issue_obj.search([('partner_id','in',partner_ids)])
+            partner.project_issue_ids = issue_obj.search([('partner_id', 'in', partner_ids)])
 
     project_issue_ids = fields.One2many('project.issue', compute='_compute_project_issue_ids', string='SAV')
 
-
-# Migration
+# Migration
 #     def _get_courriels(self, cr, uid, ids, *args):
 #         result = {}
 #         for part in self.browse(cr, uid, ids):
@@ -771,11 +760,10 @@ class ResPartner(models.Model):
 #                 email = ' || '.join(emails)
 #             result[part.id] = email
 #         return result
-#     
+#
 #     _columns = {
 #         'courriels': fields_oldapi.function(_get_courriels, string="Courriels", type='char', size=256),
 #     }
-
 
 class OfPlanningIntervention(models.Model):
     _name = "of.planning.intervention"

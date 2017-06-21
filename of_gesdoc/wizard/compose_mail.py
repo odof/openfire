@@ -1,12 +1,16 @@
 # -*- encoding: utf-8 -*-
 
 from odoo import models, fields, api
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import UserError
 
 import time
-import pypdftk
 import os
 import base64
+
+try:
+    import pypdftk
+except ImportError:
+    pypdftk = None
 
 class OfComposeMail(models.TransientModel):
     _name = 'of.compose.mail'
@@ -64,7 +68,7 @@ class OfComposeMail(models.TransientModel):
                     order = line.sale_line_ids[0].order_id
                     break
 
-        addresses = partner.address_get(adr_pref=['contact','delivery'])
+        addresses = partner.address_get(adr_pref=['contact', 'delivery'])
         address = addresses['contact'] and partner_obj.browse(addresses['contact'])
         address_pose = addresses['delivery'] and partner_obj.browse(addresses['delivery'])
 
@@ -85,14 +89,14 @@ class OfComposeMail(models.TransientModel):
 
         if not objects:
             objects = self._get_objects(o)
-        order = objects.get('order',False)
-        invoice = objects.get('invoice',False)
-        partner = objects.get('partner',False)
-        address = objects.get('address',False)
-        address_pose = objects.get('address_pose',False)
+        order = objects.get('order', False)
+        invoice = objects.get('invoice', False)
+        partner = objects.get('partner', False)
+        address = objects.get('address', False)
+        address_pose = objects.get('address_pose', False)
 
         lang_code = self._context.get('lang', partner.lang)
-        lang = lang_obj.search([('code','=', lang_code)])
+        lang = lang_obj.search([('code', '=', lang_code)])
 
         values = (
             ('amount_total', o, ''),
@@ -107,7 +111,7 @@ class OfComposeMail(models.TransientModel):
             ('objet', o, ''),
         )
 
-        res = {key: getattr(obj, key, default) for key,obj,default in values}
+        res = {key: getattr(obj, key, default) for key, obj, default in values}
 
         res['date_confirm_order'] = res['date_confirm']
         del res['date_confirm']
@@ -151,7 +155,7 @@ class OfComposeMail(models.TransientModel):
             'account.invoice': 'of_gesdoc.courriers_account',
         }
 
-    #print a mail in the format pdf
+    # print a mail in the format pdf
     @api.multi
     def print_report(self):
         lettre_obj = self.env['of.mail.template']
@@ -165,12 +169,12 @@ class OfComposeMail(models.TransientModel):
         obj = self.env[data['model']]
         lettre = lettre_obj.browse(lett_id)
         for o in obj.browse(data['ids']):
-            #information of customer
+            # information of customer
             partner = o if data['model'] == 'res.partner' else o.partner_id
             if partner.child_ids:
                 partner = partner.child_ids[0]
 
-            #Update partner comment
+            # Update partner comment
             text = "%s: Envoi d'un courrier \"%s\" (%s)\n" % (time.strftime('%Y-%m-%d'),
                                                               lettre.name_get()[0][1],
                                                               self.env.user.name_get()[0][1])
@@ -180,8 +184,8 @@ class OfComposeMail(models.TransientModel):
                 text = '\n' + text
             partner.comment = partner.comment + text
 
-        #test if user has checked 'sans adresse' and 'sans entete'
-        #self._log_event(cr, uid, ids, data, context=context)
+        # test if user has checked 'sans adresse' and 'sans entete'
+        # self._log_event(cr, uid, ids, data, context=context)
         act = self._get_model_action_dict().get(data['model'], '')
         if lettre.sans_header:
             act += '_sehead'
@@ -214,9 +218,9 @@ class OfComposeMail(models.TransientModel):
             with open(generated_pdf + '.pdf', "rb") as encode:
                 encoded_file = base64.b64encode(encode.read())
             # Si c'est un rapport généré depuis un SAV, on prend le no du SAV et le nom du client
-            if self._context['model'] == 'project.issue' and 'cnom' in datas and 'sno' in datas and datas['cnom'] and datas['sno']:
+            if self._context['model'] == 'project.issue' and datas.get('cnom') and datas.get('sno'):
                 res_file_name = datas['sno'] + ' ' + datas['cnom'] + '.pdf'
-            elif self._context['model'] == 'project.issue' and '1_Client_Nom' in datas and '1_num_sav' in datas and datas['1_Client_Nom'] and datas['1_num_sav']:
+            elif self._context['model'] == 'project.issue' and datas.get('1_Client_Nom') and datas.get('1_num_sav'):
                 res_file_name = datas['1_num_sav'] + ' ' + datas['1_Client_Nom'] + '.pdf'
             else:
                 res_file_name = 'courrier.pdf'

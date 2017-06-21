@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-import of_sale_payment
+from . import of_sale_payment

@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-import of_parc_installe
+from . import of_parc_installe

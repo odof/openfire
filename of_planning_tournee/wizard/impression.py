@@ -1,3 +1,4 @@
+"""
 from osv import fields, osv
 import base64
 import netsvc
@@ -128,7 +129,7 @@ class of_imp_docs(osv.osv_memory):
                                     new_file_code.close()
                                 report_file_name = str(doc.report_template.name + '_' + data[1])[:51] + '.pdf'
                                 line_id = doc_line_obj.create(cr, uid, {
-                                                                        'doc_file': base64.b64encode(new_file), 
+                                                                        'doc_file': base64.b64encode(new_file),
                                                                         'doc_file_name':report_file_name
                                                                         }, context=context)
                                 doc_line_ids.append((4,line_id))
@@ -145,29 +146,29 @@ class of_imp_docs(osv.osv_memory):
                                 else:
                                     act = 'courriers'
                             elif doc.model == 'sale.order':
-                                if mail_template.sans_add: 
+                                if mail_template.sans_add:
                                     act = 'courriers_sale_se'
-                                else: 
+                                else:
                                     act = 'courriers_sale'
                             elif doc.model == 'crm.lead':
-                                if mail_template.sans_add: 
+                                if mail_template.sans_add:
                                     act = 'courriers_crm_se'
-                                else: 
+                                else:
                                     act = 'courriers_crm'
                             elif doc.model == 'account.invoice':
-                                if mail_template.sans_add: 
+                                if mail_template.sans_add:
                                     act = 'courriers_account_se'
-                                else: 
+                                else:
                                     act = 'courriers_account'
                             elif doc.model == 'of.planning.pose':
-                                if mail_template.sans_add: 
+                                if mail_template.sans_add:
                                     act = 'courriers_pose_se'
                                 else:
                                     act = 'courriers_pose'
-                            if mail_template.sans_header: 
+                            if mail_template.sans_header:
                                 act += '_sehead'
                             report_name += act
-                                
+
                             # Ensure report is rendered using template's language
                             ctx = context.copy()
                             service = netsvc.LocalService(report_name)
@@ -180,7 +181,7 @@ class of_imp_docs(osv.osv_memory):
                                 }
                                 content = compose_mail_obj._format_lettre(cr, uid, lettre_data, mail_template.body_text or '', self.pool[doc.model])
                                 (result, format) = service.create(cr, uid, [r[0]], {
-                                                        'model': doc.model, 
+                                                        'model': doc.model,
                                                         'form': {'name': mail_template.name, 'file': False, 'file_name': '', 'file_url': '', \
                                                                  'content': content}}, ctx)
                                 result = base64.b64encode(result)
@@ -189,36 +190,35 @@ class of_imp_docs(osv.osv_memory):
                                 if not report_file_name.endswith(ext):
                                     report_file_name += ext
                                 line_id = doc_line_obj.create(cr, uid, {
-                                                                        'doc_file': result, 
+                                                                        'doc_file': result,
                                                                         'doc_file_name':report_file_name
                                                                         }, context=context)
                                 doc_line_ids.append((4,line_id))
-                                                     
         return doc_line_ids
-    
+
     _columns = {
         'doc_line_ids': fields.one2many('of.imp.doc.lines', 'doc_id', 'Lignes des documents'),
     }
-    
+
     _rec_name = 'doc_line_ids'
-    
+
     _defaults = {
         'doc_line_ids': _default_doc_lines,
     }
-    
+
 of_imp_docs()
 
 
 class of_imp_doc_lines(osv.osv_memory):
     _name = 'of.imp.doc.lines'
     _description = 'Lignes des documents'
-    
+
     _columns = {
         'doc_file': fields.binary('Fichier'),
         'doc_file_name': fields.char('Nom du fichier', size=64),
         'doc_id': fields.many2one('of.imp.docs', 'Document'),
     }
-    
     _rec_name = 'doc_file_name'
 
 of_imp_doc_lines()
+"""

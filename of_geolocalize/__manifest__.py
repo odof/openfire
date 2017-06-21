@@ -2,7 +2,7 @@
 
 {
     'name': 'OpenFire Geolocation',
-    'author':'OpenFire',
+    'author': 'OpenFire',
     'version': '10.0',
     'category': 'OpenFire modules',
     'summary': 'Company and Partners Geolocation',

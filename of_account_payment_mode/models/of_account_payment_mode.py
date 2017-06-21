@@ -10,7 +10,7 @@ class OfAccountPaymentMode(models.Model):
     _description = 'Payment mode'
 
     name = fields.Char('Name', required=True, help='Mode of Payment')
-    journal_id = fields.Many2one('account.journal', 'Journal', domain=[('type', 'in', ('bank','cash'))],
+    journal_id = fields.Many2one('account.journal', 'Journal', domain=[('type', 'in', ('bank', 'cash'))],
                                  required=True, help='Bank or Cash Journal for the Payment Mode')
     company_id = fields.Many2one('res.company', 'Company', required=True)
     partner_id = fields.Many2one(related='company_id.partner_id', string='Partner', store=True)

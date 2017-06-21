@@ -3,7 +3,7 @@
 
 {
     'name': 'OpenFire Multi logos',
-    'author':'OpenFire',
+    'author': 'OpenFire',
     'version': '10.0',
     'category': 'OpenFire modules',
     'summary': 'Multi logos',

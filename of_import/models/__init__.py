@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-import of_import
+from . import of_import

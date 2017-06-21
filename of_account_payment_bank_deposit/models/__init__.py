@@ -1,3 +1,3 @@
 # -*- encoding: utf-8 -*-
 
-import of_account_payment_bank_deposit
+from . import of_account_payment_bank_deposit

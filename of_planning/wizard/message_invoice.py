@@ -9,5 +9,5 @@ class OfPlanningMessageInvoice(models.TransientModel):
     @api.model
     def _default_name(self):
         return self._context.get('default_msg', '')
-    
+
     name = fields.Text(string="Note", default=_default_name)

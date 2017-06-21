@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
+from odoo import models, fields, api
 import odoo.addons.decimal_precision as dp
 
-from odoo.exceptions import UserError, RedirectWarning, ValidationError
+from odoo.exceptions import UserError
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
@@ -22,7 +22,7 @@ class SaleOrderLine(models.Model):
             price_percent = 100.0
             if line.of_discount_formula:
                 try:
-                    for discount in map(float, line.of_discount_formula.replace(',','.').split('+')):
+                    for discount in map(float, line.of_discount_formula.replace(',', '.').split('+')):
                         price_percent *= (100 - discount) / 100.0
                 except:
                     raise UserError("Formule de remise invalide :\n%s" % (line.of_discount_formula,))
@@ -59,7 +59,7 @@ class AccountInvoiceLine(models.Model):
             price_percent = 100.0
             if line.of_discount_formula:
                 try:
-                    for discount in map(float, line.of_discount_formula.replace(',','.').split('+')):
+                    for discount in map(float, line.of_discount_formula.replace(',', '.').split('+')):
                         price_percent *= (100 - discount) / 100.0
                 except:
                     raise UserError("Formule de remise invalide :\n%s" % (line.of_discount_formula,))

@@ -4,10 +4,14 @@ from odoo import models, fields, api
 
 import StringIO
 import base64
-from pdfminer.pdfparser import PDFParser
-from pdfminer.pdfdocument import PDFDocument
-from pdfminer.pdftypes import resolve1
-from pdfminer.utils import decode_text
+
+try:
+    from pdfminer.pdfparser import PDFParser
+    from pdfminer.pdfdocument import PDFDocument
+    from pdfminer.pdftypes import resolve1
+    from pdfminer.utils import decode_text
+except ImportError:
+    PDFParser = PDFDocument = resolve1 = decode_text = None
 
 class OfGesdocImport(models.TransientModel):
     _name = 'of.gesdoc.import'
@@ -24,7 +28,7 @@ class OfGesdocImport(models.TransientModel):
             parser = PDFParser(pf)
             doc = PDFDocument(parser)
             fields = resolve1(doc.catalog['AcroForm'])['Fields']
-            
+
             for i in fields:
                 field = resolve1(i)
                 name, value = field.get('T'), field.get('V')

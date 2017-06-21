@@ -13,7 +13,7 @@ class CourrierCrm(report_sxw.rml_parse):
             'adr_get': self.adr_get,
         })
 
-    #update company
+    # update company
     def setCompany(self, company):
         self.company = company
         self.localcontext['company'] = company
@@ -22,7 +22,7 @@ class CourrierCrm(report_sxw.rml_parse):
         self.localcontext['logo'] = company.logo
         self.logo = company.logo
 
-    #get client's address
+    # get client's address
     def adr_get(self, partner):
         pad_obj = self.pool.get('res.partner.address')
         crm_obj = self.pool.get('crm.lead')
@@ -56,4 +56,3 @@ report_sxw.report_sxw('report.of_gesdoc.courriers_crm', 'crm.lead', "addons/of_g
 report_sxw.report_sxw('report.of_gesdoc.courriers_crm_se', 'crm.lead', "addons/of_gesdoc/report/CourrierCrm_se.rml", parser=CourrierCrm, header=True)
 report_sxw.report_sxw('report.of_gesdoc.courriers_crm_sehead', 'crm.lead', "addons/of_gesdoc/report/CourrierCrm.rml", parser=CourrierCrm, header=False)
 report_sxw.report_sxw('report.of_gesdoc.courriers_crm_se_sehead', 'crm.lead', "addons/of_gesdoc/report/CourrierCrm_se.rml", parser=CourrierCrm, header=False)
-

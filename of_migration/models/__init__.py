@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import main
-import base
-import product
-import account
-import sale
-import mail
-import post_process
+from . import main
+from . import base
+from . import product
+from . import account
+from . import sale
+from . import mail
+from . import post_process

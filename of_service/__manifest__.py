@@ -11,8 +11,8 @@
         'of_planning',
         'of_map_view',
     ],
-    'init_xml' : [ ],
-    'demo_xml' : [ ],
+    'init_xml' : [],
+    'demo_xml' : [],
     'data' : [
         'security/ir.model.access.csv',
         'views/of_service_view.xml',

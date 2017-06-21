@@ -7,7 +7,7 @@ class OfComposeMail(models.TransientModel):
 
     @api.model
     def _get_objects(self, o):
-        result = super(OfComposeMail,self)._get_objects(o)
+        result = super(OfComposeMail, self)._get_objects(o)
         if o._name == 'of.planning.intervention':
             result.update({
                 'interventions': [o],
@@ -29,7 +29,7 @@ class OfComposeMail(models.TransientModel):
             objects = self._get_objects(o)
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')
-        result = super(OfComposeMail,self)._get_dict_values(o, objects=objects)
+        result = super(OfComposeMail, self)._get_dict_values(o, objects=objects)
 
         equipes = []
         dates = []
@@ -48,7 +48,7 @@ class OfComposeMail(models.TransientModel):
             intervention = intervention[0]
             h = int(intervention.duree)
             m = 60 * (intervention.duree - h)
-            duree = "%02d:%02d" % (h,m)
+            duree = "%02d:%02d" % (h, m)
 
             if intervention.tache_id.product_id:
                 tache_product_ht = intervention.tache_id.product_id.list_pvht or 0.0
@@ -65,7 +65,7 @@ class OfComposeMail(models.TransientModel):
 
                     lang_obj = self.env['res.lang']
                     lang_code = self._context.get('lang', partner.lang)
-                    lang = lang_obj.search([('code','=', lang_code)], limit=1)
+                    lang = lang_obj.search([('code', '=', lang_code)], limit=1)
                     tache_product_ttc = lang.format("%.2f", round(tache_product_ht * (1.0 + tache_product_tax), 2), grouping=True)
 
         result.update({

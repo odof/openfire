@@ -17,7 +17,7 @@ Pour faire l'import, aller dans Configuration -> Technique -> Cities/Locations M
     'website': 'http://www.akretion.com',
     'depends': [
         'base_location_geonames_import',
-        'l10n_fr_base_location_geonames_import', # Dépendance inutile pour le module. Sert uniquement à ne pas oublier d'installer ce module
+        'l10n_fr_base_location_geonames_import',  # Dépendance inutile pour le module. Sert uniquement à ne pas oublier d'installer ce module
     ],
     'data': [
         'views/of_better_zip_view.xml',

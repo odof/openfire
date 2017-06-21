@@ -1,3 +1,3 @@
 # -*- encoding: utf-8 -*-
 
-import of_tiers
+from . import of_tiers

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from odoo.report import report_sxw
-#from osv import osv
 
 class attestation_ramonage(report_sxw.rml_parse):
     def __init__(self, cr, uid, name, context):
@@ -11,11 +10,7 @@ class attestation_ramonage(report_sxw.rml_parse):
             'format_date'       : self.format_date,
             'get_price_ttc'     : self.get_price_ttc,
         })
-        
-#     def set_context(self, objects, data, ids, report_type=None):
-#         super(attestation_ramonage, self).set_context(objects, data, ids, report_type)
-#         #self.setMagasin(self.pool.get('of.planning.intervention').browse(self.cr, self.uid, ids[0]))
-        
+
     def format_date(self, date=False):
         if date:
             date = str(date)
@@ -39,8 +34,8 @@ class attestation_ramonage(report_sxw.rml_parse):
 #         if not intervention.address_id:
 #             return ''
 #         part = intervention.address_id
-# 
-#         partner = intervention.partner_id 
+#
+#         partner = intervention.partner_id
 #         address = intervention.address_id
 #         pf = self.env['account.fiscal.position'].get_fiscal_position(partner, delivery_id=address)
 #         if not pf:
@@ -59,14 +54,14 @@ class attestation_ramonage(report_sxw.rml_parse):
 #         taxes = product.taxes_id
 #         company_id = intervention.company_id or self.env.user.company_id
 #         taxes = taxes.filtered(lambda r: r.company_id == company_id)
-# 
+#
 #         if price:
-# 
+#
 #             taxes = pf.map_tax(taxes, self.product_id, self.invoice_id.partner_id)
 #             taxes = taxes.compute_all(price, product=product, partner=address)
-# 
+#
 #             result = taxes['total_excluded'] + taxes['taxes'] if taxes else price
-#             
+#
 #             # Fonctionalite du module of_sales, mais on s'evite ici de recopier le fichier attestation_ramonage en entier
 #             if getattr(intervention.tache_id, 'arrondi') and round(abs(round(result)-result)-.01) == 0:
 #                 result = round(result)

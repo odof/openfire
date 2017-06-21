@@ -2,7 +2,7 @@
 
 {
     'name' : "OpenFire / CRM Odoo/OpenFire",
-    'version' : "1.0",
+    'version' : "9.0",
     'author' : "OpenFire",
     'website' : "http://openfire.fr",
     'category': 'Customer Relationship Management',
@@ -18,8 +18,4 @@ Les pistes utilisent le même jeu d'étiquettes que les partenaires.
         'views/of_crm_view.xml',
     ],
     'installable': False,
-    'active': False,
 }
-
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

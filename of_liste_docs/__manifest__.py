@@ -34,7 +34,6 @@
         'of_liste_docs_view.xml'
     ],
     'installable': False,
-    'active': False,
 }
 
 

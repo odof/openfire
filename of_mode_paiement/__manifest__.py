@@ -28,6 +28,4 @@
         # Migration 'wizard/wizard_edi_view.xml',
     ],
     'installable': False,
-    'active': False,
 }
-# vim:expandtab:smartindent:tabstop=4:sorderttabstop=4:shiftwidth=4:

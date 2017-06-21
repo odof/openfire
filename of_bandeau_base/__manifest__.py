@@ -6,7 +6,7 @@
     'author' : "OpenFire",
     'complexity': "easy",
     'description' : """
-Afficher en permanence le nom de la base dans le bandeau. 
+Afficher en permanence le nom de la base dans le bandeau.
 """,
     'website' : "www.openfire.fr",
     'category': "OpenFire",
@@ -17,5 +17,3 @@ Afficher en permanence le nom de la base dans le bandeau.
     'application': False,
     'auto_install': False,
 }
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

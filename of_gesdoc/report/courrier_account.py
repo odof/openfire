@@ -13,7 +13,7 @@ class CourrierAccount(report_sxw.rml_parse):
             'adr_get': self.adr_get,
         })
 
-    #update company
+    # update company
     def setCompany(self, company):
         self.company = company
         self.localcontext['company'] = company
@@ -22,7 +22,7 @@ class CourrierAccount(report_sxw.rml_parse):
         self.localcontext['logo'] = company.logo
         self.logo = company.logo
 
-    #get client's company address
+    # get client's company address
     def adr_get(self, partner):
         pad_obj = self.pool['res.partner.address']
         pad = pad_obj.browse(self.cr, self.uid, partner.address_invoice_id.id)

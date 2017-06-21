@@ -5,14 +5,14 @@ from odoo import models, fields, api, _
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    delivery_expected = fields.Char(string='Livraison Attendue', states={'done':[('readonly', True)]})
+    delivery_expected = fields.Char(string='Livraison Attendue', states={'done': [('readonly', True)]})
 
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
     customer_id = fields.Many2one('res.partner', string='Client')
     sale_order_id = fields.Many2one('sale.order', string="Commande d'origine")
-    delivery_expected = fields.Char(string='Livraison Attendue', states={'done':[('readonly', True)]})
+    delivery_expected = fields.Char(string='Livraison Attendue', states={'done': [('readonly', True)]})
 
 class ProcurementOrder(models.Model):
     _inherit = 'procurement.order'
@@ -43,7 +43,7 @@ class ProcurementOrder(models.Model):
 
             # Recherche du client associé
             domain = ()
-            regroup_type = 'sale_order' # Récupérer le type de regroupement sélectionné en configuration ('standard', 'sale_order', 'customer')
+            regroup_type = 'sale_order'  # Récupérer le type de regroupement sélectionné en configuration ('standard', 'sale_order', 'customer')
             if regroup_type != 'standard':
                 sale_line = procurement.sale_line_id
                 if not sale_line:

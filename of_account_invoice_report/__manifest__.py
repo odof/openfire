@@ -2,7 +2,7 @@
 
 {
     'name': 'OpenFire - Impression Factures',
-    'author':'OpenFire',
+    'author': 'OpenFire',
     'version': '10.0',
     'category': 'OpenFire modules',
     'summary': 'Affichage des acomptes dans les factures',

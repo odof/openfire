@@ -25,7 +25,7 @@ class sav(report_sxw.rml_parse):
 
     def maintenant(self):
         return time.strftime('%Y-%m-%d')
-    
+
     def get_company_name(self, o, user):
         if o.user_id:
             company = o.user_id.company_id.name

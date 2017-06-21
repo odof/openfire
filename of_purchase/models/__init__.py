@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-import of_purchase
+from . import of_purchase

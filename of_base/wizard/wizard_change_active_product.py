@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
-from odoo.exceptions import UserError, RedirectWarning, ValidationError
+from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 class wizard_change_active_product(models.TransientModel):
     u"""Active/désactive tous produits selectionnes"""
@@ -9,15 +9,15 @@ class wizard_change_active_product(models.TransientModel):
     _description = u"Active/désactive tous produits selectionnés"
 
     action = fields.Selection([
-            ("active",u"Activer les produits sélectionnés"),
-            ("desactive",u"Désactiver les produits sélectionnés")
+        ("active", u"Activer les produits sélectionnés"),
+        ("desactive", u"Désactiver les produits sélectionnés"),
         ], string='Action', required=True)
 
     @api.multi
     def action_change_active_product(self):
         u"""Action appelée pour activer/desactiver les produits selectionnés"""
-        product_ids = self._context.get('active_ids', []) # Les id des produits sélectionnés
-        
+        product_ids = self._context.get('active_ids', [])  # Les id des produits sélectionnés
+
         # Teste si au moins un produit est sélectionné
         if not product_ids:
             raise UserError(u"Vous devez sélectionner au moins un produit.")

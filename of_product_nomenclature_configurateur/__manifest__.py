@@ -2,7 +2,7 @@
 {
     'name': 'OpenFire / Configurateur de produits',
     'author': 'OpenFire',
-    'version': '1.0',
+    'version': '9.0',
     'category': 'Ventes',
     'description': u"""Module OpenFire qui ajoute un configurateur de produits au module OpenFire nomenclature.
 """,
@@ -11,4 +11,5 @@
         'views/of_product_nomenclature_configurateur_view.xml',
         'security/ir.model.access.csv',
     ],
+    'installable': False,
 }

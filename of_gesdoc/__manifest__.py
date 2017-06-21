@@ -16,6 +16,9 @@ Fonctionnalité pour l'instant disponible uniquement pour les SAV, via le module
 - Nécessite l'installation de pdfminer et pypdftk sur le serveur
 """,
     'depends': ['crm', 'sale'],
+    'external_dependancies': {
+        'python': ['pdfminer', 'pypdftk'],
+    },
     'data' : [
         'views/mail_template_view.xml',
         'wizard/compose_mail_view.xml',

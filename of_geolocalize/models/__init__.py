@@ -1,3 +1,4 @@
 # -*- coding: utf-8 -*-
 
-import of_partner, of_company
+from . import of_partner
+from . import of_company

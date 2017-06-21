@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-import of_crm
+from . import of_crm

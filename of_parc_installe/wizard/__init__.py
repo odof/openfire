@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
 
-import compose_mail
-import import_mail
+from . import compose_mail
+from . import import_mail

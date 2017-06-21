@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import UserError
 
 class OfAccountPaymentBankDeposit(models.Model):
     _name = 'of.account.payment.bank.deposit'
@@ -13,7 +13,7 @@ class OfAccountPaymentBankDeposit(models.Model):
         if self._context.get('active_model', '') == 'account.payment':
             # Allow only payments that have not been already deposited
             payments = self.env['account.payment'].search([('id', 'in', self._context['active_ids']), ('of_deposit_id', '=', False)])
-            res = [(4,payment.id) for payment in payments]
+            res = [(4, payment.id) for payment in payments]
         return res
 
     name = fields.Char('Deposit code', required=True, help='Deposit code')
@@ -96,7 +96,7 @@ class OfAccountPaymentBankDeposit(models.Model):
     @api.multi
     def cancel(self):
         for rec in self:
-            if rec.move_id: # move_id can be null when payments amount is 0
+            if rec.move_id:  # move_id can be null when payments amount is 0
                 rec.move_id.line_ids.remove_move_reconcile()
                 move_id = rec.move_id
                 rec.move_id = False
@@ -116,7 +116,7 @@ class OfAccountPaymentBankDeposit(models.Model):
         if not payment_data:
             return
         ids = self._ids
-        payments = self.resolve_2many_commands('payment_ids', payment_data, fields=['of_deposit_id','name'])
+        payments = self.resolve_2many_commands('payment_ids', payment_data, fields=['of_deposit_id', 'name'])
         if not payments:
             return
 
@@ -126,7 +126,7 @@ class OfAccountPaymentBankDeposit(models.Model):
             dep_id = ids and ids[0] or False
 
             for payment in payments:
-                if payment['of_deposit_id'] and payment['of_deposit_id'][0]!=dep_id:
+                if payment['of_deposit_id'] and payment['of_deposit_id'][0] != dep_id:
                     raise UserError(_('Payment %s has already been deposited') % payment['name'])
 
     @api.model

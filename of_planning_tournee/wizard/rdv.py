@@ -1,10 +1,4 @@
 # -*- encoding: utf-8 -*-
-##############################################################################
-#
-#    OpenFire
-#
-##############################################################################
-
 
 from odoo import api, models, fields
 from datetime import datetime, timedelta, date
@@ -12,7 +6,7 @@ import pytz
 import math
 from math import cos
 from odoo.addons.of_planning_tournee.models.of_planning_tournee import distance_points
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import UserError
 
 RES_MODES = [
     ('tournee', u'Tournées uniquement'),
@@ -131,7 +125,7 @@ class OfTourneeRdv(models.TransientModel):
         self.ensure_one()
         equipe_ids = []
         for planning in self.planning_ids:
-            if not planning.equipe_id.id in equipe_ids:
+            if planning.equipe_id.id not in equipe_ids:
                 equipe_ids.append(planning.equipe_id.id)
         return equipe_ids
 
@@ -141,7 +135,7 @@ class OfTourneeRdv(models.TransientModel):
     def button_calcul_suivant(self):
         # Calcule a prochaine intervention à partir de la dernière intervention proposée
         self.compute(creneau_suivant=True)
-        context = dict(self._context, equipe_domain = self._get_equipe_possible())
+        context = dict(self._context, equipe_domain=self._get_equipe_possible())
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'of.tournee.rdv',
@@ -156,7 +150,7 @@ class OfTourneeRdv(models.TransientModel):
     def button_calcul(self):
         # Calcule a prochaine intervention à partir du lendemain de la date courante
         self.compute(creneau_suivant=False)
-        context = dict(self._context, equipe_domain = self._get_equipe_possible())
+        context = dict(self._context, equipe_domain=self._get_equipe_possible())
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'of.tournee.rdv',
@@ -186,7 +180,7 @@ class OfTourneeRdv(models.TransientModel):
 
         address = self.partner_address_id
         service = self.service_id
-        jours = [jour.id % 7 for jour in service.jour_ids] if service else range(1,6)
+        jours = [jour.id % 7 for jour in service.jour_ids] if service else range(1, 6)
 
         # Suppression des anciens créneaux
         planning_del_ids = wizard_line_obj.search([('wizard_id', '=', self.id)])
@@ -236,9 +230,9 @@ class OfTourneeRdv(models.TransientModel):
             lat = math.radians(geo_lat_client)
             lon = math.radians(geo_lng_client)
             dist_constante = 2.0*6366
-            where_item = "AND asin(sqrt(pow(sin((radians(epi_lat)-(%s))/2.0),2) " \
-                                           "+ cos(radians(epi_lat))*(%s)*pow(sin((radians(epi_lon)-(%s))/2.0),2))) " \
-                             "* %s < distance "
+            where_item = "AND asin(sqrt(pow(sin((radians(epi_lat) - (%s)) / 2.0), 2) " \
+                         "+ cos(radians(epi_lat)) * (%s) * pow(sin((radians(epi_lon) - (%s)) / 2.0), 2))) " \
+                         "* %s < distance "
 
             where_calc += where_item % (lat, cos(lat), lon, dist_constante)
 
@@ -262,9 +256,9 @@ class OfTourneeRdv(models.TransientModel):
                     if tournee.date != date:
                         break
                     equipes_dispo.append(tournee.equipe_id.id)
-                tournees = tournees[len(equipes_dispo):] # @todo: Vérifier ce code ([:] depuis un recordset)
-                #                                          sinon: tournees = tournee_obj.browse(tournees._ids[len(equipes_dispo):])
-                equipes_dispo = list(set(equipes_dispo)) # Pour le cas où il y aurait plusieurs tournées créées par erreur pour une même équipe
+                tournees = tournees[len(equipes_dispo):]  # @todo: Vérifier ce code ([:] depuis un recordset)
+                #                                           sinon: tournees = tournee_obj.browse(tournees._ids[len(equipes_dispo):])
+                equipes_dispo = list(set(equipes_dispo))  # Pour le cas où il y aurait plusieurs tournées créées par erreur pour une même équipe
             else:
                 if date_date:
                     date_date += un_jour
@@ -301,11 +295,11 @@ class OfTourneeRdv(models.TransientModel):
             # Recherche de creneaux pour la date voulue et les équipes sélectionnées
             date_jour_deb = tz.localize(datetime.strptime(date+" 00:00:00", "%Y-%m-%d %H:%M:%S"))
             date_jour_fin = tz.localize(datetime.strptime(date+" 23:59:00", "%Y-%m-%d %H:%M:%S"))
-            interventions = intervention_obj.search([('equipe_id','in',equipes_dispo),
+            interventions = intervention_obj.search([('equipe_id', 'in', equipes_dispo),
                                                      ('date', '<=', date),
                                                      ('date_deadline', '>=', date),
-                                                     ('state','in',('draft', 'confirm')),
-                                                    ], order='date')
+                                                     ('state', 'in', ('draft', 'confirm')),
+                                                     ], order='date')
 
             # Récupération des interventions déjà planifiées
             equipe_intervention_dates = {equipe_id: [] for equipe_id in equipes_dispo}
@@ -373,7 +367,6 @@ class OfTourneeRdv(models.TransientModel):
                         'date_flo': intervention_deb,
                         'date_flo_deadline': intervention_fin,
                         'description': description,
-#                            'jour_res_id': plan[3],
                         'wizard_id': self.id,
                         'equipe_id': equipe.id,
                         'intervention_id': False,
@@ -385,7 +378,6 @@ class OfTourneeRdv(models.TransientModel):
                         'date_flo': intervention_deb,
                         'date_flo_deadline': intervention_fin,
                         'description': description,
-#                            'jour_res_id': plan[3],
                         'wizard_id': self.id,
                         'equipe_id': intervention.equipe_id.id,
                         'intervention_id': intervention.id,
@@ -452,7 +444,7 @@ class OfTourneeRdv(models.TransientModel):
                 debut = datetime.combine(date_date, datetime.min.time()) + timedelta(hours=planning.date_flo)
                 fin = datetime.combine(date_date, datetime.min.time()) + timedelta(hours=planning.date_flo_deadline)
                 if (date_propos_local_datetime_sanszone >= debut) and (date_propos_local_datetime_sanszone <= fin) and \
-                    (date_propos_deadline_local_datetime_sanszone >= debut) and (date_propos_deadline_local_datetime_sanszone <= fin):
+                   (date_propos_deadline_local_datetime_sanszone >= debut) and (date_propos_deadline_local_datetime_sanszone <= fin):
                     break
         else:
             raise UserError(u"Vérifier la date de RDV et l'équipe technique")
@@ -481,7 +473,7 @@ class OfTourneeRdv(models.TransientModel):
 
         # Si rdv RES pris depuis un SAV, on le lie au SAV
         if self._context.get('active_model') == 'crm.helpdesk':
-            values['sav_id'] = self._context.get('active_id',False)
+            values['sav_id'] = self._context.get('active_id', False)
 
         intervention_obj.create(values)
 
@@ -549,7 +541,6 @@ class OfTourneeRdvLine(models.TransientModel):
     date_flo = fields.Float(string='Date', required=True, digits=(12, 5))
     date_flo_deadline = fields.Float(string='Date', required=True, digits=(12, 5))
     description = fields.Char(string='RDV', size=128)
-#    tournee_id = fields.Many2one('of.planning.tournee', string="Jour RES")
     wizard_id = fields.Many2one('of.tournee.rdv', string="RDV", required=True, ondelete='cascade')
     equipe_id = fields.Many2one('of.planning.equipe', string='Equipe')
     intervention_id = fields.Many2one('of.planning.intervention', string="Planning")

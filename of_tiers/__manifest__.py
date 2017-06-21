@@ -14,9 +14,10 @@ Utilisation de comptes de tiers
     'data': [
         'views/of_tiers_view.xml',
         'data/of_tiers_data.xml',
+        'security/ir.model.access.csv',
     ],
-    'demo': [ ],
-    'qweb': [ ],
+    'demo': [],
+    'qweb': [],
     'installable': True,
     'application': False,
     'auto_install': False,

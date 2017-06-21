@@ -23,9 +23,9 @@ class OfAccountTaxAccount(models.Model):
 
     tax_id = fields.Many2one('account.tax', string='Taxe', required=True, ondelete='cascade')
     account_src_id = fields.Many2one('account.account', string="Compte de l'article",
-        domain=[('deprecated', '=', False)], required=True)
+                                     domain=[('deprecated', '=', False)], required=True)
     account_dest_id = fields.Many2one('account.account', string=u"Compte à utiliser à la place",
-        domain=[('deprecated', '=', False)], required=True)
+                                      domain=[('deprecated', '=', False)], required=True)
 
     _sql_constraints = [
         ('of_account_src_dest_uniq',

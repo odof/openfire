@@ -1,3 +1,4 @@
+"""
 # -*- encoding: utf-8 -*-
 ##############################################################################
 #
@@ -129,3 +130,4 @@ class of_search_partner(osv.osv_memory):
         return True
     
 of_search_partner()
+"""

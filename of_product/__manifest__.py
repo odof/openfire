@@ -21,6 +21,4 @@ Ce module apporte une personnalisation des produits :
         'views/of_product_view.xml',
     ],
     'installable': False,
-    'active': False,
 }
-

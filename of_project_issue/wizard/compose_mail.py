@@ -11,7 +11,7 @@ class OfComposeMail(models.TransientModel):
 
     @api.model
     def _get_objects(self, o):
-        result = super(OfComposeMail,self)._get_objects(o)
+        result = super(OfComposeMail, self)._get_objects(o)
         if o._name == 'project.issue':
             result['sav'] = o
         return result
@@ -20,7 +20,7 @@ class OfComposeMail(models.TransientModel):
     def _get_dict_values(self, o, objects=None):
         if not objects:
             objects = self._get_objects(o)
-        result = super(OfComposeMail,self)._get_dict_values(o, objects=objects)
+        result = super(OfComposeMail, self)._get_dict_values(o, objects=objects)
 
         sav = objects.get('sav')
         sav_categ = sav and sav.of_categorie_id
@@ -51,9 +51,9 @@ class OfComposeMail(models.TransientModel):
         if sav_date:
             lang_obj = self.env['res.lang']
 
-            partner = objects.get('partner',False)
+            partner = objects.get('partner', False)
             lang_code = self._context.get('lang', partner.lang)
-            lang = lang_obj.search([('code','=', lang_code)])
+            lang = lang_obj.search([('code', '=', lang_code)])
 
             date_length = len((datetime.now()).strftime(DEFAULT_SERVER_DATE_FORMAT))
             sav_date = datetime.strptime(sav_date[:date_length], DEFAULT_SERVER_DATE_FORMAT)

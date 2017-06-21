@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-import of_planning_tournee
+from . import of_planning_tournee

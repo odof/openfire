@@ -16,7 +16,7 @@ Module gestion de prêt d'appareil
 """,
     'depends' : [
         'project_issue',
-        'of_sav_but'
+        'of_sav_but',
     ],
     'data' : [
         'views/of_pret_appareil_view.xml',
@@ -25,4 +25,3 @@ Module gestion de prêt d'appareil
     'installable': False,
     'active': False,
 }
-

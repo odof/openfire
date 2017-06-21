@@ -23,7 +23,7 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
 
     @api.multi
     def unlink(self):
-        if self.search([('id','in',self._ids),('verr','=',True)]):
+        if self.search([('id', 'in', self._ids), ('verr', '=', True)]):
             raise ValidationError(u'Vous essayez de supprimer une tâche verrouillée.')
         return super(OfPlanningTache, self).unlink()
 
@@ -62,7 +62,7 @@ class OfPlanningEquipe(models.Model):
             if category_ids:
                 self.category_ids = category_ids
 
-    @api.onchange('hor_md','hor_mf','hor_ad','hor_af')
+    @api.onchange('hor_md', 'hor_mf', 'hor_ad', 'hor_af')
     def onchange_horaires(self):
         hors = (self.hor_md, self.hor_mf, self.hor_ad, self.hor_af)
         if all(hors):
@@ -181,11 +181,11 @@ class OfPlanningIntervention(models.Model):
     equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe', required=True, oldname='poseur_id')
     employee_ids = fields.Many2many(related='equipe_id.employee_ids', string='Intervenants', readonly=True)
     state = fields.Selection([
-            ('draft', 'Brouillon'),
-            ('confirm', u'Confirmé'),
-            ('done', u'Réalisé'),
-            ('cancel', u'Annulé'),
-            ('postponed', u'Reporté'),
+        ('draft', 'Brouillon'),
+        ('confirm', u'Confirmé'),
+        ('done', u'Réalisé'),
+        ('cancel', u'Annulé'),
+        ('postponed', u'Reporté'),
         ], string=u'État', index=True, readonly=True, default='draft')
 #     state = fields.Many2one('of.planning.intervention.state', string=u"État")
     company_id = fields.Many2one('res.company', string='Magasin', default=lambda self: self.env.user.company_id.id)
@@ -211,7 +211,7 @@ class OfPlanningIntervention(models.Model):
         name = False
         if self.address_id:
             name = [self.address_id.name_get()[0][1]]
-            for field in ('zip','city'):
+            for field in ('zip', 'city'):
                 val = getattr(self.address_id, field)
                 if val:
                     name.append(val)
@@ -233,23 +233,23 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def button_confirm(self):
-        return self.write({'state':'confirm'})
+        return self.write({'state': 'confirm'})
 
     @api.multi
     def button_done(self):
-        return self.write({'state':'done'})
+        return self.write({'state': 'done'})
 
     @api.multi
     def button_postponed(self):
-        return self.write({'state':'postponed'})
+        return self.write({'state': 'postponed'})
 
     @api.multi
     def button_cancel(self):
-        return self.write({'state':'cancel'})
+        return self.write({'state': 'cancel'})
 
     @api.multi
     def button_draft(self):
-        return self.write({'state':'draft'})
+        return self.write({'state': 'draft'})
 
     @api.multi
     def change_state_after(self):
@@ -282,10 +282,10 @@ class OfPlanningIntervention(models.Model):
         # Vérification de la disponibilité du créneau
         if vals.get('verif_dispo') and vals.get('date') and vals.get('date_deadline'):
             rdv = self.search([
-                ('equipe_id','=',vals.get('equipe_id')),
-                ('date','<',vals['date_deadline']),
-                ('date_deadline','>',vals['date']),
-                ('state', 'not in', ('cancel','postponed')),
+                ('equipe_id', '=', vals.get('equipe_id')),
+                ('date', '<', vals['date_deadline']),
+                ('date_deadline', '>', vals['date']),
+                ('state', 'not in', ('cancel', 'postponed')),
             ])
             if rdv:
                 raise ValidationError('Attention', u'Cette équipe a déjà %s rendez-vous sur ce créneau' % (len(rdv),))
@@ -303,7 +303,7 @@ class OfPlanningIntervention(models.Model):
                     ('date', '<', intervention.date_deadline),
                     ('date_deadline', '>', intervention.date),
                     ('id', '!=', intervention.id),
-                    ('state', 'not in', ('cancel','postponed')),
+                    ('state', 'not in', ('cancel', 'postponed')),
                 ])
                 if rdv:
                     raise ValidationError(u'Cette équipe a déjà %s rendez-vous sur ce créneau' % (len(rdv),))
@@ -348,7 +348,7 @@ class OfPlanningIntervention(models.Model):
             err.append(u"le produit lié doit être de type 'Service'")
         if err:
             return (False,
-                   msg_erreur % (self.name, ", ".join(err)))
+                    msg_erreur % (self.name, ", ".join(err)))
         fiscal_position_id = self.env['account.fiscal.position'].get_fiscal_position(partner.id, delivery_id=self.address_id.id)
         if not fiscal_position_id:
             return (False,
@@ -424,8 +424,8 @@ class OfPlanningIntervention(models.Model):
                 invoice = invoice_obj.create(invoice_data)
                 invoice.compute_taxes()
                 invoice.message_post_with_view('mail.message_origin_link',
-                    values={'self': invoice, 'origin': intervention},
-                    subtype_id=self.env.ref('mail.mt_note').id)
+                                               values={'self': invoice, 'origin': intervention},
+                                               subtype_id=self.env.ref('mail.mt_note').id)
         msg = "\n".join(msgs)
 
         return {
