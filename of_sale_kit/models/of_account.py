@@ -20,14 +20,14 @@ class OFKitAccountInvoice(models.Model):
     contains_kit = fields.Boolean(string='Contains a kit', compute='_compute_contains_kit')
     
     components = fields.One2many('account.invoice.line.comp', 'invoice_id', string='Components', domain=[('is_kit_invoice_comp','=',False)], readonly=True,
-                    help="Contains all components in this sale order that are not kits")
+                    help="Contains all components in this invoice that are not kits")
     
     @api.multi
     @api.depends('invoice_line_ids.product_id')
     def _compute_contains_kit(self):
         line_obj = self.env['account.invoice.line']
-        for order in self:
-            order.contains_kit = line_obj.search([("invoice_id", "=",order.id),('is_kit_invoice_line','=',True)],count=True) > 0
+        for invoice in self:
+            invoice.contains_kit = line_obj.search([("invoice_id", "=",invoice.id),('is_kit_invoice_line','=',True)],count=True) > 0
 
     kit_display_mode = fields.Selection([
         ('collapse','Collapse'),
@@ -147,7 +147,7 @@ class OFKitAccountInvoiceLine(models.Model):
             if line.is_kit_invoice_line:
                 uc_price = 0
                 for comp in line.direct_child_ids:
-                    uc_price += comp.shown_price
+                    uc_price += comp.price_per_line
                 line.unit_compo_price = uc_price
                 line._refresh_price_unit()
     
@@ -159,6 +159,37 @@ class OFKitAccountInvoiceLine(models.Model):
                     line.price_unit = line.unit_compo_price
                 else:
                     line.price_unit = line.product_id.list_price
+
+    @api.onchange('is_kit_invoice_line')
+    def _onchange_is_kit_invoice_line(self):
+        if self.is_kit_invoice_line:
+            if not self.product_id.is_kit: # a product that is not a kit is being made into a kit
+                # we create a component with current product (for procurements, kits are ignored)
+                comp_name = self.product_id.name_get()[0][1] or self.product_id.name
+                new_comp_vals = {
+                    'product_id': self.product_id.id,
+                    'rec_lvl': 1,
+                    'name': comp_name,
+                    'bom_path': comp_name,
+                    'is_kit_invoice_comp': False,
+                    'qty_per_parent': 1,
+                    #'qty_per_line': 1,
+                    'uom_id': self.uom_id,
+                    'price_unit': self.product_id.list_price,
+                    'unit_cost': self.product_id.standard_price,
+                    }
+                
+                self.update({
+                    'direct_child_ids': [(0,0,new_comp_vals)],
+                    'pricing': 'dynamic',
+                    'price_unit': self.unit_compo_price,
+                    })
+            else:
+                pass
+        else: # a product that was a kit is not anymore, we unlink its components
+            self.update({
+                'direct_child_ids': [(5,)],
+                })
 
     @api.multi
     def _init_components(self):
@@ -175,56 +206,25 @@ class OFKitAccountInvoiceLine(models.Model):
                 for comp in comp_obj:
                     comp.load_under_components(True,hide_prices)
 
-    @api.onchange('is_kit_invoice_line')
-    def onchange_is_kit_invoice_line(self):
+    def init_comps_from_so_line(self, so_line_id):
+        # called by sale.order.line.invoice_line_create
+        self.ensure_one()
+        so_line = self.env['sale.order.line'].search([('id','=',so_line_id)])
         if self.is_kit_invoice_line:
-            if not self.product_id.is_kit: # a product that is not a kit is being made into a kit
-                # we create a component with current product (for procurements, kits are ignored)
-                comp_name = self.product_id.name_get()[0][1] or self.product_id.name
-                new_comp_vals = {
-                    'product_id': self.product_id.id,
-                    'rec_lvl': 1,
-                    'name': comp_name,
-                    'bom_path': comp_name,
-                    'is_kit_invoice_comp': False,
-                    'qty_bom_line': 1,
-                    #'qty_inv_line': 1,
-                    'uom_id': self.uom_id,
-                    'unit_price': self.product_id.list_price,
-                    'unit_cost': self.product_id.standard_price,
-                    'customer_lead': self.product_id.sale_delay,
-                    }
-                
-                self.update({
-                    'direct_child_ids': [(0,0,new_comp_vals)],
-                    'pricing': 'dynamic',
-                    'price_unit': self.unit_compo_price,
-                    })
-            else:
-                pass
-        else: # a product that was a kit is not anymore, we unlink its components
-            self.update({
-                'direct_child_ids': [(5,)],
-                })
-            
-
-    """@api.multi
-    def _action_procurement_create(self):
-        ""
-        
-        ""
-        lines = self.filtered(lambda line:not line.is_kit_invoice_line) # get all lines in self that are not kits
-        res_order_lines = super(OFKitSaleOrderLine, lines)._action_procurement_create() # create POs for those lines
-
-        kits = self - lines # get all lines that are kits
-        components = self.env['account.invoice.line.comp'].search([('invoice_line_id','in',kits._ids),('is_kit_invoice_comp','=',False)]) # get all comps that are not kits
-        res_order_comps = components._action_procurement_create()
-        return res_order_lines + res_order_comps"""
+            direct_children = []
+            for comp in so_line.direct_child_ids:
+                direct_children += comp._prepare_invoice_line_comp(self.id)
+            self.direct_child_ids = direct_children
+            self._init_components()
+            self._refresh_price_unit()
 
     @api.model
     def create(self, vals):
+        # from_so_line key added in vals in case of creation from a sale order
+        from_so_line = vals.pop("from_so_line",False)
+        
         line = super(OFKitAccountInvoiceLine,self).create(vals)
-        if line.is_kit_invoice_line:
+        if line.is_kit_invoice_line and not from_so_line:
             line._init_components()
             if line.pricing == 'dynamic':
                 line.price_unit = line.unit_compo_price
@@ -253,6 +253,7 @@ class OFKitAccountInvoiceLineComponent(models.Model):
     invoice_line_id = fields.Many2one('account.invoice.line',string='Invoice Line',ondelete='cascade',required=True,readonly=True)
     invoice_id = fields.Many2one('account.invoice', string='Invoice', related='invoice_line_id.invoice_id', readonly=True)
     bom_path = fields.Char(string='Kit Arch',help="Contains the chain of parents of this component")
+    order_comp_id = fields.Many2one('sale.order.line.comp',string="Sale Order Component")
     
     name = fields.Char(string='Name',required=True)
     
@@ -265,7 +266,7 @@ class OFKitAccountInvoiceLineComponent(models.Model):
     load_children = fields.Boolean(string="Load children",
                         help="odoo is currently unable to load components of components at once on the fly. \n \
                         check this box to load this component under-components on the fly. \n \
-                        if you don't, all components will be loaded when you click 'save' on the order.")
+                        if you don't, all components will be loaded when you click 'save' on the invoice.")
     children_loaded = fields.Boolean(string="Children loaded") # no readonly for this or bug double children loading
     
     pricing = fields.Selection([
@@ -277,30 +278,27 @@ class OFKitAccountInvoiceLineComponent(models.Model):
                 if set to 'dynamic', the price will be computed according to the components of the kit.")
     currency_id = fields.Many2one(related='invoice_id.currency_id', store=True, string='Currency', readonly=True)
     uom_id = fields.Many2one('product.uom', string='UoM', required=True)
-    unit_price = fields.Monetary('Unit Price',digits=dp.get_precision('Product Price'),required=True,default=0.0)
-    children_price = fields.Monetary('Unit Price',digits=dp.get_precision('Product Price'),compute='_compute_children_price')
+    price_unit = fields.Monetary('Unit Price',digits=dp.get_precision('Product Price'),required=True,default=0.0,oldname="unit_price")
+    children_price = fields.Monetary('Unit Price',digits=dp.get_precision('Product Price'),compute='_compute_prices')
     unit_cost = fields.Monetary('Unit Cost',digits=dp.get_precision('Product Price'))
     
-    qty_bom_line = fields.Float(string='Qty / parent', digits=dp.get_precision('Product Unit of Measure'),
+    qty_per_parent = fields.Float(string='Qty / parent', digits=dp.get_precision('Product Unit of Measure'),oldname='qty_bom_line',
                         help="Quantity per direct parent unit.")
-    qty_inv_line = fields.Float(string='Qty / Invline', digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0,
-                            help="Quantity per invoice line kit unit", compute="_compute_qty_inv_line")
-    #TODO: onchange_qty_bom_line et onchange_qty_inv_line
+    qty_per_line = fields.Float(string='Qty / Invline', digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0,
+                            help="Quantity per invoice line kit unit", compute="_compute_qty_per_line",oldname="qty_inv_line")
+
     nb_units = fields.Float(string='Number of kits', related='invoice_line_id.quantity', readonly=True)
     qty_total = fields.Float(string='Total Qty', digits=dp.get_precision('Product Unit of Measure'), 
                                    compute='_compute_qty_total', help='total quantity equal to quantity per kit times number of kits')
     display_qty_changed = fields.Boolean(string="display qty changed message",default=False)
-    shown_price_total = fields.Monetary(string='Subtotal Price', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_shown_price', 
-                            help="Equal to total quantity * unit price")
-    shown_price = fields.Monetary(string='Price/Kit', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_shown_price', 
-                            help="Equal to quantity per so line unit * unit price")
+    price_total = fields.Monetary(string='Subtotal Price', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices', 
+                            help="Equal to total quantity * unit price", oldname="shown_price_total")
+    price_per_line = fields.Monetary(string='Price/Kit', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices', 
+                            help="Equal to quantity per so line unit * unit price", oldname="shown_price")
 
     hide_prices = fields.Boolean(string="Hide prices", default=False)
     
-    """customer_lead = fields.Float(
-        'Delivery Lead Time', required=True, default=0.0,
-        help="Number of days between the order confirmation and the shipping of the products to the customer")
-    procurement_ids = fields.One2many('procurement.order', 'sale_comp_id', string='Procurements')
+    """
     state = fields.Selection([
         ('draft','Draft'),
         ('proforma', 'Pro-forma'),
@@ -308,7 +306,7 @@ class OFKitAccountInvoiceLineComponent(models.Model):
         ('open', 'Open'),
         ('paid', 'Paid'),
         ('cancel', 'Cancelled'),
-    ], related='invoice_id.state', string='Order Status', readonly=True, copy=False, store=True, default='draft')"""
+    ], related='invoice_id.state', string='Invoice Status', readonly=True, copy=False, store=True, default='draft')"""
     
     @api.multi
     def toggle_hide_prices(self,hide,rec=True):
@@ -321,19 +319,21 @@ class OFKitAccountInvoiceLineComponent(models.Model):
                 comp.child_ids.toggle_hide_prices(hide)
 
     @api.onchange('product_id')
-    def onchange_product_id_comp(self):
+    def _onchange_product_id(self):
         if self.is_kit_invoice_comp:
             # former product was a kit, lets clear its components
-            self.child_ids = [(5,)]
-            
+            self.update({
+                'child_ids': [(5,)],
+                'children_loaded': False,
+            })
+        
         new_vals = {
-            'name': self.product_id.name,
+            'name': self.product_id.name_get()[0][1] or self.product_id.name,
             'pricing': self.product_id.pricing or 'fixed',
             'uom_id': self.product_id.product_tmpl_id.uom_id,
-            'unit_price': self.product_id.list_price,
+            'price_unit': self.product_id.list_price,
             'unit_cost': self.product_id.standard_price,
-            'qty_bom_line': 1,
-            #'customer_lead': self.product_id.sale_delay,
+            'qty_per_parent': 1,
             }
         if self.parent_id:
             if not self.bom_path:
@@ -342,7 +342,7 @@ class OFKitAccountInvoiceLineComponent(models.Model):
                 bom_path = self.bom_path
             hide_prices = self.parent_id.hide_prices
             rec_lvl = self.parent_id.rec_lvl +1
-            qty_inv_line_parent = self.parent_id.qty_inv_line
+            qty_per_line_parent = self.parent_id.qty_per_line
         else:
             if not self.bom_path: # on creation, when choosing a product
                 bom_path = self.invoice_line_id.name
@@ -356,11 +356,11 @@ class OFKitAccountInvoiceLineComponent(models.Model):
             else:
                 hide_prices = False
             rec_lvl = 1
-            qty_inv_line_parent = 1
+            qty_per_line_parent = 1
         if self.product_id:
             comp_name = self.product_id.name_get()[0][1] or self.product_id.name
             new_vals['name'] = comp_name
-        #new_vals['qty_inv_line'] = qty_inv_line_parent
+        #new_vals['qty_per_line'] = qty_per_line_parent
         new_vals['bom_path'] = bom_path
         new_vals['rec_lvl'] = rec_lvl
         new_vals['hide_prices'] = hide_prices
@@ -376,7 +376,7 @@ class OFKitAccountInvoiceLineComponent(models.Model):
                 bom = bom_obj.search([('product_tmpl_id','=',product_tmpl_id.id)], limit=1)
             if bom:
                 comp_name = self.product_id.name_get()[0][1] or self.product_id.name
-                under_components = bom.get_components(rec_lvl,qty_inv_line_parent,bom_path + " -> " + comp_name,'account')
+                under_components = bom.get_components(rec_lvl,qty_per_line_parent,bom_path + " -> " + comp_name,'account')
                 if hide_prices:
                     for under_comp in under_components:
                         under_comp[2]['hide_prices'] = True
@@ -389,15 +389,15 @@ class OFKitAccountInvoiceLineComponent(models.Model):
         
         self.update(new_vals)
     
-    @api.onchange('qty_bom_line')
-    def onchange_qty_bom_line(self):
+    @api.onchange('qty_per_parent')
+    def _onchange_qty_per_parent(self):
         if self.is_kit_invoice_comp:
             self.display_qty_changed = True
 
     @api.onchange('load_children')
-    def onchange_load_children(self):
+    def _onchange_load_children(self):
         """
-        checkbox to load components on the fly before saving.
+        checkbox to load components on the fly before saving. Odoo doesn't handle well recursive one2many on the fly
         """
         if self.load_children:
             self.load_under_components(False,self.hide_prices)
@@ -414,7 +414,7 @@ class OFKitAccountInvoiceLineComponent(models.Model):
                     bom = bom_obj.search([('product_tmpl_id','=',product_tmpl_id.id)], limit=1)
                 if bom:
                     comp_name = comp.product_id.name_get()[0][1] or comp.product_id.name
-                    components = bom.get_components(comp.rec_lvl,comp.qty_inv_line,comp.bom_path + " -> " + comp_name,'account')
+                    components = bom.get_components(comp.rec_lvl,comp.qty_per_line,comp.bom_path + " -> " + comp_name,'account')
                     if hide_prices:
                         for under_comp in components:
                             under_comp[2]['hide_prices'] = True
@@ -424,81 +424,58 @@ class OFKitAccountInvoiceLineComponent(models.Model):
                     comp.child_ids.load_under_components(True,hide_prices)
             else:
                 comp.hide_prices = hide_prices
-
-    @api.depends('child_ids')
-    def _compute_children_price(self):
+    
+    @api.depends('child_ids','qty_per_line','nb_units')
+    def _compute_prices(self):
         for comp in self:
+            qty_per_line = comp.qty_per_line
             if comp.is_kit_invoice_comp:
-                if comp.children_loaded:
-                    comp.children_price = comp.get_prices_rec(False)
-                else:
-                    bom_obj = self.env['mrp.bom']
-                    bom = bom_obj.search([('product_id','=',comp.product_id.id)], limit=1)
-                    if not bom:
-                        product_tmpl_id = comp.product_id.product_tmpl_id
-                        bom = bom_obj.search([('product_tmpl_id','=',product_tmpl_id.id)], limit=1)
-                    if bom:
-                        comp.children_price = bom.get_components_price(comp.qty_inv_line,True)
-                        
+                children_price = comp.child_ids.get_prices_rec(1)
+                comp.children_price = children_price # unit price
+                comp.price_per_line = children_price * qty_per_line
+                comp.price_total = children_price * qty_per_line * comp.nb_units
+            else:
+                comp.children_price = comp.price_unit
+                comp.price_per_line = comp.price_unit * qty_per_line
+                comp.price_total = comp.price_unit * qty_per_line * comp.nb_units
 
     @api.multi
-    def get_prices_rec(self,per_ai_line=True,without_pricing=True):
+    def get_prices_rec(self,qty_parent=1):
         """
-        returns the price of the components in self and their children per unit AI or bom line
-        doesn't take under-kits pricing into account if without_pricing
+        returns the price of the components in self and their children.
+        doesn't take under-kits pricing into account.
+        :param qty_parent: 
         """
         res = 0
         for comp in self:
             if not comp.is_kit_invoice_comp: # comp is not a kit, stop condition
-                if per_ai_line:
-                    res += comp.qty_inv_line * comp.unit_price
-                else:
-                    res += comp.qty_bom_line * comp.unit_price
-            elif without_pricing:
-                res += comp.child_ids.get_prices_rec(per_ai_line,without_pricing)
-            elif comp.pricing == 'fixed': # comp is a kit with fixed pricing, stop condition
-                if per_ai_line:
-                    res += comp.qty_inv_line * comp.unit_price
-                else:
-                    res += comp.qty_bom_line * comp.unit_price
-            else: # comp is a kit with dynamic pricing, recursive call
-                res += comp.child_ids.get_prices_rec(per_ai_line,without_pricing)
-        return res
-
-    @api.multi
-    @api.depends('qty_inv_line','unit_price','nb_units')
-    def _compute_shown_price(self):
-        for comp in self:
-            if not comp.is_kit_invoice_comp:
-                ai_unit_price = comp.get_prices_rec()
+                res += comp.price_unit * comp.qty_per_parent * qty_parent
             else:
-                if comp.children_loaded:
-                    ai_unit_price = comp.get_prices_rec()
-                else: # on the fly
+                res += comp.child_ids.get_prices_rec(qty_parent * comp.qty_per_parent) # recursive call
+                if not comp.children_loaded:
                     bom_obj = self.env['mrp.bom']
                     bom = bom_obj.search([('product_id','=',comp.product_id.id)], limit=1)
                     if not bom:
                         product_tmpl_id = comp.product_id.product_tmpl_id
                         bom = bom_obj.search([('product_tmpl_id','=',product_tmpl_id.id)], limit=1)
                     if bom:
-                        ai_unit_price = bom.get_components_price(comp.qty_inv_line,True)
-            comp.shown_price = ai_unit_price
-            comp.shown_price_total = ai_unit_price * comp.nb_units
-    
-    @api.depends('qty_bom_line','parent_id')
-    def _compute_qty_inv_line(self):
+                        res += bom.get_components_price(comp.qty_per_line,True)
+        return res
+
+    @api.depends('qty_per_parent','parent_id')
+    def _compute_qty_per_line(self):
         for comp in self:
             parent = comp.parent_id
-            qty = comp.qty_bom_line
+            qty = comp.qty_per_parent
             while parent:
-                qty *= parent.qty_bom_line
+                qty *= parent.qty_per_parent
                 parent = parent.parent_id
-            comp.qty_inv_line = qty
+            comp.qty_per_line = qty
     
-    @api.depends('qty_inv_line','nb_units')
+    @api.depends('qty_per_line','nb_units')
     def _compute_qty_total(self):
         for comp in self:
-            comp.qty_total = comp.qty_inv_line * comp.nb_units 
+            comp.qty_total = comp.qty_per_line * comp.nb_units 
 
     @api.model
     def create(self, vals):
@@ -512,7 +489,9 @@ class OFKitAccountInvoiceLineComponent(models.Model):
     @api.multi
     def write(self,vals):
         super(OFKitAccountInvoiceLineComponent,self).write(vals)
-        if 'qty_bom_line' in vals:
-            self.display_qty_changed = False
+        for comp in self:
+            if comp.display_qty_changed:
+                # set to True in onchange_qty_per_parent, we need to set it back to False so the message doesn't stay
+                comp.display_qty_changed = False
         return True
     

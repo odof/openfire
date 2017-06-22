@@ -31,8 +31,8 @@
                             <field name="bom_path"/>
                             <field name="product_id"/>
                             <field name="name"/>
-                            <field name="qty_bom_line"/>
-                            <field name="qty_inv_line"/>
+                            <field name="qty_per_parent"/>
+                            <field name="qty_per_line"/>
                             <field name="qty_total"/>
                             <field name="uom_id"/>
                         </tree>
@@ -101,8 +101,8 @@
                             attrs="{'invisible': ['|',('children_loaded','=',True),('is_kit_invoice_comp','=',False)]}"/>
                     </group>
                     <group  name="Quantities">
-                        <field name="qty_bom_line"/>
-                        <field name="qty_inv_line"/>
+                        <field name="qty_per_parent"/>
+                        <field name="qty_per_line"/>
                         <field name="nb_units"/>
                         <field name="qty_total"/>
                         <field name="uom_id"/>
@@ -116,10 +116,10 @@
                     <div/>
                     <group name="Prices" attrs="{'invisible': [('hide_prices','=',True)]}">
                         <!--<field name="pricing" required="False"/>-->
-                        <field name="unit_price" attrs="{'invisible': [('is_kit_invoice_comp','=',True)]}"/>
+                        <field name="price_unit" attrs="{'invisible': [('is_kit_invoice_comp','=',True)]}"/>
                         <field name="children_price" attrs="{'invisible': [('is_kit_invoice_comp','=',False)]}"/>
-                        <field name="shown_price"/>
-                        <field name="shown_price_total"/>
+                        <field name="price_per_line"/>
+                        <field name="price_total"/>
                     </group>
                 </group>
                 <div name="hide_prices_message" attrs="{'invisible': [('hide_prices','=',False)]}">
@@ -137,14 +137,14 @@
                         <field name="child_ids" invisible="1"/>
                         <!-- <field name="invoice_line_id"/> -->
                         <field name="name"/>
-                        <field name="qty_bom_line"/>
-                        <field name="qty_inv_line"/>
+                        <field name="qty_per_parent"/>
+                        <field name="qty_per_line"/>
                         <field name="qty_total" invisible="1"/>
                         <field name="uom_id"/>
                         <field name="hide_prices" invisible="1"/>
-                        <field name="unit_price" attrs="{'invisible': ['|',('is_kit_invoice_comp','=',True),('hide_prices','=',True)]}"/>
-                        <field name="shown_price" attrs="{'invisible': [('hide_prices','=',True)]}"/>
-                        <field name="shown_price_total" attrs="{'invisible': [('hide_prices','=',True)]}"/>
+                        <field name="price_unit" attrs="{'invisible': ['|',('is_kit_invoice_comp','=',True),('hide_prices','=',True)]}"/>
+                        <field name="price_per_line" attrs="{'invisible': [('hide_prices','=',True)]}"/>
+                        <field name="price_total" attrs="{'invisible': [('hide_prices','=',True)]}"/>
                     </tree>
                 </field>
                 <separator string="Developer Mode Information" name="Developer Mode Information" groups="base.group_no_one"/>
@@ -176,14 +176,14 @@
                 <field name="bom_path"/>
                 <field name="product_id"/>
                 <field name="name"/>
-                <field name="qty_bom_line"/>
-                <field name="qty_inv_line"/>
+                <field name="qty_per_parent"/>
+                <field name="qty_per_line"/>
                 <field name="qty_total"/>
                 <field name="uom_id"/>
                 <field name="hide_prices" invisible="1"/>
-                <field name="unit_price" attrs="{'invisible': ['|',('is_kit_invoice_comp','=',True),('hide_prices','=',True)]}"/>
-                <field name="shown_price" attrs="{'invisible': [('hide_prices','=',True)]}"/>
-                <!--<field name="shown_price_total" attrs="{'invisible': [('is_kit_invoice_comp','=',True)]}"/>-->
+                <field name="price_unit" attrs="{'invisible': ['|',('is_kit_invoice_comp','=',True),('hide_prices','=',True)]}"/>
+                <field name="price_per_line" attrs="{'invisible': [('hide_prices','=',True)]}"/>
+                <!--<field name="price_total" attrs="{'invisible': [('is_kit_invoice_comp','=',True)]}"/>-->
             </tree>
         </field>
     </record>

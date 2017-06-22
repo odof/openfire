@@ -30,7 +30,7 @@ class OFBom(models.Model):
         return res
     
     @api.multi
-    def get_components(self,rec_lvl=0,parent_qty_so_line=1,bom_path="",origin="sale"):
+    def get_components(self,rec_lvl=0,parent_qty_per_line=1,bom_path="",origin="sale"):
         self.ensure_one()
         self._check_product_recursion()
         res = []
@@ -43,10 +43,10 @@ class OFBom(models.Model):
                     'name': comp_name,
                     #'pricing': 'dynamic', # set pricing of under_kits to dynamic by default
                     #'is_kit_order_comp': True,
-                    'qty_bom_line': line.product_qty,
-                    #'qty_so_line': parent_qty_so_line * line.product_qty,
+                    'qty_per_parent': line.product_qty,
+                    #'qty_per_line': parent_qty_per_line * line.product_qty,
                     #'product_uom': line.product_uom_id.id,
-                    'unit_price': line.product_id.lst_price,
+                    'price_unit': line.product_id.lst_price,
                     'unit_cost': line.product_id.standard_price,
                     #'child_ids': under_comps,
                 }
@@ -70,7 +70,7 @@ class OFBom(models.Model):
         return res
     
     @api.multi
-    def get_components_rec(self,rec_lvl=1,parent_qty_so_line=1,bom_path=""):
+    def get_components_rec(self,rec_lvl=1,parent_qty_per_line=1,bom_path=""):
         """
         recursive method.
         returns a list of all components (and under-kits) in this bom
@@ -81,11 +81,7 @@ class OFBom(models.Model):
         for line in self.bom_line_ids:
             if line.child_bom_id and line.child_bom_id.type == 'phantom': # this line is kit. get the components and add the under_kit
                 
-                under_comps = line.child_bom_id.get_components_rec(rec_lvl+1, parent_qty_so_line*line.product_qty, bom_path + " -> " + line.product_id.name) # recursive call, get the components of the under_kit
-                #for elt in under_comps:
-                    #elt[2]['bom_path'] = [bom_path] + elt[2]['bom_path'] # add the under_kit in the path
-                    #elt['qty_bom_line'] = elt['qty_so_line']
-                    #elt['qty_so_line'] *= line.product_qty
+                under_comps = line.child_bom_id.get_components_rec(rec_lvl+1, parent_qty_per_line*line.product_qty, bom_path + " -> " + line.product_id.name) # recursive call, get the components of the under_kit
                 
                 comp = { #under_kit
                     'rec_lvl': rec_lvl+1,
@@ -94,10 +90,10 @@ class OFBom(models.Model):
                     'name': line.product_id.name,
                     'pricing': 'dynamic', # set pricing of under_kits to dynamic by default
                     'is_kit_order_comp': True,
-                    'qty_bom_line': line.product_qty,
-                    'qty_so_line': parent_qty_so_line * line.product_qty,
+                    'qty_per_parent': line.product_qty,
+                    'qty_per_line': parent_qty_per_line * line.product_qty,
                     'product_uom': line.product_uom_id.id,
-                    'unit_price': line.product_id.lst_price,
+                    'price_unit': line.product_id.lst_price,
                     'unit_cost': line.product_id.standard_price,
                     'child_ids': under_comps,
                 }
@@ -111,10 +107,10 @@ class OFBom(models.Model):
                     'name': line.product_id.name,
                     'pricing': 'fixed',
                     'is_kit_order_comp': False,
-                    'qty_bom_line': line.product_qty, # the qty as it is given in the bom
-                    'qty_so_line': parent_qty_so_line * line.product_qty,
+                    'qty_per_parent': line.product_qty, # the qty as it is given in the bom
+                    'qty_per_line': parent_qty_per_line * line.product_qty,
                     'product_uom': line.product_uom_id.id,
-                    'unit_price': line.product_id.lst_price,
+                    'price_unit': line.product_id.lst_price,
                     'unit_cost': line.product_id.standard_price,
 #                    'children': [],
                 }

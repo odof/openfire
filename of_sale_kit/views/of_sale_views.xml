@@ -31,8 +31,8 @@
                             <field name="bom_path"/>
                             <field name="product_id"/>
                             <field name="name"/>
-                            <field name="qty_bom_line"/>
-                            <field name="qty_so_line"/>
+                            <field name="qty_per_parent"/>
+                            <field name="qty_per_line"/>
                             <field name="qty_total"/>
                             <field name="product_uom"/>
                         </tree>
@@ -92,26 +92,27 @@
                         <field name="customer_lead" attrs="{'invisible': [('is_kit_order_comp','=',True)]}"/>
                     </group>
                     <group  name="Quantities">
-                        <field name="qty_bom_line"/>
-                        <field name="qty_so_line"/>
+                        <field name="qty_per_parent"/>
+                        <field name="qty_per_line"/>
                         <field name="nb_units"/>
                         <field name="qty_total"/>
+                        <field name="qty_delivered"/>
                         <field name="product_uom"/>
                         <field name="display_qty_changed" invisible="1"/>
-                        <div attrs="{'invisible': [('display_qty_changed','=',False)]}">
+                        <div attrs="{'invisible': [('display_qty_changed','=',False)]}" colspan="2">
                             <i>Kit quantities are a bit tricky to update on the fly, please save your changes to recompute its children quantities</i>
                         </div>
                     </group>
-                    <div/>
                     <separator string="Prices" name="Prices" attrs="{'invisible': [('hide_prices','=',True)]}"/>
                     <div/>
                     <group name="Prices" attrs="{'invisible': [('hide_prices','=',True)]}">
                         <!--<field name="pricing" required="False"/>-->
-                        <field name="unit_price" attrs="{'invisible': [('is_kit_order_comp','=',True)]}"/>
+                        <field name="price_unit" attrs="{'invisible': [('is_kit_order_comp','=',True)]}"/>
                         <field name="children_price" attrs="{'invisible': [('is_kit_order_comp','=',False)]}"/>
-                        <field name="shown_price"/>
-                        <field name="shown_price_total"/>
+                        <field name="price_per_line"/>
+                        <field name="price_total"/>
                     </group>
+                    <div/>
                 </group>
                 <div name="hide_prices_message" attrs="{'invisible': [('hide_prices','=',False)]}">
                     <i>prices are not shown when the sale order line pricing is set to 'fixed'</i>
@@ -128,14 +129,15 @@
                         <field name="child_ids" invisible="1"/>
                         <!-- <field name="order_line_id"/> -->
                         <field name="name"/>
-                        <field name="qty_bom_line"/>
-                        <field name="qty_so_line"/>
+                        <field name="qty_per_parent"/>
+                        <field name="qty_per_line"/>
                         <field name="qty_total" invisible="1"/>
                         <field name="product_uom"/>
                         <field name="hide_prices" invisible="1"/>
-                        <field name="unit_price" attrs="{'invisible': ['|',('is_kit_order_comp','=',True),('hide_prices','=',True)]}"/>
-                        <field name="shown_price" attrs="{'invisible': [('hide_prices','=',True)]}"/>
-                        <field name="shown_price_total" attrs="{'invisible': [('hide_prices','=',True)]}"/>
+                        <field name="price_unit" invisible="1"/> <!--attrs="{'invisible': ['|',('is_kit_order_comp','=',True),('hide_prices','=',True)]}"/>-->
+                        <field name="children_price"/>
+                        <field name="price_per_line" attrs="{'invisible': [('hide_prices','=',True)]}"/>
+                        <field name="price_total" attrs="{'invisible': [('hide_prices','=',True)]}"/>
                     </tree>
                 </field>
                 <separator string="Developer Mode Information" name="Developer Mode Information" groups="base.group_no_one"/>
@@ -167,14 +169,15 @@
                 <field name="bom_path"/>
                 <field name="product_id"/>
                 <field name="name"/>
-                <field name="qty_bom_line"/>
-                <field name="qty_so_line"/>
+                <field name="qty_per_parent"/>
+                <field name="qty_per_line"/>
                 <field name="qty_total"/>
                 <field name="product_uom"/>
                 <field name="hide_prices" invisible="1"/>
-                <field name="unit_price" attrs="{'invisible': ['|',('is_kit_order_comp','=',True),('hide_prices','=',True)]}"/>
-                <field name="shown_price" attrs="{'invisible': [('hide_prices','=',True)]}"/>
-                <!--<field name="shown_price_total" attrs="{'invisible': [('is_kit_order_comp','=',True)]}"/>-->
+                <field name="price_unit" invisible="1"/> <!--attrs="{'invisible': ['|',('is_kit_order_comp','=',True),('hide_prices','=',True)]}"/>-->
+                <field name="children_price"/>
+                <field name="price_per_line" attrs="{'invisible': [('hide_prices','=',True)]}"/>
+                <!--<field name="price_total" attrs="{'invisible': [('is_kit_order_comp','=',True)]}"/>-->
             </tree>
         </field>
     </record>
