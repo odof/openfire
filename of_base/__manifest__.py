@@ -15,6 +15,7 @@ Personnalisations des fonctions de base Odoo :
 - Ajoute le groupe utilisateur "Intranet"
 - Affiche l'adresse du contact dans le menu déroulant de sélection d'un partenaire
 - Affiche l'adresse au format français par défaut quand le pays n'est pas renseigné et non le format US
+- Ajout de la recherche multi-mots pour les articles
 """,
     'website' : "www.openfire.fr",
     'depends' : ["product"],
