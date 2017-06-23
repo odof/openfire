@@ -3,12 +3,12 @@
 
     <template id="of_report_saleorder_document" inherit_id="sale.report_saleorder_document">
         <xpath expr="//span[@t-field='l.name']" position="after">
-            <t t-if="l.is_kit_order_line and doc.kit_display_mode == 'collapse'">
+            <t t-if="l.is_kit and doc.kit_display_mode == 'collapse'">
                 <span t-esc="l.get_kit_descr_collapse()"/>
             </t>
         </xpath>
         <xpath expr="//t[@t-as='l']/tr" position="after">
-            <t t-if="l.is_kit_order_line and doc.kit_display_mode == 'expand'">
+            <t t-if="l.is_kit and doc.kit_display_mode == 'expand'">
                 <t t-set="line_comps" t-value="l.get_all_comps()"/>
                 <t t-foreach="line_comps" t-as="comp">
                     <tr>

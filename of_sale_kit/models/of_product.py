@@ -11,9 +11,9 @@ class OFKitProductTemplate(models.Model):
     is_kit = fields.Boolean(string="Is a kit", compute='_compute_is_kit', store=True)
     
     current_bom_id = fields.Many2one('mrp.bom', string="Current BoM", compute='_compute_current_bom_id', store=True)
-    unit_compo_price = fields.Monetary('Compo Price/Kit',digits=dp.get_precision('Product Price'),compute='_compute_unit_compo_price')
+    price_compo = fields.Monetary('Compo Price/Kit',digits=dp.get_precision('Product Price'),compute='_compute_price_compo',oldname="unit_compo_price")
     
-    used_price = fields.Monetary('Used Price',digits=dp.get_precision('Product Price'),compute='_compute_used_price')
+    price_used = fields.Monetary('Used Price',digits=dp.get_precision('Product Price'),compute='_compute_price_used',oldname="used_price")
     
     pricing = fields.Selection([
         ('fixed','Fixed'),
@@ -46,19 +46,19 @@ class OFKitProductTemplate(models.Model):
         
     
     @api.depends('current_bom_id')
-    def _compute_unit_compo_price(self):
+    def _compute_price_compo(self):
         for product in self:
             if product.is_kit:
-                product.unit_compo_price = product.current_bom_id.get_components_price(1,True)
+                product.price_compo = product.current_bom_id.get_components_price(1,True)
     
-    @api.depends('unit_compo_price','pricing')
-    def _compute_used_price(self):
+    @api.depends('price_compo','pricing')
+    def _compute_price_used(self):
         for product in self:
             if product.is_kit:
                 if product.pricing == 'fixed':
-                    product.used_price = product.list_price
+                    product.price_used = product.list_price
                 else:
-                    product.used_price = product.unit_compo_price
+                    product.price_used = product.price_compo
 
 class OFKitProductProduct(models.Model):
     _inherit = "product.product"

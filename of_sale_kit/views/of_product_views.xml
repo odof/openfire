@@ -20,8 +20,8 @@
             	<div attrs="{'invisible': [('is_kit','=',False)]}"/>
             	<field name="current_bom_id" attrs="{'invisible': [('is_kit','=',False)]}"/>
             	<field name="pricing" attrs="{'invisible': [('is_kit','=',False)]}"/>
-            	<field name="unit_compo_price" attrs="{'invisible': [('is_kit','=',False)]}"/>
-            	<field name="used_price" attrs="{'invisible': [('is_kit','=',False)]}"/>
+            	<field name="price_compo" attrs="{'invisible': [('is_kit','=',False)]}"/>
+            	<field name="price_used" attrs="{'invisible': [('is_kit','=',False)]}"/>
             </xpath>
             <xpath expr="//page[@name='general_information']//field[@name='type']" position="attributes">
             	<attribute name="attrs">{'readonly': [('is_kit','=',True)]}</attribute>

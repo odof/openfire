@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, models, _
+from odoo import api, models, _
 from odoo.addons import decimal_precision as dp
-from odoo.exceptions import UserError, ValidationError
-from odoo.tools import float_round
 
 
 class OFBom(models.Model):
@@ -12,7 +10,8 @@ class OFBom(models.Model):
     def get_components_price(self,rec_qty=1,without_pricing=True):
         """
         recursive method.
-        returns the sum of the price of all components in this bom. the return price of under-kits is function of their pricing.
+        returns the sum of the price of all components in this bom. 
+        doesn't take 'pricing' into account unless without_pricing set to false.
         """
         self.ensure_one()
         self._check_product_recursion()
@@ -30,7 +29,7 @@ class OFBom(models.Model):
         return res
     
     @api.multi
-    def get_components(self,rec_lvl=0,parent_qty_per_line=1,bom_path="",origin="sale"):
+    def get_components(self,rec_lvl=0,parent_qty_per_line=1,parent_chain="",origin="sale"):
         self.ensure_one()
         self._check_product_recursion()
         res = []
@@ -38,42 +37,37 @@ class OFBom(models.Model):
             comp_name = line.product_id.name_get()[0][1] or line.product_id.name
             comp = { 
                     'rec_lvl': rec_lvl+1,
-                    'bom_path': bom_path ,
+                    'parent_chain': parent_chain ,
                     'product_id': line.product_id.id,
                     'name': comp_name,
-                    #'pricing': 'dynamic', # set pricing of under_kits to dynamic by default
-                    #'is_kit_order_comp': True,
+                    'default_code': line.product_id.default_code,
                     'qty_per_parent': line.product_qty,
-                    #'qty_per_line': parent_qty_per_line * line.product_qty,
-                    #'product_uom': line.product_uom_id.id,
                     'price_unit': line.product_id.lst_price,
                     'unit_cost': line.product_id.standard_price,
-                    #'child_ids': under_comps,
                 }
             if line.child_bom_id and line.child_bom_id.type == 'phantom': # this line is a kit
                 comp['pricing'] = 'dynamic'
+                comp['is_kit'] = True
                 if origin == 'sale':
                     comp['product_uom'] = line.product_uom_id.id,
-                    comp['is_kit_order_comp'] = True
                 elif origin == 'account':
                     comp['uom_id'] = line.product_uom_id.id,
-                    comp['is_kit_invoice_comp'] = True
             else:
                 comp['pricing'] = 'fixed'
+                comp['is_kit'] = False
                 if origin == 'sale':
                     comp['product_uom'] = line.product_uom_id.id,
-                    comp['is_kit_order_comp'] = False
                 elif origin == 'account':
                     comp['uom_id'] = line.product_uom_id.id,
-                    comp['is_kit_invoice_comp'] = False
             res.append((0,0,comp))
         return res
     
     @api.multi
-    def get_components_rec(self,rec_lvl=1,parent_qty_per_line=1,bom_path=""):
+    def get_components_rec(self,rec_lvl=1,parent_qty_per_line=1,parent_chain=""):
         """
         recursive method.
         returns a list of all components (and under-kits) in this bom
+        to be reworked
         """
         self.ensure_one()
         self._check_product_recursion()
@@ -81,15 +75,15 @@ class OFBom(models.Model):
         for line in self.bom_line_ids:
             if line.child_bom_id and line.child_bom_id.type == 'phantom': # this line is kit. get the components and add the under_kit
                 
-                under_comps = line.child_bom_id.get_components_rec(rec_lvl+1, parent_qty_per_line*line.product_qty, bom_path + " -> " + line.product_id.name) # recursive call, get the components of the under_kit
+                under_comps = line.child_bom_id.get_components_rec(rec_lvl+1, parent_qty_per_line*line.product_qty, parent_chain + " -> " + line.product_id.name) # recursive call, get the components of the under_kit
                 
                 comp = { #under_kit
                     'rec_lvl': rec_lvl+1,
-                    'bom_path': bom_path ,
+                    'parent_chain': parent_chain ,
                     'product_id': line.product_id.id,
                     'name': line.product_id.name,
                     'pricing': 'dynamic', # set pricing of under_kits to dynamic by default
-                    'is_kit_order_comp': True,
+                    'is_kit': True,
                     'qty_per_parent': line.product_qty,
                     'qty_per_line': parent_qty_per_line * line.product_qty,
                     'product_uom': line.product_uom_id.id,
@@ -102,11 +96,11 @@ class OFBom(models.Model):
                     
                 comp = {
                     'rec_lvl': rec_lvl+1,
-                    'bom_path': bom_path,
+                    'parent_chain': parent_chain,
                     'product_id': line.product_id.id,
                     'name': line.product_id.name,
                     'pricing': 'fixed',
-                    'is_kit_order_comp': False,
+                    'is_kit': False,
                     'qty_per_parent': line.product_qty, # the qty as it is given in the bom
                     'qty_per_line': parent_qty_per_line * line.product_qty,
                     'product_uom': line.product_uom_id.id,
