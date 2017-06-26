@@ -60,8 +60,8 @@
                 <label for="pricing"/>
                 <div name="pricing_div" attrs="{'invisible': [('is_kit','=',False)]}">
                     <field name="pricing" required="False"/>
-                    <div name="hide_prices_message" attrs="{'invisible': [('pricing','=','dynamic')]}">
-                        <i>components prices are not shown when the sale order line pricing is set to 'fixed'</i>
+                    <div name="hide_prices_message" attrs="{'invisible': [('pricing','=','computed')]}">
+                        <i>Components prices are not shown when the invoice line pricing is set to 'fixed'. They are never printed out in PDF reports.</i>
                     </div>
                 </div>
             </xpath>
@@ -78,7 +78,7 @@
             </xpath>
         </field>
     </record>
-    
+
     <!--#############################################################################
         ##                   ACCOUNT INVOICE COMPONENT VIEWS
         #############################################################################
@@ -87,7 +87,7 @@
         <field name="name">of.kit.account.invoice.comp.form</field>
         <field name="model">account.invoice.line.comp</field>
         <field name="arch" type="xml">
-            <form string="Sales Order Component">
+            <form string="Invoice line component">
             <header>
                 <h2>Invoice Line Component</h2>
             </header>
@@ -106,10 +106,13 @@
                             attrs="{'invisible': ['|',('children_loaded','=',True),('is_kit','=',False)]}"/>
                     </group>
                     <group  name="Quantities">
-                        <field name="qty_per_parent"/>
-                        <field name="qty_per_line" attrs="{'invisible': [('rec_lvl','&lt;',2)]}"/>
+                        <label for="qty_per_parent" string="Quantity"/>
+                        <field name="qty_per_parent" nolabel="1"/>
+                        <label for="qty_per_line" string="Quantity per kit" attrs="{'invisible': [('rec_lvl','&lt;',2)]}"/>
+                        <field name="qty_per_line" nolabel="1" attrs="{'invisible': [('rec_lvl','&lt;',2)]}"/>
                         <field name="nb_units"/>
-                        <field name="qty_total"/>
+                        <label for="qty_total" string="Total Quantity"/>
+                        <field name="qty_total" nolabel="1"/>
                         <field name="uom_id"/>
                         <field name="display_qty_changed" invisible="1"/>
                         <div attrs="{'invisible': [('display_qty_changed','=',False)]}">
@@ -128,7 +131,7 @@
                     </group>
                 </group>
                 <div name="hide_prices_message" attrs="{'invisible': [('hide_prices','=',False)]}">
-                    <i>prices are not shown when the invoice line pricing is set to 'fixed'</i>
+                    <i>Components prices are not shown when the invoice line pricing is set to 'fixed'. They are never printed out in PDF reports.</i>
                 </div>
                 <separator string="Underkit Components" name="Underkit Components" attrs="{'invisible': [('is_kit','=',False)]}"/>
                 <field name="child_ids" mode="tree" attrs="{'invisible': [('is_kit','=',False)]}">
@@ -158,7 +161,6 @@
                     <field name="is_kit"/>
                     <field name="rec_lvl"/>
                     <field name="parent_chain"/>
-                    <!--<field name="invoice_line_pricing"/>-->
                     <field name="children_loaded"/>
                     <field name="hide_prices"/>
                 </group>
@@ -166,7 +168,7 @@
             </form>
         </field>
     </record>
-    
+
     <record id="of_view_account_comp_tree" model="ir.ui.view">
         <field name="name">of.kit.account.invoice.line.comp.tree</field>
         <field name="model">account.invoice.line.comp</field>
@@ -175,7 +177,6 @@
                 <field name="rec_lvl" invisible="1"/>
                 <field name="is_kit" invisible="1"/>
                 <!-- <field name="invoice_line_id" invisible="1"/> -->
-                <!--<field name="invoice_line_pricing" invisible="1"/>-->
                 <field name="parent_id" invisible="1"/>
                 <field name="child_ids" invisible="1"/>
                 <field name="parent_chain"/>
@@ -192,5 +193,5 @@
             </tree>
         </field>
     </record>
-    
+
 </odoo>

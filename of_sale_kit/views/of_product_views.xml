@@ -12,9 +12,6 @@
                     <label for="is_kit"/>
                 </div>
             </xpath>
-            <!--<xpath expr="//field[@name='list_price']" position="before">
-            	<field name="pricing" attrs="{'invisible': [('is_kit','=',False)]}"/>
-            </xpath>-->
             <xpath expr="//group[@name='group_general']" position="inside">
             	<separator string="Kit info" name="Kit info" attrs="{'invisible': [('is_kit','=',False)]}"/>
             	<div attrs="{'invisible': [('is_kit','=',False)]}"/>
@@ -28,7 +25,7 @@
             </xpath>
         </field>
     </record>
-    
+
     <record id="of_product_template_form_view_bom_button" model="ir.ui.view">
         <field name="name">of.kit.product.template.procurement</field>
         <field name="model">product.template</field>
@@ -40,7 +37,7 @@
             </xpath>
         </field>
     </record>
-    
+
     <record id="of_product_product_form_view_bom_button" model="ir.ui.view">
         <field name="name">of.kit.product.product.procurement</field>
         <field name="model">product.product</field>
@@ -49,6 +46,20 @@
         <field name="arch" type="xml">
         	<xpath expr="//button[@name='action_view_bom']" position="attributes">
             	<attribute name="attrs"></attribute>
+            </xpath>
+        </field>
+    </record>
+
+	<!--#############################################################################
+        ##                      PROCUREMENT VIEWS
+        #############################################################################
+     -->
+	<record id="of_procurement_form_view" model="ir.ui.view">
+        <field name="name">procurement.order.form</field>
+        <field name="model">procurement.order</field>
+        <field name="arch" type="xml">
+        	<xpath expr="//field[@name='origin']" position="after">
+            	<field name="sale_comp_id" attrs="{'invisible': [('sale_comp_id','=',False)]}"/>
             </xpath>
         </field>
     </record>

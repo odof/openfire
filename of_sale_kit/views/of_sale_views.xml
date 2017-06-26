@@ -4,6 +4,7 @@
         action="mrp.mrp_bom_form_action"
         parent="sales_team.menu_sales"
         sequence="20"/>
+
     <!--#############################################################################
         ##                       SALE ORDER VIEWS
         #############################################################################
@@ -53,8 +54,8 @@
                 <label for="pricing"/>
                 <div name="pricing_div" attrs="{'invisible': [('is_kit','=',False)]}">
                     <field name="pricing" required="False"/>
-                    <div name="hide_prices_message" attrs="{'invisible': [('pricing','=','dynamic')]}">
-                        <i>components prices are not shown when the sale order line pricing is set to 'fixed'</i>
+                    <div name="hide_prices_message" attrs="{'invisible': [('pricing','=','computed')]}">
+                        <i>Components prices are not shown when the sale order line pricing is set to 'fixed'. They are never printed out in PDF reports.</i>
                     </div>
                 </div>
             </xpath>
@@ -72,7 +73,7 @@
             </xpath>
         </field>
     </record>
-    
+
     <!--#############################################################################
         ##                   SALE ORDER COMPONENT VIEWS
         #############################################################################
@@ -81,7 +82,7 @@
         <field name="name">of.kit.sale.order.line.comp.form</field>
         <field name="model">sale.order.line.comp</field>
         <field name="arch" type="xml">
-            <form string="Sales Order Component">
+            <form string="Order line component">
             <header>
                 <h2>Sale Order Line Component</h2>
             </header>
@@ -101,11 +102,15 @@
                         <field name="customer_lead" attrs="{'invisible': [('is_kit','=',True)]}"/>
                     </group>
                     <group  name="Quantities">
-                        <field name="qty_per_parent"/>
-                        <field name="qty_per_line" attrs="{'invisible': [('rec_lvl','&lt;',2)]}"/>
+                    	<label for="qty_per_parent" string="Quantity"/>
+                        <field name="qty_per_parent" nolabel="1"/>
+                        <label for="qty_per_line" string="Quantity per kit" attrs="{'invisible': [('rec_lvl','&lt;',2)]}"/>
+                        <field name="qty_per_line" nolabel="1" attrs="{'invisible': [('rec_lvl','&lt;',2)]}"/>
                         <field name="nb_units"/>
-                        <field name="qty_total"/>
-                        <field name="qty_delivered"/>
+                        <label for="qty_total" string="Total Quantity"/>
+                        <field name="qty_total" nolabel="1"/>
+                        <label for="qty_delivered" string="Delivered Quantity"/>
+                        <field name="qty_delivered" nolabel="1"/>
                         <field name="product_uom"/>
                         <field name="display_qty_changed" invisible="1"/>
                         <div attrs="{'invisible': [('display_qty_changed','=',False)]}" colspan="2">
@@ -124,7 +129,7 @@
                     <div/>
                 </group>
                 <div name="hide_prices_message" attrs="{'invisible': [('hide_prices','=',False)]}">
-                    <i>prices are not shown when the sale order line pricing is set to 'fixed'</i>
+                    <i>Components prices are not shown when the sale order line pricing is set to 'fixed'. They are never printed out in PDF reports.</i>
                 </div>
                 <separator string="Underkit Components" name="Underkit Components" attrs="{'invisible': [('is_kit','=',False)]}"/>
                 <field name="child_ids" mode="tree" attrs="{'invisible': [('is_kit','=',False)]}">

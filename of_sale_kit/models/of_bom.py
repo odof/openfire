@@ -3,10 +3,9 @@
 from odoo import api, models, _
 from odoo.addons import decimal_precision as dp
 
-
 class OFBom(models.Model):
     _inherit='mrp.bom'
-    
+
     def get_components_price(self,rec_qty=1,without_pricing=True):
         """
         recursive method.
@@ -22,14 +21,14 @@ class OFBom(models.Model):
                     res += line.child_bom_id.get_components_price(rec_qty*line.product_qty)
                 elif line.product_id.pricing == 'fixed': # the under-kit pricing is fixed, its components price does not matter
                     res += line.product_id.lst_price * line.product_qty * rec_qty
-                else: # the under-kit pricing is dynamic, we need the price of its components
+                else: # the under-kit pricing is computed, we need the price of its components
                     res += line.child_bom_id.get_components_price(rec_qty*line.product_qty)
             else: # this line is not a bom
                 res += line.product_id.lst_price  * line.product_qty * rec_qty
         return res
-    
+
     @api.multi
-    def get_components(self,rec_lvl=0,parent_qty_per_line=1,parent_chain="",origin="sale"):
+    def get_components(self,rec_lvl=0,parent_chain="",origin="sale"):
         self.ensure_one()
         self._check_product_recursion()
         res = []
@@ -46,7 +45,7 @@ class OFBom(models.Model):
                     'unit_cost': line.product_id.standard_price,
                 }
             if line.child_bom_id and line.child_bom_id.type == 'phantom': # this line is a kit
-                comp['pricing'] = 'dynamic'
+                comp['pricing'] = 'computed'
                 comp['is_kit'] = True
                 if origin == 'sale':
                     comp['product_uom'] = line.product_uom_id.id,
@@ -61,7 +60,7 @@ class OFBom(models.Model):
                     comp['uom_id'] = line.product_uom_id.id,
             res.append((0,0,comp))
         return res
-    
+
     @api.multi
     def get_components_rec(self,rec_lvl=1,parent_qty_per_line=1,parent_chain=""):
         """
@@ -74,15 +73,14 @@ class OFBom(models.Model):
         res = []
         for line in self.bom_line_ids:
             if line.child_bom_id and line.child_bom_id.type == 'phantom': # this line is kit. get the components and add the under_kit
-                
+
                 under_comps = line.child_bom_id.get_components_rec(rec_lvl+1, parent_qty_per_line*line.product_qty, parent_chain + " -> " + line.product_id.name) # recursive call, get the components of the under_kit
-                
                 comp = { #under_kit
                     'rec_lvl': rec_lvl+1,
                     'parent_chain': parent_chain ,
                     'product_id': line.product_id.id,
                     'name': line.product_id.name,
-                    'pricing': 'dynamic', # set pricing of under_kits to dynamic by default
+                    'pricing': 'computed', # set pricing of under_kits to computed by default
                     'is_kit': True,
                     'qty_per_parent': line.product_qty,
                     'qty_per_line': parent_qty_per_line * line.product_qty,
@@ -91,9 +89,7 @@ class OFBom(models.Model):
                     'unit_cost': line.product_id.standard_price,
                     'child_ids': under_comps,
                 }
-                
             else:
-                    
                 comp = {
                     'rec_lvl': rec_lvl+1,
                     'parent_chain': parent_chain,
@@ -106,23 +102,21 @@ class OFBom(models.Model):
                     'product_uom': line.product_uom_id.id,
                     'price_unit': line.product_id.lst_price,
                     'unit_cost': line.product_id.standard_price,
-#                    'children': [],
                 }
             res.append((0,0,comp))
-        #print res
         return res
-    
+
     @api.model
     def create(self, vals):
         bom = super(OFBom,self).create(vals)
-        #call to related product method
+        # call to related product method. get around issues with store=True
         bom.product_tmpl_id._compute_is_kit()
         bom.product_tmpl_id._compute_current_bom_id()
         if bom.type == 'phantom':
             bom.product_tmpl_id.type = 'service' # kit products are services
-            bom.product_tmpl_id.pricing = 'dynamic' # kits pricing is dynamic by default
+            bom.product_tmpl_id.pricing = 'computed' # kits pricing is computed by default
         return bom
-    
+
     @api.multi
     def write(self, vals):
         for bom in self:
@@ -133,6 +127,5 @@ class OFBom(models.Model):
                 bom.product_tmpl_id._compute_current_bom_id()
                 if vals['type'] == 'phantom':
                     bom.product_tmpl_id.type = 'service' # kit products are services
-                    bom.product_tmpl_id.pricing = 'dynamic' # kits pricing is dynamic by default
+                    bom.product_tmpl_id.pricing = 'computed' # kits pricing is computed by default
         return True
-    

@@ -24,6 +24,7 @@
         'views/of_account_views.xml',
         'report/of_sale_report_templates.xml',
         'report/of_account_report_templates.xml',
+        'security/ir.model.access.csv',
     ],
     'qweb': [
         
