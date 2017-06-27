@@ -3,6 +3,7 @@
 	<menuitem id="menu_mrp_bom_form_action_sale"
         action="mrp.mrp_bom_form_action"
         parent="sales_team.menu_sales"
+        name="Kits"
         sequence="20"/>
 
     <!--#############################################################################

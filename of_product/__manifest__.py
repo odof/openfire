@@ -10,8 +10,6 @@ Module produits OpenFire.
 ======================================
 
 Ce module apporte une personnalisation des produits :
-
-- Ajout champ Frais de port pour chaque article
 - Mettre par défaut la référence produit (default_code) de l'article de base lors de la création d'une variante
 """,
     'depends' : [
@@ -20,5 +18,5 @@ Ce module apporte une personnalisation des produits :
     'data': [
         'views/of_product_view.xml',
     ],
-    'installable': False,
+    'installable': True,
 }

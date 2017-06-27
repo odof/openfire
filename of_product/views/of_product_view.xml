@@ -11,10 +11,7 @@
             <field name="model">product.product</field>
             <field name="inherit_id" ref="product.product_normal_form_view"/>
             <field name="arch" type="xml">
-                <field name="barcode" position="after">
-                    <field name="of_frais_port" widget='monetary'/>
-                    <field name="id" groups="base.group_no_one"/>
-                </field>
+
             </field>
         </record>
 
@@ -24,10 +21,7 @@
             <field name="model">product.template</field>
             <field name="inherit_id" ref="product.product_template_only_form_view"/>
             <field name="arch" type="xml">
-                <field name="barcode" position="after">
-                    <field name="of_frais_port" widget='monetary'/>
-                    <field name="id" groups="base.group_no_one"/>
-                </field>
+
             </field>
         </record>
 

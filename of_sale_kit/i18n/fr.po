@@ -45,13 +45,13 @@ msgstr "<i>Les prix des composants d'un kit ne sont pas affichés si sa tarifica
 
 #. module: of_sale_kit
 #: model:ir.model,name:of_sale_kit.model_mrp_bom
-msgid "Bill of Material"
-msgstr "Nomenclature"
+msgid "Kit"
+msgstr "Kit"
 
 #. module: of_sale_kit
 #: model:ir.ui.menu,name:of_sale_kit.menu_mrp_bom_form_action_sale
-msgid "Bill of Materials"
-msgstr "Nomenclatures"
+msgid "Kits"
+msgstr "Kits"
 
 #. module: of_sale_kit
 #: model:ir.model.fields,field_description:of_sale_kit.field_account_invoice_line_comp_child_ids
