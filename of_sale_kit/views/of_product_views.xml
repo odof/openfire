@@ -57,6 +57,7 @@
 	<record id="of_procurement_form_view" model="ir.ui.view">
         <field name="name">procurement.order.form</field>
         <field name="model">procurement.order</field>
+        <field name="inherit_id" ref="procurement.procurement_form_view"/>
         <field name="arch" type="xml">
         	<xpath expr="//field[@name='origin']" position="after">
             	<field name="sale_comp_id" attrs="{'invisible': [('sale_comp_id','=',False)]}"/>
