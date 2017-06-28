@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<record id="of_account_fr_fec_view" model="ir.ui.view">
+    <field name="name">of.account.fr.fec.form.view</field>
+    <field name="model">account.fr.fec</field>
+    <field name="inherit_id" ref="l10n_fr_fec.account_fr_fec_view"/>
+    <field name="arch" type="xml">
+        <xpath expr="//group" position="replace">
+            <group col="4">
+                <field name="export_type" widget="radio"/>
+                <field name="sortby" widget="radio" attrs="{'invisible': [('export_type','=','official')]}"/>
+            </group>
+            <group col="4">
+                <field name="date_from"/>
+                <field name="date_to"/>
+            </group>
+            <group>
+                <field name="journal_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'invisible': [('export_type','=','official')]}"/>
+            </group>
+        </xpath>
+    </field>
+</record>
+
+</odoo>
