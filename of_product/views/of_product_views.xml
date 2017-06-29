@@ -1,0 +1,69 @@
+<odoo>
+    <data>
+
+<!--##############################################################################-->
+<!--########################### ______ Produits ______ ###########################-->
+<!--##############################################################################-->
+
+        <!-- Ajout champ frais de port product.product - ->
+        <record id="of_product_product_form_view" model="ir.ui.view">
+            <field name="name">of.product.product.form</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="arch" type="xml">
+
+            </field>
+        </record>
+
+        <!- - Ajout champ frais de port product.template- ->
+        <record id="of_product_template_form_view" model="ir.ui.view">
+            <field name="name">of.product.template.form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+
+            </field>
+        </record>-->
+
+        <record id="of_product_product_form_view" model="ir.ui.view">
+            <field name="name">of.product.template.common.form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook//field[@name='type']" position="after">
+                    <field name="modele"/>
+                </xpath>
+                <xpath expr="//notebook//div[@name='standard_price_uom']" position="after">
+                    <label for="marge"/>
+                    <span><field name="marge" class="oe_inline"/>%</span>
+                    <field name="date_tarif"/>
+                </xpath>
+                <xpath expr="//field[@name='description_sale']" position="after">
+                    <separator string="Description du Fabricant" colspan="4"/>
+                    <field name="description_fabricant" colspan="4" nolabel="1"
+                        placeholder=""/>
+                </xpath>
+            </field>
+        </record>
+
+<!--##############################################################################-->
+<!--###################### ______ Infos Fournisseurs ______ ######################-->
+<!--##############################################################################-->
+
+        <record id="of_product_supplierinfo_form_view" model="ir.ui.view">
+            <field name="name">of.product.supplierinfo.form.view</field>
+            <field name="model">product.supplierinfo</field>
+            <field name="inherit_id" ref="product.product_supplierinfo_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='product_code']" position="after">
+                    <field name="old_code"/>
+                </xpath>
+                <xpath expr="//label[@for='date_start']" position="before">
+                    <field name="pp_ht" class="oe_inline"/><field name="pp_currency_id" class="oe_inline" groups="base.group_multi_currency"/>
+                    <label for="remise"/>
+                    <span><field name="remise" class="oe_inline"/>%</span>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
