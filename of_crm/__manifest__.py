@@ -1,15 +1,18 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 {
-    'name' : "OpenFire / CRM Odoo/OpenFire",
-    'version' : "9.0",
+    'name' : "OpenFire CRM",
+    'version' : "10.0.1.0.0",
     'author' : "OpenFire",
     'website' : "http://openfire.fr",
     'category': 'Customer Relationship Management',
-    'description': u""" Module OpenFire pour le CRM Odoo.
----------------------------------
+    'description': u"""
+Module OpenFire pour le CRM Odoo
+================================
 
-Les pistes utilisent le même jeu d'étiquettes que les partenaires.
+ - Ajout du champ site web dans les pistes/opportunités.
+ - Recherche du code postal par préfixe.
+ - Retrait du filtre de recherche par défaut dans la vue "Mon pipeline".
 """,
     'depends' : [
         'crm',
@@ -17,5 +20,5 @@ Les pistes utilisent le même jeu d'étiquettes que les partenaires.
     'data' : [
         'views/of_crm_view.xml',
     ],
-    'installable': False,
+    'installable': True,
 }

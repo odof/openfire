@@ -2,6 +2,10 @@
 <openerp>
     <data>
 
+        <!--
+            crm.lead (as Lead) views
+        -->
+
         <!-- CRM Lead Form View  -->
         <record model="ir.ui.view" id="of_crm_case_form_view_leads">
             <field name="name">of.crm.lead.form - Leads</field>
@@ -11,18 +15,6 @@
                 <div class="o_address_format" position="after">
                     <field name="of_website" widget="url"/>
                 </div>
-            </field>
-        </record>
-
-        <record model="ir.ui.view" id="of_crm_case_form_view_oppor">
-            <field name="name">of.crm.lead.form - Opportunities</field>
-            <field name="model">crm.lead</field>
-            <field name="priority">20</field>
-            <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
-            <field name="arch" type="xml">
-                <field name="phone" position="after">
-                    <field name="of_website" widget="url"/>
-                </field>
             </field>
         </record>
 
@@ -48,9 +40,6 @@
                 <field name="phone" position="attributes">
                     <attribute name="invisible">True</attribute>
                 </field>
-                <field name="stage_id" position="attributes">
-                    <attribute name="invisible">True</attribute>
-                </field>
                 <field name="team_id" position="attributes">
                     <attribute name="invisible">True</attribute>
                 </field>
@@ -71,6 +60,25 @@
                     <field name="zip"/>
                     <field name="contact_name"/>
                 </field>
+            </field>
+        </record>
+
+        <!--
+            crm.lead (as Opportunity) views
+        -->
+        <record id="of_crm_case_form_view_oppor" model="ir.ui.view">
+            <field name="name">of.crm.lead.form.opportunity</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='phone']" position="after">
+                    <field name="of_website" widget="url"/>
+                </xpath>
+                <xpath expr="//notebook" position="inside">
+                    <page string="Projet">
+                        <field name="of_description_projet"/>
+                    </page>
+                </xpath>
             </field>
         </record>
 
