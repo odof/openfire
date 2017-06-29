@@ -106,7 +106,7 @@ class resPartner(models.Model):
 
         # On ne supprime pas les comptes liés à d'autres partenaires
         for account_id in account_ids.copy():
-            cr.execute("SELECT id FROM ir_property WHERE res_id = 'account.account,%s' LIMIT 1" % account_id)
+            cr.execute("SELECT id FROM ir_property WHERE value_reference = 'account.account,%s' LIMIT 1" % account_id)
             if cr.fetchall():
                 account_ids.remove(account_id)
 
