@@ -2,7 +2,7 @@
 
 <!-- Afficher de façon permanente le nom de la base dans la barre de menu -->
 
-<openerp>
+<odoo>
 	<data>
 		<template id="assets_backend" name="mydisplaydb" inherit_id="web.assets_backend">
 			<xpath expr="." position="inside">
@@ -10,4 +10,4 @@
 			</xpath>
 		</template>
 	</data>
-</openerp>
+</odoo>
