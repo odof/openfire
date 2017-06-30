@@ -2,7 +2,9 @@
 <odoo>
     <record id="of_mrp_bom_form_action" model="ir.actions.act_window">
         <field name="name">Kits</field>
-        <field name="inherit_id" ref="mrp.mrp_bom_form_action"/>
+        <field name="res_model">mrp.bom</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="domain">[('type','=','phantom')]</field>
     </record>
 	<menuitem id="of_menu_mrp_bom_form_action_sale"
         action="of_mrp_bom_form_action"
