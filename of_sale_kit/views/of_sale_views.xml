@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-	<menuitem id="menu_mrp_bom_form_action_sale"
-        action="mrp.mrp_bom_form_action"
+    <record id="of_mrp_bom_form_action" model="ir.actions.act_window">
+        <field name="name">Kits</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_form_action"/>
+    </record>
+	<menuitem id="of_menu_mrp_bom_form_action_sale"
+        action="of_mrp_bom_form_action"
         parent="sales_team.menu_sales"
         name="Kits"
         sequence="20"/>

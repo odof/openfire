@@ -35,15 +35,16 @@ class OFKitProductTemplate(models.Model):
     @api.depends('bom_count')
     def _compute_current_bom_id(self):
         # this method will be called upon creation or change of a BoM for its related product (workaround store=True)
-        if self.is_kit:
-            boms = self.env['mrp.bom'].search([('product_tmpl_id', 'in', self.ids),('type','=','phantom')])
-            if len(boms) == 1:
-                bom = boms[0]
-                #print bom
-                self.current_bom_id = bom['id']
-            elif len(boms) > 1:
-                bom = boms[0] # meant to change later
-                self.current_bom_id = bom['id']
+        for prod in self:
+            if prod.is_kit:
+                boms = prod.env['mrp.bom'].search([('product_tmpl_id', 'in', self.ids),('type','=','phantom')])
+                if len(boms) == 1:
+                    bom = boms[0]
+                    #print bom
+                    prod.current_bom_id = bom['id']
+                elif len(boms) > 1:
+                    bom = boms[0] # meant to change later
+                    prod.current_bom_id = bom['id']
 
     @api.depends('current_bom_id')
     def _compute_price_compo(self):

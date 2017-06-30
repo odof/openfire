@@ -109,7 +109,7 @@ class OFKitSaleOrderLine(models.Model):
 	@api.multi
 	@api.onchange('product_id')
 	def product_id_change(self):
-		super(OFKitSaleOrderLine,self).product_id_change()
+		res = super(OFKitSaleOrderLine,self).product_id_change()
 		new_vals = {}
 		if self.is_kit: # former product was a kit, we need to delete its components
 			self.child_ids = [(5,)]
@@ -132,6 +132,8 @@ class OFKitSaleOrderLine(models.Model):
 			new_vals['is_kit'] = False
 			new_vals['pricing'] = 'fixed'
 		self.update(new_vals)
+		
+		return res
 
 	@api.depends('child_ids')
 	def _compute_price_compo(self):
