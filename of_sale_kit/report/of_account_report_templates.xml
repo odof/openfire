@@ -26,7 +26,7 @@
                         <span t-esc="', '.join(map(lambda x: (x.description or x.name), l.invoice_line_tax_ids))"/>
                     </td>
                     <td class="text-right">
-                        <span t-field="l.price_subtotal" 
+                        <span t-field="l.price_subtotal"
                             t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                     </td>
                 </tr>
@@ -60,6 +60,11 @@
                     </t>
                 </t>
             </t>
+        </xpath>
+        <xpath expr="//div[@class='row']/div[@class='col-xs-4 pull-right']" position="before">
+            <div t-if="doc.contains_kit == True" class="col-xs-8">
+                <i style="font-size: small">displayed quantities of kit components are their total quantities.</i>
+            </div>
         </xpath>
     </template>
 </odoo>

@@ -106,10 +106,10 @@
                             attrs="{'invisible': ['|',('children_loaded','=',True),('is_kit','=',False)]}"/>
                     </group>
                     <group  name="Quantities">
-                        <label for="qty_per_parent" string="Quantity"/>
-                        <field name="qty_per_parent" nolabel="1"/>
-                        <label for="qty_per_line" string="Quantity per kit" attrs="{'invisible': [('rec_lvl','&lt;',2)]}"/>
-                        <field name="qty_per_line" nolabel="1" attrs="{'invisible': [('rec_lvl','&lt;',2)]}"/>
+                        <!--<label for="qty_per_parent" string="Quantity"/>
+                        <field name="qty_per_parent" nolabel="1"/>-->
+                        <label for="qty_per_line" string="Quantity per kit"/>
+                        <field name="qty_per_line" nolabel="1"/>
                         <field name="nb_units"/>
                         <label for="qty_total" string="Total Quantity"/>
                         <field name="qty_total" nolabel="1"/>
@@ -158,6 +158,7 @@
                 <separator string="Developer Mode Information" name="Developer Mode Information" groups="base.group_no_one"/>
                 <group name="Developer Mode Information" groups="base.group_no_one">
                     <field name="id"/>
+                    <field name="qty_per_parent"/>
                     <field name="is_kit"/>
                     <field name="rec_lvl"/>
                     <field name="parent_chain"/>

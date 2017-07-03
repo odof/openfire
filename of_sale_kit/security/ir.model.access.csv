@@ -1,2 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_sale_order_line_comp,sale.order.line.comp,model_sale_order_line_comp,sales_team.group_sale_salesman,1,1,1,1
+access_account_invoice_line_comp,account.invoice.line.comp,model_account_invoice_line_comp,account.group_account_invoice,1,1,1,1
+access_mrp_bom_sales_manager,mrp.bom.sales.manager,mrp.model_mrp_bom,sales_team.group_sale_manager,1,1,1,1
+access_mrp_bom_line_sales_manager,mrp.bom.line.sales.manager,mrp.model_mrp_bom_line,sales_team.group_sale_manager,1,1,1,1
+access_mrp_bom_account_manager,mrp.bom.account.manager,mrp.model_mrp_bom,account.group_account_manager,1,1,1,1
+access_mrp_bom_line_account_manager,mrp.bom.line.account.manager,mrp.model_mrp_bom_line,account.group_account_manager,1,1,1,1

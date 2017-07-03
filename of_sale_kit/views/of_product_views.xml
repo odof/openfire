@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
+    <!--#############################################################################
+        ##                      PRODUCT VIEWS
+        #############################################################################
+     -->
     <record id="of_product_template_form_view" model="ir.ui.view">
         <field name="name">of.kit.product.template.common.form</field>
         <field name="model">product.template</field>
@@ -49,6 +52,19 @@
             </xpath>
         </field>
     </record>
+    
+    <record id="of_product_template_search_view_kits" model="ir.ui.view">
+         <field name="name">of.product.template.search.kit</field>
+         <field name="model">product.template</field>
+         <field name="inherit_id" ref="mrp.product_template_search_view_procurment"/>
+         <field name="arch" type="xml">
+             <xpath expr="//filter[@name='components']" position="replace">
+                 <separator/>
+                 <filter string="Manufactured" name="manufactured" domain="[('bom_ids','not in',[]),('is_kit','=',False)]"/>
+                 <filter string="Kits" name="kits" domain="[('is_kit','=',True)]"/>
+             </xpath>
+         </field>
+    </record>
 
 	<!--#############################################################################
         ##                      PROCUREMENT VIEWS
@@ -61,6 +77,35 @@
         <field name="arch" type="xml">
         	<xpath expr="//field[@name='origin']" position="after">
             	<field name="sale_comp_id" attrs="{'invisible': [('sale_comp_id','=',False)]}"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <!--#############################################################################
+        ##                      BOM VIEWS
+        #############################################################################
+     -->
+     <record id="of_mrp_bom_form_view" model="ir.ui.view">
+        <field name="name">of.mrp.bom.form</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+        <field name="arch" type="xml">
+            <!-- current version of of_sale_kit can't handle this functionnality-->
+            <xpath expr="//form//label[@for='product_qty']" position="attributes">
+                <attribute name="attrs">{'invisible': [('type','=','phantom')]}</attribute>
+            </xpath>
+            <xpath expr="//form//div[@class='o_row']" position="attributes">
+                <attribute name="attrs">{'invisible': [('type','=','phantom')]}</attribute>
+            </xpath>
+            <xpath expr="//form//p[@class='oe_grey']" position="replace">
+                <p colspan="2" class="oe_grey" attrs="{'invisible': [('type','=','normal')]}">
+                    When processing a sales order for this product, the delivery order will contain all the components that are not kits themselves. 
+        (a kit itself can contain kits, sometimes called under-kits).
+                </p>
+            </xpath>
+            <xpath expr="//form//notebook//field[@name='ready_to_produce']" position="attributes">
+                <!-- useless to show in case of kits -->
+                <attribute name="attrs">{'invisible': [('type','=','phantom')]}</attribute>
             </xpath>
         </field>
     </record>

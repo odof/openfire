@@ -1,10 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, models, _
+from odoo import api, models, fields
 from odoo.addons import decimal_precision as dp
 
 class OFBom(models.Model):
     _inherit='mrp.bom'
+    
+    type = fields.Selection([
+        ('normal', 'Manufacture this product'),
+        ('phantom', 'This product is a kit')],# 'BoM Type',
+        default='phantom',#, required=True,
+        help="Kit (Phantom): When processing a sales order for this product, the delivery order will contain all the components that are not kits themselves. \
+        (a kit itself can contain kits, sometimes called under-kits).")
 
     def get_components_price(self,rec_qty=1,without_pricing=True):
         """
@@ -28,7 +35,7 @@ class OFBom(models.Model):
         return res
 
     @api.multi
-    def get_components(self,rec_lvl=0,parent_chain="",origin="sale"):
+    def get_components(self,rec_lvl=0,parent_qty_per_line=1,parent_chain="",origin="sale"):
         self.ensure_one()
         self._check_product_recursion()
         res = []
@@ -40,7 +47,8 @@ class OFBom(models.Model):
                     'product_id': line.product_id.id,
                     'name': comp_name,
                     'default_code': line.product_id.default_code,
-                    'qty_per_parent': line.product_qty,
+                    'qty_per_line': line.product_qty * parent_qty_per_line,
+                    #'qty_per_parent': line.product_qty,
                     'price_unit': line.product_id.lst_price,
                     'unit_cost': line.product_id.standard_price,
                 }
@@ -105,6 +113,13 @@ class OFBom(models.Model):
                 }
             res.append((0,0,comp))
         return res
+
+    @api.onchange('type')
+    def _onchange_type(self):
+        # method to force product_qty to be 1 in case of kit. ATM Openfire Kits can't handle product_qty different than 1
+        for bom in self:
+            if bom.type == 'phantom':
+                bom.product_qty = 1
 
     @api.model
     def create(self, vals):
