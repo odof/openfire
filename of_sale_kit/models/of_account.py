@@ -105,7 +105,7 @@ class OFKitAccountInvoiceLine(models.Model):
     @api.multi
     @api.onchange('product_id')
     def _onchange_product_id(self):
-        super(OFKitAccountInvoiceLine,self)._onchange_product_id()
+        res = super(OFKitAccountInvoiceLine,self)._onchange_product_id()
         new_vals = {}
         if self.is_kit: # former product was a kit, we need to delete its components
             self.child_ids = [(5,)]
@@ -128,6 +128,7 @@ class OFKitAccountInvoiceLine(models.Model):
             new_vals['is_kit'] = False
             new_vals['pricing'] = 'fixed'
         self.update(new_vals)
+        return res
 
     @api.depends('child_ids')
     def _compute_price_compo(self):
@@ -256,7 +257,11 @@ class OFKitAccountInvoiceLineComponent(models.Model):
 
     invoice_line_id = fields.Many2one('account.invoice.line',string='Invoice Line',ondelete='cascade',required=True,readonly=True)
     invoice_id = fields.Many2one('account.invoice', string='Invoice', related='invoice_line_id.invoice_id', readonly=True)
-    parent_chain = fields.Char(string='Parent chain',help="Contains the chain of parents of this component",oldname="bom_path")
+    parent_chain = fields.Char(string='Parent chain',oldname="bom_path",help="""
+Contains the chain of parents of this component
+example: Kit A -> Kit B
+means that the product is a component of Kit B which is itself a component of Kit A
+""")
     order_comp_id = fields.Many2one('sale.order.line.comp',string="Sale Order Component")
 
     name = fields.Char(string='Name',required=True)

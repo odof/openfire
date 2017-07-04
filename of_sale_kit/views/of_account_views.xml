@@ -34,8 +34,6 @@
 	                            <field name="parent_chain"/>
 	                            <field name="product_id"/>
 	                            <field name="name"/>
-	                            <!--<field name="qty_per_parent"/>-->
-	                            <!--<field name="qty_per_line"/>-->
 	                            <field name="qty_total"/>
 	                            <field name="uom_id"/>
 	                        </tree>
@@ -72,7 +70,24 @@
                 <div name="compo_content">
                     <div name="components" attrs="{'invisible': [('is_kit','=',False)]}">
                         <label for="child_ids"/>
-                        <field name="child_ids" mode="tree"/>
+                        <field name="child_ids" mode="tree">
+                            <tree string="Kit components">
+                                <field name="rec_lvl" invisible="1"/>
+                                <field name="is_kit" invisible="1"/>
+                                <field name="parent_id" invisible="1"/>
+                                <field name="child_ids" invisible="1"/>
+                                <field name="parent_chain"/>
+                                <field name="product_id"/>
+                                <field name="name"/>
+                                <field name="qty_per_line"/>
+                                <field name="qty_total" invisible="1"/>
+                                <field name="uom_id"/>
+                                <field name="hide_prices" invisible="1"/>
+                                <field name="price_unit" invisible="1"/> 
+                                <field name="children_price" attrs="{'invisible': [('hide_prices','=',True)]}"/>
+                                <field name="price_per_line" attrs="{'invisible': [('hide_prices','=',True)]}"/>
+                            </tree>
+                        </field>
                     </div>
                 </div>
             </xpath>
@@ -116,7 +131,7 @@
                         <field name="uom_id"/>
                         <field name="display_qty_changed" invisible="1"/>
                         <div attrs="{'invisible': [('display_qty_changed','=',False)]}">
-                            <i>Kit quantities are a bit tricky to update on the fly, please save your changes to recompute its children quantities</i>
+                            <i class="oe_grey">Kit quantities are a bit tricky to update on the fly, please save your changes to recompute its children quantities</i>
                         </div>
                     </group>
                     <div/>
@@ -134,36 +149,18 @@
                     <i>Components prices are not shown when the invoice line pricing is set to 'fixed'. They are never printed out in PDF reports.</i>
                 </div>
                 <separator string="Underkit Components" name="Underkit Components" attrs="{'invisible': [('is_kit','=',False)]}"/>
-                <field name="child_ids" mode="tree" attrs="{'invisible': [('is_kit','=',False)]}">
-                    <tree string="Underkit Components">
-                        <field name="product_id"/>
-                        <field name="parent_chain"/>
-                        <field name="rec_lvl" invisible="1"/>
-                        <field name="is_kit" invisible="1"/>
-                        <!--<field name="invoice_line_pricing" invisible="1"/>-->
-                        <field name="parent_id" invisible="1"/>
-                        <field name="child_ids" invisible="1"/>
-                        <!-- <field name="invoice_line_id"/> -->
-                        <field name="name"/>
-                        <field name="qty_per_parent"/>
-                        <field name="qty_per_line"/>
-                        <field name="qty_total" invisible="1"/>
-                        <field name="uom_id"/>
-                        <field name="hide_prices" invisible="1"/>
-                        <field name="price_unit" attrs="{'invisible': ['|',('is_kit','=',True),('hide_prices','=',True)]}"/>
-                        <field name="price_per_line" attrs="{'invisible': [('hide_prices','=',True)]}"/>
-                        <field name="price_total" attrs="{'invisible': [('hide_prices','=',True)]}"/>
-                    </tree>
-                </field>
+                <field name="child_ids" mode="tree" attrs="{'invisible': [('is_kit','=',False)]}"/>
                 <separator string="Developer Mode Information" name="Developer Mode Information" groups="base.group_no_one"/>
                 <group name="Developer Mode Information" groups="base.group_no_one">
-                    <field name="id"/>
-                    <field name="qty_per_parent"/>
-                    <field name="is_kit"/>
-                    <field name="rec_lvl"/>
-                    <field name="parent_chain"/>
-                    <field name="children_loaded"/>
-                    <field name="hide_prices"/>
+                    <group>
+                        <field name="id"/>
+                        <field name="qty_per_parent"/>
+                        <field name="is_kit"/>
+                        <field name="rec_lvl"/>
+                        <field name="parent_chain"/>
+                        <field name="children_loaded"/>
+                        <field name="hide_prices"/>
+                    </group>
                 </group>
             </sheet>
             </form>
@@ -177,7 +174,6 @@
             <tree string="Kit components">
                 <field name="rec_lvl" invisible="1"/>
                 <field name="is_kit" invisible="1"/>
-                <!-- <field name="invoice_line_id" invisible="1"/> -->
                 <field name="parent_id" invisible="1"/>
                 <field name="child_ids" invisible="1"/>
                 <field name="parent_chain"/>
@@ -185,12 +181,12 @@
                 <field name="name"/>
                 <field name="qty_per_parent"/>
                 <field name="qty_per_line"/>
-                <field name="qty_total"/>
+                <field name="qty_total" invisible="1"/>
                 <field name="uom_id"/>
                 <field name="hide_prices" invisible="1"/>
-                <field name="price_unit" attrs="{'invisible': ['|',('is_kit','=',True),('hide_prices','=',True)]}"/>
+                <field name="price_unit" invisible="1"/> 
+                <field name="children_price" attrs="{'invisible': [('hide_prices','=',True)]}"/>
                 <field name="price_per_line" attrs="{'invisible': [('hide_prices','=',True)]}"/>
-                <!--<field name="price_total" attrs="{'invisible': [('is_kit','=',True)]}"/>-->
             </tree>
         </field>
     </record>

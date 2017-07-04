@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-03 15:08+0000\n"
-"PO-Revision-Date: 2017-07-03 15:08+0000\n"
+"POT-Creation-Date: 2017-07-04 12:23+0000\n"
+"PO-Revision-Date: 2017-07-04 12:23+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,39 +16,68 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_sale_kit
+#: model:ir.model.fields,help:of_sale_kit.field_account_invoice_line_comp_parent_chain
+#: model:ir.model.fields,help:of_sale_kit.field_sale_order_line_comp_parent_chain
+msgid "\n"
+"Contains the chain of parents of this component\n"
+"example: Kit A -> Kit B\n"
+"means that the product is a component of Kit B which is itself a component of Kit A\n"
+""
+msgstr "\n"
+"Contient la chaine de parenté de ce composant\n"
+"exemple: Kit A -> Kit B\n"
+"signifie que cet article est un composant de Kit B qui est lui-même un composant de Kit A\n"
+""
+
+#. module: of_sale_kit
 #: model:ir.model.fields,help:of_sale_kit.field_account_invoice_line_comp_rec_lvl
 #: model:ir.model.fields,help:of_sale_kit.field_sale_order_line_comp_rec_lvl
 msgid "1 for components of a kit. 2 for components of a kit inside a kit... etc."
 msgstr "1 pour les composants d'un kit. 2 pour les composants d'un kit dans un kit... etc."
 
 #. module: of_sale_kit
+#: model:ir.ui.view,arch_db:of_sale_kit.of_view_order_form
+msgid "<br/>\n"
+"                    <i attrs=\"{'invisible': ['|',('picking_policy','in','one'),('contains_kit','=',False)]}\" style=\"color: #aaa; font-size: small\">\n"
+"                        Components of a kit will be delivered at once.\n"
+"                    </i>"
+msgstr "<br/>\n"
+"                    <i attrs=\"{'invisible': ['|',('picking_policy','in','one'),('contains_kit','=',False)]}\" style=\"color: #aaa; font-size: small\">\n"
+"                        Tous les composants d'un même kit seront livrés ensemble.\n"
+"                    </i>"
+
+#. module: of_sale_kit
+#: model:ir.ui.view,arch_db:of_sale_kit.of_view_account_comp_form
+msgid "<i class=\"oe_grey\">Kit quantities are a bit tricky to update on the fly, please save your changes to recompute its children quantities</i>"
+msgstr "<i class=\"oe_grey\">Les quantités des kits sont difficiles à mettre à jour à la volée. Pour voir les changements causés par votre modification, veuillez sauvegarder la facture</i>"
+
+#. module: of_sale_kit
+#: model:ir.ui.view,arch_db:of_sale_kit.of_view_sale_comp_form
+msgid "<i class=\"oe_grey\">Kit quantities are a bit tricky to update on the fly, please save your changes to recompute its children quantities</i>"
+msgstr "<i class=\"oe_grey\">Les quantités des kits sont difficiles à mettre à jour à la volée. Pour voir les changements causés par votre modification, veuillez sauvegarder la commande</i>"
+
+#. module: of_sale_kit
 #: model:ir.ui.view,arch_db:of_sale_kit.of_report_invoice_document
 #: model:ir.ui.view,arch_db:of_sale_kit.of_report_saleorder_document
 msgid "<i style=\"font-size: small\">displayed quantities of kit components are their total quantities.</i>"
-msgstr "<i style=\"font-size: small\">La quantité affichée des composant de kits est leur quantité totale.</i>"
+msgstr "<i style=\"font-size: small\">La quantité affichée des composants de kits est leur quantité totale.</i>"
 
 #. module: of_sale_kit
 #: model:ir.ui.view,arch_db:of_sale_kit.of_view_account_comp_form
 #: model:ir.ui.view,arch_db:of_sale_kit.of_view_invoice_line_form
 msgid "<i>Components prices are not shown when the invoice line pricing is set to 'fixed'. They are never printed out in PDF reports.</i>"
-msgstr "<i>Les prix des composants d'un kit ne sont pas affichés si sa tarification est dynamique. Ils ne sont jamais affichés dans les rapport PDF.</i>"
+msgstr "<i>Les prix des composants d'un kit ne sont pas affichés si sa tarification est fixée. Ils ne sont jamais affichés dans les rapport PDF.</i>"
 
 #. module: of_sale_kit
 #: model:ir.ui.view,arch_db:of_sale_kit.of_view_order_form
 #: model:ir.ui.view,arch_db:of_sale_kit.of_view_sale_comp_form
 msgid "<i>Components prices are not shown when the sale order line pricing is set to 'fixed'. They are never printed out in PDF reports.</i>"
-msgstr "<i>Les prix des composants d'un kit ne sont pas affichés si sa tarification est dynamique. Ils ne sont jamais affichés dans les rapport PDF.</i>"
-
-#. module: of_sale_kit
-#: model:ir.ui.view,arch_db:of_sale_kit.of_view_account_comp_form
-#: model:ir.ui.view,arch_db:of_sale_kit.of_view_sale_comp_form
-msgid "<i>Kit quantities are a bit tricky to update on the fly, please save your changes to recompute its children quantities</i>"
-msgstr "<i>Les quantités des kits sont difficiles à mettre à jour à la volée. Pour voir les changements causés par votre modification, veuillez sauvegarder la facture</i>"
+msgstr "<i>Les prix des composants d'un kit ne sont pas affichés si sa tarification est fixée. Ils ne sont jamais affichés dans les rapport PDF.</i>"
 
 #. module: of_sale_kit
 #: model:ir.model,name:of_sale_kit.model_mrp_bom
 msgid "Bill of Material"
-msgstr "Bill of Material"
+msgstr "Nomenclature"
 
 #. module: of_sale_kit
 #: model:ir.model.fields,field_description:of_sale_kit.field_account_invoice_line_comp_child_ids
@@ -89,7 +118,7 @@ msgstr "Composants"
 #: selection:sale.order.line,pricing:0
 #: selection:sale.order.line.comp,pricing:0
 msgid "Computed"
-msgstr "Dynamique"
+msgstr "Calculée"
 
 #. module: of_sale_kit
 #: model:ir.model.fields,field_description:of_sale_kit.field_account_invoice_contains_kit
@@ -112,12 +141,6 @@ msgstr "Contient tous les composants des kits de cette facture qui ne sont pas e
 #: model:ir.model.fields,help:of_sale_kit.field_sale_order_component_ids
 msgid "Contains all kit components in this sale order that are not kits themselves."
 msgstr "Contient tous les composants des kits de cette commande qui ne sont pas eux-mêmes des kits."
-
-#. module: of_sale_kit
-#: model:ir.model.fields,help:of_sale_kit.field_account_invoice_line_comp_parent_chain
-#: model:ir.model.fields,help:of_sale_kit.field_sale_order_line_comp_parent_chain
-msgid "Contains the chain of parents of this component"
-msgstr "Contient la chaine de parenté de ce composant"
 
 #. module: of_sale_kit
 #: model:ir.model.fields,field_description:of_sale_kit.field_account_invoice_line_comp_create_uid
@@ -195,7 +218,7 @@ msgstr "Fixée"
 #: model:ir.ui.view,arch_db:of_sale_kit.of_view_account_comp_form
 #: model:ir.ui.view,arch_db:of_sale_kit.of_view_sale_comp_form
 msgid "General Information"
-msgstr "Information Générale"
+msgstr "Informations Générales"
 
 #. module: of_sale_kit
 #: model:ir.model.fields,field_description:of_sale_kit.field_account_invoice_line_comp_hide_prices
@@ -249,6 +272,7 @@ msgstr "Est un kit"
 #. module: of_sale_kit
 #: model:ir.ui.view,arch_db:of_sale_kit.of_view_account_comp_tree
 #: model:ir.ui.view,arch_db:of_sale_kit.of_view_invoice_form
+#: model:ir.ui.view,arch_db:of_sale_kit.of_view_invoice_line_form
 #: model:ir.ui.view,arch_db:of_sale_kit.of_view_order_form
 #: model:ir.ui.view,arch_db:of_sale_kit.of_view_sale_comp_tree
 msgid "Kit components"
@@ -475,6 +499,19 @@ msgid "Quantity per kit"
 msgstr "Quantité par kit"
 
 #. module: of_sale_kit
+#: model:ir.model.fields,help:of_sale_kit.field_account_invoice_line_comp_qty_per_line
+msgid "Quantity per kit unit (invoice line).\n"
+"                        example: 2 kit K1 -> 3 kit K2 -> 2 prod P. \n"
+"P.qty_per_parent = 2, \n"
+"P.qty_per_line = 6\n"
+"P.qty_total = 12"
+msgstr "QUantité par kit (ligne de facture).\n"
+"                        exemple: 2 kit K1 -> 3 sous-kit K2 -> 2 prod P. \n"
+"P.qté par parent = 2, \n"
+"P.qté par kit = 6 (2*3)\n"
+"P.qté totale = 12 (2*3*2)"
+
+#. module: of_sale_kit
 #: model:ir.model.fields,help:of_sale_kit.field_sale_order_line_comp_qty_per_line
 msgid "Quantity per kit unit (order line).\n"
 "						example: 2 kit K1 -> 3 kit K2 -> 2 prod P. \n"
@@ -483,19 +520,6 @@ msgid "Quantity per kit unit (order line).\n"
 "P.qty_total = 12"
 msgstr "Quantité par kit (ligne de commande).\n"
 "						exemple: 2 kit K1 -> 3 sous-kit K2 -> 2 prod P. \n"
-"P.qté par parent = 2, \n"
-"P.qté par kit = 6 (2*3)\n"
-"P.qté totale = 12 (2*3*2)"
-
-#. module: of_sale_kit
-#: model:ir.model.fields,help:of_sale_kit.field_account_invoice_line_comp_qty_per_line
-msgid "Quantity per kit unit (invoice line)..\n"
-"                        example: 2 kit K1 -> 3 kit K2 -> 2 prod P. \n"
-"P.qty_per_parent = 2, \n"
-"P.qty_per_line = 6\n"
-"P.qty_total = 12"
-msgstr "Quantité par kit (ligne de facture).\n"
-"                        exemple: 2 kit K1 -> 3 sous-kit K2 -> 2 prod P. \n"
 "P.qté par parent = 2, \n"
 "P.qté par kit = 6 (2*3)\n"
 "P.qté totale = 12 (2*3*2)"
@@ -563,8 +587,8 @@ msgid "This field is only relevant if the product is a kit. It represents the wa
 "                 if set to 'fixed', the price of it's components won't be taken into account and the price will be the one of the kit. \n"
 "                 if set to 'computed', the price will be computed according to the components of the kit."
 msgstr "Ce champ n'est pertinent que si le produit est un kit. Il représente la façon dont le prix du kit est défini. \n"
-"                 si 'fixé', le prix du kit est arbitraire et indépendant de son contenu. \n"
-"                 si 'calculé', le prix du kit est calculé en fonction de son contenu"
+"                 si 'fixée', le prix du kit est arbitraire et indépendant de son contenu. \n"
+"                 si 'calculée', le prix du kit est calculé en fonction de son contenu"
 
 #. module: of_sale_kit
 #: model:ir.model.fields,field_description:of_sale_kit.field_account_invoice_line_comp_qty_total
@@ -636,16 +660,16 @@ msgid "defines the way kits should be printed out in pdf reports:\n"
 "			- Expand: One line per kit, plus one line per component"
 msgstr "Défini la façon d'afficher les composants des kits dans les rapports PDF:\n"
 "			- Restreint: Une ligne par kit, avec informations minimales\n"
-"			- Expand: One line per kit, plus one line per component"
+"			- Etendu: Une ligne par kit, plus une ligne par composant"
 
 #. module: of_sale_kit
 #: model:ir.model.fields,help:of_sale_kit.field_account_invoice_kit_display_mode
 msgid "defines the way kits should be printed out in pdf reports:\n"
 "            - Collapse: One line per kit, with minimal info\n"
-"            - Étendu: Une ligne par kit, ainsi qu'une ligne par composant"
+"            - Expand: One line per kit, plus one line per component"
 msgstr "Défini la façon d'afficher les composants des kits dans les rapports PDF:\n"
 "            - Restreint: Une ligne par kit, avec informations minimales\n"
-"            - Étendu: Une ligne par kit, ainsi qu'une ligne par composant"
+"            - Etendu: Une ligne par kit, plus une ligne par composant"
 
 #. module: of_sale_kit
 #: model:ir.model.fields,field_description:of_sale_kit.field_account_invoice_line_comp_display_qty_changed
@@ -659,7 +683,7 @@ msgid "odoo is currently unable to load components of components at once on the 
 " 						check this box to load this component under-components on the fly. \n"
 " 						if you don't, all components will be loaded when you click 'save' on the order."
 msgstr "Odoo est à l'heure actuelle incapable de charger les composants de composants à la volée. \n"
-" 						cochez cette case si vous désirez charger les composants à la volée. \n"
+" 						cochez cette case si vous désirez charger les composants (directs) à la volée. \n"
 " 						si vous ne le faites pas, pas de panique! tous les composants seront chargés sur sauvergarde de la commande."
 
 #. module: of_sale_kit
@@ -668,23 +692,8 @@ msgid "odoo is currently unable to load components of components at once on the 
 "                         check this box to load this component under-components on the fly. \n"
 "                         if you don't, all components will be loaded when you click 'save' on the invoice."
 msgstr "Odoo est à l'heure actuelle incapable de charger les composants de composants à la volée. \n"
-"                         cochez cette case si vous désirez charger les composants à la volée. \n"
+"                         cochez cette case si vous désirez charger les composants (directs) à la volée. \n"
 "                         si vous ne le faites pas, pas de panique! tous les composants seront chargés sur sauvergarde de la facture."
-
-#. module: of_sale_kit
-#: model:ir.model,name:of_sale_kit.model_of_kit_mrp_bom
-msgid "of.kit.mrp.bom"
-msgstr "of.kit.mrp.bom"
-
-#. module: of_sale_kit
-#: model:ir.model,name:of_sale_kit.model_of_kit_sale_order
-msgid "of.kit.sale.order"
-msgstr "of.kit.sale.order"
-
-#. module: of_sale_kit
-#: model:ir.model,name:of_sale_kit.model_of_kit_sale_order_line
-msgid "of.kit.sale.order.line"
-msgstr "of.kit.sale.order.line"
 
 #. module: of_sale_kit
 #: model:ir.model.fields,help:of_sale_kit.field_sale_order_line_comp_qty_total

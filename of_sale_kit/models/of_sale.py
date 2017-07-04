@@ -31,6 +31,16 @@ class OFKitSaleOrder(models.Model):
 			- Collapse: One line per kit, with minimal info\n\
 			- Expand: One line per kit, plus one line per component")
 
+	@api.multi
+	def _prepare_invoice(self):
+		"""
+		Prepare the dict of values to create the new invoice for a sales order.
+		Override of parent function
+		"""
+		invoice_vals = super(OFKitSaleOrder,self)._prepare_invoice()
+		invoice_vals['kit_display_mode'] = self.kit_display_mode
+		return invoice_vals
+
 class OFKitSaleOrderLine(models.Model):
 	_inherit = 'sale.order.line'
 
@@ -355,7 +365,11 @@ class OFKitSaleOrderLineComponent(models.Model):
 
 	order_line_id = fields.Many2one('sale.order.line',string='Order Line',ondelete='cascade',required=True,readonly=True)
 	order_id = fields.Many2one('sale.order', string='Order', related='order_line_id.order_id', readonly=True)
-	parent_chain = fields.Char(string='Parent chain',help="Contains the chain of parents of this component",oldname="bom_path")
+	parent_chain = fields.Char(string='Parent chain',oldname="bom_path",help="""
+Contains the chain of parents of this component
+example: Kit A -> Kit B
+means that the product is a component of Kit B which is itself a component of Kit A
+""")
 
 	name = fields.Char(string='Name',required=True)
 	default_code = fields.Char(string='Prod ref')
@@ -692,7 +706,7 @@ class OFKitSaleOrderLineComponent(models.Model):
 			#'sequence': self.sequence,
 			'default_code': self.default_code,
 			'price_unit': self.price_unit,
-			'quantity': self.qty_total,
+			#'quantity': self.qty_total,
 			'uom_id': self.product_uom.id,
 			'product_id': self.product_id.id or False,
 			'order_comp_id': self.id,

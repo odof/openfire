@@ -17,7 +17,7 @@ class OFStockMove(models.Model):
         # Update delivered quantities on sale order lines that are kits
         for line in lines:
             qty_delivered = line._get_delivered_qty_hack()
-            if qty_delivered == 0:
+            if qty_delivered != 0:
                 line.qty_delivered = qty_delivered
                 line.update_underkit_delivered()
 

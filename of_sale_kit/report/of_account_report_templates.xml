@@ -62,7 +62,7 @@
             </t>
         </xpath>
         <xpath expr="//div[@class='row']/div[@class='col-xs-4 pull-right']" position="before">
-            <div t-if="doc.contains_kit == True" class="col-xs-8">
+            <div t-if="o.contains_kit == True" class="col-xs-8">
                 <i style="font-size: small">displayed quantities of kit components are their total quantities.</i>
             </div>
         </xpath>
