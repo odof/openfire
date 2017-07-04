@@ -14,7 +14,7 @@ Modification de l'affichage du formulaire de devis/commande client.
 Ajout d'un filtre de recherche pour les commandes à facturer entièrement.
 """,
     "website": "www.openfire.fr",
-    "depends": ["sale"],
+    "depends": ["sale","of_product"],
     "category": "OpenFire",
     "data": [
         'views/of_sale_view.xml',

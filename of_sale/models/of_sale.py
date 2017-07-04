@@ -2,7 +2,7 @@
 
 from odoo import models, fields, api
 
-class SaleOrder(models.Model):
+class OFSaleOrder(models.Model):
     _inherit = 'sale.order'
 
     def _search_of_to_invoice(self, operator, value):
@@ -32,3 +32,36 @@ class SaleOrder(models.Model):
                 order.of_to_invoice = True
 
     of_to_invoice = fields.Boolean(u"Entièrement facturable", compute='_compute_of_to_invoice', search='_search_of_to_invoice')
+
+class OFSaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
+
+    @api.multi
+    @api.onchange('product_id')
+    def product_id_change(self):
+        res = super(OFSaleOrderLine,self).product_id_change()
+
+        product = self.product_id.with_context(
+            lang=self.order_id.partner_id.lang,
+            partner=self.order_id.partner_id.id,
+        )
+        if product and product.description_fabricant:
+            name = self.name
+            name += '\n' + product.description_fabricant
+            self.update({'name': name})
+        return res
+
+class OFSaleAccountInvoiceLine(models.Model):
+    _inherit = 'account.invoice.line'
+
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        res = super(OFSaleAccountInvoiceLine,self)._onchange_product_id()
+        product = self.product_id.with_context(
+            lang=self.invoice_id.partner_id.lang,
+            partner=self.invoice_id.partner_id.id,
+        )
+        if product and product.description_fabricant:
+            self.name += '\n' + product.description_fabricant
+        return res
+
