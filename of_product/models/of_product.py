@@ -12,6 +12,10 @@ class OfProductTemplate(models.Model):
     description_fabricant = fields.Text('Description du fabricant', translate=True)
     date_tarif = fields.Date(string="Date du tarif")
 
+    # Champs ajoutés pour openImport
+    of_seller_pp_ht = fields.Float(related="seller_ids.pp_ht")
+    of_seller_product_code = fields.Char(related="seller_ids.product_code")
+
     @api.multi
     @api.depends('lst_price','standard_price')
     def _compute_marge(self):
