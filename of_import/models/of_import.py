@@ -178,7 +178,7 @@ class of_import(models.Model):
         # Vérification si le champ primaire est bien dans le fichier d'import (si le champ primaire est défini)
         if champ_primaire and champ_primaire not in ligne:
             erreur = 1
-            sortie_erreur += u"Le champ référence qui permet d'identifier un " + nom_objet + " (" + champ_primaire + u") n'est pas dans le fichier d'import.\n"
+            sortie_erreur += u"Le champ référence qui permet d'identifier un %s (%s) n'est pas dans le fichier d'import.\n" % (nom_objet, champ_primaire)
 
         # Vérification si il y a des champs du fichier d'import qui sont en plusieurs exemplaires
         # et détection champ relation (id, id externe, nom)
@@ -223,9 +223,9 @@ class of_import(models.Model):
             return
 
         # On ajoute le séparateur (caractère souligné) entre le préfixe et la référence si il n'a pas déjà été mis.
-        prefixe = self.prefixe or ''
+        prefixe = self.prefixe and self.prefixe.encode("utf-8") or ''
         if prefixe and prefixe[-1:] != '_':
-            prefixe = self.prefixe + '_'
+            prefixe = prefixe + '_'
 
         fichier.seek(0, 0) # On remet le pointeur au début du fichier
         fichier = csv.DictReader(fichier, dialect = dialect) # Renvoi une liste de dictionnaires avec le nom du champ_fichier comme clé
@@ -438,7 +438,7 @@ class of_import(models.Model):
                 # Mais en cas de création, on doit vérifier que tous les champs Odoo requis ont bien été renseignés.
                 for cle in champs_odoo:
                     if champs_odoo[cle]['requis'] == True and cle not in valeurs:
-                        sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[cle]['description'] + " (" + cle.decode('utf8', 'ignore') + u") obligatoire mais non présent dans le fichier d'import. " + nom_objet.capitalize() + u" non importé.\n"
+                        sortie_erreur += u"Ligne %s : champ %s (%s) obligatoire mais non présent dans le fichier d'import. %s non importé.\n" % (i, champs_odoo[cle]['description'], cle, nom_objet.capitalize())
                         erreur = 1
 
                 if erreur: # On n'enregistre pas si erreur.
@@ -449,9 +449,9 @@ class of_import(models.Model):
                     if not simuler:
                         model_obj.create(valeurs)
                     nb_ajout = nb_ajout + 1
-                    sortie_succes += u"Création " + nom_objet + " " + libelle_ref + " (ligne " + str(i) + ")\n"
+                    sortie_succes += u"Création %s %s (ligne %s)\n" % (nom_objet, libelle_ref, i)
                 except Exception, exp:
-                    sortie_erreur += "Ligne " + str(i) + u" : échec création " + nom_objet + " " + libelle_ref + " - Erreur : " + str(exp) + "\n"
+                    sortie_erreur += u"Ligne %s : échec création %s %s - Erreur : %s\n" % (i, nom_objet, libelle_ref, exp)
                     nb_echoue = nb_echoue + 1
 
             elif len(res_objet_ids) == 1:
@@ -460,15 +460,15 @@ class of_import(models.Model):
                     if not simuler:
                         res_objet_ids.write(valeurs)
                     nb_maj = nb_maj + 1
-                    sortie_succes += u"MAJ " + nom_objet +  " " + libelle_ref + " (ligne " + str(i) + ")\n"
+                    sortie_succes += u"MAJ %s %s (ligne %s)\n" % (nom_objet, libelle_ref, i)
                 except Exception, exp:
-                    sortie_erreur += "Ligne " + str(i) + u" : échec mise à jour " + nom_objet + " " + libelle_ref + " - Erreur : " + str(exp) + "\n"
+                    sortie_erreur += u"Ligne %s : échec mise à jour %s %s - Erreur : %s\n" % (i, nom_objet, libelle_ref, exp)
                     nb_echoue = nb_echoue + 1
 
             else:
                 # Il existe plusieurs articles dans la base avec cette référence. On ne sait pas lequel mettre à jour. On passe au suivant en générant une erreur.
                 nb_echoue = nb_echoue + 1
-                sortie_erreur += "Ligne " + str(i) + " " + nom_objet + " " + libelle_ref + u" en plusieurs exemplaire dans la base, on ne sait pas lequel mettre à jour. " + nom_objet.capitalize() + u" non importé.\n"
+                sortie_erreur += u"Ligne %s %s %s en plusieurs exemplaire dans la base, on ne sait pas lequel mettre à jour. %s non importé.\n" % (i, nom_objet, libelle_ref, nom_objet.capitalize())
 
             if nb_total % frequence_commit == 0:
                 self.write({'nb_total': nb_total, 'nb_ajout': nb_ajout, 'nb_maj': nb_maj, 'nb_echoue': nb_echoue, 'sortie_succes': sortie_succes, 'sortie_avertissement': sortie_avertissement, 'sortie_erreur': sortie_erreur})
@@ -477,7 +477,7 @@ class of_import(models.Model):
         # On affiche les enregistrements qui étaient en plusieurs exemplaires dans le fichier d'import.
         for cle in doublons:
             if doublons[cle][0] > 1:
-                sortie_avertissement += nom_objet.capitalize() + u" réf. " + cle.decode('utf8', 'ignore') + u" existe en " + str(doublons[cle][0]) + u" exemplaires dans le fichier d'import (lignes " + doublons[cle][1] + u"). Seule la première ligne est importée.\n"
+                sortie_avertissement += u"%s réf. %s existe en %s exemplaires dans le fichier d'import (lignes %s). Seule la première ligne est importée.\n" % (nom_objet.capitalize(), cle, doublons[cle][0], doublons[cle][1])
         
         # On enregistre les dernières lignes qui ne l'auraient pas été.
         self.write({'nb_total': nb_total, 'nb_ajout': nb_ajout, 'nb_maj': nb_maj, 'nb_echoue': nb_echoue, 'sortie_succes': sortie_succes, 'sortie_avertissement': sortie_avertissement, 'sortie_erreur': sortie_erreur, 'date_debut_import' : date_debut, 'date_fin_import' : time.strftime('%Y-%m-%d %H:%M:%S')})
