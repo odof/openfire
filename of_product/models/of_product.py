@@ -3,7 +3,7 @@
 from odoo import api, models, fields
 import odoo.addons.decimal_precision as dp
 
-class OfProductTemplate(models.Model):
+class OFProductTemplate(models.Model):
     _inherit = "product.template"
 
     modele = fields.Char(string='Modèle')
@@ -27,7 +27,7 @@ class OfProductTemplate(models.Model):
             else: # division par 0!
                 product.marge = -100
 
-class OfProductProduct(models.Model):
+class OFProductProduct(models.Model):
     _inherit = "product.product"
 
     @api.model
@@ -35,9 +35,9 @@ class OfProductProduct(models.Model):
         # Mettre la référence produit (default_code) du template par défaut lors de la création d'une variante.
         if 'product_tmpl_id' in values and values['product_tmpl_id']:
             values['default_code'] = self.env['product.template'].browse(values['product_tmpl_id']).default_code
-        return super(OfProductProduct, self)._add_missing_default_values(values)
+        return super(OFProductProduct, self)._add_missing_default_values(values)
 
-class OFSuppliferInfo(models.Model):
+class OFProductSuppliferInfo(models.Model):
     _inherit = "product.supplierinfo"
 
     old_code = fields.Char(string="Ancienne Référence")

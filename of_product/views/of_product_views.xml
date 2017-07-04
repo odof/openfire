@@ -21,7 +21,7 @@
                 <xpath expr="//field[@name='description_sale']" position="after">
                     <separator string="Description du Fabricant" colspan="4"/>
                     <field name="description_fabricant" colspan="4" nolabel="1"
-                        placeholder=""/>
+                        placeholder="Cette note correspond à la description du produit par son fabricant."/>
                 </xpath>
             </field>
         </record>
