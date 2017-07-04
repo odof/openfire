@@ -292,7 +292,7 @@ class OFKitAccountInvoiceLineComponent(models.Model):
                         help="Quantity per direct parent unit. Indicative value. Can differ from the quantity per line in case of a component of an under-kit.\n\
                         example: 2 kit K1 -> 3 kit K2 -> 2 prod P. \nP.qty_per_parent = 2, \nP.qty_per_line = 6\nP.qty_total = 12",)
     qty_per_line = fields.Float(string='Qty / Kit', digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0, oldname="qty_inv_line",
-                            help="Quantity per order line kit unit.\n\
+                            help="Quantity per kit unit (invoice line).\n\
                         example: 2 kit K1 -> 3 kit K2 -> 2 prod P. \nP.qty_per_parent = 2, \nP.qty_per_line = 6\nP.qty_total = 12")
 
     nb_units = fields.Float(string='Number of kits', related='invoice_line_id.quantity', readonly=True)
@@ -476,6 +476,14 @@ class OFKitAccountInvoiceLineComponent(models.Model):
                 qty *= parent.qty_per_parent
                 parent = parent.parent_id
             comp.qty_per_line = qty"""
+
+    @api.depends('qty_per_line','parent_id')
+    def _compute_qty_per_parent(self):
+        for comp in self:
+            qty = comp.qty_per_line
+            if comp.parent_id:
+                qty /= comp.parent_id.qty_per_line
+            comp.qty_per_parent = qty
 
     @api.depends('qty_per_line','nb_units')
     def _compute_qty_total(self):
