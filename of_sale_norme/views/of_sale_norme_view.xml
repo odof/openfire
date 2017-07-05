@@ -23,7 +23,6 @@
 <!--##############################################################################-->
 <!--########################### ______ Normes ______ #############################-->
 <!--##############################################################################-->
-    <menuitem id="menu_norme" name="Normes" action="of_norme_action_view" parent="sale.prod_config_main" sequence="20"/>
 
     <record id="of_view_norme_form" model="ir.ui.view">
         <field name="name">of.product.norme.form</field>
@@ -103,5 +102,8 @@
             </p>
         </field>
     </record>
+
+    <menuitem id="menu_norme" name="Normes" action="of_norme_action_view" parent="sale.prod_config_main" sequence="20"/>
+
 </data>
 </odoo>
