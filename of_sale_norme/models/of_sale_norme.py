@@ -19,6 +19,7 @@ class OFNormeProductTemplate(models.Model):
 
 class OFProductNorme(models.Model):
     _name = 'of.product.norme'
+    _order = 'name'
 
     name = fields.Char(string="Code")
     libelle = fields.Char(string="Libellé")
