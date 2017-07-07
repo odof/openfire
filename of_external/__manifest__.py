@@ -10,7 +10,7 @@
 
     """,
     'website': 'openfire.fr',
-    'depends': ['report'],
+    'depends': ['report','of_base'],
     'data': [
         'views/of_external_layout.xml',
         'views/of_company_views.xml'

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-
+<!--##############################################################################-->
+<!--############################ ______ Ventes ______ ############################-->
+<!--##############################################################################-->
         <record id="of_sale_order_view_search_inherit_sale" model="ir.ui.view">
             <field name="name">of.sale.order.search.inherit.sale</field>
             <field name="model">sale.order</field>
@@ -25,5 +27,26 @@
             </field>
         </record>
 
+<!--##############################################################################-->
+<!--########################### ______ Sociétés ______ ###########################-->
+<!--##############################################################################-->
+        <record id="of_sale_view_company_form" model="ir.ui.view">
+            <field name="name">of.sale.company.form</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="of_base.of_base_view_company_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//notebook//page[@name='advanced_settings']" position="attributes">
+                    <attribute name="invisible">0</attribute>
+                </xpath>
+                <xpath expr="//notebook//page[@name='advanced_settings']" position="inside">
+                    <group>
+                        <group name="sales">
+                            <separator string="Ventes" colspan="2"/>
+                            <field name="afficher_descr_fab"/>
+                        </group>
+                    </group>
+                </xpath>
+            </field>
+        </record>
     </data>
 </odoo>

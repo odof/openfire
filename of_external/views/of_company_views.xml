@@ -1,41 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-        <record id="of_company_settings" model="ir.ui.view">
-            <field name="name">of.company.settings</field>
+    <data>
+        <record id="of_external_view_company_form" model="ir.ui.view">
+            <field name="name">of.external.company.form</field>
             <field name="model">res.company</field>
-            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="inherit_id" ref="of_base.of_base_view_company_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//notebook[last()]" position="inside">
-                    <page string="Advanced Settings" name="advanced_settings">
-                        <!-- something to do here -->
-                        <group col="1">
-                            <separator string="Company Footer" colspan="2"/>
-                            <div>
-                                <field name="use_of_custom_footer" nolabel="1" class="oe_inline"/>
-                                <span> Use company custom footer.</span>
+                <xpath expr="//notebook//page[@name='advanced_settings']" position="attributes">
+                    <attribute name="invisible">0</attribute>
+                </xpath>
+                <xpath expr="//notebook//page[@name='advanced_settings']" position="inside">
+                    <group col="1" name="of_company_footer">
+                        <separator string="Company Footer" colspan="2"/>
+                        <div>
+                            <field name="use_of_custom_footer" nolabel="1" class="oe_inline"/>
+                            <span> Use company custom footer.</span>
+                        </div>
+                        <div>
+                            <div>Line 1 : </div>
+                            <div style="padding: 8px 16px; border: 1px dotted lightgray">
+                                <span>Content: </span>
+                                <field name="of_custom_footer_line_1" nolabel="1" class="oe_inline" placeholder="replace with desired content for line 1"/>
+                                <br/>
+                                <span>Size: </span>
+                                <field name="of_custom_footer_line_1_size" class="oe_inline"/>
                             </div>
-                            <div>
-                                <div>Line 1 : </div>
-                                <div style="padding: 8px 16px; border: 1px dotted lightgray">
-                                    <span>Content: </span>
-                                    <field name="of_custom_footer_line_1" nolabel="1" class="oe_inline" placeholder="replace with desired content for line 1"/>
-                                    <br/>
-                                    <span>Size: </span>
-                                    <field name="of_custom_footer_line_1_size" class="oe_inline"/>
-                                </div>
-                                
-                                <div>Line 2 : </div>
-                                <div style="padding: 8px 16px; border: 1px dotted lightgray">
-                                    <span>Content: </span>
-                                    <field name="of_custom_footer_line_2" nolabel="1" class="oe_inline" placeholder="replace with desired content for line 2"/>
-                                    <br/>
-                                    <span>Size: </span>
-                                    <field name="of_custom_footer_line_2_size" class="oe_inline"/>
-                                </div>
+
+                            <div>Line 2 : </div>
+                            <div style="padding: 8px 16px; border: 1px dotted lightgray">
+                                <span>Content: </span>
+                                <field name="of_custom_footer_line_2" nolabel="1" class="oe_inline" placeholder="replace with desired content for line 2"/>
+                                <br/>
+                                <span>Size: </span>
+                                <field name="of_custom_footer_line_2_size" class="oe_inline"/>
                             </div>
-                        </group>
-                    </page>
+                        </div>
+                    </group>
                 </xpath>
             </field>
         </record>
+    </data>
 </odoo>

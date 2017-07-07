@@ -40,12 +40,13 @@ class OFSaleOrderLine(models.Model):
     @api.onchange('product_id')
     def product_id_change(self):
         res = super(OFSaleOrderLine,self).product_id_change()
-
+        afficher_descr_fab = self.env.user.company_id.afficher_descr_fab
+        afficher = afficher_descr_fab == 'devis' or afficher_descr_fab == 'devis_factures'
         product = self.product_id.with_context(
             lang=self.order_id.partner_id.lang,
             partner=self.order_id.partner_id.id,
         )
-        if product and product.description_fabricant:
+        if product and product.description_fabricant and afficher:
             name = self.name
             name += '\n' + product.description_fabricant
             self.update({'name': name})
@@ -57,11 +58,24 @@ class OFSaleAccountInvoiceLine(models.Model):
     @api.onchange('product_id')
     def _onchange_product_id(self):
         res = super(OFSaleAccountInvoiceLine,self)._onchange_product_id()
+        afficher_descr_fab = self.env.user.company_id.afficher_descr_fab
+        afficher = afficher_descr_fab == 'factures' or afficher_descr_fab == 'devis_factures'
         product = self.product_id.with_context(
             lang=self.invoice_id.partner_id.lang,
             partner=self.invoice_id.partner_id.id,
         )
-        if product and product.description_fabricant:
+        if product and product.description_fabricant and afficher:
             self.name += '\n' + product.description_fabricant
         return res
 
+class OFCompany(models.Model):
+    _inherit = 'res.company'
+
+    afficher_descr_fab = fields.Selection([
+        ('non','Ne pas afficher'),
+        ('devis','Dans les devis'),
+        ('factures','Dans les factures'),
+        ('devis_factures','Dans les devis & les factures'),
+        ],string="afficher descr. fabricant", default='devis_factures', help="""
+La description du fabricant d'un article sera ajoutée à la description de l'article dans les documents.
+""")

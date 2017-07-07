@@ -16,7 +16,7 @@ Ajout d'un filtre de recherche pour les commandes à facturer entièrement.
 Report de la description fabricant dans les devis et factures.
 """,
     "website": "www.openfire.fr",
-    "depends": ["sale","of_product"],
+    "depends": ["sale","of_product","of_base"],
     "category": "OpenFire",
     "data": [
         'views/of_sale_view.xml',
