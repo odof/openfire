@@ -8,6 +8,11 @@ class Lead(models.Model):
     of_website = fields.Char('Site web', help="Website of Lead")
     tag_ids = fields.Many2many('res.partner.category', 'crm_lead_res_partner_category_rel', 'lead_id', 'category_id', string='Tags', help="Classify and analyze your lead/opportunity categories like: Training, Service", oldname="of_tag_ids")
     of_description_projet = fields.Html('Notes de projet')
+    of_ref = fields.Char(string="Référence",copy=False)
+    of_prospecteur = fields.Many2one("res.users",string="prospecteur")
+    of_date_prospection = fields.Date(string="Date de prospection")
+    geo_lat = fields.Float(string='Geo Lat', digits=(8, 8))
+    geo_lng = fields.Float(string='Geo Lng', digits=(8, 8))
 
     # Récupération du site web à la sélection du partenaire
     def _onchange_partner_id_values(self, partner_id):
