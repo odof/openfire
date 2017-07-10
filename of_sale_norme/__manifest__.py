@@ -28,6 +28,8 @@ Cet objet contient 4 champs:
 Il est possible d'archiver une norme.
 
 La description d'une norme est copiée dans l'article quand elle lui est associée. Elle peut ensuite être modifiée article par article.
+
+Quand la description d'une norme est modifiée, met à jour le champ 'description_norme' des articles associés. Les articles dont la description norme a été modifiée ne sont pas mis à jour.
 """,
     "website": "www.openfire.fr",
     "depends": ["sale"],

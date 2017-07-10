@@ -6,7 +6,7 @@ class OFNormeProductTemplate(models.Model):
     _inherit = 'product.template'
 
     norme_id = fields.Many2one("of.product.norme",string="Norme",ondelete="set null")
-    description_norme = fields.Text("Descriptif de norme")
+    description_norme = fields.Text("Descriptif de norme",translate=True)
 
     @api.multi
     @api.onchange('norme_id')
@@ -22,10 +22,28 @@ class OFProductNorme(models.Model):
     _order = 'name'
 
     name = fields.Char(string="Code")
-    libelle = fields.Char(string="Libellé")
-    description = fields.Text(string="Description")
+    libelle = fields.Char(string="Libellé",translate=True)
+    description = fields.Text(string="Description",translate=True)
     active = fields.Boolean(string="Active", default=True)
-    display_docs = fields.Boolean("Afficher en impression")
+    display_docs = fields.Boolean("Afficher en impression",default=True)
+
+    @api.multi
+    def write(self,vals):
+        if 'description' in vals:
+            # mettre à jour la description_norme des produits si celle-ci est la même que celle de leur norme associée.
+            # càd si elle n'a pas été modifiéee
+            product_obj = self.env['product.template']
+            prods_to_update = self.env['product.template']
+            for norme in self:
+                # différentes normes avec différentes descriptions peuvent être modifiées pour avoir la même description
+                products = product_obj.search([('norme_id','=',norme.id)])
+                for prod in products:
+                    if prod.description_norme == norme.description:
+                        prods_to_update += prod
+        super(OFProductNorme,self).write(vals)
+        if 'description' in vals:
+            prods_to_update.write({'description_norme': vals['description']})
+        return True
 
 class OFNormeSaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
