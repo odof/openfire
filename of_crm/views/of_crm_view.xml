@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
+<odoo>
     <data>
 
         <!--
@@ -74,10 +74,21 @@
                 <xpath expr="//field[@name='phone']" position="after">
                     <field name="of_website" widget="url"/>
                 </xpath>
+                <xpath expr="//form//sheet//field[@name='partner_id']" position="before">
+                    <field name="of_ref"/>
+                </xpath>
+                <xpath expr="//form//sheet//field[@name='team_id']" position="after">
+                    <field name="of_prospecteur"/>
+                    <field name="of_date_prospection"/>
+                </xpath>
                 <xpath expr="//notebook" position="inside">
                     <page string="Projet">
                         <field name="of_description_projet"/>
                     </page>
+                </xpath>
+                <xpath expr="//notebook//page[@name='lead']//div[@class='o_address_format']" position="after">
+                    <field name="geo_lat"/>
+                    <field name="geo_lng"/>
                 </xpath>
             </field>
         </record>
@@ -96,4 +107,4 @@
 
         <delete model="ir.ui.menu" id="crm.menu_crm_lead_categ"/>
     </data>
-</openerp>
+</odoo>
