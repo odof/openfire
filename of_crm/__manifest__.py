@@ -16,6 +16,7 @@ Module OpenFire pour le CRM Odoo
 """,
     'depends' : [
         'crm',
+        'sale_crm',
     ],
     'data' : [
         'views/of_crm_view.xml',
