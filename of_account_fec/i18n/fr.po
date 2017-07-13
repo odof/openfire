@@ -1,0 +1,88 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_account_fec
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-07-13 14:36+0000\n"
+"PO-Revision-Date: 2017-07-13 14:36+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_account_fec
+#: selection:account.fr.fec,sortby:0
+msgid "Date"
+msgstr "Date"
+
+#. module: of_account_fec
+#: code:addons/of_account_fec/wizard/of_account_fec.py:126
+#, python-format
+msgid "FEC is for French companies only !"
+msgstr "Le fichier FEC est pour les sociétés françaises uniquement !"
+
+#. module: of_account_fec
+#: model:ir.model,name:of_account_fec.model_account_fr_fec
+msgid "Ficher Echange Informatise"
+msgstr "Ficher Echange Informatise"
+
+#. module: of_account_fec
+#: model:ir.model.fields,field_description:of_account_fec.field_account_fr_fec_of_extension
+msgid "File extension"
+msgstr "Extension de fichier"
+
+#. module: of_account_fec
+#: selection:account.fr.fec,sortby:0
+msgid "Journal & Partner"
+msgstr "Journal & Partenaire"
+
+#. module: of_account_fec
+#: model:ir.model.fields,field_description:of_account_fec.field_account_fr_fec_journal_ids
+msgid "Journals"
+msgstr "Journaux"
+
+#. module: of_account_fec
+#: code:addons/of_account_fec/wizard/of_account_fec.py:123
+#, python-format
+msgid "Missing VAT number for company %s"
+msgstr "Numéro de TVA manquant sur la société %s"
+
+#. module: of_account_fec
+#: model:ir.model.fields,field_description:of_account_fec.field_account_fr_fec_sortby
+msgid "Sort by"
+msgstr "Trier par"
+
+#. module: of_account_fec
+#: selection:account.fr.fec,export_type:0
+msgid "Official"
+msgstr "Officiel"
+
+#. module: of_account_fec
+#: selection:account.fr.fec,export_type:0
+msgid "Non-official posted only"
+msgstr "Non-officiel comptabilisé uniquement"
+
+#. module: of_account_fec
+#: selection:account.fr.fec,export_type:0
+msgid "Non-official"
+msgstr "Non-officiel"
+
+# Cette traduction refuse de se charger ... a investiguer
+#. module: of_account_fec
+#: model:ir.model.fields,help:of_account_fec.field_account_fr_fec_export_type
+msgid ""
+"Export Type :\n"
+" - Official : Official FEC report (posted entries only)\n"
+" - Non-official posted only : Non-official FEC report (posted entries only)\n"
+" - Non-official : Non-official FEC report (posted and unposted entries)"
+msgstr ""
+"Type d'export :\n"
+" - Officiel : Fichier officiel FEC (écritures comptabilisées uniquement)\n"
+" - Non-officiel comptabilisé uniquement : Fichier non-officiel FEC (écritures comptabilisées uniquement)\n"
+" - Non-officiel : Fichier non-officiel FEC (écritures comptabilisées et non comptabilisées)"
+

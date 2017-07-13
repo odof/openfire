@@ -1,4 +1,4 @@
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 
 import base64
 import csv
@@ -10,7 +10,7 @@ from odoo.exceptions import Warning
 
 class OFAccountFrFec(models.TransientModel):
     _inherit = 'account.fr.fec'
-    
+
     journal_ids = fields.Many2many('account.journal', string='Journals', required=True, default=lambda self: self.env['account.journal'].search([]))
     sortby = fields.Selection([('sort_date', 'Date'), ('sort_journal_partner', 'Journal & Partner')], string='Sort by', required=True, default='sort_date')
     export_type = fields.Selection([
@@ -18,13 +18,12 @@ class OFAccountFrFec(models.TransientModel):
         ('nonofficial_posted', 'Non-official posted only'),
         ('nonofficial', 'Non-official'),
         ], string='Export Type', required=True, default='official',
-        help="""
-        Export Type:
-        - Official: Official FEC report (posted entries only)
-        - Non-official posted only: Non-official FEC report (posted entries only)
-        - Non-official: Non-official FEC report (posted and unposted entries)
-        """)
-    
+        help="Export Type :\n"
+             " - Official : Official FEC report (posted entries only)\n"
+             " - Non-official posted only : Non-official FEC report (posted entries only)\n"
+             " - Non-official : Non-official FEC report (posted and unposted entries)")
+    of_extension = fields.Selection([('csv', 'csv'), ('txt', 'txt')], string="File extension", required=True, default='csv')
+
     def do_query_unaffected_earnings(self):
         ''' Compute the sum of ending balances for all accounts that are of a type that does not bring forward the balance in new fiscal years.
             This is needed because we have to display only one line for the initial balance of all expense/revenue accounts in the FEC.
@@ -76,11 +75,11 @@ class OFAccountFrFec(models.TransientModel):
         formatted_date_from = self.date_from.replace('-', '')
         self._cr.execute(
             sql_query, (formatted_date_from, formatted_date_from, formatted_date_from, self.date_from, company.id, self.journal_ids._ids))
-        #listrow = []
+        # listrow = []
         row = self._cr.fetchone()
         listrow = list(row)
         return listrow
-    
+
     @api.multi
     def generate_fec(self):
         '''
@@ -132,7 +131,7 @@ class OFAccountFrFec(models.TransientModel):
         unaffected_earnings_xml_ref = self.env.ref('account.data_unaffected_earnings')
         unaffected_earnings_line = True  # used to make sure that we add the unaffected earning initial balance only once
         if unaffected_earnings_xml_ref:
-            #compute the benefit/loss of last year to add in the initial balance of the current year earnings account
+            # compute the benefit/loss of last year to add in the initial balance of the current year earnings account
             unaffected_earnings_results = self.do_query_unaffected_earnings()
             unaffected_earnings_line = False
 
@@ -193,7 +192,7 @@ class OFAccountFrFec(models.TransientModel):
             if not unaffected_earnings_line:
                 account = self.env['account.account'].browse(account_id)
                 if account.user_type_id.id == self.env.ref('account.data_unaffected_earnings').id:
-                    #add the benefit/loss of previous fiscal year to the first unaffected earnings account found.
+                    # add the benefit/loss of previous fiscal year to the first unaffected earnings account found.
                     unaffected_earnings_line = True
                     current_amount = float(listrow[11].replace(',', '.')) - float(listrow[12].replace(',', '.'))
                     unaffected_earnings_amount = float(unaffected_earnings_results[11].replace(',', '.')) - float(unaffected_earnings_results[12].replace(',', '.'))
@@ -205,12 +204,12 @@ class OFAccountFrFec(models.TransientModel):
                         listrow[11] = '0,00'
                         listrow[12] = str(-listrow_amount).replace('.', ',')
             w.writerow([s.encode("utf-8") for s in listrow])
-        #if the unaffected earnings account wasn't in the selection yet: add it manually
+        # if the unaffected earnings account wasn't in the selection yet: add it manually
         if (not unaffected_earnings_line
             and unaffected_earnings_results
             and (unaffected_earnings_results[11] != '0,00'
                  or unaffected_earnings_results[12] != '0,00')):
-            #search an unaffected earnings account
+            # search an unaffected earnings account
             unaffected_earnings_account = self.env['account.account'].search([('user_type_id', '=', self.env.ref('account.data_unaffected_earnings').id)], limit=1)
             if unaffected_earnings_account:
                 unaffected_earnings_results[4] = unaffected_earnings_account.code
@@ -295,7 +294,7 @@ class OFAccountFrFec(models.TransientModel):
         self.write({
             'fec_data': base64.encodestring(fecvalue),
             # Filename = <siren>FECYYYYMMDD where YYYMMDD is the closing date
-            'filename': '%sFEC%s%s.csv' % (siren, end_date, suffix),
+            'filename': '%sFEC%s%s.%s' % (siren, end_date, suffix, self.of_extension),
             })
         fecfile.close()
 
