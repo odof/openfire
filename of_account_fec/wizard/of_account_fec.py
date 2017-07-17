@@ -23,6 +23,8 @@ class OFAccountFrFec(models.TransientModel):
              " - Non-official posted only : Non-official FEC report (posted entries only)\n"
              " - Non-official : Non-official FEC report (posted and unposted entries)")
     of_extension = fields.Selection([('csv', 'csv'), ('txt', 'txt')], string="File extension", required=True, default='csv')
+    of_ouv_code = fields.Char("Code du journal d'ouverture", required=True, default='OUV')
+    of_ouv_name = fields.Char("Libellé du journal d'ouverture", required=True, default='Balance initiale')
 
     def do_query_unaffected_earnings(self):
         ''' Compute the sum of ending balances for all accounts that are of a type that does not bring forward the balance in new fiscal years.
@@ -32,9 +34,9 @@ class OFAccountFrFec(models.TransientModel):
 
         sql_query = '''
         SELECT
-            'OUV' AS JournalCode,
-            'Balance initiale' AS JournalLib,
-            'Balance initiale PL' AS EcritureNum,
+            %s AS JournalCode,
+            %s AS JournalLib,
+            %s || ' PL' AS EcritureNum,
             %s AS EcritureDate,
             '120/129' AS CompteNum,
             'Benefice (perte) reporte(e)' AS CompteLib,
@@ -74,7 +76,7 @@ class OFAccountFrFec(models.TransientModel):
         company = self.env.user.company_id
         formatted_date_from = self.date_from.replace('-', '')
         self._cr.execute(
-            sql_query, (formatted_date_from, formatted_date_from, formatted_date_from, self.date_from, company.id, self.journal_ids._ids))
+            sql_query, (self.of_ouv_code, self.of_ouv_name, self.of_ouv_name, formatted_date_from, formatted_date_from, formatted_date_from, self.date_from, company.id, self.journal_ids._ids))
         # listrow = []
         row = self._cr.fetchone()
         listrow = list(row)
@@ -137,9 +139,9 @@ class OFAccountFrFec(models.TransientModel):
 
         sql_query = '''
         SELECT
-            'OUV' AS JournalCode,
-            'Balance initiale' AS JournalLib,
-            'Balance initiale ' || MIN(aa.name) AS EcritureNum,
+            %s AS JournalCode,
+            %s AS JournalLib,
+            %s || ' ' || MIN(aa.name) AS EcritureNum,
             %s AS EcritureDate,
             MIN(aa.code) AS CompteNum,
             replace(MIN(aa.name), '|', '/') AS CompteLib,
@@ -184,7 +186,7 @@ class OFAccountFrFec(models.TransientModel):
         '''
         formatted_date_from = self.date_from.replace('-', '')
         self._cr.execute(
-            sql_query, (formatted_date_from, formatted_date_from, formatted_date_from, self.date_from, company.id, self.journal_ids._ids))
+            sql_query, (self.of_ouv_code, self.of_ouv_name, self.of_ouv_name, formatted_date_from, formatted_date_from, formatted_date_from, self.date_from, company.id, self.journal_ids._ids))
 
         for row in self._cr.fetchall():
             listrow = list(row)

@@ -14,6 +14,8 @@
             <group col="4">
                 <field name="export_type" widget="radio"/>
                 <field name="sortby" widget="radio" attrs="{'invisible': [('export_type','=','official')]}"/>
+                <field name="of_ouv_code"/>
+                <field name="of_ouv_name"/>
                 <field name="of_extension"/>
             </group>
             <group>
