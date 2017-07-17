@@ -143,10 +143,26 @@ class OFAccountFrFec(models.TransientModel):
             %s AS JournalLib,
             %s || ' ' || MIN(aa.name) AS EcritureNum,
             %s AS EcritureDate,
-            MIN(aa.code) AS CompteNum,
-            replace(MIN(aa.name), '|', '/') AS CompteLib,
-            '' AS CompAuxNum,
-            '' AS CompAuxLib,
+            CASE WHEN aa.code LIKE '455%%' THEN '455000'
+                 WHEN aa.internal_type = 'payable' THEN '401000'
+                 WHEN aa.internal_type = 'receivable' THEN '411000'
+                 ELSE aa.code
+            END
+            AS CompteNum,
+            CASE WHEN aa.code LIKE '455%%' THEN 'Associés'
+                 WHEN aa.internal_type = 'payable' THEN 'Fournisseurs'
+                 WHEN aa.internal_type = 'receivable' THEN 'Clients'
+                 ELSE replace(MIN(aa.name), '|', '/')
+            END
+            AS CompteLib,
+            CASE WHEN aa.internal_type IN ('payable', 'receivable') THEN aa.code
+                 ELSE ''
+            END
+            AS CompAuxNum,
+            CASE WHEN aa.internal_type IN ('payable', 'receivable') THEN replace(MIN(aa.name), '|', '/')
+                 ELSE ''
+            END
+            AS CompAuxLib,
             '-' AS PieceRef,
             %s AS PieceDate,
             '/' AS EcritureLib,
@@ -181,8 +197,9 @@ class OFAccountFrFec(models.TransientModel):
         '''
 
         sql_query += '''
-        GROUP BY aml.account_id
+        GROUP BY aml.account_id, aa.code, aa.internal_type
         HAVING sum(aml.balance) != 0
+        ORDER BY CompteNum, aa.code
         '''
         formatted_date_from = self.date_from.replace('-', '')
         self._cr.execute(
