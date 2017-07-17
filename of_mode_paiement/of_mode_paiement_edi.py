@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from openerp import models, fields, api
-from openerp.exceptions import UserError
-from openerp import netsvc
+from odoo import models, fields, api
+from odoo.exceptions import UserError
 import time
 import unicodedata
 import re
@@ -45,10 +44,6 @@ class res_partner(models.Model):
     of_sepa_type_prev = fields.Selection([("FRST","1er prélèvement récurrent à venir"),("RCUR","Prélèvement récurrent en cours")], 'Type de prélèvement (SEPA)', required=True, default='FRST', help=u"Type de prélèvement SEPA.\n- Mettre à 1er prélèvement quand aucun prélèvement n'a été effectué avec ce mandat.\nLors d'un 1er prélèvement, cette option passera automatiquement à prélèvement récurrent en cours.\n\n- Mettre à prélèvement récurrent en cours lorsqu'un prélèvement a déjà été effectué avec ce mandat.\n\n")
     company_registry = fields.Char(u'Registre de la société', size=64) # Migration : on ajoute le champ company_registry pour les partenaires. Il est définit dans of_sales mais on le rajoute au cas où of_sales ne serait pas installé.
     
-#     _defaults = {
-#         'of_sepa_type_prev': 'FRST'
-#     }
-
 class wizard_paiement_edi(models.TransientModel):
     """Ce wizard va effectuer un paiement par échange de fichier informatique"""
     _name = 'wizard.paiement.edi'
@@ -70,42 +65,15 @@ class wizard_paiement_edi(models.TransientModel):
     aff_bouton_genere_fich = fields.Boolean(default=True)
     type_paiement = fields.Char('Type de paiement', size=16)
 
-#     _defaults = {
-#         'date_remise': time.strftime('%Y-%m-%d'),
-#         'date_valeur': time.strftime('%Y-%m-%d'),
-#         'date_echeance': time.strftime('%Y-%m-%d'),
-#         'date_creation': time.strftime('%Y-%m-%d %H:%M:%S'),
-#         'nom_fichier': "edi_" + time.strftime('%Y-%m-%d') +".txt",
-#         'motif': 'nofacture',
-#         'aff_bouton_paiement': False,
-#         'aff_bouton_genere_fich': True
-#     }
-   
     @api.multi
     def action_paiement_sepa_prev(self):
         self.action_paiement_edi("sepa_prev")
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'wizard.paiement.edi',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_id': self.id,
-            'target': 'new',
-            'context': self._context
-        }
+        return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
     def action_paiement_lcr(self):
         self.action_paiement_edi("lcr")
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'wizard.paiement.edi',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_id': self.id,
-            'target': 'new',
-            'context': self._context
-        }
+        return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
     def action_paiement_edi(self, type_paiement="sepa_prev"):
@@ -582,9 +550,7 @@ class wizard_paiement_edi(models.TransientModel):
         sortie = ""
         if not self._context:
             raise UserError(u"Erreur ! (#ED303)\n\nLe serveur a été arrêté depuis que vous avez généré le fichier.\n\nAppuyer une nouvelle fois sur le bouton générer le fichier avant d'effectuer une nouvelle validation des paiements.")
-        
-        partner_obj = self.env['res.partner']
-        
+
         # On récupère les factures selectionnées
         invoice_obj = self.env['account.invoice']
         liste_factures = invoice_obj.browse(self._context.get('active_ids', []))
@@ -645,8 +611,8 @@ class wizard_paiement_edi(models.TransientModel):
         self.write({'sortie': sortie})
         self.write({'aff_bouton_paiement': False})
         self.write({'aff_bouton_genere_fich': False})
-        return True
-    
+        return {'type': 'ir.actions.do_nothing'}
+
     def chaine2ascii_taille_fixe_maj(self, chaine, longueur):
         """ (pour LCR) Retourne une chaine en majuscule sans accent et ponctuation autre que ().,/+-:*espace et tronquée ou complétée à (longueur) caractères"""
         if not chaine or not longueur or longueur < 1:

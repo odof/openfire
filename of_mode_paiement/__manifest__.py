@@ -27,5 +27,5 @@
         'of_mode_paiement_edi_view.xml',
         # Migration 'wizard/wizard_edi_view.xml',
     ],
-    'installable': False,
+    'installable': True,
 }

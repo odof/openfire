@@ -1,4 +1,4 @@
-<openerp>
+<odoo>
     <data>
  
         <!-- Ajouter compte en banque aux modes de paiement -->
@@ -85,23 +85,21 @@
                     <group colspan="4" col="1">
                         <field name="sortie" readonly="1"/>
                     </group>
-                    <!--  <separator colspan="4"/>
-                    <newline/> -->
                     <hr/>
                     <group colspan="4" col="8">
-                        <button special="cancel" string="Annuler" icon="gtk-cancel" attrs="{'invisible':[('aff_bouton_genere_fich','=',False)]}"/>
-                        <button special="cancel" string="Fermer" icon="gtk-ok" attrs="{'invisible':[('aff_bouton_genere_fich','=',True)]}"/>
-                        <button name="action_paiement_lcr" string="Générer fichier LCR" type="object" icon="gtk-convert" attrs="{'invisible':[('aff_bouton_genere_fich','=',False)]}"/>
-                        <button name="action_paiement_sepa_prev" string="Générer fichier prélèvement SEPA" type="object" icon="gtk-convert" attrs="{'invisible':[('aff_bouton_genere_fich','=',False)]}"/>
+                        <button special="cancel" string="Annuler" icon="fa-times" attrs="{'invisible':[('aff_bouton_genere_fich','=',False)]}"/>
+                        <button special="cancel" string="Fermer" icon="fa-check" attrs="{'invisible':[('aff_bouton_genere_fich','=',True)]}"/>
+                        <button name="action_paiement_lcr" string="Générer fichier LCR" type="object" icon="fa-file-text" attrs="{'invisible':[('aff_bouton_genere_fich','=',False)]}"/>
+                        <button name="action_paiement_sepa_prev" string="Générer fichier prélèvement SEPA" type="object" icon="fa-file-text" attrs="{'invisible':[('aff_bouton_genere_fich','=',False)]}"/>
                     </group>
                     <group colspan="2" col="4">
                         <field name="fichier" filename="nom_fichier" readonly="1" attrs="{'invisible':[('fichier','=','')]}"/>
-                        <button name="action_enregistre_paiements" string="Valider le paiement des factures" type="object" icon="gtk-go-forward" attrs="{'invisible':[('aff_bouton_paiement','=',False)]}"/>
+                        <button name="action_enregistre_paiements" string="Valider le paiement des factures" type="object" icon="fa-arrow-right" attrs="{'invisible':[('aff_bouton_paiement','=',False)]}"/>
                     </group>
                 </form>
             </field>
         </record>
-     
+
         <act_window id="action_view_paiement_edi_wizard"
             key2="client_action_multi"
             name="Prélèvement SEPA, LCR par EDI"
@@ -115,4 +113,4 @@
             groups="account.group_account_manager,account.group_account_user" />
 
     </data>
-</openerp>
+</odoo>
