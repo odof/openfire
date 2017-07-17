@@ -3,7 +3,7 @@
 {
     'name' : 'OpenFire FEC',
     'author': 'OpenFire',
-    'version' : '10.0',
+    'version' : '10.0.1.0.0',
     'summary': 'extension de l10n_fr_fec',
     'description': """
 OpenFire FEC\n

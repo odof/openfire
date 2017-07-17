@@ -217,20 +217,33 @@ class OFAccountFrFec(models.TransientModel):
             w.writerow([s.encode("utf-8") for s in unaffected_earnings_results])
 
         # LINES
+        # Il faudra ajouter les comptes de tiers nécessaires au cas par cas (Associés, Fournisseurs, Clients, etc.)
         sql_query = '''
         SELECT
             replace(aj.code, '|', '/') AS JournalCode,
             replace(aj.name, '|', '/') AS JournalLib,
             replace(am.name, '|', '/') AS EcritureNum,
             TO_CHAR(am.date, 'YYYYMMDD') AS EcritureDate,
-            aa.code AS CompteNum,
-            replace(aa.name, '|', '/') AS CompteLib,
-            CASE WHEN rp.ref IS null OR rp.ref = ''
-            THEN COALESCE('ID ' || rp.id, '')
-            ELSE rp.ref
+            CASE WHEN aa.code LIKE '455%%' THEN '455000'
+                 WHEN aa.internal_type = 'payable' THEN '401000'
+                 WHEN aa.internal_type = 'receivable' THEN '411000'
+                 ELSE aa.code
+            END
+            AS CompteNum,
+            CASE WHEN aa.code LIKE '455%%' THEN 'Associés'
+                 WHEN aa.internal_type = 'payable' THEN 'Fournisseurs'
+                 WHEN aa.internal_type = 'receivable' THEN 'Clients'
+                 ELSE replace(aa.name, '|', '/')
+            END
+            AS CompteLib,
+            CASE WHEN aa.internal_type IN ('payable', 'receivable') THEN aa.code
+                 ELSE ''
             END
             AS CompAuxNum,
-            COALESCE(replace(rp.name, '|', '/'), '') AS CompAuxLib,
+            CASE WHEN aa.internal_type IN ('payable', 'receivable') THEN replace(rp.name, '|', '/')
+                 ELSE ''
+            END
+            AS CompAuxLib,
             CASE WHEN am.ref IS null OR am.ref = ''
             THEN '-'
             ELSE replace(am.ref, '|', '/')

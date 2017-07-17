@@ -1,3 +1,3 @@
 #-*- coding:utf-8 -*-
 
-import of_account_fec
+from . import of_account_fec
