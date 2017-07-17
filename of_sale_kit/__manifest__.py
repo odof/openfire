@@ -2,7 +2,7 @@
 
 {
     'name': 'OpenFire Kits',
-    'author':'OpenFire',
+    'author': 'OpenFire',
     'version': '10.0',
     'category': 'OpenFire modules',
     'summary': 'Kits',
@@ -14,10 +14,10 @@
         \t- Possibilité de création de kits à la volée dans les Devis, Bons de commandes et Factures clients
         \t- Approvisionnement des composants sur confirmation de commande
         \t- Conversion de Bons de commandes en Factures
-        \t- 2 modes d'affichage des kits dans les rapports PDF: restreint et étendu 
+        \t- 2 modes d'affichage des kits dans les rapports PDF: restreint et étendu
     """,
     'website': 'openfire.fr',
-    'depends': ['sale_stock','mrp'],
+    'depends': ['sale_stock', 'mrp'],
     'data': [
         'views/of_product_views.xml',
         'views/of_sale_views.xml',
@@ -25,9 +25,6 @@
         'report/of_sale_report_templates.xml',
         'report/of_account_report_templates.xml',
         'security/ir.model.access.csv',
-    ],
-    'qweb': [
-        
     ],
     'installable': True,
     'auto_install': False,

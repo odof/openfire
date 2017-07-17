@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from openerp import models, fields, api, _
+from odoo import models, fields, api, _
 
 # Ajout de la fonction de fusion des factures
 class AccountInvoice(models.Model):
@@ -152,9 +152,9 @@ class AccountInvoice(models.Model):
 class AccountMove(models.Model):
     _inherit = "account.move"
 
-    @api.one
     @api.depends('line_ids')
     def _get_default_line_name(self):
-        self.default_line_name = self.line_ids and self.line_ids[-1].name or ""
+        for move in self:
+            move.default_line_name = move.line_ids and move.line_ids[-1].name or ""
 
     default_line_name = fields.Char(size=64, compute='_get_default_line_name')
