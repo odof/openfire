@@ -63,7 +63,7 @@
                             <label string="La société, le compte bancaire émetteur et le journal comptable sont ceux du mode de paiement choisi." colspan="4"/>
                             <label string="Le compte bancaire des tirés est celui du client attaché à la facture." colspan="4"/>
                             <label string="Pour LCR :" colspan="4"/>
-                            <label string="-> Le fichier génère des lettres de change non acceptées avec encaissement à l'échéance (pas d'escompte), sans cession ou nantissement ou convention Daily." colspan="4"/>
+                            <label string="-> Le fichier génère des lettres de change non acceptées." colspan="4"/>
                             <label string="-> Le n° SIREN se configure pour l'émetteur dans le champs ''Registre de la société'' dans la configuration de la société et pour les clients, dans l'onglet achats/ventes des paramètres clients." colspan="4"/>
                             <label string="-> Le numéro national émetteur (NNE) se configure dans les paramètres de la société émettrice." colspan="4"/>
                             <label string="Pour prélèvement SEPA :" colspan="4"/>
@@ -80,7 +80,9 @@
                         <field name="date_remise"/>
                         <field name="date_valeur"/>
                         <field name="date_echeance"/>
+                        <field name="type_remise_lcr"/>
                         <field name="motif"/>
+                        <field name="code_dailly_lcr"/>
                     </group>
                     <group colspan="4" col="1">
                         <field name="sortie" readonly="1"/>

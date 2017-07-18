@@ -64,6 +64,8 @@ class wizard_paiement_edi(models.TransientModel):
     aff_bouton_paiement = fields.Boolean(default=False)
     aff_bouton_genere_fich = fields.Boolean(default=True)
     type_paiement = fields.Char('Type de paiement', size=16)
+    type_remise_lcr = fields.Selection([("encaissement_forfait",u"Encaissement, crédit forfaitaire après l'échéance"), ("encaissement_delai",u"Encaissement, crédit crédit après expiration d'un délai forfaitaire"), ("escompte",u"Escompte"), ("escompte_valeur",u"Escompte en valeur")], u"Type de remise (LCR)", required=False, help=u"Type de remise (LCR uniquement)")
+    code_dailly_lcr = fields.Selection([("pas_indication",u"Pas d'indication"), ("cession_escompte",u"Cession escompte dans le cadre d'une convention Dailly"), ("nantissement",u"Nantissement de créance dans le cadre d'une convention Dailly"), ("cession_nantissement",u"Cession ou nantissement hors convention Dailly")], u"Convention Dailly (LCR)", required=False, help=u"Indique si convention Dailly (LCR uniquement).\nChoisir \"Pas d'indication\" si pas de convention.")
 
     @api.multi
     def action_paiement_sepa_prev(self):
@@ -132,9 +134,35 @@ class wizard_paiement_edi(models.TransientModel):
         if self.mode_paiement_id.bank_id.bank_id.name:                        # Domiciliation (nom) bancaire du tirant
             chaine += self.chaine2ascii_taille_fixe_maj(self.mode_paiement_id.bank_id.bank_id.name, 24)
             sortie += self.mode_paiement_id.bank_id.bank_id.name
-        chaine += "30E"                             # Code entrée, code Daily, code monnaie (euro)
+
+        # Code entrée (Type remise)
+        if self.type_remise_lcr == 'encaissement_forfait':
+            chaine += "3"
+        elif self.type_remise_lcr == 'encaissement_delai':
+            chaine += "4"
+        elif self.type_remise_lcr == 'escompte':
+            chaine += "1"
+        elif self.type_remise_lcr == 'escompte_valeur':
+            chaine += "2"
+        else:
+            raise UserError(u"Erreur ! (#ED207)\n\nVous devez choisir le type de remise (LCR).")
+
+        # Code Daily
+        if self.code_dailly_lcr == 'pas_indication':
+            chaine += "0"
+        elif self.code_dailly_lcr == 'cession_escompte':
+            chaine += "1"
+        elif self.code_dailly_lcr == 'nantissement':
+            chaine += "2"
+        elif self.code_dailly_lcr == 'cession_nantissement':
+            chaine += "3"
+        else:
+            raise UserError(u"Erreur ! (#ED208)\n\nVous devez choisir s'il y a une convention Dailly (LCR).\nChoisir \"Pas d'indication\" si pas de convention.")
+
+        # code monnaie (euro)
+        chaine += "E"
         
-        # référence bancaire émetteur - Configuré dans Odoo soit en IBAN
+        # Référence bancaire émetteur - Configuré dans Odoo soit en IBAN
         temp = self.mode_paiement_id.bank_id.acc_number
         if temp:
             temp = temp.replace("IBAN", "").replace(" ", "").upper()
