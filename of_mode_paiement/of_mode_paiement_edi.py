@@ -179,23 +179,23 @@ class wizard_paiement_edi(models.TransientModel):
             
             # On vérifie que le montant à payer en fonction de l'échéancier n'est pas nul, sinon passe à la facture suivante
             if montant_du == 0:
-                sortie += u"Facture non exigible suivant échéancier : " + facture.partner_id.name + u" [Rien à payer suivant échéancier] [Montant total facture : " + str('%.2f' % facture.amount_total).replace('.', ',') + u" euros]\n"
+                sortie += u"Facture non exigible suivant échéancier : " + facture.partner_id.display_name + u" [Rien à payer suivant échéancier] [Montant total facture : " + str('%.2f' % facture.amount_total).replace('.', ',') + u" euros]\n"
                 continue
             elif montant_du < 0:
-                raise UserError(u"Erreur ! (#ED217)\n\nLa balance de la facture de " + facture.partner_id.name + u" est négative.\n\nVous ne pouvez payer par LCR que des factures avec un solde positif.")
+                raise UserError(u"Erreur ! (#ED217)\n\nLa balance de la facture de " + facture.partner_id.display_name + u" est négative.\n\nVous ne pouvez payer par LCR que des factures avec un solde positif.")
             else:
                 nb_facture = nb_facture + 1
             
-            sortie += u"Tiré : " + facture.partner_id.name + " ["
+            sortie += u"Tiré : " + facture.partner_id.display_name + " ["
             rib = rib_obj.search([('partner_id', '=' , facture.partner_id.id)]) 
             if not rib:
-                raise UserError(u"Erreur ! (#ED220)\n\nPas de compte bancaire trouvé pour " + facture.partner_id.name + u".\n\nPour effectuer une LCR, un compte en banque doit être défini pour le client de chaque facture.")
+                raise UserError(u"Erreur ! (#ED220)\n\nPas de compte bancaire trouvé pour " + facture.partner_id.display_name + u".\n\nPour effectuer une LCR, un compte en banque doit être défini pour le client de chaque facture.")
             no_ligne = no_ligne + 1
             chaine += "0660"
             chaine += str(no_ligne).zfill(8)        # No de la ligne (no enregistrement sur 8 caractères)
             chaine += " " * 8                       # Zones réservées
             chaine += " " * 10                      # Référence du tiré
-            chaine += self.chaine2ascii_taille_fixe_maj(facture.partner_id.name, 24) # Nom du tiré (24 caractères)
+            chaine += self.chaine2ascii_taille_fixe_maj(facture.partner_id.display_name, 24) # Nom du tiré (24 caractères)
             if rib[0].bank_name:                    # Domiciliation (nom) bancaire du tiré
                 chaine += self.chaine2ascii_taille_fixe_maj(rib[0].bank_name, 24)
                 sortie += rib[0].bank_name
@@ -221,7 +221,7 @@ class wizard_paiement_edi(models.TransientModel):
                 chaine += rib[0].rib_acc_number
                 sortie += " Banque : " + rib[0].bank_code + " Guichet : " + rib[0].office + " Compte : " + rib[0].rib_acc_number
             else:   # Aucune référence bancaire valide
-                raise UserError(u"Erreur ! (#ED-225)\n\nPas de coordonnées bancaires (RIB ou IBAN) valides trouvées pour " + facture.partner_id.name + u".\n\n (codes banque et guichet 5 chiffres, n° compte 11 chiffres et clé 2 chiffres)")
+                raise UserError(u"Erreur ! (#ED-225)\n\nPas de coordonnées bancaires (RIB ou IBAN) valides trouvées pour " + facture.partner_id.display_name + u".\n\n (codes banque et guichet 5 chiffres, n° compte 11 chiffres et clé 2 chiffres)")
             sortie += "]"
             montant_total = montant_total + montant_du
             sortie += " [Montant : " + str('%.2f' % montant_du).replace('.', ',') + " euros]"
@@ -240,7 +240,7 @@ class wizard_paiement_edi(models.TransientModel):
                 if len(temp.replace(" ", "")) == 14:   # C'est un n° SIRET. Le SIREN est les 9 premiers chiffres.
                     temp = temp.replace(" ", "")[0:9]
                 elif len(temp) > 9:
-                    raise UserError(u"Erreur ! (#ED230)\n\nLe n° SIREN de " + facture.partner_id.name + u" dépasse 9 caractères.")
+                    raise UserError(u"Erreur ! (#ED230)\n\nLe n° SIREN de " + facture.partner_id.display_name + u" dépasse 9 caractères.")
                 chaine += temp.ljust(9, " ")
                 sortie += " [No SIREN : " + temp + "]"
             chaine += " " * 10                       # Référence tireur
@@ -294,9 +294,9 @@ class wizard_paiement_edi(models.TransientModel):
         factures_par_type = {}
         for facture in liste_factures:
             if not facture.partner_id.of_sepa_type_prev:
-                raise UserError(u"Erreur ! (#ED431)\n\nLe champ \"Type de prélèvement SEPA\" n'a pas été configuré pour " + facture.partner_id.name + u".\n\nCe champ est obligatoire pour effectuer un prélèvement SEPA et se configure dans l'onglet Achats-Ventes du client.")
+                raise UserError(u"Erreur ! (#ED431)\n\nLe champ \"Type de prélèvement SEPA\" n'a pas été configuré pour " + facture.partner_id.display_name + u".\n\nCe champ est obligatoire pour effectuer un prélèvement SEPA et se configure dans l'onglet Achats-Ventes du client.")
             if facture.partner_id.of_sepa_type_prev not in ('FRST','RCUR'):
-                raise UserError(u"Erreur ! (#ED432)\n\nLe champ \"Type de prélèvement SEPA\" contient une valeur incorrecte pour " + facture.partner_id.name + u".\n\nVeuillez configurer ce champ à nouveau. Il se configure dans l'onglet Achats-Ventes du client.")
+                raise UserError(u"Erreur ! (#ED432)\n\nLe champ \"Type de prélèvement SEPA\" contient une valeur incorrecte pour " + facture.partner_id.display_name + u".\n\nVeuillez configurer ce champ à nouveau. Il se configure dans l'onglet Achats-Ventes du client.")
             if facture.partner_id.of_sepa_type_prev not in factures_par_type:
                 factures_par_type[facture.partner_id.of_sepa_type_prev] = []
             factures_par_type[facture.partner_id.of_sepa_type_prev].append(facture)
@@ -313,15 +313,15 @@ class wizard_paiement_edi(models.TransientModel):
                 
                 # On vérifie que le montant à payer en fonction de l'échéancier n'est pas nul, sinon passe à la facture suivante 
                 if montant_du == 0:
-                    sortie += u"Facture non exigible suivant échéancier : " + facture.partner_id.name + u" [Rien à payer suivant échéancier] [Montant total facture : " + str('%.2f' % facture.amount_total).replace('.', ',') + u" euros]\n"
+                    sortie += u"Facture non exigible suivant échéancier : " + facture.partner_id.display_name + u" [Rien à payer suivant échéancier] [Montant total facture : " + str('%.2f' % facture.amount_total).replace('.', ',') + u" euros]\n"
                     continue
                 elif montant_du < 0:
-                    raise UserError(u"Erreur ! (#ED434)\n\nLa balance de la facture de " + facture.partner_id.name + u" est négative.\n\nVous ne pouvez payer par prélèvement SEPA que des factures avec un solde positif.")
+                    raise UserError(u"Erreur ! (#ED434)\n\nLa balance de la facture de " + facture.partner_id.display_name + u" est négative.\n\nVous ne pouvez payer par prélèvement SEPA que des factures avec un solde positif.")
 
                 # On récupère les coordonnées bancaires
                 rib = rib_obj.search([('partner_id', '=' , facture.partner_id.id)])
                 if not rib:
-                    raise UserError(u"Erreur ! (#ED436)\n\nPas de compte bancaire trouvé pour " + facture.partner_id.name + u".\n\nPour effectuer une opération SEPA, un compte en banque doit être défini pour le client de chaque facture.")
+                    raise UserError(u"Erreur ! (#ED436)\n\nPas de compte bancaire trouvé pour " + facture.partner_id.display_name + u".\n\nPour effectuer une opération SEPA, un compte en banque doit être défini pour le client de chaque facture.")
                 chaine_transaction += """
                         <!-- Niveau transaction -->
                         <DrctDbtTxInf> <!-- Débit à effectuer (plusieurs possible) -->
@@ -337,13 +337,13 @@ class wizard_paiement_edi(models.TransientModel):
                 if facture.partner_id.of_sepa_rum:
                     chaine_transaction += str(facture.partner_id.of_sepa_rum)
                 else:
-                    raise UserError(u"Erreur ! (#ED438)\n\nPas de référence unique du mandat (RUM) trouvé pour " + facture.partner_id.name + u".\n\nLe RUM est obligatoire pour effectuer un prélèvement SEPA et se configure dans l'onglet Achats-Ventes du client.")
+                    raise UserError(u"Erreur ! (#ED438)\n\nPas de référence unique du mandat (RUM) trouvé pour " + facture.partner_id.display_name + u".\n\nLe RUM est obligatoire pour effectuer un prélèvement SEPA et se configure dans l'onglet Achats-Ventes du client.")
                 chaine_transaction += """</MndtId> <!-- Code RUM -->
                                     <DtOfSgntr>"""
                 if facture.partner_id.of_sepa_date_mandat:
                     chaine_transaction += str(facture.partner_id.of_sepa_date_mandat)
                 else:
-                    raise UserError(u"Erreur ! (#ED440)\n\nPas de date de signature du mandat SEPA trouvé pour " + facture.partner_id.name + u".\n\nCette date est obligatoire pour effectuer un prélèvement SEPA et se configure dans l'onglet Achats-Ventes du client.")
+                    raise UserError(u"Erreur ! (#ED440)\n\nPas de date de signature du mandat SEPA trouvé pour " + facture.partner_id.display_name + u".\n\nCette date est obligatoire pour effectuer un prélèvement SEPA et se configure dans l'onglet Achats-Ventes du client.")
                 chaine_transaction += """</DtOfSgntr> <!-- Date de signature du mandat -->
                                     <AmdmntInd>false</AmdmntInd> <!-- facultatif Indicateur permettant de signaler une modification d'une ou plusieurs données du mandat. Valeurs : "true" (si il y a des modifications) "false" (pas de modification). Valeur par défaut : "false" -->
                                 </MndtRltdInf>
@@ -354,12 +354,12 @@ class wizard_paiement_edi(models.TransientModel):
                 if rib[0].bank_id.bic:
                     chaine_transaction += str(rib[0].bank_id.bic)
                 else:
-                    raise UserError(u"Erreur ! (#ED445)\n\nPas de code BIC (SWIFT) de la banque trouvé pour " + facture.partner_id.name + u".\n\nIl est nécessaire de fournir ce code pour effectuer une opération SEPA.")
+                    raise UserError(u"Erreur ! (#ED445)\n\nPas de code BIC (SWIFT) de la banque trouvé pour " + facture.partner_id.display_name + u".\n\nIl est nécessaire de fournir ce code pour effectuer une opération SEPA.")
                 chaine_transaction += """</BIC> <!-- Code SWIFT banque débiteur -->
                                 </FinInstnId>
                             </DbtrAgt>
                             <Dbtr> <!-- Information sur le débiteur obligatoire mais balises filles facultatives-->
-                                <Nm>""" + self.chaine2ascii_taillemax(facture.partner_id.name, 70) + """</Nm> <!-- Nom débiteur -->
+                                <Nm>""" + self.chaine2ascii_taillemax(facture.partner_id.display_name, 70) + """</Nm> <!-- Nom débiteur -->
                             </Dbtr>
                             <DbtrAcct> <!-- Informations sur le compte à débiter obligatoire -->
                                 <Id>
@@ -367,7 +367,7 @@ class wizard_paiement_edi(models.TransientModel):
                 if rib[0].acc_number:
                     chaine_transaction += str(rib[0].acc_number).replace("IBAN", "").replace(" ", "").upper()
                 else:
-                    raise UserError(u"Erreur ! (#ED450)\n\nPas d'IBAN valide trouvé pour " +  facture.partner_id.name + u".\n\nIl est nécessaire d'avoir des coordonnées bancaires sous forme d'IBAN pour effectuer une opération SEPA.")
+                    raise UserError(u"Erreur ! (#ED450)\n\nPas d'IBAN valide trouvé pour " +  facture.partner_id.display_name + u".\n\nIl est nécessaire d'avoir des coordonnées bancaires sous forme d'IBAN pour effectuer une opération SEPA.")
                 chaine_transaction += """</IBAN>
                                 </Id>
                             </DbtrAcct>"""
@@ -384,7 +384,7 @@ class wizard_paiement_edi(models.TransientModel):
                 nb_transaction_lot = nb_transaction_lot + 1
                 montant_total = montant_total + montant_du
                 montant_total_lot = montant_total_lot + montant_du
-                sortie += u"Tiré : " + facture.partner_id.name + " ["
+                sortie += u"Tiré : " + facture.partner_id.display_name + " ["
                 if rib[0].bank_name:
                     sortie += rib[0].bank_name + " "
                 sortie += "BIC : " + rib[0].bank_bic + " IBAN : " + str(rib[0].acc_number).upper() + "] [Montant : " + str('%.2f' % montant_du).replace('.', ',') + " euros]\n"
@@ -584,13 +584,13 @@ class wizard_paiement_edi(models.TransientModel):
             })
             
             if not payment:
-                raise UserError(u"Erreur ! (#ED310)\n\nErreur création du paiement pour la facture du " + facture.date_invoice + u", client : " + facture.partner_id.name + u", montant restant à payer : " + str('%.2f' % montant_du).replace('.', ',') + u" euros.\n\nAucun paiement n'a été en conséquence validé.")
+                raise UserError(u"Erreur ! (#ED310)\n\nErreur création du paiement pour la facture du " + facture.date_invoice + u", client : " + facture.partner_id.display_name + u", montant restant à payer : " + str('%.2f' % montant_du).replace('.', ',') + u" euros.\n\nAucun paiement n'a été en conséquence validé.")
             payment.post() # On le confirme.
             
             # On met le champ type de prélèvement SEPA de chaque client à récurent en cours si était à 1er prélèvement à venir
             if facture.partner_id.of_sepa_type_prev == "FRST":
                 if not facture.partner_id.write({'of_sepa_type_prev': 'RCUR'}):
-                    raise UserError(u"Erreur ! (#ED320)\n\nErreur dans l'enregistrement du type de prélèvement SEPA pour : " + facture.partner_id.name + u".\n\nAucun paiement n'a été en conséquence validé.")
+                    raise UserError(u"Erreur ! (#ED320)\n\nErreur dans l'enregistrement du type de prélèvement SEPA pour : " + facture.partner_id.display_name + u".\n\nAucun paiement n'a été en conséquence validé.")
                 
         sortie = u"Le paiement des factures a été effectué.\nIl vous reste à transmettre le fichier à votre banque.\n\n-----------------------------------------------\n\n" + sortie
         temp = {'type_paiement': self.type_paiement,
@@ -605,7 +605,7 @@ class wizard_paiement_edi(models.TransientModel):
         
         # On enregistre les caractéristiques du paiement EDI (date, fichier généré, ...) objet of.paiement.edi 
         if not self.env['of.paiement.edi'].create(temp):
-            raise UserError(u"Erreur ! (#ED325)\n\nErreur lors de l'enregistrement du paiement pour la facture du " + facture.date_invoice + u", client : " + facture.partner_id.name + u", montant à payer : " + str('%.2f' % montant_du).replace('.', ',') + u" euros.\n\nAucun paiement n'a été en conséquence validé.")
+            raise UserError(u"Erreur ! (#ED325)\n\nErreur lors de l'enregistrement du paiement pour la facture du " + facture.date_invoice + u", client : " + facture.partner_id.display_name + u", montant à payer : " + str('%.2f' % montant_du).replace('.', ',') + u" euros.\n\nAucun paiement n'a été en conséquence validé.")
         if self.sortie:   # On récupère la sortie d'avant si elle existe
             sortie = sortie + self.sortie
         self.write({'sortie': sortie})
