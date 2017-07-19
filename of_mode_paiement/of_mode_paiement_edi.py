@@ -19,31 +19,35 @@ class of_paiement_edi(models.Model):
     "Paiement par échange de fichier informatique"
     _name = 'of.paiement.edi'
     _description = "Effectuer un paiement par echange de fichier informatique"
-    
-    name = fields.Char("Nom", size=64, required=False)
-    type_paiement = fields.Char('type de paiement par EDI', size=16, required=True)
-    date_creation = fields.Date('Date de création fichier EDI', required=True)
-    date_remise = fields.Date('Date de remise fichier EDI', required=False)
-    date_echeance = fields.Date('Date d\'échéance paiement EDI', required=False)
-    date_valeur = fields.Date('Date de valeur paiement EDI', required=False)
-    fichier_edi = fields.Text('Fichier EDI')
+
+    name = fields.Char("Nom", size=64)
+    type_paiement = fields.Char(u"Type de paiement par EDI", required=True)
+    mode_paiement = fields.Char(u"Mode de paiement")
+    date_creation = fields.Date(u"Date de création fichier EDI", required=True)
+    date_remise = fields.Date(u"Date de remise fichier EDI")
+    date_echeance = fields.Date(u"Date d'échéance paiement EDI")
+    date_valeur = fields.Date(u"Date de valeur paiement EDI")
+    type_remise_lcr = fields.Char(u"Type de remise (LCR)")
+    code_dailly_lcr = fields.Char(u"Convention Dailly (LCR)")
+    fichier_edi = fields.Text(u"Fichier EDI")
 
 
 class res_company(models.Model):
     _inherit = "res.company"
-    
+
     of_num_nne = fields.Char("Numéro national d'émetteur (NNE)", size=6, required=False, help=u"Numéro national d'émetteur pour opérations bancaires par échange de fichiers informatiques")
     of_num_ics = fields.Char("Identifiant créancier SEPA (ICS)", size=32, required=False, help=u"Identifiant créancier SEPA (ICS) pour opérations bancaires SEPA par échange de fichiers informatiques")
-    
+
 
 class res_partner(models.Model):
     _inherit = "res.partner"
-    
+
     of_sepa_rum = fields.Char("Référence unique du mandat (RUM) SEPA", size=35, required=False, help=u"Référence unique du mandat (RUM) SEPA pour opérations bancaires par échange de fichiers informatiques")
     of_sepa_date_mandat = fields.Date("Date de signature du mandat SEPA", required=False, help=u"Date de signature du mandat SEPA pour opérations bancaires par échange de fichiers informatiques")
     of_sepa_type_prev = fields.Selection([("FRST","1er prélèvement récurrent à venir"),("RCUR","Prélèvement récurrent en cours")], 'Type de prélèvement (SEPA)', required=True, default='FRST', help=u"Type de prélèvement SEPA.\n- Mettre à 1er prélèvement quand aucun prélèvement n'a été effectué avec ce mandat.\nLors d'un 1er prélèvement, cette option passera automatiquement à prélèvement récurrent en cours.\n\n- Mettre à prélèvement récurrent en cours lorsqu'un prélèvement a déjà été effectué avec ce mandat.\n\n")
     company_registry = fields.Char(u'Registre de la société', size=64) # Migration : on ajoute le champ company_registry pour les partenaires. Il est définit dans of_sales mais on le rajoute au cas où of_sales ne serait pas installé.
-    
+
+
 class wizard_paiement_edi(models.TransientModel):
     """Ce wizard va effectuer un paiement par échange de fichier informatique"""
     _name = 'wizard.paiement.edi'
@@ -65,7 +69,7 @@ class wizard_paiement_edi(models.TransientModel):
     aff_bouton_genere_fich = fields.Boolean(default=True)
     type_paiement = fields.Char('Type de paiement', size=16)
     type_remise_lcr = fields.Selection([("encaissement_forfait",u"Encaissement, crédit forfaitaire après l'échéance"), ("encaissement_delai",u"Encaissement, crédit crédit après expiration d'un délai forfaitaire"), ("escompte",u"Escompte"), ("escompte_valeur",u"Escompte en valeur")], u"Type de remise (LCR)", required=False, help=u"Type de remise (LCR uniquement)")
-    code_dailly_lcr = fields.Selection([("pas_indication",u"Pas d'indication"), ("cession_escompte",u"Cession escompte dans le cadre d'une convention Dailly"), ("nantissement",u"Nantissement de créance dans le cadre d'une convention Dailly"), ("cession_nantissement",u"Cession ou nantissement hors convention Dailly")], u"Convention Dailly (LCR)", required=False, help=u"Indique si convention Dailly (LCR uniquement).\nChoisir \"Pas d'indication\" si pas de convention.")
+    code_dailly_lcr = fields.Selection([("pas_indication",u"Pas d'indication"), ("cession_escompte",u"Cession escompte dans le cadre d'une convention Dailly"), ("nantissement",u"Nantissement de créance dans le cadre d'une convention Dailly"), ("cession_nantissement",u"Cession ou nantissement hors convention Dailly")], u"Convention Dailly (LCR)", required=False, default="pas_indication", help=u"Indique si convention Dailly (LCR uniquement).\nChoisir \"Pas d'indication\" si pas de convention.")
 
     @api.multi
     def action_paiement_sepa_prev(self):
@@ -85,24 +89,24 @@ class wizard_paiement_edi(models.TransientModel):
         # On récupère les factures selectionnées
         invoice_obj = self.env['account.invoice']
         liste_factures = invoice_obj.browse(self._context.get('active_ids', []))
-        
+
         # Teste si au moins une facturé sélectionnée
         if not liste_factures:
             raise UserError(u"Erreur ! (#ED105)\n\nVous devez sélectionner au moins une facture.")
-             
+
         # On vérifie qu'il s'agit bien de factures ouvertes non payées 
         for facture in liste_factures:
             if facture.type != "out_invoice" and facture.type != "in_refund":
                 raise UserError(u"Erreur ! (#ED110)\n\nVous avez sélectionné au moins une facture qui n'est pas une facture client ou un avoir fournisseur.\n\nVous ne pouvez demander le règlement par LCR ou prélèvement SEPA que pour une facture client ou un avoir fournisseur.")
             if facture.state != "open" or facture.residual <= 0 or facture.amount_total <= 0:
                 raise UserError(u"Erreur ! (#ED115)\n\nVous avez sélectionné au moins une facture non ouverte, déjà payée ou avec une balance ou un montant total négatif.\nVous ne devez sélectionner que des factures ouvertes, non payées avec une balance et un montant total positif.")
-        
+
         # On récupère le mode de paiement du wizard et génère le fichier EDI
         if type_paiement == "lcr":
             self.genere_fichier_lcr(liste_factures)
         else:
             self.genere_fichier_sepa_prev(liste_factures)
-        
+
         return True
 
     @api.multi
@@ -114,7 +118,7 @@ class wizard_paiement_edi(models.TransientModel):
         chaine = ""  # Contient la chaine du fichier généré
         montant_total = 0
         self.write({'date_creation': time.strftime('%Y-%m-%d %H:%M:%S')})
-               
+
         # 1ère ligne : émetteur
         sortie += u"Tireur : " + self.mode_paiement_id.company_id.name + " ["
         chaine += "0360"
@@ -161,7 +165,7 @@ class wizard_paiement_edi(models.TransientModel):
 
         # code monnaie (euro)
         chaine += "E"
-        
+
         # Référence bancaire émetteur - Configuré dans Odoo soit en IBAN
         temp = self.mode_paiement_id.bank_id.acc_number
         if temp:
@@ -182,7 +186,7 @@ class wizard_paiement_edi(models.TransientModel):
         else:
             chaine += " " * 6
         chaine += " " * 10 # Zone réservée
-        
+
         temp = liste_factures[0].company_id.company_registry    # No SIREN
         if not temp:   
             chaine += " " * 15
@@ -196,7 +200,7 @@ class wizard_paiement_edi(models.TransientModel):
         chaine += " " * 11 # Référence remise à faire
         chaine += "\n"
         sortie += "\n"
-        
+
         # 2e ligne : tiré(s)
         rib_obj = self.env['res.partner.bank']
         for facture in liste_factures:
@@ -204,7 +208,7 @@ class wizard_paiement_edi(models.TransientModel):
                 montant_du = self.montantapayer_echeancier(facture)
             else:
                 montant_du = facture.residual
-            
+
             # On vérifie que le montant à payer en fonction de l'échéancier n'est pas nul, sinon passe à la facture suivante
             if montant_du == 0:
                 sortie += u"Facture non exigible suivant échéancier : " + facture.partner_id.display_name + u" [Rien à payer suivant échéancier] [Montant total facture : " + str('%.2f' % facture.amount_total).replace('.', ',') + u" euros]\n"
@@ -213,7 +217,7 @@ class wizard_paiement_edi(models.TransientModel):
                 raise UserError(u"Erreur ! (#ED217)\n\nLa balance de la facture de " + facture.partner_id.display_name + u" est négative.\n\nVous ne pouvez payer par LCR que des factures avec un solde positif.")
             else:
                 nb_facture = nb_facture + 1
-            
+
             sortie += u"Tiré : " + facture.partner_id.display_name + " ["
             rib = rib_obj.search([('partner_id', '=' , facture.partner_id.id)]) 
             if not rib:
@@ -231,7 +235,7 @@ class wizard_paiement_edi(models.TransientModel):
                 chaine += " " * 24
             chaine += "0"                           # Acceptation
             chaine += " " * 2                       # Zone réservée
-            
+
             # référence bancaire - Configuré dans Odoo soit en IBAN
             temp = rib[0].acc_number
             if temp:
@@ -274,7 +278,7 @@ class wizard_paiement_edi(models.TransientModel):
             chaine += " " * 10                       # Référence tireur
             chaine += "\n"
             sortie += "\n"
-        
+
         # Dernière ligne : total
         no_ligne = no_ligne + 1
         chaine += "0860"
@@ -284,7 +288,7 @@ class wizard_paiement_edi(models.TransientModel):
         chaine += str('%.2f' % montant_total).replace('.', '').zfill(12) # Montant total
         chaine += " " * 46                          # Zones réservées
         chaine += "\n"
-        
+
         if nb_facture: # Si des factures sont à payer, on génère le fichier
             sortie = u"Pour enregistrer l'opération, vous devez valider le paiement des factures.\n\nLe fichier lettre change relevé (LCR) a été généré avec les éléments suivants :\n\n" + sortie
             chaine = base64.encodestring(chaine)
@@ -312,11 +316,11 @@ class wizard_paiement_edi(models.TransientModel):
         nb_transaction = 0
         nb_transaction_lot = 0
         index = 1 # Pour générer des identifiants uniques
-        
+
         self.write({'date_creation': time.strftime('%Y-%m-%d %H:%M:%S')})
         
         rib_obj = self.env['res.partner.bank']
-       
+
         # On doit faire un lot par type de prélèvement (frst, rcur, ...)
         # On classe la liste des factures par type de prélèvement
         factures_par_type = {}
@@ -328,7 +332,7 @@ class wizard_paiement_edi(models.TransientModel):
             if facture.partner_id.of_sepa_type_prev not in factures_par_type:
                 factures_par_type[facture.partner_id.of_sepa_type_prev] = []
             factures_par_type[facture.partner_id.of_sepa_type_prev].append(facture)
-        
+
         # On parcourt la liste des factures
         # par type de prélèvement
         for type_prev in factures_par_type:
@@ -338,7 +342,7 @@ class wizard_paiement_edi(models.TransientModel):
                     montant_du = self.montantapayer_echeancier(facture)
                 else:
                     montant_du = facture.residual
-                
+
                 # On vérifie que le montant à payer en fonction de l'échéancier n'est pas nul, sinon passe à la facture suivante 
                 if montant_du == 0:
                     sortie += u"Facture non exigible suivant échéancier : " + facture.partner_id.display_name + u" [Rien à payer suivant échéancier] [Montant total facture : " + str('%.2f' % facture.amount_total).replace('.', ',') + u" euros]\n"
@@ -417,11 +421,11 @@ class wizard_paiement_edi(models.TransientModel):
                     sortie += rib[0].bank_name + " "
                 sortie += "BIC : " + rib[0].bank_bic + " IBAN : " + str(rib[0].acc_number).upper() + "] [Montant : " + str('%.2f' % montant_du).replace('.', ',') + " euros]\n"
                 # Fin parcours chaque facture d'un type
-            
+
             # Si pas de facture à payer en fonction de l'échéancier dans ce lot, on passe au lot suivant
             if nb_transaction_lot == 0:
                 continue
-            
+
             # On génére le lot
             chaine_lot += """
                 <!-- Lot de transaction -->
@@ -491,7 +495,7 @@ class wizard_paiement_edi(models.TransientModel):
             nb_transaction_lot = 0
             chaine_transaction = ""
             # Fin parcours par type
-        
+
         # Fin parcourt de toutes les factures 
         # On ajoute l'en-tête
         chaine_entete += """<?xml version="1.0" encoding="utf-8"?>
@@ -513,14 +517,14 @@ class wizard_paiement_edi(models.TransientModel):
         chaine = chaine_entete + chaine_lot + """
             </CstmrDrctDbtInitn>
         </Document>"""
-        
+
         sortie += u">> Montant total : " + str('%.2f' % montant_total).replace('.', ',') + " euros"
         sortie = "BIC : " + str(self.mode_paiement_id.bank_id.bank_bic) + " IBAN : "+ str(self.mode_paiement_id.bank_id.acc_number).upper() + "]\n" + sortie
         if self.mode_paiement_id.bank_id.bank_name:
             sortie = self.mode_paiement_id.bank_id.bank_name + " " + sortie
         
         sortie = "Tireur : " + self.mode_paiement_id.company_id.name + " [" + sortie
-         
+
         if nb_transaction: # Si des factures sont à payer, on génère le fichier
             sortie = u"Pour enregistrer l'opération, vous devez valider le paiement des factures.\n\nLe fichier prélèvement SEPA a été généré avec les éléments suivants :\n\n" + sortie 
             chaine = base64.encodestring(chaine)
@@ -534,21 +538,21 @@ class wizard_paiement_edi(models.TransientModel):
             self.write({'fichier': ''})
         
         self.write({'sortie': sortie})
-        
+
         return True
 
-    
+
     @api.model
     def montantapayer_echeancier(self, facture):
         """calcul le montant à payer en fonction de l'échéancier de la facture"""
         result = 0
         date_aujourdhui = self.date_creation[0:10]
-        
+
         if facture.residual: # montant acquitté = montant déjà payé d'après balance (total facture moins ce qui reste à payer)
             montant_acquitte = facture.amount_total - facture.residual
         else:
             montant_acquitte = 0
-                
+
         # Si pas de ligne dans l'échéancier, on considère que la facture est à payer au comptant (échéance = date facture)
         if not facture.acompte_line_ids:
             if facture.date_invoice and date_aujourdhui >= facture.date_invoice: # Si date de facture existe et est avant la date d'échéance on doit payer le montant total
@@ -567,11 +571,11 @@ class wizard_paiement_edi(models.TransientModel):
                 cumul_montant_echeance = cumul_montant_echeance + echeance.montant
             
             result = cumul_montant_echeance - montant_acquitte
-        
+
         if result < 0:
                 result = 0
         return result
-    
+
     @api.multi
     def action_enregistre_paiements(self):
         """Enregistre les paiements des factures suite à un paiement EDI"""
@@ -582,15 +586,15 @@ class wizard_paiement_edi(models.TransientModel):
         # On récupère les factures selectionnées
         invoice_obj = self.env['account.invoice']
         liste_factures = invoice_obj.browse(self._context.get('active_ids', []))
-        
+
         # On vérifie qu'il s'agit bien de factures ouvertes non payées 
         for facture in liste_factures:
-            
+
             if self.type_montant_facture == "echeancier":
                 montant_du = self.montantapayer_echeancier(facture)
             else:
                 montant_du = facture.residual
-            
+
             # On vérifie que le montant à payer en fonction de l'échéancier n'est pas nul, sinon passe à la facture suivante 
             if montant_du == 0:
                 continue
@@ -610,27 +614,30 @@ class wizard_paiement_edi(models.TransientModel):
                 'writeoff_account_id': False,
                 'of_payment_mode_id': self.mode_paiement_id.id,
             })
-            
+
             if not payment:
                 raise UserError(u"Erreur ! (#ED310)\n\nErreur création du paiement pour la facture du " + facture.date_invoice + u", client : " + facture.partner_id.display_name + u", montant restant à payer : " + str('%.2f' % montant_du).replace('.', ',') + u" euros.\n\nAucun paiement n'a été en conséquence validé.")
             payment.post() # On le confirme.
-            
+
             # On met le champ type de prélèvement SEPA de chaque client à récurent en cours si était à 1er prélèvement à venir
             if facture.partner_id.of_sepa_type_prev == "FRST":
                 if not facture.partner_id.write({'of_sepa_type_prev': 'RCUR'}):
                     raise UserError(u"Erreur ! (#ED320)\n\nErreur dans l'enregistrement du type de prélèvement SEPA pour : " + facture.partner_id.display_name + u".\n\nAucun paiement n'a été en conséquence validé.")
-                
+
         sortie = u"Le paiement des factures a été effectué.\nIl vous reste à transmettre le fichier à votre banque.\n\n-----------------------------------------------\n\n" + sortie
         temp = {'type_paiement': self.type_paiement,
+                'mode_paiement': self.mode_paiement_id.name,
                 'date_creation': self.date_creation,
                 'date_remise': self.date_remise,
                 'date_echeance': self.date_echeance,
+                'type_remise_lcr': self.type_remise_lcr,
+                'code_dailly_lcr': self.code_dailly_lcr,
                 'fichier_edi': base64.decodestring(self.fichier)
                 }
         # On ajoute la date de valeur si renseignée dans le formulaire
         if self.date_valeur:
             temp['date_valeur'] = self.date_valeur
-        
+
         # On enregistre les caractéristiques du paiement EDI (date, fichier généré, ...) objet of.paiement.edi 
         if not self.env['of.paiement.edi'].create(temp):
             raise UserError(u"Erreur ! (#ED325)\n\nErreur lors de l'enregistrement du paiement pour la facture du " + facture.date_invoice + u", client : " + facture.partner_id.display_name + u", montant à payer : " + str('%.2f' % montant_du).replace('.', ',') + u" euros.\n\nAucun paiement n'a été en conséquence validé.")
@@ -646,7 +653,6 @@ class wizard_paiement_edi(models.TransientModel):
         if not chaine or not longueur or longueur < 1:
             return False
         chaine = unicodedata.normalize('NFKD', chaine).encode('ascii','ignore')
-        #chaine = chaine.replace("'", " ")   # apostrophe par espace
         chaine = re.sub(r'[^0-9A-Za-z\(\)\ \.\,\/\+\-\:\*]', ' ', chaine)
         chaine = chaine[:longueur]
         return chaine.upper().ljust(longueur)
