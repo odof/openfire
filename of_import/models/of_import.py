@@ -127,9 +127,9 @@ class of_import(models.Model):
             champ_primaire = 'acc_number'             # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
             champ_reference = ''            # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
         elif model == 'crm.lead':
-            nom_objet = u'partenaire/opportunité'     # Libellé pour affichage dans message information/erreur
-            champ_primaire = ''              # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
-            champ_reference = ''               # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
+            nom_objet = u'partenaire/opportunité'   # Libellé pour affichage dans message information/erreur
+            champ_primaire = 'of_ref'               # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
+            champ_reference = 'of_ref'              # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
 
         # Initialisation variables
         champs_odoo = self.get_champs_odoo(model) # On récupère la liste des champs de l'objet (depuis ir.model.fields)
