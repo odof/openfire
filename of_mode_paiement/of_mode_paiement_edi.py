@@ -219,7 +219,11 @@ class wizard_paiement_edi(models.TransientModel):
                 nb_facture = nb_facture + 1
 
             sortie += u"Tiré : " + facture.partner_id.display_name + " ["
-            rib = rib_obj.search([('partner_id', '=' , facture.partner_id.id)]) 
+            rib = rib_obj.search([('partner_id', '=' , facture.partner_id.id)])
+            if not rib and facture.partner_id != facture.partner_id.commercial_partner_id:
+                # Le compte bancaire devrait toujours être renseigné dans le commercial_partner (société mère ou partenaire de niveau supérieur)
+                # plutôt que dans un contact de facturation
+                rib = rib_obj.search([('partner_id', '=' , facture.partner_id.commercial_partner_id.id)])
             if not rib:
                 raise UserError(u"Erreur ! (#ED220)\n\nPas de compte bancaire trouvé pour " + facture.partner_id.display_name + u".\n\nPour effectuer une LCR, un compte en banque doit être défini pour le client de chaque facture.")
             no_ligne = no_ligne + 1
@@ -265,7 +269,7 @@ class wizard_paiement_edi(models.TransientModel):
             chaine += " "                           # Type
             chaine += " " * 3                       # Nature
             chaine += " " * 3                       # Pays
-            temp = facture.partner_id.company_registry    # No SIREN
+            temp = facture.partner_id.company_registry or facture.partner_id.commercial_partner_id.company_registry    # No SIREN
             if not temp:
                 chaine += " " * 9
             else:
