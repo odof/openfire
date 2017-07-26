@@ -136,11 +136,9 @@ class of_import(models.Model):
         date_debut = time.strftime('%Y-%m-%d %H:%M:%S')
 
         if simuler:
-            sortie_succes = sortie_avertissement = sortie_erreur = u"SIMULATION - Rien n'a été créé/modifié.\n" 
+            sortie_succes = sortie_avertissement = sortie_erreur = u"SIMULATION - Rien n'a été créé/modifié.\n"
         else:
-            sortie_succes = ''
-            sortie_avertissement = ''
-            sortie_erreur = ''
+            sortie_succes = sortie_avertissement = sortie_erreur = u""
 
         nb_total = 0
         nb_ajout = 0
@@ -173,7 +171,7 @@ class of_import(models.Model):
 #
 
         # On récupère la 1ère ligne du fichier (liste des champs) pour vérifier si des champs existent en plusieurs exemplaires
-        ligne = fichier.readline().strip().split(dialect.delimiter) # Liste des champs de la 1ère ligne du fichier d'import
+        ligne = fichier.readline().strip().decode('utf8', 'ignore').split(dialect.delimiter) # Liste des champs de la 1ère ligne du fichier d'import
 
         # Vérification si le champ primaire est bien dans le fichier d'import (si le champ primaire est défini)
         if champ_primaire and champ_primaire not in ligne:
@@ -199,23 +197,23 @@ class of_import(models.Model):
 
             # Test si est un champ de l'objet (sinon message d'information que le champ est ignoré à l'import)
             if champ_fichier not in champs_odoo:
-                sortie_avertissement += u"Info : colonne \"" + champ_fichier.decode('utf8', 'ignore') + u"\" dans le fichier d'import non reconnue. Ignorée lors de l'import.\n"
+                sortie_avertissement += u"Info : colonne \"%s\" dans le fichier d'import non reconnue. Ignorée lors de l'import.\n" % champ_fichier
             else:
                 # Vérification que le champ relation (si est indiqué) est correct.
                 if champ_relation and champs_odoo[champ_fichier]['type'] in ('many2one') and not champs_odoo[champ_fichier]['relation_champ']:
                     if not self.env['ir.model.fields'].search(['&',('model','=', model),('name','=',champ_relation)]):
-                        sortie_erreur += u"Le champ relation \"" + champ_relation.decode('utf8', 'ignore') + u"\" (après le /) de la colonne \"" + champ_fichier.decode('utf8', 'ignore') + u"\" n'existe pas.\n"
+                        sortie_erreur += u"Le champ relation \"%s\" (après le /) de la colonne \"%s\" n'existe pas.\n" % (champ_relation, champ_fichier)
                         erreur = 1
                     else:
                         champs_odoo[champ_fichier]['relation_champ'] = champ_relation
                 elif champ_relation:
-                    sortie_erreur += u"Un champ relation (après le /) dans la colonne \"" + champ_fichier.decode('utf8', 'ignore') + u"\" n'est pas possible pour ce champ.\n"
+                    sortie_erreur += u"Un champ relation (après le /) dans la colonne \"%s\" n'est pas possible pour ce champ.\n" % champ_fichier
                     erreur = 1
 
         for champ_fichier in doublons:
             # On affiche un message d'avertissement si le champ existe en plusieurs exemplaires et si c'est un champ connu à importer
             if champ_fichier in champs_odoo and doublons[champ_fichier] > 1:
-                sortie_erreur += "La colonne \"" + champ_fichier.decode('utf8', 'ignore') + u"\" dans le fichier d'import existe en " + str(doublons[champ_fichier]) + u" exemplaires.\n"
+                sortie_erreur += u"La colonne \"%s\" dans le fichier d'import existe en %s exemplaires.\n" % (champ_fichier, doublons[champ_fichier])
                 erreur = 1
 
         if erreur: # On arrête si erreur
@@ -239,6 +237,7 @@ class of_import(models.Model):
 
         # On parcourt le fichier enregistrement par enregistrement
         for ligne in fichier:
+            ligne = {key.decode('utf8', 'ignore'):value.decode('utf8', 'ignore') for key, value in ligne.iteritems()}
             i = i + 1
             nb_total = nb_total + 1
             erreur = 0
@@ -266,7 +265,7 @@ class of_import(models.Model):
 
                 if champ_fichier_sansrel in champs_odoo: # On ne récupère que les champs du fichier d'import qui sont des champs de l'objet (on ignore les champs inconnus du fichier d'import).
                     # Valeur du champ : suppression des espaces avant et après et conversion en utf8.
-                    ligne[champ_fichier] = ligne[champ_fichier].decode('utf8', 'ignore').strip()
+                    ligne[champ_fichier] = ligne[champ_fichier].strip()
 
                     if ligne[champ_fichier].strip().lower() == "#vide":
                         ligne[champ_fichier] = "#vide"
@@ -278,7 +277,7 @@ class of_import(models.Model):
 
                     # si le champs est requis, vérification qu'il est renseigné
                     if champs_odoo[champ_fichier_sansrel]['requis'] and (ligne[champ_fichier] == "" or ligne[champ_fichier] == "#vide"):
-                        sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[champ_fichier_sansrel]['description'] + " (" + champ_fichier.decode('utf8', 'ignore') + u") vide alors que requis. " + nom_objet.capitalize() + u" non importé.\n"
+                        sortie_erreur += u"Ligne %s : champ %s (%s) vide alors que requis. %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, nom_objet.capitalize())
                         erreur = 1
 
                     # Si le champ relation est un id, vérification qu'est un entier
@@ -286,7 +285,7 @@ class of_import(models.Model):
                         try:
                             int(ligne[champ_fichier])
                         except ValueError:
-                            sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[champ_fichier_sansrel]['description'] + " (" + champ_fichier.decode('utf8', 'ignore') + u") n'est pas un id (nombre entier) alors que le champ relation (après le /) est un id. " + nom_objet.capitalize() + u" non importé.\n"
+                            sortie_erreur += u"Ligne %s : champ %s (%s) n'est pas un id (nombre entier) alors que le champ relation (après le /) est un id. %s non importé.\n" % (i,  champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, nom_objet.capitalize())
                             erreur = 1
                             continue
 
@@ -302,14 +301,14 @@ class of_import(models.Model):
                             float(ligne[champ_fichier])
                             valeurs[champ_fichier_sansrel] = ligne[champ_fichier]
                         except ValueError:
-                            sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[champ_fichier_sansrel]['description'] + " (" + champ_fichier_sansrel.decode('utf8', 'ignore') + u") n'est pas un nombre. " + nom_objet.capitalize() + u" non importé.\n"
+                            sortie_erreur += u"Ligne %s : champ %s (%s) n'est pas un nombre. %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier_sansrel, nom_objet.capitalize())
                             erreur = 1
 
                     # Si est un field selection
                     elif champs_odoo[champ_fichier_sansrel]['type'] == 'selection':
                         # C'est un champ sélection. On vérifie que les données sont autorisées.
                         if ligne[champ_fichier] not in dict(self.env[model]._fields[champ_fichier].selection):
-                            sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[champ_fichier_sansrel]['description'] + " (" + champ_fichier.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[champ_fichier]) + u"\" non autorisée. " + nom_objet.capitalize() + u" non importé.\n"
+                            sortie_erreur += u"Ligne %s : champ %s (%s) valeur \"%s\" non autorisée. %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], nom_objet.capitalize())
                             erreur = 1
                         else:
                             valeurs[champ_fichier_sansrel] = ligne[champ_fichier]
@@ -321,7 +320,7 @@ class of_import(models.Model):
                         elif ligne[champ_fichier].upper() in ('0', "FALSE", "FAUX"):
                             ligne[champ_fichier] = False
                         else:
-                            sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[champ_fichier_sansrel]['description'] + " (" + champ_fichier.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[champ_fichier]) + u"\" non autorisée (admis 0, 1, True, False, vrai, faux). " + nom_objet.capitalize() + u" non importé.\n"
+                            sortie_erreur += u"Ligne %s : champ %s (%s) valeur \"%s\" non autorisée (admis 0, 1, True, False, vrai, faux). %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], nom_objet.capitalize())
                             erreur = 1
 
                     # si est un many2one
@@ -344,7 +343,7 @@ class of_import(models.Model):
                             if len(res_ids) == 1:
                                 valeurs[champ_fichier_sansrel] = res_ids.id
                             elif len(res_ids) > 1:
-                                sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[champ_fichier_sansrel]['description'] + " (" + champ_fichier.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[champ_fichier]) + u"\" a plusieurs correspondances. " + nom_objet.capitalize() + u" non importé.\n"
+                                sortie_erreur += u"Ligne %s : champ %s (%s) valeur \"%s\" a plusieurs correspondances. %s non importé.\n", (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], nom_objet.capitalize())
                                 erreur = 1
                             else:
                                 # Si import de partenaires et champ compte comptable (client et fournisseur), on le créer.
@@ -357,7 +356,7 @@ class of_import(models.Model):
                                 elif ligne[champ_fichier] == "#vide":
                                     valeurs[champ_fichier_sansrel] = ''
                                 else:
-                                    sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[champ_fichier_sansrel]['description'] + " (" + champ_fichier.decode('utf8', 'ignore') + u") valeur \"" + ligne[champ_fichier] + u"\" n'a pas de correspondance. " + nom_objet.capitalize() + u" non importé.\n"
+                                    sortie_erreur += u"Ligne %s : champ %s (%s) valeur \"%s\" n'a pas de correspondance. %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], nom_objet.capitalize())
                                     erreur = 1
 
                     # Si est un one2many
@@ -372,10 +371,10 @@ class of_import(models.Model):
                                 else:
                                     valeurs[champ_fichier_sansrel] = [(5, ), (0, 0, {'name': res_ids.id})]
                             elif len(res_ids) > 1:
-                                sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[champ_fichier_sansrel]['description'] + " (" + champ_fichier.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[champ_fichier]).strip() + u"\" a plusieurs correspondances. " + nom_objet.capitalize() + u" non importé.\n"
+                                sortie_erreur += u"Ligne %s : champ %s (%s) valeur \"%s\" a plusieurs correspondances. %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier].strip(), nom_objet.capitalize())
                                 erreur = 1
                             else:
-                                sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[champ_fichier_sansrel]['description'] + " (" + champ_fichier.decode('utf8', 'ignore') + u") valeur \"" + str(ligne[champ_fichier]).strip() + u"\" n'a pas de correspondance. " + nom_objet.capitalize() + u" non importé.\n"
+                                sortie_erreur += u"Ligne %s : champ %s (%s) valeur \"%s\" n'a pas de correspondance. %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier].strip(), nom_objet.capitalize())
                                 erreur = 1
 
                     # Si est un many2many
@@ -392,10 +391,10 @@ class of_import(models.Model):
                                 if len(res_ids) == 1:
                                     tag_ids.append(res_ids.id)
                                 elif len(res_ids) > 1:
-                                    sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[champ_fichier_sansrel]['description'] + " (" + champ_fichier.decode('utf8', 'ignore') + u") valeur \"" + str(tag).strip() + u"\" a plusieurs correspondances. " + nom_objet.capitalize() + u" non importé.\n"
+                                    sortie_erreur += u"Ligne %s : champ %s (%s) valeur \"%s\" a plusieurs correspondances. %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, tag.strip(), nom_objet.capitalize())
                                     erreur = 1
                                 else:
-                                    sortie_erreur += "Ligne " + str(i) + u" : champ " + champs_odoo[champ_fichier_sansrel]['description'] + " (" + champ_fichier.decode('utf8', 'ignore') + u") valeur \"" + str(tag).strip() + u"\" n'a pas de correspondance. " + nom_objet.capitalize() + u" non importé.\n"
+                                    sortie_erreur += u"Ligne %s : champ %s (%s) valeur \"%s\" n'a pas de correspondance. %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, tag.strip(), nom_objet.capitalize())
                                     erreur = 1
                         if not erreur:
                             if ligne[champ_fichier] == "#vide":
