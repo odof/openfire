@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+<!--###############################################################################################################
+##############################       U T M (utm.medium, utm.source)
+#################################################################################################################-->
+        <menuitem id="utm.menu_link_tracker_root" parent= "sales_team.menu_sale_config"/>
+        <menuitem id="utm.menu_utm_medium" sequence="4" parent="utm.menu_link_tracker_root"/>
+        <menuitem id="utm.menu_utm_source" sequence="5" parent="utm.menu_link_tracker_root"/>
+        <menuitem id="utm.menu_utm_campaign_act" sequence="6" parent="utm.menu_link_tracker_root"/>
+
+        <record id="of_crm_utm_medium_view_form" model="ir.ui.view">
+            <field name="name">of.utm.medium.form</field>
+            <field name="model">utm.medium</field>
+            <field name="inherit_id" ref="utm.utm_medium_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form//group" position="inside">
+                    <field name="source_ids" mode="tree">
+                        <tree>
+                            <field name="sequence" widget="handle"/>
+                            <field name="name"/>
+                        </tree>
+                    </field>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_utm_source_view_form" model="ir.ui.view">
+            <field name="name">of.utm.source.form</field>
+            <field name="model">utm.source</field>
+            <field name="inherit_id" ref="utm.utm_source_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form//group" position="inside">
+                    <field name="sequence"/>
+                    <field name="medium_id"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
