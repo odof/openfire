@@ -25,6 +25,7 @@ class OFAccountFrFec(models.TransientModel):
     of_extension = fields.Selection([('csv', 'csv'), ('txt', 'txt')], string="File extension", required=True, default='csv')
     of_ouv_code = fields.Char("Code du journal d'ouverture", required=True, default='OUV')
     of_ouv_name = fields.Char("Libellé du journal d'ouverture", required=True, default='Balance initiale')
+    of_ouv_include = fields.Boolean(string="inclure le journal d'ouverture", default=True)     
 
     def do_query_unaffected_earnings(self):
         ''' Compute the sum of ending balances for all accounts that are of a type that does not bring forward the balance in new fiscal years.
@@ -132,7 +133,7 @@ class OFAccountFrFec(models.TransientModel):
         # INITIAL BALANCE
         unaffected_earnings_xml_ref = self.env.ref('account.data_unaffected_earnings')
         unaffected_earnings_line = True  # used to make sure that we add the unaffected earning initial balance only once
-        if unaffected_earnings_xml_ref:
+        if unaffected_earnings_xml_ref and (self.export_type == 'official' or self.of_ouv_include):
             # compute the benefit/loss of last year to add in the initial balance of the current year earnings account
             unaffected_earnings_results = self.do_query_unaffected_earnings()
             unaffected_earnings_line = False
@@ -191,10 +192,11 @@ class OFAccountFrFec(models.TransientModel):
             sql_query += '''
             AND am.state = 'posted'
             '''
-        # choice of journals
-        sql_query += '''
-        AND am.journal_id IN %s
-        '''
+        # choice of journals (not for official export type
+        if self.export_type != "official":
+            sql_query += '''
+            AND am.journal_id IN %s
+            '''
 
         sql_query += '''
         GROUP BY aml.account_id, aa.code, aa.internal_type
@@ -202,27 +204,33 @@ class OFAccountFrFec(models.TransientModel):
         ORDER BY CompteNum, aa.code
         '''
         formatted_date_from = self.date_from.replace('-', '')
-        self._cr.execute(
-            sql_query, (self.of_ouv_code, self.of_ouv_name, self.of_ouv_name, formatted_date_from, formatted_date_from, formatted_date_from, self.date_from, company.id, self.journal_ids._ids))
+        #TODO: inclusion balance initiale
+        if self.export_type == "official":
+            self._cr.execute(
+                sql_query, (self.of_ouv_code, self.of_ouv_name, self.of_ouv_name, formatted_date_from, formatted_date_from, formatted_date_from, self.date_from, company.id))
+        elif self.of_ouv_include:
+            self._cr.execute(
+                sql_query, (self.of_ouv_code, self.of_ouv_name, self.of_ouv_name, formatted_date_from, formatted_date_from, formatted_date_from, self.date_from, company.id, self.journal_ids._ids))
 
-        for row in self._cr.fetchall():
-            listrow = list(row)
-            account_id = listrow.pop()
-            if not unaffected_earnings_line:
-                account = self.env['account.account'].browse(account_id)
-                if account.user_type_id.id == self.env.ref('account.data_unaffected_earnings').id:
-                    # add the benefit/loss of previous fiscal year to the first unaffected earnings account found.
-                    unaffected_earnings_line = True
-                    current_amount = float(listrow[11].replace(',', '.')) - float(listrow[12].replace(',', '.'))
-                    unaffected_earnings_amount = float(unaffected_earnings_results[11].replace(',', '.')) - float(unaffected_earnings_results[12].replace(',', '.'))
-                    listrow_amount = current_amount + unaffected_earnings_amount
-                    if listrow_amount > 0:
-                        listrow[11] = str(listrow_amount).replace('.', ',')
-                        listrow[12] = '0,00'
-                    else:
-                        listrow[11] = '0,00'
-                        listrow[12] = str(-listrow_amount).replace('.', ',')
-            w.writerow([s.encode("utf-8") for s in listrow])
+        if (self.export_type == 'official' or self.of_ouv_include):
+            for row in self._cr.fetchall():
+                listrow = list(row)
+                account_id = listrow.pop()
+                if not unaffected_earnings_line:
+                    account = self.env['account.account'].browse(account_id)
+                    if account.user_type_id.id == self.env.ref('account.data_unaffected_earnings').id:
+                        # add the benefit/loss of previous fiscal year to the first unaffected earnings account found.
+                        unaffected_earnings_line = True
+                        current_amount = float(listrow[11].replace(',', '.')) - float(listrow[12].replace(',', '.'))
+                        unaffected_earnings_amount = float(unaffected_earnings_results[11].replace(',', '.')) - float(unaffected_earnings_results[12].replace(',', '.'))
+                        listrow_amount = current_amount + unaffected_earnings_amount
+                        if listrow_amount > 0:
+                            listrow[11] = str(listrow_amount).replace('.', ',')
+                            listrow[12] = '0,00'
+                        else:
+                            listrow[11] = '0,00'
+                            listrow[12] = str(-listrow_amount).replace('.', ',')
+                w.writerow([s.encode("utf-8") for s in listrow])
         # if the unaffected earnings account wasn't in the selection yet: add it manually
         if (not unaffected_earnings_line
             and unaffected_earnings_results
@@ -300,18 +308,23 @@ class OFAccountFrFec(models.TransientModel):
             sql_query += '''
             AND am.state = 'posted'
             '''
-        # choice of journals
-        sql_query += '''
-        AND am.journal_id IN %s
-        '''
+        # choice of journals (not for official export type
+        if self.export_type != "official":
+            sql_query += '''
+            AND am.journal_id IN %s
+            '''
 
         sql_sort = 'am.create_date, am.name, aml.id'
         if self.sortby == 'sort_journal_partner':
             sql_sort = 'aj.code, rp.name, aml.id'
         sql_query += '\nORDER BY ' + sql_sort
 
-        self._cr.execute(
-            sql_query, (self.date_from, self.date_to, company.id, self.journal_ids._ids))
+        if self.export_type != "official":
+            self._cr.execute(
+                sql_query, (self.date_from, self.date_to, company.id, self.journal_ids._ids))
+        else:
+            self._cr.execute(
+                sql_query, (self.date_from, self.date_to, company.id))
 
         for row in self._cr.fetchall():
             listrow = list(row)

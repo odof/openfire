@@ -16,6 +16,7 @@
                 <field name="sortby" widget="radio" attrs="{'invisible': [('export_type','=','official')]}"/>
                 <field name="of_ouv_code"/>
                 <field name="of_ouv_name"/>
+                <field name="of_ouv_include" attrs="{'invisible': [('export_type','=','official')]}"/>
                 <field name="of_extension"/>
             </group>
             <group>
