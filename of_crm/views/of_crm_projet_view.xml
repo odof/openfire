@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <menuitem id="of_crm_menu_projet_config" name="Projets" parent="sales_team.menu_sale_config" sequence="5"/>
+
+        <!-- Modèles de Projets -->
+        <record id="of_crm_projet_modele_view_form" model="ir.ui.view">
+            <field name="name">of.crm.projet.modele.form</field>
+            <field name="model">of.crm.projet.modele</field>
+            <field name="arch" type="xml">
+                <form string="Projet">
+                    <sheet>
+                        <group col="4">
+                            <field name="name"/>
+                            <field name="active"/>
+                        </group>
+                        <label for="attr_ids"/>
+                        <field name="attr_ids" widget="many2many_tags"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="of_crm_projet_modele_view_tree" model="ir.ui.view">
+            <field name="name">of.crm.projet.modele.tree</field>
+            <field name="model">of.crm.projet.modele</field>
+            <field name="arch" type="xml">
+                <tree string="Modèle de Projet" colors="#A0A0A0:active==False;">
+                    <field name="name"/>
+                    <field name="attr_ids" widget="many2many_tags"/>
+                    <field name="active" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="of_crm_projet_modele_view_filter" model="ir.ui.view">
+            <field name="name">of.crm.projet.modele.search</field>
+            <field name="model">of.crm.projet.modele</field>
+            <field name="arch" type="xml">
+                <search string="Recherche de valeurs d'attributs de projets">
+                    <field name="name" string="Modèles" filter_domain="[('name','ilike',self)]"/>
+                    <field name="attr_ids" string="Attributs" filter_domain="[('attr_ids', 'ilike', self)]"/>
+                    <separator/>
+                    <filter string="Archivé" name="archived" domain="[('active', '=', False)]"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="of_crm_projet_modele_action" model="ir.actions.act_window">
+            <field name="name">Modèles de Projets</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">of.crm.projet.modele</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_type">form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to define a new project modele.
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="of_crm_projet_modele_menu" name="Modèles de Projets" action="of_crm_projet_modele_action" parent="of_crm_menu_projet_config" sequence="10"/>
+
+        <!-- Entrées de Projets -->
+        <record id="of_crm_projet_line_view_form" model="ir.ui.view">
+            <field name="name">of.crm.projet.line.form</field>
+            <field name="model">of.crm.projet.line</field>
+            <field name="arch" type="xml">
+                <form string="Entrée de Projet">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="lead_id"/>
+                            <field name="attr_id"/>
+                            <field name="sequence"/>
+                            <field name="type"/>
+                            <field name="val_bool" attrs="{'invisible': [('type','!=','bool')]}"/>
+                            <field name="val_date" attrs="{'invisible': [('type','!=','date')]}"/>
+                            <field name="val_char" attrs="{'invisible': [('type','!=','char')]}"/>
+                            <field name="val_select_id" widget="selection" attrs="{'invisible': [('type','!=','selection')]}"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="of_crm_projet_line_view_tree" model="ir.ui.view">
+            <field name="name">of.crm.projet.line.tree</field>
+            <field name="model">of.crm.projet.line</field>
+            <field name="arch" type="xml">
+                <tree string="Entrées de Projet" editable="bottom">
+                    <field name="sequence" widget="handle"/>
+                    <field name="attr_id" widget="selection"/>
+                    <field name="name"/>
+                    <field name="type" readonly="1"/>
+                    <field name="val_bool" attrs="{'invisible': [('type','!=','bool')]}"/>
+                    <field name="val_date" attrs="{'invisible': [('type','!=','date')]}"/>
+                    <field name="val_char" attrs="{'invisible': [('type','!=','char')]}"/>
+                    <field name="val_select_id" widget="selection" attrs="{'invisible': [('type','!=','selection')]}"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="of_crm_projet_line_view_kanban" model="ir.ui.view">
+            <field name="name">of.crm.projet.line.kanban</field>
+            <field name="model">of.crm.projet.line</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="sequence"/>
+                    <field name="attr_id"/>
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="val_bool"/>
+                    <field name="val_date"/>
+                    <field name="val_char"/>
+                    <field name="val_select_id"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click" style="border: 1px solid lightgrey; border-radius: 4px;">
+                                <a t-if="!read_only_mode" type="delete" class="fa fa-times pull-right"/>
+                                <div class="oe_kanban_details">
+                                    <span style="padding-right: 8px; border-right: 1px solid lightgrey;"><field name="name"/></span>
+                                    <strong style="padding-left: 8px; border-left: 1px solid lightgrey;">
+                                        <field name="val_bool" invisible="1"/>
+                                        <span t-if="record.val_bool.raw_value == true and record.type.raw_value == 'bool'">Oui</span>
+                                        <span t-if="record.val_bool.raw_value == false and record.type.raw_value == 'bool'">Non</span>
+                                        <field name="val_char" attrs="{'invisible': [('type','!=','char')]}"/>
+                                        <field name="val_date" attrs="{'invisible': [('type','!=','date')]}"/>
+                                        <field name="val_select_id" widget="selection" attrs="{'invisible': [('type','!=','selection')]}"/>
+                                    </strong>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Attributs de Projets -->
+        <record id="of_crm_projet_attr_view_form" model="ir.ui.view">
+            <field name="name">of.crm.projet.attr.form</field>
+            <field name="model">of.crm.projet.attr</field>
+            <field name="arch" type="xml">
+                <form string="Attribut de Projet">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="type"/>
+                            </group>
+                            <group>
+                                <field name="active"/>
+                            </group>
+                            <group colspan="4">
+                                <field name="description"/>
+                                <field name="selection_ids" attrs="{'invisible': [('type','!=','selection')]}">
+                                    <tree editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="name"/>
+                                        <field name="description"/>
+                                    </tree>
+                                </field>
+                                <field name="modele_ids" widget="many2many_tags"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="of_crm_projet_attr_view_tree" model="ir.ui.view">
+            <field name="name">of.crm.projet.attr.tree</field>
+            <field name="model">of.crm.projet.attr</field>
+            <field name="arch" type="xml">
+                <tree string="Attributs de Projet" colors="#A0A0A0:active==False;">
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="description"/>
+                    <field name="modele_ids" widget="many2many_tags"/>
+                    <field name="active" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="of_crm_projet_attr_view_filter" model="ir.ui.view">
+            <field name="name">of.crm.projet.attr.search</field>
+            <field name="model">of.crm.projet.attr</field>
+            <field name="arch" type="xml">
+                <search string="Recherche d'attributs de projets">
+                    <field name="name" string="Attribut" filter_domain="[('name','ilike',self)]"/>
+                    <field name="modele_ids" string="Modèles" filter_domain="[('modele_ids', 'ilike', self)]"/>
+                    <field name="type"/>
+                    <separator/>
+                    <filter string="Booléen" name="filter_bool" domain="[('type', '=', 'bool')]"/>
+                    <filter string="Choix Unique" name="filter_selection" domain="[('type', '=', 'selection')]"/>
+                    <filter string="Date" name="filter_date" domain="[('type', '=', 'date')]"/>
+                    <filter string="Texte Court" name="filter_char" domain="[('type', '=', 'char')]"/>
+                    <separator/>
+                    <filter string="Archivé" name="archived" domain="[('active', '=', False)]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Type" name="groupby_type" domain="[]" context="{'group_by':'type'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="of_crm_projet_attr_action" model="ir.actions.act_window">
+            <field name="name">Attributs de Projets</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">of.crm.projet.attr</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_type">form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to define a new attribute.
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="of_crm_projet_attr_menu" name="Attributs de Projets" action="of_crm_projet_attr_action" parent="of_crm_menu_projet_config" sequence="15"/>
+
+        <!-- Valeurs d'attributs selection de projets -->
+        <record id="of_crm_projet_attr_select_view_form" model="ir.ui.view">
+            <field name="name">of.crm.projet.attr.select.form</field>
+            <field name="model">of.crm.projet.attr.select</field>
+            <field name="arch" type="xml">
+                <form string="Valeur d'attribut de Projet">
+                    <sheet>
+                        <group col="4">
+                            <field name="name"/>
+                            <field name="active"/>
+                            <field name="attr_id"/>
+                            <field name="sequence"/>
+                            <field name="description" colspan="4"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="of_crm_projet_attr_select_view_tree" model="ir.ui.view">
+            <field name="name">of.crm.projet.attr.select.tree</field>
+            <field name="model">of.crm.projet.attr.select</field>
+            <field name="arch" type="xml">
+                <tree string="Valeurs d'attributs de Projets" colors="#A0A0A0:active==False;">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="attr_id"/>
+                    <field name="description"/>
+                    <field name="active" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="of_crm_projet_attr_select_view_filter" model="ir.ui.view">
+            <field name="name">of.crm.projet.attr.select.search</field>
+            <field name="model">of.crm.projet.attr.select</field>
+            <field name="arch" type="xml">
+                <search string="Recherche de valeurs d'attributs de projets">
+                    <field name="name" string="Valeurs" filter_domain="[('name','ilike',self)]"/>
+                    <field name="attr_id" string="Attributs" filter_domain="[('attr_id', 'ilike', self)]"/>
+                    <separator/>
+                    <filter string="Archivé" name="archived" domain="[('active', '=', False)]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Attribut" name="groupby_attr" domain="[]" context="{'group_by':'attr_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="of_crm_projet_attr_select_action" model="ir.actions.act_window">
+            <field name="name">Valeurs d'attributs de projets</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">of.crm.projet.attr.select</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_type">form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to define a new attribute value.
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="of_crm_projet_attr_select_menu" name="Valeurs d'Attributs" action="of_crm_projet_attr_select_action" parent="of_crm_menu_projet_config" sequence="20"/>
+
+    </data>
+</odoo>

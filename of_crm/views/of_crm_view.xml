@@ -2,7 +2,7 @@
 <odoo>
     <data>
 <!--###############################################################################################################
-##############################       PISTES & OPPORTUNITES
+##############################       PISTES & OPPORTUNITES (crm.lead, crm.stage)
 #################################################################################################################-->
         <!--
             crm.lead (as Lead) views
@@ -83,7 +83,10 @@
                     <attribute name="attrs"></attribute>
                 </xpath>
                 <xpath expr="//form//sheet//div[@class='label label-danger pull-right']" position="attributes">
-                    <attribute name="attrs">{'invisible': [('probability', '&gt;', 0)]}</attribute>
+                    <attribute name="attrs">{'invisible': [('stage_probability', '&gt;', 0)]}</attribute>
+                </xpath>
+                <xpath expr="//form//sheet//div[@class='label label-success pull-right']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('stage_probability', '&lt;', 100)]}</attribute>
                 </xpath>
                 <xpath expr="//form//sheet//field[@name='phone']" position="after">
                     <field name="of_website" widget="url"/>
@@ -91,19 +94,72 @@
                 <xpath expr="//form//sheet//field[@name='partner_id']" position="before">
                     <field name="of_ref"/>
                 </xpath>
+                <!-- infos client transféré depuis onglet contact -->
+                <xpath expr="//form//sheet//field[@name='partner_id']" position="after">
+                    <field name="partner_name"/>
+                    <label for="street" string="Adresse"/>
+                    <div class="o_address_format">
+                        <field name="street" placeholder="Street..." class="o_address_street"/>
+                        <field name="street2" placeholder="Street 2..." class="o_address_street"/>
+                        <field name="city" placeholder="City" class="o_address_city"/>
+                        <field name="state_id" class="o_address_state" placeholder="State" options='{"no_open": True}'/>
+                        <field name="zip" placeholder="ZIP" class="o_address_zip"/>
+                        <field name="country_id" placeholder="Country" class="o_address_country" options='{"no_open": True, "no_create": True}'/>
+                    </div>
+                </xpath>
+                <xpath expr="//form//sheet//field[@name='team_id']" position="attributes">
+                    <!-- inhiber equipes commerciales -->
+                    <attribute name="invisible">1</attribute>
+                </xpath>
                 <xpath expr="//form//sheet//field[@name='team_id']" position="after">
                     <field name="of_prospecteur"/>
                     <field name="of_date_prospection"/>
+                    <field name="company_id"/>
                 </xpath>
                 <xpath expr="//form//sheet//field[@name='lost_reason']" position="attributes">
                     <attribute name="attrs">{'invisible': [('probability', '&gt;', 0)]}</attribute>
                 </xpath>
                 <xpath expr="//form//sheet//field[@name='date_deadline']" position="after">
                     <field name="of_date_cloture"/>
+                    <field name="stage_probability" invisible="1"/>
                 </xpath>
+                <!-- multi-activites
+                <xpath expr="//form//sheet//notebook" position="before">
+                    <label for="activity_ids"/>
+                    <field name="activity_ids" mode="tree">
+                        <tree colors="red:is_late==True; #A0A0A0:is_done==True;">
+                            <field name="sequence" widget="handle"/>
+                            <field name="activity_id"/>
+                            <field name="name"/>
+                            <field name="date_action"/>
+                            <field name="date_done"/>
+                            <button string="Rendre compte" 
+                                icon='fa fa-check'
+                                attrs="{'invisible': [('is_done','=',True)]}"/><!- - ouvrir un wizard de compte rendu - ->
+                            <field name="is_done" invisible="1"/>
+                            <field name="is_late" invisible="1"/>
+                        </tree>
+                    </field>
+                </xpath>-->
                 <xpath expr="//form//sheet//notebook" position="inside">
                     <page name="project" string="Projet">
-                        <field name="of_description_projet"/>
+                        <group>
+                            <field name="of_modele_id" widget="selection"/>
+                        </group>
+                        <label for="of_projet_line_ids"/>
+                        <field name="of_projet_line_ids" mode="kanban">
+                            <form>
+                                <group>
+                                    <field name="type" invisible="1"/>
+                                    <field name="attr_id" widget="selection"/>
+                                    <field name="name"/>
+                                    <field name="val_bool" attrs="{'invisible': [('type','!=','bool')]}"/>
+                                    <field name="val_date" attrs="{'invisible': [('type','!=','date')]}"/>
+                                    <field name="val_char" attrs="{'invisible': [('type','!=','char')]}"/>
+                                    <field name="val_select_id" attrs="{'invisible': [('type','!=','selection')]}" domain="[('attr_id','=',attr_id)]"/>
+                                </group>
+                            </form>
+                        </field>
                     </page>
                 </xpath>
                 <xpath expr="//form//sheet//notebook" position="inside">
@@ -112,15 +168,47 @@
                     </page>
                 </xpath>
                 <xpath expr="//form//sheet//notebook//page[1]" position="attributes">
-                    <attribute name="string">Notes</attribute>
-                    <attribute name="name">notes</attribute>
+                    <attribute name="string">Suivi</attribute>
+                    <attribute name="name">suivi</attribute>
                 </xpath>
                 <xpath expr="//form//sheet//notebook//page[@name='lead']" position="attributes">
                     <attribute name="string">Contact</attribute>
                 </xpath>
-                <xpath expr="//form//sheet//notebook//page[@name='lead']//div[@class='o_address_format']" position="after">
-                    <field name="geo_lat"/>
-                    <field name="geo_lng"/>
+                <!-- infos client transféré depuis onglet contact -->
+                <xpath expr="//form//sheet//notebook//page[@name='lead']//field[@name='partner_name']/.." position="replace">
+                    <group string="Géolocalisation" name="geoloc">
+                        <field name="geo_lat"/>
+                        <field name="geo_lng"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_crm_case_tree_view_oppor" model="ir.ui.view">
+            <field name="name">crm.lead.tree.opportunity</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_tree_view_oppor"/>
+            <field name="arch" type="xml">
+                <!-- Retrait des affichages pays et équipe commerciale -->
+                <xpath expr="//tree//field[@name='country_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//tree//field[@name='team_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <!-- Simplification des titres -->
+                <xpath expr="//tree//field[@name='create_date']" position="attributes">
+                    <attribute name="string">Date</attribute>
+                </xpath>
+                <xpath expr="//tree//field[@name='date_action']" position="attributes">
+                    <attribute name="string">Date Action</attribute>
+                </xpath>
+                <xpath expr="//tree//field[@name='title_action']" position="attributes">
+                    <attribute name="string">Résumé Action</attribute>
+                </xpath>
+                <!-- Ajout du nom de l'activité suivante -->
+                <xpath expr="//tree//field[@name='date_action']" position="after">
+                    <field name="next_activity_id" string="Action"/>
                 </xpath>
             </field>
         </record>
@@ -139,19 +227,38 @@
 
         <delete model="ir.ui.menu" id="crm.menu_crm_lead_categ"/>
 
-<!--###############################################################################################################
-##############################       U T M
-#################################################################################################################-->
-        <record id="of_crm_utm_medium_view_form" model="ir.ui.view">
-            <field name="name">of.utm.medium.form</field>
-            <field name="model">utm.medium</field>
-            <field name="inherit_id" ref="utm.utm_medium_view_form"/>
+        <record id="of_crm_stage_form" model="ir.ui.view">
+            <field name="name">of.crm.stage.form</field>
+            <field name="model">crm.stage</field>
+            <field name="inherit_id" ref="crm.crm_stage_form"/>
+            <field name="priority" eval="1"/>
             <field name="arch" type="xml">
-                <xpath expr="//form//group" position="inside">
-                    <field name="source_id"/>
+                <!-- rendre la probabilité toujours visible-->
+                <xpath expr="//form//field[@name='probability']" position="attributes">
+                    <attribute name="attrs"></attribute>
                 </xpath>
             </field>
         </record>
+
+        <!-- multi-activites
+        <record id="of_crm_view_action_com_form" model="ir.ui.view">
+            <field name="name">of.crm.opportunity.activity.form</field>
+            <field name="model">of.crm.opportunity.activity</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="activity_id"/>
+                        <field name="lead_id" required="0"/>
+                        <field name="name"/>
+                        <field name="sequence"/>
+                        <field name="is_done"/>
+                        <field name="is_late"/>
+                        <field name="date_action" colors="red:is_late==True; #A0A0A0:is_done==True;"/>
+                        <field name="activity_result" attrs="{'invisible': [('is_done','=',False)]}"/>
+                    </group>
+                </form>
+            </field>
+        </record>-->
 
 <!--###############################################################################################################
 ##############################       VENTES
@@ -166,13 +273,77 @@
                     <attribute name="name">other_info</attribute>
                 </xpath>
                 <xpath expr="//form//sheet//notebook//group[@name='technical']" position="attributes">
+                    <!-- ouvrir visibilité en dehors de mode développeur-->
                     <attribute name="groups">sales_team.group_sale_salesman</attribute>
                 </xpath>
                 <xpath expr="//form//sheet//notebook//group[@name='technical']//field[@name='opportunity_id']" position="attributes">
+                    <!-- ouvrir visibilité en dehors de mode développeur-->
                     <attribute name="groups">sales_team.group_sale_salesman</attribute>
                 </xpath>
             </field>
         </record>
 
+<!--###############################################################################################################
+##############################       PARTENAIRES
+#################################################################################################################-->
+        <record id="of_crm_view_partner_form" model="ir.ui.view">
+            <field name="name">of.crm.res.partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <!-- label 'prospect' -->
+                <xpath expr="//form//div[@class='oe_title']//div[@class='o_row']" position="inside">
+                    <div class="label label-info" attrs="{'invisible': [('is_confirmed', '=', True)]}">Prospect</div>
+                </xpath>
+                <xpath expr="//form//notebook//page[@name='sales_purchases']//field[@name='customer']" position="after">
+                    <field name="is_confirmed" attrs="{'invisible': [('customer', '=', False)]}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Partner Kanban View -->
+        <record model="ir.ui.view" id="of_crm_res_partner_kanban_view">
+            <field name="name">of.crm.res.partner.kanban</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.res_partner_kanban_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//kanban//field[@name='type']" position="after">
+                    <field name="is_confirmed"/>
+                </xpath>
+                <xpath expr="//kanban//templates//strong[@class='oe_partner_heading']" position="after">
+                    <div t-if="record.is_confirmed.raw_value == false" class="label label-info">prospect</div>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_crm_view_partner_tree" model="ir.ui.view">
+            <field name="name">of.crm.res.partner.tree</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_tree"/>
+            <field eval="8" name="priority"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree" position="inside">
+                    <field name="is_confirmed" invisible="1"/>
+                </xpath>
+                <!--prospects en bleu clair -->
+                <xpath expr="//tree" position="attributes">
+                    <attribute name="colors">#5bc0de: is_confirmed==False;</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_res_partner_filter" model="ir.ui.view">
+            <field name="name">res.partner.select</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="of_geolocalize.of_view_res_partner_filter"/>
+            <field name="arch" type="xml">
+                <!-- filtres prospects et signés -->
+                <xpath expr="//search//filter[@name='not_localized']" position="before">
+                    <filter string="Clients signés" name="confirmed" domain="[('customer','=',1), ('parent_id', '=', False), ('is_confirmed', '=', True)]"/>
+                    <filter string="Prospects" name="lead" domain="[('customer','=',1), ('parent_id', '=', False), ('is_confirmed', '=', False)]"/>
+                    <separator/>
+                </xpath>
+            </field>
+        </record>
     </data>
 </odoo>
