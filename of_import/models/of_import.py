@@ -469,9 +469,11 @@ class of_import(models.Model):
                 nb_echoue = nb_echoue + 1
                 sortie_erreur += u"Ligne %s %s %s en plusieurs exemplaire dans la base, on ne sait pas lequel mettre à jour. %s non importé.\n" % (i, nom_objet, libelle_ref, nom_objet.capitalize())
 
+            if not simuler:
+                self._cr.commit()
+
             if nb_total % frequence_commit == 0:
                 self.write({'nb_total': nb_total, 'nb_ajout': nb_ajout, 'nb_maj': nb_maj, 'nb_echoue': nb_echoue, 'sortie_succes': sortie_succes, 'sortie_avertissement': sortie_avertissement, 'sortie_erreur': sortie_erreur})
-                self._cr.commit()
 
         # On affiche les enregistrements qui étaient en plusieurs exemplaires dans le fichier d'import.
         for cle in doublons:
