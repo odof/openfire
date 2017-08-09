@@ -19,8 +19,9 @@ class OFCRMProjetLine(models.Model):
     # xml will not display val_bool and val_select_id if type set to 'char'
     val_bool = fields.Boolean(string="Valeur", default=False)
     val_char = fields.Char(string="Valeur")
-    val_select_id = fields.Many2one('of.crm.projet.attr.select', string="Valeur")#, domain="[('attr_id','=',attr_id)]")
     val_date = fields.Date(string="Valeur", default=fields.Date.today)
+    val_select_id = fields.Many2one('of.crm.projet.attr.select', string="Valeur")#, domain="[('attr_id','=',attr_id)]")
+    #val_select_ids = fields.Many2many('of.crm.projet.attr.select', string="Valeurs")
     sequence = fields.Integer(string=u'Séquence', default=10)
 
     @api.onchange('attr_id')

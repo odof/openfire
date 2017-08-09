@@ -24,6 +24,7 @@ class OFCRMLead(models.Model):
     of_projet_line_ids = fields.One2many('of.crm.projet.line', 'lead_id', string=u'Entrées')
     of_modele_id = fields.Many2one('of.crm.projet.modele', string=u"Modèle")
 
+    of_customer_state = fields.Selection(related="partner_id.of_customer_state", required=False)
     #activity_ids = fields.One2many('of.crm.opportunity.activity', 'lead_id', string=u"Activités de cette opportunité")
 
     @api.onchange('of_modele_id')
@@ -165,18 +166,32 @@ class Team(models.Model):
 class OFCRMResPartner(models.Model):
     _inherit = 'res.partner'
 
-    is_confirmed = fields.Boolean(string="Client signé", help="""
+    is_confirmed = fields.Boolean(string="Client signé", default=True, help="""
 Champ uniquement valable pour les partenaires clients.
 Un client est considéré comme prospect tant qu'il n'a ni commande confirmée ni facture validée.
 Ce champ se met à jour automatiquement sur confirmation de commande et sur validation de facture
     """)
-    #prospects_inited = False
+    of_customer_state = fields.Selection([
+        ('lead', u'Prospect'),
+        ('customer', u'Client signé'),
+        ('other', u'Autre'),
+        ], string=u"État", default='other', required=True, help="""
+Champ uniquement utile pour les partenaires clients.
+Un client est considéré comme prospect tant qu'il n'a ni commande confirmée ni facture validée.
+Ce champ se met à jour automatiquement sur confirmation de commande et sur validation de facture
+    """)
 
+    #TODO: faire réviser par cédric
     @api.model
     def _init_prospects(self):
-        customers = self.search([('customer','=',True)])
+        partner_obj = self.with_context(active_test=False)
+        # partner who are not customers
+        partners = partner_obj.search([('customer','=',False)])
+        partners.write({'of_customer_state': 'other'})
+        
+        customers = partner_obj.search([('customer','=',True)])
         customers._compute_sale_order_count() # needed (because store=False computed field?)
-        todo = self.search([('customer','=',True),'|',('parent_id','=', False),('company_type','=','company')]) # all customers without parent
+        todo = partner_obj.search([('customer','=',True),'|',('parent_id','in', (False,None,0)),('company_type','=','company')]) # all customers without parent
         done = self.env['res.partner']
         len_customers = len(customers)
         while len(todo) > 0:
@@ -184,27 +199,24 @@ Ce champ se met à jour automatiquement sur confirmation de commande et sur vali
             todo -= todo[0]
             if not partner.parent_id:
                 # nothing sold and nothing invoiced -> this is a lead
-                if (partner.sale_order_count == 0 and partner.total_invoiced == 0) and partner.is_confirmed:
-                    partner.is_confirmed = False
+                if (partner.sale_order_count == 0 and partner.total_invoiced == 0) and partner.of_customer_state != 'lead':
+                    partner.of_customer_state = 'lead'
                 # something sold or something invoiced -> this is a confirmed customer!
-                elif (partner.sale_order_count != 0 or partner.total_invoiced > 0) and not partner.is_confirmed:
-                    partner.is_confirmed = True
+                elif (partner.sale_order_count != 0 or partner.total_invoiced > 0) and partner.of_customer_state != 'customer':
+                    partner.of_customer_state = 'customer'
                 done += partner
             else:
-                if (partner.sale_order_count != 0 or partner.total_invoiced > 0) and not partner.is_confirmed or partner.parent_id.is_confirmed:
-                    partner.is_confirmed = True
+                #has a parent
+                if (partner.sale_order_count != 0 or partner.total_invoiced > 0) and partner.of_customer_state != 'customer' or partner.parent_id.of_customer_state == 'customer':
+                    partner.of_customer_state = 'customer'
                 done += partner
             if len(partner.child_ids) > 0:
-                todo += partner.child_ids # add children to todo list
+                children = partner_obj.search([('parent_id','=',partner.id),('customer','=',True)]) # potentially inactive children
+                todo += children
         len_done = len(done)
         if len_customers != len_done: # not all partners have been processed
-            """not_done = customers - done
-            print "not done partners", not_done._ids
-            for partner in not_done:
-                print partner.name, partner.parent_id and partner.parent_id.name
-            print "ERROR" """
-            raise ValidationError(u"Erreur d'initialisation du champ 'is_confirmed'. Certains clients n'ont pas été traités (%s/%s)" % (len_customers - len_done,len_customers,))
-        print "Prospects configurés"
+            raise ValidationError(u"Erreur d'initialisation du champ 'of_customer_state'. Certains clients n'ont pas été traités (%s/%s)" % (len_customers - len_done,len_customers,))
+        print u"%s Partenaires configurés" % (len_done)
 
     def _compute_sale_order_count(self):
         """
@@ -221,7 +233,7 @@ surcharge méthode du même nom pour ne pas compter les devis dans les ventes
             partner_ids = filter(lambda r: r['id'] == partner.id, partner_child_ids)[0]
             partner_ids = [partner_ids.get('id')] + partner_ids.get('child_ids')
             # then we can sum for all the partner's child
-            #added is_confirmed
+            #added of_customer_state
             sale_order_count = sum(mapped_data.get(child, 0) for child in partner_ids)
             partner.sale_order_count = sale_order_count
 
@@ -236,9 +248,9 @@ un prospect devient signé sur confirmation de commande
         res = super(OFCRMSaleOrder,self).action_confirm()
         partners = self.env['res.partner']
         for order in self:
-            if not order.partner_id.is_confirmed and order.partner_id not in partners:
+            if order.partner_id.of_customer_state == 'lead' and order.partner_id not in partners:
                 partners += order.partner_id
-        partners.write({'is_confirmed': True})
+        partners.write({'of_customer_state': 'customer'})
         return res
 
 class OFCRMAccountInvoice(models.Model):
@@ -249,7 +261,7 @@ class OFCRMAccountInvoice(models.Model):
         res = super(OFCRMAccountInvoice,self).invoice_validate()
         partners = self.env['res.partner']
         for invoice in self:
-            if not invoice.partner_id.is_confirmed and invoice.partner_id not in partners and invoice.partner_id.customer:
+            if invoice.partner_id.of_customer_state == 'lead' and invoice.partner_id not in partners and invoice.partner_id.customer:
                 partners += invoice.partner_id
-        partners.write({'is_confirmed': True})
+        partners.write({'of_customer_state': 'customer'})
         return res

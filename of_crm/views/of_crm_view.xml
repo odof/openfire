@@ -65,6 +65,22 @@
             </field>
         </record>
 
+        <record id="of_crm_case_kanban_view_leads" model="ir.ui.view">
+            <field name="name">of.crm.lead.kanban.lead</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_kanban_view_leads"/>
+            <field name="arch" type="xml">
+                <xpath expr="//kanban//field[@name='company_currency']" position="after">
+                    <field name="of_customer_state"/>
+                </xpath>
+                <!-- ajout pastille prospect -->
+                <xpath expr="//kanban//templates//div[@class='o_kanban_footer']//field[@name='priority']" position="after">
+                    <div class="label label-info" attrs="{'invisible': [('of_customer_state', '!=', 'lead')]}">Prospect</div>
+                    <div class="label label-success" attrs="{'invisible': [('of_customer_state', '!=', 'customer')]}">Client</div>
+                </xpath>
+            </field>
+        </record>
+
         <!--
             crm.lead (as Opportunity) views
         -->
@@ -293,10 +309,10 @@
             <field name="arch" type="xml">
                 <!-- label 'prospect' -->
                 <xpath expr="//form//div[@class='oe_title']//div[@class='o_row']" position="inside">
-                    <div class="label label-info" attrs="{'invisible': [('is_confirmed', '=', True)]}">Prospect</div>
+                    <div class="label label-info" attrs="{'invisible': [('of_customer_state', '!=', 'lead')]}">Prospect</div>
                 </xpath>
                 <xpath expr="//form//notebook//page[@name='sales_purchases']//field[@name='customer']" position="after">
-                    <field name="is_confirmed" attrs="{'invisible': [('customer', '=', False)]}"/>
+                    <field name="of_customer_state" attrs="{'invisible': [('customer', '=', False)]}"/>
                 </xpath>
             </field>
         </record>
@@ -308,10 +324,10 @@
             <field name="inherit_id" ref="base.res_partner_kanban_view"/>
             <field name="arch" type="xml">
                 <xpath expr="//kanban//field[@name='type']" position="after">
-                    <field name="is_confirmed"/>
+                    <field name="of_customer_state"/>
                 </xpath>
                 <xpath expr="//kanban//templates//strong[@class='oe_partner_heading']" position="after">
-                    <div t-if="record.is_confirmed.raw_value == false" class="label label-info">prospect</div>
+                    <div t-if="record.of_customer_state.raw_value == 'lead'" class="label label-info">prospect</div>
                 </xpath>
             </field>
         </record>
@@ -323,11 +339,11 @@
             <field eval="8" name="priority"/>
             <field name="arch" type="xml">
                 <xpath expr="//tree" position="inside">
-                    <field name="is_confirmed" invisible="1"/>
+                    <field name="of_customer_state" invisible="1"/>
                 </xpath>
                 <!--prospects en bleu clair -->
                 <xpath expr="//tree" position="attributes">
-                    <attribute name="colors">#5bc0de: is_confirmed==False;</attribute>
+                    <attribute name="colors">#5bc0de: of_customer_state=='lead';</attribute>
                 </xpath>
             </field>
         </record>
@@ -339,8 +355,8 @@
             <field name="arch" type="xml">
                 <!-- filtres prospects et signés -->
                 <xpath expr="//search//filter[@name='not_localized']" position="before">
-                    <filter string="Clients signés" name="confirmed" domain="[('customer','=',1), ('parent_id', '=', False), ('is_confirmed', '=', True)]"/>
-                    <filter string="Prospects" name="lead" domain="[('customer','=',1), ('parent_id', '=', False), ('is_confirmed', '=', False)]"/>
+                    <filter string="Clients signés" name="confirmed" domain="[('customer','=',1), ('parent_id', '=', False), ('of_customer_state', '=', 'customer')]"/>
+                    <filter string="Prospects" name="lead" domain="[('customer','=',1), ('parent_id', '=', False), ('of_customer_state', '=', 'lead')]"/>
                     <separator/>
                 </xpath>
             </field>
