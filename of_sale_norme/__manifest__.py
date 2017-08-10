@@ -36,6 +36,7 @@ Quand la description d'une norme est modifiée, met à jour le champ 'descriptio
     "category": "OpenFire",
     "data": [
         'views/of_sale_norme_view.xml',
+        'security/ir.model.access.csv',
     ],
     'installable': True,
     'application': False,
