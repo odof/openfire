@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import time
+import logging
+_logger = logging.getLogger(__name__)
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
@@ -22,7 +24,7 @@ class OFCRMLead(models.Model):
     stage_probability = fields.Float(related="stage_id.probability",readonly=True)
 
     of_projet_line_ids = fields.One2many('of.crm.projet.line', 'lead_id', string=u'Entrées')
-    of_modele_id = fields.Many2one('of.crm.projet.modele', string=u"Modèle")
+    of_modele_id = fields.Many2one('of.crm.projet.modele', string=u"Modèle", ondelete="set null")
 
     of_customer_state = fields.Selection(related="partner_id.of_customer_state", required=False)
     #activity_ids = fields.One2many('of.crm.opportunity.activity', 'lead_id', string=u"Activités de cette opportunité")
@@ -34,13 +36,11 @@ class OFCRMLead(models.Model):
                 projet.of_projet_line_ids = [(5,)]
                 attr_vals = {}
                 vals = []
-                #print projet.modele_id.attr_ids
                 for attr in projet.of_modele_id.attr_ids:
                     attr_vals['attr_id'] = attr.id
                     attr_vals['type'] = attr.type
                     attr_vals['name'] = attr.name
                     vals.append((0,0,attr_vals.copy()))
-                    #print 'vals', vals
                 projet.of_projet_line_ids = vals
 
     # Récupération du site web à la sélection du partenaire
@@ -184,39 +184,47 @@ Ce champ se met à jour automatiquement sur confirmation de commande et sur vali
     #TODO: faire réviser par cédric
     @api.model
     def _init_prospects(self):
+        """
+Cette fonction a pour but d'initialiser le champ of_customer_state.
+Pour les partenaires non clients (champ 'customer' à False): of_customer_state = 'other'
+Pour les partenaires client:
+    si un partenaire (ou son parent le cas échéant) a au moins une vente ou une facturation: of_customer_state = 'customer'
+    sinon: of_customer_state = 'lead'
+On s'occupe des enfants après s'être occupé de leur parent.
+        """
         partner_obj = self.with_context(active_test=False)
         # partner who are not customers
-        partners = partner_obj.search([('customer','=',False)])
-        partners.write({'of_customer_state': 'other'})
-        
+        partners = partner_obj.search([])
+        partners.write({'of_customer_state': 'other'}) # (ré)initialisation du champ à 'other' pour tous les partenaires
+
         customers = partner_obj.search([('customer','=',True)])
         customers._compute_sale_order_count() # needed (because store=False computed field?)
-        todo = partner_obj.search([('customer','=',True),'|',('parent_id','in', (False,None,0)),('company_type','=','company')]) # all customers without parent
-        done = self.env['res.partner']
+        todo = partner_obj.search([('customer','=',True),'|',('parent_id','in', (False,None,0)),('company_type','=','company')]) # <- erreur dans les log 'non-stored field cannot be searched'
+        #todo = partner_obj.search([('customer','=',True),('parent_id','in', (False,None,0))]) # all customers without parent # <- incohérence 'des clients ne sont pas traités'
+        to_lead = self.env['res.partner']
+        to_customer = self.env['res.partner']
         len_customers = len(customers)
         while len(todo) > 0:
             partner = todo[0]
             todo -= todo[0]
-            if not partner.parent_id:
-                # nothing sold and nothing invoiced -> this is a lead
-                if (partner.sale_order_count == 0 and partner.total_invoiced == 0) and partner.of_customer_state != 'lead':
-                    partner.of_customer_state = 'lead'
-                # something sold or something invoiced -> this is a confirmed customer!
-                elif (partner.sale_order_count != 0 or partner.total_invoiced > 0) and partner.of_customer_state != 'customer':
-                    partner.of_customer_state = 'customer'
-                done += partner
+            if (partner.sale_order_count == 0 and partner.total_invoiced == 0):
+                if partner.parent_id and partner.parent_id in to_customer:
+                    to_customer += partner
+                else:
+                    to_lead += partner
             else:
-                #has a parent
-                if (partner.sale_order_count != 0 or partner.total_invoiced > 0) and partner.of_customer_state != 'customer' or partner.parent_id.of_customer_state == 'customer':
-                    partner.of_customer_state = 'customer'
-                done += partner
+                to_customer += partner
             if len(partner.child_ids) > 0:
+                # search pour récupérer les éventuels enfants archivés
                 children = partner_obj.search([('parent_id','=',partner.id),('customer','=',True)]) # potentially inactive children
                 todo += children
-        len_done = len(done)
+        to_lead.write({'of_customer_state': 'lead'})
+        to_customer.write({'of_customer_state': 'customer'})
+        len_done = len(to_lead) + len(to_customer)
         if len_customers != len_done: # not all partners have been processed
-            raise ValidationError(u"Erreur d'initialisation du champ 'of_customer_state'. Certains clients n'ont pas été traités (%s/%s)" % (len_customers - len_done,len_customers,))
-        print u"%s Partenaires configurés" % (len_done)
+            _logger.warning(u"fonction '_init_prospects': incohérence. Clients à traiter %d - %d Clients traités" % (len_customers, len_done))
+        else:
+            _logger.info(u"fonction '_init_prospects': %d clients ont été traités" % (len_done))
 
     def _compute_sale_order_count(self):
         """
@@ -233,7 +241,7 @@ surcharge méthode du même nom pour ne pas compter les devis dans les ventes
             partner_ids = filter(lambda r: r['id'] == partner.id, partner_child_ids)[0]
             partner_ids = [partner_ids.get('id')] + partner_ids.get('child_ids')
             # then we can sum for all the partner's child
-            #added of_customer_state
+            # added of_customer_state
             sale_order_count = sum(mapped_data.get(child, 0) for child in partner_ids)
             partner.sale_order_count = sale_order_count
 

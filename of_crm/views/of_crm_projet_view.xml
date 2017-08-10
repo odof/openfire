@@ -114,6 +114,7 @@
                     <field name="val_date"/>
                     <field name="val_char"/>
                     <field name="val_select_id"/>
+                    <!--field name="val_select_ids"/-->
                     <templates>
                         <t t-name="kanban-box">
                             <div class="oe_kanban_global_click" style="border: 1px solid lightgrey; border-radius: 4px;">
@@ -126,7 +127,8 @@
                                         <span t-if="record.val_bool.raw_value == false and record.type.raw_value == 'bool'">Non</span>
                                         <field name="val_char" attrs="{'invisible': [('type','!=','char')]}"/>
                                         <field name="val_date" attrs="{'invisible': [('type','!=','date')]}"/>
-                                        <field name="val_select_id" widget="selection" attrs="{'invisible': [('type','!=','selection')]}"/>
+                                        <field name="val_select_id" attrs="{'invisible': [('type','!=','selection')]}"/>
+                                        <!-- field name="val_select_ids" attrs="{'invisible': [('type','!=','multiple')]}"/-->
                                     </strong>
                                 </div>
                             </div>
@@ -153,7 +155,7 @@
                             </group>
                             <group colspan="4">
                                 <field name="description"/>
-                                <field name="selection_ids" attrs="{'invisible': [('type','!=','selection')]}">
+                                <field name="selection_ids" attrs="{'invisible': [('type','not in',('selection','multiple'))]}">
                                     <tree editable="bottom">
                                         <field name="sequence" widget="handle"/>
                                         <field name="name"/>
