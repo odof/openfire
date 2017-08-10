@@ -59,7 +59,7 @@ class OFAccountFrFec(models.TransientModel):
             JOIN account_account aa ON aa.id = aml.account_id
             LEFT JOIN account_account_type aat ON aa.user_type_id = aat.id
         WHERE
-            am.date < %s
+            am.create_date < %s
             AND am.company_id = %s
             AND aat.include_initial_balance = 'f'
             AND (aml.debit != 0 OR aml.credit != 0)
@@ -181,7 +181,7 @@ class OFAccountFrFec(models.TransientModel):
             JOIN account_account aa ON aa.id = aml.account_id
             LEFT JOIN account_account_type aat ON aa.user_type_id = aat.id
         WHERE
-            am.date < %s
+            am.create_date < %s
             AND am.company_id = %s
             AND aat.include_initial_balance = 't'
             AND (aml.debit != 0 OR aml.credit != 0)
@@ -250,7 +250,7 @@ class OFAccountFrFec(models.TransientModel):
             replace(aj.code, '|', '/') AS JournalCode,
             replace(aj.name, '|', '/') AS JournalLib,
             replace(am.name, '|', '/') AS EcritureNum,
-            TO_CHAR(am.create_date, 'YYYYMMDD') AS EcritureDate,
+            TO_CHAR(am.date, 'YYYYMMDD') AS EcritureDate,
             CASE WHEN aa.code LIKE '455%%' THEN '455000'
                  WHEN aa.internal_type = 'payable' THEN '401000'
                  WHEN aa.internal_type = 'receivable' THEN '411000'
@@ -314,7 +314,7 @@ class OFAccountFrFec(models.TransientModel):
             AND am.journal_id IN %s
             '''
 
-        sql_sort = 'am.create_date, am.name, aml.id'
+        sql_sort = 'am.date, am.name, aml.id'
         if self.sortby == 'sort_journal_partner':
             sql_sort = 'aj.code, rp.name, aml.id'
         sql_query += '\nORDER BY ' + sql_sort
