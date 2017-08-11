@@ -193,7 +193,7 @@ Pour les partenaires client:
 On s'occupe des enfants après s'être occupé de leur parent.
         """
         partner_obj = self.with_context(active_test=False)
-        # partner who are not customers
+        # all partners
         partners = partner_obj.search([])
         partners.write({'of_customer_state': 'other'}) # (ré)initialisation du champ à 'other' pour tous les partenaires
 

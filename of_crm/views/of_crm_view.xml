@@ -174,6 +174,7 @@
                                     <field name="val_char" attrs="{'invisible': [('type','!=','char')]}"/>
                                     <field name="val_select_id" attrs="{'invisible': [('type','!=','selection')]}" domain="[('attr_id','=',attr_id)]"/>
                                     <!--field name="val_select_ids" widget="many2many_tags" attrs="{'invisible': [('type','!=','multiple')]}" domain="[('attr_id','=',attr_id)]"/-->
+                                    <field name="sequence"/>
                                 </group>
                             </form>
                         </field>

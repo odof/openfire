@@ -152,6 +152,7 @@
                             </group>
                             <group>
                                 <field name="active"/>
+                                <field name="sequence"/>
                             </group>
                             <group colspan="4">
                                 <field name="description"/>
@@ -175,6 +176,7 @@
             <field name="model">of.crm.projet.attr</field>
             <field name="arch" type="xml">
                 <tree string="Attributs de Projet" colors="#A0A0A0:active==False;">
+                    <field name="sequence" widget="handle"/>
                     <field name="name"/>
                     <field name="type"/>
                     <field name="description"/>

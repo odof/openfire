@@ -31,6 +31,7 @@ class OFCRMProjetLine(models.Model):
             vals = {
                 'type': self.attr_id.type,
                 'name': self.attr_id.name,
+                'sequence': self.attr_id.sequence,
                 }
             self.update(vals)
 
@@ -45,6 +46,7 @@ Liste des attributs de ce modèle. Ils seront copiés dans la fiche projet si ce
 
 class OFCRMProjetAttr(models.Model):
     _name = 'of.crm.projet.attr'
+    _order = 'sequence'
 
     name = fields.Char(string=u"Libellé", required=True, translate=True)
     description = fields.Text(string="Description", translate=True)
@@ -58,6 +60,7 @@ class OFCRMProjetAttr(models.Model):
     selection_ids = fields.One2many('of.crm.projet.attr.select', 'attr_id', string="Valeurs")
     modele_ids = fields.Many2many('of.crm.projet.modele', 'crm_projet_modele_attr_rel', 'attr_id', 'modele_id', string='Modèles')
     active = fields.Boolean(string="Actif", default=True)
+    sequence = fields.Integer(string=u'Séquence', default=10)
 
     """@api.onchange('active')
     def _onchange_active(self):
