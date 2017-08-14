@@ -55,7 +55,12 @@ class res_partner(models.Model):
 
     of_revendeur = fields.Boolean('Revendeur', help="Cocher cette case si ce partenaire est un revendeur.")
     of_installateur = fields.Boolean('Installateur', help="Cocher cette case si ce partenaire est un installateur.")
+    of_parc_installe_count = fields.Integer("Parc installé", compute='_compute_of_parc_installe_count')
 
+    @api.multi
+    def _compute_of_parc_installe_count(self):
+        for partner in self:
+            partner.of_parc_installe_count = self.env['of.parc.installe'].search_count([('client_id', '=', partner.id)])
 
 class project_issue(models.Model):
     _inherit = "project.issue"
