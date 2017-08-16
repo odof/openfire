@@ -1,15 +1,15 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
 
-class resCompany(models.Model):
+class ResCompany(models.Model):
     _inherit = "res.company"
 
     of_client_id_ref = fields.Boolean('Réf. client automatique',
                                       help=u"Lors de la création d'un nouveau partenaire, si cette case est cochée, "
                                            u"la référence client prendra par défaut le n° de compte comptable du partenaire.")
 
-class resPartner(models.Model):
+class ResPartner(models.Model):
     _inherit = 'res.partner'
 
     @api.multi
@@ -17,6 +17,16 @@ class resPartner(models.Model):
         """
         Création / Mise à jour du compte de tiers des clients.
         """
+        # Ce verrou est normalement inutile car les appels _update_account() se font après les appels super() dans create et write
+        if self._context.get('of_no_update_partner_account'):
+            return
+        self = self.with_context(of_no_update_partner_account=True)
+
+        # Pas de création de compte de tiers pour les contacts, mais uniquement pour les vrais partenaires
+        partners = self.search([('id', 'in', self._ids), '|', ('is_company', '=', True), ('parent_id', '=', False)])
+        if not partners:
+            return
+
         data_obj = self.env['ir.model.data']
         ac_obj = self.env['account.account']
 
@@ -26,7 +36,7 @@ class resPartner(models.Model):
         default_account_receivable = self.env['ir.property'].get('property_account_receivable_id', self._name)
         default_account_payable = self.env['ir.property'].get('property_account_payable_id', self._name)
 
-        for partner in self:
+        for partner in partners:
             data = {}
             # Si est un client
             if partner.customer:
@@ -63,7 +73,7 @@ class resPartner(models.Model):
 
     @api.model
     def create(self, vals):
-        partner = super(resPartner, self).create(vals)
+        partner = super(ResPartner, self).create(vals)
 
         # Utilisation de l'id du partenaire comme référence client, si option configurée dans la société
         if partner.company_id.of_client_id_ref:
@@ -76,7 +86,7 @@ class resPartner(models.Model):
 
     @api.multi
     def write(self, vals):
-        super(resPartner, self).write(vals)
+        super(ResPartner, self).write(vals)
         self._update_account()
         return True
 
@@ -92,7 +102,7 @@ class resPartner(models.Model):
                        for account in (partner.property_account_receivable_id, partner.property_account_payable_id)
                        if account not in (default_account_receivable, default_account_payable)]
 
-        super(resPartner, self).unlink()
+        super(ResPartner, self).unlink()
 
         account_ids = set(account_ids)
 
