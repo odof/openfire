@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
+from odoo import models, fields, api
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
+
 import time
 import logging
 _logger = logging.getLogger(__name__)
-from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
-from odoo import models, fields, api
-from odoo.exceptions import ValidationError
 
 class OFCRMLead(models.Model):
     _inherit = 'crm.lead'
@@ -13,34 +13,34 @@ class OFCRMLead(models.Model):
     of_website = fields.Char('Site web', help="Website of Lead")
     tag_ids = fields.Many2many('res.partner.category', 'crm_lead_res_partner_category_rel', 'lead_id', 'category_id', string='Tags', help="Classify and analyze your lead/opportunity categories like: Training, Service", oldname="of_tag_ids")
     of_description_projet = fields.Html('Notes de projet')
-    of_ref = fields.Char(string=u"Référence",copy=False)
-    of_prospecteur = fields.Many2one("res.users",string="Prospecteur")
+    of_ref = fields.Char(string=u"Référence", copy=False)
+    of_prospecteur = fields.Many2one("res.users", string="Prospecteur")
     of_date_prospection = fields.Date(string="Date de prospection")
-    #@TODO: implémenter la maj automatique de la date de cloture en fonction du passage de probabilité à 0 ou 100
+    # @TODO: implémenter la maj automatique de la date de cloture en fonction du passage de probabilité à 0 ou 100
     of_date_cloture = fields.Date(string="Date de clôture")
     of_infos_compl = fields.Text(string="Autres infos")
     geo_lat = fields.Float(string='Geo Lat', digits=(8, 8))
     geo_lng = fields.Float(string='Geo Lng', digits=(8, 8))
-    stage_probability = fields.Float(related="stage_id.probability",readonly=True)
+    stage_probability = fields.Float(related="stage_id.probability", readonly=True)
 
     of_projet_line_ids = fields.One2many('of.crm.projet.line', 'lead_id', string=u'Entrées')
     of_modele_id = fields.Many2one('of.crm.projet.modele', string=u"Modèle", ondelete="set null")
 
     of_customer_state = fields.Selection(related="partner_id.of_customer_state", required=False)
-    #activity_ids = fields.One2many('of.crm.opportunity.activity', 'lead_id', string=u"Activités de cette opportunité")
+    # activity_ids = fields.One2many('of.crm.opportunity.activity', 'lead_id', string=u"Activités de cette opportunité")
 
     @api.onchange('of_modele_id')
     def _onchange_modele_id(self):
         for projet in self:
             if projet.of_modele_id:
-                projet.of_projet_line_ids = [(5,)]
+                projet.of_projet_line_ids = [(5, )]
                 attr_vals = {}
                 vals = []
                 for attr in projet.of_modele_id.attr_ids:
                     attr_vals['attr_id'] = attr.id
                     attr_vals['type'] = attr.type
                     attr_vals['name'] = attr.name
-                    vals.append((0,0,attr_vals.copy()))
+                    vals.append((0, 0, attr_vals.copy()))
                 projet.of_projet_line_ids = vals
 
     # Récupération du site web à la sélection du partenaire
@@ -86,7 +86,7 @@ class OFCRMLead(models.Model):
 
     @api.multi
     def action_set_lost(self):
-        """ surcharge sans appel à super(), une opportunité perdue n'est pas forcément archivée 
+        """ surcharge sans appel à super(), une opportunité perdue n'est pas forcément archivée
             fonction appelée (au moins) depuis le wizard de motif de perte
         """
         for lead in self:
@@ -99,7 +99,7 @@ class OFCRMLead(models.Model):
 
     @api.multi
     def action_set_won(self):
-        res = super(OFCRMLead,self).action_set_won()
+        res = super(OFCRMLead, self).action_set_won()
         for lead in self:
             lead.of_date_cloture = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
         return res
@@ -147,7 +147,7 @@ class OFCrmActivity(models.Model):
     def add_report_to_opportunity_description(self):
         "" "
         copie le contenu du rapport dans le champ 'description' de lead_id.
-        la personne fait son action co, tape son compte-rendu, valide, et ça s'ajoute automatiquement dans le champs note de l'opportunité quoi 
+        la personne fait son action co, tape son compte-rendu, valide, et ça s'ajoute automatiquement dans le champs note de l'opportunité quoi
         "" "
         self.ensure_one()
         self.lead_id.description = self.activity_id + " (" + self.name + u") fait(e) le " + time.strftime(DEFAULT_SERVER_DATE_FORMAT) \
@@ -181,7 +181,6 @@ Un client est considéré comme prospect tant qu'il n'a ni commande confirmée n
 Ce champ se met à jour automatiquement sur confirmation de commande et sur validation de facture
     """)
 
-    #TODO: faire réviser par cédric
     @api.model
     def _init_prospects(self):
         """
@@ -195,33 +194,32 @@ On s'occupe des enfants après s'être occupé de leur parent.
         partner_obj = self.with_context(active_test=False)
         # all partners
         partners = partner_obj.search([])
-        partners.write({'of_customer_state': 'other'}) # (ré)initialisation du champ à 'other' pour tous les partenaires
+        partners.write({'of_customer_state': 'other'})  # (ré)initialisation du champ à 'other' pour tous les partenaires
 
-        customers = partner_obj.search([('customer','=',True)])
-        customers._compute_sale_order_count() # needed (because store=False computed field?)
-        todo = partner_obj.search([('customer','=',True),'|',('parent_id','in', (False,None,0)),('company_type','=','company')]) # <- erreur dans les log 'non-stored field cannot be searched'
-        #todo = partner_obj.search([('customer','=',True),('parent_id','in', (False,None,0))]) # all customers without parent # <- incohérence 'des clients ne sont pas traités'
+        customers = partner_obj.search([('customer', '=', True)])
+        customers._compute_sale_order_count()  # needed (because store=False computed field?)
         to_lead = self.env['res.partner']
         to_customer = self.env['res.partner']
         len_customers = len(customers)
-        while len(todo) > 0:
+
+        todo = partner_obj.search([('customer', '=', True), '|', ('parent_id', '=', False), ('parent_id.customer', '=', False)])
+        while todo:
             partner = todo[0]
             todo -= todo[0]
-            if (partner.sale_order_count == 0 and partner.total_invoiced == 0):
+            if partner.sale_order_count == 0 and partner.total_invoiced == 0:
                 if partner.parent_id and partner.parent_id in to_customer:
                     to_customer += partner
                 else:
                     to_lead += partner
             else:
                 to_customer += partner
-            if len(partner.child_ids) > 0:
-                # search pour récupérer les éventuels enfants archivés
-                children = partner_obj.search([('parent_id','=',partner.id),('customer','=',True)]) # potentially inactive children
-                todo += children
+
+            # search pour récupérer les éventuels enfants archivés
+            todo += partner_obj.search([('parent_id', '=', partner.id), ('customer', '=', True)])  # potentially inactive children
         to_lead.write({'of_customer_state': 'lead'})
         to_customer.write({'of_customer_state': 'customer'})
         len_done = len(to_lead) + len(to_customer)
-        if len_customers != len_done: # not all partners have been processed
+        if len_customers != len_done:  # not all partners have been processed
             _logger.warning(u"fonction '_init_prospects': incohérence. Clients à traiter %d - %d Clients traités" % (len_customers, len_done))
         else:
             _logger.info(u"fonction '_init_prospects': %d clients ont été traités" % (len_done))
@@ -230,8 +228,8 @@ On s'occupe des enfants après s'être occupé de leur parent.
         """
 surcharge méthode du même nom pour ne pas compter les devis dans les ventes
         """
-        #added domain value for states
-        sale_data = self.env['sale.order'].read_group(domain=[('partner_id', 'child_of', self.ids),('state','in',['sale','done'])],
+        # added domain value for states
+        sale_data = self.env['sale.order'].read_group(domain=[('partner_id', 'child_of', self.ids), ('state', 'in', ['sale', 'done'])],
                                                       fields=['partner_id'], groupby=['partner_id'])
         # read to keep the child/parent relation while aggregating the read_group result in the loop
         partner_child_ids = self.read(['child_ids'])
@@ -253,7 +251,7 @@ class OFCRMSaleOrder(models.Model):
         """
 un prospect devient signé sur confirmation de commande
         """
-        res = super(OFCRMSaleOrder,self).action_confirm()
+        res = super(OFCRMSaleOrder, self).action_confirm()
         partners = self.env['res.partner']
         for order in self:
             if order.partner_id.of_customer_state == 'lead' and order.partner_id not in partners:
@@ -266,7 +264,7 @@ class OFCRMAccountInvoice(models.Model):
 
     @api.multi
     def invoice_validate(self):
-        res = super(OFCRMAccountInvoice,self).invoice_validate()
+        res = super(OFCRMAccountInvoice, self).invoice_validate()
         partners = self.env['res.partner']
         for invoice in self:
             if invoice.partner_id.of_customer_state == 'lead' and invoice.partner_id not in partners and invoice.partner_id.customer:
