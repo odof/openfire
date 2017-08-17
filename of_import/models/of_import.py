@@ -70,7 +70,7 @@ class of_import(models.Model):
                 sortie_note += "- " + valeur['description'] + " : " + champ
                 if valeur['type'] == 'selection':
                     sortie_note += u" [ valeurs autorisées : "
-                    for cle in dict(self.env[self.type_import]._fields[champ].selection):
+                    for cle in self.env[self.type_import]._fields[champ].get_values(self.env):
                         sortie_note += cle + " "
                     sortie_note += ']'
                 sortie_note += '\n'
