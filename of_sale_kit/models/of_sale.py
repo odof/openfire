@@ -50,6 +50,8 @@ class OFKitSaleOrderLine(models.Model):
 
 	price_compo = fields.Monetary('Compo Price/Kit',digits=dp.get_precision('Product Price'),compute='_compute_price_compo',
 							help="Sum of the prices of all components necessary for 1 unit of this kit",oldname="unit_compo_price")
+	cost_compo = fields.Monetary('Compo Cost/Kit',digits=dp.get_precision('Product Price'),compute='_compute_price_compo',
+                                  help="Sum of the costs of all components necessary for 1 unit of this kit")
 
 	pricing = fields.Selection([
 		('fixed','Fixed'),
@@ -150,12 +152,15 @@ class OFKitSaleOrderLine(models.Model):
 		for line in self:
 			if line.is_kit:
 				uc_price = 0
+				uc_cost = 0
 				for comp in line.child_ids:
 					uc_price += comp.price_per_line
+					uc_cost += comp.cost_per_line
 				line.price_compo = uc_price
+				line.cost_compo = uc_cost
 				line._refresh_price_unit()
 
-	@api.onchange('price_compo','product_uom_qty','pricing','product_id')
+	@api.onchange('price_compo','cost_compo','product_uom_qty','pricing','product_id')
 	def _refresh_price_unit(self):
 		for line in self:
 			if line.is_kit:
@@ -163,6 +168,7 @@ class OFKitSaleOrderLine(models.Model):
 					line.price_unit = line.price_compo
 				else:
 					line.price_unit = line.product_id.lst_price
+				line.purchase_price = line.cost_compo
 
 	@api.multi
 	def _init_components(self):
@@ -192,11 +198,10 @@ class OFKitSaleOrderLine(models.Model):
 					'default_code': self.product_id.default_code,
 					'parent_chain': self.product_id.default_code or comp_name,
 					'is_kit': False,
-					#'qty_per_parent': 1,
 					'qty_per_line': 1,
 					'product_uom': self.product_uom,
 					'price_unit': self.product_id.list_price,
-                    'unit_cost': self.product_id.standard_price,
+                    'cost_unit': self.product_id.standard_price,
                     'customer_lead': self.product_id.sale_delay,
 					}
 
@@ -334,6 +339,32 @@ class OFKitSaleOrderLine(models.Model):
 				for underkit in underkits:
 					underkit.qty_delivered = underkit.qty_total
 
+	@api.depends('product_id', 'purchase_price', 'product_uom_qty', 'price_unit', 'cost_compo')
+	def _product_margin(self):
+		# Override of function from sale_margin
+		for line in self:
+			currency = line.order_id.pricelist_id.currency_id
+			if line.is_kit:
+				cost = line.cost_compo or line.product_id.cost_compo
+			else:
+				cost = line.purchase_price or line.product_id.standard_price
+			line.margin = currency.round(line.price_subtotal - (cost * line.product_uom_qty))
+
+	def _compute_margin(self, order_id, product_id, product_uom_id):
+		# Override of function from sale_margin
+		frm_cur = self.env.user.company_id.currency_id
+		to_cur = order_id.pricelist_id.currency_id
+		if product_id.is_kit:
+			purchase_price = product_id.cost_compo
+		else:
+			purchase_price = product_id.standard_price
+		if product_uom_id != product_id.uom_id:
+			purchase_price = product_id.uom_id._compute_price(purchase_price, product_uom_id)
+		ctx = self.env.context.copy()
+		ctx['date'] = order_id.date_order
+		price = frm_cur.with_context(ctx).compute(purchase_price, to_cur, round=False)
+		return price
+
 	@api.model
 	def create(self, vals):
 		line = super(OFKitSaleOrderLine,self).create(vals)
@@ -396,9 +427,15 @@ means that the product is a component of Kit B which is itself a component of Ki
 	currency_id = fields.Many2one(related='order_id.currency_id', store=True, string='Currency', readonly=True)
 	product_uom = fields.Many2one('product.uom', string='UoM', required=True)
 	price_unit = fields.Monetary('Unit Price',digits=dp.get_precision('Product Price'),required=True,default=0.0,oldname="unit_price")
-	children_price = fields.Monetary('Unit Price',digits=dp.get_precision('Product Price'),compute='_compute_prices',
-						help="Unit price. In case of a kit, price of components necessary for one unit")
-	unit_cost = fields.Monetary('Unit Cost',digits=dp.get_precision('Product Price'))
+	price_children = fields.Monetary('Unit Price',digits=dp.get_precision('Product Price'),compute='_compute_prices',
+						help="Unit price. In case of a kit, price of components necessary for one unit", oldname="children_price")
+	cost_unit = fields.Monetary('Unit Cost',digits=dp.get_precision('Product Price'),oldname="unit_cost")
+	cost_children = fields.Monetary('Unit Cost',digits=dp.get_precision('Product Price'),compute='_compute_prices',
+						help="Unit cost. In case of a kit, cost of components necessary for one unit")
+	cost_total = fields.Monetary(string='Subtotal Cost', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices', 
+							help="Cost of this component total quantity. Equal to total quantity * unit cost.")
+	cost_per_line = fields.Monetary(string='Cost/Kit', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices', 
+							help="Cost of this component quantity necessary to make one unit of its order line kit. Equal to quantity per kit unit * unit cost.")
 
 	qty_per_parent = fields.Float(string='Qty / parent', digits=dp.get_precision('Product Unit of Measure'),oldname='qty_bom_line', compute="_compute_qty_per_parent",
 						help="Quantity per direct parent unit. Indicative value. Can differ from the quantity per line in case of a component of an under-kit.\n\
@@ -458,8 +495,7 @@ means that the product is a component of Kit B which is itself a component of Ki
 			'pricing': self.product_id.pricing or 'fixed',
 			'product_uom': self.product_id.product_tmpl_id.uom_id,
 			'price_unit': self.product_id.lst_price,
-			'unit_cost': self.product_id.standard_price,
-			#'qty_per_parent': 1,
+			'cost_unit': self.product_id.standard_price,
 			'customer_lead': self.product_id.sale_delay,
 		}
 		if self.parent_id:
@@ -561,31 +597,48 @@ means that the product is a component of Kit B which is itself a component of Ki
 		for comp in self:
 			qty_per_line = comp.qty_per_line
 			if comp.is_kit:
-				children_price = comp.child_ids.get_prices_rec(1)
+				price_n_cost = comp.child_ids.get_prices_rec(1)
+				price_children = price_n_cost['price']
+				cost_children = price_n_cost['cost']
 				if not comp.children_loaded and comp.product_id.current_bom_id: # a kit not loaded and not created on the fly
-					children_price += comp.product_id.current_bom_id.get_components_price(1,True)
-				comp.children_price = children_price # unit price
-				comp.price_per_line = children_price * qty_per_line
-				comp.price_total = children_price * qty_per_line * comp.nb_units
+					price_n_cost_bom = comp.product_id.current_bom_id.get_components_price(1,True)
+					price_children += price_n_cost_bom['price']
+					cost_children += price_n_cost_bom['cost']
+				# prices
+				comp.price_children = price_children # unit price
+				comp.price_per_line = price_children * qty_per_line
+				comp.price_total = price_children * qty_per_line * comp.nb_units
+				# costs
+				comp.cost_children = cost_children # unit price
+				comp.cost_per_line = cost_children * qty_per_line
+				comp.cost_total = cost_children * qty_per_line * comp.nb_units
 			else:
-				comp.children_price = comp.price_unit # no children but this way we can display unit prices on same column
+				# prices
+				comp.price_children = comp.price_unit # no children but this way we can display unit prices on same column
 				comp.price_per_line = comp.price_unit * qty_per_line
 				comp.price_total = comp.price_unit * qty_per_line * comp.nb_units
+				# costs
+				comp.cost_children = comp.cost_unit # no children but this way we can display unit prices on same column
+				comp.cost_per_line = comp.cost_unit * qty_per_line
+				comp.cost_total = comp.cost_unit * qty_per_line * comp.nb_units
 
 	@api.multi
 	def get_prices_rec(self,qty_parent=1):
 		"""
-		returns the price of the components in self and their children.
+		returns the price and cost of the components in self and their children.
 		doesn't take under-kits pricing into account.
 		:param qty_parent: equal to 1 on first call of the function
 		"""
-		res = 0
+		res = {'price': 0.0, 'cost': 0.0}
 		for comp in self:
 			if not comp.is_kit: # comp is not a kit, stop condition
-				res += comp.price_unit * comp.qty_per_parent * qty_parent # can't use qty_per_line because the first caller of this function may not be the root component
+				res['price'] += comp.price_unit * comp.qty_per_parent * qty_parent # can't use qty_per_line because the first caller of this function may not be the root component
+				res['cost'] += comp.cost_unit * comp.qty_per_parent * qty_parent
 			else:
 				# case may happen where children are not loaded and still has children added on the fly, so we always add children price.
-				res += comp.child_ids.get_prices_rec(qty_parent * comp.qty_per_parent) # recursive call
+				price_n_cost = comp.child_ids.get_prices_rec(qty_parent * comp.qty_per_parent) # recursive call
+				res['price'] += price_n_cost['price']
+				res['cost'] += price_n_cost['cost']
 				if not comp.children_loaded: # get prices from bom if children are not loaded
 					bom_obj = self.env['mrp.bom']
 					bom = bom_obj.search([('product_id','=',comp.product_id.id)], limit=1)
@@ -593,7 +646,9 @@ means that the product is a component of Kit B which is itself a component of Ki
 						product_tmpl_id = comp.product_id.product_tmpl_id
 						bom = bom_obj.search([('product_tmpl_id','=',product_tmpl_id.id)], limit=1)
 					if bom:
-						res += bom.get_components_price(comp.qty_per_line,True)
+						price_n_cost = bom.get_components_price(comp.qty_per_line,True)
+						res['price'] += price_n_cost['price']
+						res['cost'] += price_n_cost['cost']
 		return res
 
 	"""@api.depends('qty_per_parent','parent_id')
@@ -695,7 +750,7 @@ means that the product is a component of Kit B which is itself a component of Ki
 	def _prepare_invoice_line_comp(self,inv_line_id):
 		"""
 		Prepare the dict of values to create a new invoice line comp, as well as all comps that are directly or indirectly its children
-		
+
 		:param inv_line_id: id of the invoice line where to put these comps
 		"""
 		self.ensure_one()
@@ -706,7 +761,6 @@ means that the product is a component of Kit B which is itself a component of Ki
 			#'sequence': self.sequence,
 			'default_code': self.default_code,
 			'price_unit': self.price_unit,
-			#'quantity': self.qty_total,
 			'uom_id': self.product_uom.id,
 			'product_id': self.product_id.id or False,
 			'order_comp_id': self.id,
@@ -715,8 +769,7 @@ means that the product is a component of Kit B which is itself a component of Ki
 			'rec_lvl': self.rec_lvl,
 			'pricing': self.pricing,
 			'currency_id': self.currency_id,
-            'unit_cost': self.unit_cost,
-            #'qty_per_parent': self.qty_per_parent,
+            'cost_unit': self.cost_unit,
             'qty_per_line': self.qty_per_line,
             'hide_prices': self.hide_prices,
             'invoice_line_id': inv_line_id

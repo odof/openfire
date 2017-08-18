@@ -84,7 +84,7 @@
                                 <field name="uom_id"/>
                                 <field name="hide_prices" invisible="1"/>
                                 <field name="price_unit" invisible="1"/> 
-                                <field name="children_price" attrs="{'invisible': [('hide_prices','=',True)]}"/>
+                                <field name="price_children" attrs="{'invisible': [('hide_prices','=',True)]}"/>
                                 <field name="price_per_line" attrs="{'invisible': [('hide_prices','=',True)]}"/>
                             </tree>
                         </field>
@@ -140,7 +140,7 @@
                     <group name="Prices" attrs="{'invisible': [('hide_prices','=',True)]}">
                         <!--<field name="pricing" required="False"/>-->
                         <field name="price_unit" attrs="{'invisible': [('is_kit','=',True)]}"/>
-                        <field name="children_price" attrs="{'invisible': [('is_kit','=',False)]}"/>
+                        <field name="price_children" attrs="{'invisible': [('is_kit','=',False)]}"/>
                         <field name="price_per_line"/>
                         <field name="price_total"/>
                     </group>
@@ -185,7 +185,7 @@
                 <field name="uom_id"/>
                 <field name="hide_prices" invisible="1"/>
                 <field name="price_unit" invisible="1"/> 
-                <field name="children_price" attrs="{'invisible': [('hide_prices','=',True)]}"/>
+                <field name="price_children" attrs="{'invisible': [('hide_prices','=',True)]}"/>
                 <field name="price_per_line" attrs="{'invisible': [('hide_prices','=',True)]}"/>
             </tree>
         </field>

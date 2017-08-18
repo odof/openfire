@@ -15,9 +15,10 @@
         \t- Approvisionnement des composants sur confirmation de commande
         \t- Conversion de Bons de commandes en Factures
         \t- 2 modes d'affichage des kits dans les rapports PDF: restreint et étendu
+        \t- Prix d'achat des kits en fonction de leurs composants et marges dans les Devis
     """,
     'website': 'openfire.fr',
-    'depends': ['sale_stock', 'mrp'],
+    'depends': ['sale_stock', 'mrp', 'of_product', 'sale_margin'],
     'data': [
         'views/of_product_views.xml',
         'views/of_sale_views.xml',

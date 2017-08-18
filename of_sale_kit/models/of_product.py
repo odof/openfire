@@ -12,6 +12,8 @@ class OFKitProductTemplate(models.Model):
     current_bom_id = fields.Many2one('mrp.bom', string="Current BoM", compute='_compute_current_bom_id', store=True)
     price_compo = fields.Monetary('Compo Price/Kit',digits=dp.get_precision('Product Price'),compute='_compute_price_compo',oldname="unit_compo_price",
                                   help="Sum of the prices of all components necessary for 1 unit of this kit")
+    cost_compo = fields.Monetary('Compo Cost/Kit',digits=dp.get_precision('Product Price'),compute='_compute_price_compo',
+                                  help="Sum of the costs of all components necessary for 1 unit of this kit")
 
     price_used = fields.Monetary('Used Price',digits=dp.get_precision('Product Price'),compute='_compute_price_used',oldname="used_price",
                     help="Price that will be taken into account in sale orders and invoices. Either list price or the price of its components, dependant on the pricing.")
@@ -50,7 +52,9 @@ class OFKitProductTemplate(models.Model):
     def _compute_price_compo(self):
         for product in self:
             if product.is_kit:
-                product.price_compo = product.current_bom_id.get_components_price(1,True)
+                price_n_cost = product.current_bom_id.get_components_price(1,True)
+                product.price_compo = price_n_cost['price']
+                product.cost_compo = price_n_cost['cost']
 
     @api.depends('price_compo','pricing')
     def _compute_price_used(self):
@@ -60,6 +64,27 @@ class OFKitProductTemplate(models.Model):
                     product.price_used = product.list_price
                 else:
                     product.price_used = product.price_compo
+
+    @api.multi
+    @api.depends('lst_price','list_price','standard_price','price_compo','cost_compo','pricing')
+    def _compute_marge(self):
+        # override of function from of_product
+        for product in self:
+            if not product.is_kit:
+                lst_price = product.lst_price
+                if lst_price != 0:
+                    product.marge = (lst_price - product.standard_price) * 100.00 / lst_price
+                else: # division par 0!
+                    product.marge = -100
+            else: # product is a kit
+                if product.pricing == 'fixed':
+                    price = product.lst_price
+                else:
+                    price = product.price_compo
+                if price != 0:
+                    product.marge = (price - product.cost_compo) * 100.00 / price
+                else:
+                    product.marge = -100
 
 class OFKitProductProduct(models.Model):
     _inherit = "product.product"

@@ -68,6 +68,7 @@
             </xpath>
             <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="after">
                 <field name="price_compo" attrs="{'invisible': [('is_kit','=',False)]}"/>
+                <field name="cost_compo" attrs="{'invisible': [('is_kit','=',False)]}" groups="base.group_no_one"/>
             </xpath>
             <xpath expr="//field[@name='order_line']/form//field[@name='name']" position="after">
                 <div name="compo_content"
@@ -89,7 +90,10 @@
                                 <field name="product_uom"/>
                                 <field name="hide_prices" invisible="1"/>
                                 <field name="price_unit" invisible="1"/> 
-                                <field name="children_price" attrs="{'invisible': [('hide_prices','=',True)]}"/>
+                                <field name="cost_unit" invisible="1"/> 
+                                <field name="cost_per_line" invisible="1"/> 
+                                <field name="cost_children" attrs="{'invisible': [('hide_prices','=',True)]}" groups="base.group_no_one"/>
+                                <field name="price_children" attrs="{'invisible': [('hide_prices','=',True)]}"/>
                                 <field name="price_per_line" attrs="{'invisible': [('hide_prices','=',True)]}"/>
                             </tree>
                         </field>
@@ -123,9 +127,8 @@
             </header>
             <sheet>
                 <group>
-                    <separator string="General Information" name="General Information"/>
-                    <separator string="Quantities" name="Quantities"/>
                     <group name="General Information">
+                        <separator string="General Information" name="General Information" colspan="2"/>
                         <field name="product_id"/>
                         <field name="name"/>
                         <field name="default_code"/>
@@ -137,6 +140,7 @@
                         <field name="customer_lead" attrs="{'invisible': [('is_kit','=',True)]}"/>
                     </group>
                     <group  name="Quantities">
+                        <separator string="Quantities" name="Quantities" colspan="2"/>
                     	<!--<label for="qty_per_parent" string="Quantity"/>
                         <field name="qty_per_parent" nolabel="1"/>-->
                         <label for="qty_per_line" string="Quantity per kit"/>
@@ -152,16 +156,21 @@
                             <i class="oe_grey">Kit quantities are a bit tricky to update on the fly, please save your changes to recompute its children quantities</i>
                         </div>
                     </group>
-                    <separator string="Prices" name="Prices" attrs="{'invisible': [('hide_prices','=',True)]}"/>
-                    <div/>
                     <group name="Prices" attrs="{'invisible': [('hide_prices','=',True)]}">
+                        <separator string="Prices" name="Prices" attrs="{'invisible': [('hide_prices','=',True)]}" colspan="2"/>
                         <!--<field name="pricing" required="False"/>-->
                         <field name="price_unit" attrs="{'invisible': [('is_kit','=',True)]}"/>
-                        <field name="children_price" attrs="{'invisible': [('is_kit','=',False)]}"/>
+                        <field name="price_children" attrs="{'invisible': [('is_kit','=',False)]}"/>
                         <field name="price_per_line"/>
                         <field name="price_total"/>
                     </group>
-                    <div/>
+                    <group name="Costs" attrs="{'invisible': [('hide_prices','=',True)]}">
+                        <separator string="Costs" name="Costs" attrs="{'invisible': [('hide_prices','=',True)]}" colspan="2"/>
+                        <field name="cost_unit" attrs="{'invisible': [('is_kit','=',True)]}"/>
+                        <field name="cost_children" attrs="{'invisible': [('is_kit','=',False)]}"/>
+                        <field name="cost_per_line"/>
+                        <field name="cost_total"/>
+                    </group>
                 </group>
                 <div name="hide_prices_message" attrs="{'invisible': [('hide_prices','=',False)]}">
                     <i>Components prices are not shown when the sale order line pricing is set to 'fixed'. They are never printed out in PDF reports.</i>
@@ -203,7 +212,7 @@
                 <field name="product_uom"/>
                 <field name="hide_prices" invisible="1"/>
                 <field name="price_unit" invisible="1"/> 
-                <field name="children_price" attrs="{'invisible': [('hide_prices','=',True)]}"/>
+                <field name="price_children" attrs="{'invisible': [('hide_prices','=',True)]}"/>
                 <field name="price_per_line" attrs="{'invisible': [('hide_prices','=',True)]}"/>
             </tree>
         </field>

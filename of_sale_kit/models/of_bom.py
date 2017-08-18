@@ -13,7 +13,7 @@ class OFBom(models.Model):
         help="Kit (Phantom): When processing a sales order for this product, the delivery order will contain all the components that are not kits themselves. \
         (a kit itself can contain kits, sometimes called under-kits).")
 
-    def get_components_price(self,rec_qty=1,without_pricing=True):
+    def get_components_price_old(self,rec_qty=1,without_pricing=True):
         """
         recursive method.
         returns the sum of the price of all components in this bom. 
@@ -34,6 +34,33 @@ class OFBom(models.Model):
                 res += line.product_id.lst_price  * line.product_qty * rec_qty
         return res
 
+    def get_components_price(self,rec_qty=1,without_pricing=True):
+        """
+        recursive method.
+        returns the sum of the price and cost of all components in this bom.
+        doesn't take 'pricing' into account unless without_pricing set to false.
+        """
+        self.ensure_one()
+        self._check_product_recursion()
+        res = {'price': 0.0, 'cost': 0.0}
+        for line in self.bom_line_ids:
+            if line.child_bom_id: # this line is bom. Its product is a kit (or under-kit)
+                if without_pricing: # we don't take kits pricing into account
+                    tmp_res = line.child_bom_id.get_components_price(rec_qty*line.product_qty)
+                    res['price'] += tmp_res['price']
+                    res['cost'] += tmp_res['cost']
+                elif line.product_id.pricing == 'fixed': # the under-kit pricing is fixed, its components price does not matter
+                    res['cost'] += line.child_bom_id.get_components_price(rec_qty*line.product_qty)['cost']
+                    res['price'] += line.product_id.lst_price * line.product_qty * rec_qty
+                else: # the under-kit pricing is computed, we need the price of its components
+                    tmp_res = line.child_bom_id.get_components_price(rec_qty*line.product_qty)
+                    res['price'] += tmp_res['price']
+                    res['cost'] += tmp_res['cost']
+            else: # this line is not a bom
+                res['price'] += line.product_id.lst_price  * line.product_qty * rec_qty
+                res['cost'] += line.product_id.standard_price  * line.product_qty * rec_qty
+        return res
+
     @api.multi
     def get_components(self,rec_lvl=0,parent_qty_per_line=1,parent_chain="",origin="sale"):
         self.ensure_one()
@@ -50,22 +77,22 @@ class OFBom(models.Model):
                     'qty_per_line': line.product_qty * parent_qty_per_line,
                     #'qty_per_parent': line.product_qty,
                     'price_unit': line.product_id.lst_price,
-                    'unit_cost': line.product_id.standard_price,
+                    'cost_unit': line.product_id.standard_price,
                 }
             if line.child_bom_id and line.child_bom_id.type == 'phantom': # this line is a kit
                 comp['pricing'] = 'computed'
                 comp['is_kit'] = True
                 if origin == 'sale':
-                    comp['product_uom'] = line.product_uom_id.id,
+                    comp['product_uom'] = line.product_uom_id.id
                 elif origin == 'account':
-                    comp['uom_id'] = line.product_uom_id.id,
+                    comp['uom_id'] = line.product_uom_id.id
             else:
                 comp['pricing'] = 'fixed'
                 comp['is_kit'] = False
                 if origin == 'sale':
-                    comp['product_uom'] = line.product_uom_id.id,
+                    comp['product_uom'] = line.product_uom_id.id
                 elif origin == 'account':
-                    comp['uom_id'] = line.product_uom_id.id,
+                    comp['uom_id'] = line.product_uom_id.id
             res.append((0,0,comp))
         return res
 
@@ -94,7 +121,7 @@ class OFBom(models.Model):
                     'qty_per_line': parent_qty_per_line * line.product_qty,
                     'product_uom': line.product_uom_id.id,
                     'price_unit': line.product_id.lst_price,
-                    'unit_cost': line.product_id.standard_price,
+                    'cost_unit': line.product_id.standard_price,
                     'child_ids': under_comps,
                 }
             else:
@@ -109,7 +136,7 @@ class OFBom(models.Model):
                     'qty_per_line': parent_qty_per_line * line.product_qty,
                     'product_uom': line.product_uom_id.id,
                     'price_unit': line.product_id.lst_price,
-                    'unit_cost': line.product_id.standard_price,
+                    'cost_unit': line.product_id.standard_price,
                 }
             res.append((0,0,comp))
         return res
@@ -129,7 +156,8 @@ class OFBom(models.Model):
         bom.product_tmpl_id._compute_current_bom_id()
         if bom.type == 'phantom':
             bom.product_tmpl_id.type = 'service' # kit products are services
-            bom.product_tmpl_id.pricing = 'computed' # kits pricing is computed by default
+            bom.product_tmpl_id.pricing = 'computed' # kit pricing is computed by default
+            bom.product_tmpl_id.standard_price = bom.get_components_price(1,True)
         return bom
 
     @api.multi
@@ -143,4 +171,6 @@ class OFBom(models.Model):
                 if vals['type'] == 'phantom':
                     bom.product_tmpl_id.type = 'service' # kit products are services
                     bom.product_tmpl_id.pricing = 'computed' # kits pricing is computed by default
+            if 'bom_line_ids' in vals:
+                bom.product_tmpl_id.standard_price = bom.get_components_price(1,True)
         return True
