@@ -171,7 +171,7 @@ class OFKitAccountInvoiceLine(models.Model):
                     'cost_unit': self.product_id.standard_price,
                     }
                 self.update({
-                    'child_ids': [(0,0,new_comp_vals)],
+                    'child_ids': [(0, 0, new_comp_vals)],
                     'pricing': 'computed',
                     'price_unit': self.price_compo,
                     })
@@ -179,13 +179,13 @@ class OFKitAccountInvoiceLine(models.Model):
                 new_vals = {}
                 new_vals['pricing'] = self.product_id.pricing or 'computed'
                 bom_obj = self.env['mrp.bom']
-                bom = bom_obj.search([('product_id','=',self.product_id.id)], limit=1)
+                bom = bom_obj.search([('product_id', '=', self.product_id.id)], limit=1)
                 if not bom:
                     product_tmpl_id = self.product_id.product_tmpl_id
-                    bom = bom_obj.search([('product_tmpl_id','=',product_tmpl_id.id)], limit=1)
+                    bom = bom_obj.search([('product_tmpl_id', '=', product_tmpl_id.id)], limit=1)
                 if bom:
                     comp_ref = self.product_id.default_code or self.product_id.name_get()[0][1] or self.product_id.name
-                    components = bom.get_components(0,1,comp_ref,'account')
+                    components = bom.get_components(0, 1, comp_ref, 'account')
                     if new_vals['pricing'] == 'fixed':
                         for comp in components:
                             comp[2]['hide_prices'] = True
@@ -205,18 +205,18 @@ class OFKitAccountInvoiceLine(models.Model):
         """
         for line in self:
             if line.is_kit:
-                comp_obj = line.env['account.invoice.line.comp'].search([('invoice_line_id','=',self.id),('children_loaded','=',False)])
+                comp_obj = line.env['account.invoice.line.comp'].search([('invoice_line_id', '=', self.id), ('children_loaded', '=', False)])
                 if line.pricing == 'computed':
                     hide_prices = False
                 else:
                     hide_prices = True 
                 for comp in comp_obj:
-                    comp.load_under_components(True,hide_prices)
+                    comp.load_under_components(True, hide_prices)
 
     def init_comps_from_so_line(self, so_line_id):
         # called by sale.order.line.invoice_line_create
         self.ensure_one()
-        so_line = self.env['sale.order.line'].search([('id','=',so_line_id)])
+        so_line = self.env['sale.order.line'].search([('id', '=', so_line_id)])
         if self.is_kit:
             direct_children = []
             for comp in so_line.child_ids:
@@ -228,9 +228,9 @@ class OFKitAccountInvoiceLine(models.Model):
     @api.model
     def create(self, vals):
         # from_so_line key added in vals in case of creation from a sale order
-        from_so_line = vals.pop("from_so_line",False)
+        from_so_line = vals.pop("from_so_line", False)
 
-        line = super(OFKitAccountInvoiceLine,self).create(vals)
+        line = super(OFKitAccountInvoiceLine, self).create(vals)
         if line.is_kit and not from_so_line:
             line._init_components()
             if line.pricing == 'computed':
@@ -239,7 +239,7 @@ class OFKitAccountInvoiceLine(models.Model):
         return line
 
     @api.multi
-    def write(self,vals):
+    def write(self, vals):
         if len(self._ids) == 1 and self.pricing == 'computed' and not self.price_unit == self.price_compo:
             vals['price_unit'] = self.price_compo
         super(OFKitAccountInvoiceLine,self).write(vals)
@@ -257,23 +257,23 @@ class OFKitAccountInvoiceLineComponent(models.Model):
     _description = 'Invoice Line Components'
     _order = 'parent_chain'
 
-    invoice_line_id = fields.Many2one('account.invoice.line',string='Invoice Line',ondelete='cascade',required=True,readonly=True)
+    invoice_line_id = fields.Many2one('account.invoice.line', string='Invoice Line', ondelete='cascade', required=True, readonly=True)
     invoice_id = fields.Many2one('account.invoice', string='Invoice', related='invoice_line_id.invoice_id', readonly=True)
-    parent_chain = fields.Char(string='Parent chain',oldname="bom_path",help="""
+    parent_chain = fields.Char(string='Parent chain', oldname="bom_path", help="""
 Contains the chain of parents of this component
 example: Kit A -> Kit B
 means that the product is a component of Kit B which is itself a component of Kit A
 """)
-    order_comp_id = fields.Many2one('sale.order.line.comp',string="Sale Order Component")
+    order_comp_id = fields.Many2one('sale.order.line.comp', string="Sale Order Component")
 
-    name = fields.Char(string='Name',required=True)
+    name = fields.Char(string='Name', required=True)
     default_code = fields.Char(string='Prod ref')
 
-    product_id = fields.Many2one('product.product',string='Product',required=True)
-    is_kit = fields.Boolean(string="Is a kit",required=True, default=False,oldname="is_kit_invoice_comp",
+    product_id = fields.Many2one('product.product', string='Product', required=True)
+    is_kit = fields.Boolean(string="Is a kit", required=True, default=False, oldname="is_kit_invoice_comp",
                             help="True if this comp is a kit itself. Also called an under-kit in that case")
     rec_lvl = fields.Integer(string="Recursion Level", help="1 for components of a kit. 2 for components of a kit inside a kit... etc.")
-    parent_id = fields.Many2one('account.invoice.line.comp',string='Parent Comp', ondelete='cascade')
+    parent_id = fields.Many2one('account.invoice.line.comp', string='Parent Comp', ondelete='cascade')
     child_ids = fields.One2many('account.invoice.line.comp', 'parent_id', string='Children Comps')
     load_children = fields.Boolean(string="Load direct children",
                         help="odoo is currently unable to load components of components at once on the fly. \n \
@@ -282,26 +282,26 @@ means that the product is a component of Kit B which is itself a component of Ki
     children_loaded = fields.Boolean(string="Children loaded") # no readonly for this or bug double children loading
 
     pricing = fields.Selection([
-        ('fixed','Fixed'),
-        ('computed','Computed')
-        ],string="Pricing", required=True, default='fixed',
+        ('fixed', 'Fixed'),
+        ('computed', 'Computed')
+        ], string="Pricing", required=True, default='fixed',
             help="This field is only relevant if the product is a kit. It represents the way the price should be computed. \n \
                 if set to 'fixed', the price of it's components won't be taken into account and the price will be the one of the kit. \n \
                 if set to 'computed', the price will be computed according to the components of the kit.")
     currency_id = fields.Many2one(related='invoice_id.currency_id', store=True, string='Currency', readonly=True)
     uom_id = fields.Many2one('product.uom', string='UoM', required=True)
-    price_unit = fields.Monetary('Unit Price',digits=dp.get_precision('Product Price'),required=True,default=0.0,oldname="unit_price")
-    price_children = fields.Monetary('Unit Price',digits=dp.get_precision('Product Price'),compute='_compute_prices',
+    price_unit = fields.Monetary('Unit Price', digits=dp.get_precision('Product Price'), required=True, default=0.0, oldname="unit_price")
+    price_children = fields.Monetary('Unit Price', digits=dp.get_precision('Product Price'), compute='_compute_prices',
                         help="Unit price. In case of a kit, price of components necessary for one unit", oldname="children_price")
-    cost_unit = fields.Monetary('Unit Cost',digits=dp.get_precision('Product Price'))
-    cost_children = fields.Monetary('Unit Cost',digits=dp.get_precision('Product Price'),compute='_compute_prices',
+    cost_unit = fields.Monetary('Unit Cost', digits=dp.get_precision('Product Price'))
+    cost_children = fields.Monetary('Unit Cost', digits=dp.get_precision('Product Price'), compute='_compute_prices',
                         help="Unit cost. In case of a kit, cost of components necessary for one unit")
     cost_total = fields.Monetary(string='Subtotal Cost', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices', 
                             help="Cost of this component total quantity. Equal to total quantity * unit cost.")
     cost_per_line = fields.Monetary(string='Cost/Kit', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices', 
                             help="Cost of this component quantity necessary to make one unit of its order line kit. Equal to quantity per kit unit * unit cost.")
 
-    qty_per_parent = fields.Float(string='Qty / parent', digits=dp.get_precision('Product Unit of Measure'),oldname='qty_bom_line', compute="_compute_qty_per_parent",
+    qty_per_parent = fields.Float(string='Qty / parent', digits=dp.get_precision('Product Unit of Measure'), oldname='qty_bom_line', compute="_compute_qty_per_parent",
                         help="Quantity per direct parent unit. Indicative value. Can differ from the quantity per line in case of a component of an under-kit.\n\
                         example: 2 kit K1 -> 3 kit K2 -> 2 prod P. \nP.qty_per_parent = 2, \nP.qty_per_line = 6\nP.qty_total = 12",)
     qty_per_line = fields.Float(string='Qty / Kit', digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0, oldname="qty_inv_line",
@@ -312,7 +312,7 @@ means that the product is a component of Kit B which is itself a component of Ki
     qty_total = fields.Float(string='Total Qty', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_qty_total', 
                                    help='total quantity equal to quantity per kit times number of kits.\n\
                         example: 2 kit K1 -> 3 kit K2 -> 2 prod P. \nP.qty_per_parent = 2, \nP.qty_per_line = 6\nP.qty_total = 12')
-    display_qty_changed = fields.Boolean(string="display qty changed message",default=False)
+    display_qty_changed = fields.Boolean(string="display qty changed message", default=False)
     price_total = fields.Monetary(string='Subtotal Price', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices', 
                             help="Price of this component total quantity. Equal to total quantity * unit price.", oldname="shown_price_total")
     price_per_line = fields.Monetary(string='Price/Kit', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices', 
@@ -321,7 +321,7 @@ means that the product is a component of Kit B which is itself a component of Ki
     hide_prices = fields.Boolean(string="Hide prices", default=False)
 
     @api.multi
-    def toggle_hide_prices(self,hide,rec=True):
+    def toggle_hide_prices(self, hide, rec=True):
         for comp in self:
             if hide:
                 comp.hide_prices =  True
@@ -382,13 +382,13 @@ means that the product is a component of Kit B which is itself a component of Ki
             new_vals['is_kit'] = True
             new_vals['pricing'] = 'computed'
             bom_obj = self.env['mrp.bom']
-            bom = bom_obj.search([('product_id','=',self.product_id.id)], limit=1)
+            bom = bom_obj.search([('product_id', '=', self.product_id.id)], limit=1)
             if not bom:
                 product_tmpl_id = self.product_id.product_tmpl_id
-                bom = bom_obj.search([('product_tmpl_id','=',product_tmpl_id.id)], limit=1)
+                bom = bom_obj.search([('product_tmpl_id', '=', product_tmpl_id.id)], limit=1)
             if bom:
                 comp_ref = self.product_id.default_code or self.product_id.name_get()[0][1] or self.product_id.name
-                under_components = bom.get_components(rec_lvl,qty_per_line,parent_chain + " -> " + comp_ref,'account')
+                under_components = bom.get_components(rec_lvl, qty_per_line, parent_chain + " -> " + comp_ref, 'account')
                 if hide_prices:
                     for under_comp in under_components:
                         under_comp[2]['hide_prices'] = True
@@ -411,10 +411,10 @@ means that the product is a component of Kit B which is itself a component of Ki
         checkbox to load components on the fly before saving. Odoo doesn't handle well recursive one2many on the fly
         """
         if self.load_children:
-            self.load_under_components(False,self.hide_prices)
+            self.load_under_components(False, self.hide_prices)
 
     @api.multi
-    def load_under_components(self,recursive=False,hide_prices=False):
+    def load_under_components(self, recursive=False, hide_prices=False):
         """
         Creates new components according to Bills of Materials.
         :param recursive: True if we want to load components of components as well. can't be True on the fly.
@@ -423,24 +423,24 @@ means that the product is a component of Kit B which is itself a component of Ki
         for comp in self:
             if comp.is_kit and not comp.children_loaded:
                 bom_obj = self.env['mrp.bom']
-                bom = bom_obj.search([('product_id','=',comp.product_id.id)], limit=1)
+                bom = bom_obj.search([('product_id', '=', comp.product_id.id)], limit=1)
                 if not bom:
                     product_tmpl_id = comp.product_id.product_tmpl_id
-                    bom = bom_obj.search([('product_tmpl_id','=',product_tmpl_id.id)], limit=1)
+                    bom = bom_obj.search([('product_tmpl_id', '=', product_tmpl_id.id)], limit=1)
                 if bom:
                     comp_ref = comp.product_id.default_code or comp.product_id.name_get()[0][1] or comp.product_id.name
-                    components = bom.get_components(comp.rec_lvl,comp.qty_per_line,comp.parent_chain + " -> " + comp_ref,'account')
+                    components = bom.get_components(comp.rec_lvl, comp.qty_per_line, comp.parent_chain + " -> " + comp_ref, 'account')
                     if hide_prices:
                         for under_comp in components:
                             under_comp[2]['hide_prices'] = True
                     comp.child_ids = components
                 comp.children_loaded = True
                 if recursive:
-                    comp.child_ids.load_under_components(True,hide_prices)
+                    comp.child_ids.load_under_components(True, hide_prices)
             else:
                 comp.hide_prices = hide_prices
 
-    @api.depends('child_ids','qty_per_line','nb_units','children_loaded','product_id')
+    @api.depends('child_ids', 'qty_per_line', 'nb_units', 'children_loaded', 'product_id')
     def _compute_prices(self):
         for comp in self:
             qty_per_line = comp.qty_per_line
@@ -449,7 +449,7 @@ means that the product is a component of Kit B which is itself a component of Ki
                 price_children = price_n_cost['price']
                 cost_children = price_n_cost['cost']
                 if not comp.children_loaded and comp.product_id.current_bom_id: # a kit not loaded and not created on the fly
-                    price_n_cost_bom = comp.product_id.current_bom_id.get_components_price(1,True)
+                    price_n_cost_bom = comp.product_id.current_bom_id.get_components_price(1, True)
                     price_children += price_n_cost_bom['price']
                     cost_children += price_n_cost_bom['cost']
                 # prices
@@ -471,7 +471,7 @@ means that the product is a component of Kit B which is itself a component of Ki
                 comp.cost_total = comp.cost_unit * qty_per_line * comp.nb_units
 
     @api.multi
-    def get_prices_rec(self,qty_parent=1):
+    def get_prices_rec(self, qty_parent=1):
         """
         returns the price and cost of the components in self and their children.
         doesn't take under-kits pricing into account.
@@ -487,25 +487,15 @@ means that the product is a component of Kit B which is itself a component of Ki
                 res += comp.child_ids.get_prices_rec(qty_parent * comp.qty_per_parent) # recursive call
                 if not comp.children_loaded: # get prices from bom if children are not loaded
                     bom_obj = self.env['mrp.bom']
-                    bom = bom_obj.search([('product_id','=',comp.product_id.id)], limit=1)
+                    bom = bom_obj.search([('product_id', '=', comp.product_id.id)], limit=1)
                     if not bom:
                         product_tmpl_id = comp.product_id.product_tmpl_id
-                        bom = bom_obj.search([('product_tmpl_id','=',product_tmpl_id.id)], limit=1)
+                        bom = bom_obj.search([('product_tmpl_id', '=', product_tmpl_id.id)], limit=1)
                     if bom:
-                        res += bom.get_components_price(comp.qty_per_line,True)
+                        res += bom.get_components_price(comp.qty_per_line, True)
         return res
 
-    """@api.depends('qty_per_parent','parent_id')
-    def _compute_qty_per_line(self):
-        for comp in self:
-            parent = comp.parent_id
-            qty = comp.qty_per_parent
-            while parent:
-                qty *= parent.qty_per_parent
-                parent = parent.parent_id
-            comp.qty_per_line = qty"""
-
-    @api.depends('qty_per_line','parent_id')
+    @api.depends('qty_per_line', 'parent_id')
     def _compute_qty_per_parent(self):
         for comp in self:
             qty = comp.qty_per_line
@@ -513,7 +503,7 @@ means that the product is a component of Kit B which is itself a component of Ki
                 qty /= comp.parent_id.qty_per_line
             comp.qty_per_parent = qty
 
-    @api.depends('qty_per_line','nb_units')
+    @api.depends('qty_per_line', 'nb_units')
     def _compute_qty_total(self):
         for comp in self:
             comp.qty_total = comp.qty_per_line * comp.nb_units 
@@ -522,14 +512,14 @@ means that the product is a component of Kit B which is itself a component of Ki
     def create(self, vals):
         if vals.get('parent_id') and not vals.get('invoice_line_id'):
             vals['invoice_line_id'] = self.browse(vals['parent_id']).invoice_line_id.id
-        comp = super(OFKitAccountInvoiceLineComponent,self).create(vals)
+        comp = super(OFKitAccountInvoiceLineComponent, self).create(vals)
         if not comp.parent_chain:
             comp.parent_chain = comp.invoice_line_id.product_id.default_code or comp.invoice_line_id.name
         return comp
 
     @api.multi
-    def write(self,vals):
-        super(OFKitAccountInvoiceLineComponent,self).write(vals)
+    def write(self, vals):
+        super(OFKitAccountInvoiceLineComponent, self).write(vals)
         for comp in self:
             if comp.display_qty_changed:
                 # set to True in _onchange_qty_per_line, we need to set it back to False so the message doesn't stay

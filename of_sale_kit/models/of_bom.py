@@ -13,7 +13,7 @@ class OFBom(models.Model):
         help="Kit (Phantom): When processing a sales order for this product, the delivery order will contain all the components that are not kits themselves. \
         (a kit itself can contain kits, sometimes called under-kits).")
 
-    def get_components_price_old(self,rec_qty=1,without_pricing=True):
+    def get_components_price_old(self, rec_qty=1, without_pricing=True):
         """
         recursive method.
         returns the sum of the price of all components in this bom. 
@@ -34,7 +34,7 @@ class OFBom(models.Model):
                 res += line.product_id.lst_price  * line.product_qty * rec_qty
         return res
 
-    def get_components_price(self,rec_qty=1,without_pricing=True):
+    def get_components_price(self, rec_qty=1, without_pricing=True):
         """
         recursive method.
         returns the sum of the price and cost of all components in this bom.
@@ -62,7 +62,7 @@ class OFBom(models.Model):
         return res
 
     @api.multi
-    def get_components(self,rec_lvl=0,parent_qty_per_line=1,parent_chain="",origin="sale"):
+    def get_components(self, rec_lvl=0, parent_qty_per_line=1, parent_chain="", origin="sale"):
         self.ensure_one()
         self._check_product_recursion()
         res = []
@@ -75,7 +75,6 @@ class OFBom(models.Model):
                     'name': comp_name,
                     'default_code': line.product_id.default_code,
                     'qty_per_line': line.product_qty * parent_qty_per_line,
-                    #'qty_per_parent': line.product_qty,
                     'price_unit': line.product_id.lst_price,
                     'cost_unit': line.product_id.standard_price,
                 }
@@ -93,11 +92,11 @@ class OFBom(models.Model):
                     comp['product_uom'] = line.product_uom_id.id
                 elif origin == 'account':
                     comp['uom_id'] = line.product_uom_id.id
-            res.append((0,0,comp))
+            res.append((0, 0, comp))
         return res
 
     @api.multi
-    def get_components_rec(self,rec_lvl=1,parent_qty_per_line=1,parent_chain=""):
+    def get_components_rec(self, rec_lvl=1, parent_qty_per_line=1, parent_chain=""):
         """
         recursive method.
         returns a list of all components (and under-kits) in this bom
@@ -138,7 +137,7 @@ class OFBom(models.Model):
                     'price_unit': line.product_id.lst_price,
                     'cost_unit': line.product_id.standard_price,
                 }
-            res.append((0,0,comp))
+            res.append((0, 0, comp))
         return res
 
     @api.onchange('type')
@@ -150,20 +149,20 @@ class OFBom(models.Model):
 
     @api.model
     def create(self, vals):
-        bom = super(OFBom,self).create(vals)
+        bom = super(OFBom, self).create(vals)
         # call to related product method. get around issues with store=True
         bom.product_tmpl_id._compute_is_kit()
         bom.product_tmpl_id._compute_current_bom_id()
         if bom.type == 'phantom':
             bom.product_tmpl_id.type = 'service' # kit products are services
             bom.product_tmpl_id.pricing = 'computed' # kit pricing is computed by default
-            bom.product_tmpl_id.standard_price = bom.get_components_price(1,True)
+            bom.product_tmpl_id.standard_price = bom.get_components_price(1, True)
         return bom
 
     @api.multi
     def write(self, vals):
         for bom in self:
-            super(OFBom,bom).write(vals)
+            super(OFBom, bom).write(vals)
             if 'type' in vals:
                 #call to related product method
                 bom.product_tmpl_id._compute_is_kit()
@@ -172,5 +171,5 @@ class OFBom(models.Model):
                     bom.product_tmpl_id.type = 'service' # kit products are services
                     bom.product_tmpl_id.pricing = 'computed' # kits pricing is computed by default
             if 'bom_line_ids' in vals:
-                bom.product_tmpl_id.standard_price = bom.get_components_price(1,True)
+                bom.product_tmpl_id.standard_price = bom.get_components_price(1, True)
         return True
