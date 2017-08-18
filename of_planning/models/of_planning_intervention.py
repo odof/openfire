@@ -138,6 +138,11 @@ class OfPlanningIntervention(models.Model):
 
             # Calcul du nombre de jours
             jours, duree = duree // duree_jour, duree % duree_jour
+            # Correction erreur d'arrondi
+            if duree * 60 < 1: # ça dépasse de moins d'une minute
+                # Le travail se termine à la fin de la journée
+                duree = duree_jour
+                jours -= 1
 
             if not (intervention.hor_sam and intervention.hor_dim):
                 # Deplacement de l'horaire de debut au debut de la semaine pour faciliter le calcul
