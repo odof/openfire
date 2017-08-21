@@ -38,6 +38,25 @@
         </field>
     </record>
 
+    <record id="of_kit_product_template_kanban_view" model="ir.ui.view">
+        <field name="name">of.kit.product.template.kanban</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban//field[@name='currency_id']" position="after">
+                <field name="is_kit"/>
+                <field name="pricing"/>
+                <field name="price_compo"/>
+                <field name="price_used"/>
+            </xpath>
+            <xpath expr="//kanban//templates//ul//li" position="replace">
+                <li t-if="record.is_kit.raw_value == false">Price: <field name="lst_price" widget="monetary"></field></li>
+                <li t-if="record.is_kit.raw_value == true">Price: <field name="price_used" widget="monetary"></field></li>
+                <li t-if="record.is_kit.raw_value == true">Pricing: <field name="pricing"/></li>
+            </xpath>
+        </field>
+    </record>
+
     <record id="of_product_template_form_view_bom_button" model="ir.ui.view">
         <field name="name">of.kit.product.template.procurement</field>
         <field name="model">product.template</field>
