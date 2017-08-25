@@ -164,10 +164,13 @@ class OFKitSaleOrderLine(models.Model):
 	def _refresh_price_unit(self):
 		for line in self:
 			if line.is_kit:
+				price = line.price_unit
 				if line.pricing == 'computed':
 					line.price_unit = line.price_compo
-				else:
-					line.price_unit = line.product_id.lst_price
+					if line.price_unit != price:
+						line._compute_amount()
+				#else:
+				#	line.price_unit = line.product_id.lst_price
 				line.purchase_price = line.cost_compo
 
 	@api.multi
