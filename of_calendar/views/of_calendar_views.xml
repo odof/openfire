@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data>
+<!--##############################################################################-->
+<!--######################### ______ Utilisateurs ______ #########################-->
+<!--##############################################################################-->
+    <record id="of_view_users_form" model="ir.ui.view">
+        <field name="name">of.res.users.form</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form//notebook//group[@name='messaging']" position="after">
+                <group string="Divers" name="divers">
+                    <field name="of_color_ft" widget="color"/>
+                    <field name="of_color_bg" widget="color"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_users_tree" model="ir.ui.view">
+        <field name="name">res.users.tree</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree//field[@name='login']" position="after">
+                <field name="of_color_bg" string="couleur" widget="color"/>
+            </xpath>
+        </field>
+    </record>
+
+<!--##############################################################################-->
+<!--########################## ______ Calendrier ______ ##########################-->
+<!--##############################################################################-->
+    <record id="of_view_calendar_event_calendar" model="ir.ui.view">
+        <field name="name">of.calendar.event.calendar</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="calendar.view_calendar_event_calendar"/>
+        <field name="priority" eval="2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//calendar" position="attributes">
+                <attribute name="color_ft_field">of_color_ft</attribute>
+                <attribute name="color_bg_field">of_color_bg</attribute>
+                <attribute name="custom_colors">1</attribute>
+            </xpath>
+            <xpath expr="//calendar" position="inside">
+                <field name="location" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+<!--##############################################################################-->
+<!--########################## ______ Partenaires ______ ##########################-->
+<!--##############################################################################-->
+    <record id="of_calendar_view_partner_form" model="ir.ui.view">
+        <field name="name">of.calendar.res.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form//sheet//field[@name='category_id']" position="after">
+                <field name="of_color_ft" widget="color"/>
+                <field name="of_color_bg" widget="color"/>
+            </xpath>
+        </field>
+    </record>
+</data>
+</odoo>

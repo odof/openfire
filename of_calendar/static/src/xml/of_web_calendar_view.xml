@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-extend="CalendarView.sidebar.contacts">
+        <t t-jquery="span[t-attf-class='color_filter o_underline_color_#{filters_value.color}']" t-operation="replace">
+            <t t-if="filters_value.custom_colors">
+                <!--span t-attf-style="border-bottom: 4px solid #{filters_value.color_bg};"-->
+                <span t-attf-style="
+                    color: #{filters_value.color_ft}; 
+                    background: #{filters_value.color_bg}; 
+                    padding: 2px 8px 4px; 
+                    border-radius: 4px;
+                    border: 1px solid #0D0D0D;">
+                    <t t-esc="filters_value.label"/>
+                </span>
+            </t>
+            <t t-if="!filters_value.custom_colors">
+                <span t-attf-class="color_filter o_underline_color_#{filters_value.color}"><t t-esc="filters_value.label"/></span>
+            </t>
+        </t>
+    </t>
+</templates>
