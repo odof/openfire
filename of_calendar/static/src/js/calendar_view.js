@@ -8,8 +8,10 @@ var core = require('web.core');
 var CalendarView = require('web_calendar.CalendarView');
 var widgets = require('web_calendar.widgets');
 var Model = require('web.DataModel');
+var Widget = require('web.Widget');
 
 var SidebarFilter = widgets.SidebarFilter;
+var Sidebar = widgets.Sidebar;
 var _t = core._t;
 var QWeb = core.qweb;
 
@@ -34,7 +36,9 @@ CalendarView.include({
             throw new Error(_t("Calendar views with 'custom_colors' attribute set to true need to define either 'use_contacts' or 'attendee_model' attribute. \n\
                 (use_contacts takes precedence)."));
         }
-        this.draggable = attrs.draggable || false; // make drag n drop defaults to false
+        this.draggable = !isNullOrUndef(attrs.draggable)  && _.str.toBool(attrs.draggable); // make drag n drop defaults to false
+
+        this.display_states = attrs.display_states  && _.str.toBool(attrs.display_states); // integer to make state easily visible. see .less file
 
         this.info_fields = [];
         for (var fld = 0; fld < this.fields_view.arch.children.length; fld++) {
@@ -42,7 +46,27 @@ CalendarView.include({
                 this.info_fields.push(this.fields_view.arch.children[fld].attrs.name); // don't add field to description if invisible="1"
             }
         }
+
+        // if we have not sidebar, (eg: Dashboard), we don't use the captions
+        if (isNullOrUndef(this.options.sidebar)) {
+            this.display_states = false;
+        }
+
         //console.log("this",this);
+    },
+
+    /*start: function () {
+        if (this.display_states) {
+            this.caption = new SidebarCaption(Widget,this);
+        }
+        return this._super();
+    },*/
+
+    _do_show_init: function () {
+        this._super.apply(this,arguments);
+        if (this.display_states) {
+            this.sidebar.caption.render();
+        }
     },
 
     /**
@@ -53,6 +77,11 @@ CalendarView.include({
         fc.editable = this.draggable;
         return fc;
     },
+
+    /*_do_search: function(domain, context, _group_by) {
+        var self = this;
+        self._super.apply(self, arguments);
+    },*/
 
     /**
      *  called by CalendarView.get_all_filters_ordered if custom_colors set to true
@@ -128,7 +157,7 @@ CalendarView.include({
      *  Returns the first value in indexes that is in self.all_custom_colors
      *  Returns -1 if no match
      */
-    get_custom_color: function(indexes) {
+    get_custom_color_index: function(indexes) {
         var self = this;
         var i = 0, res = -1;
         while (i < indexes.length && res == -1) {
@@ -149,14 +178,22 @@ CalendarView.include({
         var r = self._super.apply(self, arguments); // inherit function event_data_transform
         if (self.custom_colors) {
             if (self.useContacts) {
-                var index = self.get_custom_color(r.attendees);
+                var index = self.get_custom_color_index(r.attendees);
                 r.backgroundColor = self.all_filters[index]['color_bg'];
                 r.textColor = self.all_filters[index]['color_ft'];
-            }else{
+            }else if (evt[self.color_ft_field] && evt[self.color_bg_field]) {
                 r.textColor = evt[self.color_ft_field];
                 r.backgroundColor = evt[self.color_bg_field];
+            }else{
+                throw new Error(_t("Missing fields in calendar view definition: '" + self.color_ft_field + "'' and/or '" + self.color_bg_field + "'."));
             }
-            r.className = ["of_custom_color","of_color_bg_" + r.backgroundColor,"of_color_ft_" + r.textColor];
+            r.className = ["of_custom_color"];
+            if (self.display_states) {
+                r.className.push("of_calendar_state_" + evt["state_int"]);
+                r.borderColor = "rgba( 0, 0, 0, 0.0)"; // border to represent state
+            }else{
+                r.borderColor = "rgba( 0, 0, 0, 0.7)";
+            }
         }else{ // debug of odoo code
             var color_key = evt[this.color_field];
             if (typeof color_key === "object") { // make sure color_key is an integer before testing self.all_filters[color_key]
@@ -172,6 +209,16 @@ CalendarView.include({
         };
         //console.log("looks like it's working, r:",r);
         return r;
+    },
+});
+
+Sidebar.include({
+    /**
+     *  Override of parent function. Adds captions.
+     */
+    start: function() {
+        this.caption = new SidebarCaption(this, this.getParent());
+        return $.when(this._super(), this.caption.appendTo(this.$el));
     },
 });
 
@@ -194,5 +241,45 @@ SidebarFilter.include({
         });
     },
 });
+
+var SidebarCaption = Widget.extend({
+    //template: 'CalendarView.sidebar.captions',
+
+    /**
+     *  called by Sidebar.start
+     */
+    init: function(parent, view) {
+        this._super(parent);
+        this.view = view;
+        //console.log("this SidebarCaption: ",this);
+        this.start();
+    },
+
+    start: function() {
+        if (this.view.display_states) {
+            this.$el.addClass("of_calendar_captions");
+        };
+        return $.when(this._super());
+    },
+
+    render: function () {
+        var self = this;
+        if (this.view.display_states) {
+            $.when(new Model(this.view.dataset.model).call('get_state_int_map'))
+            .then(function (states){
+                //console.log("states: ", states);
+                //var captions = states;
+                self.$el.html(QWeb.render('CalendarView.sidebar.captions', { widget: self, captions: states }));
+                self.do_show();
+            });
+        }else{
+            this.do_hide();
+        }
+    },
+});
+
+return {
+    SidebarCaption: SidebarCaption
+};
 
 });

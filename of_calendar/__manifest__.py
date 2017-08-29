@@ -11,7 +11,7 @@
 Module OpenFire des calendrier
 ==============================
 
-- Ajout des champs 'of_color_ft' et 'of_color_ft' dans res.users et res.partner
+- Ajout des champs 'of_color_ft' et 'of_color_bg' dans res.users et res.partner
 - Ajout choix des couleurs dans les calendriers
 
 Vue calendar
@@ -23,6 +23,13 @@ Vue calendar
 - si 'use_contacts' à "1": 'color_bg_field' est à 'of_color_bg' (le champ de res.partner)
 - si 'use_contacts' à "0": 'color_bg_field' est le nom du champs couleur de l'objet du calendrier. exemple 'of_color_bg' pour "calendar.event"
 - ajout gestion de l'attribut invisible="1" dans les fields de la vue calendar
+
+Etat des évènements d'un calendrier (classe abstraite 'of.calendar.mixin')
+-----------------------------------
+
+Les objets implémentant une vue calendrier et des états peuvent desormais hériter de 'of.calendar.mixin'.
+Leur classe devra définir les fonctions '_compute_state_int' et 'get_state_int_map'.
+Leur balise calendar devra contenir l'attribut display_states="1".
 """,
     "website": "www.openfire.fr",
     "depends": ["web_widget_color","calendar","web_calendar"],

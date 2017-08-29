@@ -28,6 +28,10 @@ class OFMeeting(models.Model):
     _inherit = "calendar.event"
 
     color_partner_id = fields.Many2one("res.partner", "Partner whose color we will take", compute='_compute_color_partner', store=False)
+
+    """
+    These fields would be necessary if use_contacts="0" in <calendar>. See event_data_transform function in .js file
+
     of_color_ft = fields.Char(string="Couleur de texte", help="Couleur de texte de l'utilisateur", compute="_compute_of_color")
     of_color_bg = fields.Char(string="Couleur de fond", help="Couleur de fond de l'utilisateur", compute="_compute_of_color")
 
@@ -37,6 +41,7 @@ class OFMeeting(models.Model):
         for meeting in self:
             meeting.of_color_bg = meeting.color_partner_id.of_color_bg
             meeting.of_color_ft = meeting.color_partner_id.of_color_ft
+    """
 
     @api.multi
     @api.depends('user_id')
@@ -46,3 +51,27 @@ class OFMeeting(models.Model):
                 meeting.color_partner_id = meeting.user_id.partner_id
             else:
                 meeting.color_partner_id = (filter(lambda partner:partner.user_ids, meeting.partner_ids) or [False])[0]
+
+class OFCalendarMixin(models.AbstractModel):
+    _name = "of.calendar.mixin"
+
+    state_int = fields.Integer(string="Valeur d'état", compute="_compute_state_int", help="valeur allant de 0 à 3 inclus")
+
+    @api.depends('state')
+    def _compute_state_int(self):
+        """
+        Function to give an integer value (0,1,2 or 3) depending on the state. ONLY 4 values are implemented.
+        A CSS class 'of_calendar_state_#{self.state_int} will be given in CalendarView.event_data_transform.
+        See .less and .js files for further information
+        """
+        raise NotImplementedError("A class inheriting from this one must implement a '_compute_state_int' function")
+
+    @api.model
+    def get_state_int_map(self):
+        """
+        Returns a tuple of dictionaries. Each one contains 'value' and 'label' attributes.
+        'value' ranges from 0 to 3 included.
+        'label' is a string that will be displayed in the caption.
+        See template 'CalendarView.sidebar.captions'
+        """
+        raise NotImplementedError("A class inheriting from this one must implement a 'get_state_int_map' function")

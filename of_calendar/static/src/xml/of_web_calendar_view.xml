@@ -2,6 +2,7 @@
 <templates>
     <t t-extend="CalendarView.sidebar.contacts">
         <t t-jquery="span[t-attf-class='color_filter o_underline_color_#{filters_value.color}']" t-operation="replace">
+            <!-- if custom colors -->
             <t t-if="filters_value.custom_colors">
                 <!--span t-attf-style="border-bottom: 4px solid #{filters_value.color_bg};"-->
                 <span t-attf-style="
@@ -13,9 +14,28 @@
                     <t t-esc="filters_value.label"/>
                 </span>
             </t>
-            <t t-if="!filters_value.custom_colors">
+            <t t-if="!filters_value.custom_colors"><!-- copy of parent XML -->
                 <span t-attf-class="color_filter o_underline_color_#{filters_value.color}"><t t-esc="filters_value.label"/></span>
             </t>
         </t>
     </t>
+
+    <!--t t-extend="CalendarView.sidebar">
+        <!- - put the captions container under the mini calendar - ->
+        <t t-jquery="div[class='o_calendar_mini']" t-operation="after">
+            <div class="of_calendar_caption_container"/>
+        </t>
+    </t-->
+
+    <t t-name="CalendarView.sidebar.captions">
+        <t t-if="captions">
+            <!-- captions parameter given in SidebarCaption.render out model function 'get_state_int_map' -->
+            <t t-foreach="captions" t-as="caption">
+                <t t-if="caption_value.value || caption_value.value===0"><!-- don't display if no value given (or undefined) -->
+                    <div t-attf-class="of_calendar_state_#{caption_value.value} of_calendar_caption"><t t-esc="caption_value.label"/></div>
+                </t>
+            </t>
+        </t>
+    </t>
+
 </templates>
