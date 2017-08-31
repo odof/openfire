@@ -156,7 +156,7 @@ class OFBom(models.Model):
         if bom.type == 'phantom':
             bom.product_tmpl_id.type = 'service' # kit products are services
             bom.product_tmpl_id.pricing = 'computed' # kit pricing is computed by default
-            bom.product_tmpl_id.standard_price = bom.get_components_price(1, True)
+            bom.product_tmpl_id.standard_price = bom.get_components_price(1, True)['cost']
         return bom
 
     @api.multi
@@ -171,5 +171,5 @@ class OFBom(models.Model):
                     bom.product_tmpl_id.type = 'service' # kit products are services
                     bom.product_tmpl_id.pricing = 'computed' # kits pricing is computed by default
             if 'bom_line_ids' in vals:
-                bom.product_tmpl_id.standard_price = bom.get_components_price(1, True)
+                bom.product_tmpl_id.standard_price = bom.get_components_price(1, True)['cost']
         return True
