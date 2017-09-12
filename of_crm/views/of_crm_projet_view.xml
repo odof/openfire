@@ -105,7 +105,7 @@
             <field name="name">of.crm.projet.line.kanban</field>
             <field name="model">of.crm.projet.line</field>
             <field name="arch" type="xml">
-                <kanban>
+                <kanban draggable="1">
                     <field name="sequence"/>
                     <field name="attr_id"/>
                     <field name="name"/>
@@ -121,13 +121,17 @@
                                 <a t-if="!read_only_mode" type="delete" class="fa fa-times pull-right"/>
                                 <div class="oe_kanban_details">
                                     <span style="padding-right: 8px; border-right: 1px solid lightgrey;"><field name="name"/></span>
+                                    <!--div widget="of_fa_button"/-->
                                     <strong style="padding-left: 8px; border-left: 1px solid lightgrey;">
-                                        <field name="val_bool" invisible="1"/>
-                                        <span t-if="record.val_bool.raw_value == true and record.type.raw_value == 'bool'">Oui</span>
-                                        <span t-if="record.val_bool.raw_value == false and record.type.raw_value == 'bool'">Non</span>
-                                        <field name="val_char" attrs="{'invisible': [('type','!=','char')]}"/>
-                                        <field name="val_date" attrs="{'invisible': [('type','!=','date')]}"/>
-                                        <field name="val_select_id" attrs="{'invisible': [('type','!=','selection')]}"/>
+                                        <!-- <t t-if="record.type.raw_value == 'bool'">
+                                            <field name="val_bool" invisible="1"/>
+                                            <span t-if="record.val_bool.raw_value == true and record.type.raw_value == 'bool'">Oui</span>
+                                            <span t-if="record.val_bool.raw_value == false and record.type.raw_value == 'bool'">Non</span>
+                                        </t>-->
+                                        <t t-if="record.type.raw_value == 'bool'"><field name="val_bool" widget="of_kanban_bool"/></t>
+                                        <t t-if="record.type.raw_value == 'char'"><field name="val_char" widget="of_kanban_char"/></t>
+                                        <t t-if="record.type.raw_value == 'date'"><field name="val_date" widget="of_kanban_date"/></t>
+                                        <t t-if="record.type.raw_value == 'selection'"><field name="val_select_id" widget="of_kanban_selection"/></t>
                                         <!-- field name="val_select_ids" attrs="{'invisible': [('type','!=','multiple')]}"/-->
                                     </strong>
                                 </div>
@@ -137,6 +141,24 @@
                 </kanban>
             </field>
         </record>
+
+        <!-- temporaire - ->
+
+        <record id="of_crm_projet_line_action" model="ir.actions.act_window">
+            <field name="name">Entrées de Projets</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">of.crm.projet.line</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_type">form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to define a new attribute.
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="of_crm_projet_line_menu" name="Entrées de Projets" action="of_crm_projet_line_action" parent="of_crm_menu_projet_config" sequence="15"/>
+        <!- - / -->
 
         <!-- Attributs de Projets -->
         <record id="of_crm_projet_attr_view_form" model="ir.ui.view">
@@ -149,6 +171,10 @@
                             <group>
                                 <field name="name"/>
                                 <field name="type"/>
+                                <field name="val_bool_default" attrs="{'invisible': [('type','!=','bool')]}"/>
+                                <!--<field name="val_date_default" attrs="{'invisible': [('type','!=','date')]}"/>-->
+                                <field name="val_char_default" attrs="{'invisible': [('type','!=','char')]}"/>
+                                <field name="val_select_id_default" widget="selection" attrs="{'invisible': [('type','!=','selection')]}"/>
                             </group>
                             <group>
                                 <field name="active"/>

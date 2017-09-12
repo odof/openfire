@@ -35,6 +35,36 @@ class OFCRMProjetLine(models.Model):
                 }
             self.update(vals)
 
+    type_var_name = fields.Char(string="nom de la variable de valeur", compute="_compute_type_var_name")
+
+    @api.multi
+    @api.depends('type')
+    def _compute_type_var_name(self):
+        for line in self:
+            if line.type == 'bool':
+                line.type_var_name = 'val_bool'
+            elif line.type == 'char':
+                line.type_var_name = 'val_char'
+            elif line.type == 'date':
+                line.type_var_name = 'val_date'
+            else:
+                line.type_var_name = 'val_select_id'
+
+    @api.model
+    def create(self, vals):
+        attr = self.env['of.crm.projet.attr'].search([('id', '=', vals['attr_id'])])
+        vals['sequence'] = attr.sequence
+        """the_type = vals.get('type')
+        if the_type == 'char':
+            vals['val_char'] = attr.val_char_default
+        elif the_type == 'selection':
+            vals['val_select_id'] = attr.val_select_id_default
+        elif the_type == 'date':
+            vals['val_date'] = attr.val_date_default
+        else:
+            vals['val_bool'] = attr.val_bool_default"""
+        super(OFCRMProjetLine,self).create(vals)
+
 class OFCRMProjetModele(models.Model):
     _name = 'of.crm.projet.modele'
 
@@ -62,16 +92,17 @@ class OFCRMProjetAttr(models.Model):
     active = fields.Boolean(string="Actif", default=True)
     sequence = fields.Integer(string=u'Séquence', default=10)
 
+    val_bool_default = fields.Boolean(string="Valeur par Défaut", default=False)
+    val_char_default = fields.Char(string="Valeur par Défaut")
+    #val_date_default = fields.Date(string="Valeur par Défaut", default=fields.Date.today)
+    val_select_id_default = fields.Many2one('of.crm.projet.attr.select', string="Valeur par Défaut", ondelete="set null")
+
     """@api.onchange('active')
     def _onchange_active(self):
         select_obj = self.env['of.crm.projet.attr.select'].with_context(active_test=False)
         values = select_obj.search([('attr_id','in',self._ids)])
         print self._ids
         print values"""
-
-    #def get_select_default_val(self):
-    #    self.ensure_one()
-    #    if len(self.selection_ids):
 
     @api.multi
     def write(self,vals):

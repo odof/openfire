@@ -32,6 +32,7 @@ Fiche de projet dynamique
         'crm',
         'sale_crm',
         'of_geolocalize',
+        'of_web_widgets',
     ],
     'data' : [
         'views/of_crm_view.xml',
