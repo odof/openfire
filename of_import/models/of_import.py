@@ -316,9 +316,9 @@ class of_import(models.Model):
                     # Si est un boolean
                     elif champs_odoo[champ_fichier_sansrel]['type'] == 'boolean':
                         if ligne[champ_fichier].upper() in ('1', "TRUE", "VRAI"):
-                            ligne[champ_fichier] = True
+                            valeurs[champ_fichier] = True
                         elif ligne[champ_fichier].upper() in ('0', "FALSE", "FAUX"):
-                            ligne[champ_fichier] = False
+                            valeurs[champ_fichier] = False
                         else:
                             sortie_erreur += u"Ligne %s : champ %s (%s) valeur \"%s\" non autorisée (admis 0, 1, True, False, vrai, faux). %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], nom_objet.capitalize())
                             erreur = 1
