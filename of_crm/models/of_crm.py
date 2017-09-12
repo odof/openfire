@@ -251,11 +251,11 @@ surcharge méthode du même nom pour ne pas compter les devis dans les ventes
             elif not partner.customer and partner.of_customer_state !='other':
                 partner.of_customer_state = 'other'
 
-    @api.model
+    """@api.model
     def create(self, vals):
-        """
+        ""
         On creation of a partner, will set of_customer_state field.
-        """
+        ""
         if ((vals['of_customer_state'] and vals['of_customer_state'] == 'other') and vals['customer']):
             vals['of_customer_state'] = 'lead'
         elif ((vals['of_customer_state'] and vals['of_customer_state'] != 'other') and not vals['customer']):
@@ -263,7 +263,7 @@ surcharge méthode du même nom pour ne pas compter les devis dans les ventes
 
         partner = super(OFCRMResPartner, self).create(vals)
 
-        return partner
+        return partner"""
 
 class OFCRMSaleOrder(models.Model):
     _inherit = 'sale.order'
