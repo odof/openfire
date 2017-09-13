@@ -15,7 +15,7 @@ class OFCRMLead(models.Model):
     of_description_projet = fields.Html('Notes de projet')
     of_ref = fields.Char(string=u"Référence", copy=False)
     of_prospecteur = fields.Many2one("res.users", string="Prospecteur")
-    of_date_prospection = fields.Date(string="Date de prospection")
+    of_date_prospection = fields.Date(string="Date de prospection", default=fields.Date.today)
     # @TODO: implémenter la maj automatique de la date de cloture en fonction du passage de probabilité à 0 ou 100
     of_date_cloture = fields.Date(string="Date de clôture")
     of_infos_compl = fields.Text(string="Autres infos")
@@ -30,6 +30,17 @@ class OFCRMLead(models.Model):
     # activity_ids = fields.One2many('of.crm.opportunity.activity', 'lead_id', string=u"Activités de cette opportunité")
 
     referred = fields.Many2one('res.partner', string="Apporteur", help="Nom contact")
+    street = fields.Char(related='partner_id.street')
+    street2 = fields.Char(related='partner_id.street2')
+    zip = fields.Char(related='partner_id.zip')
+    city = fields.Char(related='partner_id.city')
+    state_id = fields.Many2one(related="partner_id.state_id")
+    country_id = fields.Many2one(related='partner_id.country_id')
+    phone = fields.Char(related='partner_id.phone')
+    fax = fields.Char(related='partner_id.fax')
+    mobile = fields.Char(related='partner_id.mobile')
+    email_from = fields.Char(related="partner_id.email")
+    #partner_name = fields.Char(related="partner_id.name")
 
     @api.onchange('of_modele_id')
     def _onchange_modele_id(self):
