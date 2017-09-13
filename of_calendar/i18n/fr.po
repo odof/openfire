@@ -1,0 +1,120 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_calendar
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-09-13 09:18+0000\n"
+"PO-Revision-Date: 2017-09-13 09:18+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_calendar
+#. openerp-web
+#: code:addons/of_calendar/static/src/js/calendar_view.js:32
+#, python-format
+msgid "Calendar views with 'custom_colors' attribute set to true need to define both 'color_ft_field' and 'color_bg_field' attributes."
+msgstr "Les vues Calendrier avec l'attribut 'custom_colors' à 'vrai' doivent définir les attributs 'color_ft_field' et 'color_bg_field'."
+
+#. module: of_calendar
+#. openerp-web
+#: code:addons/of_calendar/static/src/js/calendar_view.js:36
+#, python-format
+msgid "Calendar views with 'custom_colors' attribute set to true need to define either 'use_contacts' or 'attendee_model' attribute. \n"
+"\n"
+"                (use_contacts takes precedence)."
+msgstr "Les vues Calendrier avec l'attribut 'custom_colors' à 'vrai' doivent définir soit l'attribut 'use_contacts', soit l'attribut 'attendee_model'. \n"
+"\n"
+"                ('use_contacts' prévaut)."
+
+#. module: of_calendar
+#: model:ir.model.fields,help:of_calendar.field_res_users_of_color_bg
+#: model:ir.model.fields,help:of_calendar.field_res_users_of_color_ft
+msgid "Choisissez votre couleur"
+msgstr "Choisissez votre couleur"
+
+#. module: of_calendar
+#: model:ir.model.fields,field_description:of_calendar.field_res_partner_of_color_bg
+#: model:ir.model.fields,field_description:of_calendar.field_res_users_of_color_bg
+msgid "Couleur de fond"
+msgstr "Couleur de fond"
+
+#. module: of_calendar
+#: model:ir.model.fields,field_description:of_calendar.field_res_partner_of_color_ft
+#: model:ir.model.fields,field_description:of_calendar.field_res_users_of_color_ft
+msgid "Couleur de texte"
+msgstr "Couleur de texte"
+
+#. module: of_calendar
+#: model:ir.model.fields,field_description:of_calendar.field_of_calendar_mixin_display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: of_calendar
+#: model:ir.ui.view,arch_db:of_calendar.of_view_users_form
+msgid "Divers"
+msgstr "Divers"
+
+#. module: of_calendar
+#: model:ir.model,name:of_calendar.model_calendar_event
+msgid "Event"
+msgstr "Évènement"
+
+#. module: of_calendar
+#: model:ir.model.fields,field_description:of_calendar.field_of_calendar_mixin_id
+msgid "ID"
+msgstr "ID"
+
+#. module: of_calendar
+#: model:ir.model.fields,field_description:of_calendar.field_of_calendar_mixin___last_update
+msgid "Last Modified on"
+msgstr "Dernière Modification le"
+
+#. module: of_calendar
+#. openerp-web
+#: code:addons/of_calendar/static/src/js/calendar_view.js:188
+#, python-format
+msgid "Missing fields in calendar view definition: ''' and/or ''."
+msgstr "Champ(s) manquant(s) dans la définition de la vue Calendrier: '' et/ou ''."
+
+#. module: of_calendar
+#: model:ir.model.fields,field_description:of_calendar.field_res_users_of_parc_installe_count
+msgid "Parc installé"
+msgstr "Parc installé"
+
+#. module: of_calendar
+#: model:ir.model,name:of_calendar.model_res_partner
+msgid "Partner"
+msgstr "Partenaire"
+
+#. module: of_calendar
+#: model:ir.model,name:of_calendar.model_res_users
+msgid "Users"
+msgstr "Utilisateurs"
+
+#. module: of_calendar
+#: model:ir.model.fields,field_description:of_calendar.field_of_calendar_mixin_state_int
+msgid "Valeur d'état"
+msgstr "Valeur d'état"
+
+#. module: of_calendar
+#: model:ir.ui.view,arch_db:of_calendar.view_users_tree
+msgid "couleur"
+msgstr "couleur"
+
+#. module: of_calendar
+#: model:ir.model,name:of_calendar.model_of_calendar_mixin
+msgid "of.calendar.mixin"
+msgstr "of.calendar.mixin"
+
+#. module: of_calendar
+#: model:ir.model.fields,help:of_calendar.field_of_calendar_mixin_state_int
+msgid "valeur allant de 0 à 3 inclus"
+msgstr "valeur allant de 0 à 3 inclus"
+
