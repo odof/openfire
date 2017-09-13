@@ -267,7 +267,7 @@ class OFAccountFrFec(models.TransientModel):
                  ELSE ''
             END
             AS CompAuxNum,
-            CASE WHEN aa.internal_type IN ('payable', 'receivable') THEN replace(rp.name, '|', '/')
+            CASE WHEN aa.internal_type IN ('payable', 'receivable') THEN replace(COALESCE(rp.name, ''), '|', '/')
                  ELSE ''
             END
             AS CompAuxLib,
