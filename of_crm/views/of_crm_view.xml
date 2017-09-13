@@ -89,116 +89,236 @@
             <field name="model">crm.lead</field>
             <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
             <field name="arch" type="xml">
+
+                <!-- Modifications header -->
                 <xpath expr="//form//header//button[@name='action_set_won']" position="attributes">
                     <attribute name="attrs">{'invisible': [('probability', 'in', (0,100))]}</attribute>
                 </xpath>
                 <xpath expr="//form//header//button[@type='action'][@class='oe_highlight'][2]" position="attributes">
                     <attribute name="attrs">{'invisible': [('probability', 'in', (0,100))]}</attribute>
                 </xpath>
-                <xpath expr="//form//sheet//button[@name='toggle_active']" position="attributes">
-                    <attribute name="attrs"></attribute>
-                </xpath>
-                <xpath expr="//form//sheet//div[@class='label label-danger pull-right']" position="attributes">
-                    <attribute name="attrs">{'invisible': [('stage_probability', '&gt;', 0)]}</attribute>
-                </xpath>
-                <xpath expr="//form//sheet//div[@class='label label-success pull-right']" position="attributes">
-                    <attribute name="attrs">{'invisible': [('stage_probability', '&lt;', 100)]}</attribute>
-                </xpath>
-                <xpath expr="//form//sheet//field[@name='phone']" position="after">
-                    <field name="of_website" widget="url"/>
-                </xpath>
-                <xpath expr="//form//sheet//field[@name='partner_id']" position="before">
-                    <field name="of_ref"/>
-                </xpath>
-                <!-- infos client transféré depuis onglet contact -->
-                <xpath expr="//form//sheet//field[@name='partner_id']" position="after">
-                    <field name="partner_name"/>
-                    <label for="street" string="Adresse"/>
-                    <div class="o_address_format">
-                        <field name="street" placeholder="Street..." class="o_address_street"/>
-                        <field name="street2" placeholder="Street 2..." class="o_address_street"/>
-                        <field name="city" placeholder="City" class="o_address_city"/>
-                        <field name="state_id" class="o_address_state" placeholder="State" options='{"no_open": True}'/>
-                        <field name="zip" placeholder="ZIP" class="o_address_zip"/>
-                        <field name="country_id" placeholder="Country" class="o_address_country" options='{"no_open": True, "no_create": True}'/>
-                    </div>
-                </xpath>
-                <xpath expr="//form//sheet//field[@name='team_id']" position="attributes">
-                    <!-- inhiber equipes commerciales -->
-                    <attribute name="invisible">1</attribute>
-                </xpath>
-                <xpath expr="//form//sheet//field[@name='team_id']" position="after">
-                    <field name="of_prospecteur"/>
-                    <field name="of_date_prospection"/>
-                    <field name="company_id"/>
-                </xpath>
-                <xpath expr="//form//sheet//field[@name='lost_reason']" position="attributes">
-                    <attribute name="attrs">{'invisible': [('probability', '&gt;', 0)]}</attribute>
-                </xpath>
-                <xpath expr="//form//sheet//field[@name='date_deadline']" position="after">
-                    <field name="of_date_cloture"/>
-                    <field name="stage_probability" invisible="1"/>
-                </xpath>
-                <!-- multi-activites
-                <xpath expr="//form//sheet//notebook" position="before">
-                    <label for="activity_ids"/>
-                    <field name="activity_ids" mode="tree">
-                        <tree colors="red:is_late==True; #A0A0A0:is_done==True;">
-                            <field name="sequence" widget="handle"/>
-                            <field name="activity_id"/>
-                            <field name="name"/>
-                            <field name="date_action"/>
-                            <field name="date_done"/>
-                            <button string="Rendre compte" 
-                                icon='fa fa-check'
-                                attrs="{'invisible': [('is_done','=',True)]}"/><!- - ouvrir un wizard de compte rendu - ->
-                            <field name="is_done" invisible="1"/>
-                            <field name="is_late" invisible="1"/>
-                        </tree>
-                    </field>
-                </xpath>-->
-                <xpath expr="//form//sheet//notebook" position="inside">
-                    <page name="project" string="Projet">
-                        <group>
-                            <field name="of_modele_id" widget="selection"/>
+
+                <!-- ##### Full sheet's modification ##### -->
+                <xpath expr="//form//sheet" position="replace"></xpath>
+
+                <form>
+                    <sheet>
+                        <group name="title_and_buttons" >
+                                <div class="oe_title of_width_200" >
+                                    <!-- Étiquettes Gagné/Perdu (vues conditionnelles) -->
+                                    <field name="stage_probability" invisible="1"/>
+                                    <div class="label label-danger pull-right" attrs="{'invisible': [('stage_probability', '&gt;', 0)]}" >Perdu</div>
+                                    <div class="label label-success pull-right" attrs="{'invisible': [('stage_probability', '&lt;', 100)]}" >Gagné</div>
+
+                                    <!-- Titre -->
+                                    <separator string="Opportunité"  />
+                                </div>
+
+                                <!-- Boutons -->
+                                <div class="oe_button_box of_width_600" name="button_box_custom" >
+                                    <!-- Bouton Actif -->
+                                    <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive" display="inline-block">
+                                        <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                                    </button>
+
+                                    <!-- Bouton Reunion  -->
+                                    <button class="oe_stat_button" type="object" display="inline-block"
+                                            context="{'partner_id': partner_id}"
+                                            name="action_schedule_meeting" icon="fa-calendar">
+                                            <div class="o_stat_info">
+                                                <field name="meeting_count" class="o_stat_value"/>
+                                                <span class="o_stat_text" attrs="{'invisible': [('meeting_count', '&lt;', 2)]}"> Réunions</span>
+                                                <span class="o_stat_text" attrs="{'invisible': [('meeting_count', '&gt;', 1)]}"> Réunion</span>
+                                            </div>
+                                    </button>
+
+                                <!-- Bouton Devis -->
+                                <button class="oe_stat_button" type="action" display="inline-block"
+                                        name="361" icon="fa-pencil-square-o"
+                                        context="{'default_partner_id': partner_id, 'search_default_draft': 1}">
+                                        <div class="o_stat_info">
+                                            <field name="sale_number" class="o_stat_value" modifiers="{'readonly': true}"/>
+                                                <span class="o_stat_text"> Devis</span>
+                                        </div>
+                                </button>
+
+                                <!-- Bouton Ordres (vue conditionnelle) -->
+                                <button class="oe_stat_button" type="action" display="inline-block"
+                                        attrs="{'invisible': [('sale_amount_total', '=', 0)]}" name="361" icon="fa-usd"
+                                        context="{'search_default_partner_id': partner_id, 'default_partner_id': partner_id, 'search_default_sales': 1}"
+                                        modifiers="{'invisible': [['sale_amount_total', '=', 0]]}">
+                                        <div class="o_form_field o_stat_info">
+                                            <span class="o_stat_value">
+                                                <field name="sale_amount_total" widget="monetary"
+                                                       options="{'currency_field': 'company_currency'}"
+                                                       modifiers="{'readonly': true}"/>
+                                                </span>
+                                            <span class="o_stat_text"> Ordres</span>
+                                        </div>
+                                </button>
+                            </div>
                         </group>
-                        <label for="of_projet_line_ids"/>
-                        <field name="of_projet_line_ids" mode="kanban">
-                            <form>
+
+                        <!-- Description revenu et probabilite -->
+                        <h1>
+                            <label string="Description" fonts="bold" class="oe_edit_only" />
+                            <field name="name" placeholder="Description du Projet" modifiers="{'required': true}"/>
+                        </h1>
+                        <h2 class="o_row">
+                            <div>
+                                <label for="planned_revenue" class="oe_edit_only" />
+                                    <div class="o_row">
+                                        <field name="company_currency" invisible="1"/>
+                                        <field name="planned_revenue" widget='monetary' options="{'currency_field': 'company_currency'}"/>
+                                        <span class="oe_grey">&#160;à&#160;</span>
+                                    </div>
+                            </div>
+                            <div>
+                                <label for="probability" class="oe_edit_only"/>
+                                    <div class="o_row">
+                                        <field name="probability" widget="integer"/>
+                                        <span>%%</span>
+                                    </div>
+                            </div>
+                        </h2>
+
+                        <!-- Corps -->
+                        <group col="2">
+                            <!-- Prospect group -->
+                            <group name='prospect'>
+                                <separator string="Prospect" colspan="2"/>
+                                    <field name="of_ref"/>
+                                    <field name="partner_id"/>
+                                    <label for="partner_name" name="partner_name"/>
+                                        <div>
+                                            <div class="o_row " >
+                                                <field name="partner_name"/>
+                                                <field name="title" placeholder="Civilité" domain="[]"
+                                                       options="{'no_open': True}" can_create="true" can_write="true" modifiers="{}"
+                                                       attrs="{'invisible': [('partner_name', '=', False)]}"/>
+                                            </div>
+                                        </div>
+                                    <label for="street" string="Adresse"/>
+                                        <div class="o_address_format">
+                                            <field name="street" placeholder="Adresse..." class="o_address_street"/>
+                                            <field name="street2" placeholder="Adresse suite..." class="o_address_street"/>
+                                            <field name="city" placeholder="Ville" class="o_address_city"/>
+                                            <field name="zip" placeholder="Code postal" class="o_address_zip"/>
+                                            <field name="country_id" placeholder="Pays" class="o_address_country" options='{"no_open": True, "no_create": True}'/>
+                                        </div>
+                                    <field name="phone" widget="phone" modifiers="{}"/>
+                                    <field name="mobile" widget="phone" modifiers="{}"/>
+                                    <field name="email_from" string="Courriel" widget="email" modifiers="{}"/>
+                            </group>
+
+                            <!-- Qualification et Suivi group -->
+                            <group name='suivi'>
+                                <separator string="Qualification et Suivi" colspan="2"/>
+                                    <label for="next_activity_id"/>
+                                    <div>
+                                        <div class="o_row mr18">
+                                            <field name="next_activity_id"
+                                                   options="{'no_create': True, 'no_open': True}"
+                                                   domain="['|',('team_id','=',False),('team_id','=',team_id)]"/>
+                                                   <span class="oe_form_field"
+                                                         attrs="{'invisible': ['|', ('next_activity_id', '=', False), ('date_action', '=', False)]}">&#160;Date</span>
+                                                   <field name="date_action" attrs="{'invisible': [('next_activity_id', '=', False)]}" placeholder="Date..."/>
+                                        </div>
+                                        <div>
+                                            <field name="title_action" placeholder="Ex. Proposition d'examen"
+                                                   attrs="{'invisible': [('next_activity_id', '=', False)]}"/>
+                                        </div>
+                                    </div>
+
+                                    <field name="of_date_prospection"
+                                           string="Date de création" />
+                                    <field name="date_deadline"
+                                           string="Date du projet"/>
+                                    <field name="of_date_cloture"/>
+                                    <field name="company_id"/>
+                                    <field name="priority" widget="priority"/>
+                                    <field name="tag_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
+                                    <field name="user_id" context="{'default_groups_ref': ['base.group_user', 'base.group_partner_manager', 'sales_team.group_sale_salesman_all_leads'], 'team_id': team_id}"
+                                           domain="[('share', '=', False)]" string="Commercial"/>
+                                    <field name="of_prospecteur"/>
+                                    <field name="lost_reason" attrs="{'invisible': [('stage_probability', '!=', 0)]}"/>
+
+                                    <!-- Invisible champs -->
+                                    <field name="team_id" invisible="1"/>
+                                    <field name="date_conversion" invisible="1"/>
+                            </group>
+                        </group>
+
+                        <!-- Onglets -->
+                        <notebook colspan="4">
+
+                            <!-- Suivi -->
+                            <page string="Suivi" >
+                                <field name="description" widget="html"/>
+                            </page>
+
+                            <!-- Contact -->
+                            <page name="lead" string="Contact">
                                 <group>
-                                    <field name="type" invisible="1"/>
-                                    <field name="attr_id" widget="selection"/>
-                                    <field name="name"/>
-                                    <field name="val_bool" attrs="{'invisible': [('type','!=','bool')]}"/>
-                                    <field name="val_date" attrs="{'invisible': [('type','!=','date')]}"/>
-                                    <field name="val_char" attrs="{'invisible': [('type','!=','char')]}"/>
-                                    <field name="val_select_id" options="{'no_create': True}" attrs="{'invisible': [('type','!=','selection')]}" domain="[('attr_id','=',attr_id)]"/>
-                                    <!--field name="val_select_ids" widget="many2many_tags" attrs="{'invisible': [('type','!=','multiple')]}" domain="[('attr_id','=',attr_id)]"/-->
-                                    <field name="sequence"/>
+                                    <group string="Géolocalisation" name="geoloc">
+                                        <field name="geo_lat"/>
+                                        <field name="geo_lng"/>
+                                    </group>
+
+                                    <group string="Options" name="options">
+                                        <!-- option de retrait -->
+                                        <field name="opt_out"/>
+                                    </group>
+
+                                    <group string="Marketing">
+                                        <field name="campaign_id" />
+                                        <field name="medium_id" string="Canal"/>
+                                        <field name="source_id" />
+                                    </group>
+
+                                    <group string="Misc" name="Misc">
+                                        <field name="referred" />
+                                    </group>
                                 </group>
-                            </form>
-                        </field>
-                    </page>
-                </xpath>
-                <xpath expr="//form//sheet//notebook" position="inside">
-                    <page name="infos_compl" string="Autres infos">
-                        <field name="of_infos_compl" nolabel="1"/>
-                    </page>
-                </xpath>
-                <xpath expr="//form//sheet//notebook//page[1]" position="attributes">
-                    <attribute name="string">Suivi</attribute>
-                    <attribute name="name">suivi</attribute>
-                </xpath>
-                <xpath expr="//form//sheet//notebook//page[@name='lead']" position="attributes">
-                    <attribute name="string">Contact</attribute>
-                </xpath>
-                <!-- infos client transféré depuis onglet contact -->
-                <xpath expr="//form//sheet//notebook//page[@name='lead']//field[@name='partner_name']/.." position="replace">
-                    <group string="Géolocalisation" name="geoloc">
-                        <field name="geo_lat"/>
-                        <field name="geo_lng"/>
-                    </group>
-                </xpath>
+                            </page>
+
+                            <!-- Projet -->
+                            <page name="lead" string="Projet">
+                                <group>
+                                    <field name="of_modele_id" widget="selection"/>
+                                </group>
+ 
+                                <label for="of_projet_line_ids"/>
+                                <field name="of_projet_line_ids" mode="kanban">
+                                    <form>
+                                        <group>
+                                            <field name="type" invisible="1"/>
+                                            <field name="attr_id" widget="selection"/>
+                                            <field name="name"/>
+                                            <field name="val_bool" attrs="{'invisible': [('type','!=','bool')]}"/>
+                                            <field name="val_date" attrs="{'invisible': [('type','!=','date')]}"/>
+                                            <field name="val_char" attrs="{'invisible': [('type','!=','char')]}"/>
+                                            <field name="val_select_id" options="{'no_create': True}" attrs="{'invisible': [('type','!=','selection')]}" domain="[('attr_id','=',attr_id)]"/>
+                                            <!--field name="val_select_ids" widget="many2many_tags" attrs="{'invisible': [('type','!=','multiple')]}" domain="[('attr_id','=',attr_id)]"/-->
+                                            <field name="sequence"/>
+                                        </group>
+                                    </form>
+                                </field>
+                            </page>
+
+                            <!-- Autres infos -->
+                            <page name="infos_compl" string="Autres infos">
+                                <field name="of_infos_compl" nolabel="1" widget="html"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+
+                    <!-- Mail et chat -->
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
             </field>
         </record>
 
