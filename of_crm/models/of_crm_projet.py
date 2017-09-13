@@ -50,21 +50,6 @@ class OFCRMProjetLine(models.Model):
             else:
                 line.type_var_name = 'val_select_id'
 
-    @api.model
-    def create(self, vals):
-        attr = self.env['of.crm.projet.attr'].search([('id', '=', vals['attr_id'])])
-        vals['sequence'] = attr.sequence
-        """the_type = vals.get('type')
-        if the_type == 'char':
-            vals['val_char'] = attr.val_char_default
-        elif the_type == 'selection':
-            vals['val_select_id'] = attr.val_select_id_default
-        elif the_type == 'date':
-            vals['val_date'] = attr.val_date_default
-        else:
-            vals['val_bool'] = attr.val_bool_default"""
-        super(OFCRMProjetLine,self).create(vals)
-
 class OFCRMProjetModele(models.Model):
     _name = 'of.crm.projet.modele'
 

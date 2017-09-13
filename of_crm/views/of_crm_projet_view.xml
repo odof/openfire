@@ -105,7 +105,7 @@
             <field name="name">of.crm.projet.line.kanban</field>
             <field name="model">of.crm.projet.line</field>
             <field name="arch" type="xml">
-                <kanban draggable="1">
+                <kanban>
                     <field name="sequence"/>
                     <field name="attr_id"/>
                     <field name="name"/>
@@ -121,13 +121,7 @@
                                 <a t-if="!read_only_mode" type="delete" class="fa fa-times pull-right"/>
                                 <div class="oe_kanban_details">
                                     <span style="padding-right: 8px; border-right: 1px solid lightgrey;"><field name="name"/></span>
-                                    <!--div widget="of_fa_button"/-->
                                     <strong style="padding-left: 8px; border-left: 1px solid lightgrey;">
-                                        <!-- <t t-if="record.type.raw_value == 'bool'">
-                                            <field name="val_bool" invisible="1"/>
-                                            <span t-if="record.val_bool.raw_value == true and record.type.raw_value == 'bool'">Oui</span>
-                                            <span t-if="record.val_bool.raw_value == false and record.type.raw_value == 'bool'">Non</span>
-                                        </t>-->
                                         <t t-if="record.type.raw_value == 'bool'"><field name="val_bool" widget="of_kanban_bool"/></t>
                                         <t t-if="record.type.raw_value == 'char'"><field name="val_char" widget="of_kanban_char"/></t>
                                         <t t-if="record.type.raw_value == 'date'"><field name="val_date" widget="of_kanban_date"/></t>

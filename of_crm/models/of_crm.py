@@ -40,6 +40,14 @@ class OFCRMLead(models.Model):
                     attr_vals['attr_id'] = attr.id
                     attr_vals['type'] = attr.type
                     attr_vals['name'] = attr.name
+                    attr_vals['sequence'] = attr.sequence
+                    the_type = attr.type
+                    if the_type == 'char':
+                        attr_vals['val_char'] = attr.val_char_default
+                    elif the_type == 'selection':
+                        attr_vals['val_select_id'] = attr.val_select_id_default
+                    else:
+                        attr_vals['val_bool'] = attr.val_bool_default
                     vals.append((0, 0, attr_vals.copy()))
                 projet.of_projet_line_ids = vals
 
@@ -251,19 +259,19 @@ surcharge méthode du même nom pour ne pas compter les devis dans les ventes
             elif not partner.customer and partner.of_customer_state !='other':
                 partner.of_customer_state = 'other'
 
-    """@api.model
+    @api.model
     def create(self, vals):
-        ""
+        """
         On creation of a partner, will set of_customer_state field.
-        ""
-        if ((vals['of_customer_state'] and vals['of_customer_state'] == 'other') and vals['customer']):
-            vals['of_customer_state'] = 'lead'
-        elif ((vals['of_customer_state'] and vals['of_customer_state'] != 'other') and not vals['customer']):
+        """
+        if not vals.get('customer'): # partner is not a customer -> set to 'other'
             vals['of_customer_state'] = 'other'
+        elif vals.get('of_customer_state', 'other') == 'other': # partner is a customer -> defaults to 'lead'
+            vals['of_customer_state'] = 'lead'
 
         partner = super(OFCRMResPartner, self).create(vals)
 
-        return partner"""
+        return partner
 
 class OFCRMSaleOrder(models.Model):
     _inherit = 'sale.order'
