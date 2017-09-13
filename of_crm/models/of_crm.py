@@ -29,6 +29,8 @@ class OFCRMLead(models.Model):
     of_customer_state = fields.Selection(related="partner_id.of_customer_state", required=False)
     # activity_ids = fields.One2many('of.crm.opportunity.activity', 'lead_id', string=u"Activités de cette opportunité")
 
+    referred = fields.Many2one('res.partner', string="Apporteur", help="Nom contact")
+
     @api.onchange('of_modele_id')
     def _onchange_modele_id(self):
         for projet in self:
