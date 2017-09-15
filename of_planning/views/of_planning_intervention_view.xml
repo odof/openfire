@@ -202,9 +202,13 @@
             <field name="name">of.planning.intervention.calendar</field>
             <field name="model">of.planning.intervention</field>
             <field name="arch" type="xml">
-                <calendar string="Calendrier" date_start="date" color="equipe_id" date_stop="date_deadline">
+                <calendar string="Calendrier" date_start="date" color="equipe_id" date_stop="date_deadline" display_states="1"
+                    attendee_model="of.planning.equipe" color_ft_field="color_ft" color_bg_field="color_bg" custom_colors="1">
                     <field name="name"/>
-                    <field name="state"/>
+                    <field name="state" invisible="1"/>
+                    <field name="state_int" invisible="1"/>
+                    <field name="color_ft" invisible="1"/>
+                    <field name="color_bg" invisible="1"/>
                     <!--field name="color" invisible="1"/>
                     <field name="sidebar_color" invisible="1"/-->
                 </calendar>
@@ -332,6 +336,7 @@
                     <!--field name="cout_horaire" string="Coût horaire"/>
                     <field name="cout_annuel" string="Coût annuel"/-->
                     <field name="employee_ids"/>
+                    <field name="color_bg" widget="color"/>
                     <field name="note"/>
                     <field name="sequence"/>
                     <!--field name="color_id"/-->
@@ -354,9 +359,15 @@
                             </h1>
                         </div>
                         <group col="4">
-                            <field name="active"/>
-                            <field name="sequence"/>
-                            <group name="horaires" colspan="2" col="4">
+                            <group colspan="2">
+                                <field name="active"/>
+                                <field name="sequence"/>
+                            </group>
+                            <group colspan="2">
+                                <field name="color_ft" widget="color"/>
+                                <field name="color_bg" widget="color"/>
+                            </group>
+                            <group name="horaires" colspan="4" col="4">
                                 <separator string="Horaires de travail" colspan="4"/>
                                 <label for="hor_md" string="Matin"/>
                                 <field name="hor_md" nolabel="1" widget="float_time" string="Matin :"/>

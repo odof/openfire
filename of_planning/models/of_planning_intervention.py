@@ -50,6 +50,8 @@ class OfPlanningEquipe(models.Model):
     hor_ad = fields.Float(u'Après-midi début', required=True, digits=(12, 5))
     hor_af = fields.Float(u'Après-midi fin', required=True, digits=(12, 5))
     sequence = fields.Integer(u'Séquence', help=u"Ordre d'affichage (plus petit en premier)")
+    color_ft = fields.Char(string="Couleur de texte", help="Choisissez votre couleur", default="#0D0D0D")
+    color_bg = fields.Char(string="Couleur de fond", help="Choisissez votre couleur", default="#F0F0F0")
 
     @api.onchange('employee_ids')
     def onchange_employees(self):
@@ -83,7 +85,7 @@ class OfPlanningInterventionRaison(models.Model):
 class OfPlanningIntervention(models.Model):
     _name = "of.planning.intervention"
     _description = "Planning d'intervention OpenFire"
-    _inherit = "of.readgroup"
+    _inherit = ["of.readgroup","of.calendar.mixin"]
 
 #     def _get_color(self, cr, uid, ids, *args):
 #         result = {}
@@ -205,11 +207,35 @@ class OfPlanningIntervention(models.Model):
     category_id = fields.Many2one(related='tache_id.category_id', string=u"Type de tâche")
     verif_dispo = fields.Boolean(string=u'Vérif', help=u"Vérifier la disponibilité de l'équipe sur ce créneau", default=True)
 
+    color_ft = fields.Char(related="equipe_id.color_ft", readonly=True)
+    color_bg = fields.Char(related="equipe_id.color_bg", readonly=True)
+    #state_int = fields.Integer(string="Valeur d'état", compute="_compute_state_int")
+
 #    _columns = {
 #         'color'                : fields_old.function(_get_color, type='char', help=u"Couleur utilisée pour le planning. Dépend de l'équipe d'intervention et de l'état de l'intervention"),
 #         'sidebar_color'        : fields_old.related('equipe_id','color_id','color', type='char', help="Couleur pour le menu droit du planning (couleur de base de l'équipe d'intervention)"),
 #    }
     _order = 'date'
+
+    @api.depends('state')
+    def _compute_state_int(self):
+        for interv in self:
+            if interv.state and interv.state == "draft":
+                interv.state_int = 0;
+            elif interv.state and interv.state == "confirm":
+                interv.state_int = 1;
+            elif interv.state and interv.state == "done":
+                interv.state_int = 2;
+            elif interv.state and interv.state in ("cancel","postponed"):
+                interv.state_int = 3;
+
+    @api.model
+    def get_state_int_map(self):
+        v0 = {'label': 'Brouillon', 'value': 0}
+        v1 = {'label': u'Confirmé', 'value': 1}
+        v2 = {'label': u'Réalisé', 'value': 2}
+        v3 = {'label': u'Annulé / Reporté', 'value': 3}
+        return (v0, v1, v2, v3)
 
     @api.onchange('address_id')
     def _onchange_address_id(self):
