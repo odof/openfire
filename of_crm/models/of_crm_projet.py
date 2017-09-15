@@ -80,7 +80,7 @@ class OFCRMProjetAttr(models.Model):
     val_bool_default = fields.Boolean(string="Valeur par Défaut", default=False)
     val_char_default = fields.Char(string="Valeur par Défaut")
     #val_date_default = fields.Date(string="Valeur par Défaut", default=fields.Date.today)
-    val_select_id_default = fields.Many2one('of.crm.projet.attr.select', string="Valeur par Défaut", ondelete="set null")
+    val_select_id_default = fields.Many2one('of.crm.projet.attr.select', string="Valeur par Défaut", domain="[('attr_id','=',id)]", ondelete="set null")
 
     """@api.onchange('active')
     def _onchange_active(self):

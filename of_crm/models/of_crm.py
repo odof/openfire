@@ -10,6 +10,36 @@ _logger = logging.getLogger(__name__)
 class OFCRMLead(models.Model):
     _inherit = 'crm.lead'
 
+    @api.model
+    def _init_clients(self):
+        partner_obj = self.env['res.partner']
+
+        account_obj = self.env['account.account']
+        # Desactivation du recalcul du _parent_order pour gagner du temps (beaucoup de temps)
+        account_parent_store = account_obj._parent_store
+        account_obj._parent_store = False
+
+        cr = self._cr
+        cr.execute("SELECT id, street, street2, zip, city, state_id, country_id, phone, fax, "
+                   "       mobile, email_from AS email, COALESCE(partner_name, name) AS name, "
+                   "       company_id "
+                   "FROM crm_lead "
+                   "WHERE partner_id IS NULL")
+        columns = [column[0] for column in cr.description]
+        for partner_data in cr.fetchall():
+            # Création du partenaire associé
+            partner_data_dict = dict(zip(columns, partner_data))
+            lead = self.browse(partner_data_dict.pop('id'))
+            partner_data_dict.update({
+                'customer': True,
+                'of_customer_state': 'lead',
+            })
+            lead.partner_id = partner_obj.create(partner_data_dict)
+
+        # Recalcul des colonnes parent_left,parent_right
+        account_obj._parent_store = account_parent_store
+        account_obj._parent_store_compute()
+
     of_website = fields.Char('Site web', help="Website of Lead")
     tag_ids = fields.Many2many('res.partner.category', 'crm_lead_res_partner_category_rel', 'lead_id', 'category_id', string='Tags', help="Classify and analyze your lead/opportunity categories like: Training, Service", oldname="of_tag_ids")
     of_description_projet = fields.Html('Notes de projet')
@@ -40,7 +70,6 @@ class OFCRMLead(models.Model):
     fax = fields.Char(related='partner_id.fax')
     mobile = fields.Char(related='partner_id.mobile')
     email_from = fields.Char(related="partner_id.email")
-    #partner_name = fields.Char(related="partner_id.name")
 
     @api.onchange('of_modele_id')
     def _onchange_modele_id(self):
@@ -187,11 +216,11 @@ class Team(models.Model):
 class OFCRMResPartner(models.Model):
     _inherit = 'res.partner'
 
-    is_confirmed = fields.Boolean(string="Client signé", default=True, help="""
+    """is_confirmed = fields.Boolean(string="Client signé", default=True, help="" "
 Champ uniquement valable pour les partenaires clients.
 Un client est considéré comme prospect tant qu'il n'a ni commande confirmée ni facture validée.
 Ce champ se met à jour automatiquement sur confirmation de commande et sur validation de facture
-    """)
+    "" ")"""
     of_customer_state = fields.Selection([
         ('lead', u'Prospect'),
         ('customer', u'Client signé'),
@@ -282,7 +311,7 @@ surcharge méthode du même nom pour ne pas compter les devis dans les ventes
         elif vals.get('of_customer_state', 'other') == 'other': # partner is a customer -> defaults to 'lead'
             vals['of_customer_state'] = 'lead'
 
-        partner = super(OFCRMResPartner, self).create(vals)
+        partner = super(OFCRMResPartner, self.with_context(inhiber_geocode=True)).create(vals)
 
         return partner
 

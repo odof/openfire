@@ -125,7 +125,7 @@
                                         <t t-if="record.type.raw_value == 'bool'"><field name="val_bool" widget="of_kanban_bool"/></t>
                                         <t t-if="record.type.raw_value == 'char'"><field name="val_char" widget="of_kanban_char"/></t>
                                         <t t-if="record.type.raw_value == 'date'"><field name="val_date" widget="of_kanban_date"/></t>
-                                        <t t-if="record.type.raw_value == 'selection'"><field name="val_select_id" widget="of_kanban_selection"/></t>
+                                        <t t-if="record.type.raw_value == 'selection'"><field name="val_select_id" widget="of_kanban_selection" domain="[('attr_id','=',attr_id)]"/></t>
                                         <!-- field name="val_select_ids" attrs="{'invisible': [('type','!=','multiple')]}"/-->
                                     </strong>
                                 </div>

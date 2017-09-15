@@ -4,4 +4,7 @@
         <!-- only call function on installation of the module and not on update -->
         <function model="res.partner" name="_init_prospects"/>
     </data>
+    <data>
+        <function model="crm.lead" name="_init_clients"/>
+    </data>
 </odoo>
