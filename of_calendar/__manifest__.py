@@ -32,7 +32,11 @@ Leur classe devra définir les fonctions '_compute_state_int' et 'get_state_int_
 Leur balise calendar devra contenir l'attribut display_states="1".
 """,
     "website": "www.openfire.fr",
-    "depends": ["web_widget_color","calendar","web_calendar"],
+    "depends": [
+        "web_widget_color",
+        "calendar",
+        "web_calendar"
+    ],
     "data": [
         "views/of_web_calendar_templates.xml",
         "views/of_calendar_views.xml",

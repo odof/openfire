@@ -39,6 +39,10 @@ var OFKanbanSelection = AbstractField.extend({
         this.records_orderer = new utils.DropMisordered(); // function query_values
 
         this.options = _.defaults(options||{},this.defaults);
+        this.parent_context = this.parent.qweb_context;
+
+        this.context = this.build_context();
+        this.set("domain", this.build_domain().eval());
 
         //console.log("of_kanban_selection init this and arguments: ", this, arguments);
     },
@@ -100,7 +104,6 @@ var OFKanbanSelection = AbstractField.extend({
 		        //console.log("$el",self.$el);
 	    	});
         }
-        
     },
     /**
      *  sets new value dict and sends signal to update record
@@ -124,7 +127,8 @@ var OFKanbanSelection = AbstractField.extend({
         var def;
         if (this.field.type === "many2one") { // supposed to be always the case, maybe force it with an error?
             var model = new Model(this.field.relation);
-            def = model.call("name_search", ['', this.get("domain")], {"context": this.build_context()});
+            //console.log("query_value this.domain: ",[this.domain, this.domain_eval]);
+            def = model.call("name_search", ['', this.get("domain")], {"context": this.context});
         } else { // copied code
             var values = _.reject(this.field.selection, function (v) { return v[0] === false && v[1] === ''; });
             def = $.when(values);
@@ -162,11 +166,52 @@ var OFKanbanSelection = AbstractField.extend({
         return v_context;
     },
     /**
+     *  builds domain according to attribute in XML view or in python file, XML view takes precedence
+     */
+    build_domain: function() {
+        var f_domain = this.field.domain || [];
+        var n_domain = this.$node[0].attributes.domain || null;
+        // if there is a domain on the node, overrides the model's domain
+        var final_domain = n_domain !== null ? n_domain : f_domain;
+        //console.log("final_domain A: ",final_domain);
+        var fields_values = this.build_eval_context();
+        final_domain = new data.CompoundDomain(final_domain).set_eval_context(fields_values);
+        var len = final_domain['__domains'].length;
+        for (var i=0; i<len; i++){
+            if (final_domain['__domains'][i]['value']) {
+                final_domain['__domains'][i] = final_domain['__domains'][i]['value']
+            }
+        };
+        //console.log("final_domain B: ",final_domain);
+        
+        return final_domain;
+    },
+    /**
+     *  
+     */
+    build_eval_context: function() {
+        return new data.CompoundContext(this.build_context(),this._get_fields_values());
+    },
+    /**
      * Method useful to implement to ease validity testing. Must return true if the current
      * value is similar to false in OpenERP. see web.form_common.AbstractField
      */
     is_false: function() {
         return this.get('value') === '' || this.get('value') === false;
+    },
+    /**
+     *  Returns record values as a dict of the form {field_name_1: field_value_1, field_name_2: field_value_2, ...}
+     */
+    _get_fields_values: function() {
+        var values = {};
+        _.each(this.parent.values, function(value_, key) {
+            if (value_.value instanceof Array) { // take only the id (at index 0)
+                values[key] = value_.value[0];
+            }else{
+                values[key] = value_.value;
+            }
+        });
+        return values;
     },
 });
 
@@ -367,9 +412,6 @@ var OFKanbanBool = AbstractField.extend({
         this.set('value',field.raw_value);
 
         //console.log("of_kanban_bool init this and arguments: ", this, arguments);
-        if (!this.read_only_mode) {
-            console.log("of_kanban_bool séquence = ",parent.values.sequence.value);
-        }
     },
     /**
      *  wait for this.$input to be rendered

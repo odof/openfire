@@ -29,7 +29,7 @@ CalendarView.include({
     	this.color_ft_field = attrs.color_ft_field;
     	this.color_bg_field = attrs.color_bg_field;
         if (this.custom_colors && !(attrs.color_ft_field && attrs.color_bg_field)) {
-            throw new Error(_t("Calendar views with 'custom_colors' attribute set to true need to define both 'evt_color_bg' and 'att_color_bg' attributes."));
+            throw new Error(_t("Calendar views with 'custom_colors' attribute set to true need to define both 'color_ft_field' and 'color_bg_field' attributes."));
         }
         this.attendee_model = attrs.attendee_model;
         if (this.custom_colors && !this.useContacts && isNullOrUndef(this.attendee_model)) {
@@ -185,7 +185,7 @@ CalendarView.include({
                 r.textColor = evt[self.color_ft_field];
                 r.backgroundColor = evt[self.color_bg_field];
             }else{
-                throw new Error(_t("Missing fields in calendar view definition: '" + self.color_ft_field + "'' and/or '" + self.color_bg_field + "'."));
+                throw new Error(_t("Missing fields in calendar view definition: '" + self.color_ft_field + "' and/or '" + self.color_bg_field + "'."));
             }
             r.className = ["of_custom_color"];
             if (self.display_states) {
