@@ -93,10 +93,10 @@ class OfReadGroup(models.AbstractModel):
         # Modif OpenFire : Recherche directe du nom par name_get sur l'objet ciblé
         #  (la méthode standart Odoo procédait par lecture du champ sur l'objet courant,
         #   ce qui est impossible dans le cadre d'un champ one2many)
-        for gb in set(annotated_groupbys):
+        for gb in annotated_groupbys:
             if gb['type'] == 'many2one':
                 gb_field = gb['field']
-                rel = self._fields[gb_field].base_field._obj
+                rel = self._fields[gb_field].base_field.comodel_name
                 gb_obj = self.env[rel]
                 gb_ids = [r[gb_field] for r in fetched_data if r[gb_field]]
                 gb_dict = {d[0]: d for d in gb_obj.browse(gb_ids).name_get()}
