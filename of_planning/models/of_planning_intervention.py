@@ -175,6 +175,9 @@ class OfPlanningIntervention(models.Model):
                     partner = partner.parent_id
             intervention.partner_id = partner and partner.id
 
+    def search_gb_employee_id(self, operator, value):
+        return [('equipe_id.employee_ids', operator, value)]
+
     name = fields.Char(string=u'Libellé', required=True)
     date = fields.Datetime(string='Date intervention', required=True)
     date_deadline = fields.Datetime(compute="_get_date_deadline", string='Date Fin', store=True)
@@ -206,6 +209,8 @@ class OfPlanningIntervention(models.Model):
 
     category_id = fields.Many2one(related='tache_id.category_id', string=u"Type de tâche")
     verif_dispo = fields.Boolean(string=u'Vérif', help=u"Vérifier la disponibilité de l'équipe sur ce créneau", default=True)
+    gb_employee_id = fields.Many2one('hr.employee', compute='lambda *a, **k:{}', search='search_gb_employee_id',
+                                     string="Intervenant", of_custom_groupby=True)
 
     color_ft = fields.Char(related="equipe_id.color_ft", readonly=True)
     color_bg = fields.Char(related="equipe_id.color_bg", readonly=True)
