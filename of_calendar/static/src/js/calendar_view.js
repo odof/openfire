@@ -54,14 +54,22 @@ CalendarView.include({
 
         //console.log("this",this);
     },
-
-    /*start: function () {
-        if (this.display_states) {
-            this.caption = new SidebarCaption(Widget,this);
-        }
-        return this._super();
-    },*/
-
+    /**
+     *  go to system parameters to see if we should allow drag and drop
+     */
+    willStart: function() {
+        var self = this
+        var dfd = $.Deferred();
+        var ir_config = new Model('ir.config_parameter');
+        ir_config.call('get_param',['Calendar_Drag_And_Drop']).then(function(val) {
+            self.draggable = _.str.toBool(val) || self.draggable; // if false in system parameters but true in view definition, make it true
+            dfd.resolve();
+        });
+        return $.when(dfd,this._super());
+    },
+    /**
+     *  render states caption if display_states in attributes
+     */
     _do_show_init: function () {
         this._super.apply(this,arguments);
         if (this.display_states) {
@@ -77,11 +85,6 @@ CalendarView.include({
         fc.editable = this.draggable;
         return fc;
     },
-
-    /*_do_search: function(domain, context, _group_by) {
-        var self = this;
-        self._super.apply(self, arguments);
-    },*/
 
     /**
      *  called by CalendarView.get_all_filters_ordered if custom_colors set to true

@@ -13,6 +13,7 @@ Module OpenFire des calendrier
 
 - Ajout des champs 'of_color_ft' et 'of_color_bg' dans res.users et res.partner
 - Ajout choix des couleurs dans les calendriers
+- Ajout configuration du drag and drop dans les paramètres systèmes (configuration -> technique -> paramètres)
 
 Vue calendar
 ------------
@@ -25,7 +26,7 @@ Vue calendar
 - ajout gestion de l'attribut invisible="1" dans les fields de la vue calendar
 
 Etat des évènements d'un calendrier (classe abstraite 'of.calendar.mixin')
------------------------------------
+--------------------------------------------------------------------------
 
 Les objets implémentant une vue calendrier et des états peuvent desormais hériter de 'of.calendar.mixin'.
 Leur classe devra définir les fonctions '_compute_state_int' et 'get_state_int_map'.
@@ -35,9 +36,10 @@ Leur balise calendar devra contenir l'attribut display_states="1".
     "depends": [
         "web_widget_color",
         "calendar",
-        "web_calendar"
+        "web_calendar",
     ],
     "data": [
+        "data/ir_config_parameter_data.xml",
         "views/of_web_calendar_templates.xml",
         "views/of_calendar_views.xml",
     ],

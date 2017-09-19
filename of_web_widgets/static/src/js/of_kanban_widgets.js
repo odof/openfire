@@ -187,7 +187,7 @@ var OFKanbanSelection = AbstractField.extend({
         return final_domain;
     },
     /**
-     *  
+     *
      */
     build_eval_context: function() {
         return new data.CompoundContext(this.build_context(),this._get_fields_values());

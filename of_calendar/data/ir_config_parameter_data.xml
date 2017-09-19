@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1">
+
+    <record id="calendar_drag_and_drop" model="ir.config_parameter">
+        <field name="key">Calendar_Drag_And_Drop</field>
+        <field name="value">0</field>
+    </record>
+
+</odoo>
