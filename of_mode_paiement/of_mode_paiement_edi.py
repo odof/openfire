@@ -109,6 +109,15 @@ class wizard_paiement_edi(models.TransientModel):
 
         return True
 
+    @api.model
+    def _get_partner_rib(self, partner):
+        rib_obj = self.env['res.partner.bank']
+        rib = False
+        while partner and not rib:
+            rib = rib_obj.search([('partner_id', '=' , partner.id)])
+            partner = partner.parent_id
+        return rib
+
     @api.multi
     def genere_fichier_lcr(self, liste_factures):
         """Génère le fichier pour lettre de change relevé (LCR)"""
@@ -202,7 +211,6 @@ class wizard_paiement_edi(models.TransientModel):
         sortie += "\n"
 
         # 2e ligne : tiré(s)
-        rib_obj = self.env['res.partner.bank']
         for facture in liste_factures:
             if self.type_montant_facture == "echeancier":
                 montant_du = self.montantapayer_echeancier(facture)
@@ -219,11 +227,7 @@ class wizard_paiement_edi(models.TransientModel):
                 nb_facture = nb_facture + 1
 
             sortie += u"Tiré : " + facture.partner_id.display_name + " ["
-            rib = rib_obj.search([('partner_id', '=' , facture.partner_id.id)])
-            if not rib and facture.partner_id != facture.partner_id.commercial_partner_id:
-                # Le compte bancaire devrait toujours être renseigné dans le commercial_partner (société mère ou partenaire de niveau supérieur)
-                # plutôt que dans un contact de facturation
-                rib = rib_obj.search([('partner_id', '=' , facture.partner_id.commercial_partner_id.id)])
+            rib = self._get_partner_rib(facture.partner_id)
             if not rib:
                 raise UserError(u"Erreur ! (#ED220)\n\nPas de compte bancaire trouvé pour " + facture.partner_id.display_name + u".\n\nPour effectuer une LCR, un compte en banque doit être défini pour le client de chaque facture.")
             no_ligne = no_ligne + 1
@@ -251,13 +255,8 @@ class wizard_paiement_edi(models.TransientModel):
                 sortie += " Guichet : " + temp[9:14]
                 chaine += temp[14:25]   # No compte
                 sortie += " Compte : " + temp[14:25]
-            elif rib[0].bank_code and len(rib[0].bank_code) == 5 and rib[0].office and len(rib[0].office) == 5 and rib[0].rib_acc_number and len(rib[0].rib_acc_number) == 11 and rib[0].key and len(rib[0].key) == 2:   # On prend le RIB sinon si renseigné
-                chaine += rib[0].bank_code
-                chaine += rib[0].office
-                chaine += rib[0].rib_acc_number
-                sortie += " Banque : " + rib[0].bank_code + " Guichet : " + rib[0].office + " Compte : " + rib[0].rib_acc_number
             else:   # Aucune référence bancaire valide
-                raise UserError(u"Erreur ! (#ED-225)\n\nPas de coordonnées bancaires (RIB ou IBAN) valides trouvées pour " + facture.partner_id.display_name + u".\n\n (codes banque et guichet 5 chiffres, n° compte 11 chiffres et clé 2 chiffres)")
+                raise UserError(u"Erreur ! (#ED-225)\n\nPas de coordonnées bancaires (RIB ou IBAN) valides trouvées pour " + facture.partner_id.display_name + u".\n\n (Seuls les comptes IBAN français sont autorisés, FR suivi de 25 chiffres)")
             sortie += "]"
             montant_total = montant_total + montant_du
             sortie += " [Montant : " + str('%.2f' % montant_du).replace('.', ',') + " euros]"
