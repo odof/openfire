@@ -16,6 +16,7 @@ Personnalisations des fonctions de base Odoo :
 - Affiche l'adresse du contact dans le menu déroulant de sélection d'un partenaire
 - Affiche l'adresse au format français par défaut quand le pays n'est pas renseigné et non le format US
 - Ajout de la recherche multi-mots pour les articles
+- Désactive l'envoi des notifications par courriel des changements d'affectation des commandes et factures
 """,
     'website' : "www.openfire.fr",
     'depends' : ["product"],

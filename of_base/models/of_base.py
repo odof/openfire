@@ -3,7 +3,7 @@
 import threading
 import re
 
-from odoo import models, api, tools
+from odoo import models, api, tools, fields
 from odoo.exceptions import ValidationError
 from odoo.modules import get_module_resource
 from odoo.tools import OrderedSet
@@ -115,6 +115,19 @@ class OfReadGroup(models.AbstractModel):
                 aggregated_fields, count_field, result, read_group_order=order,
             )
         return result
+
+class ResUsers(models.Model):
+    _inherit = "res.users"
+
+    @api.model
+    @tools.ormcache('self._uid')
+    def context_get(self):
+        # Pour désactiver l'envoi des notifications par courriel des changements d'affectation des commandes et factures.
+        # On met par défaut dans le contexte des utilisateurs la valeur mail_auto_subscribe_no_notify qui inhibe l'envoi des notifications dans la fonction _message_auto_subscribe_notify() de /addons/mail/models.mail_thread.py.
+        result = super(ResUsers, self).context_get()
+        result['mail_auto_subscribe_no_notify'] = 1
+        return result
+
 
 class ResPartner(models.Model):
     _inherit = "res.partner"
