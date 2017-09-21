@@ -38,7 +38,7 @@ Fiche de projet dynamique
         'views/of_crm_view.xml',
         'views/of_crm_projet_view.xml',
         'views/of_crm_templates.xml',
-        #'report/of_crm_fiche_rdv_report_views.xml',
+        'report/of_crm_fiche_rdv_report_views.xml',
         'data/data.xml',
         'security/ir.model.access.csv',
     ],

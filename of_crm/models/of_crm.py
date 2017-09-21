@@ -71,6 +71,8 @@ class OFCRMLead(models.Model):
     mobile = fields.Char(related='partner_id.mobile')
     email_from = fields.Char(related="partner_id.email")
 
+    meeting_ids = fields.Many2many('calendar.event', string=u"Réunions", related="partner_id.meeting_ids")
+
     @api.onchange('of_modele_id')
     def _onchange_modele_id(self):
         for projet in self:
@@ -167,6 +169,22 @@ class OFCRMLead(models.Model):
                 self.write({'of_date_cloture': time.strftime(DEFAULT_SERVER_DATE_FORMAT)})
         return res"""
 
+class OFCalendarEvent(models.Model):
+    _inherit = 'calendar.event'
+
+    def get_meeting_data(self):
+        self.ensure_one()
+        res = ['name', 'start', 'description', 'partner_ids']
+        return res
+
+class OFCrmTags(models.Model):
+    _inherit = 'res.partner.category'
+
+    def get_crm_tags_data(self):
+        result = self.name
+        return result
+
+
 class OFCrmActivity(models.Model):
     _inherit = 'crm.activity'
 
@@ -230,6 +248,8 @@ Champ uniquement utile pour les partenaires clients.
 Un client est considéré comme prospect tant qu'il n'a ni commande confirmée ni facture validée.
 Ce champ se met à jour automatiquement sur confirmation de commande et sur validation de facture
     """)
+
+    meeting_ids = fields.Many2many('calendar.event', 'calendar_event_res_partner_rel', string='Meetings')
 
     @api.model
     def _init_prospects(self):
@@ -314,6 +334,10 @@ surcharge méthode du même nom pour ne pas compter les devis dans les ventes
         partner = super(OFCRMResPartner, self.with_context(inhiber_geocode=True)).create(vals)
 
         return partner
+
+    def get_crm_partner_name(self):
+        res = self.name
+        return res
 
 class OFCRMSaleOrder(models.Model):
     _inherit = 'sale.order'

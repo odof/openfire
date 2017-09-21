@@ -50,6 +50,19 @@ class OFCRMProjetLine(models.Model):
             else:
                 line.type_var_name = 'val_select_id'
 
+    def get_name_and_val(self):
+        self.ensure_one()
+        if self.type == 'bool':
+            #value = "Oui" if self.val_bool  else "Non"
+            value = ("Non", "Oui")[self.val_bool]
+        elif self.type == 'char':
+            value = self.val_char
+        elif self.type == 'date':
+            value = self.val_date
+        else:
+            value = self.val_select_id.name
+        return (self.name,value)
+
 class OFCRMProjetModele(models.Model):
     _name = 'of.crm.projet.modele'
 
