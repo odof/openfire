@@ -48,6 +48,9 @@ class ResPartner(models.Model):
                         'code': sequence_receivable.get_next_char(partner.id),
                         'name': partner.name,
                         'reconcile': True,
+                        # Avec le module of_base_multicompany, il est utile de forcer la société à la même que celle du compte par défaut
+                        # et non celle de l'utilisateur (compte au niveau de la société, pas du magasin)
+                        'company_id': default_account_receivable.company_id.id
                     }
                     data['property_account_receivable_id'] = ac_obj.create(account_data)
                 elif partner.property_account_receivable_id.name != partner.name:
@@ -63,6 +66,9 @@ class ResPartner(models.Model):
                         'code': sequence_payable.get_next_char(partner.id),
                         'name': partner.name,
                         'reconcile': True,
+                        # Avec le module of_base_multicompany, il est utile de forcer la société à la même que celle du compte par défaut
+                        # et non celle de l'utilisateur (compte au niveau de la société, pas du magasin)
+                        'company_id': default_account_payable.company_id.id
                     }
                     data['property_account_payable_id'] = ac_obj.create(account)
                 elif partner.property_account_payable_id.name != partner.name:

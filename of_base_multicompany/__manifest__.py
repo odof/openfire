@@ -8,12 +8,15 @@
     'description' : """
 Personnalisation de la multi-société :
 
-- les champs company-dependent se lisent au niveau de la société comptable au lieu de la société courante.
+- Les champs company-dependent se lisent au niveau de la société comptable au lieu de la société courante.
+- Modification des droits pour permettre l'utilisation de la configuration comptable des sociétés parentes.
+- Lasociété des comptes comptables est forcée au niveau d'une société comptable.
 """,
     'website' : "www.openfire.fr",
-    'depends' : [],
+    'depends' : ['account'],
     'category' : "OpenFire",
     'data' : [
+        'security/of_base_multicompany_security.xml',
     ],
     'installable': True,
     'application': False,

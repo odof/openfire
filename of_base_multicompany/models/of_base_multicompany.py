@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, models
+from odoo import api, models, fields
 
 class Company(models.Model):
     _inherit = 'res.company'
@@ -12,6 +12,27 @@ class Company(models.Model):
         while not company.chart_template_id and company.parent_id:
             company = company.parent_id
         return company
+
+    @api.model
+    def _company_default_get(self, object=False, field=False):
+        res = super(Company, self)._company_default_get(object, field)
+        if object == 'account.account' and not field:
+            res = res._get_accounting_company()
+        return res
+
+class AccountAccount(models.Model):
+    _inherit = 'account.account'
+
+    @api.model
+    def create(self, vals):
+        if 'company_id' in vals:
+            vals['company_id'] = self.env['res.company'].browse(vals['company_id'])._get_accounting_company().id
+        return super(AccountAccount, self).create(vals)
+
+class AccountMoveLine(models.Model):
+    _inherit = 'account.move.line'
+
+    company_id = fields.Many2one('res.company', related='move_id.journal_id.company_id', string='Company', store=True, readonly=True)
 
 class Property(models.Model):
     _inherit = 'ir.property'
