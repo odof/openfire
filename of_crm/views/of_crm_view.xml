@@ -81,6 +81,40 @@
             </field>
         </record>
 
+        <record id="of_crm_view_create_opportunity_simplified" model="ir.ui.view">
+            <field name="name">of.crm.lead.form.simple</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.view_create_opportunity_simplified"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="of_ref"/>
+                    <label for="contact_name" string="Nom du Client"/>
+                    <div>
+                        <div class="o_row " >
+                            <field name="contact_name"/>
+                            <field name="title" placeholder="Civilité" domain="[]"
+                                   options="{'no_open': True}" can_create="true" can_write="true" modifiers="{}"
+                                   attrs="{'invisible': [('contact_name', '=', False)]}"/>
+                        </div>
+                    </div>
+                    <field name="is_company"/>
+                    <label for="of_customer_state" string="Prospect ou Client?"/>
+                    <field name="of_customer_state" nolabel="1"/>
+                    <label for="street" string="Adresse"/>
+                    <div class="o_address_format">
+                        <field name="street" placeholder="Adresse..." class="o_address_street"/>
+                        <field name="street2" placeholder="Adresse suite..." class="o_address_street"/>
+                        <field name="city" placeholder="Ville" class="o_address_city"/>
+                        <field name="zip" placeholder="Code postal" class="o_address_zip"/>
+                        <field name="country_id" placeholder="Pays" class="o_address_country" options='{"no_open": True, "no_create": True}'/>
+                    </div>
+                    <field name="phone" widget="phone" modifiers="{}"/>
+                    <field name="mobile" widget="phone" modifiers="{}"/>
+                    <field name="email_from" string="Courriel" widget="email" modifiers="{}"/>
+                </xpath>
+            </field>
+        </record>
+
         <!--
             crm.lead (as Opportunity) views
         -->
@@ -189,15 +223,16 @@
                                 <separator string="Prospect" colspan="2"/>
                                     <field name="of_ref"/>
                                     <field name="partner_id"/>
-                                    <label for="partner_name" name="partner_name"/>
+                                    <label for="contact_name" string="Nom du Client"/>
                                     <div>
                                         <div class="o_row " >
-                                            <field name="partner_name"/>
+                                            <field name="contact_name"/>
                                             <field name="title" placeholder="Civilité" domain="[]"
                                                    options="{'no_open': True}" can_create="true" can_write="true" modifiers="{}"
-                                                   attrs="{'invisible': [('partner_name', '=', False)]}"/>
+                                                   attrs="{'invisible': [('contact_name', '=', False)]}"/>
                                         </div>
                                     </div>
+                                    <field name="is_company"/>
                                     <label for="street" string="Adresse"/>
                                     <div class="o_address_format">
                                         <field name="street" placeholder="Adresse..." class="o_address_street"/>

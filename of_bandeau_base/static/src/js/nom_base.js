@@ -22,5 +22,4 @@ UserMenu.include({
     },
 });
 
-return UserMenu;
 });

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, tools
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
 
 import time
@@ -40,8 +40,7 @@ class OFCRMLead(models.Model):
         account_obj._parent_store = account_parent_store
         account_obj._parent_store_compute()
 
-    of_website = fields.Char('Site web', help="Website of Lead")
-    tag_ids = fields.Many2many('res.partner.category', 'crm_lead_res_partner_category_rel', 'lead_id', 'category_id', string='Tags', help="Classify and analyze your lead/opportunity categories like: Training, Service", oldname="of_tag_ids")
+    of_website = fields.Char(related="partner_id.website")
     of_description_projet = fields.Html('Notes de projet')
     of_ref = fields.Char(string=u"Référence", copy=False)
     of_prospecteur = fields.Many2one("res.users", string="Prospecteur")
@@ -49,16 +48,19 @@ class OFCRMLead(models.Model):
     # @TODO: implémenter la maj automatique de la date de cloture en fonction du passage de probabilité à 0 ou 100
     of_date_cloture = fields.Date(string="Date de clôture")
     of_infos_compl = fields.Text(string="Autres infos")
-    geo_lat = fields.Float(string='Geo Lat', digits=(8, 8))
-    geo_lng = fields.Float(string='Geo Lng', digits=(8, 8))
+    geo_lat = fields.Float(related="partner_id.geo_lat")
+    geo_lng = fields.Float(related="partner_id.geo_lng")
     stage_probability = fields.Float(related="stage_id.probability", readonly=True)
 
     of_projet_line_ids = fields.One2many('of.crm.projet.line', 'lead_id', string=u'Entrées')
     of_modele_id = fields.Many2one('of.crm.projet.modele', string=u"Modèle", ondelete="set null")
 
     of_customer_state = fields.Selection(related="partner_id.of_customer_state", required=False)
+    is_company = fields.Boolean(string="Est une société")
     # activity_ids = fields.One2many('of.crm.opportunity.activity', 'lead_id', string=u"Activités de cette opportunité")
 
+    # surcharges
+    tag_ids = fields.Many2many('res.partner.category', 'crm_lead_res_partner_category_rel', 'lead_id', 'category_id', string='Tags', help="Classify and analyze your lead/opportunity categories like: Training, Service", oldname="of_tag_ids")
     referred = fields.Many2one('res.partner', string="Apporteur", help="Nom contact")
     street = fields.Char(related='partner_id.street')
     street2 = fields.Char(related='partner_id.street2')
@@ -108,23 +110,51 @@ class OFCRMLead(models.Model):
             res['geo_lng'] = partner.geo_lng
         return res
 
-    # Transfert du site web à la création du partenaire
+    """# Transfert du site web à la création du partenaire
     @api.multi
-    def _lead_create_contact(self, name, is_company, parent_id=False):
-        """ extract data from lead to create a partner
+    def _lead_create_contact(self, name, is_company, parent_id=False, vals={}):
+        "" " totalement surchargée
+        extract data from lead to create a partner
             :param name : furtur name of the partner
-            :param is_company : True if the partner is a company
+            :param is_company : True if the partner is a company. Overriden
             :param parent_id : id of the parent partner (False if no parent)
             :returns res.partner record
-        """
-        partner = super(OFCRMLead, self)._lead_create_contact(name, is_company, parent_id=parent_id)
-        if self.of_website:
-            partner.website = self.of_website
+        "" "
+        email_split = tools.email_split(vals.get('email_from') or False)
+        values = {
+            'name': name,
+            'user_id': self.user_id.id,
+            'comment': self.description,
+            'team_id': self.team_id.id,
+            'parent_id': parent_id,
+            'phone': vals['phone'] or False,
+            'mobile': vals['mobile'] or False,
+            'email': email_split[0] if email_split else False,
+            'fax': self.fax,
+            'title': self.title.id,
+            'function': self.function,
+            'street': vals['street'] or False,
+            'street2': vals['street2'] or False,
+            'zip': vals['zip'],
+            'city': vals['city'],
+            'country_id': vals['country_id'] or False,
+            'state_id': vals['state_id'] or False,
+            #'is_company': is_company,
+            'type': False,
+            'website': self.of_website or False,
+            'geo_lat': self.geo_lat or False,
+            'geo_lng': self.geo_lng or False,
+            'is_company': self.is_company,
+        }
+        "" "if self.of_website:
+            values['website'] = self.of_website
         if self.geo_lat:
-            partner.geo_lat = self.geo_lat
+            values['geo_lat'] = self.geo_lat
         if self.geo_lng:
-            partner.geo_lng = self.geo_lng
-        return partner
+            values['geo_lng'] = self.geo_lng
+        if self.is_company:
+            values['is_company'] = True"" "
+        return self.env['res.partner'].create(values)"""
 
     # Recherche du code postal en mode préfixe
     @api.model
@@ -169,6 +199,16 @@ class OFCRMLead(models.Model):
                 self.write({'of_date_cloture': time.strftime(DEFAULT_SERVER_DATE_FORMAT)})
         return res"""
 
+    @api.model
+    def create(self, vals):
+        if not vals.get('partner_id'):
+            name = vals.get('contact_name') or vals['name']
+            partner = self.env['res.partner'].create({'name': name, 'type': False, 'customer': True})
+            vals['of_customer_state'] = partner.of_customer_state
+            vals['partner_id'] = partner.id
+        lead = super(OFCRMLead, self).create(vals)
+        return lead
+
 class OFCalendarEvent(models.Model):
     _inherit = 'calendar.event'
 
@@ -183,7 +223,6 @@ class OFCrmTags(models.Model):
     def get_crm_tags_data(self):
         result = self.name
         return result
-
 
 class OFCrmActivity(models.Model):
     _inherit = 'crm.activity'
