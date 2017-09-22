@@ -11,7 +11,7 @@ class OFCRMProjetLine(models.Model):
     lead_id = fields.Many2one('crm.lead', string="Opportunité", required=True, ondelete="cascade")
     attr_id = fields.Many2one('of.crm.projet.attr', string="Attribut", required=True, ondelete="restrict")
     type = fields.Selection([
-        ('bool', u'Booléen'),
+        ('bool', u'Booléen (Oui/Non)'),
         ('char', u'Texte court'),
         ('selection', u'Choix Unique'),
         #('multiple',u'Choix Multiple'), # plus tard
@@ -79,7 +79,7 @@ class OFCRMProjetAttr(models.Model):
     name = fields.Char(string=u"Libellé", required=True, translate=True)
     description = fields.Text(string="Description", translate=True)
     type = fields.Selection([
-        ('bool', u'Booléen'),
+        ('bool', u'Booléen (Oui/Non)'),
         ('char', u'Texte Court'),
         ('selection', u'Choix Unique'),
         #('multiple',u'Choix Multiple'), # plus tard
