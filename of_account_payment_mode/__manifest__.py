@@ -13,6 +13,7 @@ OpenFire Payment Modes
     'data': [
         'views/of_account_payment_mode_view.xml',
         'security/ir.model.access.csv',
+        'security/of_account_payment_mode_security.xml',
     ],
     'demo': [],
     'qweb': [],
