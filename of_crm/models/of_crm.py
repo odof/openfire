@@ -75,6 +75,22 @@ class OFCRMLead(models.Model):
 
     meeting_ids = fields.Many2many('calendar.event', string=u"Réunions", related="partner_id.meeting_ids")
 
+    """@api.model
+    def _of_extract_partner_values(self, vals):
+        new_vals = vals.copy()
+        partner_vals = {}
+        for field_name, val in vals.iteritems():
+            if field_name not in self._fields:
+                continue
+            field = self._fields[field_name]
+            if not getattr(field, 'related'):
+                continue
+            related = field.related
+            if related.startswith('partner_id.'):
+                partner_vals[related[11:]] = val
+                del new_vals[field_name]
+        return new_vals, partner_vals"""
+
     @api.onchange('of_modele_id')
     def _onchange_modele_id(self):
         for projet in self:
@@ -199,6 +215,22 @@ class OFCRMLead(models.Model):
                 self.write({'of_date_cloture': time.strftime(DEFAULT_SERVER_DATE_FORMAT)})
         return res"""
 
+    """@api.model
+    def create(self, vals):
+        if not vals.get('partner_id'):
+            vals, partner_vals = self._of_extract_partner_values(vals)
+            partner_vals.update({
+                'name': vals.get('contact_name') or vals['name'],
+                'type': False,
+                'customer': True,
+            })
+
+            partner = self.env['res.partner'].create(partner_vals)
+#            vals['of_customer_state'] = partner.of_customer_state
+            vals['partner_id'] = partner.id
+        lead = super(OFCRMLead, self).create(vals)
+        return lead"""
+
     @api.model
     def create(self, vals):
         if not vals.get('partner_id'):
@@ -208,6 +240,16 @@ class OFCRMLead(models.Model):
             vals['partner_id'] = partner.id
         lead = super(OFCRMLead, self).create(vals)
         return lead
+
+    """@api.multi
+    def write(self, vals):
+        partner_vals = False
+        if len(self._ids) == 1 and vals.get('partner_id', self.partner_id):
+            vals, partner_vals = self._of_extract_partner_values(vals)
+        super(OFCRMLead, self).write(vals)
+        if partner_vals:
+            self.partner_id.write(partner_vals)
+        return True"""
 
 class OFCalendarEvent(models.Model):
     _inherit = 'calendar.event'
@@ -373,6 +415,11 @@ surcharge méthode du même nom pour ne pas compter les devis dans les ventes
         partner = super(OFCRMResPartner, self.with_context(inhiber_geocode=True)).create(vals)
 
         return partner
+
+    @api.multi
+    def write(self, vals):
+        super(OFCRMResPartner, self.with_context(inhiber_geocode=True)).write(vals)
+        return True
 
     def get_crm_partner_name(self):
         res = self.name
