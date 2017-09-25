@@ -9,8 +9,8 @@
         <field name="orientation">Portrait</field>
         <field name="margin_top">35</field>
         <field name="margin_bottom">23</field>
-        <field name="margin_left">7</field>
-        <field name="margin_right">7</field>
+        <field name="margin_left">12</field>
+        <field name="margin_right">12</field>
         <field name="header_line" eval="False" />
         <field name="header_spacing">25</field>
         <field name="dpi">90</field>
@@ -45,15 +45,16 @@
         </t>
         <div class="header">
             <div class="row">
-                <div class="col-xs-4 text-center">
-                    <div style="max-width: 80%; vertical-align: middle; margin-top">
+                <div class="col-xs-3 text-center">
+                    <div style="max-width: 90%; max-height: 90%; vertical-align: middle; margin-top">
                         <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo" style="max-width: 100%; max-height: 200px;"/>
                     </div>
                 </div>
-                <div class="h3 col-xs-4 text-center" style="padding-top: 20px; vertical-align: middle;">
-                    Fiche RDV<br/><strong style="padding-top: 8px"><span t-field="o.partner_id"/></strong>
+                <div class="h3 col-xs-6 text-center" style="padding-top: 8px; vertical-align: middle;">
+                    <div>Fiche RDV</div>
+                    <strong><div style="max-width: 100%; padding-top: 12px" t-field="o.partner_id"></div></strong>
                 </div>
-                <div class="h5 col-xs-4 text-right" style="vertical-align: top;">
+                <div class="h5 col-xs-3 text-right" style="vertical-align: top;">
                     <t t-if="o.of_ref">
                         <span t-field="o.of_ref"/>
                     </t>
