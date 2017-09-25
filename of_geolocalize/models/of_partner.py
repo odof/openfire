@@ -363,7 +363,6 @@ class ResPartner(models.Model):
           partner.env['ir.config_parameter'].get_param('Deactivate_Geocoding_On_Create') == "0":
             if (partner.street or partner.street2) and partner.zip and partner.city:
                 partner.geo_code()
-                _logger.warning(u"AIE AIE AIE")
 
         return partner
 
@@ -375,13 +374,16 @@ class ResPartner(models.Model):
         Case geocoding didn't change and either geo_lat or geo_lng changed: the partner was localized manually.
         Case address changed: we will try to geocode the newly set address
         """
-        if 'geocoding' not in vals and ('geo_lat' in vals or 'geo_lng' in vals) and vals['geo_lat'] != 0:
-            vals['geocoding'] = 'manual'
+        if not self._context.get('inhiber_geocode') and \
+          self.env['ir.config_parameter'].get_param('Deactivate_Geocoding_On_Write') == "0":
+            if 'geocoding' not in vals and ('geo_lat' in vals or 'geo_lng' in vals) and (vals.get('geo_lat') != 0 or vals.get('geo_lng') != 0):
+                vals['geocoding'] = 'manual'
 
         super(ResPartner, self).write(vals)
 
         if len(self._ids) == 1:
-            if self.geocoding != 'manual':
+            if self.geocoding != 'manual' and \
+              self.env['ir.config_parameter'].get_param('Deactivate_Geocoding_On_Write') == "0":
                 for key in vals:
                     if key in ('street', 'street2', 'city', 'state_id', 'country_id', 'zip'):
                         if self.geocoding == 'failure' or self.geocoding == 'failure_retry':

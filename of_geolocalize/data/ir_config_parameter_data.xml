@@ -11,4 +11,9 @@
     	<field name="value">0</field>
     </record>
 
+    <record id="deactivate_geocoding_on_write" model="ir.config_parameter">
+        <field name="key">Deactivate_Geocoding_On_Write</field>
+        <field name="value">0</field>
+    </record>
+
 </odoo>
