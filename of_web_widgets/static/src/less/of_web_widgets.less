@@ -6,6 +6,10 @@
 	display: inline-block;
 }
 
+.of_kanban_text {
+	/*display: inline-block;*/
+}
+
 .of_kanban_bool {
 	display: inline-block;
 }
@@ -14,12 +18,20 @@
 	display: inline-block;
 }
 
-.of_input {
-	border: none;
+.of_kanban_char_input {
 	display: inline-block;
 }
 
-.of_input_edit {
+.of_kanban_text_input {
+	word-break: break-word;
+	white-space: pre-wrap;
+	width: 100%;
+	&.oe_inline {
+		width: 100%!important;
+		@media (min-width: @screen-xs-min) {
+			width: 45%!important;
+		}
+	}
 	display: inline-block;
 }
 

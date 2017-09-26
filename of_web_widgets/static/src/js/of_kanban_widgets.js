@@ -392,6 +392,60 @@ var OFKanbanChar = AbstractField.extend({
     },
 });
 
+var OFKanbanText = OFKanbanChar.extend({
+    className: "of_kanban_text",
+    defaults: _.extend({},{
+
+    }),
+    events: {
+        'keyup': function (e) {
+            if (e.which === $.ui.keyCode.ENTER) {
+                e.stopPropagation();
+            }
+        },
+        'keypress': function (e) {
+            if (e.which === $.ui.keyCode.ENTER) {
+                e.stopPropagation();
+            }
+        },
+        'change': 'handle_change',
+    },
+
+    /**
+     *  inits this.$input and attaches it to this.$el
+     */
+    init_input: function() {
+        var input_attrs = {
+            rows: '4',
+            type: 'text',
+            class: 'of_kanban_text_input',
+        };
+        if (!this.is_false()) {
+            var input_content = this.get('value');
+        }
+        this.$input = this.make('textarea',input_attrs,input_content);
+        this.$el.append(this.$input);
+    },
+    /**
+     *  renders the element
+     */
+    renderElement: function() {
+        var self = this;
+        if (this.read_only_mode) {
+            var txt = this.get("value") || '';
+            this.$el.toggleClass("of_kanban_text_input");
+            this.$el.text(txt);
+        }else{
+            console.log("of_kanban_text.read_only_mode == false")
+            this.init_input();
+            // don't open popup on click
+            this.$el.click(function (ev) {
+                ev.preventDefault();
+            });
+        }
+    },
+});
+
 var OFKanbanBool = AbstractField.extend({
     className: "of_kanban_bool",
     custom_events: {
@@ -561,6 +615,7 @@ web_k_registry
     .add('of_kanban_selection', OFKanbanSelection)
     .add('of_kanban_date', OFKanbanDate)
     .add('of_kanban_char', OFKanbanChar)
+    .add('of_kanban_text', OFKanbanText)
     .add('of_kanban_bool', OFKanbanBool)
     .add('of_fa_button', OFFAButton)
     .add('of_fa_toggle_button', OFFAToggleButton)
