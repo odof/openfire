@@ -12,7 +12,8 @@ class OFCRMProjetLine(models.Model):
     attr_id = fields.Many2one('of.crm.projet.attr', string="Attribut", required=True, ondelete="restrict")
     type = fields.Selection([
         ('bool', u'Booléen (Oui/Non)'),
-        ('char', u'Texte court'),
+        ('char', u'Texte Court'),
+        ('text', u'Texte Long'),
         ('selection', u'Choix Unique'),
         #('multiple',u'Choix Multiple'), # plus tard
         ('date',u'Date'),
@@ -20,6 +21,7 @@ class OFCRMProjetLine(models.Model):
     # xml will not display val_bool and val_select_id if type set to 'char'
     val_bool = fields.Boolean(string="Valeur", default=False)
     val_char = fields.Char(string="Valeur")
+    val_text = fields.Text(string="Valeur")
     val_date = fields.Date(string="Valeur", default=fields.Date.today)
     val_select_id = fields.Many2one('of.crm.projet.attr.select', string="Valeur", ondelete="set null")#, domain="[('attr_id','=',attr_id)]")
     #val_select_ids = fields.Many2many('of.crm.projet.attr.select', 'crm_projet_multiple_rel', 'line_id', 'val_id', string="Valeurs")
@@ -45,6 +47,8 @@ class OFCRMProjetLine(models.Model):
                 line.type_var_name = 'val_bool'
             elif line.type == 'char':
                 line.type_var_name = 'val_char'
+            elif line.type == 'text':
+                line.type_var_name = 'val_text'
             elif line.type == 'date':
                 line.type_var_name = 'val_date'
             else:
@@ -57,6 +61,8 @@ class OFCRMProjetLine(models.Model):
             value = ("Non", "Oui")[self.val_bool]
         elif self.type == 'char':
             value = self.val_char
+        elif self.type == 'text':
+            value = self.val_text
         elif self.type == 'date':
             value = self.val_date
         else:
@@ -81,17 +87,19 @@ class OFCRMProjetAttr(models.Model):
     type = fields.Selection([
         ('bool', u'Booléen (Oui/Non)'),
         ('char', u'Texte Court'),
+        ('text', u'Texte Long'),
         ('selection', u'Choix Unique'),
         #('multiple',u'Choix Multiple'), # plus tard
         ('date',u'Date'),
         ], string=u'Type', required=True, default='char')
     selection_ids = fields.One2many('of.crm.projet.attr.select', 'attr_id', string="Valeurs")
-    modele_ids = fields.Many2many('of.crm.projet.modele', 'crm_projet_modele_attr_rel', 'attr_id', 'modele_id', string='Modèles')
+    modele_ids = fields.Many2many('of.crm.projet.modele', 'crm_projet_modele_attr_rel', 'attr_id', 'modele_id', string='Projets')
     active = fields.Boolean(string="Actif", default=True)
     sequence = fields.Integer(string=u'Séquence', default=10)
 
     val_bool_default = fields.Boolean(string="Valeur par Défaut", default=False)
     val_char_default = fields.Char(string="Valeur par Défaut")
+    val_text_default = fields.Text(string="Valeur par Défaut")
     #val_date_default = fields.Date(string="Valeur par Défaut", default=fields.Date.today)
     val_select_id_default = fields.Many2one('of.crm.projet.attr.select', string="Valeur par Défaut", domain="[('attr_id','=',id)]", ondelete="set null")
 

@@ -25,7 +25,7 @@
             <field name="name">of.crm.projet.modele.tree</field>
             <field name="model">of.crm.projet.modele</field>
             <field name="arch" type="xml">
-                <tree string="Modèle de Projet" colors="#A0A0A0:active==False;">
+                <tree string="Modèles de Projet" colors="#A0A0A0:active==False;">
                     <field name="name"/>
                     <field name="attr_ids" widget="many2many_tags"/>
                     <field name="active" invisible="1"/>
@@ -38,7 +38,7 @@
             <field name="model">of.crm.projet.modele</field>
             <field name="arch" type="xml">
                 <search string="Recherche de valeurs d'attributs de projets">
-                    <field name="name" string="Modèles" filter_domain="[('name','ilike',self)]"/>
+                    <field name="name" string="Modèles de projet" filter_domain="[('name','ilike',self)]"/>
                     <field name="attr_ids" string="Attributs" filter_domain="[('attr_ids', 'ilike', self)]"/>
                     <separator/>
                     <filter string="Archivé" name="archived" domain="[('active', '=', False)]"/>
@@ -77,6 +77,7 @@
                             <field name="val_bool" attrs="{'invisible': [('type','!=','bool')]}"/>
                             <field name="val_date" attrs="{'invisible': [('type','!=','date')]}"/>
                             <field name="val_char" attrs="{'invisible': [('type','!=','char')]}"/>
+                            <field name="val_text" attrs="{'invisible': [('type','!=','text')]}"/>
                             <field name="val_select_id" widget="selection" attrs="{'invisible': [('type','!=','selection')]}"/>
                         </group>
                     </sheet>
@@ -96,6 +97,7 @@
                     <field name="val_bool" attrs="{'invisible': [('type','!=','bool')]}"/>
                     <field name="val_date" attrs="{'invisible': [('type','!=','date')]}"/>
                     <field name="val_char" attrs="{'invisible': [('type','!=','char')]}"/>
+                    <field name="val_text" attrs="{'invisible': [('type','!=','text')]}"/>
                     <field name="val_select_id" widget="selection" attrs="{'invisible': [('type','!=','selection')]}"/>
                 </tree>
             </field>
@@ -113,6 +115,7 @@
                     <field name="val_bool"/>
                     <field name="val_date"/>
                     <field name="val_char"/>
+                    <field name="val_text"/>
                     <field name="val_select_id"/>
                     <!--field name="val_select_ids"/-->
                     <templates>
@@ -127,6 +130,9 @@
                                         <t t-if="record.type.raw_value == 'date'"><field name="val_date" widget="of_kanban_date"/></t>
                                         <t t-if="record.type.raw_value == 'selection'"><field name="val_select_id" widget="of_kanban_selection" domain="[('attr_id','=',attr_id)]"/></t>
                                         <!-- field name="val_select_ids" attrs="{'invisible': [('type','!=','multiple')]}"/-->
+                                    </strong>
+                                    <strong>
+                                        <t t-if="record.type.raw_value == 'text'"><field name="val_text" widget="of_kanban_text"/></t>
                                     </strong>
                                 </div>
                             </div>
@@ -168,6 +174,7 @@
                                 <field name="val_bool_default" attrs="{'invisible': [('type','!=','bool')]}"/>
                                 <!--<field name="val_date_default" attrs="{'invisible': [('type','!=','date')]}"/>-->
                                 <field name="val_char_default" attrs="{'invisible': [('type','!=','char')]}"/>
+                                <field name="val_text_default" attrs="{'invisible': [('type','!=','text')]}"/>
                                 <field name="val_select_id_default" widget="selection" attrs="{'invisible': [('type','!=','selection')]}"/>
                             </group>
                             <group>

@@ -46,17 +46,17 @@ class OFCRMLead(models.Model):
     of_prospecteur = fields.Many2one("res.users", string="Prospecteur")
     of_date_prospection = fields.Date(string="Date de prospection", default=fields.Date.today)
     # @TODO: implémenter la maj automatique de la date de cloture en fonction du passage de probabilité à 0 ou 100
-    of_date_cloture = fields.Date(string="Date de clôture")
+    of_date_cloture = fields.Date(string=u"Date de clôture")
     of_infos_compl = fields.Text(string="Autres infos")
     geo_lat = fields.Float(related="partner_id.geo_lat")
     geo_lng = fields.Float(related="partner_id.geo_lng")
     stage_probability = fields.Float(related="stage_id.probability", readonly=True)
 
     of_projet_line_ids = fields.One2many('of.crm.projet.line', 'lead_id', string=u'Entrées')
-    of_modele_id = fields.Many2one('of.crm.projet.modele', string=u"Modèle", ondelete="set null")
+    of_modele_id = fields.Many2one('of.crm.projet.modele', string=u"Projet", ondelete="set null")
 
     of_customer_state = fields.Selection(related="partner_id.of_customer_state", required=False)
-    is_company = fields.Boolean(string="Est une société")
+    is_company = fields.Boolean(string=u"Est une société")
     # activity_ids = fields.One2many('of.crm.opportunity.activity', 'lead_id', string=u"Activités de cette opportunité")
 
     # surcharges
@@ -75,21 +75,14 @@ class OFCRMLead(models.Model):
 
     meeting_ids = fields.Many2many('calendar.event', string=u"Réunions", related="partner_id.meeting_ids")
 
-    """@api.model
-    def _of_extract_partner_values(self, vals):
-        new_vals = vals.copy()
-        partner_vals = {}
-        for field_name, val in vals.iteritems():
-            if field_name not in self._fields:
-                continue
-            field = self._fields[field_name]
-            if not getattr(field, 'related'):
-                continue
-            related = field.related
-            if related.startswith('partner_id.'):
-                partner_vals[related[11:]] = val
-                del new_vals[field_name]
-        return new_vals, partner_vals"""
+    """@api.onchange('stage_id')
+    def _onchange_stage_id(self):
+        values = self._onchange_stage_id_values(self.stage_id.id)
+        if values.get('probability') == 100 and self.of_customer_state and self.of_customer_state != "customer":
+            values['of_customer_state'] = "customer"
+        elif values.get('probability') != 100 and self.of_customer_state and self.of_customer_state != "lead":
+            values['of_customer_state'] = "lead"
+        self.update(values)"""
 
     @api.onchange('of_modele_id')
     def _onchange_modele_id(self):
@@ -106,6 +99,8 @@ class OFCRMLead(models.Model):
                     the_type = attr.type
                     if the_type == 'char':
                         attr_vals['val_char'] = attr.val_char_default
+                    elif the_type == 'text':
+                        attr_vals['val_text'] = attr.val_text_default
                     elif the_type == 'selection':
                         attr_vals['val_select_id'] = attr.val_select_id_default
                     else:
@@ -215,10 +210,26 @@ class OFCRMLead(models.Model):
                 self.write({'of_date_cloture': time.strftime(DEFAULT_SERVER_DATE_FORMAT)})
         return res"""
 
-    """@api.model
+    @api.model
+    def _of_extract_partner_values(self, vals):
+        new_vals = vals.copy()
+        partner_vals = {}
+        for field_name, val in vals.iteritems():
+            if field_name not in self._fields: # don't take vals that are not fields into account
+                continue
+            field = self._fields[field_name]
+            if not getattr(field, 'related'): # field is not related -> let it be
+                continue
+            related = field.related
+            if related and related[0] == 'partner_id': # field related to partner_id
+                partner_vals['.'.join(related[1:])] = val # add value to partner_vals
+                del new_vals[field_name] # take value out of new vals
+        return new_vals, partner_vals
+
+    @api.model
     def create(self, vals):
         if not vals.get('partner_id'):
-            vals, partner_vals = self._of_extract_partner_values(vals)
+            vals, partner_vals = self._of_extract_partner_values(vals) # split vals
             partner_vals.update({
                 'name': vals.get('contact_name') or vals['name'],
                 'type': False,
@@ -229,9 +240,9 @@ class OFCRMLead(models.Model):
 #            vals['of_customer_state'] = partner.of_customer_state
             vals['partner_id'] = partner.id
         lead = super(OFCRMLead, self).create(vals)
-        return lead"""
+        return lead
 
-    @api.model
+    """@api.model
     def create(self, vals):
         if not vals.get('partner_id'):
             name = vals.get('contact_name') or vals['name']
@@ -239,9 +250,9 @@ class OFCRMLead(models.Model):
             vals['of_customer_state'] = partner.of_customer_state
             vals['partner_id'] = partner.id
         lead = super(OFCRMLead, self).create(vals)
-        return lead
+        return lead"""
 
-    """@api.multi
+    @api.multi
     def write(self, vals):
         partner_vals = False
         if len(self._ids) == 1 and vals.get('partner_id', self.partner_id):
@@ -249,7 +260,7 @@ class OFCRMLead(models.Model):
         super(OFCRMLead, self).write(vals)
         if partner_vals:
             self.partner_id.write(partner_vals)
-        return True"""
+        return True
 
 class OFCalendarEvent(models.Model):
     _inherit = 'calendar.event'
@@ -302,13 +313,13 @@ class OFCrmActivity(models.Model):
         self.lead_id.description = self.activity_id + " (" + self.name + u") fait(e) le " + time.strftime(DEFAULT_SERVER_DATE_FORMAT) \
             + u": \n" + self.activity_result + "\n" + self.lead_id.description
 """
-class Team(models.Model):
+class OFCRMTeam(models.Model):
     _inherit = 'crm.team'
 
     # Retrait des filtres de recherche par défaut dans la vue 'Votre pipeline'
     @api.model
     def action_your_pipeline(self):
-        action = super(Team, self).action_your_pipeline()
+        action = super(OFCRMTeam, self).action_your_pipeline()
         action['context'] = {key: val for key, val in action['context'].iteritems() if not key.startswith('search_default_')}
         return action
 
@@ -412,14 +423,9 @@ surcharge méthode du même nom pour ne pas compter les devis dans les ventes
         elif vals.get('of_customer_state', 'other') == 'other': # partner is a customer -> defaults to 'lead'
             vals['of_customer_state'] = 'lead'
 
-        partner = super(OFCRMResPartner, self.with_context(inhiber_geocode=True)).create(vals)
+        partner = super(OFCRMResPartner, self).create(vals)
 
         return partner
-
-    @api.multi
-    def write(self, vals):
-        super(OFCRMResPartner, self.with_context(inhiber_geocode=True)).write(vals)
-        return True
 
     def get_crm_partner_name(self):
         res = self.name
