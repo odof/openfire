@@ -2,7 +2,7 @@
     <data>
 
         <!-- ################## Vues import tarif ##################-->
-        
+
         <!-- Filtre -->    
 <!--         <record id="of_import_search_view" model="ir.ui.view">
             <field name="name">of.import.search</field>
@@ -83,10 +83,10 @@
                 </form>
             </field>
         </record>
-        
-        
+
+
         <!-- Menus -->
-        
+
         <!-- Action vue import -->
         <record id="action_of_import" model="ir.actions.act_window">
             <field name="name">OpenImport</field>
@@ -96,7 +96,7 @@
             <field name="view_mode">tree,form</field>
             <field name="help">Import OpenFire</field>
         </record>
-        
+
         <!-- Menu import (Configuration/OpenImport) -->
         <menuitem id="menu_of_import" action="action_of_import" name="OpenImport" 
             parent="base.menu_administration" sequence="1"/>

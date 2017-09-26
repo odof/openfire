@@ -26,7 +26,7 @@ class of_import(models.Model):
     sortie_succes = fields.Text('Information', readonly=True)
     sortie_avertissement = fields.Text('Avertissements', readonly=True)
     sortie_erreur = fields.Text('Erreurs', readonly=True)
-    
+
     def get_champs_odoo(self, model=''):
         "Renvoi un dictionnaire contenant les caractéristiques des champs Odoo en fonction du type d'import sélectionné (champ type_import)"
 
@@ -74,7 +74,7 @@ class of_import(models.Model):
                         sortie_note += cle + " "
                     sortie_note += ']'
                 sortie_note += '\n'
-                    
+
             if sortie_note:
                 sortie_note = u"Champs disponibles pour l'import (en-tête de colonne) :\n" + sortie_note
             imp.sortie_note = sortie_note
@@ -89,15 +89,15 @@ class of_import(models.Model):
     def bouton_simuler(self):
         self.importer(simuler=True)
         return True
-    
+
     @api.multi
     def bouton_importer(self):
         self.importer(simuler=False)
         return True
-    
+
     @api.multi
     def importer(self, simuler=True):
-        
+
 #
 # VARIABLES DE CONFIGURATION
 #
@@ -105,7 +105,7 @@ class of_import(models.Model):
         frequence_commit = 100 # Enregistrer (commit) tous les n enregistrements
 
         model = self.type_import # On récupère l'objet (model) à importer indiqué dans le champ type d'import
-        model_obj = self.env[model]
+        model_obj = self.env[model].with_context(from_import=True)
 
         if model == 'product.template':
             nom_objet = 'article'              # Libellé pour affichage dans message information/erreur
@@ -149,7 +149,7 @@ class of_import(models.Model):
 #
 # LECTURE DU FICHIER D'IMPORT
 #
-        
+
         # Lecture du fichier d'import par la bibliothèque csv de python
         fichier = base64.decodestring(self.file)
         dialect = csv.Sniffer().sniff(fichier) # Deviner automatiquement les paramètres : caractère séparateur, type de saut de ligne, ...
@@ -479,7 +479,7 @@ class of_import(models.Model):
         for cle in doublons:
             if doublons[cle][0] > 1:
                 sortie_avertissement += u"%s réf. %s existe en %s exemplaires dans le fichier d'import (lignes %s). Seule la première ligne est importée.\n" % (nom_objet.capitalize(), cle, doublons[cle][0], doublons[cle][1])
-        
+
         # On enregistre les dernières lignes qui ne l'auraient pas été.
         self.write({'nb_total': nb_total, 'nb_ajout': nb_ajout, 'nb_maj': nb_maj, 'nb_echoue': nb_echoue, 'sortie_succes': sortie_succes, 'sortie_avertissement': sortie_avertissement, 'sortie_erreur': sortie_erreur, 'date_debut_import' : date_debut, 'date_fin_import' : time.strftime('%Y-%m-%d %H:%M:%S')})
 
