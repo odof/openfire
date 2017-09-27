@@ -19,12 +19,14 @@ class OFKitAccountInvoice(models.Model):
             invoice.contains_kit = line_obj.search([("invoice_id", "=", invoice.id),('is_kit', '=', True)], count=True) > 0
 
     kit_display_mode = fields.Selection([
+        ('none', 'None'),
         ('collapse', 'Collapse'),
         #('collapse_expand','One line per kit, with detail'),
         ('expand', 'Expand'),
-        ], string='Kit display mode', default='expand',
+        ], string='Kit display mode', default='none',
             help="defines the way kits should be printed out in pdf reports:\n\
-            - Collapse: One line per kit, with minimal info\n\
+            - None: One line per kit. Nothing printed out about components\n\
+            - Collapse: One line per kit, with minimal info about components\n\
             - Expand: One line per kit, plus one line per component")
 
 class OFKitAccountInvoiceLine(models.Model):

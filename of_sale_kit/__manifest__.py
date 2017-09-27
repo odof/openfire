@@ -14,7 +14,7 @@
         \t- Possibilité de création de kits à la volée dans les Devis, Bons de commandes et Factures clients
         \t- Approvisionnement des composants sur confirmation de commande
         \t- Conversion de Bons de commandes en Factures
-        \t- 2 modes d'affichage des kits dans les rapports PDF: restreint et étendu
+        \t- 3 modes d'affichage des kits dans les rapports PDF: masqué, restreint et étendu
         \t- Prix d'achat des kits en fonction de leurs composants et marges dans les Devis
     """,
     'website': 'openfire.fr',

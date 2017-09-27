@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-21 07:34+0000\n"
-"PO-Revision-Date: 2017-08-21 07:34+0000\n"
+"POT-Creation-Date: 2017-09-27 12:37+0000\n"
+"PO-Revision-Date: 2017-09-27 12:37+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -51,12 +51,6 @@ msgstr "<br/>\n"
 #: model:ir.ui.view,arch_db:of_sale_kit.of_view_sale_comp_form
 msgid "<i class=\"oe_grey\">Kit quantities are a bit tricky to update on the fly, please save your changes to recompute its children quantities</i>"
 msgstr "<i class=\"oe_grey\">Les quantités des kits sont difficiles à mettre à jour à la volée. Pour voir les changements causés par votre modification, veuillez sauvegarder la facture</i>"
-
-#. module: of_sale_kit
-#: model:ir.ui.view,arch_db:of_sale_kit.of_report_invoice_document
-#: model:ir.ui.view,arch_db:of_sale_kit.of_report_saleorder_document
-msgid "<i style=\"font-size: small\">displayed quantities of kit components are their total quantities.</i>"
-msgstr "<i style=\"font-size: small\">La quantité affichée des composants de kits est leur quantité totale.</i>"
 
 #. module: of_sale_kit
 #: model:ir.ui.view,arch_db:of_sale_kit.of_view_account_comp_form
@@ -358,6 +352,12 @@ msgstr "Fabriqués"
 #: model:ir.model.fields,field_description:of_sale_kit.field_sale_order_line_comp_name
 msgid "Name"
 msgstr "Nom"
+
+#. module: of_sale_kit
+#: selection:account.invoice,kit_display_mode:0
+#: selection:sale.order,kit_display_mode:0
+msgid "None"
+msgstr "Masqué"
 
 #. module: of_sale_kit
 #: model:ir.model.fields,help:of_sale_kit.field_sale_order_line_comp_customer_lead
@@ -710,22 +710,16 @@ msgstr "Lors du traitement de la commande de ce produit, le bon de livraison con
 "        (un kit peut lui-même contenir des kits, aussi appelés sous-kits)."
 
 #. module: of_sale_kit
+#: model:ir.model.fields,help:of_sale_kit.field_account_invoice_kit_display_mode
 #: model:ir.model.fields,help:of_sale_kit.field_sale_order_kit_display_mode
 msgid "defines the way kits should be printed out in pdf reports:\n"
-"			- Collapse: One line per kit, with minimal info\n"
-"			- Expand: One line per kit, plus one line per component"
-msgstr "Défini la façon d'afficher les composants des kits dans les rapports PDF:\n"
-"			- Restreint: Une ligne par kit, avec informations minimales\n"
-"			- Etendu: Une ligne par kit, plus une ligne par composant"
-
-#. module: of_sale_kit
-#: model:ir.model.fields,help:of_sale_kit.field_account_invoice_kit_display_mode
-msgid "defines the way kits should be printed out in pdf reports:\n"
-"            - Collapse: One line per kit, with minimal info\n"
+"            - None: One line per kit. Nothing printed out about components\n"
+"            - Collapse: One line per kit, with minimal info about components\n"
 "            - Expand: One line per kit, plus one line per component"
 msgstr "Défini la façon d'afficher les composants des kits dans les rapports PDF:\n"
-"            - Restreint: Une ligne par kit, avec informations minimales\n"
-"            - Etendu: Une ligne par kit, plus une ligne par composant"
+"			- Masqué: Une ligne par kit, sans information sur les composants\n"
+"			- Restreint: Une ligne par kit, avec informations minimales\n"
+"			- Etendu: Une ligne par kit, plus une ligne par composant"
 
 #. module: of_sale_kit
 #: model:ir.model.fields,field_description:of_sale_kit.field_account_invoice_line_comp_display_qty_changed

@@ -23,13 +23,15 @@ class OFKitSaleOrder(models.Model):
 			order.contains_kit = line_obj.search([("order_id", "=",order.id), ('is_kit', '=', True)], count=True) > 0
 
 	kit_display_mode = fields.Selection([
-		('collapse', 'Collapse'),
-		#('collapse_expand','One line per kit, with detail'),
-		('expand', 'Expand'),
-		], string='Kit display mode', default='expand',
-			help="defines the way kits should be printed out in pdf reports:\n\
-			- Collapse: One line per kit, with minimal info\n\
-			- Expand: One line per kit, plus one line per component")
+        ('none', 'None'),
+        ('collapse', 'Collapse'),
+        #('collapse_expand','One line per kit, with detail'),
+        ('expand', 'Expand'),
+        ], string='Kit display mode', default='none',
+            help="defines the way kits should be printed out in pdf reports:\n\
+            - None: One line per kit. Nothing printed out about components\n\
+            - Collapse: One line per kit, with minimal info about components\n\
+            - Expand: One line per kit, plus one line per component")
 
 	@api.multi
 	def _prepare_invoice(self):
