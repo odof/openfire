@@ -73,6 +73,7 @@ class OFCRMLead(models.Model):
     mobile = fields.Char(related='partner_id.mobile')
     email_from = fields.Char(related="partner_id.email")
     description = fields.Html(string="Suivi")
+    description_rapport = fields.Html(string="Suivi bis", compute="_compute_description_rapport")
 
     meeting_ids = fields.Many2many('calendar.event', string=u"Réunions", related="partner_id.meeting_ids")
 
@@ -252,6 +253,12 @@ class OFCRMLead(models.Model):
             vals['partner_id'] = partner.id
         lead = super(OFCRMLead, self).create(vals)
         return lead"""
+
+    def _compute_description_rapport(self):
+        descr = self.description
+        descr_1 = descr.replace("<p>", "")
+        descr_2 = descr_1.replace("</p>","<br/>")
+        self.description_rapport = descr_2
 
     @api.multi
     def write(self, vals):
