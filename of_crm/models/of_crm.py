@@ -41,13 +41,13 @@ class OFCRMLead(models.Model):
         account_obj._parent_store_compute()
 
     of_website = fields.Char(related="partner_id.website")
-    of_description_projet = fields.Html('Notes de projet')
+    of_description_projet = fields.Html('Notes de projet') # champs inutile a supprimer bientot
     of_ref = fields.Char(string=u"Référence", copy=False)
     of_prospecteur = fields.Many2one("res.users", string="Prospecteur")
     of_date_prospection = fields.Date(string="Date de prospection", default=fields.Date.today)
     # @TODO: implémenter la maj automatique de la date de cloture en fonction du passage de probabilité à 0 ou 100
     of_date_cloture = fields.Date(string=u"Date de clôture")
-    of_infos_compl = fields.Text(string="Autres infos")
+    of_infos_compl = fields.Html(string="Autres infos")
     geo_lat = fields.Float(related="partner_id.geo_lat")
     geo_lng = fields.Float(related="partner_id.geo_lng")
     stage_probability = fields.Float(related="stage_id.probability", readonly=True)
@@ -72,6 +72,7 @@ class OFCRMLead(models.Model):
     fax = fields.Char(related='partner_id.fax')
     mobile = fields.Char(related='partner_id.mobile')
     email_from = fields.Char(related="partner_id.email")
+    description = fields.Html(string="Suivi")
 
     meeting_ids = fields.Many2many('calendar.event', string=u"Réunions", related="partner_id.meeting_ids")
 
