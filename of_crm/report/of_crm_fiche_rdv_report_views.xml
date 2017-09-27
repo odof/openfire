@@ -7,12 +7,12 @@
         <field name="page_height">0</field>
         <field name="page_width">0</field>
         <field name="orientation">Portrait</field>
-        <field name="margin_top">35</field>
-        <field name="margin_bottom">23</field>
+        <field name="margin_top">28</field>
+        <field name="margin_bottom">18</field>
         <field name="margin_left">12</field>
         <field name="margin_right">12</field>
         <field name="header_line" eval="False" />
-        <field name="header_spacing">25</field>
+        <field name="header_spacing">18</field>
         <field name="dpi">90</field>
     </record>
 
@@ -32,7 +32,7 @@
         report_type="qweb-html"
         name="of_crm.of_fiche_rdv_report_template" 
         paperformat="paperformat_euro_portrait_custom">
-    </report>
+    </report> 
 
     <template id="of_internal_layout">
        
@@ -50,12 +50,13 @@
                         <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo" style="max-width: 100%; max-height: 200px;"/>
                     </div>
                 </div>
-                <div class="h3 col-xs-6 text-center" style="padding-top: 8px; vertical-align: middle;">
+                <div class="h4 col-xs-6 text-center" style="padding-top: 2px">
                     <div>Fiche RDV</div>
-                    <strong><div style="max-width: 100%; padding-top: 12px" t-field="o.partner_id"></div></strong>
+                    <strong><div style="max-width: 100%; padding-top: 10px" t-field="o.partner_id"></div></strong>
                 </div>
                 <div class="h5 col-xs-3 text-right" style="vertical-align: top;">
                     <t t-if="o.of_ref">
+                    	<span>Réf :</span>
                         <span t-field="o.of_ref"/>
                     </t>
                 </div>
@@ -69,103 +70,142 @@
             <t t-foreach="docs" t-as="o">
                 <t t-call="of_crm.of_internal_layout">
                     <div class="page">
-                        <!-- Report page content -->
+                        
                         <!-- Prospect -->
-                        <div class="row h3">
+                        <div class="row h4 mb0">
                             <div class="col-xs-12"><strong>Prospect</strong></div>
-                        </div>                    
-                        <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black;">
-                            <div class="col-xs-6" style="border-right: 1px solid lightgray;">
-                                <div class="h5">
-                                    <t t-if="o.name">
-                                        <div><span>Description : </span><strong><span t-field="o.name"/></strong></div>
-                                    </t>
-                                    <t t-if="o.of_ref">
-                                        <div><span>Référence : </span><span t-field="o.of_ref"/></div>
-                                    </t>
-                                    <t t-if="o.partner_id">
-                                        <div><span>Client : </span><strong><span t-field="o.partner_id"/></strong></div>
-                                    </t>
-                                    <!-- t t-if="o.partner_name">
-                                        <div><span>Client : </span><span t-field="o.partner_name"/></div>
-                                    </t-->
-                                    <t t-if="o.street">
-                                        <span>Adresse :</span>
-                                        <span t-field="o.street"/>
-                                    </t> 
-                                    <t t-if="o.street2">
-                                        <span t-field="o.street2"/>
-                                    </t>
-                                    <div>    
-                                        <t t-if="o.zip">
-                                            <span style="color: white">Adresse :</span>
-                                            <span t-field="o.zip"/>
-                                        </t>    
-                                        <t t-if="o.city">
-                                            <span t-field="o.city"/>
-                                        </t>
-                                        <t t-if="o.country_id">
-                                            <span t-field="o.country_id"/>
-                                        </t>
-                                    </div>
-                                    <t t-if="o.phone">
-                                        <div><span>Téléphone : </span><span t-field="o.phone"/></div>
-                                    </t>
-                                    <t t-if="o.mobile">
-                                        <div><span>Mobile : </span><span t-field="o.mobile"/></div>
-                                    </t>
-                                    <t t-if="o.email_from">
-                                        <div><span>Courriel : </span><span t-field="o.email_from"/></div>
-                                    </t>
-                                </div>
-                            </div>        
-                            <div class="col-xs-6"> 
-                                <div class="h5">
-                                     <t t-if="o.of_date_prospection">
-                                        <div><span>Date de creation : </span><span t-field="o.of_date_prospection"/></div>
-                                     </t>
-                                     <t t-if="o.user_id">
-                                        <div><span>Commercial : </span><span t-field="o.user_id"/></div>
-                                     </t>
-                                     <t t-if="o.of_prospecteur">
-                                        <div><span>Prospecteur : </span><span t-field="o.of_prospecteur"/></div>
-                                     </t>
-                                     <t t-if="o.referred">
-                                        <div><span>Apporté par : </span><span t-field="o.referred"/></div>
-                                     </t>
-                                     <t t-if="o.campaign_id">
-                                        <div><span>Campagne : </span><span t-field="o.campaign_id"/></div>
-                                     </t>
-                                     <t t-if="o.medium_id">
-                                        <div><span>Canal : </span><span t-field="o.medium_id"/></div>
-                                     </t>
-                                     <t t-if="o.opt_out">
-                                        <div><span>Option de retrait : Oui </span></div>
-                                     </t>
-                                </div>
-                            </div>
                         </div>
+
+                        <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black;">
+                         	<div class="col-xs-12" style="display: table; padding: 0px;">
+                            <div style="display: table-cell; width: 50%;">
+                                 <div class="h5" style="padding: 0px 16px;">
+									 <t t-if="o.name">
+                                         <div><span>Description : </span><strong><span t-field="o.name"/></strong></div>
+                                     </t>
+                                     
+                                     <t t-if="o.of_ref">
+                                        <div><span>Référence : </span><span t-field="o.of_ref"/></div>
+                                     </t>
+                                 </div>  
+                                 <div t-if="o.partner_id or o.street or o.zip or o.city or o.country_id or o.phone or o.mobile or o.email_from" style="margin-bottom: 8px; margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                 <div class="h5" style="padding: 0px 16px;">    
+                                     
+                                     <t t-if="o.partner_id">
+                                         <div><span>Client : </span><strong><span t-field="o.partner_id"/></strong></div>
+                                     </t>
+                                     <t t-if="o.street">
+                                         <span>Adresse :</span><span t-field="o.street"/>
+                                     </t> 
+                                     <t t-if="o.street2">
+                                         <span t-field="o.street2"/>
+                                     </t>
+                                     <div>    
+                                         <t t-if="o.zip">
+                                             <span style="color: white">Adresse :</span><span t-field="o.zip"/>
+                                         </t>    
+                                         <t t-if="o.city">
+                                             <span t-field="o.city"/>
+                                         </t>
+                                         <t t-if="o.country_id">
+                                             <span t-field="o.country_id"/>
+                                         </t>
+                                     </div>
+                                     <t t-if="o.phone">
+                                         <div><span>Téléphone : </span><span t-field="o.phone"/></div>
+                                     </t>
+                                     <t t-if="o.mobile">
+                                         <div><span>Mobile : </span><span t-field="o.mobile"/></div>
+                                     </t>
+                                     <t t-if="o.email_from">
+                                         <div><span>Courriel : </span><span t-field="o.email_from"/></div>
+                                     </t>
+                                 </div>
+                             </div>
+                             
+                             <div style="display: table-cell; width: 50%; border-left: 1px solid lightgray">
+                                 <div>
+                                     <div class="h5" style="padding: 0px 16px;">
+	                                     <t t-if="o.company_id">
+	                                         <div><span>Société : </span><span t-field="o.company_id"/></div>
+	                                     </t>
+	                                     <t t-if="o.of_date_prospection">
+                                     		<span>Creation : <span t-field="o.of_date_prospection"/></span>
+                                     	 </t>
+                                     	 <t t-if="o.of_date_cloture">
+                                     		<span style="padding-left: 14px;">Clôture : <span t-field="o.of_date_cloture"/></span>
+	                                     </t>
+	                                     <t t-if="o.priority">
+	                                         <div><span>Évaluation : </span><span t-field="o.priority"/></div>
+	                                     </t>
+	                                     <t t-if="o.tag_ids">
+                                         <div>
+                                             <span>Étiquettes : </span>
+                                             <t t-set="bool_tiret" t-value="False"/>
+                                             <t t-foreach="o.tag_ids" t-as="tag_id">
+                                                 <span t-if="bool_tiret == True">- </span>
+                                                 <t t-set="tags_data" t-value="tag_id.get_crm_tags_data()"/>
+                                                     <span t-esc="tags_data"/>
+                                                 <t t-if="bool_tiret == False" t-set="bool_tiret" t-value="True"/>
+                                             </t>
+                                         </div>
+                                         </t>
+	                                     <t t-if="o.user_id">
+	                                         <div><span>Commercial : </span><span t-field="o.user_id"/></div>
+	                                     </t>
+	                                     <t t-if="o.of_prospecteur">
+	                                         <div><span>Prospecteur : </span><span t-field="o.of_prospecteur"/></div>
+	                                     </t>   
+                                     </div>
+                                     
+                                     <div t-if="o.campaign_id or o.medium_id or o.source_id or o.opt_out or o.referred" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                     <div class="h5" style="padding: 0px 16px;">
+	                                     <t t-if="o.campaign_id">
+	                                        <div><span>Campagne : </span><span t-field="o.campaign_id"/></div>
+	                                     </t>
+	                                     <t t-if="o.medium_id">
+	                                     	<span>Canal : </span><span t-field="o.medium_id"/>
+	                                     </t>
+	                                     <t t-if="o.source_id">
+	                                        <span style="padding-left: 14px">Origine : </span><span t-field="o.source_id"/>
+	                                     </t>
+	                                     <t t-if="o.opt_out"><div>Option de retrait : Oui</div></t>
+	                                     <t t-if="o.referred">
+	                                        <div><span>Apporté par : </span><span t-field="o.referred"/></div>
+	                                     </t>       
+                                 	 </div>
+                                 </div>
+                             </div>
+                             </div>
+                         </div>
                         
                         <!-- Projet -->
-                        <div class="row h3 mt32">
+                        <div class="row h4 mt28 mb0">
                             <div class="col-xs-12"><strong>Projet</strong></div>
                         </div>
                         
                         <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black;">
                              <div class="col-xs-12" style="display: table;">
-                                 <div t-if="o.of_modele_id or o.date_deadline" style="border-right: 1px solid lightgray; width: 50%; display: table-cell;">
-                                     <div t-if="o.of_modele_id" class="h5">
-                                         <span>Modèle : </span><span t-field="o.of_modele_id"/>
+                                 <div style="border-right: 1px solid lightgray; width: 50%; display: table-cell;">
+                                     <div class="h5">
+                                         <span>Modèle : </span>
+                                         <t t-if="o.of_modele_id" >
+                                             <span t-field="o.of_modele_id"/>
+                                         </t>
                                      </div>
                                  </div>
-                                 <div t-if="o.of_modele_id or o.date_deadline" style="width: 50%; display: table-cell; padding: 0px 16px;"> 
-                                     <div t-if="o.date_deadline" class="h5">
-                                         <div><span>Date du projet : </span><span t-field="o.date_deadline"/></div>
+                                 <div style="width: 50%; display: table-cell; padding: 0px 16px;">
+                                     <div class="h5">
+                                         <div><span>Date du projet : </span>
+                                         	 <t t-if="o.date_deadline">
+                                             	<span t-field="o.date_deadline"/>
+                                             </t>
+                                         </div>
                                      </div>
                                  </div>
                              </div>
                              <div class="col-xs-12" style="display: table; border-top: 1px solid lightgray">
-                                 <div style="border-right: 1px solid lightgray; width: 50%; display: table-cell;"> 
+                                 <div style="border-right: 1px solid lightgray; width: 50%; display: table-cell; padding-right: 8px;"> 
                                      <div class="h5">
                                          <!-- Get fields -->
                                          <t t-foreach="o.of_projet_line_ids" t-as="entree">
@@ -174,7 +214,7 @@
                                                  <span t-esc="name_val[0]"/><span> : </span><strong><span t-esc="name_val[1]"/></strong><br/>
                                              </span>
                                              <span t-else="">
-                                                 <span t-esc="name_val[0]"/><span> : </span><span t-esc="name_val[1]"/>
+                                                 <span t-esc="name_val[0]"/><span> : </span><span t-esc="name_val[1]"/><br/>
                                              </span>
                                          </t>
                                      </div>
@@ -182,7 +222,7 @@
                                  <div style="width: 50%; display: table-cell; padding: 0px 16px;">
                                      <div class="h5">
                                          <t t-if="o.planned_revenue">
-                                             <div><span>Revenu espéré : </span><span t-field="o.planned_revenue"/> €</div>
+                                             <div><span>Budget : </span><span t-field="o.planned_revenue"/> €</div>
                                          </t>
                                          <t t-if="o.probability">
                                              <div><span>Probabilité : </span><span t-field="o.probability"/><span> %</span></div>
@@ -191,12 +231,19 @@
                                              <div><span>Étape : </span><span t-field="o.stage_id"/></div>
                                          </t>                                   
                                      </div>
+                                     <div>
+                                         Autres infos : <br/>
+                                         <t t-if="o.of_infos_compl">
+                                             <div t-field="o.of_infos_compl"/>
+                                         </t> 
+        
+                                     </div>
                                  </div>
                              </div>
                         </div>
     
                         <!-- Reunions -->
-                        <div class="row h3 mt32">
+                        <div class="row h4 mt28 mb0">
                             <div class="col-xs-12"><strong>Rendez-vous</strong></div>
                         </div>
                         <div t-if="o.meeting_ids" class="row" style="border: 1px solid lightgray; border-top: 2px solid black;">
@@ -207,13 +254,17 @@
                                             <th>Sujet</th>
                                             <th>Date</th>
                                             <th>Description</th>
-                                            <th>Participants</th>
+                                            <th>Lieu</th>
                                         </thead>
                                         <t t-set="date_sorted_meetings" t-value="o.meeting_ids.sorted(key=lambda k: k.start)"/>
                                         <tr t-foreach="date_sorted_meetings" t-as="meeting">
                                             <t t-set="meeting_data" t-value="meeting.get_meeting_data()"/>
                                             <t t-foreach="meeting_data" t-as="key">
                                                 <t t-if="key=='start'" t-set="value" t-value="meeting[key][8:10] + '/' + meeting[key][5:7] + '/' + meeting[key][0:4] + '  ' + meeting[key][11:16]"/>
+                                                <t t-else="" t-set="value" t-value="meeting[key]"/>
+                                                <td t-if="meeting[key] and key != 'partner_ids'" t-esc="value"/>
+                                                <td t-elif="not meeting[key]"/>
+                                                <!-- Participans 
                                                 <t t-elif="key=='partner_ids'">
                                                     <td>
                                                         <t t-set="bool_tiret" t-value="False"/>
@@ -224,10 +275,9 @@
                                                             <t t-if="bool_tiret == False" t-set="bool_tiret" t-value="True"/>
                                                         </t>
                                                     </td>
-                                                </t>
-                                                <t t-else="" t-set="value" t-value="meeting[key]"/>
-                                                <td t-if="meeting[key] and key != 'partner_ids'" t-esc="value"/>
-                                                <td t-elif="not meeting[key]"/>
+                                                </t>-->
+                                                
+                                                
                                             </t>
                                         </tr>
                                     </table>
@@ -240,64 +290,62 @@
                             </div> 
                         </div>
     
-                        <!-- Qualification et Suivi -->
-                        <div class="row h3 mt32">
-                            <div class="col-xs-12"><strong>Qualification et Suivi</strong></div>
+                        <!-- Suivi -->
+                        <div class="row h4 mt28 mb0">
+                            <div class="col-xs-12"><strong>Suivi</strong></div>
+                        </div>
+                        <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black;">
+                            <div class="h5" >
+                            	<t t-if="o.next_activity_id">
+                                    <div style="padding-left: 16px">
+	                                    <span><strong>Activité prevue : </strong></span>
+	                                    <span t-if="o.date_action"></span><span t-field="o.date_action"/><span> - </span>  
+	                                    <span t-field="o.next_activity_id"/>
+	                                    <span t-if="o.title_action"></span><span> - </span><span t-field="o.title_action"/>
+                                    </div>
+                                    <div style="margin-bottom: 8px; margin-top: 8px; border-top: 1px solid lightgray; width: 100%;"/>
+                                </t>
+                            	<t t-if="o.description_rapport">
+                                    <div t-field="o.description_rapport" style="padding-left: 16px; padding-bottom: 0px"/>
+                            	</t>
+                            </div>
+                        </div>
+                        
+                                              
+                        <!-- Compte Rendu de RDV - ->
+                        <div class="row h4 mt28 mb0">
+                            <div class="col-xs-12"><strong>Compte Rendu de RDV</strong></div>
                         </div>
                         <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black;">
                             <div class="col-xs-6"> 
                                 <div class="h5">
-                                    <t t-if="o.next_activity_id">
-                                        <div><span>Activité suivante : </span><span t-field="o.next_activity_id"/>
-                                             <t t-if="o.date_action">
-                                                 <span>  ( Date : </span>
-                                                 <span t-field="o.date_action"/>
-                                                 <span> )</span>
-                                             </t>   
-                                        </div>
-                                        <t t-if="o.title_action">
-                                            <div><span>Description de l'action : </span><span t-field="o.title_action"/></div>
-                                        </t>
-                                    </t>
-                                    <t t-if="o.of_date_prospection">
-                                        <div>
-                                            <span>Date de création : </span>
-                                            <span t-field="o.of_date_prospection"/>
-                                        </div>
-                                    </t>
-                                    <t t-if="o.date_deadline">
-                                        <div>
-                                            <span>Date du projet : </span>
-                                            <span t-field="o.date_deadline"/>
-                                        </div>
-                                    </t>
-                                    <t t-if="o.of_date_cloture">
-                                        <div>
-                                            <span>Date de clôture : </span>
-                                            <span t-field="o.of_date_cloture"/>
-                                        </div>
-                                    </t>
-                                    <t t-if="o.company_id">
-                                        <div>
-                                            <span>Société : </span>
-                                            <span t-field="o.company_id"/>
-                                        </div>
-                                    </t>
-                                    <t t-if="o.tag_ids">
-                                        <div>
-                                            <span>Étiquettes : </span>
-                                            <t t-set="bool_tiret" t-value="False"/>
-                                            <t t-foreach="o.tag_ids" t-as="tag_id">
-                                                <span t-if="bool_tiret == True">- </span>
-                                                <t t-set="tags_data" t-value="tag_id.get_crm_tags_data()"/>
-                                                    <span t-esc="tags_data"/>
-                                                <t t-if="bool_tiret == False" t-set="bool_tiret" t-value="True"/>
-                                            </t>
-                                        </div>
-                                    </t>
+                                    CARRÉ COMPTE RENDU DE RDV                                 
+                                    
                                 </div>
                             </div>
+                        </div-->
+                        
+                        
+                        
+                        <!-- Actions suivantes - ->
+                        <div class="row h4 mt28 mb0">
+                            <div class="col-xs-12"><strong>Actions suivantes</strong></div>
                         </div>
+                        <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black;">
+                            <div class="col-xs-6"> 
+                                <div class="h5">
+                                    CARRÉ ACTIONS SUIVANTES                                 
+                                    
+                                </div>
+                            </div>
+                        </div-->
+                        
+                        
+                        
+                        
+                        
+                        
+                        
                     </div>         
                 </t>
             </t>
