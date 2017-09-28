@@ -77,14 +77,14 @@ class OFCRMLead(models.Model):
 
     meeting_ids = fields.Many2many('calendar.event', string=u"Réunions", related="partner_id.meeting_ids")
 
-    """@api.onchange('stage_id')
+    @api.onchange('stage_id')
     def _onchange_stage_id(self):
         values = self._onchange_stage_id_values(self.stage_id.id)
         if values.get('probability') == 100 and self.of_customer_state and self.of_customer_state != "customer":
             values['of_customer_state'] = "customer"
         elif values.get('probability') != 100 and self.of_customer_state and self.of_customer_state != "lead":
             values['of_customer_state'] = "lead"
-        self.update(values)"""
+        self.update(values)
 
     @api.onchange('of_modele_id')
     def _onchange_modele_id(self):

@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
+from odoo.osv.expression import NEGATIVE_TERM_OPERATORS
 
 class OFCRMProjetLine(models.Model):
     _name = 'of.crm.projet.line'
@@ -38,6 +39,45 @@ class OFCRMProjetLine(models.Model):
             self.update(vals)
 
     type_var_name = fields.Char(string="nom de la variable de valeur", compute="_compute_type_var_name")
+
+    @api.multi
+    def name_get(self):
+        return [(record.id, "%s:%s" % (record.name, getattr(record, record.type_var_name)))
+                for record in self]
+
+    @api.model
+    def _name_search(self, name='', args=None, operator='ilike', limit=100, name_get_uid=None):
+        """
+        Système de recherche avancé permettant d'utiliser une syntaxe de type 'nom_attribut:valeur'
+        Si name ne contient pas de ':', recherche sur valeurs uniquement
+        """
+        name = name.split(':')
+        if len(name) == 1:
+            value = name[0]
+            name = False
+        else:
+            value = ':'.join(name[1:])
+            name = name[0]
+
+        args = list(args or [])
+        if name:
+            args.append(('name', 'ilike', name))
+
+        name_args = []
+        nb_name_args = 0
+        if value in '01' and operator in ('=', '!='):
+            # Cas particulier du champ booleen
+            name_args.append(('val_bool', operator, value=='1'))
+            nb_name_args = 1
+        #op = operator in NEGATIVE_TERM_OPERATORS and '&' or '|'
+        if value:
+            for field_type, field_name in (('char', 'val_char'), ('text', 'val_text'), 
+                                          ('date', 'val_date'), ('selection', 'val_select_id')):
+                name_args += ['&', ('type', '=', field_type), (field_name, operator, value)]
+            nb_name_args += 4
+        if name_args:
+            args = args + ['|'] * (nb_name_args-1) + name_args
+        return super(OFCRMProjetLine, self)._name_search('', args, 'ilike', limit, name_get_uid)
 
     @api.multi
     @api.depends('type')
