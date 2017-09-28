@@ -121,7 +121,7 @@
                     <templates>
                         <t t-name="kanban-box">
                             <div class="oe_kanban_global_click" style="border: 1px solid lightgrey; border-radius: 4px;">
-                                <a t-if="!read_only_mode" type="delete" class="fa fa-times pull-right"/>
+                                <a t-if="!read_only_mode" type="delete" groups="sales_team.group_sale_manager" class="fa fa-times pull-right"/>
                                 <div class="oe_kanban_details">
                                     <span style="padding-right: 8px; border-right: 1px solid lightgrey;"><field name="name"/></span>
                                     <strong style="padding-left: 8px; border-left: 1px solid lightgrey;">
