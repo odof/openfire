@@ -72,7 +72,7 @@
                     <div class="page">
                         
                         <!-- Prospect -->
-                        <div class="row h4 mb0">
+                        <div class="row h4 mb4">
                             <div class="col-xs-12"><strong>Prospect</strong></div>
                         </div>
 
@@ -180,7 +180,7 @@
                          </div>
                         
                         <!-- Projet -->
-                        <div class="row h4 mt28 mb0">
+                        <div class="row h4 mt28 mb4">
                             <div class="col-xs-12"><strong>Projet</strong></div>
                         </div>
                         
@@ -232,9 +232,9 @@
                                          </t>                                   
                                      </div>
                                      <div>
-                                         Autres infos : <br/>
+                                         Autres infos : 
                                          <t t-if="o.of_infos_compl">
-                                             <div t-field="o.of_infos_compl"/>
+                                             <span t-field="o.of_infos_compl"/>
                                          </t> 
         
                                      </div>
@@ -243,20 +243,20 @@
                         </div>
     
                         <!-- Reunions -->
-                        <div class="row h4 mt28 mb0">
+                        <div class="row h4 mt28 mb4">
                             <div class="col-xs-12"><strong>Rendez-vous</strong></div>
                         </div>
                         <div t-if="o.meeting_ids" class="row" style="border: 1px solid lightgray; border-top: 2px solid black;">
                             <div class="col-xs-12"> 
                                 <div class="h5">
-                                    <table width="100%" class="table table-striped">
+                                    <table width="100%" class="table table-condensed">
                                         <thead>
+                                            <th style="width: 16%">Date</th>
                                             <th>Sujet</th>
-                                            <th>Date</th>
                                             <th>Description</th>
                                             <th>Lieu</th>
                                         </thead>
-                                        <t t-set="date_sorted_meetings" t-value="o.meeting_ids.sorted(key=lambda k: k.start)"/>
+                                        <t t-set="date_sorted_meetings" t-value="o.meeting_ids.sorted(key=lambda k: k.start, reverse=True)"/>
                                         <tr t-foreach="date_sorted_meetings" t-as="meeting">
                                             <t t-set="meeting_data" t-value="meeting.get_meeting_data()"/>
                                             <t t-foreach="meeting_data" t-as="key">
@@ -264,20 +264,6 @@
                                                 <t t-else="" t-set="value" t-value="meeting[key]"/>
                                                 <td t-if="meeting[key] and key != 'partner_ids'" t-esc="value"/>
                                                 <td t-elif="not meeting[key]"/>
-                                                <!-- Participans 
-                                                <t t-elif="key=='partner_ids'">
-                                                    <td>
-                                                        <t t-set="bool_tiret" t-value="False"/>
-                                                        <t t-foreach="meeting.partner_ids" t-as="partner">
-                                                            <span t-if="bool_tiret == True">- </span>
-                                                            <t t-set="value" t-value="partner.get_crm_partner_name()"/>
-                                                            <span t-esc="value"/>
-                                                            <t t-if="bool_tiret == False" t-set="bool_tiret" t-value="True"/>
-                                                        </t>
-                                                    </td>
-                                                </t>-->
-                                                
-                                                
                                             </t>
                                         </tr>
                                     </table>
@@ -291,7 +277,7 @@
                         </div>
     
                         <!-- Suivi -->
-                        <div class="row h4 mt28 mb0">
+                        <div class="row h4 mt28 mb4">
                             <div class="col-xs-12"><strong>Suivi</strong></div>
                         </div>
                         <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black;">
@@ -311,37 +297,92 @@
                             </div>
                         </div>
                         
+                        <!--  div class="child" style="margin-top: 16px; border-bottom: 1px solid lightgray; width: 10%"/> -->
                                               
-                        <!-- Compte Rendu de RDV - ->
-                        <div class="row h4 mt28 mb0">
-                            <div class="col-xs-12"><strong>Compte Rendu de RDV</strong></div>
+                        <!-- Compte Rendu de RDV -->
+                        <div class="row h4 mt32 mb4">
+                            <div class="col-xs-12"><strong>Compte rendu</strong></div>
                         </div>
                         <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black;">
-                            <div class="col-xs-6"> 
+                            <div class="col-xs-2" style="border-right: 1px solid lightgray; border-bottom: 1px solid lightgray"> 
                                 <div class="h5">
-                                    CARRÉ COMPTE RENDU DE RDV                                 
-                                    
+                                	<div>
+                                    	<span class="fa fa fa-square-o"/><span> Devis</span>
+                                    </div>
+                                    <div>
+                                    	<span class="fa fa fa-square-o"/><span> Commande</span>
+                                    </div>                                 
                                 </div>
                             </div>
-                        </div-->
+                            <div class="col-xs-4" style="border-right: 1px solid lightgray; border-bottom: 1px solid lightgray">
+                                <div class="h5">
+                                	<div>Montant HT : <span style="padding-left: 100px">%</span></div>
+                                	<div><span style="padding-right: 2px">TVA réduite : </span> 
+                                		<span class="fa fa fa-square-o"/> Oui 
+                                		<span class="fa fa fa-square-o" style="padding-left: 6px" /> Non
+                                	</div>
+                            	</div>
+                            </div>
+                            <div class="col-xs-6" style="border-bottom: 1px solid lightgray">
+                            	<div class="h5">
+                            		<div> Intérêt : </div>
+                            		<div> Modèle : </div>
+                                </div>  
+                            </div>
+                            <div class="col-xs-2" style="border-right: 1px solid lightgray;">
+                            	<div class="h5">
+                                	<div>
+                                    	<span class="fa fa fa-square-o"/><span> Refus</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-10">
+                                <div class="h5">
+                                	<div>Motif : </div>
+                            	</div>
+                            </div>
+                        </div>
                         
-                        
-                        
-                        <!-- Actions suivantes - ->
-                        <div class="row h4 mt28 mb0">
+                        <!-- Actions suivantes 
+                        <div class="row h4 mt28 mb4">
                             <div class="col-xs-12"><strong>Actions suivantes</strong></div>
                         </div>
                         <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black;">
-                            <div class="col-xs-6"> 
-                                <div class="h5">
-                                    CARRÉ ACTIONS SUIVANTES                                 
+                        	<div style="border-right: 1px solid lightgray; width: 25%; display: table-cell;">
+	                            <div class="h5">
+	                                <!- - Get activities - ->
+	                                
+                                    <t t-foreach="o.env['crm.activity'].search([])" t-as="act">
+	                                    <div class="fa fa fa-square-o"><span t-esc="act.name"/></div>
+	                                    
+	                                    
+                                    </t>
                                     
-                                </div>
+	                            </div>
                             </div>
-                        </div-->
+                        	<div style="border-right: 1px solid lightgray; width: 25%; display: table-cell;">
+	                            <div class="h5">
+	                                hola2
+	                            </div>
+                            </div>
+                            <div style="border-right: 1px solid lightgray; width: 25%; display: table-cell;">
+	                            <div class="h5">
+	                                hola3
+	                            </div>
+                            </div>
+                             <div style="border-right: 1px solid lightgray; width: 25%; display: table-cell;">
+	                            <div class="h5">
+	                                hola3
+	                            </div>
+                            </div>
                         
                         
+                       
+                         
+                        </div>
                         
+                        
+                        -->
                         
                         
                         
