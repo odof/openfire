@@ -51,6 +51,9 @@ class OFCRMLead(models.Model):
     geo_lat = fields.Float(related="partner_id.geo_lat")
     geo_lng = fields.Float(related="partner_id.geo_lng")
     stage_probability = fields.Float(related="stage_id.probability", readonly=True)
+    # custom colors
+    of_color_ft = fields.Char(string="Couleur de texte", related="user_id.of_color_ft")
+    of_color_bg = fields.Char(string="Couleur de fond", related="user_id.of_color_bg")
 
     of_projet_line_ids = fields.One2many('of.crm.projet.line', 'lead_id', string=u'Entrées')
     of_modele_id = fields.Many2one('of.crm.projet.modele', string=u"Projet", ondelete="set null")

@@ -20,7 +20,7 @@ Module OpenFire pour le CRM Odoo
 Fiche de projet dynamique
 -------------------------
 
- - Dans l'onglet 'projet' d'une opportunité. 
+ - Dans l'onglet 'projet' d'une opportunité.
  - Configuration via le menu 'Projets' dans Ventes -> Configuration.
  - Modèles de Projets: contiennent une liste d'attributs qui seront reportés dans une fiche projet sur sélection d'un modèle.
  - Valeurs d'attributs: valeurs possible pour les attributs de type 'Choix Unique'
@@ -33,6 +33,7 @@ Fiche de projet dynamique
         'sale_crm',
         'of_geolocalize',
         'of_web_widgets',
+        'of_calendar',
     ],
     'data' : [
         'views/of_crm_view.xml',
