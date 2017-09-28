@@ -161,8 +161,8 @@ class OFBom(models.Model):
 
     @api.multi
     def write(self, vals):
+        super(OFBom, self).write(vals)
         for bom in self:
-            super(OFBom, bom).write(vals)
             if 'type' in vals:
                 #call to related product method
                 bom.product_tmpl_id._compute_is_kit()
@@ -173,3 +173,16 @@ class OFBom(models.Model):
             if 'bom_line_ids' in vals:
                 bom.product_tmpl_id.standard_price = bom.get_components_price(1, True)['cost']
         return True
+
+    @api.multi
+    def unlink(self):
+        templates = self.env['product.template']
+        for bom in self:
+            templates |= bom.product_tmpl_id
+
+        templates.write({
+            'is_kit': False,
+            'current_bom_id': False,
+        })
+        super(OFBom, self).unlink()
+
