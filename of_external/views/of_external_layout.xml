@@ -132,16 +132,9 @@
                 </t>
                 
                 <t t-if="company.use_of_custom_footer and not company.custom_footer">
-                    <!-- ugly but couldn't find a better way to do this -->
-                    <t t-if="company.of_custom_footer_line_1_size == 'medium'"><span t-field="company.of_custom_footer_line_1" style="font-size: medium;"/><br/></t>
-                    <t t-if="company.of_custom_footer_line_1_size == 'small'"><span t-field="company.of_custom_footer_line_1" style="font-size: small;"/><br/></t>
-                    <t t-if="company.of_custom_footer_line_1_size == 'smaller'"><span t-field="company.of_custom_footer_line_1" style="font-size: smaller;"/><br/></t>
-                    <t t-if="company.of_custom_footer_line_1_size == 'x-small'"><span t-field="company.of_custom_footer_line_1" style="font-size: x-small;"/><br/></t>
-                    
-                    <t t-if="company.of_custom_footer_line_2_size == 'medium'"><span t-field="company.of_custom_footer_line_2" style="font-size: medium;"/><br/></t>
-                    <t t-if="company.of_custom_footer_line_2_size == 'small'"><span t-field="company.of_custom_footer_line_2" style="font-size: small;"/><br/></t>
-                    <t t-if="company.of_custom_footer_line_2_size == 'smaller'"><span t-field="company.of_custom_footer_line_2" style="font-size: smaller;"/><br/></t>
-                    <t t-if="company.of_custom_footer_line_2_size == 'x-small'"><span t-field="company.of_custom_footer_line_2" style="font-size: x-small;"/><br/></t>
+                    <span t-field="company.of_custom_footer_line_1" t-attf-style="font-size: #{company.of_custom_footer_line_1_size};"/><br/>
+                    <span t-field="company.of_custom_footer_line_2" t-attf-style="font-size: #{company.of_custom_footer_line_2_size};"/><br/>
+                    <span t-field="company.of_custom_footer_line_3" t-attf-style="font-size: #{company.of_custom_footer_line_3_size};"/><br/>
                 </t>
                 
                 <t t-if="company.custom_footer and company.use_of_custom_footer">

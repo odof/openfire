@@ -9,8 +9,8 @@
                 <xpath expr="//notebook//page[@name='advanced_settings']" position="attributes">
                     <attribute name="invisible">0</attribute>
                 </xpath>
-                <xpath expr="//notebook//page[@name='advanced_settings']" position="inside">
-                    <group col="1" name="of_company_footer">
+                <xpath expr="//notebook//page[@name='advanced_settings']/group[@name='advanced_settings_group_1']" position="inside">
+                    <group colspan="4" col="1" name="of_company_footer">
                         <separator string="Company Footer" colspan="2"/>
                         <div>
                             <field name="use_of_custom_footer" nolabel="1" class="oe_inline"/>
@@ -19,8 +19,9 @@
                         <div>
                             <div>Line 1 : </div>
                             <div style="padding: 8px 16px; border: 1px dotted lightgray">
-                                <span>Content: </span>
-                                <field name="of_custom_footer_line_1" nolabel="1" class="oe_inline" placeholder="replace with desired content for line 1"/>
+                                <span style="max-width: 10%">Content: </span>
+                                <field name="of_custom_footer_line_1" nolabel="1" class="oe_inline" 
+                                  placeholder="replace with desired content for line 1" style="min-width: 90%"/>
                                 <br/>
                                 <span>Size: </span>
                                 <field name="of_custom_footer_line_1_size" class="oe_inline"/>
@@ -28,11 +29,22 @@
 
                             <div>Line 2 : </div>
                             <div style="padding: 8px 16px; border: 1px dotted lightgray">
-                                <span>Content: </span>
-                                <field name="of_custom_footer_line_2" nolabel="1" class="oe_inline" placeholder="replace with desired content for line 2"/>
+                                <span style="max-width: 10%">Content: </span>
+                                <field name="of_custom_footer_line_2" nolabel="1" class="oe_inline" 
+                                  placeholder="replace with desired content for line 2" style="min-width: 90%;"/>
                                 <br/>
                                 <span>Size: </span>
                                 <field name="of_custom_footer_line_2_size" class="oe_inline"/>
+                            </div>
+
+                            <div>Line 3 : </div>
+                            <div style="padding: 8px 16px; border: 1px dotted lightgray">
+                                <span style="max-width: 10%">Content: </span>
+                                <field name="of_custom_footer_line_3" nolabel="1" class="oe_inline" 
+                                  placeholder="replace with desired content for line 3" style="min-width: 90%;"/>
+                                <br/>
+                                <span>Size: </span>
+                                <field name="of_custom_footer_line_3_size" class="oe_inline"/>
                             </div>
                         </div>
                     </group>
