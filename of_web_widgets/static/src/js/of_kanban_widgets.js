@@ -436,7 +436,6 @@ var OFKanbanText = OFKanbanChar.extend({
             this.$el.toggleClass("of_kanban_text_input");
             this.$el.text(txt);
         }else{
-            console.log("of_kanban_text.read_only_mode == false")
             this.init_input();
             // don't open popup on click
             this.$el.click(function (ev) {

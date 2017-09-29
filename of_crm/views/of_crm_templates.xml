@@ -3,6 +3,7 @@
     <template id="assets_backend" name="of_crm assets" inherit_id="web.assets_backend">
         <xpath expr="." position="inside">
             <link rel="stylesheet" href="/of_crm/static/src/less/of_crm.less"/>
+            <script type="text/javascript" src="/of_crm/static/src/js/of_kanban_view.js"></script>
         </xpath>
     </template>
 </odoo>
