@@ -442,6 +442,24 @@ surcharge méthode du même nom pour ne pas compter les devis dans les ventes
         res = self.name
         return res
 
+class OFCRMResCompany(models.Model):
+    _inherit = 'res.company'
+
+    crm_suivi = fields.Boolean(string="Actions Co suivies", default=True)
+    crm_suivi_notes = fields.Boolean(string="avec les notes", default=False)
+
+    @api.onchange('crm_suivi')
+    def _onchange_crm_suivi(self):
+        for company in self:
+            if not company.crm_suivi:
+                company.crm_suivi_notes = False
+
+    @api.onchange('crm_suivi_notes')
+    def _onchange_crm_suivi_notes(self):
+        for company in self:
+            if company.crm_suivi_notes:
+                company.crm_suivi = True
+
 class OFCRMSaleOrder(models.Model):
     _inherit = 'sale.order'
 

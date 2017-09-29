@@ -34,6 +34,7 @@ Fiche de projet dynamique
         'of_geolocalize',
         'of_web_widgets',
         'of_calendar',
+        'of_base',
     ],
     'data' : [
         'views/of_crm_view.xml',
