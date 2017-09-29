@@ -85,6 +85,8 @@
             <field name="arch" type="xml">
                 <notebook position="inside">
                     <page string="Paramètres Avancés" name="advanced_settings" invisible="1">
+                        <group name="advanced_settings_group_1" col="4"></group>
+                        <group name="advanced_settings_group_2" col="4"></group>
                     </page>
                 </notebook>
             </field>
