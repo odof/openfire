@@ -38,12 +38,10 @@
                 <xpath expr="//notebook//page[@name='advanced_settings']" position="attributes">
                     <attribute name="invisible">0</attribute>
                 </xpath>
-                <xpath expr="//notebook//page[@name='advanced_settings']" position="inside">
-                    <group>
-                        <group name="sales">
-                            <separator string="Ventes" colspan="2"/>
-                            <field name="afficher_descr_fab"/>
-                        </group>
+                <xpath expr="//notebook//page[@name='advanced_settings']/group[@name='advanced_settings_group_2']" position="inside">
+                    <group name="sales" colspan="2">
+                        <separator string="Ventes" colspan="2"/>
+                        <field name="afficher_descr_fab"/>
                     </group>
                 </xpath>
             </field>
