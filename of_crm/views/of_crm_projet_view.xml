@@ -107,7 +107,7 @@
             <field name="name">of.crm.projet.line.kanban</field>
             <field name="model">of.crm.projet.line</field>
             <field name="arch" type="xml">
-                <kanban>
+                <kanban create="0">
                     <field name="sequence"/>
                     <field name="attr_id"/>
                     <field name="name"/>

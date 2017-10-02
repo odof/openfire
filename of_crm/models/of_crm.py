@@ -93,7 +93,7 @@ class OFCRMLead(models.Model):
     def _onchange_modele_id(self):
         for projet in self:
             if projet.of_modele_id:
-                projet.of_projet_line_ids = [(5, )]
+                projet.update({'of_projet_line_ids': [(5, )]})
                 attr_vals = {}
                 vals = []
                 for attr in projet.of_modele_id.attr_ids:
@@ -111,7 +111,7 @@ class OFCRMLead(models.Model):
                     else:
                         attr_vals['val_bool'] = attr.val_bool_default
                     vals.append((0, 0, attr_vals.copy()))
-                projet.of_projet_line_ids = vals
+                projet.update({'of_projet_line_ids': vals})
 
     # Récupération du site web à la sélection du partenaire
     # Pas de api.onchange parceque crm.lead._onchange_partner_id_values
