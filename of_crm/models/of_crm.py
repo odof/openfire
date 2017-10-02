@@ -278,7 +278,7 @@ class OFCalendarEvent(models.Model):
 
     def get_meeting_data(self):
         self.ensure_one()
-        res = ['name', 'start', 'description', 'location']
+        res = ['start', 'name', 'description', 'location']
         return res
 
 class OFCrmTags(models.Model):
