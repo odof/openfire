@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 class AccountTax(models.Model):
     _inherit = 'account.tax'
@@ -41,6 +42,8 @@ class AccountFiscalPosition(models.Model):
 
     @api.multi
     def map_tax(self, taxes, product=None, partner=None):
+        if not self:
+            raise UserError(u"Veuillez renseigner une position fiscale")
         self.ensure_one()
         if not taxes:
             taxes = self.default_tax_ids
