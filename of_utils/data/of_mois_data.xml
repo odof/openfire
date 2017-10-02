@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<openerp>
+<data>
+    
+    <record id="of_mois_1" model="of.mois">
+        <field name="name">Janvier</field>
+        <field name="abr">janv.</field>
+    </record>
+    <record id="of_mois_2" model="of.mois">
+        <field name="name">Février</field>
+        <field name="abr">févr.</field>
+    </record>
+    <record id="of_mois_3" model="of.mois">
+        <field name="name">Mars</field>
+        <field name="abr">mars</field>
+    </record>
+    <record id="of_mois_4" model="of.mois">
+        <field name="name">Avril</field>
+        <field name="abr">avr.</field>
+    </record>
+    <record id="of_mois_5" model="of.mois">
+        <field name="name">Mai</field>
+        <field name="abr">mai</field>
+    </record>
+    <record id="of_mois_6" model="of.mois">
+        <field name="name">Juin</field>
+        <field name="abr">juin</field>
+    </record>
+    <record id="of_mois_7" model="of.mois">
+        <field name="name">Juillet</field>
+        <field name="abr">juill.</field>
+    </record>
+    <record id="of_mois_8" model="of.mois">
+        <field name="name">Août</field>
+        <field name="abr">août</field>
+    </record>
+    <record id="of_mois_9" model="of.mois">
+        <field name="name">Septembre</field>
+        <field name="abr">sept.</field>
+    </record>
+    <record id="of_mois_10" model="of.mois">
+        <field name="name">Octobre</field>
+        <field name="abr">oct.</field>
+    </record>
+    <record id="of_mois_11" model="of.mois">
+        <field name="name">Novembre</field>
+        <field name="abr">nov.</field>
+    </record>
+    <record id="of_mois_12" model="of.mois">
+        <field name="name">Décembre</field>
+        <field name="abr">déc.</field>
+    </record>
+
+</data>
+</openerp>
