@@ -13,6 +13,10 @@ class OFBom(models.Model):
         help="Kit (Phantom): When processing a sales order for this product, the delivery order will contain all the components that are not kits themselves. \
         (a kit itself can contain kits, sometimes called under-kits).")
 
+    product_tmpl_id = fields.Many2one(
+        'product.template', 'Product',
+        domain="[('type', 'in', ['product', 'consu', 'service'])]", required=True)
+
     def get_components_price_old(self, rec_qty=1, without_pricing=True):
         """
         recursive method.
@@ -161,13 +165,20 @@ class OFBom(models.Model):
 
     @api.multi
     def write(self, vals):
+        if 'product_tmpl_id' in vals:
+            product_tmpl_obj = self.env['product.template']
+            old_products = product_tmpl_obj.search([('current_bom_id','in',self._ids)])
+            old_products.write({
+                'is_kit': False,
+                'current_bom_id': False,
+            })
         super(OFBom, self).write(vals)
         for bom in self:
-            if 'type' in vals:
+            if 'type' in vals or 'product_tmpl_id' in vals:
                 #call to related product method
                 bom.product_tmpl_id._compute_is_kit()
                 bom.product_tmpl_id._compute_current_bom_id()
-                if vals['type'] == 'phantom':
+                if vals.get('type') == 'phantom':
                     bom.product_tmpl_id.type = 'service' # kit products are services
                     bom.product_tmpl_id.pricing = 'computed' # kits pricing is computed by default
             if 'bom_line_ids' in vals:
