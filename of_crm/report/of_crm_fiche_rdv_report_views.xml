@@ -260,11 +260,11 @@
                                         <tr t-foreach="date_sorted_meetings" t-as="meeting">
                                             <t t-set="meeting_data" t-value="meeting.get_meeting_data()"/>
                                             <t t-foreach="meeting_data" t-as="key">
-                                                <t t-if="key=='start'" t-set="value" t-value="meeting[key][8:10] + '/' + meeting[key][5:7] + '/' + meeting[key][0:4] + '  ' + meeting[key][11:16]"/>
-                                                <t t-else="" t-set="value" t-value="meeting[key]"/>
+												<t t-if="key=='start'" t-set="value" t-value="meeting.get_date_updated()"/>
+												<t t-else="" t-set="value" t-value="meeting[key]"/>
                                                 <td t-if="meeting[key] and key != 'partner_ids'" t-esc="value"/>
                                                 <td t-elif="not meeting[key]"/>
-                                            </t>
+											</t>
                                         </tr>
                                     </table>
                                 </div>
@@ -284,7 +284,7 @@
                             <div class="h5" >
                             	<t t-if="o.next_activity_id">
                                     <div style="padding-left: 16px">
-	                                    <span><strong>Activité prevue : </strong></span>
+	                                    <span><strong>Activité prévue : </strong></span>
 	                                    <span t-if="o.date_action"></span><span t-field="o.date_action"/><span> - </span>  
 	                                    <span t-field="o.next_activity_id"/>
 	                                    <span t-if="o.title_action"></span><span> - </span><span t-field="o.title_action"/>
