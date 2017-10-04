@@ -54,9 +54,6 @@ class OFCRMLead(models.Model):
     geo_lat = fields.Float(related="partner_id.geo_lat")
     geo_lng = fields.Float(related="partner_id.geo_lng")
     stage_probability = fields.Float(related="stage_id.probability", readonly=True)
-    # custom colors
-    of_color_ft = fields.Char(string="Couleur de texte", related="user_id.of_color_ft")
-    of_color_bg = fields.Char(string="Couleur de fond", related="user_id.of_color_bg")
 
     of_projet_line_ids = fields.One2many('of.crm.projet.line', 'lead_id', string=u'Entrées')
     of_modele_id = fields.Many2one('of.crm.projet.modele', string=u"Projet", ondelete="set null")
@@ -80,8 +77,23 @@ class OFCRMLead(models.Model):
     email_from = fields.Char(related="partner_id.email")
     description = fields.Html(string="Suivi")
     description_rapport = fields.Html(string="Suivi bis", compute="_compute_description_rapport")
+    user_id = fields.Many2one(help="La couleur des activités en vue calendrier est celle du commercial")
 
     meeting_ids = fields.Many2many('calendar.event', string=u"Réunions", related="partner_id.meeting_ids")
+    # custom colors
+    of_color_ft = fields.Char(string="Couleur de texte", compute="_compute_custom_colors")
+    of_color_bg = fields.Char(string="Couleur de fond", compute="_compute_custom_colors")
+
+    @api.multi
+    @api.depends('user_id')
+    def _compute_custom_colors(self):
+        for lead in self:
+            if lead.user_id:
+                lead.of_color_ft = lead.user_id.of_color_ft
+                lead.of_color_bg = lead.user_id.of_color_bg
+            else:
+                lead.of_color_ft = "#0D0D0D"
+                lead.of_color_bg = "#F0F0F0"
 
     @api.onchange('stage_id')
     def _onchange_stage_id(self):
