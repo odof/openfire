@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_mois_user,of.mois.user,model_of_mois,base.group_user,1,0,1,1
+access_of_jours_user,of.jours.user,model_of_jours,base.group_user,1,0,1,1
