@@ -370,6 +370,14 @@ class OFKitSaleOrderLine(models.Model):
 		price = frm_cur.with_context(ctx).compute(purchase_price, to_cur, round=False)
 		return price
 
+	@api.onchange('product_uom_qty', 'product_uom', 'route_id')
+	def _onchange_product_id_check_availability(self):
+		# inhiber la vérification de stock
+		afficher_warning = self.env['ir.values'].get_default('sale.config.settings', 'stock_warning_setting')
+		if afficher_warning:
+			print afficher_warning
+			return super(OFKitSaleOrderLine, self)._onchange_product_id_check_availability()
+
 	@api.model
 	def create(self, vals):
 		line = super(OFKitSaleOrderLine, self).create(vals)
