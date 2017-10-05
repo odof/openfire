@@ -92,7 +92,8 @@ CalendarView.include({
      */
     _set_all_custom_colors: function() {
         var self = this;
-        var ids = _.keys(self.all_filters);
+        var ids = _.reject(_.keys(self.all_filters),function(num){ return num == 'undefined'; });
+
         var dfd = $.Deferred();
         var p = dfd.promise({target: kays});
         var kays = [];
