@@ -2,8 +2,7 @@
 
 from odoo import models, fields, api, tools
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
-#from datetime import datetime
-
+from datetime import datetime
 
 import time
 import logging
@@ -292,13 +291,9 @@ class OFCalendarEvent(models.Model):
     _inherit = 'calendar.event'
 
     def get_date_updated(self):
-        """ à reviser avant le 21-oct 
-        """
+        "Renvoit la date et l'heure du rendez-vous en heure locale au format JJ/MM/AAAA HH:MM"
         self.ensure_one()
-        value = self.start
-        hours = str( (int(value[11:13]) + 2) % 24 )
-        value = value[8:10] + '/' + value[5:7] + '/' + value[0:4] + '  ' + hours + value[13:16]
-        return value
+        return fields.Datetime.context_timestamp(self, datetime.strptime(self.start, "%Y-%m-%d %H:%M:%S")).strftime("%d/%m/%Y %H:%M")
 
     def get_meeting_data(self):
         self.ensure_one()
