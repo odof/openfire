@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!-- Nomenclature -->
+
+        <!-- ################## Wizard nomenclature insertion dans devis ##################-->
+        
+        <!-- wizard  -->
+        <record id="view_of_datastore_product_nomenclature_wizard" model="ir.ui.view">
+            <field name="name">of.datastore.product.nomenclature.wizard</field>
+            <field name="model">of.product.nomenclature.wizard</field>
+            <field name="inherit_id" ref="of_sales.view_of_product_nomenclature_wizard"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <field name="nomenclature_id" position="before">
+                    <field name="datastore_supplier_id" on_change="onchange_datastore_supplier_id()"/>
+                </field>
+                <field name="nomenclature_id" position="attributes">
+                    <attribute name="context">{'nomenclature_datastore_supplier_id':datastore_supplier_id}</attribute>
+                </field>
+            </field>
+        </record>
+
+
+    </data>
+</openerp>
