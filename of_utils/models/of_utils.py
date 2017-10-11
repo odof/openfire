@@ -18,14 +18,3 @@ class OFJours(models.Model):
 
     name = fields.Char('Jour', size=16)
     abr = fields.Char(u'Abréviation', size=16)
-
-class OFSaleConfiguration(models.TransientModel):
-    _inherit = 'sale.config.settings'
-
-    stock_warning_setting = fields.Boolean(string="Avertissements de stock", required=True, default=False,
-            help="Afficher les messages d'avertissement de stock?")
-
-    @api.multi
-    def set_utils_defaults(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'stock_warning_setting', self.stock_warning_setting)

@@ -11,7 +11,7 @@ Module OpenFire d'utilitaires.
 ==============================
 
 - Ajout des Objets 'of.jours' et 'of.mois' qui contiennent les jours de la semaine et les mois de l'année
-- Ajout Paramètre de vente inhibition des avertissements de stock
+
 """,
         "depends" : [
             'of_base',
