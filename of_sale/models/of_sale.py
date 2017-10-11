@@ -52,6 +52,19 @@ class OFSaleOrderLine(models.Model):
             self.update({'name': name})
         return res
 
+    def of_get_line_name(self):
+        self.ensure_one()
+        # inhiber l'affichage de la référence
+        afficher_ref = self.env['ir.values'].get_default('sale.config.settings', 'pdf_display_product_ref_setting')
+        name = self.name
+        if not afficher_ref:
+            if name.startswith("["):
+                splitted = name.split("]")
+                if len(splitted) > 1:
+                    splitted.pop(0)
+                    name = ''.join(splitted)
+        return name
+
 class OFSaleAccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
@@ -76,6 +89,25 @@ class OFCompany(models.Model):
         ('devis','Dans les devis'),
         ('factures','Dans les factures'),
         ('devis_factures','Dans les devis & les factures'),
-        ],string="afficher descr. fabricant", default='devis_factures', help="""
-La description du fabricant d'un article sera ajoutée à la description de l'article dans les documents.
-""")
+        ],string="afficher descr. fabricant", default='devis_factures',
+            help="La description du fabricant d'un article sera ajoutée à la description de l'article dans les documents."
+    )
+
+class OFSaleConfiguration(models.TransientModel):
+    _inherit = 'sale.config.settings'
+
+    stock_warning_setting = fields.Boolean(string="Avertissements de stock", required=True, default=False,
+            help="Afficher les messages d'avertissement de stock?")
+
+    pdf_display_product_ref_setting = fields.Boolean(string="Réf produits dans Devis PDF", required=True, default=False,
+            help="Afficher les références produits dans les Rapports PDF?")
+
+    @api.multi
+    def set_stock_warning_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'stock_warning_setting', self.stock_warning_setting)
+
+    @api.multi
+    def set_pdf_display_product_ref_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_display_product_ref_setting', self.pdf_display_product_ref_setting)

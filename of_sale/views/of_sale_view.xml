@@ -27,6 +27,21 @@
             </field>
         </record>
 
+        <!-- Sale config wizard -->
+        <record id="of_sale_view_sale_config_settings" model="ir.ui.view">
+            <field name="name">of sale settings</field>
+            <field name="model">sale.config.settings</field>
+            <field name="inherit_id" ref="sales_team.view_sale_config_settings"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@id='main']" position="inside">
+                    <group string="Paramètres OpenFire">
+                        <field name="stock_warning_setting"/>
+                        <field name="pdf_display_product_ref_setting"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
 <!--##############################################################################-->
 <!--########################### ______ Sociétés ______ ###########################-->
 <!--##############################################################################-->

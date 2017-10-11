@@ -24,6 +24,7 @@
         'of_product',
         'sale_margin',
         'of_utils',
+        'of_sale',
     ],
     'data': [
         'views/of_product_views.xml',
