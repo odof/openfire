@@ -20,7 +20,7 @@ Module OpenFire d'utilitaires.
         "demo_xml" : [ ],
         "data" : [
             'security/ir.model.access.csv',
-            'views/of_utils_views.xml',
+            #'views/of_utils_views.xml',
             'data/of_utils_data.xml',
         ],
         "installable": True,
