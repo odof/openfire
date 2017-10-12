@@ -297,12 +297,13 @@ class of_import(models.Model):
                     # Si est un float
                     if champs_odoo[champ_fichier_sansrel]['type'] == 'float':
                         ligne[champ_fichier] = ligne[champ_fichier].replace(',', '.')
-                        try:
-                            float(ligne[champ_fichier])
-                            valeurs[champ_fichier_sansrel] = ligne[champ_fichier]
-                        except ValueError:
-                            sortie_erreur += u"Ligne %s : champ %s (%s) n'est pas un nombre. %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier_sansrel, nom_objet.capitalize())
-                            erreur = 1
+                        if ligne[champ_fichier] != "":
+                            try:
+                                float(ligne[champ_fichier])
+                                valeurs[champ_fichier_sansrel] = ligne[champ_fichier]
+                            except ValueError:
+                                sortie_erreur += u"Ligne %s : champ %s (%s) n'est pas un nombre. %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier_sansrel, nom_objet.capitalize())
+                                erreur = 1
 
                     # Si est un field selection
                     elif champs_odoo[champ_fichier_sansrel]['type'] == 'selection':
@@ -420,8 +421,10 @@ class of_import(models.Model):
                 if ligne[champ_primaire] in doublons:
                     doublons[ligne[champ_primaire]][0] = doublons[ligne[champ_primaire]][0] + 1
                     doublons[ligne[champ_primaire]][1] = doublons[ligne[champ_primaire]][1] + ", " + str(i)
-                    nb_echoue = nb_echoue + 1
-                    continue
+                    # Si la réfrence est un champ vide, on ne s'arrête pas, ça sera une création, mais on garde une copie des lignes pour faire un message d'avertissement.
+                    if ligne[champ_primaire] != "":
+                        nb_echoue = nb_echoue + 1
+                        continue
                 else:
                     doublons[ligne[champ_primaire]] = [1, str(i)]
 
@@ -477,7 +480,9 @@ class of_import(models.Model):
 
         # On affiche les enregistrements qui étaient en plusieurs exemplaires dans le fichier d'import.
         for cle in doublons:
-            if doublons[cle][0] > 1:
+            if cle == "":
+                sortie_avertissement += u"ATTENTION : les enregistrements suivants ont été créés mais ont un champ référence vide (risque de doublon en cas d'import en plusieurs passes) : ligne(s) %s.\n" % (doublons[cle][1])
+            elif doublons[cle][0] > 1:
                 sortie_avertissement += u"%s réf. %s existe en %s exemplaires dans le fichier d'import (lignes %s). Seule la première ligne est importée.\n" % (nom_objet.capitalize(), cle, doublons[cle][0], doublons[cle][1])
 
         # On enregistre les dernières lignes qui ne l'auraient pas été.
