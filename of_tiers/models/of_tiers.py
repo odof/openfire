@@ -36,11 +36,15 @@ class ResPartner(models.Model):
         default_account_receivable = self.env['ir.property'].get('property_account_receivable_id', self._name)
         default_account_payable = self.env['ir.property'].get('property_account_payable_id', self._name)
 
+        if not (default_account_payable and default_account_receivable):
+            # La comptabilité de la société n'est pas configurée
+            return
+
         for partner in partners:
             data = {}
             # Si est un client
             if partner.customer:
-                if partner.property_account_receivable_id == default_account_receivable:
+                if (partner.property_account_receivable_id or default_account_receivable) == default_account_receivable:
                     type_id = data_obj.get_object_reference('account', 'data_account_type_receivable')[1]
                     account_data = {
                         'internal_type': 'receivable',
@@ -58,7 +62,7 @@ class ResPartner(models.Model):
 
             # Si est un fournisseur
             if partner.supplier:
-                if partner.property_account_payable_id == default_account_payable:
+                if (partner.property_account_payable_id or default_account_payable) == default_account_payable:
                     type_id = data_obj.get_object_reference('account', 'data_account_type_payable')[1]
                     account = {
                         'internal_type': 'payable',
