@@ -5,6 +5,8 @@
     'version' : "10.0.1.0.0",
     'author' : "OpenFire",
     'complexity': "easy",
+    # Réduction de la séquence pour permettre un chargement avant celui des autres modules (à réduire encore au besoin)
+    'sequence': 40,
     'description' : """
 Personnalisation de la multi-société :
 
