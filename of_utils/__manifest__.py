@@ -15,6 +15,7 @@ Module OpenFire d'utilitaires.
 """,
         "depends" : [
             'of_base',
+            'sale',
         ],
         "init_xml" : [ ],
         "demo_xml" : [ ],
