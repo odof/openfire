@@ -131,6 +131,10 @@
         (a kit itself can contain kits, sometimes called under-kits).
                 </p>
             </xpath>
+            <xpath expr="//form//notebook//field[@name='bom_line_ids']/tree//field[@name='product_id']" position="after">
+                <field name="product_list_price"/>
+                <field name="product_standard_price"/>
+            </xpath>
             <xpath expr="//form//notebook//field[@name='ready_to_produce']" position="attributes">
                 <!-- useless to show in case of kits -->
                 <attribute name="attrs">{'invisible': [('type','=','phantom')]}</attribute>

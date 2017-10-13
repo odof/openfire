@@ -197,3 +197,12 @@ class OFBom(models.Model):
         })
         super(OFBom, self).unlink()
 
+class OFKitMrpBomLine(models.Model):
+    _inherit = 'mrp.bom.line'
+
+    product_list_price = fields.Float(string='Prix', default=1.0, digits=dp.get_precision('Product Price'),
+        related="product_id.list_price", readonly=True,
+        help="Base price to compute the customer price. Sometimes called the catalog price.")
+    product_standard_price = fields.Float(string='Coût', default=1.0, digits=dp.get_precision('Product Price'),
+        related="product_id.standard_price", readonly=True,
+        help="Cost of the product, in the default unit of measure of the product.")
