@@ -186,7 +186,7 @@ class OfTourneePlanification(models.TransientModel):
 
         return plannings
 
-    tournee_id = fields.Many2one('of.planning.tournee', string=u'Tournée', required=True)
+    tournee_id = fields.Many2one('of.planning.tournee', string=u'Tournée', required=True, ondelete='cascade')
 
     plan_partner_ids = fields.One2many('of.tournee.planification.partner', 'wizard_id', string='Clients')
     plan_planning_ids = fields.One2many('of.tournee.planification.planning', 'wizard_id', string='RDV')
@@ -433,7 +433,7 @@ class OfTourneePlanificationPartner(models.TransientModel):
             plan_partner.phone = ' || '.join([p for p in phone if p])
 
     wizard_id = fields.Many2one('of.tournee.planification', string="Planification", required=True, ondelete='cascade')
-    service_id = fields.Many2one('of.service', string="Service", required=True)
+    service_id = fields.Many2one('of.service', string="Service", required=True, ondelete='cascade')
 
     partner_id = fields.Many2one(related='service_id.partner_id')
     partner_address_id = fields.Many2one(related='service_id.address_id')
@@ -465,12 +465,12 @@ class OfTourneePlanificationPlanning(models.TransientModel):
     _description = u'Résultat de Planification de RDV'
 
     name = fields.Char(u'Libellé', size=128, required=True)
-    wizard_id = fields.Many2one('of.tournee.planification', string="Planification")
-    service_id = fields.Many2one('of.service', string="Service")
+    wizard_id = fields.Many2one('of.tournee.planification', string="Planification", ondelete='cascade')
+    service_id = fields.Many2one('of.service', string="Service", ondelete='cascade')
 
-    tache_id = fields.Many2one('of.planning.tache', string='Intervention')
+    tache_id = fields.Many2one('of.planning.tache', string='Intervention', ondelete='cascade')
 #    partner_id = fields.Many2one('res.partner', string='Client')
-    partner_address_id = fields.Many2one('res.partner', string='Adresse')
+    partner_address_id = fields.Many2one('res.partner', string='Adresse', ondelete='cascade')
 
     date_flo = fields.Float(string='RDV', required=True, digits=(12, 5))
     date_flo_deadline = fields.Float(string='Date', required=True, digits=(12, 5))
