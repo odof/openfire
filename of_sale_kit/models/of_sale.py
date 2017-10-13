@@ -375,7 +375,6 @@ class OFKitSaleOrderLine(models.Model):
 		# inhiber la vérification de stock
 		afficher_warning = self.env['ir.values'].get_default('sale.config.settings', 'stock_warning_setting')
 		if afficher_warning:
-			print afficher_warning
 			return super(OFKitSaleOrderLine, self)._onchange_product_id_check_availability()
 
 	@api.model
