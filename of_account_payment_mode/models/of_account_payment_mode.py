@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
@@ -37,7 +37,11 @@ class AccountAbstractPayment(models.AbstractModel):
     _inherit = "account.abstract.payment"
 
     of_payment_mode_id = fields.Many2one('of.account.payment.mode', string='Payment mode', required=True)
-    journal_id = fields.Many2one(related='of_payment_mode_id.journal_id', string='Payment Journal', store=True)
+    # journal_id is now related to the payment mode.
+    # must be set to readonly or payment creation will try to write in payment mode, with risk of access right error
+    # must be set as not required because it is readonly, so not set on the INSERT request
+    journal_id = fields.Many2one(related='of_payment_mode_id.journal_id', string='Payment Journal',
+                                 required=False, readonly=True, store=True)
 
     @api.model_cr_context
     def _auto_init(self):
