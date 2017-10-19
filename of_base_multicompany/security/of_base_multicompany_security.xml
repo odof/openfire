@@ -13,6 +13,9 @@
 'account.account_comp_rule',
 'account.tax_comp_rule',
 'account.account_fiscal_position_comp_rule',
+'account.account_move_comp_rule',
+'account.account_move_line_comp_rule',
+'account.account_payment_comp_rule',
 )], {'active':False})"/>
 
     <!-- Ajout des règles Multi-société OpenFire-->
@@ -87,7 +90,7 @@
     </record>
 
     <record id="of_base_multicompany_account_fiscal_position_rule_read" model="ir.rule">
-        <field name="name">Account fiscal Mapping company rule</field>
+        <field name="name">OF Account fiscal Mapping company rule</field>
         <field name="model_id" ref="account.model_account_fiscal_position"/>
         <field name="global" eval="True"/>
         <field name="perm_write" eval="False"/>
@@ -96,11 +99,32 @@
         <field name="domain_force">['|','|',('company_id','=',False),('company_id','child_of',[user.company_id.id]),('company_id','parent_of',[user.company_id.id])]</field>
     </record>
     <record id="of_base_multicompany_account_fiscal_position_rule_write" model="ir.rule">
-        <field name="name">Account fiscal Mapping company rule</field>
+        <field name="name">OF Account fiscal Mapping company rule</field>
         <field name="model_id" ref="account.model_account_fiscal_position"/>
         <field name="global" eval="True"/>
         <field name="perm_read" eval="False"/>
         <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+    </record>
+
+    <record id="of_base_multicompany_account_move_rule" model="ir.rule">
+        <field name="name">OF Account Entry</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.accounting_company_id.id])]</field>
+    </record>
+
+    <record id="of_base_multicompany_account_move_line_rule" model="ir.rule">
+        <field name="name">OF Entry lines</field>
+        <field name="model_id" ref="account.model_account_move_line"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.accounting_company_id.id])]</field>
+    </record>
+
+    <record id="of_base_multicompany_account_payment_rule" model="ir.rule">
+        <field name="name">OF Account payment company rule</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.accounting_company_id.id])]</field>
     </record>
 
 </data>
