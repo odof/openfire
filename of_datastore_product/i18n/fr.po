@@ -1,0 +1,4 @@
+#. module: datastore_product
+msgid "Invalid username or password"
+msgstr "Nom d'utilisateur ou mot de passe incorrect"
+
