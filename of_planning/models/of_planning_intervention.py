@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 
+from __builtin__ import False
+from datetime import datetime, timedelta
+
 from odoo import api, models, fields
 from odoo.exceptions import UserError, ValidationError
-from datetime import datetime, timedelta
-from __builtin__ import False
+from odoo.tools.safe_eval import safe_eval
+
 
 class OfPlanningTache(models.Model):
     _name = "of.planning.tache"
@@ -199,7 +202,7 @@ class OfPlanningIntervention(models.Model):
         ], string=u'État', index=True, readonly=True, default='draft')
 #     state = fields.Many2one('of.planning.intervention.state', string=u"État")
     company_id = fields.Many2one('res.company', string='Magasin', default=lambda self: self.env.user.company_id.id)
-    description = fields.Text(string='Description')
+    description = fields.Html(string='Description')
     hor_md = fields.Float(string=u'Matin début', required=True, digits=(12, 5))
     hor_mf = fields.Float(string='Matin fin', required=True, digits=(12, 5))
     hor_ad = fields.Float(string=u'Après-midi début', required=True, digits=(12, 5))
@@ -221,6 +224,9 @@ class OfPlanningIntervention(models.Model):
 #         'sidebar_color'        : fields_old.related('equipe_id','color_id','color', type='char', help="Couleur pour le menu droit du planning (couleur de base de l'équipe d'intervention)"),
 #    }
     _order = 'date'
+
+    order_id = fields.Many2one("sale.order", string="Commande associée")
+    of_notes_intervention = fields.Html(related='order_id.of_notes_intervention')
 
     @api.depends('state')
     def _compute_state_int(self):
@@ -479,3 +485,31 @@ class ResPartner(models.Model):
 
     intervention_partner_ids = fields.One2many('of.planning.intervention', 'partner_id', "Interventions client")
     intervention_address_ids = fields.One2many('of.planning.intervention', 'address_id', "Interventions adresse")
+
+class OFSaleOrder(models.Model):
+    _inherit = "sale.order"
+
+    # Utilisé pour ajouter bouton Interventions à Devis (see order_id many2one field above)
+    intervention_ids = fields.One2many("of.planning.intervention", "order_id", string="Interventions")
+
+    intervention_count = fields.Integer(string='Interventions', compute='_compute_intervention_count')
+
+    @api.depends('intervention_ids')
+    @api.multi
+    def _compute_intervention_count(self):
+        for sale_order in self:
+            sale_order.intervention_count = len(sale_order.intervention_ids)
+
+    @api.multi
+    def action_view_interventions(self):
+        action = self.env.ref('of_planning.of_sale_order_open_interventions').read()[0]
+
+        action['domain'] = [('order_id', 'in', self._ids)]
+        if len(self._ids) == 1:
+            context = safe_eval(action['context'])
+            context.update({
+                'default_address_id': self.partner_shipping_id.id or False,
+                'default_order_id': self.id,
+            })
+            action['context'] = str(context)
+        return action

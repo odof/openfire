@@ -49,6 +49,7 @@
                                 <field name="state"/>
                                 <field name="name" string="Libellé"/>
                                 <field name="description"/>
+                                <field name="category_id"/>
                             </tree>
                         </field>
                     </group>
@@ -139,26 +140,34 @@
                                 <field name="verif_dispo"/>
                             </group>
                             <group name="liens" invisible="1">
-                                <separator string="Documents liés" colspan="4"/>
+                                <separator string="Documents liés" colspan="2"/>
+                                <field name="order_id"/>
                             </group>
                             <group name="horaires" col="4">
                                 <separator string="Horaires de travail" colspan="4"/>
-                                <label for="hor_md" string="Matin"/>
-                                <field name="hor_md" nolabel="1" widget="float_time" string="Matin :" context="{'tz': 'Europe/Paris'}"/>
-                                <label string="-"/>
-                                <field name="hor_mf" nolabel="1" widget="float_time" context="{'tz': 'Europe/Paris'}"/>
-                                <label for="hor_ad" string="Après-midi"/>
-                                <field name="hor_ad" nolabel="1" widget="float_time" context="{'tz': 'Europe/Paris'}"/>
-                                <label string="-"/>
-                                <field name="hor_af" nolabel="1" widget="float_time" context="{'tz': 'Europe/Paris'}"/>
-                                <group colspan="4" col="4">
-                                    <field name="hor_sam" context="{'tz': 'Europe/Paris'}" />
-                                    <field name="hor_dim" context="{'tz': 'Europe/Paris'}" />
+                                <group colspan="4">
+                                    <label for="hor_md" string="Matin"/>
+                                    <field name="hor_md" nolabel="1" widget="float_time" string="Matin :" context="{'tz': 'Europe/Paris'}"/>
+                                    <label for="hor_mf" string="&#160;"/>
+                                    <field name="hor_mf" nolabel="1" widget="float_time" context="{'tz': 'Europe/Paris'}"/>
+                                </group>
+                                <group colspan="4">
+                                    <label for="hor_ad" string="Après-midi"/>
+                                    <field name="hor_ad" nolabel="1" widget="float_time" context="{'tz': 'Europe/Paris'}"/>
+                                    <label for="hor_af" string="&#160;"/>
+                                    <field name="hor_af" nolabel="1" widget="float_time" context="{'tz': 'Europe/Paris'}"/>
+                                   </group>
+                                <group colspan="2" col="2">
+                                    <field name="hor_sam" context="{'tz': 'Europe/Paris'}"/>
+                                    <field name="hor_dim" context="{'tz': 'Europe/Paris'}"/>
                                 </group>
                             </group>
                             <!-- label colspan="4" string="Description" align="0.00"/ -->
                             <separator string="Description" colspan="2"/>
-                            <field colspan="2" name="description" nolabel="1" context="{'tz': 'Europe/Paris'}" />
+                            <field colspan="2" name="description" nolabel="1" context="{'tz': 'Europe/Paris'}" witget="html"/>
+                            <!-- Notes Intervention -->
+                            <separator string="Notes Intervention" colspan="2"/>
+                            <field name="of_notes_intervention" nolabel="1"/>
                         </group>
                     </sheet>
                 </form>
@@ -630,6 +639,31 @@
             <field name="model">of.planning.intervention</field>
             <field name="value" eval="'ir.actions.server,%d'%action_of_create_invoice_intervention"/>
             <field name="object" eval="True"/>
+        </record>
+
+
+<!--#################################_Ajout bouton Interventions dans Devis_############################# -->
+
+        <!-- Ajout bouton Interventions dans Devis -->
+        <record id="of_sale_view_order_form" model="ir.ui.view">
+            <field name="name">of.sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/sheet/div[@name='button_box']/button[@name='action_view_invoice']" position="after">
+                    <button class="oe_stat_button" name="action_view_interventions" type="object" icon="fa-wrench">
+                        <field string="Interventions" name="intervention_count" widget="statinfo"/>
+                    </button>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Action pour afficher interventions list -->
+        <record id="of_sale_order_open_interventions" model="ir.actions.act_window">
+            <field name="name">Interventions</field>
+            <field name="res_model">of.planning.intervention</field>
+            <field name="domain">[]</field> <!-- Force empty -->
+            <field name="view_type">form</field>
         </record>
 
     </data>
