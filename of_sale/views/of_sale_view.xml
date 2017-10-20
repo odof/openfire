@@ -42,6 +42,23 @@
             </field>
         </record>
 
+        <!-- Ajout onglet Notes avec des champs-->
+        <record id="of_sale_view_order_form" model="ir.ui.view">
+            <field name="name">of.sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                 <xpath expr="//notebook" position="inside">
+                     <page string="Notes">
+                        <separator string="Notes Factures" colspan="4"/>
+                        <field name="of_notes_factures" colspan="4" nolabel="1" widget="html"/>
+                        <separator string="Notes Intervention" colspan="4"/>
+                        <field name="of_notes_intervention" colspan="4" nolabel="1" widget="html"/>
+                     </page>
+                </xpath>
+            </field>
+        </record>
+
 <!--##############################################################################-->
 <!--########################### ______ Sociétés ______ ###########################-->
 <!--##############################################################################-->
