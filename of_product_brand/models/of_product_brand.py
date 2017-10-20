@@ -10,6 +10,16 @@ class OfProductBrand(models.Model):
     partner_id = fields.Many2one('res.partner', string='Supplier', domain=[('supplier', '=', True)])
     product_ids = fields.One2many('product.product', 'brand_id', string='Products', readonly=True)
     active = fields.Boolean(string='Active', default=True)
+    logo = fields.Binary(string='Logo')
+    product_count = fields.Integer(
+        '# Products', compute='_compute_product_count',
+        help="The number of products of this brand")
+
+    def _compute_product_count(self):
+        read_group_res = self.env['product.template'].read_group([('brand_id', 'in', self.ids)], ['brand_id'], ['brand_id'])
+        group_data = dict((data['brand_id'][0], data['brand_id_count']) for data in read_group_res)
+        for categ in self:
+            categ.product_count = group_data.get(categ.id, 0)
 
     _sql_constraints = [
         ('prefix', 'unique(prefix)', "Another brand already exists with this prefix"),
@@ -58,7 +68,7 @@ class ProductTemplate(models.Model):
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
-    brand_id = fields.Many2one('of.product.brand')
+    brand_id = fields.Many2one('of.product.brand', string='Brand')
     # @todo: Make it work with variants
 
 class Partner(models.Model):
