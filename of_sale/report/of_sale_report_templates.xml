@@ -90,7 +90,7 @@
                             <t t-foreach="layout_category['lines']" t-as="l">
                                 <tr>
                                     <t t-set="the_name" t-value="l.of_get_line_name()"/>
-                                    <td><span t-esc="the_name"/></td>
+                                    <td><span t-esc="the_name"/><span t-field="l.name" style="display: none;"/></td>
                                     <td class="text-right">
                                         <span t-field="l.product_uom_qty"/>
                                         <span t-field="l.product_uom" groups="product.group_uom"/>
