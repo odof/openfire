@@ -32,8 +32,9 @@ class OFSaleOrder(models.Model):
                 order.of_to_invoice = True
 
     of_to_invoice = fields.Boolean(u"Entièrement facturable", compute='_compute_of_to_invoice', search='_search_of_to_invoice')
-    of_notes_factures = fields.Html(string="Notes Factures")
+    of_notes_facture = fields.Html(string="Notes Facture", oldname="of_notes_factures")
     of_notes_intervention = fields.Html(string="Notes Intervention")
+    of_notes_client = fields.Html(related='partner_id.of_notes_client', string="Notes Client")
 
 class OFSaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
@@ -113,3 +114,4 @@ class OFSaleConfiguration(models.TransientModel):
     def set_pdf_display_product_ref_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'pdf_display_product_ref_setting', self.pdf_display_product_ref_setting)
+
