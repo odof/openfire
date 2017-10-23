@@ -227,6 +227,7 @@ class OfPlanningIntervention(models.Model):
 
     order_id = fields.Many2one("sale.order", string="Commande associée")
     of_notes_intervention = fields.Html(related='order_id.of_notes_intervention')
+    of_notes_client = fields.Html(related='partner_id.of_notes_client', string="Notes Client")
 
     @api.depends('state')
     def _compute_state_int(self):

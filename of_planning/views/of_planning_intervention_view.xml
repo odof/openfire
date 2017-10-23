@@ -126,7 +126,7 @@
                     <sheet>
                         <group>
                             <group col="2">
-                                <field name="equipe_id" context="{'tz': 'Europe/Paris'}"/>
+                                <field name="equipe_id" default_focus="1" context="{'tz': 'Europe/Paris'}"/>
                                 <field name="address_id" domain="[('customer','=',True)]" colspan="2" context="{'tz': 'Europe/Paris'}"/>
                                 <field name="user_id" context="{'tz': 'Europe/Paris'}"/>
                                 <field name="company_id" widget="selection"/>
@@ -166,6 +166,8 @@
                             <separator string="Description" colspan="2"/>
                             <field colspan="2" name="description" nolabel="1" context="{'tz': 'Europe/Paris'}" witget="html"/>
                             <!-- Notes Intervention -->
+                            <separator string="Notes Client" colspan="2"/>
+                            <field name="of_notes_client" nolabel="1"/>
                             <separator string="Notes Intervention" colspan="2"/>
                             <field name="of_notes_intervention" nolabel="1"/>
                         </group>
