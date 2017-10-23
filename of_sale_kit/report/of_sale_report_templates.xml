@@ -2,7 +2,7 @@
 <odoo>
 
     <template id="of_report_saleorder_document" inherit_id="sale.report_saleorder_document">
-        <xpath expr="//span[@t-field='l.name']" position="after">
+        <xpath expr="//span[@t-esc='the_name']" position="after">
             <t t-if="l.is_kit and doc.kit_display_mode == 'collapse'">
                 <span t-esc="l.get_kit_descr_collapse()"/>
             </t>
