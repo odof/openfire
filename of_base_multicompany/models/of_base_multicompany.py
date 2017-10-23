@@ -36,6 +36,13 @@ class AccountAccount(models.Model):
             vals['company_id'] = self.env['res.company'].browse(vals['company_id']).accounting_company_id.id
         return super(AccountAccount, self).create(vals)
 
+class AccountMove(models.Model):
+    _inherit = 'account.move'
+
+    # La société de la pièce comptable doit être la même que celle des écritures (voir account.move._post_validate())
+    company_id = fields.Many2one('res.company', related='journal_id.company_id.accounting_company_id', string='Company', store=True, readonly=True,
+        default=lambda self: self.env.user.company_id.accounting_company_id)
+
 class Property(models.Model):
     _inherit = 'ir.property'
 
