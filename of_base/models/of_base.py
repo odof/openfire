@@ -132,10 +132,12 @@ class ResUsers(models.Model):
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
+    # Notes Client
+    of_notes_client = fields.Html(string="Notes Client")
+
     # Pour afficher l'adresse au format français par défaut quand le pays n'est pas renseigné et non le format US
     @api.multi
     def _display_address(self, without_company=False):
-
         '''
         The purpose of this function is to build and return an address formatted accordingly to the
         standards of the country where it belongs.
