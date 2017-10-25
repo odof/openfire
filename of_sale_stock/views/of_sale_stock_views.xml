@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--#############################################################################
+        ##                      STOCK VIEWS
+        #############################################################################
+     -->
+    <record id="of_sale_stock_view_inventory_form" model="ir.ui.view">
+        <field name="name">of.sale.stock.inventory.form</field>
+        <field name="model">stock.inventory</field>
+        <field name="inherit_id" ref="stock.view_inventory_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook//field[@name='line_ids']//tree//field[@name='product_qty']" position="after">
+                <field name="product_value" groups="account.group_account_manager"/>
+                <field name="currency_id" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

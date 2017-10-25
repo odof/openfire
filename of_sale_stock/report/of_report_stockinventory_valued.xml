@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <report
+            string="Valued Inventory"
+            id="action_report_inventory_valued"
+            model="stock.inventory"
+            groups="account.group_account_manager"
+            report_type="qweb-pdf"
+            name="of_sale_stock.of_report_inventory_valued"
+            file="of_sale_stock.of_report_inventory_valued"
+        />
+        <template id="of_report_inventory_valued">
+            <t t-call="report.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="report.external_layout">
+                        <div class="page">
+                             
+                            <h2>
+                            Stock Inventory Valued
+                            </h2>
+                            <table class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th><strong>Inventory</strong></th>
+                                    <th><strong>Date</strong></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <span t-field="o.name"/>
+                                    </td>
+                                    <td>
+                                        <span t-field="o.date"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            </table>
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th><strong>Location</strong></th>
+                                        <th><strong>Product</strong></th>
+                                        <th><strong>Production Lot</strong></th>
+                                        <th><strong>Package</strong></th>
+                                        <th class="text-right"><strong>Quantity</strong></th>
+                                        <th class="text-right" groups="account.group_account_manager"><strong>Value</strong></th>
+                                    </tr>
+                                </thead>
+                                <tr t-foreach="o.line_ids" t-as="line">
+                                    <td><span t-field="line.location_id"/></td>
+                                    <td><span t-field="line.product_id"/></td>
+                                    <td><span t-field="line.prod_lot_id"/></td>
+                                    <td><span t-field="line.package_id"/></td>
+                                    <td class="text-right"><span t-field="line.product_qty"/> <span t-field="line.product_uom_id" groups="product.group_uom"/></td>
+                                    <td class="text-right" groups="account.group_account_manager"><span t-field="line.product_value" t-options='{"widget": "monetary", "display_currency": line.currency_id}'/> <!--span t-field="line.currency_id" groups="base.group_multi_currency"/--></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                </tr>
+                            </table>
+                            <t t-if="o.filter == 'product' and o.product_id">
+                              <div class="row">
+                                <div class="col-xs-4 pull-right">
+                                     <table class="table table-condensed">
+                                        <tr class="border-black">
+                                            <td><strong>Total Quantity</strong></td>
+                                            <td class="text-right">
+                                                <span t-field="o.total_qty"/> <span t-field="o.product_id.uom_id"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                              </div>
+                            </t>
+                        </div>
+                    </t>
+                 </t>
+             </t>
+        </template>
+    </data>
+</odoo>
