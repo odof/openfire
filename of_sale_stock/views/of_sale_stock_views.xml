@@ -15,4 +15,20 @@
             </xpath>
         </field>
     </record>
+
+    <!--#############################################################################
+        ##                      SALE VIEWS
+        #############################################################################
+     -->
+    <!-- Sale config wizard - ->
+    <record id="of_sale_stock_view_sale_config_settings" model="ir.ui.view">
+        <field name="name">of sale stock settings</field>
+        <field name="model">sale.config.settings</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_sale_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='of_sale_param']" position="inside">
+                    <field name="of_stock_warning_setting"/>
+            </xpath>
+        </field>
+    </record-->
 </odoo>

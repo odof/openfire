@@ -45,7 +45,7 @@
             <field name="inherit_id" ref="sales_team.view_sale_config_settings"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[@id='main']" position="inside">
-                    <group string="Paramètres OpenFire">
+                    <group string="Paramètres OpenFire" name="of_sale_param">
                         <field name="stock_warning_setting"/>
                         <field name="pdf_display_product_ref_setting"/>
                     </group>
