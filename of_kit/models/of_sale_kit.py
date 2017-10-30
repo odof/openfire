@@ -1,0 +1,278 @@
+# -*- coding: utf-8 -*-
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
+
+from odoo import api, fields, models, _
+from odoo.addons import decimal_precision as dp
+from odoo.exceptions import UserError, ValidationError
+
+class OFKitProductTemplate(models.Model):
+    _inherit = "product.template"
+
+    is_kit = fields.Boolean(string="Is a kit")
+    is_comp = fields.Boolean(string="Is a comp", compute="_compute_is_comp", store=True, help="is a component of a kit")
+    kit_line_ids = fields.One2many('of.product.kit.line', 'kit_id', string='Components', oldname="line_ids")
+
+    price_compo = fields.Monetary('Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_compo_price_n_cost', oldname="unit_compo_price",
+                                  help="Sum of the prices of all components necessary for 1 unit of this kit")
+    cost_compo = fields.Monetary('Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_compo_price_n_cost',
+                                  help="Sum of the costs of all components necessary for 1 unit of this kit")
+
+    price_used = fields.Monetary('Used Price', digits=dp.get_precision('Product Price'), compute='_compute_price_used', oldname="used_price",
+                    help="Price that will be taken into account in sale orders and invoices. Either list price or the price of its components, dependant on the pricing.")
+
+    pricing = fields.Selection([
+        ('fixed', 'Fixed'),
+        ('computed', 'Computed')
+        ], string="Pricing", required=True, default='fixed',
+            help="This field is only relevant if the product is a kit. It represents the way the price should be computed. \n \
+                if set to 'fixed', the price of it's components won't be taken into account and the price will be the one of the kit. \n \
+                if set to 'computed', the price will be computed according to the components of the kit.")
+
+    kit_count = fields.Integer('# Kits', compute='_compute_kit_count')
+
+    _sql_constraints = [
+        ('kit_n_comp_constraint', 'CHECK ( NOT(is_kit AND is_comp) )', _('A product can not be a kit and a kit component at the same time !'))
+    ]
+
+    def get_account_invoice_kit_data(self):
+        self.ensure_one()
+        res = {'pricing': self.pricing}
+        lines = [(5,)]
+        comp_vals = {}
+        if self.pricing == 'fixed':
+            comp_vals["hide_prices"] = True
+        for line in self.kit_line_ids:
+            comp_vals = comp_vals.copy()
+            comp_vals["product_id"] = line.product_id.id
+            comp_vals["product_uom_id"] = line.product_uom_id.id
+            comp_vals["qty_per_kit"] = line.product_qty
+            comp_vals["sequence"] = line.sequence
+            comp_vals["name"] = line.product_id.name_get()[0][1] or line.product_id.name
+            comp_vals["default_code"] = line.product_id.default_code
+            comp_vals["price_unit"] = line.product_id.list_price
+            comp_vals["cost_unit"] = line.product_id.standard_price
+            lines.append((0, 0, comp_vals))
+        res["kit_line_ids"] = lines
+        return res
+
+    def get_sale_order_kit_data(self):
+        self.ensure_one()
+        res = {'pricing': self.pricing}
+        lines = [(5,)]
+        comp_vals = {}
+        if self.pricing == 'fixed':
+            comp_vals["hide_prices"] = True
+        for line in self.kit_line_ids:
+            comp_vals = comp_vals.copy()
+            comp_vals["product_id"] = line.product_id.id
+            comp_vals["product_uom_id"] = line.product_uom_id.id
+            comp_vals["qty_per_kit"] = line.product_qty
+            comp_vals["sequence"] = line.sequence
+            comp_vals["name"] = line.product_id.name_get()[0][1] or line.product_id.name
+            comp_vals["default_code"] = line.product_id.default_code
+            comp_vals["price_unit"] = line.product_id.list_price
+            comp_vals["cost_unit"] = line.product_id.standard_price
+            comp_vals["customer_lead"] = line.product_id.sale_delay
+            lines.append((0, 0, comp_vals))
+        res["kit_line_ids"] = lines
+        return res
+
+    @api.multi
+    @api.depends('kit_line_ids')
+    def _compute_compo_price_n_cost(self):
+        for product in self:
+            if product.is_kit:
+                price_n_cost = product.get_compo_price_n_cost()
+                product.price_compo = price_n_cost['price']
+                product.cost_compo = price_n_cost['cost']
+
+    @api.multi
+    @api.depends('price_compo', 'pricing')
+    def _compute_price_used(self):
+        for product in self:
+            if product.is_kit:
+                if product.pricing == 'fixed':
+                    product.price_used = product.list_price
+                else:
+                    product.price_used = product.price_compo
+
+    @api.multi
+    @api.depends('list_price', 'standard_price', 'price_compo', 'cost_compo', 'pricing')
+    def _compute_marge(self):
+        # override of function from of_product
+        for product in self:
+            if not product.is_kit:
+                list_price = product.list_price
+                if list_price != 0:
+                    product.marge = (list_price - product.standard_price) * 100.00 / list_price
+                else: # division par 0!
+                    product.marge = -100
+            else: # product is a kit
+                if product.pricing == 'fixed':
+                    price = product.list_price
+                else:
+                    price = product.price_compo
+                if price != 0:
+                    product.marge = (price - product.cost_compo) * 100.00 / price
+                else:
+                    product.marge = -100
+
+    @api.onchange('is_kit')
+    def _onchange_is_kit(self):
+        self.ensure_one()
+        if not self.is_kit:
+            self.kit_line_ids = [(5,)]
+
+    def get_compo_price_n_cost(self):
+        """
+        returns the sum of the prices and costs of all components in this bom.
+        doesn't take 'pricing' into account unless without_pricing set to false.
+        """
+        self.ensure_one()
+        res = {'price': 0.0, 'cost': 0.0}
+        for line in self.kit_line_ids:
+            res['price'] += line.product_id.list_price * line.product_qty
+            res['cost'] += line.product_id.standard_price * line.product_qty
+        return res
+
+    def _compute_is_comp(self):
+        #this method will be called upon creation or change of a BoM for its related product (workaround store=True)
+        read_group_res = self.env['of.product.kit.line'].read_group([('product_id', 'in', self.ids)], ['product_id'], ['product_id'])
+        mapped_data = dict([(data['product_id'][0], data['product_id_count']) for data in read_group_res])
+        for product in self:
+            product.is_comp = mapped_data.get(product.id, 0) > 0
+
+    def _compute_kit_count(self):
+        read_group_res = self.env['of.product.kit.line'].read_group([('product_id', 'in', self.ids)], ['product_id'], ['product_id'])
+        mapped_data = dict([(data['product_id'][0], data['product_id_count']) for data in read_group_res])
+        for product in self:
+            product.kit_count = mapped_data.get(product.id, 0)
+
+    @api.multi
+    def action_view_kits(self):
+        action = self.env.ref('of_kit.of_template_open_kit').read()[0]
+        action['domain'] = [('kit_line_ids.product_id', 'in', [self.ids])]
+        return action
+
+class OFKitProductProduct(models.Model):
+    _inherit = "product.product"
+
+    kit_count = fields.Integer('# Kits', compute='_compute_kit_count')
+
+    def _compute_kit_count(self):
+        read_group_res = self.env['of.product.kit.line'].read_group([('product_id', 'in', self.ids)], ['product_id'], ['product_id'])
+        mapped_data = dict([(data['product_id'][0], data['product_id_count']) for data in read_group_res])
+        for product in self:
+            if product.product_tmpl_id.product_variant_count == 1:
+                kit_count = mapped_data.get(product.id, product.product_tmpl_id.kit_count)
+            else:
+                kit_count = mapped_data.get(product.id, 0)
+            product.kit_count = kit_count
+
+    def get_sale_order_kit_data(self):
+        self.ensure_one()
+        return self.product_tmpl_id.get_sale_order_kit_data()
+
+    def get_account_invoice_kit_data(self):
+        self.ensure_one()
+        return self.product_tmpl_id.get_account_invoice_kit_data()
+
+    def _compute_is_comp(self):
+        templates = self.env["product.template"]
+        for product in self:
+            templates |= product.product_tmpl_id
+        templates._compute_is_comp()
+
+    """@api.multi
+    def action_view_kits(self):
+        action = self.env.ref('of_kit.of_product_open_kit').read()[0]
+        action['context'] = {
+            'default_product_id': self.ids[0],
+        }
+        action['domain'] = [('product_id', 'in', [self.ids])]
+        return action"""
+
+class OFKitProductKitLine(models.Model):
+    _name = "of.product.kit.line"
+    _order = 'sequence'
+
+    def _get_default_product_uom_id(self):
+        return self.env['product.uom'].search([], limit=1, order='id').id
+
+    #name = fields.Char(string="Name", required=True)
+    kit_id = fields.Many2one("product.template", string="Kit",  domain="[('is_comp', '=', False)]",
+                             help="Kit containing this as component", ondelete="cascade")
+    product_id = fields.Many2one("product.product", string="Product", domain="[('is_kit', '=', False)]", required=True,
+                                 help="Product this line references")
+    product_qty = fields.Float(string='Qty / Kit', digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0,
+                               help="Quantity per kit unit.")
+    product_uom_id = fields.Many2one('product.uom', string='UoM', default=_get_default_product_uom_id, required=True, oldname="product_uom")
+    sequence = fields.Integer(string=u'Sequence', default=10)
+
+    _sql_constraints = [
+        ('product_not_kit', 'CHECK (kit_id != product_id)', _('The product can not be the same as the kit !'))
+    ]
+
+    @api.model
+    def create(self, vals):
+        line = super(OFKitProductKitLine, self).create(vals)
+        line.product_id._compute_is_comp()
+        #line.product_id._compute_kit_count()
+        return line
+
+    @api.multi
+    def write(self, vals):
+        if len(self) == 1 and 'product_id' in vals:
+            products = self.env["product.product"]
+            products |= self.product_id
+        super(OFKitProductKitLine, self).write(vals)
+        if len(self) == 1 and 'product_id' in vals:
+            products |= self.product_id
+            products._compute_is_comp()
+        return True
+
+    @api.multi
+    def unlink(self):
+        products = self.env['product.product']
+        for kit_line in self:
+            products |= kit_line.product_id
+        super(OFKitProductKitLine, self).unlink()
+        products._compute_is_comp()
+
+class OFKitProcurementOrder(models.Model):
+    _inherit = 'procurement.order'
+
+    sale_comp_id = fields.Many2one('of.saleorder.kit.line', string='Sale Order Kit Component')
+
+    def _get_sale_order(self):
+        self.ensure_one()
+        sale_order = super(OFKitProcurementOrder, self)._get_sale_order()
+        if not sale_order:
+            sale_comp = self.sale_comp_id
+            if not sale_comp:
+                move = self.move_dest_id
+                sale_comp = move and move.procurement_id and move.procurement_id.sale_comp_id
+            sale_order = sale_comp and sale_comp.order_id or False
+        return sale_order
+
+class OFKitStockMove(models.Model):
+    _inherit = "stock.move"
+
+    @api.multi
+    def action_done(self):
+        # Update delivered quantities on sale order lines that are not kits
+        result = super(OFKitStockMove, self).action_done()
+        # Update delivered quantities on sale order line components
+        sale_order_components = self.filtered(lambda move: move.product_id.expense_policy == 'no').mapped('procurement_id.sale_comp_id') # bug mal initialisé sale_comp_id?
+        for comp in sale_order_components:
+            comp.qty_delivered = comp._get_delivered_qty()
+        lines = sale_order_components.mapped('kit_id.order_line_id')
+        # Update delivered quantities on sale order lines that are kits
+        for line in lines:
+            qty_delivered = line._get_delivered_qty_hack()
+            if qty_delivered != 0:
+                line.qty_delivered = qty_delivered
+                #line.update_underkit_delivered()  # former version of kits
+
+        return result
+

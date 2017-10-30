@@ -17,6 +17,8 @@ class PurchaseOrder(models.Model):
 class ProcurementOrder(models.Model):
     _inherit = 'procurement.order'
 
+#    order_id = fields.Many2one('sale.order', related='sale_line_id.order_id')
+
     @api.multi
     def _prepare_purchase_order(self, partner):
         res = super(ProcurementOrder, self)._prepare_purchase_order(partner)
@@ -60,6 +62,15 @@ class ProcurementOrder(models.Model):
                 res["name"] = name
         return res
 
+    def _get_sale_order(self):
+        self.ensure_one()
+        sale_line = self.sale_line_id
+        if not sale_line:
+            move = self.move_dest_id
+            sale_line = move and move.procurement_id and move.procurement_id.sale_line_id
+        sale_order = sale_line and sale_line.order_id or False
+        return sale_order
+
     @api.multi
     def make_po(self):
         cache = {}
@@ -74,13 +85,9 @@ class ProcurementOrder(models.Model):
 
             # Recherche du client associé
             domain = ()
-            regroup_type = 'sale_order'  # Récupérer le type de regroupement sélectionné en configuration ('standard', 'sale_order', 'customer')
+            regroup_type = 'sale_order'  #@TODO: Récupérer le type de regroupement sélectionné en configuration ('standard', 'sale_order', 'customer') à implémenter
             if regroup_type != 'standard':
-                sale_line = procurement.sale_line_id
-                if not sale_line:
-                    move = procurement.move_dest_id
-                    sale_line = move and move.procurement_id and move.procurement_id.sale_line_id
-                sale_order = sale_line and sale_line.order_id or False
+                sale_order = procurement._get_sale_order()
                 if regroup_type == 'sale_order':
                     domain = (('sale_order_id', '=', sale_order and sale_order.id),)
                 elif regroup_type == 'customer':
