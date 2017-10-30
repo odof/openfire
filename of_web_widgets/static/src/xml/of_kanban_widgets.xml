@@ -22,4 +22,8 @@
     </button>
 </t>
 
+<t t-name="FieldOne2One">
+    <button type="button" t-if="!widget.options.no_open" class="btn btn-default of_external_button" draggable="false"/>
+</t>
+
 </templates>
