@@ -8,30 +8,28 @@
     'summary': 'Kits',
     'description': """
         Module de Kits openfire: \n
-        \t- Création de kits à partir des nomenclatures du module mrp
+        \t- Création de kits directement dans les Articles
         \t- Ajout des champs 'is_kit' et 'pricing' dans les produits, lignes de commandes, de factures et composants
         \t- Ajout des kits dans les Devis, Bons de commandes, et Factures clients
         \t- Possibilité de création de kits à la volée dans les Devis, Bons de commandes et Factures clients
         \t- Approvisionnement des composants sur confirmation de commande
         \t- Conversion de Bons de commandes en Factures
-        \t- 2 modes d'affichage des kits dans les rapports PDF: restreint et étendu
+        \t- 3 modes d'affichage des kits dans les rapports PDF: aucun, restreint et étendu
         \t- Prix d'achat des kits en fonction de leurs composants et marges dans les Devis
     """,
     'website': 'openfire.fr',
     'depends': [
+        'of_sale_stock',
         'of_product',
         'sale_margin',
         'of_web_widgets',
         'of_purchase',
         ],
     'data': [
-        'views/of_sale_kit_views.xml',
-        #'views/of_sale_views.xml',
-        #'views/of_account_views.xml',
-        'report/of_sale_report_templates.xml',
-        'report/of_account_report_templates.xml',
-        #'security/ir.model.access.csv',
-        'data/data.xml',
+        'views/of_kit_views.xml',
+        'report/of_kit_report_templates.xml',
+        'security/ir.model.access.csv',
+        'data/of_kit_data.xml',
     ],
     'installable': True,
     'auto_install': False,
