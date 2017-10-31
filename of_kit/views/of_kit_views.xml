@@ -12,7 +12,7 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@name='options']" position="inside">
                 <div>
-                    <field name="is_kit"/>
+                    <field name="is_kit" attrs="{'readonly': [('is_comp', '=', True)]}"/>
                     <label for="is_kit"/>
                 </div>
                 <div>
@@ -28,7 +28,7 @@
                 <field name="cost_compo" attrs="{'invisible': [('is_kit','=',False)]}"/>
             </xpath>
             <xpath expr="//form//notebook//page[2]" position="before">
-                <page name="components" string="Components">
+                <page name="components" string="Components" attrs="{'invisible': [('is_kit', '=', False)]}">
                     <group>
                         <label for="kit_line_ids" colspan="2"/>
                         <field name="kit_line_ids" nolabel="1" colspan="2">
@@ -46,6 +46,7 @@
                 <!-- all kits are services -->
             	<attribute name="attrs">{'readonly': [('is_kit', '=', True)]}</attribute>
             </xpath>
+            <!-- kits don't have a standard_price -->
             <xpath expr="//form//notebook//page[@name='general_information']//label[@for='standard_price']" position="attributes">
                 <attribute name="attrs">{'invisible': [('is_kit', '!=', False)]}</attribute>
             </xpath>
@@ -65,16 +66,18 @@
                 <field name="pricing"/>
                 <field name="price_compo"/>
                 <field name="price_used"/>
+                <field name="comp_count"/>
             </xpath>
             <xpath expr="//kanban//templates//ul//li" position="replace">
                 <li t-if="record.is_kit.raw_value == false">Price: <field name="list_price" widget="monetary"></field></li>
+                <li t-if="record.is_kit.raw_value == true"><field name="comp_count"/> components</li>
                 <li t-if="record.is_kit.raw_value == true">Price: <field name="price_used" widget="monetary"></field></li>
                 <li t-if="record.is_kit.raw_value == true">Pricing: <field name="pricing"/></li>
             </xpath>
         </field>
     </record>
 
-    <!-- displayed from smart button 'kits' in product form view -->
+    <!-- displayed from smart button and menuitem 'kits' in product form view -->
     <record id="of_product_template_kit_tree" model="ir.ui.view">
         <field name="name">of.product.template.kit.tree</field>
         <field name="model">product.template</field>
@@ -84,26 +87,33 @@
                 <field name="display_name" string="Kit"/>
                 <field name="pricing"/>
                 <field name="price_used" widget="monetary"/>
+                <field name="comp_count" class="text-right"/>
                 <field name="list_price" invisible="1"/>
                 <field name="price_compo" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
             </tree>
         </field>
     </record>
 
     <record id="of_template_open_kit" model="ir.actions.act_window">
-        <!--field name="context">{'default_product_id': active_id, 'search_default_product_id': active_id}</field-->
         <field name="name">Kits</field>
         <field name="res_model">product.template</field>
         <field name="domain">[('is_kit', '=', True)]</field>
-        <field name="view_id" ref="of_product_template_kit_tree"/>
+        <!--field name="view_id" ref="of_product_template_kit_tree"/-->
+        <field name="view_mode">tree, kanban</field>
         <field name="view_type">form</field>
     </record>
-    <record id="of_product_open_kit" model="ir.actions.act_window">
-        <field name="context">{'default_product_id': active_id, 'search_default_product_id': active_id}</field>
-        <field name="name">Kits</field>
-        <field name="res_model">product.template</field>
-        <field name="domain">[('kit_line_ids.product_id','=',active_id)]</field>
-        <field name="view_type">form</field>
+    <record id="of_template_open_kit_view_tree" model="ir.actions.act_window.view">
+        <field eval="0" name="sequence"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="of_product_template_kit_tree"/>
+        <field name="act_window_id" ref="of_template_open_kit"/>
+    </record>
+    <record id="of_template_open_kit_view_kanban" model="ir.actions.act_window.view">
+        <field eval="1" name="sequence"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="of_kit_product_template_kanban_view"/>
+        <field name="act_window_id" ref="of_template_open_kit"/>
     </record>
     <record id="of_product_template_form_view_kit_button" model="ir.ui.view">
         <field name="name">of.product.template.kit</field>
@@ -112,11 +122,32 @@
         <field name="arch" type="xml">
             <div name="button_box" position="inside">
                 <button class="oe_stat_button" name="action_view_kits" type="object"
-                    attrs="{'invisible':[('is_comp', '!=', True)]}" icon="fa-object-group">
+                  attrs="{'invisible':[('is_kit', '=', True)]}" icon="fa-object-group"
+                  help="Kits containning this product as a component">
                     <field string="Kits" name="kit_count" widget="statinfo" />
                 </button>
             </div>
         </field>
+    </record>
+
+    <record id="of_product_open_kit" model="ir.actions.act_window">
+        <field name="name">Kits</field>
+        <field name="res_model">product.template</field>
+        <field name="domain">[('kit_line_ids.product_id', '=', active_id)]</field>
+        <field name="view_mode">tree, kanban</field>
+        <field name="view_type">form</field>
+    </record>
+    <record id="of_product_open_kit_view_tree" model="ir.actions.act_window.view">
+        <field eval="0" name="sequence"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="of_product_template_kit_tree"/>
+        <field name="act_window_id" ref="of_product_open_kit"/>
+    </record>
+    <record id="of_product_open_kit_view_kanban" model="ir.actions.act_window.view">
+        <field eval="1" name="sequence"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="of_kit_product_template_kanban_view"/>
+        <field name="act_window_id" ref="of_product_open_kit"/>
     </record>
     <record id="of_product_product_form_view_kit_button" model="ir.ui.view">
         <field name="name">of.product.product.kit</field>
@@ -125,7 +156,8 @@
         <field name="arch" type="xml">
             <div name="button_box" position="inside">
                 <button class="oe_stat_button" name="%(of_product_open_kit)d" type="action"
-                    attrs="{'invisible':[('is_comp', '!=', True)]}" icon="fa-object-group">
+                  attrs="{'invisible':[('is_kit', '=', True)]}" icon="fa-object-group"
+                  help="Kits containning this product as a component">
                     <field string="Kits" name="kit_count" widget="statinfo" />
                 </button>
             </div>
@@ -139,7 +171,6 @@
          <field name="arch" type="xml">
              <xpath expr="//filter[@name='filter_to_purchase']" position="after">
                  <separator/>
-                 <!--filter string="Manufactured" name="manufactured" domain="[('bom_ids','not in',[]),('is_kit','=',False)]"/-->
                  <filter string="Kits" name="kits" domain="[('is_kit','=',True)]"/>
                  <filter string="Comps" name="comps" domain="[('is_comp','=',True)]"/>
              </xpath>
@@ -149,7 +180,7 @@
     <menuitem id="of_menu_kit_form_action_sale"
         action="of_template_open_kit"
         parent="sales_team.menu_sales"
-        name="Kits"
+        name="Kits (Nouveaux)"
         sequence="20"/>
 
     <!--#############################################################################
@@ -187,6 +218,20 @@
             </tree>
         </field>
     </record>
+
+    <!--record id="of_open_kit_line" model="ir.actions.act_window">
+        <field name="name">Kits Lines</field>
+        <field name="res_model">of.product.kit.line</field>
+        <field name="groups">base.group_no_one</field>
+        <field name="view_id" ref="of_kit_product_kit_line_list_view"/>
+        <field name="view_type">form</field>
+    </record>
+
+    <menuitem id="of_menu_kit_line_action_view"
+        action="of_open_kit_line"
+        parent="sales_team.menu_sales"
+        name="Kit lines"
+        sequence="21"/-->
 
 	<!--#############################################################################
         ##                      PROCUREMENT VIEWS
