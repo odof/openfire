@@ -3,12 +3,12 @@
     <!-- invoice reports -->
     <template id="of_kit_report_invoice_document" inherit_id="account.report_invoice_document">
         <xpath expr="//span[@t-field='l.name']" position="after">
-            <t t-if="l.is_kit and o.kit_display_mode == 'collapse'">
+            <t t-if="l.of_is_kit and o.of_kit_display_mode == 'collapse'">
                 <span t-esc="l.get_kit_descr_collapse()"/>
             </t>
         </xpath>
         <xpath expr="//tr[@t-as='l']/td[last()]" position="after">
-            <t t-if="l.kit_id and o.kit_display_mode == 'expand'">
+            <t t-if="l.kit_id and o.of_kit_display_mode == 'expand'">
                 <t t-foreach="l.kit_id.kit_line_ids" t-as="comp">
                     <tr>
                         <td>
@@ -35,7 +35,7 @@
             </t>
         </xpath>
         <xpath expr="//div[@class='row']/div[@class='col-xs-4 pull-right']" position="before">
-            <div t-if="o.contains_kit == True and o.kit_display_mode in ('collapse', 'expand')" class="col-xs-8">
+            <div t-if="o.of_contains_kit == True and o.of_kit_display_mode in ('collapse', 'expand')" class="col-xs-8">
                 <i style="font-size: small">displayed quantities of kit components are their total quantities.</i>
             </div>
         </xpath>
@@ -44,12 +44,12 @@
     <!-- saleorder reports -->
     <template id="of_report_saleorder_document" inherit_id="sale.report_saleorder_document">
         <xpath expr="//span[@t-field='l.name']" position="after">
-            <t t-if="l.is_kit and doc.kit_display_mode == 'collapse'">
+            <t t-if="l.of_is_kit and doc.of_kit_display_mode == 'collapse'">
                 <span t-esc="l.get_kit_descr_collapse()"/>
             </t>
         </xpath>
         <xpath expr="//t[@t-as='l']/tr" position="after">
-            <t t-if="l.kit_id and doc.kit_display_mode == 'expand'">
+            <t t-if="l.kit_id and doc.of_kit_display_mode == 'expand'">
                 <t t-foreach="l.kit_id.kit_line_ids" t-as="comp">
                     <tr>
                         <td>
@@ -77,7 +77,7 @@
             </t>
         </xpath>
         <xpath expr="//div[@name='total']/div[@class='col-xs-4 pull-right']" position="before">
-            <div t-if="doc.contains_kit == True and doc.kit_display_mode in ('collapse', 'expand')" class="col-xs-8">
+            <div t-if="doc.of_contains_kit == True and doc.of_kit_display_mode in ('collapse', 'expand')" class="col-xs-8">
                 <i style="font-size: small">displayed quantities of kit components are their total quantities.</i>
             </div>
         </xpath>

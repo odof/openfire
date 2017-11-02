@@ -6,19 +6,19 @@ import odoo.addons.decimal_precision as dp
 class OFKitAccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
-    contains_kit = fields.Boolean(string='Contains a kit', compute='_compute_contains_kit')
+    of_contains_kit = fields.Boolean(string='Contains a kit', compute='_compute_of_contains_kit')
 
     comp_ids = fields.One2many('of.invoice.kit.line', 'invoice_id', string='Components',
                     help="Contains all kit components in this invoice that are not kits themselves.")
 
     @api.multi
     @api.depends('invoice_line_ids.product_id')
-    def _compute_contains_kit(self):
+    def _compute_of_contains_kit(self):
         line_obj = self.env['account.invoice.line']
         for invoice in self:
-            invoice.contains_kit = line_obj.search([("invoice_id", "=", invoice.id),('is_kit', '=', True)], count=True) > 0
+            invoice.of_contains_kit = line_obj.search([("invoice_id", "=", invoice.id),('of_is_kit', '=', True)], count=True) > 0
 
-    kit_display_mode = fields.Selection([
+    of_kit_display_mode = fields.Selection([
         ('none', 'None'),
         ('collapse', 'Collapse'),
         ('expand', 'Expand'),
@@ -32,13 +32,13 @@ class OFKitAccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
     kit_id = fields.Many2one('of.invoice.kit', string="Components")
-    is_kit = fields.Boolean(string='Is a kit')
+    of_is_kit = fields.Boolean(string='Is a kit')
 
-    price_compo = fields.Monetary('Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_compo',
+    price_comps = fields.Monetary('Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
                             help="Sum of the prices of all components necessary for 1 unit of this kit", oldname="unit_compo_price")
-    cost_compo = fields.Monetary('Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_compo',
+    cost_comps = fields.Monetary('Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
                                   help="Sum of the costs of all components necessary for 1 unit of this kit")
-    pricing = fields.Selection([
+    of_pricing = fields.Selection([
         ('fixed', 'Fixed'),
         ('computed', 'Computed')
         ], string="Pricing", required=True, default='fixed',
@@ -54,7 +54,7 @@ class OFKitAccountInvoiceLine(models.Model):
         that string contains all components in this line that are not kits, plus their total quantities
         """
         self.ensure_one()
-        if not self.is_kit:
+        if not self.of_is_kit:
             return ""
         components = self.kit_id.kit_line_ids
         ir_model_data = self.env['ir.model.data']
@@ -92,60 +92,60 @@ class OFKitAccountInvoiceLine(models.Model):
             new_vals["invoice_kits_to_unlink"] = True
         if not self.product_id:
             return res
-        if self.product_id.is_kit:  # new product is a kit, we need to add its components
-            new_vals['is_kit'] = True
-            new_vals['pricing'] = self.product_id.pricing
+        if self.product_id.of_is_kit:  # new product is a kit, we need to add its components
+            new_vals['of_is_kit'] = True
+            new_vals['of_pricing'] = self.product_id.of_pricing
             account_kit_vals = self.product_id.get_account_invoice_kit_data()
             account_kit_vals["qty_invoice_line"] = self.quantity
             new_vals["kit_id"] = self.env["of.invoice.kit"].create(account_kit_vals)
         else:  # new product is not a kit
-            new_vals['is_kit'] = False
-            new_vals['pricing'] = 'fixed'
+            new_vals['of_is_kit'] = False
+            new_vals['of_pricing'] = 'fixed'
         self.update(new_vals)
         return res
 
-    @api.onchange('pricing')
-    def _onchange_pricing(self):
+    @api.onchange('of_pricing')
+    def _onchange_of_pricing(self):
         self.ensure_one()
-        if self.pricing:
+        if self.of_pricing:
             if self.kit_id:
-                self.kit_id.write({'pricing': self.pricing})
+                self.kit_id.write({'of_pricing': self.of_pricing})
                 self._refresh_price_unit()
 
     @api.depends('kit_id.kit_line_ids')
-    def _compute_price_compo(self):
+    def _compute_price_comps(self):
         for line in self:
-            if line.is_kit:
+            if line.of_is_kit:
                 uc_price = 0
                 uc_cost = 0
                 if line.kit_id:
                     for comp in line.kit_id.kit_line_ids:
                         uc_price += comp.price_unit * comp.qty_per_kit
                         uc_cost += comp.cost_unit * comp.qty_per_kit
-                line.price_compo = uc_price
-                line.cost_compo = uc_cost
+                line.price_comps = uc_price
+                line.cost_comps = uc_cost
                 #line._refresh_price_unit()
 
-    @api.onchange('price_compo', 'quantity', 'pricing')
+    @api.onchange('price_comps', 'quantity', 'of_pricing')
     def _refresh_price_unit(self):
         for line in self:
-            if line.is_kit:
+            if line.of_is_kit:
                 price = line.price_unit
-                if line.pricing == 'computed':
-                    line.price_unit = line.price_compo
+                if line.of_pricing == 'computed':
+                    line.price_unit = line.price_comps
                     if line.price_unit != price:
                         line._compute_price()
-                line.purchase_price = line.cost_compo
+                line.purchase_price = line.cost_comps
 
-    @api.onchange('is_kit')
-    def _onchange_is_kit(self):
+    @api.onchange('of_is_kit')
+    def _onchange_of_is_kit(self):
         new_vals = {}
         if self.kit_id:  # former product was a kit -> unlink it's kit_id
             self.kit_id.write({"to_unlink": True})
             new_vals["kit_id"] = False
             new_vals["invoice_kits_to_unlink"] = True
-        if self.is_kit:  # checkbox got checked
-            if not self.product_id.is_kit: # a product that is not a kit is being made into a kit
+        if self.of_is_kit:  # checkbox got checked
+            if not self.product_id.of_is_kit: # a product that is not a kit is being made into a kit
                 # we create a component with current product (for procurements, kits are ignored)
                 #comp_name = self.product_id.name_get()[0][1] or self.product_id.name
                 new_comp_vals = {
@@ -159,17 +159,17 @@ class OFKitAccountInvoiceLine(models.Model):
                     'hide_prices': False,
                     }
                 account_kit_vals = {
-                    'pricing': 'computed',
+                    'of_pricing': 'computed',
                     'kit_line_ids': [(0, 0, new_comp_vals)],
                     }
                 new_vals["kit_id"] = self.env["of.invoice.kit"].create(account_kit_vals)
-                new_vals["pricing"] = "computed"
+                new_vals["of_pricing"] = "computed"
             else: # can happen if uncheck then recheck a kit
-                new_vals['pricing'] = self.product_id.pricing
+                new_vals['of_pricing'] = self.product_id.of_pricing
                 account_kit_vals = self.product_id.get_account_invoice_kit_data()
                 new_vals["kit_id"] = self.env["of.invoice.kit"].create(account_kit_vals)
         else: # a product that was a kit is not anymore, we unlink its components
-            new_vals["pricing"] = 'fixed'
+            new_vals["of_pricing"] = 'fixed'
             new_vals["price_unit"] = self.product_id.list_price
         self.update(new_vals)
         self._refresh_price_unit()
@@ -194,17 +194,17 @@ class OFKitAccountInvoiceLine(models.Model):
             self.env["of.invoice.kit"].search([("to_unlink", "=", True)]).unlink()
             vals.pop("invoice_kits_to_unlink")
         line = super(OFKitAccountInvoiceLine, self).create(vals)
-        if line.is_kit and not from_so_line:  # 
+        if line.of_is_kit and not from_so_line:  # 
             account_kit_vals = {'invoice_line_id': line.id, 'name': line.name}
             line.kit_id.write(account_kit_vals)
-            if line.pricing == 'computed':
-                line.price_unit = line.price_compo
+            if line.of_pricing == 'computed':
+                line.price_unit = line.price_comps
         return line
 
     @api.multi
     def write(self, vals):
-        if len(self._ids) == 1 and self.pricing == 'computed' and not self.price_unit == self.price_compo:
-            vals['price_unit'] = self.price_compo
+        if len(self._ids) == 1 and self.of_pricing == 'computed' and not self.price_unit == self.price_comps:
+            vals['price_unit'] = self.price_comps
         if vals.get("invoice_kits_to_unlink") or self.invoice_kits_to_unlink:
             self.env["of.invoice.kit"].search([("to_unlink", "=", True)]).unlink()
             vals["invoice_kits_to_unlink"] = False
@@ -234,13 +234,13 @@ class OFAccountInvoiceKit(models.Model):
 
     qty_invoice_line = fields.Float(string="Invoice Line Qty", related="invoice_line_id.quantity", readonly=True)
     currency_id = fields.Many2one(related='invoice_line_id.currency_id', store=True, string='Currency', readonly=True)
-    price_compo = fields.Monetary('Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_compo',
+    price_comps = fields.Monetary('Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
                             help="Sum of the prices of all components necessary for 1 unit of this kit", oldname="unit_compo_price")
-    cost_compo = fields.Monetary('Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_compo',
+    cost_comps = fields.Monetary('Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
                                   help="Sum of the costs of all components necessary for 1 unit of this kit")
 
     to_unlink = fields.Boolean(string="to unlink?", default=False)
-    pricing = fields.Selection([
+    of_pricing = fields.Selection([
         ('fixed', 'Fixed'),
         ('computed', 'Computed')
         ], string="Pricing", required=True, default='fixed',
@@ -250,7 +250,7 @@ class OFAccountInvoiceKit(models.Model):
 
     @api.multi
     @api.depends('kit_line_ids')
-    def _compute_price_compo(self):
+    def _compute_price_comps(self):
         for kit in self:
             price = 0.0
             cost = 0.0
@@ -258,8 +258,8 @@ class OFAccountInvoiceKit(models.Model):
                 for comp in kit.kit_line_ids:
                     price += comp.price_unit * comp.qty_per_kit
                     cost += comp.cost_unit * comp.qty_per_kit
-                kit.price_compo = price
-                kit.cost_compo = cost
+                kit.price_comps = price
+                kit.cost_comps = cost
 
     @api.model
     def _clear_db(self):
@@ -304,7 +304,7 @@ class OFAccountInvoiceKitLine(models.Model):
                             help="Price of this component total quantity. Equal to total quantity * unit price.")
     price_per_kit = fields.Monetary(string='Price/Kit', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices', 
                             help="Price of this component quantity necessary to make one unit of its invoice line kit. Equal to quantity per kit unit * unit price.")
-    kit_pricing = fields.Selection(related="kit_id.pricing", readonly=True)
+    kit_pricing = fields.Selection(related="kit_id.of_pricing", readonly=True)
     hide_prices = fields.Boolean(string="Hide prices", default=False)
 
     @api.onchange('product_id')
@@ -319,7 +319,7 @@ class OFAccountInvoiceKitLine(models.Model):
                 'cost_unit': self.product_id.standard_price,
             }
             if self.kit_id.invoice_line_id:
-                if self.kit_id.invoice_line_id.pricing == 'fixed':
+                if self.kit_id.invoice_line_id.of_pricing == 'fixed':
                     hide_prices = True
                 else:
                     hide_prices = False
