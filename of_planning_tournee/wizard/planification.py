@@ -35,9 +35,8 @@ class OfTourneePlanification(models.TransientModel):
         services = service_obj.search([
             ('tache_id', 'in', taches._ids),
             ('date_next', '<=', date_tournee),
-            ('jour_ids', 'in', [date_jour]),
+            ('jour_ids.numero', 'in', [date_jour]),
             ('partner_id', '!=', False),
-            ('state', '=', 'progress')
         ])
 
         if not services:
@@ -157,7 +156,6 @@ class OfTourneePlanification(models.TransientModel):
                     service = service_obj.search([
                         ('tache_id', '=', intervention.tache_id.id),
                         ('address_id', '=', intervention.address_id.id),
-                        ('state', '=', 'progress')
                     ])
 
                     plannings.append((0, 0, {

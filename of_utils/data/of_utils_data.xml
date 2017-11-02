@@ -7,30 +7,37 @@
     <record id="of_jours_1" model="of.jours">
         <field name="name">Lundi</field>
         <field name="abr">lun.</field>
+        <field name="numero">1</field>
     </record>
     <record id="of_jours_2" model="of.jours">
         <field name="name">Mardi</field>
         <field name="abr">mar.</field>
+        <field name="numero">2</field>
     </record>
     <record id="of_jours_3" model="of.jours">
         <field name="name">Mercredi</field>
         <field name="abr">mer.</field>
+        <field name="numero">3</field>
     </record>
     <record id="of_jours_4" model="of.jours">
         <field name="name">Jeudi</field>
         <field name="abr">jeu.</field>
+        <field name="numero">4</field>
     </record>
     <record id="of_jours_5" model="of.jours">
         <field name="name">Vendredi</field>
         <field name="abr">ven.</field>
+        <field name="numero">5</field>
     </record>
     <record id="of_jours_6" model="of.jours">
         <field name="name">Samedi</field>
         <field name="abr">sam.</field>
+        <field name="numero">6</field>
     </record>
     <record id="of_jours_7" model="of.jours">
         <field name="name">Dimanche</field>
         <field name="abr">dim.</field>
+        <field name="numero">7</field>
     </record>
 
 <!--#############################################################################################################
@@ -40,50 +47,62 @@
     <record id="of_mois_1" model="of.mois">
         <field name="name">Janvier</field>
         <field name="abr">janv.</field>
+        <field name="numero">1</field>
     </record>
     <record id="of_mois_2" model="of.mois">
         <field name="name">Février</field>
         <field name="abr">févr.</field>
+        <field name="numero">2</field>
     </record>
     <record id="of_mois_3" model="of.mois">
         <field name="name">Mars</field>
         <field name="abr">mars</field>
+        <field name="numero">3</field>
     </record>
     <record id="of_mois_4" model="of.mois">
         <field name="name">Avril</field>
         <field name="abr">avr.</field>
+        <field name="numero">4</field>
     </record>
     <record id="of_mois_5" model="of.mois">
         <field name="name">Mai</field>
         <field name="abr">mai</field>
+        <field name="numero">5</field>
     </record>
     <record id="of_mois_6" model="of.mois">
         <field name="name">Juin</field>
         <field name="abr">juin</field>
+        <field name="numero">6</field>
     </record>
     <record id="of_mois_7" model="of.mois">
         <field name="name">Juillet</field>
         <field name="abr">juill.</field>
+        <field name="numero">7</field>
     </record>
     <record id="of_mois_8" model="of.mois">
         <field name="name">Août</field>
         <field name="abr">août</field>
+        <field name="numero">8</field>
     </record>
     <record id="of_mois_9" model="of.mois">
         <field name="name">Septembre</field>
         <field name="abr">sept.</field>
+        <field name="numero">9</field>
     </record>
     <record id="of_mois_10" model="of.mois">
         <field name="name">Octobre</field>
         <field name="abr">oct.</field>
+        <field name="numero">10</field>
     </record>
     <record id="of_mois_11" model="of.mois">
         <field name="name">Novembre</field>
         <field name="abr">nov.</field>
+        <field name="numero">11</field>
     </record>
     <record id="of_mois_12" model="of.mois">
         <field name="name">Décembre</field>
         <field name="abr">déc.</field>
+        <field name="numero">12</field>
     </record>
 
 </odoo>

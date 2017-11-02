@@ -12,12 +12,15 @@
             <field name="model">of.service</field>
             <field name="arch" type="xml">
                 <form>
-                <header>
-                    <button name="button_progress" string="Activer le service" states="cancel"/>
-                    <button name="button_cancel" string="Désactiver le service" states="progress"/>
-                    <field name="state" widget="statusbar"/>
-                </header>
                     <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="toggle_active" type="object"
+                                    class="oe_stat_button" icon="fa-archive"
+                                    confirm="Êtes-vous sûr de vouloir archiver/activer ce service ?">
+                                <field name="active" widget="boolean_button"
+                                    options='{"terminology": "archive"}'/>
+                            </button>
+                        </div>
                         <group>
                             <field name="partner_id" invisible="context.get('hide_service_partner_id')"/>
                             <field name="address_id" invisible="context.get('hide_service_address_id')"/>
@@ -26,8 +29,8 @@
                             <!-- <field name="template_id"/> -->
                             <field name="date_next"/>
                             <field name="date_fin"/>
-                            <field name="mois_ids" widget="many2many_tags"/>
-                            <field name="jour_ids" widget="many2many_tags"/>
+                            <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                            <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
                         </group>
                         <separator string="Notes"/>
                         <field name="note"/>
@@ -62,12 +65,8 @@
             <field name="priority" eval="10"/>
             <field name="arch" type="xml">
                 <form>
-                <header>
-                    <button name="button_progress" string="Activer le service" states="cancel"/>
-                    <button name="button_cancel" string="Désactiver le service" states="progress"/>
-                    <field name="state" widget="statusbar"/>
-                </header>
                     <sheet>
+                        <field name="active" invisible="1"/>
                         <group>
                             <field name="partner_id" invisible="1"/>
                             <field name="address_id" invisible="context.get('hide_service_address_id')"
@@ -77,8 +76,8 @@
                             <!-- <field name="template_id"/> -->
                             <field name="date_next"/>
                             <field name="date_fin"/>
-                            <field name="mois_ids" widget="many2many_tags"/>
-                            <field name="jour_ids" widget="many2many_tags"/>
+                            <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                            <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
                         </group>
                         <separator string="Notes"/>
                         <field name="note"/>
@@ -111,7 +110,7 @@
             <field name="name">of.service.tree</field>
             <field name="model">of.service</field>
             <field name="arch" type="xml">
-                <tree colors="grey:state=='cancel';red:color=='red';gray:color=='gray';blue:color=='blue'">
+                <tree colors="grey:active==False;red:color=='red';gray:color=='gray';blue:color=='blue'">
                     <field name="color" invisible="1"/>
                     <field name="partner_id"/>
                     <field name="partner_zip"/>
@@ -124,7 +123,8 @@
                     <field name="date_last"/>
                     <field name="date_next"/>
                     <field name="date_fin"/>
-                    <field name="state" invisible="1"/>
+                    <field name="active" invisible="1"/>
+                    <!--field name="state" invisible="1"/-->
                 </tree>
             </field>
         </record>
@@ -135,7 +135,8 @@
             <field name="type">search</field>
             <field name="arch" type="xml">
                <search>
-                   <filter string="En cours" name="filter_progress" domain="[('state','=','progress')]"/>
+                   <filter string="En cours" name="filter_progress" domain="[('active', '=', True)]"/>
+                   <filter string="Annulé" name="filter_cancel" domain="[('active', '=', False)]"/>
                    <field name="date_next" filter_domain="[('date_next','&lt;=',self)]"
                           string="Prochaine intervention min" context="{'date_next_max': self}"/>
                    <field name="partner_id"/>
@@ -182,7 +183,7 @@
                         <!-- Affichage des services liés au partenaire -->
                         <field name="service_partner_ids" nolabel="1" attrs="{'invisible': [('parent_id','!=', False)]}"
                                context="{'default_address_id':id, 'form_view_get':'of_planning_tournee.view_res_partner_of_service_form'}">
-                            <tree string="Service" colors="grey:state=='cancel'">
+                            <tree string="Service" colors="grey:active==False">
                                 <field name="address_id" domain="[('parent_id','=',parent.id)]"/>
                                 <field name="tache_id"/>
                                 <field name="mois_ids"/>
@@ -191,7 +192,8 @@
                                 <field name="date_last" string="Dernière"/>
                                 <field name="date_next" string="Prochaine"/>
                                 <field name="date_fin" string="Échéance"/>
-                                <field name="state" invisible="0"/>
+                                <field name="active" invisible="1"/>
+                                <!--field name="state" invisible="0"/-->
                                 <!--button name="% (of_gesdoc.action_view_courrier_wizard)d" icon="gtk-paste" string="Ajouter Contrat" type="action"
                                         attrs="{'invisible': [('template_id', '=', False)]}"/-->
                             </tree>
@@ -200,10 +202,11 @@
                         <!-- Affichage des services liés à l'adresse -->
                         <field name="service_address_ids" nolabel="1" attrs="{'invisible': [('parent_id','=', False)]}"
                                context="{'hide_service_address_id':True, 'form_view_get':'of_planning_tournee.view_res_partner_of_service_form'}">
-                            <tree string="Service" colors="grey:state=='cancel'">
+                            <tree string="Service" colors="grey:active==False">
                                 <field name="tache_id"/>
                                 <field name="mois_ids"/>
                                 <field name="note"/>
+                                <field name="active" invisible="1"/>
                                 <!-- <field name="template_id"/> -->
                                 <field name="date_last" string="Dernière"/>
                                 <field name="date_next" string="Prochaine"/>
