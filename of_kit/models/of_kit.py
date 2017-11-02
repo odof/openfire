@@ -8,19 +8,19 @@ from odoo.exceptions import UserError, ValidationError
 class OFKitProductTemplate(models.Model):
     _inherit = "product.template"
 
-    is_kit = fields.Boolean(string="Is a kit")
+    of_is_kit = fields.Boolean(string="Is a kit")
     is_comp = fields.Boolean(string="Is a comp", compute="_compute_is_comp", store=True, help="is a component of a kit")  # store=True for domain searches and _sq_constraint
     kit_line_ids = fields.One2many('of.product.kit.line', 'kit_id', string='Components')
 
-    price_compo = fields.Monetary('Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_compo_price_n_cost',
+    price_comps = fields.Monetary('Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_compo_price_n_cost',
                                   help="Sum of the prices of all components necessary for 1 unit of this kit")
-    cost_compo = fields.Monetary('Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_compo_price_n_cost',
+    cost_comps = fields.Monetary('Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_compo_price_n_cost',
                                   help="Sum of the costs of all components necessary for 1 unit of this kit")
 
-    price_used = fields.Monetary('Used Price', digits=dp.get_precision('Product Price'), compute='_compute_price_used',
+    of_price_used = fields.Monetary('Used Price', digits=dp.get_precision('Product Price'), compute='_compute_of_price_used',
                     help="Price that will be taken into account in sale orders and invoices. Either list price or the price of its components, dependant on the pricing.")
 
-    pricing = fields.Selection([
+    of_pricing = fields.Selection([
         ('fixed', 'Fixed'),
         ('computed', 'Computed')
         ], string="Pricing", required=True, default='fixed',
@@ -32,15 +32,15 @@ class OFKitProductTemplate(models.Model):
     comp_count = fields.Integer('# Comps', compute='_compute_comp_count')
 
     _sql_constraints = [
-        ('kit_n_comp_constraint', 'CHECK ( NOT(is_kit AND is_comp) )', _('A product can not be a kit and a kit component at the same time !'))
+        ('kit_n_comp_constraint', 'CHECK ( NOT(of_is_kit AND is_comp) )', _('A product can not be a kit and a kit component at the same time !'))
     ]
 
     def get_account_invoice_kit_data(self):
         self.ensure_one()
-        res = {'pricing': self.pricing}
+        res = {'of_pricing': self.of_pricing}
         lines = [(5,)]
         comp_vals = {}
-        if self.pricing == 'fixed':
+        if self.of_pricing == 'fixed':
             comp_vals["hide_prices"] = True
         for line in self.kit_line_ids:
             comp_vals = comp_vals.copy()
@@ -58,10 +58,10 @@ class OFKitProductTemplate(models.Model):
 
     def get_sale_order_kit_data(self):
         self.ensure_one()
-        res = {'pricing': self.pricing}
+        res = {'of_pricing': self.of_pricing}
         lines = [(5,)]
         comp_vals = {}
-        if self.pricing == 'fixed':
+        if self.of_pricing == 'fixed':
             comp_vals["hide_prices"] = True
         for line in self.kit_line_ids:
             comp_vals = comp_vals.copy()
@@ -82,10 +82,10 @@ class OFKitProductTemplate(models.Model):
     @api.depends('kit_line_ids')
     def _compute_compo_price_n_cost(self):
         for product_tmpl in self:
-            if product_tmpl.is_kit:
+            if product_tmpl.of_is_kit:
                 price_n_cost = product_tmpl.get_compo_price_n_cost()
-                product_tmpl.price_compo = price_n_cost['price']
-                product_tmpl.cost_compo = price_n_cost['cost']
+                product_tmpl.price_comps = price_n_cost['price']
+                product_tmpl.cost_comps = price_n_cost['cost']
 
     @api.multi
     @api.depends('kit_line_ids')
@@ -94,46 +94,45 @@ class OFKitProductTemplate(models.Model):
             product_tmpl.comp_count = len(product_tmpl.kit_line_ids)
 
     @api.multi
-    @api.depends('price_compo', 'pricing')
-    def _compute_price_used(self):
+    @api.depends('price_comps', 'of_pricing')
+    def _compute_of_price_used(self):
         for product_tmpl in self:
-            if product_tmpl.is_kit:
-                if product_tmpl.pricing == 'fixed':
-                    product_tmpl.price_used = product_tmpl.list_price
+            if product_tmpl.of_is_kit:
+                if product_tmpl.of_pricing == 'fixed':
+                    product_tmpl.of_price_used = product_tmpl.list_price
                 else:
-                    product_tmpl.price_used = product_tmpl.price_compo
+                    product_tmpl.of_price_used = product_tmpl.price_comps
 
     @api.multi
-    @api.depends('list_price', 'standard_price', 'price_compo', 'cost_compo', 'pricing')
+    @api.depends('list_price', 'standard_price', 'price_comps', 'cost_comps', 'of_pricing', 'of_is_kit')
     def _compute_marge(self):
         # override of function from of_product
         for product_tmpl in self:
-            if not product_tmpl.is_kit:
+            if not product_tmpl.of_is_kit:
                 list_price = product_tmpl.list_price
                 if list_price != 0:
                     product_tmpl.marge = (list_price - product_tmpl.standard_price) * 100.00 / list_price
                 else: # division par 0!
                     product_tmpl.marge = -100
             else: # product is a kit
-                if product_tmpl.pricing == 'fixed':
+                if product_tmpl.of_pricing == 'fixed':
                     price = product_tmpl.list_price
                 else:
-                    price = product_tmpl.price_compo
+                    price = product_tmpl.price_comps
                 if price != 0:
-                    product_tmpl.marge = (price - product_tmpl.cost_compo) * 100.00 / price
+                    product_tmpl.marge = (price - product_tmpl.cost_comps) * 100.00 / price
                 else:
                     product_tmpl.marge = -100
 
-    @api.onchange('is_kit')
-    def _onchange_is_kit(self):
+    @api.onchange('of_is_kit')
+    def _onchange_of_is_kit(self):
         self.ensure_one()
-        if not self.is_kit:
+        if not self.of_is_kit:
             self.kit_line_ids = [(5,)]
 
     def get_compo_price_n_cost(self):
         """
-        returns the sum of the prices and costs of all components in this bom.
-        doesn't take 'pricing' into account unless without_pricing set to false.
+        returns the sum of the prices and costs of all components in this kit.
         """
         self.ensure_one()
         res = {'price': 0.0, 'cost': 0.0}
@@ -213,7 +212,7 @@ class OFKitProductKitLine(models.Model):
     #name = fields.Char(string="Name", required=True)
     kit_id = fields.Many2one("product.template", string="Kit",  domain="[('is_comp', '=', False)]",
                              help="Kit containing this as component", ondelete="cascade")
-    product_id = fields.Many2one("product.product", string="Product", domain="[('is_kit', '=', False)]", required=True,
+    product_id = fields.Many2one("product.product", string="Product", domain="[('of_is_kit', '=', False)]", required=True,
                                  help="Product this line references")
     product_qty = fields.Float(string='Qty / Kit', digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0,
                                help="Quantity per kit unit.")
@@ -260,17 +259,17 @@ class OFKitProductKitLine(models.Model):
 class OFKitProcurementOrder(models.Model):
     _inherit = 'procurement.order'
 
-    sale_comp_id = fields.Many2one('of.saleorder.kit.line', string='Sale Order Kit Component')
+    of_sale_comp_id = fields.Many2one('of.saleorder.kit.line', string='Sale Order Kit Component')
 
     def _get_sale_order(self):
         # fonction définie dans of_purchase
         self.ensure_one()
         sale_order = super(OFKitProcurementOrder, self)._get_sale_order()
         if not sale_order:
-            sale_comp = self.sale_comp_id
+            sale_comp = self.of_sale_comp_id
             if not sale_comp:
                 move = self.move_dest_id
-                sale_comp = move and move.procurement_id and move.procurement_id.sale_comp_id
+                sale_comp = move and move.procurement_id and move.procurement_id.of_sale_comp_id
             sale_order = sale_comp and sale_comp.order_id or False
         return sale_order
 
@@ -282,7 +281,7 @@ class OFKitStockMove(models.Model):
         # Update delivered quantities on sale order lines that are not kits
         result = super(OFKitStockMove, self).action_done()
         # Update delivered quantities on sale order line components
-        sale_order_components = self.filtered(lambda move: move.product_id.expense_policy == 'no').mapped('procurement_id.sale_comp_id') # bug mal initialisé sale_comp_id?
+        sale_order_components = self.filtered(lambda move: move.product_id.expense_policy == 'no').mapped('procurement_id.of_sale_comp_id') # bug mal initialisé of_sale_comp_id?
         for comp in sale_order_components:
             comp.qty_delivered = comp._get_delivered_qty()
         lines = sale_order_components.mapped('kit_id.order_line_id')

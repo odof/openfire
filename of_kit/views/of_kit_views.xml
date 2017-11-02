@@ -12,8 +12,8 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@name='options']" position="inside">
                 <div>
-                    <field name="is_kit" attrs="{'readonly': [('is_comp', '=', True)]}"/>
-                    <label for="is_kit"/>
+                    <field name="of_is_kit" attrs="{'readonly': [('is_comp', '=', True)]}"/>
+                    <label for="of_is_kit"/>
                 </div>
                 <div>
                     <field name="is_comp" invisible="1"/>
@@ -21,14 +21,14 @@
                 </div>
             </xpath>
             <xpath expr="//group[@name='group_general']" position="inside">
-                <separator string="Kit info" name="Kit info" attrs="{'invisible': [('is_kit','=',False)]}" colspan="2"/>
-            	<field name="pricing" attrs="{'invisible': [('is_kit','=',False)]}"/>
-            	<field name="price_compo" attrs="{'invisible': [('is_kit','=',False)]}"/>
-            	<field name="price_used" attrs="{'invisible': [('is_kit','=',False)]}"/>
-                <field name="cost_compo" attrs="{'invisible': [('is_kit','=',False)]}"/>
+                <separator string="Kit info" name="Kit info" attrs="{'invisible': [('of_is_kit','=',False)]}" colspan="2"/>
+                <field name="of_pricing" attrs="{'invisible': [('of_is_kit','=',False)]}"/>
+                <field name="price_comps" attrs="{'invisible': [('of_is_kit','=',False)]}"/>
+                <field name="of_price_used" attrs="{'invisible': [('of_is_kit','=',False)]}"/>
+                <field name="cost_comps" attrs="{'invisible': [('of_is_kit','=',False)]}"/>
             </xpath>
             <xpath expr="//form//notebook//page[2]" position="before">
-                <page name="components" string="Components" attrs="{'invisible': [('is_kit', '=', False)]}">
+                <page name="components" string="Components" attrs="{'invisible': [('of_is_kit', '=', False)]}">
                     <group>
                         <label for="kit_line_ids" colspan="2"/>
                         <field name="kit_line_ids" nolabel="1" colspan="2">
@@ -44,14 +44,14 @@
             </xpath>
             <xpath expr="//form//notebook//page[@name='general_information']//field[@name='type']" position="attributes">
                 <!-- all kits are services -->
-            	<attribute name="attrs">{'readonly': [('is_kit', '=', True)]}</attribute>
+                <attribute name="attrs">{'readonly': [('of_is_kit', '=', True)]}</attribute>
             </xpath>
             <!-- kits don't have a standard_price -->
             <xpath expr="//form//notebook//page[@name='general_information']//label[@for='standard_price']" position="attributes">
-                <attribute name="attrs">{'invisible': [('is_kit', '!=', False)]}</attribute>
+                <attribute name="attrs">{'invisible': [('of_is_kit', '!=', False)]}</attribute>
             </xpath>
             <xpath expr="//form//notebook//page[@name='general_information']//field[@name='standard_price']" position="attributes">
-                <attribute name="attrs">{'invisible': [('is_kit', '!=', False)]}</attribute>
+                <attribute name="attrs">{'invisible': [('of_is_kit', '!=', False)]}</attribute>
             </xpath>
         </field>
     </record>
@@ -62,17 +62,17 @@
         <field name="inherit_id" ref="product.product_template_kanban_view"/>
         <field name="arch" type="xml">
             <xpath expr="//kanban//field[@name='currency_id']" position="after">
-                <field name="is_kit"/>
-                <field name="pricing"/>
-                <field name="price_compo"/>
-                <field name="price_used"/>
+                <field name="of_is_kit"/>
+                <field name="of_pricing"/>
+                <field name="price_comps"/>
+                <field name="of_price_used"/>
                 <field name="comp_count"/>
             </xpath>
             <xpath expr="//kanban//templates//ul//li" position="replace">
-                <li t-if="record.is_kit.raw_value == false">Price: <field name="list_price" widget="monetary"></field></li>
-                <li t-if="record.is_kit.raw_value == true"><field name="comp_count"/> components</li>
-                <li t-if="record.is_kit.raw_value == true">Price: <field name="price_used" widget="monetary"></field></li>
-                <li t-if="record.is_kit.raw_value == true">Pricing: <field name="pricing"/></li>
+                <li t-if="record.of_is_kit.raw_value == false">Price: <field name="list_price" widget="monetary"></field></li>
+                <li t-if="record.of_is_kit.raw_value == true"><field name="comp_count"/> components</li>
+                <li t-if="record.of_is_kit.raw_value == true">Price: <field name="of_price_used" widget="monetary"></field></li>
+                <li t-if="record.of_is_kit.raw_value == true">Pricing: <field name="of_pricing"/></li>
             </xpath>
         </field>
     </record>
@@ -85,11 +85,11 @@
         <field name="arch" type="xml">
             <tree string="Kits">
                 <field name="display_name" string="Kit"/>
-                <field name="pricing"/>
-                <field name="price_used" widget="monetary"/>
+                <field name="of_pricing"/>
+                <field name="of_price_used" widget="monetary"/>
                 <field name="comp_count" class="text-right"/>
                 <field name="list_price" invisible="1"/>
-                <field name="price_compo" invisible="1"/>
+                <field name="price_comps" invisible="1"/>
                 <field name="currency_id" invisible="1"/>
             </tree>
         </field>
@@ -98,7 +98,7 @@
     <record id="of_template_open_kit" model="ir.actions.act_window">
         <field name="name">Kits</field>
         <field name="res_model">product.template</field>
-        <field name="domain">[('is_kit', '=', True)]</field>
+        <field name="domain">[('of_is_kit', '=', True)]</field>
         <!--field name="view_id" ref="of_product_template_kit_tree"/-->
         <field name="view_mode">tree, kanban</field>
         <field name="view_type">form</field>
@@ -122,7 +122,7 @@
         <field name="arch" type="xml">
             <div name="button_box" position="inside">
                 <button class="oe_stat_button" name="action_view_kits" type="object"
-                  attrs="{'invisible':[('is_kit', '=', True)]}" icon="fa-object-group"
+                  attrs="{'invisible':[('of_is_kit', '=', True)]}" icon="fa-object-group"
                   help="Kits containning this product as a component">
                     <field string="Kits" name="kit_count" widget="statinfo" />
                 </button>
@@ -156,7 +156,7 @@
         <field name="arch" type="xml">
             <div name="button_box" position="inside">
                 <button class="oe_stat_button" name="%(of_product_open_kit)d" type="action"
-                  attrs="{'invisible':[('is_kit', '=', True)]}" icon="fa-object-group"
+                  attrs="{'invisible':[('of_is_kit', '=', True)]}" icon="fa-object-group"
                   help="Kits containning this product as a component">
                     <field string="Kits" name="kit_count" widget="statinfo" />
                 </button>
@@ -171,7 +171,7 @@
          <field name="arch" type="xml">
              <xpath expr="//filter[@name='filter_to_purchase']" position="after">
                  <separator/>
-                 <filter string="Kits" name="kits" domain="[('is_kit','=',True)]"/>
+                 <filter string="Kits" name="kits" domain="[('of_is_kit','=',True)]"/>
                  <filter string="Comps" name="comps" domain="[('is_comp','=',True)]"/>
              </xpath>
          </field>
@@ -243,7 +243,7 @@
         <field name="inherit_id" ref="procurement.procurement_form_view"/>
         <field name="arch" type="xml">
         	<xpath expr="//field[@name='origin']" position="after">
-            	<field name="sale_comp_id" attrs="{'invisible': [('sale_comp_id','=',False)]}"/>
+                <field name="of_sale_comp_id" attrs="{'invisible': [('of_sale_comp_id', '=', False)]}"/>
             </xpath>
         </field>
     </record>
@@ -268,13 +268,13 @@
                 <page name="kit_tab" string="Kit info">
                     <group>
                         <group>
-                            <field name="contains_kit"/>
+                            <field name="of_contains_kit"/>
                         </group>
                         <group>
-                            <field name="kit_display_mode" attrs="{'invisible': [('contains_kit','=',False)]}"/>
+                            <field name="of_kit_display_mode" attrs="{'invisible': [('of_contains_kit','=',False)]}"/>
                         </group>
                     </group>
-                    <div name="components" class="mt8 mb8" attrs="{'invisible': [('contains_kit','=',False)]}">
+                    <div name="components" class="mt8 mb8" attrs="{'invisible': [('of_contains_kit','=',False)]}">
                         <label for="comp_ids"/>
                         <field name="comp_ids" mode="tree"><!-- readonly="True"-->
                             <tree string="Kit components">
@@ -292,14 +292,14 @@
             </xpath>
             <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="after">
                 <field name="sale_kits_to_unlink" invisible="1"/>
-                <field name="is_kit"/>
-                <field name="pricing"/>
-                <field name="kit_id" widget="one2one" options="{'text_empty': 'Créer Composants', 'text_nonempty': 'Voir Composants'}"/>
+                <field name="of_is_kit"/>
+                <field name="of_pricing" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
+                <field name="kit_id" widget="one2one" options="{'text_empty': 'Créer Composants', 'text_nonempty': 'Voir Composants'}"
+                  attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
             </xpath>
             <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="after">
-                <field name="price_compo"/>
-                <field name="cost_compo"/>
-                <field name="id"/>
+                <field name="price_comps" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
+                <field name="cost_comps" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
             </xpath>
         </field>
     </record>
@@ -310,11 +310,11 @@
         <field name="arch" type="xml">
             <form string="Components">
                 <h2>
-                    <div for="order_line_id" attrs="{'invisible': [('order_line_id', '!=', False)]}">Draft Saleorder Kit</div>
+                    <div attrs="{'invisible': [('order_line_id', '!=', False)]}">Draft Saleorder Kit</div>
                     <field name="order_line_id" attrs="{'invisible': [('order_line_id', '=', False)]}" 
                       nolabel="1" options='{"no_open": True}' readonly="1"/>
                 </h2>
-                <div name="hide_prices_message" class="mb8 mt8" attrs="{'invisible': [('pricing', '=', 'computed')]}">
+                <div name="hide_prices_message" class="mb8 mt8" attrs="{'invisible': [('of_pricing', '=', 'computed')]}">
                     <i>Components prices are not shown when the sale order line pricing is set to 'fixed'. They are never printed out in PDF reports.</i>
                 </div>
                 <field name="kit_line_ids">
@@ -329,15 +329,15 @@
                         <field name="currency_id" invisible="1"/>
                     </tree>
                 </field>
-                <group class="oe_subtotal_footer oe_right" colspan="2" name="price_compo">
-                    <field name="price_compo" widget='monetary'/>
+                <group class="oe_subtotal_footer oe_right" colspan="2" name="price_comps">
+                    <field name="price_comps" widget='monetary'/>
                 </group>
                 <group name="Developer Mode Information" groups="base.group_no_one">
                     <separator string="Developer Mode Information" name="dmi" groups="base.group_no_one" colspan="2"/>
                     <group>
                         <field name="id" readonly="1"/>
                         <!--field name="order_line_id" readonly="1"/-->
-                        <field name="pricing" readonly="1"/>
+                        <field name="of_pricing" readonly="1"/>
                         <field name="currency_id" invisible="1"/>
                     </group>
                 </group>
@@ -381,7 +381,7 @@
                         </group>
                         <group name="Prices" attrs="{'invisible': [('hide_prices','=',True)]}">
                             <separator string="Prices" name="Prices" attrs="{'invisible': [('hide_prices','=',True)]}" colspan="2"/>
-                            <!--<field name="pricing" required="False"/>-->
+                            <!--<field name="of_pricing" required="False"/>-->
                             <field name="price_unit" widget='monetary' options="{'currency_field': 'currency_id'}"/>
                             <field name="price_per_kit"/>
                             <field name="price_total"/>
@@ -429,13 +429,13 @@
                 <page name="kit_tab" string="Kit info">
                     <group>
                         <group>
-                            <field name="contains_kit"/>
+                            <field name="of_contains_kit"/>
                         </group>
                         <group>
-                            <field name="kit_display_mode" attrs="{'invisible': [('contains_kit','=',False)]}"/>
+                            <field name="of_kit_display_mode" attrs="{'invisible': [('of_contains_kit','=',False)]}"/>
                         </group>
                     </group>
-                    <div name="components" class="mt8 mb8" attrs="{'invisible': [('contains_kit','=',False)]}">
+                    <div name="components" class="mt8 mb8" attrs="{'invisible': [('of_contains_kit','=',False)]}">
                         <label for="comp_ids"/>
                         <field name="comp_ids" mode="tree" readonly="True">
                             <tree string="Kit components">
@@ -460,13 +460,14 @@
         <field name="arch" type="xml">
             <xpath expr="//form//field[@name='product_id']" position="after">
                 <field name="invoice_kits_to_unlink" invisible="0"/>
-                <field name="is_kit"/>
-                <field name="pricing"/>
-                <field name="kit_id" widget="one2one" options="{'text_empty': 'Créer Composants', 'text_nonempty': 'Voir Composants'}"/>
+                <field name="of_is_kit"/>
+                <field name="of_pricing" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
+                <field name="kit_id" widget="one2one" options="{'text_empty': 'Créer Composants', 'text_nonempty': 'Voir Composants'}"
+                  attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
             </xpath>
             <xpath expr="//form//field[@name='price_unit']" position="after">
-                <field name="price_compo"/>
-                <field name="cost_compo"/>
+                <field name="price_comps" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
+                <field name="cost_comps" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
             </xpath>
         </field>
     </record>
@@ -477,12 +478,12 @@
         <field name="arch" type="xml">
             <form string="Components">
                 <field name="invoice_line_id" invisible="1"/>
-                <field name="pricing" invisible="1"/>
+                <field name="of_pricing" invisible="1"/>
                 <field name="currency_id" invisible="1"/>
                 <group>
                 
                 </group>
-                <div name="hide_prices_message" attrs="{'invisible': [('pricing', '=', 'computed')]}">
+                <div name="hide_prices_message" attrs="{'invisible': [('of_pricing', '=', 'computed')]}">
                     <i>Components prices are not shown when the sale order line pricing is set to 'fixed'. They are never printed out in PDF reports.</i>
                 </div>
                 <field name="kit_line_ids">
@@ -497,8 +498,8 @@
                         <field name="currency_id" invisible="1"/>
                     </tree>
                 </field>
-                <group class="oe_subtotal_footer oe_right" colspan="2" name="price_compo">
-                    <field name="price_compo" widget='monetary'/>
+                <group class="oe_subtotal_footer oe_right" colspan="2" name="price_comps">
+                    <field name="price_comps" widget='monetary'/>
                 </group>
             </form>
         </field>
@@ -538,7 +539,7 @@
                         </group>
                         <group name="Prices" attrs="{'invisible': [('hide_prices','=',True)]}">
                             <separator string="Prices" name="Prices" attrs="{'invisible': [('hide_prices','=',True)]}" colspan="2"/>
-                            <!--<field name="pricing" required="False"/>-->
+                            <!--<field name="of_pricing" required="False"/>-->
                             <field name="price_unit" widget='monetary' options="{'currency_field': 'currency_id'}"/>
                             <field name="price_per_kit"/>
                             <field name="price_total"/>

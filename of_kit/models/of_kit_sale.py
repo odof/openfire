@@ -10,18 +10,18 @@ import odoo.addons.decimal_precision as dp
 class OFKitSaleOrder(models.Model):
 	_inherit = 'sale.order'
 
-	comp_ids = fields.One2many('of.saleorder.kit.line', 'order_id', string='Components', oldname="component_ids",# readonly=True,
+	comp_ids = fields.One2many('of.saleorder.kit.line', 'order_id', string='Components',
 					help="Contains all kit components in this sale order.")
-	contains_kit = fields.Boolean(string='Contains a kit', compute='_compute_contains_kit')
+	of_contains_kit = fields.Boolean(string='Contains a kit', compute='_compute_of_contains_kit')
 
 	@api.multi
 	@api.depends('order_line.product_id')
-	def _compute_contains_kit(self):
+	def _compute_of_contains_kit(self):
 		comp_obj = self.env['of.saleorder.kit.line']
 		for order in self:
-			order.contains_kit = comp_obj.search([("order_id", "=", order.id)], count=True) > 0
+			order.of_contains_kit = comp_obj.search([("order_id", "=", order.id)], count=True) > 0
 
-	kit_display_mode = fields.Selection([
+	of_kit_display_mode = fields.Selection([
 		('none', 'None'),
 		('collapse', 'Collapse'),
 		('expand', 'Expand'),
@@ -38,20 +38,20 @@ class OFKitSaleOrder(models.Model):
 		Override of parent function
 		"""
 		invoice_vals = super(OFKitSaleOrder, self)._prepare_invoice()
-		invoice_vals['kit_display_mode'] = self.kit_display_mode
+		invoice_vals['of_kit_display_mode'] = self.of_kit_display_mode
 		return invoice_vals
 
 class OFKitSaleOrderLine(models.Model):
 	_inherit = 'sale.order.line'
 
 	kit_id = fields.Many2one('of.saleorder.kit', string="Components")
-	is_kit = fields.Boolean(string='Is a kit')
+	of_is_kit = fields.Boolean(string='Is a kit')
 
-	price_compo = fields.Monetary('Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_compo',
+	price_comps = fields.Monetary('Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
 							help="Sum of the prices of all components necessary for 1 unit of this kit", oldname="unit_compo_price")
-	cost_compo = fields.Monetary('Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_compo',
+	cost_comps = fields.Monetary('Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
                                   help="Sum of the costs of all components necessary for 1 unit of this kit")
-	pricing = fields.Selection([
+	of_pricing = fields.Selection([
         ('fixed', 'Fixed'),
         ('computed', 'Computed')
         ], string="Pricing", required=True, default='fixed',
@@ -67,7 +67,7 @@ class OFKitSaleOrderLine(models.Model):
 		that string contains all components in this line that are not kits, plus their total quantities
 		"""
 		self.ensure_one()
-		if not self.is_kit:
+		if not self.of_is_kit:
 			return ""
 		components = self.kit_id.kit_line_ids
 		ir_model_data = self.env['ir.model.data']
@@ -90,28 +90,29 @@ class OFKitSaleOrderLine(models.Model):
 
 	@api.multi
 	@api.depends('kit_id.kit_line_ids')
-	def _compute_price_compo(self):
+	def _compute_price_comps(self):
 		for line in self:
-			price = 0.0
-			cost = 0.0
+			#price = 0.0
+			#cost = 0.0
 			if line.kit_id:
-				for comp in line.kit_id.kit_line_ids:
-					price += comp.price_unit * comp.qty_per_kit
-					cost += comp.cost_unit * comp.qty_per_kit
-				line.price_compo = price
-				line.cost_compo = cost
-				#line._refresh_price_unit()
+				line.price_comps = line.kit_id.price_comps
+				line.cost_comps = line.kit_id.cost_comps
+				#for comp in line.kit_id.kit_line_ids:
+				#	price += comp.price_unit * comp.qty_per_kit
+				#	cost += comp.cost_unit * comp.qty_per_kit
+				#line.price_comps = price
+				#line.cost_comps = cost
 
-	@api.onchange('price_compo', 'cost_compo', 'pricing', 'product_id')
+	@api.onchange('price_comps', 'cost_comps', 'of_pricing', 'product_id')
 	def _refresh_price_unit(self):
 		for line in self:
-			if line.is_kit:
+			if line.of_is_kit:
 				price = line.price_unit
-				if line.pricing == 'computed':
-					line.price_unit = line.price_compo
+				if line.of_pricing == 'computed':
+					line.price_unit = line.price_comps
 					if line.price_unit != price:
 						line._compute_amount()
-				line.purchase_price = line.cost_compo
+				line.purchase_price = line.cost_comps
 
 	@api.multi
 	@api.onchange('product_id')
@@ -124,15 +125,15 @@ class OFKitSaleOrderLine(models.Model):
 			new_vals["sale_kits_to_unlink"] = True
 		if not self.product_id:
 			return res
-		if self.product_id.is_kit:  # new product is a kit, we need to add its components
-			new_vals['is_kit'] = True
-			new_vals['pricing'] = self.product_id.pricing
+		if self.product_id.of_is_kit:  # new product is a kit, we need to add its components
+			new_vals['of_is_kit'] = True
+			new_vals['of_pricing'] = self.product_id.of_pricing
 			sale_kit_vals = self.product_id.get_sale_order_kit_data()
 			sale_kit_vals["qty_order_line"] = self.product_uom_qty
 			new_vals["kit_id"] = self.env["of.saleorder.kit"].create(sale_kit_vals)
 		else:  # new product is not a kit
-			new_vals['is_kit'] = False
-			new_vals['pricing'] = 'fixed'
+			new_vals['of_is_kit'] = False
+			new_vals['of_pricing'] = 'fixed'
 		self.update(new_vals)
 		return res
 
@@ -142,23 +143,23 @@ class OFKitSaleOrderLine(models.Model):
 		super(OFKitSaleOrderLine, self).product_uom_change()
 		self._refresh_price_unit()
 
-	@api.onchange('pricing')
-	def _onchange_pricing(self):
+	@api.onchange('of_pricing')
+	def _onchange_of_pricing(self):
 		self.ensure_one()
-		if self.pricing:
+		if self.of_pricing:
 			if self.kit_id:
-				self.kit_id.write({'pricing': self.pricing})
+				self.kit_id.write({'of_pricing': self.of_pricing})
 				self._refresh_price_unit()
 
-	@api.onchange('is_kit')
-	def _onchange_is_kit(self):
+	@api.onchange('of_is_kit')
+	def _onchange_of_is_kit(self):
 		new_vals = {}
 		if self.kit_id:  # former product was a kit -> unlink it's kit_id
 			self.kit_id.write({"to_unlink": True})
 			new_vals["kit_id"] = False
 			new_vals["sale_kits_to_unlink"] = True
-		if self.is_kit:  # checkbox got checked
-			if not self.product_id.is_kit: # a product that is not a kit is being made into a kit
+		if self.of_is_kit:  # checkbox got checked
+			if not self.product_id.of_is_kit: # a product that is not a kit is being made into a kit
 				# we create a component with current product (for procurements, kits are ignored)
 				#comp_name = self.product_id.name_get()[0][1] or self.product_id.name
 				new_comp_vals = {
@@ -173,28 +174,35 @@ class OFKitSaleOrderLine(models.Model):
                     'hide_prices': False,
 					}
 				sale_kit_vals = {
-					'pricing': 'computed',
+					'of_pricing': 'computed',
 					'kit_line_ids': [(0, 0, new_comp_vals)],
 					}
 				new_vals["kit_id"] = self.env["of.saleorder.kit"].create(sale_kit_vals)
-				new_vals["pricing"] = "computed"
+				new_vals["of_pricing"] = "computed"
 			else: # can happen if uncheck then recheck a kit
-				new_vals['pricing'] = self.product_id.pricing
+				new_vals['of_pricing'] = self.product_id.of_pricing
 				sale_kit_vals = self.product_id.get_sale_order_kit_data()
 				new_vals["kit_id"] = self.env["of.saleorder.kit"].create(sale_kit_vals)
 
 		else: # a product that was a kit is not anymore, we unlink its components
-			new_vals["pricing"] = 'fixed'
+			new_vals["of_pricing"] = 'fixed'
 			new_vals["price_unit"] = self.product_id.list_price
 		self.update(new_vals)
 		self._refresh_price_unit()
+
+	"""@api.onchange('kit_id')
+	def _onchange_kit_id(self):
+		self.ensure_one()
+		if self.kit_id:
+			self._compute_price_comps()
+			self._refresh_price_unit()"""
 
 	@api.multi
 	def _action_procurement_create(self):
 		"""
 		Creates a procurement order for lines in self. Call ._action_procurement_create() on components.
 		"""
-		lines = self.filtered(lambda line:not line.is_kit) # get all lines in self that are not kits
+		lines = self.filtered(lambda line:not line.of_is_kit) # get all lines in self that are not kits
 		res_order_lines = super(OFKitSaleOrderLine, lines)._action_procurement_create() # create POs for those lines
 
 		kits = self - lines # get all lines that are kits
@@ -210,7 +218,7 @@ class OFKitSaleOrderLine(models.Model):
 		hack because of mrp_bom vs sale order lines that are kit made from BoMs
 		"""
 		self.ensure_one()
-		if not self.is_kit:
+		if not self.of_is_kit:
 			qty = super(OFKitSaleOrderLine, self)._get_delivered_qty()
 			return qty
 		if not self._all_comps_delivered():
@@ -224,7 +232,7 @@ class OFKitSaleOrderLine(models.Model):
 		check if all components were delivered entirely.
 		"""
 		self.ensure_one()
-		#components = self.env['sale.order.line.comp'].search([('order_line_id', '=', self.id), ('is_kit', '=', False)]) # get all comps that are not kits
+		#components = self.env['sale.order.line.comp'].search([('order_line_id', '=', self.id), ('of_is_kit', '=', False)]) # get all comps that are not kits
 		components = self.kit_id.kit_line_ids or []
 		precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
 		for comp in components:
@@ -236,18 +244,18 @@ class OFKitSaleOrderLine(models.Model):
 	def _prepare_invoice_line(self, qty):
 		"""
 		Prepare the dict of values to create the new invoice line for a sales order line.
-		override to add 'is_kit' and 'pricing' fields. Components will be loaded after creation of the line.
+		override to add 'of_is_kit' and 'of_pricing' fields. Components will be loaded after creation of the line.
 		
 		:param qty: float quantity to invoice
 		"""
 		self.ensure_one()
 		res = super(OFKitSaleOrderLine, self)._prepare_invoice_line(qty)
-		if self.is_kit:
-			res['is_kit'] = True
-			res['pricing'] = self.pricing
+		if self.of_is_kit:
+			res['of_is_kit'] = True
+			res['of_pricing'] = self.of_pricing
 		else:
-			res['pricing'] = 'fixed'
-			res['is_kit'] = False
+			res['of_pricing'] = 'fixed'
+			res['of_is_kit'] = False
 		return res
 
 	@api.multi
@@ -263,7 +271,7 @@ class OFKitSaleOrderLine(models.Model):
 		kit_lines = self.env['sale.order.line']
 		other_lines = self.env['sale.order.line']
 		for line in self:
-			if line.is_kit:
+			if line.of_is_kit:
 				kit_lines |= line
 			else:
 				other_lines |= line
@@ -283,13 +291,13 @@ class OFKitSaleOrderLine(models.Model):
 				# now new_line has an id
 				new_line.init_kit_from_so_line(line.id)
 
-	"""@api.depends('product_id', 'purchase_price', 'product_uom_qty', 'price_unit', 'cost_compo')
+	"""@api.depends('product_id', 'purchase_price', 'product_uom_qty', 'price_unit', 'cost_comps')
 	def _product_margin(self):
 		# Override of function from sale_margin
 		for line in self:
 			currency = line.order_id.pricelist_id.currency_id
-			if line.is_kit:
-				cost = line.cost_compo or line.product_id.cost_compo
+			if line.of_is_kit:
+				cost = line.cost_comps or line.product_id.cost_comps
 			else:
 				cost = line.purchase_price or line.product_id.standard_price
 			line.margin = currency.round(line.price_subtotal - (cost * line.product_uom_qty))
@@ -298,8 +306,8 @@ class OFKitSaleOrderLine(models.Model):
 		# Override of function from sale_margin
 		frm_cur = self.env.user.company_id.currency_id
 		to_cur = order_id.pricelist_id.currency_id
-		if product_id.is_kit:
-			purchase_price = product_id.cost_compo
+		if product_id.of_is_kit:
+			purchase_price = product_id.cost_comps
 		else:
 			purchase_price = product_id.standard_price
 		if product_uom_id != product_id.uom_id:
@@ -315,7 +323,7 @@ class OFKitSaleOrderLine(models.Model):
 			self.env["of.saleorder.kit"].search([("to_unlink", "=", True)]).unlink()
 			vals.pop("sale_kits_to_unlink")
 		line = super(OFKitSaleOrderLine, self).create(vals)
-		sale_kit_vals = {'order_line_id': line.id, 'name': line.name, 'pricing': line.pricing}
+		sale_kit_vals = {'order_line_id': line.id, 'name': line.name, 'of_pricing': line.of_pricing}
 		line.kit_id.write(sale_kit_vals)
 		return line
 
@@ -331,15 +339,15 @@ class OFKitSaleOrderLine(models.Model):
 		elif len(self) == 1 and vals.get("name") and self.kit_id:
 			# line changed name
 			update_ol_id = True
-		elif 'pricing' in vals:
+		elif 'of_pricing' in vals:
 			update_ol_id = True
 		super(OFKitSaleOrderLine, self).write(vals)
 		if update_ol_id:
 			sale_kit_vals = {'order_line_id': self.id}
 			if vals.get("name"):
 				sale_kit_vals["name"] = vals.get("name")
-			if vals.get("pricing"):
-				sale_kit_vals["pricing"] = vals.get("pricing")
+			if vals.get("of_pricing"):
+				sale_kit_vals["of_pricing"] = vals.get("of_pricing")
 			self.kit_id.write(sale_kit_vals)
 
 class OFSaleOrderKit(models.Model):
@@ -352,13 +360,13 @@ class OFSaleOrderKit(models.Model):
 
 	qty_order_line = fields.Float(string="Order Line Qty", related="order_line_id.product_uom_qty", readonly=True)
 	currency_id = fields.Many2one(related='order_line_id.currency_id', store=True, string='Currency', readonly=True)
-	price_compo = fields.Monetary('Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_compo',
+	price_comps = fields.Monetary('Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
 							help="Sum of the prices of all components necessary for 1 unit of this kit", oldname="unit_compo_price")
-	cost_compo = fields.Monetary('Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_compo',
+	cost_comps = fields.Monetary('Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
                                   help="Sum of the costs of all components necessary for 1 unit of this kit")
 
 	to_unlink = fields.Boolean(string="to unlink?", default=False)
-	pricing = fields.Selection([
+	of_pricing = fields.Selection([
         ('fixed', 'Fixed'),
         ('computed', 'Computed')
         ], string="Pricing", required=True, default='computed',
@@ -368,7 +376,7 @@ class OFSaleOrderKit(models.Model):
 
 	@api.multi
 	@api.depends('kit_line_ids')
-	def _compute_price_compo(self):
+	def _compute_price_comps(self):
 		for kit in self:
 			price = 0.0
 			cost = 0.0
@@ -376,8 +384,8 @@ class OFSaleOrderKit(models.Model):
 				for comp in kit.kit_line_ids:
 					price += comp.price_unit * comp.qty_per_kit
 					cost += comp.cost_unit * comp.qty_per_kit
-				kit.price_compo = price
-				kit.cost_compo = cost
+				kit.price_comps = price
+				kit.cost_comps = cost
 
 	@api.multi
 	def _prepare_account_kit(self, inv_line_id):
@@ -390,7 +398,7 @@ class OFSaleOrderKit(models.Model):
 		account_kit_vals = {
 			#'order_kit_id': self.id,
 			'name': self.name,
-			'pricing': self.pricing,
+			'of_pricing': self.of_pricing,
 			'invoice_line_id': inv_line_id,
 			'to_unlink': self.to_unlink,
 			}
@@ -451,7 +459,7 @@ class OFSaleOrderKitLine(models.Model):
 							help="Price of this component total quantity. Equal to total quantity * unit price.", oldname="price_per_line_total")
 	price_per_kit = fields.Monetary(string='Price/Kit', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices', 
 							help="Price of this component quantity necessary to make one unit of its order line kit. Equal to quantity per kit unit * unit price.")
-	kit_pricing = fields.Selection(related="kit_id.pricing", readonly=True)
+	kit_pricing = fields.Selection(related="kit_id.of_pricing", readonly=True)
 	hide_prices = fields.Boolean(string="Hide prices", default=False)
 	state = fields.Selection([
         ('draft', 'Quotation'),
@@ -464,7 +472,7 @@ class OFSaleOrderKitLine(models.Model):
 	customer_lead = fields.Float(
 	    'Delivery Lead Time', required=True, default=0.0,
 	    help="Number of days between the order confirmation and the shipping of the products to the customer")
-	procurement_ids = fields.One2many('procurement.order', 'sale_comp_id', string='Procurements')
+	procurement_ids = fields.One2many('procurement.order', 'of_sale_comp_id', string='Procurements')
 
 	qty_delivered = fields.Float(string='Delivered Qty', copy=False, digits=dp.get_precision('Product Unit of Measure'), default=0.0)
 
@@ -481,7 +489,7 @@ class OFSaleOrderKitLine(models.Model):
 				'customer_lead': self.product_id.sale_delay,
 			}
 			if self.kit_id.order_line_id:
-				if self.kit_id.order_line_id.pricing == 'fixed':
+				if self.kit_id.order_line_id.of_pricing == 'fixed':
 					hide_prices = True
 				else:
 					hide_prices = False
@@ -523,7 +531,7 @@ class OFSaleOrderKitLine(models.Model):
             'route_ids': self.kit_id.order_line_id.route_id and [(4, self.route_id.id)] or [],
             'warehouse_id': self.order_id.warehouse_id and self.order_id.warehouse_id.id or False,
             'partner_dest_id': self.order_id.partner_shipping_id.id,
-            'sale_comp_id': self.id,
+            'of_sale_comp_id': self.id,
 		}
 
 	@api.multi
