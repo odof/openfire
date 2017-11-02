@@ -201,7 +201,7 @@ class of_import(models.Model):
             else:
                 # Vérification que le champ relation (si est indiqué) est correct.
                 if champ_relation and champs_odoo[champ_fichier]['type'] in ('many2one') and not champs_odoo[champ_fichier]['relation_champ']:
-                    if not self.env['ir.model.fields'].search(['&',('model','=', model),('name','=',champ_relation)]):
+                    if not self.env['ir.model.fields'].search(['&',('model','=', champs_odoo[champ_fichier]['relation']),('name','=',champ_relation)]):
                         sortie_erreur += u"Le champ relation \"%s\" (après le /) de la colonne \"%s\" n'existe pas.\n" % (champ_relation, champ_fichier)
                         erreur = 1
                     else:
@@ -344,7 +344,7 @@ class of_import(models.Model):
                             if len(res_ids) == 1:
                                 valeurs[champ_fichier_sansrel] = res_ids.id
                             elif len(res_ids) > 1:
-                                sortie_erreur += u"Ligne %s : champ %s (%s) valeur \"%s\" a plusieurs correspondances. %s non importé.\n", (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], nom_objet.capitalize())
+                                sortie_erreur += u"Ligne %s : champ %s (%s) valeur \"%s\" a plusieurs correspondances. %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], nom_objet.capitalize())
                                 erreur = 1
                             else:
                                 # Si import de partenaires et champ compte comptable (client et fournisseur), on le créer.
