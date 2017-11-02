@@ -9,10 +9,10 @@
             model="of.planning.intervention"
             name="of_planning.attestation_ramonage"
             rml="of_planning/report/attestation_ramonage.rml" 
-            string="Attestation Ramonage"/>
+            string="Attestation ramonage"/>
 
 
-        <!-- wizard for sending a mail: first step -->
+        <!-- Wizard for sending a mail: first step -->
         <record id="of_planning_report_view_form" model="ir.ui.view">
             <field name="name">of_planning.impression_wizard.form</field>
             <field name="model">of_planning.impression_wizard</field>
@@ -32,7 +32,7 @@
         </record>
 
         <record model="ir.actions.act_window" id="action_of_planning_report">
-            <field name="name">Impression Interventions</field>
+            <field name="name">Impression interventions</field>
             <field name="res_model">of_planning.impression_wizard</field>
             <field name="view_type">form</field>
             <field name="view_mode">form</field>

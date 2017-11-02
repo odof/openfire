@@ -12,6 +12,7 @@ Modifications OpenFire pour les commandes fournisseur
 - Ajout du client final dans les commandes fournisseur, auto-alimenté depuis la commande client
 - Modification des documents imprimés pour l'ajout de ces informations
 - Ajout de l'impression de la commande fournisseur sans prix
+- Ajout option pour afficher la description telle que saisie dans le devis dans la commande fournisseur et les documents imprimables associés
 """,
     'depends': ['purchase', 'sale'],
     'data': [

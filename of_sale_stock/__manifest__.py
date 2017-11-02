@@ -13,12 +13,14 @@ Extension OpenFire du module sale_stock
 - Ajout du champ 'product_value' dans 'stock.inventory.line' pour le groupe Comptabilité - Gestionnaire
 - Ajout du rapport "Inventaire valorisé" dans 'stock.inventory.line' pour le groupe Comptabilité - Gestionnaire
 - Ajout d'un filtre avancé dans les devis/bons de commandes sur la date et la date de transfert du bon de livraison
+- Ajout l'option pour afficher l'article et sa description dans le bon de livraison et les documents imprimables associés.
 
-Paramètres de Ventes (sale.config.settings)
+
+Paramètres de ventes (sale.config.settings)
 -------------------------------------------
 
-- description paramètre (module(s) concerné(s))
-- inhibition avertissements de stock (of_sale_kit)
+- Description paramètre (module(s) concerné(s))
+- Inhibition avertissements de stock (of_sale_kit)
 """,
     "website": "www.openfire.fr",
     "depends": [
@@ -29,6 +31,8 @@ Paramètres de Ventes (sale.config.settings)
     "data": [
         'views/of_sale_stock_views.xml',
         'report/of_report_stockinventory_valued.xml',
+        'report/of_sale_stock_report_templates.xml',
+        'security/of_sale_stock_security.xml',
     ],
     'installable': True,
     'application': False,

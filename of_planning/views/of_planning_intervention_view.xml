@@ -90,7 +90,7 @@
                     <group expand="0" string="Regrouper par...">
                        <filter string="Utilisateur" icon="terp-personal" domain="[]" context="{'group_by' : 'user_id'}"/>
                        <filter string="Tâche" icon="terp-folder-blue" domain="[]" context="{'group_by' : 'tache_id'}"/>
-                       <filter string="Equipe" icon="terp-partner" domain="[]" context="{'group_by' : 'equipe_id'}"/>
+                       <filter string="Équipe" icon="terp-partner" domain="[]" context="{'group_by' : 'equipe_id'}"/>
                        <filter string="Intervenant" icon="terp-partner" domain="[]" context="{'group_by' : 'gb_employee_id'}"/>
                        <filter string="Magasin" icon="terp-go-home" domain="[]" context="{'group_by' : 'company_id'}"/>
                    </group>
@@ -127,7 +127,7 @@
                         <group>
                         <field name="jour"/>
                             <group col="2">
-                                <field name="equipe_id" default_focus="1" context="{'tz': 'Europe/Paris'}"/>
+                                <field name="equipe_id" autofocus="autofocus" context="{'tz': 'Europe/Paris'}"/>
                                 <field name="address_id" domain="[('customer','=',True)]" colspan="2" context="{'tz': 'Europe/Paris'}"/>
                                 <field name="user_id" context="{'tz': 'Europe/Paris'}"/>
                                 <field name="company_id" widget="selection"/>
@@ -163,14 +163,20 @@
                                     <field name="hor_dim" context="{'tz': 'Europe/Paris'}"/>
                                 </group>
                             </group>
-                            <!-- label colspan="4" string="Description" align="0.00"/ -->
-                            <separator string="Description" colspan="2"/>
-                            <field colspan="2" name="description" nolabel="1" context="{'tz': 'Europe/Paris'}" witget="html"/>
+
                             <!-- Notes intervention -->
-                            <separator string="Notes client" colspan="2"/>
-                            <field name="of_notes_client" nolabel="1"/>
                             <separator string="Notes intervention" colspan="2"/>
                             <field name="of_notes_intervention" nolabel="1"/>
+
+                            <!-- Notes client -->
+                            <separator string="Notes client" colspan="2" attrs="{'invisible': [('address_id', '=', False)]}"/>
+                            <field name="of_notes_client" nolabel="1" attrs="{'invisible': [('address_id', '=', False)]}"/>
+
+                            <!-- Description
+                            <separator string="Description" colspan="2"/>
+                            <field colspan="2" name="description" nolabel="1" context="{'tz': 'Europe/Paris'}" witget="html"/>
+                            -->
+
                         </group>
                     </sheet>
                 </form>
@@ -196,11 +202,11 @@
                     <field name="company_id"/>
                     <field name="state"/>
 
-                    <!-- Afficher les fleches pour passer a d'autres statuts -->
+                    <!-- Afficher les flèches pour passer à d'autres statuts -->
                     <button name="change_state_before" type="object" icon="gtk-go-back"/>
                     <button name="change_state_after" type="object" icon="gtk-go-forward"/>
 
-                    <!-- Afficher l'icône quand le statut est Confirmé et Réalisé -->
+                    <!-- Afficher l'icône quand le statut est confirmé et réalisé -->
                     <button name="button_confirm" type="object" icon="gtk-no" attrs="{'invisible':[('state', '!=', 'confirm')]}"/>
                     <button name="button_done" type="object" icon="gtk-apply" attrs="{'invisible':[('state', '!=', 'done')]}"/>
                     <field name="description"/>
@@ -645,9 +651,9 @@
         </record>
 
 
-<!--#################################_Ajout bouton Interventions dans Devis_############################# -->
+<!--#################################_Ajout bouton interventions dans Devis_############################# -->
 
-        <!-- Ajout bouton Interventions dans Devis -->
+        <!-- Ajout bouton interventions dans devis -->
         <record id="of_sale_view_order_form" model="ir.ui.view">
             <field name="name">of.sale.order.form</field>
             <field name="model">sale.order</field>
@@ -661,7 +667,7 @@
             </field>
         </record>
 
-        <!-- Action pour afficher interventions list -->
+        <!-- Action pour afficher leste d'interventions -->
         <record id="of_sale_order_open_interventions" model="ir.actions.act_window">
             <field name="name">Interventions</field>
             <field name="res_model">of.planning.intervention</field>

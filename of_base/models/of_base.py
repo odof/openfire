@@ -133,7 +133,8 @@ class ResPartner(models.Model):
     _inherit = "res.partner"
 
     # Notes client
-    of_notes_client = fields.Html(string="Notes client")
+    of_notes_client = fields.Html(string="Notes client", default=u"<em style='color: grey;'>Attention, ces notes sont synchronisées entre contacts, devis et plannings d'intervention.</em>",
+                                  help="Ce champ est synchronisé entre contacts, devis/bons de commande et plannings d'intervention.\nToute modification sera diffusée et synchronisée entre ces éléments.")
 
     # Pour afficher l'adresse au format français par défaut quand le pays n'est pas renseigné et non le format US
     @api.multi
@@ -166,7 +167,7 @@ class ResPartner(models.Model):
             address_format = '%(company_name)s\n' + address_format
         return address_format % args
 
-    # Pour afficher dans le menu déroulant de choix de partenaire l'adresse du contact et pas que le nom
+    # Pour afficher dans le menu déroulant du choix de partenaire l'adresse du contact et pas que le nom.
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
         if self._context.get('show_address'):
@@ -209,7 +210,7 @@ class ResPartner(models.Model):
 
     @api.model
     def _add_missing_default_values(self, values):
-        # La référence par défaut est celle du parent
+        # La référence par défaut est celle du parent.
         parent_id = values.get('parent_id')
         if parent_id and isinstance(parent_id, (int, long)) and not values.get('ref') and 'default_ref' not in self._context:
             values['ref'] = self.browse(parent_id).ref

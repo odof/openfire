@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+
 <!--##############################################################################-->
 <!--############################ ______ Ventes ______ ############################-->
 <!--##############################################################################-->
+
         <record id="of_sale_order_view_search_inherit_sale" model="ir.ui.view">
             <field name="name">of.sale.order.search.inherit.sale</field>
             <field name="model">sale.order</field>
@@ -24,13 +26,15 @@
                 <field name="date_order" position="attributes">
                     <attribute name="widget">date</attribute>
                 </field>
-                <!-- Ajout onglet Notes : Client, Facture, Intervention -->
+                <!-- Ajout onglet Notes : client, facture, intervention -->
                 <xpath expr="//notebook" position="inside">
                      <page string="Notes">
                         <separator string="Notes client" colspan="4"/>
                         <field name="of_notes_client" colspan="4" nolabel="1" widget="html"/>
-                        <separator string="Notes facture" colspan="4"/>
+                        <!--
+                        <separator string="Notes Facture" colspan="4"/>
                         <field name="of_notes_facture" colspan="4" nolabel="1" widget="html"/>
+                        -->
                         <separator string="Notes intervention" colspan="4"/>
                         <field name="of_notes_intervention" colspan="4" nolabel="1" widget="html"/>
                      </page>
@@ -45,7 +49,7 @@
             <field name="inherit_id" ref="sale.view_sales_config"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[@id='main']" position="inside">
-                    <group name="rubrique_report" string="Devis &amp; Commandes PDF">
+                    <group name="rubrique_report" string="Devis &amp; commandes PDF">
                         <label for="pdf_adresse_civilite"/>
                         <div name="pdf_afficher_civilite">
                             <field name="pdf_adresse_civilite" class="oe_inline"/>
@@ -96,6 +100,7 @@
 <!--##############################################################################-->
 <!--########################### ______ Sociétés ______ ###########################-->
 <!--##############################################################################-->
+
         <record id="of_sale_view_company_form" model="ir.ui.view">
             <field name="name">of.sale.company.form</field>
             <field name="model">res.company</field>

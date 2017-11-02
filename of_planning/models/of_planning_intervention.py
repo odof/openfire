@@ -203,7 +203,7 @@ class OfPlanningIntervention(models.Model):
         ], string=u'État', index=True, readonly=True, default='draft')
 #     state = fields.Many2one('of.planning.intervention.state', string=u"État")
     company_id = fields.Many2one('res.company', string='Magasin', default=lambda self: self.env.user.company_id.id)
-    description = fields.Html(string='Description')
+    description = fields.Html(string='Description') # Non utilisé, changé pour notes intervention
     hor_md = fields.Float(string=u'Matin début', required=True, digits=(12, 5))
     hor_mf = fields.Float(string='Matin fin', required=True, digits=(12, 5))
     hor_ad = fields.Float(string=u'Après-midi début', required=True, digits=(12, 5))
