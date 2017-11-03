@@ -12,12 +12,12 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@name='options']" position="inside">
                 <div>
-                    <field name="of_is_kit" attrs="{'readonly': [('is_comp', '=', True)]}"/>
+                    <field name="of_is_kit" attrs="{'readonly': [('is_kit_comp', '=', True)]}"/>
                     <label for="of_is_kit"/>
                 </div>
                 <div>
-                    <field name="is_comp" invisible="1"/>
-                    <!--label for="is_comp" groups="base.group_no_one"/-->
+                    <field name="is_kit_comp" invisible="1"/>
+                    <!--label for="is_kit_comp" groups="base.group_no_one"/-->
                 </div>
             </xpath>
             <xpath expr="//group[@name='group_general']" position="inside">
@@ -172,7 +172,7 @@
              <xpath expr="//filter[@name='filter_to_purchase']" position="after">
                  <separator/>
                  <filter string="Kits" name="kits" domain="[('of_is_kit','=',True)]"/>
-                 <filter string="Comps" name="comps" domain="[('is_comp','=',True)]"/>
+                 <filter string="Comps" name="comps" domain="[('is_kit_comp','=',True)]"/>
              </xpath>
          </field>
     </record>

@@ -190,12 +190,12 @@ class OFKitSaleOrderLine(models.Model):
 		self.update(new_vals)
 		self._refresh_price_unit()
 
-	"""@api.onchange('kit_id')
+	@api.onchange('kit_id')
 	def _onchange_kit_id(self):
 		self.ensure_one()
 		if self.kit_id:
 			self._compute_price_comps()
-			self._refresh_price_unit()"""
+			self._refresh_price_unit()
 
 	@api.multi
 	def _action_procurement_create(self):
@@ -349,6 +349,9 @@ class OFKitSaleOrderLine(models.Model):
 			if vals.get("of_pricing"):
 				sale_kit_vals["of_pricing"] = vals.get("of_pricing")
 			self.kit_id.write(sale_kit_vals)
+		if len(self) == 1 and self.pricing == 'computed' and self.price_unit != self.price_comps:
+			self._refresh_price_unit()
+		return True
 
 class OFSaleOrderKit(models.Model):
 	_name = 'of.saleorder.kit'

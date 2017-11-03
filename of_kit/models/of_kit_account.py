@@ -112,6 +112,13 @@ class OFKitAccountInvoiceLine(models.Model):
                 self.kit_id.write({'of_pricing': self.of_pricing})
                 self._refresh_price_unit()
 
+    @api.onchange('kit_id')
+    def _onchange_kit_id(self):
+        self.ensure_one()
+        if self.kit_id:
+            self._compute_price_comps()
+            self._refresh_price_unit()
+
     @api.depends('kit_id.kit_line_ids')
     def _compute_price_comps(self):
         for line in self:
@@ -221,6 +228,8 @@ class OFKitAccountInvoiceLine(models.Model):
             if vals.get("name"):
                 account_kit_vals["name"] = vals.get("name")
             self.kit_id.write(account_kit_vals)
+        if len(self) == 1 and self.pricing == 'computed' and self.price_unit != self.price_comps:
+            self._refresh_price_unit()
         return True
 
 class OFAccountInvoiceKit(models.Model):
