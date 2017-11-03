@@ -24,7 +24,7 @@ var FieldOne2One = FieldMany2One.extend({
 
     init: function(field_manager, node) {
     	this._super.apply(this, arguments);
-        console.log("FieldOne2One init this and arguments: ",this,arguments);
+        //console.log("FieldOne2One init this and arguments: ",this,arguments);
 
     },
 
@@ -60,6 +60,13 @@ var FieldOne2One = FieldMany2One.extend({
 	                    self.focus();
 	                    self.trigger('changed_value');
 	                });
+	                pop.on('record_saved', self, function(){  //
+	                    self.display_value = {};
+	                    self.display_value_backup = {};
+	                    self.render_value();
+	                    self.focus();
+	                    self.trigger('changed_value');
+	                });
 	            });
 	        });
         }else{
@@ -76,12 +83,13 @@ var FieldOne2One = FieldMany2One.extend({
 	                    view_id: view_id,
 	                    readonly: self.get('effective_readonly'),
 	                }).open();
-	                pop.on('write_completed', self, function(){
+	                pop.on('record_saved', self, function(){
 	                    self.display_value = {};
 	                    self.display_value_backup = {};
 	                    self.render_value();
 	                    self.focus();
 	                    self.trigger('changed_value');
+	                    //console.log("record_saved B self: ",self);
 	                });
 	            });
 	        });
