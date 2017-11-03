@@ -9,7 +9,7 @@ class OFKitProductTemplate(models.Model):
     _inherit = "product.template"
 
     of_is_kit = fields.Boolean(string="Is a kit")
-    is_comp = fields.Boolean(string="Is a comp", compute="_compute_is_comp", store=True, help="is a component of a kit")  # store=True for domain searches and _sq_constraint
+    is_kit_comp = fields.Boolean(string="Is a comp", compute="_compute_is_kit_comp", store=True, help="is a component of a kit")  # store=True for domain searches and _sq_constraint
     kit_line_ids = fields.One2many('of.product.kit.line', 'kit_id', string='Components')
 
     price_comps = fields.Monetary('Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_compo_price_n_cost',
@@ -32,7 +32,7 @@ class OFKitProductTemplate(models.Model):
     comp_count = fields.Integer('# Comps', compute='_compute_comp_count')
 
     _sql_constraints = [
-        ('kit_n_comp_constraint', 'CHECK ( NOT(of_is_kit AND is_comp) )', _('A product can not be a kit and a kit component at the same time !'))
+        ('kit_n_comp_constraint', 'CHECK ( NOT(of_is_kit AND is_kit_comp) )', _('A product can not be a kit and a kit component at the same time !'))
     ]
 
     def get_account_invoice_kit_data(self):
@@ -141,12 +141,12 @@ class OFKitProductTemplate(models.Model):
             res['cost'] += line.product_id.standard_price * line.product_qty
         return res
 
-    def _compute_is_comp(self):
+    def _compute_is_kit_comp(self):
         # this method will be called upon creation or change of a kit_line for its related product (workaround store=True)
-        read_group_res = self.env['product.product'].read_group([('product_tmpl_id', 'in', self.ids), ('is_comp', '=', True)], ['product_tmpl_id'], ['product_tmpl_id'])
+        read_group_res = self.env['product.product'].read_group([('product_tmpl_id', 'in', self.ids), ('is_kit_comp', '=', True)], ['product_tmpl_id'], ['product_tmpl_id'])
         mapped_data = dict([(data['product_tmpl_id'][0], data['product_tmpl_id_count']) for data in read_group_res])
         for product_tmpl in self:
-            product_tmpl.is_comp = mapped_data.get(product_tmpl.id, 0) > 0
+            product_tmpl.is_kit_comp = mapped_data.get(product_tmpl.id, 0) > 0
 
     def _compute_kit_count(self):
         all_variants = self.env['product.product'].search([('product_tmpl_id', 'in', self.ids)])
@@ -157,10 +157,10 @@ class OFKitProductTemplate(models.Model):
             for variant in product_tmpl.product_variant_ids:
                 kit_count += variant.kit_count
             product_tmpl.kit_count = kit_count
-            if (not product_tmpl.is_comp and kit_count > 0) or (product_tmpl.is_comp and kit_count == 0):  # product_tmpl needs its is_comp field updated
+            if (not product_tmpl.is_kit_comp and kit_count > 0) or (product_tmpl.is_kit_comp and kit_count == 0):  # product_tmpl needs its is_kit_comp field updated
                 templates |= product_tmpl
         if len(templates) > 0:
-            templates._compute_is_comp()
+            templates._compute_is_kit_comp()
 
     @api.multi
     def action_view_kits(self):
@@ -172,7 +172,7 @@ class OFKitProductProduct(models.Model):
     _inherit = "product.product"
 
     kit_count = fields.Integer('# Kits', compute='_compute_kit_count')
-    is_comp = fields.Boolean(string="Is a comp", compute="_compute_is_comp", store=True, help="is a component of a kit")  # store=True for domain searches and _sq_constraint
+    is_kit_comp = fields.Boolean(string="Is a comp", compute="_compute_is_kit_comp", store=True, help="is a component of a kit")  # store=True for domain searches and _sq_constraint
 
     def _compute_kit_count(self):
         read_group_res = self.env['of.product.kit.line'].read_group([('product_id', 'in', self.ids)], ['product_id'], ['product_id'])
@@ -192,15 +192,15 @@ class OFKitProductProduct(models.Model):
         self.ensure_one()
         return self.product_tmpl_id.get_account_invoice_kit_data()
 
-    def _compute_is_comp(self):
+    def _compute_is_kit_comp(self):
         # this method will be called upon creation or change of a kit_line for its related product (workaround store=True)
         read_group_res = self.env['of.product.kit.line'].read_group([('product_id', 'in', self.ids)], ['product_id'], ['product_id'])
         mapped_data = dict([(data['product_id'][0], data['product_id_count']) for data in read_group_res])
         templates = self.env["product.template"]
         for product in self:
-            product.is_comp = mapped_data.get(product.id, 0) > 0
+            product.is_kit_comp = mapped_data.get(product.id, 0) > 0
             templates |= product.product_tmpl_id
-        templates._compute_is_comp()
+        templates._compute_is_kit_comp()
 
 class OFKitProductKitLine(models.Model):
     _name = "of.product.kit.line"
@@ -210,7 +210,7 @@ class OFKitProductKitLine(models.Model):
         return self.env['product.uom'].search([], limit=1, order='id').id
 
     #name = fields.Char(string="Name", required=True)
-    kit_id = fields.Many2one("product.template", string="Kit",  domain="[('is_comp', '=', False)]",
+    kit_id = fields.Many2one("product.template", string="Kit",  domain="[('is_kit_comp', '=', False)]",
                              help="Kit containing this as component", ondelete="cascade")
     product_id = fields.Many2one("product.product", string="Product", domain="[('of_is_kit', '=', False)]", required=True,
                                  help="Product this line references")
@@ -231,7 +231,7 @@ class OFKitProductKitLine(models.Model):
     def create(self, vals):
         line = super(OFKitProductKitLine, self).create(vals)
         line.kit_id.type = 'service'
-        line.product_id._compute_is_comp()
+        line.product_id._compute_is_kit_comp()
         #line.product_id._compute_kit_count()
         return line
 
@@ -243,7 +243,7 @@ class OFKitProductKitLine(models.Model):
         super(OFKitProductKitLine, self).write(vals)
         if len(self) == 1 and 'product_id' in vals:
             products |= self.product_id
-            products._compute_is_comp()
+            products._compute_is_kit_comp()
         if len(self) == 1 and 'kit_id' in vals:
             self.kit_id.type = 'service'
         return True
@@ -254,7 +254,7 @@ class OFKitProductKitLine(models.Model):
         for kit_line in self:
             products |= kit_line.product_id
         super(OFKitProductKitLine, self).unlink()
-        products._compute_is_comp()
+        products._compute_is_kit_comp()
 
 class OFKitProcurementOrder(models.Model):
     _inherit = 'procurement.order'
