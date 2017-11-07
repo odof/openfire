@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, models, fields
+from odoo.addons.account.models.account_invoice import TYPE2JOURNAL
 
 class Company(models.Model):
     _inherit = 'res.company'
@@ -23,9 +24,37 @@ class Company(models.Model):
     @api.model
     def _company_default_get(self, object=False, field=False):
         res = super(Company, self)._company_default_get(object, field)
+        # Dans le cadre de la recherche d'un compte comptable, la société voulue est la société comptable.
         if object == 'account.account' and not field:
             res = res.accounting_company_id
         return res
+
+class AccountInvoice(models.Model):
+    _inherit = 'account.invoice'
+
+    @api.model
+    def _default_journal(self):
+        journal = super(AccountInvoice, self)._default_journal()
+        # Code modifié de la fonction account_invoice._default_journal() pour recherche sur la société comptable
+        if not journal:
+            company_id = self._context.get('company_id', self.env.user.company_id.id)
+            company = self.env['res.company'].browse(company_id)
+            if company != company.accounting_company_id:
+                # Code copié de account.invoice._default_journal() définie dans le module account
+                inv_type = self._context.get('type', 'out_invoice')
+                inv_types = inv_type if isinstance(inv_type, list) else [inv_type]
+                domain = [
+                    ('type', 'in', filter(None, map(TYPE2JOURNAL.get, inv_types))),
+                    ('company_id', '=', company.accounting_company_id.id),
+                ]
+                journal = self.env['account.journal'].search(domain, limit=1)
+        return journal
+
+    accounting_company_id = fields.Many2one(
+        'res.company', related='company_id.accounting_company_id', string=u"Société comptable")
+    journal_id = fields.Many2one('account.journal',
+        default=lambda self: self._default_journal(),
+        domain="[('type', 'in', {'out_invoice': ['sale'], 'out_refund': ['sale'], 'in_refund': ['purchase'], 'in_invoice': ['purchase']}.get(type, [])), ('company_id', 'in', (company_id, accounting_company_id))]")
 
 class AccountAccount(models.Model):
     _inherit = 'account.account'

@@ -20,6 +20,7 @@ Personnalisation de la multi-société :
     'category' : "OpenFire",
     'data' : [
         'security/of_base_multicompany_security.xml',
+        'views/account_invoice_view.xml',
     ],
     'installable': True,
     'application': False,
