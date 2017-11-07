@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Invoices -->
+        <!--
+            IMPORTANT
+            Les deux vues suivantes ont le paramètre priority=1 pour être appliquées avant toute autre modification sur la vue parente.
+            Pour la même raison ces deux vues ne doivent pas contenir de suppression/déplacement de champ.
+         -->
+        <record id="of_multicompany_invoice_supplier_form" model="ir.ui.view">
+            <field name="name">of.multicompany.account.invoice.supplier.form</field>
+            <field name="model">account.invoice</field>
+            <field name="priority" eval="1"/>
+            <field name="inherit_id" ref="account.invoice_supplier_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook/page[last()]//field[@name='company_id']" position="after">
+                    <field name="accounting_company_id" invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='account_id']" position="attributes">
+                    <attribute name="domain">[('company_id', '=', parent.accounting_company_id), ('internal_type', '=', 'other'), ('deprecated', '=', False)]</attribute>
+                </xpath>
+                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='account_analytic_id']" position="attributes">
+                    <attribute name="domain">[('company_id', '=', parent.accounting_company_id)]</attribute>
+                </xpath>
+                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='invoice_line_tax_ids']" position="attributes">
+                    <attribute name="domain">[('type_tax_use','=','purchase'),('company_id', '=', parent.accounting_company_id)]</attribute>
+                </xpath>
+                <xpath expr="//field[@name='tax_line_ids']/tree/field[@name='account_analytic_id']" position="attributes">
+                    <attribute name="domain">[('company_id', '=', parent.accounting_company_id)]</attribute>
+                </xpath>
+                <xpath expr="//notebook/page[last()]//field[@name='account_id']" position="attributes">
+                    <attribute name="domain">[('company_id', '=', accounting_company_id), ('internal_type', '=', 'payable'), ('deprecated', '=', False)]</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_multicompany_invoice_form" model="ir.ui.view">
+            <field name="name">of.multicompany.account.invoice.form</field>
+            <field name="model">account.invoice</field>
+            <field name="priority" eval="1"/>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook/page[last()]//field[@name='company_id']" position="after">
+                    <field name="accounting_company_id" invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='account_id']" position="attributes">
+                    <attribute name="domain">[('company_id', '=', parent.accounting_company_id), ('internal_type', '=', 'other')]</attribute>
+                </xpath>
+                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='account_analytic_id']" position="attributes">
+                    <attribute name="domain">[('company_id', '=', parent.accounting_company_id)]</attribute>
+                </xpath>
+                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='invoice_line_tax_ids']" position="attributes">
+                    <attribute name="domain">[('type_tax_use','=','sale'),('company_id', '=', parent.accounting_company_id)]</attribute>
+                </xpath>
+                <xpath expr="//notebook/page[last()]//field[@name='account_id']" position="attributes">
+                    <attribute name="domain">[('company_id', '=', accounting_company_id), ('internal_type', '=', 'receivable'), ('deprecated', '=', False)]</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_multicompany_view_invoice_line_form" model="ir.ui.view">
+            <field name="name">of.multicompany.account.invoice.line.form</field>
+            <field name="model">account.invoice.line</field>
+            <field name="inherit_id" ref="account.view_invoice_line_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='account_id']" position="attributes">
+                    <attribute name="domain">[('company_id', '=', parent.accounting_company_id)]</attribute>
+                </xpath>
+                <xpath expr="//field[@name='invoice_line_tax_ids']" position="attributes">
+                    <attribute name="domain">[('type_tax_use','!=','none'),('company_id', '=', parent.accounting_company_id)]</attribute>
+                </xpath>
+                <xpath expr="//field[@name='account_analytic_id']" position="attributes">
+                    <attribute name="domain">[('company_id', '=', parent.accounting_company_id)]</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_multicompany_view_invoice_tax_form" model="ir.ui.view">
+            <field name="name">of.multicompany.account.invoice.tax.form</field>
+            <field name="model">account.invoice.tax</field>
+            <field name="inherit_id" ref="account.view_invoice_tax_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='account_analytic_id']" position="attributes">
+                    <attribute name="domain">[('company_id', '=', parent.accounting_company_id)]</attribute>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>
