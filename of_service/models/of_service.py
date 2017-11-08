@@ -3,32 +3,15 @@
 from odoo import api, models, fields
 from datetime import date
 
-
-class OfMois(models.Model):
-    _name = 'of.mois'
-    _description = u"Mois de l'année"
-    _order = 'id'
-
-    name = fields.Char('Mois', size=16)
-    abr = fields.Char(u'Abréviation', size=16)
-
-
-class OfJours(models.Model):
-    _name = 'of.jours'
-    _description = "Jours de la semaine"
-    _order = 'id'
-
-    name = fields.Char('Jour', size=16)
-    abr = fields.Char(u'Abréviation', size=16)
-
-
 class OfService(models.Model):
     _name = "of.service"
     _description = "Service"
 
     def _get_default_jours(self):
         # Lundi à vendredi comme valeurs par défaut
-        return [1, 2, 3, 4, 5]
+        jours = self.env['of.jours'].search([('numero', 'in', (1,2,3,4,5))], order="numero")
+        res = [jour.id for jour in jours]
+        return res
 
     def _search_mois(self, operator, value):
         mois = self.env['of.mois'].search(['|', ('name', operator, value), ('abr', operator, value)])
@@ -78,9 +61,9 @@ class OfService(models.Model):
 
     def _get_color(self):
         u""" COULEURS :
-        gris : Service dont l'adresse n'a pas de coordonnées GPS
-        rouge : Service dont la date de dernière intervention est inférieure à la date courante (ou à self._context.get('date_next_max'))
-        noir : Autres services
+        Gris  : service dont l'adresse n'a pas de coordonnées GPS
+        Rouge : service dont la date de dernière intervention est inférieure à la date courante (ou à self._context.get('date_next_max'))
+        Noir  : autres services
         """
         date_next_max = self._context.get('date_next_max') or fields.Date.today()
 
@@ -92,8 +75,8 @@ class OfService(models.Model):
             else:
                 service.color = 'black'
 
-#    template_id = fields.Many2one('of.mail.template', string='Contrat')
-    partner_id = fields.Many2one('res.partner', string='Partenaire', ondelete='cascade')
+    # template_id = fields.Many2one('of.mail.template', string='Contrat')
+    partner_id = fields.Many2one('res.partner', string='Partenaire', ondelete='restrict')
     address_id = fields.Many2one('res.partner', string="Adresse", ondelete='restrict')
 
     # 3 champs ajoutés pour la vue map
@@ -118,7 +101,8 @@ class OfService(models.Model):
     state = fields.Selection([
         ('progress', 'En cours'),
         ('cancel', u'Annulé'),
-        ], u'État', default='progress')
+        ], u'État')
+    active = fields.Boolean(string="Active", default=True)
 
     planning_ids = fields.One2many('of.planning.intervention', compute='_get_planning_ids', string="Interventions")
     date_last = fields.Date(u'Dernière intervention', compute='_get_planning_ids', search='_search_last_date', help=u"Date de la dernière intervention")
@@ -138,24 +122,26 @@ class OfService(models.Model):
         #       avant que l'utilisateur ait confirmé son choix.
         #     Cette fonction doit donc être autorisée à écraser le mois déjà saisi
         #     Pour éviter les ennuis, elle est donc restreinte à un usage en mode création de nouveau service uniquement
-        if self.date_next and isinstance(self.id, models.NewId):
-            mois_id = int(self.date_next[5:7])
-            self.mois_ids = [(4, mois_id)]
+        if self.date_next and not self._origin:  # <- signifie mode creation
+            mois = self.env['of.mois'].search([('numero', '=', int(self.date_next[5:7]))])
+            mois_id = mois[0] and mois[0].id or False
+            if mois_id:
+                self.mois_ids = [(4, mois_id, 0)]
 
     @api.multi
     def get_next_date(self, date_str):
         self.ensure_one()
-        mois_ids = [mois.id for mois in self.mois_ids]
+        mois_nums = self.mois_ids.mapped('numero')
 
         date_date = fields.Date.from_string(max(date_str, self.date_last))
         date_mois = date_date.month
         date_annee = date_date.year
 
-        if (date_mois not in mois_ids) and (date_mois+1 in mois_ids):
+        if (date_mois not in mois_nums) and (date_mois+1 in mois_nums):
             # Le rdv a été pris en avance pour le mois suivant
             date_mois += 1
 
-        mois = min(mois_ids, key=lambda m: (m <= date_mois, m))
+        mois = min(mois_nums, key=lambda m: (m <= date_mois, m))
         annee = date_annee + (mois <= date_mois)
         return fields.Date.to_string(date(annee, mois, 1))
 
@@ -166,14 +152,6 @@ class OfService(models.Model):
             partner = address.parent_id or address
             vals['partner_id'] = partner.id
         return super(OfService, self).create(vals)
-
-    @api.multi
-    def button_progress(self):
-        self.write({'state': 'progress'})
-
-    @api.multi
-    def button_cancel(self):
-        self.write({'state': 'cancel'})
 
     @api.model
     def search(self, args, offset=0, limit=None, order=None, count=False):
@@ -188,6 +166,6 @@ class OfService(models.Model):
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    service_address_ids = fields.One2many('of.service', 'address_id', string='Services')
-    service_partner_ids = fields.One2many('of.service', 'partner_id', string='Services du partenaire',
+    service_address_ids = fields.One2many('of.service', 'address_id', string='Services', context={'active_test':False})
+    service_partner_ids = fields.One2many('of.service', 'partner_id', string='Services du partenaire', context={'active_test':False},
                                           help="Services liés au partenaire, incluant les services des contacts associés")

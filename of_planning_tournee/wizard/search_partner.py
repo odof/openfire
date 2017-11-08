@@ -79,13 +79,13 @@ class of_search_partner(osv.osv_memory):
                 # chercher tous les clients (adresse livraison) avec service valide dans ce secteur
                 # service valide: service en cours
                 if with_service and (not without_service):
-                    cr.execute("SELECT DISTINCT partner_id from of_service WHERE state='progress'")
+                    cr.execute("SELECT DISTINCT partner_id from of_service WHERE active='t'")
                     partner_service_ids = map(lambda x: x[0], cr.fetchall())
                     partner_confirm_ids = list(set(partner_service_ids) & set(all_partner_ids))
                     
                 # tous les clients sans services ou avec service annule
                 elif without_service and (not with_service):
-                    cr.execute("SELECT DISTINCT partner_id from of_service WHERE state='progress'")
+                    cr.execute("SELECT DISTINCT partner_id from of_service WHERE active='t'")
                     partner_service_ids = map(lambda x: x[0], cr.fetchall())
                     partner_confirm_ids = list(set(all_partner_ids) - set(partner_service_ids))
                 else:
