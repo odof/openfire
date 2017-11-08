@@ -1,0 +1,8 @@
+<templates>
+
+<t t-name="OFFieldColorIndex">
+    <!-- ajouter éléments qweb et html: globalement on veut une boite colorée -->
+    <!-- voir web/static/src/xml/base.xml/FieldMany2ManyTag -->
+</t>
+
+</templates>
