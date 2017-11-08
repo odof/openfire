@@ -14,14 +14,14 @@
 
         <!-- wizard for sending a mail: first step -->
         <record id="of_planning_report_view_form" model="ir.ui.view">
-            <field name="name">of.planning.report.form</field>
-            <field name="model">of.planning.report</field>
+            <field name="name">of_planning.impression_wizard.form</field>
+            <field name="model">of_planning.impression_wizard</field>
             <field name="arch" type="xml">
                 <form string="Imprimer le planning des interventions">
                     <group>
                         <field name="type"/>
                         <field name="date_start"/>
-                        <field name="equipe_ids" widget="many2many_tags"/>
+                        <field name="equipe_ids" widget="many2many_tags" attrs="{'invisible': [('type','=','week2')], 'required': [('type', '!=', 'week2')]}"/>
                     </group>
                     <footer>
                         <button string="Imprimer" name="button_print" type="object" class="btn-primary"/>
@@ -33,7 +33,7 @@
 
         <record model="ir.actions.act_window" id="action_of_planning_report">
             <field name="name">Impression Interventions</field>
-            <field name="res_model">of.planning.report</field>
+            <field name="res_model">of_planning.impression_wizard</field>
             <field name="view_type">form</field>
             <field name="view_mode">form</field>
             <field name="target">new</field>

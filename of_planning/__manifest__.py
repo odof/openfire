@@ -36,6 +36,7 @@ Inclut la gestion d'équipes d'intervention.""",
         'views/of_planning_report_view.xml',
         # 'wizard/of_planning_pose_mensuel_view.xml',
         'report/of_planning_fiche_intervention_view.xml',
+        'report/of_planning_report_templates.xml',
     ],
     "installable": True,
 }
