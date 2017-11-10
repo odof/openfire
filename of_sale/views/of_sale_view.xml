@@ -42,13 +42,48 @@
         <record id="of_sale_view_sale_config_settings" model="ir.ui.view">
             <field name="name">of sale settings</field>
             <field name="model">sale.config.settings</field>
-            <field name="inherit_id" ref="sales_team.view_sale_config_settings"/>
+            <field name="inherit_id" ref="sale.view_sales_config"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[@id='main']" position="inside">
-                    <group string="Paramètres OpenFire" name="of_sale_param">
-                        <field name="stock_warning_setting"/>
-                        <field name="pdf_display_product_ref_setting"/>
+                    <group name="rubrique_report" string="Devis &amp; Commandes PDF">
+                        <label for="pdf_adresse_civilite"/>
+                        <div name="pdf_afficher_civilite">
+                            <field name="pdf_adresse_civilite" class="oe_inline"/>
+                            <span>Afficher la(les) civilité(s) dans les rapports PDF</span>
+                        </div>
+                        <label for="pdf_adresse_telephone"/>
+                        <div name="pdf_afficher_telephone">
+                            <field name="pdf_adresse_telephone" class="oe_inline"/>
+                            <span>Afficher le numéro de téléphone dans les rapports PDF</span>
+                        </div>
+                        <label for="pdf_adresse_mobile"/>
+                        <div name="pdf_adresse_mobile">
+                            <field name="pdf_adresse_mobile" class="oe_inline"/>
+                            <span>Afficher le numéro de mobile dans les rapports PDF</span>
+                        </div>
+                        <label for="pdf_adresse_fax"/>
+                        <div name="pdf_afficher_fax">
+                            <field name="pdf_adresse_fax" class="oe_inline"/>
+                            <span>Afficher le fax dans les rapports PDF</span>
+                        </div>
+                        <label for="pdf_adresse_email"/>
+                        <div name="pdf_afficher_email">
+                            <field name="pdf_adresse_email" class="oe_inline"/>
+                            <span>Afficher l'adresse email dans les rapports PDF</span>
+                        </div>
+                        <label for="pdf_display_product_ref_setting"/>
+                        <div name="pdf_display_product_ref_setting">
+                            <field name="pdf_display_product_ref_setting" class="oe_inline"/>
+                            <span>Afficher les références produits dans les rapports PDF</span>
+                        </div>
                     </group>
+                </xpath>
+                <xpath expr="//group[@name='quotations_sales']" position="inside">
+                    <label for="stock_warning_setting"/>
+                    <div name="stock_warning_setting">
+                        <field name="stock_warning_setting" class="oe_inline"/>
+                        <span>Afficher les messages d'avertissement de stock</span>
+                    </div>
                 </xpath>
             </field>
         </record>
