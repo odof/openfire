@@ -1,3 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 of_access_account_payment_mode_user,of.account.payment.mode.user,model_of_account_payment_mode,account.group_account_invoice,1,0,0,0
 of_access_account_payment_mode_accountant,of.account.payment.mode.accountant,model_of_account_payment_mode,account.group_account_manager,1,1,1,1
+of_access_of_payment_tags_user,of.payment.tags.user,model_of_payment_tags,account.group_account_invoice,1,0,0,0
+of_access_of_payment_tags_accountant,of.payment.tags.accountant,model_of_payment_tags,account.group_account_manager,1,1,1,1

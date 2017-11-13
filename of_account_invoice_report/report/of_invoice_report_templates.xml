@@ -121,14 +121,14 @@
                         </td>
                         <td class="text-right">
                             <span t-field="l.price_subtotal" 
-                                t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                t-tag='{"widget": "monetary", "display_currency": o.currency_id}'/>
                         </td>
                     </tr>
                 </tbody>
             </table>
 
             <div class="row">
-                <div class="col-xs-4 pull-right">
+                <div name="subdivision" class="col-xs-4 pull-right">
                     <table class="table table-condensed">
                         <tr class="border-black">
                             <td><strong>Subtotal</strong></td>
@@ -153,9 +153,9 @@
                         <t t-set="payments" t-value="json.loads(o.payments_widget)"/>
                         <t t-if="payments">
                             <tr t-foreach="payments['content']" t-as="payment">
-                                <td>
+                                <td class="col-xs-8 pull-right">
                                     <t t-set="payment_entry" t-value="o.env['account.move'].browse(payment['move_id'])"/>
-                                    <i><span>Paid on </span><span t-field="payment_entry.date"/></i>
+                                    <i name="payments_data"><span>Paid on </span><span t-field="payment_entry.date"/></i>
                                 </td>
                                 <td>
                                     <span class="pull-right text-right"><t t-esc="payment['amount']" t-options='{"widget": "monetary", "display_currency": "o.currency_id"}'/></span>
