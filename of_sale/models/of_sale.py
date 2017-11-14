@@ -47,9 +47,9 @@ class OFSaleOrder(models.Model):
                 order.of_to_invoice = True
 
     of_to_invoice = fields.Boolean(u"Entièrement facturable", compute='_compute_of_to_invoice', search='_search_of_to_invoice')
-    of_notes_facture = fields.Html(string="Notes Facture", oldname="of_notes_factures")
-    of_notes_intervention = fields.Html(string="Notes Intervention")
-    of_notes_client = fields.Html(related='partner_id.of_notes_client', string="Notes Client")
+    of_notes_facture = fields.Html(string="Notes facture", oldname="of_notes_factures")
+    of_notes_intervention = fields.Html(string="Notes intervention")
+    of_notes_client = fields.Html(related='partner_id.of_notes_client', string="Notes client")
 
 class OFSaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
@@ -121,8 +121,8 @@ class OFSaleConfiguration(models.TransientModel):
     stock_warning_setting = fields.Boolean(string="(OF) Stock", required=True, default=False,
             help="Afficher les messages d'avertissement de stock?")
 
-    pdf_display_product_ref_setting = fields.Boolean(string="(OF) Réf. produits", required=True, default=False,
-            help="Afficher les références produits dans les Rapports PDF?")
+    pdf_display_product_ref_setting = fields.Boolean(string="Réf produits dans Devis PDF", required=True, default=False,
+            help="Afficher les références produits dans les rapports PDF ?")
 
     pdf_adresse_civilite = fields.Boolean(string=u"(OF) Civilités", required=True, default=False,
             help=u"Afficher la(les) civilité(s) dans les rapport PDF?")

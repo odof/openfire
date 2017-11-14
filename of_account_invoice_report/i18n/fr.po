@@ -17,7 +17,7 @@ msgstr ""
 #. module: of_account_invoice_report
 #: model:ir.ui.view,arch_db:account.report_invoice_document
 msgid "TIN: "
-msgstr "TVA: "
+msgstr "TVA : "
 
 #. module: of_account_invoice_report
 #: model:ir.ui.view,arch_db:account.report_invoice_document

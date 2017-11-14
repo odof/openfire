@@ -1,0 +1,270 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_sale
+#	* sale
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-11-24 13:21+0000\n"
+"PO-Revision-Date: 2017-11-24 13:21+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "<strong>Adresse de livraison :</strong>"
+msgstr "<strong>Adresse de livraison :</strong>"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_invoice_document_inherit_sale
+msgid "<strong>Adresse de livraison :</strong><br/>"
+msgstr "<strong>Adresse de livraison :</strong><br/>"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "<strong>Commercial(e):</strong>"
+msgstr "<strong>Commercial(e):</strong>"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "<strong>Conditions de règlement :</strong>"
+msgstr "<strong>Conditions de règlement :</strong>"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "<strong>Note de position fiscale :</strong>"
+msgstr "<strong>Note de position fiscale :</strong>"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "<strong>Réf. client :</strong>"
+msgstr "<strong>Réf. client :</strong>"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "<strong>Réf. commande :</strong>"
+msgstr "<strong>Réf. commande :</strong>"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_invoice_layouted
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "<strong>Subtotal : </strong>"
+msgstr "<strong>Sous-total : </strong>"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "<strong>Total hors taxe</strong>"
+msgstr "<strong>Total hors taxe</strong>"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "<strong>Total</strong>"
+msgstr "<strong>Total</strong>"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "<strong>Vos références : </strong>"
+msgstr "<strong>Vos références : </strong>"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_invoice_document_inherit_sale
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "Adresse de facturation :"
+msgstr "Adresse de facturation :"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_invoice_document_inherit_sale
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "Adresse de livraison et de facturation :"
+msgstr "Adresse de livraison et de facturation :"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_sale_config_settings_pdf_display_product_ref_setting
+msgid "Afficher les références produits dans les rapports PDF ?"
+msgstr "Afficher les références produits dans les rapports PDF ?"
+
+#. module: of_sale
+#: selection:res.company,afficher_descr_fab:0
+msgid "Dans les devis"
+msgstr "Dans les devis"
+
+#. module: of_sale
+#: selection:res.company,afficher_descr_fab:0
+msgid "Dans les devis & les factures"
+msgstr "Dans les devis & les factures"
+
+#. module: of_sale
+#: selection:res.company,afficher_descr_fab:0
+msgid "Dans les factures"
+msgstr "Dans les factures"
+
+#. module: sale
+#: model:ir.model.fields,field_description:sale.field_sale_order_line_name
+#: model:ir.ui.view,arch_db:sale.report_invoice_layouted
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "Description"
+msgstr "Description"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.view_sales_config
+msgid "Digital Products"
+msgstr "Produits numériques"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_invoice_layouted
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "Disc.(%)"
+msgstr "Rem.(%)"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_to_invoice
+msgid "Entièrement facturable"
+msgstr "Entièrement facturable"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_invoice_document_inherit_sale
+msgid "Fax"
+msgstr "Fax"
+
+#. modules: of_sale, sale
+#: model:ir.model,name:of_sale.model_account_invoice_line
+#: model:ir.model,name:sale.model_account_invoice_line
+msgid "Invoice Line"
+msgstr "Ligne de facture"
+
+#. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_res_company_afficher_descr_fab
+msgid "La description du fabricant d'un article sera ajoutée à la description de l'article dans les documents."
+msgstr "La description du fabricant d'un article sera ajoutée à la description de l'article dans les documents."
+
+#. module: of_sale
+#: selection:res.company,afficher_descr_fab:0
+msgid "Ne pas afficher"
+msgstr "Ne pas afficher"
+
+#. module: of_sale
+#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "Notes"
+msgstr "Notes"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_notes_client
+#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "Notes client"
+msgstr "Notes client"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_notes_facture
+#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "Notes facture"
+msgstr "Notes facture"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_of_notes_intervention
+#: model:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "Notes intervention"
+msgstr "Notes intervention"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_invoice_layouted
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "Price"
+msgstr "Prix"
+
+#. module: sale
+#: model:ir.model.fields,field_description:sale.field_sale_order_line_product_uom_qty
+#: model:ir.ui.view,arch_db:sale.report_invoice_layouted
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "Quantity"
+msgstr "Quantité"
+
+#. modules: of_sale, sale
+#: model:ir.model,name:of_sale.model_sale_order
+#: model:ir.model,name:sale.model_sale_order
+#: model:ir.model.fields,field_description:sale.field_res_partner_sale_order_ids
+#: model:ir.model.fields,field_description:sale.field_res_partner_sale_warn
+#: model:ir.ui.view,arch_db:sale.view_order_form
+#: model:ir.ui.view,arch_db:sale.view_sales_order_filter
+#: model:res.request.link,name:sale.req_link_sale_order
+#: selection:sale.order,state:0
+#: selection:sale.report,state:0
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. modules: of_sale, sale
+#: model:ir.model,name:of_sale.model_sale_order_line
+#: model:ir.model,name:sale.model_sale_order_line
+#: model:ir.model.fields,field_description:sale.field_product_product_sale_line_warn
+#: model:ir.model.fields,field_description:sale.field_product_template_sale_line_warn
+msgid "Sales Order Line"
+msgstr "Ligne de bon de commande"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "TVA"
+msgstr "TVA"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_invoice_document_inherit_sale
+msgid "TVA:"
+msgstr "TVA :"
+
+#. module: sale
+#: model:ir.model.fields,field_description:sale.field_sale_order_amount_tax
+#: model:ir.model.fields,field_description:sale.field_sale_order_line_price_tax
+#: model:ir.model.fields,field_description:sale.field_sale_order_line_tax_id
+#: model:ir.ui.view,arch_db:sale.report_invoice_layouted
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "Taxes"
+msgstr "TVA"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "Total Price"
+msgstr "Prix total"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_invoice_document_inherit_sale
+msgid "Tél."
+msgstr "Tél."
+
+#. module: sale
+#: model:ir.model.fields,field_description:sale.field_sale_order_line_price_unit
+#: model:ir.ui.view,arch_db:sale.report_invoice_layouted
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "Unit Price"
+msgstr "Prix unitaire"
+
+#. module: sale
+#: model:ir.ui.view,arch_db:sale.report_invoice_document_inherit_sale
+#: model:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid "VAT:"
+msgstr "TVA :"
+
+#. module: of_sale
+#: model:ir.ui.view,arch_db:of_sale.of_sale_view_company_form
+msgid "Ventes"
+msgstr "Ventes"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_res_company_afficher_descr_fab
+msgid "afficher descr. fabricant"
+msgstr "afficher descr. fabricant"
+
+#. modules: of_sale, sale
+#: model:ir.model,name:of_sale.model_sale_config_settings
+#: model:ir.model,name:sale.model_sale_config_settings
+msgid "sale.config.settings"
+msgstr "sale.config.settings"
+
+#. module: of_sale
+#: model:ir.ui.view,arch_db:of_sale.of_sale_order_view_search_inherit_sale
+msgid "À facturer entièrement"
+msgstr "À facturer entièrement"
+

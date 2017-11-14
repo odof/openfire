@@ -132,8 +132,8 @@ class ResUsers(models.Model):
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    # Notes Client
-    of_notes_client = fields.Html(string="Notes Client")
+    # Notes client
+    of_notes_client = fields.Html(string="Notes client")
 
     # Pour afficher l'adresse au format français par défaut quand le pays n'est pas renseigné et non le format US
     @api.multi
