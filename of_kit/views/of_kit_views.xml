@@ -100,7 +100,7 @@
         <field name="res_model">product.template</field>
         <field name="domain">[('of_is_kit', '=', True)]</field>
         <!--field name="view_id" ref="of_product_template_kit_tree"/-->
-        <field name="view_mode">tree, kanban</field>
+        <field name="view_mode">tree, kanban, form</field>
         <field name="view_type">form</field>
     </record>
     <record id="of_template_open_kit_view_tree" model="ir.actions.act_window.view">
@@ -113,6 +113,12 @@
         <field eval="1" name="sequence"/>
         <field name="view_mode">kanban</field>
         <field name="view_id" ref="of_kit_product_template_kanban_view"/>
+        <field name="act_window_id" ref="of_template_open_kit"/>
+    </record>
+    <record id="of_template_open_kit_view_form" model="ir.actions.act_window.view">
+        <field eval="2" name="sequence"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_product_template_form_view"/>
         <field name="act_window_id" ref="of_template_open_kit"/>
     </record>
     <record id="of_product_template_form_view_kit_button" model="ir.ui.view">
@@ -301,6 +307,10 @@
                 <field name="price_comps" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
                 <field name="cost_comps" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
             </xpath>
+            <!-- implementation future -> ajouter les composants d'un kit en tant que lignes de commandes
+            <xpath expr="//field[@name='order_line']" position="before">
+                <field name="of_inser_nom"/>
+            </xpath-->
         </field>
     </record>
 

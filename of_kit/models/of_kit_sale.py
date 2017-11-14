@@ -14,6 +14,11 @@ class OFKitSaleOrder(models.Model):
 					help="Contains all kit components in this sale order.")
 	of_contains_kit = fields.Boolean(string='Contains a kit', compute='_compute_of_contains_kit')
 
+	"""
+	implementation future -> ajouter les composants d'un kit en tant que lignes de commandes
+	of_inser_nom = fields.Many2one('product.template', string="Insert Kit lines",
+						help="select a kit to add its components as sale order lines.")"""
+
 	@api.multi
 	@api.depends('order_line.product_id')
 	def _compute_of_contains_kit(self):
@@ -30,6 +35,17 @@ class OFKitSaleOrder(models.Model):
 			- None: One line per kit. Nothing printed out about components\n\
 			- Collapse: One line per kit, with minimal info\n\
 			- Expand: One line per kit, plus one line per component")
+
+	"""
+	implementation future -> ajouter les composants d'un kit en tant que lignes de commandes
+	@api.onchange('of_inser_nom')
+	def _onchange_of_inser_nom(self):
+		self.ensure_one()
+		if not self.of_inser_nom:
+			return
+		new_vals = self.of_inser_nom.get_saleorder_kit_nom_data()
+		new_vals['of_inser_nom'] = False
+		self.update(new_vals)"""
 
 	@api.multi
 	def _prepare_invoice(self):
@@ -128,7 +144,7 @@ class OFKitSaleOrderLine(models.Model):
 		if self.product_id.of_is_kit:  # new product is a kit, we need to add its components
 			new_vals['of_is_kit'] = True
 			new_vals['of_pricing'] = self.product_id.of_pricing
-			sale_kit_vals = self.product_id.get_sale_order_kit_data()
+			sale_kit_vals = self.product_id.get_saleorder_kit_data()
 			sale_kit_vals["qty_order_line"] = self.product_uom_qty
 			new_vals["kit_id"] = self.env["of.saleorder.kit"].create(sale_kit_vals)
 		else:  # new product is not a kit
@@ -181,7 +197,7 @@ class OFKitSaleOrderLine(models.Model):
 				new_vals["of_pricing"] = "computed"
 			else: # can happen if uncheck then recheck a kit
 				new_vals['of_pricing'] = self.product_id.of_pricing
-				sale_kit_vals = self.product_id.get_sale_order_kit_data()
+				sale_kit_vals = self.product_id.get_saleorder_kit_data()
 				new_vals["kit_id"] = self.env["of.saleorder.kit"].create(sale_kit_vals)
 
 		else: # a product that was a kit is not anymore, we unlink its components
@@ -291,7 +307,9 @@ class OFKitSaleOrderLine(models.Model):
 				# now new_line has an id
 				new_line.init_kit_from_so_line(line.id)
 
-	"""@api.depends('product_id', 'purchase_price', 'product_uom_qty', 'price_unit', 'cost_comps')
+	"""
+	implementation future -> marges dans les devis
+	@api.depends('product_id', 'purchase_price', 'product_uom_qty', 'price_unit', 'cost_comps')
 	def _product_margin(self):
 		# Override of function from sale_margin
 		for line in self:
