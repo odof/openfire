@@ -39,6 +39,10 @@ class OFSaleOrder(models.Model):
 class OFSaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
+    of_date_delivered = fields.Date(
+        string='Date de validation de livraison',
+        help=u"Date à laquelle la valeur de quantité livrée a été modifiée")
+
     @api.multi
     @api.onchange('product_id')
     def product_id_change(self):
@@ -67,6 +71,11 @@ class OFSaleOrderLine(models.Model):
                     splitted.pop(0)
                     name = ''.join(splitted)
         return name
+
+    @api.multi
+    def write(self, vals):
+        if vals.get('qty_delivered'):
+            vals['of_date_delivered'] = fields.Date.context_today(self)
 
 class OFSaleAccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
