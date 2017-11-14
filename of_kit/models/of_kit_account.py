@@ -95,7 +95,7 @@ class OFKitAccountInvoiceLine(models.Model):
         if self.product_id.of_is_kit:  # new product is a kit, we need to add its components
             new_vals['of_is_kit'] = True
             new_vals['of_pricing'] = self.product_id.of_pricing
-            account_kit_vals = self.product_id.get_account_invoice_kit_data()
+            account_kit_vals = self.product_id.get_invoice_kit_data()
             account_kit_vals["qty_invoice_line"] = self.quantity
             new_vals["kit_id"] = self.env["of.invoice.kit"].create(account_kit_vals)
         else:  # new product is not a kit
@@ -173,7 +173,7 @@ class OFKitAccountInvoiceLine(models.Model):
                 new_vals["of_pricing"] = "computed"
             else: # can happen if uncheck then recheck a kit
                 new_vals['of_pricing'] = self.product_id.of_pricing
-                account_kit_vals = self.product_id.get_account_invoice_kit_data()
+                account_kit_vals = self.product_id.get_invoice_kit_data()
                 new_vals["kit_id"] = self.env["of.invoice.kit"].create(account_kit_vals)
         else: # a product that was a kit is not anymore, we unlink its components
             new_vals["of_pricing"] = 'fixed'

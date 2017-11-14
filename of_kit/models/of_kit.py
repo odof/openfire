@@ -35,7 +35,7 @@ class OFKitProductTemplate(models.Model):
         ('kit_n_comp_constraint', 'CHECK ( NOT(of_is_kit AND is_kit_comp) )', _('A product can not be a kit and a kit component at the same time !'))
     ]
 
-    def get_account_invoice_kit_data(self):
+    def get_invoice_kit_data(self):
         self.ensure_one()
         res = {'of_pricing': self.of_pricing}
         lines = [(5,)]
@@ -56,7 +56,7 @@ class OFKitProductTemplate(models.Model):
         res["kit_line_ids"] = lines
         return res
 
-    def get_sale_order_kit_data(self):
+    def get_saleorder_kit_data(self):
         self.ensure_one()
         res = {'of_pricing': self.of_pricing}
         lines = [(5,)]
@@ -77,6 +77,27 @@ class OFKitProductTemplate(models.Model):
             lines.append((0, 0, comp_vals))
         res["kit_line_ids"] = lines
         return res
+
+    """
+    implementation future -> ajouter les composants d'un kit en tant que lignes de commandes
+    def get_saleorder_kit_nom_data(self):
+        self.ensure_one()
+        res = {}
+        lines = []
+        new_line_vals = {}
+        for line in self.kit_line_ids:
+            new_line_vals = new_line_vals.copy()
+            new_line_vals["product_id"] = line.product_id.id
+            new_line_vals["product_uom"] = line.product_uom_id.id
+            new_line_vals["product_uom_qty"] = line.product_qty
+            new_line_vals["sequence"] = line.sequence
+            new_line_vals["name"] = line.product_id.name_get()[0][1] or line.product_id.name
+            new_line_vals["price_unit"] = line.product_id.list_price
+            new_line_vals["customer_lead"] = line.product_id.sale_delay
+            lines.append((0, 0, new_line_vals))
+        res["order_line"] = lines
+        return res
+    """
 
     @api.multi
     @api.depends('kit_line_ids')
@@ -184,13 +205,13 @@ class OFKitProductProduct(models.Model):
                 kit_count = mapped_data.get(product.id, 0)
             product.kit_count = kit_count
 
-    def get_sale_order_kit_data(self):
+    def get_saleorder_kit_data(self):
         self.ensure_one()
-        return self.product_tmpl_id.get_sale_order_kit_data()
+        return self.product_tmpl_id.get_saleorder_kit_data()
 
-    def get_account_invoice_kit_data(self):
+    def get_invoice_kit_data(self):
         self.ensure_one()
-        return self.product_tmpl_id.get_account_invoice_kit_data()
+        return self.product_tmpl_id.get_invoice_kit_data()
 
     def _compute_is_kit_comp(self):
         # this method will be called upon creation or change of a kit_line for its related product (workaround store=True)
