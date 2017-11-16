@@ -34,6 +34,7 @@ var OFFieldColorIndex = FieldFloat.extend({
 
 	init: function() {
         this._super.apply(this, arguments);
+        console.log("HAHAHAHAHAHA");
         // ajouter des action appliquées à l'initialisation du widget
     },
 
@@ -45,8 +46,9 @@ var OFFieldColorIndex = FieldFloat.extend({
 core.form_widget_registry
     .add('color_index', OFFieldColorIndex)
 
-return {
+/*return {
     OFFieldColorIndex: OFFieldColorIndex,
-};
+};*/
+return OFFieldColorIndex;
 
 });

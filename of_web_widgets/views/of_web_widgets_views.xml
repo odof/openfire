@@ -10,7 +10,7 @@
                 <page name="tests_web_widgets" string="Tests Web Widgets">
                     <group>
                         <group string="Widget color_index" name="widget_color_index">
-                            <field name="color" widget="color_index"/>
+                            <field name="int_test" widget="color_index"/>
                         </group>
                     </group>
                 </page>

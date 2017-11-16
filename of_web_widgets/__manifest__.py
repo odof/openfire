@@ -16,6 +16,7 @@ Module OpenFire de widgets
     "depends": ["web","web_kanban"],
     "data": [
         "views/of_web_widgets_templates.xml",
+        "views/of_web_widgets_views.xml",
     ],
     'qweb': [
         'static/src/xml/*.xml',
