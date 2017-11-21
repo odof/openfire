@@ -59,14 +59,18 @@ class OFSaleOrderLine(models.Model):
         self.ensure_one()
         # inhiber l'affichage de la référence
         afficher_ref = self.env['ir.values'].get_default('sale.config.settings', 'pdf_display_product_ref_setting')
-        name = self.name
+        le_self = self.with_context(
+            lang=self.order_id.partner_id.lang,
+            partner=self.order_id.partner_id.id,
+        )
+        name = le_self.name
         if not afficher_ref:
             if name.startswith("["):
                 splitted = name.split("]")
                 if len(splitted) > 1:
                     splitted.pop(0)
                     name = ''.join(splitted)
-        return name
+        return name.split("\n")  # utilisation t-foreach dans template qweb
 
 class OFSaleAccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
