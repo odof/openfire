@@ -25,7 +25,7 @@ class OfPlanningJour(report_sxw.rml_parse):
     def get_titre(self, equipe):
         date_date = fields.Date.from_string(self.objects.date_start)
 
-        date_month = date_date.strftime("%B").capitalize()
+        date_month = date_date.strftime("%B").decode("utf-8").capitalize()
         date_weekday = date_date.strftime("%A")
         title = "%s - Planning du %s %s %s %s" % (equipe.name, date_weekday, date_date.day, date_month, date_date.year)
         return title
