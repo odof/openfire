@@ -76,6 +76,7 @@ class OFSaleOrderLine(models.Model):
     def write(self, vals):
         if vals.get('qty_delivered'):
             vals['of_date_delivered'] = fields.Date.context_today(self)
+        return super(OFSaleOrderLine, self).write(vals)
 
 class OFSaleAccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'

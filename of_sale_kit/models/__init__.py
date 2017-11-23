@@ -6,3 +6,4 @@ import of_sale
 import of_procurement
 import of_account
 import of_stock
+import of_sale_kit_init

@@ -19,12 +19,11 @@
     """,
     'website': 'openfire.fr',
     'depends': [
-        'sale_stock',
         'mrp',
         'of_product',
         'sale_margin',
         'of_utils',
-        'of_sale',
+        'of_sale_stock',
     ],
     'data': [
         'views/of_product_views.xml',
@@ -33,6 +32,7 @@
         'report/of_sale_report_templates.xml',
         'report/of_account_report_templates.xml',
         'security/ir.model.access.csv',
+        'data/data.xml',
     ],
     'installable': True,
     'auto_install': False,

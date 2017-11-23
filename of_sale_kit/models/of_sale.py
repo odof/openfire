@@ -481,6 +481,7 @@ means that the product is a component of Kit B which is itself a component of Ki
 	procurement_ids = fields.One2many('procurement.order', 'sale_comp_id', string='Procurements')
 
 	qty_delivered = fields.Float(string='Delivered Qty', copy=False, digits=dp.get_precision('Product Unit of Measure'), default=0.0)
+	of_date_delivered = fields.Date(string='Date de validation de livraison', help=u"Date à laquelle la valeur de quantité livrée a été modifiée")
 
 	@api.multi
 	def toggle_hide_prices(self, hide, rec=True):

@@ -35,6 +35,9 @@
                         <field name="of_notes_intervention" colspan="4" nolabel="1" widget="html"/>
                      </page>
                 </xpath>
+                <xpath expr="//field[@name='order_line']//form//label[@for='qty_invoiced']" position="before">
+                    <field name="of_date_delivered" invisible="context.get('hide_sale')"/>
+                </xpath>
             </field>
         </record>
 
