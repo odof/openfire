@@ -1,31 +1,245 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
-import time, csv, base64
-from StringIO import StringIO
+import csv
+import datetime
+import io
+import itertools
+import logging
+import time
+import base64
+
+from odoo import api, fields, models
+from odoo.tools.translate import _
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.exceptions import UserError
+from odoo.report.render.odt2odt.odt2odt import odt2odt
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
+
+try:
+    import xlrd
+    try:
+        from xlrd import xlsx
+    except ImportError:
+        xlsx = None
+except ImportError:
+    xlrd = xlsx = None
+
+try:
+    from odoo.addons.base_import.models import odf_ods_reader
+except ImportError:
+    odf_ods_reader = None
+
+try:
+    import chardet
+except ImportError:
+    chardet = None
+
+_logger = logging.getLogger(__name__)
+
+EXTENSIONS = ('csv', 'xls', 'xlsx', 'ods')
+SELECT_EXTENSIONS = [
+    ('csv', 'CSV'),
+    ('xls', 'MS-Excel'),
+    ('xlsx', 'MS-Excel-10'),
+    ('ods', 'LibreOffice'),
+    ]
 
 class of_import(models.Model):
     _name = 'of.import'
 
-    name = fields.Char('Nom', size=64, required=True)
-    type_import = fields.Selection([('product.template', 'Articles'), ('res.partner', 'Partenaires'), ('crm.lead', u'Pistes/opportunités'), ('res.partner.bank', 'Comptes en banques partenaire'), ('of.service', 'Services Openfire')], string="Type d'import", required=True)
+    user_id = fields.Many2one('res.users', u'Utilisateur', readonly=True, default=lambda self: self._uid)
+
+    name = fields.Char(u'Nom', size=64, required=True)
+    type_import = fields.Selection([('product.template', u'Articles'), ('res.partner', u'Partenaires'), ('crm.lead', u'Pistes/opportunités'), ('res.partner.bank', u'Comptes en banques partenaire'), ('of.service', u'Services Openfire')], string=u"Type d'import", required=True)
+
     date = fields.Datetime('Date', required=True, default=lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'), help=u"Date qui sera affectée aux imports comme date de valeur.")
-    date_debut_import = fields.Datetime('Début', readonly=True)
-    date_fin_import = fields.Datetime('Fin', readonly=True)
-    prefixe = fields.Char(u'Préfixe référence', size=10, help=u"Texte qui précèdera la référence.")
-    user_id = fields.Many2one('res.users', 'Utilisateur', readonly=True, default=lambda self: self._uid)
-    file = fields.Binary('Fichier', required=True)
-    file_name = fields.Char('Nom du fichier')
+    date_debut_import = fields.Datetime(u'Début', readonly=True)
+    date_fin_import = fields.Datetime(u'Fin', readonly=True)
+    time_lapse = fields.Char(string=u'Importé en', compute="_compute_time_lapse")
+
+    file = fields.Binary(u'Fichier', required=True)
+    file_name = fields.Char(u'Nom du fichier')
+    file_type = fields.Selection(SELECT_EXTENSIONS, u'Type de fichier', compute="_compute_file_type")
+    file_size = fields.Char(u'Taille du fichier', compute="_compute_file_size")
+    file_encoding = fields.Char(u'Encodage')
+
+    #separateur1 = fields.Selection([(';', u'Point-virgule'), (',', u'Virgule'), (' ', u'Espace'), ('\\t', u'Tabulation'), ('x',u'Personnalisé')], string=u'Séparateur champs', help=u"Caractère séparateur des champs dans le fichier d'import.\nSi non renseigné, le système essaye de le déterminer lui même.")
+    #separateur2 = fields.Char(size=1, string=u'Séparateur personnalisé')
+    #separateur = fields.Char(string=u'Séparateur utilisé')
     separateur = fields.Char(u'Séparateur champs', help=u"Caractère séparateur des champs dans le fichier d'import.\nSi non renseigné, le système essaye de le déterminer lui même.\nMettre \\t pour tabulation.")
-    state = fields.Selection([('brouillon', 'Brouillon'), ('importe', 'Importé'), ('annule', 'Annulé')], 'État', default='brouillon', readonly=True)
-    nb_total = fields.Integer('Nombre total', readonly=True)
+
+    prefixe = fields.Char(u'Préfixe référence', size=10, help=u"Texte qui précèdera la référence.")
+
+    state = fields.Selection([('brouillon', u'Brouillon'), ('importe', u'Importé'), ('annule', u'Annulé')], u'État', default='brouillon', readonly=True)
+
+    nb_total = fields.Integer(u'Nombre total', readonly=True)
     nb_ajout = fields.Integer(u'Ajoutés', readonly=True)
     nb_maj = fields.Integer(u'Mis à jour', readonly=True)
     nb_echoue = fields.Integer(u'Échoués/ignorés', readonly=True)
-    sortie_note = fields.Text('Note', compute='get_sortie_note', readonly=True)
-    sortie_succes = fields.Text('Information', readonly=True)
-    sortie_avertissement = fields.Text('Avertissements', readonly=True)
-    sortie_erreur = fields.Text('Erreurs', readonly=True)
+
+    sortie_note = fields.Text(u'Note', compute='get_sortie_note', readonly=True)
+    sortie_succes = fields.Text(u'Information', readonly=True)
+    sortie_avertissement = fields.Text(u'Avertissements', readonly=True)
+    sortie_erreur = fields.Text(u'Erreurs', readonly=True)
+
+    @api.depends('file', 'file_name')
+    def _compute_file_type(self):
+        """Get file type par extension ('csv', 'xls', 'xlsx', 'ods')"""
+        for imp in self:
+            file_name = self.file_name
+            if file_name:
+                splitted = file_name.split(".")
+                if len(splitted) > 1:
+                    extension = splitted[-1]
+                    if extension not in EXTENSIONS:
+                        raise UserError(u"Type de fichier non reconnu !")
+                    imp.file_type = extension
+                else:
+                    raise UserError(u"Type de fichier non reconnu !")
+            else:
+                imp.file_type = False
+
+    @api.multi
+    def _compute_encoding(self, file_enc):
+        try:
+            result = chardet.detect(file_enc)
+            if result:
+                file_encoding = result['encoding']
+                return file_encoding
+            else:
+                raise UserError(u'Encodage non reconnu.')
+        except:
+            raise UserError(u'Erreur : encodage non reconnu.')
+
+    @api.depends('file')
+    def _compute_file_size(self):
+        if not self.file:
+            self.file_size = "--"
+        else:
+            if len(self.file) > 20:
+                self.file_size = "--"
+            else:
+                self.file_size = self.file
+
+#     @api.onchange('separateur1', 'separateur2')
+#     def _onchange_separateur(self):
+#         for item in self:
+#             if item.separateur1 == 'x':
+#                 item.separateur = item.separateur2
+#             else:
+#                 item.separateur = item.separateur1
+
+    @api.depends('date_debut_import', 'date_fin_import')
+    def _compute_time_lapse(self):
+        if self.date_debut_import:
+            start_dt = fields.Datetime.from_string(self.date_debut_import)
+            finish_dt = fields.Datetime.from_string(self.date_fin_import)
+            self.time_lapse = finish_dt - start_dt
+        else:
+            self.time_lapse = False
+
+#### READERS #####
+# Un reader retourne au premier appel la liste des champs du fichier (éléments de la première ligne)
+# Aux appels suivants, le reader retoune un dictionnaire {nom de la colonne: valeur} pour la ligne suivante
+
+    @api.multi
+    def _read_csv(self):
+        # Lecture du fichier d'import par la bibliothèque csv de python
+        csv_data = base64.decodestring(self.file)
+        dialect = csv.Sniffer().sniff(csv_data)   # Deviner automatiquement les paramètres : caractère séparateur, type de saut de ligne,...
+        file_encoding = self._compute_encoding(csv_data)
+        self.file_encoding = file_encoding
+
+        # Encode en utf-8
+        if file_encoding != 'utf-8':
+            csv_data = csv_data.decode(file_encoding).encode('utf-8')
+
+        # On prend le séparateur indiqué dans le formulaire si est renseigné.
+        # Sinon on prend celui deviné par la bibliothèque csv, et si vierge, on prend le ; par défaut.
+        if self.separateur and self.separateur.strip(' '):
+            dialect.delimiter = str(self.separateur.strip(' ').replace('\\t', '\t'))
+        else:
+            if dialect.delimiter and dialect.delimiter.strip(' '):
+                self.separateur = dialect.delimiter.replace('\t', '\\t')
+            else:
+                self.separateur = dialect.delimiter = ';'
+
+        reader = csv.DictReader(
+            StringIO(csv_data),
+            dialect=dialect)
+
+        prems = True
+        for row in reader:
+            if prems:
+                prems = False
+                yield [item.strip().decode('utf8', 'ignore') for item in row]
+            if not any(x for x in row if x.strip()):
+                # Ligne vide
+                continue
+            yield {key.strip().decode('utf8', 'ignore'): value.strip().decode('utf8', 'ignore')
+                   for key,value in row.iteritems()}
+
+    ## OPENOFFICE ##
+    @api.multi
+    def _read_ods(self):
+        raise UserError(u"Pour l'instant, il n'est pas possible d'importer des fichiers OpenOffice.")
+
+        """ Read file content using ODSReader custom lib """
+        doc = odf_ods_reader.ODSReader(file=io.BytesIO(self.file))
+
+        return (
+            row
+            for row in doc.getFirstSheet()
+            if any(x for x in row if x.strip())
+            )
+
+    ## MS OFFICE ##
+    @api.multi
+    def _read_xls(self):
+        """ Read file content, using xlrd lib """
+        book = xlrd.open_workbook(file_contents=base64.b64decode(self.file))
+        sheet = book.sheet_by_index(0)
+        header = False
+        # emulate Sheet.get_rows for pre-0.9.4
+        for row in itertools.imap(sheet.row, range(sheet.nrows)):
+            values = []
+            for cell in row:
+                if cell.ctype is xlrd.XL_CELL_NUMBER:
+                    is_float = cell.value % 1 != 0.0
+                    values.append(
+                        unicode(cell.value)
+                        if is_float
+                        else unicode(int(cell.value))
+                    )
+                elif cell.ctype is xlrd.XL_CELL_DATE:
+                    is_datetime = cell.value % 1 != 0.0
+                    # emulate xldate_as_datetime for pre-0.9.3
+                    dt = datetime.datetime(*xlrd.xldate.xldate_as_tuple(cell.value, book.datemode))
+                    values.append(
+                        dt.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+                        if is_datetime
+                        else dt.strftime(DEFAULT_SERVER_DATE_FORMAT)
+                    )
+                elif cell.ctype is xlrd.XL_CELL_BOOLEAN:
+                    values.append(u'True' if cell.value else u'False')
+                elif cell.ctype is xlrd.XL_CELL_ERROR:
+                    raise ValueError(
+                        _("Error cell found while reading XLS/XLSX file: %s") %
+                        xlrd.error_text_from_code.get(
+                            cell.value, "unknown error code %s" % cell.value)
+                    )
+                else:
+                    values.append(cell.value)
+            if any(x for x in values if x.strip()):
+                if header:
+                    yield {header[i]: values[i] for i in range(len(header))}
+                else:
+                    header = values
+                    yield values
 
     def get_champs_odoo(self, model=''):
         "Renvoi un dictionnaire contenant les caractéristiques des champs Odoo en fonction du type d'import sélectionné (champ type_import)"
@@ -57,7 +271,6 @@ class of_import(models.Model):
 
         return champs_odoo
 
-
     @api.depends('type_import')
     def get_sortie_note(self):
         "Met à jour la liste des champs Odoo disponibles pour l'import dans le champ note"
@@ -66,7 +279,6 @@ class of_import(models.Model):
             for champ, valeur in self.get_champs_odoo(self.type_import).items():
                 if champ in ('tz', 'lang'): # Champs qui plantent lors de l'import, on les ignore.
                     continue
-                # sortie_note += "- " + valeur['description'] + " : " + champ + u" (type : " + valeur['type'] + u") relation : " + str(valeur['relation']) + u" relation champ  : " + str(valeur['relation_champ'])
                 sortie_note += "- " + valeur['description'] + " : " + champ
                 if valeur['type'] == 'selection':
                     sortie_note += u" [ valeurs autorisées : "
@@ -95,12 +307,31 @@ class of_import(models.Model):
         self.importer(simuler=False)
         return True
 
+    def _choisir_reader(self):
+        """Choisir reader selon extension"""
+        if self.file:
+            # OPENOFFICE
+            if self.file_type == 'ods':
+                return self._read_ods()
+
+            # MS-OFFICE
+            elif self.file_type == 'xls' or self.file_type == 'xlsx':
+                return self._read_xls()
+
+            # CSV
+            elif self.file_type == 'csv':
+                return self._read_csv()
+
+            # Error
+            else:
+                raise UserError(u'Type de fichier non reconnu')
+
+### IMPORT ###
+
     @api.multi
     def importer(self, simuler=True):
 
-#
-# VARIABLES DE CONFIGURATION
-#
+        # VARIABLES DE CONFIGURATION
 
         frequence_commit = 100 # Enregistrer (commit) tous les n enregistrements
 
@@ -108,31 +339,31 @@ class of_import(models.Model):
         model_obj = self.env[model].with_context(from_import=True)
 
         if model == 'product.template':
-            nom_objet = 'article'              # Libellé pour affichage dans message information/erreur
+            nom_objet = u'article'             # Libellé pour affichage dans message information/erreur
             champ_primaire = 'default_code'    # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
             champ_reference = 'default_code'   # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
         elif model == 'res.partner':
-            nom_objet = 'partenaire'           # Libellé pour affichage dans message information/erreur
+            nom_objet = u'partenaire'          # Libellé pour affichage dans message information/erreur
             champ_primaire = 'ref'             # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
             champ_reference = 'ref'            # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
             # 2 champs suivants : on récupère les id des types de compte comptable payable et recevable pour création comptes comptables clients et fournisseurs (généralement 411 et 401).
-            res_model, data_account_type_receivable_id = self.env['ir.model.data'].get_object_reference('account','data_account_type_receivable')
-            res_model, data_account_type_payable_id = self.env['ir.model.data'].get_object_reference('account','data_account_type_payable')
+            data_account_type_receivable_id = self.env['ir.model.data'].get_object_reference('account','data_account_type_receivable')[1]
+            data_account_type_payable_id = self.env['ir.model.data'].get_object_reference('account','data_account_type_payable')[1]
         elif model == 'of.service':
-            nom_objet = 'service OpenFire'     # Libellé pour affichage dans message information/erreur
+            nom_objet = u'service OpenFire'    # Libellé pour affichage dans message information/erreur
             champ_primaire = 'id'              # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
             champ_reference = ''               # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
         elif model == 'res.partner.bank':
-            nom_objet = 'Comptes en banque partenaire'           # Libellé pour affichage dans message information/erreur
-            champ_primaire = 'acc_number'             # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
-            champ_reference = ''            # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
+            nom_objet = u'Comptes en banque partenaire'  # Libellé pour affichage dans message information/erreur
+            champ_primaire = 'acc_number'                # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
+            champ_reference = ''                         # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
         elif model == 'crm.lead':
             nom_objet = u'partenaire/opportunité'   # Libellé pour affichage dans message information/erreur
             champ_primaire = 'of_ref'               # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
             champ_reference = 'of_ref'              # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
 
         # Initialisation variables
-        champs_odoo = self.get_champs_odoo(model) # On récupère la liste des champs de l'objet (depuis ir.model.fields)
+        champs_odoo = self.get_champs_odoo(model)  # On récupère la liste des champs de l'objet (depuis ir.model.fields)
         date_debut = time.strftime('%Y-%m-%d %H:%M:%S')
 
         if simuler:
@@ -146,43 +377,23 @@ class of_import(models.Model):
         nb_echoue = 0
         erreur = 0
 
-#
-# LECTURE DU FICHIER D'IMPORT
-#
+        # LECTURE DU FICHIER D'IMPORT SELON EXTENSION (CHOISIR READER)
+        reader = self._choisir_reader()
 
-        # Lecture du fichier d'import par la bibliothèque csv de python
-        fichier = base64.decodestring(self.file)
-        dialect = csv.Sniffer().sniff(fichier) # Deviner automatiquement les paramètres : caractère séparateur, type de saut de ligne, ...
-        fichier = StringIO(fichier)
- 
-        # On prend le séparateur indiqué dans le formulaire si est renseigné.
-        # Sinon on prend celui deviné par la bibliothèque csv, et si vierge, on prend le ; par défaut.
-
-        if self.separateur and self.separateur.strip(' '):
-            dialect.delimiter = str(self.separateur.strip(' ').replace('\\t', '\t'))
-        else:
-            if dialect.delimiter and dialect.delimiter.strip(' '):
-                self.separateur = dialect.delimiter.replace('\t', '\\t')
-            else:
-                self.separateur = dialect.delimiter = ';'
-
-#
-# ANALYSE DES CHAMPS DU FICHIER D'IMPORT
-#
+        # ANALYSE DES CHAMPS DU FICHIER D'IMPORT
 
         # On récupère la 1ère ligne du fichier (liste des champs) pour vérifier si des champs existent en plusieurs exemplaires
-        ligne = fichier.readline().strip().decode('utf8', 'ignore').split(dialect.delimiter) # Liste des champs de la 1ère ligne du fichier d'import
+        ligne = reader.next()
 
         # Vérification si le champ primaire est bien dans le fichier d'import (si le champ primaire est défini)
         if champ_primaire and champ_primaire not in ligne:
             erreur = 1
             sortie_erreur += u"Le champ référence qui permet d'identifier un %s (%s) n'est pas dans le fichier d'import.\n" % (nom_objet, champ_primaire)
 
-        # Vérification si il y a des champs du fichier d'import qui sont en plusieurs exemplaires
-        # et détection champ relation (id, id externe, nom)
+        # Vérification si il y a des champs du fichier d'import qui sont en plusieurs exemplaires et détection champ relation (id, id externe, nom)
         doublons = {}
+
         for champ_fichier in ligne:
-            champ_fichier = champ_fichier.strip(dialect.quotechar) # On enlève les séparateurs de texte (souvent guillemet ou apostrophe) aux extrimités de la chaine.
 
             # Récupération du champ relation si est indiqué (dans le nom du champ après un /)
             champ_relation = champ_fichier[champ_fichier.rfind('/')+1 or len(champ_fichier):].strip() # On le récupère.
@@ -225,19 +436,20 @@ class of_import(models.Model):
         if prefixe and prefixe[-1:] != '_':
             prefixe = prefixe + '_'
 
-        fichier.seek(0, 0) # On remet le pointeur au début du fichier
-        fichier = csv.DictReader(fichier, dialect = dialect) # Renvoi une liste de dictionnaires avec le nom du champ_fichier comme clé
-
         doublons = {} # Variable pour test si enregistrement en plusieurs exemplaires dans fichier d'import
         i = 1 # No de ligne
 
-#
-# IMPORT ENREGISTREMENT PAR ENREGISTREMENT
-#
+    #
+    # IMPORT ENREGISTREMENT PAR ENREGISTREMENT
+    #
 
         # On parcourt le fichier enregistrement par enregistrement
-        for ligne in fichier:
-            ligne = {key.decode('utf8', 'ignore'):value.decode('utf8', 'ignore') for key, value in ligne.iteritems()}
+        while True:
+            try:
+                ligne = reader.next()
+            except StopIteration:
+                break
+
             i = i + 1
             nb_total = nb_total + 1
             erreur = 0
@@ -246,10 +458,7 @@ class of_import(models.Model):
             if champ_reference and champ_reference in ligne:
                 ligne[champ_reference] =  prefixe + ligne[champ_reference]
 
-    #
-    # PARCOURS DE TOUS LES CHAMPS DE L'ENREGISTREMENT
-    #
-
+            # PARCOURS DE TOUS LES CHAMPS DE L'ENREGISTREMENT
             valeurs = {} # Variables qui récupère la valeur des champs à importer (pour injection à fonction create ou update)
 
             # Parcours de tous les champs de la ligne
