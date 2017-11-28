@@ -1,15 +1,24 @@
 <?xml version="1.0"?>
 <odoo>
-<data>
+
 <template id="account.report_invoice_document">
     <t t-call="report.external_layout">
         <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})" />
+        <!--####################
+            Cette Vue est entièrement modifiée depuis le module of_account_invoice_report
+            ####################-->
         <div class="page">
             <div name="invoice_address" class="row">
                 <div class="col-xs-6"></div>
                 <div class="col-xs-5 col-xs-offset-1">
+                    <t t-if="o.partner_id.title and o.pdf_afficher_civilite()"><span t-field="o.partner_id.title"/></t>
+                    <span t-field="o.partner_id.name"/>
                     <address t-field="o.partner_id"
-                        t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}' />
+                        t-options='{"widget": "contact", "fields": ["address"], "no_marker": True}' />
+                    <t t-if="o.partner_id.phone and o.pdf_afficher_telephone()">Tél. <span t-field="o.partner_id.phone"/><br/></t>
+                    <t t-if="o.partner_id.mobile and o.pdf_afficher_mobile()">Tél. <span t-field="o.partner_id.mobile"/><br/></t>
+                    <t t-if="o.partner_id.fax and o.pdf_afficher_fax()">Fax <span t-field="o.partner_id.fax"/><br/></t>
+                    <t t-if="o.partner_id.email and o.pdf_afficher_email()"><span t-field="o.partner_id.email"/><br/></t>
                     <span t-if="o.partner_id.vat">TIN: <span t-field="o.partner_id.vat"/></span>
                 </div>
             </div>
@@ -43,7 +52,7 @@
                         <p t-field="o.date_due"/>
                     </div>
                     <div t-if="o.date_due and o.type == 'out_invoice' and (o.state == 'open' or o.state == 'paid')" style="display: table-cell; width: 4px;"/>
-                    
+
                     <div t-if="o.user_id" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                         <strong>Salesperson:</strong>
                         <p>
@@ -53,7 +62,7 @@
                         </p>
                     </div>
                     <div t-if="o.user_id" style="display: table-cell; width: 4px;"/>
-                    
+
                     <div t-if="o.reference and o.type == 'in_invoice'" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                         <strong>Doc Ref:</strong>
                         <p t-field="o.reference"/>
@@ -69,7 +78,7 @@
             <table class="table table-condensed">
                 <thead>
                     <tr>
-                        <th class="col-xs-7">Description</th>
+                        <th style="width: 60%">Description</th>
                         <th class="hidden">Source Doc</th>
                         <th class="text-right">Qty</th>
                         <th class="text-right">Unit Price</th>
@@ -80,7 +89,17 @@
                 </thead>
                 <tbody class="invoice_tbody">
                     <tr t-foreach="o.invoice_line_ids" t-as="l">
-                        <td><span t-field="l.name"/></td>
+                        <t t-set="the_name" t-value="l.of_get_line_name()"/>
+                        <t t-set="name_line" t-value="the_name[0]"/>
+                        <t t-set="the_name" t-value="the_name[1:]"/>
+                        <td>
+                            <span t-esc="name_line"/>
+                            <t t-foreach="the_name" t-as="name_line">
+                                <br/>
+                                <span t-esc="name_line"/>
+                            </t>
+                            <span t-field="l.name" style="display: none;"/>  <!-- à conserver pour héritages -->
+                        </td>
                         <td class="hidden"><span t-field="l.origin"/></td>
                         <td class="text-right">
                             <span t-field="l.quantity"/>
@@ -134,13 +153,15 @@
                                     <i><span>Paid on </span><span t-field="payment_entry.date"/></i>
                                 </td>
                                 <td>
-                                    <span class="pull-right text-right"><t t-esc="payment['amount']" t-esc-options='{"widget": "monetary", "display_currency": "o.currency_id"}'/></span>
+                                    <span class="pull-right text-right"><t t-esc="payment['amount']" t-options='{"widget": "monetary", "display_currency": "o.currency_id"}'/></span>
+                                    <!--span class="pull-right text-right"><t t-esc="payment['amount']" t-esc-options='{"widget": "monetary", "display_currency": "o.currency_id"}'/></span-->
                                 </td>
                             </tr>
                             <tr class="border-black">
                                 <td><strong>Amount left </strong></td>
                                 <td class="text-right">
-                                    <span t-field="o.residual" t-field-options='{"widget": "monetary", "display_currency": "o.currency_id"}'/>
+                                    <span t-field="o.residual" t-options='{"widget": "monetary", "display_currency": "o.currency_id"}'/>
+                                    <!--span t-field="o.residual" t-field-options='{"widget": "monetary", "display_currency": "o.currency_id"}'/-->
                                 </td>
                             </tr>
                         </t>
@@ -174,6 +195,7 @@
                 </div>
             </div>
 
+            <!-- à conserver: héritage -->
             <p t-if="o.comment"> 
                 <strong>Comment:</strong>
                 <span t-field="o.comment"/>
@@ -188,5 +210,13 @@
         </div>
     </t>
 </template>
-</data>
+
+<template id="report_invoice">
+    <t t-call="report.html_container">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="account.report_invoice_document" t-lang="o.partner_id.lang"/>
+        </t>
+    </t>
+</template>
+
 </odoo>

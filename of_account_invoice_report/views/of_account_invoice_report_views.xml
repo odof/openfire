@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="of_view_account_config_settings" model="ir.ui.view">
+        <field name="name">(OF) account settings</field>
+        <field name="model">account.config.settings</field>
+        <field name="inherit_id" ref="of_account.of_view_account_config_settings"/>
+        <field name="arch" type="xml">
+            <!-- rendre group visible -->
+            <xpath expr="//group[@name='rubrique_report']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
+            <!-- ajout param -->
+            <xpath expr="//group[@name='rubrique_report']" position="inside">
+                <label for="pdf_adresse_civilite"/>
+                <div name="pdf_afficher_civilite">
+                    <field name="pdf_adresse_civilite" class="oe_inline"/>
+                    <span>Afficher la(les) civilité(s) dans les rapports PDF</span>
+                </div>
+                <label for="pdf_adresse_telephone"/>
+                <div name="pdf_afficher_telephone">
+                    <field name="pdf_adresse_telephone" class="oe_inline"/>
+                    <span>Afficher le numéro de téléphone dans les rapports PDF</span>
+                </div>
+                <label for="pdf_adresse_mobile"/>
+                <div name="pdf_adresse_mobile">
+                    <field name="pdf_adresse_mobile" class="oe_inline"/>
+                    <span>Afficher le numéro de mobile dans les rapports PDF</span>
+                </div>
+                <label for="pdf_adresse_fax"/>
+                <div name="pdf_afficher_fax">
+                    <field name="pdf_adresse_fax" class="oe_inline"/>
+                    <span>Afficher le fax dans les rapports PDF</span>
+                </div>
+                <label for="pdf_adresse_email"/>
+                <div name="pdf_afficher_email">
+                    <field name="pdf_adresse_email" class="oe_inline"/>
+                    <span>Afficher l'adresse email dans les rapports PDF</span>
+                </div>
+                <label for="pdf_display_product_ref"/>
+                <div name="pdf_display_product_ref">
+                    <field name="pdf_display_product_ref" class="oe_inline"/>
+                    <span>Afficher les références produits dans les rapports PDF</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
