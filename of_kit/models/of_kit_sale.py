@@ -385,7 +385,14 @@ class OFSaleOrderKit(models.Model):
 							help="Sum of the prices of all components necessary for 1 unit of this kit", oldname="unit_compo_price")
 	cost_comps = fields.Monetary('Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
                                   help="Sum of the costs of all components necessary for 1 unit of this kit")
-
+	qty_invoiced = fields.Float(related="order_line_id.qty_invoiced", readonly=True)
+	state = fields.Selection([
+        ('draft', 'Quotation'),
+        ('sent', 'Quotation Sent'),
+        ('sale', 'Sale Order'),
+        ('done', 'Done'),
+        ('cancel', 'Cancelled'),
+    ], related='order_line_id.state', string='Order Status', copy=False, store=True, default='draft')
 	to_unlink = fields.Boolean(string="to unlink?", default=False)
 	of_pricing = fields.Selection([
         ('fixed', 'Fixed'),
@@ -496,6 +503,8 @@ class OFSaleOrderKitLine(models.Model):
 	procurement_ids = fields.One2many('procurement.order', 'of_sale_comp_id', string='Procurements')
 
 	qty_delivered = fields.Float(string='Delivered Qty', copy=False, digits=dp.get_precision('Product Unit of Measure'), default=0.0)
+	qty_delivered_updateable = fields.Boolean(compute='_compute_qty_delivered_updateable', string='Can Edit Delivered', readonly=True, default=True)
+	invoiced = fields.Boolean("Invoiced", compute="_compute_invoiced")  # for readonly in XML
 
 	@api.onchange('product_id')
 	def _onchange_product_id(self):
@@ -520,6 +529,7 @@ class OFSaleOrderKitLine(models.Model):
 
 			self.update(new_vals)
 
+	@api.multi
 	@api.depends('price_unit', 'cost_unit', 'qty_per_kit', 'nb_kits')
 	def _compute_prices(self):
 		for comp in self:
@@ -531,10 +541,23 @@ class OFSaleOrderKitLine(models.Model):
 			comp.cost_per_kit = comp.cost_unit * qty_per_kit
 			comp.cost_total = comp.cost_unit * qty_per_kit * comp.nb_kits
 
+	@api.multi
 	@api.depends('qty_per_kit', 'nb_kits')
 	def _compute_qty_total(self):
 		for comp in self:
 			comp.qty_total = comp.qty_per_kit * comp.nb_kits 
+
+	@api.multi
+	@api.depends("kit_id")
+	def _compute_invoiced(self):
+		for kit_line in self:
+			kit_line.invoiced = kit_line.kit_id.order_line_id and kit_line.kit_id.order_line_id.qty_invoiced
+
+	@api.multi
+	@api.depends('product_id.invoice_policy', 'order_id.state')
+	def _compute_qty_delivered_updateable(self):
+		for line in self:
+			line.qty_delivered_updateable = (line.order_id.state == 'sale') and (line.product_id.track_service == 'manual') and (line.product_id.expense_policy == 'no')
 
 	@api.multi
 	def _prepare_order_comp_procurement(self, group_id=False):
