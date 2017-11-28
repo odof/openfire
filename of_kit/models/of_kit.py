@@ -238,6 +238,8 @@ class OFKitProductKitLine(models.Model):
     product_qty = fields.Float(string='Qty / Kit', digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0,
                                help="Quantity per kit unit.")
     product_uom_id = fields.Many2one('product.uom', string='UoM', default=_get_default_product_uom_id, required=True, oldname="product_uom")
+    product_price = fields.Float(related='product_id.list_price', readonly=True)
+    product_cost = fields.Float(related='product_id.standard_price', readonly=True)
     sequence = fields.Integer(string=u'Sequence', default=10)
 
     @api.constrains('kit_id', 'product_id')
