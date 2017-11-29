@@ -53,7 +53,7 @@ class OFSaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'
 
     of_stock_warning_setting = fields.Boolean(string="Avertissements de stock", required=True, default=False,
-            help="Afficher les messages d'avertissement de stock?")
+            help="Afficher les messages d'avertissement de stock ?")
 
     @api.multi
     def set_stock_warning_defaults(self):

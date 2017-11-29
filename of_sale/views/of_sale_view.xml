@@ -49,7 +49,12 @@
                         <label for="pdf_adresse_civilite"/>
                         <div name="pdf_afficher_civilite">
                             <field name="pdf_adresse_civilite" class="oe_inline"/>
-                            <span>Afficher la(les) civilité(s) dans les rapports PDF</span>
+                            <span>Afficher la civilité dans les rapports PDF</span>
+                        </div>
+                        <label for="pdf_adresse_nom_parent"/>
+                        <div name="pdf_afficher_nom_parent">
+                            <field name="pdf_adresse_nom_parent" class="oe_inline"/>
+                            <span>Remplacer le nom du contact par celui du parent dans les rapports PDF</span>
                         </div>
                         <label for="pdf_adresse_telephone"/>
                         <div name="pdf_afficher_telephone">

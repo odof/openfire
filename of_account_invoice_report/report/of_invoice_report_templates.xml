@@ -11,8 +11,13 @@
             <div name="invoice_address" class="row">
                 <div class="col-xs-6"></div>
                 <div class="col-xs-5 col-xs-offset-1">
-                    <t t-if="o.partner_id.title and o.pdf_afficher_civilite()"><span t-field="o.partner_id.title"/></t>
-                    <span t-field="o.partner_id.name"/>
+                    <t t-set="the_address" t-value="o.partner_id"/>
+                    <t t-if="o.pdf_afficher_nom_parent()">
+                        <t t-if="the_address.parent_id"><t t-set="the_address" t-value="the_address.parent_id"/></t>
+                    </t>
+                    <t t-if="the_address.title and o.pdf_afficher_civilite()"><span t-field="the_address.title"/></t>
+                    <t t-if="the_address.name"><span t-field="the_address.name"/></t>
+                    <t t-if="not the_address.name and the_address.parent_id"><span t-field="the_address.parent_id.name"/></t>
                     <address t-field="o.partner_id"
                         t-options='{"widget": "contact", "fields": ["address"], "no_marker": True}' />
                     <t t-if="o.partner_id.phone and o.pdf_afficher_telephone()">Tél. <span t-field="o.partner_id.phone"/><br/></t>
@@ -42,7 +47,7 @@
                     <div t-if="o.partner_id.ref" style="display: table-cell; width: 4px;"/>
 
                     <div t-if="o.origin" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
-                        <strong>Source Doc:</strong>
+                        <strong>Origin:</strong>
                         <p t-field="o.origin"/>
                     </div>
                     <div t-if="o.origin" style="display: table-cell; width: 4px;"/>
