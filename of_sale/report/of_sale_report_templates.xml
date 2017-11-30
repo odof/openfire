@@ -11,7 +11,7 @@
             <div name="addresses" class="row mt8">
                 <div class="col-xs-6">
                     <div t-if="doc.partner_shipping_id != doc.partner_id">
-                        <strong>Adresse de Livraison :</strong><br/>
+                        <strong>Adresse de livraison :</strong><br/>
                         <t t-if="doc.partner_shipping_id.title and doc.pdf_afficher_civilite()"><span t-field="doc.partner_shipping_id.title"/></t>
                         <span t-field="doc.partner_shipping_id.name"/>
                         <div t-field="doc.partner_shipping_id" t-field-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;], &quot;no_marker&quot;: true}"/>
@@ -41,13 +41,13 @@
                     <div><strong>Vos références : </strong></div>
                     <div class="mt8" id="informations" style="display: table">
                         <div t-if="doc.partner_id.ref" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
-                            <strong>Réf. Client:</strong>
+                            <strong>Réf. client :</strong>
                             <p t-field="doc.partner_id.ref"/>
                         </div>
                         <div t-if="doc.partner_id.ref" style="display: table-cell; width: 4px;"/>
 
                         <div t-if="doc.client_order_ref" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
-                            <strong>Réf. Commande:</strong>
+                            <strong>Réf. commande :</strong>
                             <p t-field="doc.client_order_ref"/>
                         </div>
                         <div t-if="doc.client_order_ref" style="display: table-cell; width: 4px"/>
@@ -64,7 +64,7 @@
 
                         <!-- div name="payment_term" important pour sale_stock.report_saleorder_document_inherit_sale_stock -->
                         <div name="payment_term" t-if="doc.payment_term_id" style="flex: 1; padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
-                            <strong>Conditions de Règlement:</strong>
+                            <strong>Conditions de règlement :</strong>
                             <p t-field="doc.payment_term_id"/>
                         </div>
                     </div>
@@ -78,7 +78,7 @@
                 <table class="table table-condensed">
                     <thead>
                         <tr>
-                            <th>Description</th>
+                            <th style="width: 60%">Description</th>
                             <th class="text-right">Quantity</th>
                             <th class="text-right">Unit Price</th>
                             <th t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">Disc.(%)</th>
@@ -119,7 +119,7 @@
                                         <span t-field="l.product_uom" groups="product.group_uom"/>
                                     </td>
                                     <td class="text-right">
-                                        <span t-field="l.price_unit"/>
+                                        <span t-field="l.price_unit" t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
                                     </td>
                                     <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
                                         <span t-field="l.discount"/>
@@ -141,7 +141,7 @@
                             <t t-if="(layout_category_size > 1 or page_size > 1) and layout_category['subtotal']" groups="sale.group_sale_layout">
                                 <tr class="text-right">
                                     <td colspan="6">
-                                        <strong>Subtotal: </strong>
+                                        <strong>Subtotal : </strong>
                                         <t t-set="subtotal" t-value="sum(line.price_subtotal for line in layout_category['lines'])"/>
                                         <span t-esc="subtotal" t-options="{'widget': 'monetary', 'display_currency': doc.pricelist_id.currency_id}"/>
                                     </td>
@@ -161,7 +161,7 @@
                 <div class="col-xs-4 pull-right">
                     <table class="table table-condensed">
                         <tr class="border-black">
-                            <td><strong>Total Hors Taxes</strong></td>
+                            <td><strong>Total hors taxe</strong></td>
                             <td class="text-right">
                                 <span t-field="doc.amount_untaxed" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;doc.pricelist_id.currency_id&quot;}"/>
                             </td>
@@ -190,7 +190,7 @@
                 <span t-field="doc.partner_id.property_payment_term_id.note"/>
             </p>
             <p id="fiscal_position_remark" t-if="doc.fiscal_position_id and doc.fiscal_position_id.note">
-                <strong>Note de position fiscale:</strong>
+                <strong>Note de position fiscale :</strong>
                 <span t-field="doc.fiscal_position_id.note"/>
             </p>
             <div class="oe_structure"/>
@@ -209,7 +209,7 @@
         <div name="addresses" class="row mt8" groups="sale.group_delivery_invoice_address">
             <div class="col-xs-6">
                 <div t-if="o.partner_shipping_id != o.partner_id">
-                    <strong>Adresse de Livraison :</strong><br/>
+                    <strong>Adresse de livraison :</strong><br/>
                     <t t-if="o.partner_shipping_id.title and o.pdf_afficher_civilite()"><span t-field="o.partner_shipping_id.title"/></t>
                     <span t-field="o.partner_shipping_id.name"/>
                     <div t-field="o.partner_shipping_id" t-field-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;], &quot;no_marker&quot;: true}"/>

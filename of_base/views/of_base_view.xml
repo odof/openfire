@@ -49,9 +49,9 @@
                 <field name="zip" position="after">
                     <field name="city" class="o_address_city" placeholder="City" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
                 </field>
-                <!-- Ajout Notes Client dans l'onglet Notes internes -->
+                <!-- Ajout Notes client dans l'onglet Notes internes -->
                 <xpath expr="//notebook/page[2]" position="inside">
-                    <separator string="Notes Client" colspan="4"/>
+                    <separator string="Notes client" colspan="4"/>
                     <field name="of_notes_client" colspan="4" nolabel="1" widget="html"/>
                 </xpath>
             </field>

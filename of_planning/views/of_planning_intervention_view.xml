@@ -165,10 +165,10 @@
                             <!-- label colspan="4" string="Description" align="0.00"/ -->
                             <separator string="Description" colspan="2"/>
                             <field colspan="2" name="description" nolabel="1" context="{'tz': 'Europe/Paris'}" witget="html"/>
-                            <!-- Notes Intervention -->
-                            <separator string="Notes Client" colspan="2"/>
+                            <!-- Notes intervention -->
+                            <separator string="Notes client" colspan="2"/>
                             <field name="of_notes_client" nolabel="1"/>
-                            <separator string="Notes Intervention" colspan="2"/>
+                            <separator string="Notes intervention" colspan="2"/>
                             <field name="of_notes_intervention" nolabel="1"/>
                         </group>
                     </sheet>
