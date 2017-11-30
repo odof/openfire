@@ -28,9 +28,8 @@ Paramètres de Ventes (sale.config.settings)
     "data": [
         'views/of_sale_stock_views.xml',
         'report/of_report_stockinventory_valued.xml',
-        #'report/of_sale_stock_report_templates.xml',
-        #'wizard/of_sale_stock_wizard_views.xml',
-        'of_sale_stock_data.xml'
+        'wizard/of_sale_stock_wizard_views.xml',
+        'of_sale_stock_data.xml',
     ],
     'installable': True,
     'application': False,

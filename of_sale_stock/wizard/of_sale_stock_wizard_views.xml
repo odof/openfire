@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_stock_livrefacture_wizard_view" model="ir.ui.view">
+        <field name="name">of.sale_stock.livrefacture.wizard.view</field>
+        <field name="model">of_sale_stock.livre_facture_wizard</field>
+        <field name="arch" type="xml">
+            <form string="Imprimer un rapport PDF de ventes">
+                <group col="3">
+                    <field name="type"/><span/>
+                    <field name="date_from"/><em>inclus</em>
+                    <field name="date_to"/><em>inclus</em>
+                </group>
+                <div name="comments">
+                    <em class="oe_grey" attrs="{'invisible': ['|',('date_from', '!=', False),('date_to', '!=', False)]}">
+                        Si aucune date n'est remplie, la recherche se fera depuis la création de la base jusqu'à aujourd'hui
+                    </em>
+                </div>
+                <footer>
+                    <button string="Imprimer" name="button_print" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_sale_stock_livrefacture_wizard_action" model="ir.actions.act_window">
+        <field name="name">Impression Rapports livraisons/facturations</field>
+        <field name="res_model">of_sale_stock.livre_facture_wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="of_sale_stock_livrefacture_wizard_menu" name="Livraisons/Facturations" parent="sales_team.menu_sale_report" action="of_sale_stock_livrefacture_wizard_action" sequence="60"/>
+
+</odoo>
