@@ -12,6 +12,7 @@ Extension OpenFire du module sale_stock
 
 - Ajout du champ 'product_value' dans 'stock.inventory.line' pour le groupe Comptabilité - Gestionnaire
 - Ajout du rapport "Inventaire valorisé" dans 'stock.inventory.line' pour le groupe Comptabilité - Gestionnaire
+- Redéfinition des templates sale_stock.report_saleorder_document_inherit_sale_stock et sale_stock.report_delivery_document_inherit_sale_stock
 
 Paramètres de Ventes (sale.config.settings)
 -------------------------------------------
@@ -23,11 +24,13 @@ Paramètres de Ventes (sale.config.settings)
     "depends": [
         "sale_stock",
         "of_sale",
+        "of_stock",
     ],
     "category": "OpenFire",
     "data": [
         'views/of_sale_stock_views.xml',
         'report/of_report_stockinventory_valued.xml',
+        'report/of_sale_stock_report_templates',
     ],
     'installable': True,
     'application': False,
