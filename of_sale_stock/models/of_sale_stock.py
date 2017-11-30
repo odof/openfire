@@ -22,6 +22,23 @@ class OFSaleStockInventoryLine(models.Model):
             # @TODO: gérer le multi-currency
             line.product_value = line.product_id.standard_price * line.product_qty
 
+class SaleOrder(models.Model):
+    _inherit = "sale.order"
+
+    of_picking_min_date = fields.Datetime(compute=lambda x: False, search='_search_of_picking_min_date', string="Date bon de livraison")
+
+    @api.model
+    def _search_of_picking_min_date(self, operator, value):
+        pickings = self.env['stock.picking'].search([('min_date', operator, value)])
+        order_ids = []
+        if pickings:
+            self._cr.execute("SELECT o.id "
+                "FROM sale_order AS o "
+                "INNER JOIN stock_picking AS p ON p.group_id = o.procurement_group_id "
+                "WHERE p.id IN %s", (tuple(pickings._ids), ))
+            order_ids = [row[0] for row in self._cr.fetchall()]
+        return [('id', 'in', order_ids)]
+
 class OFSaleStockSaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
