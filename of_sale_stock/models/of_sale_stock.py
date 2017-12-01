@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-# Part of Openfire. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models
 import odoo.addons.decimal_precision as dp
 
+
 class OFSaleStockInventory(models.Model):
     _inherit = "stock.inventory"
     _order = "date desc, name"
+
 
 class OFSaleStockInventoryLine(models.Model):
     _inherit = "stock.inventory.line"
@@ -25,10 +26,12 @@ class OFSaleStockInventoryLine(models.Model):
             else:
                 line.product_value = 0.0
 
+
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     of_picking_min_date = fields.Datetime(compute=lambda x: False, search='_search_of_picking_min_date', string="Date bon de livraison")
+    of_picking_date_done = fields.Datetime(compute=lambda x: False, search='_search_of_picking_date_done', string="Date transfert bon de livraison")
 
     @api.model
     def _search_of_picking_min_date(self, operator, value):
@@ -42,6 +45,19 @@ class SaleOrder(models.Model):
             order_ids = [row[0] for row in self._cr.fetchall()]
         return [('id', 'in', order_ids)]
 
+    @api.model
+    def _search_of_picking_date_done(self, operator, value):
+        pickings = self.env['stock.picking'].search([('date_done', operator, value)])
+        order_ids = []
+        if pickings:
+            self._cr.execute("SELECT o.id "
+                "FROM sale_order AS o "
+                "INNER JOIN stock_picking AS p ON p.group_id = o.procurement_group_id "
+                "WHERE p.id IN %s", (tuple(pickings._ids), ))
+            order_ids = [row[0] for row in self._cr.fetchall()]
+        return [('id', 'in', order_ids)]
+
+
 class OFSaleStockSaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
@@ -51,6 +67,7 @@ class OFSaleStockSaleOrderLine(models.Model):
         afficher_warning = self.env['ir.values'].get_default('sale.config.settings', 'of_stock_warning_setting')
         if afficher_warning:
             return super(OFSaleStockSaleOrderLine, self)._onchange_product_id_check_availability()
+
 
 class OFSaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'
