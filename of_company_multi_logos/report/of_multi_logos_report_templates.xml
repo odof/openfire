@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Permettre l'affichage des logos additionnels dans l'en-tête des rapports pdf -->
+    <!-- Désactivé le temps de mettre tous les templates report.external_layout_header en no_update = False. Réactiver ensuite. -->
+<!--     <template id="of_external_layout_header_multi_logos" inherit_id="report.external_layout_header">
+        <xpath expr="//div[@name='company_header_center_top']" position="inside">
+            <div style="display:inline-block;">
+                <t t-foreach="company.of_logo_ids" t-as="logo">
+                    <t t-set="le_logo" t-value="logo.getLogo()"/>
+                    <div style="display: inline;"><img t-att-src="'data:image/png;base64,%s' % le_logo" style="max-height: 64px; max-width: 64px; padding-left: 4px;"/></div>
+                </t>
+            </div>
+        </xpath>
+    </template> -->
+
+</odoo>

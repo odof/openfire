@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report.external_layout_header">
+
+    <!--  On redéfinit totalement l'en-tête par défaut d'Odoo par un en-tête personnalisable. -->
+    <div class="header">
+        <div style="height: 132px; padding-top: 16px">
+            <div name="company_header" style="width: 73%; display: inline-block; vertical-align: top;">
+                <div name="company_header_logo" style="display: inline-block; vertical-align: top;">
+                    <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo" style="max-height: 128px; max-width: 192px;"/>
+                </div>
+                <div name="company_header_center" style="min-width: 60%; display: inline-block; vertical-align: top; padding-left: 8px;">
+                    <!-- Les multi-logos viennent là. -->
+                    <div name="company_header_center_top" style="display: block;"/>
+
+                    <div name="company_address_right" t-if="company.of_position_header_lines == 'logo_right'" style="min-width: 99%; display: inlin-block;">
+                        <div style="display: inline-block; min-width: 99%; vertical-align: top;">
+                            <span t-esc="company.get_line_content('header', 1)" t-attf-style="font-size: #{company.of_custom_header_line_1_size};"/><br/>
+                            <span t-esc="company.get_line_content('header', 2)" t-attf-style="font-size: #{company.of_custom_header_line_2_size};"/><br/>
+                            <span name="of_custom_header_line_3_right" t-esc="company.get_line_content('header', 3)" t-attf-style="font-size: #{company.of_custom_header_line_3_size};"/>
+                        </div>
+                    </div>
+                </div>
+                <br t-if="company.of_position_header_lines == 'logo_under'"/>
+                <div t-if="company.of_position_header_lines == 'logo_under'" style="min-width: 99%; display: inline-block;">
+                    <div name="company_address" style="display: inline-block; min-width: 50%; vertical-align: top;">
+                        <span t-esc="company.get_line_content('header', 1)" t-attf-style="font-size: #{company.of_custom_header_line_1_size};"/><br/>
+                        <span t-esc="company.get_line_content('header', 2)" t-attf-style="font-size: #{company.of_custom_header_line_2_size};"/><br/>
+                        <span name="of_custom_header_line_3" t-esc="company.get_line_content('header', 3)" t-attf-style="font-size: #{company.of_custom_header_line_3_size};"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Entre les 2 parties de l'en-tête -->
+            <div name="gutter" style="width: 1%; vertical-align: top; display:inline-block;"/>
+
+            <!-- Pastille grise -->
+            <div name="doc_infochip" class="pull-right"
+              style="width: 25%; background-color: lightgray; font-size: large; padding: 8px 16px;
+                  border-radius: 8px; display: inline-block; vertical-align: top;">
+
+                <div name="doc_title" style="font-size: large; text-align: center; padding: 4px 0px;">
+                    <strong>
+                    <!-- Si le document possède un type -->
+                    <t t-if="o">
+                        <!-- si le document est de type facture -->
+                        <t t-if="o._name == 'account.invoice'">
+                            <span t-if="o.type == 'out_invoice' and (o.state == 'open' or o.state == 'paid')">Facture<br/></span>
+                            <span t-if="o.type == 'out_invoice' and o.state == 'proforma2'">Facture PRO-FORMA<br/></span>
+                            <span t-if="o.type == 'out_invoice' and o.state == 'draft'">Facture brouillon<br/></span>
+                            <span t-if="o.type == 'out_invoice' and o.state == 'cancel'">Facture annulée<br/></span>
+                            <span t-if="o.type == 'out_refund'">Avoir<br/></span>
+                            <span t-if="o.type == 'in_refund'">Avoir fournisseur<br/></span>
+                            <span t-if="o.type == 'in_invoice'">Facture fournisseur<br/></span>
+                        </t>
+                        <!-- Si le document est de type devis -->
+                        <t t-if="o._name == 'sale.order'">
+                            <span t-if="o.state in ['draft','sent']">Devis</span>
+                            <span t-if="o.state not in ['draft','sent']">Bon de commande</span>
+                            <br/>
+                        </t>
+                        <!-- si le document est de type achat -->
+                        <t t-if="o._name == 'purchase.order'">
+                            <span t-if="o.state in ['draft','sent']">Demande de prix</span>
+                            <span t-if="o.state == 'to approve'">À approuver</span>
+                            <span t-if="o.state in ['purchase','done']">Commande fournisseur</span>
+                            <span t-if="o.state == 'cancel'">Annulé</span>
+                        </t>
+                        <!-- si le document est de type bon de préparation -->
+                        <t t-if="o._name == 'stock.picking'">
+                            <span name="bon_livraison" style="font-size: medium;">Bon de livraison</span>
+                        </t>
+                    </t>
+                    <!-- Si le document ne possède pas de type (exemple: aperçu de rapport) -->
+                    <t t-if="not o">
+                        <span>Document sans objet</span><br/>
+                    </t>
+                    </strong>
+                </div>
+                <div name="doc_number" class="of_doc_infochip_line" col="2">
+                    <div style="text-align: left; display: inline-block;">N° :</div>
+                    <div name="doc_number" style="text-align: right; float: right; display: inline-block;">
+                        <strong>
+                        <!-- Si le document possède un type -->
+                        <t t-if="o">
+                            <!-- si le document est de type facture -->
+                            <t t-if="o._name == 'account.invoice'">
+                                <span t-if="o.number" t-field="o.number"/>
+                                <span t-if="not o.number">-</span>
+                            </t>
+                            <!-- si le document est de type devis ou achat-->
+                            <t t-if="o._name == 'sale.order' or o._name == 'purchase.order'">
+                                <span t-field="o.name"/>
+                            </t>
+                            <!-- si le document est de type préparation/livraison-->
+                            <t t-if="o._name == 'stock.picking'">
+                                <span t-field="o.name" style="margin-left: -4px; font-size: medium;"/>
+                            </t>
+                        </t>
+                        <!-- Si le document ne possède pas de type (exemple: aperçu de rapport) -->
+                        <t t-if="not o">
+                            <span>-</span>
+                        </t>
+                        </strong>
+                    </div>
+                </div>
+                <div name="doc_date" class="of_doc_infochip_line" col="2">
+                    <div style="text-align: left; display: inline-block;">Date :</div>
+                    <div name="doc_date" style="text-align: right; float: right; display: inline-block;">
+                        <strong>
+                        <!-- Si le document possède un type -->
+                        <t t-if="o">
+                            <!-- Si le document est de type facture -->
+                            <t t-if="o._name == 'account.invoice'">
+                                <span t-if="o.date_invoice" t-field="o.date_invoice"></span>
+                                <span t-if="not o.date_invoice">-</span>
+                            </t>
+                            <!-- Si le document est de type devis-->
+                            <t t-if="o._name == 'sale.order'">
+                                <t t-if="o.date_order and not o.confirmation_date">
+                                    <t t-set="date_order" t-value="o.date_order[8:10] + '/' + o.date_order[5:7] + '/' + o.date_order[0:4]"/>
+                                    <span t-esc="date_order"/>
+                                </t>
+                                <t t-if="o.confirmation_date">
+                                    <t t-set="confirmation_date" t-value="o.confirmation_date[8:10] + '/' + o.confirmation_date[5:7] + '/' + o.confirmation_date[0:4]"/>
+                                    <span t-esc="confirmation_date"/>
+                                </t>
+                                <span t-if="not o.date_order and not o.confirmation_date">-</span>
+                            </t>
+                            <!-- Si le document est de type achat -->
+                            <t t-if="o._name == 'purchase.order'">
+                                <t t-if="o.date_order">
+                                    <t t-set="date_order" t-value="o.date_order[8:10] + '/' + o.date_order[5:7] + '/' + o.date_order[0:4]"/>
+                                    <span t-esc="date_order"/>
+                                </t>
+                                <span t-if="not o.date_order">-</span>
+                            </t>
+                            <!--Si le document est de type préparation/livraison -->
+                            <t t-if="o._name == 'stock.picking'">
+                                <t t-if="o.date_done">
+                                    <t t-set="date_done" t-value="o.date_done[8:10] + '/' + o.date_done[5:7] + '/' + o.date_done[0:4]"/>
+                                    <span t-esc="date_done"/>
+                                </t>
+                                <t t-elif="o.date">
+                                    <t t-set="date" t-value="o.date[8:10] + '/' + o.date[5:7] + '/' + o.date[0:4]"/>
+                                    <span t-esc="date"/>
+                                </t>
+                                <t t-else="">
+                                    <span>-</span>
+                                </t>
+                            </t>
+                        </t>
+                        <!-- Si le document ne possède pas de type (exemple: aperçu de rapport) -->
+                        <t t-if="not o">
+                            <!-- TODO: date du jour si pas de type -->
+                            <span>-</span>
+                        </t>
+                        </strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </template>
+
+    <template id="report.external_layout_footer">
+        <!--####################
+            La vue d'origine est entièrement réécrite ici.
+            ####################-->
+        <div class="footer">
+            <div style="border-bottom: 1px solid black; padding-top: 16px;"/>
+            <div class="col-xs-10 col-xs-offset-1 text-center" style="font-size: small; padding-top: 8px;">
+
+               <t t-if="not company.custom_footer and not company.use_of_custom_footer" class="list-inline">
+                    <span>
+                        <t t-if="company.name"><span t-field="company.name"/></t>
+                        <t t-if="company.company_registry"> - <span t-field="company.company_registry"/></t>
+                        <t t-if="company.ape"> - APE <span t-field="company.ape"/></t>
+                        <br/>
+                        <t t-if="company.siret">SIRET <span t-field="company.siret"/></t>
+                    </span>
+                    <t t-if="company.vat"> - TVA&amp;nbsp;: <span t-field="company.vat"/></t>
+                    <ul t-if="not company.custom_footer" class="list-inline" name="financial_infos"></ul>
+                </t>
+
+                <t t-if="company.custom_footer and not company.use_of_custom_footer">
+                    <span t-raw="company.rml_footer"/>
+                </t>
+
+                <t t-if="company.use_of_custom_footer and not company.custom_footer">
+                    <span t-esc="company.get_line_content('footer', 1)" t-attf-style="font-size: #{company.of_custom_footer_line_1_size};"/><br/>
+                    <span t-esc="company.get_line_content('footer', 2)" t-attf-style="font-size: #{company.of_custom_footer_line_2_size};"/><br/>
+                    <span t-esc="company.get_line_content('footer', 3)" t-attf-style="font-size: #{company.of_custom_footer_line_3_size};"/>
+                </t>
+
+                <t t-if="company.custom_footer and company.use_of_custom_footer">
+                    <span>
+                        company.custom_footer et company.use_of_custom_footer sont tous deux à vrai. L'un des deux doit être à faux.\n"
+                    </span>
+                </t>
+            </div>
+
+            <!-- Affichage des numéros de pages -->
+            <div class="col-xs-1 text-right" style="font-size: x-small; padding-top: 45px">
+                <span class="page"/>/<span class="topage"/>
+            </div>
+        </div>
+    </template>
+</odoo>

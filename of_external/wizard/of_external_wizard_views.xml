@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<record id="of_external_mako_wizard_view" model="ir.ui.view">
+    <field name="name">Variables mako</field>
+    <field name="model">of.external.mako.wizard</field>
+    <field name="arch" type="xml">
+        <form>
+            <h1>Variables Mako</h1>
+            <separator string="Quoi et pourquoi ?"/>
+            <p>
+                Les variables Mako sont utilisées pour insérer dynamiquement le contenu de champs à l'intérieur d'un champ de type 'Char', 'Text' ou 'Html'.<br/>
+                Disons que vous désirez placer le numéro de téléphone de votre société dans l'en-tête.<br/>
+                Vous pouvez directement écrire ce numéro dans une ligne. Mais si ensuite vous modifiez ce numéro dans la fiche de société, Il vous faudra aussi le modifier dans la ligne d'en-tête.<br/>
+                OU ALORS, vous pouvez utiliser une variable Mako, et de cette façon le système mettera automatiquement à jour votre ligne d'en-tête si vous modifiez le numéro de téléphone dans la fiche société.<br/>
+            </p>
+            <separator string="Comment ?"/>
+            <p>
+                À l'intérieur de votre champ texte, utiliser la syntaxe <strong>${object.nom_du_champ}</strong>, où 'nom_du_champ' est le nom du champ à insérer.<br/>
+                Pour voir les noms des champs, activer le mode développeur et placer votre curseur de souris sur un champ. Après une seconde, une bulle d'aide contenant le nom du champ apparaitra.<br/>
+                Noms de champs basiques d'une société : <em>name, street, street2, zip, city, country_id.name, website, phone, fax, email...</em>
+             </p>
+            <p>
+                Exemple de lignes d'en-tête :<br/>
+                ligne 1: ${object.street2}, ${object.street}<br/>
+                ligne 2: ${object.zip}, ${object.city}<br/>
+                ligne 3: ${object.email}<br/>
+                <em>affichera l'adresse sur les deux premières lignes et l'email sur la troisième.</em>
+            </p>
+            <footer>
+                <button string="Exit" class="btn-default btn-primary" special="cancel"/>
+            </footer>
+        </form>
+    </field>
+</record>
+
+<record id="of_external_open_mako_wizard_action" model="ir.actions.act_window">
+    <field name="name">Ouvrir l'aide mako</field>
+    <field name="res_model">of.external.mako.wizard</field>
+    <field name="view_type">form</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+</record>
+
+</odoo>

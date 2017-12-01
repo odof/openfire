@@ -1,3 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_of_multi_logos_user,of.multi.logos.user,model_of_company_multi_logos,,1,0,0,0
-access_of_multi_logos_manager,of.multi.logos.manager,model_of_company_multi_logos,base.group_erp_manager,1,1,1,1
+access_of_multi_logos_manager,of.multi.logos.manager,model_of_company_multi_logos,base.group_system,1,1,1,1

@@ -4,7 +4,7 @@
     <t t-call="report.external_layout">
         <t t-set="doc" t-value="doc.with_context({'lang':doc.partner_id.lang})" />
         <!--####################
-            Cette Vue est entièrement modifiée depuis le module of_sale
+            La vue d'origine est entièrement réécrite ici.
             ####################-->
         <div class="page">
             <div class="oe_structure"/>
