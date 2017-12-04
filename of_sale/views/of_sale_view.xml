@@ -84,26 +84,29 @@
                         <field name="stock_warning_setting" class="oe_inline"/>
                         <span>Afficher les messages d'avertissement de stock</span>
                     </div>
+                    <label for="add_product_fab_descr"/>
+                    <div name="add_product_fab_descr">
+                        <field name="add_product_fab_descr" class="oe_inline"/>
+                        <span>Ajouter la description fabricant des produits aux lignes de commandes</span>
+                    </div>
                 </xpath>
             </field>
         </record>
 
 <!--##############################################################################-->
-<!--########################### ______ Sociétés ______ ###########################-->
+<!--######################### ______ Comptabilité ______ #########################-->
 <!--##############################################################################-->
-        <record id="of_sale_view_company_form" model="ir.ui.view">
-            <field name="name">of.sale.company.form</field>
-            <field name="model">res.company</field>
-            <field name="inherit_id" ref="of_base.of_base_view_company_form" />
+        <record id="of_view_account_config_settings" model="ir.ui.view">
+            <field name="name">(OF) account settings</field>
+            <field name="model">account.config.settings</field>
+            <field name="inherit_id" ref="account.view_account_config_settings"/>
             <field name="arch" type="xml">
-                <xpath expr="//notebook//page[@name='advanced_settings']" position="attributes">
-                    <attribute name="invisible">0</attribute>
-                </xpath>
-                <xpath expr="//notebook//page[@name='advanced_settings']/group[@name='advanced_settings_group_2']" position="inside">
-                    <group name="sales" colspan="2">
-                        <separator string="Ventes" colspan="2"/>
-                        <field name="afficher_descr_fab"/>
-                    </group>
+                <xpath expr="//field[@name='group_warning_account']" position="after">
+                    <label for="add_product_fab_descr"/>
+                    <div name="add_product_fab_descr">
+                        <field name="add_product_fab_descr" class="oe_inline"/>
+                        <span>Ajouter la description fabricant des produits aux lignes de factures</span>
+                    </div>
                 </xpath>
             </field>
         </record>

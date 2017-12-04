@@ -58,13 +58,12 @@ class OFSaleOrderLine(models.Model):
     @api.onchange('product_id')
     def product_id_change(self):
         res = super(OFSaleOrderLine,self).product_id_change()
-        afficher_descr_fab = self.env.user.company_id.afficher_descr_fab
-        afficher = afficher_descr_fab == 'devis' or afficher_descr_fab == 'devis_factures'
+        afficher_descr_fab = self.env['ir.values'].get_default('sale.config.settings', 'add_product_fab_descr')
         product = self.product_id.with_context(
             lang=self.order_id.partner_id.lang,
             partner=self.order_id.partner_id.id,
         )
-        if product and product.description_fabricant and afficher:
+        if product and product.description_fabricant and afficher_descr_fab:
             name = self.name
             name += '\n' + product.description_fabricant
             self.update({'name': name})
@@ -93,33 +92,23 @@ class OFSaleAccountInvoiceLine(models.Model):
     @api.onchange('product_id')
     def _onchange_product_id(self):
         res = super(OFSaleAccountInvoiceLine,self)._onchange_product_id()
-        afficher_descr_fab = self.env.user.company_id.afficher_descr_fab
-        afficher = afficher_descr_fab == 'factures' or afficher_descr_fab == 'devis_factures'
+        afficher_descr_fab = self.env['ir.values'].get_default('account.config.settings', 'add_product_fab_descr')
         product = self.product_id.with_context(
             lang=self.invoice_id.partner_id.lang,
             partner=self.invoice_id.partner_id.id,
         )
-        if product and product.description_fabricant and afficher:
+        if product and product.description_fabricant and afficher_descr_fab:
             self.name += '\n' + product.description_fabricant
         return res
-
-class OFCompany(models.Model):
-    _inherit = 'res.company'
-
-    afficher_descr_fab = fields.Selection([
-        ('non','Ne pas afficher'),
-        ('devis','Dans les devis'),
-        ('factures','Dans les factures'),
-        ('devis_factures','Dans les devis & les factures'),
-        ],string="afficher descr. fabricant", default='devis_factures',
-            help="La description du fabricant d'un article sera ajoutée à la description de l'article dans les documents."
-    )
 
 class OFSaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'
 
     stock_warning_setting = fields.Boolean(string="(OF) Stock", required=True, default=False,
             help="Afficher les messages d'avertissement de stock?")
+
+    add_product_fab_descr = fields.Boolean(string="(OF) Description fabricant", default=False,
+            help="Ajouter la description fabricant des produits aux lignes de commandes ?")
 
     pdf_display_product_ref_setting = fields.Boolean(string="(OF) Réf produits", required=True, default=False,
             help="Afficher les références produits dans les rapports PDF ?")
@@ -165,3 +154,18 @@ class OFSaleConfiguration(models.TransientModel):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'pdf_display_product_ref_setting', self.pdf_display_product_ref_setting)
 
+    @api.multi
+    def set_add_product_fab_descr_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'add_product_fab_descr', self.add_product_fab_descr)
+
+class OFAccountConfiguration(models.TransientModel):
+    _inherit = 'account.config.settings'
+
+    add_product_fab_descr = fields.Boolean(string="(OF) Description fabricant", default=False,
+            help="Ajouter la description fabricant des produits aux lignes de factures ?")
+
+    @api.multi
+    def set_add_product_fab_descr_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'account.config.settings', 'add_product_fab_descr', self.add_product_fab_descr)
