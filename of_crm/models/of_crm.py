@@ -461,23 +461,31 @@ surcharge méthode du même nom pour ne pas compter les devis dans les ventes
         res = self.name
         return res
 
-class OFCRMResCompany(models.Model):
-    _inherit = 'res.company'
+class CRMSettings(models.TransientModel):
+    _inherit = ['sale.config.settings']
 
-    crm_suivi = fields.Boolean(string="Actions Co suivies", default=True)
-    crm_suivi_notes = fields.Boolean(string="avec les notes", default=False)
+    crm_suivi = fields.Boolean(string="(OF) Actions Co suivies", default=True,
+                               help=u"Enregistrer les activités dans le suivi?")
+    crm_suivi_notes = fields.Boolean(string="(OF) avec les notes", default=False,
+                                help=u"Enregistrer aussi les notes d'activités dans le suivi?")
 
     @api.onchange('crm_suivi')
     def _onchange_crm_suivi(self):
-        for company in self:
-            if not company.crm_suivi:
-                company.crm_suivi_notes = False
+        if not self.crm_suivi:
+            self.crm_suivi_notes = False
 
     @api.onchange('crm_suivi_notes')
     def _onchange_crm_suivi_notes(self):
-        for company in self:
-            if company.crm_suivi_notes:
-                company.crm_suivi = True
+        if self.crm_suivi_notes:
+            self.crm_suivi = True
+
+    @api.multi
+    def set_crm_suivi_defaults(self):
+        return self.env['ir.values'].sudo().set_default('sale.config.settings', 'crm_suivi', self.crm_suivi)
+
+    @api.multi
+    def set_crm_suivi_notes_defaults(self):
+        return self.env['ir.values'].sudo().set_default('sale.config.settings', 'crm_suivi_notes', self.crm_suivi_notes)
 
 class OFCRMSaleOrder(models.Model):
     _inherit = 'sale.order'

@@ -121,7 +121,7 @@ class OFSaleConfiguration(models.TransientModel):
     stock_warning_setting = fields.Boolean(string="(OF) Stock", required=True, default=False,
             help="Afficher les messages d'avertissement de stock?")
 
-    pdf_display_product_ref_setting = fields.Boolean(string="Réf produits dans Devis PDF", required=True, default=False,
+    pdf_display_product_ref_setting = fields.Boolean(string="(OF) Réf produits", required=True, default=False,
             help="Afficher les références produits dans les rapports PDF ?")
 
     pdf_adresse_civilite = fields.Boolean(string=u"(OF) Civilités", required=True, default=False,

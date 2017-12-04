@@ -637,6 +637,26 @@
             </field>
         </record>
 
+        <record id="of_crm_view_sale_config_settings" model="ir.ui.view">
+            <field name="name">of_crm settings</field>
+            <field name="model">sale.config.settings</field>
+            <field name="inherit_id" ref="crm.view_sale_config_settings"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='config_alias']" position="inside">
+                    <label for="crm_suivi"/>
+                    <div name="crm_suivi">
+                        <field name="crm_suivi" class="oe_inline"/>
+                        <span>Enregistrer les activités dans le suivi</span>
+                    </div>
+                    <label for="crm_suivi_notes"/>
+                    <div name="crm_suivi_notes">
+                        <field name="crm_suivi_notes" class="oe_inline"/>
+                        <span>Enregistrer aussi les notes d'activités dans le suivi</span>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
 <!--###############################################################################################################
 ##############################       PARTENAIRES
 #################################################################################################################-->
@@ -744,25 +764,5 @@
             name="Prospects"
             sequence="3"/>
 
-<!--###############################################################################################################
-##############################       SOCIETES
-#################################################################################################################-->
-        <record id="of_crm_view_company_form" model="ir.ui.view">
-            <field name="name">of.crm.company.form</field>
-            <field name="model">res.company</field>
-            <field name="inherit_id" ref="of_base.of_base_view_company_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//notebook//page[@name='advanced_settings']" position="attributes">
-                    <attribute name="invisible">0</attribute>
-                </xpath>
-                <xpath expr="//notebook//page[@name='advanced_settings']/group[@name='advanced_settings_group_2']" position="inside">
-                    <group colspan="2">
-                        <separator string="CRM" colspan="2"/>
-                        <field name="crm_suivi"/>
-                        <field name="crm_suivi_notes"/>
-                    </group>
-                </xpath>
-            </field>
-        </record>
     </data>
 </odoo>

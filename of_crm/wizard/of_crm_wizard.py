@@ -10,8 +10,8 @@ class OFCRMActivityLog(models.TransientModel):
 
     @api.multi
     def action_log(self):
-        crm_suivi = self.env.user.company_id.crm_suivi
-        crm_suivi_notes = self.env.user.company_id.crm_suivi_notes
+        crm_suivi = self.env['ir.values'].get_default('sale.config.settings', 'crm_suivi')
+        crm_suivi_notes = self.env['ir.values'].get_default('sale.config.settings', 'crm_suivi_notes')
         if crm_suivi:
             for log in self:
                 new_line = "<p>%(date)s%(user)s%(type)s%(title)s%(note)s</p>" % {
