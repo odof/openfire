@@ -11,9 +11,14 @@
             <div name="addresses" class="row mt8">
                 <div class="col-xs-6">
                     <div t-if="doc.partner_shipping_id != doc.partner_id">
-                        <strong>Adresse de livraison :</strong><br/>
-                        <t t-if="doc.partner_shipping_id.title and doc.pdf_afficher_civilite()"><span t-field="doc.partner_shipping_id.title"/></t>
-                        <span t-field="doc.partner_shipping_id.name"/>
+                        <strong>Adresse de Livraison :</strong><br/>
+                        <t t-set="the_shipping_address" t-value="doc.partner_shipping_id"/>
+                        <t t-if="doc.pdf_afficher_nom_parent()">
+                            <t t-if="the_shipping_address.parent_id"><t t-set="the_shipping_address" t-value="the_shipping_address.parent_id"/></t>
+                        </t>
+                        <t t-if="the_shipping_address.title and doc.pdf_afficher_civilite()"><span t-field="the_shipping_address.title"/></t>
+                        <t t-if="the_shipping_address.name"><span t-field="the_shipping_address.name"/></t>
+                        <t t-if="not the_shipping_address.name and the_shipping_address.parent_id"><span t-field="the_shipping_address.parent_id.name"/></t>
                         <div t-field="doc.partner_shipping_id" t-field-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;], &quot;no_marker&quot;: true}"/>
                         <t t-if="doc.partner_shipping_id.phone and doc.pdf_afficher_telephone()">Tél. <span t-field="doc.partner_shipping_id.phone"/><br/></t>
                         <t t-if="doc.partner_shipping_id.mobile and doc.pdf_afficher_mobile()">Tél. <span t-field="doc.partner_shipping_id.mobile"/><br/></t>
@@ -25,8 +30,13 @@
                 <div class="col-xs-5 col-xs-offset-1">
                     <strong t-if="doc.partner_shipping_id == doc.partner_invoice_id">Adresse de livraison et de facturation :</strong>
                     <strong t-if="doc.partner_shipping_id != doc.partner_invoice_id">Adresse de facturation :</strong><br/>
-                    <t t-if="doc.partner_invoice_id.title and doc.pdf_afficher_civilite()"><span t-field="doc.partner_invoice_id.title"/></t>
-                    <span t-field="doc.partner_invoice_id.name"/>
+                    <t t-set="the_address" t-value="doc.partner_invoice_id"/>
+                    <t t-if="doc.pdf_afficher_nom_parent()">
+                        <t t-if="the_address.parent_id"><t t-set="the_address" t-value="the_address.parent_id"/></t>
+                    </t>
+                    <t t-if="the_address.title and doc.pdf_afficher_civilite()"><span t-field="the_address.title"/></t>
+                    <t t-if="the_address.name"><span t-field="the_address.name"/></t>
+                    <t t-if="not the_address.name and the_address.parent_id"><span t-field="the_address.parent_id.name"/></t>
                     <div t-field="doc.partner_invoice_id" t-field-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;], &quot;no_marker&quot;: true}"/>
                     <t t-if="doc.partner_invoice_id.phone and doc.pdf_afficher_telephone()">Tél. <span t-field="doc.partner_invoice_id.phone"/><br/></t>
                     <t t-if="doc.partner_invoice_id.mobile and doc.pdf_afficher_mobile()">Tél. <span t-field="doc.partner_invoice_id.mobile"/><br/></t>
@@ -209,9 +219,14 @@
         <div name="addresses" class="row mt8" groups="sale.group_delivery_invoice_address">
             <div class="col-xs-6">
                 <div t-if="o.partner_shipping_id != o.partner_id">
-                    <strong>Adresse de livraison :</strong><br/>
-                    <t t-if="o.partner_shipping_id.title and o.pdf_afficher_civilite()"><span t-field="o.partner_shipping_id.title"/></t>
-                    <span t-field="o.partner_shipping_id.name"/>
+                    <strong>Adresse de Livraison :</strong><br/>
+                    <t t-set="the_shipping_address" t-value="o.partner_shipping_id"/>
+                    <t t-if="o.pdf_afficher_nom_parent()">
+                        <t t-if="the_shipping_address.parent_id"><t t-set="the_shipping_address" t-value="the_shipping_address.parent_id"/></t>
+                    </t>
+                    <t t-if="the_shipping_address.title and o.pdf_afficher_civilite()"><span t-field="the_shipping_address.title"/></t>
+                    <t t-if="the_shipping_address.name"><span t-field="the_shipping_address.name"/></t>
+                    <t t-if="not the_shipping_address.name and the_shipping_address.parent_id"><span t-field="the_shipping_address.parent_id.name"/></t>
                     <div t-field="o.partner_shipping_id" t-field-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;], &quot;no_marker&quot;: true}"/>
                     <t t-if="o.partner_shipping_id.phone and o.pdf_afficher_telephone()">Tél. <span t-field="o.partner_shipping_id.phone"/><br/></t>
                     <t t-if="o.partner_shipping_id.mobile and o.pdf_afficher_mobile()">Tél. <span t-field="o.partner_shipping_id.mobile"/><br/></t>
@@ -223,8 +238,13 @@
             <div class="col-xs-5 col-xs-offset-1">
                 <strong t-if="o.partner_shipping_id == o.partner_id">Adresse de livraison et de facturation :</strong>
                 <strong t-if="o.partner_shipping_id != o.partner_id">Adresse de facturation :</strong><br/>
-                <t t-if="o.partner_id.title and o.pdf_afficher_civilite()"><span t-field="o.partner_id.title"/></t>
-                <span t-field="o.partner_id.name"/>
+                <t t-set="the_address" t-value="o.partner_id"/>
+                <t t-if="o.pdf_afficher_nom_parent()">
+                    <t t-if="the_address.parent_id"><t t-set="the_address" t-value="the_address.parent_id"/></t>
+                </t>
+                <t t-if="the_address.title and o.pdf_afficher_civilite()"><span t-field="the_address.title"/></t>
+                <t t-if="the_address.name"><span t-field="the_address.name"/></t>
+                <t t-if="not the_address.name and the_address.parent_id"><span t-field="the_address.parent_id.name"/></t>
                 <div t-field="o.partner_id" t-field-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;], &quot;no_marker&quot;: true}"/>
                 <t t-if="o.partner_id.phone and o.pdf_afficher_telephone()">Tél. <span t-field="o.partner_id.phone"/><br/></t>
                 <t t-if="o.partner_id.mobile and o.pdf_afficher_mobile()">Tél. <span t-field="o.partner_id.mobile"/><br/></t>
