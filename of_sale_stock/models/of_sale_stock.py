@@ -11,7 +11,7 @@ class OFSaleStockInventory(models.Model):
 class OFSaleStockInventoryLine(models.Model):
     _inherit = "stock.inventory.line"
 
-    currency_id = fields.Many2one('res.currency', string='Currency', readonly=True, required=True, related="company_id.currency_id")
+    currency_id = fields.Many2one('res.currency', string='Currency', readonly=True, related="company_id.currency_id")
     product_value = fields.Monetary('Value', digits=dp.get_precision('Product Price'), compute="_compute_product_value")
 
     @api.multi
@@ -20,7 +20,10 @@ class OFSaleStockInventoryLine(models.Model):
         for line in self:
             # @TODO: ajouter un paramètre config pour choisir la façon de calculer la valeur
             # @TODO: gérer le multi-currency
-            line.product_value = line.product_id.standard_price * line.product_qty
+            if line.product_id:
+                line.product_value = line.product_id.standard_price * line.product_qty
+            else:
+                line.product_value = 0.0
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
