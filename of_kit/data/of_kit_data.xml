@@ -28,4 +28,10 @@
             <field name="args"></field>
         </record>
     </data>
+    <data noupdate="1">
+        <!-- init new kits functions -->
+        <function model="mrp.bom" name="_init_new_kits"/>
+        <function model="sale.order" name="_init_new_kits"/>
+        <function model="account.invoice" name="_init_new_kits"/>
+    </data>
 </odoo>

@@ -108,16 +108,9 @@ class OFKitSaleOrderLine(models.Model):
 	@api.depends('kit_id.kit_line_ids')
 	def _compute_price_comps(self):
 		for line in self:
-			#price = 0.0
-			#cost = 0.0
 			if line.kit_id:
 				line.price_comps = line.kit_id.price_comps
 				line.cost_comps = line.kit_id.cost_comps
-				#for comp in line.kit_id.kit_line_ids:
-				#	price += comp.price_unit * comp.qty_per_kit
-				#	cost += comp.cost_unit * comp.qty_per_kit
-				#line.price_comps = price
-				#line.cost_comps = cost
 
 	@api.onchange('price_comps', 'cost_comps', 'of_pricing', 'product_id')
 	def _refresh_price_unit(self):
@@ -177,7 +170,6 @@ class OFKitSaleOrderLine(models.Model):
 		if self.of_is_kit:  # checkbox got checked
 			if not self.product_id.of_is_kit: # a product that is not a kit is being made into a kit
 				# we create a component with current product (for procurements, kits are ignored)
-				#comp_name = self.product_id.name_get()[0][1] or self.product_id.name
 				new_comp_vals = {
 					'product_id': self.product_id.id,
 					'name': self.product_id.name_get()[0][1] or self.product_id.name,
@@ -248,7 +240,6 @@ class OFKitSaleOrderLine(models.Model):
 		check if all components were delivered entirely.
 		"""
 		self.ensure_one()
-		#components = self.env['sale.order.line.comp'].search([('order_line_id', '=', self.id), ('of_is_kit', '=', False)]) # get all comps that are not kits
 		components = self.kit_id.kit_line_ids or []
 		precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
 		for comp in components:
@@ -359,6 +350,8 @@ class OFKitSaleOrderLine(models.Model):
 			update_ol_id = True
 		elif 'of_pricing' in vals:
 			update_ol_id = True
+		if len(self) == 1 and ((self.of_pricing == 'computed' and not vals.get('of_pricing')) or vals.get('of_pricing') == 'computed'):
+			vals['price_unit'] = vals.get('price_comps', self.price_comps)  # price_unit is equal to price_comps if pricing is computed
 		super(OFKitSaleOrderLine, self).write(vals)
 		if update_ol_id:
 			sale_kit_vals = {'order_line_id': self.id}
@@ -367,8 +360,6 @@ class OFKitSaleOrderLine(models.Model):
 			if vals.get("of_pricing"):
 				sale_kit_vals["of_pricing"] = vals.get("of_pricing")
 			self.kit_id.write(sale_kit_vals)
-		if len(self) == 1 and self.pricing == 'computed' and self.price_unit != self.price_comps:
-			self._refresh_price_unit()
 		return True
 
 class OFSaleOrderKit(models.Model):
@@ -424,7 +415,6 @@ class OFSaleOrderKit(models.Model):
 		"""
 		self.ensure_one()
 		account_kit_vals = {
-			#'order_kit_id': self.id,
 			'name': self.name,
 			'of_pricing': self.of_pricing,
 			'invoice_line_id': inv_line_id,
