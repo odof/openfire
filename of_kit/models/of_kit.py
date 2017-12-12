@@ -162,16 +162,13 @@ class OFKitProductTemplate(models.Model):
             res['cost'] += line.product_id.standard_price * line.product_qty
         return res
 
+    @api.depends('product_variant_ids', 'product_variant_ids.is_kit_comp')
     def _compute_is_kit_comp(self):
-        # this method will be called upon creation or change of a kit_line for its related product (workaround store=True)
-        read_group_res = self.env['product.product'].read_group([('product_tmpl_id', 'in', self.ids), ('is_kit_comp', '=', True)], ['product_tmpl_id'], ['product_tmpl_id'])
-        mapped_data = dict([(data['product_tmpl_id'][0], data['product_tmpl_id_count']) for data in read_group_res])
         for product_tmpl in self:
-            product_tmpl.is_kit_comp = mapped_data.get(product_tmpl.id, 0) > 0
+            product_tmpl.is_kit_comp = any(product.is_kit_comp for product in product_tmpl.product_variant_ids)
 
+    @api.depends('product_variant_ids', 'product_variant_ids.kit_count')
     def _compute_kit_count(self):
-        all_variants = self.env['product.product'].search([('product_tmpl_id', 'in', self.ids)])
-        all_variants._compute_kit_count()  # load kit counts in cache in one go
         templates = self.env['product.template']
         for product_tmpl in self:
             kit_count = 0
@@ -199,10 +196,7 @@ class OFKitProductProduct(models.Model):
         read_group_res = self.env['of.product.kit.line'].read_group([('product_id', 'in', self.ids)], ['product_id'], ['product_id'])
         mapped_data = dict([(data['product_id'][0], data['product_id_count']) for data in read_group_res])
         for product in self:
-            if product.product_tmpl_id.product_variant_count == 1:
-                kit_count = mapped_data.get(product.id, product.product_tmpl_id.kit_count)
-            else:
-                kit_count = mapped_data.get(product.id, 0)
+            kit_count = mapped_data.get(product.id, 0)
             product.kit_count = kit_count
 
     def get_saleorder_kit_data(self):
@@ -217,11 +211,8 @@ class OFKitProductProduct(models.Model):
         # this method will be called upon creation or change of a kit_line for its related product (workaround store=True)
         read_group_res = self.env['of.product.kit.line'].read_group([('product_id', 'in', self.ids)], ['product_id'], ['product_id'])
         mapped_data = dict([(data['product_id'][0], data['product_id_count']) for data in read_group_res])
-        templates = self.env["product.template"]
         for product in self:
             product.is_kit_comp = mapped_data.get(product.id, 0) > 0
-            templates |= product.product_tmpl_id
-        templates._compute_is_kit_comp()
 
 class OFKitProductKitLine(models.Model):
     _name = "of.product.kit.line"
@@ -313,7 +304,6 @@ class OFKitStockMove(models.Model):
             qty_delivered = line._get_delivered_qty_hack()
             if qty_delivered != 0:
                 line.qty_delivered = qty_delivered
-                #line.update_underkit_delivered()  # former version of kits
 
         return result
 

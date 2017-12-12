@@ -14,9 +14,9 @@ class OFKitAccountInvoice(models.Model):
     @api.multi
     @api.depends('invoice_line_ids.product_id')
     def _compute_of_contains_kit(self):
-        line_obj = self.env['account.invoice.line']
+        comp_obj = self.env['of.invoice.kit.line']
         for invoice in self:
-            invoice.of_contains_kit = line_obj.search([("invoice_id", "=", invoice.id),('of_is_kit', '=', True)], count=True) > 0
+            invoice.of_contains_kit = comp_obj.search([("invoice_id", "=", invoice.id)], count=True) > 0
 
     of_kit_display_mode = fields.Selection([
         ('none', 'None'),
@@ -131,7 +131,6 @@ class OFKitAccountInvoiceLine(models.Model):
                         uc_cost += comp.cost_unit * comp.qty_per_kit
                 line.price_comps = uc_price
                 line.cost_comps = uc_cost
-                #line._refresh_price_unit()
 
     @api.onchange('price_comps', 'quantity', 'of_pricing')
     def _refresh_price_unit(self):
@@ -154,7 +153,6 @@ class OFKitAccountInvoiceLine(models.Model):
         if self.of_is_kit:  # checkbox got checked
             if not self.product_id.of_is_kit: # a product that is not a kit is being made into a kit
                 # we create a component with current product (for procurements, kits are ignored)
-                #comp_name = self.product_id.name_get()[0][1] or self.product_id.name
                 new_comp_vals = {
                     'product_id': self.product_id.id,
                     'name': self.product_id.name_get()[0][1] or self.product_id.name,
@@ -222,21 +220,20 @@ class OFKitAccountInvoiceLine(models.Model):
         elif len(self) == 1 and vals.get("name") and self.kit_id:
             # line changed name
             update_il_id = True
+        if len(self) == 1 and ((self.of_pricing == 'computed' and not vals.get('of_pricing')) or vals.get('of_pricing') == 'computed'):
+            vals['price_unit'] = vals.get('price_comps', self.price_comps)  # price_unit is equal to price_comps if pricing is computed
         super(OFKitAccountInvoiceLine, self).write(vals)
         if update_il_id:
             account_kit_vals = {'invoice_line_id': self.id}
             if vals.get("name"):
                 account_kit_vals["name"] = vals.get("name")
             self.kit_id.write(account_kit_vals)
-        if len(self) == 1 and self.pricing == 'computed' and self.price_unit != self.price_comps:
-            self._refresh_price_unit()
         return True
 
 class OFAccountInvoiceKit(models.Model):
     _name = 'of.invoice.kit'
 
     invoice_line_id = fields.Many2one("account.invoice.line", string="Invoice line", ondelete="cascade")
-    #order_kit_id = fields.Many2one('of.saleorder.kit', string="Original kit")
 
     name = fields.Char(string='Name', required=True, default="draft invoice kit")
     kit_line_ids = fields.One2many('of.invoice.kit.line', 'kit_id', string="Components")
