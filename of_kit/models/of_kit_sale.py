@@ -467,7 +467,7 @@ class OFSaleOrderKitLine(models.Model):
 
 	qty_per_kit = fields.Float(string='Qty / Kit', digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0, oldname="qty_per_line",
 							help="Quantity per kit unit (order line).\n\
-						example: 2 kit K1 -> 3 kit K2 -> 2 prod P. \nP.qty_per_parent = 2, \nP.qty_per_line = 6\nP.qty_total = 12")
+						example: 2 kit K1 -> 3 prod P. \nP.qty_per_kit = 3\nP.qty_total = 6")
 
 	nb_kits = fields.Float(string='Number of kits', related='kit_id.qty_order_line', readonly=True)
 	qty_total = fields.Float(string='Total Qty', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_qty_total', 
