@@ -455,7 +455,7 @@ class OFSaleOrderKitLine(models.Model):
 	default_code = fields.Char(string='Prod ref')
 	sequence = fields.Integer(string=u'Sequence', default=10)
 
-	product_id = fields.Many2one('product.product', string='Product', required=True)
+	product_id = fields.Many2one('product.product', string='Product', required=True, domain="[('of_is_kit', '=', False)]")
 	currency_id = fields.Many2one(related='order_id.currency_id', store=True, string='Currency', readonly=True)
 	product_uom_id = fields.Many2one('product.uom', string='UoM', required=True)
 	price_unit = fields.Monetary('Unit Price', digits=dp.get_precision('Product Price'), required=True,default=0.0, oldname="unit_price")
