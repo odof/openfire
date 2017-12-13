@@ -7,6 +7,10 @@ class MrpBom(models.Model):
 
     @api.model
     def _init_new_kits(self):
+        """
+prends tous les kits de mrp et copie leurs composants de premier niveau en tant que composants de leur product_tmpl_id
+-> pas besoin de créer d'article 
+        """
         old_kits = self.search([('type', '=', 'phantom')])
         kit_line_obj = self.env['of.product.kit.line']
         for kit in old_kits:
@@ -30,6 +34,10 @@ class SaleOrder(models.Model):
 
     @api.model
     def _init_new_kits(self):
+        """
+créé des kits pour chaque ligne de commande qui est un kit
+prends tous les composants de la ligne et en créé des copies rattachées aux nouveaux kits créés
+        """
         orders = self.with_context({'active_test': False}).search([])
         new_saleorder_kit_obj = self.env['of.saleorder.kit']
         new_saleorder_kit_line_obj = self.env['of.saleorder.kit.line']
@@ -69,6 +77,10 @@ class AccountInvoice(models.Model):
 
     @api.model
     def _init_new_kits(self):
+        """
+créé des kits pour chaque ligne de facture qui est un kit
+prends tous les composants de la ligne et en créé des copies rattachées aux nouveaux kits créés
+        """
         invoices = self.search([])
         new_invoice_kit_obj = self.env['of.invoice.kit']
         new_invoice_kit_line_obj = self.env['of.invoice.kit.line']
