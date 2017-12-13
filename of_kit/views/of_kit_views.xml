@@ -264,7 +264,7 @@
     <record id="of_kit_view_order_form" model="ir.ui.view"><!-- temporaire -->
         <field name="name">of.kit.sale.order.form</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='order_line']/tree" position="attributes">
                 <!-- Edition des lignes de commande par formulaire -->
@@ -316,6 +316,16 @@
             <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="after">
                 <field name="price_comps" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
                 <field name="cost_comps" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
+            </xpath>
+            <xpath expr="//group[@name='sale_shipping']//field[@name='picking_policy']" position="replace">
+                <label for="picking_policy"/>
+                <div name="picking_policy_div">
+                    <field name="picking_policy" required="True"/>
+                    <br/>
+                    <i attrs="{'invisible': ['|',('picking_policy','in','one'),('of_contains_kit','=',False)]}" style="color: #aaa; font-size: small">
+                        Components of a kit will be delivered at once.
+                    </i>
+                </div>
             </xpath>
             <!-- implementation future -> ajouter les composants d'un kit en tant que lignes de commandes
             <xpath expr="//field[@name='order_line']" position="before">
