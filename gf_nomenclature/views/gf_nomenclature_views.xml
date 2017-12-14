@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--#############################################################################
+        ##                      NOMENCLATURE VIEWS
+        #############################################################################
+     -->
+    <record id="gf_nomenclature_view_form" model="ir.ui.view">
+        <field name="name">gf.nomenclature.view.form</field>
+        <field name="model">gf.nomenclature</field>
+        <field name="arch" type="xml">
+            <form string="Nomenclature">
+                <header>
+                    <!-- boutons make_saleorder et make_invoice -->
+                    <button name="action_make_saleorder" string="Créer Commande" type="object" class="btn-primary"/>
+                    <button name="action_make_invoice" string="Créer Facture" type="object" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="company_id"/>
+                        <field name="price_comps" widget="monetary"/>
+                        <field name="cost_comps" widget="monetary"/>
+                        <field name="currency_id" invisible="1"/>
+                    </group>
+                    <field name="nom_line_ids">
+                        <tree string="Nomenclature line">
+                            <field name="sequence" widget="handle"/>
+                            <field name="nomenclature_id" invisible="1"/>
+                            <field name="product_id"/>
+                            <field name="product_qty"/>
+                            <field name="product_uom_id"/>
+                            <field name="product_price" widget="monetary"/>
+                            <field name="product_cost" widget="monetary"/>
+                            <field name="currency_id" invisible="1"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="gf_nomenclature_view_tree" model="ir.ui.view">
+        <field name="name">gf.nomenclature.view.tree</field>
+        <field name="model">gf.nomenclature</field>
+        <field name="arch" type="xml">
+            <tree string="Nomenclatures">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="product_count"/>
+                <field name="price_comps" widget="monetary"/>
+                <field name="cost_comps" widget="monetary"/>
+                <field name="company_id" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="gf_nomenclature_view_kanban" model="ir.ui.view">
+        <field name="name">gf.nomenclature.view.kanban</field>
+        <field name="model">gf.nomenclature</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="sequence"/>
+                <field name="name"/>
+                <field name="product_count"/>
+                <field name="price_comps"/>
+                <field name="cost_comps"/>
+                <field name="company_id"/>
+                <field name="currency_id"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <!--div class="o_kanban_image">
+                                <img t-att-src="kanban_image('product.product', 'image_small', record.id.value)"/>
+                            </div-->
+                            <div class="oe_kanban_details">
+                                <strong>
+                                    <span t-if="record.default_code.value">[<field name="default_code"/>]</span>
+                                    <field name="name"/>
+                                </strong>
+                                <div t-if="record.product_count.value &gt; 1">
+                                    <strong>
+                                        <t t-esc="record.product_count.value"/> Products
+                                    </strong>
+                                </div>
+                                <div name="tags"/>
+                                <ul>
+                                    <li>Price: <field name="price_comps" widget="monetary"></field></li>
+                                    <li>Cost: <field name="cost_comps" widget="monetary"></field></li>
+                                </ul>
+                                <div name="tags"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="gf_nomenclature_search_view" model="ir.ui.view">
+        <field name="name">gf.nomenclature.search</field>
+        <field name="model">gf.nomenclature</field>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <search string="Nomenclature">
+                <field string="Name" name="name"/>
+                <separator/>
+                <filter string="Active" name="active" domain="[('active','=',True)]"/>
+                <filter string="Archivé" name="inactive" domain="[('active','=',False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="gf_nomenclature_action" model="ir.actions.act_window">
+        <field name="name">Nomenclatures</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">gf.nomenclature</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_type">form</field>
+        <field name="search_view_id" ref="gf_nomenclature_search_view"/>
+        <field name="context">{'search_default_active': True}</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Cliquez pour créer une nouvelle nomenclature.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_nomenclature" name="Nomenclatures" action="gf_nomenclature_action" parent="sale.prod_config_main" sequence="50"/>
+
+    <!--#############################################################################
+        ##                      NOMENCLATURE LINE VIEWS
+        #############################################################################
+     -->
+
+    <record id="gf_nomenclature_line_view_form" model="ir.ui.view">
+        <field name="name">gf.nomenclature.view.form</field>
+        <field name="model">gf.nomenclature</field>
+        <field name="arch" type="xml">
+            <form string="Nomenclature line">
+                <group>
+                    <field name="nomenclature_id" readonly="1"/>
+                    <field name="product_id"/>
+                    <field name="product_qty"/>
+                    <field name="product_uom_id"/>
+                    <field name="product_price" widget="monetary"/>
+                    <field name="product_cost" widget="monetary"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="sequence"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="gf_nomenclature_line_view_tree" model="ir.ui.view">
+        <field name="name">gf.nomenclature.view.tree</field>
+        <field name="model">gf.nomenclature</field>
+        <field name="arch" type="xml">
+            <tree string="Nomenclature line">
+                <field name="sequence" widget="handle"/>
+                <field name="nomenclature_id" readonly="1"/>
+                <field name="product_id"/>
+                <field name="product_qty"/>
+                <field name="product_uom_id"/>
+                <field name="product_price" widget="monetary"/>
+                <field name="product_cost" widget="monetary"/>
+                <field name="currency_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <!--#############################################################################
+        ##                      PRODUCT VIEWS
+        #############################################################################
+     -->
+
+    <record id="gf_template_open_nom" model="ir.actions.act_window">
+        <field name="name">Nomenclatures</field>
+        <field name="res_model">gf.nomenclature</field>
+        <field name="view_mode">tree, kanban, form</field>
+        <field name="view_type">form</field>
+    </record>
+    <record id="gf_template_open_nom_view_tree" model="ir.actions.act_window.view">
+        <field eval="0" name="sequence"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="gf_nomenclature_view_tree"/>
+        <field name="act_window_id" ref="gf_template_open_nom"/>
+    </record>
+    <record id="gf_template_open_nom_view_kanban" model="ir.actions.act_window.view">
+        <field eval="1" name="sequence"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="gf_nomenclature_view_kanban"/>
+        <field name="act_window_id" ref="gf_template_open_nom"/>
+    </record>
+    <record id="gf_template_open_nom_view_form" model="ir.actions.act_window.view">
+        <field eval="2" name="sequence"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="gf_nomenclature_view_form"/>
+        <field name="act_window_id" ref="gf_template_open_nom"/>
+    </record>
+    <record id="of_product_template_form_view_nom_button" model="ir.ui.view">
+        <field name="name">of.product.template.nom</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button" name="action_view_noms" type="object" icon="fa-object-group"
+                  help="Noms containning this product as a component">
+                    <field string="Noms" name="nom_count" widget="statinfo" />
+                </button>
+            </div>
+        </field>
+    </record>
+
+    <record id="gf_product_open_nom" model="ir.actions.act_window">
+        <field name="name">Nomenclatures</field>
+        <field name="res_model">gf.nomenclature</field>
+        <field name="domain">[('nom_line_ids.product_id', '=', active_id)]</field>
+        <field name="view_mode">tree, kanban, form</field>
+        <field name="view_type">form</field>
+    </record>
+    <record id="gf_product_open_nom_view_tree" model="ir.actions.act_window.view">
+        <field eval="0" name="sequence"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="gf_nomenclature_view_tree"/>
+        <field name="act_window_id" ref="gf_product_open_nom"/>
+    </record>
+    <record id="gf_product_open_nom_view_kanban" model="ir.actions.act_window.view">
+        <field eval="1" name="sequence"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="gf_nomenclature_view_kanban"/>
+        <field name="act_window_id" ref="gf_product_open_nom"/>
+    </record>
+    <record id="gf_product_open_nom_view_form" model="ir.actions.act_window.view">
+        <field eval="2" name="sequence"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="gf_nomenclature_view_form"/>
+        <field name="act_window_id" ref="gf_product_open_nom"/>
+    </record>
+    <record id="gf_product_product_form_view_nom_button" model="ir.ui.view">
+        <field name="name">of.product.product.nom</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button" name="%(of_product_open_kit)d" type="action" icon="fa-object-group"
+                  help="Noms containning this product as a component">
+                    <field string="Noms" name="nom_count" widget="statinfo" />
+                </button>
+            </div>
+        </field>
+    </record>
+
+    <!--#############################################################################
+        ##                      SALE VIEWS
+        #############################################################################
+     -->
+
+    <record id="gf_nom_view_order_form" model="ir.ui.view"><!-- temporaire -->
+        <field name="name">gf.nom.sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <!-- bouton inserer nomenclature -->
+            </xpath>
+        </field>
+    </record>
+
+
+    <!--#############################################################################
+        ##                      ACCOUNT VIEWS
+        #############################################################################
+     -->
+
+</odoo>
