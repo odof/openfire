@@ -1,8 +1,30 @@
 <templates>
 
 <t t-name="OFFieldColorIndex">
-    <!-- ajouter éléments qweb et html: globalement on veut une boite colorée -->
-    <!-- voir web/static/src/xml/base.xml/FieldMany2ManyTag -->
+    <span t-attf-class="dropdown of_form_widget_color_index of_tag_color_#{widget.index}"
+          t-att-data-color="widget.index">
+    </span>
 </t>
 
+<t t-name="OFFieldColorIndex.colorpicker">
+    <ul class="of_colorpicker dropdown-menu" role="menu">
+        <li t-foreach="10" t-as="index_couleur">
+            <span t-att-data-color="index_couleur" t-attf-class="of_form_widget_color_index of_tag_color_#{index_couleur}"></span>
+        </li>
+        <br/>
+        <li>
+            <span t-att-data-color="10" class="of_form_widget_color_index of_tag_color_10"></span>
+        </li>
+        <li style="padding-top: 5px;">
+            Not shown in Kanban
+        </li>
+    </ul>
+</t>
+<!-- Implémentation future
+
+<t t-name="OFFieldColorIndex.FormList">
+    <tr t-extend="ListView.row">
+        <t t-jquery="t td t" t-operation="replace"><t t-if="column.widget =='widget.index' || column.type == 'widget.index'"><div class="color_box" t-att-style="'background-color:' + render_cell(record, column)"/></t><t t-raw="render_cell(record, column)"/></t>
+    </tr>
+</t> -->
 </templates>
