@@ -30,8 +30,10 @@
             <form string="Nomenclature">
                 <header>
                     <!-- boutons make_saleorder et make_invoice -->
-                    <button name="action_make_saleorder" string="Créer Commande" type="object" class="btn-primary"/>
-                    <button name="action_make_invoice" string="Créer Facture" type="object" class="btn-primary"/>
+                    <button name="action_make_saleorder" string="Créer Commande" type="object" class="btn-primary"
+                      context="{'insert_type': 'sale', 'mode': 'create'}"/>
+                    <button name="action_make_invoice" string="Créer Facture" type="object" class="btn-primary"
+                      context="{'insert_type': 'account', 'mode': 'create'}"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -49,19 +51,19 @@
                     </div>
                     <div class="oe_title">
                         <h1>
-                            <field name="name" readonly="1"/>
+                            <field name="name"/>
                         </h1>
                     </div>
                     <group>
                         <field name="company_ids" widget="many2many_tags"/>
+                        <field name="product_count"/>
                         <field name="price_comps" widget="monetary"/>
                         <field name="cost_comps" widget="monetary"/>
                         <field name="currency_id" invisible="1"/>
                     </group>
                     <field name="nom_line_ids">
-                        <tree string="Nomenclature line">
+                        <tree string="Nomenclature line" editable="bottom">
                             <field name="sequence" widget="handle"/>
-                            <field name="nomenclature_id" invisible="1"/>
                             <field name="product_id"/>
                             <field name="product_qty"/>
                             <field name="product_uom_id"/>
@@ -300,8 +302,8 @@
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
                 <!-- bouton inserer nomenclature -->
-                <button name="%(gf_nomenclature_insert_action)d" string="Insérer nomenclature" type="action" class="btn-primary"
-                  context="{'type': 'sale'}"/>
+                <button name="%(gf_nomenclature_insert_action)d" string="Insérer nomenclature" type="action" class="btn-default"
+                  context="{'insert_type': 'sale', 'mode': 'update'}"/>
             </xpath>
         </field>
     </record>
@@ -318,8 +320,8 @@
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
                 <!-- bouton inserer nomenclature -->
-                <button name="%(gf_nomenclature_insert_action)d" string="Insérer nomenclature" type="action" class="btn-primary"
-                  context="{'type': 'account'}"/>
+                <button name="%(gf_nomenclature_insert_action)d" string="Insérer nomenclature" type="action" class="btn-default"
+                  context="{'insert_type': 'account', 'mode': 'update'}"/>
             </xpath>
         </field>
     </record>

@@ -40,7 +40,7 @@ class GFNomenclature(models.Model):
     invoice_ids = fields.One2many("account.invoice", "nomenclature_id", string="Invoices")
 
     @api.multi
-    @api.depends("saleorder_ids")
+    @api.depends("saleorder_ids", "invoice_ids")
     def _compute_docs_count(self):
         for nomenclature in self:
             nomenclature.saleorder_count = len(nomenclature.saleorder_ids)
@@ -67,10 +67,6 @@ class GFNomenclature(models.Model):
         self.ensure_one()
         res = {'price': 0.0, 'cost': 0.0}
         for line in self.nom_line_ids:
-            #if line.product_id.of_is_kit:
-            #    res['price'] += line.product_id.of_price_used * line.product_qty
-            #    res['cost'] += line.product_id.cost_comps * line.product_qty
-            #else:
             res['price'] += line.product_id.list_price * line.product_qty
             res['cost'] += line.product_id.standard_price * line.product_qty
         return res
@@ -98,20 +94,27 @@ class GFNomenclature(models.Model):
         return vals
 
     @api.multi
+    def _prepare_insert_vals(self):
+        self.ensure_one()
+        vals= {}
+        lines = [(5,)]
+        for line in self.nom_line_ids:
+            line_vals = line._prepare_vals_for_insert()
+            lines.append((0, 0, line_vals))
+        vals["nom_insert_line_ids"] = lines
+        return vals
+
+    @api.multi
     def action_make_saleorder(self):
         # action déclenchée depuis le bouton "créer devis"
         self.ensure_one()
-        action = {
-            "type": "ir_actions.act_window",
-            "name": "nomenclature_make_so_action",
-            "res_model": "sale.order",
-            "view_type": "form",
-            "view_mode": "form",
-            "target": "same",
-        }
-        # pré-remplir les lignes de commande
+        action = self.env.ref('gf_nomenclature.gf_nomenclature_insert_action').read()[0]
+        # pré-remplir les lignes
         action["context"] = {
-            "default_order_line": self._prepare_saleorder_vals()["order_line"]
+            "default_nomenclature_id": self.id,
+            "default_nom_insert_line_ids": self._prepare_insert_vals()["nom_insert_line_ids"],
+            "mode": "create",
+            "insert_type": "sale",
         }
         return action
 
@@ -121,7 +124,7 @@ class GFNomenclature(models.Model):
         self.ensure_one()
         action = {
             "type": "ir_actions.act_window",
-            "name": "nomenclature_make_fac_action",
+            #"name": "nomenclature_make_fac_action",
             "res_model": "account.invoice",
             "view_type": "form",
             "view_mode": "form",
@@ -182,7 +185,7 @@ class GFNomenclatureLine(models.Model):
         }
         return vals
 
-    @api.multi
+    """@api.multi
     @api.onchange("product_id")
     def _onchange_product_id(self):
         # changer l'udm
@@ -206,7 +209,7 @@ class GFNomenclatureLine(models.Model):
 
     @api.multi
     def unlink(self):
-        super(GFNomenclatureLine, self).unlink()
+        super(GFNomenclatureLine, self).unlink()"""
 
 
 class GFProductTemplate(models.Model):

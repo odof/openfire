@@ -30,6 +30,17 @@ utiliser le même wizard pour lancer des appros depuis une nomenclature?
             nomenclature.price_comps = price_n_cost['price']
             nomenclature.cost_comps = price_n_cost['cost']
 
+    def get_compo_price_n_cost(self):
+        """
+        returns the sum of the prices and costs of all components in this kit.
+        """
+        self.ensure_one()
+        res = {'price': 0.0, 'cost': 0.0}
+        for line in self.nom_insert_line_ids:
+            res['price'] += line.product_id.list_price * line.product_qty
+            res['cost'] += line.product_id.standard_price * line.product_qty
+        return res
+
     @api.multi
     @api.depends('nom_insert_line_ids')
     def _compute_product_count(self):
@@ -42,9 +53,10 @@ utiliser le même wizard pour lancer des appros depuis une nomenclature?
         lines = [(5,)]
         if self.nomenclature_id:
             # charger les lignes
-            for line in self.nomenclature_id.nom_insert_line_ids:
+            for line in self.nomenclature_id.nom_line_ids:
                 vals = line._prepare_vals_for_insert()
                 lines.append((0, 0, vals))
+            self.update({'nom_insert_line_ids': lines})
 
     def button_insert(self):
         # TODO: prendre le contenu des lignes
@@ -52,18 +64,29 @@ utiliser le même wizard pour lancer des appros depuis une nomenclature?
         return_vals = {
             'nomenclature_id': self.nomenclature_id.id
         }
-        if self._context.get('type') == 'sale':
+        if self._context.get('insert_type') == 'sale':
             for line in self.nom_insert_line_ids:
                 vals = line._prepare_vals_for_insert('sale')
                 lines_to_insert.append((0, 0, vals))
             return_vals["order_line"] = lines_to_insert
-            self.env["sale.order"].search([("id", "=", self._context.get("active_id"))]).write(return_vals)
+            if self._context.get('mode') == 'update':
+                # insertion dans un devis existant
+                so = self.env["sale.order"].search([("id", "=", self._context.get("active_id"))])[0]
+                so.write(return_vals)
+            else:
+                # TODO création d'un devis
+                pass
         else:
             for line in self.nom_insert_line_ids:
                 vals = line._prepare_vals_for_insert('account')
                 lines_to_insert.append((0, 0, vals))
             return_vals["invoice_line_ids"] = lines_to_insert
-            self.env["account.invoice"].search([("id", "=", self._context.get("active_id"))]).write(return_vals)
+            if self._context.get('mode') == 'update':
+                # insertion dans un devis existant
+                self.env["account.invoice"].search([("id", "=", self._context.get("active_id"))])[0].write(return_vals)
+            else:
+                # TODO création d'une facture 
+                pass
 
         return {'type': 'ir.actions.act_window_close'}
 
@@ -72,7 +95,7 @@ class GFNomenclatureInsertLine(models.TransientModel):
 wizard imitant les lignes de nomenclatures -> pour pouvoir en supprimer sans les supprimer de la nomenclature source
     """
     _name = "gf.nomenclature.insert.line"
-    _order = 'nomenclature_id, sequence'
+    _order = 'sequence'
 
     def _get_default_product_uom_id(self):
         return self.env['product.uom'].search([], limit=1, order='id').id
@@ -89,9 +112,9 @@ wizard imitant les lignes de nomenclatures -> pour pouvoir en supprimer sans les
     product_cost = fields.Float(related='product_id.standard_price', readonly=True)
     currency_id = fields.Many2one(related="nom_insert_id.currency_id", readonly=True)
 
-    def _prepare_vals_for_insert(self, type='sale'):
+    def _prepare_vals_for_insert(self, insert_type='sale'):
         self.ensure_one()
-        if type == 'sale':
+        if insert_type == 'sale':
             vals = {
                 'product_id': self.product_id.id,
                 'product_uom_qty': self.product_qty,

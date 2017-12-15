@@ -7,7 +7,10 @@
     'category': 'OpenFire modules',
     'summary': 'Nomenclatures',
     'description': """
-        Module de Nomenclatures openfire: 
+Module de Nomenclatures openfire:
+=================================
+
+config des nomenclature depuis ventes/configuration/articles
     """,
     'website': 'openfire.fr',
     'depends': [

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--#############################################################################
+        ##                      NOMENCLATURE VIEWS
+        #############################################################################
+     -->
+
+    <record id="gf_kit_nomenclature_view_form" model="ir.ui.view">
+        <field name="name">gf.kit.nomenclature.view.form</field>
+        <field name="model">gf.nomenclature</field>
+        <field name="inherit_id" ref="gf_nomenclature_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form//field[@name='product_count']" position="after">
+                <field name="kit_count"/>
+                <field name="comp_count"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="gf_kit_nomenclature_view_tree" model="ir.ui.view">
+        <field name="name">gf.kit.nomenclature.view.tree</field>
+        <field name="model">gf.nomenclature</field>
+        <field name="inherit_id" ref="gf_nomenclature_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree//field[@name='product_count']" position="after">
+                <field name="kit_count"/>
+                <field name="comp_count"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="gf_kit_nomenclature_view_kanban" model="ir.ui.view">
+        <field name="name">gf.nomenclature.view.kanban</field>
+        <field name="model">gf.nomenclature</field>
+        <field name="inherit_id" ref="gf_nomenclature_view_kanban"/>
+        <field name="arch" type="xml">
+            <xpath="//kanban//field[@name='product_count']" position="after">
+                <field name="kit_count"/>
+                <field name="comp_count"/>
+            </xpath>
+            <xpath="//kanban//div[@t-if='record.product_count.value &gt; 1']/strong" position="after">
+                <br/>
+                <t t-esc="record.kit_count.value"/> Kits (<t t-esc="record.kit_count.value"/> Comps)
+            </xpath>
+        </field>
+    </record>
+
+    <!--#############################################################################
+        ##                      NOMENCLATURE LINE VIEWS
+        #############################################################################
+     -->
+
+    <record id="gf_kit_nomenclature_line_view_form" model="ir.ui.view">
+        <field name="name">gf.kit.nomenclature.view.form</field>
+        <field name="model">gf.nomenclature.line</field>
+        <field name="inherit_id" ref="gf_nomenclature_line_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='sequence']" position="after">
+                <field name="kit_line_ids">
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
