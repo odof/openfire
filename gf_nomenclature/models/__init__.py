@@ -1,2 +1,3 @@
 # -*- coding: utf-8 -*-
-from gf_nomenclature.models import gf_nomenclature
+
+from . import gf_nomenclature

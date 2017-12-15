@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--#############################################################################
+        ##                NOMENCLATURE WIZARD VIEWS
+        #############################################################################
+     -->
+
+    <record id="gf_nomenclature_insert_view_form" model="ir.ui.view">
+        <field name="name">gf.nomenclature.insert.view.form</field>
+        <field name="model">gf.nomenclature.insert</field>
+        <field name="arch" type="xml">
+            <form string="Nomenclature">
+                <sheet>
+                    <group>
+                        <field name="nomenclature_id"/>
+                        <field name="product_count"/>
+                        <field name="price_comps" widget="monetary"/>
+                        <field name="cost_comps" widget="monetary"/>
+                        <field name="currency_id" invisible="1"/>
+                    </group>
+                    <field name="nom_insert_line_ids">
+                        <tree string="Nomenclature line" editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="nom_insert_id" invisible="1"/>
+                            <field name="product_id"/>
+                            <field name="product_qty"/>
+                            <field name="product_uom_id"/>
+                            <field name="product_price" widget="monetary"/>
+                            <field name="product_cost" widget="monetary"/>
+                            <field name="currency_id" invisible="1"/>
+                        </tree>
+                    </field>
+                </sheet>
+                <footer>
+                    <button string="Insérer" name="button_insert" type="object" class="oe_highlight"/>
+                    <button string="Annuler" special="cancel" class="oe_link"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="gf_nomenclature_insert_action" model="ir.actions.act_window">
+        <field name="name">Insérer une nomenclature</field>
+        <field name="res_model">gf.nomenclature.insert</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

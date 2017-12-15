@@ -11,11 +11,12 @@
     """,
     'website': 'openfire.fr',
     'depends': [
-        'of_kit',
+        'of_sale',
         ],
     'data': [
-        #'views/of_kit_nomenclature_views.xml',
-        #'security/ir.model.access.csv',
+        'wizard/gf_nomenclature_wizard_views.xml',
+        'views/gf_nomenclature_views.xml',
+        'security/ir.model.access.csv',
     ],
     'installable': True,
     'auto_install': False,

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
 from odoo.addons import decimal_precision as dp
@@ -8,18 +7,44 @@ from odoo.exceptions import UserError, ValidationError
 class GFNomenclature(models.Model):
     _name = "gf.nomenclature"
 
+    @api.model
+    def _get_euro(self):
+        return self.env['res.currency.rate'].search([('rate', '=', 1)], limit=1).currency_id
+
+    @api.model
+    def _get_user_currency(self):
+        currency_id = self.env['res.users'].browse(self._uid).company_id.currency_id
+        return currency_id or self._get_euro()
+
+    @api.model
+    def _get_company(self):
+        return self.env.user.company_id
+
     name = fields.Char(string="Nom", required=True)
     default_code = fields.Char(string="Réf interne")
-    company_id = fields.Many2one("res.company", string=u"Société", required=True, default=lambda x: x.env.user.company_id.id)
+    company_ids = fields.Many2many('res.company', 'res_company_users_rel', 'user_id', 'cid',
+        string='Companies', default=_get_company)
     nom_line_ids = fields.One2many('gf.nomenclature.line', 'nomenclature_id', string='Products')
-    currency_id = fields.Many2one('res.currency', string='Currency', readonly=True, related="company_id.currency_id")
+    currency_id = fields.Many2one('res.currency', string='Currency', required=True, default=lambda self: self._get_user_currency())
     price_comps = fields.Monetary('Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_compo_price_n_cost',
-                                  help="Sum of the prices of all components necessary for 1 unit of this kit")
+                                  help="Sum of the prices of all components necessary for 1 unit of this nom")
     cost_comps = fields.Monetary('Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_compo_price_n_cost',
-                                  help="Sum of the costs of all components necessary for 1 unit of this kit")
+                                  help="Sum of the costs of all components necessary for 1 unit of this nom")
     active = fields.Boolean(string="Active", default=True)
     product_count = fields.Integer('# Products', compute='_compute_product_count')
     sequence = fields.Integer(string=u'Sequence', default=10)
+
+    saleorder_count = fields.Integer(string="# Sale orders", compute="_compute_docs_count")
+    saleorder_ids = fields.One2many("sale.order", "nomenclature_id", string="Sale orders")
+    invoice_count = fields.Integer(string="# Invoices", compute="_compute_docs_count")
+    invoice_ids = fields.One2many("account.invoice", "nomenclature_id", string="Invoices")
+
+    @api.multi
+    @api.depends("saleorder_ids")
+    def _compute_docs_count(self):
+        for nomenclature in self:
+            nomenclature.saleorder_count = len(nomenclature.saleorder_ids)
+            nomenclature.invoice_count = len(nomenclature.invoice_ids)
 
     @api.multi
     @api.depends('nom_line_ids')
@@ -147,6 +172,16 @@ class GFNomenclatureLine(models.Model):
         }
         return vals
 
+    def _prepare_vals_for_insert(self):
+        self.ensure_one()
+        vals = {
+            'product_id': self.product_id.id,
+            'product_qty': self.product_qty,
+            'product_uom_id': self.product_uom_id.id,
+            'sequence': self.sequence,
+        }
+        return vals
+
     @api.multi
     @api.onchange("product_id")
     def _onchange_product_id(self):
@@ -200,7 +235,7 @@ class GFProductProduct(models.Model):
 
     nom_count = fields.Integer('# Nomenclatures', compute='_compute_nom_count')
 
-    def _compute_kit_count(self):
+    def _compute_nom_count(self):
         read_group_res = self.env['gf.nomenclature.line'].read_group([('product_id', 'in', self.ids)], ['product_id'], ['product_id'])
         mapped_data = dict([(data['product_id'][0], data['product_id_count']) for data in read_group_res])
         for product in self:
@@ -211,8 +246,12 @@ class GFProductProduct(models.Model):
 class GFSaleOrder(models.Model):
     _inherit = "sale.order"
 
-    nomenclature_ids = fields.Many2one("gf.nomenclature", "saleorder_nomenclature", "order_id", "nomenclature_id", string="Nomenclatures")
+    nomenclature_id = fields.Many2one("gf.nomenclature", string="Nomenclature")
 
 
 
+class GFAccountInvoice(models.Model):
+    _inherit = "account.invoice"
+
+    nomenclature_id = fields.Many2one("gf.nomenclature", string="Nomenclature")
 

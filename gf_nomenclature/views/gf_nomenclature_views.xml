@@ -4,6 +4,25 @@
         ##                      NOMENCLATURE VIEWS
         #############################################################################
      -->
+
+    <!-- appelée depuis les nomenclatures -->
+    <record id="gf_nom_open_invoice" model="ir.actions.act_window">
+        <field name="name">Invoices</field>
+        <field name="res_model">account.invoice</field>
+        <field name="domain">[('nomenclature_id', '=', active_id)]</field>
+        <field name="view_mode">tree, form</field>
+        <field name="view_type">form</field>
+    </record>
+
+    <!-- appelée depuis les nomenclatures -->
+    <record id="gf_nom_open_saleorder" model="ir.actions.act_window">
+        <field name="name">Sale orders</field>
+        <field name="res_model">sale.order</field>
+        <field name="domain">[('nomenclature_id', '=', active_id)]</field>
+        <field name="view_mode">tree, form</field>
+        <field name="view_type">form</field>
+    </record>
+
     <record id="gf_nomenclature_view_form" model="ir.ui.view">
         <field name="name">gf.nomenclature.view.form</field>
         <field name="model">gf.nomenclature</field>
@@ -19,6 +38,14 @@
                         <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
                             <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
                         </button>
+                        <button class="oe_stat_button" name="%(gf_nom_open_saleorder)d" type="action" icon="fa-sticky-note"
+                          help="Sale orders that inserted this bill of products">
+                            <field string="Sale orders" name="saleorder_count" widget="statinfo" />
+                        </button>
+                        <button class="oe_stat_button" name="%(gf_nom_open_invoice)d" type="action" icon="fa-sticky-note-o"
+                          help="Invoices that inserted this bill of products">
+                            <field string="Invoices" name="invoice_count" widget="statinfo" />
+                        </button>
                     </div>
                     <div class="oe_title">
                         <h1>
@@ -26,7 +53,7 @@
                         </h1>
                     </div>
                     <group>
-                        <field name="company_id"/>
+                        <field name="company_ids" widget="many2many_tags"/>
                         <field name="price_comps" widget="monetary"/>
                         <field name="cost_comps" widget="monetary"/>
                         <field name="currency_id" invisible="1"/>
@@ -58,7 +85,7 @@
                 <field name="product_count"/>
                 <field name="price_comps" widget="monetary"/>
                 <field name="cost_comps" widget="monetary"/>
-                <field name="company_id" invisible="1"/>
+                <field name="company_ids" invisible="1"/>
                 <field name="currency_id" invisible="1"/>
             </tree>
         </field>
@@ -74,7 +101,7 @@
                 <field name="product_count"/>
                 <field name="price_comps"/>
                 <field name="cost_comps"/>
-                <field name="company_id"/>
+                <field name="company_ids"/>
                 <field name="currency_id"/>
                 <templates>
                     <t t-name="kanban-box">
@@ -124,7 +151,7 @@
         <field name="name">Nomenclatures</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">gf.nomenclature</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,form,kanban</field>
         <field name="view_type">form</field>
         <field name="search_view_id" ref="gf_nomenclature_search_view"/>
         <field name="context">{'search_default_active': True}</field>
@@ -144,7 +171,7 @@
 
     <record id="gf_nomenclature_line_view_form" model="ir.ui.view">
         <field name="name">gf.nomenclature.view.form</field>
-        <field name="model">gf.nomenclature</field>
+        <field name="model">gf.nomenclature.line</field>
         <field name="arch" type="xml">
             <form string="Nomenclature line">
                 <group>
@@ -163,7 +190,7 @@
 
     <record id="gf_nomenclature_line_view_tree" model="ir.ui.view">
         <field name="name">gf.nomenclature.view.tree</field>
-        <field name="model">gf.nomenclature</field>
+        <field name="model">gf.nomenclature.line</field>
         <field name="arch" type="xml">
             <tree string="Nomenclature line">
                 <field name="sequence" widget="handle"/>
@@ -208,8 +235,8 @@
         <field name="view_id" ref="gf_nomenclature_view_form"/>
         <field name="act_window_id" ref="gf_template_open_nom"/>
     </record>
-    <record id="of_product_template_form_view_nom_button" model="ir.ui.view">
-        <field name="name">of.product.template.nom</field>
+    <record id="gf_product_template_form_view_nom_button" model="ir.ui.view">
+        <field name="name">gf.product.template.nom</field>
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_only_form_view"/>
         <field name="arch" type="xml">
@@ -248,14 +275,14 @@
         <field name="act_window_id" ref="gf_product_open_nom"/>
     </record>
     <record id="gf_product_product_form_view_nom_button" model="ir.ui.view">
-        <field name="name">of.product.product.nom</field>
+        <field name="name">gf.product.product.nom</field>
         <field name="model">product.product</field>
         <field name="inherit_id" ref="product.product_normal_form_view"/>
         <field name="arch" type="xml">
             <div name="button_box" position="inside">
-                <button class="oe_stat_button" name="%(of_product_open_kit)d" type="action" icon="fa-object-group"
+                <button class="oe_stat_button" name="%(gf_product_open_nom)d" type="action" icon="fa-object-group"
                   help="Noms containning this product as a component">
-                    <field string="Noms" name="nom_count" widget="statinfo" />
+                    <field string="BoPs" name="nom_count" widget="statinfo" />
                 </button>
             </div>
         </field>
@@ -266,21 +293,35 @@
         #############################################################################
      -->
 
-    <record id="gf_nom_view_order_form" model="ir.ui.view"><!-- temporaire -->
+    <record id="gf_nom_view_order_form" model="ir.ui.view">
         <field name="name">gf.nom.sale.order.form</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
                 <!-- bouton inserer nomenclature -->
+                <button name="%(gf_nomenclature_insert_action)d" string="Insérer nomenclature" type="action" class="btn-primary"
+                  context="{'type': 'sale'}"/>
             </xpath>
         </field>
     </record>
-
 
     <!--#############################################################################
         ##                      ACCOUNT VIEWS
         #############################################################################
      -->
+
+    <record id="gf_nom_invoice_form" model="ir.ui.view">
+        <field name="name">gf.nom.account.invoice.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <!-- bouton inserer nomenclature -->
+                <button name="%(gf_nomenclature_insert_action)d" string="Insérer nomenclature" type="action" class="btn-primary"
+                  context="{'type': 'account'}"/>
+            </xpath>
+        </field>
+    </record>
 
 </odoo>
