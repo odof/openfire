@@ -7,7 +7,7 @@ from odoo.tools import float_is_zero, float_compare, DEFAULT_SERVER_DATETIME_FOR
 
 import odoo.addons.decimal_precision as dp
 
-class OFKitSaleOrder(models.Model):
+class SaleOrder(models.Model):
 	_inherit = 'sale.order'
 
 	comp_ids = fields.One2many('of.saleorder.kit.line', 'order_id', string='Components',
@@ -53,11 +53,11 @@ class OFKitSaleOrder(models.Model):
 		Prepare the dict of values to create the new invoice for a sales order.
 		Override of parent function
 		"""
-		invoice_vals = super(OFKitSaleOrder, self)._prepare_invoice()
+		invoice_vals = super(SaleOrder, self)._prepare_invoice()
 		invoice_vals['of_kit_display_mode'] = self.of_kit_display_mode
 		return invoice_vals
 
-class OFKitSaleOrderLine(models.Model):
+class SaleOrderLine(models.Model):
 	_inherit = 'sale.order.line'
 
 	kit_id = fields.Many2one('of.saleorder.kit', string="Components")
@@ -126,7 +126,7 @@ class OFKitSaleOrderLine(models.Model):
 	@api.multi
 	@api.onchange('product_id')
 	def product_id_change(self):
-		res = super(OFKitSaleOrderLine, self).product_id_change()
+		res = super(SaleOrderLine, self).product_id_change()
 		new_vals = {}
 		if self.kit_id:  # former product was a kit -> unlink it's kit_id
 			self.kit_id.write({"to_unlink": True})
@@ -149,7 +149,7 @@ class OFKitSaleOrderLine(models.Model):
 	@api.onchange('product_uom_qty', 'product_uom')
 	def product_uom_change(self):
 		self.ensure_one()
-		super(OFKitSaleOrderLine, self).product_uom_change()
+		super(SaleOrderLine, self).product_uom_change()
 		self._refresh_price_unit()
 
 	@api.onchange('of_pricing')
@@ -211,7 +211,7 @@ class OFKitSaleOrderLine(models.Model):
 		Creates a procurement order for lines in self. Call ._action_procurement_create() on components.
 		"""
 		lines = self.filtered(lambda line:not line.of_is_kit) # get all lines in self that are not kits
-		res_order_lines = super(OFKitSaleOrderLine, lines)._action_procurement_create() # create POs for those lines
+		res_order_lines = super(SaleOrderLine, lines)._action_procurement_create() # create POs for those lines
 
 		kits = self - lines # get all lines that are kits
 		components = self.env['of.saleorder.kit.line'].search([('kit_id.order_line_id', 'in', kits._ids)]) # get all comps
@@ -227,7 +227,7 @@ class OFKitSaleOrderLine(models.Model):
 		"""
 		self.ensure_one()
 		if not self.of_is_kit:
-			qty = super(OFKitSaleOrderLine, self)._get_delivered_qty()
+			qty = super(SaleOrderLine, self)._get_delivered_qty()
 			return qty
 		if not self._all_comps_delivered():
 			return 0.0
@@ -256,7 +256,7 @@ class OFKitSaleOrderLine(models.Model):
 		:param qty: float quantity to invoice
 		"""
 		self.ensure_one()
-		res = super(OFKitSaleOrderLine, self)._prepare_invoice_line(qty)
+		res = super(SaleOrderLine, self)._prepare_invoice_line(qty)
 		if self.of_is_kit:
 			res['of_is_kit'] = True
 			res['of_pricing'] = self.of_pricing
@@ -283,7 +283,7 @@ class OFKitSaleOrderLine(models.Model):
 			else:
 				other_lines |= line
 
-		super(OFKitSaleOrderLine, other_lines).invoice_line_create(invoice_id, qty)
+		super(SaleOrderLine, other_lines).invoice_line_create(invoice_id, qty)
 		precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
 		ai_line_obj = self.env['account.invoice.line']
 		for line in kit_lines:
@@ -331,7 +331,7 @@ class OFKitSaleOrderLine(models.Model):
 		if vals.get("sale_kits_to_unlink"):
 			self.env["of.saleorder.kit"].search([("to_unlink", "=", True)]).unlink()
 			vals.pop("sale_kits_to_unlink")
-		line = super(OFKitSaleOrderLine, self).create(vals)
+		line = super(SaleOrderLine, self).create(vals)
 		sale_kit_vals = {'order_line_id': line.id, 'name': line.name, 'of_pricing': line.of_pricing}
 		line.kit_id.write(sale_kit_vals)
 		return line
@@ -352,7 +352,7 @@ class OFKitSaleOrderLine(models.Model):
 			update_ol_id = True
 		if len(self) == 1 and ((self.of_pricing == 'computed' and not vals.get('of_pricing')) or vals.get('of_pricing') == 'computed'):
 			vals['price_unit'] = vals.get('price_comps', self.price_comps)  # price_unit is equal to price_comps if pricing is computed
-		super(OFKitSaleOrderLine, self).write(vals)
+		super(SaleOrderLine, self).write(vals)
 		if update_ol_id:
 			sale_kit_vals = {'order_line_id': self.id}
 			if vals.get("name"):

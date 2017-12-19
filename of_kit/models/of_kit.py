@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
 from odoo.addons import decimal_precision as dp
 from odoo.exceptions import UserError, ValidationError
 
-class OFKitProductTemplate(models.Model):
+class ProductTemplate(models.Model):
     _inherit = "product.template"
 
     of_is_kit = fields.Boolean(string="Is a kit")
@@ -34,6 +33,70 @@ class OFKitProductTemplate(models.Model):
     _sql_constraints = [
         ('kit_n_comp_constraint', 'CHECK ( NOT(of_is_kit AND is_kit_comp) )', _('A product can not be a kit and a kit component at the same time !'))
     ]
+
+    @api.depends('product_variant_ids.is_kit_comp')
+    def _compute_is_kit_comp(self):
+        for product_tmpl in self:
+            product_tmpl.is_kit_comp = any(product.is_kit_comp for product in product_tmpl.product_variant_ids)
+
+    @api.multi
+    @api.depends('kit_line_ids')
+    def _compute_compo_price_n_cost(self):
+        for product_tmpl in self:
+            if product_tmpl.of_is_kit:
+                price_n_cost = product_tmpl.get_compo_price_n_cost()
+                product_tmpl.price_comps = price_n_cost['price']
+                product_tmpl.cost_comps = price_n_cost['cost']
+
+    @api.multi
+    @api.depends('price_comps', 'of_pricing')
+    def _compute_of_price_used(self):
+        for product_tmpl in self:
+            if product_tmpl.of_is_kit:
+                if product_tmpl.of_pricing == 'fixed':
+                    product_tmpl.of_price_used = product_tmpl.list_price
+                else:
+                    product_tmpl.of_price_used = product_tmpl.price_comps
+
+    @api.depends('product_variant_ids.kit_count')
+    def _compute_kit_count(self):
+#        templates = self.env['product.template']
+        for product_tmpl in self:
+            kit_count = 0
+            for variant in product_tmpl.product_variant_ids:
+                kit_count += variant.kit_count
+            product_tmpl.kit_count = kit_count
+#            if (not product_tmpl.is_kit_comp and kit_count > 0) or (product_tmpl.is_kit_comp and kit_count == 0):  # product_tmpl needs its is_kit_comp field updated
+#                templates |= product_tmpl
+#        if len(templates) > 0:
+#            templates._compute_is_kit_comp()
+
+    @api.multi
+    @api.depends('kit_line_ids')
+    def _compute_comp_count(self):
+        for product_tmpl in self:
+            product_tmpl.comp_count = len(product_tmpl.kit_line_ids)
+
+    @api.multi
+    @api.depends('list_price', 'standard_price', 'price_comps', 'cost_comps', 'of_pricing', 'of_is_kit')
+    def _compute_marge(self):
+        # override of function from of_product
+        for product_tmpl in self:
+            if not product_tmpl.of_is_kit:
+                list_price = product_tmpl.list_price
+                if list_price != 0:
+                    product_tmpl.marge = (list_price - product_tmpl.standard_price) * 100.00 / list_price
+                else: # division par 0!
+                    product_tmpl.marge = -100
+            else:  # product is a kit
+                if product_tmpl.of_pricing == 'fixed':
+                    price = product_tmpl.list_price
+                else:
+                    price = product_tmpl.price_comps
+                if price != 0:
+                    product_tmpl.marge = (price - product_tmpl.cost_comps) * 100.00 / price
+                else:
+                    product_tmpl.marge = -100
 
     def get_invoice_kit_data(self):
         self.ensure_one()
@@ -99,52 +162,6 @@ class OFKitProductTemplate(models.Model):
         return res
     """
 
-    @api.multi
-    @api.depends('kit_line_ids')
-    def _compute_compo_price_n_cost(self):
-        for product_tmpl in self:
-            if product_tmpl.of_is_kit:
-                price_n_cost = product_tmpl.get_compo_price_n_cost()
-                product_tmpl.price_comps = price_n_cost['price']
-                product_tmpl.cost_comps = price_n_cost['cost']
-
-    @api.multi
-    @api.depends('kit_line_ids')
-    def _compute_comp_count(self):
-        for product_tmpl in self:
-            product_tmpl.comp_count = len(product_tmpl.kit_line_ids)
-
-    @api.multi
-    @api.depends('price_comps', 'of_pricing')
-    def _compute_of_price_used(self):
-        for product_tmpl in self:
-            if product_tmpl.of_is_kit:
-                if product_tmpl.of_pricing == 'fixed':
-                    product_tmpl.of_price_used = product_tmpl.list_price
-                else:
-                    product_tmpl.of_price_used = product_tmpl.price_comps
-
-    @api.multi
-    @api.depends('list_price', 'standard_price', 'price_comps', 'cost_comps', 'of_pricing', 'of_is_kit')
-    def _compute_marge(self):
-        # override of function from of_product
-        for product_tmpl in self:
-            if not product_tmpl.of_is_kit:
-                list_price = product_tmpl.list_price
-                if list_price != 0:
-                    product_tmpl.marge = (list_price - product_tmpl.standard_price) * 100.00 / list_price
-                else: # division par 0!
-                    product_tmpl.marge = -100
-            else: # product is a kit
-                if product_tmpl.of_pricing == 'fixed':
-                    price = product_tmpl.list_price
-                else:
-                    price = product_tmpl.price_comps
-                if price != 0:
-                    product_tmpl.marge = (price - product_tmpl.cost_comps) * 100.00 / price
-                else:
-                    product_tmpl.marge = -100
-
     @api.onchange('of_is_kit')
     def _onchange_of_is_kit(self):
         self.ensure_one()
@@ -162,42 +179,35 @@ class OFKitProductTemplate(models.Model):
             res['cost'] += line.product_id.standard_price * line.product_qty
         return res
 
-    @api.depends('product_variant_ids', 'product_variant_ids.is_kit_comp')
-    def _compute_is_kit_comp(self):
-        for product_tmpl in self:
-            product_tmpl.is_kit_comp = any(product.is_kit_comp for product in product_tmpl.product_variant_ids)
-
-    @api.depends('product_variant_ids', 'product_variant_ids.kit_count')
-    def _compute_kit_count(self):
-        templates = self.env['product.template']
-        for product_tmpl in self:
-            kit_count = 0
-            for variant in product_tmpl.product_variant_ids:
-                kit_count += variant.kit_count
-            product_tmpl.kit_count = kit_count
-            if (not product_tmpl.is_kit_comp and kit_count > 0) or (product_tmpl.is_kit_comp and kit_count == 0):  # product_tmpl needs its is_kit_comp field updated
-                templates |= product_tmpl
-        if len(templates) > 0:
-            templates._compute_is_kit_comp()
-
     @api.multi
     def action_view_kits(self):
         action = self.env.ref('of_kit.of_template_open_kit').read()[0]
         action['domain'] = [('kit_line_ids.product_id.product_tmpl_id', 'in', [self.ids])]
         return action
 
-class OFKitProductProduct(models.Model):
+class ProductProduct(models.Model):
     _inherit = "product.product"
 
     kit_count = fields.Integer('# Kits', compute='_compute_kit_count')
     is_kit_comp = fields.Boolean(string="Is a comp", compute="_compute_is_kit_comp", store=True, help="is a component of a kit")  # store=True for domain searches and _sq_constraint
+    kit_line_ids = fields.One2many("of.product.kit.line", "product_id", string="Lignes de kit")
 
+    @api.depends('kit_line_ids')
     def _compute_kit_count(self):
         read_group_res = self.env['of.product.kit.line'].read_group([('product_id', 'in', self.ids)], ['product_id'], ['product_id'])
-        mapped_data = dict([(data['product_id'][0], data['product_id_count']) for data in read_group_res])
+        mapped_data = {data['product_id'][0]: data['product_id_count'] for data in read_group_res}
         for product in self:
-            kit_count = mapped_data.get(product.id, 0)
-            product.kit_count = kit_count
+            product.kit_count = mapped_data.get(product.id, 0)
+
+    @api.depends('kit_line_ids')
+    def _compute_is_kit_comp(self):
+        # this method will be called upon creation or change of a kit_line for its related product (workaround store=True)
+        for product in self:
+            product.is_kit_comp = bool(product.kit_line_ids)
+#         read_group_res = self.env['of.product.kit.line'].read_group([('product_id', 'in', self.ids)], ['product_id'], ['product_id'])
+#         mapped_data = dict([(data['product_id'][0], data['product_id_count']) for data in read_group_res])
+#         for product in self:
+#             product.is_kit_comp = mapped_data.get(product.id, 0) > 0
 
     def get_saleorder_kit_data(self):
         self.ensure_one()
@@ -207,14 +217,7 @@ class OFKitProductProduct(models.Model):
         self.ensure_one()
         return self.product_tmpl_id.get_invoice_kit_data()
 
-    def _compute_is_kit_comp(self):
-        # this method will be called upon creation or change of a kit_line for its related product (workaround store=True)
-        read_group_res = self.env['of.product.kit.line'].read_group([('product_id', 'in', self.ids)], ['product_id'], ['product_id'])
-        mapped_data = dict([(data['product_id'][0], data['product_id_count']) for data in read_group_res])
-        for product in self:
-            product.is_kit_comp = mapped_data.get(product.id, 0) > 0
-
-class OFKitProductKitLine(models.Model):
+class ProductKitLine(models.Model):
     _name = "of.product.kit.line"
     _order = 'kit_id, sequence'
 
@@ -243,34 +246,34 @@ class OFKitProductKitLine(models.Model):
 
     @api.model
     def create(self, vals):
-        line = super(OFKitProductKitLine, self).create(vals)
+        line = super(ProductKitLine, self).create(vals)
         line.kit_id.type = 'service'
-        line.product_id._compute_is_kit_comp()
+#         line.product_id._compute_is_kit_comp()
         #line.product_id._compute_kit_count()
         return line
 
     @api.multi
     def write(self, vals):
-        if len(self) == 1 and 'product_id' in vals:
-            products = self.env["product.product"]
-            products |= self.product_id
-        super(OFKitProductKitLine, self).write(vals)
-        if len(self) == 1 and 'product_id' in vals:
-            products |= self.product_id
-            products._compute_is_kit_comp()
+#         if len(self) == 1 and 'product_id' in vals:
+#             products = self.env["product.product"]
+#             products |= self.product_id
+        super(ProductKitLine, self).write(vals)
+#         if len(self) == 1 and 'product_id' in vals:
+#             products |= self.product_id
+#             products._compute_is_kit_comp()
         if len(self) == 1 and 'kit_id' in vals:
             self.kit_id.type = 'service'
         return True
 
-    @api.multi
-    def unlink(self):
-        products = self.env['product.product']
-        for kit_line in self:
-            products |= kit_line.product_id
-        super(OFKitProductKitLine, self).unlink()
-        products._compute_is_kit_comp()
+#     @api.multi
+#     def unlink(self):
+#         products = self.env['product.product']
+#         for kit_line in self:
+#             products |= kit_line.product_id
+#         super(ProductKitLine, self).unlink()
+#         products._compute_is_kit_comp()
 
-class OFKitProcurementOrder(models.Model):
+class ProcurementOrder(models.Model):
     _inherit = 'procurement.order'
 
     of_sale_comp_id = fields.Many2one('of.saleorder.kit.line', string='Sale Order Kit Component')
@@ -278,7 +281,7 @@ class OFKitProcurementOrder(models.Model):
     def _get_sale_order(self):
         # fonction définie dans of_purchase
         self.ensure_one()
-        sale_order = super(OFKitProcurementOrder, self)._get_sale_order()
+        sale_order = super(ProcurementOrder, self)._get_sale_order()
         if not sale_order:
             sale_comp = self.of_sale_comp_id
             if not sale_comp:
@@ -287,15 +290,15 @@ class OFKitProcurementOrder(models.Model):
             sale_order = sale_comp and sale_comp.order_id or False
         return sale_order
 
-class OFKitStockMove(models.Model):
+class StockMove(models.Model):
     _inherit = "stock.move"
 
     @api.multi
     def action_done(self):
         # Update delivered quantities on sale order lines that are not kits
-        result = super(OFKitStockMove, self).action_done()
+        result = super(StockMove, self).action_done()
         # Update delivered quantities on sale order line components
-        sale_order_components = self.filtered(lambda move: move.product_id.expense_policy == 'no').mapped('procurement_id.of_sale_comp_id') # bug mal initialisé of_sale_comp_id?
+        sale_order_components = self.filtered(lambda move: move.product_id.expense_policy == 'no').mapped('procurement_id.of_sale_comp_id')  # bug mal initialisé of_sale_comp_id?
         for comp in sale_order_components:
             comp.qty_delivered = comp._get_delivered_qty()
         lines = sale_order_components.mapped('kit_id.order_line_id')

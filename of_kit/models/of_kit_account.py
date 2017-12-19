@@ -3,7 +3,7 @@
 from odoo import api, fields, models, _
 import odoo.addons.decimal_precision as dp
 
-class OFKitAccountInvoice(models.Model):
+class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
     of_contains_kit = fields.Boolean(string='Contains a kit', compute='_compute_of_contains_kit')
@@ -28,7 +28,7 @@ class OFKitAccountInvoice(models.Model):
             - Collapse: One line per kit, with minimal info\n\
             - Expand: One line per kit, plus one line per component")
 
-class OFKitAccountInvoiceLine(models.Model):
+class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
     kit_id = fields.Many2one('of.invoice.kit', string="Components")
@@ -78,13 +78,13 @@ class OFKitAccountInvoiceLine(models.Model):
     @api.onchange('quantity', 'uom_id')
     def _onchange_uom_id(self):
         self.ensure_one()
-        super(OFKitAccountInvoiceLine, self)._onchange_uom_id()
+        super(AccountInvoiceLine, self)._onchange_uom_id()
         self._refresh_price_unit()
 
     @api.multi
     @api.onchange('product_id')
     def _onchange_product_id(self):
-        res = super(OFKitAccountInvoiceLine, self)._onchange_product_id()
+        res = super(AccountInvoiceLine, self)._onchange_product_id()
         new_vals = {}
         if self.kit_id:  # former product was a kit -> unlink it's kit_id
             self.kit_id.write({"to_unlink": True})
@@ -198,7 +198,7 @@ class OFKitAccountInvoiceLine(models.Model):
         if vals.get("invoice_kits_to_unlink"):
             self.env["of.invoice.kit"].search([("to_unlink", "=", True)]).unlink()
             vals.pop("invoice_kits_to_unlink")
-        line = super(OFKitAccountInvoiceLine, self).create(vals)
+        line = super(AccountInvoiceLine, self).create(vals)
         if line.of_is_kit and not from_so_line:  # 
             account_kit_vals = {'invoice_line_id': line.id, 'name': line.name}
             line.kit_id.write(account_kit_vals)
@@ -222,7 +222,7 @@ class OFKitAccountInvoiceLine(models.Model):
             update_il_id = True
         if len(self) == 1 and ((self.of_pricing == 'computed' and not vals.get('of_pricing')) or vals.get('of_pricing') == 'computed'):
             vals['price_unit'] = vals.get('price_comps', self.price_comps)  # price_unit is equal to price_comps if pricing is computed
-        super(OFKitAccountInvoiceLine, self).write(vals)
+        super(AccountInvoiceLine, self).write(vals)
         if update_il_id:
             account_kit_vals = {'invoice_line_id': self.id}
             if vals.get("name"):

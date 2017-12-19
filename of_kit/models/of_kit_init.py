@@ -2,15 +2,29 @@
 
 from odoo import fields, models, api
 
-class MrpBom(models.Model):
-    _inherit = 'mrp.bom'
+"""
+Ce fichier assure le passage de l'ancien système de kits au nouveau.
+Il pourra être supprimé à l'issue de l'installation de ce module sur toutes les bases OpenFire
 
-    @api.model
-    def _init_new_kits(self):
+ - Désinstaller of_sale_kit sur toutes les bases
+ - Supprimer le module of_sale_kit du dépôt
+ - Supprimer l'appel aux fonctions ci-dessous dans data/of_kit_data.xml
+ - Supprimer l'appel de ce fichier dans models/_init_.py
+ - Supprimer ce fichier
+"""
+
+class OFKitInit(models.AbstractModel):
+    _name = 'of.kit.init'
+
+    def _init_kits_product(self):
         """
-prends tous les kits de mrp et copie leurs composants de premier niveau en tant que composants de leur product_tmpl_id
+prend tous les kits de mrp et copie leurs composants de premier niveau en tant que composants de leur product_tmpl_id
 -> pas besoin de créer d'article 
         """
+        mrp_obj = self.env.get('mrp.bom')
+        if not mrp_obj:
+            # Le module mrp n'a pas été installé, donc pas de migration à effectuer
+            return
         old_kits = self.search([('type', '=', 'phantom')])
         kit_line_obj = self.env['of.product.kit.line']
         for kit in old_kits:
@@ -29,15 +43,15 @@ prends tous les kits de mrp et copie leurs composants de premier niveau en tant 
             }
             kit.product_tmpl_id.write(kit_vals)
 
-class SaleOrder(models.Model):
-    _inherit = 'sale.order'
-
     @api.model
-    def _init_new_kits(self):
+    def _init_kits_sale_order(self):
         """
-créé des kits pour chaque ligne de commande qui est un kit
-prends tous les composants de la ligne et en créé des copies rattachées aux nouveaux kits créés
+crée des kits pour chaque ligne de commande qui est un kit
+prend tous les composants de la ligne et en créé des copies rattachées aux nouveaux kits créés
         """
+        if 'sale.order.line.comp' not in self.env:
+            # Le module of_sale_kit n'est pas installé, donc pas de migration à effectuer
+            return
         orders = self.with_context({'active_test': False}).search([])
         new_saleorder_kit_obj = self.env['of.saleorder.kit']
         new_saleorder_kit_line_obj = self.env['of.saleorder.kit.line']
@@ -72,15 +86,15 @@ prends tous les composants de la ligne et en créé des copies rattachées aux n
                         for proc in comp.procurement_ids:
                             proc.of_sale_comp_id = new_saleorder_kit_line.id
 
-class AccountInvoice(models.Model):
-    _inherit = 'account.invoice'
-
     @api.model
-    def _init_new_kits(self):
+    def _init_kits_invoice(self):
         """
-créé des kits pour chaque ligne de facture qui est un kit
-prends tous les composants de la ligne et en créé des copies rattachées aux nouveaux kits créés
+crée des kits pour chaque ligne de facture qui est un kit
+prend tous les composants de la ligne et en créé des copies rattachées aux nouveaux kits créés
         """
+        if 'account.invoice.line.comp' not in self.env:
+            # Le module of_sale_kit n'est pas installé, donc pas de migration à effectuer
+            return
         invoices = self.search([])
         new_invoice_kit_obj = self.env['of.invoice.kit']
         new_invoice_kit_line_obj = self.env['of.invoice.kit.line']
@@ -110,3 +124,9 @@ prends tous les composants de la ligne et en créé des copies rattachées aux n
                             'qty_per_kit': comp.qty_per_line,
                         }
                         new_invoice_kit_line_obj.create(new_comp_vals)
+
+    @api.model
+    def _init_new_kits(self):
+        self._init_kits_product()
+        self._init_kits_sale_order()
+        self._init_kits_invoice()
