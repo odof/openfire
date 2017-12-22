@@ -1,0 +1,199 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_l10n_fr_certification
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 9.0c\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-25 22:45+0000\n"
+"PO-Revision-Date: 2017-12-25 22:45+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement_create_date
+msgid "Date de modification"
+msgstr "Date de modification"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement_payment_date
+msgid "Date paiement"
+msgstr "Date paiement"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement_display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: of_l10n_fr_certification
+#: model:ir.ui.view,arch_db:of_l10n_fr_certification.of_log_paiement_filter
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: of_l10n_fr_certification
+#: model:ir.ui.view,arch_db:of_l10n_fr_certification.of_log_paiement_filter
+msgid "Draft vouchers"
+msgstr "Paiements brouillon"
+
+#. module: of_l10n_fr_certification
+#: model:ir.ui.view,arch_db:of_l10n_fr_certification.of_log_paiement_filter
+#: model:ir.ui.view,arch_db:of_l10n_fr_certification.of_log_paiement_form
+msgid "Historique des paiements"
+msgstr "Historique des paiements"
+
+#. module: of_l10n_fr_certification
+#: model:ir.actions.act_window,name:of_l10n_fr_certification.action_of_log_paiement
+#: model:ir.ui.menu,name:of_l10n_fr_certification.menu_of_log_paiement
+#: model:ir.ui.view,arch_db:of_l10n_fr_certification.of_log_paiement_tree
+msgid "Historique paiements"
+msgstr "Historique paiements"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement_id
+msgid "ID"
+msgstr "ID"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement_partner_id
+msgid "ID client/fournisseur"
+msgstr "ID client/fournisseur"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement_of_payment_mode_id
+msgid "ID mode de paiement"
+msgstr "ID mode de paiement"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement_paiement_id
+msgid "ID paiement"
+msgstr "ID paiement"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement_company_id
+msgid "ID société"
+msgstr "ID société"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement_create_uid
+msgid "ID utilisateur"
+msgstr "ID utilisateur"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement___last_update
+msgid "Last Modified on"
+msgstr "Dernière modification le"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement_write_uid
+msgid "Last Updated by"
+msgstr "Mis à jour par"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement_write_date
+msgid "Last Updated on"
+msgstr "Mis à jour le"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model,name:of_l10n_fr_certification.model_ir_module_module
+msgid "Module"
+msgstr "Module"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement_amount
+msgid "Montant"
+msgstr "Montant"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement_communication
+msgid "Mémo"
+msgstr "Mémo"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement_name
+msgid "Nom"
+msgstr "Nom"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement_partner_name
+msgid "Nom client/fournisseur"
+msgstr "Nom client/fournisseur"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement_of_payment_mode_name
+msgid "Nom mode de paiement"
+msgstr "Nom mode de paiement"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement_company_name
+msgid "Nom société"
+msgstr "Nom société"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement_user_name
+msgid "Nom utilisateur"
+msgstr "Nom utilisateur"
+
+#. module: of_l10n_fr_certification
+#: model:ir.ui.view,arch_db:of_l10n_fr_certification.of_log_paiement_filter
+msgid "Paiement"
+msgstr "Paiement"
+
+#. module: of_l10n_fr_certification
+#: model:ir.ui.view,arch_db:of_l10n_fr_certification.of_log_paiement_filter
+msgid "Partner"
+msgstr "Partenaire"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model,name:of_l10n_fr_certification.model_account_payment
+msgid "Payments"
+msgstr "Paiements"
+
+#. module: of_l10n_fr_certification
+#: model:ir.ui.view,arch_db:of_l10n_fr_certification.of_log_paiement_filter
+msgid "Posted"
+msgstr "Comptabilisée"
+
+#. module: of_l10n_fr_certification
+#: model:ir.ui.view,arch_db:of_l10n_fr_certification.of_log_paiement_filter
+msgid "Posted vouchers"
+msgstr "Paiements postés"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement_payment_reference
+msgid "Ref. paiement"
+msgstr "Réf. paiement"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model,name:of_l10n_fr_certification.model_of_log_paiement
+msgid "Table historique modifications paiements"
+msgstr "Table historique modifications paiements"
+
+#. module: of_l10n_fr_certification
+#: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement_payment_type
+msgid "Type"
+msgstr "Type"
+
+#. module: of_l10n_fr_certification
+#: code:addons/of_l10n_fr_certification/models/of_l10n_fr_certification.py:105
+#, python-format
+msgid "Vous ne pouvez pas désinstaller le module of_l10n_fr_certification."
+msgstr "Vous ne pouvez pas désinstaller le module of_l10n_fr_certification."
+
+#. module: of_l10n_fr_certification
+#: code:addons/of_l10n_fr_certification/models/of_l10n_fr_certification.py:94
+#, python-format
+msgid "Vous ne pouvez pas supprimer un paiement.\n"
+"Vous pouvez seulement le laisser en brouillon."
+msgstr "Vous ne pouvez pas supprimer un paiement.\n"
+"Vous pouvez seulement le laisser en brouillon."
+
+#. module: of_l10n_fr_certification
+#: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement_state
+msgid "État"
+msgstr "État"
+
