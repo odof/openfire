@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+
+    <data>
+       <record model="ir.ui.view" id="of_log_paiement_tree">
+            <field name="name">of.log.paiement.tree</field>
+            <field name="model">of.log.paiement</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree colors="blue:state == 'draft';gray:state == 'cancel';" string="Historique paiements">
+                    <field name="id" readonly="1"/>
+                    <field name="create_date" readonly="1"/>
+                    <field name="paiement_id" readonly="1"/>
+                    <field name="payment_date" readonly="1"/>
+                    <field name="partner_id" readonly="1"/>
+                    <field name="partner_name" readonly="1"/>
+                    <field name="payment_type" readonly="1"/>
+                    <field name="amount" readonly="1"/>
+                    <field name="payment_reference" readonly="1"/>
+                    <field name="name" readonly="1"/>
+                    <field name="communication" readonly="1"/>
+                    <field name="of_payment_mode_id" readonly="1"/>
+                    <field name="of_payment_mode_name" readonly="1"/>
+                    <field name="company_id" readonly="1"/>
+                    <field name="company_name" readonly="1"/>
+                    <field name="state" readonly="1"/>
+                    <field name="create_uid" readonly="1"/>
+                    <field name="user_name" readonly="1"/>
+                </tree>
+            </field>
+        </record>
+
+       <record model="ir.ui.view" id="of_log_paiement_form">
+            <field name="name">of.log.paiement.form</field>
+            <field name="model">of.log.paiement</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Historique des paiements">
+                    <group colspan="2" col="2">
+                        <field name="id" readonly="1"/>
+                        <field name="create_date" readonly="1"/>
+                        <field name="paiement_id" readonly="1"/>
+                        <field name="payment_date" readonly="1"/>
+                        <field name="partner_id" readonly="1"/>
+                        <field name="partner_name" readonly="1"/>
+                        <field name="payment_type" readonly="1"/>
+                        <field name="amount" readonly="1"/>
+                        <field name="payment_reference" readonly="1"/>
+                        <field name="name" readonly="1"/>
+                        <field name="communication" readonly="1"/>
+                        <field name="of_payment_mode_id" readonly="1"/>
+                        <field name="of_payment_mode_name" readonly="1"/>
+                        <field name="company_id" readonly="1"/>
+                        <field name="company_name" readonly="1"/>
+                        <field name="state" readonly="1"/>
+                        <field name="create_uid" readonly="1"/>
+                        <field name="user_name" readonly="1"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="of_log_paiement_filter">
+            <field name="name">of.log.paiement.filter</field>
+            <field name="model">of.log.paiement</field>
+            <field name="priority">1</field>
+            <field name="arch" type="xml">
+                <search string="Historique des paiements">
+                    <field name="payment_date"/>
+                    <field name="partner_id"/>
+                    <field name="partner_name"/>
+                    <field name="amount"/>
+                    <field name="of_payment_mode_name"/>
+                    <separator/>
+                    <filter string="Draft" domain="[('state','=','draft')]" help="Draft vouchers"/>
+                    <filter string="Posted" domain="[('state','=','posted')]" help="Posted vouchers"/>
+                    <separator/>
+                    <filter string="Partner" domain="[]" context="{'group_by':'partner_id'}"/>
+                    <filter string="Paiement" domain="[]" context="{'group_by':'paiement_id'}"/>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_of_log_paiement">
+            <field name="name">Historique paiements</field>
+            <field name="res_model">of.log.paiement</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'type':'general'}</field>
+            <field name="view_id" eval="of_log_paiement_tree"/>
+        </record>
+        <menuitem action="action_of_log_paiement" id="menu_of_log_paiement" parent="account.menu_finance_entries" sequence="100"/>
+
+    </data>
+
+    <data noupdate="1">
+        <!-- Lors de la 1ère installation, peupler l'historique avec les paiements validés existants. -->
+        <function model="of.log.paiement" name="_peupler_log_paiements_existants"/>
+    </data>
+
+</openerp>
