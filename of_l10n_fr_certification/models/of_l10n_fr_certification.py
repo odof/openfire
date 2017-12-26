@@ -32,7 +32,7 @@ class of_log_paiement(models.Model):
     def create(self, vals):
         # Empêcher une modification de la table of.log.paiement
         return False
- 
+
     @api.multi
     def write(self, vals):
         # Empêcher une modification de la table of.log.paiement
@@ -41,12 +41,12 @@ class of_log_paiement(models.Model):
     @api.multi
     def unlink(self):
         # Empêcher une modification de la table of.log.paiement
-        return False    
+        return False
 
     @api.model
     def _peupler_log_paiements_existants(self):
         # Lors de la 1ère installation, peupler l'historique avec les paiements validés existants.
-        
+
         # On récupère les paiements validés existants qui ne sont pas déjà dans l'historique.
         self._cr.execute(u"SELECT account_payment.*, res_company.name AS company_name, p.name AS partner_name, of_account_payment_mode.name AS mode_name, u.name AS user_name\
             FROM account_payment\
@@ -75,7 +75,7 @@ class account_payment(models.Model):
     def write(self, vals):
         res = super(account_payment, self).write(vals)
         # On ignore les (nombreux) appels à write avec vals vide et quand il s'agit uniquement unemodification du lettrage (vals avec une seule clé 'invoice_ids')
-        if vals and not (len(vals) == 1 and  'invoice_ids' in vals):
+        if vals and not (len(vals) == 1 and 'invoice_ids' in vals):
             user_name = self.env.user.name or ''
             # On récupère les paiements qui ont été modifiés.
             paiements = self.env['account.payment'].browse(self._ids)

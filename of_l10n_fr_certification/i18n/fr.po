@@ -161,7 +161,7 @@ msgstr "Comptabilisée"
 #. module: of_l10n_fr_certification
 #: model:ir.ui.view,arch_db:of_l10n_fr_certification.of_log_paiement_filter
 msgid "Posted vouchers"
-msgstr "Paiements postés"
+msgstr "Paiements comptabilisés"
 
 #. module: of_l10n_fr_certification
 #: model:ir.model.fields,field_description:of_l10n_fr_certification.field_of_log_paiement_payment_reference

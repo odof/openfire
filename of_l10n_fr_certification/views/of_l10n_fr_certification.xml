@@ -7,7 +7,7 @@
             <field name="model">of.log.paiement</field>
             <field name="type">tree</field>
             <field name="arch" type="xml">
-                <tree colors="blue:state == 'draft';gray:state == 'cancel';" string="Historique paiements">
+                <tree colors="blue:state == 'draft';" string="Historique paiements" create="false">
                     <field name="id" readonly="1"/>
                     <field name="create_date" readonly="1"/>
                     <field name="paiement_id" readonly="1"/>
@@ -35,7 +35,7 @@
             <field name="model">of.log.paiement</field>
             <field name="type">form</field>
             <field name="arch" type="xml">
-                <form string="Historique des paiements">
+                <form create="0" edit="0" string="Historique des paiements">
                     <group colspan="2" col="2">
                         <field name="id" readonly="1"/>
                         <field name="create_date" readonly="1"/>
