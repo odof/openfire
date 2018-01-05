@@ -119,7 +119,7 @@ class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
     client_order_ref = fields.Char(related="sale_id.client_order_ref")
-
+    of_note_operations = fields.Text('Notes Operations')
 
 class PackOperation(models.Model):
     _inherit = "stock.pack.operation"
