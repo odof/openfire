@@ -17,6 +17,95 @@
                             <field name="company_id"/>
                             <field name="journal_id"/>
                         </group>
+                        <!-- Paramètres d'affichage dans la facture (pdf) -->
+                        <separator string="Paramètres d'affichage"/>
+                        <group>
+                            <field name="config_affichage" placeholder="Ex.: Payé par ${object.of_payment_mode_id.name}, Réf. du règlement ${object.of_ref_reglement or 'non renseigné'} le ${format_date(object.payment_date)}"/>
+                        </group>
+                        <div>
+                            <br/>
+                            <strong>Exemples de variables</strong>
+                        </div>
+                        <table class="table table-condensed" style="padding-bottom: 0px; margin-bottom: 0px">
+                            <tbody colspan="2">
+                                <tr>
+                                    <td class="col-xs-3" style="border: none; padding: 0px; margin: 0px">
+                                        Description
+                                    </td>
+                                    <td class="col-xs-9" style="border: none; padding: 0px; margin: 0px">
+                                        ${object.name}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border: none; padding: 0px; margin: 0px">
+                                        Partenaire
+                                    </td>
+                                    <td style="border: none; padding: 0px; margin: 0px">
+                                        ${object.partner_id.name}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border: none; padding: 0px; margin: 0px">
+                                        Mode de paiement
+                                    </td>
+                                    <td style="border: none; padding: 0px; margin: 0px">
+                                        ${object.of_payment_mode_id.name}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border: none; padding: 0px; margin: 0px">
+                                        Date de règlement
+                                    </td>
+                                    <td style="border: none; padding: 0px; margin: 0px">
+                                        ${format_date(object.payment_date)}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border: none; padding: 0px; margin: 0px">
+                                        Remise en banque
+                                    </td>
+                                    <td style="border: none; padding: 0px; margin: 0px">
+                                        ${object.of_deposit_id.name or ''} # Avec option si champ vide.
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border: none; padding: 0px; margin: 0px">
+                                        Réf. du règlement
+                                    </td>
+                                    <td style="border: none; padding: 0px; margin: 0px">
+                                        ${object.of_ref_reglement or 'non renseigné'} # Avec option si champ vide.
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border: none; padding: 0px; margin: 0px">
+                                        Mémo
+                                    </td>
+                                    <td style="border: none; padding: 0px; margin: 0px">
+                                        ${object.communication}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border: none; padding: 0px; margin: 0px">
+                                        Catégorie
+                                    </td>
+                                    <td style="border: none; padding: 0px; margin: 0px">
+                                        ${" - ".join(object.of_tag_ids.mapped('name'))}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border: none; padding: 0px; margin: 0px">
+                                        Transaction
+                                    </td>
+                                    <td style="border: none; padding: 0px; margin: 0px">
+                                        ${object.payment_transaction_id}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div>
+                            <br/>
+                            Astuce : ajouter une option en cas de champ vide.
+                        </div>
                     </sheet>
                 </form>
             </field>
@@ -45,6 +134,8 @@
                 </field>
                 <field name="journal_id" position="after">
                     <field name="of_payment_mode_id"/>
+                    <!-- Ajout column Categories -->
+                    <field name="of_tag_ids" widget="many2many_tags"/>
                 </field>
             </field>
         </record>
@@ -88,8 +179,76 @@
                 <field name="journal_id" position="after">
                     <field name="of_payment_mode_id" widget="selection" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                 </field>
+                <!-- Ajout champ "Ref. du reglement" -->
+                <xpath expr="//field[@name='payment_date']" position="after">
+                    <field name="of_ref_reglement"/>
+                </xpath>
+                <!-- Mise en page partner_type et partner_id -->
+                <xpath expr="//field[@name='partner_type']" position="attributes">
+                    <attribute name="nolabel">0</attribute>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="attributes">
+                    <attribute name="nolabel">0</attribute>
+                </xpath>
+                <!-- Ajout champ Categorie -->
+                <xpath expr="//field[@name='communication']" position="after">
+                    <field name="of_tag_ids" widget="many2many_tags"/>
+                </xpath>
             </field>
         </record>
+
+        <!-- Menu et Action pour Categorie de paiement : Payment Tags -->
+        <record id="of_payment_tags_search_view" model="ir.ui.view">
+            <field name="name">Catégories de paiement</field>
+            <field name="model">of.payment.tags</field>
+            <field name="arch" type="xml">
+                <search string="Category">
+                    <field name="name"/>
+                    <field name="tag_description"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="of_payment_tags_view_form" model="ir.ui.view">
+            <field name="name">Catégories de paiement</field>
+            <field name="model">of.payment.tags</field>
+            <field name="arch" type="xml">
+                <form string="Categorie">
+                    <group>
+                        <field name="name" string="Nom"/>
+                        <field name="tag_description" string="Description"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="of_payment_tags_view_tree" model="ir.ui.view">
+            <field name="name">Catégories de paiement</field>
+            <field name="model">of.payment.tags</field>
+            <field name="arch" type="xml">
+                <tree string="Categorie">
+                    <field name="name" string="Nom"/>
+                    <field name="tag_description" string="Description"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="of_payment_tags_action" model="ir.actions.act_window">
+            <field name="name">Catégories de paiement</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">of.payment.tags</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_type">form</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Cliquez pour ajouter une nouvelle catégorie.
+              </p>
+            </field>
+        </record>
+
+        <menuitem action="of_payment_tags_action" id="menu_of_payment_tags_act"
+            name="Catégories de paiement" parent="account.account_management_menu" sequence="20"/>
+
 
         <record id="of_view_account_payment_graph" model="ir.ui.view">
             <field name="name">account.payment.graph</field>
@@ -113,6 +272,14 @@
                 <field name="journal_id" position="after">
                     <field name="of_payment_mode_id" widget="selection"/>
                 </field>
+                <!-- Ajout champ "Ref. du reglement" -->
+                <xpath expr="//field[@name='payment_date']" position="after">
+                    <field name="of_ref_reglement"></field>
+                </xpath>
+                <!-- Ajout champ Categorie -->
+                <xpath expr="//field[@name='communication']" position="after">
+                    <field name="of_tag_ids" widget="many2many_tags"/>
+                </xpath>
             </field>
         </record>
 
