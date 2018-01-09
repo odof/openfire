@@ -44,7 +44,6 @@ class OfProductBrand(models.Model):
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
-    name = 'of.product.template'
 
     brand_id = fields.Many2one(string='Brand', related='product_variant_ids.brand_id', store=True)
 
