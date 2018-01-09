@@ -57,7 +57,7 @@ class of_res_add(osv.TransientModel):
         mois_fin = date(date_annee, date_mois, calendar.mdays[date_mois])
         mois_debut_str = mois_debut.strftime('%Y-%m-%d')
         mois_fin_str = mois_fin.strftime('%Y-%m-%d')
-        service_ids = service_obj.search(cr, uid, [('product_id', 'in', tuple(product_ids)), ('state', '=', 'progress')])
+        service_ids = service_obj.search(cr, uid, [('product_id', 'in', tuple(product_ids))])
         service_ids_mj = []
         for service in service_obj.browse(cr, uid, service_ids):
             for m in service.mois_ids:
@@ -175,9 +175,9 @@ class of_res_add(osv.TransientModel):
                                 for service in res_parter.service_ids:
                                     if service.product_id.id in product_ids:
                                         for mois in service.mois_ids:
-                                            if mois.id == date_mois:
+                                            if mois.numero == date_mois:
                                                 for jour in service.jour_ids:
-                                                    if jour.id == date_jour:
+                                                    if jour.numero == date_jour:
                                                         obj_service = service
                                                         service_product_id = service.product_id.id
                                                         break

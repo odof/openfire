@@ -1,24 +1,14 @@
-<openerp>
-    <data>
-
-<!--##############################################################################-->
-<!--###########################______Account Move______###########################-->
-<!--##############################################################################-->
-
-        <record model="ir.ui.view" id="of_account_move_form_view">
-            <field name="name">of.account.move.form</field>
-            <field name="model">account.move</field>
-            <field name="type">form</field>
-            <field name="inherit_id" ref="account.view_move_form"/>
-            <field name="arch" type="xml">
-                <field name="line_ids" position="before">
-                    <field name="default_line_name" invisible="0"/>
-                </field>
-                <field name="line_ids" position="attributes">
-                    <attribute name="context">{'line_ids': line_ids, 'journal_id': journal_id , 'default_name': default_line_name}</attribute>
-                </field>
-            </field>
-        </record>
-
-    </data>
-</openerp>
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Ajout rubriques -->
+    <record id="of_view_account_config_settings" model="ir.ui.view">
+        <field name="name">(OF) account settings</field>
+        <field name="model">account.config.settings</field>
+        <field name="inherit_id" ref="account.view_account_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <group name="rubrique_report" string="Factures PDF" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

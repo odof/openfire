@@ -10,14 +10,13 @@
     'depends' : [
         'of_planning',
         'of_map_view',
+        'of_utils',
     ],
     'init_xml' : [],
     'demo_xml' : [],
     'data' : [
         'security/ir.model.access.csv',
         'views/of_service_view.xml',
-        'data/of_mois_data.xml',
-        'data/of_jour_data.xml',
     ],
     'installable': True,
 }

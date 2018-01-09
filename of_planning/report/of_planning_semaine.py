@@ -44,11 +44,11 @@ class OfPlanningSemaine(report_sxw.rml_parse):
 
         date_start_extend = ""
         if date_start_date.year != date_stop_date.year:
-            date_start_extend = date_start_date.strftime(" %B %Y")
+            date_start_extend = date_start_date.strftime(" %B %Y").decode("utf-8")
         elif date_start_date.month != date_stop_date.month:
-            date_start_extend = date_start_date.strftime(" %Y")
+            date_start_extend = date_start_date.strftime(" %B").decode("utf-8")
 
-        title = "Planning des Interventions - %s - Semaine %s du %s%s au %s%s" % (equipe.name, week_number, date_start_date.day, date_start_extend, date_stop_date.day, date_stop_date.strftime(" %B %Y"))
+        title = "Planning des Interventions - %s - Semaine %s du %s%s au %s%s" % (equipe.name, week_number, date_start_date.day, date_start_extend, date_stop_date.day, date_stop_date.strftime(" %B %Y").decode("utf-8"))
         return title
 
     def get_interventions(self, equipe):

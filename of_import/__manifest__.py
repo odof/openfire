@@ -5,10 +5,7 @@
     "website" : "openfire.fr",
     "category" : "'Extra Tools'",
     "description": """
-Import OpenFire.
-======================================
-
-Import OpenFire
+Module d'import OpenFire.
 """,
     "depends" : [],
     "demo_xml" : [],

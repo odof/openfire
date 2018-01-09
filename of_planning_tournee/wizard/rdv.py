@@ -39,7 +39,7 @@ class OfTourneeRdv(models.TransientModel):
         partner = self._default_partner()
         if not partner:
             return False
-        services = service_obj.search([('partner_id', '=', partner.id), ('state', '=', 'progress')], limit=1)
+        services = service_obj.search([('partner_id', '=', partner.id)], limit=1)
         return services
 
     @api.model
@@ -76,7 +76,7 @@ class OfTourneeRdv(models.TransientModel):
                                          domain="['|', ('id', '=', partner_id), ('parent_id', '=', partner_id)]")
     date_display = fields.Char(string='Jour du RDV', size=64, readonly=True)
     service_id = fields.Many2one('of.service', string='Service client', default=_default_service,
-                                 domain="[('partner_id', '=', partner_id), ('state', '=', 'progress')]")
+                                 domain="[('partner_id', '=', partner_id)]")
     date_next = fields.Date(string=u'Prochaine intervention', help=u"Date à partir de laquelle programmer la prochaine intervention")
     mode = fields.Selection(RES_MODES, string="Mode de recherche", required=True, default="hors_tournee")
 
@@ -90,7 +90,6 @@ class OfTourneeRdv(models.TransientModel):
                     services = True
                 else:
                     services = service_obj.search([('partner_id', '=', self.partner_id.id),
-                                                   ('state', '=', 'progress'),
                                                    ('tache_id', '=', self.tache_id.id)], limit=1)
                     if services:
                         self.service_id = services
@@ -180,7 +179,7 @@ class OfTourneeRdv(models.TransientModel):
 
         address = self.partner_address_id
         service = self.service_id
-        jours = [jour.id % 7 for jour in service.jour_ids] if service else range(1, 6)
+        jours = [jour.numero for jour in service.jour_ids] if service else range(1, 6)
 
         # Suppression des anciens créneaux
         planning_del_ids = wizard_line_obj.search([('wizard_id', '=', self.id)])

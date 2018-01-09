@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <!-- inherit from report_invoice_document (module of_account_invoice_report) -->
+        <template id="of_report_invoice_document_extended" inherit_id="account.report_invoice_document">
+            <xpath expr="//div[@name='subdivision']" position="attributes">
+                <attribute name="class">col-xs-6 pull-right</attribute>
+            </xpath>
+            <xpath expr="//i[@name='payments_data']" position="attributes">
+                <attribute name="t-if">not o.get_payment_mode_data(payment['payment_id'])</attribute>
+            </xpath>
+            <xpath expr="//i[@name='payments_data']" position="after">
+                <i t-if="o.get_payment_mode_data(payment['payment_id'])"><span t-esc="o.get_payment_mode_data(payment['payment_id'])"/></i>
+            </xpath>
+        </template> 
+    </data>
+</odoo>

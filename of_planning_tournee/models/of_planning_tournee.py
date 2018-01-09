@@ -43,8 +43,9 @@ class OfPlanningIntervention(models.Model):
     def _compute_tournee_id(self):
         tournee_obj = self.env['of.planning.tournee']
         for intervention in self:
-            tournee = tournee_obj.search([('equipe_id', '=', intervention.equipe_id.id), ('date', '=', intervention.date[:10])], limit=1)
-            intervention.tournee_id = tournee
+            if intervention.equipe_id and intervention.date:
+                tournee = tournee_obj.search([('equipe_id', '=', intervention.equipe_id.id), ('date', '=', intervention.date[:10])], limit=1)
+                intervention.tournee_id = tournee
 
     @api.depends('equipe_id', 'date', 'date_deadline')
     def _compute_tournee_is_complet(self):

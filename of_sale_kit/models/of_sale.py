@@ -375,7 +375,6 @@ class OFKitSaleOrderLine(models.Model):
 		# inhiber la vérification de stock
 		afficher_warning = self.env['ir.values'].get_default('sale.config.settings', 'stock_warning_setting')
 		if afficher_warning:
-			print afficher_warning
 			return super(OFKitSaleOrderLine, self)._onchange_product_id_check_availability()
 
 	@api.model
@@ -710,7 +709,8 @@ means that the product is a component of Kit B which is itself a component of Ki
 				continue
 			qty = 0.0
 			for proc in comp.procurement_ids:
-				qty += proc.product_qty
+				if proc.state != 'cancel':
+					qty += proc.product_qty
 			if float_compare(qty, comp.qty_total, precision_digits=precision) >= 0:
 				continue
 			

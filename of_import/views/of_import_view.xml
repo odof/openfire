@@ -1,9 +1,9 @@
-<openerp>
+<odoo>
     <data>
 
         <!-- ################## Vues import tarif ##################-->
 
-        <!-- Filtre -->    
+        <!-- Filtre -->
 <!--         <record id="of_import_search_view" model="ir.ui.view">
             <field name="name">of.import.search</field>
             <field name="model">of.importe</field>
@@ -39,51 +39,71 @@
             <field name="model">of.import</field>
             <field name="arch" type="xml">
                 <form>
-                    <group>
-                        <group>
-                            <button name="bouton_simuler" string="Simuler import" type="object" icon="fa-check" attrs="{'invisible': [('state','!=','brouillon')]}"/>
-                            <button name="bouton_importer" string="Importer" type="object" icon="fa-check" attrs="{'invisible': [('state','!=','brouillon')]}" confirm="Confirmez-vous l'import (non annulable) ?"/>
-                            <button name="bouton_remettre_brouillon" string="Remettre en brouillon" type="object" icon="fa-check" attrs="{'invisible': [('state','=','brouillon')]}" confirm="Remettre à l'état brouillon ?"/>
-                        </group>
-                        <group colspan="4" col="4">
-                            <field name="type_import"/>
-                            <field name="name"/>
-                        </group>
-                        <group colspan="4" col="4">
-                            <field name="date" widget="date"/>
-                            <field name="prefixe"/>
-                        </group>
-                        <group colspan="4" col="4">
-                            <field name="file" filename="file_name" placeholder="Choose a file to import..."/>
-                            <field name="separateur"/>
-                            <field name="file_name" invisible="1"/>
-                        </group>
-                        <separator string="Informations import"/>
-                        <group colspan="4" col="6">
-                            <field name="date_debut_import"/>
-                            <field name="date_fin_import"/>
-                            <field name="state"/>
-                        </group>
-                        <group colspan="4" col="8">
-                            <field name="nb_total"/>
-                            <field name="nb_ajout"/>
-                            <field name="nb_maj"/>
-                            <field name="nb_echoue"/>
-                        </group>
-                        <separator string="Résultat import"/>
-                        <group colspan="4" col="6">
-                            <field name="sortie_succes"/>
-                            <field name="sortie_avertissement"/>
-                            <field name="sortie_erreur"/>
-                        </group>
+                    <header>
+                        <button name="bouton_simuler" string="Simuler import" type="object" icon="fa-check" attrs="{'invisible': [('state','!=','brouillon')]}"/>
+                        <button name="bouton_importer" string="Importer" type="object" icon="fa-check" attrs="{'invisible': [('state','!=','brouillon')]}" confirm="Confirmez-vous l'import (non annulable) ?"/>
+                        <button name="bouton_remettre_brouillon" string="Remettre en brouillon" type="object" icon="fa-check" attrs="{'invisible': [('state','=','brouillon')]}" confirm="Remettre à l'état brouillon ?"/>
+                    </header>
+                    <separator string="Configuration" colspan="12"/>
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <group>
+                                <field name="type_import"/>
+                                <field name="date" widget="date"/>
+                                <field name="file" filename="file_name"/>
+                            </group>
+                        </div>
+                        <div class="col-xs-6">
+                            <group>
+                                <field name="name"/>
+                                <field name="prefixe"/>
+                                <field name="separateur"/>
+                                <!-- <field name="separateur1" widget="selection" attrs="{'invisible': [('file_type', '!=', 'csv')]}"/> -->
+                                <!-- <field name="separateur2" placeholder="Séparateur personnalisé" options="{'no_open': True}" attrs="{'invisible': [('separateur1', '!=', 'x')]}"/> -->
+                            </group>
+                        </div>
+                    </div>
+                    <separator string="Informations" colspan="12"/>
+                    <div class="row">
+                        <div class="col-xs-5">
+                            <group>
+                                <field name="file_name" attrs="{'effective_readonly': '1'}"/>
+                                <field name="file_type"/>
+                                <field name="file_encoding" attrs="{'invisible': [('file_encoding', '=', False)], 'effective_readonly': '1'}"/>
+                                <!-- <field name="separateur" string="Séparateur utilisé" attrs="{'invisible': [('file_type', '!=', 'csv')], 'effective_readonly': '1'}"/> -->
+                                <field name="file_size"/>
+                            </group>
+                        </div>
+                        <div class="col-xs-3">
+                            <group>
+                                <field name="nb_total"/>
+                                <field name="nb_ajout"/>
+                                <field name="nb_maj"/>
+                                <field name="nb_echoue"/>
+                            </group>
+                        </div>
+                        <div class="col-xs-4">
+                            <group>
+                                <field name="date_debut_import"/>
+                                <field name="date_fin_import"/>
+                                <field name="time_lapse"/>
+                                <field name="state"/>
+                            </group>
+                        </div>
+                    </div>
+                    <separator string="Résultat"/>
+                    <group colspan="4" col="6">
+                        <field name="sortie_succes"/>
+                        <field name="sortie_avertissement"/>
+                        <field name="sortie_erreur"/>
                     </group>
+                    <separator string="Champs disponibles"/>
                     <group colspan="4" col="4">
                         <field name="sortie_note" nolabel="1" attrs="{'invisible': [('state','!=','brouillon')]}"/>
                     </group>
                 </form>
             </field>
         </record>
-
 
         <!-- Menus -->
 
@@ -98,8 +118,8 @@
         </record>
 
         <!-- Menu import (Configuration/OpenImport) -->
-        <menuitem id="menu_of_import" action="action_of_import" name="OpenImport" 
+        <menuitem id="menu_of_import" action="action_of_import" name="OpenImport"
             parent="base.menu_administration" sequence="1"/>
 
     </data>
-</openerp>
+</odoo>

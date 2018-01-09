@@ -22,12 +22,14 @@ Paramètres de Ventes (sale.config.settings)
 - description paramètre (module(s) concerné(s))
 - inhibition avertissements de stock (of_sale_kit)
 - inhibition affichage réf produit dans les rapports PDF (of_sale)
+- redéfinition templates sale.report_saleorder_document, sale.report_invoice_document_inherit_sale et sale.report_invoice_layouted
 """,
     "website": "www.openfire.fr",
     "depends": [
         "sale",
         "of_product",
         "of_base",
+        "of_account_invoice_report",  # définition des paramètres d'adresse dans les rapports
     ],
     "category": "OpenFire",
     "data": [

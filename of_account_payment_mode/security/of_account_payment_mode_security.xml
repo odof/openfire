@@ -4,10 +4,20 @@
 <data noupdate="1">
 
     <!-- Objets de account -->
-    <record id="of_account_payment_mode_multicompany_rule" model="ir.rule">
+    <record id="of_account_payment_mode_multicompany_rule_read" model="ir.rule">
+        <field name="name">OF Payment Mode multi-company Read</field>
+        <field name="model_id" ref="model_of_account_payment_mode"/>
+        <field name="global" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="domain_force">['|','|',('company_id','=',False),('company_id','child_of',[user.company_id.id]),('company_id','parent_of',[user.company_id.id])]</field>
+    </record>
+    <record id="of_account_payment_mode_multicompany_rule_write" model="ir.rule">
         <field name="name">OF Payment Mode multi-company Write</field>
         <field name="model_id" ref="model_of_account_payment_mode"/>
         <field name="global" eval="True"/>
+        <field name="perm_read" eval="False"/>
         <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
     </record>
 

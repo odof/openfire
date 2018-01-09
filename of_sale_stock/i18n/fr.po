@@ -1,0 +1,92 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_sale_stock
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-10-26 13:17+0000\n"
+"PO-Revision-Date: 2017-10-26 13:17+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_report_inventory_valued
+msgid "<strong>Date</strong>"
+msgstr "<strong>Date</strong>"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_report_inventory_valued
+msgid "<strong>Inventory</strong>"
+msgstr "<strong>Inventaire</strong>"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_report_inventory_valued
+msgid "<strong>Location</strong>"
+msgstr "<strong>Emplacement</strong>"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_report_inventory_valued
+msgid "<strong>Package</strong>"
+msgstr "<strong>Paquet</strong>"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_report_inventory_valued
+msgid "<strong>Product</strong>"
+msgstr "<strong>Article</strong>"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_report_inventory_valued
+msgid "<strong>Production Lot</strong>"
+msgstr "<strong>Lot de fabrication</strong>"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_report_inventory_valued
+msgid "<strong>Quantity</strong>"
+msgstr "<strong>Quantité</strong>"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_report_inventory_valued
+msgid "<strong>Total Quantity</strong>"
+msgstr "<strong>Quantité totale</strong>"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_report_inventory_valued
+msgid "<strong>Value</strong>"
+msgstr "<strong>Valeur</strong>"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_stock_inventory_line_currency_id
+msgid "Currency"
+msgstr "Devise"
+
+#. module: of_sale_stock
+#: model:ir.model,name:of_sale_stock.model_stock_inventory_line
+msgid "Inventory Line"
+msgstr "Ligne d'inventaire"
+
+#. module: of_sale_stock
+#: model:ir.ui.view,arch_db:of_sale_stock.of_report_inventory_valued
+msgid "Stock Inventory Valued"
+msgstr "Inventaire de stock Valorisé"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_stock_inventory_line_product_value
+msgid "Value"
+msgstr "Valeur"
+
+#. module: of_sale_stock
+#: model:ir.actions.report.xml,name:of_sale_stock.action_report_inventory_valued
+msgid "Valued Inventory"
+msgstr "Inventaire Valorisé"
+
+#. module: of_sale_stock
+#: model:ir.model,name:of_sale_stock.model_sale_config_settings
+msgid "sale.config.settings"
+msgstr "sale.config.settings"
+

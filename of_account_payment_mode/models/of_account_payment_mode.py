@@ -1,8 +1,7 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
-
 import traceback
 
 class OfAccountPaymentMode(models.Model):
@@ -15,6 +14,10 @@ class OfAccountPaymentMode(models.Model):
     company_id = fields.Many2one('res.company', 'Company', required=True)
     partner_id = fields.Many2one(related='company_id.partner_id', string='Partner', store=True)
     journal_type = fields.Selection(related='journal_id.type', string='Type', readonly=True)
+
+    config_affichage = fields.Text(string='Configuration', help=u'Attention niveau avancé!\n Décrivez par texte et balises mako (${variable}) ce qui sera affiché sur la facture.')
+
+    _sql_constraints = [('name_uniq', 'unique (name)', u"Ce mode de paiement existe déjà !")]
 
     @api.model_cr_context
     def _auto_init(self):
@@ -37,7 +40,11 @@ class AccountAbstractPayment(models.AbstractModel):
     _inherit = "account.abstract.payment"
 
     of_payment_mode_id = fields.Many2one('of.account.payment.mode', string='Payment mode', required=True)
-    journal_id = fields.Many2one(related='of_payment_mode_id.journal_id', string='Payment Journal', store=True)
+    # journal_id is now related to the payment mode.
+    # must be set to readonly or payment creation will try to write in payment mode, with risk of access right error
+    # must be set as not required because it is readonly, so not set on the INSERT request
+    journal_id = fields.Many2one(related='of_payment_mode_id.journal_id', string='Payment Journal',
+                                 required=False, readonly=True, store=True)
 
     @api.model_cr_context
     def _auto_init(self):
@@ -87,3 +94,39 @@ class AccountRegisterPayments(models.TransientModel):
 class AccountPayment(models.Model):
     _name = "account.payment"
     _inherit = ["account.payment", "account.abstract.payment"]
+
+    # Champ Ref. du reglement
+    of_ref_reglement = fields.Char(size=64, string=u'Réf. du règlement')
+
+    # Champ Categories (Tags)
+    of_tag_ids = fields.Many2many('of.payment.tags', string=u'Catégorie', help=u"Sélectionnez la catégorie de paiement")
+
+class OFPaymentTags(models.Model):
+    """ Tags of payment / Catégorie de paiement """
+    _name = "of.payment.tags"
+    _description = u"Catégorie de paiement"
+
+    name = fields.Char(string = u'Nom catégorie', help = u'Nom catégorie')
+    color = fields.Integer(string=u'Couleur')
+    tag_description = fields.Text(string = u'Description de la catégorie', help = u'Description de la catégorie de paiement')
+
+    _sql_constraints = [('name_uniq', 'unique (name)', u"Le nom de la catégorie existe déjà !")]
+
+class OFAccountInvoice(models.Model):
+    _inherit = "account.invoice"
+
+    @api.multi
+    def get_payment_mode_data(self, move_line_id):
+        self.ensure_one()
+
+        move_line = self.env['account.move.line'].browse(move_line_id)
+        payment = move_line.payment_id
+        mode_data = payment.of_payment_mode_id
+        result = False
+        mode_config_affichage = mode_data.config_affichage
+
+        if mode_config_affichage:
+            affichage = self.env['mail.template'].render_template(mode_config_affichage, 'account.payment', payment.id, post_process=False)
+            result = affichage
+
+        return result
