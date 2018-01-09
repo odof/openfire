@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+
+    <record id="paperformat_custom_portrait_withoot_header" model="report.paperformat">
+        <field name="name">Portrait A4 without header</field>
+        <field name="default" eval="True" />
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">12</field>
+        <field name="header_line" eval="False" />
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <report
+        string="Attestation individuelle du logiciel"
+        id="action_report_certification"
+        model="of.impression.wizard"
+        report_type="qweb-pdf"
+        name="of_l10n_fr_certification.of_report_attestation_certification"
+        file="of_l10n_fr_certification.of_report_attestation_certification"
+        paperformat="paperformat_custom_portrait_withoot_header"
+    />
+
+    <template id="of_l10n_fr_certification.of_report_attestation_certification">
+        <t t-call="report.html_container">
+            <div class="page">
+            <img src='/of_l10n_fr_certification/static/src/img/logo_openfire.png' style="height:150px"/>
+            <div style="text-align:right">
+                <h2>Attestation individuelle</h2>
+                <h3>Utilisation d'un logiciel de gestion certifié<br/>
+                conforme à l’art. 286, I-3° bis du CGI</h3>
+            </div>
+            <h3>L'éditeur</h3>
+            <p style="text-align:justify">
+                Je soussigné, Kremer Aymeric, représentant légal de la SAS OpenFire, fournisseur du logiciel de gestion OpenFire 10.0 basé sur Odoo 10.0, atteste que ce logiciel, mis sur le marché à compter du 01/01/2018 dans sa version majeure OF10.0 satisfait aux conditions d’inaltérabilité, de sécurisation, de conservation et d’archivage des données en vue du contrôle de l’administration fiscale, prévues au 3° bis du I de l’article 286 du code général des impôts.
+            </p>
+            <p>
+                Le présent certificat, renouvelable, est valable jusqu’au 31/12/2018.<br/>
+                <br/>
+                Fait à Rennes (35),<br/> 
+                Le <t t-esc="docs.get_date()"/>.<br/>
+            </p>
+            <p style="text-align:right"><img src='/of_l10n_fr_certification/static/src/img/Signature_Aymeric_Kremer.png' style="height:75px"/><br/>Aymeric Kremer<br/>Directeur général OpenFire SAS</p>
+            <br/>
+            <h3>L’entreprise</h3>
+            <p style="text-align:justify">
+                Je soussigné, …………………………………………………………………………………………,<br/>
+                Représentant légal de la société <t t-esc="docs.company_id.name"/>,<br/>
+                Certifie avoir acquis le ……………………… auprès de la SAS OpenFire le logiciel de gestion OpenFire dans sa version majeure OF10.0.
+                <br/><br/>
+                J'atteste utiliser ce logiciel de gestion pour enregistrer les règlements de mes clients depuis le ……………………….<br/>
+                <br/>
+                Fait à <t t-esc="docs.company_id.city"/>,<br/>
+                Le <t t-esc="docs.get_date()"/>.<br/>
+             </p>
+             <p style="text-align:right">Signature du représentant légal :</p>
+             </div>
+             <div class="footer" style="text-align:center">
+                OpenFire SAS – ZA La Brosse, 5 rue de la Garenne, 35520 La-Chapelle-des-Fougeretz<br/>
+                RCS Rennes 750 740 193 – www.openfire.fr – Tél. 02 30 96 02 65
+             </div>
+        </t>
+    </template>
+</odoo>
