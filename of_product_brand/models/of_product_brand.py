@@ -48,6 +48,7 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     brand_id = fields.Many2one('of.product.brand', string='Brand', required=True)
+    of_seller_name = fields.Many2one(related="seller_ids.name")
 
     @api.onchange('brand_id')
     def _onchange_brand_id(self):
