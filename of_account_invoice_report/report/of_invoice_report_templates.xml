@@ -94,17 +94,7 @@
                 </thead>
                 <tbody class="invoice_tbody">
                     <tr t-foreach="o.invoice_line_ids" t-as="l">
-                        <t t-set="the_name" t-value="l.of_get_line_name()"/>
-                        <t t-set="name_line" t-value="the_name[0]"/>
-                        <t t-set="the_name" t-value="the_name[1:]"/>
-                        <td>
-                            <span t-esc="name_line"/>
-                            <t t-foreach="the_name" t-as="name_line">
-                                <br/>
-                                <span t-esc="name_line"/>
-                            </t>
-                            <span t-field="l.name" style="display: none;"/>  <!-- à conserver pour héritages -->
-                        </td>
+                        <td><span t-field="l.name"/></td>
                         <td class="hidden"><span t-field="l.origin"/></td>
                         <td class="text-right">
                             <span t-field="l.quantity"/>
@@ -201,7 +191,7 @@
             </div>
 
             <!-- à conserver: héritage -->
-            <p t-if="o.comment"> 
+            <p t-if="o.comment">
                 <strong>Comment:</strong>
                 <span t-field="o.comment"/>
             </p>
@@ -214,6 +204,20 @@
             </p>
         </div>
     </t>
+</template>
+
+<!-- Vue à priorité faible pour limiter les problèmes d'héritage -->
+<template id="of_report_invoice_document" inherit_id="account.report_invoice_document" priority="30">
+    <xpath expr="//span[@t-field='l.name']" position="replace">
+        <t t-set="the_name" t-value="l.of_get_line_name()"/>
+        <t t-set="name_line" t-value="the_name[0]"/>
+        <t t-set="the_name" t-value="the_name[1:]"/>
+        <span t-esc="name_line"/>
+        <t t-foreach="the_name" t-as="name_line">
+            <span t-esc="name_line"/>
+        </t>
+        <span t-field="l.name" style="display: none;"/>  <!-- à conserver pour héritages -->
+    </xpath>
 </template>
 
 <template id="report_invoice">
