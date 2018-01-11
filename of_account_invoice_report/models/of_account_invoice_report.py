@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
+from odoo import models, fields, api
 
 class AccountInvoice(models.Model):
     _inherit = "account.invoice"
@@ -40,7 +40,7 @@ class AccountInvoiceLine(models.Model):
                 splitted = name.split("]")
                 if len(splitted) > 1:
                     splitted.pop(0)
-                    name = ''.join(splitted)
+                    name = ']'.join(splitted).strip()
         return name.split("\n")  # utilisation t-foreach dans template qweb
 
 

@@ -87,7 +87,7 @@ class OFSaleOrderLine(models.Model):
                 splitted = name.split("]")
                 if len(splitted) > 1:
                     splitted.pop(0)
-                    name = ''.join(splitted)
+                    name = ']'.join(splitted).strip()
         return name.split("\n")  # utilisation t-foreach dans template qweb
 
 class OFSaleAccountInvoiceLine(models.Model):
