@@ -372,6 +372,7 @@ Ce champ se met à jour automatiquement sur confirmation de commande et sur vali
     """)
 
     meeting_ids = fields.Many2many('calendar.event', 'calendar_event_res_partner_rel', string='Meetings')
+    of_prospecteur = fields.Many2one("res.users", string="Prospecteur") # non liée a celui du crm.lead
 
     @api.model
     def _init_prospects(self):

@@ -652,6 +652,10 @@
                 <xpath expr="//form//notebook//page[@name='sales_purchases']//field[@name='customer']" position="after">
                     <field name="of_customer_state" attrs="{'invisible': [('customer', '=', False)]}"/>
                 </xpath>
+                <!-- ajout prospecteur -->
+                <xpath expr="//form//notebook/page[@name='sales_purchases']//field[@name='user_id']" position="before">
+                    <field name="of_prospecteur"/>
+                </xpath>
             </field>
         </record>
 
@@ -683,6 +687,10 @@
                 <xpath expr="//tree" position="attributes">
                     <attribute name="colors">#5cb85c: of_customer_state=='lead';</attribute>
                 </xpath>
+                <!-- ajout prospecteur -->
+                <xpath expr="//tree" position="inside">
+                    <field name="of_prospecteur" invisible="1"/>
+                </xpath>
             </field>
         </record>
 
@@ -696,6 +704,10 @@
                     <filter string="Clients signés" name="confirmed" domain="[('customer','=',1), ('parent_id', '=', False), ('of_customer_state', '=', 'customer')]"/>
                     <filter string="Prospects" name="lead" domain="[('customer','=',1), ('parent_id', '=', False), ('of_customer_state', '=', 'lead')]"/>
                     <separator/>
+                </xpath>
+                <!-- ajout prospecteur -->
+                <xpath expr="//search" position="inside">
+                    <field name="of_prospecteur"/>
                 </xpath>
             </field>
         </record>
