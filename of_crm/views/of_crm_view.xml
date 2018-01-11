@@ -652,6 +652,9 @@
                 <xpath expr="//form//notebook//page[@name='sales_purchases']//field[@name='customer']" position="after">
                     <field name="of_customer_state" attrs="{'invisible': [('customer', '=', False)]}"/>
                 </xpath>
+                <field name="user_id" position="after">
+                    <field name="of_prospecteur"/>
+                </field>
             </field>
         </record>
 
@@ -697,6 +700,9 @@
                     <filter string="Prospects" name="lead" domain="[('customer','=',1), ('parent_id', '=', False), ('of_customer_state', '=', 'lead')]"/>
                     <separator/>
                 </xpath>
+                <field name="user_id" position="after">
+                    <field name="of_prospecteur"/>
+                </field>
             </field>
         </record>
 

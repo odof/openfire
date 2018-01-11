@@ -372,6 +372,7 @@ Ce champ se met à jour automatiquement sur confirmation de commande et sur vali
     """)
 
     meeting_ids = fields.Many2many('calendar.event', 'calendar_event_res_partner_rel', string='Meetings')
+    of_prospecteur = fields.Many2one("res.users", string="Prospecteur")
 
     @api.model
     def _init_prospects(self):
@@ -507,3 +508,4 @@ class OFCRMAccountInvoice(models.Model):
                 partners += invoice.partner_id
         partners.write({'of_customer_state': 'customer'})
         return res
+
