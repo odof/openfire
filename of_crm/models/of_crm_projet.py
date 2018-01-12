@@ -143,13 +143,6 @@ class OFCRMProjetAttr(models.Model):
     #val_date_default = fields.Date(string="Valeur par Défaut", default=fields.Date.today)
     val_select_id_default = fields.Many2one('of.crm.projet.attr.select', string="Valeur par Défaut", domain="[('attr_id','=',id)]", ondelete="set null")
 
-    """@api.onchange('active')
-    def _onchange_active(self):
-        select_obj = self.env['of.crm.projet.attr.select'].with_context(active_test=False)
-        values = select_obj.search([('attr_id','in',self._ids)])
-        print self._ids
-        print values"""
-
     @api.multi
     def write(self,vals):
         super(OFCRMProjetAttr,self).write(vals)

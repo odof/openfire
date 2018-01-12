@@ -142,24 +142,6 @@
             </field>
         </record>
 
-        <!-- temporaire - ->
-
-        <record id="of_crm_projet_line_action" model="ir.actions.act_window">
-            <field name="name">Entrées de Projets</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">of.crm.projet.line</field>
-            <field name="view_mode">tree,form</field>
-            <field name="view_type">form</field>
-            <field name="help" type="html">
-                <p class="oe_view_nocontent_create">
-                    Click to define a new attribute.
-                </p>
-            </field>
-        </record>
-
-        <menuitem id="of_crm_projet_line_menu" name="Entrées de Projets" action="of_crm_projet_line_action" parent="of_crm_menu_projet_config" sequence="15"/>
-        <!- - / -->
-
         <!-- Attributs de Projets -->
         <record id="of_crm_projet_attr_view_form" model="ir.ui.view">
             <field name="name">of.crm.projet.attr.form</field>

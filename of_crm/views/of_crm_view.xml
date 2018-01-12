@@ -595,26 +595,6 @@
             </field>
         </record>
 
-        <!-- multi-activites
-        <record id="of_crm_view_action_com_form" model="ir.ui.view">
-            <field name="name">of.crm.opportunity.activity.form</field>
-            <field name="model">of.crm.opportunity.activity</field>
-            <field name="arch" type="xml">
-                <form>
-                    <group>
-                        <field name="activity_id"/>
-                        <field name="lead_id" required="0"/>
-                        <field name="name"/>
-                        <field name="sequence"/>
-                        <field name="is_done"/>
-                        <field name="is_late"/>
-                        <field name="date_action" colors="red:is_late==True; #A0A0A0:is_done==True;"/>
-                        <field name="activity_result" attrs="{'invisible': [('is_done','=',False)]}"/>
-                    </group>
-                </form>
-            </field>
-        </record>-->
-
 <!--###############################################################################################################
 ##############################       VENTES
 #################################################################################################################-->
