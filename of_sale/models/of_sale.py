@@ -68,6 +68,15 @@ class SaleOrder(models.Model):
     of_etiquette_partenaire_ids = fields.Many2many('res.partner.category', related='partner_id.category_id', string=u"Étiquettes client")
     of_client_view = fields.Boolean(string='Vue client/vendeur')
 
+    of_date_vt = fields.Date(string="Date visite technique", help=u"Si renseignée apparaîtra sur le devis / Bon de commande")
+
+    @api.multi
+    def _prepare_invoice(self):
+        #ajout de la date de la visite technique dans la vue formulaire de la facture
+        invoice_vals = super(SaleOrder, self)._prepare_invoice()
+        invoice_vals['of_date_vt'] = self.of_date_vt
+        return invoice_vals
+
     @api.depends('state', 'order_line', 'order_line.qty_to_invoice', 'order_line.product_uom_qty')
     def _compute_of_to_invoice(self):
         for order in self:
@@ -296,6 +305,8 @@ class OFSaleConfiguration(models.TransientModel):
 
 class AccountInvoice(models.Model):
     _inherit = "account.invoice"
+
+    of_date_vt = fields.Date(string="Date visite technique")
 
     def get_color_section(self):
         return self.env['ir.values'].get_default('account.config.settings', 'of_color_bg_section')
