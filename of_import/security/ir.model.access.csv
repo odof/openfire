@@ -1,2 +1,4 @@
 "id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_of_import_product_categ_config_user","of.import.product.categ.config","model_of_import_product_categ_config","base.group_user",1,0,0,0
+"access_of_import_product_categ_config_sale_manager","of.import.product.categ.config","model_of_import_product_categ_config","sales_team.group_sale_manager",1,1,1,1
 "access_of_import","of.import","model_of_import","base.group_erp_manager",1,1,1,1
