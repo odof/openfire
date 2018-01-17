@@ -1,5 +1,4 @@
 <odoo>
-    <data>
 
 <!--##############################################################################-->
 <!--########################### ______ Produits ______ ###########################-->
@@ -9,14 +8,41 @@
             <field name="name">of.product.template.common.form</field>
             <field name="model">product.template</field>
             <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="priority" eval="1"/>
             <field name="arch" type="xml">
-                <xpath expr="//notebook//field[@name='type']" position="after">
-                    <field name="modele"/>
+                <xpath expr="//group[@name='group_standard_price']" position="replace">
+                    <group name="group_standard_price">
+                        <separator string="Informations fournisseur" colspan="2"/>
+                        <field name="date_tarif"/>
+                        <field name="of_seller_price" attrs="{'readonly':[('seller_ids','=',[])]}"/>
+                        <field name="of_seller_pp_ht" attrs="{'readonly':[('seller_ids','=',[])]}"/>
+                        <field name="of_seller_remise"/>
+                        <separator string="Informations avancées" colspan="2"/>
+                        <field name="company_id" groups="base.group_multi_company"
+                            options="{'no_create': True}"/>
+                        <field name="uom_id" groups="product.group_uom" options="{'no_create': True}"/>
+                        <field name="uom_po_id" groups="product.group_uom" options="{'no_create': True}"/>
+                        <field name="currency_id" invisible="1"/>
+                    </group>
                 </xpath>
-                <xpath expr="//notebook//div[@name='standard_price_uom']" position="after">
+                <xpath expr="//group[@name='group_general']" position="attributes">
+                    <attribute name="cols" eval="2"/>
+                </xpath>
+                <xpath expr="//group[@name='group_general']" position="inside">
+                    <field name="list_price" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                    <label for="standard_price" groups="base.group_user"/>
+                    <div name="standard_price_uom" groups="base.group_user">
+                        <field name="standard_price" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                    </div>
                     <label for="marge"/>
                     <span><field name="marge" class="oe_inline"/>%</span>
-                    <field name="date_tarif"/>
+                </xpath>
+
+                <xpath expr="//field[@name='type']" position="before">
+                    <separator string="Informations distributeur" colspan="2"/>
+                </xpath>
+                <xpath expr="//field[@name='type']" position="after">
+                    <field name="modele"/>
                 </xpath>
                 <xpath expr="//field[@name='description_sale']" position="after">
                     <separator string="Description du Fabricant" colspan="4"/>
@@ -37,6 +63,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='product_code']" position="after">
                     <field name="old_code"/>
+                    <field name="of_product_category_name"/>
                 </xpath>
                 <xpath expr="//label[@for='date_start']" position="before">
                     <field name="pp_ht" class="oe_inline"/><field name="pp_currency_id" class="oe_inline" groups="base.group_multi_currency"/>
@@ -45,5 +72,19 @@
                 </xpath>
             </field>
         </record>
-    </data>
+
+    <!-- Ajout des champs dans la vue liste afin qu'ils puissent être retournés par les on_change.
+         Sans ça, ces champs sont mis à 0/False quand les informations fournisseur sont crées à la sélection de la marque de l'article
+     -->
+    <record id="of_product_supplierinfo_tree_view" model="ir.ui.view">
+        <field name="name">of.product.supplierinfo.tree.view</field>
+        <field name="model">product.supplierinfo</field>
+        <field name="inherit_id" ref="product.product_supplierinfo_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="pp_ht" invisible="1"/>
+                <field name="remise" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>

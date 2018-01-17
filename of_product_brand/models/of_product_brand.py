@@ -7,7 +7,7 @@ class OfProductBrand(models.Model):
 
     name = fields.Char(string='Name', required=True)
     prefix = fields.Char(string='Prefix', required=True)
-    partner_id = fields.Many2one('res.partner', string='Supplier', domain=[('supplier', '=', True)])
+    partner_id = fields.Many2one('res.partner', string='Supplier', domain=[('supplier', '=', True)], required=True)
     product_ids = fields.One2many('product.product', 'brand_id', string='Products', readonly=True)
     active = fields.Boolean(string='Active', default=True)
     logo = fields.Binary(string='Logo')
@@ -45,16 +45,25 @@ class OfProductBrand(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    brand_id = fields.Many2one(string='Brand', related='product_variant_ids.brand_id', store=True)
+    brand_id = fields.Many2one(string='Brand', related='product_variant_ids.brand_id', store=True, required=True)
 
     @api.onchange('brand_id')
     def _onchange_brand_id(self):
+        # Ajout du préfixe de la marque sur l'article
         default_code = self.default_code or ''
         ind = default_code.find('_')
         prefix = self.brand_id and self.brand_id.prefix + '_' or ''
         default_code = prefix + default_code[ind+1:]
         if self.default_code != default_code:
             self.default_code = default_code
+
+        # Création de la relation fournisseur
+        if self.brand_id and not self.seller_ids:
+            seller_data = {
+                'name': self.brand_id.partner_id.id,
+            }
+            seller_data = self.env['product.supplierinfo']._add_missing_default_values(seller_data)
+            self.seller_ids = [(0, 0, seller_data)]
 
     @api.onchange('default_code')
     def _onchange_default_code(self):
@@ -65,10 +74,27 @@ class ProductTemplate(models.Model):
             if brand != self.brand_id:
                 self.brand_id = brand
 
+    @api.model
+    def create(self, vals):
+        # Code copié depuis le module product
+        # Permet l'attribution de la marque à la création de l'article
+
+        # La marque est un champ obligatoire, qui doit donc être renseigné avant la création de l'article
+        self = self.with_context(default_brand_id=vals.get('brand_id', False))
+        template = super(ProductTemplate, self).create(vals)
+
+        # This is needed to set given values to first variant after creation
+        related_vals = {}
+        if vals.get('brand_id') and template.brand_id.id != vals['brand_id']:
+            related_vals['brand_id'] = vals['brand_id']
+        if related_vals:
+            template.write(related_vals)
+        return template
+
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
-    brand_id = fields.Many2one('of.product.brand', string='Brand')
+    brand_id = fields.Many2one('of.product.brand', string='Brand', required=True)
     # @todo: Make it work with variants
 
 class Partner(models.Model):
