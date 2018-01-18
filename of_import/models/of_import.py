@@ -246,7 +246,7 @@ class OFProductBrand(models.Model):
         Recalcule les champs de l'article en fonction de la configuration de la marque
         et des paramètres d'import de l'article (dans product_supplierinfo)
         """
-        # On prétend venir d'un import afin de lancer la propagation du cout sur les differentes societes
+        # On prétend venir d'un import afin de lancer la propagation du coût sur les différentes sociétés
         self = self.with_context(from_import=True)
         for brand in self:
             supplier = brand.partner_id
@@ -258,8 +258,6 @@ class OFProductBrand(models.Model):
                                                              product)
                         values = {key: val for key, val in values.iteritems() if product[key] != val}
                         if values:
-                            if 'categ_id' in values:
-                                values['categ_id'] = values['categ_id'].id
                             product.write(values)
                         break
 
@@ -674,7 +672,7 @@ class OfImport(models.Model):
     #
 
                 # si le champs est requis, vérification qu'il est renseigné
-                if champs_odoo[champ_fichier_sansrel]['requis'] and (ligne[champ_fichier] == "" or ligne[champ_fichier] == "#vide"):
+                if champs_odoo[champ_fichier_sansrel]['requis'] and (ligne[champ_fichier] == "#vide" or (ligne[champ_fichier] == "" and not valeurs.get(champ_fichier_sansrel))):
                     erreur(u"Ligne %s : champ %s (%s) vide alors que requis. %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, model_data['nom_objet'].capitalize()))
 
                 # Si le champ relation est un id, vérification qu'est un entier
