@@ -53,10 +53,15 @@
                 <xpath expr="//notebook/page[2]//field[@name='comment']" position="replace">
                     <field name="comment" colspan="4" placeholder="Note interne (non diffusée)"/>
                 </xpath>
-                <!-- Ajout Notes client dans l'onglet Notes internes -->
-                <xpath expr="//notebook/page[2]" position="inside">
-                    <separator string="Notes client" colspan="4"/>
-                    <field name="of_notes_client" colspan="4" widget="html"/>
+                <!-- Ajout aide du champ comment (notes internes / notes client) -->
+                <xpath expr="//page[@name='internal_notes']//field[@name='comment']" position="attributes">
+                    <attribute name='placeholder'>Notes client...</attribute>
+                    <attribute name='help'>Ces notes seront affichées sous la rubrique 'Notes clients' dans le devis et le planning d'intervention.</attribute>
+                </xpath>
+                <xpath expr="//page[@name='internal_notes']//field[@name='comment']" position="after">
+                    <div class="oe_edit_only" colspan="4">
+                        * Les données saisies dans ce champ seront affichées sous la rubrique 'Notes clients' dans le devis et le planning d'intervention.
+                    </div>
                 </xpath>
             </field>
         </record>

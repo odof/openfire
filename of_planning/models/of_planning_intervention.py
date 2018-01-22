@@ -3,6 +3,7 @@
 from __builtin__ import False
 from datetime import datetime, timedelta
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
+import re
 
 from odoo import api, models, fields
 from odoo.exceptions import UserError, ValidationError
@@ -227,8 +228,21 @@ class OfPlanningIntervention(models.Model):
     _order = 'date'
 
     order_id = fields.Many2one("sale.order", string="Commande associée")
-    of_notes_intervention = fields.Html(related='order_id.of_notes_intervention')
-    of_notes_client = fields.Html(related='partner_id.of_notes_client', string="Notes client")
+    of_notes_intervention = fields.Html(related='order_id.of_notes_intervention', readonly=True)
+    of_notes_client = fields.Text(related='partner_id.comment', string="Notes client", readonly=True)
+    cleantext_description = fields.Text(compute='_detect_description_vide')
+    cleantext_intervention = fields.Text(compute='_detect_intervention_vide')
+
+    # detectetion champs seulement avec balises html
+    def _detect_description_vide(self):
+        cleanr = re.compile('<.*?>')
+        cleantext = re.sub(cleanr, '', self.description)
+        self.cleantext_description = cleantext
+
+    def _detect_intervention_vide(self):
+        cleanr = re.compile('<.*?>')
+        cleantext = re.sub(cleanr, '', self.order_id.of_notes_intervention)
+        self.cleantext_intervention = cleantext
 
     @api.depends('state')
     def _compute_state_int(self):

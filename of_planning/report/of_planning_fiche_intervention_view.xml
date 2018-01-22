@@ -18,7 +18,7 @@
 
     <!-- PDF version dans interventions view-->
     <report id="of_planning_fiche_intervention_report"
-        string="Fiche Intervention"
+        string="Fiche intervention"
         model="of.planning.intervention"
         report_type="qweb-pdf"
         name="of_planning.of_fiche_intervention_report_template"
@@ -27,7 +27,7 @@
 
     <!-- preview version dans interventions view 
     <report id="of_planning_fiche_intervention_report_preview"
-        string="Fiche Intervention (preview)"
+        string="Fiche intervention (preview)"
         model="of.planning.intervention"
         report_type="qweb-html"
         name="of_planning.of_fiche_intervention_report_template"
@@ -36,7 +36,7 @@
 
     <!-- PDF version dans Devis -->
     <report id="of_sale_fiche_intervention_report"
-        string="Fiche Intervention"
+        string="Fiche intervention"
         model="sale.order"
         report_type="qweb-pdf"
         name="of_planning.of_sale_order_fiche_intervention_report_template"
@@ -56,8 +56,13 @@
                     </div>
                 </div>
                 <div class="h4 col-xs-6 text-center" style="padding-top: 2px">
-                    <div>Fiche Intervention</div>
-                    <strong><div style="max-width: 100%; padding-top: 10px" t-field="o.order_id.partner_id"></div></strong>
+                    <div>Fiche intervention</div>
+                    <t t-if="o.order_id.partner_id">
+                        <strong><div style="max-width: 100%; padding-top: 10px" t-field="o.order_id.partner_id"></div></strong>
+                    </t>
+                    <t t-else="o.address_id">
+                        <strong><div  style="max-width: 100%; padding-top: 10px" t-field="o.address_id" t-field-options="{'widget': 'contact', 'fields': ['name']}"></div></strong>
+                    </t>
                 </div>
                 <div class="h5 col-xs-3 text-right" style="vertical-align: top;">
                     <t t-if="o.order_id">
@@ -82,44 +87,61 @@
                 <t t-call="of_planning.of_internal_layout">
                     <div class="page">
 
-                        <!-- Commande -->
-                        <div class="row h4 mb4">
-                            <div class="col-xs-12"><strong>Commande</strong></div>
-                        </div>
-                        <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; margin-bottom: 12px">
-                            <div class="col-xs-12" style="display: table; padding: 0px;">
-                                <div style="display: table-cell; width: 50%;">
-                                     <div class="h5" style="padding: 0px 16px;">
-                                         <t t-if="o.order_id.partner_id">
-                                            <div><span>Client : </span><strong><span t-field="o.order_id.partner_id"/></strong></div>
-                                         </t>
-                                         <t t-if="o.order_id">
-                                            <div><span>Commande associée : </span><span t-field="o.order_id"/></div>
-                                         </t>
-                                         <t t-if="o.order_id.confirmation_date">
-                                            <t t-set="pre_d" t-value="o.order_id.confirmation_date"/>
-                                            <t t-set="confirmation_date" t-value="pre_d[8:10] + '/' + pre_d[5:7] + '/' + pre_d[0:4]"/>
-                                            <div><span>Date de confirmation : </span><span t-esc="confirmation_date"/></div>
-                                         </t>
-                                     </div>
-                                </div>
-                                <div style="display: table-cell; width: 50%; border-left: 1px solid lightgray">
-                                    <div>
-                                        <div class="h5" style="padding: 0px 16px;">
-                                            <t t-if="o.name">
-                                             <div><span>Libellé : </span><span t-field="o.name"/></div>
-                                            </t>
-                                            <t t-if="o.company_id">
-                                                <div><span>Magasin : </span><span t-field="o.company_id"/></div>
-                                            </t>
-                                            <t t-if="o.order_id.user_id">
-                                                <div><span>Vendeur : </span><span t-field="o.order_id.user_id"/></div>
-                                            </t>
+                        <!-- Commande (view conditionalle selon order_id / commande) -->
+                        <t t-if="o.order_id">
+                            <div class="row h4 mb4">
+                                <div class="col-xs-12"><strong>Commande</strong></div>
+                            </div>
+                            <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; margin-bottom: 12px">
+                                <div class="col-xs-12" style="display: table; padding: 0px;">
+                                    <div style="display: table-cell; width: 50%;">
+                                         <div class="h5" style="padding: 0px 16px;">
+                                             <t t-if="o.order_id.partner_id">
+                                                <div><span>Client : </span><strong><span t-field="o.order_id.partner_id"/></strong></div>
+                                             </t>
+                                             <t t-if="o.order_id">
+                                                <div><span>Commande associée : </span><span t-field="o.order_id"/></div>
+                                             </t>
+                                             <t t-if="o.order_id.confirmation_date">
+                                                <t t-set="pre_d" t-value="o.order_id.confirmation_date"/>
+                                                <t t-set="confirmation_date" t-value="pre_d[8:10] + '/' + pre_d[5:7] + '/' + pre_d[0:4]"/>
+                                                <div><span>Date de confirmation : </span><span t-esc="confirmation_date"/></div>
+                                             </t>
+                                         </div>
+                                    </div>
+                                    <div style="display: table-cell; width: 50%; border-left: 1px solid lightgray">
+                                        <div>
+                                            <div class="h5" style="padding: 0px 16px;">
+                                                <t t-if="o.name">
+                                                 <div><span>Libellé : </span><span t-field="o.name"/></div>
+                                                </t>
+                                                <t t-if="o.company_id">
+                                                    <div><span>Magasin : </span><span t-field="o.company_id"/></div>
+                                                </t>
+                                                <t t-if="o.order_id.user_id">
+                                                    <div><span>Vendeur : </span><span t-field="o.order_id.user_id"/></div>
+                                                </t>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </t>
+                        <t t-else="o.name or o.company_id">
+                            <div class="row h4 mb4">
+                                <div class="col-xs-12"><strong>Informations</strong></div>
+                            </div>
+                            <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; margin-bottom: 12px">
+                                <div class="h5" style="padding: 0px 16px;">
+                                    <t t-if="o.name">
+                                        <div><span>Libellé : </span><span t-field="o.name"/></div>
+                                    </t>
+                                    <t t-if="o.company_id">
+                                        <div><span>Magasin : </span><span t-field="o.company_id"/></div>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
 
                          <!-- Intervention -->
                         <div class="row h4 mb4">
@@ -175,89 +197,98 @@
                             </div>
                         </div>
 
-                         <!-- Produits et travaux-->
-                        <div class="row h4 mb4">
-                            <div class="col-xs-12"><strong>Produits et travaux</strong></div>
-                        </div>
-                        <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; padding: 0px 16px; ">
-                            <t t-foreach="o.order_id.order_lines_layouted()" t-as="page">
-                                <table class="table table-condensed" style="padding-bottom: 0px; margin-bottom: 0px">
-                                    <thead>
-                                        <tr colspan="3">
-                                            <th class="col-xs-9" style="vertical-align: middle">Description</th>
-                                            <th class="col-xs-2 text-right">Quantité prévue</th>
-                                            <th class="col-xs-1 text-center">· posée</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="sale_tbody">
-                                        <t t-foreach="page" t-as="layout_category">
-                                            <t t-if="layout_category_size > 1 or page_size > 1" groups="sale.group_sale_layout">
-                                                <tr class="active">
-                                                    <td colspan="12" style="font-weight: bold; border-bottom: 1px solid black;">&amp;bull;
-                                                        <t t-esc="layout_category['name']"/>
-                                                    </td>
-                                                </tr>
-                                            </t>
-                                            <!-- Lines associated -->
-                                            <t t-foreach="layout_category['lines']" t-as="l">
-                                                <tr>
-                                                    <t t-set="the_name" t-value="l.of_get_line_name()"/>
-                                                    <t t-set="name_line" t-value="the_name[0]"/>
-                                                    <t t-set="the_name" t-value="the_name[1:]"/>
-                                                    <td>
-                                                        <span t-esc="name_line"/>
-                                                        <br t-if="len(the_name) > 0"/>
-                                                        <t t-foreach="the_name" t-as="name_line">
-                                                        <!--<span t-esc="the_name"/-->
+                        <!-- Produits et travaux (view conditionalle selon order_id / commande) -->
+                        <t t-if="o.order_id">
+                            <div class="row h4 mb4">
+                                <div class="col-xs-12"><strong>Produits et travaux</strong></div>
+                            </div>
+                            <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; padding: 0px 16px; ">
+                                <t t-foreach="o.order_id.order_lines_layouted()" t-as="page">
+                                    <table class="table table-condensed" style="padding-bottom: 0px; margin-bottom: 0px">
+                                        <thead>
+                                            <tr colspan="3">
+                                                <th class="col-xs-9" style="vertical-align: middle">Description</th>
+                                                <th class="col-xs-2 text-right">Quantité prévue</th>
+                                                <th class="col-xs-1 text-center">· posée</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="sale_tbody">
+                                            <t t-foreach="page" t-as="layout_category">
+                                                <t t-if="layout_category_size > 1 or page_size > 1" groups="sale.group_sale_layout">
+                                                    <tr class="active">
+                                                        <td colspan="12" style="font-weight: bold; border-bottom: 1px solid black;">&amp;bull;
+                                                            <t t-esc="layout_category['name']"/>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                <!-- Lignes de commande -->
+                                                <t t-foreach="layout_category['lines']" t-as="l">
+                                                    <tr>
+                                                        <t t-set="the_name" t-value="l.of_get_line_name()"/>
+                                                        <t t-set="name_line" t-value="the_name[0]"/>
+                                                        <t t-set="the_name" t-value="the_name[1:]"/>
+                                                        <td>
                                                             <span t-esc="name_line"/>
-                                                            <br/>
+                                                            <br t-if="len(the_name) > 0"/>
+                                                            <t t-foreach="the_name" t-as="name_line">
+                                                                <span t-esc="name_line"/><br/>
+                                                            </t>
+                                                            <span t-field="l.name" style="display: none;"/>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <span t-field="l.product_uom_qty"/>
+                                                            <span t-field="l.product_uom" groups="product.group_uom"/>
+                                                        </td>
+                                                        <td>
+                                                            <span class="text-right"> </span>
+                                                        </td>
+                                                    </tr>
+                                                    <!-- Afficher les composants du kit -->
+                                                    <t t-if="l.is_kit">
+                                                        <t t-set="line_comps" t-value="l.get_all_comps()"/>
+                                                        <t t-foreach="line_comps" t-as="comp">
+                                                            <tr>
+                                                                <td>
+                                                                    <t t-foreach="(comp.rec_lvl)-1" t-as="lvl">
+                                                                        <span style="padding: 0 8px;">-</span>
+                                                                    </t>
+                                                                    <span style="padding: 0 8px;">-&gt;</span><span t-field="comp.name"/>
+                                                                </td>
+                                                                <td class="text-right">
+                                                                    <span t-field="comp.qty_total"/>
+                                                                    <span t-field="comp.product_uom" groups="product.group_uom"/>
+                                                                </td>
+                                                                <td style="border-bottom: 1px solid lightgray">
+                                                                    <span class="text-right"> </span>
+                                                                </td>
+                                                            </tr>
                                                         </t>
-                                                        <span t-field="l.name" style="display: none;"/>
-                                                    </td>
-                                                    <td class="text-right">
-                                                        <span t-field="l.product_uom_qty"/>
-                                                        <span t-field="l.product_uom" groups="product.group_uom"/>
-                                                    </td>
-                                                    <td>
-                                                        <span class="text-right"> </span>
-                                                    </td>
-                                                </tr>
-                                                <!-- Print composants du kit -->
-                                                <t t-if="l.is_kit">
-                                                    <t t-set="line_comps" t-value="l.get_all_comps()"/>
-                                                    <t t-foreach="line_comps" t-as="comp">
-                                                        <tr>
-                                                            <td>
-                                                                <t t-foreach="(comp.rec_lvl)-1" t-as="lvl">
-                                                                    <span style="padding: 0 8px;">-</span>
-                                                                </t>
-                                                                <span style="padding: 0 8px;">-&gt;</span><span t-field="comp.name"/>
-                                                            </td>
-                                                            <td class="text-right">
-                                                                <span t-field="comp.qty_total"/>
-                                                                <span t-field="comp.product_uom" groups="product.group_uom"/>
-                                                            </td>
-                                                            <td style="border-bottom: 1px solid lightgray">
-                                                                <span class="text-right"> </span>
-                                                            </td>
-                                                        </tr>
                                                     </t>
                                                 </t>
-
                                             </t>
-                                        </t>
-                                    </tbody>
-                                </table>
-
-                                <t t-if="page_index &lt; page_size - 1" groups="sale.group_sale_layout">
-                                    <p style="page-break-before:always;"> </p>
+                                        </tbody>
+                                    </table>
+                                    <t t-if="page_index &lt; page_size - 1" groups="sale.group_sale_layout">
+                                        <p style="page-break-before:always;"> </p>
+                                    </t>
                                 </t>
+                            </div>
+                        </t>
 
-                            </t>
-                        </div>
+                        <!-- Description (view conditionalle si pas vide) -->
+                        <t t-if="o.description and o.cleantext_description">
+                            <div class="row h4 mb4">
+                                <div class="col-xs-12"><strong>Description</strong></div>
+                            </div>
+                            <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; margin-bottom: 12px">
+                                <div class="h5" style="padding: 0px 16px;">
+                                    <div t-field="o.description"></div>
+                                </div>
+                            </div>
+                        </t>
 
-                        <!-- Notes intervention (view conditionalle) -->
-                        <t t-if="o.order_id.of_notes_intervention">
+                        <!-- Notes intervention (view conditionalle si pas vide) -->
+                        <t t-if="o.order_id.of_notes_intervention and o.cleantext_intervention">
                             <div class="row h4 mb4">
                                 <div class="col-xs-12"><strong>Notes intervention</strong></div>
                             </div>

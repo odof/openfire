@@ -164,19 +164,26 @@
                                 </group>
                             </group>
 
-                            <!-- Notes intervention -->
-                            <separator string="Notes intervention" colspan="2"/>
-                            <field name="of_notes_intervention" nolabel="1"/>
+                            <!-- Description -->
+                            <separator string="Description" colspan="4"/>
+                            <field colspan="4" name="description" nolabel="1" context="{'tz': 'Europe/Paris'}" witget="html"
+                                help="Ce champ sera imprimé dans la fiche d'intervention."/>
+                            <div class="oe_edit_only" colspan="4" style="margin-top: -20px; padding-top: 0px">
+                                * Les données saisies dans ce champ seront imprimées dans la fiche d'intervention.
+                            </div>
 
                             <!-- Notes client -->
-                            <separator string="Notes client" colspan="2" attrs="{'invisible': [('address_id', '=', False)]}"/>
-                            <field name="of_notes_client" nolabel="1" attrs="{'invisible': [('address_id', '=', False)]}"/>
-
-                            <!-- Description
-                            <separator string="Description" colspan="2"/>
-                            <field colspan="2" name="description" nolabel="1" context="{'tz': 'Europe/Paris'}" witget="html"/>
-                            -->
-
+                            <group attrs="{'invisible':[('of_notes_client','=',False)]}" colspan="4">
+                                <separator string="Notes client" colspan="4"/>
+                                <field name="of_notes_client" colspan="4" nolabel="1" readonly="1"
+                                    help="Ces notes proviennent de la fiche client sous la rubrique 'Notes internes'. Ils sont uniquement modifiables dans la fiche client."/>
+                            </group>
+                            <!-- Notes intervention -->
+                            <group attrs="{'invisible':[('of_notes_intervention','=',False)]}" colspan="4">
+                                <separator string="Notes intervention" colspan="4"/>
+                                <field name="of_notes_intervention" nolabel="1"
+                                    help="Ces notes proviennent du devis / commande sous la rubrique 'Notes intervention'. Ils sont uniquement modifiables dans le  devis / commande (voir la commande associée)."/>
+                            </group>
                         </group>
                     </sheet>
                 </form>
