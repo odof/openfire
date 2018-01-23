@@ -216,7 +216,7 @@ class OFProductBrand(models.Model):
                     value = safe_eval(obj[config_field], eval_dict)
                     if product_field == 'remise':
                         # Une fois la remise calculée, on peut ajouter le prix d'achat au eval_dict pour le calcul du coût final
-                        eval_dict['pa'] = values['list_price'] * (100.0 - value) / 100.0
+                        eval_dict['pa'] = list_price * (100.0 - value) / 100.0
                     else:
                         values[product_field] = value
                     break
