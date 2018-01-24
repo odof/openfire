@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <report
+        string="Planning général semaine "
+        id="action_report_planning_general_semaine"
+        model="of_planning.report_planning_general_semaine"
+        report_type="qweb-pdf"
+        name="of_planning.report_planning_general_semaine"
+        file="of_planning.report_planning_general_semaine"
+        paperformat="of_base.paperformat_euro_internal_landscape"
+    />
+
+    <template id="of_planning.report_planning_general_semaine">
+        <t t-call="report.html_container">
+            <t t-call="report.internal_layout">
+               <t t-set="res" t-value="get_interventions(data['equipe_ids'],data['date_start'])"/>
+               <t t-set="interventions" t-value="res[0]"/>
+               <t t-set="days" t-value="res[1]"/>
+               <t t-set="title" t-value="get_title(data['date_start'])"/>
+               <div class="page">
+                    <style>
+                       table {
+                            width:100%;
+                            table-layout: fixed;
+                       }
+                       th,tr:nth-child(2n) {
+                            background-color:#C7C7C7;
+                            border: 1px solid #E6E6E6;
+                       }
+                       thead,th,td {
+                            border: 1px solid #E6E6E6;
+                            margin:4px;
+                            padding:4px;
+                       }
+                       .col_day {
+                            text-align:center;
+                            width:13.2%!important;
+                       }
+                       .col_equipe {
+                            text-align:center;
+                            width:5%!important;
+                       }
+                       p {
+                            margin-left: 39px;
+                            text-indent: -39px;
+                       }
+                    </style>
+                    <b><h3 style="text-align:center" t-esc="title"></h3></b>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="col_equipe">
+                                    Équipes
+                                </th>
+                                <t t-foreach="days" t-as="day">
+                                    <th class="col_day" >
+                                        <span t-esc="int_to_day(day)"/>
+                                    </th>
+                                </t>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="interventions" t-as="equipe_data">
+                                <tr>
+                                    <td class="col_equipe">
+                                        <span t-esc="equipe_data[0]"/>
+                                    </td>
+                                    <td t-foreach="days" t-as="day">
+                                        <t t-set="day_data" t-value="equipe_data[1].get(day, [])"/>
+                                        <t t-foreach="day_data" t-as="interv_data">
+                                            <p>
+                                            <t t-if="interv_data[0]">
+                                                <t t-esc="interv_data[0]"/>
+                                                <t t-esc="interv_data[1]"/>
+                                                <t t-if="interv_data[2]"><font color="red" t-esc="u'\u2022'"/></t>
+                                            </t>
+                                            <t t-if="not interv_data[0]">
+                                                <t t-esc="interv_data[1]"/>
+                                            </t>
+                                            </p>
+                                        </t>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+                </t>
+            </t>
+    </template>
+</odoo>

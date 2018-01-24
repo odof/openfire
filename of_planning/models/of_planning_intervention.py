@@ -2,6 +2,7 @@
 
 from __builtin__ import False
 from datetime import datetime, timedelta
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 from odoo import api, models, fields
 from odoo.exceptions import UserError, ValidationError
@@ -480,6 +481,31 @@ class OfPlanningIntervention(models.Model):
             'target'   : 'new',
             'context'  : {'default_msg': msg}
         }
+
+    jour = fields.Char("jour", compute="_compute_jour")
+    
+    def _compute_jour(self):
+        for inter in self:
+            dt = datetime.strptime(inter.date, DEFAULT_SERVER_DATETIME_FORMAT)
+            dt = fields.Datetime.context_timestamp(self, dt)   # openerp's ORM method 
+            t = dt.strftime("%A")        # the day_name is Sunday here
+            inter.jour = t
+            
+    @api.model
+    def get_titre(self):
+        date_start_date = self.localcontext['date_start']
+        date_stop_date = self.localcontext['date_stop']
+
+        week_number = date_start_date.isocalendar()[1]
+
+        date_start_extend = ""
+        if date_start_date.year != date_stop_date.year:
+            date_start_extend = date_start_date.strftime(" %B %Y")
+        elif date_start_date.month != date_stop_date.month:
+            date_start_extend = date_start_date.strftime(" %Y")
+
+        title = "Planning des Interventions - Semaine %s du %s%s au %s%s" % (week_number, date_start_date.day, date_start_extend, date_stop_date.day, date_stop_date.strftime(" %B %Y"))
+        return title
 
 class ResPartner(models.Model):
     _inherit = "res.partner"

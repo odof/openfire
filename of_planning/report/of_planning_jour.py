@@ -69,4 +69,4 @@ class OfPlanningJour(report_sxw.rml_parse):
         ) if s]
         return "\n".join(partner_vals)
 
-report_sxw.report_sxw('report.of_planning.of_planning_jour', 'of.planning.report', 'addons/of_planning/report/of_planning_jour.rml', parser=OfPlanningJour, header=False)
+report_sxw.report_sxw('report.of_planning.of_planning_jour', 'of_planning.impression_wizard', 'addons/of_planning/report/of_planning_jour.rml', parser=OfPlanningJour, header=False)
