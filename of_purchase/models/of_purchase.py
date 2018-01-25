@@ -5,7 +5,7 @@ from odoo import models, fields, api, _
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    delivery_expected = fields.Char(string='Livraison Attendue', states={'done': [('readonly', True)]})
+    delivery_expected = fields.Char(string='Livraison attendue', states={'done': [('readonly', True)]})
 
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
@@ -27,6 +27,37 @@ class ProcurementOrder(models.Model):
         res['customer_id'] = self._context.get('purchase_customer_id', False) or (sale_order_id and sale_order.partner_id.id)
         res['sale_order_id'] = sale_order_id
         res['delivery_expected'] = sale_order_id and sale_order.delivery_expected
+
+        return res
+
+    @api.multi
+    def _prepare_purchase_order_line(self, po, supplier):
+        """
+        Prendre la description de la ligne de commande et ajouter la description du produit
+        """
+        res = super(ProcurementOrder, self)._prepare_purchase_order_line(po, supplier)
+
+        # Option : Description articles
+        desc_option = self.env['ir.values'].get_default('purchase.config.settings', 'of_description_as_order_setting')
+
+        if desc_option:
+            # recherche d'une ligne de commande associee
+            sale_line = self.sale_line_id
+            if not sale_line:
+                # Si non trouvée, remonter la chaine des stock.move
+                move = self.move_dest_id
+                sale_line = move and move.procurement_id and move.procurement_id.sale_line_id
+
+            # Si trouvée, prendre la description de la ligne de commande et ajouter éventuellement la description du produit
+            if sale_line:
+                name = sale_line.display_name
+                product_lang = self.product_id.with_context({
+                    'lang': supplier.name.lang,
+                    'partner_id': supplier.name.id,
+                })
+                if product_lang.description_purchase:
+                    name += '\n' + product_lang.description_purchase
+                res["name"] = name
         return res
 
     @api.multi
@@ -121,6 +152,7 @@ class ProcurementOrder(models.Model):
                         price_unit = seller.currency_id.compute(price_unit, po.currency_id)
 
                     po_line = line.write({
+                        'name': line.name,
                         'product_qty': line.product_qty + procurement_uom_po_qty,
                         'price_unit': price_unit,
                         'procurement_ids': [(4, procurement.id)]
@@ -130,3 +162,18 @@ class ProcurementOrder(models.Model):
                 vals = procurement._prepare_purchase_order_line(po, supplier)
                 self.env['purchase.order.line'].create(vals)
         return res
+
+# Ajouter la configuration "Description articles"
+class OFPurchaseConfiguration(models.TransientModel):
+    _inherit = 'purchase.config.settings'
+
+    of_description_as_order_setting = fields.Selection([
+        (0, 'Description article telle que saisie dans le catalogue'),
+        (1, 'Description article telle que saisie dans le devis')
+        ], "(OF) Description articles",
+        help="Choisissez le type de description affiché dans la commande fournisseur.\n Cela affecte également les documents imprimables.")
+
+    @api.multi
+    def set_description_as_order_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'purchase.config.settings', 'of_description_as_order_setting', self.of_description_as_order_setting)

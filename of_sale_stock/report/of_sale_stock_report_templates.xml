@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <template id="sale_stock.report_saleorder_document_inherit_sale_stock" inherit_id="sale.report_saleorder_document">
+        <!--####################
+            Cette vue est entièrement modifiée depuis le module of_sale_stock.
+            ####################-->
+        <xpath expr="//div[@name='payment_term']" position="after">
+            <div class="col-xs-3" t-if="doc.incoterm" groups="sale.group_display_incoterm">
+                <strong>Incoterms:</strong>
+                <p t-field="doc.incoterm.code"/>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="sale_stock.report_delivery_document_inherit_sale_stock" inherit_id="stock.report_delivery_document">
+        <!--####################
+            Cette vue est entièrement modifiée depuis le module of_sale_stock.
+            ####################-->
+        <xpath expr="//div[@name='customer_address']" position="after">
+            <div class="row mt32 mb32">
+            <div class="col-xs-12">
+                <div t-if="o.sale_id.client_order_ref"><strong>Vos références : </strong></div>
+                <div name="refs" class="mt8" id="informations" style="display: table">
+                    <div t-if="o.sale_id.client_order_ref" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                        <strong>Réf. Commande client :</strong><br/>
+                        <span t-field="o.sale_id.client_order_ref"/>
+                    </div>
+                    <div t-if="o.sale_id.client_order_ref" style="display: table-cell; width: 4px;"/>
+                </div>
+            </div>
+            </div>
+        </xpath>
+        <xpath expr="//table[@class='table table-condensed mt48']//th" position="after">
+            <th groups="of_sale_stock.group_description_BL_variant">Description</th>
+        </xpath>
+        <xpath expr="//table[2]//tbody//td" position="after">
+            <td groups="of_sale_stock.group_description_BL_variant"><span t-field="move.name"/></td>
+        </xpath>
+    </template>
+
+</odoo>

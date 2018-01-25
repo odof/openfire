@@ -50,9 +50,10 @@ class OFSaleOrder(models.Model):
                 order.of_to_invoice = True
 
     of_to_invoice = fields.Boolean(u"Entièrement facturable", compute='_compute_of_to_invoice', search='_search_of_to_invoice')
-    of_notes_facture = fields.Html(string="Notes facture", oldname="of_notes_factures")
-    of_notes_intervention = fields.Html(string="Notes intervention")
-    of_notes_client = fields.Html(related='partner_id.of_notes_client', string="Notes client")
+    #of_notes_facture = fields.Html(string="Notes Facture", oldname="of_notes_factures")
+    of_notes_intervention = fields.Html(string="Notes intervention", default=u"<em style='color: grey;'>Attention, ces notes sont synchronisées entre devis et plannnings d'intervention.</em>",
+                                        help="Ce champ est synchronisé entre devis/bons de commande et plannings d'intervention.\nToute modification sera diffusée et synchronisée entre ces éléments.")
+    of_notes_client = fields.Html(related='partner_id.of_notes_client', string="Notes client", default=u"<em style='color: grey;'>Attention, ces notes sont synchronisées entre contacts, devis et plannings d'intervention.</em>")
 
 class OFSaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
@@ -113,7 +114,7 @@ class OFCompany(models.Model):
         ('non','Ne pas afficher'),
         ('devis','Dans les devis'),
         ('factures','Dans les factures'),
-        ('devis_factures','Dans les devis & les factures'),
+        ('devis_factures','Dans les devis et les factures'),
         ],string="afficher descr. fabricant", default='devis_factures',
             help="La description du fabricant d'un article sera ajoutée à la description de l'article dans les documents."
     )

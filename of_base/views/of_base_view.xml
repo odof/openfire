@@ -49,10 +49,14 @@
                 <field name="zip" position="after">
                     <field name="city" class="o_address_city" placeholder="City" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
                 </field>
+                <!-- Change placeholder Notes internes non difusées -->
+                <xpath expr="//notebook/page[2]//field[@name='comment']" position="replace">
+                    <field name="comment" colspan="4" placeholder="Note interne (non diffusée)"/>
+                </xpath>
                 <!-- Ajout Notes client dans l'onglet Notes internes -->
                 <xpath expr="//notebook/page[2]" position="inside">
                     <separator string="Notes client" colspan="4"/>
-                    <field name="of_notes_client" colspan="4" nolabel="1" widget="html"/>
+                    <field name="of_notes_client" colspan="4" widget="html"/>
                 </xpath>
             </field>
         </record>
@@ -70,7 +74,7 @@
             </field>
         </record>
 
-        <!-- Ajouter type adresse (livraison, facture, ...) dans vue Kanban quand est un contact-->
+        <!-- Ajouter type adresse (livraison, facture, ...) dans vue kanban quand est un contact -->
         <record id="of_res_partner_kanban" model="ir.ui.view" >
             <field name="name">of.res.partner.kanban</field>
             <field name="inherit_id" ref="base.res_partner_kanban_view"/>
@@ -89,7 +93,7 @@
             <field name="inherit_id" ref="base.view_company_form" />
             <field name="arch" type="xml">
                 <notebook position="inside">
-                    <page string="Paramètres Avancés" name="advanced_settings" invisible="1">
+                    <page string="Paramètres avancés" name="advanced_settings" invisible="1">
                         <group name="advanced_settings_group_1" col="4"></group>
                         <group name="advanced_settings_group_2" col="4"></group>
                     </page>

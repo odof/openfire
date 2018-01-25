@@ -72,10 +72,26 @@ class OFSaleStockSaleOrderLine(models.Model):
 class OFSaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'
 
-    of_stock_warning_setting = fields.Boolean(string="Avertissements de stock", required=True, default=False,
+    of_stock_warning_setting = fields.Boolean(string="(OF) Avertissements de stock", required=True, default=False,
             help="Afficher les messages d'avertissement de stock ?")
 
     @api.multi
     def set_stock_warning_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_stock_warning_setting', self.of_stock_warning_setting)
+
+# Ajouter le Setting "Description articles"
+class OFStockConfiguration(models.TransientModel):
+    _inherit = 'stock.config.settings'
+
+    group_description_BL_variant = fields.Selection([
+            (0, "Afficher uniquement l'article dans le bon de livraison"),
+            (1, "Afficher l'article et sa description dans le bon de livraison")
+        ], "(OF) Description articles",
+        help = "Choisissez si la description de l'article s'affichée dans le bon de livraison.\nCela affecte également les documents imprimables.",
+        implied_group = 'of_sale_stock.group_description_BL_variant')
+
+    @api.multi
+    def set_group_description_BL_variant_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'stock.config.settings', 'group_description_BL_variant', self.group_description_BL_variant)

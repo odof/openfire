@@ -28,8 +28,8 @@ msgstr "<strong>Adresse de livraison :</strong><br/>"
 
 #. module: sale
 #: model:ir.ui.view,arch_db:sale.report_saleorder_document
-msgid "<strong>Commercial(e):</strong>"
-msgstr "<strong>Commercial(e):</strong>"
+msgid "<strong>Commercial(e) :</strong>"
+msgstr "<strong>Commercial(e) :</strong>"
 
 #. module: sale
 #: model:ir.ui.view,arch_db:sale.report_saleorder_document

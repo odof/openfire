@@ -63,7 +63,7 @@
                         <div t-if="doc.client_order_ref" style="display: table-cell; width: 4px"/>
 
                         <div t-if="doc.user_id" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
-                            <strong>Commercial(e):</strong>
+                            <strong>Commercial(e) :</strong>
                             <p>
                                 <span t-field="doc.user_id"/><br t-if="doc.user_id.phone or doc.user_id.mobile"/>
                                 <span t-if="doc.user_id.phone" t-field="doc.user_id.phone"/><br t-if="doc.user_id.phone and (doc.user_id.mobile or doc.user_id.email)"/>

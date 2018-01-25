@@ -31,4 +31,34 @@
             </xpath>
         </field>
     </record-->
+
+    <!-- Reprendre dans le bon de livraison la description article telle que saisie dans le devis. -->
+    <record id="of_view_move_picking_tree" model="ir.ui.view">
+        <field name="name">of.stock.move.tree</field>
+        <field name="model">stock.move</field>
+        <field name="inherit_id" ref="stock.view_move_picking_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree//field[@name='product_id']" position="after">
+                <field name="name" groups="of_sale_stock.group_description_BL_variant"></field>
+            </xpath>
+        </field>
+    </record>
+
+    <!--#############################################################################
+        ##                      STOCK (INVENTAIRE) VIEWS
+        #############################################################################
+     -->
+
+    <!-- Ajouter le paramètre de configuration "Description articles" dans Inventaire/Configuration -->
+    <record id="of_view_stock_config_settings" model="ir.ui.view">
+        <field name="name">of.stock settings</field>
+        <field name="model">stock.config.settings</field>
+        <field name="inherit_id" ref="stock.view_stock_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='group_stock_packaging']" position="after">
+                <field name="group_description_BL_variant" widget="radio"/>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>

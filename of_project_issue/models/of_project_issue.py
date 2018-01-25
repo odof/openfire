@@ -222,7 +222,7 @@ class ProjectIssue(models.Model):
             if sale_order_ids:
                 for s_order in sale_order_ids:
                     docs.append({
-                        'name': 'Devis/Commande Client',
+                        'name': 'Devis/Commande client',
                         'doc_objet': 'sale.order',
                         'date': s_order.date_order or False,
                         'number': s_order.name or '',

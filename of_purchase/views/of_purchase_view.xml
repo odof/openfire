@@ -47,10 +47,22 @@
             </field>
         </record>
 
+        <!-- Ajouter la configuration "Description articles" -->
+        <record id="of_view_purchase_configuration" model="ir.ui.view">
+            <field name="name">of_purchase.res.config.view</field>
+            <field name="model">purchase.config.settings</field>
+            <field name="inherit_id" ref="purchase.view_purchase_configuration"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form//field[@name='group_warning_purchase']" position="after">
+                    <field name="of_description_as_order_setting" widget="radio"/>
+                </xpath>
+            </field>
+        </record>
+
     <!--
 	#########################################################################################################
 	###
-	###                       S A L E   V I EW S
+	###                       S A L E   V I E W S
 	###
 	#########################################################################################################
 	-->
