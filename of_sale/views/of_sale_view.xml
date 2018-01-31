@@ -29,14 +29,22 @@
                 <!-- Ajout onglet Notes : client, facture, intervention -->
                 <xpath expr="//notebook" position="inside">
                      <page string="Notes">
-                        <separator string="Notes client" colspan="4"/>
-                        <field name="of_notes_client" colspan="4" nolabel="1" widget="html"/>
-                        <!--
-                        <separator string="Notes Facture" colspan="4"/>
+                        <!-- Notes client -->
+                        <group attrs="{'invisible':[('of_notes_client','=',False)]}">
+                            <separator string="Notes client" colspan="4"/>
+                            <field name="of_notes_client" colspan="4" nolabel="1" readonly="1"
+                                help="Ces notes proviennent de la fiche client sous la rubrique 'Notes internes'. Ils sont uniquement modifiables dans la fiche client."/>
+                         </group>
+                         <!-- Notes Facture -->
+                        <separator string="Notes facture" colspan="4"/>
                         <field name="of_notes_facture" colspan="4" nolabel="1" widget="html"/>
-                        -->
+                        <!-- Notes intervention -->
                         <separator string="Notes intervention" colspan="4"/>
-                        <field name="of_notes_intervention" colspan="4" nolabel="1" widget="html"/>
+                        <field name="of_notes_intervention" colspan="4" nolabel="1" widget="html"
+                            help="Ces notes sont visualisées dans planning d'intervention et imprimées dans la fiche d'intervention."/>
+                        <div class="oe_edit_only" colspan="4">
+                            * Les données saisies dans ce champ seront visualisées dans planning d'intervention et imprimées dans la fiche d'intervention.
+                        </div>
                      </page>
                 </xpath>
             </field>

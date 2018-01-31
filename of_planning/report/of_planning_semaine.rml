@@ -138,7 +138,7 @@
                     <para style="terp_default_8">[[ p.tache_id.name or '' ]]</para>
                 </td>
                 <td>
-                    <para style="terp_default_8">[[ p.description or '' ]]</para>
+                    <para style="terp_default_8">[[ get_description(p) or '' ]]</para>
                 </td>
             </tr>
         </blockTable>

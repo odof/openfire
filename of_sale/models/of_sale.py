@@ -50,10 +50,9 @@ class OFSaleOrder(models.Model):
                 order.of_to_invoice = True
 
     of_to_invoice = fields.Boolean(u"Entièrement facturable", compute='_compute_of_to_invoice', search='_search_of_to_invoice')
-    #of_notes_facture = fields.Html(string="Notes Facture", oldname="of_notes_factures")
-    of_notes_intervention = fields.Html(string="Notes intervention", default=u"<em style='color: grey;'>Attention, ces notes sont synchronisées entre devis et plannnings d'intervention.</em>",
-                                        help="Ce champ est synchronisé entre devis/bons de commande et plannings d'intervention.\nToute modification sera diffusée et synchronisée entre ces éléments.")
-    of_notes_client = fields.Html(related='partner_id.of_notes_client', string="Notes client", default=u"<em style='color: grey;'>Attention, ces notes sont synchronisées entre contacts, devis et plannings d'intervention.</em>")
+    of_notes_facture = fields.Html(string="Notes facture", oldname="of_notes_factures")
+    of_notes_intervention = fields.Html(string="Notes intervention")
+    of_notes_client = fields.Text(related='partner_id.comment', string="Notes client", readonly=True)
 
 class OFSaleOrderLine(models.Model):
     _inherit = 'sale.order.line'

@@ -13,6 +13,7 @@ class OfPlanningSemaine(report_sxw.rml_parse):
             'get_date': self.get_date,
             'get_heure': self.get_heure,
             'get_client': self.get_client,
+            'get_description': self.get_description,
             'get_local_datetime': self.get_local_datetime,
             })
 
@@ -87,5 +88,8 @@ class OfPlanningSemaine(report_sxw.rml_parse):
             address.fax,
         ) if s]
         return "\n".join(partner_vals)
+
+    def get_description(self, line):
+        return line.description.replace('<br>', '\n').replace('<br/>', '\n').replace('<p>', '').replace('</p>', '\n').replace('<p/>', '\n').replace('<b>', '').replace('</b>', '').replace('<i>', '').replace('</i>', '').replace('<u>', '').replace('</u>', '')
 
 report_sxw.report_sxw('report.of_planning.of_planning_semaine', 'of_planning.impression_wizard', 'addons/of_planning/report/of_planning_semaine.rml', parser=OfPlanningSemaine, header=False)
