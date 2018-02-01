@@ -932,9 +932,9 @@ class OfImport(models.Model):
                 'data_account_type_payable_id': self.env['ir.model.data'].get_object_reference('account', 'data_account_type_payable')[1],
             },
             'of.service': {
-                'nom_objet', u'service OpenFire',    # Libellé pour affichage dans message information/erreur
-                'champ_primaire', 'id',              # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
-                'champ_reference', '',               # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
+                'nom_objet': u'service OpenFire',    # Libellé pour affichage dans message information/erreur
+                'champ_primaire': 'id',              # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
+                'champ_reference': '',               # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
             },
             'res.partner.bank': {
                 'nom_objet': u'Comptes en banque partenaire',  # Libellé pour affichage dans message information/erreur
