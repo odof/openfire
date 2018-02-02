@@ -9,7 +9,8 @@
 Module de comptabilité OpenFire.
 ======================================
 
-- Ajout de la rubrique 'Rapports' dans les paramètres de config
+- Ajout de la rubrique 'Rapports' dans les paramètres de configuration
+- Factures : afficher le boutton "Envoyer par email" dans tous les cas sauf pour les factures annulées et brouillon
 """,
     'depends' : [
         'account',
