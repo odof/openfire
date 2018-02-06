@@ -115,7 +115,6 @@ class OFProductBrand(models.Model):
                                          inverse="_inverse_product_config_ids", domain="[('brand_id', '=', id)]")
 
     of_import_price = fields.Char(required=True, default='ppht')
-    of_import_remise = fields.Char(required=True)
     of_import_cout = fields.Char(required=True, default="pa")
     of_import_categ_id = fields.Many2one(required=True)
 
@@ -192,10 +191,11 @@ class OFProductBrand(models.Model):
         return self.of_import_categ_id
 
     @api.multi
-    def compute_product_price(self, list_price, categ_name, product=None):
+    def compute_product_price(self, list_price, categ_name, product=None, price=None, remise=None):
         """
         @param categ_name: Nom de la catégorie de produit telle que donnée par le fournisseur
-        @param product: objet product.template si existant sur la base actuellement
+        @param product: Objet product.template si existant sur la base actuellement
+        @param price: Prix d'achat pouvant être utilisé si aucune formule n'est renseignée pour la remise
         """
         self.ensure_one()
 
@@ -221,22 +221,36 @@ class OFProductBrand(models.Model):
                         values[product_field] = value
                     break
             else:
-                # Aucune formule n'a été renseignée. Cette formule n'est pas obligatoire pour le coût
-                if product_field != 'standard_price':
+                # Aucune formule n'a été renseignée. Cette formule n'est pas obligatoire pour la remise
+                if product_field == 'remise':
+                    # Si la formule de la remise n'est pas renseignée, le prix d'achat d'origine est conservé
+                    if price is not None:
+                        # Le prix est renseigné au niveau de l'import
+                        eval_dict['pa'] = price
+                    elif remise is not None:
+                        # La remise est renseignée au niveau de l'import
+                        eval_dict['pa'] = list_price * (100.0 - remise) / 100.0
+                    elif product:
+                        # L'article existe déjà, son prix d'achat est conservé
+                        eval_dict['pa'] = product.of_seller_price
+                    else:
+                        # La formule n'est pas renseignée et aucune valeur ne peut être déduite
+                        raise OfImportError(u"Aucune formule n'est renseignée pour %s de cet article." % (text, ))
+                else:
                     raise OfImportError(u"Aucune formule n'est renseignée pour %s de cet article." % (text, ))
 
         values['of_seller_price'] = eval_dict['pa']
         return values
 
     @api.multi
-    def compute_product_values(self, list_price, categ_name, product=None):
+    def compute_product_values(self, list_price, categ_name, product=None, price=None, remise=None):
         self.ensure_one()
 
         categ = self.compute_product_categ(categ_name, product=product)
         if not categ:
             raise UserError(u"Impossible de trouver la catégorie de produits correspondant à \"%s\"" % (categ_name, ))
 
-        values = self.compute_product_price(list_price, categ_name, product=product)
+        values = self.compute_product_price(list_price, categ_name, product=product, price=price, remise=remise)
         values['categ_id'] = categ.id
         return values
 
@@ -599,7 +613,11 @@ class OfImport(models.Model):
             # Calcul des prix d'achat/vente en fonction des règles de calcul et du prix public ht
             if 'list_price' in valeurs and brand:
                 valeurs['of_seller_pp_ht'] = valeurs['list_price']
-                valeurs.update(brand.compute_product_price(valeurs['list_price'], valeurs.get('of_seller_product_category_name', res_objet and res_objet.of_seller_product_category_name or ''), res_objet))
+                valeurs.update(brand.compute_product_price(valeurs['list_price'],
+                                                           valeurs.get('of_seller_product_category_name', res_objet and res_objet.of_seller_product_category_name or ''),
+                                                           product=res_objet,
+                                                           price=valeurs.get('of_seller_price'),
+                                                           remise=valeurs.get('of_seller_remise')))
 
     @api.multi
     def _importer_ligne(self, ligne, champs_fichier, champs_odoo, i, model_data, doublons, simuler):
