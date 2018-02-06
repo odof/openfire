@@ -33,7 +33,11 @@ Les champs pouvant ainsi être personnalisés sont
  - La catégorie de l'article
  - La remise accordée par le fournisseur
  - Le prix de vente à appliquer (en fonction du prix public hors taxe)
+ - Le coût total de l'article
 Ces différentes valeurs peuvent être configurées par marque et par catégorie d'article ou forcées par article.
+
+La configuration d'une formule pour la remise n'est pas obligatoire. Si elle n'est pas renseignée, le fichier d'import devra
+contenir une colonne renseignant soit le prix d'achat ('of_seller_price'), soit la remise accordée par le fournisseur ('of_seller_remise')
 """,
     "depends" : [
         'of_product_brand',
