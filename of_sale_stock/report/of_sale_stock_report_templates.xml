@@ -13,30 +13,42 @@
         </xpath>
     </template>
 
+    <!-- Modifications rapport bon de livraison -->
     <template id="sale_stock.report_delivery_document_inherit_sale_stock" inherit_id="stock.report_delivery_document">
         <!--####################
             Cette vue est entièrement modifiée depuis le module of_sale_stock.
             ####################-->
         <xpath expr="//div[@name='customer_address']" position="after">
             <div class="row mt32 mb32">
-            <div class="col-xs-12">
-                <div t-if="o.sale_id.client_order_ref"><strong>Vos références&amp;nbsp;: </strong></div>
-                <div name="refs" class="mt8" id="informations" style="display: table">
-                    <div t-if="o.sale_id.client_order_ref" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
-                        <strong>Réf. commande client&amp;nbsp;:</strong><br/>
-                        <span t-field="o.sale_id.client_order_ref"/>
+                <div class="col-xs-12">
+                    <div t-if="o.sale_id.client_order_ref"><strong>Vos références&amp;nbsp;: </strong></div>
+                    <div name="refs" class="mt8" id="informations" style="display: table">
+                        <div t-if="o.sale_id.client_order_ref" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                            <strong>Réf. commande client&amp;nbsp;:</strong><br/>
+                            <span t-field="o.sale_id.client_order_ref"/>
+                        </div>
+                        <div t-if="o.sale_id.client_order_ref" style="display: table-cell; width: 4px;"/>
                     </div>
-                    <div t-if="o.sale_id.client_order_ref" style="display: table-cell; width: 4px;"/>
                 </div>
             </div>
-            </div>
         </xpath>
-        <xpath expr="//table[@class='table table-condensed mt48']//th" position="after">
-            <th groups="of_sale_stock.group_description_BL_variant">Description</th>
+
+        <!-- not o.pack_operation_ids -->
+        <xpath expr="//table[2]/thead//th" position="after">
+            <th groups="of_sale_stock.group_description_BL_variant" >Description</th>
         </xpath>
         <xpath expr="//table[2]//tbody//td" position="after">
-            <td groups="of_sale_stock.group_description_BL_variant"><span t-field="move.name"/></td>
+            <td groups="of_sale_stock.group_description_BL_variant" ><span t-field="move.name"/></td>
         </xpath>
+
+        <!-- with o.pack_operation_ids -->
+        <xpath expr="//table[3]/thead//th" position="after">
+            <th groups="of_sale_stock.group_description_BL_variant">Description</th>
+        </xpath>
+        <xpath expr="//table[3]//tbody//td" position="after">
+            <td groups="of_sale_stock.group_description_BL_variant"><span t-field="pack_operation.move_name"/></td>
+        </xpath>
+
     </template>
 
 </odoo>
