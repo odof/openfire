@@ -65,7 +65,8 @@ class OfImportProductConfigTemplate(models.AbstractModel):
 
 Exemples :
  ppht : Conserve le prix de vente conseillé (prix public hors taxe)
- ppht * 1.05 + 10 : Augmente le prix de vente de 5%, plus 10€""")
+ ppht * 1.05 + 10 : Augmente le prix de vente de 5%, plus 10€
+ pa * 100 / 60 : Vend l'article pour obtenir une marge de 40% sur le prix d'achat (et non sur le prix de revient!)""")
     of_import_remise = fields.Char(string="Remise",
                                    help=u"""Remise à appliquer sur les articles de ce fournisseur.
 La remise est appliquée sur le prix public pour calculer le prix d'achat.
@@ -206,8 +207,8 @@ class OFProductBrand(models.Model):
             'cumul': self.compute_remise,
         }
 
-        fields = (('of_import_price', 'list_price', 'le prix public ht'),
-                  ('of_import_remise', 'remise', 'la remise'),
+        fields = (('of_import_remise', 'remise', 'la remise'),
+                  ('of_import_price', 'list_price', 'le prix public ht'),
                   ('of_import_cout', 'standard_price', u'le coût'))
         values = {}
         for config_field, product_field, text in fields:
