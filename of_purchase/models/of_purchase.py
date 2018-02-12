@@ -6,6 +6,30 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     delivery_expected = fields.Char(string='Livraison attendue', states={'done': [('readonly', True)]})
+    purchase_order_ids = fields.One2many('purchase.order', 'sale_order_id')
+    purchase_order_count = fields.Integer(string='Nombre de commande', compute='_compute_purchase_order_ids')
+
+    @api.multi
+    def action_vue_commande_fournisseur(self):
+        '''
+        Cette fonction renvoie une action qui affiche les commandes fournisseurs existants
+        liés au bon de commande du client. Il peut être soit dans une liste ou sous une forme
+        vue, s'il n'y a qu'une seule commande à afficher.
+        '''
+        action = self.env.ref('of_purchase.of_purchase_open_purchase_order_ids').read()[0]
+
+        purchase_order_ids = self.mapped('purchase_order_ids')
+        if len(purchase_order_ids) > 1:
+            action['domain'] = [('id', 'in', purchase_order_ids.ids)]
+        elif purchase_order_ids:
+            action['views'] = [(self.env.ref('of_purchase.of_purchase_order_customer_form').id, 'form')]
+            action['res_id'] = purchase_order_ids.id
+        return action
+
+    @api.multi
+    def _compute_purchase_order_ids(self):
+        purchase_order_ids = self.mapped('purchase_order_ids')
+        self.purchase_order_count = len(purchase_order_ids)
 
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'

@@ -59,6 +59,14 @@
             </field>
         </record>
 
+        <!-- Action pour afficher liste commande fournisseur depuis un bon de commande-->
+        <record id="of_purchase_open_purchase_order_ids" model="ir.actions.act_window">
+            <field name="name">Commandes fournisseurs</field>
+            <field name="res_model">purchase.order</field>
+            <field name="domain">[]</field> <!-- Force empty -->
+            <field name="view_type">form</field>
+        </record>
+
     <!--
 	#########################################################################################################
 	###
@@ -71,10 +79,19 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
         <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_view_invoice']" position="after">
+                <field name="purchase_order_ids" invisible="1"/>
+                <button type="object"
+                    name="action_vue_commande_fournisseur"
+                    class="oe_stat_button"
+                    icon="fa-list-alt"
+                    groups="base.group_user">
+                    <field name="purchase_order_count" widget="statinfo" string="Cde fournisseur"/>
+                </button>
+            </xpath>
             <xpath expr="//group[@name='sale_shipping']" position="inside">
 				<field name="delivery_expected"/>
             </xpath>
         </field>
     </record>
-
 </odoo>
