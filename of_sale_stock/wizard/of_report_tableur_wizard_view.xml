@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!-- Wizard pour imprimer liste articles sous format excel (.csv) -->
+        <record id="of_rapport_gestion_stock_view_form" model="ir.ui.view">
+            <field name="name">of_sale_stock.of_sale_stock_impression_wizard.form</field>
+            <field name="model">rapport.gestion.stock.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Imprimer liste article">
+                    <group>
+                        <field name="product_ids" widget="many2many"/>
+                        <field name="location_ids" widget="many2many_tags"/>
+                        <field name="date_stock"/>
+                        <field name="file_name" invisible="1"/>
+                    </group>
+                    <footer>
+                        <button string="Annuler" special="cancel" class="btn-default"/>
+                        <span attrs="{'invisible': [('file', '=', False)]}">
+                            Télécharger
+                            <field name="file" filename="file_name" readonly="1"/>
+                            ou
+                        </span>
+                        <button string="(Re)générer le document" name="action_generate_excel_file" type="object" class="btn-primary"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_of_sale_stock_report">
+            <field name="name">Impression liste articles</field>
+            <field name="res_model">rapport.gestion.stock.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_of_sale_stock_report" name="Rapport gestion stock" parent="stock.menu_stock_inventory_control" action="action_of_sale_stock_report" sequence="4"/>
+
+    </data>
+</openerp>  
+

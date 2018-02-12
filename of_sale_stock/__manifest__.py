@@ -33,6 +33,7 @@ Paramètres de ventes (sale.config.settings)
         'report/of_report_stockinventory_valued.xml',
         'report/of_sale_stock_report_templates.xml',
         'security/of_sale_stock_security.xml',
+        'wizard/of_report_tableur_wizard_view.xml'
     ],
     'installable': True,
     'application': False,
