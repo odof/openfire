@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+
+    <!-- Wizard Annuler / modifier / rembourser un paiement -->
+    <record id="of_certification_annulation_wizard_view" model="ir.ui.view">
+        <field name="name">of.annulation_paiment.wizard_form</field>
+        <field name="model">of.account.payment.wizard</field>
+        <field name="arch" type="xml">
+            <form string="annulation payment wizard">
+                <group>
+                     <group>
+                         <field name="type_modification_payment" widget="radio"/>
+                     </group>
+                     <group>
+                         <div attrs="{'invisible':[('type_modification_payment','&lt;&gt;','cancel')]}" class="oe_grey" colspan="4">
+                            Cette fonction annule le paiement d'origine et génère une extourne comptable lettrée avec l'écriture d'origine.
+                         </div>
+                         <div attrs="{'invisible':[('type_modification_payment','&lt;&gt;','modify')]}" class="oe_grey" colspan="4">
+                            Cette fonction annule le paiement d'origine avec écriture de extourne et génère un nouveau paiement brouillon identique et intégralement modifiable.
+                         </div>
+                         <div attrs="{'invisible':[('type_modification_payment','&lt;&gt;','refund')]}" class="oe_grey" colspan="4">
+                            Cette fonction génère un paiement brouillon destiné à rembourser le client. Ce paiement de remboursement se lettrera automatiquement avec le paiement d'origine après validation.
+                         </div>
+                     </group>
+                     <group>
+                         <field name="description"/>
+                     </group>
+                </group>
+                <footer>
+                    <!-- Bouton valider si annuler -->
+                    <button class="btn-primary" name="payment_modification" string='Annuler le paiement avec une extourne comptable' type="object"
+                        confirm="Êtes-vous sûr de vouloir annuler le paiement ? Ceci créera une extourne comptable."
+                        attrs="{'invisible':['|',('type_modification_payment','=','refund'),('type_modification_payment','=','modify')]}"/>
+                    <!-- Bouton valider si remboursement paiement -->
+                    <button class="btn-primary" name="payment_modification" string='Effectuer un remboursement' type="object" style="margin-left: 0px"
+                        confirm="Êtes-vous sûr de vouloir effectuer un remboursement ? Ceci ouvrira une nouvelle fenêtre vous permettant de créer un paiement de remboursement."
+                        attrs="{'invisible':['|',('type_modification_payment','=','cancel'),('type_modification_payment','=','modify')]}"/>
+                    <!-- Bouton valider si modification paiement -->
+                    <button class="btn-primary" name="payment_modification" string='Modifier le paiement' type="object" style="margin-left: 0px"
+                        confirm="Êtes-vous sûr de vouloir modifier le paiement ? Ceci annulera ce paiement avec une extourne comptable et une nouvelle fenêtre vous permettra de créer un nouveau paiement."
+                        attrs="{'invisible':['|',('type_modification_payment','=','cancel'),('type_modification_payment','=','refund')]}"/>
+                    <!-- Button Annuler -->
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action wizard view -->
+    <record id="action_of_certification_annulation" model="ir.actions.act_window">
+        <field name="name">Remboursement, annulation ou modification</field>
+        <field name="res_model">of.account.payment.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_certification_annulation_wizard_view"/>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Vue formulaire paiements -->
+    <!-- Ajout boutton Rembourser/Annuler/Modifier (invisible en brouillon) -->
+    <record id="of_certification_annulation_form" model="ir.ui.view">
+        <field name="name">of.account.payment.annulation.form</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='post']" position="after">
+                <button name="%(action_of_certification_annulation)d" string="Rembourser / Annuler / Modifier"
+                    type="action" attrs="{'invisible': [('state', '=', 'draft')]}"/>
+            </xpath>
+            <form><footer position="replace"><div></div></footer></form>
+        </field>
+    </record>
+
+</odoo>
