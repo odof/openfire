@@ -66,6 +66,16 @@ class AccountFiscalPosition(models.Model):
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        taxes = self.invoice_line_tax_ids
+        res = super(AccountInvoiceLine,self)._onchange_product_id()
+        if self.invoice_line_tax_ids == taxes:
+            # Odoo recalcule le compte comptable en fonction de la position fiscale et du nouvel article sélectionné
+            # On doit donc s'assurer de ré-appliquer les règles OpenFire de la taxe
+            self.onchange_tax_ids()
+        return res
+
     @api.onchange('invoice_line_tax_ids')
     def onchange_tax_ids(self):
         # Recalcul du compte comptable en fonction des taxes sélectionnées
