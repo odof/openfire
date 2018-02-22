@@ -5,13 +5,13 @@ from cStringIO import StringIO
 import xlsxwriter
 from xlsxwriter.utility import xl_range
 
-class SaleStockImpressionWizard(models.TransientModel):
-    _name = "rapport.gestion.stock.wizard"
+class OFRapportGestionStockWizard(models.TransientModel):
+    _name = "of.rapport.gestion.stock.wizard"
 
     product_ids = fields.Many2many('product.product', string=u"Articles")
     file = fields.Binary(string='Fichier')
     file_name = fields.Char(string='Nom du fichier', size=64, default='articles.xlsx')
-    location_ids = fields.Many2many('stock.location', string="Emplacement", required=True)
+    location_ids = fields.Many2many('stock.location', string="Emplacement", required=True, domain=[('usage','=','internal')])
     date_stock = fields.Date(string='Date stock', required=True)
 
     @api.multi
@@ -19,7 +19,6 @@ class SaleStockImpressionWizard(models.TransientModel):
         self.ensure_one()
 
         # Initialisation du document
-
         fp = StringIO()
         workbook = xlsxwriter.Workbook(fp, {'in_memory': True})
         worksheet = workbook.add_worksheet()
@@ -54,6 +53,11 @@ class SaleStockImpressionWizard(models.TransientModel):
         # Initialisation des lignes et colonnes
         row = 4
         col = 2
+
+        worksheet.set_column(0, 0, 20)
+        worksheet.set_column(1, 1, 40)
+        worksheet.set_column(2, 8+(len(self.location_ids)),20)
+
         # Titre des colonnes
         worksheet.write(row, 0, u"Référence", style_title_col)
         worksheet.write(row, 1, u"Désignation", style_title_col)
@@ -147,7 +151,7 @@ class SaleStockImpressionWizard(models.TransientModel):
         self.file = base64.encodestring(data)
         self.file_name = 'rapport_gestion_stock.xlsx'
 
-        action = self.env.ref('of_sale_stock.action_of_sale_stock_report').read()[0]
+        action = self.env.ref('of_sale_stock.action_of_rapport_gestion_stock').read()[0]
         action['views'] = [(self.env.ref('of_sale_stock.of_rapport_gestion_stock_view_form').id, 'form')]
         action['res_id'] = self.ids[0]
         return action
