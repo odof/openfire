@@ -66,7 +66,7 @@
                 </div>
                 <div class="h5 col-xs-3 text-right" style="vertical-align: top;">
                     <t t-if="o.order_id">
-                        <span>Cmd : </span>
+                        <span>Commande&amp;nbsp;: </span>
                         <span t-field="o.order_id"/>
                     </t>
                 </div>
@@ -97,15 +97,15 @@
                                     <div style="display: table-cell; width: 50%;">
                                          <div class="h5" style="padding: 0px 16px;">
                                              <t t-if="o.order_id.partner_id">
-                                                <div><span>Client : </span><strong><span t-field="o.order_id.partner_id"/></strong></div>
+                                                <div><span>Client&amp;nbsp;: </span><strong><span t-field="o.order_id.partner_id"/></strong></div>
                                              </t>
                                              <t t-if="o.order_id">
-                                                <div><span>Commande associée : </span><span t-field="o.order_id"/></div>
+                                                <div><span>Commande associée&amp;nbsp;: </span><span t-field="o.order_id"/></div>
                                              </t>
                                              <t t-if="o.order_id.confirmation_date">
                                                 <t t-set="pre_d" t-value="o.order_id.confirmation_date"/>
                                                 <t t-set="confirmation_date" t-value="pre_d[8:10] + '/' + pre_d[5:7] + '/' + pre_d[0:4]"/>
-                                                <div><span>Date de confirmation : </span><span t-esc="confirmation_date"/></div>
+                                                <div><span>Date de confirmation&amp;nbsp;: </span><span t-esc="confirmation_date"/></div>
                                              </t>
                                          </div>
                                     </div>
@@ -113,13 +113,13 @@
                                         <div>
                                             <div class="h5" style="padding: 0px 16px;">
                                                 <t t-if="o.name">
-                                                 <div><span>Libellé : </span><span t-field="o.name"/></div>
+                                                 <div><span>Libellé&amp;nbsp;: </span><span t-field="o.name"/></div>
                                                 </t>
                                                 <t t-if="o.company_id">
-                                                    <div><span>Magasin : </span><span t-field="o.company_id"/></div>
+                                                    <div><span>Magasin&amp;nbsp;: </span><span t-field="o.company_id"/></div>
                                                 </t>
                                                 <t t-if="o.order_id.user_id">
-                                                    <div><span>Vendeur : </span><span t-field="o.order_id.user_id"/></div>
+                                                    <div><span>Vendeur&amp;nbsp;: </span><span t-field="o.order_id.user_id"/></div>
                                                 </t>
                                             </div>
                                         </div>
@@ -134,10 +134,10 @@
                             <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; margin-bottom: 12px">
                                 <div class="h5" style="padding: 0px 16px;">
                                     <t t-if="o.name">
-                                        <div><span>Libellé : </span><span t-field="o.name"/></div>
+                                        <div><span>Libellé&amp;nbsp;: </span><span t-field="o.name"/></div>
                                     </t>
                                     <t t-if="o.company_id">
-                                        <div><span>Magasin : </span><span t-field="o.company_id"/></div>
+                                        <div><span>Magasin&amp;nbsp;: </span><span t-field="o.company_id"/></div>
                                     </t>
                                 </div>
                             </div>
@@ -153,31 +153,31 @@
                                      <div>
                                          <div class="h5" style="padding: 0px 16px;">
                                              <t t-if="o.date">
-                                                 <div><span>Date intervention : </span><strong><span t-field="o.date"/></strong></div>
+                                                 <div><span>Date intervention&amp;nbsp;: </span><strong><span t-field="o.date"/></strong></div>
                                              </t>
                                          </div>
                                          <div t-if="o.equipe_id" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
                                          <div class="h5" style="padding: 0px 16px;">
                                              <t t-if="o.tache_id">
-                                                 <span>Tâche : </span>
+                                                 <span>Tâche&amp;nbsp;: </span>
                                                  <strong><span t-field="o.tache_id"/></strong>
                                              </t>
                                          </div>
                                          <div t-if="o.equipe_id" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
                                          <div class="h5" style="padding: 0px 16px;">
                                              <t t-if="o.equipe_id">
-                                                 <div><span>Équipe : </span><span t-field="o.equipe_id"/></div>
+                                                 <div><span>Équipe&amp;nbsp;: </span><span t-field="o.equipe_id"/></div>
                                              </t>
                                          </div>
                                          <div t-if="o.duree" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
                                          <div class="h5" style="padding: 0px 16px;">
                                              <t t-if="o.duree">
-                                                 <div>Durée : <span t-field="o.duree" t-field-options='{"widget": "duration", "unit": "hour", "round": "minute"}'></span></div>
+                                                 <div>Durée&amp;nbsp;: <span t-field="o.duree" t-field-options='{"widget": "duration", "unit": "hour", "round": "minute"}'></span></div>
                                              </t>
                                          </div>
                                          <div t-if="o.duree" style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
                                          <div class="h5" style="padding: 0px 16px;">
-                                            <div>Date Fin : <span t-field="o.date_deadline"></span></div>
+                                            <div>Date fin&amp;nbsp;: <span t-field="o.date_deadline"></span></div>
                                          </div>
                                      </div>
                                 </div>

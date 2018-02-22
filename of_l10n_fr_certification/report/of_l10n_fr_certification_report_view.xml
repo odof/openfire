@@ -60,7 +60,7 @@
                 Fait à <t t-esc="docs.company_id.city"/>,<br/>
                 Le <t t-esc="docs.get_date()"/>.<br/>
              </p>
-             <p style="text-align:right">Signature du représentant légal :</p>
+             <p style="text-align:right">Signature du représentant légal&amp;nbsp;:</p>
              </div>
              <div class="footer" style="text-align:center">
                 OpenFire SAS – ZA La Brosse, 5 rue de la Garenne, 35520 La-Chapelle-des-Fougeretz<br/>

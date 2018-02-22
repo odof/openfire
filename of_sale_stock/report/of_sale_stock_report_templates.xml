@@ -20,10 +20,10 @@
         <xpath expr="//div[@name='customer_address']" position="after">
             <div class="row mt32 mb32">
             <div class="col-xs-12">
-                <div t-if="o.sale_id.client_order_ref"><strong>Vos références : </strong></div>
+                <div t-if="o.sale_id.client_order_ref"><strong>Vos références&amp;nbsp;: </strong></div>
                 <div name="refs" class="mt8" id="informations" style="display: table">
                     <div t-if="o.sale_id.client_order_ref" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
-                        <strong>Réf. Commande client :</strong><br/>
+                        <strong>Réf. commande client&amp;nbsp;:</strong><br/>
                         <span t-field="o.sale_id.client_order_ref"/>
                     </div>
                     <div t-if="o.sale_id.client_order_ref" style="display: table-cell; width: 4px;"/>

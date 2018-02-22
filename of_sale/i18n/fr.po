@@ -18,44 +18,44 @@ msgstr ""
 
 #. module: sale
 #: model:ir.ui.view,arch_db:sale.report_saleorder_document
-msgid "<strong>Adresse de livraison :</strong>"
-msgstr "<strong>Adresse de livraison :</strong>"
+msgid "<strong>Adresse de livraison&amp;nbsp;:</strong>"
+msgstr "<strong>Adresse de livraison&amp;nbsp;:</strong>"
 
 #. module: sale
 #: model:ir.ui.view,arch_db:sale.report_invoice_document_inherit_sale
-msgid "<strong>Adresse de livraison :</strong><br/>"
-msgstr "<strong>Adresse de livraison :</strong><br/>"
+msgid "<strong>Adresse de livraison&amp;nbsp;:</strong><br/>"
+msgstr "<strong>Adresse de livraison&amp;nbsp;:</strong><br/>"
 
 #. module: sale
 #: model:ir.ui.view,arch_db:sale.report_saleorder_document
-msgid "<strong>Commercial(e) :</strong>"
-msgstr "<strong>Commercial(e) :</strong>"
+msgid "<strong>Commercial(e)&amp;nbsp;:</strong>"
+msgstr "<strong>Commercial(e)&amp;nbsp;:</strong>"
 
 #. module: sale
 #: model:ir.ui.view,arch_db:sale.report_saleorder_document
-msgid "<strong>Conditions de règlement :</strong>"
-msgstr "<strong>Conditions de règlement :</strong>"
+msgid "<strong>Conditions de règlement&amp;nbsp;:</strong>"
+msgstr "<strong>Conditions de règlement&amp;nbsp;:</strong>"
 
 #. module: sale
 #: model:ir.ui.view,arch_db:sale.report_saleorder_document
-msgid "<strong>Note de position fiscale :</strong>"
-msgstr "<strong>Note de position fiscale :</strong>"
+msgid "<strong>Note de position fiscale&amp;nbsp;:</strong>"
+msgstr "<strong>Note de position fiscale&amp;nbsp;:</strong>"
 
 #. module: sale
 #: model:ir.ui.view,arch_db:sale.report_saleorder_document
-msgid "<strong>Réf. client :</strong>"
-msgstr "<strong>Réf. client :</strong>"
+msgid "<strong>Réf. client&amp;nbsp;:</strong>"
+msgstr "<strong>Réf. client&amp;nbsp;:</strong>"
 
 #. module: sale
 #: model:ir.ui.view,arch_db:sale.report_saleorder_document
-msgid "<strong>Réf. commande :</strong>"
-msgstr "<strong>Réf. commande :</strong>"
+msgid "<strong>Réf. commande&amp;nbsp;:</strong>"
+msgstr "<strong>Réf. commande&amp;nbsp;:</strong>"
 
 #. module: sale
 #: model:ir.ui.view,arch_db:sale.report_invoice_layouted
 #: model:ir.ui.view,arch_db:sale.report_saleorder_document
-msgid "<strong>Subtotal : </strong>"
-msgstr "<strong>Sous-total : </strong>"
+msgid "<strong>Subtotal&amp;nbsp;: </strong>"
+msgstr "<strong>Sous-total&amp;nbsp;: </strong>"
 
 #. module: sale
 #: model:ir.ui.view,arch_db:sale.report_saleorder_document
@@ -69,20 +69,20 @@ msgstr "<strong>Total</strong>"
 
 #. module: sale
 #: model:ir.ui.view,arch_db:sale.report_saleorder_document
-msgid "<strong>Vos références : </strong>"
-msgstr "<strong>Vos références : </strong>"
+msgid "<strong>Vos références&amp;nbsp;: </strong>"
+msgstr "<strong>Vos références&amp;nbsp;: </strong>"
 
 #. module: sale
 #: model:ir.ui.view,arch_db:sale.report_invoice_document_inherit_sale
 #: model:ir.ui.view,arch_db:sale.report_saleorder_document
-msgid "Adresse de facturation :"
-msgstr "Adresse de facturation :"
+msgid "Adresse de facturation&amp;nbsp;:"
+msgstr "Adresse de facturation&amp;nbsp;:"
 
 #. module: sale
 #: model:ir.ui.view,arch_db:sale.report_invoice_document_inherit_sale
 #: model:ir.ui.view,arch_db:sale.report_saleorder_document
-msgid "Adresse de livraison et de facturation :"
-msgstr "Adresse de livraison et de facturation :"
+msgid "Adresse de livraison et de facturation&amp;nbsp;:"
+msgstr "Adresse de livraison et de facturation&amp;nbsp;:"
 
 #. module: of_sale
 #: model:ir.model.fields,help:of_sale.field_sale_config_settings_pdf_display_product_ref_setting
@@ -245,7 +245,7 @@ msgstr "Prix unitaire"
 #: model:ir.ui.view,arch_db:sale.report_invoice_document_inherit_sale
 #: model:ir.ui.view,arch_db:sale.report_saleorder_document
 msgid "VAT:"
-msgstr "TVA :"
+msgstr "TVA&amp;nbsp;:"
 
 #. module: of_sale
 #: model:ir.ui.view,arch_db:of_sale.of_sale_view_company_form
@@ -267,4 +267,3 @@ msgstr "sale.config.settings"
 #: model:ir.ui.view,arch_db:of_sale.of_sale_order_view_search_inherit_sale
 msgid "À facturer entièrement"
 msgstr "À facturer entièrement"
-
