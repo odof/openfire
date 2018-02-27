@@ -63,7 +63,7 @@ class OFSaleStockSaleOrderLine(models.Model):
 
     @api.onchange('product_uom_qty', 'product_uom', 'route_id')
     def _onchange_product_id_check_availability(self):
-        # inhiber la vérification de stock
+        # Inhiber la vérification de stock
         afficher_warning = self.env['ir.values'].get_default('sale.config.settings', 'of_stock_warning_setting')
         if afficher_warning:
             return super(OFSaleStockSaleOrderLine, self)._onchange_product_id_check_availability()
@@ -80,7 +80,7 @@ class OFSaleConfiguration(models.TransientModel):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_stock_warning_setting', self.of_stock_warning_setting)
 
-# Ajouter le Setting "Description articles"
+# Ajout configuration "Description articles"
 class OFStockConfiguration(models.TransientModel):
     _inherit = 'stock.config.settings'
 
@@ -95,3 +95,9 @@ class OFStockConfiguration(models.TransientModel):
     def set_group_description_BL_variant_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'stock.config.settings', 'group_description_BL_variant', self.group_description_BL_variant)
+
+# Pour affichage de la contremarque (référence client) du bon de commande client dans le bon de livraison
+class StockPicking(models.Model):
+    _inherit = 'stock.picking'
+
+    client_order_ref = fields.Char(related="sale_id.client_order_ref")
