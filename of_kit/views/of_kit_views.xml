@@ -239,16 +239,16 @@
         name="Kit lines"
         sequence="21"/-->
 
-	<!--#############################################################################
+    <!--#############################################################################
         ##                      PROCUREMENT VIEWS
         #############################################################################
      -->
-	<record id="of_procurement_form_view" model="ir.ui.view">
+    <record id="of_procurement_form_view" model="ir.ui.view">
         <field name="name">procurement.order.form</field>
         <field name="model">procurement.order</field>
         <field name="inherit_id" ref="procurement.procurement_form_view"/>
         <field name="arch" type="xml">
-        	<xpath expr="//field[@name='origin']" position="after">
+            <xpath expr="//field[@name='origin']" position="after">
                 <field name="of_sale_comp_id" attrs="{'invisible': [('of_sale_comp_id', '=', False)]}"/>
             </xpath>
         </field>
@@ -282,8 +282,7 @@
                     </group>
                     <div name="components" class="mt8 mb8" attrs="{'invisible': [('of_contains_kit','=',False)]}">
                         <label for="comp_ids"/>
-                        <field name="comp_ids" mode="tree" attrs="{'readonly': [('state', 'in', ('done','cancel'))]}"
-                          context="{'hide_sale': context.get('hide_sale')}">
+                        <field name="comp_ids" context="{'hide_sale': context.get('hide_sale')}">
                             <tree string="Kit components">
                                 <field name="kit_id"/>
                                 <field name="kit_pricing"/>
@@ -341,7 +340,7 @@
             <form string="Components">
                 <h2>
                     <div attrs="{'invisible': [('order_line_id', '!=', False)]}">Draft Saleorder Kit</div>
-                    <field name="order_line_id" attrs="{'invisible': [('order_line_id', '=', False)]}" 
+                    <field name="order_line_id" attrs="{'invisible': [('order_line_id', '=', False)]}"
                       nolabel="1" options='{"no_open": True}' readonly="1"/>
                 </h2>
                 <div name="hide_prices_message" class="mb8 mt8" attrs="{'invisible': [('of_pricing', '=', 'computed')]}">
@@ -354,7 +353,7 @@
                         <field name="name"/>
                         <field name="qty_per_kit"/>
                         <field name="qty_delivered" invisible="context.get('hide_sale')" attrs="{'readonly': [('qty_delivered_updateable', '=', False)]}"/>
-                        <field name="product_uom_id" attrs="{'readonly': [('state', 'in', ('sale','done', 'cancel'))]}"/>
+                        <field name="product_uom_id" attrs="{'readonly': [('state', 'in', ('sale', 'done', 'cancel'))]}"/>
                         <field name="price_unit" attrs="{'readonly': [('kit_pricing', '=', 'fixed')]}"/>
                         <field name="price_per_kit"/>
                         <field name="kit_pricing" invisible="1"/>
@@ -472,18 +471,6 @@
                         </group>
                     </group>
                     <div name="components" class="mt8 mb8" attrs="{'invisible': [('of_contains_kit','=',False)]}">
-                        <label for="comp_ids"/>
-                        <field name="comp_ids" mode="tree" readonly="True">
-                            <tree string="Kit components">
-                                <field name="kit_id"/>
-                                <field name="product_id"/>
-                                <field name="name"/>
-                                <field name="qty_per_kit"/>
-                                <field name="product_uom_id"/>
-                                <field name="price_unit" attrs="{'readonly': [('kit_pricing', '=', 'fixed')]}"/>
-                                <field name="kit_pricing" invisible="1"/>
-                            </tree>
-                        </field>
                         <div name="hide_prices_message" class="mb8 mt8">
                             <i>Components prices are only informational when the invoice line pricing is set to 'fixed'. Only the invoice line unit price matters in that case.</i>
                         </div>
@@ -521,7 +508,7 @@
                 <field name="of_pricing" invisible="1"/>
                 <field name="currency_id" invisible="1"/>
                 <group>
-                
+
                 </group>
                 <div name="hide_prices_message" attrs="{'invisible': [('of_pricing', '=', 'computed')]}">
                     <i>Components prices are only informational when the invoice line pricing is set to 'fixed'. Only the invoice line unit price matters in that case.</i>

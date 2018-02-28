@@ -5,7 +5,7 @@ from odoo import api, fields, models, _
 from odoo.addons import decimal_precision as dp
 from odoo.exceptions import UserError, ValidationError
 
-class OFKitProductTemplate(models.Model):
+class ProductTemplate(models.Model):
     _inherit = "product.template"
 
     of_is_kit = fields.Boolean(string="Is a kit")
@@ -186,7 +186,7 @@ class OFKitProductTemplate(models.Model):
         action['domain'] = [('kit_line_ids.product_id.product_tmpl_id', 'in', [self.ids])]
         return action
 
-class OFKitProductProduct(models.Model):
+class ProductProduct(models.Model):
     _inherit = "product.product"
 
     kit_count = fields.Integer('# Kits', compute='_compute_kit_count')
@@ -214,7 +214,7 @@ class OFKitProductProduct(models.Model):
         for product in self:
             product.is_kit_comp = mapped_data.get(product.id, 0) > 0
 
-class OFKitProductKitLine(models.Model):
+class OfProductKitLine(models.Model):
     _name = "of.product.kit.line"
     _order = 'kit_id, sequence'
 
@@ -243,7 +243,7 @@ class OFKitProductKitLine(models.Model):
 
     @api.model
     def create(self, vals):
-        line = super(OFKitProductKitLine, self).create(vals)
+        line = super(OfProductKitLine, self).create(vals)
         line.kit_id.type = 'service'
         line.product_id._compute_is_kit_comp()
         #line.product_id._compute_kit_count()
@@ -254,7 +254,7 @@ class OFKitProductKitLine(models.Model):
         if len(self) == 1 and 'product_id' in vals:
             products = self.env["product.product"]
             products |= self.product_id
-        super(OFKitProductKitLine, self).write(vals)
+        super(OfProductKitLine, self).write(vals)
         if len(self) == 1 and 'product_id' in vals:
             products |= self.product_id
             products._compute_is_kit_comp()
@@ -267,10 +267,10 @@ class OFKitProductKitLine(models.Model):
         products = self.env['product.product']
         for kit_line in self:
             products |= kit_line.product_id
-        super(OFKitProductKitLine, self).unlink()
+        super(OfProductKitLine, self).unlink()
         products._compute_is_kit_comp()
 
-class OFKitProcurementOrder(models.Model):
+class ProcurementOrder(models.Model):
     _inherit = 'procurement.order'
 
     of_sale_comp_id = fields.Many2one('of.saleorder.kit.line', string='Sale Order Kit Component')
@@ -278,7 +278,7 @@ class OFKitProcurementOrder(models.Model):
     def _get_sale_order(self):
         # fonction définie dans of_purchase
         self.ensure_one()
-        sale_order = super(OFKitProcurementOrder, self)._get_sale_order()
+        sale_order = super(ProcurementOrder, self)._get_sale_order()
         if not sale_order:
             sale_comp = self.of_sale_comp_id
             if not sale_comp:
@@ -287,13 +287,13 @@ class OFKitProcurementOrder(models.Model):
             sale_order = sale_comp and sale_comp.order_id or False
         return sale_order
 
-class OFKitStockMove(models.Model):
+class StockMove(models.Model):
     _inherit = "stock.move"
 
     @api.multi
     def action_done(self):
         # Update delivered quantities on sale order lines that are not kits
-        result = super(OFKitStockMove, self).action_done()
+        result = super(StockMove, self).action_done()
         # Update delivered quantities on sale order line components
         sale_order_components = self.filtered(lambda move: move.product_id.expense_policy == 'no').mapped('procurement_id.of_sale_comp_id') # bug mal initialisé of_sale_comp_id?
         for comp in sale_order_components:
