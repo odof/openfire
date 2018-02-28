@@ -3,21 +3,12 @@
 from odoo import api, fields, models, _
 import odoo.addons.decimal_precision as dp
 
-class OFKitAccountInvoice(models.Model):
+class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
-    of_contains_kit = fields.Boolean(string='Contains a kit', compute='_compute_of_contains_kit')
-
+    of_contains_kit = fields.Boolean(string='Contains a kit', compute='_compute_of_contains_kit', search='_search_of_contains_kit')
     comp_ids = fields.One2many('of.invoice.kit.line', 'invoice_id', string='Components',
-                    help="Contains all kit components in this invoice that are not kits themselves.")
-
-    @api.multi
-    @api.depends('invoice_line_ids.product_id')
-    def _compute_of_contains_kit(self):
-        comp_obj = self.env['of.invoice.kit.line']
-        for invoice in self:
-            invoice.of_contains_kit = comp_obj.search([("invoice_id", "=", invoice.id)], count=True) > 0
-
+        help="Contains all kit components in this invoice that are not kits themselves.")
     of_kit_display_mode = fields.Selection([
         ('none', 'None'),
         ('collapse', 'Collapse'),
@@ -28,7 +19,37 @@ class OFKitAccountInvoice(models.Model):
             - Collapse: One line per kit, with minimal info\n\
             - Expand: One line per kit, plus one line per component")
 
-class OFKitAccountInvoiceLine(models.Model):
+    @api.multi
+    @api.depends('invoice_line_ids.product_id')
+    def _compute_of_contains_kit(self):
+        comp_obj = self.env['of.invoice.kit.line']
+        if self and isinstance(self[0].id, models.NewId):
+            # Le calcul se situe dans un appel onchange
+            # l'objet est donc unique, et il faut utiliser _origin au lieu de id
+            self.of_contains_kit = comp_obj.search([("invoice_id", "=", self._origin.id)], count=True) > 0
+        else:
+            for invoice in self:
+                invoice.of_contains_kit = comp_obj.search([("invoice_id", "=", invoice.id)], count=True) > 0
+
+    @api.model
+    def _search_of_contains_kit(self, operator, value):
+        invoices = self.env['account.invoice.line'].search([('of_is_kit', '=', True)]).mapped('invoice_id')
+        op = 'in' if (operator == '=') == value else 'not in'
+        return [('id', op, invoices.ids)]
+
+    @api.model
+    def _refund_cleanup_lines(self, lines):
+        # La création d'un avoir de facture implique la duplication de ses kits
+        kit_obj = self.env['of.invoice.kit']
+        result = super(AccountInvoice, self)._refund_cleanup_lines(lines)
+
+        if lines._name == 'account.invoice.line':
+            for vals in result:
+                if vals[2].get('kit_id'):
+                    vals[2]['kit_id'] = kit_obj.browse(vals[2]['kit_id']).copy().id
+        return result
+
+class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
     kit_id = fields.Many2one('of.invoice.kit', string="Components")
@@ -78,13 +99,13 @@ class OFKitAccountInvoiceLine(models.Model):
     @api.onchange('quantity', 'uom_id')
     def _onchange_uom_id(self):
         self.ensure_one()
-        super(OFKitAccountInvoiceLine, self)._onchange_uom_id()
+        super(AccountInvoiceLine, self)._onchange_uom_id()
         self._refresh_price_unit()
 
     @api.multi
     @api.onchange('product_id')
     def _onchange_product_id(self):
-        res = super(OFKitAccountInvoiceLine, self)._onchange_product_id()
+        res = super(AccountInvoiceLine, self)._onchange_product_id()
         new_vals = {}
         if self.kit_id:  # former product was a kit -> unlink it's kit_id
             self.kit_id.write({"to_unlink": True})
@@ -198,8 +219,8 @@ class OFKitAccountInvoiceLine(models.Model):
         if vals.get("invoice_kits_to_unlink"):
             self.env["of.invoice.kit"].search([("to_unlink", "=", True)]).unlink()
             vals.pop("invoice_kits_to_unlink")
-        line = super(OFKitAccountInvoiceLine, self).create(vals)
-        if line.of_is_kit and not from_so_line:  # 
+        line = super(AccountInvoiceLine, self).create(vals)
+        if line.of_is_kit and not from_so_line:
             account_kit_vals = {'invoice_line_id': line.id, 'name': line.name}
             line.kit_id.write(account_kit_vals)
             if line.of_pricing == 'computed':
@@ -222,7 +243,7 @@ class OFKitAccountInvoiceLine(models.Model):
             update_il_id = True
         if len(self) == 1 and ((self.of_pricing == 'computed' and not vals.get('of_pricing')) or vals.get('of_pricing') == 'computed'):
             vals['price_unit'] = vals.get('price_comps', self.price_comps)  # price_unit is equal to price_comps if pricing is computed
-        super(OFKitAccountInvoiceLine, self).write(vals)
+        super(AccountInvoiceLine, self).write(vals)
         if update_il_id:
             account_kit_vals = {'invoice_line_id': self.id}
             if vals.get("name"):
@@ -230,13 +251,21 @@ class OFKitAccountInvoiceLine(models.Model):
             self.kit_id.write(account_kit_vals)
         return True
 
-class OFAccountInvoiceKit(models.Model):
+    @api.multi
+    def copy_data(self, default=None):
+        # La duplication d'une ligne de commande implique la duplication de son kit
+        res = super(AccountInvoiceLine, self).copy_data(default)
+        if res[0].get('kit_id'):
+            res[0]['kit_id'] = self.kit_id.copy().id
+        return res
+
+class OfAccountInvoiceKit(models.Model):
     _name = 'of.invoice.kit'
 
     invoice_line_id = fields.Many2one("account.invoice.line", string="Invoice line", ondelete="cascade")
 
     name = fields.Char(string='Name', required=True, default="draft invoice kit")
-    kit_line_ids = fields.One2many('of.invoice.kit.line', 'kit_id', string="Components")
+    kit_line_ids = fields.One2many('of.invoice.kit.line', 'kit_id', string="Components", copy=True)
 
     qty_invoice_line = fields.Float(string="Invoice Line Qty", related="invoice_line_id.quantity", readonly=True)
     currency_id = fields.Many2one(related='invoice_line_id.currency_id', store=True, string='Currency', readonly=True)
@@ -276,7 +305,7 @@ class OFAccountInvoiceKit(models.Model):
             not_linked -= kit.kit_id
         not_linked.unlink()
 
-class OFAccountInvoiceKitLine(models.Model):
+class OfAccountInvoiceKitLine(models.Model):
     _name = 'of.invoice.kit.line'
     _order = "kit_id, sequence"
 
@@ -293,9 +322,9 @@ class OFAccountInvoiceKitLine(models.Model):
     product_uom_id = fields.Many2one('product.uom', string='UoM', required=True)
     price_unit = fields.Monetary('Unit Price', digits=dp.get_precision('Product Price'), required=True,default=0.0, oldname="unit_price")
     cost_unit = fields.Monetary('Unit Cost', digits=dp.get_precision('Product Price'))
-    cost_total = fields.Monetary(string='Subtotal Cost', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices', 
+    cost_total = fields.Monetary(string='Subtotal Cost', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
                             help="Cost of this component total quantity. Equal to total quantity * unit cost.")
-    cost_per_kit = fields.Monetary(string='Cost/Kit', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices', 
+    cost_per_kit = fields.Monetary(string='Cost/Kit', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
                             help="Cost of this component quantity necessary to make one unit of its invoice line kit. Equal to quantity per kit unit * unit cost.")
 
     qty_per_kit = fields.Float(string='Qty / Kit', digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0,
@@ -303,12 +332,12 @@ class OFAccountInvoiceKitLine(models.Model):
                         example: 2 kit K1 -> 3 prod P. \nP.qty_per_kit = 3\nP.qty_total = 6")
 
     nb_kits = fields.Float(string='Number of kits', related='kit_id.qty_invoice_line', readonly=True)
-    qty_total = fields.Float(string='Total Qty', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_qty_total', 
+    qty_total = fields.Float(string='Total Qty', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_qty_total',
                                    help='total quantity equal to quantity per kit times number of kits.')
     #display_qty_changed = fields.Boolean(string="display qty changed message", default=False)
-    price_total = fields.Monetary(string='Subtotal Price', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices', 
+    price_total = fields.Monetary(string='Subtotal Price', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
                             help="Price of this component total quantity. Equal to total quantity * unit price.")
-    price_per_kit = fields.Monetary(string='Price/Kit', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices', 
+    price_per_kit = fields.Monetary(string='Price/Kit', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
                             help="Price of this component quantity necessary to make one unit of its invoice line kit. Equal to quantity per kit unit * unit price.")
     kit_pricing = fields.Selection(related="kit_id.of_pricing", readonly=True)
     hide_prices = fields.Boolean(string="Hide prices", default=False)
@@ -349,4 +378,4 @@ class OFAccountInvoiceKitLine(models.Model):
     @api.depends('qty_per_kit', 'nb_kits')
     def _compute_qty_total(self):
         for comp in self:
-            comp.qty_total = comp.qty_per_kit * comp.nb_kits 
+            comp.qty_total = comp.qty_per_kit * comp.nb_kits
