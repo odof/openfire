@@ -14,6 +14,7 @@ class OfProductBrand(models.Model):
     product_count = fields.Integer(
         '# Products', compute='_compute_product_count',
         help="The number of products of this brand")
+    note = fields.Text(string='Notes')
 
     def _compute_product_count(self):
         read_group_res = self.env['product.template'].read_group([('brand_id', 'in', self.ids)], ['brand_id'], ['brand_id'])

@@ -14,35 +14,72 @@
 
 Cette action irréversible recalculera la catégorie, le prix d'achat et le prix de vente de tous les articles de cette marque."/>
             </xpath>
+            <xpath expr="//field[@name='note']" position="replace"/>
             <xpath expr="//sheet" position="inside">
-                <group name="import_config">
-                    <separator string="Paramètres d'import par défaut" colspan="2"/>
-                    <field name="of_import_categ_id"/>
-                    <field name="of_import_remise"/>
-                    <field name="of_import_price"/>
-                    <field name="of_import_cout"/>
-                    <separator string="Correspondance des catégories d'articles" colspan="2"/>
-                    <field name="categ_ids" nolabel="1" colspan="2">
-                        <tree editable="bottom">
-                            <field name="categ_origin"/>
+                <notebook>
+                    <page name="import_config" string="Paramétrage">
+                        <group name="import_config">
+                            <separator string="Paramètres d'import par défaut" colspan="2"/>
                             <field name="of_import_categ_id"/>
                             <field name="of_import_remise"/>
                             <field name="of_import_price"/>
                             <field name="of_import_cout"/>
-                        </tree>
-                    </field>
-                    <separator string="Articles ayant des règles spécifiques" colspan="2"/>
-                    <field name="product_config_ids" widget="many2many" nolabel="1" colspan="2">
-                        <tree editable="bottom">
-                            <field name="default_code" readonly="1"/>
-                            <field name="name" readonly="1"/>
-                            <field name="of_import_categ_id"/>
-                            <field name="of_import_remise"/>
-                            <field name="of_import_price"/>
-                            <field name="of_import_cout"/>
-                        </tree>
-                    </field>
-                </group>
+                            <separator string="Correspondance des catégories d'articles" colspan="2"/>
+                            <field name="categ_ids" nolabel="1" colspan="2">
+                                <tree editable="bottom">
+                                    <field name="categ_origin"/>
+                                    <field name="of_import_categ_id"/>
+                                    <field name="of_import_remise"/>
+                                    <field name="of_import_price"/>
+                                    <field name="of_import_cout"/>
+                                </tree>
+                            </field>
+                            <separator string="Articles ayant des règles spécifiques" colspan="2"/>
+                            <field name="product_config_ids" widget="many2many" nolabel="1" colspan="2">
+                                <tree editable="bottom">
+                                    <field name="default_code" readonly="1"/>
+                                    <field name="name" readonly="1"/>
+                                    <field name="of_import_categ_id"/>
+                                    <field name="of_import_remise"/>
+                                    <field name="of_import_price"/>
+                                    <field name="of_import_cout"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </page>
+                    <page name="notes" string="Notes">
+                        <field name="note"/>
+                    </page>
+                    <page name="aide" string="Aide">
+                        <group>
+                            <group>
+                                <div>
+                                    <p>Le module des marques permet de traiter les données reçues du fournisseur pour intégration sur votre base.</p>
+                                    <p>Les champs de <b>remise</b>, <b>prix de vente HT</b> et <b>prix de revient</b> acceptent des expressions python.</p>
+                                    <p>Les éléments spécifiques suivants sont reconnus dans les expressions (en plus des fonctions standard python):</p>
+                                    <ul>
+                                        <li><b>ppht</b>: Le prix public hors taxe, fourni par le fournisseur.</li>
+                                        <li><b>pa</b>: Le prix d'achat</li>
+                                        <li><b>cumul()</b> est une fonction qui sert à cumuler plusieurs remises. cumul(40.5,5) cumule une remise de 40.5% et une remise de 5% pour un total de 43.475% (Attention à la distinction entre point et virgule)</li>
+                                    </ul>
+                                    <p>La remise est un champ optionnel qui peut donc être laissé vide, si par exemple vous importez votre propre tarif, avec un prix d'achat renseigné.</p>
+                                </div>
+                            </group>
+                            <group>
+                                <div>
+                                    <p>Exemples:</p>
+                                    <ul>
+                                        <li><b>40.5</b>: Utiliser une remise de 40.5%.</li>
+                                        <li><b>cumul(40.5,5)</b>: Utiliser deux remises, une de 40.5% plus une de 5%.</li>
+                                        <li><b>pa + 20</b>: Ajouter de 20€ de frais annexes au prix de revient de l'article.</li>
+                                        <li><b>(ppht + 20) * 1.15</b>: Vente de l'article au prix public + 20€ de frais annexes, le tout réhaussé de 15%.</li>
+                                        <li><b>ppht if ppht &lt; 1000 else round(ppht * 1.2)</b>: Vente de l'article au prix public si inférieur à 1000€, sinon au prix public réhaussé de 20% et arrondi à l'euro plein.</li>
+                                    </ul>
+                                </div>
+                            </group>
+                        </group>
+                    </page>
+                </notebook>
             </xpath>
         </field>
     </record>

@@ -81,6 +81,8 @@
                     <group>
                         <field name="prefix" placeholder="OPE"/>
                         <field name="partner_id"/>
+                        <label for="note" colspan="2"/>
+                        <field name="note" colspan="2" nolabel="1"/>
                     </group>
                 </sheet>
             </form>
