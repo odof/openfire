@@ -12,7 +12,7 @@ from odoo import api, fields, models
 from odoo.tools.translate import _
 from odoo.tools.safe_eval import safe_eval
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 try:
     from cStringIO import StringIO
@@ -73,7 +73,7 @@ La remise est appliquée sur le prix public pour calculer le prix d'achat.
 
 Exemples :
  rc : Utiliser la remise conseillée
- 40 : Forcer une remise de 40%
+ 40.5 : Forcer une remise de 40,5% (Attention, utiliser un . et non pas une virgule!)
  cumul(10,5) : Appliquer la remise conseillée, puis une remise de 10%, puis une remise de 5%
  cumul(14.5) : Équivalent à la ligne précedente, une remise de 10% puis 5% fait 14.5% au total
 """)
@@ -85,6 +85,42 @@ Exemples :
  pa * 1.05 + 20 : Prix d'achat augmenté de 5% puis augmenté de 20€
 """)
     of_import_categ_id = fields.Many2one('product.category', string=u"Catégorie")
+
+    @api.constrains('of_import_price', 'of_import_remise', 'of_import_cout')
+    def _check_description(self):
+        """
+        Fonction de vérification de la validité des formules saisies.
+        Une formule, si renseignée, ne peut pas être constituée uniquement d'espaces blancs.
+        Une formule doit être évaluable sans erreur, avec les variables fournies dans eval_dict.
+        Une formule, si renseignée, doit retourner une valeur de type numérique (entier ou flottant).
+        """
+        # Jeu de valeurs pour tester la validité des formules saisies
+        eval_dict = {
+            'ppht' : 100,
+            'cumul': self.env['of.product.brand'].compute_remise,
+            'pa'   : 50,
+        }
+
+        for record in self:
+            for field in (
+                'of_import_price',
+                'of_import_remise',
+                'of_import_cout',
+            ):
+                code = record[field]
+                if not code:
+                    continue
+                if not code.strip():
+                    raise ValidationError(u"Une formule ne doit pas être constituée uniquement d'espaces.\n\n"
+                                          u"Vous devez vider le champ, ou le renseigner avec une formule correcte s'il est obligatoire : (champ \"%s\", formule \"%s\")" % (self._fields[field].string, code))
+                try:
+                    value = safe_eval(code, eval_dict)
+                except Exception, e:
+                    raise ValidationError(u"Une erreur s'est produite à la validation de la formule : (champ \"%s\", formule \"%s\")\n\n"
+                                          u"Erreur :\n%s" % (self._fields[field].string, code, e))
+                if value and not isinstance(value, (int, long, float)):
+                    raise ValidationError(u"Le format de retour de la fonction n'est pas celui attendu : (champ \"%s\", formule \"%s\")\n\n"
+                                          u"Cette erreur peut se produire si vous avez utilisé une virgule au lieu d'un point comme séparateur de décimales." % (self._fields[field].string, code))
 
     @api.model
     def get_config_field_list(self):
