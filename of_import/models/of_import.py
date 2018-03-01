@@ -691,6 +691,7 @@ class OfImport(models.Model):
                 raise OfImportError(erreur_msg[0])
         model = self.type_import
         model_obj = self.env[model_data['model']].with_context(from_import=True)
+        product_categ_config_obj = self.env['of.import.product.categ.config']
 
         # res_objet correspond à l'élément déjà existant en base de données, le cas échéant
         # cette variable sera renseignée à l'import du champ primaire de l'objet
@@ -788,6 +789,11 @@ class OfImport(models.Model):
                             brand = valeurs.get('brand_id') and self.env['of.product.brand'].browse(valeurs['brand_id'])
                             if res_objet and not brand:
                                 brand = res_objet.brand_id
+
+                            if brand and simuler:
+                                # Lors d'une simulation, les catégories manquantes sont ajoutées à la configuration de la marque
+                                if not product_categ_config_obj.search([('brand_id', '=', brand.id), ('categ_origin', '=', ligne[champ_fichier])]):
+                                    product_categ_config_obj.create({'brand_id': brand.id, 'categ_origin': ligne[champ_fichier]})
 
                             categ = brand and brand.compute_product_categ(ligne[champ_fichier], product=res_objet)
 
@@ -1056,6 +1062,11 @@ class OfImport(models.Model):
                         break
                 else:
                     sortie_erreur += u"Un préfixe doit être choisi pour l'import, ou une colonne du fichier doit définir la marque des articles\n"
+
+            # L'import de tarif est susceptible d'ajouter des lignes de configuration dans les marques.
+            # On sauvegarde l'état actuel pour récupérer les lignes nouvellement créées
+            product_categ_config_obj = self.env['of.import.product.categ.config']
+            product_categ_config_ids = product_categ_config_obj.search([]).ids
         else:
             # Définition de l'ordre de lecture des champs. La marque doit être lue en premier
             champs_fichier = sorted(champs_fichier,
@@ -1130,7 +1141,12 @@ class OfImport(models.Model):
                 break
 
             if (nb_total + 1) % frequence_commit == 0:
-                self.write({'nb_total': nb_total, 'nb_ajout': nb_ajout, 'nb_maj': nb_maj, 'nb_echoue': nb_echoue, 'sortie_succes': sortie_succes, 'sortie_avertissement': sortie_avertissement, 'sortie_erreur': sortie_erreur})
+                sortie_avert = sortie_avertissement
+                if model == 'product.template':
+                    product_categ_configs = product_categ_config_obj.search([('id', 'not in', product_categ_config_ids)], order='brand_id, categ_origin')
+                    if product_categ_configs:
+                        sortie_avert = "\n".join([u"Marque %s : Ajout de la configuration pour la catégorie \"%s\"" % (config.brand_id.name, config.categ_origin) for config in product_categ_configs]) + "\n\n" + sortie_avert
+                self.write({'nb_total': nb_total, 'nb_ajout': nb_ajout, 'nb_maj': nb_maj, 'nb_echoue': nb_echoue, 'sortie_succes': sortie_succes, 'sortie_avertissement': sortie_avert, 'sortie_erreur': sortie_erreur})
 
             i = i + 1
             nb_total += 1
@@ -1162,7 +1178,12 @@ class OfImport(models.Model):
                 sortie_avertissement += u"%s réf. %s existe en %s exemplaires dans le fichier d'import (lignes %s). Seule la première ligne est importée.\n" % (model_data['nom_objet'].capitalize(), cle, doublons[cle][0], doublons[cle][1])
 
         # On enregistre les dernières lignes qui ne l'auraient pas été.
-        self.write({'nb_total': nb_total, 'nb_ajout': nb_ajout, 'nb_maj': nb_maj, 'nb_echoue': nb_echoue, 'sortie_succes': sortie_succes, 'sortie_avertissement': sortie_avertissement, 'sortie_erreur': sortie_erreur, 'date_debut_import' : date_debut, 'date_fin_import' : time.strftime('%Y-%m-%d %H:%M:%S')})
+        sortie_avert = sortie_avertissement
+        if model == 'product.template':
+            product_categ_configs = product_categ_config_obj.search([('id', 'not in', product_categ_config_ids)], order='brand_id, categ_origin')
+            if product_categ_configs:
+                sortie_avert = "\n".join([u"Marque %s : Ajout de la configuration pour la catégorie \"%s\"" % (config.brand_id.name, config.categ_origin) for config in product_categ_configs]) + "\n\n" + sortie_avert
+        self.write({'nb_total': nb_total, 'nb_ajout': nb_ajout, 'nb_maj': nb_maj, 'nb_echoue': nb_echoue, 'sortie_succes': sortie_succes, 'sortie_avertissement': sortie_avert, 'sortie_erreur': sortie_erreur, 'date_debut_import' : date_debut, 'date_fin_import' : time.strftime('%Y-%m-%d %H:%M:%S')})
 
         if not simuler:
             self.write({'state': 'importe'})
