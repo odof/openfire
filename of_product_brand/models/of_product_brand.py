@@ -8,7 +8,8 @@ class OfProductBrand(models.Model):
     name = fields.Char(string='Name', required=True)
     prefix = fields.Char(string='Prefix', required=True)
     partner_id = fields.Many2one('res.partner', string='Supplier', domain=[('supplier', '=', True)], required=True)
-    product_ids = fields.One2many('product.product', 'brand_id', string='Products', readonly=True)
+    product_ids = fields.One2many('product.template', 'brand_id', string='Products', readonly=True)
+    product_variant_ids = fields.One2many('product.product', 'brand_id', string='Product variants', readonly=True)
     active = fields.Boolean(string='Active', default=True)
     logo = fields.Binary(string='Logo')
     product_count = fields.Integer(
@@ -40,13 +41,13 @@ class OfProductBrand(models.Model):
             if 'prefix' in vals:
                 # Reset products link to this brand
                 new_products = new_self.env['product.product'].search([('default_code', '=like', vals['prefix'] + r'\_%')])
-                vals['product_ids'] = [(6, 0, list(new_products._ids))]
+                vals['product_variant_ids'] = [(6, 0, list(new_products._ids))]
         return super(OfProductBrand, self).write(vals)
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    brand_id = fields.Many2one(string='Brand', related='product_variant_ids.brand_id', store=True, required=True)
+    brand_id = fields.Many2one('of.product.brand', string='Brand', required=True)
 
     @api.onchange('brand_id')
     def _onchange_brand_id(self):
@@ -95,7 +96,7 @@ class ProductTemplate(models.Model):
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
-    brand_id = fields.Many2one('of.product.brand', string='Brand', required=True)
+    brand_id = fields.Many2one('of.product.brand', string='Brand', related='product_tmpl_id.brand_id', store=True, required=True)
     # @todo: Make it work with variants
 
 class Partner(models.Model):
