@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_import_update_product_brand_products_form_view" model="ir.ui.view">
+        <field name="name">of.import.update.product.brand.products.form.view</field>
+        <field name="model">of.import.update.product.brand.products</field>
+        <field name="arch" type="xml">
+            <form string="Add products to brand">
+                <sheet>
+                    <field name="brand_id" invisible="1"/>
+                    <div>
+                        <p>Attention ! Cette action irréversible recalculera la catégorie, le prix d'achat et le prix de vente de tous les articles de cette marque.</p>
+                        <p>Cette opération peut prendre un certain temps, en fonction du nombre d'articles concernés.</p>
+                        <p>Si vous ne voulez mettre à jour que certains articles de la marque, veuillez les sélectionner dans la liste ci-dessous :</p>
+                    </div>
+                    <field name="product_ids">
+                        <tree>
+                            <field name="default_code"/>
+                            <field name="name"/>
+                        </tree>
+                    </field>
+                </sheet>
+                <footer>
+                    <button name="update_products" type="object" string="Mettre à jour" class="btn-primary"/>
+                    <button string="Annuler" class="btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_of_import_update_product_brand_products" model="ir.actions.act_window">
+        <field name="name">Appliquer les règles de la marque</field>
+        <field name="res_model">of.import.update.product.brand.products</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_import_update_product_brand_products_form_view"/>
+        <field name="context">{'default_brand_id': active_id}</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

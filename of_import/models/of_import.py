@@ -138,10 +138,25 @@ class OfImportProductCategConfig(models.Model):
 
     brand_id = fields.Many2one('of.product.brand', required=True)
     categ_origin = fields.Char(string=u"Catégorie d'origine", required=True)
+    product_ids = fields.One2many('product.template', string="Articles", compute="_compute_product_ids")
+
+    @api.depends('categ_origin', 'brand_id.product_ids', 'brand_id.product_ids.of_seller_product_category_name')
+    def _compute_product_ids(self):
+        product_obj = self.env['product.template']
+        for categ in self:
+            categ.product_ids = product_obj.search([('brand_id', '=', categ.brand_id.id), ('seller_ids.of_product_category_name', '=', categ.categ_origin)])
 
     _sql_constraints = [
         ('categ_origin_uniq', 'unique(brand_id, categ_origin)', u"Une catégorie de produits ne peut être renseignée qu'une fois"),
     ]
+
+    @api.multi
+    def action_update_products(self):
+        """
+        Recalcule les champs des articles en fonction de la configuration de la marque
+        et des paramètres d'import de l'article (dans product_supplierinfo)
+        """
+        self.mapped('product_ids').of_action_update_from_brand()
 
 class OFProductBrand(models.Model):
     _name = 'of.product.brand'
@@ -297,24 +312,33 @@ class OFProductBrand(models.Model):
         Recalcule les champs de l'article en fonction de la configuration de la marque
         et des paramètres d'import de l'article (dans product_supplierinfo)
         """
-        # On prétend venir d'un import afin de lancer la propagation du coût sur les différentes sociétés
-        self = self.with_context(from_import=True)
-        for brand in self:
-            supplier = brand.partner_id
-            for product in brand.product_ids:
-                for seller in product.seller_ids:
-                    if seller.name == supplier:
-                        values = self.compute_product_values(seller.pp_ht,
-                                                             seller.of_product_category_name,
-                                                             product)
-                        values = {key: val for key, val in values.iteritems() if product[key] != val}
-                        if values:
-                            product.write(values)
-                        break
+        self.mapped('product_ids').of_action_update_from_brand()
 
 class ProductTemplate(models.Model):
     _name = 'product.template'
     _inherit = ('product.template', 'of.import.product.config.template')
+
+    @api.multi
+    def of_action_update_from_brand(self):
+        """
+        Recalcule les champs de l'article en fonction de la configuration de la marque
+        et des paramètres d'import de l'article (dans product_supplierinfo)
+        """
+        # On prétend venir d'un import afin de lancer la propagation du coût sur les différentes sociétés
+        self = self.with_context(from_import=True)
+        for product in self:
+            supplier = product.brand_id.partner_id
+            for seller in product.seller_ids:
+                if seller.name == supplier:
+                    values = product.brand_id.compute_product_values(
+                        seller.pp_ht,
+                        seller.of_product_category_name,
+                        product
+                    )
+                    values = {key: val for key, val in values.iteritems() if self._fields[key].convert_to_write(product[key], product) != val}
+                    if values:
+                        product.write(values)
+                    break
 
 class ProductProduct(models.Model):
     _inherit = 'product.product'

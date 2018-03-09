@@ -45,6 +45,7 @@ contenir une colonne renseignant soit le prix d'achat ('of_seller_price'), soit 
     "demo_xml" : [],
     'data': [
         'security/ir.model.access.csv',
+        'wizards/of_import_update_product_brand_products.xml',
         'views/of_import_view.xml',
     ],
     "installable": True,

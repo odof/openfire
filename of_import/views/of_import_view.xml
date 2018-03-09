@@ -9,10 +9,7 @@
         <field name="inherit_id" ref="of_product_brand.of_product_brand_view_form" />
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="action_update_products" type="object" string="Appliquer  les règles"
-                        confirm="Attention !
-
-Cette action irréversible recalculera la catégorie, le prix d'achat et le prix de vente de tous les articles de cette marque."/>
+                <button name="%(action_of_import_update_product_brand_products)d" type="action" string="Appliquer les règles"/>
             </xpath>
             <xpath expr="//field[@name='note']" position="replace"/>
             <xpath expr="//sheet" position="inside">
@@ -32,6 +29,9 @@ Cette action irréversible recalculera la catégorie, le prix d'achat et le prix
                                     <field name="of_import_remise"/>
                                     <field name="of_import_price"/>
                                     <field name="of_import_cout"/>
+                                    <field name="product_ids"/>
+                                    <button name="action_update_products" type="object" string="Mettre à jour" icon="fa-cogs" confirm="Attention !
+Cette action irréversible recalculera la catégorie, le prix d'achat et le prix de vente de tous les articles de cette catégorie."/>
                                 </tree>
                             </field>
                             <separator string="Articles ayant des règles spécifiques" colspan="2"/>
@@ -43,6 +43,8 @@ Cette action irréversible recalculera la catégorie, le prix d'achat et le prix
                                     <field name="of_import_remise"/>
                                     <field name="of_import_price"/>
                                     <field name="of_import_cout"/>
+                                    <button name="of_action_update_from_brand" type="object" string="Mettre à jour" icon="fa-cogs" confirm="Attention !
+Cette action irréversible recalculera la catégorie, le prix d'achat et le prix de vente de l'article."/>
                                 </tree>
                             </field>
                         </group>
