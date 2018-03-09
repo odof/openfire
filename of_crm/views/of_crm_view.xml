@@ -575,6 +575,7 @@
                     <field name="of_projet_line_ids" string="Projet"/>
                     <!-- on utilise le champ 'name' car il nous fallait un champ texte -->
                     <field name="name" string="Marque" filter_domain="[('of_projet_line_ids','ilike','Marque:'+self)]"/>
+                    <field name="company_id"/>
                 </field>
             </field>
         </record>
