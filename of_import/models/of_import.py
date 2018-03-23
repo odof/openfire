@@ -221,24 +221,6 @@ class OFProductBrand(models.Model):
         if categ_config and categ_config.of_import_categ_id:
             return categ_config.of_import_categ_id
 
-        # Vérification si la catégorie par défaut pour cette marque correspond au nom de catégorie fourni
-        if self.of_import_categ_id.name == categ_name:
-            return self.of_import_categ_id
-
-        # Si une catégorie existante porte le même nom que la catégorie fournisseur, on l'utilise
-        categ = self.env['product.category'].search([('name', '=', categ_name)])
-        if categ:
-            if len(categ) == 1:
-                return categ
-            else:
-                # Plusieurs catégories existantes correspondent, on ne sait pas laquelle choisir
-                #  et la catégorie par défaut pour la marque ne correspond pas
-
-                # @todo: Faut-il utiliser la marque par défaut quand-même?
-                # Note: le return False provoque un recalcul dans l'import d'article, qui génère un message
-                #   d'erreur adapté à la détection de plusieurs valeurs pour un many2one
-                return False
-
         # Enfin, dernière solution, retour de la catégorie par défaut pour la marque
         return self.of_import_categ_id
 
@@ -715,6 +697,7 @@ class OfImport(models.Model):
                 raise OfImportError(erreur_msg[0])
         model = self.type_import
         model_obj = self.env[model_data['model']].with_context(from_import=True)
+        product_categ_obj = self.env['product.category']
         product_categ_config_obj = self.env['of.import.product.categ.config']
 
         # res_objet correspond à l'élément déjà existant en base de données, le cas échéant
@@ -817,7 +800,12 @@ class OfImport(models.Model):
                             if brand and simuler:
                                 # Lors d'une simulation, les catégories manquantes sont ajoutées à la configuration de la marque
                                 if not product_categ_config_obj.search([('brand_id', '=', brand.id), ('categ_origin', '=', ligne[champ_fichier])]):
-                                    product_categ_config_obj.create({'brand_id': brand.id, 'categ_origin': ligne[champ_fichier]})
+                                    categ = product_categ_obj.search([('name', '=', ligne[champ_fichier])])
+                                    product_categ_config_obj.create({
+                                        'brand_id': brand.id,
+                                        'categ_origin': ligne[champ_fichier],
+                                        'of_import_categ_id': categ and len(categ) == 1 and categ.id or False,
+                                    })
 
                             categ = brand and brand.compute_product_categ(ligne[champ_fichier], product=res_objet)
 
@@ -1206,7 +1194,7 @@ class OfImport(models.Model):
         if model == 'product.template':
             product_categ_configs = product_categ_config_obj.search([('id', 'not in', product_categ_config_ids)], order='brand_id, categ_origin')
             if product_categ_configs:
-                sortie_avert = "\n".join([u"Marque %s : Ajout de la configuration pour la catégorie \"%s\"" % (config.brand_id.name, config.categ_origin) for config in product_categ_configs]) + "\n\n" + sortie_avert
+                sortie_avert = "\n".join([u"Marque %s : Ajout de la configuration pour la catégorie \"%s\" (%s correspondance)" % (config.brand_id.name, config.categ_origin, config.of_import_categ_id and 'avec' or 'sans') for config in product_categ_configs]) + "\n\n" + sortie_avert
         self.write({'nb_total': nb_total, 'nb_ajout': nb_ajout, 'nb_maj': nb_maj, 'nb_echoue': nb_echoue, 'sortie_succes': sortie_succes, 'sortie_avertissement': sortie_avert, 'sortie_erreur': sortie_erreur, 'date_debut_import' : date_debut, 'date_fin_import' : time.strftime('%Y-%m-%d %H:%M:%S')})
 
         if not simuler:
