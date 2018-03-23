@@ -47,12 +47,10 @@ msgstr "<i style=\"font-size: small\">La quantité affichée des composant de ki
 #. module: of_kit
 #: model:ir.ui.view,arch_db:of_kit.of_account_invoice_kit_line_view_form
 #: model:ir.ui.view,arch_db:of_kit.of_account_invoice_kit_view_form
-#: model:ir.ui.view,arch_db:of_kit.of_kit_view_invoice_form
 msgid "<i>Components prices are only informational when the invoice line pricing is set to 'fixed'. Only the invoice line unit price matters in that case.</i>"
 msgstr "<i>Les prix des composants sont seulement à titre informatif si la tarification de leur kit est fixée. Seul le prix unitaire de la ligne de facture compte dans ce cas.</i>"
 
 #. module: of_kit
-#: model:ir.ui.view,arch_db:of_kit.of_kit_view_order_form
 #: model:ir.ui.view,arch_db:of_kit.of_sale_order_kit_line_view_form
 #: model:ir.ui.view,arch_db:of_kit.of_sale_order_kit_view_form
 msgid "<i>Components prices are only informational when the sale order line pricing is set to 'fixed'. Only the saleorder line unit price matters in that case.</i>"

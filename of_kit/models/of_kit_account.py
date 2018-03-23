@@ -6,7 +6,7 @@ import odoo.addons.decimal_precision as dp
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
-    of_contains_kit = fields.Boolean(string='Contains a kit', compute='_compute_of_contains_kit')
+    of_contains_kit = fields.Boolean(string='Contains a kit', compute='_compute_of_contains_kit', search='_search_of_contains_kit')
     comp_ids = fields.One2many('of.invoice.kit.line', 'invoice_id', string='Components',
         help="Contains all kit components in this invoice that are not kits themselves.")
     of_kit_display_mode = fields.Selection([
@@ -30,6 +30,12 @@ class AccountInvoice(models.Model):
         else:
             for invoice in self:
                 invoice.of_contains_kit = comp_obj.search([("invoice_id", "=", invoice.id)], count=True) > 0
+
+    @api.model
+    def _search_of_contains_kit(self, operator, value):
+        invoices = self.env['account.invoice.line'].search([('of_is_kit', '=', True)]).mapped('invoice_id')
+        op = 'in' if (operator == '=') == value else 'not in'
+        return [('id', op, invoices.ids)]
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
@@ -233,13 +239,21 @@ class AccountInvoiceLine(models.Model):
             self.kit_id.write(account_kit_vals)
         return True
 
+    @api.multi
+    def copy_data(self, default=None):
+        # La duplication d'une ligne de commande implique la duplication de son kit
+        res = super(AccountInvoiceLine, self).copy_data(default)
+        if res[0].get('kit_id'):
+            res[0]['kit_id'] = self.kit_id.copy().id
+        return res
+
 class OfAccountInvoiceKit(models.Model):
     _name = 'of.invoice.kit'
 
     invoice_line_id = fields.Many2one("account.invoice.line", string="Invoice line", ondelete="cascade")
 
     name = fields.Char(string='Name', required=True, default="draft invoice kit")
-    kit_line_ids = fields.One2many('of.invoice.kit.line', 'kit_id', string="Components")
+    kit_line_ids = fields.One2many('of.invoice.kit.line', 'kit_id', string="Components", copy=True)
 
     qty_invoice_line = fields.Float(string="Invoice Line Qty", related="invoice_line_id.quantity", readonly=True)
     currency_id = fields.Many2one(related='invoice_line_id.currency_id', store=True, string='Currency', readonly=True)

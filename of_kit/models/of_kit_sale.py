@@ -14,9 +14,6 @@ class SaleOrder(models.Model):
     # Un champ classique pour faciliter l'édition
     comp_ids = fields.One2many('of.saleorder.kit.line', 'order_id', string='Components',
         help="Contains all kit components in this sale order.")
-#     # Un champ compute pour l'affichage, qui se recalcule automatiquement
-#     comp_ids = fields.One2many('of.saleorder.kit.line', string='Components', compute="_compute_comp_ids",
-#                     help="Contains all kit components in this sale order.")
     of_contains_kit = fields.Boolean(string='Contains a kit', compute='_compute_of_contains_kit', search='_search_of_contains_kit')
     of_kit_display_mode = fields.Selection([
         ('none', 'None'),
@@ -32,19 +29,6 @@ class SaleOrder(models.Model):
     implementation future -> ajouter les composants d'un kit en tant que lignes de commandes
     of_inser_nom = fields.Many2one('product.template', string="Insert Kit lines",
                         help="select a kit to add its components as sale order lines.")"""
-
-#     @api.depends('order_line','order_line.kit_id')
-#     def _compute_comp_ids(self):
-#         for order in self:
-#             comp_ids = []
-#             for line in self.order_line:
-#                 if line.kit_id:
-#                     comp_ids += line.kit_id.kit_line_ids._ids
-#             order.comp_ids = comp_ids
-
-#     @api.model
-#     def _search_comp_ids(self, operator, value):
-#         return [('order_line.kit_id.kit_line_ids', operator, value)]
 
     @api.multi
     @api.depends('order_line.product_id')
@@ -88,7 +72,7 @@ class SaleOrder(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    kit_id = fields.Many2one('of.saleorder.kit', string="Components")
+    kit_id = fields.Many2one('of.saleorder.kit', string="Components", copy=True)
     of_is_kit = fields.Boolean(string='Is a kit')
 
     price_comps = fields.Monetary('Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
@@ -390,13 +374,21 @@ class SaleOrderLine(models.Model):
             self.kit_id.write(sale_kit_vals)
         return True
 
+    @api.multi
+    def copy_data(self, default=None):
+        # La duplication d'une ligne de commande implique la duplication de son kit
+        res = super(SaleOrderLine, self).copy_data(default)
+        if res[0].get('kit_id'):
+            res[0]['kit_id'] = self.kit_id.copy().id
+        return res
+
 class OfSaleOrderKit(models.Model):
     _name = 'of.saleorder.kit'
 
     order_line_id = fields.Many2one("sale.order.line", string="Order line", ondelete="cascade")
 
     name = fields.Char(string='Name', required=True, default="draft saleorder kit")
-    kit_line_ids = fields.One2many('of.saleorder.kit.line', 'kit_id', string="Components")
+    kit_line_ids = fields.One2many('of.saleorder.kit.line', 'kit_id', string="Components", copy=True)
 
     qty_order_line = fields.Float(string="Order Line Qty", related="order_line_id.product_uom_qty", readonly=True)
     currency_id = fields.Many2one(related='order_line_id.currency_id', store=True, string='Currency', readonly=True)
