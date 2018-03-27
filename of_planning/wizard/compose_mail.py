@@ -13,6 +13,7 @@ class OfComposeMail(models.TransientModel):
                 'interventions': [o],
                 'partner'      : o.part_id or False,
                 'address'      : o.address_id or False,
+                'address_pose' : o.address_id or False,
                 'shop'         : o.company_id,
                 # order_id et invoice_id ne seront définis que dans of_sales, mais getattr gère l'exception si le module n'est pas installé
                 'order'        : getattr(o, 'order_id', False),
@@ -20,7 +21,7 @@ class OfComposeMail(models.TransientModel):
             })
         else:
             # interventions_liees ne sera défini que dans of_sales, mais getattr gère l'exception si le module n'est pas installé
-            result['interventions'] = getattr(o, 'interventions_liees', [])
+            result['interventions'] = getattr(o, 'intervention_ids', [])
         return result
 
     @api.model
@@ -39,7 +40,8 @@ class OfComposeMail(models.TransientModel):
             d_interv = fields.Datetime.from_string(intervention.date)
             d_interv = fields.Datetime.context_timestamp(self, d_interv)
 
-            dates.append(d_interv.strftime("%d/%m/%Y à %H:%M"))
+            # La fonction date.strftime ne gère pas correctement les chaînes unicode, on ne peut donc pas faire strftime(u"%d/%m/%Y à %H:%M")
+            dates.append(d_interv.strftime("%d/%m/%Y à %H:%M").decode('utf-8'))
 
         tache_product_ttc = ''
         duree = ''
@@ -51,13 +53,11 @@ class OfComposeMail(models.TransientModel):
             duree = "%02d:%02d" % (h, m)
 
             if intervention.tache_id.product_id:
-                tache_product_ht = intervention.tache_id.product_id.list_pvht or 0.0
+                tache_product_ht = intervention.tache_id.product_id.list_price or 0.0
                 fpos = False
                 partner = objects['partner']
                 if partner:
-                    fpos = partner.property_account_position or False
-                    if not fpos:
-                        fpos = partner.company_id and partner.company_id.fiscal_position_sale or False
+                    fpos = self.env['account.fiscal.position'].get_fiscal_position(partner.id, delivery_id=intervention.address_id.id)
                 if fpos:
                     tache_product_tax = 0.0
                     for tax in fpos.tax_ids:
@@ -69,8 +69,9 @@ class OfComposeMail(models.TransientModel):
                     tache_product_ttc = lang.format("%.2f", round(tache_product_ht * (1.0 + tache_product_tax), 2), grouping=True)
 
         result.update({
-            'date_intervention': dates and dates[0] or ' ',
-            'date_intervention_date': dates and dates[0].split()[0] or ' ',
+            'date_intervention': dates and dates[0] or '',
+            'date_intervention_date': dates and dates[0].split()[0] or '',
+            'date_intervention_heure': dates and dates[0].split()[2] or '',
             'equipe': equipes and equipes[0] or '',
             'equipes': "\n".join(equipes),
             'dates_intervention': "\n".join(dates),

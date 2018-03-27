@@ -91,6 +91,7 @@ class OfPlanningIntervention(models.Model):
     _name = "of.planning.intervention"
     _description = "Planning d'intervention OpenFire"
     _inherit = ["of.readgroup","of.calendar.mixin"]
+    _order = 'date'
 
 #     def _get_color(self, cr, uid, ids, *args):
 #         result = {}
@@ -225,7 +226,6 @@ class OfPlanningIntervention(models.Model):
 #         'color'                : fields_old.function(_get_color, type='char', help=u"Couleur utilisée pour le planning. Dépend de l'équipe d'intervention et de l'état de l'intervention"),
 #         'sidebar_color'        : fields_old.related('equipe_id','color_id','color', type='char', help="Couleur pour le menu droit du planning (couleur de base de l'équipe d'intervention)"),
 #    }
-    _order = 'date'
 
     order_id = fields.Many2one("sale.order", string="Commande associée")
     of_notes_intervention = fields.Html(related='order_id.of_notes_intervention', readonly=True)

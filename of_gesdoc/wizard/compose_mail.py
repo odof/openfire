@@ -120,22 +120,23 @@ class OfComposeMail(models.TransientModel):
 
         date_format = lang.date_format.encode('utf-8')
         res.update({
-            'c_title'           : address and address.title.name or 'Madame, Monsieur',
-            'c_name'            : address and (address.name or (address.partner_id and address.partner_id.name)) or '',
-            'c_street'          : address and address.street or '',
-            'c_street2'         : address and address.street2 or '',
-            'c_zip'             : address and address.zip or '',
-            'c_city'            : address and address.city or '',
-            'c_phone'           : address and address.phone or '',
-            'c_mobile'          : address and address.mobile or '',
-            'c_fax'             : address and address.fax or '',
-            'c_email'           : address and address.email or '',
-            'c_adr_pose_name'   : address_pose and (address_pose.name or (address_pose.partner_id and address_pose.partner_id.name)) or '',
-            'c_adr_pose_street' : address_pose and address_pose.street or '',
-            'c_adr_pose_street2': address_pose and address_pose.street2 or '',
-            'c_adr_pose_city'   : address_pose and address_pose.city or '',
-            'c_adr_pose_zip'    : address_pose and address_pose.zip or '',
-            'date'              : time.strftime(date_format),
+            'c_title'                   : address and address.title.name or 'Madame, Monsieur',
+            'c_name'                    : address and address.name or (address.partner_id and address.partner_id.name) or '',
+            'c_note'                    : partner and partner.comment,
+            'c_street'                  : address and address.street or '',
+            'c_street2'                 : address and address.street2 or '',
+            'c_zip'                     : address and address.zip or '',
+            'c_city'                    : address and address.city or '',
+            'c_phone'                   : address and address.phone or '',
+            'c_mobile'                  : address and address.mobile or '',
+            'c_fax'                     : address and address.fax or '',
+            'c_email'                   : address and address.email or '',
+            'c_adr_intervention_name'   : address_pose and address_pose.name or (address_pose.partner_id and address_pose.partner_id.name) or '',
+            'c_adr_intervention_street' : address_pose and address_pose.street or '',
+            'c_adr_intervention_street2': address_pose and address_pose.street2 or '',
+            'c_adr_intervention_city'   : address_pose and address_pose.city or '',
+            'c_adr_intervention_zip'    : address_pose and address_pose.zip or '',
+            'date'                      : time.strftime(date_format),
         })
 
         for date_field in ('date_order', 'date_confirm_order', 'date_invoice'):
@@ -145,6 +146,15 @@ class OfComposeMail(models.TransientModel):
             date = fields.Datetime.from_string(res[date_field])
             date = date.strftime(date_format)
             res[date_field] = date
+
+        # Pour rétrocompatibilité
+        res.update({
+            'c_adr_pose_name'   : res['c_adr_intervention_name'],
+            'c_adr_pose_street' : res['c_adr_intervention_street'],
+            'c_adr_pose_street2': res['c_adr_intervention_street2'],
+            'c_adr_pose_city'   : res['c_adr_intervention_city'],
+            'c_adr_pose_zip'    : res['c_adr_intervention_zip'],
+        })
         return res
 
     def _get_model_action_dict(self):

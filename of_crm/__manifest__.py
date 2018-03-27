@@ -32,6 +32,7 @@ Fiche de projet dynamique
         'crm',
         'sale_crm',
         'of_geolocalize',
+        'of_gesdoc',
         'of_web_widgets',
         'of_calendar',
         'of_base',
