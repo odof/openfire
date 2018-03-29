@@ -580,7 +580,7 @@
             </field>
         </record>
 
-        <delete model="ir.ui.menu" id="crm.menu_crm_lead_categ"/>
+        <!-- delete model="ir.ui.menu" id="crm.menu_crm_lead_categ"/>  -->
 
         <record id="of_crm_stage_form" model="ir.ui.view">
             <field name="name">of.crm.stage.form</field>

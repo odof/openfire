@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- URLs geocodeurs -->
+        <record id="openfire_base_url" model="ir.config_parameter">
+            <field name="key">url_openfire</field>
+            <field name="value">https://openfire.fr/nominatim/search?q=</field>
+        </record>
+        <record id="openstreetmap_base_url" model="ir.config_parameter">
+            <field name="key">url_osm</field>
+            <field name="value">https://nominatim.openstreetmap.org/search?q=</field>
+        </record>
+        <record id="bano_base_url" model="ir.config_parameter">
+            <field name="key">url_bano</field>
+            <field name="value">https://api-adresse.data.gouv.fr/search/?</field>
+        </record>
+        <record id="google_base_url" model="ir.config_parameter">
+            <field name="key">url_google</field>
+            <field name="value">http://maps.googleapis.com/maps/api/geocode/json</field>
+        </record>
+        <!-- API keys -->
+        <record id="google_api_key_default" model="ir.config_parameter">
+            <field name="key">google_api_key</field>
+            <field name="value">AIzaSyDMFTzRY4LjI3xaX8sN9ouHjeTMeqHCYIo</field>
+        </record>
+        <!-- Automatics functions -->
+        <record id="show_stats_default" model="ir.config_parameter">
+            <field name="key">show_stats</field>
+            <field name="value">True</field>
+        </record>
+        <record id="geocoding_on_write_default" model="ir.config_parameter">
+            <field name="key">geocoding_on_write</field>
+            <field name="value">1</field>
+        </record> 
+         
+        <record id="geocoding_on_create_default" model="ir.config_parameter">
+            <field name="key">geocoding_on_create</field>
+            <field name="value">0</field>
+        </record>
+        <record id="geocoder_by_default_default" model="ir.config_parameter">
+            <field name="key">geocoder_by_default</field>
+            <field name="value">2</field>
+        </record>
+    </data>
+</odoo>
