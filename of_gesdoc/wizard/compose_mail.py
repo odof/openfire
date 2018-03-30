@@ -71,6 +71,7 @@ class OfComposeMail(models.TransientModel):
         addresses = partner.address_get(adr_pref=['contact', 'delivery'])
         address = addresses['contact'] and partner_obj.browse(addresses['contact'])
         address_pose = addresses['delivery'] and partner_obj.browse(addresses['delivery'])
+        cal_event = partner and self.env['calendar.event'].search([('partner_ids', 'in', [partner.id])], order='start DESC', limit=1)
 
         result = {
             'address_pose': address_pose,
@@ -78,6 +79,7 @@ class OfComposeMail(models.TransientModel):
             'partner'     : partner,
             'order'       : order,
             'invoice'     : invoice,
+            'cal_event'   : cal_event,
         }
         return result
 
@@ -94,6 +96,7 @@ class OfComposeMail(models.TransientModel):
         partner = objects.get('partner', False)
         address = objects.get('address', False)
         address_pose = objects.get('address_pose', False)
+        cal_event = objects.get('cal_event', False)
 
         lang_code = self._context.get('lang', partner.lang)
         lang = lang_obj.search([('code', '=', lang_code)])
@@ -104,7 +107,6 @@ class OfComposeMail(models.TransientModel):
             ('date_order', order or o, ''),
             ('date_confirm', order or o, ''),
             ('date_invoice', invoice or o, ''),
-            ('date_order', order, ''),
             ('residual', invoice or o, ''),
             ('number', invoice, ''),
             ('user_id', o, ''),
@@ -117,6 +119,10 @@ class OfComposeMail(models.TransientModel):
         del res['date_confirm']
         res['user'] = res['user_id'] and res['user_id'].name
         del res['user_id']
+
+        if cal_event:
+            date_event = fields.Datetime.from_string(cal_event.start)
+            date_event = fields.Datetime.context_timestamp(self, date_event)
 
         date_format = lang.date_format.encode('utf-8')
         res.update({
@@ -136,7 +142,10 @@ class OfComposeMail(models.TransientModel):
             'c_adr_intervention_street2': address_pose and address_pose.street2 or '',
             'c_adr_intervention_city'   : address_pose and address_pose.city or '',
             'c_adr_intervention_zip'    : address_pose and address_pose.zip or '',
+            'c_rdv_date'                : cal_event and date_event.strftime(date_format) or '',
+            'c_rdv_heure'               : cal_event and date_event.strftime('%H:%M') or '',
             'date'                      : time.strftime(date_format),
+            'order_name'                : order and order.name or '',
         })
 
         for date_field in ('date_order', 'date_confirm_order', 'date_invoice'):
