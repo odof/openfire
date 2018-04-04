@@ -96,8 +96,16 @@ class OFStockConfiguration(models.TransientModel):
         return self.env['ir.values'].sudo().set_default(
             'stock.config.settings', 'group_description_BL_variant', self.group_description_BL_variant)
 
+
 # Pour affichage de la contremarque (référence client) du bon de commande client dans le bon de livraison
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
     client_order_ref = fields.Char(related="sale_id.client_order_ref")
+
+
+class PackOperation(models.Model):
+    _inherit = "stock.pack.operation"
+
+    move_id = fields.Many2one('stock.move', related='linked_move_operation_ids.move_id', string='Move_id')
+    move_name = fields.Char(related='move_id.name', string='Description')

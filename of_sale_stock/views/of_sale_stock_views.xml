@@ -32,7 +32,7 @@
         </field>
     </record-->
 
-    <!-- Reprendre dans le bon de livraison la description article telle que saisie dans le devis. -->
+    <!-- Afficher la description article dans le bon de livraison (onglet Demande initiale) -->
     <record id="of_view_move_picking_tree" model="ir.ui.view">
         <field name="name">of.stock.move.tree</field>
         <field name="model">stock.move</field>
@@ -40,6 +40,18 @@
         <field name="arch" type="xml">
             <xpath expr="//tree//field[@name='product_id']" position="after">
                 <field name="name" groups="of_sale_stock.group_description_BL_variant"></field>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Afficher la description article dans le bon de livraison (onglet Operations) -->
+    <record id="of_pack_operation_product_ids" model="ir.ui.view">
+        <field name="name">of.stock.picking.operation.form</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='pack_operation_product_ids']/tree/field[@name='product_id']" position="after">
+                <field name="move_name" groups="of_sale_stock.group_description_BL_variant"/>
             </xpath>
         </field>
     </record>
