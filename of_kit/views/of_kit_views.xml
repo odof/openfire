@@ -270,11 +270,13 @@
                 <!-- Edition des lignes de commande par formulaire -->
                 <attribute name="editable"/>
             </xpath>
-            <xpath expr="//page[@name='other_info']/group" position="inside">
+            <xpath expr="//page//group[@name='technical']" position="after">
                 <group string="Kit" name='kit'>
-                    <label colspan="2" string="Cette commande ne contient pas de kit" attrs="{'invisible': [('of_contains_kit','!=',False)]}"/>
-                    <field name="of_contains_kit" attrs="{'invisible': [('of_contains_kit','=',False)]}"/>
-                    <field name="of_kit_display_mode" attrs="{'invisible': [('of_contains_kit','=',False)]}"/>
+                    <span colspan="2" attrs="{'invisible': [('of_contains_kit','!=',False)]}">Cette commande ne contient pas de kit</span>
+                    <group attrs="{'invisible': [('of_contains_kit','=',False)]}">
+                        <field name="of_contains_kit"/>
+                        <field name="of_kit_display_mode"/>
+                    </group>
                 </group>
             </xpath>
             <xpath expr="//field[@name='order_line']" position="attributes">
