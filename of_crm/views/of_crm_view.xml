@@ -155,6 +155,7 @@
                                 <div class="o_address_format">
                                     <field name="street" placeholder="Adresse..." class="o_address_street"/>
                                     <field name="street2" placeholder="Adresse suite..." class="o_address_street"/>
+                                    <field name="zip_id" options="{'no_open': True, 'no_create': True}" placeholder="City completion" class="oe_edit_only"/>
                                     <field name="city" placeholder="Ville" class="o_address_city"/>
                                     <field name="zip" placeholder="Code postal" class="o_address_zip"/>
                                     <field name="country_id" placeholder="Pays" class="o_address_country" options='{"no_open": True, "no_create": True}'/>
@@ -389,6 +390,7 @@
                                 <div class="o_address_format">
                                     <field name="street" placeholder="Adresse..." class="o_address_street"/>
                                     <field name="street2" placeholder="Adresse suite..." class="o_address_street"/>
+                                    <field name="zip_id" options="{'no_open': True, 'no_create': True}" placeholder="City completion" class="oe_edit_only"/>
                                     <field name="city" placeholder="Ville" class="o_address_city"/>
                                     <field name="zip" placeholder="Code postal" class="o_address_zip"/>
                                     <field name="country_id" placeholder="Pays" class="o_address_country" options='{"no_open": True, "no_create": True}'/>

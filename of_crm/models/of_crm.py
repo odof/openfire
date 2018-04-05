@@ -82,6 +82,16 @@ class CrmLead(models.Model):
     # custom colors
     of_color_ft = fields.Char(string="Couleur de texte", compute="_compute_custom_colors")
     of_color_bg = fields.Char(string="Couleur de fond", compute="_compute_custom_colors")
+    # city completion
+    zip_id = fields.Many2one('res.better.zip', 'City/Location')
+
+    @api.onchange('zip_id')
+    def onchange_zip_id(self):
+        if self.zip_id:
+            self.zip = self.zip_id.name
+            self.city = self.zip_id.city
+            self.state_id = self.zip_id.state_id
+            self.country_id = self.zip_id.country_id
 
     @api.multi
     @api.depends('user_id')
