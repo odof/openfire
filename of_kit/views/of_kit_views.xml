@@ -457,6 +457,9 @@
                 <field name="kit_id" widget="one2one" options="{'text_empty': 'Créer Composants', 'text_nonempty': 'Voir Composants'}"
                   attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
             </xpath>
+            <xpath expr="//form//field[@name='price_unit']" position="attributes">
+                <attribute name="attrs">{'invisible': [('of_pricing', '=', 'computed')]}</attribute>
+            </xpath>
             <xpath expr="//form//field[@name='price_unit']" position="after">
                 <field name="price_comps" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
                 <field name="cost_comps" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>

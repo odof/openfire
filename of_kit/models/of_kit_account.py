@@ -37,6 +37,18 @@ class AccountInvoice(models.Model):
         op = 'in' if (operator == '=') == value else 'not in'
         return [('id', op, invoices.ids)]
 
+    @api.model
+    def _refund_cleanup_lines(self, lines):
+        # La création d'un avoir de facture implique la duplication de ses kits
+        kit_obj = self.env['of.invoice.kit']
+        result = super(AccountInvoice, self)._refund_cleanup_lines(lines)
+
+        if lines._name == 'account.invoice.line':
+            for vals in result:
+                if vals[2].get('kit_id'):
+                    vals[2]['kit_id'] = kit_obj.browse(vals[2]['kit_id']).copy().id
+        return result
+
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
