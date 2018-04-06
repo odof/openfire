@@ -19,6 +19,8 @@ class OfComposeMail(models.TransientModel):
                 'order'        : getattr(o, 'order_id', False),
                 'invoice'      : getattr(o, 'invoice_id', False),
             })
+        elif o._name == 'res.partner':
+            result['interventions'] = o.intervention_partner_ids
         else:
             # interventions_liees ne sera défini que dans of_sales, mais getattr gère l'exception si le module n'est pas installé
             result['interventions'] = getattr(o, 'intervention_ids', [])

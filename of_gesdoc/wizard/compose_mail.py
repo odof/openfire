@@ -127,7 +127,7 @@ class OfComposeMail(models.TransientModel):
         date_format = lang.date_format.encode('utf-8')
         res.update({
             'c_title'                   : address and address.title.name or 'Madame, Monsieur',
-            'c_name'                    : address and address.name or (address.partner_id and address.partner_id.name) or '',
+            'c_name'                    : address and address.name or (address.parent_id and address.parent_id.name) or '',
             'c_note'                    : partner and partner.comment,
             'c_street'                  : address and address.street or '',
             'c_street2'                 : address and address.street2 or '',
@@ -137,7 +137,7 @@ class OfComposeMail(models.TransientModel):
             'c_mobile'                  : address and address.mobile or '',
             'c_fax'                     : address and address.fax or '',
             'c_email'                   : address and address.email or '',
-            'c_adr_intervention_name'   : address_pose and address_pose.name or (address_pose.partner_id and address_pose.partner_id.name) or '',
+            'c_adr_intervention_name'   : address_pose and address_pose.name or (address_pose.parent_id and address_pose.parent_id.name) or '',
             'c_adr_intervention_street' : address_pose and address_pose.street or '',
             'c_adr_intervention_street2': address_pose and address_pose.street2 or '',
             'c_adr_intervention_city'   : address_pose and address_pose.city or '',

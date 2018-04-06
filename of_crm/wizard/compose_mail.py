@@ -12,5 +12,5 @@ class OfComposeMail(models.TransientModel):
         result = super(OfComposeMail, self)._get_dict_values(o, objects=objects)
 
         partner = objects.get('partner')
-        result['c_prospecteur'] = partner and partner.of_prospecteur or ''
+        result['c_prospecteur'] = partner and partner.of_prospecteur and partner.of_prospecteur.name or ''
         return result
