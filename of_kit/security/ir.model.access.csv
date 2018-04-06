@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_product_kit_line,of.product.kit.line.user,model_of_product_kit_line,base.group_user,1,1,1,1
+access_of_saleorder_kit,of.saleorder.kit.user,model_of_saleorder_kit,sales_team.group_sale_salesman,1,1,1,1
+access_of_saleorder_kit_line,of.saleorder.kit.line.user,model_of_saleorder_kit_line,sales_team.group_sale_salesman,1,1,1,1
+access_of_invoice_kit,of.invoice.kit.user,model_of_invoice_kit,account.group_account_invoice,1,1,1,1
+access_of_invoice_kit_line,of.invoice.kit.line.user,model_of_invoice_kit_line,account.group_account_invoice,1,1,1,1

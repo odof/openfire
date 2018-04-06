@@ -1,0 +1,822 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_kit
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-13 08:15+0000\n"
+"PO-Revision-Date: 2017-12-13 08:15+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_product_product_comp_count
+#: model:ir.model.fields,field_description:of_kit.field_product_template_comp_count
+msgid "# Comps"
+msgstr "# Comps"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_product_product_kit_count
+#: model:ir.model.fields,field_description:of_kit.field_product_template_kit_count
+msgid "# Kits"
+msgstr "# Kits"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_kit_view_order_form
+msgid "<br/>\n"
+"                    <i attrs=\"{'invisible': ['|',('picking_policy','in','one'),('of_contains_kit','=',False)]}\" style=\"color: #aaa; font-size: small\">\n"
+"                        Components of a kit will be delivered at once.\n"
+"                    </i>"
+msgstr "<br/>\n"
+"                    <i attrs=\"{'invisible': ['|',('picking_policy','in','one'),('of_contains_kit','=',False)]}\" style=\"color: #aaa; font-size: small\">\n"
+"                        Les composants d'un kit seront livrés en une fois.\n"
+"                    </i>"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_kit_report_invoice_document
+#: model:ir.ui.view,arch_db:of_kit.of_report_saleorder_document
+msgid "<i style=\"font-size: small\">displayed quantities of kit components are their total quantities.</i>"
+msgstr "<i style=\"font-size: small\">La quantité affichée des composant de kits est leur quantité totale.</i>"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_account_invoice_kit_line_view_form
+#: model:ir.ui.view,arch_db:of_kit.of_account_invoice_kit_view_form
+msgid "<i>Components prices are only informational when the invoice line pricing is set to 'fixed'. Only the invoice line unit price matters in that case.</i>"
+msgstr "<i>Les prix des composants sont seulement à titre informatif si la tarification de leur kit est fixée. Seul le prix unitaire de la ligne de facture compte dans ce cas.</i>"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_sale_order_kit_line_view_form
+#: model:ir.ui.view,arch_db:of_kit.of_sale_order_kit_view_form
+msgid "<i>Components prices are only informational when the sale order line pricing is set to 'fixed'. Only the saleorder line unit price matters in that case.</i>"
+msgstr "<i>Les prix des composants sont seulement à titre informatif si la tarification de leur kit est fixée. Seul le prix unitaire de la ligne de commande compte dans ce cas.</i>"
+
+#. module: of_kit
+#: code:addons/of_kit/models/of_kit.py:35
+#: sql_constraint:product.template:0
+#, python-format
+msgid "A product can not be a kit and a kit component at the same time !"
+msgstr "Un produit ne peut pas être à la fois un kit et un composant !"
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_of_product_kit_line_product_price
+msgid "Base price to compute the customer price. Sometimes called the catalog price."
+msgstr "Prix de base pour calculer le prix client. Parfois appelé prix catalogue."
+
+#. module: of_kit
+#: model:ir.model,name:of_kit.model_mrp_bom
+msgid "Bill of Material"
+msgstr "Nomenclature"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_qty_delivered_updateable
+msgid "Can Edit Delivered"
+msgstr "Peut éditer livré"
+
+#. module: of_kit
+#: selection:account.invoice,of_kit_display_mode:0
+#: selection:sale.order,of_kit_display_mode:0
+msgid "Collapse"
+msgstr "Restreint"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_account_invoice_line_cost_comps
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_cost_comps
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_cost_comps
+#: model:ir.model.fields,field_description:of_kit.field_product_product_cost_comps
+#: model:ir.model.fields,field_description:of_kit.field_product_template_cost_comps
+#: model:ir.model.fields,field_description:of_kit.field_sale_order_line_cost_comps
+msgid "Compo Cost/Kit"
+msgstr "Coût compos/Kit"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_account_invoice_line_price_comps
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_price_comps
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_price_comps
+#: model:ir.model.fields,field_description:of_kit.field_product_product_price_comps
+#: model:ir.model.fields,field_description:of_kit.field_product_template_price_comps
+#: model:ir.model.fields,field_description:of_kit.field_sale_order_line_price_comps
+msgid "Compo Price/Kit"
+msgstr "Prix compos/Kit"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_account_invoice_kit_line_view_form
+#: model:ir.ui.view,arch_db:of_kit.of_sale_order_kit_line_view_form
+msgid "Component"
+msgstr "Composant"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_account_invoice_comp_ids
+#: model:ir.model.fields,field_description:of_kit.field_account_invoice_line_kit_id
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_kit_line_ids
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_kit_line_ids
+#: model:ir.model.fields,field_description:of_kit.field_product_product_kit_line_ids
+#: model:ir.model.fields,field_description:of_kit.field_product_template_kit_line_ids
+#: model:ir.model.fields,field_description:of_kit.field_sale_order_comp_ids
+#: model:ir.model.fields,field_description:of_kit.field_sale_order_line_kit_id
+#: model:ir.ui.view,arch_db:of_kit.of_account_invoice_kit_view_form
+#: model:ir.ui.view,arch_db:of_kit.of_product_template_form_view
+#: model:ir.ui.view,arch_db:of_kit.of_sale_order_kit_view_form
+msgid "Components"
+msgstr "Composants"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_product_template_search_view_kits
+msgid "Comps"
+msgstr "Comps"
+
+#. module: of_kit
+#: selection:account.invoice.line,of_pricing:0
+#: selection:of.invoice.kit,of_pricing:0
+#: selection:of.saleorder.kit,of_pricing:0
+#: selection:product.template,of_pricing:0
+#: selection:sale.order.line,of_pricing:0
+msgid "Computed"
+msgstr "Calculée"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_account_invoice_of_contains_kit
+#: model:ir.model.fields,field_description:of_kit.field_sale_order_of_contains_kit
+msgid "Contains a kit"
+msgstr "Contient un kit"
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_account_invoice_comp_ids
+msgid "Contains all kit components in this invoice that are not kits themselves."
+msgstr "Contient tous les composants des kits de cette facture."
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_sale_order_comp_ids
+msgid "Contains all kit components in this sale order."
+msgstr "Contient tous les composants des kits de cette facture."
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_product_kit_line_product_cost
+msgid "Cost"
+msgstr "Coût"
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_of_product_kit_line_product_cost
+msgid "Cost of the product template used for standard stock valuation in accounting and used as a base price on purchase orders. Expressed in the default unit of measure of the product."
+msgstr "Prix de revient utilisé en comptabilité pour la valorisation standard des stocks et en achat comme prix de base. Exprimé dans l'unité de mesure par défaut de l'article."
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_of_invoice_kit_line_cost_per_kit
+msgid "Cost of this component quantity necessary to make one unit of its invoice line kit. Equal to quantity per kit unit * unit cost."
+msgstr "Coût de la quantité requise de ce composant pour faire une unité de sa ligne de commande. Égal à la quantité par kit * le coût unitaire."
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_of_saleorder_kit_line_cost_per_kit
+msgid "Cost of this component quantity necessary to make one unit of its order line kit. Equal to quantity per kit unit * unit cost."
+msgstr "Prix de la quantité requise de ce composant pour faire une unité de sa ligne de commande. Égal à la quantité par kit * le prix unitaire."
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_of_invoice_kit_line_cost_total
+#: model:ir.model.fields,help:of_kit.field_of_saleorder_kit_line_cost_total
+msgid "Cost of this component total quantity. Equal to total quantity * unit cost."
+msgstr "Coût de la quantité totale de ce composant. Égal à la quantité totale * le coût unitaire"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_cost_per_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_cost_per_kit
+msgid "Cost/Kit"
+msgstr "Coût/Kit"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_account_invoice_kit_line_view_form
+#: model:ir.ui.view,arch_db:of_kit.of_sale_order_kit_line_view_form
+msgid "Costs"
+msgstr "Coûts"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_create_uid
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_create_uid
+#: model:ir.model.fields,field_description:of_kit.field_of_product_kit_line_create_uid
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_create_uid
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_create_date
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_create_date
+#: model:ir.model.fields,field_description:of_kit.field_of_product_kit_line_create_date
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_create_date
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_currency_id
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_currency_id
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_currency_id
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_currency_id
+msgid "Currency"
+msgstr "Devise"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_qty_delivered
+msgid "Delivered Qty"
+msgstr "Qté livrée"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_sale_order_kit_line_view_form
+msgid "Delivered Quantity"
+msgstr "Qté livrée"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_customer_lead
+msgid "Delivery Lead Time"
+msgstr "Délai de livraison"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_account_invoice_kit_line_view_form
+#: model:ir.ui.view,arch_db:of_kit.of_sale_order_kit_line_view_form
+#: model:ir.ui.view,arch_db:of_kit.of_sale_order_kit_view_form
+msgid "Developer Mode Information"
+msgstr "Informations pour les développeurs"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_display_name
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_display_name
+#: model:ir.model.fields,field_description:of_kit.field_of_product_kit_line_display_name
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_display_name
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_sale_order_kit_view_form
+msgid "Draft Saleorder Kit"
+msgstr "Kit de ventes brouillon"
+
+#. module: of_kit
+#: selection:account.invoice,of_kit_display_mode:0
+#: selection:sale.order,of_kit_display_mode:0
+msgid "Expand"
+msgstr "Étendu"
+
+#. module: of_kit
+#: selection:account.invoice.line,of_pricing:0
+#: selection:of.invoice.kit,of_pricing:0
+#: selection:of.saleorder.kit,of_pricing:0
+#: selection:product.template,of_pricing:0
+#: selection:sale.order.line,of_pricing:0
+msgid "Fixed"
+msgstr "Fixée"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_account_invoice_kit_line_view_form
+#: model:ir.ui.view,arch_db:of_kit.of_sale_order_kit_line_view_form
+msgid "General Information"
+msgstr "Information Générale"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_hide_prices
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_hide_prices
+msgid "Hide prices"
+msgstr "Masquer les prix"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_id
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_id
+#: model:ir.model.fields,field_description:of_kit.field_of_product_kit_line_id
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_id
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_id
+msgid "ID"
+msgstr "ID"
+
+#. module: of_kit
+#: model:ir.model,name:of_kit.model_account_invoice
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_invoice_id
+msgid "Invoice"
+msgstr "Facture"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_account_invoice_kit_line_view_form
+msgid "Invoice Kit Component"
+msgstr "Composant d'un kit de factures"
+
+#. module: of_kit
+#: model:ir.model,name:of_kit.model_account_invoice_line
+msgid "Invoice Line"
+msgstr "Ligne de facture"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_qty_invoice_line
+msgid "Invoice Line Qty"
+msgstr "Qté ligne de facture"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_invoice_line_id
+msgid "Invoice line"
+msgstr "Ligne de facture"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_invoiced
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_qty_invoiced
+msgid "Invoiced"
+msgstr "Facturé"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_product_product_is_kit_comp
+#: model:ir.model.fields,field_description:of_kit.field_product_template_is_kit_comp
+msgid "Is a comp"
+msgstr "Est un composant"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_account_invoice_line_of_is_kit
+#: model:ir.model.fields,field_description:of_kit.field_product_product_of_is_kit
+#: model:ir.model.fields,field_description:of_kit.field_product_template_of_is_kit
+#: model:ir.model.fields,field_description:of_kit.field_sale_order_line_of_is_kit
+msgid "Is a kit"
+msgstr "Est un kit"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_kit_id
+#: model:ir.model.fields,field_description:of_kit.field_of_product_kit_line_kit_id
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_kit_id
+#: model:ir.ui.view,arch_db:of_kit.of_product_template_kit_tree
+msgid "Kit"
+msgstr "Kit"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_kit_view_invoice_form
+#: model:ir.ui.view,arch_db:of_kit.of_kit_view_order_form
+msgid "Kit components"
+msgstr "Composants du kit"
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_of_product_kit_line_kit_id
+msgid "Kit containing this as component"
+msgstr "Kit contenant ce composant"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_account_invoice_of_kit_display_mode
+#: model:ir.model.fields,field_description:of_kit.field_sale_order_of_kit_display_mode
+msgid "Kit display mode"
+msgstr "Mode d'impression"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_kit_view_invoice_form
+#: model:ir.ui.view,arch_db:of_kit.of_kit_view_order_form
+#: model:ir.ui.view,arch_db:of_kit.of_product_template_form_view
+msgid "Kit info"
+msgstr "Kits"
+
+#. module: of_kit
+#: model:ir.actions.act_window,name:of_kit.of_product_open_kit
+#: model:ir.actions.act_window,name:of_kit.of_template_open_kit
+#: model:ir.ui.view,arch_db:of_kit.of_product_product_form_view_kit_button
+#: model:ir.ui.view,arch_db:of_kit.of_product_template_form_view_kit_button
+#: model:ir.ui.view,arch_db:of_kit.of_product_template_kit_tree
+#: model:ir.ui.view,arch_db:of_kit.of_product_template_search_view_kits
+msgid "Kits"
+msgstr "Kits"
+
+#. module: of_kit
+#: model:ir.ui.menu,name:of_kit.of_menu_kit_form_action_sale
+msgid "Kits (Nouveaux)"
+msgstr "Kits (Nouveaux)"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_product_product_form_view_kit_button
+#: model:ir.ui.view,arch_db:of_kit.of_product_template_form_view_kit_button
+msgid "Kits containning this product as a component"
+msgstr "Kits contenant ce produit en composant"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit___last_update
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line___last_update
+#: model:ir.model.fields,field_description:of_kit.field_of_product_kit_line___last_update
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit___last_update
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line___last_update
+msgid "Last Modified on"
+msgstr "Dernière Modification le"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_write_uid
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_write_uid
+#: model:ir.model.fields,field_description:of_kit.field_of_product_kit_line_write_uid
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_write_uid
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_write_date
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_write_date
+#: model:ir.model.fields,field_description:of_kit.field_of_product_kit_line_write_date
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_write_date
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_name
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_name
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_name
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_name
+msgid "Name"
+msgstr "Nom"
+
+#. module: of_kit
+#: selection:account.invoice,of_kit_display_mode:0
+#: selection:sale.order,of_kit_display_mode:0
+msgid "None"
+msgstr "Aucun"
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_of_saleorder_kit_line_customer_lead
+msgid "Number of days between the order confirmation and the shipping of the products to the customer"
+msgstr "Nombre de jours entre la confirmation de la commande et l'expédition des articles au client."
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_nb_kits
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_nb_kits
+msgid "Number of kits"
+msgstr "Nombre de kits"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_order_id
+msgid "Order"
+msgstr "Commande"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_qty_order_line
+msgid "Order Line Qty"
+msgstr "Qté ligne de commande"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_state
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_state
+msgid "Order Status"
+msgstr "État de la commande"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_order_line_id
+msgid "Order line"
+msgstr "Ligne de commande"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_order_comp_id
+msgid "Original comp"
+msgstr "Comp source"
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_of_invoice_kit_line_price_per_kit
+msgid "Price of this component quantity necessary to make one unit of its invoice line kit. Equal to quantity per kit unit * unit price."
+msgstr "Prix de la quantité requise de ce composant pour faire une unité de sa ligne de facture. Égal à la quantité par kit * le prix unitaire."
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_of_saleorder_kit_line_price_per_kit
+msgid "Price of this component quantity necessary to make one unit of its order line kit. Equal to quantity per kit unit * unit price."
+msgstr "Prix de la quantité requise de ce composant pour faire une unité de sa ligne de commande. Égal à la quantité par kit * le prix unitaire."
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_of_invoice_kit_line_price_total
+#: model:ir.model.fields,help:of_kit.field_of_saleorder_kit_line_price_total
+msgid "Price of this component total quantity. Equal to total quantity * unit price."
+msgstr "Prix de la quantité totale de ce composant. Égal à la quantité totale * le prix unitaire"
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_product_product_of_price_used
+#: model:ir.model.fields,help:of_kit.field_product_template_of_price_used
+msgid "Price that will be taken into account in sale orders and invoices. Either list price or the price of its components, dependant on the pricing."
+msgstr "Prix qui sera reporté dans les devis et factures. Soit le prix de vente soit le prix des composants, en fonction de la tarification."
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_price_per_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_price_per_kit
+msgid "Price/Kit"
+msgstr "Prix/Kit"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_kit_product_template_kanban_view
+msgid "Price:"
+msgstr "Prix :"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_account_invoice_kit_line_view_form
+#: model:ir.ui.view,arch_db:of_kit.of_sale_order_kit_line_view_form
+msgid "Prices"
+msgstr "Prix"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_account_invoice_line_of_pricing
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_kit_pricing
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_of_pricing
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_kit_pricing
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_of_pricing
+#: model:ir.model.fields,field_description:of_kit.field_product_product_of_pricing
+#: model:ir.model.fields,field_description:of_kit.field_product_template_of_pricing
+#: model:ir.model.fields,field_description:of_kit.field_sale_order_line_of_pricing
+msgid "Pricing"
+msgstr "Tarification"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_kit_product_template_kanban_view
+msgid "Pricing:"
+msgstr "Tarification :"
+
+#. module: of_kit
+#: model:ir.model,name:of_kit.model_procurement_order
+msgid "Procurement"
+msgstr "Approvisionnement"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_procurement_ids
+msgid "Procurements"
+msgstr "Approvisionnements"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_default_code
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_default_code
+msgid "Prod ref"
+msgstr "Réf produit"
+
+#. module: of_kit
+#: model:ir.model,name:of_kit.model_product_product
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_product_id
+#: model:ir.model.fields,field_description:of_kit.field_of_product_kit_line_product_id
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_product_id
+msgid "Product"
+msgstr "Article"
+
+#. module: of_kit
+#: model:ir.model,name:of_kit.model_product_template
+msgid "Product Template"
+msgstr "Modèle d'article"
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_of_product_kit_line_product_id
+msgid "Product this line references"
+msgstr "Produit que cette ligne référence"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_qty_per_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_product_kit_line_product_qty
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_qty_per_kit
+msgid "Qty / Kit"
+msgstr "Qté / Kit"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_account_invoice_kit_line_view_form
+#: model:ir.ui.view,arch_db:of_kit.of_sale_order_kit_line_view_form
+msgid "Quantities"
+msgstr "Quantités"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_account_invoice_kit_line_view_form
+#: model:ir.ui.view,arch_db:of_kit.of_sale_order_kit_line_view_form
+msgid "Quantity per kit"
+msgstr "Quantité par kit"
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_of_invoice_kit_line_qty_per_kit
+msgid "Quantity per kit unit (invoice line).\n"
+"                        example: 2 kit K1 -> 3 prod P. \n"
+"P.qty_per_kit = 3\n"
+"P.qty_total = 6"
+msgstr "Quantité par kit (ligne de facture).\n"
+"                        exemple: 2 kit K1 -> 3 prod P. \n"
+"P.qty_per_kit = 3\n"
+"P.qty_total = 6"
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_of_saleorder_kit_line_qty_per_kit
+msgid "Quantity per kit unit (order line).\n"
+"						example: 2 kit K1 -> 3 prod P. \n"
+"P.qty_per_kit = 3\n"
+"P.qty_total = 6"
+msgstr "Quantité par kit (ligne de commande).\n"
+"						exemple: 2 kit K1 -> 3 prod P. \n"
+"P.qty_per_kit = 3\n"
+"P.qty_total = 6"
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_of_product_kit_line_product_qty
+msgid "Quantity per kit unit."
+msgstr "Quantité par kit."
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_procurement_order_of_sale_comp_id
+#: model:ir.ui.view,arch_db:of_kit.of_sale_order_kit_line_view_form
+msgid "Sale Order Kit Component"
+msgstr "Composant d'un kit de ventes"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_product_kit_line_product_price
+msgid "Sale Price"
+msgstr "Prix de vente"
+
+#. module: of_kit
+#: model:ir.model,name:of_kit.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_kit
+#: model:ir.model,name:of_kit.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de bon de commande"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_sequence
+#: model:ir.model.fields,field_description:of_kit.field_of_product_kit_line_sequence
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_sequence
+msgid "Sequence"
+msgstr "Séquence"
+
+#. module: of_kit
+#: model:ir.model,name:of_kit.model_stock_move
+msgid "Stock Move"
+msgstr "Mouvement de stock"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_cost_total
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_cost_total
+msgid "Subtotal Cost"
+msgstr "Coût HT"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_price_total
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_price_total
+msgid "Subtotal Price"
+msgstr "Prix HT"
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_account_invoice_line_cost_comps
+#: model:ir.model.fields,help:of_kit.field_of_invoice_kit_cost_comps
+#: model:ir.model.fields,help:of_kit.field_of_saleorder_kit_cost_comps
+#: model:ir.model.fields,help:of_kit.field_product_product_cost_comps
+#: model:ir.model.fields,help:of_kit.field_product_template_cost_comps
+#: model:ir.model.fields,help:of_kit.field_sale_order_line_cost_comps
+msgid "Sum of the costs of all components necessary for 1 unit of this kit"
+msgstr "Somme des coûts des composant requis pour une unité de ce kit"
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_account_invoice_line_price_comps
+#: model:ir.model.fields,help:of_kit.field_of_invoice_kit_price_comps
+#: model:ir.model.fields,help:of_kit.field_of_saleorder_kit_price_comps
+#: model:ir.model.fields,help:of_kit.field_product_product_price_comps
+#: model:ir.model.fields,help:of_kit.field_product_template_price_comps
+#: model:ir.model.fields,help:of_kit.field_sale_order_line_price_comps
+msgid "Sum of the prices of all components necessary for 1 unit of this kit"
+msgstr "Somme des prix des composant requis pour une unité de ce kit"
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_account_invoice_line_of_pricing
+#: model:ir.model.fields,help:of_kit.field_product_product_of_pricing
+#: model:ir.model.fields,help:of_kit.field_product_template_of_pricing
+#: model:ir.model.fields,help:of_kit.field_sale_order_line_of_pricing
+msgid "This field is only relevant if the product is a kit. It represents the way the price should be computed. \n"
+"                 if set to 'fixed', the price of it's components won't be taken into account and the price will be the one of the kit. \n"
+"                 if set to 'computed', the price will be computed according to the components of the kit."
+msgstr "Ce champ n'est pertinent que si le produit est un kit. Il représente la façon dont le prix du kit est défini. \n"
+"                 si 'fixé', le prix du kit est arbitraire et indépendant de son contenu. \n"
+"                 si 'calculé', le prix du kit est calculé en fonction de son contenu"
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_of_invoice_kit_line_kit_pricing
+#: model:ir.model.fields,help:of_kit.field_of_invoice_kit_of_pricing
+#: model:ir.model.fields,help:of_kit.field_of_saleorder_kit_line_kit_pricing
+#: model:ir.model.fields,help:of_kit.field_of_saleorder_kit_of_pricing
+msgid "This field represents the way the price should be computed. \n"
+"                 if set to 'fixed', the price of it's components won't be taken into account and the price will be the one of the kit. \n"
+"                 if set to 'computed', the price will be computed according to the components of the kit."
+msgstr "Ce champ représente la façon dont le prix du kit est défini. \n"
+"                 si 'fixé', le prix du kit est arbitraire et indépendant de son contenu. \n"
+"                 si 'calculé', le prix du kit est calculé en fonction de son contenu"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_qty_total
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_qty_total
+msgid "Total Qty"
+msgstr "Qté Totale"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_account_invoice_kit_line_view_form
+#: model:ir.ui.view,arch_db:of_kit.of_sale_order_kit_line_view_form
+msgid "Total Quantity"
+msgstr "Quantité Totale"
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_account_invoice_line_invoice_kits_to_unlink
+msgid "True if at least 1 account kit needs to be deleted from database"
+msgstr "Vrai si au moins un kit de comptabilité doit être supprimé de la base de donnée"
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_sale_order_line_sale_kits_to_unlink
+msgid "True if at least 1 sale kit needs to be deleted from database"
+msgstr "Vrai si au moins un kit de ventes doit être supprimé de la base de donnée"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_cost_unit
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_cost_unit
+msgid "Unit Cost"
+msgstr "Coût unitaire"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_price_unit
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_price_unit
+msgid "Unit Price"
+msgstr "Prix unitaire"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_product_uom_id
+#: model:ir.model.fields,field_description:of_kit.field_of_product_kit_line_product_uom_id
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_product_uom_id
+msgid "UoM"
+msgstr "UdM"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_product_product_of_price_used
+#: model:ir.model.fields,field_description:of_kit.field_product_template_of_price_used
+msgid "Used Price"
+msgstr "Prix utile"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_account_invoice_line_invoice_kits_to_unlink
+msgid "account kits to unlink?"
+msgstr "Kits de comptabilité à supprimer?"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_kit_product_template_kanban_view
+msgid "components"
+msgstr "composants"
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_sale_order_of_kit_display_mode
+msgid "defines the way kits and their components should be printed out in pdf reports:\n"
+"			- None: One line per kit. Nothing printed out about components\n"
+"			- Collapse: One line per kit, with minimal info\n"
+"			- Expand: One line per kit, plus one line per component"
+msgstr "Défini la façon dont les kits et leurs composants seront imprimés dans les rapports PDF:\n"
+"			- Aucun: Une ligne par kit, sans information sur les composants\n"
+"			- Restreint: Une ligne par kit, avec informations minimales sur les composants\n"
+"			- Étendu: Une ligne par kit, plus une ligne par composant"
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_account_invoice_of_kit_display_mode
+msgid "defines the way kits and their components should be printed out in pdf reports:\n"
+"            - None: One line per kit. Nothing printed out about components\n"
+"            - Collapse: One line per kit, with minimal info\n"
+"            - Expand: One line per kit, plus one line per component"
+msgstr "Défini la façon dont les kits et leurs composants seront imprimés dans les rapports PDF:\n"
+"            - Aucun: Une ligne par kit, sans information sur les composants\n"
+"            - Restreint: Une ligne par kit, avec informations minimales sur les composants\n"
+"            - Étendu: Une ligne par kit, plus une ligne par composant"
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_product_product_is_kit_comp
+#: model:ir.model.fields,help:of_kit.field_product_template_is_kit_comp
+msgid "is a component of a kit"
+msgstr "Est le composant d'un kit"
+
+#. module: of_kit
+#: model:ir.model,name:of_kit.model_of_invoice_kit
+msgid "of.invoice.kit"
+msgstr "of.invoice.kit"
+
+#. module: of_kit
+#: model:ir.model,name:of_kit.model_of_invoice_kit_line
+msgid "of.invoice.kit.line"
+msgstr "of.invoice.kit.line"
+
+#. module: of_kit
+#: model:ir.model,name:of_kit.model_of_product_kit_line
+msgid "of.product.kit.line"
+msgstr "of.product.kit.line"
+
+#. module: of_kit
+#: model:ir.model,name:of_kit.model_of_saleorder_kit
+msgid "of.saleorder.kit"
+msgstr "of.saleorder.kit"
+
+#. module: of_kit
+#: model:ir.model,name:of_kit.model_of_saleorder_kit_line
+msgid "of.saleorder.kit.line"
+msgstr "of.saleorder.kit.line"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_sale_order_line_sale_kits_to_unlink
+msgid "sale kits to unlink?"
+msgstr "Kits de ventes à supprimer?"
+
+#. module: of_kit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_to_unlink
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_to_unlink
+msgid "to unlink?"
+msgstr "A supprimer?"
+
+#. module: of_kit
+#: model:ir.model.fields,help:of_kit.field_of_invoice_kit_line_qty_total
+#: model:ir.model.fields,help:of_kit.field_of_saleorder_kit_line_qty_total
+msgid "total quantity equal to quantity per kit times number of kits."
+msgstr "Quantité totale du composant. Égale à la quantité par kit multipliée par le nombre de kit."
+

@@ -1,0 +1,558 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--#############################################################################
+        ##                      PRODUCT VIEWS
+        #############################################################################
+     -->
+    <record id="of_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.kit.product.template.common.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='options']" position="inside">
+                <div>
+                    <field name="of_is_kit" attrs="{'readonly': [('is_kit_comp', '=', True)]}"/>
+                    <label for="of_is_kit"/>
+                </div>
+                <div>
+                    <field name="is_kit_comp" invisible="1"/>
+                </div>
+            </xpath>
+            <xpath expr="//group[@name='group_general']" position="inside">
+                <separator string="Kit info" name="kit_info" attrs="{'invisible': [('of_is_kit','=',False)]}" colspan="2"/>
+                <field name="of_pricing" attrs="{'invisible': [('of_is_kit','=',False)]}"/>
+                <field name="price_comps" attrs="{'invisible': [('of_is_kit','=',False)]}"/>
+                <field name="of_price_used" attrs="{'invisible': [('of_is_kit','=',False)]}"/>
+                <field name="cost_comps" attrs="{'invisible': [('of_is_kit','=',False)]}"/>
+            </xpath>
+            <xpath expr="//form//notebook//page[2]" position="before">
+                <page name="components" string="Components" attrs="{'invisible': [('of_is_kit', '=', False)]}">
+                    <group>
+                        <label for="kit_line_ids" colspan="2"/>
+                        <field name="kit_line_ids" nolabel="1" colspan="2">
+                            <tree editable="bottom">
+                                <field name="sequence" widget="handle"/>
+                                <field name="product_id"/>
+                                <field name="product_qty"/>
+                                <field name="product_uom_id"/>
+                                <field name="product_price" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                            </tree>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+            <xpath expr="//form//notebook//page[@name='general_information']//field[@name='type']" position="attributes">
+                <!-- all kits are services -->
+                <attribute name="attrs">{'readonly': [('of_is_kit', '=', True)]}</attribute>
+            </xpath>
+            <!-- kits don't have a standard_price -->
+            <xpath expr="//form//notebook//page[@name='general_information']//label[@for='standard_price']" position="attributes">
+                <attribute name="attrs">{'invisible': [('of_is_kit', '!=', False)]}</attribute>
+            </xpath>
+            <xpath expr="//form//notebook//page[@name='general_information']//field[@name='standard_price']" position="attributes">
+                <attribute name="attrs">{'invisible': [('of_is_kit', '!=', False)]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_kit_product_template_kanban_view" model="ir.ui.view">
+        <field name="name">of.kit.product.template.kanban</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban//field[@name='currency_id']" position="after">
+                <field name="of_is_kit"/>
+                <field name="of_pricing"/>
+                <field name="price_comps"/>
+                <field name="of_price_used"/>
+                <field name="comp_count"/>
+            </xpath>
+            <xpath expr="//kanban//templates//ul//li" position="replace">
+                <li t-if="record.of_is_kit.raw_value == false">Price: <field name="list_price" widget="monetary"></field></li>
+                <li t-if="record.of_is_kit.raw_value == true"><field name="comp_count"/> components</li>
+                <li t-if="record.of_is_kit.raw_value == true">Price: <field name="of_price_used" widget="monetary"></field></li>
+                <li t-if="record.of_is_kit.raw_value == true">Pricing: <field name="of_pricing"/></li>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- displayed from smart button and menuitem 'kits' in product form view -->
+    <record id="of_product_template_kit_tree" model="ir.ui.view">
+        <field name="name">of.product.template.kit.tree</field>
+        <field name="model">product.template</field>
+        <field name="priority" eval="80"/>
+        <field name="arch" type="xml">
+            <tree string="Kits">
+                <field name="display_name" string="Kit"/>
+                <field name="of_pricing"/>
+                <field name="of_price_used" widget="monetary"/>
+                <field name="comp_count" class="text-right"/>
+                <field name="list_price" invisible="1"/>
+                <field name="price_comps" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_template_open_kit" model="ir.actions.act_window">
+        <field name="name">Kits</field>
+        <field name="res_model">product.template</field>
+        <field name="domain">[('of_is_kit', '=', True)]</field>
+        <field name="view_mode">tree, kanban, form</field>
+        <field name="view_type">form</field>
+        <field name="context">{"default_of_is_kit":1}</field>
+    </record>
+    <record id="of_template_open_kit_view_tree" model="ir.actions.act_window.view">
+        <field eval="0" name="sequence"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="of_product_template_kit_tree"/>
+        <field name="act_window_id" ref="of_template_open_kit"/>
+    </record>
+    <record id="of_template_open_kit_view_kanban" model="ir.actions.act_window.view">
+        <field eval="1" name="sequence"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="of_kit_product_template_kanban_view"/>
+        <field name="act_window_id" ref="of_template_open_kit"/>
+    </record>
+    <record id="of_template_open_kit_view_form" model="ir.actions.act_window.view">
+        <field eval="2" name="sequence"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_product_template_form_view"/>
+        <field name="act_window_id" ref="of_template_open_kit"/>
+    </record>
+    <record id="of_product_template_form_view_kit_button" model="ir.ui.view">
+        <field name="name">of.product.template.kit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button" name="action_view_kits" type="object"
+                  attrs="{'invisible':[('of_is_kit', '=', True)]}" icon="fa-object-group"
+                  help="Kits containning this product as a component">
+                    <field string="Kits" name="kit_count" widget="statinfo" />
+                </button>
+            </div>
+        </field>
+    </record>
+
+    <record id="of_product_open_kit" model="ir.actions.act_window">
+        <field name="name">Kits</field>
+        <field name="res_model">product.template</field>
+        <field name="domain">[('kit_line_ids.product_id', '=', active_id)]</field>
+        <field name="view_mode">tree, kanban</field>
+        <field name="view_type">form</field>
+    </record>
+    <record id="of_product_open_kit_view_tree" model="ir.actions.act_window.view">
+        <field eval="0" name="sequence"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="of_product_template_kit_tree"/>
+        <field name="act_window_id" ref="of_product_open_kit"/>
+    </record>
+    <record id="of_product_open_kit_view_kanban" model="ir.actions.act_window.view">
+        <field eval="1" name="sequence"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="of_kit_product_template_kanban_view"/>
+        <field name="act_window_id" ref="of_product_open_kit"/>
+    </record>
+    <record id="of_product_product_form_view_kit_button" model="ir.ui.view">
+        <field name="name">of.product.product.kit</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button" name="%(of_product_open_kit)d" type="action"
+                  attrs="{'invisible':[('of_is_kit', '=', True)]}" icon="fa-object-group"
+                  help="Kits containning this product as a component">
+                    <field string="Kits" name="kit_count" widget="statinfo" />
+                </button>
+            </div>
+        </field>
+    </record>
+
+    <record id="of_product_template_search_view_kits" model="ir.ui.view">
+         <field name="name">of.product.template.search.kit</field>
+         <field name="model">product.template</field>
+         <field name="inherit_id" ref="product.product_template_search_view"/>
+         <field name="arch" type="xml">
+             <xpath expr="//filter[@name='filter_to_purchase']" position="after">
+                 <separator/>
+                 <filter string="Kits" name="kits" domain="[('of_is_kit','=',True)]"/>
+                 <filter string="Comps" name="comps" domain="[('is_kit_comp','=',True)]"/>
+             </xpath>
+         </field>
+    </record>
+
+    <menuitem id="of_menu_kit_form_action_sale"
+        action="of_template_open_kit"
+        parent="sales_team.menu_sales"
+        name="Kits (Nouveaux)"
+        sequence="20"/>
+
+    <!--#############################################################################
+        ##                    PRODUCT KIT LINE VIEWS
+        #############################################################################
+    -->
+    <record id="of_kit_product_kit_line_form_view" model="ir.ui.view">
+        <field name="name">of.kit.product.kit.line.form</field>
+        <field name="model">of.product.kit.line</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="kit_id"/>
+                    <field name="product_id"/>
+                    <field name="product_qty"/>
+                    <field name="product_uom_id"/>
+                    <field name="sequence"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_kit_product_kit_line_list_view" model="ir.ui.view">
+        <field name="name">of.kit.product.kit.line.list</field>
+        <field name="model">of.product.kit.line</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="kit_id"/>
+                <field name="product_id"/>
+                <field name="product_qty"/>
+                <field name="product_uom_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!--record id="of_open_kit_line" model="ir.actions.act_window">
+        <field name="name">Kits Lines</field>
+        <field name="res_model">of.product.kit.line</field>
+        <field name="groups">base.group_no_one</field>
+        <field name="view_id" ref="of_kit_product_kit_line_list_view"/>
+        <field name="view_type">form</field>
+    </record>
+
+    <menuitem id="of_menu_kit_line_action_view"
+        action="of_open_kit_line"
+        parent="sales_team.menu_sales"
+        name="Kit lines"
+        sequence="21"/-->
+
+    <!--#############################################################################
+        ##                      PROCUREMENT VIEWS
+        #############################################################################
+     -->
+    <record id="of_procurement_form_view" model="ir.ui.view">
+        <field name="name">procurement.order.form</field>
+        <field name="model">procurement.order</field>
+        <field name="inherit_id" ref="procurement.procurement_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='origin']" position="after">
+                <field name="of_sale_comp_id" attrs="{'invisible': [('of_sale_comp_id', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!--#############################################################################
+        #############################################################################
+        ##                      SALE VIEWS
+        #############################################################################
+        #############################################################################
+     -->
+
+    <record id="of_kit_view_order_form" model="ir.ui.view"><!-- temporaire -->
+        <field name="name">of.kit.sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/tree" position="attributes">
+                <!-- Edition des lignes de commande par formulaire -->
+                <attribute name="editable"/>
+            </xpath>
+            <xpath expr="//page//group[@name='technical']" position="after">
+                <group string="Kit" name='kit'>
+                    <span colspan="2" attrs="{'invisible': [('of_contains_kit','!=',False)]}">Cette commande ne contient pas de kit</span>
+                    <group attrs="{'invisible': [('of_contains_kit','=',False)]}">
+                        <field name="of_contains_kit"/>
+                        <field name="of_kit_display_mode"/>
+                    </group>
+                </group>
+            </xpath>
+            <xpath expr="//field[@name='order_line']" position="attributes">
+                <attribute name="context">{'hide_sale': context.get('hide_sale')}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="after">
+                <field name="sale_kits_to_unlink" invisible="1"/>
+                <field name="of_is_kit"/>
+                <field name="of_pricing" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
+                <field name="kit_id" widget="one2one" options="{'text_empty': 'Créer Composants', 'text_nonempty': 'Voir Composants'}"
+                  attrs="{'invisible': [('of_is_kit', '=', False)], 'readonly': [('state', 'in', ('done','cancel'))]}"
+                  context="{'hide_sale': context.get('hide_sale')}"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="after">
+                <field name="price_comps" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
+                <field name="cost_comps" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
+            </xpath>
+            <xpath expr="//group[@name='sale_shipping']//field[@name='picking_policy']" position="replace">
+                <label for="picking_policy"/>
+                <div name="picking_policy_div">
+                    <field name="picking_policy" required="True"/>
+                    <br/>
+                    <i attrs="{'invisible': ['|',('picking_policy','in','one'),('of_contains_kit','=',False)]}" style="color: #aaa; font-size: small">
+                        Components of a kit will be delivered at once.
+                    </i>
+                </div>
+            </xpath>
+            <!-- implementation future -> ajouter les composants d'un kit en tant que lignes de commandes
+            <xpath expr="//field[@name='order_line']" position="before">
+                <field name="of_inser_nom"/>
+            </xpath-->
+        </field>
+    </record>
+
+    <record id="of_sale_order_kit_view_form" model="ir.ui.view">
+        <field name="name">of.saleorder.kit.view.form</field>
+        <field name="model">of.saleorder.kit</field>
+        <field name="arch" type="xml">
+            <form string="Components">
+                <h2>
+                    <div attrs="{'invisible': [('order_line_id', '!=', False)]}">Draft Saleorder Kit</div>
+                    <field name="order_line_id" attrs="{'invisible': [('order_line_id', '=', False)]}"
+                      nolabel="1" options='{"no_open": True}' readonly="1"/>
+                </h2>
+                <div name="hide_prices_message" class="mb8 mt8" attrs="{'invisible': [('of_pricing', '=', 'computed')]}">
+                    <i>Components prices are only informational when the sale order line pricing is set to 'fixed'. Only the saleorder line unit price matters in that case.</i>
+                </div>
+                <field name="kit_line_ids" attrs="{'readonly': [('state', 'in', ('done','cancel'))]}"
+                  context="{'hide_sale': context.get('hide_sale')}">
+                    <tree editable="bottom">
+                        <field name="product_id" attrs="{'readonly': ['|', ('invoiced', '=', True), ('procurement_ids', '!=', [])]}"/>
+                        <field name="name"/>
+                        <field name="qty_per_kit"/>
+                        <field name="qty_delivered" invisible="context.get('hide_sale')" attrs="{'readonly': [('qty_delivered_updateable', '=', False)]}"/>
+                        <field name="product_uom_id" attrs="{'readonly': [('state', 'in', ('sale', 'done', 'cancel'))]}"/>
+                        <field name="price_unit" attrs="{'readonly': [('kit_pricing', '=', 'fixed')]}"/>
+                        <field name="price_per_kit"/>
+                        <field name="kit_pricing" invisible="1"/>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="invoiced" invisible="1"/>
+                        <field name="procurement_ids" invisible="1"/>
+                        <field name="state" invisible="1"/>
+                        <field name="qty_delivered_updateable" invisible="1"/>
+                    </tree>
+                </field>
+                <group class="oe_subtotal_footer oe_right" colspan="2" name="price_comps">
+                    <field name="price_comps" widget='monetary'/>
+                </group>
+                <group name="Developer Mode Information" groups="base.group_no_one">
+                    <separator string="Developer Mode Information" name="dmi" groups="base.group_no_one" colspan="2"/>
+                    <group>
+                        <field name="id" readonly="1"/>
+                        <!--field name="order_line_id" readonly="1"/-->
+                        <field name="of_pricing" readonly="1"/>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="state" invisible="1"/>
+                        <field name="qty_invoiced" invisible="1"/>
+                    </group>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_sale_order_kit_line_view_form" model="ir.ui.view">
+        <field name="name">of.saleorder.kit.line.form</field>
+        <field name="model">of.saleorder.kit.line</field>
+        <field name="arch" type="xml">
+            <form string="Component">
+                <header>
+                    <h2>Sale Order Kit Component</h2>
+                </header>
+                <sheet>
+                    <group>
+                        <group name="General Information">
+                            <separator string="General Information" name="General Information" colspan="2"/>
+                            <field name="product_id" attrs="{'readonly': ['|', ('invoiced', '=', True), ('procurement_ids', '!=', [])]}"/>
+                            <field name="name"/>
+                            <field name="kit_id" readonly="1"/>
+                            <field name="customer_lead"/>
+                        </group>
+                        <group  name="Quantities">
+                            <separator string="Quantities" name="Quantities" colspan="2"/>
+                            <label for="qty_per_kit" string="Quantity per kit"/>
+                            <field name="qty_per_kit" nolabel="1"/>
+                            <field name="nb_kits"/>
+                            <label for="qty_total" string="Total Quantity"/>
+                            <field name="qty_total" nolabel="1"/>
+                            <label for="qty_delivered" string="Delivered Quantity" invisible="context.get('hide_sale')"/>
+                            <field name="qty_delivered" nolabel="1" invisible="context.get('hide_sale')" attrs="{'readonly': [('qty_delivered_updateable', '=', False)]}"/>
+                            <field name="product_uom_id" attrs="{'readonly': [('state', 'in', ('sale','done', 'cancel'))]}"/>
+                        </group>
+                        <group name="Prices">
+                            <separator string="Prices" name="Prices" colspan="2"/>
+                            <field name="kit_pricing" invisible="1"/>
+                            <field name="price_unit" widget='monetary' options="{'currency_field': 'currency_id'}" attrs="{'readonly': [('kit_pricing', '=', 'fixed')]}"/>
+                            <field name="price_per_kit"/>
+                            <field name="price_total"/>
+                        </group>
+                        <group name="Costs">
+                            <separator string="Costs" name="Costs" colspan="2"/>
+                            <field name="cost_unit" widget='monetary' options="{'currency_field': 'currency_id'}" attrs="{'readonly': [('kit_pricing', '=', 'fixed')]}"/>
+                            <field name="cost_per_kit"/>
+                            <field name="cost_total"/>
+                        </group>
+                    </group>
+                    <div name="hide_prices_message" attrs="{'invisible': [('kit_pricing', '=', 'computed')]}">
+                        <i>Components prices are only informational when the sale order line pricing is set to 'fixed'. Only the saleorder line unit price matters in that case.</i>
+                    </div>
+                    <separator string="Developer Mode Information" name="Developer Mode Information" groups="base.group_no_one"/>
+                    <group name="Developer Mode Information" groups="base.group_no_one">
+                        <group>
+                            <field name="id"/>
+                            <field name="order_id" required="False"/>
+                            <field name="hide_prices"/>
+                            <field name="procurement_ids" invisible="1"/>
+                            <field name="invoiced" invisible="1"/>
+                            <field name="state" invisible="1"/>
+                            <field name="qty_delivered_updateable" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!--#############################################################################
+        #############################################################################
+        ##                      ACCOUNT VIEWS
+        #############################################################################
+        #############################################################################
+     -->
+
+    <record id="of_kit_view_invoice_form" model="ir.ui.view">
+        <field name="name">of.kit.account.invoice.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_ids']/tree" position="attributes">
+                <!-- Edition des lignes de facture par formulaire -->
+                <attribute name="editable"/>
+            </xpath>
+            <xpath expr="//page[@name='other_info']//field[@name='name']" position="after">
+                <field name="of_contains_kit"/>
+                <field name="of_kit_display_mode" attrs="{'invisible': [('of_contains_kit','=',False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_kit_view_invoice_line_form" model="ir.ui.view">
+        <field name="name">of.kit.account.invoice.line.form</field>
+        <field name="model">account.invoice.line</field>
+        <field name="inherit_id" ref="account.view_invoice_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form//field[@name='product_id']" position="after">
+                <field name="invoice_kits_to_unlink" invisible="1"/>
+                <field name="of_is_kit"/>
+                <field name="of_pricing" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
+                <field name="kit_id" widget="one2one" options="{'text_empty': 'Créer Composants', 'text_nonempty': 'Voir Composants'}"
+                  attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
+            </xpath>
+            <xpath expr="//form//field[@name='price_unit']" position="attributes">
+                <attribute name="attrs">{'invisible': [('of_pricing', '=', 'computed')]}</attribute>
+            </xpath>
+            <xpath expr="//form//field[@name='price_unit']" position="after">
+                <field name="price_comps" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
+                <field name="cost_comps" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_account_invoice_kit_view_form" model="ir.ui.view">
+        <field name="name">of.invoice.kit.view.form</field>
+        <field name="model">of.invoice.kit</field>
+        <field name="arch" type="xml">
+            <form string="Components">
+                <field name="invoice_line_id" invisible="1"/>
+                <field name="of_pricing" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+                <group>
+
+                </group>
+                <div name="hide_prices_message" attrs="{'invisible': [('of_pricing', '=', 'computed')]}">
+                    <i>Components prices are only informational when the invoice line pricing is set to 'fixed'. Only the invoice line unit price matters in that case.</i>
+                </div>
+                <field name="kit_line_ids">
+                    <tree editable="bottom">
+                        <field name="product_id"/>
+                        <field name="name"/>
+                        <field name="qty_per_kit"/>
+                        <field name="product_uom_id"/>
+                        <field name="price_unit" attrs="{'readonly': [('kit_pricing', '=', 'fixed')]}"/>
+                        <field name="price_per_kit"/>
+                        <field name="kit_pricing" invisible="1"/>
+                        <field name="currency_id" invisible="1"/>
+                    </tree>
+                </field>
+                <group class="oe_subtotal_footer oe_right" colspan="2" name="price_comps">
+                    <field name="price_comps" widget='monetary'/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_account_invoice_kit_line_view_form" model="ir.ui.view">
+        <field name="name">of.invoice.kit.line.form</field>
+        <field name="model">of.invoice.kit.line</field>
+        <field name="arch" type="xml">
+            <form string="Component">
+                <header>
+                    <h2>Invoice Kit Component</h2>
+                </header>
+                <sheet>
+                    <group>
+                        <group name="General Information">
+                            <separator string="General Information" name="General Information" colspan="2"/>
+                            <field name="product_id"/>
+                            <field name="name"/>
+                            <field name="kit_id" readonly="1"/>
+                            <field name="order_comp_id" readonly="1"/>
+                        </group>
+                        <group  name="Quantities">
+                            <separator string="Quantities" name="Quantities" colspan="2"/>
+                            <label for="qty_per_kit" string="Quantity per kit"/>
+                            <field name="qty_per_kit" nolabel="1"/>
+                            <field name="nb_kits"/>
+                            <label for="qty_total" string="Total Quantity"/>
+                            <field name="qty_total" nolabel="1"/>
+                            <field name="product_uom_id"/>
+                        </group>
+                        <group name="Prices">
+                            <separator string="Prices" name="Prices" colspan="2"/>
+                            <field name="kit_pricing" invisible="1"/>
+                            <field name="price_unit" widget='monetary' options="{'currency_field': 'currency_id'}" attrs="{'readonly': [('kit_pricing', '=', 'fixed')]}"/>
+                            <field name="price_per_kit"/>
+                            <field name="price_total"/>
+                        </group>
+                        <group name="Costs">
+                            <separator string="Costs" name="Costs" colspan="2"/>
+                            <field name="cost_unit" widget='monetary' options="{'currency_field': 'currency_id'}" attrs="{'readonly': [('kit_pricing', '=', 'fixed')]}"/>
+                            <field name="cost_per_kit"/>
+                            <field name="cost_total"/>
+                        </group>
+                    </group>
+                    <div name="hide_prices_message" attrs="{'invisible': [('kit_pricing', '=', 'computed')]}">
+                        <i>Components prices are only informational when the invoice line pricing is set to 'fixed'. Only the invoice line unit price matters in that case.</i>
+                    </div>
+                    <separator string="Developer Mode Information" name="Developer Mode Information" groups="base.group_no_one"/>
+                    <group name="Developer Mode Information" groups="base.group_no_one">
+                        <group>
+                            <field name="id"/>
+                            <field name="invoice_id" required="False"/>
+                            <field name="hide_prices"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

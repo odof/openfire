@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <!--
+        'of.saleorder.kit' and 'of.invoice.kit' records are created in db without saving changes in 'sale.order' and 'account.invoice'
+        the function _clear_db is called everyday
+     -->
+        <record forcecreate="True" id="of_cron_clear_saleorder_kits" model="ir.cron">
+            <field name="name">Auto-vaccum saleorder kits</field>
+            <field name="user_id">1</field>
+            <!--field name="nextcall">2017-11-01 06:00:00</field-->
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="function">_clear_db</field>
+            <field name="model">of.saleorder.kit</field>
+            <field name="args"></field>
+        </record>
+        <record forcecreate="True" id="of_cron_clear_invoice_kits" model="ir.cron">
+            <field name="name">Auto-vaccum invoice kits</field>
+            <field name="user_id">1</field>
+            <!--field name="nextcall">2017-11-01 06:00:00</field-->
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="function">_clear_db</field>
+            <field name="model">of.invoice.kit</field>
+            <field name="args"></field>
+        </record>
+    </data>
+    <data noupdate="1">
+        <!-- init new kits functions -->
+        <function model="mrp.bom" name="_init_new_kits"/>
+        <function model="sale.order" name="_init_new_kits"/>
+        <function model="account.invoice" name="_init_new_kits"/>
+    </data>
+</odoo>
