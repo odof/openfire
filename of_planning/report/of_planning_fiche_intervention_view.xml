@@ -234,7 +234,7 @@
                                                                 <span t-esc="name_line"/><br/>
                                                             </t>
                                                             <span t-field="l.name" style="display: none;"/>
-                                                            <t t-if="l.of_is_kit and o.of_kit_display_mode == 'collapse'">
+                                                            <t t-if="l.of_is_kit and o.order_id.of_kit_display_mode == 'collapse'">
                                                                 <span t-esc="l.get_kit_descr_collapse()"/>
                                                             </t>
                                                         </td>
@@ -247,7 +247,7 @@
                                                         </td>
                                                     </tr>
                                                     <!-- Afficher les composants du kit -->
-                                                    <t t-if="l.kit_id and o.of_kit_display_mode == 'expand'">
+                                                    <t t-if="l.kit_id and o.order_id.of_kit_display_mode == 'expand'">
                                                         <t t-foreach="l.kit_id.kit_line_ids" t-as="comp">
                                                             <tr>
                                                                 <td>
@@ -255,7 +255,7 @@
                                                                 </td>
                                                                 <td class="text-right">
                                                                     <span t-field="comp.qty_total"/>
-                                                                    <span t-field="comp.uom_id" groups="product.group_uom"/>
+                                                                    <span t-field="comp.product_uom_id" groups="product.group_uom"/>
                                                                 </td>
                                                                 <td class="text-right">
                                                                     <span t-field="comp.qty_delivered"/>
