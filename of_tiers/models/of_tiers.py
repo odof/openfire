@@ -102,6 +102,8 @@ class ResPartner(models.Model):
 
     @api.multi
     def unlink(self):
+        # Suppression des comptes de tiers a la suppression du partenaire.
+        # En cas de multi-société, seuls les comptes de la société courante de l'utilisateur sont supprimés
         cr = self._cr
         account_obj = self.env['account.account']
         default_account_receivable = self.env['ir.property'].get('property_account_receivable_id', self._name)
@@ -117,10 +119,11 @@ class ResPartner(models.Model):
         account_ids = set(account_ids)
 
         # On ne supprime pas les comptes ayant des écritures
-        cr.execute("SELECT DISTINCT account_id FROM account_move_line WHERE account_id IN %s", (tuple(account_ids),))
-        used_account_ids = cr.fetchall()
-        if used_account_ids:
-            account_ids -= set(zip(*used_account_ids)[0])
+        if account_ids:
+            cr.execute("SELECT DISTINCT account_id FROM account_move_line WHERE account_id IN %s", (tuple(account_ids),))
+            used_account_ids = cr.fetchall()
+            if used_account_ids:
+                account_ids -= set(zip(*used_account_ids)[0])
 
         # On ne supprime pas les comptes liés à d'autres partenaires
         for account_id in account_ids.copy():
