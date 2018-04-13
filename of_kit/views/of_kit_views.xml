@@ -273,7 +273,7 @@
             <xpath expr="//page//group[@name='technical']" position="after">
                 <group string="Kit" name='kit'>
                     <span colspan="2" attrs="{'invisible': [('of_contains_kit','!=',False)]}">Cette commande ne contient pas de kit</span>
-                    <group attrs="{'invisible': [('of_contains_kit','=',False)]}">
+                    <group attrs="{'invisible': [('of_contains_kit','=',False)]}" colspan="2">
                         <field name="of_contains_kit"/>
                         <field name="of_kit_display_mode"/>
                     </group>

@@ -83,7 +83,7 @@ class AccountInvoiceLine(models.Model):
         res = []
         for comp in components:
             qty_int_val = int(comp.qty_total)
-            if comp.uom_id.id == units_id: # uom is units, no need to print it
+            if comp.product_uom_id.id == units_id: # uom is units, no need to print it
                 qty = str(qty_int_val) # qty is an int because it's in units
                 comp_str = (comp.default_code or comp.name) + ": " + qty
             else:
@@ -91,7 +91,7 @@ class AccountInvoiceLine(models.Model):
                     qty = str(qty_int_val)
                 else:
                     qty = str(comp.qty_total)
-                comp_str = (comp.default_code or comp.name) + ": " + qty + " " + comp.uom_id.name
+                comp_str = (comp.default_code or comp.name) + ": " + qty + " " + comp.product_uom_id.name
             res.append(comp_str)
         res = " (" + ", ".join(res) + ")"
         return res
@@ -379,3 +379,23 @@ class OfAccountInvoiceKitLine(models.Model):
     def _compute_qty_total(self):
         for comp in self:
             comp.qty_total = comp.qty_per_kit * comp.nb_kits
+
+    @api.multi
+    def get_report_name(self):
+        self.ensure_one()
+        # Inhibe l'affichage de la référence
+        afficher_ref = self.env['ir.values'].get_default('account.config.settings', 'pdf_display_product_ref')
+        if afficher_ref is None:
+            # Test en théorie inutile car ce module dépend de of_sale qui dépend de of_account_report qui définit pdf_display_product_ref
+            afficher_ref = True
+
+        self = self.with_context(
+            lang=self.invoice_id.partner_id.lang,
+            partner=self.invoice_id.partner_id.id,
+        )
+        name = self.name
+        if not afficher_ref and name.startswith("["):
+            pos = name.find(']')
+            if pos != -1:
+                name = name[pos+1:]
+        return name.strip()
