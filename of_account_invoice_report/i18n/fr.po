@@ -83,7 +83,7 @@ msgstr "<span>Afficher les références produits dans les rapports PDF</span>"
 #. module: account
 #: model:ir.ui.view,arch_db:account.account_invoice_report_duplicate
 msgid "<span>Duplicate</span>"
-msgstr "<span>Dupliquer</span>"
+msgstr "<span>Duplicata</span>"
 
 #. module: account
 #: model:ir.ui.view,arch_db:account.report_invoice_document
