@@ -96,20 +96,21 @@ class resPartner(models.Model):
 
         super(resPartner, self).unlink()
 
-        account_ids = set(account_ids)
-
-        # On ne supprime pas les comptes ayant des écritures
-        cr.execute("SELECT DISTINCT account_id FROM account_move_line WHERE account_id IN %s", (tuple(account_ids),))
-        used_account_ids = cr.fetchall()
-        if used_account_ids:
-            account_ids -= set(zip(*used_account_ids)[0])
-
-        # On ne supprime pas les comptes liés à d'autres partenaires
-        for account_id in account_ids.copy():
-            cr.execute("SELECT id FROM ir_property WHERE value_reference = 'account.account,%s' LIMIT 1" % account_id)
-            if cr.fetchall():
-                account_ids.remove(account_id)
-
         if account_ids:
-            account_obj.browse(account_ids).unlink()
+            account_ids = set(account_ids)
+
+            # On ne supprime pas les comptes ayant des écritures
+            cr.execute("SELECT DISTINCT account_id FROM account_move_line WHERE account_id IN %s", (tuple(account_ids),))
+            used_account_ids = cr.fetchall()
+            if used_account_ids:
+                account_ids -= set(zip(*used_account_ids)[0])
+
+            # On ne supprime pas les comptes liés à d'autres partenaires
+            for account_id in account_ids.copy():
+                cr.execute("SELECT id FROM ir_property WHERE value_reference = 'account.account,%s' LIMIT 1" % account_id)
+                if cr.fetchall():
+                    account_ids.remove(account_id)
+
+            if account_ids:
+                account_obj.browse(account_ids).unlink()
         return True
