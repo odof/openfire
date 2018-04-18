@@ -263,6 +263,6 @@ class OfGesdocChpTmp(models.TransientModel):
     _name = 'of.gesdoc.chp.tmp'
     _description = 'PDF champs temporaire'
 
-    name = fields.Char(string='Nom du champ PDF', size=256, required=True, readonly=True)
-    value_openfire = fields.Char(string='Valeur OpenFire', size=256)
+    name = fields.Char(string='Nom du champ PDF', required=True, readonly=True)
+    value_openfire = fields.Char(string='Valeur OpenFire')
     compose_id = fields.Many2one('of.compose.mail', string='Visualisation Courrier')
