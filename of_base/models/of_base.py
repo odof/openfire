@@ -3,8 +3,8 @@
 import threading
 import re
 
-from odoo import models, api, tools, fields
-from odoo.exceptions import ValidationError
+from odoo import models, api, tools, fields, SUPERUSER_ID
+from odoo.exceptions import ValidationError, AccessError
 from odoo.modules import get_module_resource
 from odoo.tools import OrderedSet
 from odoo.osv import expression
@@ -128,6 +128,11 @@ class ResUsers(models.Model):
         result['mail_auto_subscribe_no_notify'] = 1
         return result
 
+    @api.multi
+    def write(self, values):
+        if SUPERUSER_ID in self._ids and self._uid != SUPERUSER_ID:
+            raise AccessError(u'Seul le compte administrateur peut modifier les informations du compte administrateur.')
+        return super(ResUsers, self).write(values)
 
 class ResPartner(models.Model):
     _inherit = "res.partner"
