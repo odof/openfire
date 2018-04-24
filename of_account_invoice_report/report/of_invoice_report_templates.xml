@@ -5,7 +5,7 @@
     <t t-call="report.external_layout">
         <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})" />
         <!--####################
-            Cette Vue est entièrement modifiée depuis le module of_account_invoice_report
+            La vue d'origine est entièrement réécrite ici.
             ####################-->
         <div class="page">
             <div name="invoice_address" class="row">

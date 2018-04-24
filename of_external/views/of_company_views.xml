@@ -11,37 +11,75 @@
                 </xpath>
                 <xpath expr="//notebook//page[@name='advanced_settings']/group[@name='advanced_settings_group_1']" position="inside">
                     <group colspan="4" col="1" name="of_company_footer">
-                        <separator string="Company Footer" colspan="2"/>
+                        <separator string="Company Header Lines" colspan="2"/>
+                        <group col="3">
+                            <field name="of_position_header_lines"/>
+                            <button name="%(of_external_open_mako_wizard_action)d" type="action"
+                              string="Variables Mako" class="pull-right" icon="fa-question"/>
+                        </group>
+                        <div>
+                            <div>Ligne 1 : </div>
+                            <div style="padding: 8px 16px; border: 1px dotted lightgray">
+                                <span style="max-width: 10%">Contenu : </span>
+                                <field name="of_custom_header_line_1" nolabel="1" class="oe_inline" 
+                                  placeholder="remplacer par le contenu voulu pour la ligne 1" style="min-width: 90%"/>
+                                <br/>
+                                <span>Size: </span>
+                                <field name="of_custom_header_line_1_size" class="oe_inline"/>
+                            </div>
+
+                            <div>Ligne 2 : </div>
+                            <div style="padding: 8px 16px; border: 1px dotted lightgray">
+                                <span style="max-width: 10%">Contenu : </span>
+                                <field name="of_custom_header_line_2" nolabel="1" class="oe_inline" 
+                                  placeholder="remplacer par le contenu voulu pour la ligne 2" style="min-width: 90%;"/>
+                                <br/>
+                                <span>Size: </span>
+                                <field name="of_custom_header_line_2_size" class="oe_inline"/>
+                            </div>
+
+                            <div>Ligne 3 : <em class="oe_grey">/!\ Ne sera pas imprimée dans les bons de préparation !</em></div>
+                            <div style="padding: 8px 16px; border: 1px dotted lightgray">
+                                <span style="max-width: 10%">Contenu : </span>
+                                <field name="of_custom_header_line_3" nolabel="1" class="oe_inline" 
+                                  placeholder="remplacer par le contenu voulu pour la ligne 3" style="min-width: 90%;"/>
+                                <br/>
+                                <span>Taille: </span>
+                                <field name="of_custom_header_line_3_size" class="oe_inline"/>
+                            </div>
+                        </div>
+
+                        <separator string="Lignes du pied de page externe de société" colspan="2"/>
                         <div>
                             <field name="use_of_custom_footer" nolabel="1" class="oe_inline"/>
-                            <span> Use company custom footer.</span>
+                            <span> Utiliser le pied de page personnalisé pour cette société.</span>
                         </div>
                         <div>
-                            <div>Line 1 : </div>
+                            <div>Ligne 1 : </div>
                             <div style="padding: 8px 16px; border: 1px dotted lightgray">
-                                <span style="max-width: 10%">Content: </span>
+                                <span style="max-width: 10%">Contenu : </span>
                                 <field name="of_custom_footer_line_1" nolabel="1" class="oe_inline" 
-                                  placeholder="replace with desired content for line 1" style="min-width: 90%"/>
+                                  placeholder="remplacer par le contenu voulu pour la ligne 1" style="min-width: 90%"/>
                                 <br/>
                                 <span>Size: </span>
                                 <field name="of_custom_footer_line_1_size" class="oe_inline"/>
                             </div>
 
-                            <div>Line 2 : </div>
+                            <div>Ligne 2 : </div>
                             <div style="padding: 8px 16px; border: 1px dotted lightgray">
-                                <span style="max-width: 10%">Content: </span>
+                                <span style="max-width: 10%">Contenu : </span>
                                 <field name="of_custom_footer_line_2" nolabel="1" class="oe_inline" 
-                                  placeholder="replace with desired content for line 2" style="min-width: 90%;"/>
+                                  placeholder="remplacer par le contenu voulu pour la ligne 2" style="min-width: 90%;"/>
                                 <br/>
                                 <span>Size: </span>
                                 <field name="of_custom_footer_line_2_size" class="oe_inline"/>
                             </div>
 
-                            <div>Line 3 : </div>
+                            <div>Ligne 3 : </div>
                             <div style="padding: 8px 16px; border: 1px dotted lightgray">
-                                <span style="max-width: 10%">Content: </span>
+                                <span style="max-width: 10%">Contenu : </span>
                                 <field name="of_custom_footer_line_3" nolabel="1" class="oe_inline" 
-                                  placeholder="replace with desired content for line 3" style="min-width: 90%;"/>
+                                  placeholder="remplacer par le contenu voulu pour la ligne 3" style="min-width: 90%;"/>
                                 <br/>
                                 <span>Size: </span>
                                 <field name="of_custom_footer_line_3_size" class="oe_inline"/>

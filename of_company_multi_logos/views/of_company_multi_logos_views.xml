@@ -1,40 +1,139 @@
 <?xml version="1.0"?>
 <odoo>
-    <record id="of_company_multi_logos" model="ir.ui.view"> <!-- record enregistre dans la BDD  -->
+
+    <!-- Ajout de l'onglets des logos supplémentaires -->
+    <record id="of_company_multi_logos" model="ir.ui.view">
         <field name="name">of.company.view.logotab</field>
-        <field name="model">res.company</field> <!-- le modèle associé à cette vue -->
-        <field name="inherit_id" ref="base.view_company_form" /> <!-- la vue parente de cette vue -->
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form" />
         <field name="arch" type="xml">
-            <notebook position="inside"> <!-- la vue parente possède un notebook, on ajoute un onglet -->
-                <page string="Logos" name="other_logos"> <!-- l'onglet en question -->
-                    <field name="of_logo_ids" mode="kanban">
-                        <kanban>
-                            <field name="name"/>
-                            <field name="logo"/>
-                            <templates>
-                                <t t-name="kanban-box"> <!-- une cellule du kanban -->
-                                    <div class="oe_kanban_global_click"> <!-- permet d'accéder au détail de la cellule par un click -->
-                                        <a t-if="!read_only_mode" type="delete" class="fa fa-times pull-right"/> <!-- permet de supprimer une cellule en mode éditer, via une croix en haut à droite -->
-                                        <div class="o_kanban_image"> <!-- image de la cellule -->
-                                            <img t-att-src="'data:image/png;base64,'+record.logo.raw_value"/>
-                                        </div>
-                                        <div class="oe_kanban_details"> <!-- détail, texte de la cellule -->
-                                            <strong><field name="name"/></strong>
-                                        </div>
-                                    </div>
-                                </t>
-                            </templates>
-                        </kanban>
-                        <form>
-                            <group>
-                                <field name="name"/>
-                                <field name="logo" widget="image"/>
-                            </group>
-                        </form>
-                    </field>
+            <notebook position="inside">
+                <page string="Logos" name="other_logos">
+                    <field name="of_logo_ids" mode="kanban"/>
                 </page>
             </notebook>
         </field>
-
     </record>
+
+
+    <!--#############################################################################
+        ##                    VUES DES LOGOS DES SOCIÉTÉS
+        ############################################################################# -->
+
+    <record id="of_multi_logos_view_form" model="ir.ui.view">
+        <field name="name">Logos Form</field>
+        <field name="model">of.company.multi.logos</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label class="oe_edit_only" for="name"/>
+                        <h1><field name="name" placeholder="Nom du logo"/></h1>
+                        <div name="options" groups="base.group_user">
+                            <div>
+                                <field name="display_docs"/>
+                                <label for="display_docs"/>
+                            </div>
+                        </div>
+                    </div>
+                    <group col="4">
+                        <label for="company_ids" string="Sociétés"/>
+                        <field name="company_ids" widget="many2many_tags" colspan="3" nolabel="1"/>
+                        <label for="description" string="Description"/>
+                        <field name="description" colspan="3" nolabel="1"/>
+                    </group>
+                    <separator name="picture" string="Image"/>
+                    <field name="logo" widget="image" nolabel="1" style="max-height: 200px; max-width: 200px;"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_multi_logos_view_kanban" model="ir.ui.view">
+        <field name="name">Logos Kanban</field>
+        <field name="model">of.company.multi.logos</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="name"/>
+                <field name="logo"/>
+                <templates>
+                    <t t-name="kanban-box"> <!-- Une cellule du kanban -->
+                        <div class="oe_kanban_global_click"> <!-- Permet d'accéder au détail de la cellule par un click -->
+                            <a t-if="!read_only_mode" type="delete" class="fa fa-times pull-right"/> <!-- Permet de supprimer une cellule en mode éditer, via une croix en haut à droite -->
+                            <div class="o_kanban_image"> <!-- image de la cellule -->
+                                <img t-att-src="'data:image/png;base64,'+record.logo.raw_value"/>
+                            </div>
+                            <div class="oe_kanban_details"> <!-- Détail, texte de la cellule -->
+                                <strong><field name="name"/></strong>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="of_multi_logos_view_tree" model="ir.ui.view">
+        <field name="name">Logos Tree</field>
+        <field name="model">of.company.multi.logos</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <!--field name="color" widget="color_index"/> <!- - widget de Sacha (à adapter pour vue liste: voir web_widget_color)! ;) -->
+                <field name="description"/>
+                <field name="display_docs"/>
+                <field name="company_ids" widget="many2many_tags"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_multi_logos_view_search" model="ir.ui.view">
+        <field name="name">Logos search</field>
+        <field name="model">of.company.multi.logos</field>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <search string="Logos">
+                <field string="Nom" name="name"/>
+                <separator/>
+                <filter string="Affiché" name="displayed" domain="[('display_docs','=',True)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_multi_logos_action" model="ir.actions.act_window">
+        <field name="name">Logos</field>
+        <field name="res_model">of.company.multi.logos</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">kaban,tree,form</field>
+        <field name="context">{'search_default_displayed':1}</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Cliquez pour ajouter un logo.
+            </p>
+        </field>
+    </record>
+    <record id="of_multi_logos_action_view_tree" model="ir.actions.act_window.view">
+        <field eval="0" name="sequence"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="of_multi_logos_view_kanban"/>
+        <field name="act_window_id" ref="of_multi_logos_action"/>
+    </record>
+    <record id="of_multi_logos_action_view_kanban" model="ir.actions.act_window.view">
+        <field eval="1" name="sequence"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="of_multi_logos_view_tree"/>
+        <field name="act_window_id" ref="of_multi_logos_action"/>
+    </record>
+    <record id="of_multi_logos_action_view_form" model="ir.actions.act_window.view">
+        <field eval="2" name="sequence"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_multi_logos_view_form"/>
+        <field name="act_window_id" ref="of_multi_logos_action"/>
+    </record>
+
+    <!-- Menu logos des sociétés -->
+    <menuitem id="of_logos_menu" name="Logos société" sequence="100"
+        parent="base.menu_custom" groups="base.group_system"
+        action="of_multi_logos_action"/>
+
 </odoo>
