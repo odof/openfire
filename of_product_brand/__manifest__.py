@@ -12,10 +12,13 @@ OpenFire module to manage products brand
 ========================================
 
 """,
-    "depends" : ['product'],
+    "depends" : [
+        'of_product',
+        'sale',
+    ],
     "init_xml" : [],
     "demo_xml" : [],
-    "update_xml" : [
+    "data" : [
         'security/ir.model.access.csv',
         'wizards/of_product_brand_add_products.xml',
         'views/of_product_brand_view.xml',
