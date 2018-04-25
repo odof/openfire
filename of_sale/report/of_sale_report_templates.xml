@@ -10,7 +10,7 @@
             <div class="oe_structure"/>
             <div name="addresses" class="row mt8">
                 <div class="col-xs-6">
-                    <div t-if="doc.partner_shipping_id != doc.partner_id">
+                    <div t-if="doc.partner_shipping_id != doc.partner_invoice_id">
                         <strong>Adresse de livraison&amp;nbsp;:</strong><br/>
                         <t t-set="the_shipping_address" t-value="doc.partner_shipping_id"/>
                         <t t-if="doc.pdf_afficher_nom_parent()">
