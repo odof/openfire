@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Ajouter champ catégorie dans vue form "Activités feuilles de temps" -->
+    <record id="of_hr_timesheet_categ_form" model="ir.ui.view">
+        <field name="name">of.hr.timesheet.categ.form</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_form"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="of_categ_id"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Ajouter champ catégorie dans vue tree "Activités feuilles de temps" -->
+    <record id="of_hr_timesheet_categ_tree" model="ir.ui.view">
+        <field name="name">of.hr.timesheet.categ.tree</field>
+        <field name="model">account.analytic.line</field>
+        <field name="type">tree</field>
+        <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_tree"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="of_categ_id"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Ajouter champ catégorie activités dans vue "Mes feuilles de temps" -->
+    <record id="of_hr_timesheet_sheet_sheet_form" model="ir.ui.view">
+        <field name="name">of.hr.timesheet.sheet.sheet.form</field>
+        <field name="model">hr_timesheet_sheet.sheet</field>
+        <field name="inherit_id" ref="hr_timesheet_sheet.hr_timesheet_sheet_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='name']" position="after">
+                <field name="of_categ_id"/>
+            </xpath>
+            <xpath expr="//field[@name='timesheet_ids']/form/group/field[@name='name']" position="after">
+                <field name="of_categ_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Ajouter champ catégorie activités dans vue projet task onglet "Feuilles de temps" -->
+    <record id="of_hr_timesheet_categ_project_form" model="ir.ui.view">
+        <field name="name">of.hr.timesheet.categ.project.form</field>
+        <field name="model">project.task</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="hr_timesheet.view_task_form2_inherited"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='timesheet_ids']/tree//field[@name='user_id']" position="after">
+                <field name="of_categ_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Rapport feuille de présence ajout stats par champ of_categ_id -->
+    <record id="of_view_hr_timesheet_report_search" model="ir.ui.view">
+        <field name="name">of.hr.timesheet.report.search</field>
+        <field name="model">account.analytic.line</field>
+        <field name="type">search</field>
+        <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_search"/>
+        <field name="arch" type="xml">
+            <field name="user_id" position="after">
+                <field name="of_categ_id"/>
+                <filter string="Catégorie" context="{'group_by':'of_categ_id'}" help="Regrouper par catégorie d'activités"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Configuration -->
+
+    <!-- Activités feuilles de temps catégories tree -->
+    <record id="of_hr_timesheet_categ_tree_view" model="ir.ui.view">
+        <field name="name">of.hr.timesheet.categ.tree.view</field>
+        <field name="model">of.hr.timesheet.categ</field>
+        <field name="arch" type="xml">
+            <tree string="Catégories de partenaires">
+                <field name="name"/>
+                <field name="parent_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Activités feuilles de temps catégories form -->
+    <record id="of_hr_timesheet_form_view" model="ir.ui.view">
+        <field name="name">of.hr.timesheet.categ.form.view</field>
+        <field name="model">of.hr.timesheet.categ</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="parent_id"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <!-- Menus et actions -->
+    <!-- Action configuration catégories d'activités feuilles de temps -->
+    <record id="of_hr_timesheet_categ_action_form" model="ir.actions.act_window">
+        <field name="name">Catégories d'activités</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.hr.timesheet.categ</field>
+        <field name="view_type">form</field>
+    </record>
+
+    <!-- Action comptes analytiques -->
+    <record id="of_hr_timesheet_categ_action_account_analytic" model="ir.actions.act_window">
+        <field name="name">Comptes feuilles de temps</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.analytic.account</field>
+        <field name="view_type">form</field>
+    </record>
+
+    <menuitem id="main_menu_of_timesheet_categories" name="Configuration" parent="hr_timesheet.timesheet_menu_root" sequence="100"/>
+
+    <!-- Sous-menu "Catégories d'activités" -->
+    <menuitem action="of_hr_timesheet_categ_action_form" id="menu_of_hr_timesheet_categ_action_form"
+        parent="of_hr_timesheet.main_menu_of_timesheet_categories" sequence="10"/>
+
+    <!-- Sous-menu "Comptes des feuilles de temps" -->
+    <menuitem name="Comptes des feuilles de temps" id="menu_of_hr_timesheet_categories_comptes" sequence="9"
+        parent="main_menu_of_timesheet_categories" action="of_hr_timesheet_categ_action_account_analytic"/>
+
+</odoo>
