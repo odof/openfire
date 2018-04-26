@@ -70,7 +70,7 @@ class AccountInvoiceLine(models.Model):
     def _onchange_product_id(self):
         taxes = self.invoice_line_tax_ids
         res = super(AccountInvoiceLine,self)._onchange_product_id()
-        if self.invoice_line_tax_ids == taxes:
+        if self._context.get('of_force_product_onchange_tax') or self.invoice_line_tax_ids == taxes:
             # Odoo recalcule le compte comptable en fonction de la position fiscale et du nouvel article sélectionné
             # On doit donc s'assurer de ré-appliquer les règles OpenFire de la taxe
             self.onchange_tax_ids()

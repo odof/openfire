@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Inherited Analytic Account list for contracts -->
+    <record id="of_view_account_analytic_account_journal_tree" model="ir.ui.view">
+        <field name="name">Contract list</field>
+        <field name="model">account.analytic.account</field>
+        <field name="inherit_id" ref="contract.view_account_analytic_account_journal_tree" />
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="of_amount_untaxed"/>
+                <field name="of_amount_total"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_account_analytic_account_recurring_form" model="ir.ui.view">
+        <field name="name">Contract form</field>
+        <field name="model">account.analytic.account</field>
+        <field name="inherit_id" ref="contract.account_analytic_account_recurring_form_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='recurring_next_date']" position="after">
+                <field name="of_fiscal_position_id" options="{'no_create': True}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
