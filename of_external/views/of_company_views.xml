@@ -11,7 +11,7 @@
                 </xpath>
                 <xpath expr="//notebook//page[@name='advanced_settings']/group[@name='advanced_settings_group_1']" position="inside">
                     <group colspan="4" col="1" name="of_company_footer">
-                        <separator string="Company Header Lines" colspan="2"/>
+                        <separator string="En-tête de page externe de la société" colspan="2"/>
                         <group col="3">
                             <field name="of_position_header_lines"/>
                             <button name="%(of_external_open_mako_wizard_action)d" type="action"
@@ -49,7 +49,7 @@
                             </div>
                         </div>
 
-                        <separator string="Lignes du pied de page externe de société" colspan="2"/>
+                        <separator string="Lignes du pied de page externe de la société" colspan="2"/>
                         <div>
                             <field name="use_of_custom_footer" nolabel="1" class="oe_inline"/>
                             <span> Utiliser le pied de page personnalisé pour cette société.</span>
