@@ -5,46 +5,50 @@
 
     <!--  On redéfinit totalement l'en-tête par défaut d'Odoo par un en-tête personnalisable. -->
     <div class="header">
-        <div style="height: 132px; padding-top: 16px">
-            <div name="company_header" style="width: 73%; display: inline-block; vertical-align: top;">
-                <div name="company_header_logo" style="display: inline-block; vertical-align: top;">
-                    <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo" style="max-height: 128px; max-width: 192px;"/>
+        <div style="border: 1px solid red; padding-top: 16px;">
+            <div name="company_header" style="border: 1px solid blue; width: 73%; display: inline-block; vertical-align: top;">
+                <div name="company_header_logo" t-attf-style="border: 1px solid; margin-top: #{company.of_logo_margin_top}px; display: inline-block; vertical-align: top;">
+                    <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo" t-attf-style="max-height: #{company.of_logo_max_height}px; max-width: #{company.of_logo_max_width}px;"/>
                 </div>
-                <div name="company_header_center" style="min-width: 60%; display: inline-block; vertical-align: top; padding-left: 8px;">
+                <div name="company_header_center" style="border: 1px solid yellow; display: inline-block; vertical-align: top; padding-left: 8px;">
                     <!-- Les multi-logos viennent là. -->
-                    <div name="company_header_center_top" style="display: block;"/>
+                    <div name="company_header_center_top" style="border: 1px solid; display: block;"/>
 
-                    <div name="company_address_right" t-if="company.of_position_header_lines == 'logo_right'" style="min-width: 99%; display: inlin-block;">
-                        <div style="display: inline-block; min-width: 99%; vertical-align: top;">
+                    <div name="company_address_right" t-if="company.of_position_header_lines == 'logo_right'" style="border: 1px solid; min-width: 99%; display: inline-block;">
+                        <div style="border: 1px solid red; display: inline-block; min-width: 99%; vertical-align: middle;">
                             <span t-esc="company.get_line_content('header', 1)" t-attf-style="font-size: #{company.of_custom_header_line_1_size};"/><br/>
-                            <span t-esc="company.get_line_content('header', 2)" t-attf-style="font-size: #{company.of_custom_header_line_2_size};"/><br/>
-                            <span name="of_custom_header_line_3_right" t-esc="company.get_line_content('header', 3)" t-attf-style="font-size: #{company.of_custom_header_line_3_size};"/>
+                            <t t-if="company.of_custom_header_line_2"><span t-esc="company.get_line_content('header', 2)" t-attf-style="font-size: #{company.of_custom_header_line_2_size};"/><br/></t>
+                            <t t-if="company.of_custom_header_line_3"><span name="of_custom_header_line_3_right" t-esc="company.get_line_content('header', 3)" t-attf-style="font-size: #{company.of_custom_header_line_3_size};"/><br/></t>
+                            <t t-if="company.of_custom_header_line_4"><span t-esc="company.get_line_content('header', 4)" t-attf-style="font-size: #{company.of_custom_header_line_4_size};"/><br/></t>
+                            <t t-if="company.of_custom_header_line_5"><span t-esc="company.get_line_content('header', 5)" t-attf-style="font-size: #{company.of_custom_header_line_5_size};"/><br/></t>
                         </div>
                     </div>
                 </div>
                 <br t-if="company.of_position_header_lines == 'logo_under'"/>
                 <div t-if="company.of_position_header_lines == 'logo_under'" style="min-width: 99%; display: inline-block;">
-                    <div name="company_address" style="display: inline-block; min-width: 50%; vertical-align: top;">
+                    <div name="company_address" style="border: 1px solid; display: inline-block; min-width: 50%; vertical-align: top;">
                         <span t-esc="company.get_line_content('header', 1)" t-attf-style="font-size: #{company.of_custom_header_line_1_size};"/><br/>
-                        <span t-esc="company.get_line_content('header', 2)" t-attf-style="font-size: #{company.of_custom_header_line_2_size};"/><br/>
-                        <span name="of_custom_header_line_3" t-esc="company.get_line_content('header', 3)" t-attf-style="font-size: #{company.of_custom_header_line_3_size};"/>
+                        <t t-if="company.of_custom_header_line_2"><span t-esc="company.get_line_content('header', 2)" t-attf-style="font-size: #{company.of_custom_header_line_2_size};"/><br/></t>
+                        <t t-if="company.of_custom_header_line_3"><span name="of_custom_header_line_3" t-esc="company.get_line_content('header', 3)" t-attf-style="font-size: #{company.of_custom_header_line_3_size};"/><br/></t>
+                        <t t-if="company.of_custom_header_line_4"><span t-esc="company.get_line_content('header', 4)" t-attf-style="font-size: #{company.of_custom_header_line_4_size};"/><br/></t>
+                        <t t-if="company.of_custom_header_line_5"><span t-esc="company.get_line_content('header', 5)" t-attf-style="font-size: #{company.of_custom_header_line_5_size};"/><br/></t>
                     </div>
                 </div>
             </div>
 
             <!-- Entre les 2 parties de l'en-tête -->
-            <div name="gutter" style="width: 1%; vertical-align: top; display:inline-block;"/>
+            <div name="gutter" style="border: 1px solid; width: 1%; vertical-align: top; display:inline-block;"/>
 
             <!-- Pastille grise -->
             <div name="doc_infochip" class="pull-right"
-              style="width: 25%; background-color: lightgray; font-size: large; padding: 8px 16px;
+              style="border: 1px solid; width: 25%; background-color: lightgray; font-size: large; padding: 8px 16px;
                   border-radius: 8px; display: inline-block; vertical-align: top;">
 
                 <div name="doc_title" style="font-size: large; text-align: center; padding: 4px 0px;">
                     <strong>
                     <!-- Si le document possède un type -->
                     <t t-if="o">
-                        <!-- si le document est de type facture -->
+                        <!-- Si le document est de type facture -->
                         <t t-if="o._name == 'account.invoice'">
                             <span t-if="o.type == 'out_invoice' and (o.state == 'open' or o.state == 'paid')">Facture<br/></span>
                             <span t-if="o.type == 'out_invoice' and o.state == 'proforma2'">Facture PRO-FORMA<br/></span>
@@ -60,14 +64,14 @@
                             <span t-if="o.state not in ['draft','sent']">Bon de commande</span>
                             <br/>
                         </t>
-                        <!-- si le document est de type achat -->
+                        <!-- Si le document est de type achat -->
                         <t t-if="o._name == 'purchase.order'">
                             <span t-if="o.state in ['draft','sent']">Demande de prix</span>
                             <span t-if="o.state == 'to approve'">À approuver</span>
                             <span t-if="o.state in ['purchase','done']">Commande fournisseur</span>
                             <span t-if="o.state == 'cancel'">Annulé</span>
                         </t>
-                        <!-- si le document est de type bon de préparation -->
+                        <!-- Si le document est de type bon de préparation -->
                         <t t-if="o._name == 'stock.picking'">
                             <span name="bon_livraison" style="font-size: medium;">Bon de livraison</span>
                         </t>
@@ -84,16 +88,16 @@
                         <strong>
                         <!-- Si le document possède un type -->
                         <t t-if="o">
-                            <!-- si le document est de type facture -->
+                            <!-- Si le document est de type facture -->
                             <t t-if="o._name == 'account.invoice'">
                                 <span t-if="o.number" t-field="o.number"/>
                                 <span t-if="not o.number">-</span>
                             </t>
-                            <!-- si le document est de type devis ou achat-->
+                            <!-- Si le document est de type devis ou achat-->
                             <t t-if="o._name == 'sale.order' or o._name == 'purchase.order'">
                                 <span t-field="o.name"/>
                             </t>
-                            <!-- si le document est de type préparation/livraison-->
+                            <!-- Si le document est de type préparation/livraison-->
                             <t t-if="o._name == 'stock.picking'">
                                 <span t-field="o.name" style="margin-left: -4px; font-size: medium;"/>
                             </t>
