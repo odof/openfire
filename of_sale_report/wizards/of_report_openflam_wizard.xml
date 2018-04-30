@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_rapport_openflam_view_form" model="ir.ui.view">
+        <field name="name">Openflam Report</field>
+        <field name="model">of.rapport.openflam.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Openflam report">
+                <separator string="Rapport sur mesure"/>
+                <group col="4" colspan="2">
+                    <field name="report_model"/>
+                    <field name="date"/>
+                </group>
+                <separator string="Sociétés"/>
+                <group>
+                    <field name="company_ids" widget="many2many_tags"/>
+                </group>
+                <footer>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                        <span attrs="{'invisible': [('file', '=', False)]}">
+                            Télécharger
+                            <field name="file" filename="file_name" readonly="1"/>
+                            ou
+                        </span>
+                        <button string="(Re)générer le document" name="button_print" type="object" class="btn-primary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window id="action_of_rapport_openflam"
+            key2="client_action_multi"
+            name="Rapport sur mesure"
+            res_model="of.rapport.openflam.wizard"
+            src_model="sale.report"
+            view_mode="form"
+            view_type="form"
+            view_id="of_rapport_openflam_view_form"
+            target="new"/>
+
+    <menuitem name="Rapport sur mesure" action="action_of_rapport_openflam" id="menu_rapport_openflam" parent="sales_team.menu_sale_report"/>
+
+</odoo>
