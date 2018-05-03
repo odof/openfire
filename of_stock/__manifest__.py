@@ -12,6 +12,7 @@ Extension OpenFire du module stock
 
 - Possibilité de sélectionner le même article plusieurs fois dans le même inventaire. Les quantités seront cumulées.
 - Ajout de l'id (non modifiable) et d'un champ note dans les lignes d'inventaire.
+- Édition des lignes d'inventaire par le haut.
 """,
     "website": "www.openfire.fr",
     "depends": [
