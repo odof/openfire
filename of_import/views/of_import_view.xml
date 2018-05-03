@@ -183,9 +183,9 @@ Cette action irréversible recalculera la catégorie, le prix d'achat et le prix
                     </div>
                     <separator string="Résultat"/>
                     <group colspan="4" col="6">
-                        <field name="sortie_succes"/>
-                        <field name="sortie_avertissement"/>
-                        <field name="sortie_erreur"/>
+                        <field name="sortie_succes" style="max-height: 300px; overflow: auto;"/>
+                        <field name="sortie_avertissement" style="max-height: 300px; overflow: auto;"/>
+                        <field name="sortie_erreur" style="max-height: 300px; overflow: auto;"/>
                     </group>
                     <separator string="Champs disponibles"/>
                     <group colspan="4" col="4">
