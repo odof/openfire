@@ -1,0 +1,7 @@
+/* Make wizard dialog box bigger */
+
+.modal-dialog {
+  position: relative;
+  width: 90%;
+  margin: 10px;
+}

@@ -9,12 +9,24 @@
             <!-- custom icons -->
             <link type="text/css" rel="stylesheet" href="/of_map_view/static/lib/MaterialDesign-Webfont-master/css/materialdesignicons.min.css" />
             <script type="text/javascript" src="/of_map_view/static/lib/leaflet.Icon.Glyph/Leaflet.Icon.Glyph.js"></script>
-            
+
+            <!-- MapView -->
             <link rel="stylesheet" href="/of_map_view/static/src/less/map_view.less" />
             <script type="text/javascript" src="/of_map_view/static/src/js/map_controls.js"></script>
             <script type="text/javascript" src="/of_map_view/static/src/js/map_record.js"></script>
             <script type="text/javascript" src="/of_map_view/static/src/js/map_view.js"></script>
+
+            <!-- Map widget -->
+            <link href="/of_map_view/static/src/css/widget_map.css" rel="stylesheet" type="text/css"/>
+            <script src="/of_map_view/static/src/js/widget_map.js" type="text/javascript"/>
+            
         </xpath>
     </template>
-    
+
+    <template id="layout_map" name="Web layout with google map" inherit_id="web.layout">
+        <xpath expr="//script" position="before">
+            <script t-attf-src="//maps.google.com/maps/api/js?key=AIzaSyC9Z6suh_xQEUCLMYdKMvt4OpOMFxc0HBM"></script>
+        </xpath>
+    </template>
+
 </odoo>

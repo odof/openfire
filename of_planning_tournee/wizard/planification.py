@@ -3,6 +3,7 @@
 from odoo import api, models, fields
 from datetime import datetime, timedelta
 import math
+import json
 from math import cos
 import pytz
 from pytz import timezone
@@ -191,9 +192,21 @@ class OfTourneePlanification(models.TransientModel):
     date_display = fields.Char(compute='_get_date_display', string='Jour')
     distance_add = fields.Float(string=u'Éloignement maximum (km)', digits=(12, 3))
 
+    google_map_partner = fields.Char(string="variable", compute='_get_coordenates')
+    epi_lat = fields.Float(related='tournee_id.epi_lat')
+    epi_lon = fields.Float(related='tournee_id.epi_lon')
+
     zip_id = fields.Many2one(related='tournee_id.zip_id')
     distance = fields.Float(related='tournee_id.distance')
     equipe_id = fields.Many2one(related='tournee_id.equipe_id')
+    
+    
+    @api.multi
+    def _get_coordenates(self):
+        maps_loc = {u'position': {u'lat': self.epi_lat, u'lng': self.epi_lon}, u'zoom': 10}
+        json_map = json.dumps(maps_loc)
+        self.google_map_partner = json_map
+    
 
     @api.multi
     def _get_show_action(self):
