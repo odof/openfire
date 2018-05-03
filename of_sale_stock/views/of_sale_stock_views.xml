@@ -10,7 +10,8 @@
         <field name="inherit_id" ref="stock.view_inventory_form"/>
         <field name="arch" type="xml">
             <xpath expr="//notebook//field[@name='line_ids']//tree//field[@name='product_qty']" position="after">
-                <field name="product_value" groups="account.group_account_manager"/>
+                <field name="product_value_unit" groups="account.group_account_manager"/>
+                <field name="product_value" groups="account.group_account_manager" sum="Total"/>
                 <field name="currency_id" invisible="1"/>
             </xpath>
         </field>
