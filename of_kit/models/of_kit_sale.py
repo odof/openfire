@@ -69,6 +69,22 @@ class SaleOrder(models.Model):
         invoice_vals['of_kit_display_mode'] = self.of_kit_display_mode
         return invoice_vals
 
+    @api.multi
+    def action_draft(self):
+        # Retrait du lien des approvisionnements avec les composants de kits.
+        # Cela permettra d'en générer de nouveaux à la confirmation de la commande.
+        # Code copié depuis le module sale.
+        orders = self.filtered(lambda s: s.state in ['cancel', 'sent'])
+        super(SaleOrder, self).action_draft()
+        return orders.mapped('comp_ids').mapped('procurement_ids').write({'of_sale_comp_id': False})
+
+    @api.multi
+    def action_cancel(self):
+        # Annulation des approvisionnements liés aux composants de kits.
+        # Code copié depuis le module sale_stock
+        self.mapped('comp_ids').mapped('procurement_ids').cancel()
+        return super(SaleOrder, self).action_cancel()
+
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
