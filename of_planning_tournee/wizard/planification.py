@@ -203,7 +203,7 @@ class OfTourneePlanification(models.TransientModel):
     
     @api.multi
     def _get_coordenates(self):
-        maps_loc = {u'position': {u'lat': self.epi_lat, u'lng': self.epi_lon}, u'zoom': 10}
+        maps_loc = {u'position': {u'lat': self.epi_lat, u'lng': self.epi_lon}}
         json_map = json.dumps(maps_loc)
         self.google_map_partner = json_map
     

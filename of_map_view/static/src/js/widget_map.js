@@ -4,6 +4,30 @@ odoo.define('of_map_view.FieldMap', function(require) {
 var core = require('web.core');
 var form_common = require('web.form_common');
 
+//var TILE_SERVER_ADDR = 'http://192.168.1.80/osm_tiles/{z}/{x}/{y}.png';
+var TILE_SERVER_ADDR = '//{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png';
+
+
+var map2 = L.map( 'map2', {
+    center: [20.0, 5.0],
+    minZoom: 2,
+    zoom: 2
+});
+
+L.tileLayer(tile_server_addr).addTo(map2);
+
+//core.form_widget_registry.add('map2', FieldMap);
+//core.view_registry.add('map2', map2);
+
+/*
+return {
+    map2;
+};*/
+
+
+});
+
+/*
 var FieldMap = form_common.AbstractField.extend({
     template: 'FieldMap',
     start: function() {
@@ -102,3 +126,4 @@ return {
 };
 
 });
+*/

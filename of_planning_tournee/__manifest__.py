@@ -40,6 +40,7 @@ Fonctionnalités
         # 'of_gesdoc',
         # 'of_imports',
         'of_base_location',
+        'of_map_view',
     ],
     'external_dependancies': {
         #'python': ['pypackage1', 'pypackage2'],

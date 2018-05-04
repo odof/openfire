@@ -29,9 +29,16 @@
                         <div style="margin-right: 10px; margin-top: 0px">
                             <field name="plan_planning_ids" nolabel="1"/>
                         </div>
+                        
+                        <map2>
+                            <field name="google_map_partner"/>
+                        </map2>
+                        
+                        <!--  
                         <div style="margin-top: 0px">
                             <field name="google_map_partner" widget="map"/>
                         </div>
+                        -->
                     </group>
 
                     <footer>
