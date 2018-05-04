@@ -255,6 +255,22 @@
             </field>
         </record>
 
+<!--#############################################________Vue map________#####################################################-->
+
+        <record id="of_planning_intervention_view_map" model="ir.ui.view" >
+            <field name="name">of.planning.intervention.map</field>
+            <field name="model">of.planning.intervention</field> 
+            <field name="arch" type="xml" >
+                <map string="Map" latitude_field="geo_lat" longitude_field="geo_lng"> <!-- class="o_res_partner_map" -->
+                    <field name="geo_lat" required="1"/>
+                    <field name="geo_lng" required="1"/>
+                    <field name="name" class="oe_map_displayer_header"/>
+                    <field name="street" class="oe_map_displayer_body"/>
+                    <field name="phone" class="oe_map_displayer_body"/>
+                </map>
+            </field>
+        </record>
+
 <!--##########################################################################################################################-->
 <!--#############################################_________Tâches_________#####################################################-->
 <!--##########################################################################################################################-->
@@ -546,7 +562,7 @@
             <field name="name">Planning d'intervention</field>
             <field name="res_model">of.planning.intervention</field>
             <field name="view_type">form</field>
-            <field name="view_mode">calendar,form,gantt,tree</field>
+            <field name="view_mode">calendar,form,gantt,tree,map</field>
             <field name="context">{'search_default_state_confirm':1,'search_default_state_done':1,'search_default_state_draft':1}</field>
             <field name="view_id" ref="of_planning_intervention_view_calendar"/>
             <field name="search_view_id" ref="of_planning_intervention_filter"/>

@@ -124,11 +124,26 @@
             </field>
         </record>
 
+        <!-- Map view pour tournees -->
+        <record id="of_planning_tournee_view_map" model="ir.ui.view" >
+            <field name="name">of.planning.tournee.map</field>
+            <field name="model">of.planning.tournee</field> 
+            <field name="arch" type="xml">
+                <map string="Map" latitude_field="epi_lat" longitude_field="epi_lon">
+                    <field name="epi_lat" required="1"/>
+                    <field name="epi_lon" required="1"/>
+                    <field name="equipe_id" class="oe_map_displayer_header"/>
+                    <field name="zip_id" class="oe_map_displayer_body"/>
+                    <field name="distance" class="oe_map_displayer_body"/>
+                </map>
+            </field>
+        </record> 
+
         <record id="action_of_planning_tournee_tree" model="ir.actions.act_window">
             <field name="name">Préparation des tournées</field>
             <field name="res_model">of.planning.tournee</field>
             <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree,form,map</field>
             <field name="view_id" ref="of_planning_tournee.of_planning_tournee_view_tree"/>
             <field name="context">{'search_default_filter_incomplet':1}</field>
         </record>

@@ -5,7 +5,7 @@
         <record id="view_res_wizard" model="ir.ui.view">
             <field name="name">Planifier une intervention</field>
             <field name="model">of.tournee.rdv</field>
-            <field name="type">form</field>
+            <field name="type">form</field> <!-- <field name="view_mode">form,map</field> -->
             <field name="arch" type="xml">
                 <form string="Planifier une intervention">
                     <group name="informations" col="4">

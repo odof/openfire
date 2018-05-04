@@ -1,13 +1,36 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
+##############################################################################
+#
+#    OpenFire
+#    Version OF10.0
+#
+#    Module conçu et développé par OpenFire SAS sous licence AGPL-3.0
+#
+#    Compatible avec Odoo 10 Community Edition
+#    Copyright © 2004-2016 Odoo S.A. License GNU LGPL
+#
+##############################################################################
+
 {
-    "name" : "OpenFire / Planning",
-    "version" : "10.0.1.0.0",
-    "author" : "OpenFire",
-    "website" : "http://www.openfire.fr",
-    "category" : "Generic Modules/Gestion des Interventions",
-    "description": """ Le module OpenFire des plannings d'intervention.
-Inclut la gestion d'équipes d'intervention.""",
-    "depends" : [
+    'name' : "OpenFire - Planning",
+    'version' : "10.0.1.0.0",
+    'license': 'AGPL-3',
+    'author' : "OpenFire",
+    'website' : "www.openfire.fr",
+    'category': "Generic Modules / Gestion des Interventions",
+    'summary': u"Planification des interventions",
+    'description': u"""
+Module OpenFire - Plannings d'intervention
+==========================================
+Le module OpenFire des plannings d'intervention.
+Inclut la gestion d'équipes d'intervention.
+
+Fonctionnalités
+----------------
+
+""",
+    'depends' : [
         'hr',
         'product',
         'sale',
@@ -15,13 +38,12 @@ Inclut la gestion d'équipes d'intervention.""",
         'of_gesdoc',
         'of_calendar',
         'of_kit',
+        #'of_map_view',
     ],
-    "init_xml" : [],
-    "demo_xml" : [],
-    'css' : [
-        "static/src/css/of_planning.css",
-    ],
-    "data" : [
+    'external_dependancies': {
+        #'python': ['pypackage1', 'pypackage2'],
+    },
+    'data' : [
         'security/of_planning_security.xml',
         'security/ir.model.access.csv',
         # 'wizard/wizard_calendar.xml',
@@ -38,5 +60,18 @@ Inclut la gestion d'équipes d'intervention.""",
         'report/of_planning_fiche_intervention_view.xml',
         'report/of_planning_report_templates.xml',
     ],
-    "installable": True,
+    'demo': [],
+    'demo_xml' : [],
+    'init_xml' : [],
+    'css' : [
+        'static/src/css/of_planning.css',
+    ],
+    'qweb': [
+        #'static/src/xml/*.xml',
+    ],
+    'active': True,
+    'installable': True,
+    'application': False,
+    'auto_install': False,
 }
+# vim:expandtab:smartindent:tabstop=4:sorderttabstop=4:shiftwidth=4:

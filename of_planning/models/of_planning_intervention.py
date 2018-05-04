@@ -192,6 +192,13 @@ class OfPlanningIntervention(models.Model):
     partner_id = fields.Many2one('res.partner', string='Client', compute='_get_partner_id', store=True)
     address_id = fields.Many2one('res.partner', string='Adresse')
     partner_city = fields.Char(related='address_id.city')
+
+    # MapView Fields
+    geo_lat = fields.Float(related='partner_id.geo_lat')
+    geo_lng = fields.Float(related='partner_id.geo_lng')
+    phone = fields.Char(related='partner_id.phone')
+    street = fields.Char(related='partner_id.street')
+
     raison_id = fields.Many2one('of.planning.intervention.raison', string='Raison')
     tache_id = fields.Many2one('of.planning.tache', string='Tâche', required=True)
     equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe', required=True, oldname='poseur_id')
