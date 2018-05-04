@@ -300,6 +300,19 @@ class ResPartner(models.Model):
             self._update_refs(ref, partner_refs)
         return True
 
+class Module(models.Model):
+    _inherit = 'ir.module.module'
+
+    @api.multi
+    def button_immediate_upgrade(self):
+        super(Module, self).button_immediate_upgrade()
+        # Dans le cadre d'une mise à jour de module, on souhaite rester sur la page courante.
+        # On retourne donc une action de rechargement de la page sans spéficier de menu.
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }
+
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
