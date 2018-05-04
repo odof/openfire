@@ -381,8 +381,8 @@ msgstr "Kits"
 
 #. module: of_kit
 #: model:ir.ui.menu,name:of_kit.of_menu_kit_form_action_sale
-msgid "Kits (Nouveaux)"
-msgstr "Kits (Nouveaux)"
+msgid "Kits"
+msgstr "Kits"
 
 #. module: of_kit
 #: model:ir.ui.view,arch_db:of_kit.of_product_product_form_view_kit_button
