@@ -10,7 +10,7 @@
 Extension OpenFire du module sale_stock
 =======================================
 
-- Ajout du champ 'product_value' dans 'stock.inventory.line' pour le groupe Comptabilité - Gestionnaire
+- Ajout des champ 'product_value_unit' et 'product_value' dans 'stock.inventory.line' pour le groupe Comptabilité - Gestionnaire
 - Ajout du rapport "Inventaire valorisé" dans 'stock.inventory.line' pour le groupe Comptabilité - Gestionnaire
 - Ajout d'un filtre avancé dans les devis/bons de commandes sur la date et la date de transfert du bon de livraison
 - Ajout d'une option pour afficher l'article et sa description dans le bon de livraison et les documents imprimables associés

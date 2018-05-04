@@ -4,27 +4,44 @@ from odoo import api, fields, models
 import odoo.addons.decimal_precision as dp
 
 
-class OFSaleStockInventory(models.Model):
+class StockInventory(models.Model):
     _inherit = "stock.inventory"
     _order = "date desc, name"
 
 
-class OFSaleStockInventoryLine(models.Model):
+class StockInventoryLine(models.Model):
     _inherit = "stock.inventory.line"
 
-    currency_id = fields.Many2one('res.currency', string='Currency', readonly=True, related="company_id.currency_id")
-    product_value = fields.Monetary('Value', digits=dp.get_precision('Product Price'), compute="_compute_product_value")
+    @api.model_cr_context
+    def _auto_init(self):
+        # Initialise la valeur des lignes d'inventaire déjà existantes en base de données
+        self._cr.execute("SELECT * FROM information_schema.columns "
+                         "WHERE table_name = 'stock_inventory_line' AND column_name = 'product_value_unit'")
+        set_value = not self._cr.fetchall()
+        super(StockInventoryLine, self)._auto_init()
+        if set_value:
+            for inv in self.sudo().env['stock.inventory'].search([]):
+                inv = inv.with_context(force_company=inv.company_id.id)
+                for line in inv.line_ids:
+                    line._onchange_product_id()
 
-    @api.multi
-    @api.depends('product_id.standard_price', 'product_qty')
+    currency_id = fields.Many2one('res.currency', string='Currency', readonly=True, related="company_id.currency_id")
+    product_value_unit = fields.Monetary(string='Valeur unitaire', digits=dp.get_precision('Product Price'))
+    product_value = fields.Monetary(string='Value', digits=dp.get_precision('Product Price'), compute="_compute_product_value")
+
+    @api.depends('product_value_unit', 'product_qty')
     def _compute_product_value(self):
         for line in self:
-            # @TODO: ajouter un paramètre config pour choisir la façon de calculer la valeur
-            # @TODO: gérer le multi-currency
-            if line.product_id:
-                line.product_value = line.product_id.standard_price * line.product_qty
-            else:
-                line.product_value = 0.0
+            line.product_value = line.product_value_unit * line.product_qty
+
+    @api.onchange('product_id', 'product_uom_id')
+    def _onchange_product_id(self):
+        if self.product_id and self.product_uom_id:
+            # On ramène la quantité saisie à l'unité de mesure d'achat
+            qty = self.product_uom_id._compute_quantity(1.0, self.product_id.uom_po_id)
+            self.product_value_unit = self.product_id.standard_price * qty
+        else:
+            self.product_value_unit = 0.0
 
 
 class SaleOrder(models.Model):
@@ -58,7 +75,7 @@ class SaleOrder(models.Model):
         return [('id', 'in', order_ids)]
 
 
-class OFSaleStockSaleOrderLine(models.Model):
+class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
     @api.onchange('product_uom_qty', 'product_uom', 'route_id')
@@ -66,10 +83,10 @@ class OFSaleStockSaleOrderLine(models.Model):
         # Inhiber la vérification de stock
         afficher_warning = self.env['ir.values'].get_default('sale.config.settings', 'of_stock_warning_setting')
         if afficher_warning:
-            return super(OFSaleStockSaleOrderLine, self)._onchange_product_id_check_availability()
+            return super(SaleOrderLine, self)._onchange_product_id_check_availability()
 
 
-class OFSaleConfiguration(models.TransientModel):
+class SaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'
 
     of_stock_warning_setting = fields.Boolean(string="(OF) Avertissements de stock", required=True, default=False,
@@ -81,7 +98,7 @@ class OFSaleConfiguration(models.TransientModel):
             'sale.config.settings', 'of_stock_warning_setting', self.of_stock_warning_setting)
 
 # Ajout configuration "Description articles"
-class OFStockConfiguration(models.TransientModel):
+class StockConfiguration(models.TransientModel):
     _inherit = 'stock.config.settings'
 
     group_description_BL_variant = fields.Selection([
