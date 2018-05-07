@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Modification vue wizard lignes de factures -->
+    <record id="view_invoice_line_form_escompte" model="ir.ui.view">
+        <field name="name">account.invoice.line.form.escompte</field>
+        <field name="model">account.invoice.line</field>
+        <field name="inherit_id" ref="account.view_invoice_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group" position="before">
+                <div name="escompte_alert" class="oe_grey" style="pading: 2%" attrs="{'invisible':[('of_type_escompte','=',False)]}">
+                    ATTENTION : Cet article est un escompte et non un article réel.
+                    <br/>
+                    INFO : Le montant de l'escompte doit être négatif. La quantité est toujours une unité.
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="of_type_escompte" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='quantity']" position="attributes">
+                <attribute name="attrs">{'readonly': [('of_type_escompte','=',True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='uom_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Rendre invisible champ 'Est un kit' -->
+    <record id="view_invoice_line_form_escompte_2" model="ir.ui.view">
+        <field name="name">account.invoice.line.form.escompte2</field>
+        <field name="model">account.invoice.line</field>
+        <field name="inherit_id" ref="of_kit.of_kit_view_invoice_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_is_kit']" position="attributes">
+                <attribute name="attrs">{'invisible': [('of_type_escompte','=',True)]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Rendre invisible champ 'Remise %' -->
+    <record id="view_invoice_line_form_escompte_3" model="ir.ui.view">
+        <field name="name">account.invoice.line.form.escompte3</field>
+        <field name="model">account.invoice.line</field>
+        <field name="inherit_id" ref="of_sale_discount.of_sale_discount_view_invoice_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_discount_formula']" position="attributes">
+                <attribute name="attrs">{'invisible': [('of_type_escompte','=',True)]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Rendre invisible champ 'Section' -->
+    <record id="view_invoice_line_form_escompte_4" model="ir.ui.view">
+        <field name="name">account.invoice.line.form.escompte4</field>
+        <field name="model">account.invoice.line</field>
+        <field name="inherit_id" ref="sale.account_invoice_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='layout_category_id']" position="attributes">
+                <attribute name="attrs">{'invisible':[('of_type_escompte','=',True)]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Rendre invisible champ 'Commande fournisseur' -->
+    <record id="view_invoice_line_form_escompte_5" model="ir.ui.view">
+        <field name="name">account.invoice.line.form.escompte5</field>
+        <field name="model">account.invoice.line</field>
+        <field name="inherit_id" ref="purchase.view_invoice_line_form_inherit_purchase"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='purchase_id']" position="attributes">
+                <attribute name="attrs">{'invisible':[('of_type_escompte','=',True)]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

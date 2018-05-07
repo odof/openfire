@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Modif invoice report -->
+    <template id="ofab_escompte_report_invoice_document" inherit_id="account.report_invoice_document" priority="32">
+        <!-- Change Subtotal by Total HT -->
+        <xpath expr="//div[@name='subdivision']//td" position="replace">
+            <td><strong>Total HT</strong></td>
+        </xpath>
+        <!-- Change Total by Net à payer -->
+        <xpath expr="//div[@name='subdivision']//tr[2]/td" position="replace">
+            <td><strong>Net à payer</strong></td>
+        </xpath>
+        <!-- Get only lines no escompte -->
+        <xpath expr="//tr[@t-foreach='o.invoice_line_ids']" position="attributes">
+            <attribute name="t-foreach">o.of_invoice_line_sans_escompte_ids</attribute>
+        </xpath>
+        <!-- Add Sous-total HT and escompte to report only if escompte != 0 -->
+        <xpath expr="//div[@name='subdivision']/table/tr" position="before">
+            <t t-if="o.of_total_amount_escompte != 0">
+                <tr class="border-black">
+                    <td><strong>Sous-total HT</strong></td>
+                    <td class="text-right">
+                        <span t-esc="o.amount_untaxed - o.of_total_amount_escompte" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Escompte</td>
+                    <td class="text-right">
+                        <span t-field="o.of_total_amount_escompte" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                    </td>
+                </tr>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- Modif when invoice report layouted -->
+    <template id="ofab_escompte_report_invoice_document_layouted" inherit_id="sale.report_invoice_layouted">
+        <xpath expr="//t[@t-foreach=&quot;layout_category['lines']&quot;]" position="attributes">
+            <attribute name="t-foreach">[line for line in layout_category['lines'] if not line.of_type_escompte]</attribute>
+        </xpath>
+    </template>
+
+</odoo>
