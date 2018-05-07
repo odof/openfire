@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_account_bank_reconciliation_form" model="ir.ui.view">
+        <field name="name">of.account.bank.reconciliation.form</field>
+        <field name="model">of.account.bank.reconciliation</field>
+        <field name="arch" type="xml">
+            <form string="Rapprochement bancaire">
+                <header>
+                    <button name="action_done" type="object" states="open" string="Valider" class="oe_highlight"/>
+                    <button name="action_open" type="object" states="done" string="Rouvrir"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet string="Rapprochement bancaire">
+                    <div>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="state" invisible="1"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="currency_id" groups="base.group_multi_currency"/>
+                        <field name="date"/>
+                        <field name="account_id" domain="[('company_id', '=', company_id)]"/>
+                        <field name="amount_account"/>
+                        <field name="amount_total"/>
+                        <field name="amount_total_prec"/>
+                        <field name="amount_lines"/>
+                        <field name="amount_diff"/>
+                        <field name="move_line_ids" widget="many2many"
+                               options="{'not_delete':True, 'no_create_edit': True}"
+                               domain="[('account_id', '=', account_id), ('of_reconciliation_id', 'in', (False, id))]">
+                            <tree>
+                                <field name="date"/>
+                                <field name="name"/>
+                                <field name="journal_id"/>
+                                <field name="account_id"/>
+                                <field name="debit"/>
+                                <field name="credit"/>
+                                <field name="balance"/>
+                            </tree>
+                        </field>
+                        <field name="note"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_account_bank_reconciliation_tree" model="ir.ui.view">
+        <field name="name">of.account.bank.reconciliation.tree</field>
+        <field name="model">of.account.bank.reconciliation</field>
+        <field name="arch" type="xml">
+            <tree string="Rapprochement bancaire" decoration-info="state == 'open'">
+                <field name="date"/>
+                <field name="name"/>
+                <field name="account_id"/>
+                <field name="amount_total_prec"/>
+                <field name="amount_total"/>
+                <field name="amount_lines"/>
+                <field name="amount_diff"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_action_account_bank_reconciliation_form" model="ir.actions.act_window">
+        <field name="name">Rapprochements bancaires</field>
+        <field name="res_model">of.account.bank.reconciliation</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem action="of_action_account_bank_reconciliation_form" id="of_menu_action_account_bank_reconciliation_form"
+        parent="account.menu_finance_entries" sequence="23"/>
+
+    <!-- Ajout du rapprochement bancaire dans le formulaire d'écriture comptable -->
+    <record id="of_account_bank_reconciliation_view_move_line_form" model="ir.ui.view">
+        <field name="name">of.account.bank.reconciliation.move.line.form</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="account.view_move_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='open_reconcile_view']/.." position="after">
+                <field name='of_reconciliation_id' groups="account.group_account_manager"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
