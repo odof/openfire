@@ -7,7 +7,7 @@
     <record id="of_product_template_form_view" model="ir.ui.view">
         <field name="name">of.kit.product.template.common.form</field>
         <field name="model">product.template</field>
-        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
         <field name="priority">20</field>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='options']" position="inside">
@@ -118,7 +118,7 @@
     <record id="of_template_open_kit_view_form" model="ir.actions.act_window.view">
         <field eval="2" name="sequence"/>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="of_product_template_form_view"/>
+        <field name="view_id" eval="False"/>
         <field name="act_window_id" ref="of_template_open_kit"/>
     </record>
     <record id="of_product_template_form_view_kit_button" model="ir.ui.view">
