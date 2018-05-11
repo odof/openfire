@@ -22,6 +22,10 @@
             <button name="action_invoice_sent" position="attributes">
                 <attribute name="attrs">{'invisible':[('state','in',('cancel','draft'))]}</attribute>
             </button>
+            <field name="fiscal_position_id" position="replace"/>
+            <field name="date_invoice" position="after">
+                <field name="fiscal_position_id" required="1"/>
+            </field>
         </field>
     </record>
 
