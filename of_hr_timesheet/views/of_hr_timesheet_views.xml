@@ -118,7 +118,7 @@
 
     <!-- Submenu Catégories d'activités -->
     <menuitem action="of_hr_timesheet_categ_action_form" id="menu_of_hr_timesheet_categ_action_form" 
-        parent="of_hr_timesheet_categories.main_menu_of_timesheet_categories" sequence="10"/> <!-- groups="base.group_hr_manager" -->
+        parent="of_hr_timesheet.main_menu_of_timesheet_categories" sequence="10"/> <!-- groups="base.group_hr_manager" -->
 
     <!-- Submenu Comptes des feuilles de temps -->
     <menuitem name="Comptes des feuilles de temps" id="menu_of_hr_timesheet_categories_comptes" sequence="9"

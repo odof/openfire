@@ -10,7 +10,7 @@ class OFHrTimesheetCateg(models.Model):
     parent_id = fields.Many2one('of.hr.timesheet.categ', 'Catégorie parente', select=True, ondelete='restrict')
 
     _constraints = [
-        (models.Model._check_recursion, 'Error ! You can not create recursive category.', ['parent_id'])
+        (models.Model._check_recursion, u'Erreur ! Vous ne pouvez pas créer de catégorie récursive.', ['parent_id'])
     ]
 
     # Pour afficher la hiérarchie des catégories
