@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="wizard_insert_kit_comps_form" model="ir.ui.view">
+        <field name="name">of.wizard.insert.kit.comps.form</field>
+        <field name="model">of.wizard.insert.kit.comps</field>
+        <field name="arch" type="xml">
+            <form>
+                <separator string="Sélectionnez le kit dont vous voulez ajouter les composants"/>
+                <group col="2">
+                    <field name="product_id" domain="[('of_is_kit', '!=', False)]"/>
+                    <field name="comp_ids" attrs=" {'invisible': [('product_id', '=', False)]}">
+                        <tree editable="bottom">
+                            <field name="product_id"/>
+                            <field name="product_uom_qty"/>
+                            <field name="product_uom_id"/>
+                            <field name="product_uom_categ_id" invisible="1"/>
+                        </tree>
+                    </field>
+                </group>
+                <footer>
+                    <button name="button_confirm_lines" string="Confirmer" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_wizard_insert_kit_comps" model="ir.actions.act_window">
+        <field name="name">Ajout composants kit</field>
+        <field name="res_model">of.wizard.insert.kit.comps</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="wizard_insert_kit_comps_form"/>
+        <field name="target">new</field>
+    </record>
+
+    <record id="wizard_insert_kit_comps_sale_order_form" model="ir.ui.view">
+        <field name="name">of.wizard.insert.kit.comp.sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="before">
+                <button name="%(action_wizard_insert_kit_comps)d" string="Ajout composants kit" type="action" class="btn-default" states="draft,sent"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
