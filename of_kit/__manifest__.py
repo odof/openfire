@@ -28,6 +28,7 @@
     'data': [
         'views/of_kit_views.xml',
         'report/of_kit_report_templates.xml',
+        'wizards/of_wizard_insert_kit_comps_view.xml',
         'security/ir.model.access.csv',
         'data/of_kit_data.xml',
     ],
