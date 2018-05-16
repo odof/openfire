@@ -17,6 +17,13 @@ class ProductTemplate(models.Model):
     # Retrait de la société par défaut
     company_id = fields.Many2one(default=False)
 
+    # Ajout de la catégorie d'udm pour permettre de filtrer les udms d'achat autorisées
+    of_uom_category_id = fields.Many2one(related='uom_id.category_id')
+    uom_po_id = fields.Many2one(domain="[('category_id', '=', of_uom_category_id)]")
+    # Ajout de champs copiés de l'udm de vente pour affichage
+    of_uom_po_id_display = fields.Many2one(related='uom_po_id', readonly=True)
+    of_uom_po_id_display2 = fields.Many2one(related='uom_po_id', readonly=True)
+
     # Champs ajoutés pour openImport et affichage dans formulaire produit
     of_seller_pp_ht = fields.Float(related="seller_ids.pp_ht")
     of_seller_price = fields.Float(related="seller_ids.price", string="Prix d'achat")
