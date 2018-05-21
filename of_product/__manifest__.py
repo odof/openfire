@@ -16,6 +16,7 @@ Ce module apporte une personnalisation des produits :
 """,
     'depends' : [
         'product',
+        'purchase',
     ],
     'data': [
         'views/of_product_views.xml',
