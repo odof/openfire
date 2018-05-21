@@ -3,9 +3,9 @@
     <template id="assets_backend" name="of_web_widgets assets" inherit_id="web.assets_backend">
         <xpath expr="." position="inside">
             <link rel="stylesheet" href="/of_web_widgets/static/src/less/of_web_widgets.less"/>
-
             <script type="text/javascript" src="/of_web_widgets/static/src/js/of_kanban_widgets.js"></script>
             <script type="text/javascript" src="/of_web_widgets/static/src/js/of_form_relational_widgets.js"></script>
+            <script type="text/javascript" src="/of_web_widgets/static/src/js/of_form_common.js"></script>
         </xpath>
     </template>
 </odoo>
