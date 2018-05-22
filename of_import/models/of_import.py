@@ -225,7 +225,7 @@ class OFProductBrand(models.Model):
         return self.of_import_categ_id
 
     @api.multi
-    def compute_product_price(self, list_price, categ_name, product=None, price=None, remise=None):
+    def compute_product_price(self, list_price, categ_name, uom, uom_po, product=None, price=None, remise=None):
         """
         @param categ_name: Nom de la catégorie de produit telle que donnée par le fournisseur
         @param product: Objet product.template si existant sur la base actuellement
@@ -235,13 +235,15 @@ class OFProductBrand(models.Model):
 
         categ_config = self.env['of.import.product.categ.config'].search([('brand_id', '=', self.id), ('categ_origin', '=', categ_name)])
 
+        udm_ratio = uom_po._compute_price(1.0, uom) if uom_po else 1.0
         eval_dict = {
             'ppht' : list_price,
             'cumul': self.compute_remise,
+            'udm_ratio': udm_ratio,
         }
 
         fields = (('of_import_remise', 'remise', 'la remise'),
-                  ('of_import_price', 'list_price', 'le prix public ht'),
+                  ('of_import_price', 'list_price', 'le prix de vente HT'),
                   ('of_import_cout', 'standard_price', u'le coût'))
         values = {}
         for config_field, product_field, text in fields:
@@ -274,17 +276,20 @@ class OFProductBrand(models.Model):
                     raise OfImportError(u"Aucune formule n'est renseignée pour %s de cet article." % (text, ))
 
         values['of_seller_price'] = eval_dict['pa']
+        values['list_price'] *= udm_ratio
+        values['standard_price'] *= udm_ratio
+
         return values
 
     @api.multi
-    def compute_product_values(self, list_price, categ_name, product=None, price=None, remise=None):
+    def compute_product_values(self, list_price, categ_name, uom_id, uom_po_id, product=None, price=None, remise=None):
         self.ensure_one()
 
         categ = self.compute_product_categ(categ_name, product=product)
         if not categ:
             raise UserError(u"Impossible de trouver la catégorie de produits correspondant à \"%s\"" % (categ_name, ))
 
-        values = self.compute_product_price(list_price, categ_name, product=product, price=price, remise=remise)
+        values = self.compute_product_price(list_price, categ_name, uom_id, uom_po_id, product=product, price=price, remise=remise)
         values['categ_id'] = categ.id
         return values
 
@@ -315,45 +320,14 @@ class ProductTemplate(models.Model):
                     values = product.brand_id.compute_product_values(
                         seller.pp_ht,
                         seller.of_product_category_name,
+                        product.uom_id,
+                        product.uom_po_id,
                         product
                     )
                     values = {key: val for key, val in values.iteritems() if self._fields[key].convert_to_write(product[key], product) != val}
                     if values:
                         product.write(values)
                     break
-
-class ProductProduct(models.Model):
-    _inherit = 'product.product'
-
-    @api.multi
-    def of_propage_cout(self, cout):
-        # Le coût (standard_price) est défini sur l'ensemble des sociétés.
-        # Si le module of_base_multicompany est installé, il est inutile de le diffuser sur les sociétés "magasins"
-        companies = self.env['res.company'].search(['|', ('chart_template_id', '!=', False), ('parent_id', '=', False)])
-        property_obj = self.env['ir.property'].sudo()
-        values = {product.id: cout for product in self}
-        for company in companies:
-            property_obj.with_context(force_company=company.id).set_multi('standard_price', 'product.product', values)
-
-    @api.model
-    def create(self, vals):
-        propage_cout = self._context.get('from_import') and 'standard_price' in vals
-        if propage_cout:
-            cout = vals.pop('standard_price')
-        product = super(ProductProduct, self).create(vals)
-        if propage_cout:
-            product.of_propage_cout(cout)
-        return product
-
-    @api.multi
-    def write(self, vals):
-        propage_cout = self._context.get('from_import') and 'standard_price' in vals
-        if propage_cout:
-            cout = vals.pop('standard_price')
-        super(ProductProduct, self).write(vals)
-        if propage_cout:
-            self.of_propage_cout(cout)
-        return True
 
 class OfImport(models.Model):
     _name = 'of.import'
@@ -645,6 +619,7 @@ class OfImport(models.Model):
         @param valeurs: Dictionnaire de valeurs pour l'import sur lequel cette fonction appliquera des modifications
         """
         if self.type_import == 'product.template':
+            uom_obj = self.env['product.uom']
             brand_id = valeurs.get('brand_id')
             if brand_id:
                 brand = self.env['of.product.brand'].browse(brand_id)
@@ -658,6 +633,8 @@ class OfImport(models.Model):
                 valeurs['of_seller_pp_ht'] = valeurs['list_price']
                 valeurs.update(brand.compute_product_price(valeurs['list_price'],
                                                            valeurs.get('of_seller_product_category_name', res_objet and res_objet.of_seller_product_category_name or ''),
+                                                           uom_obj.browse(valeurs['uom_id']),
+                                                           uom_obj.browse(valeurs['uom_po_id']),
                                                            product=res_objet,
                                                            price=valeurs.get('of_seller_price'),
                                                            remise=valeurs.get('of_seller_remise')))
@@ -1074,6 +1051,10 @@ class OfImport(models.Model):
                         break
                 else:
                     sortie_erreur += u"Un préfixe doit être choisi pour l'import, ou une colonne du fichier doit définir la marque des articles\n"
+
+            # Les udm des articles seront nécessaires pour le calcul des prix de revient et de vente
+            for key, val in self.env['product.template'].default_get(('uom_id', 'uom_po_id')).iteritems():
+                model_data['default_' + key] = val
 
             # L'import de tarif est susceptible d'ajouter des lignes de configuration dans les marques.
             # On sauvegarde l'état actuel pour récupérer les lignes nouvellement créées

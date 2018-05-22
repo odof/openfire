@@ -58,6 +58,36 @@ class ProductProduct(models.Model):
             values['default_code'] = self.env['product.template'].browse(values['product_tmpl_id']).default_code
         return super(ProductProduct, self)._add_missing_default_values(values)
 
+    @api.multi
+    def of_propage_cout(self, cout):
+        # Le coût (standard_price) est défini sur l'ensemble des sociétés.
+        # Si le module of_base_multicompany est installé, il est inutile de le diffuser sur les sociétés "magasins"
+        companies = self.env['res.company'].search(['|', ('chart_template_id', '!=', False), ('parent_id', '=', False)])
+        property_obj = self.env['ir.property'].sudo()
+        values = {product.id: cout for product in self}
+        for company in companies:
+            property_obj.with_context(force_company=company.id).set_multi('standard_price', 'product.product', values)
+
+    @api.model
+    def create(self, vals):
+        propage_cout = 'standard_price' in vals
+        if propage_cout:
+            cout = vals.pop('standard_price')
+        product = super(ProductProduct, self).create(vals)
+        if propage_cout:
+            product.of_propage_cout(cout)
+        return product
+
+    @api.multi
+    def write(self, vals):
+        propage_cout = 'standard_price' in vals
+        if propage_cout:
+            cout = vals.pop('standard_price')
+        super(ProductProduct, self).write(vals)
+        if propage_cout:
+            self.of_propage_cout(cout)
+        return True
+
 class ProductSupplierInfo(models.Model):
     _inherit = "product.supplierinfo"
 
