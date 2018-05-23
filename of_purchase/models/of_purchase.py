@@ -12,7 +12,7 @@ class PurchaseOrder(models.Model):
 
     customer_id = fields.Many2one('res.partner', string='Client')
     sale_order_id = fields.Many2one('sale.order', string="Commande d'origine")
-    delivery_expected = fields.Char(string='Livraison Attendue', states={'done': [('readonly', True)]})
+    delivery_expected = fields.Char(string='Livraison attendue', states={'done': [('readonly', True)]})
 
 class ProcurementOrder(models.Model):
     _inherit = 'procurement.order'

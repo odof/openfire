@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Change colonne "Date demandée" par "Livraison attendue" dans les devis -->
+    <record id="of_zz_1_view_order_tree" model="ir.ui.view">
+        <field name="name">of.1.sale.order.tree</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_order_dates.view_quotation_tree_date"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree//field[@name='requested_date']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//tree//field[@name='commitment_date']" position="before">
+                <field name="delivery_expected"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Change colonne "Date demandée" par "Livraison attendue" dans les bons de commande -->
+    <record id="of_zz_1_view_order_tree_2" model="ir.ui.view">
+        <field name="name">of.1.sale.order.tree.2</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_order_dates.view_order_tree_date"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree//field[@name='requested_date']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//tree//field[@name='commitment_date']" position="before">
+                <field name="delivery_expected"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
