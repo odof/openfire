@@ -1,13 +1,32 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
+##############################################################################
+#
+#    OpenFire
+#    Version OF10.0
+#
+#    Module conçu et développé par OpenFire SAS
+#
+#    Compatible avec Odoo 10 Community Edition
+#
+##############################################################################
+
 {
-    "name" : "OpenFire / Planning",
-    "version" : "10.0.1.0.0",
-    "author" : "OpenFire",
-    "website" : "http://www.openfire.fr",
-    "category" : "Generic Modules/Gestion des Interventions",
-    "description": """ Le module OpenFire des plannings d'intervention.
-Inclut la gestion d'équipes d'intervention.""",
-    "depends" : [
+    'name' : "OpenFire - Planning",
+    'version' : "10.0.1.0.0",
+    'author' : "OpenFire",
+    'website' : "www.openfire.fr",
+    'category': "Generic Modules",
+    'summary': u"Gestion des interventions",
+    'description': u"""
+Module OpenFire - Planning
+==========================
+
+Module OpenFire des plannings d'intervention.
+Inclut la gestion des équipes d'intervention.
+
+""",
+    'depends' : [
         'hr',
         'product',
         'sale',
@@ -16,27 +35,20 @@ Inclut la gestion d'équipes d'intervention.""",
         'of_calendar',
         'of_kit',
     ],
-    "init_xml" : [],
-    "demo_xml" : [],
-    'css' : [
-        "static/src/css/of_planning.css",
-    ],
-    "data" : [
+    'data' : [
         'security/of_planning_security.xml',
         'security/ir.model.access.csv',
-        # 'wizard/wizard_calendar.xml',
-        # 'of_planning_view.xml',
-        # 'of_planning_data.xml',
-        # 'wizard/wizard_print_pose.xml',
-        # 'wizard/wizard_print_res.xml',
-        # 'wizard/wizard_equipe_semaine.xml',
-        # 'of_planning_report.xml',
         'wizard/message_invoice.xml',
         'views/of_planning_intervention_view.xml',
         'views/of_planning_report_view.xml',
-        # 'wizard/of_planning_pose_mensuel_view.xml',
         'report/of_planning_fiche_intervention_view.xml',
         'report/of_planning_report_templates.xml',
     ],
-    "installable": True,
+    'css' : [
+        'static/src/css/of_planning.css',
+    ],
+    'active': True,
+    'installable': True,
+    'application': False,
+    'auto_install': False,
 }
