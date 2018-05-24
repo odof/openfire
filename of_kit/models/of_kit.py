@@ -3,7 +3,6 @@
 
 from odoo import api, fields, models, _
 from odoo.addons import decimal_precision as dp
-from odoo.exceptions import UserError, ValidationError
 
 class ProductTemplate(models.Model):
     _inherit = "product.template"
@@ -12,21 +11,25 @@ class ProductTemplate(models.Model):
     is_kit_comp = fields.Boolean(string="Is a comp", compute="_compute_is_kit_comp", store=True, help="is a component of a kit")  # store=True for domain searches and _sq_constraint
     kit_line_ids = fields.One2many('of.product.kit.line', 'kit_id', string='Components')
 
-    price_comps = fields.Monetary('Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_compo_price_n_cost',
-                                  help="Sum of the prices of all components necessary for 1 unit of this kit")
-    cost_comps = fields.Monetary('Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_compo_price_n_cost',
-                                  help="Sum of the costs of all components necessary for 1 unit of this kit")
+    price_comps = fields.Monetary(
+        string='Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_compo_price_n_cost',
+        help="Sum of the prices of all components necessary for 1 unit of this kit")
+    cost_comps = fields.Monetary(
+        string='Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_compo_price_n_cost',
+        help="Sum of the costs of all components necessary for 1 unit of this kit")
 
-    of_price_used = fields.Monetary('Used Price', digits=dp.get_precision('Product Price'), compute='_compute_of_price_used',
-                    help="Price that will be taken into account in sale orders and invoices. Either list price or the price of its components, dependant on the pricing.")
+    of_price_used = fields.Monetary(
+        string='Used Price', digits=dp.get_precision('Product Price'), compute='_compute_of_price_used',
+        help="Price that will be taken into account in sale orders and invoices. Either list price or the price of its components, dependant on the pricing.")
 
-    of_pricing = fields.Selection([
-        ('fixed', 'Fixed'),
-        ('computed', 'Computed')
+    of_pricing = fields.Selection(
+        [
+            ('fixed', 'Fixed'),
+            ('computed', 'Computed'),
         ], string="Pricing", required=True, default='fixed',
-            help="This field is only relevant if the product is a kit. It represents the way the price should be computed. \n \
-                if set to 'fixed', the price of it's components won't be taken into account and the price will be the one of the kit. \n \
-                if set to 'computed', the price will be computed according to the components of the kit.")
+        help="This field is only relevant if the product is a kit. It represents the way the price should be computed.\n"
+             "if set to 'fixed', the price of it's components won't be taken into account and the price will be the one of the kit.\n"
+             "if set to 'computed', the price will be computed according to the components of the kit.")
 
     kit_count = fields.Integer('# Kits', compute='_compute_kit_count')
     comp_count = fields.Integer('# Comps', compute='_compute_comp_count')
@@ -77,27 +80,6 @@ class ProductTemplate(models.Model):
             lines.append((0, 0, comp_vals))
         res["kit_line_ids"] = lines
         return res
-
-    """
-    implementation future -> ajouter les composants d'un kit en tant que lignes de commandes
-    def get_saleorder_kit_nom_data(self):
-        self.ensure_one()
-        res = {}
-        lines = []
-        new_line_vals = {}
-        for line in self.kit_line_ids:
-            new_line_vals = new_line_vals.copy()
-            new_line_vals["product_id"] = line.product_id.id
-            new_line_vals["product_uom"] = line.product_uom_id.id
-            new_line_vals["product_uom_qty"] = line.product_qty
-            new_line_vals["sequence"] = line.sequence
-            new_line_vals["name"] = line.product_id.name_get()[0][1] or line.product_id.name
-            new_line_vals["price_unit"] = line.product_id.list_price
-            new_line_vals["customer_lead"] = line.product_id.sale_delay
-            lines.append((0, 0, new_line_vals))
-        res["order_line"] = lines
-        return res
-    """
 
     @api.multi
     @api.depends('kit_line_ids')
@@ -205,12 +187,15 @@ class OfProductKitLine(models.Model):
     _name = "of.product.kit.line"
     _order = 'kit_id, sequence'
 
-    kit_id = fields.Many2one("product.template", string="Kit",  domain="[('is_kit_comp', '=', False)]",
-                             help="Kit containing this as component", ondelete="cascade")
-    product_id = fields.Many2one("product.product", string="Product", domain="[('of_is_kit', '=', False)]", required=True,
-                                 help="Product this line references")
-    product_qty = fields.Float(string='Qty / Kit', digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0,
-                               help="Quantity per kit unit.")
+    kit_id = fields.Many2one(
+        "product.template", string="Kit",  domain="[('is_kit_comp', '=', False)]",
+        help="Kit containing this as component", ondelete="cascade")
+    product_id = fields.Many2one(
+        "product.product", string="Product", domain="[('of_is_kit', '=', False)]", required=True,
+        help="Product this line references")
+    product_qty = fields.Float(
+        string='Qty / Kit', digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0,
+        help="Quantity per kit unit.")
     product_uom_categ_id = fields.Many2one(related='product_id.uom_id.category_id', readonly=True)
     product_uom_id = fields.Many2one('product.uom', string='UoM', domain="[('category_id', '=', product_uom_categ_id)]", required=True)
     product_price = fields.Float(related='product_id.list_price', readonly=True)
@@ -234,7 +219,6 @@ class OfProductKitLine(models.Model):
         line = super(OfProductKitLine, self).create(vals)
         line.kit_id.type = 'service'
         line.product_id._compute_is_kit_comp()
-        #line.product_id._compute_kit_count()
         return line
 
     @api.multi
@@ -283,7 +267,7 @@ class StockMove(models.Model):
         # Update delivered quantities on sale order lines that are not kits
         result = super(StockMove, self).action_done()
         # Update delivered quantities on sale order line components
-        sale_order_components = self.filtered(lambda move: move.product_id.expense_policy == 'no').mapped('procurement_id.of_sale_comp_id') # bug mal initialisé of_sale_comp_id?
+        sale_order_components = self.filtered(lambda move: move.product_id.expense_policy == 'no').mapped('procurement_id.of_sale_comp_id')  # bug mal initialisé of_sale_comp_id?
         for comp in sale_order_components:
             comp.qty_delivered = comp._get_delivered_qty()
         lines = sale_order_components.mapped('kit_id.order_line_id')
@@ -292,6 +276,4 @@ class StockMove(models.Model):
             qty_delivered = line._get_delivered_qty_hack()
             if qty_delivered != 0:
                 line.qty_delivered = qty_delivered
-
         return result
-

@@ -307,10 +307,6 @@
                     </i>
                 </div>
             </xpath>
-            <!-- implementation future -> ajouter les composants d'un kit en tant que lignes de commandes
-            <xpath expr="//field[@name='order_line']" position="before">
-                <field name="of_inser_nom"/>
-            </xpath-->
         </field>
     </record>
 
