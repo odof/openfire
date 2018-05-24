@@ -580,22 +580,22 @@ msgstr "Quantité par kit"
 #. module: of_kit
 #: model:ir.model.fields,help:of_kit.field_of_invoice_kit_line_qty_per_kit
 msgid "Quantity per kit unit (invoice line).\n"
-"                        example: 2 kit K1 -> 3 prod P. \n"
+"example: 2 kit K1 -> 3 prod P.\n"
 "P.qty_per_kit = 3\n"
 "P.qty_total = 6"
 msgstr "Quantité par kit (ligne de facture).\n"
-"                        exemple: 2 kit K1 -> 3 prod P. \n"
+"exemple: 2 kit K1 -> 3 prod P.\n"
 "P.qty_per_kit = 3\n"
 "P.qty_total = 6"
 
 #. module: of_kit
 #: model:ir.model.fields,help:of_kit.field_of_saleorder_kit_line_qty_per_kit
 msgid "Quantity per kit unit (order line).\n"
-"						example: 2 kit K1 -> 3 prod P. \n"
+"example: 2 kit K1 -> 3 prod P.\n"
 "P.qty_per_kit = 3\n"
 "P.qty_total = 6"
 msgstr "Quantité par kit (ligne de commande).\n"
-"						exemple: 2 kit K1 -> 3 prod P. \n"
+"exemple: 2 kit K1 -> 3 prod P.\n"
 "P.qty_per_kit = 3\n"
 "P.qty_total = 6"
 
@@ -674,24 +674,24 @@ msgstr "Somme des prix des composant requis pour une unité de ce kit"
 #: model:ir.model.fields,help:of_kit.field_product_product_of_pricing
 #: model:ir.model.fields,help:of_kit.field_product_template_of_pricing
 #: model:ir.model.fields,help:of_kit.field_sale_order_line_of_pricing
-msgid "This field is only relevant if the product is a kit. It represents the way the price should be computed. \n"
-"                 if set to 'fixed', the price of it's components won't be taken into account and the price will be the one of the kit. \n"
-"                 if set to 'computed', the price will be computed according to the components of the kit."
-msgstr "Ce champ n'est pertinent que si le produit est un kit. Il représente la façon dont le prix du kit est défini. \n"
-"                 si 'fixé', le prix du kit est arbitraire et indépendant de son contenu. \n"
-"                 si 'calculé', le prix du kit est calculé en fonction de son contenu"
+msgid "This field is only relevant if the product is a kit. It represents the way the price should be computed.\n"
+"if set to 'fixed', the price of it's components won't be taken into account and the price will be the one of the kit.\n"
+"if set to 'computed', the price will be computed according to the components of the kit."
+msgstr "Ce champ n'est pertinent que si le produit est un kit. Il représente la façon dont le prix du kit est défini.\n"
+"si 'fixé', le prix du kit est arbitraire et indépendant de son contenu.\n"
+"si 'calculé', le prix du kit est calculé en fonction de son contenu"
 
 #. module: of_kit
 #: model:ir.model.fields,help:of_kit.field_of_invoice_kit_line_kit_pricing
 #: model:ir.model.fields,help:of_kit.field_of_invoice_kit_of_pricing
 #: model:ir.model.fields,help:of_kit.field_of_saleorder_kit_line_kit_pricing
 #: model:ir.model.fields,help:of_kit.field_of_saleorder_kit_of_pricing
-msgid "This field represents the way the price should be computed. \n"
-"                 if set to 'fixed', the price of it's components won't be taken into account and the price will be the one of the kit. \n"
-"                 if set to 'computed', the price will be computed according to the components of the kit."
-msgstr "Ce champ représente la façon dont le prix du kit est défini. \n"
-"                 si 'fixé', le prix du kit est arbitraire et indépendant de son contenu. \n"
-"                 si 'calculé', le prix du kit est calculé en fonction de son contenu"
+msgid "This field represents the way the price should be computed.\n"
+"if set to 'fixed', the price of it's components won't be taken into account and the price will be the one of the kit.\n"
+"if set to 'computed', the price will be computed according to the components of the kit."
+msgstr "Ce champ représente la façon dont le prix du kit est défini.\n"
+"si 'fixé', le prix du kit est arbitraire et indépendant de son contenu.\n"
+"si 'calculé', le prix du kit est calculé en fonction de son contenu"
 
 #. module: of_kit
 #: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_qty_total
@@ -723,7 +723,9 @@ msgstr "Coût unitaire"
 
 #. module: of_kit
 #: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_price_unit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_price_unit_display
 #: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_price_unit
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_price_unit_display
 msgid "Unit Price"
 msgstr "Prix unitaire"
 
@@ -753,24 +755,24 @@ msgstr "composants"
 #. module: of_kit
 #: model:ir.model.fields,help:of_kit.field_sale_order_of_kit_display_mode
 msgid "defines the way kits and their components should be printed out in pdf reports:\n"
-"			- None: One line per kit. Nothing printed out about components\n"
-"			- Collapse: One line per kit, with minimal info\n"
-"			- Expand: One line per kit, plus one line per component"
-msgstr "Défini la façon dont les kits et leurs composants seront imprimés dans les rapports PDF:\n"
-"			- Aucun: Une ligne par kit, sans information sur les composants\n"
-"			- Restreint: Une ligne par kit, avec informations minimales sur les composants\n"
-"			- Étendu: Une ligne par kit, plus une ligne par composant"
+"- None: One line per kit. Nothing printed out about components\n"
+"- Collapse: One line per kit, with minimal info\n"
+"- Expand: One line per kit, plus one line per component"
+msgstr "Définit la façon dont les kits et leurs composants seront imprimés dans les rapports PDF:\n"
+"- Aucun: Une ligne par kit, sans information sur les composants\n"
+"- Restreint: Une ligne par kit, avec informations minimales sur les composants\n"
+"- Étendu: Une ligne par kit, plus une ligne par composant"
 
 #. module: of_kit
 #: model:ir.model.fields,help:of_kit.field_account_invoice_of_kit_display_mode
 msgid "defines the way kits and their components should be printed out in pdf reports:\n"
-"            - None: One line per kit. Nothing printed out about components\n"
-"            - Collapse: One line per kit, with minimal info\n"
-"            - Expand: One line per kit, plus one line per component"
-msgstr "Défini la façon dont les kits et leurs composants seront imprimés dans les rapports PDF:\n"
-"            - Aucun: Une ligne par kit, sans information sur les composants\n"
-"            - Restreint: Une ligne par kit, avec informations minimales sur les composants\n"
-"            - Étendu: Une ligne par kit, plus une ligne par composant"
+"- None: One line per kit. Nothing printed out about components\n"
+"- Collapse: One line per kit, with minimal info\n"
+"- Expand: One line per kit, plus one line per component"
+msgstr "Définit la façon dont les kits et leurs composants seront imprimés dans les rapports PDF:\n"
+"- Aucun: Une ligne par kit, sans information sur les composants\n"
+"- Restreint: Une ligne par kit, avec informations minimales sur les composants\n"
+"- Étendu: Une ligne par kit, plus une ligne par composant"
 
 #. module: of_kit
 #: model:ir.model.fields,help:of_kit.field_product_product_is_kit_comp

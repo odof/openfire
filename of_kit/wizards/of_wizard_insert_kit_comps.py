@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, models, _
+from odoo import api, fields, models
 
 class OfWizardInsertKitComps(models.TransientModel):
     _name = "of.wizard.insert.kit.comps"
@@ -14,10 +14,10 @@ class OfWizardInsertKitComps(models.TransientModel):
         comp_lines = comp_line_obj.browse()
         for line in self.product_id.kit_line_ids:
             vals = {
-            'product_id': line.product_id.id,
-            'product_uom_qty': line.product_qty,
-            'product_uom_id': line.product_uom_id.id,
-            'wizard_id': self.id,
+                'product_id': line.product_id.id,
+                'product_uom_qty': line.product_qty,
+                'product_uom_id': line.product_uom_id.id,
+                'wizard_id': self.id,
             }
             comp_lines += comp_line_obj.new(vals)
         self.comp_ids = comp_lines
@@ -29,10 +29,10 @@ class OfWizardInsertKitComps(models.TransientModel):
         sale_order = sale_order_obj.browse(self._context.get('active_ids')[0])
         for line in self.comp_ids:
             vals = {
-            'product_id': line.product_id.id,
-            'product_uom_qty': line.product_uom_qty,
-            'product_uom': line.product_uom_id.id,
-            'order_id': sale_order.id,
+                'product_id': line.product_id.id,
+                'product_uom_qty': line.product_uom_qty,
+                'product_uom': line.product_uom_id.id,
+                'order_id': sale_order.id,
             }
             order_line_obj.create(vals)
         sale_order._compute_tax_id()

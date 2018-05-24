@@ -1,23 +1,25 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, models, _
+from odoo import api, fields, models
 import odoo.addons.decimal_precision as dp
 
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
     of_contains_kit = fields.Boolean(string='Contains a kit', compute='_compute_of_contains_kit', search='_search_of_contains_kit')
-    comp_ids = fields.One2many('of.invoice.kit.line', 'invoice_id', string='Components',
+    comp_ids = fields.One2many(
+        'of.invoice.kit.line', 'invoice_id', string='Components',
         help="Contains all kit components in this invoice that are not kits themselves.")
-    of_kit_display_mode = fields.Selection([
-        ('none', 'None'),
-        ('collapse', 'Collapse'),
-        ('expand', 'Expand'),
+    of_kit_display_mode = fields.Selection(
+        [
+            ('none', 'None'),
+            ('collapse', 'Collapse'),
+            ('expand', 'Expand'),
         ], string='Kit display mode', default='expand',
-            help="defines the way kits and their components should be printed out in pdf reports:\n\
-            - None: One line per kit. Nothing printed out about components\n\
-            - Collapse: One line per kit, with minimal info\n\
-            - Expand: One line per kit, plus one line per component")
+        help="defines the way kits and their components should be printed out in pdf reports:\n"
+             "- None: One line per kit. Nothing printed out about components\n"
+             "- Collapse: One line per kit, with minimal info\n"
+             "- Expand: One line per kit, plus one line per component")
 
     @api.multi
     @api.depends('invoice_line_ids.product_id')
@@ -55,17 +57,20 @@ class AccountInvoiceLine(models.Model):
     kit_id = fields.Many2one('of.invoice.kit', string="Components")
     of_is_kit = fields.Boolean(string='Is a kit')
 
-    price_comps = fields.Monetary('Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
-                            help="Sum of the prices of all components necessary for 1 unit of this kit", oldname="unit_compo_price")
-    cost_comps = fields.Monetary('Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
-                                  help="Sum of the costs of all components necessary for 1 unit of this kit")
-    of_pricing = fields.Selection([
-        ('fixed', 'Fixed'),
-        ('computed', 'Computed')
+    price_comps = fields.Monetary(
+        string='Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
+        help="Sum of the prices of all components necessary for 1 unit of this kit", oldname="unit_compo_price")
+    cost_comps = fields.Monetary(
+        string='Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
+        help="Sum of the costs of all components necessary for 1 unit of this kit")
+    of_pricing = fields.Selection(
+        [
+            ('fixed', 'Fixed'),
+            ('computed', 'Computed'),
         ], string="Pricing", required=True, default='fixed',
-            help="This field is only relevant if the product is a kit. It represents the way the price should be computed. \n \
-                if set to 'fixed', the price of it's components won't be taken into account and the price will be the one of the kit. \n \
-                if set to 'computed', the price will be computed according to the components of the kit.")
+        help="This field is only relevant if the product is a kit. It represents the way the price should be computed.\n"
+             "if set to 'fixed', the price of it's components won't be taken into account and the price will be the one of the kit.\n"
+             "if set to 'computed', the price will be computed according to the components of the kit.")
 
     invoice_kits_to_unlink = fields.Boolean(string="account kits to unlink?", default=False, help="True if at least 1 account kit needs to be deleted from database")
 
@@ -83,8 +88,8 @@ class AccountInvoiceLine(models.Model):
         res = []
         for comp in components:
             qty_int_val = int(comp.qty_total)
-            if comp.product_uom_id.id == units_id: # uom is units, no need to print it
-                qty = str(qty_int_val) # qty is an int because it's in units
+            if comp.product_uom_id.id == units_id:  # uom is units, no need to print it
+                qty = str(qty_int_val)  # qty is an int because it's in units
                 comp_str = (comp.default_code or comp.name) + ": " + qty
             else:
                 if qty_int_val == comp.qty_total:
@@ -172,7 +177,7 @@ class AccountInvoiceLine(models.Model):
             new_vals["kit_id"] = False
             new_vals["invoice_kits_to_unlink"] = True
         if self.of_is_kit:  # checkbox got checked
-            if not self.product_id.of_is_kit: # a product that is not a kit is being made into a kit
+            if not self.product_id.of_is_kit:  # a product that is not a kit is being made into a kit
                 # we create a component with current product (for procurements, kits are ignored)
                 new_comp_vals = {
                     'product_id': self.product_id.id,
@@ -190,11 +195,11 @@ class AccountInvoiceLine(models.Model):
                     }
                 new_vals["kit_id"] = self.env["of.invoice.kit"].create(account_kit_vals)
                 new_vals["of_pricing"] = "computed"
-            else: # can happen if uncheck then recheck a kit
+            else:  # can happen if uncheck then recheck a kit
                 new_vals['of_pricing'] = self.product_id.of_pricing
                 account_kit_vals = self.product_id.get_invoice_kit_data()
                 new_vals["kit_id"] = self.env["of.invoice.kit"].create(account_kit_vals)
-        else: # a product that was a kit is not anymore, we unlink its components
+        else:  # a product that was a kit is not anymore, we unlink its components
             new_vals["of_pricing"] = 'fixed'
             new_vals["price_unit"] = self.product_id.list_price
         self.update(new_vals)
@@ -269,19 +274,22 @@ class OfAccountInvoiceKit(models.Model):
 
     qty_invoice_line = fields.Float(string="Invoice Line Qty", related="invoice_line_id.quantity", readonly=True)
     currency_id = fields.Many2one(related='invoice_line_id.currency_id', store=True, string='Currency', readonly=True)
-    price_comps = fields.Monetary('Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
-                            help="Sum of the prices of all components necessary for 1 unit of this kit", oldname="unit_compo_price")
-    cost_comps = fields.Monetary('Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
-                                  help="Sum of the costs of all components necessary for 1 unit of this kit")
+    price_comps = fields.Monetary(
+        string='Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
+        help="Sum of the prices of all components necessary for 1 unit of this kit", oldname="unit_compo_price")
+    cost_comps = fields.Monetary(
+        string='Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
+        help="Sum of the costs of all components necessary for 1 unit of this kit")
 
     to_unlink = fields.Boolean(string="to unlink?", default=False)
-    of_pricing = fields.Selection([
-        ('fixed', 'Fixed'),
-        ('computed', 'Computed')
+    of_pricing = fields.Selection(
+        [
+            ('fixed', 'Fixed'),
+            ('computed', 'Computed'),
         ], string="Pricing", required=True, default='fixed',
-            help="This field represents the way the price should be computed. \n \
-                if set to 'fixed', the price of it's components won't be taken into account and the price will be the one of the kit. \n \
-                if set to 'computed', the price will be computed according to the components of the kit.")
+        help="This field represents the way the price should be computed.\n"
+             "if set to 'fixed', the price of it's components won't be taken into account and the price will be the one of the kit.\n"
+             "if set to 'computed', the price will be computed according to the components of the kit.")
 
     @api.multi
     @api.depends('kit_line_ids')
@@ -318,33 +326,41 @@ class OfAccountInvoiceKitLine(models.Model):
     sequence = fields.Integer(string=u'Sequence', default=10)
 
     product_id = fields.Many2one('product.product', string='Product', required=True, domain="[('of_is_kit', '=', False)]")
-    currency_id = fields.Many2one(related='invoice_id.currency_id', store=True, string='Currency', readonly=True)
-    product_uom_id = fields.Many2one('product.uom', string='UoM', required=True)
-    price_unit = fields.Monetary('Unit Price', digits=dp.get_precision('Product Price'), required=True,default=0.0, oldname="unit_price")
-    cost_unit = fields.Monetary('Unit Cost', digits=dp.get_precision('Product Price'))
-    cost_total = fields.Monetary(string='Subtotal Cost', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
-                            help="Cost of this component total quantity. Equal to total quantity * unit cost.")
-    cost_per_kit = fields.Monetary(string='Cost/Kit', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
-                            help="Cost of this component quantity necessary to make one unit of its invoice line kit. Equal to quantity per kit unit * unit cost.")
+    currency_id = fields.Many2one(related='invoice_id.currency_id', string='Currency', readonly=True)
+    product_uom_id = fields.Many2one('product.uom', string='UoM', readonly=True, related='product_id.uom_id')
+    price_unit = fields.Monetary(string='Unit Price', digits=dp.get_precision('Product Price'), required=True, default=0.0, oldname="unit_price")
+    price_unit_display = fields.Monetary(related='price_unit')
+    cost_unit = fields.Monetary(string='Unit Cost', digits=dp.get_precision('Product Price'))
+    cost_total = fields.Monetary(
+        string='Subtotal Cost', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
+        help="Cost of this component total quantity. Equal to total quantity * unit cost.")
+    cost_per_kit = fields.Monetary(
+        string='Cost/Kit', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
+        help="Cost of this component quantity necessary to make one unit of its invoice line kit. Equal to quantity per kit unit * unit cost.")
 
-    qty_per_kit = fields.Float(string='Qty / Kit', digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0,
-                            help="Quantity per kit unit (invoice line).\n\
-                        example: 2 kit K1 -> 3 prod P. \nP.qty_per_kit = 3\nP.qty_total = 6")
+    qty_per_kit = fields.Float(
+        string='Qty / Kit', digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0,
+        help="Quantity per kit unit (invoice line).\n"
+             "example: 2 kit K1 -> 3 prod P. \n"
+             "P.qty_per_kit = 3\n"
+             "P.qty_total = 6")
 
     nb_kits = fields.Float(string='Number of kits', related='kit_id.qty_invoice_line', readonly=True)
-    qty_total = fields.Float(string='Total Qty', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_qty_total',
-                                   help='total quantity equal to quantity per kit times number of kits.')
-    #display_qty_changed = fields.Boolean(string="display qty changed message", default=False)
-    price_total = fields.Monetary(string='Subtotal Price', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
-                            help="Price of this component total quantity. Equal to total quantity * unit price.")
-    price_per_kit = fields.Monetary(string='Price/Kit', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
-                            help="Price of this component quantity necessary to make one unit of its invoice line kit. Equal to quantity per kit unit * unit price.")
+    qty_total = fields.Float(
+        string='Total Qty', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_qty_total',
+        help='total quantity equal to quantity per kit times number of kits.')
+    price_total = fields.Monetary(
+        string='Subtotal Price', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
+        help="Price of this component total quantity. Equal to total quantity * unit price.")
+    price_per_kit = fields.Monetary(
+        string='Price/Kit', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
+        help="Price of this component quantity necessary to make one unit of its invoice line kit. Equal to quantity per kit unit * unit price.")
     kit_pricing = fields.Selection(related="kit_id.of_pricing", readonly=True)
     hide_prices = fields.Boolean(string="Hide prices", default=False)
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
-        #@TODO: handle case product is a kit (domain, error or load components
+        # @TODO: handle case product is a kit (domain, error or load components
         if self.product_id:
             new_vals = {
                 'name': self.product_id.name_get()[0][1] or self.product_id.name,
