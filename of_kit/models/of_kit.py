@@ -103,10 +103,13 @@ class ProductTemplate(models.Model):
     @api.depends('kit_line_ids')
     def _compute_compo_price_n_cost(self):
         for product_tmpl in self:
+            price = cost = 0.0
             if product_tmpl.of_is_kit:
-                price_n_cost = product_tmpl.get_compo_price_n_cost()
-                product_tmpl.price_comps = price_n_cost['price']
-                product_tmpl.cost_comps = price_n_cost['cost']
+                for line in product_tmpl.kit_line_ids:
+                    price += line.product_id.uom_id._compute_price(line.product_id.list_price, line.product_uom_id) * line.product_qty
+                    cost += line.product_id.uom_id._compute_price(line.product_id.standard_price, line.product_uom_id) * line.product_qty
+            product_tmpl.price_comps = price
+            product_tmpl.cost_comps = cost
 
     @api.multi
     @api.depends('kit_line_ids')
@@ -127,40 +130,24 @@ class ProductTemplate(models.Model):
     @api.multi
     @api.depends('list_price', 'standard_price', 'price_comps', 'cost_comps', 'of_pricing', 'of_is_kit')
     def _compute_marge(self):
-        # override of function from of_product
         for product_tmpl in self:
-            if not product_tmpl.of_is_kit:
-                list_price = product_tmpl.list_price
-                if list_price != 0:
-                    product_tmpl.marge = (list_price - product_tmpl.standard_price) * 100.00 / list_price
-                else: # division par 0!
-                    product_tmpl.marge = -100
-            else: # product is a kit
+            if product_tmpl.of_is_kit:
                 if product_tmpl.of_pricing == 'fixed':
                     price = product_tmpl.list_price
                 else:
                     price = product_tmpl.price_comps
-                if price != 0:
+                if price:
                     product_tmpl.marge = (price - product_tmpl.cost_comps) * 100.00 / price
                 else:
                     product_tmpl.marge = -100
+            else:
+                super(ProductTemplate, product_tmpl)._compute_marge()
 
     @api.onchange('of_is_kit')
     def _onchange_of_is_kit(self):
         self.ensure_one()
         if not self.of_is_kit:
             self.kit_line_ids = [(5,)]
-
-    def get_compo_price_n_cost(self):
-        """
-        returns the sum of the prices and costs of all components in this kit.
-        """
-        self.ensure_one()
-        res = {'price': 0.0, 'cost': 0.0}
-        for line in self.kit_line_ids:
-            res['price'] += line.product_id.list_price * line.product_qty
-            res['cost'] += line.product_id.standard_price * line.product_qty
-        return res
 
     @api.depends('product_variant_ids', 'product_variant_ids.is_kit_comp')
     def _compute_is_kit_comp(self):
@@ -218,17 +205,14 @@ class OfProductKitLine(models.Model):
     _name = "of.product.kit.line"
     _order = 'kit_id, sequence'
 
-    def _get_default_product_uom_id(self):
-        return self.env['product.uom'].search([], limit=1, order='id').id
-
-    #name = fields.Char(string="Name", required=True)
     kit_id = fields.Many2one("product.template", string="Kit",  domain="[('is_kit_comp', '=', False)]",
                              help="Kit containing this as component", ondelete="cascade")
     product_id = fields.Many2one("product.product", string="Product", domain="[('of_is_kit', '=', False)]", required=True,
                                  help="Product this line references")
     product_qty = fields.Float(string='Qty / Kit', digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0,
                                help="Quantity per kit unit.")
-    product_uom_id = fields.Many2one('product.uom', string='UoM', default=_get_default_product_uom_id, required=True, oldname="product_uom")
+    product_uom_categ_id = fields.Many2one(related='product_id.uom_id.category_id', readonly=True)
+    product_uom_id = fields.Many2one('product.uom', string='UoM', domain="[('category_id', '=', product_uom_categ_id)]", required=True)
     product_price = fields.Float(related='product_id.list_price', readonly=True)
     product_cost = fields.Float(related='product_id.standard_price', readonly=True)
     sequence = fields.Integer(string=u'Sequence', default=10)
@@ -240,6 +224,10 @@ class OfProductKitLine(models.Model):
             if kit_line.kit_id.id == kit_line.product_id.product_tmpl_id.id:
                 return False
         return True
+
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        self.product_uom_id = self.product_id.uom_id
 
     @api.model
     def create(self, vals):

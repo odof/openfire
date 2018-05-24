@@ -723,7 +723,9 @@ msgstr "Coût unitaire"
 
 #. module: of_kit
 #: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_price_unit
+#: model:ir.model.fields,field_description:of_kit.field_of_invoice_kit_line_price_unit_display
 #: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_price_unit
+#: model:ir.model.fields,field_description:of_kit.field_of_saleorder_kit_line_price_unit_display
 msgid "Unit Price"
 msgstr "Prix unitaire"
 

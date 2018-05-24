@@ -35,6 +35,7 @@
                                 <field name="sequence" widget="handle"/>
                                 <field name="product_id"/>
                                 <field name="product_qty"/>
+                                <field name="product_uom_categ_id" invisible="1"/>
                                 <field name="product_uom_id"/>
                                 <field name="product_price" widget='monetary' options="{'currency_field': 'currency_id'}"/>
                             </tree>
@@ -203,6 +204,7 @@
                     <field name="kit_id"/>
                     <field name="product_id"/>
                     <field name="product_qty"/>
+                    <field name="product_uom_categ_id" invisible="1"/>
                     <field name="product_uom_id"/>
                     <field name="sequence"/>
                 </group>
@@ -220,6 +222,7 @@
                 <field name="kit_id"/>
                 <field name="product_id"/>
                 <field name="product_qty"/>
+                <field name="product_uom_categ_id" invisible="1"/>
                 <field name="product_uom_id"/>
             </tree>
         </field>
@@ -331,8 +334,9 @@
                         <field name="name"/>
                         <field name="qty_per_kit"/>
                         <field name="qty_delivered" invisible="context.get('hide_sale')" attrs="{'readonly': [('qty_delivered_updateable', '=', False)]}"/>
-                        <field name="product_uom_id" attrs="{'readonly': [('state', 'in', ('sale', 'done', 'cancel'))]}"/>
-                        <field name="price_unit" attrs="{'readonly': [('kit_pricing', '=', 'fixed')]}"/>
+                        <field name="product_uom_id"/>
+                        <field name="price_unit" invisible="1"/>
+                        <field name="price_unit_display" attrs="{'readonly': [('kit_pricing', '=', 'fixed')]}"/>
                         <field name="price_per_kit"/>
                         <field name="kit_pricing" invisible="1"/>
                         <field name="currency_id" invisible="1"/>
@@ -386,12 +390,14 @@
                             <field name="qty_total" nolabel="1"/>
                             <label for="qty_delivered" string="Delivered Quantity" invisible="context.get('hide_sale')"/>
                             <field name="qty_delivered" nolabel="1" invisible="context.get('hide_sale')" attrs="{'readonly': [('qty_delivered_updateable', '=', False)]}"/>
-                            <field name="product_uom_id" attrs="{'readonly': [('state', 'in', ('sale','done', 'cancel'))]}"/>
+                            <field name="product_uom_id"/>
                         </group>
                         <group name="Prices">
                             <separator string="Prices" name="Prices" colspan="2"/>
                             <field name="kit_pricing" invisible="1"/>
-                            <field name="price_unit" widget='monetary' options="{'currency_field': 'currency_id'}" attrs="{'readonly': [('kit_pricing', '=', 'fixed')]}"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="price_unit" invisible="1"/>
+                            <field name="price_unit_display" options="{'currency_field': 'currency_id'}" attrs="{'readonly': [('kit_pricing', '=', 'fixed')]}"/>
                             <field name="price_per_kit"/>
                             <field name="price_total"/>
                         </group>
@@ -487,7 +493,8 @@
                         <field name="name"/>
                         <field name="qty_per_kit"/>
                         <field name="product_uom_id"/>
-                        <field name="price_unit" attrs="{'readonly': [('kit_pricing', '=', 'fixed')]}"/>
+                        <field name="price_unit" invisible="1"/>
+                        <field name="price_unit_display" attrs="{'readonly': [('kit_pricing', '=', 'fixed')]}"/>
                         <field name="price_per_kit"/>
                         <field name="kit_pricing" invisible="1"/>
                         <field name="currency_id" invisible="1"/>
@@ -529,7 +536,9 @@
                         <group name="Prices">
                             <separator string="Prices" name="Prices" colspan="2"/>
                             <field name="kit_pricing" invisible="1"/>
-                            <field name="price_unit" widget='monetary' options="{'currency_field': 'currency_id'}" attrs="{'readonly': [('kit_pricing', '=', 'fixed')]}"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="price_unit" invisible="1"/>
+                            <field name="price_unit_display" options="{'currency_field': 'currency_id'}" attrs="{'readonly': [('kit_pricing', '=', 'fixed')]}"/>
                             <field name="price_per_kit"/>
                             <field name="price_total"/>
                         </group>

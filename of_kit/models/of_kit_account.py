@@ -318,9 +318,10 @@ class OfAccountInvoiceKitLine(models.Model):
     sequence = fields.Integer(string=u'Sequence', default=10)
 
     product_id = fields.Many2one('product.product', string='Product', required=True, domain="[('of_is_kit', '=', False)]")
-    currency_id = fields.Many2one(related='invoice_id.currency_id', store=True, string='Currency', readonly=True)
-    product_uom_id = fields.Many2one('product.uom', string='UoM', required=True)
-    price_unit = fields.Monetary('Unit Price', digits=dp.get_precision('Product Price'), required=True,default=0.0, oldname="unit_price")
+    currency_id = fields.Many2one(related='invoice_id.currency_id', string='Currency', readonly=True)
+    product_uom_id = fields.Many2one('product.uom', string='UoM', readonly=True, related='product_id.uom_id')
+    price_unit = fields.Monetary(string='Unit Price', digits=dp.get_precision('Product Price'), required=True, default=0.0, oldname="unit_price")
+    price_unit_display = fields.Monetary(related='price_unit')
     cost_unit = fields.Monetary('Unit Cost', digits=dp.get_precision('Product Price'))
     cost_total = fields.Monetary(string='Subtotal Cost', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
                             help="Cost of this component total quantity. Equal to total quantity * unit cost.")
