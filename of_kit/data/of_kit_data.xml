@@ -7,7 +7,6 @@
     <record forcecreate="True" id="of_cron_clear_saleorder_kits" model="ir.cron">
         <field name="name">Auto-vaccum saleorder kits</field>
         <field name="user_id">1</field>
-        <!--field name="nextcall">2017-11-01 06:00:00</field-->
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
         <field name="numbercall">-1</field>
@@ -18,7 +17,6 @@
     <record forcecreate="True" id="of_cron_clear_invoice_kits" model="ir.cron">
         <field name="name">Auto-vaccum invoice kits</field>
         <field name="user_id">1</field>
-        <!--field name="nextcall">2017-11-01 06:00:00</field-->
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
         <field name="numbercall">-1</field>
