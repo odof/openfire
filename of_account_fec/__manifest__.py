@@ -9,6 +9,7 @@
 OpenFire FEC\n
 ======================\n
 - Ajout choix des journaux
+- Permettre à un module qui hériterait de ce module de prendre la date de création de l'écriture comptable à la place de sa date comme critère de sélection
     """,
     'category': 'OpenFire modules - Accounting',
     'website': 'openfire.fr',

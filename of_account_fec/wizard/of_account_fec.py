@@ -27,12 +27,15 @@ class OFAccountFrFec(models.TransientModel):
     of_ouv_name = fields.Char("Libellé du journal d'ouverture", required=True, default='Balance initiale')
     of_ouv_include = fields.Boolean(string="inclure le journal d'ouverture", default=True)     
 
+    where_clause_create_date = fields.Boolean("Utiliser la date de création", required=True, default=False)
+
     def do_query_unaffected_earnings(self):
         ''' Compute the sum of ending balances for all accounts that are of a type that does not bring forward the balance in new fiscal years.
             This is needed because we have to display only one line for the initial balance of all expense/revenue accounts in the FEC.
             copy of parent function.
         '''
-
+        if self.export_type == 'official':  # use parent function instead
+            return super(OFAccountFrFec, self).do_query_unaffected_earnings()
         sql_query = '''
         SELECT
             %s AS JournalCode,
@@ -59,25 +62,29 @@ class OFAccountFrFec(models.TransientModel):
             JOIN account_account aa ON aa.id = aml.account_id
             LEFT JOIN account_account_type aat ON aa.user_type_id = aat.id
         WHERE
-            am.create_date < %s
-            AND am.company_id = %s
+            am.company_id = %s
             AND aat.include_initial_balance = 'f'
             AND (aml.debit != 0 OR aml.credit != 0)
+            AND am.journal_id IN %s
         '''
-        # For official report: only use posted entries
-        if self.export_type == "official" or self.export_type == 'nonofficial_posted':
+        if self.where_clause_create_date:  # certains client veulent la date de création (exports mensuels vers logiciel compta)
+            sql_query += '''
+            AND am.create_date < %s
+            '''
+        else:
+            sql_query += '''
+            AND am.date < %s
+            '''
+
+        if self.export_type == 'nonofficial_posted':
             sql_query += '''
             AND am.state = 'posted'
             '''
-        # choice of journals
-        sql_query += '''
-        AND am.journal_id IN %s
-        '''
 
         company = self.env.user.company_id
         formatted_date_from = self.date_from.replace('-', '')
         self._cr.execute(
-            sql_query, (self.of_ouv_code, self.of_ouv_name, self.of_ouv_name, formatted_date_from, formatted_date_from, formatted_date_from, self.date_from, company.id, self.journal_ids._ids))
+            sql_query, (self.of_ouv_code, self.of_ouv_name, self.of_ouv_name, formatted_date_from, formatted_date_from, formatted_date_from, company.id, self.journal_ids._ids, self.date_from))
         # listrow = []
         row = self._cr.fetchone()
         listrow = list(row)
@@ -89,6 +96,8 @@ class OFAccountFrFec(models.TransientModel):
         copy of parent function
         '''
         self.ensure_one()
+        if self.export_type == 'official':  # use parent function instead
+            return super(OFAccountFrFec, self).generate_fec()
         # We choose to implement the flat file instead of the XML
         # file for 2 reasons :
         # 1) the XSD file impose to have the label on the account.move
@@ -133,7 +142,7 @@ class OFAccountFrFec(models.TransientModel):
         # INITIAL BALANCE
         unaffected_earnings_xml_ref = self.env.ref('account.data_unaffected_earnings')
         unaffected_earnings_line = True  # used to make sure that we add the unaffected earning initial balance only once
-        if unaffected_earnings_xml_ref and (self.export_type == 'official' or self.of_ouv_include):
+        if unaffected_earnings_xml_ref and self.of_ouv_include:
             # compute the benefit/loss of last year to add in the initial balance of the current year earnings account
             unaffected_earnings_results = self.do_query_unaffected_earnings()
             unaffected_earnings_line = False
@@ -181,21 +190,23 @@ class OFAccountFrFec(models.TransientModel):
             JOIN account_account aa ON aa.id = aml.account_id
             LEFT JOIN account_account_type aat ON aa.user_type_id = aat.id
         WHERE
-            am.create_date < %s
-            AND am.company_id = %s
+            am.company_id = %s
             AND aat.include_initial_balance = 't'
             AND (aml.debit != 0 OR aml.credit != 0)
+            AND am.journal_id IN %s
         '''
+        if self.where_clause_create_date:  # certains client veulent la date de création (exports mensuels vers logiciel compta)
+            sql_query += '''
+            AND am.create_date < %s
+            '''
+        else:
+            sql_query += '''
+            AND am.date < %s
+            '''
 
-        # For official report: only use posted entries
-        if self.export_type == "official" or self.export_type == 'nonofficial_posted':
+        if self.export_type == 'nonofficial_posted':
             sql_query += '''
             AND am.state = 'posted'
-            '''
-        # choice of journals (not for official export type
-        if self.export_type != "official":
-            sql_query += '''
-            AND am.journal_id IN %s
             '''
 
         sql_query += '''
@@ -204,15 +215,19 @@ class OFAccountFrFec(models.TransientModel):
         ORDER BY CompteNum, aa.code
         '''
         formatted_date_from = self.date_from.replace('-', '')
-        #TODO: inclusion balance initiale
-        if self.export_type == "official":
-            self._cr.execute(
-                sql_query, (self.of_ouv_code, self.of_ouv_name, self.of_ouv_name, formatted_date_from, formatted_date_from, formatted_date_from, self.date_from, company.id))
-        elif self.of_ouv_include:
-            self._cr.execute(
-                sql_query, (self.of_ouv_code, self.of_ouv_name, self.of_ouv_name, formatted_date_from, formatted_date_from, formatted_date_from, self.date_from, company.id, self.journal_ids._ids))
 
-        if (self.export_type == 'official' or self.of_ouv_include):
+        if self.of_ouv_include:
+            self._cr.execute(sql_query, (
+                                self.of_ouv_code,
+                                self.of_ouv_name,
+                                self.of_ouv_name,
+                                formatted_date_from,
+                                formatted_date_from,
+                                formatted_date_from,
+                                company.id,
+                                self.journal_ids._ids,
+                                self.date_from,
+                                ))
             for row in self._cr.fetchall():
                 listrow = list(row)
                 account_id = listrow.pop()
@@ -297,21 +312,24 @@ class OFAccountFrFec(models.TransientModel):
             LEFT JOIN res_currency rc ON rc.id = aml.currency_id
             LEFT JOIN account_full_reconcile rec ON rec.id = aml.full_reconcile_id
         WHERE
-            am.create_date >= %s
-            AND am.create_date <= %s
-            AND am.company_id = %s
+            am.company_id = %s
             AND (aml.debit != 0 OR aml.credit != 0)
+            AND am.journal_id IN %s
         '''
+        if self.where_clause_create_date:  # Certains client veulent la date de création (export mensuel vers logiciel compta).
+            sql_query += '''
+            AND am.create_date >= %s
+            AND am.create_date <= %s
+            '''
+        else:
+            sql_query += '''
+            AND am.date >= %s
+            AND am.date <= %s
+            '''
 
-        # For official report: only use posted entries
-        if self.export_type == "official" or self.export_type == 'nonofficial_posted':
+        if self.export_type == 'nonofficial_posted':
             sql_query += '''
             AND am.state = 'posted'
-            '''
-        # choice of journals (not for official export type
-        if self.export_type != "official":
-            sql_query += '''
-            AND am.journal_id IN %s
             '''
 
         sql_sort = 'am.date, am.name, aml.id'
@@ -319,12 +337,7 @@ class OFAccountFrFec(models.TransientModel):
             sql_sort = 'aj.code, rp.name, aml.id'
         sql_query += '\nORDER BY ' + sql_sort
 
-        if self.export_type != "official":
-            self._cr.execute(
-                sql_query, (self.date_from, self.date_to, company.id, self.journal_ids._ids))
-        else:
-            self._cr.execute(
-                sql_query, (self.date_from, self.date_to, company.id))
+        self._cr.execute(sql_query, (company.id, self.journal_ids._ids, self.date_from, self.date_to))
 
         for row in self._cr.fetchall():
             listrow = list(row)
@@ -332,13 +345,10 @@ class OFAccountFrFec(models.TransientModel):
 
         siren = company.vat[4:13]
         end_date = self.date_to.replace('-', '')
-        suffix = ''
-        if self.export_type == "nonofficial" or self.export_type == 'nonofficial_posted':
-            suffix = '-NONOFFICIAL'
+        suffix = '-NONOFFICIAL'
         fecvalue = fecfile.getvalue()
         self.write({
             'fec_data': base64.encodestring(fecvalue),
-            # Filename = <siren>FECYYYYMMDD where YYYMMDD is the closing date
             'filename': '%sFEC%s%s.%s' % (siren, end_date, suffix, self.of_extension),
             })
         fecfile.close()

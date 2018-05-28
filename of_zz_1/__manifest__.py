@@ -21,11 +21,13 @@ Module OpenFire - 1
 ============================
 Ce module ajoute des fonctionnalités demandées par une société.
 
- - Modification de l'affichage de la vue liste dans les devis et  bons de commande
+ - Modification de l'affichage de la vue liste dans les devis et bons de commande
+ - Export compta FEC : prend la date de création de l'écriture comptable à la place de sa date comme critère de sélection (pour export mensuel)
 
 """,
     'depends' : [
         'sale_order_dates',
+        'of_account_fec'
     ],
     'data' : [
         'views/of_zz_1_views.xml',
