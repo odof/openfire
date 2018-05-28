@@ -54,17 +54,30 @@
         </field>
     </record>
 
-    <!-- Rapport feuille de présence ajout stats par champ of_categ_id -->
+    <!-- Ajouter filtres de recherche dans "Activités feuilles de temps" -->
     <record id="of_view_hr_timesheet_report_search" model="ir.ui.view">
         <field name="name">of.hr.timesheet.report.search</field>
         <field name="model">account.analytic.line</field>
         <field name="type">search</field>
         <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_search"/>
         <field name="arch" type="xml">
-            <field name="user_id" position="after">
+            <xpath expr="//field[@name='user_id']" position="after">
                 <field name="of_categ_id"/>
+                <filter string="Mes activités" name="my_activities" domain="[(u'user_id', u'=', uid)]"/>
+                <separator/>
+                <filter string="Aujourd'hui" name="today" domain="[(u'date', u'=', current_date)]"/>
+                <filter string="Hier" name="yesterday" domain="[(u'date', u'=', (context_today() - datetime.timedelta(days=context_today().weekday()==0 and 3 or 1)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Cette semaine" name="this_week" domain="[(u'date', u'>=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                <filter string="Ce mois" name="this_month" domain="[(u'date', u'>=', context_today().strftime('%Y-%m-01'))]"/>
+                <filter string="Cette année" name="this_year" domain="[(u'date', u'>=', context_today().strftime('%Y-01-01'))]"/>
+            </xpath>
+            <xpath expr="//group/filter" position="before">
                 <filter string="Catégorie" context="{'group_by':'of_categ_id'}" help="Regrouper par catégorie d'activités"/>
-            </field>
+            </xpath>
+            <xpath expr="//group" position="inside">
+                <filter string="Semaine de la feuille de temps" domain="[]" context="{'group_by':'date:week'}" help="Feuilles de temps par semaine"/>
+                <filter string="Jour de la feuille de temps" domain="[]" context="{'group_by':'date:day'}" help="Feuilles de temps par jour"/>
+            </xpath>
         </field>
     </record>
 
