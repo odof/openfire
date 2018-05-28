@@ -56,6 +56,12 @@
             <field name="model">sale.config.settings</field>
             <field name="inherit_id" ref="sale.view_sales_config"/>
             <field name="arch" type="xml">
+                <xpath expr="//field[@name='deposit_product_id_setting']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='deposit_product_id_setting']" position="after">
+                    <field name="of_deposit_product_categ_id_setting" class="oe_inline"/>
+                </xpath>
                 <xpath expr="//div[@id='main']" position="inside">
                     <group name="rubrique_report" string="Devis &amp; commandes PDF">
                         <label for="pdf_adresse_civilite"/>

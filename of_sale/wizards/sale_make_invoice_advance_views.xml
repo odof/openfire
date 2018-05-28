@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_sale_advance_payment_inv" model="ir.ui.view">
+        <field name="name">Invoice Orders</field>
+        <field name="model">sale.advance.payment.inv</field>
+        <field name="inherit_id" ref="sale.view_sale_advance_payment_inv"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="replace">
+                <field name="product_categ_id" invisible="1"/>
+                <field name="of_nb_products" invisible="1"/>
+                <field name="product_id"
+                    string="Article d'acompte"
+                    context="{'search_default_services': 1, 'default_type': 'service', 'search_default_categ_id': product_categ_id, 'default_categ_id': product_categ_id, 'default_invoice_policy': 'order'}"
+                    attrs="{'invisible': ['|', ('advance_payment_method', 'not in', ('fixed','percentage')), ('of_nb_products', '&lt;=', 1)], 'required': [('advance_payment_method', 'in', ('fixed','percentage'))]}"
+                    class="oe_inline"/>
+                <label string="Vous devez d'abord configurer un article d'acompte" colspan="2"
+                    attrs="{'invisible': ['|', ('advance_payment_method', 'not in', ('fixed','percentage')), ('of_nb_products', '!=', 0)]}"/>
+            </xpath>
+
+            <xpath expr="//label[@for='amount']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('advance_payment_method', 'not in', ('fixed','percentage')), ('of_nb_products', '=', 0)]}</attribute>
+            </xpath>
+            <xpath expr="//form/group/div" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('advance_payment_method', 'not in', ('fixed','percentage')), ('of_nb_products', '=', 0)]}</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='deposit_account_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='deposit_taxes_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
