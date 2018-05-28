@@ -1,64 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-<template id="of_report_purchaseorder_sans_prix_document" inherit_id="purchase.report_purchaseorder_document">
-    <xpath expr="//div[@class='row mt32 mb32']" position="inside">
-        <div t-if="o.customer_id" class="col-xs-3">
-            <strong>Contremarque:</strong>
-            <p t-field="o.customer_id"/>
-        </div>
-        <div t-if="o.delivery_expected" class="col-xs-3">
-            <strong>Livraison souhaitée&amp;nbsp;:</strong>
-            <p t-field="o.delivery_expected"/>
-        </div>
-    </xpath>
+    <!-- Modifications commande fournisseur (et CF sans prix) -->
+    <template id="of_report_purchaseorder_document" inherit_id="purchase.report_purchaseorder_document">
+        <!-- Modifications de l'affichage des adresses -->
+        <xpath expr="//div[@class='row'][1]" position="replace">
+            <div name="addresses" class="row">
+                <div class="col-xs-6">
+                    <strong>Adresse de Livraison&amp;nbsp;:</strong>
+                    <div t-if="o.dest_address_id">
+                        <span t-field="o.dest_address_id.name"/>
+                        <div t-field="o.dest_address_id" t-options='{"widget": "contact", "fields": ["address", "phone", "fax"], "no_marker": True, "phone_icons": True}'/>
+                    </div>
+                    <!-- Modification actuellement en ligne sur plusieurs bases avec rapport en noupdate
+                    <div t-if="o.customer_id and (not o.picking_type_id or not o.picking_type_id.warehouse_id)">
+                        <span t-field="o.customer_id.name"/>
+                        <div t-field="o.customer_id" t-options='{"widget": "contact", "fields": ["address", "phone", "fax"], "no_marker": True, "phone_icons": True}'/>
+                        <p t-if="o.customer_id.vat">TVA: <span t-field="o.customer_id.vat"/></p>
+                    </div> -->
+                    <div t-if="not o.dest_address_id and o.picking_type_id and o.picking_type_id.warehouse_id">
+                        <strong><span t-field="o.picking_type_id.warehouse_id.name"/></strong>
+                        <div t-field="o.picking_type_id.warehouse_id.partner_id" t-options='{"widget": "contact", "fields": ["address", "phone", "fax"], "no_marker": True, "phone_icons": True}'/>
+                    </div>
+                </div>
+                <div class="col-xs-5 col-xs-offset-1">
+                    <strong><span t-field="o.partner_id.name"/></strong>
+                    <div t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "phone", "fax"], "no_marker": True, "phone_icons": True}'/>
+                    <p t-if="o.partner_id.vat">TVA: <span t-field="o.partner_id.vat"/></p>
+                </div>
+            </div>
+        </xpath>
+        <!-- Modifications des cadres références -->
+        <xpath expr="//div[@class='row mt32 mb32']" position="replace">
+            <div class="row mt32 mb32">
+                <div class="col-xs-12">
+                    <div><strong>Nos références&amp;nbsp;: </strong></div>
+                    <div name="refs" class="mt8" id="informations" style="display: table">
+                        <div t-if="o.sale_order_id" style="display: table-cell; width: 4px;"/>
+                        <div t-if="o.sale_order_id" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                            <strong>Réf. Commande Client&amp;nbsp;:</strong>
+                            <p t-field="o.sale_order_id"/>
+                        </div>
+                        <div t-if="o.partner_ref" style="display: table-cell; width: 4px;"/>
+                        <div t-if="o.partner_ref" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                            <strong>Réf. Fournisseur&amp;nbsp;:</strong>
+                            <p t-field="o.partner_ref"/>
+                        </div>
+                        <div t-if="o.customer_id" style="display: table-cell; width: 4px;"/>
+                        <div t-if="o.customer_id" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                            <strong>Contremarque&amp;nbsp;:</strong>
+                            <p t-field="o.customer_id"/>
+                        </div>
+                        <div t-if="o.delivery_expected" style="display: table-cell; width: 4px;"/>
+                        <div t-if="o.delivery_expected" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                            <strong>Livraison attendue&amp;nbsp;:</strong>
+                            <p t-field="o.delivery_expected"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+        <!-- Rendre invisible les titres h2 (CF et CF sans prix) -->
+        <xpath expr="//h2[1]" position="attributes">
+            <attribute name="style">display: none</attribute>
+        </xpath>
+        <xpath expr="//h2[2]" position="attributes">
+            <attribute name="style">display: none</attribute>
+        </xpath>
+    </template>
 
-    <!-- Retrait de dates souhaitées si la livraison souhaitée est renseignée -->
-    <xpath expr="//table/thead/tr/th[3]" position="attributes">
-        <attribute name="t-if">not o.delivery_expected</attribute>
-    </xpath>
-    <xpath expr="//table/tbody/tr/td[3]" position="attributes">
-        <attribute name="t-if">not o.delivery_expected</attribute>
-    </xpath>
+    <!-- Modifications demande de prix -->
+    <template id="of_report_purchasequotation_document" inherit_id="purchase.report_purchasequotation_document">
+        <!-- Modifications de l'affichage des adresses -->
+        <xpath expr="//div[@class='row mt32 mb32'][1]" position="replace">
+            <div name="addresses" class="row">
+                <div class="col-xs-6">
+                    <strong>Adresse de Livraison&amp;nbsp;:</strong>
+                    <div t-if="o.dest_address_id">
+                        <span t-field="o.dest_address_id.name"/>
+                        <div t-field="o.dest_address_id" t-options='{"widget": "contact", "fields": ["address", "phone", "fax"], "no_marker": True, "phone_icons": True}'/>
+                    </div>
+                    <div t-if="not o.dest_address_id and o.picking_type_id and o.picking_type_id.warehouse_id">
+                        <strong><span t-field="o.picking_type_id.warehouse_id.name"/></strong>
+                        <div t-field="o.picking_type_id.warehouse_id.partner_id" t-options='{"widget": "contact", "fields": ["address", "phone", "fax"], "no_marker": True, "phone_icons": True}'/>
+                    </div>
+                </div>
+                <div class="col-xs-5 col-xs-offset-1">
+                    <strong><span t-field="o.partner_id.name"/></strong>
+                    <div t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "phone", "fax"], "no_marker": True, "phone_icons": True}'/>
+                    <p t-if="o.partner_id.vat">TVA: <span t-field="o.partner_id.vat"/></p>
+                </div>
+            </div>
+            <br/>
+        </xpath>
+        <!-- Rendre invisible les titres h2 -->
+        <xpath expr="//h2" position="attributes">
+            <attribute name="style">display: none</attribute>
+        </xpath>
+    </template>
 
-    <!-- Retrait des prix pour la commande sans prix -->
-    <!-- Interroger docs et non o, car le context de o a été écrasé dans la vue parente -->
+    <!-- Modifications commande fournisseur sans prix -->
+    <template id="of_report_purchaseorder_sans_prix_document" inherit_id="purchase.report_purchaseorder_document">
+        <!-- Retrait de dates souhaitées si la livraison souhaitée est renseignée -->
+        <xpath expr="//table/thead/tr/th[3]" position="attributes">
+            <attribute name="t-if">not o.delivery_expected</attribute>
+        </xpath>
+        <xpath expr="//table/tbody/tr/td[3]" position="attributes">
+            <attribute name="t-if">not o.delivery_expected</attribute>
+        </xpath>
+        <!-- Retrait des prix pour la commande sans prix (Interroger docs et non o, car le context de o a été écrasé dans la vue parente) -->
+        <!-- Titres du tableau -->
+        <xpath expr="//table/thead/tr/th[2]" position="attributes">
+            <attribute name="t-if">not docs._context.get('of_sans_prix')</attribute>
+        </xpath>
+        <xpath expr="//table/thead/tr/th[last()-1]" position="attributes">
+            <attribute name="t-if">not docs._context.get('of_sans_prix')</attribute>
+        </xpath>
+        <xpath expr="//table/thead/tr/th[last()]" position="attributes">
+            <attribute name="t-if">not docs._context.get('of_sans_prix')</attribute>
+        </xpath>
+        <!-- Valeurs du tableau -->
+        <xpath expr="//table/tbody/tr/td[2]" position="attributes">
+            <attribute name="t-if">not docs._context.get('of_sans_prix')</attribute>
+        </xpath>
+        <xpath expr="//table/tbody/tr/td[last()-1]" position="attributes">
+            <attribute name="t-if">not docs._context.get('of_sans_prix')</attribute>
+        </xpath>
+        <xpath expr="//table/tbody/tr/td[last()]" position="attributes">
+            <attribute name="t-if">not docs._context.get('of_sans_prix')</attribute>
+        </xpath>
+        <!-- Totaux -->
+        <xpath expr="//div[@class='row'][last()]" position="attributes">
+            <attribute name="t-if">not docs._context.get('of_sans_prix')</attribute>
+        </xpath>
+    </template>
 
-    <!-- Titres du tableau -->
-    <xpath expr="//table/thead/tr/th[2]" position="attributes">
-        <attribute name="t-if">not docs._context.get('of_sans_prix')</attribute>
-    </xpath>
-    <xpath expr="//table/thead/tr/th[last()-1]" position="attributes">
-        <attribute name="t-if">not docs._context.get('of_sans_prix')</attribute>
-    </xpath>
-    <xpath expr="//table/thead/tr/th[last()]" position="attributes">
-        <attribute name="t-if">not docs._context.get('of_sans_prix')</attribute>
-    </xpath>
-
-    <!-- Valeurs du tableau -->
-    <xpath expr="//table/tbody/tr/td[2]" position="attributes">
-        <attribute name="t-if">not docs._context.get('of_sans_prix')</attribute>
-    </xpath>
-    <xpath expr="//table/tbody/tr/td[last()-1]" position="attributes">
-        <attribute name="t-if">not docs._context.get('of_sans_prix')</attribute>
-    </xpath>
-    <xpath expr="//table/tbody/tr/td[last()]" position="attributes">
-        <attribute name="t-if">not docs._context.get('of_sans_prix')</attribute>
-    </xpath>
-
-    <!-- Totaux -->
-    <xpath expr="//div[@class='row'][last()]" position="attributes">
-        <attribute name="t-if">not docs._context.get('of_sans_prix')</attribute>
-    </xpath>
-</template>
-
-<template id="of_report_purchaseorder_sans_prix">
-    <t t-call="report.html_container">
-        <t t-set="docs" t-value="docs.with_context(of_sans_prix=True)"/>
-        <t t-foreach="docs" t-as="o">
-            <t t-call="purchase.report_purchaseorder_document" t-lang="o.partner_id.lang"/>
+    <template id="of_report_purchaseorder_sans_prix">
+        <t t-call="report.html_container">
+            <t t-set="docs" t-value="docs.with_context(of_sans_prix=True)"/>
+            <t t-foreach="docs" t-as="o">
+                <t t-call="purchase.report_purchaseorder_document" t-lang="o.partner_id.lang"/>
+            </t>
         </t>
-    </t>
-</template>
+    </template>
 
 </odoo>
