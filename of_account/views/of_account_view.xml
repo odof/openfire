@@ -26,6 +26,10 @@
             <field name="date_invoice" position="after">
                 <field name="fiscal_position_id"/>
             </field>
+            <!-- Afficher la date d'échéance dans la vue facture sans être en mode développeur -->
+            <xpath expr="//field[@name='date_due']" position="replace">
+                <field name="date_due"/>
+            </xpath>
         </field>
     </record>
 
