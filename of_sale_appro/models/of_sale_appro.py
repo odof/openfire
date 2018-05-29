@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, api
+from odoo import models, api, fields
 
 from odoo.exceptions import UserError
 
@@ -21,3 +21,22 @@ class StockMove(models.Model):
             procurements.run()
 
         self.write({'state': 'waiting'})
+
+    of_qty_available_stock = fields.Float(string=u"Qté stock", related="product_id.qty_available")
+    of_qty_virtual_stock = fields.Float(string=u"Qté stock", related="product_id.virtual_available")
+
+class StockPicking(models.Model):
+    _inherit = 'stock.picking'
+
+    @api.multi
+    def button_procure_all(self):
+        self.move_lines.filtered(lambda m: m.state in ['confirmed']).button_create_procurement()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'action_of_popup_message_wizard',
+            'res_model': 'of.popup.message.wizard',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': str({'is_ok': not bool(self.move_lines.filtered(lambda m: m.state in ['draft', 'confirmed', 'partially_available']))})
+        }

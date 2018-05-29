@@ -1,21 +1,28 @@
 # -*- coding: utf-8 -*-
 
 {
-    "name" : "OpenFire Sale Appro",
-    "version" : "10.0.1.0.0",
-    "author" : "OpenFire",
+    "name": "OpenFire / Approvisionnement ventes",
+    "version": "10.0.1.0.0",
+    "author": "OpenFire",
     "description" : """
-Demande d'approvisionnement lancée depuis le bon de livraison client
+
+Bon de livraison client : 
+
+- Ajout d'un bouton sur lignes pour demande d'approvisionnement
+- Ajout d'un bouton pour approvisionner toutes les lignes en même temps (si elles peuvent l'être)
+- Ajout des colonnes quantité stock et quantité prévisionnelle dans onglet "Demande initiale"
 """,
-    "website" : "www.openfire.fr",
-    "depends" : ["sale"],
-    "category" : "OpenFire",
-    "data" : [
+    "website": "www.openfire.fr",
+    'license': '',
+    "depends": ['sale',
+                'stock'
+    ],
+    "category": "OpenFire",
+    "data": [
         'views/of_sale_appro_view.xml',
+        'wizards/of_popup_message_wizard_view.xml'
     ],
     'installable': True,
     'application': False,
     'auto_install': False,
 }
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

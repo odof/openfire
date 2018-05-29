@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
 
-        <!-- Bons de commande -->
+        <!-- ### BON DE LIVRAISON ### -->
 
+        <!-- Ajout bouton approvisionnement lignes -->
         <record id="of_sale_appro_view_move_picking_tree" model="ir.ui.view">
             <field name="name">of.sale.appro.stock.move.tree</field>
             <field name="model">stock.move</field>
@@ -15,5 +15,29 @@
             </field>
         </record>
 
-    </data>
+        <!-- Ajout champs quantité dans liste onglet "Demande initiale" -->
+        <record id="of_sale_appro_view_move_tree" model="ir.ui.view">
+            <field name="name">of.sale.appro.stock.move.tree</field>
+            <field name="model">stock.move</field>
+            <field name="inherit_id" ref="stock.view_move_picking_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='state']" position="after">
+                    <field name="of_qty_available_stock" string="Qté stock"/>
+                    <field name="of_qty_virtual_stock" string="Qté prévisionnelle"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Ajout bouton "Approvisionner" pour approvisionner toutes les lignes d'un coup -->
+        <record id="of_sale_appro_view_picking_form" model="ir.ui.view">
+            <field name="name">of.sale.appro.stock.move.form</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='button_scrap']" position="after">
+                    <button name="button_procure_all" string="Approvisionner" type="object" class="oe_highlight" confirm="Vous allez approvisionner toutes les lignes qui peuvent l'être. Êtes-vous certain ?" attrs="{'invisible': [('state', 'not in', ('confirmed', 'partially_available'))]}"/>
+                </xpath>
+            </field>
+        </record>
+
 </odoo>
