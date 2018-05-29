@@ -234,15 +234,19 @@ class OfPlanningIntervention(models.Model):
     cleantext_intervention = fields.Text(compute='_detect_intervention_vide')
 
     # detectetion champs seulement avec balises html
+    @api.depends('description')
     def _detect_description_vide(self):
         cleanr = re.compile('<.*?>')
-        cleantext = re.sub(cleanr, '', self.description)
-        self.cleantext_description = cleantext
+        for interv in self:
+            cleantext = re.sub(cleanr, '', interv.description)
+            interv.cleantext_description = cleantext
 
+    @api.depends('order_id.of_notes_intervention')
     def _detect_intervention_vide(self):
         cleanr = re.compile('<.*?>')
-        cleantext = re.sub(cleanr, '', self.order_id.of_notes_intervention)
-        self.cleantext_intervention = cleantext
+        for interv in self:
+            cleantext = re.sub(cleanr, '', interv.order_id.of_notes_intervention)
+            interv.cleantext_intervention = cleantext
 
     @api.depends('state')
     def _compute_state_int(self):
