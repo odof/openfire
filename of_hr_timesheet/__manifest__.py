@@ -1,5 +1,16 @@
 # -*- coding: utf-8 -*-
 
+##############################################################################
+#
+#    OpenFire
+#    Version OF10.0
+#
+#    Module conçu et développé par OpenFire SAS
+#
+#    Compatible avec Odoo 10 Community Edition
+#
+##############################################################################
+
 {
     'name' : u"OpenFire - Personnalisation du module Odoo feuilles de temps",
     'version' : "10.0.1.0.0",
@@ -9,10 +20,11 @@
     'complexity': "",
     'summary': u"Personnalisation du module Odoo feuilles de temps",
     'description': u"""
-Module OpenFire - Personnalisation du module Odoo feuilles de temps
-===================================================================
+Ce module personnalise le module Odoo des feuilles de temps.
+============================================================
 
 - Ajout des catégories dans les feuilles de temps et les activités détaillées
+- Ajout des filtres de recherche personnalisés aux feuilles de temps.
 """,
     'depends' : [
         'hr_timesheet',
