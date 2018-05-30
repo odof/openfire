@@ -19,7 +19,7 @@ class SaleAdvancePaymentInv(models.TransientModel):
     @api.model
     def _default_product_id(self):
         categ = self._default_product_categ_id()
-        products = categ and self.env['product.product'].search([('categ_id', '=', categ.id)])
+        products = categ and self.env['product.product'].search([('categ_id', '=', categ.id), ('type', '=', 'service')])
         return len(products) == 1 and products or self.env['product.product'].browse()
 
     product_categ_id = fields.Many2one(
@@ -27,14 +27,14 @@ class SaleAdvancePaymentInv(models.TransientModel):
         default=lambda self: self._default_product_categ_id())
 
     product_id = fields.Many2one(
-        domain="[('type', '=', 'service'), ('categ_id', '=', product_categ_id)]",
+        domain="[('categ_id', '=', product_categ_id), ('type', '=', 'service')]",
         default=lambda self: self._default_product_id())
     of_nb_products = fields.Integer(compute="_compute_of_nb_products")
 
     @api.depends('product_categ_id')
     def _compute_of_nb_products(self):
         categ = self._default_product_categ_id()
-        nb_products = categ and self.env['product.product'].search([('categ_id', '=', categ.id)], count=True) or 0
+        nb_products = categ and self.env['product.product'].search([('categ_id', '=', categ.id), ('type', '=', 'service')], count=True) or 0
         self.update({'of_nb_products': nb_products})
 
     @api.multi
