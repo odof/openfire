@@ -124,7 +124,7 @@ class ProjectIssue(models.Model):
         #         result[sav.id] = categ_id
         #     return result
 
-    of_code = fields.Char('Code', size=64, required=True, readonly=True, select=True, default='Nouveau')  # Migration 9 states={'draft': [('readonly', False)]},
+    of_code = fields.Char('Code', size=64, required=True, readonly=True, default='Nouveau')  # Migration 9 states={'draft': [('readonly', False)]},
     partner_note = fields.Text("Note client", related='partner_id.comment', readonly=False)
     invoice_ids = fields.One2many('account.invoice', compute='_get_partner_invoices', string='Factures du client', method=True, readonly=True)
     of_categorie_id = fields.Many2one('of.project.issue.categorie', u'Catégorie', required=False, ondelete='restrict')
@@ -558,11 +558,11 @@ class OfProjectIssueCategorie(models.Model):
     _name = "of.project.issue.categorie"
 
     name = fields.Char(u'Catégorie', size=32)
-    parent_id = fields.Many2one('of.project.issue.categorie', 'Catégorie parente', select=True, ondelete='restrict')
+    parent_id = fields.Many2one('of.project.issue.categorie', 'Catégorie parente', ondelete='restrict')
     pparent_id = fields.Many2one('of.project.issue.categorie', string='Catégorie mère', readonly=True)
     sequence = fields.Integer(u'Séquence', help=u"Ordre d'affichage (plus petit en premier)")
-    parent_left = fields.Integer('Left Parent', select=1)
-    parent_right = fields.Integer('Right Parent', select=1)
+    parent_left = fields.Integer('Left Parent')
+    parent_right = fields.Integer('Right Parent')
 
     _constraints = [
         (models.Model._check_recursion, 'Error ! You can not create recursive category.', ['parent_id'])
