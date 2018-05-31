@@ -124,7 +124,7 @@
             </field>
         </record>
 
-        <!-- ajout onglet 'Paramètres avancés' dans la fiche société -->
+        <!-- Ajout onglet "Paramètres avancés" dans la fiche société -->
         <record id="of_base_view_company_form" model="ir.ui.view">
             <field name="name">of.base.company.form</field>
             <field name="model">res.company</field>
@@ -137,6 +137,19 @@
                     </page>
                 </notebook>
             </field>
+        </record>
+
+        <!-- Restreindre l'accès au menu "Applications" à l'utilisateur root (admin) -->
+        <!-- Ajout d'un groupe pour l'administrateur uniquement -->
+        <record id="of_group_root_only" model="res.groups">
+            <field name="name">Admin seulement</field>
+            <field name="comment">Groupe uniquement pour l'utilisateur admin (root)</field>
+            <field name="users" eval="[(4, ref('base.user_root'))]"/>
+        </record>
+
+        <!-- Permet de cacher le menu application pour tout le monde sauf admin -->
+        <record id="base.menu_management" model="ir.ui.menu">
+            <field name="groups_id" eval="[(6,0,[ref('of_group_root_only')])]"/>
         </record>
 
     </data>
