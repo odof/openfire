@@ -1,6 +1,21 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError
+
+import os
+import base64
+import tempfile
+
+try:
+    import pyPdf
+except ImportError:
+    pyPdf = None
+
+try:
+    import pypdftk
+except ImportError:
+    pypdftk = None
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -53,6 +68,58 @@ class SaleOrder(models.Model):
     of_notes_facture = fields.Html(string="Notes facture", oldname="of_notes_factures")
     of_notes_intervention = fields.Html(string="Notes intervention")
     of_notes_client = fields.Text(related='partner_id.comment', string="Notes client", readonly=True)
+    of_mail_template_ids = fields.Many2many("of.mail.template", string=u"Insérer documents", help=u"Intégrer des documents pdf au devis/bon de commande (exemple : CGV)")
+
+    @api.multi
+    def _detect_doc_joint(self):
+        """
+        Cette fonction retourne les données des documents à joindre au fichier pdf du devis/commande au format binaire.
+        Le document retourné correspond au fichier pdf joint au modéle de courrier.
+        @todo: Permettre l'utilisation de courriers classiques et le remplissage des champs.
+        """
+        self.ensure_one()
+        data = []
+        for mail_template in self.of_mail_template_ids:
+            if mail_template.file:
+                # Utilisation des documents pdf fournis
+                data.append(mail_template.file)
+        return data
+
+class Report(models.Model):
+    _inherit = "report"
+
+    @api.model
+    def get_pdf(self, docids, report_name, html=None, data=None):
+        result = super(Report, self).get_pdf(docids, report_name, html=html, data=data)
+        if report_name in ('sale.report_saleorder',):
+            # On ajoute au besoin les documents joint
+            order = self.env['sale.order'].browse(docids)[0]
+            for mail_data in order._detect_doc_joint():
+                if mail_data:
+                    # Create temp files
+                    fd1, order_pdf = tempfile.mkstemp()
+                    fd2, mail_pdf = tempfile.mkstemp()
+                    fd3, merge_pdf = tempfile.mkstemp()
+
+                    os.write(fd1, result)
+                    os.write(fd2, base64.b64decode(mail_data))
+
+                    output = pyPdf.PdfFileWriter()
+                    pdfOne = pyPdf.PdfFileReader(file(order_pdf, "rb"))
+                    pdfTwo = pyPdf.PdfFileReader(file(mail_pdf, "rb"))
+
+                    for page in range(pdfOne.getNumPages()):
+                        output.addPage(pdfOne.getPage(page))
+
+                    for page in range(pdfTwo.getNumPages()):
+                        output.addPage(pdfTwo.getPage(page))
+
+                    outputStream = file(merge_pdf, "wb")
+                    output.write(outputStream)
+                    outputStream.close()
+
+                    result =  file(merge_pdf, "rb").read()
+        return result
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'

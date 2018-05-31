@@ -47,6 +47,11 @@
                         </div>
                      </page>
                 </xpath>
+                <!-- Ajout option Documents joints -->
+                <xpath expr="//page//group[@name='technical']" position="after">
+                    <separator string="Documents joints" colspan="4"/>
+                    <field name="of_mail_template_ids" widget="many2many" nolabel="1"/>
+                </xpath>
             </field>
         </record>
 
