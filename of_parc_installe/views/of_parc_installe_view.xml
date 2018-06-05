@@ -153,10 +153,20 @@
             </field>
         </record>
 
-
 <!-- *************************************************** -->
 <!-- ********** VUE PARTENAIRES (res.partner) ********** -->
 <!-- *************************************************** -->
+
+        <!-- Action vue parc installé -->
+        <record id="action_view_of_parc_installe" model="ir.actions.act_window">
+             <field name="name">Parc installé</field>
+             <field name="type">ir.actions.act_window</field>
+             <field name="res_model">of.parc.installe</field>
+             <field name="view_type">form</field>
+             <field name="view_mode">tree,form</field>
+             <field name="search_view_id" ref="of_parc_installe_search_view"/>
+             <field name="help">Parc des produits installés</field>
+        </record>
 
       <!-- Mettre revendeur, installateur, payeur dans formulaire partenaires -->
         <record id="of_res_partner_form_pi" model="ir.ui.view">
@@ -186,22 +196,9 @@
 <!-- ********************** MENUS ********************** -->
 <!-- *************************************************** -->
 
-        <!-- Action vue parc installé -->
-        <record id="action_view_of_parc_installe" model="ir.actions.act_window">
-             <field name="name">Parc installé</field>
-             <field name="type">ir.actions.act_window</field>
-             <field name="res_model">of.parc.installe</field>
-             <field name="view_type">form</field>
-             <field name="view_mode">tree,form</field>
-             <field name="search_view_id" ref="of_parc_installe_search_view"/>
-             <field name="help">Parc des produits installés</field>
-        </record>
-
         <!-- Menu parc installé -->
         <menuitem id="menu_of_parc_installe" action="action_view_of_parc_installe" name="Parc installé" 
              parent="sales_team.menu_sales" groups="project.group_project_user" sequence="100"/>
-
-
 
 <!-- *************************************************** -->
 <!-- ********************* ACTIONS ********************* -->
