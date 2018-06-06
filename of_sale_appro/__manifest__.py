@@ -15,12 +15,12 @@ Bon de livraison client :
     "website": "www.openfire.fr",
     'license': '',
     "depends": ['sale',
-                'stock'
+                'stock',
+                'of_base',
     ],
     "category": "OpenFire",
     "data": [
         'views/of_sale_appro_view.xml',
-        'wizards/of_popup_message_wizard_view.xml'
     ],
     'installable': True,
     'application': False,
