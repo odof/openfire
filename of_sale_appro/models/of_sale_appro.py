@@ -31,12 +31,8 @@ class StockPicking(models.Model):
     @api.multi
     def button_procure_all(self):
         self.move_lines.filtered(lambda m: m.state in ['confirmed']).button_create_procurement()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'action_of_popup_message_wizard',
-            'res_model': 'of.popup.message.wizard',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'target': 'new',
-            'context': str({'is_ok': not bool(self.move_lines.filtered(lambda m: m.state in ['draft', 'confirmed', 'partially_available']))})
-        }
+        if bool(self.move_lines.filtered(lambda m: m.state in ['draft', 'confirmed', 'partially_available'])):
+            message = u"Certaines lignes n'ont pas pu être approvisionnées."
+        else:
+            message = u"Toutes les lignes ont bien été approvisionnées."
+        return self.env['of.popup.wizard'].popup_return(message)

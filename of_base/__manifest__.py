@@ -4,9 +4,10 @@
     'name' : "OpenFire Base",
     'version' : "10.0",
     'author' : "OpenFire",
+    'license': '',
     'complexity': "easy",
     'description' : """
-Personnalisations des fonctions de base Odoo :
+Personnalisation des fonctions de base Odoo :
 
 - Ajout des colonnes destinataire et partenaire dans la vue liste des emails
 - Ajout onglet historique dans formulaire partenaire
@@ -17,7 +18,8 @@ Personnalisations des fonctions de base Odoo :
 - Affiche l'adresse au format français par défaut quand le pays n'est pas renseigné et non le format US
 - Ajout de la recherche multi-mots pour les articles
 - Désactive l'envoi des notifications par courriel des changements d'affectation des commandes et factures
-- Restreint l'accès au menu "Applications" à l'utilisateur administrateur.
+- Restreint l'accès au menu "Applications" à l'utilisateur administrateur
+- API fonction permettant d'afficher un message dans une fenêtre au cours de l'exécution d'une fonction 
 """,
     'website' : "www.openfire.fr",
     'depends' : ["product"],
@@ -27,10 +29,9 @@ Personnalisations des fonctions de base Odoo :
         'security/of_group_intranet_security.xml',
         'views/of_base_view.xml',
         'wizard/wizard_change_active_product.xml',
+        'wizard/of_popup_wizard_view.xml',
     ],
     'installable': True,
     'application': False,
     'auto_install': False,
 }
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
