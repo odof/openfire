@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!--===================================================================================================-->
+<!--=========================================OF SALE APPRO RULE========================================-->
+<!--===================================================================================================-->
+
+<!--============================================SEARCH VIEW============================================-->
+
+    <record id="of_sale_appro_rule_view_search" model="ir.ui.view">
+        <field name="name">of.sale.appro.rule.search</field>
+        <field name="model">of.sale.appro.rule</field>
+        <field name="arch" type="xml">
+            <search string="Approvisionnement intersociétés">
+                <field name="name"/>
+                <field name="company_src_id"/>
+                <field name="company_id"/>
+            </search>
+        </field>
+    </record>
+
+<!--=============================================TREE VIEW=============================================-->
+
+    <record id="of_sale_appro_rule_view_tree" model="ir.ui.view">
+        <field name="name">of.sale.appro.rule.tree</field>
+        <field name="model">of.sale.appro.rule</field>
+        <field name="arch" type="xml">
+            <tree string="Approvisionnement intersociétés">
+                <field name="name"/>
+                <field name="company_src_id"/>
+                <field name="company_id"/>
+                <field name="marge_fournisseur" string="Marge fournisseur (en %)"/>
+            </tree>
+        </field>
+    </record>
+
+<!--=============================================FORM VIEW=============================================-->
+
+    <record id="of_sale_appro_rule_view_form" model="ir.ui.view">
+        <field name="name">of.sale.appro.rule.form</field>
+        <field name="model">of.sale.appro.rule</field>
+        <field name="arch" type="xml">
+            <form string="Approvisionnement intersociétés">
+                <group col="12">
+                    <group colspan="4">
+                        <field name="name"/>
+                        <label for="marge_fournisseur"/>
+                        <div>
+                            <field name="marge_fournisseur" class="oe_inline"/> %
+                        </div>
+                    </group>
+                </group>
+                <notebook>
+                    <page name="Sociétés" string="Sociétés">
+                        <group>
+                            <group>
+                                <field name="company_src_id"/>
+                                <field name="company_id"/>
+                            </group>
+                            <group>
+                                <field name="user_src_id" domain="[('company_id','=',company_src_id)]"/>
+                            </group>
+                        </group>
+                    </page>
+                </notebook>
+            </form>
+        </field>
+    </record>
+
+<!--===========================================ACTION + MENU===========================================-->
+
+    <act_window id="action_of_sale_appro_rule"
+            key2="client_action_multi"
+            name="Approvisionnement intersociétés"
+            res_model="of.sale.appro.rule"
+            view_mode="tree,form"
+            view_type="form"
+            view_id="of_sale_appro_rule_view_tree"
+            target="current"
+            groups="sales_team.group_sale_manager"/>
+
+    <menuitem name="Approvisionnement intersociétés"
+            action="action_of_sale_appro_rule"
+            id="menu_of_sale_appro_rule"
+            parent="purchase.menu_purchase_config"
+            groups="base.group_system"
+            sequence="9"/>
+
+<!--===================================================================================================-->
+<!--===========================================STOCK PICKING===========================================-->
+<!--===================================================================================================-->
+
+<!--=============================================FORM VIEW=============================================-->
+
+    <!-- Ajout du bouton d'approvisionnement intersociétés -->
+    <record id="of_sale_appro_rule_stock_picking_view_form" model="ir.ui.view">
+        <field name="name">of.sale.appro.rule.stock.picking.form</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='button_scrap']" position="after">
+                <button name="button_wizard_appro_intersocietes" string="Appro intersociétés" type="object" class="oe_highlight"
+                        states="confirmed,partially_available"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
