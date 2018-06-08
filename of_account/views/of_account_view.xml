@@ -33,4 +33,17 @@
         </field>
     </record>
 
+    <!-- Ajout du choix du mode de la date d'échéance -->
+    <record id="of_tiers_client_ref" model="ir.ui.view">
+        <field name="name">of.tiers.client.ref</field>
+        <field name="model">account.config.settings</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="account.view_account_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='group_warning_account']" position="after">
+                <field name="of_date_due" widget="radio"/>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
