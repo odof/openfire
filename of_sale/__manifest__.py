@@ -1,14 +1,27 @@
 # -*- coding: utf-8 -*-
 
+##############################################################################
+#
+#    OpenFire
+#    Version OF10.0
+#
+#    Module conçu et développé par OpenFire SAS
+#
+#    Compatible avec Odoo 10 Community Edition
+#
+##############################################################################
+
 {
-    "name": "OpenFire Sale",
-    "version": "10.0.1.0.0",
-    "author": "OpenFire",
-    'license': 'AGPL-3',
-    'category': 'OpenFire',
-    "description": """
-Personnalisation des ventes OpenFire
-====================================
+    'name' : u"OpenFire / Ventes",
+    'version' : "10.0.1.0.0",
+    'license': '',
+    'author' : "OpenFire",
+    'website' : "www.openfire.fr",
+    'category': "Module OpenFlam Achats",
+    'summary': u"Personnalisation des ventes OpenFire",
+    'description': u"""
+Module OpenFire - Ventes
+========================
 
 Modification de l'affichage du formulaire de devis/commande client.
 Refonte de report.report_saleorder_document
@@ -23,6 +36,7 @@ Modification du fonctionnement de l'outil de facturation pour les factures d'aco
 - Si l'acompte est calculé en pourcentage de la commande, il s'agit désormais du pourcentage du montant TTC et non plus HT.
 - Les taxes et le compte comptable des lignes d'acompte sont calculés selon les règles du module of_account_tax
 
+Permettre d'ajouter des documents joints dans l'impression des devis/commandes
 
 Paramètres de ventes (sale.config.settings)
 -------------------------------------------
@@ -32,20 +46,25 @@ Paramètres de ventes (sale.config.settings)
 - inhibition avertissements de stock (of_sale_kit)
 - inhibition affichage réf produit dans les rapports PDF (of_sale)
 - redéfinition templates sale.report_saleorder_document, sale.report_invoice_document_inherit_sale et sale.report_invoice_layouted
+
 """,
-    "website": "www.openfire.fr",
-    "depends": [
-        "sale",
-        "of_product",
-        "of_base",
+    'depends' : [
         "of_account_invoice_report",  # définition des paramètres d'adresse dans les rapports
         "of_account_tax",  # of_sale ajoute les modifications de of_account_tax dans la creation de facture d'acompte
+        "of_base",
+        "of_gesdoc",
+        "of_product",
+        "sale",
     ],
-    "data": [
+    'external_dependancies': {
+        'python': ['pdfminer', 'pypdftk', 'pyPdf'],
+    },
+    'data' : [
         'views/of_sale_view.xml',
         'report/of_sale_report_templates.xml',
         'wizards/sale_make_invoice_advance_views.xml',
     ],
+    'active': True,
     'installable': True,
     'application': False,
     'auto_install': False,
