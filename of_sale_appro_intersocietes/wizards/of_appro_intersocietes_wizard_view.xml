@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_appro_intersocietes_wizard_view" model="ir.ui.view">
+        <field name="name">of.appro.intersocietes.wizard.form</field>
+        <field name="model">of.appro.intersocietes.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <label string="Sélectionnez la règle d'approvisionnement ainsi que la date de réception de la commande fournisseur"/>
+                <group>
+                    <field name="rule_id" domain="[('company_id', '=', company_id)]"/>
+                    <field name="date_planned"/>
+                    <field name="company_id" invisible="1"/>
+                </group>
+                <label string="Sélectionnez les lignes à approvisionner"/>
+                <field name="line_ids" widget="many2many">
+                    <tree editable="bottom">
+                        <field name="product_id"/>
+                        <field name="product_uom_id"/>
+                        <field name="product_qty"/>
+                        <field name="price" readonly="1"/>
+                        <field name="price_marge" readonly="1"/>
+                    </tree>
+                </field>
+                <footer>
+                    <button name="button_create_orders" string="Créer commandes" type="object" class="oe_highlight"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_of_appro_intersocietes_wizard" model="ir.actions.act_window">
+        <field name="name">of.appro.intersocietes.wizard.action</field>
+        <field name="res_model">of.appro.intersocietes.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="of_appro_intersocietes_wizard_view"/>
+    </record>
+
+</odoo>

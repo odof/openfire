@@ -22,8 +22,10 @@ class StockMove(models.Model):
 
         self.write({'state': 'waiting'})
 
-    of_qty_available_stock = fields.Float(string=u"Qté stock", related="product_id.qty_available")
-    of_qty_virtual_stock = fields.Float(string=u"Qté stock", related="product_id.virtual_available")
+    # Par défaut les champs relationnels sont lus en tant qu'admin.
+    # Ici ce ne doit pas être le cas car les quantités doivent êtres lues dans la société de l'utilisateur
+    of_qty_available_stock = fields.Float(string=u"Qté stock", related="product_id.qty_available", related_sudo=False)
+    of_qty_virtual_stock = fields.Float(string=u"Qté stock", related="product_id.virtual_available", related_sudo=False)
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'

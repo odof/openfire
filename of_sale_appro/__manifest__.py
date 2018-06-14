@@ -6,7 +6,7 @@
     "author": "OpenFire",
     "description" : """
 
-Bon de livraison client : 
+Bon de livraison client :
 
 - Ajout d'un bouton sur lignes pour demande d'approvisionnement
 - Ajout d'un bouton pour approvisionner toutes les lignes en même temps (si elles peuvent l'être)
@@ -14,9 +14,10 @@ Bon de livraison client :
 """,
     "website": "www.openfire.fr",
     'license': '',
-    "depends": ['sale',
-                'stock',
-                'of_base',
+    "depends": [
+        'sale',
+        'stock',
+        'of_base',
     ],
     "category": "OpenFire",
     "data": [
