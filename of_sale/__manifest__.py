@@ -61,6 +61,7 @@ Paramètres de ventes (sale.config.settings)
 - inhibition avertissements de stock (of_sale_kit)
 - inhibition affichage réf produit dans les rapports PDF (of_sale)
 - redéfinition templates sale.report_saleorder_document, sale.report_invoice_document_inherit_sale et sale.report_invoice_layouted
+- permettre le réglage de la couleur de fond des titres de section dans les bons de commandes et les factures (paramètres de comptabilité pour les factures)
 
 """,
     'depends' : [
