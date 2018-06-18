@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_view_sale_order_gestion_prix" model="ir.ui.view">
+        <field name="name">Gestion des prix</field>
+        <field name="model">of.sale.order.gestion.prix</field>
+        <field name="arch" type="xml">
+
+            <form string="Gestion des prix">
+                <header>
+                    <button name="bouton_simuler" class="oe_highlight" string="Simuler" type="object"/>
+                    <button name="bouton_valider" class="oe_highlight" string="Appliquer au devis/bon de commande (non réversible)" type="object" confirm="Confirmez-vous l'application des nouveaux prix calculés au devis/bon de commande (non réversible) ?"/>
+                    <button name="bouton_annuler" string="Retour à la commande" type="object"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="methode_remise" required="1"/>
+                        <field name="valeur"
+                               attrs="{'invisible':[('methode_remise','not in',('prix_ttc_cible','montant_ttc','pc','pc_marge'))],
+                                       'required': [('methode_remise','in',('prix_ttc_cible','montant_ttc','pc','pc_marge'))]}"/>
+                        <label for="arrondi_mode"/>
+                        <div name="arrondi">
+                            <field name="arrondi_mode" class="oe_inline" attrs="{'invisible':[('methode_remise','=',False)]}"/>
+                            <field name="arrondi_prec" class="oe_inline" nolabel="1"
+                                   style="margin-left:10px;"
+                                   attrs="{'invisible':['|', ('methode_remise','=',False), ('arrondi_mode','=','no')],
+                                           'required': [('methode_remise','!=',False), ('arrondi_mode','in',('total_excluded', 'total_included'))]}"/>
+                        </div>
+                        <field name="afficher_remise"/>
+                    </group>
+
+                    <field name="line_ids">
+                        <tree string="Lignes de commande" colors="green:is_selected==True;grey:is_selected==False;">
+                            <field name="is_selected" invisible="1"/>
+                            <button name="button_inverse" string="Inverser" type="object" icon="fa-refresh"/>
+                            <field name="text_selected"/>
+                            <field name="order_line_id"/>
+                            <field name="prix_total_ht"/>
+                            <field name="prix_total_ht_simul"/>
+                            <field name="prix_total_ttc"/>
+                            <field name="prix_total_ttc_simul"/>
+                        </tree>
+                    </field>
+
+                    <button name="bouton_inclure_tout" type="object" class="oe_left btn-default" string="Tout inclure"/>
+                    <button name="bouton_exclure_tout" type="object" class="oe_left btn-default" string="Tout exclure"/>
+
+                    <group col="4" string="Total devis/commande">
+                        <field name="montant_total_ttc_initial"/>
+                        <field name="montant_total_ttc_simul"/>
+                        <field name="pc_marge_initiale"/>
+                        <field name="pc_marge_simul"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>

@@ -57,8 +57,8 @@ class AccountInvoiceLine(models.Model):
     kit_id = fields.Many2one('of.invoice.kit', string="Components")
     of_is_kit = fields.Boolean(string='Is a kit')
 
-    price_comps = fields.Monetary(
-        string='Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
+    price_comps = fields.Float(
+        string='Compo Price/Kit', compute='_compute_price_comps',  # digits=dp.get_precision('Product Price'),
         help="Sum of the prices of all components necessary for 1 unit of this kit", oldname="unit_compo_price")
     cost_comps = fields.Monetary(
         string='Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
@@ -274,8 +274,8 @@ class OfAccountInvoiceKit(models.Model):
 
     qty_invoice_line = fields.Float(string="Invoice Line Qty", related="invoice_line_id.quantity", readonly=True)
     currency_id = fields.Many2one(related='invoice_line_id.currency_id', store=True, string='Currency', readonly=True)
-    price_comps = fields.Monetary(
-        string='Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
+    price_comps = fields.Float(
+        string='Compo Price/Kit', compute='_compute_price_comps',  # digits=dp.get_precision('Product Price'),
         help="Sum of the prices of all components necessary for 1 unit of this kit", oldname="unit_compo_price")
     cost_comps = fields.Monetary(
         string='Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
@@ -331,8 +331,8 @@ class OfAccountInvoiceKitLine(models.Model):
     price_unit = fields.Monetary(string='Unit Price', digits=dp.get_precision('Product Price'), required=True, default=0.0, oldname="unit_price")
     price_unit_display = fields.Monetary(related='price_unit')
     cost_unit = fields.Monetary(string='Unit Cost', digits=dp.get_precision('Product Price'))
-    cost_total = fields.Monetary(
-        string='Subtotal Cost', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
+    cost_total = fields.Float(
+        string='Subtotal Cost', compute='_compute_prices',  # digits=dp.get_precision('Product Unit of Measure'),
         help="Cost of this component total quantity. Equal to total quantity * unit cost.")
     cost_per_kit = fields.Monetary(
         string='Cost/Kit', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
@@ -352,8 +352,8 @@ class OfAccountInvoiceKitLine(models.Model):
     price_total = fields.Monetary(
         string='Subtotal Price', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
         help="Price of this component total quantity. Equal to total quantity * unit price.")
-    price_per_kit = fields.Monetary(
-        string='Price/Kit', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
+    price_per_kit = fields.Float(
+        string='Price/Kit', compute='_compute_prices',  # digits=dp.get_precision('Product Unit of Measure'),
         help="Price of this component quantity necessary to make one unit of its invoice line kit. Equal to quantity per kit unit * unit price.")
     kit_pricing = fields.Selection(related="kit_id.of_pricing", readonly=True)
     hide_prices = fields.Boolean(string="Hide prices", default=False)
