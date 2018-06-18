@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Ajout champs accord recevoir communication (exigence RGPD) -->
+    <record id="of_accord_communication_partner_form" model="ir.ui.view">
+        <field name="name">of.accord.communication.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="mail.view_emails_partner_info_form"/>
+        <field name="arch" type="xml">
+            <field name="opt_out" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <page name="sales_purchases" position="inside">
+                <group string="Utilisation données personnelles" name="of_utilisation_donnees">
+                    <field name="of_accord_communication"/>
+                    <field name="of_date_accord_communication" attrs="{'required': [('of_accord_communication', '=', True)]}"/>
+                    <field name="of_preuve_accord_communication" attrs="{'required': [('of_accord_communication', '=', True)]}"/>
+                </group>
+            </page>
+        </field>
+    </record>
+
+</odoo>
