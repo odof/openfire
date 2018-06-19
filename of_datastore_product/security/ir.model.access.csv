@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_datastore_supplier_user,of.datastore.supplier,model_of_datastore_supplier,base.group_user,1,0,0,0
+access_of_datastore_supplier_sale_manager,of.datastore.supplier,model_of_datastore_supplier,base.group_sale_manager,1,1,1,1
+access_of_datastore_product_category_user,of.datastore.product.category,model_of_datastore_product_category,base.group_user,1,0,0,0
+access_of_datastore_product_category_sale_manager,of.datastore.product.category,model_of_datastore_product_category,base.group_sale_manager,1,1,1,1

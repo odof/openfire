@@ -278,6 +278,7 @@ class OFProductBrand(models.Model):
         values['list_price'] *= udm_ratio
         values['standard_price'] *= udm_ratio
 
+        values['of_seller_price'] = eval_dict['pa']
         return values
 
     @api.multi
