@@ -45,6 +45,18 @@ class SaleOrder(models.Model):
         op = 'in' if (operator == '=') == value else 'not in'
         return [('id', op, orders.ids)]
 
+    @api.depends('order_line', 'amount_untaxed')
+    def _compute_of_marge(self):
+        for order in self:
+            total_cout = 0.0
+            for line in order.order_line:
+                cout = line.product_id.cost_comps if line.of_is_kit else line.product_id.standard_price
+                total_cout += line.product_id.uom_id._compute_price(cout, line.product_uom) * line.product_uom_qty
+            # Il n'est pas nécessaire de faire des arrondis (parce que je l'ai décidé)
+            order.of_total_cout = total_cout
+            order.of_marge = order.amount_untaxed - total_cout
+            order.of_marge_pc = 100 * (1 - total_cout / order.amount_untaxed) if order.amount_untaxed else -100
+
     @api.multi
     def _prepare_invoice(self):
         """
@@ -77,8 +89,8 @@ class SaleOrderLine(models.Model):
     kit_id = fields.Many2one('of.saleorder.kit', string="Components", copy=True)
     of_is_kit = fields.Boolean(string='Is a kit')
 
-    price_comps = fields.Monetary(
-        string='Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
+    price_comps = fields.Float(
+        string='Compo Price/Kit', compute='_compute_price_comps',  # digits=dp.get_precision('Product Price'),
         help="Sum of the prices of all components necessary for 1 unit of this kit", oldname="unit_compo_price")
     cost_comps = fields.Monetary(
         string='Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
@@ -93,6 +105,13 @@ class SaleOrderLine(models.Model):
              "if set to 'computed', the price will be computed according to the components of the kit.")
 
     sale_kits_to_unlink = fields.Boolean(string="sale kits to unlink?", default=False, help="True if at least 1 sale kit needs to be deleted from database")
+
+    @api.depends('kit_id.kit_line_ids')
+    def _compute_price_comps(self):
+        for line in self:
+            if line.kit_id:
+                line.price_comps = line.kit_id.price_comps
+                line.cost_comps = line.kit_id.cost_comps
 
     def get_kit_descr_collapse(self):
         """
@@ -121,20 +140,12 @@ class SaleOrderLine(models.Model):
         res = " (" + ", ".join(res) + ")"
         return res
 
-    @api.multi
-    @api.depends('kit_id.kit_line_ids')
-    def _compute_price_comps(self):
-        for line in self:
-            if line.kit_id:
-                line.price_comps = line.kit_id.price_comps
-                line.cost_comps = line.kit_id.cost_comps
-
     @api.onchange('price_comps', 'cost_comps', 'of_pricing', 'product_id')
     def _refresh_price_unit(self):
         for line in self:
             if line.of_is_kit:
-                price = line.price_unit
                 if line.of_pricing == 'computed':
+                    price = line.price_unit
                     line.price_unit = line.price_comps
                     if line.price_unit != price:
                         line._compute_amount()
@@ -397,11 +408,11 @@ class OfSaleOrderKit(models.Model):
 
     qty_order_line = fields.Float(string="Order Line Qty", related="order_line_id.product_uom_qty", readonly=True)
     currency_id = fields.Many2one(related='order_line_id.currency_id', store=True, string='Currency', readonly=True)
-    price_comps = fields.Monetary(
-        string='Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
+    price_comps = fields.Float(
+        string='Compo Price/Kit', compute='_compute_price_comps',  # digits=dp.get_precision('Product Price'),
         help="Sum of the prices of all components necessary for 1 unit of this kit", oldname="unit_compo_price")
-    cost_comps = fields.Monetary(
-        string='Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_price_comps',
+    cost_comps = fields.Float(
+        string='Compo Cost/Kit', compute='_compute_price_comps',  # digits=dp.get_precision('Product Price'),
         help="Sum of the costs of all components necessary for 1 unit of this kit")
     qty_invoiced = fields.Float(related="order_line_id.qty_invoiced", readonly=True)
     state = fields.Selection(
@@ -493,7 +504,7 @@ class OfSaleOrderKitLine(models.Model):
         string='Subtotal Cost', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
         help="Cost of this component total quantity. Equal to total quantity * unit cost.")
     cost_per_kit = fields.Monetary(
-        string='Cost/Kit', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_prices',
+        string='Cost/Kit', compute='_compute_prices',  # digits=dp.get_precision('Product Unit of Measure'),
         help="Cost of this component quantity necessary to make one unit of its order line kit. Equal to quantity per kit unit * unit cost.")
 
     qty_per_kit = fields.Float(

@@ -23,6 +23,9 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
+                <xpath expr="//header" position="inside">
+                    <button name="button_gestion_prix" type="object" string="Gestion prix" attrs="{'invisible': [('invoice_status', '=', 'invoiced')]}"/>
+                </xpath>
                 <field name="date_order" position="attributes">
                     <attribute name="widget">date</attribute>
                 </field>

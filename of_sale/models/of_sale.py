@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
-from odoo.exceptions import UserError
 
 import os
 import base64
@@ -52,6 +51,16 @@ class SaleOrder(models.Model):
             domain = ['&'] + domain + [('id', 'not in', zip(*order_ids)[0])]
         return domain
 
+    of_to_invoice = fields.Boolean(u"Entièrement facturable", compute='_compute_of_to_invoice', search='_search_of_to_invoice')
+    of_notes_facture = fields.Html(string="Notes facture", oldname="of_notes_factures")
+    of_notes_intervention = fields.Html(string="Notes intervention")
+    of_notes_client = fields.Text(related='partner_id.comment', string="Notes client", readonly=True)
+    of_mail_template_ids = fields.Many2many("of.mail.template", string=u"Insérer documents", help=u"Intégrer des documents pdf au devis/bon de commande (exemple : CGV)")
+
+    of_total_cout = fields.Monetary(compute='_compute_of_marge', string='Marge')
+    of_marge = fields.Monetary(compute='_compute_of_marge', string='Marge')
+    of_marge_pc = fields.Float(compute='_compute_of_marge', string='Marge %')
+
     @api.depends('state', 'order_line', 'order_line.qty_to_invoice', 'order_line.product_uom_qty')
     def _compute_of_to_invoice(self):
         for order in self:
@@ -64,11 +73,16 @@ class SaleOrder(models.Model):
             else:
                 order.of_to_invoice = True
 
-    of_to_invoice = fields.Boolean(u"Entièrement facturable", compute='_compute_of_to_invoice', search='_search_of_to_invoice')
-    of_notes_facture = fields.Html(string="Notes facture", oldname="of_notes_factures")
-    of_notes_intervention = fields.Html(string="Notes intervention")
-    of_notes_client = fields.Text(related='partner_id.comment', string="Notes client", readonly=True)
-    of_mail_template_ids = fields.Many2many("of.mail.template", string=u"Insérer documents", help=u"Intégrer des documents pdf au devis/bon de commande (exemple : CGV)")
+    @api.depends('order_line', 'amount_untaxed')
+    def _compute_of_marge(self):
+        for order in self:
+            cout = 0.0
+            for line in order.order_line:
+                cout += line.product_id.uom_id._compute_price(line.product_id.standard_price, line.product_uom) * line.product_uom_qty
+            # Il n'est pas nécessaire de faire des arrondis (parce que je l'ai décidé)
+            order.of_total_cout = cout
+            order.of_marge = order.amount_untaxed - cout
+            order.of_marge_pc = 100 * (1 - cout / order.amount_untaxed) if order.amount_untaxed else -100
 
     @api.multi
     def _detect_doc_joint(self):
@@ -118,11 +132,13 @@ class Report(models.Model):
                     output.write(outputStream)
                     outputStream.close()
 
-                    result =  file(merge_pdf, "rb").read()
+                    result = file(merge_pdf, "rb").read()
         return result
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
+
+    price_unit = fields.Float(digits=False)
 
     @api.multi
     @api.onchange('product_id')
@@ -160,6 +176,8 @@ class SaleOrderLine(models.Model):
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
+    price_unit = fields.Float(digits=False)
+
     @api.onchange('product_id')
     def _onchange_product_id(self):
         res = super(AccountInvoiceLine, self)._onchange_product_id()
@@ -173,7 +191,7 @@ class AccountInvoiceLine(models.Model):
             self.name += '\n' + product.description_fabricant
         return res
 
-class OFCompany(models.Model):
+class Company(models.Model):
     _inherit = 'res.company'
 
     afficher_descr_fab = fields.Selection(

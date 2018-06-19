@@ -3,11 +3,11 @@
 from odoo import api, models, fields
 from odoo.exceptions import UserError
 
-"""
-Modification OpenFire du comportement des factures d'acompte.
-Le wizard ne génère plus automatiquement d'article.
-Le wizard permet le choix d'un article parmi ceux présents dans la catégorie des articles d'acompte.
-"""
+
+# Modification OpenFire du comportement des factures d'acompte.
+# Le wizard ne génère plus automatiquement d'article.
+# Le wizard permet le choix d'un article parmi ceux présents dans la catégorie des articles d'acompte.
+
 class SaleAdvancePaymentInv(models.TransientModel):
     _inherit = "sale.advance.payment.inv"
 

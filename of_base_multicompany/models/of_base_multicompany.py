@@ -3,6 +3,8 @@
 from odoo import api, models, fields
 from odoo.addons.account.models.account_invoice import TYPE2JOURNAL
 
+# @todo: Certains paramètres de la société (e.g. méthode d'arrondi des taxes) devraient être communs à la société
+
 class Company(models.Model):
     _inherit = 'res.company'
 
