@@ -182,7 +182,6 @@ class AccountInvoiceLine(models.Model):
                 new_comp_vals = {
                     'product_id': self.product_id.id,
                     'name': self.product_id.name_get()[0][1] or self.product_id.name,
-                    'default_code': self.product_id.default_code,
                     'qty_per_kit': 1,
                     'product_uom_id': self.uom_id.id or self.product_id.uom_id.id,
                     'price_unit': self.product_id.list_price,
@@ -322,7 +321,7 @@ class OfAccountInvoiceKitLine(models.Model):
     order_comp_id = fields.Many2one('of.saleorder.kit.line', string="Original comp")
 
     name = fields.Char(string='Name', required=True)
-    default_code = fields.Char(string='Prod ref')
+    default_code = fields.Char(related='product_id.default_code', string='Prod ref', readonly=True)
     sequence = fields.Integer(string=u'Sequence', default=10)
 
     product_id = fields.Many2one('product.product', string='Product', required=True, domain="[('of_is_kit', '=', False)]")
@@ -364,7 +363,6 @@ class OfAccountInvoiceKitLine(models.Model):
         if self.product_id:
             new_vals = {
                 'name': self.product_id.name_get()[0][1] or self.product_id.name,
-                'default_code': self.product_id.default_code,
                 'product_uom_id': self.product_id.product_tmpl_id.uom_id,
                 'price_unit': self.product_id.list_price,
                 'cost_unit': self.product_id.standard_price,

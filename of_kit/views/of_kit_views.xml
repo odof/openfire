@@ -331,6 +331,7 @@
                         <field name="qty_per_kit"/>
                         <field name="qty_delivered" invisible="context.get('hide_sale')" attrs="{'readonly': [('qty_delivered_updateable', '=', False)]}"/>
                         <field name="product_uom_id"/>
+                        <field name="cost_unit" invisible="1"/>
                         <field name="price_unit" invisible="1"/>
                         <field name="price_unit_display" attrs="{'readonly': [('kit_pricing', '=', 'fixed')]}"/>
                         <field name="price_per_kit"/>
@@ -340,6 +341,7 @@
                         <field name="procurement_ids" invisible="1"/>
                         <field name="state" invisible="1"/>
                         <field name="qty_delivered_updateable" invisible="1"/>
+                        <field name="customer_lead" invisible="1"/>
                     </tree>
                 </field>
                 <group class="oe_subtotal_footer oe_right" colspan="2" name="price_comps">
@@ -392,6 +394,7 @@
                             <separator string="Prices" name="Prices" colspan="2"/>
                             <field name="kit_pricing" invisible="1"/>
                             <field name="currency_id" invisible="1"/>
+                            <field name="cost_unit" invisible="1"/>
                             <field name="price_unit" invisible="1"/>
                             <field name="price_unit_display" options="{'currency_field': 'currency_id'}" attrs="{'readonly': [('kit_pricing', '=', 'fixed')]}"/>
                             <field name="price_per_kit"/>
@@ -489,6 +492,7 @@
                         <field name="name"/>
                         <field name="qty_per_kit"/>
                         <field name="product_uom_id"/>
+                        <field name="cost_unit" invisible="1"/>
                         <field name="price_unit" invisible="1"/>
                         <field name="price_unit_display" attrs="{'readonly': [('kit_pricing', '=', 'fixed')]}"/>
                         <field name="price_per_kit"/>
@@ -533,6 +537,7 @@
                             <separator string="Prices" name="Prices" colspan="2"/>
                             <field name="kit_pricing" invisible="1"/>
                             <field name="currency_id" invisible="1"/>
+                            <field name="cost_unit" invisible="1"/>
                             <field name="price_unit" invisible="1"/>
                             <field name="price_unit_display" options="{'currency_field': 'currency_id'}" attrs="{'readonly': [('kit_pricing', '=', 'fixed')]}"/>
                             <field name="price_per_kit"/>
