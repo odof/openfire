@@ -201,7 +201,6 @@ class SaleOrderLine(models.Model):
                 new_comp_vals = {
                     'product_id': self.product_id.id,
                     'name': self.product_id.name_get()[0][1] or self.product_id.name,
-                    'default_code': self.product_id.default_code,
                     'qty_per_kit': 1,
                     'product_uom_id': self.product_uom.id or self.product_id.uom_id.id,
                     'price_unit': self.product_id.list_price,
@@ -491,7 +490,7 @@ class OfSaleOrderKitLine(models.Model):
     order_id = fields.Many2one('sale.order', string="Order", related="kit_id.order_line_id.order_id")
 
     name = fields.Char(string='Name', required=True)
-    default_code = fields.Char(string='Prod ref')
+    default_code = fields.Char(related='product_id.default_code', string='Prod ref', readonly=True)
     sequence = fields.Integer(string=u'Sequence', default=10)
 
     product_id = fields.Many2one('product.product', string='Product', required=True, domain="[('of_is_kit', '=', False)]")
@@ -550,21 +549,12 @@ class OfSaleOrderKitLine(models.Model):
         if self.product_id:
             new_vals = {
                 'name': self.product_id.name_get()[0][1] or self.product_id.name,
-                'default_code': self.product_id.default_code,
                 'product_uom_id': self.product_id.product_tmpl_id.uom_id,
                 'price_unit': self.product_id.list_price,
                 'cost_unit': self.product_id.standard_price,
                 'customer_lead': self.product_id.sale_delay,
             }
-            if self.kit_id.order_line_id:
-                if self.kit_id.order_line_id.of_pricing == 'fixed':
-                    hide_prices = True
-                else:
-                    hide_prices = False
-            else:
-                hide_prices = self.hide_prices or False
-            new_vals['hide_prices'] = hide_prices
-
+            new_vals['hide_prices'] = self.kit_id.order_line_id and self.kit_id.order_line_id.of_pricing == 'fixed'
             self.update(new_vals)
 
     @api.multi
@@ -680,7 +670,6 @@ class OfSaleOrderKitLine(models.Model):
         new_comp_vals = {
             'name': self.name,
             'sequence': self.sequence,
-            'default_code': self.default_code,
             'price_unit': self.price_unit,
             'product_uom_id': self.product_uom_id.id,
             'product_id': self.product_id.id or False,

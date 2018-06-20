@@ -52,7 +52,6 @@ class ProductTemplate(models.Model):
             comp_vals["qty_per_kit"] = line.product_qty
             comp_vals["sequence"] = line.sequence
             comp_vals["name"] = line.product_id.name_get()[0][1] or line.product_id.name
-            comp_vals["default_code"] = line.product_id.default_code
             comp_vals["price_unit"] = line.product_id.list_price
             comp_vals["cost_unit"] = line.product_id.standard_price
             lines.append((0, 0, comp_vals))
@@ -73,7 +72,6 @@ class ProductTemplate(models.Model):
             comp_vals["qty_per_kit"] = line.product_qty
             comp_vals["sequence"] = line.sequence
             comp_vals["name"] = line.product_id.name_get()[0][1] or line.product_id.name
-            comp_vals["default_code"] = line.product_id.default_code
             comp_vals["price_unit"] = line.product_id.list_price
             comp_vals["cost_unit"] = line.product_id.standard_price
             comp_vals["customer_lead"] = line.product_id.sale_delay
