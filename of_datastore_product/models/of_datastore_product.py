@@ -28,15 +28,9 @@ class OfDatastoreSupplier(models.Model):
     _name = "of.datastore.supplier"
     _inherit = "of.datastore.connector"
     _description = "Correspondance entre une marque et une base de données"
+    _order="name"
 
-    # La fonction __init__ est deprecated, remplacer par _build_model?
-    def __init__(self, pool, cr):
-        # Champ à déclarer dans le init et non dans la classe, pour avoir un dictionnaire distinct par base de données
-        self._datastore_clients = {}
-        return super(OfDatastoreSupplier,self).__init__(pool,cr)
-
-    brand_ids = fields.Many2many('of.product.brand', string='Allowed brands')
-#    partner_id = fields.Many2one("res.partner", string='Supplier', required=True)
+    brand_ids = fields.Many2one('of.product.brand', 'datastore_supplier_id', string='Allowed brands')
     partner_id = fields.Many2one('res.partner', string='Supplier', domain=[('supplier', '=', True)], required=True)
     name = fields.Char(related='partner_id,name', string='Name')
 
@@ -47,31 +41,12 @@ class OfDatastoreSupplier(models.Model):
     new_password = fields.Char(string='Set Password',
         compute='_compute_password', inverse='_inverse_password',
         help="Specify a value only when changing the password, otherwise leave empty")
-    categ_ids = fields.One2many('of.datastore.product.category', string='Product categories',
-        compute='_compute_categ_ids', inverse='_inverse_categ_ids')
-    stored_categs = fields.One2many('of.datastore.product.category', 'supplier_id', string='Stored categories')
     error_msg = fields.Char(string='Error', compute='_compute_categ_ids')
     maj_note = fields.Text(string='Notes MAJ', compute='_compute_categ_ids')
     product_ids = fields.One2many('product.product', 'datastore_supplier_id', string='Products')
 
-    remise = fields.Char(string='Remise', required=True, default='rc',
-        help=u"""Remise à appliquer sur les articles de ce fournisseur (impacte le prix d'achat)
-
-Exemples :
- rc : Utiliser la remise conseillée
- 40 : Forcer une remise de 40%
- cumul(rc,10,5) : Appliquer la remise conseillée, puis une remise de 10%, puis une remise de 5%
- cumul(rc,14.5) : Equivalent à la ligne précedente, une remise de 10% puis 5% fait 14.5% au total
-""")
-    price_ttc = fields.Char('Prix de vente', required=True, default='pv',
-        help=u"""Modification à appliquer sur le prix de vente conseillé.
-
-Exemples :
- pv : Conserve le prix de vente conseillé
- pv * 1.05 + tf * 0.4 : Augmente le prix de vente de 5%, plus 40% des transports et frais""")
     active = fields.Boolean('Active', default=True)
 
-    _order = "partner_id, product_prefix"
 
     _sql_constraints = [
         ('db_name_uniq', 'unique (db_name)', u'Une connexion à cette base existe déjà')
@@ -171,17 +146,6 @@ Exemples :
         if self.db_name:
             return {'value': {'server_address': 'https://' + self.db_name + '.openfire.fr'}}
         return False
-
-    @api.multi
-    def write(self, vals):
-        # En cas de modification des paramètres de connexion, toute éventuelle ancienne connexion est supprimée
-        for field in ('server_address','db_name','login','password'):
-            if field in vals:
-                for supplier in self:
-                    if supplier.id in self._datastore_clients:
-                        del self._datastore_clients[supplier.id]
-                break
-        return super(OfDatastoreSupplier,self).write(vals)
 
     @api.multi
     def link_products(self, product_ids=False, log=False):
@@ -469,6 +433,8 @@ class ResPartner(models.Model):
 class OfDatastoreCentralized(models.AbstractModel):
     _name = 'of.datastore.centralized'
 
+    datastore_res_id = fields.Integer(string="Identifiant base fournisseur")
+
     @api.model
     def _get_datastore_unused_fields(self):
         return []
@@ -492,9 +458,94 @@ class OfDatastoreCentralized(models.AbstractModel):
         return res
 
 
+
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        res = super(OfDatastoreCentralized, self).name_search(name=name, args=args, operator=operator, limit=limit)
+        if limit != 8 or len(res) == limit:
+            # La recherche sur une base fournisseur ne se fait en automatique que pour les recherches
+            #   dynamiques des champs many2one (limit=8)
+            return res
+        if len(res) == 7:
+            # Le 8e produit ne sert qu'à savoir si on affiche "Plus de résultats"
+            return res + [False]
+        ds_supplier_obj = self.env['of.datastore.supplier']
+        brand_obj = self.env['of.product.brand']
+
+        # Récupération des préfixes trouvés dans name
+        name_list = name.split()
+        prefixes = [s.split('_', 1)[0].upper().lstrip('[') for s in name_list]
+
+        ds_suppliers = ds_supplier_obj.browse()
+        supplier_brands = {}
+        for brand in brand_obj.search([('prefix', 'in', prefixes)]):
+            ds_suppliers |= brand.supplier_id
+            if brand.supplier_id in supplier_brands:
+                supplier_brands[brand.supplier_id] |= brand
+            else:
+                supplier_brands[brand.supplier_id] = brand
+
+        if not ds_suppliers:
+            return res
+
+        clients = ds_supplier_obj.of_datastore_connect()
+        try:
+            for supplier in ds_suppliers:
+                if len(res) == limit:
+                    break
+
+                client = clients[supplier.id]
+                if isinstance(client, basestring):
+                    # Échec de la connexion à la base fournisseur
+                    continue
+
+                brands = supplier_brands[supplier]
+
+                # Recherche des produits non déjà enregistrés
+                self._cr.execute('SELECT datastore_product_id '
+                                 'FROM %s '
+                                 'WHERE brand_id IN %%s'
+                                 ' AND datastore_product_id IS NOT NULL' % (self._table), (tuple(brands.mapped('prefix')), ))
+                orig_ids = [row[0] for row in self._cr.fetchall()]
+
+                # Mise à jour des paramètres de recherche
+                prefixes = brands.mapped('prefix')
+                long_prefixes = sum([[p, p+'_', p+'\\_'] for p in prefixes], [])
+                new_name = " ".join([s for s in name_list if s.upper() not in long_prefixes])
+                new_args = [('brand_id.prefix', 'in', prefixes),
+                            ('id', 'not in', orig_ids)
+                           ] + args
+
+                ds_product_obj = self.of_datastore_get_model(client, 'product.product')
+                res2 = self.of_datastore_name_search(ds_product_obj, new_name, new_args, operator, limit-len(res))
+                supplier_ind = DATASTORE_IND * supplier.id
+                res += [[-(pid+supplier_ind), pname] for pid, pname in res2]
+        finally:
+            ds_supplier_obj.free_connection(clients)
+
+        return res
+
+
+
+
+
+class ProductTemplate(models.Model):
+    _name = "product.template"
+    _inherit = ['product.template', 'of.datastore.centralized']
+
+
+
+
 class ProductProduct(models.Model):
     _name = "product.product"
     _inherit = ['product.product', 'of.datastore.centralized']
+
+#     datastore_product_id = fields.Integer(u'Identifiant base fournisseur', index=True)
+    datastore_supplier_id = fields.Many2one('of.datastore.supplier', string="Centralisation fournisseur", index=True,
+        help=u"Fournisseur permettant la mise à jour de ce produit grâce à la centralisation OpenFire des tarifs")
+    # Champ dummy permettant de faire des recherches sur une base fournisseur spécifique
+    ds_supplier_search_id = fields.One2many('of.datastore.supplier', related='datastore_supplier_id', string="Recherche sur base fournisseur")
 
 #     def __init__(self, pool, cr):
 #         # Récupération de tous les préfixes des codes de produits actifs présents en base de données
@@ -955,6 +1006,14 @@ class ProductProduct(models.Model):
 
 class ProductSupplierInfo(models.Model):
     _inherit = ['product.supplierinfo', 'of.datastore.centralized']
+
+
+
+
+
+
+
+
 
     def _read_datastore(self, fields_to_read, create_mode=False):
         u"""

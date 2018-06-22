@@ -51,44 +51,15 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form>
-                    <group colspan="4">
+                    <group>
                         <field name="partner_id"/>
-                        <field name="product_prefix"/>
                         <field name="db_name" on_change="onchange_db_name(db_name)"/>
                         <field name="server_address" on_change="onchange_server_address(server_address)"/>
                         <field name="login"/>
-                        <field name="new_password" password="True"/>
+                        <field name="new_password" password="True" placeholder="***"/>
                         <field name="active"/>
-                        <newline/>
-                        <field name="remise"/>
-                        <field name="price_ttc"/>
-                        <newline/>
                         <field name="error_msg" nolabel="1" colspan="3"/>
                         <button name="button_dummy" string="Tester la connexion" type="object"/>
-                    </group>
-                    <separator colspan="4" string="Catégories de produits"/>
-                    <field name="categ_ids" colspan="4" nolabel="1">
-                        <tree editable="bottom">
-                            <field name="orig_id" invisible="1"/>
-                            <field name="orig_name" readonly="1" required="1"/>
-                            <field name="categ_id"/>
-                            <field name="remise"/>
-                            <field name="price_ttc"/>
-                        </tree>
-                        <form>
-                            <field name="supplier_id"/>
-                            <field name="orig_id"/>
-                            <field name="orig_name" readonly="1"/>
-                            <field name="categ_id"/>
-                            <field name="remise"/>
-                            <field name="price_ttc"/>
-                        </form>
-                    </field>
-                    <button name="action_link_products" string="Associer les produits" type="object" icon="gtk-disconnect" help="Associe vos produits à ceux de la base fournisseur en se basant sur le code produit"/>
-                    <button name="%(action_of_datastore_update_product)d" string="Mettre à jour les produits" type="action" icon="gtk-execute" help="Ouvre l'outil de mise à jour des tarifs"/>
-                    <group colspan="4">
-                        <separator colspan="4" string="Notes de mise à jour"/>
-                        <field name="maj_note" colspan="4" nolabel="1"/>
                     </group>
                 </form>
             </field>
@@ -116,6 +87,48 @@
             <field name="view_id" ref="of_datastore_supplier_view_tree"/>
             <field name="context">{'active_test':False}</field>
         </record>
+
+        <!-- Marque -->
+        <!-- Fournisseur -->
+    <record id="of_datastore_product_brand_view_form" model="ir.ui.view">
+        <field name="name">of.datastore.product.brand.form.view</field>
+        <field name="model">of.product.brand</field>
+        <field name="inherit_id" ref="of_product_brand.of_product_brand_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="datastore_supplier_id" invisible="context.get('uid') != 1"/>
+                <group colspan="2" attrs="{'invisible':[('datastore_supplier_id', '=', False)]}">
+                    <span>Cet article est connecté au tarif centralisé</span>
+                </group>
+                <span></span>
+            </xpath>
+            <form string="Product brand">
+                <header>
+                    <button name="%(action_of_product_brand_add_products)d" type="action" string="Link products" class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{&quot;terminology&quot;: &quot;archive&quot;}"/>
+                        </button>
+                        <button name="%(of_brand_product_action)d" type="action" class="oe_stat_button" icon="fa-th-list">
+                            <field string="Products" name="product_count" widget="statinfo"/>
+                        </button>
+                    </div>
+                    <field name="logo" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="OpenFire"/></h1>
+                    </div>
+                    <group>
+                        <field name="prefix" placeholder="OPE"/>
+                        <field name="partner_id"/>
+                        <label for="note" colspan="2"/>
+                        <field name="note" colspan="2" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
 
         <menuitem name="Tarifs" id="menu_of_datastore_config" parent="base.menu_config" sequence="11"/>
         <menuitem name="Fournisseurs" id="menu_of_datastore_supplier" parent="of_datastore_product.menu_of_datastore_config" sequence="10" action="of_datastore_supplier_action"/>
