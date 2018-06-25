@@ -35,6 +35,7 @@
                             <button name="button_inverse" string="Inverser" type="object" icon="fa-refresh"/>
                             <field name="text_selected"/>
                             <field name="order_line_id"/>
+                            <field name="cout"/>
                             <field name="prix_total_ht"/>
                             <field name="prix_total_ht_simul"/>
                             <field name="prix_total_ttc"/>
@@ -48,6 +49,8 @@
                     <group col="4" string="Total devis/commande">
                         <field name="montant_total_ttc_initial"/>
                         <field name="montant_total_ttc_simul"/>
+                        <field name="marge_initiale"/>
+                        <field name="marge_simul"/>
                         <field name="pc_marge_initiale"/>
                         <field name="pc_marge_simul"/>
                     </group>

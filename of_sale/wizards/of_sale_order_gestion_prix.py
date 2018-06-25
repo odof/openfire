@@ -4,6 +4,8 @@ from odoo import api, fields, models
 import odoo.addons.decimal_precision as dp
 from odoo.exceptions import UserError
 
+# Fonction toute faite pour le formatage de valeur monétaire
+from odoo.addons.mail.models.mail_template import format_amount
 
 # Dans le cadre de la remise globale, on autorise l'utilisateur à choisir le total TTC de sa commande.
 # Afin de permettre ce tour de force (tous les montants TTC ne sont pas atteignables), on augmente la précision du
@@ -37,16 +39,18 @@ class GestionPrix(models.TransientModel):
     line_ids = fields.One2many('of.sale.order.gestion.prix.line', 'wizard_id', string=u'Lignes impactées', readonly=True)
     valeur = fields.Float(string='Valeur', digits=dp.get_precision('Sale Price'))
 
+    marge_initiale = fields.Monetary(string='marge initiale', related='order_id.of_marge', related_sudo=False)
     pc_marge_initiale = fields.Float(string='% marge initiale', related='order_id.of_marge_pc', related_sudo=False)
     montant_total_ttc_initial = fields.Monetary(string='Total TTC initial', related='order_id.amount_total', readonly=True)
 
     currency_id = fields.Many2one(related='order_id.currency_id')
-    pc_marge_simul = fields.Float(string='% marge simulée', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul')
+    marge_simul = fields.Monetary(string=u'marge simulée', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul')
+    pc_marge_simul = fields.Float(string=u'% marge simulée', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul')
     montant_total_ttc_simul = fields.Monetary(
-        string='Nouveau total TTC simulé', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul')
+        string='Total TTC simulé', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul')
     afficher_remise = fields.Boolean(
         string='Afficher dans notes',
-        help=u"Affiche le montant de la remise effectuée dans les notes du devis/de la commande")
+        help=u"Affiche le montant de la remise effectuée dans les notes du devis/de la commande.")
 
     arrondi_mode = fields.Selection(
         [
@@ -57,9 +61,9 @@ class GestionPrix(models.TransientModel):
 
     arrondi_prec = fields.Selection(
         [
-            ('-1', u"Arrondir aux 10€"),
-            ('0', u"Arrondir à l'euro"),
-            ('1', u"Arrondir aux 10 centimes"),
+            ('-1', u"Arrondir aux 10 € les plus proches"),
+            ('0', u"Arrondir à l'euro le plus proche"),
+            ('1', u"Arrondir aux 10 centimes les plus proches"),
         ], string=u"Précision d'arrondi", default='0')
 
     @api.depends('line_ids.prix_total_ttc_simul')
@@ -69,6 +73,7 @@ class GestionPrix(models.TransientModel):
             total_achat = wizard.order_id.of_total_cout
             total_vente = sum(lines.mapped('prix_total_ht_simul'))
 
+            wizard.marge_simul = total_vente - total_achat
             wizard.pc_marge_simul = 100 * (1 - total_achat / total_vente) if total_vente else -100
             wizard.montant_total_ttc_simul = sum(lines.mapped('prix_total_ttc_simul'))
 
@@ -287,9 +292,9 @@ class GestionPrix(models.TransientModel):
 
         # On ajoute le libellé de la remise dans les notes du devis si case cochée
         if self.afficher_remise:
-            text = u"Remise exceptionnelle déduite de %s €.\n"
-            text = text % (self.lang.format('%f', total_ttc_init - order.amount_total, grouping=True))
-            order.note = text + order.note
+            text = u"Remise exceptionnelle déduite de %s.\n"
+            text = text % (format_amount(self.env, total_ttc_init - order.amount_total, cur))
+            order.note = text + (order.note or '')
 
     @api.multi
     def bouton_inclure_tout(self):
@@ -314,6 +319,7 @@ class GestionPrixLine(models.TransientModel):
 #    prix_unit_achat = fields.Monetary(string='Prix achat', related='order_line_id.of_standard_price', readonly=True)
     quantity = fields.Float(string=u"Quantité", related='order_line_id.product_uom_qty', readonly=True)
 
+    cout = fields.Monetary(u'Coût', compute='_compute_cout')
     prix_unit_ht = fields.Monetary(string='Prix unit. HT initial', related='order_line_id.price_reduce_taxexcl', readonly=True)
     prix_unit_ttc = fields.Monetary(string='Prix unit. TTC initial', related='order_line_id.price_reduce_taxinc', readonly=True)
     prix_total_ht = fields.Monetary(string='Prix total HT initial', related='order_line_id.price_subtotal', readonly=True)
@@ -328,6 +334,13 @@ class GestionPrixLine(models.TransientModel):
         text = ('exclus', 'inclus')
         for line in self:
             line.text_selected = text[line.is_selected]
+
+    @api.depends('order_line_id')
+    def _compute_cout(self):
+        for line in self:
+            order_line = line.order_line_id
+            cout_unit = order_line.product_id.uom_id._compute_price(order_line.product_id.standard_price, order_line.product_uom)
+            line.cout = cout_unit * order_line.product_uom_qty
 
     @api.multi
     def button_inverse(self):
