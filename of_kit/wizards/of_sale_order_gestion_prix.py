@@ -23,7 +23,7 @@ class GestionPrix(models.TransientModel):
 
             if line_rounding:
                 # Le total cumulé des composants doit respecter la règle d'arrondi par ligne de commande
-                price = to_distribute * (1 - (order_line.discount or 0.0) / 100.0)
+                price = to_distribute * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
                 taxes = order_line.tax_id.with_context(base_values=(price, price, price), round=False)
                 taxes = taxes.compute_all(price, currency, order_line.product_uom_qty, product=order_line.product_id,
                                           partner=order_line.order_id.partner_id)

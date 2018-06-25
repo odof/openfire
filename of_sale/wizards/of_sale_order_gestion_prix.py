@@ -106,7 +106,7 @@ class GestionPrix(models.TransientModel):
                 price_unit = currency.round(price_unit)
 
             # Ces deux lignes sont copiées depuis la fonction sale_order_line._compute_amount() d module sale
-            price = price_unit * (1 - (order_line.discount or 0.0) / 100.0)
+            price = price_unit * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
             taxes = order_line.tax_id.with_context(base_values=(price, price, price))
             taxes = taxes.compute_all(price, currency, order_line.product_uom_qty,
                                       product=order_line.product_id, partner=order_line.order_id.partner_id)
@@ -121,7 +121,7 @@ class GestionPrix(models.TransientModel):
                 ratio = montant_arrondi / montant
                 price_unit *= ratio
                 # Recalcul des taxes pour l'affichage de la simulation
-                price = price_unit * (1 - (order_line.discount or 0.0) / 100.0)
+                price = price_unit * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
                 taxes = order_line.tax_id.with_context(base_values=(price, price, price))
                 taxes = taxes.compute_all(price, currency, order_line.product_uom_qty,
                                           product=order_line.product_id, partner=order_line.order_id.partner_id)
@@ -136,13 +136,9 @@ class GestionPrix(models.TransientModel):
         line = order_line.new(line_vals)
         line.product_uom_change()
 
-        price = line.price_unit * (1 - (order_line.discount or 0.0) / 100.0)
-        taxes = order_line.tax_id.compute_all(price, order_line.currency_id, order_line.product_uom_qty,
-                                              product=order_line.product_id, partner=order_line.order_id.partner_id)
-
         price_unit = line.price_unit
         if line_rounding:
-            price = price_unit * (1 - (order_line.discount or 0.0) / 100.0)
+            price = price_unit * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
             taxes = order_line.tax_id.with_context(base_values=(price, price, price), round=False)
             taxes = taxes.compute_all(price, order_line.currency_id, order_line.product_uom_qty, product=order_line.product_id,
                                       partner=order_line.order_id.partner_id)
@@ -154,7 +150,7 @@ class GestionPrix(models.TransientModel):
             price_unit *= ratio
 
         # Calcul des taxes pour l'affichage de la simulation
-        price = price_unit * (1 - (order_line.discount or 0.0) / 100.0)
+        price = price_unit * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
         taxes = order_line.tax_id.with_context(base_values=(price, price, price))
         taxes = taxes.compute_all(price, order_line.currency_id, order_line.product_uom_qty, product=order_line.product_id,
                                   partner=order_line.order_id.partner_id)
@@ -175,6 +171,7 @@ class GestionPrix(models.TransientModel):
 
         order = self.order_id
         cur = order.pricelist_id.currency_id
+        round_tax = self.env.user.company_id.tax_calculation_rounding_method != 'round_globally'
 
         lines_select = self.line_ids.filtered(lambda line: line.is_selected and line.order_line_id.price_unit)
         lines_nonselect = self.line_ids - lines_select
@@ -262,8 +259,9 @@ class GestionPrix(models.TransientModel):
                                                        rounding=line != lines_select[-1],  # On arrondit toutes les lignes sauf la dernière
                                                        line_rounding=line_rounding)
             # Recalcul de 'total_excluded' et 'total_included' sans les arrondis
-            amout_tax = sum(tax['amount'] for tax in taxes['taxes'])
-            taxes.update({'total_excluded': taxes['base'], 'total_included': taxes['base'] + amout_tax})
+            if not round_tax:
+                amout_tax = sum(tax['amount'] for tax in taxes['taxes'])
+                taxes.update({'total_excluded': taxes['base'], 'total_included': taxes['base'] + amout_tax})
 
             if self.methode_remise != 'reset':
                 to_distribute -= taxes[tax_field]
