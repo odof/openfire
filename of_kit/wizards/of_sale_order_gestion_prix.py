@@ -92,3 +92,16 @@ class GestionPrix(models.TransientModel):
         super(GestionPrix, self).calculer(simuler=simuler)
         if not simuler:
             self.order_id.order_line._refresh_price_unit()
+
+
+class GestionPrixLine(models.TransientModel):
+    """Liste des lignes dans le wizard"""
+    _inherit = 'of.sale.order.gestion.prix.line'
+
+    @api.depends('order_line_id')
+    def _compute_cout(self):
+        for line in self:
+            order_line = line.order_line_id
+            cout_unit = order_line.product_id.cost_comps if order_line.of_is_kit else order_line.product_id.standard_price
+            cout_unit = order_line.product_id.uom_id._compute_price(cout_unit, order_line.product_uom)
+            line.cout = cout_unit * order_line.product_uom_qty
