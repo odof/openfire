@@ -1,25 +1,48 @@
 # -*- coding: utf-8 -*-
 
 import base64
-import datetime
+from datetime import datetime
 from odoo import models, fields, api
 from cStringIO import StringIO
 import xlsxwriter
 from xlsxwriter.utility import xl_rowcol_to_cell, xl_range
 
-
 class OFRapportOpenflamWizard(models.TransientModel):
     _name = 'of.rapport.openflam.wizard'
     _description = 'Rapport Openflam'
 
+    @api.model
+    def _get_allowed_report_types(self):
+        param_rapport_sur_mesure = self.env['ir.values'].get_default('sale.config.settings', 'of_rapport_sur_mesure')
+        result = []
+        if param_rapport_sur_mesure != 'fabricant':
+            result.append(('encours', u"État des encours de commandes de vente"))
+            result.append(('echeancier', u"Échéancier des règlements fournisseurs"))
+        if param_rapport_sur_mesure != 'revendeur':
+            result.append(('stats', "Statistiques de ventes"))
+        return result
+
     file_name = fields.Char('Nom du fichier', size=64, default=u'Encours des commandes de vente.xlsx')
     file = fields.Binary('file')
     company_ids = fields.Many2many('res.company', string=u'Sociétés')
-    date = fields.Date(u'Date de création', default=datetime.datetime.now().strftime("%Y-%m-%d"))
-    report_model = fields.Selection([('encours', u'État des encours de commandes de vente'),
-                                     ('echeancier', u'Échéancier des règlements fournisseurs'),
-                                     ('autre', 'Autre')],
-                                     string=u"Modèle de rapport", required=True, default='encours')
+    user_company_id = fields.Many2one('res.company', compute="_compute_company_id")
+    date = fields.Date(u'Date de création', default=datetime.now().strftime("%Y-%m-%d"))
+    report_model = fields.Selection(_get_allowed_report_types, string=u"Modèle de rapport", required=True)
+    period_n = fields.Many2one('date.range', string=u"Principale")
+    period_n1 = fields.Many2one('date.range', string=u"À comparer")
+    product_ids = fields.Many2many('product.template', string="Articles")
+    partner_ids = fields.Many2many('res.partner', string="Clients")
+    category_ids = fields.Many2many('product.category', string=u"Catégories d'articles")
+    stats_partner = fields.Boolean(string="Stats/articles/clients", default=True)
+    stats_product = fields.Boolean(string=u"Stats/clients/catégories d'articles", default=True)
+    filtre_client = fields.Boolean(string="Filtre par client")
+    filtre_article = fields.Boolean(string="Filtre par article")
+
+    @api.depends('report_model')
+    def _compute_company_id(self):
+        user_obj = self.env['res.users']
+        user = user_obj.browse(self._uid)
+        self.user_company_id = user.company_id
 
     @api.multi
     def _action_return(self):
@@ -34,13 +57,21 @@ class OFRapportOpenflamWizard(models.TransientModel):
         return self._action_return()
 
     def _get_styles_excel(self, workbook):
-        color_light_gray = '#C0C0C0'
-        color_lighter_gray = '#D9D9D9'
-        #color_light_blue = '#4040A0'
+        # color_light_gray = '#C0C0C0'
+        color_lighter_gray = '#DDDDDD'
+        color_light_blue = '#66FFFF'
+        color_red = '#800000'
 
         style_text_border = workbook.add_format({
             'valign': 'vcenter',
             'align': 'center',
+            'border': 1,
+            'font_size': 10,
+        })
+
+        style_text_border_left = workbook.add_format({
+            'valign': 'vcenter',
+            'align': 'left',
             'border': 1,
             'font_size': 10,
         })
@@ -59,7 +90,35 @@ class OFRapportOpenflamWizard(models.TransientModel):
             'border': 1,
             'bold': True,
             'font_size': 10,
-            'bg_color' : color_light_gray,
+            'bg_color' : color_lighter_gray,
+        })
+
+        style_text_title_border_blue = workbook.add_format({
+            'valign': 'vcenter',
+            'align': 'center',
+            'border': 1,
+            'bold': True,
+            'font_size': 10,
+            'bg_color' : color_light_blue,
+        })
+
+        style_text_title_border_blue_left = workbook.add_format({
+            'valign': 'vcenter',
+            'align': 'left',
+            'border': 1,
+            'bold': True,
+            'font_size': 10,
+            'bg_color' : color_light_blue,
+        })
+
+        style_text_title_border_red = workbook.add_format({
+            'valign': 'vcenter',
+            'align': 'center',
+            'border': 1,
+            'bold': True,
+            'font_size': 13.5,
+            'bg_color' : color_lighter_gray,
+            'font_color': color_red,
         })
 
         style_text_title_border_wrap = workbook.add_format({
@@ -69,7 +128,7 @@ class OFRapportOpenflamWizard(models.TransientModel):
             'border': 1,
             'bold': True,
             'font_size': 10,
-            'bg_color' : color_light_gray,
+            'bg_color' : color_lighter_gray,
         })
 
         style_text_title_ita_border = workbook.add_format({
@@ -79,7 +138,7 @@ class OFRapportOpenflamWizard(models.TransientModel):
             'border': 1,
             'bold': True,
             'font_size': 10,
-            'bg_color' : color_light_gray,
+            'bg_color' : color_lighter_gray,
         })
 
         style_text_total_border = workbook.add_format({
@@ -112,7 +171,27 @@ class OFRapportOpenflamWizard(models.TransientModel):
             'border': 1,
             'bold': True,
             'font_size': 10,
-            'bg_color' : color_light_gray,
+            'bg_color' : color_lighter_gray,
+            'num_format': '#,##0.00',
+        })
+
+        style_number_title_border_blue = workbook.add_format({
+            'valign': 'vcenter',
+            'align': 'right',
+            'border': 1,
+            'bold': True,
+            'font_size': 10,
+            'bg_color' : color_light_blue,
+            'num_format': '#,##0.00',
+        })
+
+        style_number_title_border_red = workbook.add_format({
+            'valign': 'vcenter',
+            'align': 'right',
+            'border': 1,
+            'bold': True,
+            'font_size': 10,
+            'bg_color' : color_red,
             'num_format': '#,##0.00',
         })
 
@@ -127,16 +206,22 @@ class OFRapportOpenflamWizard(models.TransientModel):
         })
 
         return {
-        'text_border': style_text_border,
-        'text_bold_border': style_text_bold_border,
-        'text_title_border': style_text_title_border,
-        'text_title_ita_border': style_text_title_ita_border,
-        'text_title_border_wrap': style_text_title_border_wrap,
-        'text_total_border': style_text_total_border,
-        'number_border': style_number_border,
-        'number_bold_border': style_number_bold_border,
-        'number_title_border': style_number_title_border,
-        'number_total_border': style_number_total_border,
+            'text_border': style_text_border,
+            'text_border_left': style_text_border_left,
+            'text_bold_border': style_text_bold_border,
+            'text_title_border': style_text_title_border,
+            'text_title_border_blue': style_text_title_border_blue,
+            'text_title_border_blue_left': style_text_title_border_blue_left,
+            'text_title_border_red': style_text_title_border_red,
+            'text_title_ita_border': style_text_title_ita_border,
+            'text_title_border_wrap': style_text_title_border_wrap,
+            'text_total_border': style_text_total_border,
+            'number_border': style_number_border,
+            'number_bold_border': style_number_bold_border,
+            'number_title_border': style_number_title_border,
+            'number_title_border_blue': style_number_title_border_blue,
+            'number_title_border_red': style_number_title_border_red,
+            'number_total_border': style_number_total_border,
         }
 
     @api.multi
@@ -157,13 +242,13 @@ class OFRapportOpenflamWizard(models.TransientModel):
         # --- Initialisation des colonnes ---
         worksheet.set_column(0, 0, 13)      # Largeur colonne 'Date CC'
         worksheet.set_column(1, 1, 13)      # Largeur colonne 'n° CC'
-        worksheet.set_column(2, 2, 16)      # Largeur colonne 'Pose prévisionelle'
-        worksheet.set_column(3, 3, 20)       # Largeur colonne 'Nom client'
+        worksheet.set_column(2, 2, 16)      # Largeur colonne 'Pose prévisionnelle'
+        worksheet.set_column(3, 3, 20)      # Largeur colonne 'Nom client'
         worksheet.set_column(4, 4, 16)      # Largeur colonne 'Vendeur'
         worksheet.set_column(5, 5, 16)      # Largeur colonne 'Total HT'
         worksheet.set_column(6, 6, 16)      # Largeur colonne 'Total TTC'
-        worksheet.set_column(7, 7, 25)       # Largeur colonne 'Accompte(s) versé(s) (total)'
-        worksheet.set_column(8, 8, 20)       # Largeur colonne 'Solde'
+        worksheet.set_column(7, 7, 25)      # Largeur colonne 'Accompte(s) versé(s) (total)'
+        worksheet.set_column(8, 8, 20)      # Largeur colonne 'Solde'
 
         # --- Entête ---
         worksheet.merge_range(0, 0, 0, 2, 'Nom du fichier', styles['text_title_ita_border'])
@@ -177,7 +262,7 @@ class OFRapportOpenflamWizard(models.TransientModel):
         line_number = 3
         worksheet.write(line_number, 0, 'Date CC', styles['text_title_border'])
         worksheet.write(line_number, 1, u'n° CC', styles['text_title_border'])
-        worksheet.write(line_number, 2, u'Pose prévisionelle', styles['text_title_border'])
+        worksheet.write(line_number, 2, u'Pose prévisionnelle', styles['text_title_border'])
         worksheet.write(line_number, 3, 'Nom du client', styles['text_title_border'])
         worksheet.write(line_number, 4, 'Vendeur', styles['text_title_border'])
         worksheet.write(line_number, 5, 'Total HT', styles['text_title_border'])
@@ -187,7 +272,10 @@ class OFRapportOpenflamWizard(models.TransientModel):
         line_number += 1
         solde = 0
         week, total = [], []
-        orders = self.env['sale.order'].search(['&', ('state', '!=', 'draft'), ('company_id', 'in', self.company_ids._ids)]).sorted(key=lambda r: r.of_date_de_pose)
+        order_domain = [('state', '!=', 'draft')]
+        if self.company_ids._ids:
+            order_domain = (order_domain and ['&']) + [('company_id', 'in', self.company_ids._ids)] + order_domain
+        orders = self.env['sale.order'].search(order_domain).sorted(key=lambda r: r.of_date_de_pose)
         line_keep = line_number
         date = 0
         for order in orders:
@@ -204,18 +292,18 @@ class OFRapportOpenflamWizard(models.TransientModel):
             if not date and date not in week:
                 week.append(date)
             if solde and date not in week:
-                worksheet.merge_range(line_number, 0, line_number, 4, u'Total sans date de pose prévisionelle' if date and week and not week[-1]
-                                                                    else 'Total de la semaine ' + week[-1], styles['text_total_border'])
+                worksheet.merge_range(line_number, 0, line_number, 4,
+                                      u'Total sans date de pose prévisionnelle' if date and week and not week[-1] else 'Total de la semaine ' + week[-1],
+                                      styles['text_total_border'])
                 week.append(date)
-                for col in range(5, 8):
+                for col in range(5, 9):
                     worksheet.write(line_number, col, '=SUM(%s)' % xl_range(line_keep, col, line_number - 1, col), styles['number_total_border'])
-                worksheet.write(line_number, 8, solde, styles['number_total_border'])
                 total.append(line_number)
                 line_number += 1
                 line_keep = line_number
 
             # --- lignes régulières ---
-            solde += order.amount_total - montant_acomptes
+            solde = order.amount_total - montant_acomptes
             worksheet.write(line_number, 0, order.date_order.split(' ')[0], styles['text_border'])
             worksheet.write(line_number, 1, order.name, styles['text_border'])
             worksheet.write(line_number, 2, order.of_date_de_pose or '', styles['text_border'])
@@ -229,21 +317,20 @@ class OFRapportOpenflamWizard(models.TransientModel):
 
         # --- Ajout de la ligne de la dernière semaine ---
         if solde:
-            worksheet.merge_range(line_number, 0, line_number, 4, u'Total sans date de pose prévisionelle' if not week[-1] and not date
-                                                                else 'Total de la semaine ' + week[-1], styles['text_total_border'])
-            for col in range(5, 8):
+            worksheet.merge_range(line_number, 0, line_number, 4,
+                                  u'Total sans date de pose prévisionnelle' if not week[-1] and not date else 'Total de la semaine ' + week[-1],
+                                  styles['text_total_border'])
+            for col in range(5, 9):
                 worksheet.write(line_number, col, '=SUM(%s)' % xl_range(line_keep, col, line_number - 1, col), styles['number_total_border'])
-            worksheet.write(line_number, 8, solde, styles['number_total_border'])
             total.append(line_number)
             line_number += 1
 
         # --- Ligne de récap total ---
         if solde and total:
             worksheet.merge_range(line_number, 0, line_number, 4, 'Total de toute les semaines', styles['text_title_border'])
-            for col in range(5, 8):
+            for col in range(5, 9):
                 val = '=%s' % ('+'.join([xl_rowcol_to_cell(x, col) for x in total]))
                 worksheet.write(line_number, col, val, styles['number_title_border'])
-            worksheet.write(line_number, 8, solde, styles['number_title_border'])
 
         workbook.close()
         fp.seek(0)
@@ -302,7 +389,10 @@ class OFRapportOpenflamWizard(models.TransientModel):
         line_number += 1
         solde = 0
         day, total = [], []
-        invoices = self.env['account.invoice'].search(['&', ('type', '=', 'in_invoice'), ('company_id', 'in', self.company_ids._ids)]).sorted(key=lambda r: r.date_due)
+        invoice_domain = [('type', '=', 'in_invoice')]
+        if self.company_ids._ids:
+            invoice_domain = (invoice_domain and ['&']) + [('company_id', 'in', self.company_ids._ids)] + invoice_domain
+        invoices = self.env['account.invoice'].search(invoice_domain).sorted(key=lambda r: r.date_due)
         line_keep = line_number
         for invoice in invoices:
             # --- Vérification du montant des accomptes ---
@@ -316,18 +406,18 @@ class OFRapportOpenflamWizard(models.TransientModel):
             if not day:
                 day.append(date)
             if solde and date not in day:
-                worksheet.merge_range(line_number, 0, line_number, 5, u"Total sans date d'échéance" if date and not day[-1]
-                                                                    else u"Total de la date d'échéance " + day[-1], styles['text_total_border'])
+                worksheet.merge_range(line_number, 0, line_number, 5,
+                                      u"Total sans date d'échéance" if date and not day[-1] else u"Total de la date d'échéance " + day[-1],
+                                      styles['text_total_border'])
                 day.append(date)
-                for col in range(6, 9):
+                for col in range(6, 10):
                     worksheet.write(line_number, col, '=SUM(%s)' % xl_range(line_keep, col, line_number - 1, col), styles['number_total_border'])
-                worksheet.write(line_number, 9, solde, styles['number_total_border'])
                 total.append(line_number)
                 line_number += 1
                 line_keep = line_number
 
             # --- lignes régulières ---
-            solde += invoice.amount_total - montant_acomptes
+            solde = invoice.amount_total - montant_acomptes
             worksheet.write(line_number, 0, invoice.date_due.split(' ')[0] if invoice.date_due else '', styles['text_border'])
             worksheet.write(line_number, 1, invoice.number, styles['text_border'])
             worksheet.write(line_number, 2, invoice.create_date.split(' ')[0], styles['text_border'])
@@ -342,21 +432,20 @@ class OFRapportOpenflamWizard(models.TransientModel):
 
         # --- Ajout de la ligne de la dernière semaine ---
         if solde:
-            worksheet.merge_range(line_number, 0, line_number, 5, u"Total sans date d'échéance" if date and not day
-                                                                else u"Total de la date d'échéance " + date, styles['text_total_border'])
-            for col in range(6, 9):
+            worksheet.merge_range(line_number, 0, line_number, 5,
+                                  u"Total sans date d'échéance" if date and not day else u"Total de la date d'échéance " + date,
+                                  styles['text_total_border'])
+            for col in range(6, 10):
                 worksheet.write(line_number, col, '=SUM(%s)' % xl_range(line_keep, col, line_number - 1, col), styles['number_total_border'])
-            worksheet.write(line_number, 9, solde, styles['number_total_border'])
             total.append(line_number)
             line_number += 1
 
         # --- Ligne de récap total ---
         if solde and total:
             worksheet.merge_range(line_number, 0, line_number, 5, 'Total', styles['text_title_border'])
-            for col in range(6, 9):
+            for col in range(6, 10):
                 val = '=%s' % ('+'.join([xl_rowcol_to_cell(x, col) for x in total]))
                 worksheet.write(line_number, col, val, styles['number_title_border'])
-            worksheet.write(line_number, 9, solde, styles['number_title_border'])
 
         workbook.close()
         fp.seek(0)
@@ -365,14 +454,175 @@ class OFRapportOpenflamWizard(models.TransientModel):
         self.file = base64.b64encode(data)
         return self._action_return()
 
-    FUNDICT = {'encours': '_create_encours_excel',
-               'echeancier' : '_create_echeancier_excel',
-               'autre': '_dummy_function'}
+    @api.multi
+    def _create_stats_excel(self):
+        # --- Ouverture du workbook ---
+        fp = StringIO()
+        workbook = xlsxwriter.Workbook(fp, {'in_memory': True})
+
+        # --- Couleur de police ---
+        styles = self._get_styles_excel(workbook)
+
+        #  Création des domaines
+        sale_order_domain = [
+            ('state', '!=', 'draft'),
+            '|',
+            '&', ('confirmation_date', '>=', self.period_n.date_start), ('confirmation_date', '<=', self.period_n.date_end),
+            '&', ('confirmation_date', '>=', self.period_n1.date_start), ('confirmation_date', '<=', self.period_n1.date_end)]
+
+        if self.company_ids:
+            sale_order_domain += [('company_id', 'in', self.company_ids._ids)]
+        if self.partner_ids and self.filtre_client:
+            sale_order_domain += [('partner_id', 'in', self.partner_ids._ids)]
+        line_domain = []
+        if self.product_ids and self.filtre_article:
+            line_domain += [('product_id', 'in', self.product_ids._ids)]
+        if self.category_ids and self.filtre_article:
+            line_domain += [('product_id.categ_id', 'child_of', self.category_ids._ids)]
+
+        orders = self.env['sale.order'].search(sale_order_domain)
+        line_domain += [('order_id', 'in', orders._ids)]
+        lines = self.env['sale.order.line'].search(line_domain).sorted('order_partner_id')
+
+        vals = {}  # must be vals = {client: {produit: {period_n:{qty: x, prix:y}, period_n1:{qty: x, prix:y}}, qté: 'x'}}
+        vals2 = {}  # must be vals2 = {categ: {client: {period_n:{qty: x, prix:y}, period_n1:{qty: x, prix:y}}, qté: 'x'}}
+
+        # Récupération des valeurs dans les dictionnaires
+        for line in lines:
+            if line.product_uom_qty == 0:
+                continue
+
+            if line.order_partner_id not in vals:
+                vals[line.order_partner_id] = {'qté': 0}
+            valeurs = vals[line.order_partner_id]
+            if line.product_id not in valeurs:
+                valeurs[line.product_id] = {self.period_n: {'qté': 0, 'prix': 0}, self.period_n1: {'qté': 0, 'prix': 0}}
+            valeurs = valeurs[line.product_id]
+
+            if line.product_id.categ_id not in vals2:
+                vals2[line.product_id.categ_id] = {'qté': 0}
+            valeurs2 = vals2[line.product_id.categ_id]
+            categ = line.product_id.categ_id
+            if line.order_partner_id not in valeurs2:
+                valeurs2[line.order_partner_id] = {self.period_n: {'qté': 0, 'prix': 0}, self.period_n1: {'qté': 0, 'prix': 0}}
+            valeurs2 = valeurs2[line.order_partner_id]
+
+            if line.order_id.confirmation_date >= self.period_n.date_start and line.order_id.confirmation_date <= self.period_n.date_end:
+                vals[line.order_partner_id]['qté'] += line.product_uom_qty
+                vals2[categ]['qté'] += line.product_uom_qty
+                valeurs[self.period_n]['qté'] += line.product_uom_qty
+                valeurs[self.period_n]['prix'] += line.price_unit * line.product_uom_qty
+                valeurs2[self.period_n]['qté'] += line.product_uom_qty
+                valeurs2[self.period_n]['prix'] += line.price_unit * line.product_uom_qty
+
+            else:
+                valeurs[self.period_n1]['qté'] += line.product_uom_qty
+                valeurs[self.period_n1]['prix'] += line.price_unit * line.product_uom_qty
+                valeurs2[self.period_n1]['qté'] += line.product_uom_qty
+                valeurs2[self.period_n1]['prix'] += line.price_unit * line.product_uom_qty
+
+        # un premier tri qui permet d'avoir les tableaux dans l'ordre décroissant
+        sorted_partner = sorted(vals.items(), key=lambda data: data[1]['qté'], reverse=True)
+        sorted_categ = sorted(vals2.items(), key=lambda data: data[1]['qté'], reverse=True)
+
+        stats = {}
+        if self.stats_partner:
+            stats['partner'] = (sorted_partner, 'Statistiques de ventes par client')
+        if self.stats_product:
+            stats['categ'] = (sorted_categ, u'Statistiques de ventes par catégorie de produit')
+
+        for page in stats:
+            values, name = stats[page]
+
+            # --- Création de la page ---
+            worksheet = workbook.add_worksheet(name)
+            worksheet.set_paper(9)  # Format d'impression A4
+            worksheet.set_landscape()  # Format d'impression paysage
+            worksheet.set_margins(left=0.35, right=0.35, top=0.2, bottom=0.2)
+
+            # --- Initialisation des colonnes ---
+            worksheet.set_column(0, 0, 35)      # Largeur colonne 'nom du client/produit'
+            worksheet.set_column(1, 1, 10)      # Largeur colonne 'Période N Qté'
+            worksheet.set_column(2, 2, 10)      # Largeur colonne 'Période N-1 Qté'
+            worksheet.set_column(3, 3, 12)      # Largeur colonne 'Evo % Qté'
+            worksheet.set_column(4, 4, 16)      # Largeur colonne 'Période N CA'
+            worksheet.set_column(5, 5, 16)      # Largeur colonne 'Période N-1 CA'
+            worksheet.set_column(6, 6, 12)      # Largeur colonne 'Evo % CA'
+
+            worksheet.merge_range(0, 0, 0, 1, 'Nom du fichier', styles['text_title_ita_border'])
+            worksheet.merge_range(0, 2, 0, 5, u'Date de création', styles['text_title_ita_border'])
+            worksheet.merge_range(0, 6, 0, 8, u'Société(s)' , styles['text_title_ita_border'])
+            worksheet.merge_range(0, 9, 0, 11, u'Périodes : N / N-1' , styles['text_title_ita_border'])
+            worksheet.merge_range(1, 0, 1, 1, name, styles['text_title_border'])
+            worksheet.merge_range(1, 2, 1, 5, self.date, styles['text_title_border'])
+            worksheet.merge_range(1, 6, 1, 8, ", ".join(self.company_ids.mapped('name')), styles['text_title_border_wrap'])
+            worksheet.merge_range(1, 9, 1, 11, self.period_n.name + ' / ' + self.period_n1.name, styles['text_title_border_wrap'])
+
+            line_number = 3
+
+            for obj, valeurs in values:
+                del valeurs['qté']  # On a plus besoin de la quantité dans le dictionnaire donc on l'enlève pour pouvoir trier correctement
+                worksheet.merge_range(line_number, 0, line_number + 1, 0, obj.name, styles['text_title_border_red'])
+                worksheet.merge_range(line_number, 1, line_number, 3,  u'Qté - Commandes en cours', styles['text_title_border'])
+                worksheet.merge_range(line_number, 4, line_number, 6, u'CA', styles['text_title_border'])
+                line_number += 1
+                worksheet.write(line_number, 1, 'N', styles['text_title_border'])
+                worksheet.write(line_number, 2, 'N-1', styles['text_title_border'])
+                worksheet.write(line_number, 3, 'Evo %', styles['text_title_border'])
+                worksheet.write(line_number, 4, 'N', styles['text_title_border'])
+                worksheet.write(line_number, 5, 'N-1', styles['text_title_border'])
+                worksheet.write(line_number, 6, 'Evo %', styles['text_title_border'])
+                line_number += 1
+                line_keep = line_number
+                valeurs = sorted(valeurs.items(), key=lambda data: data[1][self.period_n1]['qté'])  # Tri secondaire par period_n1 croissant
+                valeurs = sorted(valeurs, key=lambda data: data[1][self.period_n]['qté'], reverse=True)  # Tri principal par period_n décroissant
+                for entry, data in valeurs:
+                    qty_n = data[self.period_n]['qté']
+                    qty_n1 = data[self.period_n1]['qté']
+                    price_n = data[self.period_n]['prix']
+                    price_n1 = data[self.period_n1]['prix']
+                    worksheet.write(line_number, 0, entry.name, styles['text_border_left'])
+                    worksheet.write(line_number, 1, qty_n, styles['number_border'])
+                    worksheet.write(line_number, 2, qty_n1, styles['number_border'])
+                    worksheet.write(line_number, 3, '=(%s / %s - 1) * 100' % (xl_rowcol_to_cell(line_number, 1),
+                                                                              xl_rowcol_to_cell(line_number, 2)) if qty_n1 else 100, styles['number_border'])
+                    worksheet.write(line_number, 4, price_n, styles['number_border'])
+                    worksheet.write(line_number, 5, price_n1, styles['number_border'])
+                    worksheet.write(line_number, 6, '=(%s / %s - 1) * 100' % (xl_rowcol_to_cell(line_number, 4),
+                                                                              xl_rowcol_to_cell(line_number, 5)) if price_n1 else 100, styles['number_border'])
+                    line_number += 1
+                worksheet.write(line_number, 0, 'TOTAL', styles['text_title_border_blue_left'])
+                for column in range(1, 7):
+                    if column in (3, 6):
+                        worksheet.write(line_number, column, '=IF(%s>0,(%s / %s - 1) * 100,100)' % (xl_rowcol_to_cell(line_number, column-1),
+                                                                                                    xl_rowcol_to_cell(line_number, column-2),
+                                                                                                    xl_rowcol_to_cell(line_number, column-1)), styles['number_title_border_blue'])
+                    else:
+                        worksheet.write(line_number, column, '=SUM(%s:%s)' % (xl_rowcol_to_cell(line_keep, column),
+                                                                              xl_rowcol_to_cell(line_number - 1, column)), styles['number_title_border_blue'])
+                line_number += 2
+
+        workbook.close()
+        fp.seek(0)
+        data = fp.read()
+        fp.close()
+        self.file = base64.b64encode(data)
+        return self._action_return()
+
+    FUNDICT = {
+        'encours' : '_create_encours_excel',
+        'echeancier' : '_create_echeancier_excel',
+        'stats' : '_create_stats_excel',
+        'autre' : '_dummy_function'
+    }
 
     @api.multi
     def button_print(self):
-        file_name = {'encours' : 'Encours des commandes de vente.xlsx',
-                     'echeancier': u'Échéancier des règlements fournisseurs.xlsx',
-                     'autre': 'Autre.xlsx'}
+        file_name = {
+            'encours' : 'Encours des commandes de vente.xlsx',
+            'echeancier': u'Échéancier des règlements fournisseurs.xlsx',
+            'stats' : "Statistiques de ventes.xlsx",
+            'autre': 'Autre.xlsx'
+        }
         self.file_name = file_name[self.report_model]
         return getattr(self, self.FUNDICT[self.report_model])()
