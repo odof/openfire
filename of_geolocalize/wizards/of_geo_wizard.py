@@ -546,10 +546,14 @@ class OFGeoWizard(models.TransientModel):
                         response_city = results['properties']['city'].upper().strip()
                     except:
                         response_city = ""
+                    try:
+                        response_city_name = results['properties']['name'].upper().strip()
+                    except:
+                        response_city_name = ""
 
                     if response_street:
                         precision = "high"
-                    elif response_city or response_zip:
+                    elif response_city or response_city_name or response_zip:
                         precision = "medium"
                     else:
                         precision = "low"
@@ -573,7 +577,7 @@ class OFGeoWizard(models.TransientModel):
                                 zip_ratio = self.similar(query_zip,response_zip)
                                 if zip_ratio < 0.9:
                                     precision = ""
-                                    
+
                         elif ratio_street < 0.7:
                             precision = "medium"
                             if partner.zip:
@@ -589,12 +593,14 @@ class OFGeoWizard(models.TransientModel):
                             zip_ratio = self.similar(query_zip,response_zip)
                             if zip_ratio < 0.9:
                                 precision = ""
-                        # Check city        
+                        # Check city and city name
                         if partner.city:
                             query_city = partner.city.strip().upper()
                             city_ratio = self.similar(query_city,response_city)
-                            if city_ratio < 0.6:
-                                precision = ""
+                            city_name_ratio =self.similar(query_city,response_city_name)
+                            best_city_response = max(city_ratio, city_name_ratio)
+                            if best_city_response < 0.6:
+                                precision = "low"
 
                 if longitud and latitud and precision:
                     self.ban_success += 1
@@ -806,7 +812,7 @@ class OFGeoWizard(models.TransientModel):
                                 elif ratio > 0.7:
                                     precision = "low"
                                 else:
-                                    precision = "unknown"
+                                    precision = ""
 
                                 latitud = results['geometry']['location']['lat']
                                 longitud = results['geometry']['location']['lng']
@@ -840,7 +846,7 @@ class OFGeoWizard(models.TransientModel):
                             longitud = 0
                             precision = "unknown"
                     except: # No results API
-                        # _logger.info("GOOGLE API ERROR [If you see this message for all API queries your our key is not valid]")
+                        # _logger.info("GOOGLE API ERROR [If you see this message for all API queries your key is not valid]")
                         self.google_fail += 1
                         geocoding = 'failure'
                         latitud = 0

@@ -65,8 +65,8 @@ class ResPartner(models.Model):
         self._cr.execute("UPDATE res_partner SET geocoding='failure', geocodeur='nominatim_openfire' WHERE geocoding IN ('failure_retry')")
         self._cr.execute("UPDATE res_partner SET precision='manual', geocodeur='manual' WHERE geocoding IN ('manual')")
 
-    geo_lat = fields.Float(string='Geo Lat', digits=(8, 8), help="latitude field")
-    geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), help="longitude field")
+    geo_lat = fields.Float(string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field")
+    geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field")
     date_last_localization = fields.Datetime(string='Last Geolocation Date', readonly=True)
     geocoding_response = fields.Text(string=u"Réponse géocodage", readonly=True)
     geocoding = fields.Selection([
