@@ -53,7 +53,7 @@ class AccountFiscalPosition(models.Model):
     def _get_fpos_by_region(self, country_id=False, state_id=False, zipcode=False, vat_required=False):
         # Dans le cas où un client n'a pas de pays, on veut quand-même récupérer une position fiscale par défaut
         if country_id:
-            return super(AccountFiscalPosition, self)._get_fpos_by_region(country_id=country_id, state_id=state_id, zipcode=zipcode, vat_required=zipcode)
+            return super(AccountFiscalPosition, self)._get_fpos_by_region(country_id=country_id, state_id=state_id, zipcode=zipcode, vat_required=vat_required)
 
         base_domain = [('auto_apply', '=', True), ('vat_required', '=', vat_required)]
         if self.env.context.get('force_company'):
