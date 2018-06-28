@@ -24,7 +24,7 @@ Configuration achats:
 - Ajout d'un menu pour créer les règles d'approvisionnement intersociétés
 """,
     "website" : "www.openfire.fr",
-    "depends" : ["sale", "of_sale_appro", "stock", "of_base"],
+    "depends" : ["sale", "of_sale_appro", "stock", "of_base", "procurement"],
     "category" : "OpenFire",
     "license": "",
     "data" : [

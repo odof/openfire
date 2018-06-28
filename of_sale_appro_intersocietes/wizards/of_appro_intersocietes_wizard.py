@@ -19,6 +19,26 @@ class OfApproIntersocieteWizard(models.TransientModel):
             self.line_ids.reload_price_marge(marge)
 
     @api.multi
+    def _create_procurement(self, line, purchase_line_id, purchase_order):
+        procurement_obj = self.env['procurement.order']
+        procurement_rule_obj = self.env['procurement.rule']
+
+        move = line.bl_line_id
+        data_procurement = move._prepare_procurement_from_move()
+        procurement_rule = procurement_rule_obj.search([('action', '=', 'buy'), ('location_id', '=', data_procurement['location_id']), ('company_id', '=', data_procurement['company_id'])])
+
+        data_procurement.update({
+            'rule_id': procurement_rule.id,
+            'purchase_id': purchase_order.id,
+            'purchase_line_id': purchase_line_id.id,
+        })
+
+        # Lors de la création d'un procurement, celui-ci créer automatiquement des commandes fournisseurs
+        # Pour désactiver la création automatique il faut mettre "procurement_autorun_defer" dans le context
+        procurement_id = procurement_obj.with_context(procurement_autorun_defer=True).create(data_procurement)
+        line.write({'procurement_id': procurement_id.id})
+
+    @api.multi
     def button_create_orders(self):
         if not self.line_ids:  # Si jamais toutes les lignes ont été supprimées
             return self.env['of.popup.wizard'].popup_return(u"Aucune ligne à approvisionner")
@@ -84,7 +104,7 @@ class OfApproIntersocieteWizard(models.TransientModel):
                 'customer_lead': product.sale_delay,
             })
             # Les champs obligatoires des lignes de la CF
-            purchase_line_obj.create({
+            purchase_line_id = purchase_line_obj.create({
                 'product_id': product.id,
                 'name': name,
                 'product_uom': product_uom.id,
@@ -94,6 +114,8 @@ class OfApproIntersocieteWizard(models.TransientModel):
                 'date_planned': self.date_planned,
             })
             line.bl_line_id.write({'state': 'waiting'})
+            # Ajout de la création de procurement pour lier le BL et le BR de la commande fournisseur créée
+            self._create_procurement(line, purchase_line_id, purchase_order)
         message = "La commande client " + sale_order.name + " et la commande fournisseur " + purchase_order.name + u" ont été créées."
         return self.env['of.popup.wizard'].popup_return(message)
 
