@@ -165,7 +165,7 @@
                 <footer>
                     <button class="btn-primary" name="action_geocode" string="Géolocaliser" type="object" icon="fa-map-marker"/>
                     <button class="btn-primary" name="action_reset_geo_val_selected" type="object" string="Effacer" icon="fa-eraser"
-                        confirm="Êtes-vous sûr de réinitialiser les partenaires sélectionnés?\nCeci effacera les données de géolocalisation des partenaires sélectionnés sauf ceux manuellement géolocalisés."/>
+                        confirm="Êtes-vous sûr de réinitialiser les partenaires sélectionnés ? Ceci effacera les données de géolocalisation des partenaires sélectionnés sauf ceux manuellement géolocalisés."/>
                     <button class="btn-default" special="cancel" string="Annuler"/>
                 </footer>
             </form>
