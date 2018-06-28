@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_res_wizard_new" model="ir.ui.view">
+        <field name="name">Planifier_intervention_new</field>
+        <field name="model">of.tournee.rdv</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Planifier une intervention (nouvelle méthode)">
+                <separator string="Informations" style="margin-top: 0px; margin-bottom: 0px"/>
+                <field name="partner_id" invisible="1"/>
+                <group style="margin-top: 0px">
+                    <group>
+                        <field name="partner_address_id" string="Adresse" widget="selection"/>
+                        <field name="tache_id"/>
+                        <field name="duree" widget="float_time"/>
+                    </group>
+                    <group>
+                        <field name="service_id"/>
+                        <field name="equipe_id_pre"/>
+                    </group>
+                    <group>
+                        <field name="date_recherche_debut"/>
+                        <field name="date_recherche_fin"/>
+                    </group>
+                    <group>
+                        <field name="mode2"/>
+                        <field name="distance_in_top_view" attrs="{'invisible':[('mode2','!=','distance_top_view')]}"/>
+                        <field name="distance_in_road" attrs="{'invisible':[('mode2','!=','distance_by_road')]}"/>
+                        <field name="time_in_road" attrs="{'invisible':[('mode2','!=','time_by_road')]}"/>
+                    </group>
+                </group>
+                <separator string="Propositions" style="margin-top: 0px; margin-bottom: 0px"/>
+                <group>
+                    <field name="planning_ids" colspan="4" nolabel="1" readonly="1">
+                        <tree string="Propositions des RDVs" colors="green:intervention_id==False">
+                            <field name="description" readonly="1"/>
+                            <field name="equipe_id" readonly="1"/>
+                            <field name="intervention_id"/>
+                            <field name="dist_prec"/>
+                            <field name="dist_suiv"/>
+                            <field name="distance"/>
+                        </tree>
+                        <form string="Propositions des RDVs">
+                            <field name="description" readonly="1"/>
+                            <field name="equipe_id" readonly="1"/>
+                            <field name="dist_prec"/>
+                            <field name="dist_suiv"/>
+                            <field name="distance"/>
+                        </form>
+                    </field>
+                
+                </group>
+                
+                
+            </form>
+        </field>
+    </record>
+
+    <act_window
+        name="Planifier une intervention (nouvelle methode)"
+        res_model="of.tournee.rdv"
+        src_model="res.partner"
+        view_mode="form"    
+        view_id="view_res_wizard_new"
+        id="action_view_res_wizard2"
+        key2="client_action_multi"
+        target="new"        
+        context="{'model':'res.partner'}"
+        groups="of_planning.of_group_planning_intervention_user"
+    />
+
+</odoo>
