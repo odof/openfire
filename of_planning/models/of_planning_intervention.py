@@ -432,7 +432,7 @@ class OfPlanningIntervention(models.Model):
             line_account = tax.map_account(line_account)
 
         pricelist = partner.property_product_pricelist
-        company = partner.company_id
+        company = self.company_id or partner.company_id
         from_currency = company.currency_id
 
         if pricelist.discount_policy == 'without_discount':
