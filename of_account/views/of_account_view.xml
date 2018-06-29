@@ -26,9 +26,24 @@
             <field name="date_invoice" position="after">
                 <field name="fiscal_position_id"/>
             </field>
+            <xpath expr="//field[@name='date_due']" position="after">
+                <field name="of_etiquette_partenaire_ids" widget="many2many_tags" readonly="1"/>
+            </xpath>
             <!-- Afficher la date d'échéance dans la vue facture sans être en mode développeur -->
             <xpath expr="//field[@name='date_due']" position="replace">
                 <field name="date_due"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Filtres recherche factures -->
+    <record id="of_sale_view_invoice_search" model="ir.ui.view">
+        <field name="name">of.sale.view.invoice.search</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="of_etiquette_partenaire_ids" string="Étiquettes client" widget="many2one"/>
             </xpath>
         </field>
     </record>

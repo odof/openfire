@@ -37,6 +37,7 @@ Modification du fonctionnement de l'outil de facturation pour les factures d'aco
 - Les taxes et le compte comptable des lignes d'acompte sont calculés selon les règles du module of_account_tax
 
 Permettre d'ajouter des documents joints dans l'impression des devis/commandes
+Permettre d'afficher et de rechercher des étiquettes client dans devis / bon de commande
 
 Outil de gestion des prix
 -------------------------
@@ -70,6 +71,7 @@ Paramètres de ventes (sale.config.settings)
         "of_product",
         "sale",
         "sale_margin",
+        "sale_crm",
     ],
     'external_dependancies': {
         'python': ['pdfminer', 'pypdftk', 'pyPdf'],

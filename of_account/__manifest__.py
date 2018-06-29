@@ -6,7 +6,7 @@
     'license': '',
     'website' : "www.openfire.fr",
     'category' : "Generic Modules/Accounting",
-    'description': """
+    'description': u"""
 Module de comptabilité OpenFire.
 ======================================
 
@@ -16,6 +16,7 @@ Module de comptabilité OpenFire.
   - Afficher le boutton "Envoyer par email" dans tous les cas sauf pour les factures annulées et brouillon
   - Afficher la date d'échéance dans la vue facture sans être en mode développeur
   - Permettre de modifier la date d'échéance manuellement (option dans les paramètres de configuration comptabilité : suivant les conditions de règlement/modification manuelle possible)
+  - Permettre d'afficher et de rechercher des étiquettes client dans les factures
 """,
     'depends' : [
         'account',
