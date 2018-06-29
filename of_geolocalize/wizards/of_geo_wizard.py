@@ -25,10 +25,7 @@ except ImportError:
 
 from odoo import api, fields, models
 from odoo.exceptions import UserError
-# import logging
-# _logger = logging.getLogger(__name__)
 from difflib import SequenceMatcher
-
 
 class OFGeoWizard(models.TransientModel):
     _name = "of.geo.wizard"
@@ -174,7 +171,7 @@ class OFGeoWizard(models.TransientModel):
         self.nb_selected_partners_no_address = nb_selected_partners_no_address
         self.nb_selected_partners_manual = nb_selected_partners_manual
         self.nb_selected_partners_not = nb_selected_partners_not
-        
+
         if self.overwrite_geoloc_all:
             self.nb_selected_partners_to_geoloc = nb_selected_partners - nb_selected_partners_no_address
         elif self.overwrite_geoloc_all and self.overwrite_geoloc_except_manual:
@@ -352,7 +349,6 @@ class OFGeoWizard(models.TransientModel):
                     longitud = 0
                     precision = "unknown"
 
-        # _logger.info("RESULTS OPENFIRE == geocoding= %s , geocodeur= %s, latitud= %s, longitud= %s  , precision= %s", geocoding,geocodeur,latitud,longitud,precision)
         return geocoding,geocodeur,latitud,longitud,precision
 
     # Géocodage avec OSM
@@ -468,7 +464,6 @@ class OFGeoWizard(models.TransientModel):
                     longitud = 0
                     precision = "unknown"
 
-        # _logger.info("RESULTS OSM == geocoding= %s , geocodeur= %s, latitud= %s, longitud= %s  , precision= %s", geocoding,geocodeur,latitud,longitud,precision)
         return geocoding,geocodeur,latitud,longitud,precision
 
     # Geocoding with BANO
@@ -615,9 +610,9 @@ class OFGeoWizard(models.TransientModel):
                     longitud = 0
                     precision = "unknown"
 
-        # _logger.info("RESULTS BAN == geocoding= %s , geocodeur= %s, latitud= %s, longitud= %s  , precision= %s", geocoding,geocodeur,latitud,longitud,precision)
         return geocoding,geocodeur,latitud,longitud,precision
 
+    # Geocoding with GoogleMaps
     def geo_google(self, partner):
         # Variables
         geocoding = ""
@@ -640,7 +635,6 @@ class OFGeoWizard(models.TransientModel):
 
         # Get address data
         query = partner.get_addr_params()
-        using_api = ""
 
         if not query:
             geocoding = 'no_address'
@@ -676,7 +670,6 @@ class OFGeoWizard(models.TransientModel):
                     longitud = 0
                     precision = "unknown"
                 elif res['status'] == "OK":
-                    using_api = "no"
                     results = res['results'][0]
 
                     try:
@@ -756,7 +749,6 @@ class OFGeoWizard(models.TransientModel):
                         precision = "unknown"
 
                 elif res['status'] == "OVER_QUERY_LIMIT":
-                    using_api = "yes"
 
                     # Get Google API key
                     google_api_key = partner.env['ir.config_parameter'].get_param('google_api_key')
@@ -846,7 +838,6 @@ class OFGeoWizard(models.TransientModel):
                             longitud = 0
                             precision = "unknown"
                     except: # No results API
-                        # _logger.info("GOOGLE API ERROR [If you see this message for all API queries your key is not valid]")
                         self.google_fail += 1
                         geocoding = 'failure'
                         latitud = 0
@@ -865,18 +856,11 @@ class OFGeoWizard(models.TransientModel):
                     longitud = 0
                     precision = "unknown"
 
-        # if using_api == "yes":
-        #     _logger.info("RESULTS API GOOGLE == geocoding= %s , geocodeur= %s, latitud= %s, longitud= %s  , precision= %s", geocoding,geocodeur,latitud,longitud,precision)
-        # elif using_api == "no":
-        #     _logger.info("RESULTS WEB GOOGLE == geocoding= %s , geocodeur= %s, latitud= %s, longitud= %s  , precision= %s", geocoding,geocodeur,latitud,longitud,precision)
-        # else:
-        #     _logger.info("RESULTS GOOGLE == geocoding= %s , geocodeur= %s, latitud= %s, longitud= %s  , precision= %s", geocoding,geocodeur,latitud,longitud,precision)
         return geocoding,geocodeur,latitud,longitud,precision
 
     # Erase button
     @api.multi
     def action_reset_geo_val_selected(self):
-        # _logger.info("OVERRIDING GEOCODING DATA")
         for partner in self.partner_ids:
             if not partner.geocoding == 'manual': # Protect manual geocoding
                 partner.write({
@@ -934,7 +918,7 @@ class OFGeoWizard(models.TransientModel):
             raise UserError((u"L'URL du géocodeur OpenStreetMap ne semble pas correcte: %s. Vérifiez votre paramétrage ou utilisez un autre géocodeur") % API_URL)
 
         results = self.geo_osm(partner)
-        
+
         partner.write({
             'geocoding': results[0],
             'geocodeur': results[1],
@@ -1004,15 +988,13 @@ class OFGeoWizard(models.TransientModel):
         # Geocoding manual = False (Delete manual records too)
         if self.partner_ids.geocoding == 'manual':
             self.partner_ids.geocoding = "not_tried"
-            
+
         self.action_reset_geo_val_selected()
         return True
 
     # GEOCODING BY LOT (Geolocalizer button)
     @api.multi
     def action_geocode(self):
-        # _logger.info("START GEOCODING")
-
         # count writes, commit each 100 writes
         cmpt = 0
 
@@ -1225,13 +1207,10 @@ class OFGeoWizard(models.TransientModel):
                 taux_success = float(getattr(self, '%s_success' % geocoder_name)) / float(getattr(self, '%s_try' % geocoder_name)) * 100
                 taux_success = float("{0:.2f}".format(taux_success))
                 self['taux_success_%s' % geocoder_name] = taux_success
-                # _logger.info("taux_success_%s = %d", geocoder_name, taux_success)
             except:
                 self['taux_success_%s' % geocoder_name] = ""
-                # _logger.info("taux_sucess_%s = ERROR", geocoder_name)
 
             if cmpt % 100 == 0:
-                # _logger.info("COMMIT TO DB of %d ENTRIES", cmpt)
                 self._cr.commit()
 
         return { "type": "ir.actions.do_nothing", }
