@@ -11,13 +11,11 @@ Module OpenFire pour bases de centralisation des tarifs.
 ========================================================
 
 """,
-    "depends" : ['of_product', 'of_product_brand', 'of_sales', 'account'],
+    "depends" : ['of_product', 'of_product_brand', 'of_sale', 'account', 'of_import'],
     "init_xml" : [],
     "demo_xml" : [],
     "data" : [
-        'security/ir.model.access.csv',
-#        'of_datastore_supplier_view.xml',
-#        'of_datastore_supplier_data.xml',
+        'views/of_datastore_supplier_views.xml',
     ],
     "installable": True,
     'active': False,

@@ -1,3 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_of_import_note_employee,of.import.note employee,model_of_import_note,base.group_user,1,0,0,0
-access_of_import_note_sale_manager,of.import.note salemanager,model_of_import_note,sales_team.group_sale_manager,1,1,1,1

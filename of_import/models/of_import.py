@@ -176,7 +176,7 @@ class OFProductBrand(models.Model):
         fields = self.get_config_field_list()
         domain = ['|'] * (len(fields) - 1) + [(field, '!=', False) for field in fields]
         for brand in self:
-            brand.product_config_ids = product_obj.search([('brand_id', '=', self.id)] + domain)
+            brand.product_config_ids = product_obj.search([('brand_id', '=', brand.id)] + domain)
 
     @api.multi
     def _inverse_product_config_ids(self):

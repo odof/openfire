@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- Produit -->
+        <record id="of_datastore_product_search_view" model="ir.ui.view">
+            <field name="name">of.product.product.datastore.search</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_search_form_view"/>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <field name="categ_id" position="after">
+                    <field name="ds_supplier_search_id" widget="selection">
+                        <filter help="Inclure produits déjà importés" name="datastore_stored" context="{'datastore_stored': 1}" icon="terp-gtk-jump-to-ltr"/>
+                    </field>
+                </field>
+            </field>
+        </record>
+
+        <record id="of_datastore_product_form_view" model="ir.ui.view">
+            <field name="name">of.product.product.datastore.form</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <xpath expr="//group[1]" position="before">
+                    <field name="id" invisible="1"/>
+                    <group attrs="{'invisible':[('id','&gt;=',0)]}" colspan="4">
+                        <label>/!\ Vous êtes en train de visualiser un article sur la base centralisée.</label>
+                    </group>
+                </xpath>
+                <field name="seller_ids" position="before">
+                    <group colspan="4" col="8">
+                        <field name="datastore_supplier_id" readonly="1"/>
+                        <field name="datastore_product_id" readonly="1"/>
+                        <button name="assign_datastore_product" type="object" string="Détecter chez mes fournisseurs"
+                                help="Cherche parmi vos fournisseurs renseignés un article dont le code produit correspond, et l'associe à cet article"
+                                attrs="{'invisible': [('datastore_supplier_id','!=',False)]}"/>
+                        <button name="%(action_of_datastore_update_product)s" string="Mettre à jour"
+                                help="Met à jour cet article avec les données présentes chez le fournisseur"
+                                attrs="{'invisible': [('datastore_supplier_id','=',False)]}"/>
+                    </group>
+                </field>
+            </field>
+        </record>
+
+        <!-- Fournisseur -->
+        <record id="of_datastore_supplier_view_form" model="ir.ui.view">
+            <field name="name">of.datastore.supplier.form</field>
+            <field name="model">of.datastore.supplier</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="partner_id"/>
+                        <field name="db_name" on_change="onchange_db_name(db_name)"/>
+                        <field name="server_address" on_change="onchange_server_address(server_address)"/>
+                        <field name="login"/>
+                        <field name="new_password" password="True" placeholder="***"/>
+                        <field name="active"/>
+                        <field name="error_msg" nolabel="1" colspan="3"/>
+                        <button name="button_dummy" string="Tester la connexion" type="object"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="of_datastore_supplier_view_tree" model="ir.ui.view">
+            <field name="name">of.datastore.supplier.tree</field>
+            <field name="model">of.datastore.supplier</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree colors="gray:active == False">
+                    <field name="active" invisible="1"/>
+                    <field name="partner_id"/>
+                    <field name="db_name"/>
+                    <field name="product_prefix"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="of_datastore_supplier_action" model="ir.actions.act_window">
+            <field name="name">Fournisseurs</field>
+            <field name="res_model">of.datastore.supplier</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="of_datastore_supplier_view_tree"/>
+            <field name="context">{'active_test':False}</field>
+        </record>
+
+        <!-- Marque -->
+        <!-- Fournisseur -->
+    <record id="of_datastore_product_brand_view_form" model="ir.ui.view">
+        <field name="name">of.datastore.product.brand.form.view</field>
+        <field name="model">of.product.brand</field>
+        <field name="inherit_id" ref="of_product_brand.of_product_brand_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <group colspan="2" invisible="context.get('uid') != 1">
+                    <field name="datastore_supplier_id"/>
+                </group>
+                <!--
+                <field name="datastore_supplier_id" invisible="context.get('uid') != 1"/>
+                -->
+                <group colspan="2" attrs="{'invisible':[('datastore_supplier_id', '=', False)]}">
+                    <span>Cet article est connecté au tarif centralisé</span>
+                </group>
+                <span></span>
+            </xpath>
+        </field>
+    </record>
+
+        <menuitem name="Tarifs" id="menu_of_datastore_config" parent="base.menu_config" sequence="11"/>
+        <menuitem name="Fournisseurs" id="menu_of_datastore_supplier" parent="of_datastore_product.menu_of_datastore_config" sequence="10" action="of_datastore_supplier_action"/>
+    </data>
+</openerp>

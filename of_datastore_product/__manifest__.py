@@ -35,33 +35,37 @@ Fonctionnalités à venir :
 Ce module nécessite l'installation de erppeek sur le serveur : sudo pip install erppeek
 """,
     "depends" : [
-          # Les marques sont utilisées pour filtrer les produits accédés dans la base centralisée
-        'of_product_brand',
-        # of_product définit les champs dans product_supplierinfo
-        'of_product',
-        'of_sales',
+#           # Les marques sont utilisées pour filtrer les produits accédés dans la base centralisée
+#         'of_product_brand',
+#         # of_product définit les champs dans product_supplierinfo
+#         'of_product',
+#         'of_sale',
+        # Surcharge des lignes de facture
         'account',
-        'of_stock',
+        # Surcharge des lignes d'inventaire
+        'stock',
+        # Surcharge des lignes de commande fournisseur
         'purchase',
         # Utilisation du système de paramétrage d'import
         # (matching des catégories d'articles, calcul des prix d'achat et de vente, etc.)
         'of_import',
+        'of_kit',
     ],
     "init_xml" : [ ],
     "demo_xml" : [ ],
     "data" : [
-        'security/ir.model.access.csv',
+#         'security/ir.model.access.csv',
 #         'wizard/of_datastore_update_product.xml',
 #         'wizard/of_remove_unused_products.xml',
+        'wizard/of_datastore_import_brand.xml',
         'views/of_datastore_product_view.xml',
-        'views/of_product_nomenclature_view.xml',
     ],
-    'css' : [
-        "static/src/css/of_datastore_product.css",
-    ],
-    'js': [
-        'static/src/js/of_datastore_product.js'
-    ],
+#     'css' : [
+#         "static/src/css/of_datastore_product.css",
+#     ],
+#     'js': [
+#         'static/src/js/of_datastore_product.js'
+#     ],
     "installable": True,
     'active': False,
 }

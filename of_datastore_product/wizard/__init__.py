@@ -1,4 +1,3 @@
 # -*- coding: utf-8 -*-
 
-import of_datastore_update_product
-import of_remove_unused_products
+from . import of_datastore_import_brand

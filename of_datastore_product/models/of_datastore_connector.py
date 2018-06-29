@@ -22,6 +22,44 @@ class OfDatastoreConnector(models.AbstractModel):
     """
     _name = 'of.datastore.connector'
 
+    server_address = fields.Char(string=u'Server address', required=True)
+    db_name = fields.Char(u'Database', required=True)
+    login = fields.Char('Login', required=True)
+    password = fields.Char('Password')
+    new_password = fields.Char(string='Set Password',
+        compute='_compute_password', inverse='_inverse_password',
+        help="Specify a value only when changing the password, otherwise leave empty")
+    error_msg = fields.Char(string='Error', compute='_compute_error_msg')
+
+    @api.depends()
+    def _compute_password(self):
+        for supplier in self:
+            supplier.new_password = ''
+
+    # Fonctions récupérées depuis le champ new_password défini pour res_users.
+    def _inverse_password(self):
+        for supplier in self:
+            if not supplier.new_password:
+                # Do not update the password if no value is provided, ignore silently.
+                # For example web client submits False values for all empty fields.
+                continue
+            supplier.password = supplier.new_password
+
+    @api.depends('db_name', 'server_address', 'login', 'password', 'new_password')
+    def _compute_error_msg(self):
+        for connector in self:
+            for field_name in ('db_name', 'server_address', 'login', 'password', 'new_password'):
+                if field_name == 'new_password' and connector.password:
+                    # Le nouveau mot de passe n'est obligatoire que s'il n'en existe pas déjà un
+                    continue
+                if not connector[field_name]:
+                    error_msg = _("You must fill the field \"%s\"") % self.env['ir.model.fields'].search([('model', '=', self._name), ('name', '=', field_name)]).name_get()[0][1]
+                    break
+            else:
+                error_msg = connector.of_datastore_connect()[connector.id]
+                if not isinstance(error_msg, basestring):
+                    error_msg = _('Connection successful')
+            connector.error_msg = error_msg
 
     @api.multi
     def of_datastore_connect(self):
@@ -34,78 +72,46 @@ class OfDatastoreConnector(models.AbstractModel):
                 self.result = None
 
             def run(self):
-                cli = client
                 try:
-                    if not cli:
-                        server_address = supplier.server_address
+                    server_address = supplier.server_address
 
-                        i = server_address.find('://')
-                        if i == -1:
-                            # Protocole xmlrpcs par defaut
-                            protocol = 'xmlrpcs'
-                            address = server_address
-                        else:
-                            # Protocole xmlrpc ou xmlrpcs en fonction de http ou https
-                            protocol = server_address[:i].replace('http', 'xmlrpc')
-                            address = server_address[i+3:]
-                        j = address.find(':')
-                        if j == -1:
-                            port = 443 if server_address[:i] == 'https' else 80
-                        else:
-                            port = int(address[j+1:])
-                            address = address[:j]
-                        cli = openerplib.get_connection(hostname=address, port=port, protocol=protocol,
-                                                           database=supplier.db_name,
-                                                           login=supplier.login, password=supplier.password)
+                    i = server_address.find('://')
+                    if i == -1:
+                        # Protocole xmlrpcs par defaut
+                        protocol = 'xmlrpcs'
+                        address = server_address
+                    else:
+                        # Protocole xmlrpc ou xmlrpcs en fonction de http ou https
+                        protocol = server_address[:i].replace('http', 'xmlrpc')
+                        address = server_address[i+3:]
+                    j = address.find(':')
+                    if j == -1:
+                        port = 443 if server_address[:i] == 'https' else 80
+                    else:
+                        port = int(address[j+1:])
+                        address = address[:j]
+                    cli = openerplib.get_connection(hostname=address, port=port, protocol=protocol,
+                                                       database=supplier.db_name,
+                                                       login=supplier.login, password=supplier.new_password or supplier.password)
+
                     # Operation pour verifier la connexion
                     self.result = cli.get_model('res.users').search([]) and cli or ''
                 except Exception, exc:
                     self.result = _(str(exc))
 
         for supplier in self:
-            clients = self._datastore_clients.get(supplier.id,[])
-            client = clients and clients.pop()
-            while client:
-                it = FuncThread()
-                it.start()
-                it.join(10) # attente 10 secondes ou jusqu'à la fin du thread
-                if it.result:
-                    # On a trouvé une connexion valide
-                    break
-
-                if it.isAlive():
-                    # Depassement du délai de connexion
-                    # Il n'y a pas de fonction pour forcer l'arrêt d'un thread... il se terminera tout seul
-
-                    # La connexion est probablement toujours valide, mais victime d'un ralentissement internet
-                    # Il est inutile de la supprimer, de tester les autres connexions, ou d'en créer une nouvelle
-                    self.free_connection({supplier.id: client})
-                    client = _(u"Délai de connexion expiré")
-                    break
-                client = clients and clients.pop()
-
-            if not client:
-                # Pas de client valide, on tente une connexion
-                it = FuncThread()
-                it.start()
-                it.join(10) # attente 10 secondes ou jusqu'à la fin du thread
-                if it.isAlive():
-                    client = _(u"Délai de connexion expiré")
-                else:
-                    client = it.result
+            it = FuncThread()
+            it.start()
+            it.join(10) # attente 10 secondes ou jusqu'à la fin du thread
+            if it.isAlive():
+                client = _(u"Délai de connexion expiré")
+            else:
+                client = it.result
             res[supplier.id] = client
         return res
 
     @api.model
-    def of_datastore_free_connection(self, clients):
-        for supplier_id, client in clients.iteritems():
-            if not isinstance(client, basestring):
-                self._datastore_clients.setdefault(supplier_id, []).append(client)
-        return True
-
-    @api.model
     def of_datastore_get_model(self, ds_client, model_name):
-        ds_client.ensure_one()
         return ds_client.get_model(model_name)
 
     @api.model
@@ -134,10 +140,11 @@ class OfDatastoreConnector(models.AbstractModel):
 
     @api.model
     def of_datastore_read(self, ds_model, ids, fields=None, load=None):
-        kwargs = {key: val
-                  for key,val in [('fields', fields),
-                                  ('load', load)]
-                  if val is not None}
+        kwargs = {
+            key: val
+            for key,val in [('fields', fields),
+                            ('load', load)]
+            if val is not None}
         return ds_model.read(ids, **kwargs)
 
     @api.model
