@@ -4,20 +4,10 @@
 # Requires request and googlemaps python packages (for Google Maps geocoder in wizard)
 
 from odoo import api, fields, models
-# import logging
-# _logger = logging.getLogger(__name__)
-
 
 # Add geocoding fields to res.company model (all are related to partner_id)
 class ResCompany(models.Model):
     _inherit = "res.company"
-
-    @api.model
-    def _auto_init(self):
-        super(ResCompany, self)._auto_init()
-        # A supprimer : code pour transition de version
-        self._cr.execute("UPDATE res_company SET geocoding='success_openfire' WHERE geocoding IN ('success', 'success_retry')")
-        self._cr.execute("UPDATE res_company SET geocoding='failure' WHERE geocoding IN ('failure_retry')")
 
     geo_lat = fields.Float(string='Geo Lat', digits=(8, 8), related='partner_id.geo_lat', help="latitude field")
     geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), related='partner_id.geo_lng', help="longitude field")
@@ -56,14 +46,6 @@ class ResCompany(models.Model):
 # Add geocoding parameters to res.partner model
 class ResPartner(models.Model):
     _inherit = "res.partner"
-
-    @api.model
-    def _auto_init(self):
-        super(ResPartner, self)._auto_init()
-        # A supprimer : code pour transition de version
-        self._cr.execute("UPDATE res_partner SET geocoding='success_openfire', geocodeur='nominatim_openfire' WHERE geocoding IN ('success', 'success_retry')")
-        self._cr.execute("UPDATE res_partner SET geocoding='failure', geocodeur='nominatim_openfire' WHERE geocoding IN ('failure_retry')")
-        self._cr.execute("UPDATE res_partner SET precision='manual', geocodeur='manual' WHERE geocoding IN ('manual')")
 
     geo_lat = fields.Float(string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field")
     geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field")
@@ -147,7 +129,6 @@ class ResPartner(models.Model):
             # no zip no city
             if not any((self.zip, self.city)):
                 query = ""
-        # _logger.info("QUERY = %s", query)
         return query
 
     # Conditional create when new partner is added
