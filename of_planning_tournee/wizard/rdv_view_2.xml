@@ -3,13 +3,13 @@
 
     <record id="view_res_wizard_new" model="ir.ui.view">
         <field name="name">Planifier_intervention_new</field>
-        <field name="model">of.tournee.rdv</field>
+        <field name="model">of.tournee.rdv2</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
             <form string="Planifier une intervention (nouvelle méthode)">
                 <separator string="Informations" style="margin-top: 0px; margin-bottom: 0px"/>
                 <field name="partner_id" invisible="1"/>
-                <group style="margin-top: 0px">
+                <group style="margin-top: 0px; margin-bottom: 0px;">
                     <group>
                         <field name="partner_address_id" string="Adresse" widget="selection"/>
                         <field name="tache_id"/>
@@ -19,34 +19,37 @@
                         <field name="service_id"/>
                         <field name="equipe_id_pre"/>
                     </group>
-                    <group>
-                        <field name="date_recherche_debut"/>
-                        <field name="date_recherche_fin"/>
-                    </group>
+                </group>
+
+                <separator string="Recherche" style="margin-top: 0px; margin-bottom: 0px"/>
+                <group style="margin-top: 0px; margin-bottom: 0px;">
                     <group>
                         <field name="mode2"/>
                         <field name="distance_in_top_view" attrs="{'invisible':[('mode2','!=','distance_top_view')]}"/>
                         <field name="distance_in_road" attrs="{'invisible':[('mode2','!=','distance_by_road')]}"/>
                         <field name="time_in_road" attrs="{'invisible':[('mode2','!=','time_by_road')]}"/>
                     </group>
+                    <group>
+                        <field name="date_recherche_debut"/>
+                        <field name="date_recherche_fin"/>
+                    </group>
                 </group>
-                <separator string="Propositions" style="margin-top: 0px; margin-bottom: 0px"/>
-                <group>
+
+                <separator string="Propositions" style="margin-top: 0px; margin-bottom: 4px"/>
+                <group style="margin-top: 0px; margin-bottom: 0px;">
                     <field name="planning_ids" colspan="4" nolabel="1" readonly="1">
                         <tree string="Propositions des RDVs" colors="green:intervention_id==False">
+                            <field name="date_r" readonly="1"/>
                             <field name="description" readonly="1"/>
                             <field name="equipe_id" readonly="1"/>
                             <field name="intervention_id"/>
-                            <field name="dist_prec"/>
-                            <field name="dist_suiv"/>
-                            <field name="distance"/>
+                            
                         </tree>
                         <form string="Propositions des RDVs">
+                            <field name="date_r" readonly="1"/>
                             <field name="description" readonly="1"/>
                             <field name="equipe_id" readonly="1"/>
-                            <field name="dist_prec"/>
-                            <field name="dist_suiv"/>
-                            <field name="distance"/>
+                            
                         </form>
                     </field>
                 
@@ -59,7 +62,7 @@
 
     <act_window
         name="Planifier une intervention (nouvelle methode)"
-        res_model="of.tournee.rdv"
+        res_model="of.tournee.rdv2"
         src_model="res.partner"
         view_mode="form"    
         view_id="view_res_wizard_new"
