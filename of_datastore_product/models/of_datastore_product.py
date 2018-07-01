@@ -69,8 +69,8 @@ class OfDatastoreSupplier(models.Model):
         brand_names = self.env['of.product.brand'].search([]).mapped('name')
 
         wizard = wizard_obj.create({
+            'datastore_supplier_id': self.id,
             'line_ids': [(0, 0, {
-                'datastore_supplier_id': self.id,
                 'name': ds_brand['name'],
                 'prefix': ds_brand['prefix'],
                 'logo': ds_brand['logo'],
@@ -113,6 +113,9 @@ class OfProductBrand(models.Model):
         'of.import.product.categ.config', compute="_compute_all_categ_ids", inverse="_inverse_all_categ_ids", string="Catégories")
 #     error_msg = fields.Char(string='Connection message', compute='_compute_all_categ_ids')
     datastore_note_maj = fields.Text(string='Notes MAJ', compute='_compute_datastore_note_maj')
+    datastore_product_count = fields.Integer(
+        '# Products', compute='_compute_datastore_note_maj',
+        help="The number of products of this brand")
 
     @api.depends('datastore_supplier_id')
     def _compute_all_categ_ids(self):
@@ -200,11 +203,12 @@ class OfProductBrand(models.Model):
             ds_brand_obj = supplier.of_datastore_get_model(client, 'of.product.brand')
             ds_brand_ids = supplier.of_datastore_search(ds_brand_obj, [('name', 'in', brand_names)])
             suppliers_data[supplier] = {
-                data['name']: data['note_maj']
-                for data in supplier.of_datastore_read(ds_brand_obj, ds_brand_ids, ['name', 'note_maj'])
+                data['name']: (data['note_maj'], data['product_count']) 
+                for data in supplier.of_datastore_read(ds_brand_obj, ds_brand_ids, ['name', 'note_maj', 'product_count'])
             }
 
         for brand in self:
+            product_count = 0
             if not brand.datastore_supplier_id:
                 note = u"Marque non associée à une base centrale"
             elif isinstance(suppliers_data[brand.datastore_supplier_id], basestring):
@@ -212,8 +216,9 @@ class OfProductBrand(models.Model):
             elif brand.name not in suppliers_data[brand.datastore_supplier_id]:
                 note = u"Marque non présente sur la base centrale"
             else:
-                note = suppliers_data[brand.datastore_supplier_id][brand.name]
+                note, product_count = suppliers_data[brand.datastore_supplier_id][brand.name]
             brand.datastore_note_maj = note
+            brand.datastore_product_count = product_count
 
 
 class OfDatastoreCentralized(models.AbstractModel):

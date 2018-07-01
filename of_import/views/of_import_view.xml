@@ -11,6 +11,7 @@
             <xpath expr="//header" position="inside">
                 <button name="%(action_of_import_update_product_brand_products)d" type="action" string="Appliquer les règles"/>
             </xpath>
+            <xpath expr="//label[@for='note']" position="replace"/>
             <xpath expr="//field[@name='note']" position="replace"/>
             <xpath expr="//sheet" position="inside">
                 <notebook>

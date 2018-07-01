@@ -65,13 +65,25 @@
         <field name="context">{'active_test':False}</field>
     </record>
 
-        <!-- Marque -->
-        <!-- Fournisseur -->
+    <!-- Marque -->
+    <record id="of_datastore_brand_product_action" model="ir.actions.act_window">
+        <field name="name">Centralized products</field>
+        <field name="res_model">product.template</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[('brand_id','=',active_id),('datastore_supplier_id','=','')]</field>
+    </record>
+
     <record id="of_datastore_product_brand_view_form" model="ir.ui.view">
         <field name="name">of.datastore.product.brand.form.view</field>
         <field name="model">of.product.brand</field>
-        <field name="inherit_id" ref="of_product_brand.of_product_brand_view_form"/>
+        <field name="inherit_id" ref="of_import.of_product_brand_view_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//div[@name='oe_button_box']" position="inside">
+                <button name="%(of_datastore_brand_product_action)d" type="action" class="oe_stat_button" icon="fa-th-list">
+                    <field string="Centralized products" name="datastore_product_count" widget="statinfo"/>
+                </button>
+            </xpath>
             <xpath expr="//field[@name='partner_id']" position="after">
                 <group colspan="2" invisible="context.get('uid') != 1">
                     <field name="datastore_supplier_id"/>
@@ -82,7 +94,10 @@
                 <group colspan="2" attrs="{'invisible':[('datastore_supplier_id', '=', False)]}">
                     <span>Cette marque est connectée au tarif centralisé</span>
                 </group>
-                <span></span>
+            </xpath>
+            <xpath expr="//page[@name='notes']" position="inside">
+                <separator string="Informations tarif centralisé" colspan="2"/>
+                <field name="datastore_note_maj" colspan="2" nolabel="1"/>
             </xpath>
         </field>
     </record>
