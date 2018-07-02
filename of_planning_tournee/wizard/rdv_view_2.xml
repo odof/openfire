@@ -39,14 +39,12 @@
                 <group style="margin-top: 0px; margin-bottom: 0px;">
                     <field name="planning_ids" colspan="4" nolabel="1" readonly="1">
                         <tree string="Propositions des RDVs" colors="green:intervention_id==False">
-                            <field name="date_r" readonly="1"/>
                             <field name="description" readonly="1"/>
                             <field name="equipe_id" readonly="1"/>
                             <field name="intervention_id"/>
                             
                         </tree>
                         <form string="Propositions des RDVs">
-                            <field name="date_r" readonly="1"/>
                             <field name="description" readonly="1"/>
                             <field name="equipe_id" readonly="1"/>
                             
