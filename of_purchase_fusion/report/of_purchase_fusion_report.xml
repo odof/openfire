@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Retire le champ contremarque des informations de la commande fournisseur -->
+    <template id="of_report_purchaseorder_fusion_document2" inherit_id="of_purchase.of_report_purchaseorder_sans_prix_document">
+        <!-- Pour une raison que j'ignore, il faut la position finale de l'élément. -->
+        <!-- Ici en prenant en compte l'héritage le champ contremarque est la 4ème div de son groupe-->
+        <xpath expr="//div[@class='col-xs-3'][4]" position="replace"/>
+    </template>
+
+    <!-- Ajoute le champ contremarque sur les lignes de l'impression commande fournisseur -->
+    <template id="of_report_purchaseorder_fusion_document" inherit_id="purchase.report_purchaseorder_document">
+        <xpath expr="//table/thead/tr/th[last()]" position="after">
+            <th><strong>Contremarque</strong></th>
+        </xpath>
+        <xpath expr="//tr[@t-as='line']" position="inside">
+            <td>
+                <span t-field="line.of_customer_id.name"/>
+            </td>
+        </xpath>
+    </template>
+
+</odoo>

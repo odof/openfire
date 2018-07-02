@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_purchase_fusion_order_form" model="ir.ui.view">
+        <field name="name">of.purchase.fusion.form</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="of_purchase.of_purchase_order_customer_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='sale_order_id']" position="attributes">
+                <attribute name="attrs">{'invisible': [('of_fused', '=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='sale_order_id']" position="after">
+                <field name="of_fused" invisible="1"/>
+                <field name="of_sale_order_ids" widget="many2many_tags" attrs="{'invisible': [('of_fused', '=', False)]}" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_purchase_fusion_order_form_view" model="ir.ui.view">
+        <field name="name">of.purchase.fusion.form</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" name="action_view_ventes" type="object" icon="fa-shopping-cart" attrs="{'invisible': [('of_sale_count', '=', 0)]}">
+                    <field string="Ventes" name="of_sale_count" widget="statinfo"/>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='price_subtotal']" position="after">
+                <field name="of_customer_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Action afficher ventes list -->
+    <record id="of_purchase_open_ventes" model="ir.actions.act_window">
+        <field name="name">Ventes</field>
+        <field name="res_model">sale.order</field>
+        <field name="domain">[]</field> <!-- Force empty -->
+        <field name="view_type">form</field>
+    </record>
+
+</odoo>
