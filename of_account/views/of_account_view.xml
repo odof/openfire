@@ -46,4 +46,17 @@
         </field>
     </record>
 
+    <!--  account move -->
+    <record id="of_view_move_form" model="ir.ui.view">
+        <field name="name">of.account.move</field>
+        <field name="model">account.move</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='line_ids']" position="attributes">
+                <attribute name="context">{'line_ids': line_ids, 'journal_id': journal_id, 'default_name': ref}</attribute>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
