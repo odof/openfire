@@ -27,7 +27,8 @@ Ce module ajoute des fonctionnalités demandées par une société.
 """,
     'depends' : [
         'sale_order_dates',
-        'of_account_fec'
+        'of_account_fec',
+        'of_planning',
     ],
     'data' : [
         'views/of_zz_1_views.xml',

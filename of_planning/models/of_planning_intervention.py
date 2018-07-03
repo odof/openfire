@@ -393,6 +393,10 @@ class OfPlanningIntervention(models.Model):
         }
 
     @api.multi
+    def _get_invoicing_company(self, partner):
+        return self.company_id or partner.company_id
+
+    @api.multi
     def _prepare_invoice(self):
         self.ensure_one()
 
@@ -432,7 +436,7 @@ class OfPlanningIntervention(models.Model):
             line_account = tax.map_account(line_account)
 
         pricelist = partner.property_product_pricelist
-        company = self.company_id or partner.company_id
+        company = self._get_invoicing_company(partner)
         from_currency = company.currency_id
 
         if pricelist.discount_policy == 'without_discount':
