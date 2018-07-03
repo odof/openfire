@@ -5,12 +5,12 @@
     'author': 'OpenFire',
     'version': '10.0.1.0.0',
     'category': 'OpenFire modules',
-    'summary': 'Obligations légales Européenne',
+    'summary': 'Obligations légales européennes',
     'license': '',
     'description': """
 Module qui implèmente les obligations légales en Europe :
 
-- Ajout des champs nécessaires pour être conforme aux règles de la RGPD (opt-out, date d'autorisation, type d'autorisation)
+- Partenaires : ajout des champs d'autorisation d'utilisation des données personnelles (RGPD)
     """,
     'website': 'openfire.fr',
     'depends': [
