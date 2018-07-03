@@ -9,8 +9,8 @@ class ResPartner(models.Model):
     of_accord_communication = fields.Boolean(string=u"Autorise recevoir communication")
     of_date_accord_communication = fields.Date(string=u"Date de l'autorisation")
     of_preuve_accord_communication = fields.Text(string=u"Preuve autorisation")
-    # On redéfinit le champ opt_out pour le mettre en champ calculé (inverse de of_accord_communication
-    opt_out = fields.Boolean('Opt-Out', compute='_compute_opt_out',
+    # On redéfinit le champ opt_out pour le mettre en champ calculé (inverse de of_accord_communication).
+    opt_out = fields.Boolean('Opt-out', compute='_compute_opt_out',
         help="If opt-out is checked, this contact has refused to receive emails for mass mailing and marketing campaign. "
         "Filter 'Available for Mass Mailing' allows users to filter the partners when performing mass mailing.")
 
