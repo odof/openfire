@@ -26,10 +26,82 @@ class AccountInvoice(models.Model):
             date_invoice = fields.Date.context_today(self)
         if not self.payment_term_id:
             # Quand pas de condition de règlement définie
-            if (param_date_due and not self.date_due) or  not param_date_due:  # On rajoute la vérification pour permettre de modifier manuellement la date d'échéance.
+            if (param_date_due and not self.date_due) or not param_date_due:  # On rajoute la vérification pour permettre de modifier manuellement la date d'échéance.
                 self.date_due = self.date_due or self.date_invoice
         else:
             pterm = self.payment_term_id
             pterm_list = pterm.with_context(currency_id=self.company_id.currency_id.id).compute(value=1, date_ref=date_invoice)[0]
             if (param_date_due and not self.date_due) or not param_date_due:  # On rajoute la vérification pour permettre de modifier manuellement la date d'échéance.
                 self.date_due = max(line[0] for line in pterm_list)
+
+class AccountAccount(models.Model):
+    _inherit = "account.account"
+
+    of_account_counterpart_id = fields.Many2one('account.account', string="Compte de contrepartie")
+
+class AccountMoveLine(models.Model):
+    _inherit = "account.move.line"
+
+    @api.model
+    def default_get(self, fields_list):
+        def get_line_account(line):
+            account_id = line['account_id']
+            if not account_id:
+                return False
+            if isinstance(account_id, tuple):
+                # Si la ligne existe en db account_id vaut (id, name), sinon c'est un id simple
+                account_id = account_id[0]
+            return account_obj.browse(account_id)
+        journal_obj = self.env['account.journal']
+        account_obj = self.env['account.account']
+
+        result = super(AccountMoveLine, self).default_get(fields_list)
+
+        lines = self._context.get('line_ids')
+        journal_id = self._context.get('journal_id')
+        if not journal_id or not lines:
+            return result
+
+        lines = self.env['account.move'].resolve_2many_commands('line_ids', lines, ('account_id', 'debit', 'credit', 'date_maturity'))
+        journal = journal_obj.browse(journal_id)
+        if journal.type == 'bank':  # pièce comptable de banque
+            if len(lines) == 1:
+                account = get_line_account(lines[0])
+                if account and account.user_type_id.type in ('payable', 'receivable'):
+                    if account.user_type_id.type == 'payable':
+                        account = journal.default_credit_account_id
+                    else:
+                        account = journal.default_debit_account_id
+                    result.update({
+                        'account_id': account and account.id or False,
+                        'debit': lines[0]['credit'],
+                        'credit': lines[0]['debit'],
+                        'date_maturity': lines[0]['date_maturity'],
+                    })
+        elif journal.type == 'purchase':  # pièce comptable fournisseur
+            tax_type = 'purchase'
+            len_lines = len(lines)
+            if len_lines in (1, 2):
+                # resolve_2many_commands ne préserve pas l'ordre des lignes
+                # Le nouvel est ordre est [nouvelles lignes (code 0), autres lignes (déjà en DB)]
+                # L'ordre est conservé à l'intérieur de ces deux sous-sections
+                if lines[-1].get('id') and self._context['line_ids'][-1][0] == 0:
+                    lines = lines[::-1]
+
+                account = get_line_account(lines[-1])
+                if account:
+                    for tax in (account.of_account_counterpart_id.tax_ids if len_lines == 1 else account.tax_ids):
+                        if tax.type_tax_use == tax_type:
+                            break
+                    else:
+                        tax = False
+                    if tax or len_lines == 1:
+                        tax_amount = tax and tax.amount or 0
+                        account = account.of_account_counterpart_id if len_lines == 1 else tax.account_id
+                        result.update({
+                            'account_id': account and account.id or False,
+                            'debit': lines[0]['credit'] / (100 + tax_amount) * (100 if len_lines == 1 else tax_amount),
+                            'credit': lines[0]['debit'] / (100 + tax_amount) * (100 if len_lines == 1 else tax_amount),
+                            'date_maturity': lines[0]['date_maturity'],
+                        })
+        return result
