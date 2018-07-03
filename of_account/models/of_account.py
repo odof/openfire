@@ -64,7 +64,7 @@ class AccountMoveLine(models.Model):
 
         lines = self.env['account.move'].resolve_2many_commands('line_ids', lines, ('account_id', 'debit', 'credit', 'date_maturity'))
         journal = journal_obj.browse(journal_id)
-        if journal.type == 'bank':  # pièce comptable de banque
+        if journal.type in ('bank', 'cash'):  # pièce comptable de banque ou de caisse
             if len(lines) == 1:
                 account = get_line_account(lines[0])
                 if account and account.user_type_id.type in ('payable', 'receivable'):
