@@ -2,7 +2,8 @@
 
 {
     'name' : 'OpenFire Payment Bank Deposit',
-    'version' : '10.0',
+    'author': 'OpenFire',
+    'version' : '10.0.1.0.0',
     'summary': 'Allow bank deposit',
     'description': """
 OpenFire Payment Bank Deposit

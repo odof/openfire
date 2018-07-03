@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
@@ -22,7 +22,7 @@ class OfAccountPaymentBankDeposit(models.Model):
     move_id = fields.Many2one('account.move', 'Account move', readonly=True, ondelete='restrict')
     state = fields.Selection([('draft', 'Unposted'), ('posted', 'Posted')], string='Status',
                              required=True, readonly=True, copy=False, default='draft')
-    journal_id = fields.Many2one('account.journal', 'Journal', required=True)
+    journal_id = fields.Many2one('account.journal', 'Journal', required=True, domain="[('type', 'in', ('cash', 'bank'))]")
 
     _order = 'date DESC'
 
