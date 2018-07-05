@@ -25,13 +25,16 @@
                 <group style="margin-top: 0px; margin-bottom: 0px;">
                     <group>
                         <field name="mode2"/>
-                        <field name="distance_in_top_view" attrs="{'invisible':[('mode2','!=','distance_top_view')]}"/>
-                        <field name="distance_in_road" attrs="{'invisible':[('mode2','!=','distance_by_road')]}"/>
-                        <field name="time_in_road" attrs="{'invisible':[('mode2','!=','time_by_road')]}"/>
+                        <field name="epicenter"/>
+                        <field name="client_id" attrs="{'invisible':[('epicenter','!=','client_address')]}"/>
+                        <field name="distance2" attrs="{'invisible':[('mode2','=','time_by_road')]}"/>
+                        <field name="time2" widget="float_time" attrs="{'invisible':[('mode2','!=','time_by_road')]}"/>
                     </group>
                     <group>
                         <field name="date_recherche_debut"/>
                         <field name="date_recherche_fin"/>
+                        <field name="epi_lat"/>
+                        <field name="epi_lng"/>
                     </group>
                 </group>
 
