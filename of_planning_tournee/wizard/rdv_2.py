@@ -15,6 +15,13 @@ NEW_RES_MODES = [
     ('time_by_road', u'Temps de trajet'),
 ]
 
+EPICENTERS = [
+    ('team_start_address', u"Adresse départ equipe"),
+    ('company_address', u"Adresse société"),
+    ('client_address', u'Adresse client'),
+    ('manual', u'Autre'),
+]
+
 class OfTourneeRdv2(models.TransientModel):
     _name = 'of.tournee.rdv2'
     _description = u'Prise de RDV dans les tournées (v2)'
@@ -68,18 +75,40 @@ class OfTourneeRdv2(models.TransientModel):
     partner_id = fields.Many2one('res.partner', string='Client', required=True, readonly=True, default=_default_partner)
     partner_address_id = fields.Many2one('res.partner', string="Adresse d'intervention", required=True, default=_default_address,
                                          domain="['|', ('id', '=', partner_id), ('parent_id', '=', partner_id)]")
-    service_id = fields.Many2one('of.service', string='Service client', default=_default_service,
-                                 domain="[('partner_id', '=', partner_id)]")
+    service_id = fields.Many2one('of.service', string='Service client', default=_default_service, domain="[('partner_id', '=', partner_id)]")
 
     # New fields (only of.tourner.rdv2)
-    mode2 = fields.Selection(NEW_RES_MODES, string="Mode de recherche", required=True, default="distance_top_view")
-    date_recherche_debut = fields.Date(string='Date debut', required=True, default=lambda *a: (date.today()).strftime('%Y-%m-%d'))
-    date_recherche_fin = fields.Date(string='Date fin', required=True, default=lambda *a: (date.today() + timedelta(days=15)).strftime('%Y-%m-%d'))
-    distance_in_top_view = fields.Float(string=u'Distance aérienne', digits=(8, 2), required=True, default=10, help=u'Éloignement maximum en ligne droite (km)')
-    distance_in_road = fields.Float(string=u'Distance par route', digits=(8, 2), required=True, default=10, help=u'Éloignement maximum par route (km)')
-    time_in_road = fields.Float(string=u"Temps par route", required=True, default=10, help=u"Temps maximum par route")
-    date_r = fields.Date(string="date r")
+    mode2 = fields.Selection(NEW_RES_MODES, string=u"Mode", required=True, default="distance_top_view")
+    date_recherche_debut = fields.Date(string=u"Date debut", required=True, default=lambda *a: (date.today()).strftime('%Y-%m-%d'))
+    date_recherche_fin = fields.Date(string=u'Date fin', required=True, default=lambda *a: (date.today() + timedelta(days=15)).strftime('%Y-%m-%d'))
+    distance2 = fields.Float(string=u'Distance', digits=(8, 2), required=True, default=10, help=u'Éloignement maximum (km)')
+    time2 = fields.Float(string=u"Temps", required=True, default=10, help=u"Temps maximum par route")
+    epicenter = fields.Selection(EPICENTERS, string=u"Épicentre", required=True, default="team_start_address")
+    epi_lat = fields.Float(string='Épi Lat', digits=(8, 8))
+    epi_lng = fields.Float(string='Épi Lng', digits=(8, 8))
+    epi_client = fields.Char(string=u"Épicentre client")
+    client_id = fields.Many2one('res.partner', string='Client')
+    #date_r = fields.Date(string="date r")
 
+    @api.onchange('epicenter', 'equipe_id_pre', 'client_id')
+    def _onchange_epi_address(self):
+        if self.epicenter == 'team_start_address':
+            if self.equipe_id_pre:
+                if self.equipe_id_pre.address_id.geo_lat and self.equipe_id_pre.address_id.geo_lng:
+                    self.epi_lat = self.equipe_id_pre.address_id.geo_lat
+                    self.epi_lng = self.equipe_id_pre.address_id.geo_lng
+                else:
+                    raise UserError(u"L'équipe sélectionnée n'a pas de coordonnées GPS")
+        if self.epicenter == 'company_address':
+            if self.partner_id.company_id.geo_lat and self.partner_id.company_id.geo_lng:
+                self.epi_lat = self.partner_id.company_id.geo_lat
+                self.epi_lng = self.partner_id.company_id.geo_lng
+            else:
+                raise UserError(u"La société n'a pas de coordonnées GPS")
+        if self.epicenter == 'client_address':
+            #self.client_id.
+            pass
+    
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
         service_obj = self.env['of.service']
@@ -89,8 +118,7 @@ class OfTourneeRdv2(models.TransientModel):
                 if self.service_id.tache_id.id == self.tache_id.id:
                     services = True
                 else:
-                    services = service_obj.search([('partner_id', '=', self.partner_id.id),
-                                                   ('tache_id', '=', self.tache_id.id)], limit=1)
+                    services = service_obj.search([('partner_id', '=', self.partner_id.id),('tache_id', '=', self.tache_id.id)], limit=1)
                     if services:
                         self.service_id = services
 
@@ -123,6 +151,12 @@ class OfTourneeRdv2(models.TransientModel):
 class OfTourneeRdvLine2(models.TransientModel):
     _name = 'of.tournee.rdv.line2'
     _description = u"Propositions des RDVs (v2)"
+
+
+
+
+
+
 
     @api.depends()
     def _calc_distances(self):
