@@ -882,11 +882,15 @@ class OfImport(models.Model):
                                 else:
                                     brand = res_objet and res_objet.brand_id
 
-                                if brand and brand.prefix:
-                                    prefixe = brand.prefix + '_'
-                                    # Le préfixe n'est ajouté que s'il n'est pas déjà appliqué (e.g. avec un export/import)
-                                    if not valeur.startswith(prefixe):
-                                        valeur = prefixe + valeur
+                                if brand:
+                                    prefixe = brand.code + '_'
+                                    if brand.use_prefix:
+                                        # Le préfixe n'est ajouté que s'il n'est pas déjà appliqué (e.g. avec un export/import)
+                                        if not valeur.startswith(prefixe):
+                                            valeur = prefixe + valeur
+                                    else:
+                                        if valeur.startswith(prefixe):
+                                            valeur = valeur[len(prefixe):]
 
                                 # la référence de l'article est transférée dans les informations fournisseur
                                 valeurs['of_seller_product_code'] = valeur
@@ -1036,7 +1040,7 @@ class OfImport(models.Model):
 
             # L'import de tarif nécessite l'existence de la marque associée aux articles
             if self.prefixe:
-                default_brand = self.env['of.product.brand'].search([('prefix', '=', self.prefixe.rstrip('_'))])
+                default_brand = self.env['of.product.brand'].search([('code', '=', self.prefixe.rstrip('_'))])
                 if default_brand:
                     model_data['default_brand_id'] = default_brand.id
                     if default_brand.partner_id:

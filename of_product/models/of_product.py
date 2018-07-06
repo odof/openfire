@@ -18,7 +18,7 @@ class ProductTemplate(models.Model):
     company_id = fields.Many2one(default=False)
 
     # Ajout de la catégorie d'udm pour permettre de filtrer les udms d'achat autorisées
-    of_uom_category_id = fields.Many2one(related='uom_id.category_id')
+    of_uom_category_id = fields.Many2one(related='uom_id.category_id', readonly=True)
     uom_po_id = fields.Many2one(domain="[('category_id', '=', of_uom_category_id)]")
     # Ajout de champs copiés de l'udm de vente pour affichage
     of_uom_po_id_display = fields.Many2one(related='uom_po_id', readonly=True)
