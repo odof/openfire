@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <report id="of_account_payment_bank_deposit_report"
+        string="Bordereau de remise en banque"
+        model="of.account.payment.bank.deposit"
+        report_type="qweb-pdf"
+        name="of_account_payment_bank_deposit.of_bordereau_remise_en_banque">
+    </report>
+
+    <template id="of_bordereau_remise_en_banque">
+        <t t-call="report.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="report.internal_layout">
+                    <div class="page">
+                        <div style="margin-bottom: 8px"><strong>Bordereau de remise en banque</strong></div>
+                        <div class="row" style="border: 1px solid lightgray; margin-bottom: 12px">
+                            <div class="col-xs-12" style="display: table; padding: 0px;">
+                                <div style="display: table-cell; width: 50%; border-bottom: 1px solid lightgray;">
+                                    <div class="h5" style="padding: 0px 16px;">
+                                        <t t-if="o.name">
+                                            <div style="margin-bottom: 4px"><strong>Numéro&amp;nbsp;:</strong> <span t-field="o.name"/></div>
+                                        </t>
+                                        <t t-if="o.date">
+                                            <div><strong>Date remise&amp;nbsp;:</strong> <span t-field="o.date"/></div>
+                                        </t>
+                                    </div>
+                                </div>
+                                <div style="display: table-cell; width: 50%; border-left: 1px solid lightgray; border-bottom: 1px solid lightgray;">
+                                    <div>
+                                        <div class="h5" style="padding: 0px 16px;">
+                                            <t t-if="o.journal_id">
+                                                <div style="margin-bottom: 4px"><strong>Journal&amp;nbsp;:</strong> <span t-field="o.journal_id"/></div>
+                                            </t>
+                                            <t t-if="o.move_id">
+                                                <div><strong>Pièce comptable&amp;nbsp;:</strong> <span t-field="o.move_id"/></div>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12" style="display: table">
+                                <t t-if="o.payment_ids">
+                                    <table class="table table-condensed" style="margin-top: 8px; margin-bottom: 0px">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Mode de paiement</th>
+                                                <th>Numéro</th>
+                                                <th>Client</th>
+                                                <th class="text-right">Montant</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="o.payment_ids" t-as="p">
+                                                <tr>
+                                                    <td><span t-field="p.payment_date"/></td>
+                                                    <td><span t-field="p.of_payment_mode_id"/></td>
+                                                    <td><span t-field="p.name"/></td>
+                                                    <td><span t-field="p.partner_id"/></td>
+                                                    <td class="text-right"><span t-field="p.amount"/></td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                    <div class="text-right" style="margin-top: 2px; margin-bottom: 8px;">
+                                        <strong>Total&amp;nbsp;:</strong>
+                                        <span t-esc="sum(o.payment_ids.mapped('amount'))"/>
+                                        <span style="margin-right: 5px;"> €</span>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>
