@@ -67,28 +67,30 @@ class of_log_paiement(models.Model):
         return True
 
 
-class account_payment(models.Model):
+class AccountPayment(models.Model):
     _name = "account.payment"
     _inherit = "account.payment"
 
+    active = fields.Boolean(string="Active", default=True)
+
     @api.multi
     def write(self, vals):
-        res = super(account_payment, self).write(vals)
-	# On ignore les (nombreux) appels à write avec vals vide et quand il s'agit uniquement unemodification du lettrage (vals avec une seule clé 'invoice_ids')
+        res = super(AccountPayment, self).write(vals)
+        # On ignore les (nombreux) appels à write avec vals vide et quand il s'agit uniquement une modification du lettrage (vals avec une seule clé 'invoice_ids')
         if vals and not (len(vals) == 1 and 'invoice_ids' in vals):
             user_name = self.env.user.name or ''
             # On récupère les paiements qui ont été modifiés.
             paiements = self.env['account.payment'].browse(self._ids)
             # On les parcourt un par un.
             for paiement in paiements:
-		# On récupère l'état du paiement lors de sa dernière modification.
+                # On récupère l'état du paiement lors de sa dernière modification.
                 self._cr.execute(u"SELECT state from of_log_paiement WHERE paiement_id = %s ORDER BY id DESC LIMIT 1", (paiement.id,))
                 state_avant = self._cr.fetchone()
                 if state_avant:
                     state_avant = state_avant[0]
                 else:
                     state_avant = ''
-		# On n'enregistre les traces de modification du paiement que si passe de brouillon à validé ou l'inverse (on ignore les modifications quand est en brouillon).
+                # On n'enregistre les traces de modification du paiement que si passe de brouillon à validé ou l'inverse (on ignore les modifications quand est en brouillon).
                 if state_avant == 'posted' or paiement.state == 'posted':
                     self._cr.execute(u"INSERT INTO of_log_paiement (create_uid, user_name, create_date, paiement_id, payment_date, partner_id, partner_name, payment_reference, payment_type, amount, state, name, communication, of_payment_mode_id, of_payment_mode_name, company_id, company_name)\
                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (self._uid, user_name, time.strftime('%Y-%m-%d %H:%M:%S'), paiement.id, paiement.payment_date, paiement.partner_id.id, paiement.partner_id.name or '', paiement.payment_reference or '', paiement.payment_type or '', paiement.amount, paiement.state or '', paiement.name or '', paiement.communication or '', paiement.of_payment_mode_id.id, paiement.of_payment_mode_id.name or '', paiement.company_id.id, paiement.company_id.name or ''))
@@ -98,6 +100,15 @@ class account_payment(models.Model):
     def unlink(self):
         raise UserError(_(u"Vous ne pouvez pas supprimer un paiement.\nVous pouvez seulement le laisser en brouillon."))
 
+    # Il y a un onchange dans payment.type qui change de manière non voulue la valeur du type de partenaire
+    # dans le formulaire du nouveau paiement.
+    # Fonction qui résoud ce problème.
+    @api.onchange('payment_type')
+    def _onchange_payment_type(self):
+        res = super(AccountPayment, self)._onchange_payment_type()
+        if 'of_default_partner_type' in self._context:
+            self.partner_type = self._context['of_default_partner_type']
+        return res
 
 class ir_module_module(models.Model):
     _name = "ir.module.module"
