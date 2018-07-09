@@ -13,14 +13,15 @@ class OfProductBrandAddProducts(models.TransientModel):
         self.ensure_one()
         if self.product_ids:
             # Set products' new brand_id
+            old_prefix_product_ids = {}
+            for product in self.product_ids:
+                old_prefix = product.brand_id and product.brand_id.use_prefix and product.brand_id.code or ''
+                if old_prefix in old_prefix_product_ids:
+                    old_prefix_product_ids[old_prefix] = product
+                else:
+                    old_prefix_product_ids[old_prefix] += product
+
             self.product_ids.write({'brand_id': self.brand_id.id})
 
-            # Change products' default_code to fit brand required prefix
-            product_prefix = self.brand_id.prefix + "_"
-            for product in self.product_ids:
-                for variant in product.product_variant_ids:
-                    if variant.default_code.startswith(product_prefix):
-                        continue
-                    ind = variant.default_code.find("_")
-                    variant.default_code = product_prefix + variant.default_code[ind+1:]
-        return True
+            for old_prefix, products in old_prefix_product_ids.iteritems():
+                self.brand_id.update_products_default_code(products, remove_previous_prefix=old_prefix)

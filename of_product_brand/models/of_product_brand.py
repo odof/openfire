@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 
 class OfProductBrand(models.Model):
     _name = 'of.product.brand'
 
     name = fields.Char(string='Name', required=True)
-    prefix = fields.Char(string='Prefix', required=True)
+    code = fields.Char(string='Code', required=True, oldname='prefix')
+    use_prefix = fields.Boolean(string="Use code as prefix", default=True, help="The products internal references will be prefixed with the brand code")
     partner_id = fields.Many2one('res.partner', string='Supplier', domain=[('supplier', '=', True)], required=True)
     product_ids = fields.One2many('product.template', 'brand_id', string='Products', readonly=True)
     product_variant_ids = fields.One2many('product.product', 'brand_id', string='Product variants', readonly=True)
@@ -16,6 +18,7 @@ class OfProductBrand(models.Model):
         '# Products', compute='_compute_product_count',
         help="The number of products of this brand")
     note = fields.Text(string='Notes')
+    product_change_warn = fields.Boolean(compute="_compute_product_change_warn")
 
     def _compute_product_count(self):
         read_group_res = self.env['product.template'].read_group([('brand_id', 'in', self.ids)], ['brand_id'], ['brand_id'])
@@ -23,42 +26,92 @@ class OfProductBrand(models.Model):
         for categ in self:
             categ.product_count = group_data.get(categ.id, 0)
 
+    @api.depends('code', 'use_prefix')
+    def _compute_product_change_warn(self):
+        brand_orig = getattr(self, '_origin', False)
+        for brand in self:
+            warn = False
+            if brand_orig and brand_orig.product_ids:
+                if brand.use_prefix != brand_orig.use_prefix:
+                    warn = True
+                elif brand.use_prefix and brand.code != brand_orig.code:
+                    warn = True
+            brand.product_change_warn = warn
+
     _sql_constraints = [
-        ('prefix', 'unique(prefix)', "Another brand already exists with this prefix"),
+        ('code', 'unique(code)', "Another brand already exists with this code"),
     ]
 
     @api.model
     def create(self, vals):
         res = super(OfProductBrand, self).create(vals)
-        products = self.env['product.product'].search([('default_code', '=like', vals['prefix'] + r'\_%')])
-        products.write({'brand_id': res.id})
+        if res.use_prefix:
+            product_obj = self.env['product.product'].with_context(active_test=False)
+            products = product_obj.search([('default_code', '=like', vals['code'] + r'\_%')])
+            products.write({'brand_id': res.id})
         return res
 
     @api.multi
     def write(self, vals):
-        if len(self._ids) == 1:
-            new_self = self.with_context(active_test=False)
-            if 'prefix' in vals:
-                # Reset products link to this brand
-                new_products = new_self.env['product.product'].search([('default_code', '=like', vals['prefix'] + r'\_%')])
-                vals['product_variant_ids'] = [(6, 0, list(new_products._ids))]
-        return super(OfProductBrand, self).write(vals)
+        previous_code = self and self.code
+        super(OfProductBrand, self).write(vals)
+        if 'use_prefix' in vals or (self.use_prefix and 'code' in vals):
+            self.update_products_default_code(remove_previous_prefix=previous_code)
+        return True
+
+    @api.multi
+    def update_products_default_code(self, products=False, remove_previous_prefix=False):
+        """ Update products default_code according to brand values.
+        @var self: Unique brand or empty browse record
+        @var products: if not False, restrict update to these products
+        @type products: browse records of product.product or of product.template or False
+        @var remove_previous_prefix: remove previously exiting prefix. Can be set to True or to a specific string prefix
+        @type remove_previous_prefix: boolean or string
+        """
+        if self:
+            self.ensure_one()
+            if products is False:
+                products = self.with_context(active_test=False).product_variant_ids
+            product_prefix = self.code + "_"
+        if remove_previous_prefix and isinstance(remove_previous_prefix, basestring) and not remove_previous_prefix.endswith('_'):
+            remove_previous_prefix += '_'
+        for product in products:
+            default_code = product.default_code or ''  # update_products_default_code() can be called from onchange, when default_code is not already filled
+            if remove_previous_prefix:
+                if isinstance(remove_previous_prefix, basestring):
+                    if default_code.startswith(remove_previous_prefix):
+                        default_code = default_code[len(remove_previous_prefix):]
+                else:
+                    # This part is dangerous as it may erase a part of the product default_code
+                    ind = default_code.find("_")
+                    default_code = default_code[ind+1:]
+            if self and default_code.startswith(product_prefix) != self.use_prefix:
+                if self.use_prefix:
+                    default_code = product_prefix + default_code
+                else:
+                    # @todo: is this part usefull?
+                    default_code = product.default_code[len(product_prefix):]
+            if product.default_code != default_code:
+                product.default_code = default_code
+
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     brand_id = fields.Many2one('of.product.brand', string='Brand', required=True)
     of_seller_name = fields.Many2one(related="seller_ids.name")
+    of_previous_brand_id = fields.Many2one('of.product.brand', compute='_compute_of_previous_brand_id')
+
+    # dependancy on default_code to prevent recomputing it before _onchange_brand_id call
+    @api.depends('default_code')
+    def _compute_of_previous_brand_id(self):
+        for product in self:
+            product.of_previous_brand_id = product.brand_id
 
     @api.onchange('brand_id')
     def _onchange_brand_id(self):
-        # Ajout du préfixe de la marque sur l'article
-        default_code = self.default_code or ''
-        ind = default_code.find('_')
-        prefix = self.brand_id and self.brand_id.prefix + '_' or ''
-        default_code = prefix + default_code[ind+1:]
-        if self.default_code != default_code:
-            self.default_code = default_code
+        # Mise à jour du préfixe de la marque sur l'article
+        self.brand_id.update_products_default_code(products=self, remove_previous_prefix=self.of_previous_brand_id.code)
 
         # Création de la relation fournisseur
         if self.brand_id and not self.seller_ids:
@@ -72,33 +125,101 @@ class ProductTemplate(models.Model):
     def _onchange_default_code(self):
         if self.default_code:
             ind = self.default_code.find('_')
-            prefix = self.default_code[:ind]
-            brand = self.env['of.product.brand'].search([('prefix', '=', prefix)])
-            if brand != self.brand_id:
-                self.brand_id = brand
+            code = self.default_code[:ind]
+            brand = self.env['of.product.brand'].search([('code', '=', code)])
+            if brand:
+                if brand != self.brand_id:
+                    self.brand_id = brand
+            else:
+                if self.brand_id.use_prefix:
+                    self.brand_id = False
 
     @api.model
-    def create(self, vals):
-        # Code copié depuis le module product
-        # Permet l'attribution de la marque à la création de l'article
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        brand_obj = self.env['of.product.brand']
+        brands = brand_obj.browse()
+        elems = []
+        for elem in name.split(" "):
+            if elem.startswith('m:') or elem.startswith('M:'):
+                code = elem[2:]
+                if not code:
+                    continue
+                b = brand_obj.search([('code', '=', code)])
+                if not b:
+                    b = brand_obj.search[('name', '=ilike', code)]
+                    if not b:
+                        b = brand_obj.search([('name', 'ilike', code)])
+                if b:
+                    brands += b
+            else:
+                elems.append(elem)
+        name = " ".join(elems)
+        if brands:
+            args = [('brand_id', 'in', brands._ids)] + args
+        return super(ProductTemplate, self).name_search(name, args, operator, limit)
 
-        # La marque est un champ obligatoire, qui doit donc être renseigné avant la création de l'article
-        self = self.with_context(default_brand_id=vals.get('brand_id', False))
-        template = super(ProductTemplate, self).create(vals)
-
-        # This is needed to set given values to first variant after creation
-        related_vals = {}
-        if vals.get('brand_id') and template.brand_id.id != vals['brand_id']:
-            related_vals['brand_id'] = vals['brand_id']
-        if related_vals:
-            template.write(related_vals)
-        return template
 
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
-    brand_id = fields.Many2one('of.product.brand', string='Brand', related='product_tmpl_id.brand_id', store=True, required=True)
-    # @todo: Make it work with variants
+    @api.constrains('default_code', 'brand_id', 'product_tmpl_id')
+    def check_used_default_code(self):
+        for product in self:
+            if not product.default_code:
+                continue
+            if self.search([('default_code', '=', product.default_code), ('brand_id', '=', product.brand_id.id), ('product_tmpl_id', '!=', product.product_tmpl_id.id)]):
+                raise ValidationError(_('Product reference must be unique per brand !\nReference : %s') % product.default_code)
+
+    @api.onchange('brand_id')
+    def _onchange_brand_id(self):
+        # Mise à jour du préfixe de la marque sur l'article
+        self.brand_id.update_products_default_code(products=self, remove_previous_prefix=self.of_previous_brand_id.code)
+
+        # Création de la relation fournisseur
+        if self.brand_id and not self.seller_ids:
+            seller_data = {
+                'name': self.brand_id.partner_id.id,
+            }
+            seller_data = self.env['product.supplierinfo']._add_missing_default_values(seller_data)
+            self.seller_ids = [(0, 0, seller_data)]
+
+    @api.onchange('default_code')
+    def _onchange_default_code(self):
+        if self.default_code:
+            ind = self.default_code.find('_')
+            code = self.default_code[:ind]
+            brand = self.env['of.product.brand'].search([('code', '=', code)])
+            if brand:
+                if brand != self.brand_id:
+                    self.brand_id = brand
+            else:
+                if self.brand_id.use_prefix:
+                    self.brand_id = False
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        brand_obj = self.env['of.product.brand']
+        brands = brand_obj.browse()
+        elems = []
+        for elem in name.split(" "):
+            if elem.startswith('m:') or elem.startswith('M:'):
+                code = elem[2:]
+                if not code:
+                    continue
+                b = brand_obj.search([('code', '=ilike', code)])
+                if not b:
+                    b = brand_obj.search([('name', '=ilike', code)])
+                    if not b:
+                        b = brand_obj.search([('name', '=ilike', code + '%')])
+                if b:
+                    brands += b
+            else:
+                elems.append(elem)
+        name = " ".join(elems)
+        if brands:
+            args = [('brand_id', 'in', brands._ids)] + args
+        return super(ProductProduct, self).name_search(name, args, operator, limit)
+
 
 class Partner(models.Model):
     _inherit = 'res.partner'
