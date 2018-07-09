@@ -18,11 +18,6 @@ Certification logiciel de caisse :
         'of_base',
         'account_reversal'
     ],
-    "init_xml" : [ ],
-    "demo_xml" : [ ],
-    'css' : [
-        "static/src/css/of_planning.css",
-    ],
     "update_xml" : [
         'report/of_l10n_fr_certification_report_view.xml',
         'views/of_l10n_fr_certification_report_wizard_view.xml',

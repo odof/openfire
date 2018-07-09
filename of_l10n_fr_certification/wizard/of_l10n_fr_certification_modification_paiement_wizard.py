@@ -90,7 +90,9 @@ class OFAccountPaymentWizard(models.TransientModel):
 
                 if payment.state in ['draft']:  # Si paiement déjà en brouillon, pas la peine de passer par une contrepartie comptable pour modifier le paiement.
                     raise UserError(_(u"Le paiement est en brouillon (non validé en comptabilité). Vous pouvez le modifier directement sans faire une extourne comptable."))
-                if bool(payment.of_deposit_id) and self.type_modification_payment != 'refund':
+                # On vérifie si le module OF remise en banque (of_account_payment_bank_deposit) est installé (existence du champ of_deposit_id).
+                # Si oui, on vérifie que le paiement n'est pas remis en banque.
+                if getattr(payment, 'of_deposit_id', False) and self.type_modification_payment != 'refund':
                     raise UserError(_(u"Le paiement a été remis en banque. Vous ne pouvez pas modifier ou annuler un paiement remis en banque."))
                 if payment.has_invoices:
                     raise UserError(_(u"Le paiement est lié à une facture (lettrage). Vous ne pouvez modifier/annuler/rembourser un paiement que s'il n'est pas lettré. Annulez auparavant le lien entre la facture et le paiement pour pouvoir modifier ce paiement."))
@@ -105,7 +107,6 @@ class OFAccountPaymentWizard(models.TransientModel):
                     for move in payment.move_line_ids.mapped('move_id'):
                         rev_move = move.create_reversals()
                         rev_move.ref = form.description or move.name
-                    # Et on met le paiement en brouillon.
                     payment.active = False
                     return self.env['of.popup.wizard'].popup_return(u"Le paiement a bien été annulé avec une extourne comptable.", u"Annulation paiement")
 

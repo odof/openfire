@@ -66,8 +66,12 @@
         <field name="arch" type="xml">
             <xpath expr="//button[@name='post']" position="after">
                 <button name="%(action_of_certification_annulation)d" string="Rembourser / Annuler / Modifier"
-                    type="action" attrs="{'invisible': [('state', '=', 'draft')]}"/>
+                    type="action" attrs="{'invisible': ['|',('state','=','draft'),('active','=',False)]}"/>
             </xpath>
+            <!-- Pour le domaine du boutton ci-dessus -->
+            <field name="name" position="after">
+                <field name="active" invisible="1"/>
+            </field>
             <form><footer position="replace"><div></div></footer></form>
         </field>
     </record>
