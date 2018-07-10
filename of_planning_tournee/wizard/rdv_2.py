@@ -87,7 +87,10 @@ class OfTourneeRdv2(models.TransientModel):
     epi_lat = fields.Float(string='Épi Lat', digits=(8, 8))
     epi_lng = fields.Float(string='Épi Lng', digits=(8, 8))
     epi_client = fields.Char(string=u"Épicentre client")
-    client_id = fields.Many2one('res.partner', string='Client')
+    client_id = fields.Many2one('res.partner', string='Client', default=_default_partner)
+    new_address = fields.Char(string=u"Adresse", help=u"Entrez l'adresse dans le format : numéro rue code-postal ville.\n Ex.: 22 Avenue Marceau 75008 Paris")
+    new_geo_lat = fields.Float(string='Latitude', digits=(8, 8))
+    new_geo_lng = fields.Float(string='Longitud', digits=(8, 8))
     #date_r = fields.Date(string="date r")
 
     @api.onchange('epicenter', 'equipe_id_pre', 'client_id')
@@ -106,8 +109,15 @@ class OfTourneeRdv2(models.TransientModel):
             else:
                 raise UserError(u"La société n'a pas de coordonnées GPS")
         if self.epicenter == 'client_address':
-            #self.client_id.
+            if self.client_id.geo_lat and self.client_id.geo_lng:
+                self.epi_lat = self.client_id.geo_lat
+                self.epi_lng = self.client_id.geo_lng
+            else:
+                raise UserError(u"Ce client n'a pas n'a pas de coordonnées GPS")
+        if self.epicenter == 'manual':
             pass
+        
+
     
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
