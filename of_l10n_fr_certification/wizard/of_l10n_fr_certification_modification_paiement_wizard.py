@@ -76,7 +76,7 @@ class OFAccountPaymentWizard(models.TransientModel):
             'res_model': 'account.payment',
             'view_type': 'form',
             'view_mode': 'form',
-            'target' : 'new',
+            'target': 'current',
             'view_id': False,
             'context': context,
         }
@@ -95,7 +95,11 @@ class OFAccountPaymentWizard(models.TransientModel):
                 if getattr(payment, 'of_deposit_id', False) and self.type_modification_payment != 'refund':
                     raise UserError(_(u"Le paiement a été remis en banque. Vous ne pouvez pas modifier ou annuler un paiement remis en banque."))
                 if payment.has_invoices:
-                    raise UserError(_(u"Le paiement est lié à une facture (lettrage). Vous ne pouvez modifier/annuler/rembourser un paiement que s'il n'est pas lettré. Annulez auparavant le lien entre la facture et le paiement pour pouvoir modifier ce paiement."))
+                    raise UserError(_(u"Le paiement est lié à une facture (lettrage). Vous ne pouvez modifier ou annuler un paiement que s'il n'est pas lettré. Annulez auparavant le lien entre la facture et le paiement pour pouvoir modifier ce paiement."))
+                # On vérifie s'il n'y a pas un autre lettrage.
+                for move_line in payment.move_line_ids:
+                    if move_line.reconciled:
+                        raise UserError(_(u"Le paiement est lettré. Vous ne pouvez modifier ou annuler qu'un paiement qui n'est pas lettré."))
 
                 # Remboursement
                 if self.type_modification_payment == 'refund':
@@ -105,7 +109,7 @@ class OFAccountPaymentWizard(models.TransientModel):
                 if self.type_modification_payment == 'cancel':
                     # Pour annuler le paiement, on crée une contrepartie comptable. 
                     for move in payment.move_line_ids.mapped('move_id'):
-                        rev_move = move.create_reversals()
+                        rev_move = move.create_reversals(reconcile=True)
                         rev_move.ref = form.description or move.name
                     payment.active = False
                     return self.env['of.popup.wizard'].popup_return(u"Le paiement a bien été annulé avec une extourne comptable.", u"Annulation paiement")
@@ -113,7 +117,7 @@ class OFAccountPaymentWizard(models.TransientModel):
                 # Modification
                 if self.type_modification_payment == 'modify':
                     for move in payment.move_line_ids.mapped('move_id'):
-                        rev_move = move.create_reversals()
+                        rev_move = move.create_reversals(reconcile=True)
                         rev_move.ref = form.description or move.name
                     payment.active = False
                     return self.get_action_payment_form(payment, 'modify')

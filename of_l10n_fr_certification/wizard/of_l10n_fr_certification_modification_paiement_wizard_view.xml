@@ -20,7 +20,7 @@
                             Cette fonction annule le paiement d'origine avec écriture de extourne et génère un nouveau paiement brouillon identique et intégralement modifiable.
                          </div>
                          <div attrs="{'invisible':[('type_modification_payment','&lt;&gt;','refund')]}" class="oe_grey" colspan="4">
-                            Cette fonction génère un paiement brouillon destiné à rembourser le client. Ce paiement de remboursement se lettrera automatiquement avec le paiement d'origine après validation.
+                            Cette fonction génère un paiement brouillon destiné à rembourser le client.
                          </div>
                      </group>
                      <group>
