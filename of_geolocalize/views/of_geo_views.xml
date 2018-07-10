@@ -67,19 +67,6 @@
         </field>
     </record>
 
-    <!-- Planifier un intervention -->
-    <record id="of_geo_planifier_intervention" model="ir.ui.view">
-        <field name="name">of.geo.planifier.intervention</field>
-        <field name="model">of.tournee.rdv2</field>
-        <field name="inherit_id" ref="of_planning_tournee.view_res_wizard_new"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='address_new']" position="after">
-                <button name="%(action_regeocode)d" string="Géolocaliser" type="action" style="margin-bottom: 10px;"
-                    class="btn-primary" icon="fa-map-marker" help="Géolocaliser la nouvelle adresse"/>
-            </xpath>
-        </field>
-    </record>
-
     <!-- Partner search view -->
     <record model="ir.ui.view" id="of_view_res_partner_filter">
         <field name="name">of.partner.geocoding.search</field>

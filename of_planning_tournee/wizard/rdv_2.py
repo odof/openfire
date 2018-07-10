@@ -19,7 +19,6 @@ EPICENTERS = [
     ('team_start_address', u"Adresse départ equipe"),
     ('company_address', u"Adresse société"),
     ('client_address', u'Adresse client'),
-    ('manual', u'Autre'),
 ]
 
 class OfTourneeRdv2(models.TransientModel):
@@ -88,10 +87,6 @@ class OfTourneeRdv2(models.TransientModel):
     epi_lng = fields.Float(string='Épi Lng', digits=(8, 8))
     epi_client = fields.Char(string=u"Épicentre client")
     client_id = fields.Many2one('res.partner', string='Client', default=_default_partner)
-    new_address = fields.Char(string=u"Adresse", help=u"Entrez l'adresse dans le format : numéro rue code-postal ville.\n Ex.: 22 Avenue Marceau 75008 Paris")
-    new_geo_lat = fields.Float(string='Latitude', digits=(8, 8))
-    new_geo_lng = fields.Float(string='Longitud', digits=(8, 8))
-    #date_r = fields.Date(string="date r")
 
     @api.onchange('epicenter', 'equipe_id_pre', 'client_id')
     def _onchange_epi_address(self):
@@ -161,11 +156,6 @@ class OfTourneeRdv2(models.TransientModel):
 class OfTourneeRdvLine2(models.TransientModel):
     _name = 'of.tournee.rdv.line2'
     _description = u"Propositions des RDVs (v2)"
-
-
-
-
-
 
 
     @api.depends()

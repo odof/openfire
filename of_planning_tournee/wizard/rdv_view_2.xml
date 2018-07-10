@@ -27,9 +27,6 @@
                         <field name="mode2"/>
                         <field name="epicenter"/>
                         <field name="client_id" attrs="{'invisible':[('epicenter','!=','client_address')]}"/>
-                        <field name="new_address" attrs="{'invisible':[('epicenter','!=','manual')]}" placeholder="Ex.: 22 Avenue Marceau 75008 Paris"/>
-                        <field name="new_geo_lat" attrs="{'invisible':[('epicenter','!=','manual')]}"/>
-                        <field name="new_geo_lat" attrs="{'invisible':[('epicenter','!=','manual')]}"/>
                         <field name="distance2" attrs="{'invisible':[('mode2','=','time_by_road')]}"/>
                         <field name="time2" widget="float_time" attrs="{'invisible':[('mode2','!=','time_by_road')]}"/>
                     </group>
