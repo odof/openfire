@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-20 12:36+0000\n"
-"PO-Revision-Date: 2017-10-20 12:36+0000\n"
+"POT-Creation-Date: 2018-07-09 13:32+0000\n"
+"PO-Revision-Date: 2018-07-09 13:32+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -34,12 +34,12 @@ msgstr "Actif"
 #. module: of_product_brand
 #: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_form_view
 msgid "Add products to brand"
-msgstr "Ajouter des produits à la marque"
+msgstr "Ajouter des articles à la marque"
 
 #. module: of_product_brand
 #: sql_constraint:of.product.brand:0
-msgid "Another brand already exists with this prefix"
-msgstr "Une autre marque existe déjà avec ce préfixe"
+msgid "Another brand already exists with this code"
+msgstr "Une autre marque existe déjà avec ce code"
 
 #. module: of_product_brand
 #: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_search
@@ -47,16 +47,11 @@ msgid "Archived"
 msgstr "Archivé"
 
 #. module: of_product_brand
-#: model:ir.actions.act_window,name:of_product_brand.of_brand_product_action
-#: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_form
-msgid "Products"
-msgstr "Articles"
-
-#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_delivery_carrier_brand_id
 #: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products_brand_id
+#: model:ir.model.fields,field_description:of_product_brand.field_product_product_brand_id
 #: model:ir.model.fields,field_description:of_product_brand.field_product_template_brand_id
 #: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_product_template_search_view
-#: model:ir.model.fields,field_description:of_product_brand.field_product_product_brand_id
 msgid "Brand"
 msgstr "Marque"
 
@@ -74,6 +69,16 @@ msgstr "Marques"
 #: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_form_view
 msgid "Cancel"
 msgstr "Annuler"
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_code
+msgid "Code"
+msgstr "Code"
+
+#. module: of_product_brand
+#: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_kanban
+msgid "Code:"
+msgstr "Code:"
 
 #. module: of_product_brand
 #: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_form_view
@@ -113,19 +118,19 @@ msgstr "ID"
 #: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand___last_update
 #: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products___last_update
 msgid "Last Modified on"
-msgstr "Dernière Modification le"
+msgstr "Dernière modification le"
 
 #. module: of_product_brand
 #: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products_write_uid
 #: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_write_uid
 msgid "Last Updated by"
-msgstr "Dernière mise à jour par"
+msgstr "Mis à jour par"
 
 #. module: of_product_brand
 #: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products_write_date
 #: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_write_date
 msgid "Last Updated on"
-msgstr "Dernière mise à jour le"
+msgstr "Mis à jour le"
 
 #. module: of_product_brand
 #: model:ir.actions.act_window,name:of_product_brand.action_of_product_brand_add_products
@@ -144,9 +149,26 @@ msgid "Name"
 msgstr "Nom"
 
 #. module: of_product_brand
+#: model:ir.ui.view,arch_db:of_product_brand.of_product_vrand_view_order_form
+msgid "Note: When searching for a product, typing \"m:ABC\" will filter products for brand \"ABC\"."
+msgstr "Note: Lorsque vous recherchez un article, taper \"m:ABC\" filtrera les articles de la marque \"ABC\"."
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_note
+msgid "Notes"
+msgstr "Notes"
+
+#. module: of_product_brand
 #: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_form
 msgid "OPE"
 msgstr "OPE"
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_delivery_carrier_of_previous_brand_id
+#: model:ir.model.fields,field_description:of_product_brand.field_product_product_of_previous_brand_id
+#: model:ir.model.fields,field_description:of_product_brand.field_product_template_of_previous_brand_id
+msgid "Of previous brand id"
+msgstr ""
 
 #. module: of_product_brand
 #: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_form
@@ -157,16 +179,6 @@ msgstr "OpenFire"
 #: model:ir.model,name:of_product_brand.model_res_partner
 msgid "Partner"
 msgstr "Partenaire"
-
-#. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_prefix
-msgid "Prefix"
-msgstr "Préfixe"
-
-#. module: of_product_brand
-#: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_kanban
-msgid "Prefix:"
-msgstr "Préfixe:"
 
 #. module: of_product_brand
 #: model:ir.model,name:of_product_brand.model_product_product
@@ -185,13 +197,34 @@ msgid "Product brand"
 msgstr "Marque"
 
 #. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_product_change_warn
+msgid "Product change warn"
+msgstr ""
+
+#. module: of_product_brand
+#: code:addons/of_product_brand/models/of_product_brand.py:170
+#, python-format
+msgid "Product reference must be unique per brand !n"
+"Reference : %s"
+msgstr "La référence article doit être unique par marque !\n"
+"Référence : %s"
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_product_variant_ids
+msgid "Product variants"
+msgstr "Variantes d'articles"
+
+#. module: of_product_brand
+#: model:ir.actions.act_window,name:of_product_brand.of_brand_product_action
 #: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products_product_ids
 #: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_product_ids
+#: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_form
 msgid "Products"
 msgstr "Articles"
 
 #. module: of_product_brand
 #: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_partner_id
+#: model:ir.ui.view,arch_db:of_product_brand.of_product_template_search_view
 msgid "Supplier"
 msgstr "Fournisseur"
 
@@ -205,4 +238,40 @@ msgstr "Fournisseur:"
 msgid "The number of products of this brand"
 msgstr "Le nombre d'articles de cette marque"
 
+#. module: of_product_brand
+#: model:ir.model.fields,help:of_product_brand.field_of_product_brand_use_prefix
+msgid "The products internal references will be prefixed with the brand code"
+msgstr "La référence interne des articles sera préfixée avec le code de la marque"
+
+#. module: of_product_brand
+#: model:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_form
+msgid "The reference of this brand's products will be modified if you save these changes."
+msgstr "La référence des articles de cette marque sera modifiée si vous sauvegardez ces modifications."
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_use_prefix
+msgid "Use code as prefix"
+msgstr "Utilise le code comme préfixe"
+
+#. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_product_product_of_seller_name
+#: model:ir.model.fields,field_description:of_product_brand.field_product_template_of_seller_name
+msgid "Vendor"
+msgstr "Fournisseur"
+
+#. module: of_product_brand
+#: model:ir.model.fields,help:of_product_brand.field_product_product_of_seller_name
+#: model:ir.model.fields,help:of_product_brand.field_product_template_of_seller_name
+msgid "Vendor of this product"
+msgstr "Fournisseur de cet article"
+
+#. module: of_product_brand
+#: model:ir.model,name:of_product_brand.model_of_product_brand
+msgid "of.product.brand"
+msgstr "of.product.brand"
+
+#. module: of_product_brand
+#: model:ir.model,name:of_product_brand.model_of_product_brand_add_products
+msgid "of.product.brand.add.products"
+msgstr "of.product.brand.add.products"
 

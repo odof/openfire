@@ -7,8 +7,9 @@ class ProductTemplate(models.Model):
     _inherit = "product.template"
 
     modele = fields.Char(string='Modèle')
-    marge = fields.Float(string='Marge', digits=(4, 2), compute="_compute_marge",
-                help="Marge calculée sur base du prix de vente")
+    marge = fields.Float(
+        string='Marge', digits=(4, 2), compute="_compute_marge",
+        help="Marge calculée sur base du prix de vente")
     description_fabricant = fields.Text('Description du fabricant', translate=True)
     date_tarif = fields.Date(string="Date du tarif")
 
@@ -18,7 +19,7 @@ class ProductTemplate(models.Model):
     company_id = fields.Many2one(default=False)
 
     # Ajout de la catégorie d'udm pour permettre de filtrer les udms d'achat autorisées
-    of_uom_category_id = fields.Many2one(related='uom_id.category_id')
+    of_uom_category_id = fields.Many2one(related='uom_id.category_id', readonly=True)
     uom_po_id = fields.Many2one(domain="[('category_id', '=', of_uom_category_id)]")
     # Ajout de champs copiés de l'udm de vente pour affichage
     of_uom_po_id_display = fields.Many2one(related='uom_po_id', readonly=True)
@@ -101,7 +102,8 @@ class ProductSupplierInfo(models.Model):
     # Champ inutile? Voir avec Aymeric
     # Probablement ajouté par erreur à la place de la fonctionnalité d'import avec ancienne-nouvelle références
     old_code = fields.Char(string="Ancienne Référence")
-    pp_ht = fields.Float(string='Prix public HT', default=1.0, digits=dp.get_precision('Product Price'),
+    pp_ht = fields.Float(
+        string='Prix public HT', default=1.0, digits=dp.get_precision('Product Price'),
         required=True, help="Prix Public HT conseillé par le fabricant")
     pp_currency_id = fields.Many2one(related='currency_id')
     remise = fields.Float(string='Remise', digits=(4, 2), compute="_compute_remise")

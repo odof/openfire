@@ -170,7 +170,6 @@ class OFProductBrand(models.Model):
     of_import_cout = fields.Char(required=True, default="pa")
     of_import_categ_id = fields.Many2one(required=True)
 
-
     @api.depends('product_ids.of_import_price', 'product_ids.of_import_remise', 'product_ids.of_import_categ_id')  # , 'product_ids.of_import_price_extra'
     def _compute_product_config_ids(self):
         product_obj = self.env['product.template']
@@ -431,9 +430,10 @@ class OfImport(models.Model):
             if sortie_note:
                 sortie_note = u"Champs disponibles pour l'import (en-tête de colonne) :\n" + sortie_note
             imp.sortie_note = sortie_note
-#### READERS #####
-# Un reader retourne au premier appel la liste des champs du fichier (éléments de la première ligne)
-# Aux appels suivants, le reader retoune un dictionnaire {nom de la colonne: valeur} pour la ligne suivante
+
+    # --- READERS ---
+    # Un reader retourne au premier appel la liste des champs du fichier (éléments de la première ligne)
+    # Aux appels suivants, le reader retoune un dictionnaire {nom de la colonne: valeur} pour la ligne suivante
 
     @api.multi
     def _read_csv(self):
@@ -472,7 +472,7 @@ class OfImport(models.Model):
             yield {key.strip().decode('utf8', 'ignore'): value.strip().decode('utf8', 'ignore')
                    for key, value in row.iteritems()}
 
-    ## OPENOFFICE ##
+    # OPENOFFICE
     @api.multi
     def _read_ods(self):
         raise UserError(u"Pour l'instant, il n'est pas possible d'importer des fichiers OpenOffice.")
@@ -486,7 +486,7 @@ class OfImport(models.Model):
             if any(x for x in row if x.strip())
             )
 
-    ## MS OFFICE ##
+    # MS OFFICE
     @api.multi
     def _read_xls(self):
         """ Read file content, using xlrd lib """
@@ -600,8 +600,7 @@ class OfImport(models.Model):
             else:
                 raise UserError(u'Type de fichier non reconnu')
 
-### IMPORT ###
-
+    # --- IMPORT ---
     @api.multi
     def _pre_calcule_ligne(self, champs_fichier, ligne, model_data):
         """
@@ -873,7 +872,7 @@ class OfImport(models.Model):
                         valeur = ligne[champ_fichier]
                         if champ_fichier == model_data['champ_reference']:
                             if model == 'product.template':
-                                # On ajoute à la référence d'un article le préfixe défini dans la marque associée
+                                # On ajoute (ou retire) à la référence d'un article le préfixe défini dans la marque associée
                                 # Cette opération doit être réalisée après la détection de la marque mais avant la
                                 #  détection du produit associé (la combinaison préfixe+référence est la clef de recherche)
                                 brand_id = valeurs.get('brand_id')
@@ -882,11 +881,15 @@ class OfImport(models.Model):
                                 else:
                                     brand = res_objet and res_objet.brand_id
 
-                                if brand and brand.prefix:
-                                    prefixe = brand.prefix + '_'
-                                    # Le préfixe n'est ajouté que s'il n'est pas déjà appliqué (e.g. avec un export/import)
-                                    if not valeur.startswith(prefixe):
-                                        valeur = prefixe + valeur
+                                if brand:
+                                    prefixe = brand.code + '_'
+                                    if brand.use_prefix:
+                                        # Le préfixe n'est ajouté que s'il n'est pas déjà appliqué (e.g. avec un export/import)
+                                        if not valeur.startswith(prefixe):
+                                            valeur = prefixe + valeur
+                                    else:
+                                        if valeur.startswith(prefixe):
+                                            valeur = valeur[len(prefixe):]
 
                                 # la référence de l'article est transférée dans les informations fournisseur
                                 valeurs['of_seller_product_code'] = valeur
@@ -912,7 +915,19 @@ class OfImport(models.Model):
                     doublons[valeur] = [1, str(i)]
 
                 # On regarde si l'enregistrement existe déjà dans la base
-                res_objet = model_obj.with_context(active_test=False).search([(model_data['champ_primaire'], '=', valeur)])
+                domain = [(model_data['champ_primaire'], '=', valeur)]
+                if model == 'product.template':
+                    # Pour un article, la clef est le champ primaire ET la marque.
+                    # Un article sans marque (créé avant l'installation du module of_product_brand) est également valide.
+                    if valeurs.get('brand_id'):
+                        domain += ['|', ('brand_id', '=', False), ('brand_id', '=', valeurs['brand_id'])]
+                    else:
+                        domain += [('brand_id', '=', False)]
+                res_objet = model_obj.with_context(active_test=False).search(domain)
+
+                if model == 'product.template' and len(res_objet) > 1:
+                    # Plusieurs articles trouvés, recherche sur la marque
+                    res_objet = res_objet.filtered(lambda o: o.brand_id == valeurs.get('brand_id')) or res_objet
 
                 if len(res_objet) > 1:
                     # Il existe plusieurs articles dans la base avec cette référence. On ne sait pas lequel mettre à jour. On passe au suivant en générant une erreur.
@@ -1036,7 +1051,7 @@ class OfImport(models.Model):
 
             # L'import de tarif nécessite l'existence de la marque associée aux articles
             if self.prefixe:
-                default_brand = self.env['of.product.brand'].search([('prefix', '=', self.prefixe.rstrip('_'))])
+                default_brand = self.env['of.product.brand'].search([('code', '=', self.prefixe.rstrip('_'))])
                 if default_brand:
                     model_data['default_brand_id'] = default_brand.id
                     if default_brand.partner_id:

@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
-                <field name="prefix"/>
+                <field name="code"/>
                 <field name="partner_id"/>
                 <filter string="Archived" name="inactive" domain="[('active','=',False)]"/>
             </search>
@@ -20,7 +20,7 @@
         <field name="arch" type="xml">
             <kanban>
                 <field name="name"/>
-                <field name="prefix"/>
+                <field name="code"/>
                 <field name="partner_id"/>
                 <field name="logo"/>
                 <templates>
@@ -38,7 +38,7 @@
                                     </span>
                                 </strong>
                                 <ul>
-                                    <li>Prefix: <field name="prefix"></field></li>
+                                    <li>Code: <field name="code"></field></li>
                                     <li>Supplier: <field name="partner_id"></field></li>
                                 </ul>
                             </div>
@@ -79,7 +79,13 @@
                         <h1><field name="name" placeholder="OpenFire"/></h1>
                     </div>
                     <group>
-                        <field name="prefix" placeholder="OPE"/>
+                        <field name="code" placeholder="OPE"/>
+                        <field name="use_prefix"/>
+                        <field name="product_change_warn" invisible="1"/>
+                        <div attrs="{'invisible':[('product_change_warn', '=', False)]}" colspan="2" style="color:red;">
+                                The reference of this brand's products will be modified if you save these changes.
+                        </div>
+                        <newline/>
                         <field name="partner_id"/>
                         <label for="note" colspan="2"/>
                         <field name="note" colspan="2" nolabel="1"/>
@@ -95,7 +101,7 @@
         <field name="arch" type="xml">
             <tree string="Product brand">
                 <field name="name"/>
-                <field name="prefix"/>
+                <field name="code"/>
                 <field name="partner_id"/>
             </tree>
         </field>
@@ -127,11 +133,23 @@
 
     <!-- Affichage des marques dans les produits -->
     <record id="of_product_brand_product_template_only_form_view" model="ir.ui.view">
-        <field name="name">of.product.brand.product.template.product.form</field>
+        <field name="name">of.product.brand.product.template.form</field>
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_only_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='default_code']" position="after">
+                <field name="of_previous_brand_id" invisible="1"/>
+                <field name="brand_id"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="of_product_brand_product_normal_form_view" model="ir.ui.view">
+        <field name="name">of.product.brand.product.product.form</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='default_code']" position="after">
+                <field name="of_previous_brand_id" invisible="1"/>
                 <field name="brand_id"/>
             </xpath>
         </field>
@@ -184,7 +202,21 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='categ_id']" position="after">
                 <field name="brand_id"/>
-                <field string="Fournisseur" name="of_seller_name"/>
+                <field string="Supplier" name="of_seller_name"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Bulle d'aide des articles de lignes de commandes -->
+    <record id="of_product_vrand_view_order_form" model="ir.ui.view">
+        <field name="name">of.product.brand.sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="attributes">
+                <attribute name="help">
+                    Note: When searching for a product, typing "m:ABC" will filter products for brand "ABC".
+                </attribute>
             </xpath>
         </field>
     </record>
