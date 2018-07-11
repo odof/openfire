@@ -67,14 +67,16 @@ class of_log_paiement(models.Model):
         return True
 
 
-class account_payment(models.Model):
+class AccountPayment(models.Model):
     _name = "account.payment"
     _inherit = "account.payment"
 
+    active = fields.Boolean(string="Active", default=True)
+
     @api.multi
     def write(self, vals):
-        res = super(account_payment, self).write(vals)
-        # On ignore les (nombreux) appels à write avec vals vide et quand il s'agit uniquement unemodification du lettrage (vals avec une seule clé 'invoice_ids')
+        res = super(AccountPayment, self).write(vals)
+        # On ignore les (nombreux) appels à write avec vals vide et quand il s'agit uniquement une modification du lettrage (vals avec une seule clé 'invoice_ids')
         if vals and not (len(vals) == 1 and 'invoice_ids' in vals):
             user_name = self.env.user.name or ''
             # On récupère les paiements qui ont été modifiés.
@@ -98,6 +100,15 @@ class account_payment(models.Model):
     def unlink(self):
         raise UserError(_(u"Vous ne pouvez pas supprimer un paiement.\nVous pouvez seulement le laisser en brouillon."))
 
+    # Il y a un onchange dans payment.type qui change de manière non voulue la valeur du type de partenaire
+    # dans le formulaire du nouveau paiement.
+    # Fonction qui résoud ce problème.
+    @api.onchange('payment_type')
+    def _onchange_payment_type(self):
+        res = super(AccountPayment, self)._onchange_payment_type()
+        if 'of_default_partner_type' in self._context:
+            self.partner_type = self._context['of_default_partner_type']
+        return res
 
 class ir_module_module(models.Model):
     _name = "ir.module.module"
