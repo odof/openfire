@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-
     <data>
-       <record model="ir.ui.view" id="of_log_paiement_tree">
+
+        <!-- Historique paiements : vue liste -->
+        <record model="ir.ui.view" id="of_log_paiement_tree">
             <field name="name">of.log.paiement.tree</field>
             <field name="model">of.log.paiement</field>
             <field name="type">tree</field>
@@ -26,10 +27,11 @@
                     <field name="state" readonly="1"/>
                     <field name="create_uid" readonly="1"/>
                     <field name="user_name" readonly="1"/>
-                </tree>
-            </field>
-        </record>
+                 </tree>
+             </field>
+         </record>
 
+       <!-- Historique paiements : vue formulaire -->
        <record model="ir.ui.view" id="of_log_paiement_form">
             <field name="name">of.log.paiement.form</field>
             <field name="model">of.log.paiement</field>
@@ -60,6 +62,7 @@
             </field>
         </record>
 
+        <!-- Historique paiements : filtres recherche -->
         <record model="ir.ui.view" id="of_log_paiement_filter">
             <field name="name">of.log.paiement.filter</field>
             <field name="model">of.log.paiement</field>
@@ -81,6 +84,7 @@
             </field>
         </record>
 
+        <!-- Historique paiements : action et menu -->
         <record model="ir.actions.act_window" id="action_of_log_paiement">
             <field name="name">Historique paiements</field>
             <field name="res_model">of.log.paiement</field>
@@ -90,6 +94,9 @@
             <field name="view_id" eval="of_log_paiement_tree"/>
         </record>
         <menuitem action="action_of_log_paiement" id="menu_of_log_paiement" parent="account.menu_finance_entries" sequence="100"/>
+
+        <!-- Si le module account_cancel est installé, on supprimme le bouton Annuler dans la vue formulaire des paiements. -->
+        <delete model="ir.ui.view" id="account_cancel.payment_cancel_form_inherit"/>
 
     </data>
 

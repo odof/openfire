@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<openerp>
+    <record id="of_l10n_fr_certification_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.impression.wizard_form</field>
+        <field name="model">of.impression.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Imprimer l'attestation individuel du logiciel">
+                <group>
+                    <field name="company_id" required="1" widget="selection"/>
+                </group>
+                <footer>
+                    <button string="Imprimer" name="button_print" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_of_l10n_fr_certification_wizard">
+        <field name="name">Attestation certification comptable</field>
+        <field name="res_model">of.impression.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_of_l10n_fr_certification_wizard" name="Attestation certification comptable" parent="base.menu_administration" action="action_of_l10n_fr_certification_wizard" sequence="110"/>
+
+</openerp>
