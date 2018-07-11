@@ -6,7 +6,7 @@ from odoo.exceptions import UserError
 
 class OFAccountPaymentWizard(models.TransientModel):
     _name = "of.account.payment.wizard"
-    _description = u"Remboursement, annulation ou modification d'un paiement"
+    _description = u"Remboursement, annulation ou modification d'un paiement par extourne comptable"
 
     @api.model
     def _get_description(self):
@@ -49,11 +49,10 @@ class OFAccountPaymentWizard(models.TransientModel):
             'default_partner_id': payment.partner_id.id or False,
             'default_of_payment_mode_id': payment.of_payment_mode_id.id or False,
             'default_amount': payment.amount or False,
-            'default_payment_date': fields.Date.context_today(payment), #payment.payment_date or False,
+            'default_payment_date': fields.Date.context_today(payment),
             'default_of_ref_reglement': payment.of_ref_reglement or False,
             'default_communication': payment.communication or False,
             'default_of_tag_ids': values or False,
-            'default_payment_transaction_id': payment.payment_transaction_id.id or False,
             'default_partner_type': payment.partner_type
         }
 
@@ -70,6 +69,7 @@ class OFAccountPaymentWizard(models.TransientModel):
             name = 'Modification de paiement'
             context['default_payment_type'] = payment.payment_type
 
+        # Appel action nouveau paiement
         return {
             'name': _(name),
             'type': 'ir.actions.act_window',
@@ -112,7 +112,11 @@ class OFAccountPaymentWizard(models.TransientModel):
                         rev_move = move.create_reversals(reconcile=True)
                         rev_move.ref = form.description or move.name
                     payment.active = False
-                    return self.env['of.popup.wizard'].popup_return(u"Le paiement a bien été annulé avec une extourne comptable.", u"Annulation paiement")
+                    # L'annulation a été faite. On va à la liste des paiements clients ou fournisseurs (appel de l'action).
+                    if payment.partner_type == 'supplier':
+                        return self.env.ref('account.action_account_payments_payable').read()[0]
+                    else:
+                        return self.env.ref('account.action_account_payments').read()[0]
 
                 # Modification
                 if self.type_modification_payment == 'modify':
