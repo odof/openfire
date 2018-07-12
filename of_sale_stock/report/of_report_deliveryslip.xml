@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <!-- Inherit report_delivery_document (depuis module stock) -->
+        <template id="of_report_deliveryslip" inherit_id="stock.report_delivery_document">
+            <xpath expr="//table[3]" position="after">
+                <t t-if="o.of_note_operations">
+                    <div style="border-bottom: 1px solid black; padding-bottom: 6px; margin-top: 8px;">
+                        <strong style="padding-left: 6px;">Notes</strong>
+                    </div>
+                    <div style="padding-left: 6px; padding-top: 6px" t-field="o.of_note_operations"/>
+                </t>
+            </xpath>
+        </template>
+</odoo>
