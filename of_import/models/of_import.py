@@ -551,8 +551,8 @@ class OfImport(models.Model):
         # Des champs qui sont obligatoires peuvent avoir une valeur par défaut (donc in fine pas d'obligation de les renseigner).
         # On récupère les champs qui ont une valeur par défaut et on indique qu'ils ne sont pas obligatoires.
         champs_requis = [key for key, vals in champs_odoo.iteritems() if vals['requis']]
-        for i in self.env[model].default_get(champs_requis):
-            champs_odoo[i]['requis'] = False
+        for key, val in self.env[model].default_get(champs_requis).iteritems():
+            champs_odoo[key]['requis'] = val is False
 
         # On ne rend pas obligatoire manuellement un champ qui est marqué comme obligatoire car créé par la fonction create d'Odoo.
         if model == 'product.template':
@@ -562,6 +562,10 @@ class OfImport(models.Model):
             if 'brand_id' in champs_odoo:
                 # Dans le cadre de l'import de tarif, on rend obligatoire le renseignement de la marque de l'article
                 champs_odoo['brand_id']['requis'] = True
+
+            if 'categ_id' in champs_odoo:
+                # Le champ categ_id importé est la catégorie du fournisseur. Le vrai categ_id sera calculé en fonction de la marque
+                champs_odoo['categ_id']['requis'] = False
 
         return champs_odoo
 
@@ -626,6 +630,10 @@ class OfImport(models.Model):
                 brand = res_objet and res_objet.brand_id
                 # Si brand n'est pas défini, une exception sera automatiquement générée plus tard
                 # car la marque est un champ obligatoire pour l'import de tarif
+
+            if 'categ_id' in champs_fichier and 'categ_id' not in valeurs:
+                # Si la catégorie d'article n'est pas renseignée, on prend la catégorie par défaut de la marque
+                valeurs['categ_id'] = brand.compute_product_categ(res_objet and res_objet.of_seller_product_category_name or '', product=res_objet).id
 
             # Calcul des prix d'achat/vente en fonction des règles de calcul et du prix public ht
             if 'list_price' in valeurs and brand:
@@ -700,8 +708,6 @@ class OfImport(models.Model):
             champ_fichier_sansrel = champ_fichier[0:champ_fichier.rfind('/') if champ_fichier.rfind('/') != -1 else len(champ_fichier)].strip()
 
             if champ_fichier_sansrel in champs_odoo:  # On ne récupère que les champs du fichier d'import qui sont des champs de l'objet (on ignore les champs inconnus du fichier d'import).
-                ligne[champ_fichier] = ligne[champ_fichier]
-
                 if ligne[champ_fichier].lower() == "#vide":
                     ligne[champ_fichier] = "#vide"
 
@@ -754,6 +760,17 @@ class OfImport(models.Model):
 
                 # si est un many2one
                 elif champs_odoo[champ_fichier_sansrel]['type'] == 'many2one':
+                    if model == 'product.template' and champ_fichier == 'categ_id':
+                        valeurs['of_seller_product_category_name'] = ligne[champ_fichier]
+                        if ligne[champ_fichier] == '#vide':
+                            # Avoir une catégorie non renseignée côté fournisseur n'empêche pas de calculer celle du distributeur grâce à la marque
+                            ligne[champ_fichier] = '.'
+                            valeurs['of_seller_product_category_name'] = ''
+                        elif ligne[champ_fichier] == '':
+                            # A chaque import les informations fournisseur sont supprimées et regénérées. Il faut dans ce cas les récupérer
+                            if res_objet:
+                                ligne[champ_fichier] = '.'
+                                valeurs['of_seller_product_category_name'] = res_objet.of_seller_product_category_name or ''
                     if ligne[champ_fichier] == "#vide" and not champs_odoo[champ_fichier_sansrel]['requis']:
                         # Si le champ n'est pas obligatoire et qu'il est vide, on met une valeur vide.
                         valeurs[champ_fichier_sansrel] = ""
@@ -767,7 +784,7 @@ class OfImport(models.Model):
                         # Si import de produit, la catégorie de produit peut avoir une correspondance
                         elif model == 'product.template' and champ_fichier == 'categ_id':
                             # Sauvegarde de la catégorie donnée par le fournisseur
-                            valeurs['of_seller_product_category_name'] = ligne[champ_fichier]
+                            ligne[champ_fichier] = valeurs['of_seller_product_category_name']
 
                             brand = valeurs.get('brand_id') and self.env['of.product.brand'].browse(valeurs['brand_id'])
                             if res_objet and not brand:
@@ -958,7 +975,7 @@ class OfImport(models.Model):
                     code = CODE_IMPORT_MODIFICATION
                     message = u"MAJ %s %s (ligne %s)\n" % (model_data['nom_objet'], libelle_ref, i)
                 except Exception, exp:
-                    message = u"Ligne %s : échec mise à jour %s %s - Erreur : %s\n" % (i, model_data['nom_objet'], libelle_ref, exp)
+                    message = u"Ligne %s : échec mise à jour %s %s - Erreur : %s\n" % (i, model_data['nom_objet'], libelle_ref, str(exp).decode('utf8', 'ignore'))
             else:
                 # L'enregistrement n'existe pas dans la base, on l'importe (création)
                 try:
@@ -967,7 +984,7 @@ class OfImport(models.Model):
                     code = CODE_IMPORT_CREATION
                     message = u"Création %s %s (ligne %s)\n" % (model_data['nom_objet'], libelle_ref, i)
                 except Exception, exp:
-                    message = u"Ligne %s : échec création %s %s - Erreur : %s\n" % (i, model_data['nom_objet'], libelle_ref, exp)
+                    message = u"Ligne %s : échec création %s %s - Erreur : %s\n" % (i, model_data['nom_objet'], libelle_ref, str(exp).decode('utf8', 'ignore'))
 
         if not simuler:
             self._cr.commit()
