@@ -21,11 +21,12 @@ class ImportBrand(models.TransientModel):
                 continue
             brand_obj.create({
                 'name': line.name,
-                'prefix': line.prefix,
+                'code': line.code,
                 'logo': line.logo,
                 'partner_id': (line.partner_id or self.partner_id).id,
                 'of_import_categ_id': (line.product_categ_id or self.product_categ_id).id,
                 'datastore_supplier_id': self.datastore_supplier_id.id,
+                'datastore_brand_id': line.datastore_brand_id,
             })
 
 
@@ -34,7 +35,8 @@ class ImportBrandLine(models.TransientModel):
 
     wizard_id = fields.Many2one('of.datastore.import.brand')
     name = fields.Char(string='Name', required=True)
-    prefix = fields.Char(string='Prefix', required=True, readonly=True)
+    datastore_brand_id = fields.Integer(string=u"Identifiant tarif centralisé")
+    code = fields.Char(string='code', required=True, readonly=True)
     partner_id = fields.Many2one('res.partner', string='Supplier', domain=[('supplier', '=', True)])
     product_categ_id = fields.Many2one('product.category', string=u"Catégorie")
     logo = fields.Binary(string='Logo')

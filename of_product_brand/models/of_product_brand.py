@@ -5,6 +5,7 @@ from odoo.exceptions import ValidationError
 
 class OfProductBrand(models.Model):
     _name = 'of.product.brand'
+    _order = 'name'
 
     name = fields.Char(string='Name', required=True)
     code = fields.Char(string='Code', required=True, oldname='prefix')

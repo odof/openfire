@@ -29,11 +29,14 @@
                             <field name="error_msg" colspan="4"/>
                         </group>
 
-                        <separator name="brand_ids" string="Allowed brands"/>
-                        <field name="brand_ids" nolabel="1" colspan="2" widget="many2many">
-                            <tree>
+                        <separator name="datastore_brand_ids" string="Supplier brands" create="false" delete="false"/>
+                        <field name="datastore_brand_ids" nolabel="1" colspan="2">
+                            <tree editable="bottom" create="false" delete="false" colors="red:not brand_id;">
+                                <field name="datastore_brand_id" invisible="1"/>
                                 <field name="name"/>
-                                <field name="datastore_note_maj"/>
+                                <field name="brand_id"/>
+                                <field name="note_maj"/>
+                                <field name="product_count"/>
                             </tree>
                         </field>
                     </group>
@@ -79,7 +82,7 @@
         <field name="model">of.product.brand</field>
         <field name="inherit_id" ref="of_import.of_product_brand_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[@name='oe_button_box']" position="inside">
+            <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="%(of_datastore_brand_product_action)d" type="action" class="oe_stat_button" icon="fa-th-list">
                     <field string="Centralized products" name="datastore_product_count" widget="statinfo"/>
                 </button>
@@ -98,6 +101,19 @@
             <xpath expr="//page[@name='notes']" position="inside">
                 <separator string="Informations tarif centralisé" colspan="2"/>
                 <field name="datastore_note_maj" colspan="2" nolabel="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- recherche d'articles sur base centralisée -->
+    <record id="of_product_brand_product_template_search_view" model="ir.ui.view">
+        <field name="name">product.template.search</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='inactive']" position="before">
+                <filter string="Search on centralized database" name="of_datastore_search" domain="[]" context="{'of_datastore_product_search': True}"/>
+                <separator/>
             </xpath>
         </field>
     </record>

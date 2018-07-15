@@ -15,9 +15,10 @@
                             <button name="button_inverse" string="Inverser" type="object" icon="fa-refresh"
                                 attrs="{'invisible':[('state','=','done')]}"/>
                             <field name="logo" invisible="1"/>
+                            <field name="datastore_brand_id" invisible="1"/>
                             <field name="state" readonly="1"/>
                             <field name="name"/>
-                            <field name="prefix"/>
+                            <field name="code"/>
                             <field name="partner_id"/>
                             <field name="product_categ_id"/>
                             <field name="note_maj"/>

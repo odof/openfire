@@ -32,7 +32,7 @@ Fonctionnalités à venir :
  - Utilisation de files d'attente pour les connexions distantes
 
 /!\ Information OpenFire :
-Ce module nécessite l'installation de erppeek sur le serveur : sudo pip install erppeek
+Ce module nécessite l'installation de openerplib sur le serveur : sudo easy_install openerp-client-lib
 """,
     "depends" : [
 #           # Les marques sont utilisées pour filtrer les produits accédés dans la base centralisée
