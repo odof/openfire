@@ -6,7 +6,7 @@ from odoo.exceptions import UserError, ValidationError
 from odoo.tools.safe_eval import safe_eval
 from odoo.osv.expression import NEGATIVE_TERM_OPERATORS, TERM_OPERATORS_NEGATION, TRUE_LEAF, FALSE_LEAF
 
-DATASTORE_IND = 100000000 # 100.000.000 ids devraient suffire pour les produits. Les chiffres suivants serviront pour le fournisseur
+DATASTORE_IND = 100000000  # 100.000.000 ids devraient suffire pour les produits. Les chiffres suivants serviront pour le fournisseur
 
 """
 NOTES
@@ -376,7 +376,51 @@ class OfDatastoreCentralized(models.AbstractModel):
 
     @api.model
     def _get_datastore_unused_fields(self):
-        return []
+        # Champs qu'on ne veut pas récupérer chez le fournisseur (quantités en stock)
+        cr = self._cr
+
+        # On ne veut aucun des champs ajoutes par les modules stock, mrp, purchase
+        cr.execute("SELECT DISTINCT f.name "
+                   "FROM ir_model_data AS d "
+                   "INNER JOIN ir_model_fields AS f "
+                   "  ON d.res_id=f.id "
+                   "WHERE d.model = 'ir.model.fields' "
+                   "  AND f.model IN ('product.product','product.template') "
+                   "  AND d.module IN ('mrp','procurement','stock')")
+        res = [row[0] for row in cr.fetchall()]
+
+        # Ajout de certains champs du module product
+        res += [
+        ]
+
+        # On ne veut pas non-plus les champs one2many ou many2many (seller_ids, packagind_ids, champs liés aux variantes....)
+        # Utilisation de _all_columns pour recuperer les colonnes de product_template egalement
+        # On conserve les lignes de kits
+        for field_name,field in self._all_columns.iteritems():
+            if field.column._type in ('one2many','many2many'):
+                if field_name != 'kit_line_ids' and field_name not in res:
+                    res.append(field_name)
+        return res
+
+#     @api.model
+#     def _get_datastore_fields(self):
+#         return (
+#             'brand_id',
+#             'price',
+#             'list_price',
+#             'cost',
+#             'code', # A vérifier : champ calculé
+#             'default_code',
+#             'categ_id',
+#             'lst_price',
+#             'standard_price',
+#             'uom_id',
+#             'uom_po_id',
+#             'seller_ids', # A compléter : champs relationnels ajoutés dans of_product
+#             """
+#             ... en gros tous les champs sont à lire ><
+#             """,
+#         )
 
     @api.multi
     def _read_datastore(self, fields_to_read, create_mode=False):
@@ -393,10 +437,20 @@ class OfDatastoreCentralized(models.AbstractModel):
         if 'id' in fields_to_read: # Le champ id sera de toute façon ajouté, le laisser génèrera des erreurs
             fields_to_read.remove('id')
 
-        # Produits par fournisseur
+        # Articles par fournisseur
         datastore_product_ids = {}
+
+        # Articles par marque
+        brand_product_ids = {}
+
+        # Données par article
+        product_data = {}
+
+        # Produits par fournisseur
         for full_id in self._ids:
-            supplier_id = -full_id / DATASTORE_IND
+            brand_id = -full_id / DATASTORE_IND
+            brand_product_ids.setdefault(brand_id, []).append((-full_id) % DATASTORE_IND)
+            
             datastore_product_ids.setdefault(supplier_id, []).append((-full_id) % DATASTORE_IND)
 
         suppliers = supplier_obj.browse(datastore_product_ids.keys())
@@ -407,7 +461,7 @@ class OfDatastoreCentralized(models.AbstractModel):
         # Champs a valeurs spécifiques
         fields_defaults = {
             'of_datastore_supplier_id': lambda: supplier_m2o_id,
-            'if_datastore_product_id' : lambda: vals['id'],
+            'of_datastore_product_id' : lambda: vals['id'],
             'supply_method'           : lambda: 'buy',
 
             'list_price'              : lambda: standard_price,
@@ -648,7 +702,7 @@ class OfDatastoreCentralized(models.AbstractModel):
                 new_arg = parse_domain(arg, obj_name)
                 if new_arg:
                     arg[0], arg[1], arg[2] = new_arg
-        return ds_supplier.id, domain
+        return ds_supplier, domain
 
 
     @api.model
@@ -780,25 +834,35 @@ class OfDatastoreCentralized(models.AbstractModel):
 
     @api.model
     def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
-        supplier_id, args = self.datastore_update_domain(args)
+        supplier, args = self.datastore_update_domain(args)
 
         # Recherche sur la base du fournisseur
-        if supplier_id:
+        if supplier:
+            brands = supplier.brand_ids
+            # Ex: si la base n'a qu'une base centralisée, elle peut appeler les articles de la base distante sans autre filtre de recherche.
+            # Dans ce cas, on ne veut pas les autres marques du fournisseur
+            args = ['&', ('brand_id', 'in', brands.mapped('datastore_brand_id'))] + args
+
+#            supplier = brands[0].datastore_supplier_id
             supplier_obj = self.env['of.datastore.supplier']
 
             # Exécution de la requête sur la base du fournisseur
-            client = supplier_obj.browse(supplier_id).of_datastore_connect()[supplier_id]
+            client = supplier.of_datastore_connect()[supplier.id]
             if isinstance(client, basestring):
                 # Échec de la connexion à la base fournisseur
-                supplier_name = supplier_obj.browse(supplier_id).name
-                raise UserError(u'Erreur accès '+supplier_name, client)
+                raise UserError(u'Erreur accès '+supplier.name, client)
 
-            ds_product_obj = supplier_obj.of_datastore_get_model(client, 'product.product')
+            ds_product_obj = supplier_obj.of_datastore_get_model(client, self._name)
             res = supplier_obj.of_datastore_search(ds_product_obj, args, offset, limit, order, count)
 
             if not count:
-                supplier_value = supplier_id * DATASTORE_IND
-                res = [-(product_id + supplier_value) for product_id in res]
+                if len(brands) == 1:
+                    brand_value = brands.id * DATASTORE_IND
+                    res = [-(product_id + brand_value) for product_id in res]
+                else:
+                    brand_ids = {brand.datastore_brand_id: brand.id * DATASTORE_IND for brand in brands}
+                    products = supplier_obj.of_datastore_read(ds_product_obj, res, ['brand_id'])
+                    res = [-(product['id'] + brand_ids[product['brand_id'][0]]) for product in products]
         else:
             # Éxecution de la requête sur la base courante
             res = super(OfDatastoreCentralized, self)._search(args, offset=offset, limit=limit, order=order, count=count, access_rights_uid=access_rights_uid)
