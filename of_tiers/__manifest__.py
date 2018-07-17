@@ -2,7 +2,7 @@
 
 {
     'name' : 'OpenFire - Comptes de tiers',
-    'version' : '10.0',
+    'version' : '10.0.1.0.0',
     'summary': 'Utilisation de comptes de tiers pour les clients et fournisseurs',
     'description': """
 OpenFire - Comptes de tiers
@@ -13,7 +13,6 @@ Utilisation de comptes de tiers
     'depends' : ['account'],
     'data': [
         'views/of_tiers_view.xml',
-        'data/of_tiers_data.xml',
         'security/ir.model.access.csv',
     ],
     'demo': [],

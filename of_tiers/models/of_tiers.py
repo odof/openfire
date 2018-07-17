@@ -1,13 +1,41 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.tools.safe_eval import safe_eval
 
 class ResCompany(models.Model):
     _inherit = "res.company"
 
+    @api.model_cr_context
+    def _auto_init(self):
+        xml_obj = self.env['ir.model.data']
+        sequence_obj = self.env['ir.sequence']
+        res = super(ResCompany, self)._auto_init()
+        vals = {}
+        seq_client = sequence_obj.browse(xml_obj.search([('name', 'like', 'sequence_customer_account')]).res_id)
+        if seq_client and seq_client.active:
+            code = "'%s%%0%si%s' %% partner.id" % (seq_client.prefix or '', seq_client.padding, seq_client.suffix or '')
+            vals['of_code_client'] = "(%s, %s)" % (code, 'partner.name')
+            seq_client.active = False
+        seq_fournisseur = sequence_obj.browse(xml_obj.search([('name', 'like', 'sequence_supplier_account')]).res_id)
+        if seq_fournisseur and seq_fournisseur.active:
+            code = "'%s%%0%si%s' %% partner.id" % (seq_fournisseur.prefix or '', seq_fournisseur.padding, seq_fournisseur.suffix or '')
+            vals['of_code_fournisseur'] = "(%s, %s)" % (code, 'partner.name')
+            seq_fournisseur.active = False
+        if vals:
+            companies = self.search([])
+            companies.write(vals)
+        return res
+
     of_client_id_ref = fields.Boolean('Réf. client automatique',
                                       help=u"Lors de la création d'un nouveau partenaire, si cette case est cochée, "
                                            u"la référence client prendra par défaut le n° de compte comptable du partenaire.")
+    of_code_client = fields.Char('Code client', default="('411%05i' % partner.id, partner.name)")
+    of_code_fournisseur = fields.Char('Code fournisseur', default="('401%05i' % partner.id, partner.name)")
+
+    @api.multi
+    def set_of_code_client_defaults(self):
+        return self.env['ir.values'].sudo().set_default('res.company', '', self.pdf_adresse_nom_parent)
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'
@@ -30,9 +58,6 @@ class ResPartner(models.Model):
         data_obj = self.env['ir.model.data']
         ac_obj = self.env['account.account']
 
-        sequence_receivable = data_obj.get_object('of_tiers', 'sequence_customer_account')
-        sequence_payable = data_obj.get_object('of_tiers', 'sequence_supplier_account')
-
         default_account_receivable = self.env['ir.property'].get('property_account_receivable_id', self._name)
         default_account_payable = self.env['ir.property'].get('property_account_payable_id', self._name)
 
@@ -46,11 +71,14 @@ class ResPartner(models.Model):
             if partner.customer:
                 if (partner.property_account_receivable_id or default_account_receivable) == default_account_receivable:
                     type_id = data_obj.get_object_reference('account', 'data_account_type_receivable')[1]
+                    if not self.company_id.of_code_client:
+                        return
+                    code, name = safe_eval(self.company_id.of_code_client, {'partner': partner})
                     account_data = {
                         'internal_type': 'receivable',
                         'user_type_id': type_id,
-                        'code': sequence_receivable.get_next_char(partner.id),
-                        'name': partner.name,
+                        'code': code,
+                        'name': name,
                         'reconcile': True,
                         # Avec le module of_base_multicompany, il est utile de forcer la société à la même que celle du compte par défaut
                         # et non celle de l'utilisateur (compte au niveau de la société, pas du magasin)
@@ -64,11 +92,14 @@ class ResPartner(models.Model):
             if partner.supplier:
                 if (partner.property_account_payable_id or default_account_payable) == default_account_payable:
                     type_id = data_obj.get_object_reference('account', 'data_account_type_payable')[1]
+                    if not self.company_id.of_code_fournisseur:
+                        return
+                    code, name = safe_eval(self.company_id.of_code_fournisseur, {'partner': partner})
                     account = {
                         'internal_type': 'payable',
                         'user_type_id': type_id,
-                        'code': sequence_payable.get_next_char(partner.id),
-                        'name': partner.name,
+                        'code': code,
+                        'name': name,
                         'reconcile': True,
                         # Avec le module of_base_multicompany, il est utile de forcer la société à la même que celle du compte par défaut
                         # et non celle de l'utilisateur (compte au niveau de la société, pas du magasin)
@@ -138,5 +169,8 @@ class ResPartner(models.Model):
 class AccountConfigSettings(models.TransientModel):
     _inherit = 'account.config.settings'
 
-    of_client_id_ref = fields.Boolean(related='company_id.of_client_id_ref', string="Utiliser les comptes de tiers comme références clients *",
-                                      help=u"Affectation automatique de la partie variable du compte de tiers dans la référence du partenaire nouvellement créé")
+    of_code_client = fields.Char(related='company_id.of_code_client', string='Code client')
+    of_code_fournisseur = fields.Char(related='company_id.of_code_fournisseur', string='Code fournisseur')
+    of_client_id_ref = fields.Boolean(
+        related='company_id.of_client_id_ref', string=u"Utiliser les comptes de tiers comme références clients *",
+        help=u"Affectation automatique de la partie variable du compte de tiers dans la référence du partenaire nouvellement créé")

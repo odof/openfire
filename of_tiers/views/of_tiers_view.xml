@@ -11,6 +11,8 @@
             <field name="arch" type="xml">
                 <field name="tax_calculation_rounding_method" position="after">
                     <field name="of_client_id_ref"/>
+                    <field name="of_code_client"/>
+                    <field name="of_code_fournisseur"/>
                 </field>
             </field>
         </record>
