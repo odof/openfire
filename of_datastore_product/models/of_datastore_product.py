@@ -368,6 +368,85 @@ class OfProductBrand(models.Model):
             brand.datastore_note_maj = note
             brand.datastore_product_count = product_count
 
+    @api.multi
+    def datastore_match(self, client, obj, res_id, res_name, product, match_dicts, create=True):
+        """ Tente d'associer un objet de la base centrale à un id de la base de l'utilisateur
+        @param client: client erppeek connecté à la base du fournisseur
+        @param obj: nom de l'objet à faire correspondre
+        @param res_id: id de l'instance de l'objet à faire correspondre
+        @param match_dicts: dictionnaire des correspondances par objet
+        @return: Entier correspondant a l'id de l'object correspondant dans la base courante, ou False
+        """
+        def datastore_matching_model(obj_name, obj_id):
+            """ Teste si une correspondance existe dans la table ir_model_data
+            """
+            model_ids = ds_model_obj.search([('model', '=', obj_name), ('res_id', '=', obj_id)])
+            if not model_ids:
+                return False
+            model = ds_model_obj.read(model_ids[0], ['module','name'])
+            res_id = model_obj.search([('module', '=', model['module']), ('name', '=', model['name'])]).id
+            # Dans certains cas, un objet a pu être supprimé en DB mais pas sa référence dans ir_model_data
+            res_id = res_id and self.env[obj_name].search([('id', '=', res_id)]).id
+            return res_id
+        # --- Gestion des cas particuliers ---
+        if obj == self._name:
+            return self
+        if obj == 'product.category':
+            return self.compute_product_categ(res_name, product)
+
+        match_dict = match_dicts.setdefault(obj,{})
+
+        # Recherche de correspondance dans les valeurs précalculées
+        if res_id in match_dict:
+            return match_dict[res_id]
+
+        # Recherche de correspondance dans les identifiants externes (ir_model_data)
+        model_obj = self.env['ir.model.data']
+        ds_model_obj = client.get_model('ir.model.data')
+        ds_obj_obj = client.get_model(obj)
+        result = False
+
+        # Calcul de correspondance en fonction de l'objet
+        obj_obj = self.env[obj]
+        if obj == 'product.uom.categ':
+            result = datastore_matching_model(obj, res_id)
+            if not result:
+                result = obj_obj.search([('name', '=', res_name)], limit=1)
+                if not result:
+                    raise ValidationError(u"Catégorie d'UDM inexistante : " + res_name)
+        elif obj == 'product.uom':
+            # Etape 1 : Déterminer la catégorie d'udm
+            ds_obj = ds_obj_obj.read(res_id, ['category_id', 'factor', 'uom_type', 'rounding'])
+
+            categ = self.datastore_match(client, 'product.uom.categ', ds_obj['category_id'][0], ds_obj['category_id'][1],
+                                         product, match_dicts)
+
+            # Etape 2 : Vérifier si l'unité de mesure existe
+            uoms = obj_obj.search([('factor', '=', ds_obj['factor']),
+                                   ('uom_type', '=', ds_obj['uom_type']),
+                                   ('category_id', '=', categ.id)])
+
+            if uoms:
+                if len(uoms) > 1:
+                    # Ajout d'un filtre sur le nom pour préciser la recherche
+                    uoms = obj_obj.search([('id', 'in', uoms.ids), ('name', '=ilike', ds_obj['name'])]) or uoms
+                if len(uoms) > 1:
+                    # Ajout d'un filtre sur la précision de l'arrondi pour préciser la recherche
+                    uoms = obj_obj.search([('id', 'in', uoms.ids),('rounding', '=', ds_obj['rounding'])]) or uoms
+                result = uoms[0]
+            elif create:
+                # Etape 3 : Créer l'unité de mesure
+                uom_data = {
+                    'name'       : res_name,
+                    'uom_type'   : ds_obj['uom_type'],
+                    'factor'     : ds_obj['factor'],
+                    'category_id': categ.id,
+                    'rounding'   : ds_obj['rounding'],
+                }
+                result = obj_obj.create(uom_data)
+        match_dict[res_id] = result
+        return result
+
 
 class OfDatastoreCentralized(models.AbstractModel):
     _name = 'of.datastore.centralized'
@@ -448,10 +527,11 @@ class OfDatastoreCentralized(models.AbstractModel):
 
         # Produits par fournisseur
         for full_id in self._ids:
-            brand_id = -full_id / DATASTORE_IND
-            brand_product_ids.setdefault(brand_id, []).append((-full_id) % DATASTORE_IND)
+#            brand_id = -full_id / DATASTORE_IND
+#            brand_product_ids.setdefault(brand_id, []).append((-full_id) % DATASTORE_IND)
 
-#            datastore_product_ids.setdefault(supplier_id, []).append((-full_id) % DATASTORE_IND)
+            supplier_id = -full_id / DATASTORE_IND
+            datastore_product_ids.setdefault(supplier_id, []).append((-full_id) % DATASTORE_IND)
 
         suppliers = supplier_obj.browse(datastore_product_ids.keys())
         clients = suppliers.of_datastore_connect()
@@ -461,12 +541,12 @@ class OfDatastoreCentralized(models.AbstractModel):
         # Champs a valeurs spécifiques
         fields_defaults = {
             'of_datastore_supplier_id': lambda: supplier_m2o_id,
-            'of_datastore_res_id' : lambda: vals['id'],
+            'of_datastore_res_id'     : lambda: vals['id'],
 
-            'price'                   : lambda: standard_price,  # Champ calculé avec la liste de prix ...
-            'list_price'              : lambda: standard_price,  # Champ standard
+#             'price'                   : lambda: standard_price,  # Champ calculé avec la liste de prix ...
+#             'list_price'              : lambda: standard_price,  # Champ standard
 #            'lst_price'               : lambda: standard_price,  # Champ related
-            'standard_price'          : lambda: standard_price,  # Champ calculé avec la marque
+#            'standard_price'          : lambda: standard_price,  # Champ calculé avec la marque
 
 #             'price_margin'            : lambda: price_margin,
 #             'price_remise'            : lambda: remise,
@@ -491,18 +571,19 @@ class OfDatastoreCentralized(models.AbstractModel):
         datastore_fields = [field for field in fields_to_read if field not in self._get_datastore_unused_fields()]
 
         m2o_fields = [field for field in datastore_fields
-                      if self._all_columns[field].column._type  == 'many2one'
+                      if self._fields[field].type  == 'many2one'
                       and field != 'of_datastore_supplier_id']
 
-        o2m_fields = ['kit_lines'] # :-)
+        o2m_fields = ['kit_line_ids'] # :-)
 
         # Ajout de champs nécessaires au calcul du prix de vente
-        # La conversion de categ_id n'est pas nécessaire dans ce cas, donc on ne l'ajoute pas à m2o_fields
-        added_fields = [field for field in ('categ_id', 'standard_price')
+        # Dans ce cas, la conversion des one2many n'est pas nécessaire, donc on ne l'ajoute pas à m2o_fields
+        added_fields = [field for field in ('brand_id', 'categ_id', 'uom_id', 'uom_po_id', 'list_price')
                         if field not in datastore_fields]
         datastore_fields += added_fields
 
-        for supplier_id,product_ids in datastore_product_ids.iteritems():
+        for supplier_id, product_ids in datastore_product_ids.iteritems():
+            supplier_value = supplier_id * DATASTORE_IND
             client = clients[supplier_id]
             ds_product_obj = client.get_model(self._name)
 
@@ -511,111 +592,77 @@ class OfDatastoreCentralized(models.AbstractModel):
             else:
                 # Si il n'y a plus aucun field, ds_product_obj.read lirait TOUS les field disponibles, ce qui aurait l'effet inverse (et genererait des erreurs de droits)
                 datastore_product_data = [{'id':product_id} for product_id in product_ids]
-            supplier_value = supplier_id * DATASTORE_IND
 
             if not create_mode:
                 # Les champs manquants dans la table du fournisseur ne sont pas renvoyes, sans generer d'erreur
                 # Il faut donc leur attribuer une valeur par defaut (False ou [] pour des one2many)
                 # Utilisation de _all_columns pour recuperer les colonnes de product_template egalement
-                datastore_defaults = {field: [] if self._all_columns[field].column._type in ('one2many','many2many') else False
+                datastore_defaults = {field: [] if self._fields[field].type in ('one2many','many2many') else False
                                       for field in fields_to_read if field not in datastore_product_data[0]}
 
             # Traitement des donnees
             match_dicts = {}
+            match_dicts['brand_id'] = {brand.datastore_brand_id: brand for brand in supplier.brand_ids}
 
-            # Equation de calcul de la remise
+            datastore_read_m2o_fields = [field for field in m2o_fields if field in datastore_product_data]
+            field_res_ids = {field: set() for field in datastore_read_m2o_fields}
             for vals in datastore_product_data:
-                ds_categ_id = vals['categ_id'][0]
-                for field in ('remise','price_ttc'):
-                    vals[field+'_eval'] = supplier_obj.get_matching_remise(cr, uid, supplier_id, client, [ds_categ_id], match_dicts=match_dicts,
-                                                                           field=field, context=context)[ds_categ_id]
+                # --- Calculs préalables ---
+                brand = match_dicts['brand_id'][vals['brand_id'][0]]
+                product = self.search([('of_datastore_res_id', '=', vals['id'])])
+                if self._name == 'product.template':
+                    variant = product.product_variant_id
+                else:
+                    variant = product
+                    product = product.product_tmpl_id
+                categ_name = vals['categ_id'][1]
+                obj_dict = {}
 
-            # Conversion des champs many2one
-            for field in m2o_fields:
-                if field not in datastore_product_data[0]:
-                    continue
-                if field == 'product_tmpl_id':
-                    # product_tmpl_id ne doit pas etre False, notamment a cause de la fonction pricelist.price_get_multi qui genererait une erreur
-                    # Pour eviter des effets de bord, on met une valeur negative
-                    for vals in datastore_product_data:
-                        if vals[field]:
-                            if create_mode:
-                                vals[field] = -vals[field][0]
-                            else:
-                                vals[field][0] *= -1
-                    continue
+                # ---- Champs many2one ---
+                for field in datastore_read_m2o_fields:
+                    if field == 'product_tmpl_id':
+                        # product_tmpl_id ne doit pas etre False, notamment a cause de la fonction pricelist.price_get_multi qui genererait une erreur
+                        # Pour eviter des effets de bord, on met une valeur negative
+                        if create_mode:
+                            vals[field] = -vals[field][0]
+                        else:
+                            vals[field][0] *= -1
+                        continue
 
-                # Conversion du many2one pour la base courante
-                obj = self._all_columns[field].column._obj
-                res_ids = []
-                for vals in datastore_product_data:
+                    # Conversion du many2one pour la base courante
                     if vals[field]:
-                        res_id = supplier_obj.datastore_match(cr, uid, supplier_id, client, obj, vals[field][0], match_dicts, create=create_mode, context=context)
+                        obj = self._fields[field].comodel_name
+                        res = brand.datastore_match(client, obj, vals[field][0], vals[field][1], product, match_dicts, create=create_mode)
+                        if field in ('categ_id', 'uom_id', 'uom_po_id'):
+                            obj_dict[field] = res
+                        res_id = res.id
                         vals[field] = res_id
-                        if res_id and res_id not in res_ids: res_ids.append(res_id)
+                        field_res_ids[field].add(res_id)
 
-                if not create_mode:
-                    # Conversion au format many2one (id,name)
-                    obj_obj = self.pool[obj]
-                    res_names = {v[0]:v for v in obj_obj.name_get(cr, 1, res_ids, context=context)}
-                    for vals in datastore_product_data:
-                        if vals[field]:
-                            vals[field] = res_names[vals[field]]
-
-            # Conversion des champs one2many/many2many
-            for field in o2m_fields:
-                if field not in datastore_fields:
-                    continue
-                for vals in datastore_product_data:
+                # --- Champs x2many ---
+                for field in o2m_fields:
+                    if field not in datastore_fields:
+                        continue
                     if not vals[field]:
                         continue
                     line_ids = [-(line_id + supplier_value) for line_id in vals[field]]
                     if create_mode:
                         # Preparation des lignes
-                        obj = self._all_columns[field].column._obj
+                        obj = self._fields[field].comodel_name
                         obj_obj = self.pool[obj]
-                        vals[field] = [(0,0,obj_obj.copy_data(cr, uid, line_id, context=context)) for line_id in line_ids]
+                        vals[field] = [(0, 0, obj_obj.copy_data(line_id)) for line_id in line_ids]
                     else:
                         # Conversion en id datastore
                         # Parcours avec indice pour ne pas recreer la liste
                         vals[field] = line_ids
 
-            # Champs particuliers
-            supplier_m2o_id = create_mode and supplier_id or supplier_obj.name_get(cr, uid, [supplier_id], context=context)[0]
-            for vals in datastore_product_data:
+                # --- Champs spéciaux ---
+                
+                supplier_m2o_id = create_mode and supplier_id or supplier_obj.name_get([supplier_id])[0]
                 # Preparation des variables
-                price_remise   = vals['price_remise']
-                standard_price = vals['standard_price']
-                price_extra    = vals['price_extra']
-                list_pvht      = vals['list_pvht']
-                for field in added_fields:
-                    del vals[field]
-
-                eval_dict = {
-                    'rc'   : price_remise,
-                    'ra'   : price_remise,
-                    'cumul': supplier_obj.compute_remise,
-                }
-
-                # Calcul de la remise sur prix d'achat
-                remise_eval = vals.pop('remise_eval')
-                remise = safe_eval(remise_eval, eval_dict)
-                if remise != price_remise:
-                    if remise >= 100:
-                        standard_price = 0.0
-                    else:
-                        standard_price *= (100-remise)/(100.0-price_remise)
-
-                # Calcul prix de vente modifies
-                eval_dict.update({
-                    'r'  : remise,
-                    'pv' : price_extra + standard_price * 100 / (100.0 - remise) if remise<100 else list_pvht,
-                    'tf' : price_extra,
-                })
-                price_eval = vals.pop('price_ttc_eval')
-                list_pvht = safe_eval(price_eval, eval_dict)
-                price_margin = standard_price and round((list_pvht - price_extra) / standard_price, margin_prec) or 1
-                remise = 100 - 100.0 / price_margin
+                list_price = vals['list_price']
+                vals.update(brand.compute_product_price(list_price, categ_name, obj_dict['uom_id'], obj_dict['uom_po_id'],
+                                                        product=product, price=None, remise=None))
 
                 # Calcul des valeurs specifiques
                 for field,val in fields_defaults.iteritems():
@@ -625,6 +672,118 @@ class OfDatastoreCentralized(models.AbstractModel):
                 else:
                     vals['id'] = -(vals['id'] + supplier_value)
                     vals.update(datastore_defaults)
+
+
+
+
+
+            if not create_mode:
+                # Conversion au format many2one (id,name)
+                for field, res_ids in field_res_ids.iteritems():
+                    if not res_ids:
+                        continue
+
+                    obj = self._fields[field].comodel_name
+                    res_obj = self.pool[obj].browse(res_ids)
+                    res_names = {v[0]:v for v in res_obj.sudo().name_get()}
+                    for vals in datastore_product_data:
+                        if vals[field]:
+                            vals[field] = res_names[vals[field]]
+
+#             for field in m2o_fields:
+#                 if field not in datastore_product_data[0]:
+#                     continue
+#                 if field == 'product_tmpl_id':
+#                     # product_tmpl_id ne doit pas etre False, notamment a cause de la fonction pricelist.price_get_multi qui genererait une erreur
+#                     # Pour eviter des effets de bord, on met une valeur negative
+#                     for vals in datastore_product_data:
+#                         if vals[field]:
+#                             if create_mode:
+#                                 vals[field] = -vals[field][0]
+#                             else:
+#                                 vals[field][0] *= -1
+#                     continue
+# 
+#                 # Conversion du many2one pour la base courante
+#                 obj = self._fields[field].comodel_name
+#                 res_ids = []
+#                 for vals in datastore_product_data:
+#                     if vals[field]:
+#                         res_id = brand.datastore_match(client, obj, vals[field][0], match_dicts, create=create_mode)
+#                         vals[field] = res_id
+#                         if res_id and res_id not in res_ids: res_ids.append(res_id)
+# 
+#                 if not create_mode:
+#                     # Conversion au format many2one (id,name)
+#                     obj_obj = self.pool[obj]
+#                     res_names = {v[0]:v for v in obj_obj.name_get(1, res_ids)}
+#                     for vals in datastore_product_data:
+#                         if vals[field]:
+#                             vals[field] = res_names[vals[field]]
+
+#             # Conversion des champs one2many/many2many
+#             for field in o2m_fields:
+#                 if field not in datastore_fields:
+#                     continue
+#                 for vals in datastore_product_data:
+#                     if not vals[field]:
+#                         continue
+#                     line_ids = [-(line_id + supplier_value) for line_id in vals[field]]
+#                     if create_mode:
+#                         # Preparation des lignes
+#                         obj = self._fields[field].comodel_name
+#                         obj_obj = self.pool[obj]
+#                         vals[field] = [(0, 0, obj_obj.copy_data(line_id)) for line_id in line_ids]
+#                     else:
+#                         # Conversion en id datastore
+#                         # Parcours avec indice pour ne pas recreer la liste
+#                         vals[field] = line_ids
+
+#             # Champs particuliers
+#             supplier_m2o_id = create_mode and supplier_id or supplier_obj.name_get([supplier_id])[0]
+#             for vals in datastore_product_data:
+#                 # Preparation des variables
+#                 price_remise   = vals['price_remise']
+#                 standard_price = vals['standard_price']
+#                 price_extra    = vals['price_extra']
+#                 list_pvht      = vals['list_pvht']
+#                 for field in added_fields:
+#                     del vals[field]
+# 
+#                 eval_dict = {
+#                     'rc'   : price_remise,
+#                     'ra'   : price_remise,
+#                     'cumul': supplier_obj.compute_remise,
+#                 }
+# 
+#                 # Calcul de la remise sur prix d'achat
+#                 remise_eval = vals.pop('remise_eval')
+#                 remise = safe_eval(remise_eval, eval_dict)
+#                 if remise != price_remise:
+#                     if remise >= 100:
+#                         standard_price = 0.0
+#                     else:
+#                         standard_price *= (100-remise)/(100.0-price_remise)
+# 
+#                 # Calcul prix de vente modifies
+#                 eval_dict.update({
+#                     'r'  : remise,
+#                     'pv' : price_extra + standard_price * 100 / (100.0 - remise) if remise<100 else list_pvht,
+#                     'tf' : price_extra,
+#                 })
+#                 price_eval = vals.pop('price_ttc_eval')
+#                 list_pvht = safe_eval(price_eval, eval_dict)
+#                 price_margin = standard_price and round((list_pvht - price_extra) / standard_price, margin_prec) or 1
+#                 remise = 100 - 100.0 / price_margin
+# 
+#                 # Calcul des valeurs specifiques
+#                 for field,val in fields_defaults.iteritems():
+#                     vals[field] = val()
+#                 if create_mode:
+#                     del vals['id']
+#                 else:
+#                     vals['id'] = -(vals['id'] + supplier_value)
+#                     vals.update(datastore_defaults)
             res += datastore_product_data
 
         return res
@@ -857,13 +1016,15 @@ class OfDatastoreCentralized(models.AbstractModel):
             res = supplier_obj.of_datastore_search(ds_product_obj, args, offset, limit, order, count)
 
             if not count:
-                if len(brands) == 1:
-                    brand_value = brands.id * DATASTORE_IND
-                    res = [-(product_id + brand_value) for product_id in res]
-                else:
-                    brand_ids = {brand.datastore_brand_id: brand.id * DATASTORE_IND for brand in brands}
-                    products = supplier_obj.of_datastore_read(ds_product_obj, res, ['brand_id'])
-                    res = [-(product['id'] + brand_ids[product['brand_id'][0]]) for product in products]
+                supplier_value = supplier.id * DATASTORE_IND
+                res = [-(product_id + supplier_value) for product_id in res]
+#                 if len(brands) == 1:
+#                     brand_value = brands.id * DATASTORE_IND
+#                     res = [-(product_id + brand_value) for product_id in res]
+#                 else:
+#                     brand_ids = {brand.datastore_brand_id: brand.id * DATASTORE_IND for brand in brands}
+#                     products = supplier_obj.of_datastore_read(ds_product_obj, res, ['brand_id'])
+#                     res = [-(product['id'] + brand_ids[product['brand_id'][0]]) for product in products]
         else:
             # Éxecution de la requête sur la base courante
             res = super(OfDatastoreCentralized, self)._search(args, offset=offset, limit=limit, order=order, count=count, access_rights_uid=access_rights_uid)
@@ -881,6 +1042,10 @@ class ProductTemplate(models.Model):
 class ProductProduct(models.Model):
     _name = "product.product"
     _inherit = ['product.product', 'of.datastore.centralized']
+
+
+class OfProductKitLine(models.Model):
+    _inherit = "of.product.kit.line"
 
 
 # Création/édition d'objets incluant un article centralisé
