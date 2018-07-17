@@ -91,8 +91,8 @@ class OfDatastoreConnector(models.AbstractModel):
                         port = int(address[j+1:])
                         address = address[:j]
                     cli = openerplib.get_connection(hostname=address, port=port, protocol=protocol,
-                                                       database=supplier.db_name,
-                                                       login=supplier.login, password=supplier.new_password or supplier.password)
+                                                    database=supplier.db_name,
+                                                    login=supplier.login, password=supplier.new_password or supplier.password)
 
                     # Operation pour verifier la connexion
                     self.result = cli.get_model('res.users').search([]) and cli or ''
