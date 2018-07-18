@@ -473,10 +473,9 @@ class OfDatastoreCentralized(models.AbstractModel):
         ]
 
         # On ne veut pas non-plus les champs one2many ou many2many (seller_ids, packagind_ids, champs liés aux variantes....)
-        # Utilisation de _all_columns pour recuperer les colonnes de product_template egalement
         # On conserve les lignes de kits
-        for field_name,field in self._all_columns.iteritems():
-            if field.column._type in ('one2many','many2many'):
+        for field_name, field in self._fields.iteritems():
+            if field.comodel_name in ('one2many','many2many'):
                 if field_name != 'kit_line_ids' and field_name not in res:
                     res.append(field_name)
         return res
@@ -510,7 +509,6 @@ class OfDatastoreCentralized(models.AbstractModel):
                             En mode create on remplit seller_ids
         """
         supplier_obj = self.env['of.datastore.supplier']
-        margin_prec = self._columns['price_margin'].digits[1]
         res = []
 
         if 'id' in fields_to_read: # Le champ id sera de toute façon ajouté, le laisser génèrera des erreurs
@@ -518,12 +516,6 @@ class OfDatastoreCentralized(models.AbstractModel):
 
         # Articles par fournisseur
         datastore_product_ids = {}
-
-        # Articles par marque
-        brand_product_ids = {}
-
-        # Données par article
-        product_data = {}
 
         # Produits par fournisseur
         for full_id in self._ids:
@@ -536,23 +528,13 @@ class OfDatastoreCentralized(models.AbstractModel):
         suppliers = supplier_obj.browse(datastore_product_ids.keys())
         clients = suppliers.of_datastore_connect()
 
-        suppliers = {supplier.id: supplier for supplier in suppliers}
+#        suppliers = {supplier.id: supplier for supplier in suppliers}
 
         # Champs a valeurs spécifiques
         fields_defaults = {
             'of_datastore_supplier_id': lambda: supplier_m2o_id,
             'of_datastore_res_id'     : lambda: vals['id'],
-
-#             'price'                   : lambda: standard_price,  # Champ calculé avec la liste de prix ...
-#             'list_price'              : lambda: standard_price,  # Champ standard
-#            'lst_price'               : lambda: standard_price,  # Champ related
-#            'standard_price'          : lambda: standard_price,  # Champ calculé avec la marque
-
-#             'price_margin'            : lambda: price_margin,
-#             'price_remise'            : lambda: remise,
-#             'coef'                    : lambda: price_margin * 1.2,
         }
-
 
         fields_defaults = {k:v for k,v in fields_defaults.iteritems() if k in fields_to_read}
         if create_mode:
@@ -563,12 +545,17 @@ class OfDatastoreCentralized(models.AbstractModel):
 
             # Creation de la relation fournisseur
             fields_defaults['seller_ids'] = lambda: [(0, 0, {
-                    'name'   : suppliers[supplier_id].partner_id.id,
+                    'name'   : supplier.partner_id.id,
                     'min_qty': 1,
                     'delay'  : vals['sale_delay'],
                 })]
 
         datastore_fields = [field for field in fields_to_read if field not in self._get_datastore_unused_fields()]
+
+        # Ajout de champs nécessaires aux calculs
+        added_fields = [field for field in ('brand_id', 'categ_id', 'uom_id', 'uom_po_id', 'list_price')
+                        if field not in datastore_fields]
+        datastore_fields += added_fields
 
         m2o_fields = [field for field in datastore_fields
                       if self._fields[field].type  == 'many2one'
@@ -576,15 +563,10 @@ class OfDatastoreCentralized(models.AbstractModel):
 
         o2m_fields = ['kit_line_ids'] # :-)
 
-        # Ajout de champs nécessaires au calcul du prix de vente
-        # Dans ce cas, la conversion des one2many n'est pas nécessaire, donc on ne l'ajoute pas à m2o_fields
-        added_fields = [field for field in ('brand_id', 'categ_id', 'uom_id', 'uom_po_id', 'list_price')
-                        if field not in datastore_fields]
-        datastore_fields += added_fields
-
         for supplier_id, product_ids in datastore_product_ids.iteritems():
             supplier_value = supplier_id * DATASTORE_IND
             client = clients[supplier_id]
+            supplier = supplier_obj.browse(supplier_id)
             ds_product_obj = client.get_model(self._name)
 
             if datastore_fields:
@@ -596,7 +578,6 @@ class OfDatastoreCentralized(models.AbstractModel):
             if not create_mode:
                 # Les champs manquants dans la table du fournisseur ne sont pas renvoyes, sans generer d'erreur
                 # Il faut donc leur attribuer une valeur par defaut (False ou [] pour des one2many)
-                # Utilisation de _all_columns pour recuperer les colonnes de product_template egalement
                 datastore_defaults = {field: [] if self._fields[field].type in ('one2many','many2many') else False
                                       for field in fields_to_read if field not in datastore_product_data[0]}
 
@@ -610,10 +591,7 @@ class OfDatastoreCentralized(models.AbstractModel):
                 # --- Calculs préalables ---
                 brand = match_dicts['brand_id'][vals['brand_id'][0]]
                 product = self.search([('of_datastore_res_id', '=', vals['id'])])
-                if self._name == 'product.template':
-                    variant = product.product_variant_id
-                else:
-                    variant = product
+                if self._name == 'product.product':
                     product = product.product_tmpl_id
                 categ_name = vals['categ_id'][1]
                 obj_dict = {}
@@ -658,7 +636,7 @@ class OfDatastoreCentralized(models.AbstractModel):
 
                 # --- Champs spéciaux ---
                 
-                supplier_m2o_id = create_mode and supplier_id or supplier_obj.name_get([supplier_id])[0]
+                supplier_m2o_id = create_mode and supplier_id or supplier.name_get()[0]
                 # Preparation des variables
                 list_price = vals['list_price']
                 vals.update(brand.compute_product_price(list_price, categ_name, obj_dict['uom_id'], obj_dict['uom_po_id'],
@@ -672,10 +650,6 @@ class OfDatastoreCentralized(models.AbstractModel):
                 else:
                     vals['id'] = -(vals['id'] + supplier_value)
                     vals.update(datastore_defaults)
-
-
-
-
 
             if not create_mode:
                 # Conversion au format many2one (id,name)
@@ -792,6 +766,8 @@ class OfDatastoreCentralized(models.AbstractModel):
     def read(self, fields=None, load='_classic_read'):
         new_ids = [i for i in self._ids if i>0]
         datastore_ids = [i for i in self._ids if i<0]
+#         if self._context.get('of_datastore_product_search'):
+#             self = self.with_context(of_datastore_product_search=False)
 
         # Produits sur la base courante
         res = super(OfDatastoreCentralized, self.browse(new_ids)).read(fields, load=load)
@@ -811,8 +787,12 @@ class OfDatastoreCentralized(models.AbstractModel):
         @requires: Si args contient un tuple dont le premier argument est 'ds_supplier_search_id', le second argument doit être '='
         @return: Id du fournisseur (of.datastore.supplier) ou False sinon, suivi du nouveau domaine de recherche
         """
-        if not self._context.get('of_datastore_product_search'):
+#         if not self._context.get('of_datastore_product_search'):
+#             return False, domain
+        if 'of_datastore_product_search' not in domain:
             return False, domain
+
+        domain = [arg for arg in domain if arg != 'of_datastore_product_search']
 
         # Recherche des marques
         brand_domain = []
@@ -828,7 +808,7 @@ class OfDatastoreCentralized(models.AbstractModel):
                 else:
                     brand_domain.append((id, operator, right))
         brands = self.env['of.product.brand'].search(brand_domain)
-        ds_supplier = brands.mapped('of_datastore_supplier_id')
+        ds_supplier = brands.mapped('datastore_supplier_id')
 
         if not ds_supplier:
             if brands:
@@ -837,6 +817,7 @@ class OfDatastoreCentralized(models.AbstractModel):
 
         if len(ds_supplier) > 1:
             raise UserError(_('You must select one or several brands using the same centralized database (provided by the same supplier).'))
+        brands = brands.filtered('datastore_supplier_id')
 
         # Recherche des produits non déjà enregistrés
         if not self._context.get('datastore_stored'):
@@ -997,7 +978,7 @@ class OfDatastoreCentralized(models.AbstractModel):
 
         # Recherche sur la base du fournisseur
         if brands:
-            supplier = brands[0].supplier_id
+            supplier = brands[0].datastore_supplier_id
 #            brands = supplier.brand_ids
             # Ex: si la base n'a qu'une base centralisée, elle peut appeler les articles de la base distante sans autre filtre de recherche.
             # Dans ce cas, on ne veut pas les autres marques du fournisseur
