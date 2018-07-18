@@ -120,7 +120,8 @@ class OfDatastoreConnector(models.AbstractModel):
                   for key,val in [('offset', offset),
                                   ('limit', limit),
                                   ('order', order),
-                                  ('count', count)]
+                                  ('count', count),
+                                  ('context', dict(self._context))]
                   if val is not None}
         return ds_model.search(args, **kwargs)
 
@@ -130,7 +131,8 @@ class OfDatastoreConnector(models.AbstractModel):
                   for key,val in [('name', name),
                                   ('args', args),
                                   ('operator', operator),
-                                  ('limit', limit)]
+                                  ('limit', limit),
+                                  ('context', dict(self._context))]
                   if val is not None}
         return ds_model.name_search(**kwargs)
 
@@ -143,7 +145,8 @@ class OfDatastoreConnector(models.AbstractModel):
         kwargs = {
             key: val
             for key,val in [('fields', fields),
-                            ('load', load)]
+                            ('load', load),
+                            ('context', dict(self._context))]
             if val is not None}
         return ds_model.read(ids, **kwargs)
 
@@ -154,6 +157,6 @@ class OfDatastoreConnector(models.AbstractModel):
                                   ('limit', limit),
                                   ('orderby', orderby),
                                   ('lazy', lazy),
-                                 ('context', context)]
+                                  ('context', context)]
                   if val is not None}
         return ds_model.read_group(domain, fields, groupby, **kwargs)

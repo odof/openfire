@@ -379,11 +379,12 @@ class OfProductBrand(models.Model):
         """
         def datastore_matching_model(obj_name, obj_id):
             """ Teste si une correspondance existe dans la table ir_model_data
+            @warning: Cette façon de faire est dangereuse car les éléments ont pu être modifiés à la main, ne l'utiliser que pour de rares modèles.
             """
-            model_ids = ds_model_obj.search([('model', '=', obj_name), ('res_id', '=', obj_id)])
+            model_ids = ds_supplier_obj.of_datastore_search(ds_model_obj, [('model', '=', obj_name), ('res_id', '=', obj_id)])
             if not model_ids:
                 return False
-            model = ds_model_obj.read(model_ids[0], ['module','name'])
+            model = ds_supplier_obj.of_datastore_read(ds_model_obj, model_ids, ['module','name'])[0]
             res_id = model_obj.search([('module', '=', model['module']), ('name', '=', model['name'])]).id
             # Dans certains cas, un objet a pu être supprimé en DB mais pas sa référence dans ir_model_data
             res_id = res_id and self.env[obj_name].search([('id', '=', res_id)]).id
@@ -402,6 +403,7 @@ class OfProductBrand(models.Model):
 
         # Recherche de correspondance dans les identifiants externes (ir_model_data)
         model_obj = self.env['ir.model.data']
+        ds_supplier_obj = self.env['of.datastore.supplier']
         ds_model_obj = client.get_model('ir.model.data')
         ds_obj_obj = client.get_model(obj)
         result = False
@@ -416,7 +418,7 @@ class OfProductBrand(models.Model):
                     raise ValidationError(u"Catégorie d'UDM inexistante : " + res_name)
         elif obj == 'product.uom':
             # Etape 1 : Déterminer la catégorie d'udm
-            ds_obj = ds_obj_obj.read(res_id, ['category_id', 'factor', 'uom_type', 'rounding'])
+            ds_obj = ds_supplier_obj.of_datastore_read(ds_obj_obj, [res_id], ['category_id', 'factor', 'uom_type', 'rounding'])[0]
 
             categ = self.datastore_match(client, 'product.uom.categ', ds_obj['category_id'][0], ds_obj['category_id'][1],
                                          product, match_dicts)
@@ -429,7 +431,7 @@ class OfProductBrand(models.Model):
             if uoms:
                 if len(uoms) > 1:
                     # Ajout d'un filtre sur le nom pour préciser la recherche
-                    uoms = obj_obj.search([('id', 'in', uoms.ids), ('name', '=ilike', ds_obj['name'])]) or uoms
+                    uoms = obj_obj.search([('id', 'in', uoms.ids), ('name', '=ilike', res_name)]) or uoms
                 if len(uoms) > 1:
                     # Ajout d'un filtre sur la précision de l'arrondi pour préciser la recherche
                     uoms = obj_obj.search([('id', 'in', uoms.ids),('rounding', '=', ds_obj['rounding'])]) or uoms
@@ -475,7 +477,7 @@ class OfDatastoreCentralized(models.AbstractModel):
         # On ne veut pas non-plus les champs one2many ou many2many (seller_ids, packagind_ids, champs liés aux variantes....)
         # On conserve les lignes de kits
         for field_name, field in self._fields.iteritems():
-            if field.comodel_name in ('one2many','many2many'):
+            if field.type in ('one2many','many2many'):
                 if field_name != 'kit_line_ids' and field_name not in res:
                     res.append(field_name)
         return res
@@ -509,7 +511,7 @@ class OfDatastoreCentralized(models.AbstractModel):
                             En mode create on remplit seller_ids
         """
         supplier_obj = self.env['of.datastore.supplier']
-        res = []
+        result = []
 
         if 'id' in fields_to_read: # Le champ id sera de toute façon ajouté, le laisser génèrera des erreurs
             fields_to_read.remove('id')
@@ -570,7 +572,7 @@ class OfDatastoreCentralized(models.AbstractModel):
             ds_product_obj = client.get_model(self._name)
 
             if datastore_fields:
-                datastore_product_data = ds_product_obj.read(product_ids, datastore_fields, '_classic_read')
+                datastore_product_data = supplier_obj.of_datastore_read(ds_product_obj, product_ids, datastore_fields, '_classic_read')
             else:
                 # Si il n'y a plus aucun field, ds_product_obj.read lirait TOUS les field disponibles, ce qui aurait l'effet inverse (et genererait des erreurs de droits)
                 datastore_product_data = [{'id':product_id} for product_id in product_ids]
@@ -585,7 +587,7 @@ class OfDatastoreCentralized(models.AbstractModel):
             match_dicts = {}
             match_dicts['brand_id'] = {brand.datastore_brand_id: brand for brand in supplier.brand_ids}
 
-            datastore_read_m2o_fields = [field for field in m2o_fields if field in datastore_product_data]
+            datastore_read_m2o_fields = [field for field in m2o_fields if field in datastore_product_data[0]]
             field_res_ids = {field: set() for field in datastore_read_m2o_fields}
             for vals in datastore_product_data:
                 # --- Calculs préalables ---
@@ -613,9 +615,10 @@ class OfDatastoreCentralized(models.AbstractModel):
                         res = brand.datastore_match(client, obj, vals[field][0], vals[field][1], product, match_dicts, create=create_mode)
                         if field in ('categ_id', 'uom_id', 'uom_po_id'):
                             obj_dict[field] = res
-                        res_id = res.id
+                        res_id = res and res.id
                         vals[field] = res_id
-                        field_res_ids[field].add(res_id)
+                        if res_id:
+                            field_res_ids[field].add(res_id)
 
                 # --- Champs x2many ---
                 for field in o2m_fields:
@@ -627,7 +630,7 @@ class OfDatastoreCentralized(models.AbstractModel):
                     if create_mode:
                         # Preparation des lignes
                         obj = self._fields[field].comodel_name
-                        obj_obj = self.pool[obj]
+                        obj_obj = self.env[obj]
                         vals[field] = [(0, 0, obj_obj.copy_data(line_id)) for line_id in line_ids]
                     else:
                         # Conversion en id datastore
@@ -658,7 +661,7 @@ class OfDatastoreCentralized(models.AbstractModel):
                         continue
 
                     obj = self._fields[field].comodel_name
-                    res_obj = self.pool[obj].browse(res_ids)
+                    res_obj = self.env[obj].browse(res_ids)
                     res_names = {v[0]:v for v in res_obj.sudo().name_get()}
                     for vals in datastore_product_data:
                         if vals[field]:
@@ -758,9 +761,9 @@ class OfDatastoreCentralized(models.AbstractModel):
 #                 else:
 #                     vals['id'] = -(vals['id'] + supplier_value)
 #                     vals.update(datastore_defaults)
-            res += datastore_product_data
+            result += datastore_product_data
 
-        return res
+        return result
 
     @api.multi
     def read(self, fields=None, load='_classic_read'):
