@@ -12,7 +12,7 @@ from odoo import api, fields, models
 from odoo.tools.translate import _
 from odoo.tools.safe_eval import safe_eval
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import except_orm, UserError, ValidationError
 
 try:
     from cStringIO import StringIO
@@ -52,9 +52,12 @@ CODE_IMPORT_ERREUR = -1
 CODE_IMPORT_CREATION = 0
 CODE_IMPORT_MODIFICATION = 1
 
-class OfImportError(Exception):
+# class OfImportError(Exception):
+#     def __init__(self, msg):
+#         self.msg = msg
+class OfImportError(except_orm):
     def __init__(self, msg):
-        self.msg = msg
+        super(OfImportError, self).__init__(msg)
 
 class OfImportProductConfigTemplate(models.AbstractModel):
     _name = 'of.import.product.config.template'
@@ -270,9 +273,9 @@ class OFProductBrand(models.Model):
                         eval_dict['pa'] = product.of_seller_price
                     else:
                         # La formule n'est pas renseignée et aucune valeur ne peut être déduite
-                        raise OfImportError(u"Aucune formule n'est renseignée pour %s de cet article." % (text, ))
+                        raise OfImportError(u"Aucune formule n'est renseignée pour %s de cet article (marque à configurer : %s)." % (text, self.name))
                 else:
-                    raise OfImportError(u"Aucune formule n'est renseignée pour %s de cet article." % (text, ))
+                    raise OfImportError(u"Aucune formule n'est renseignée pour %s de cet article (marque à configurer : %s)." % (text, self.name))
 
         values['of_seller_price'] = eval_dict['pa']
         values['list_price'] *= udm_ratio

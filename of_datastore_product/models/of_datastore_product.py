@@ -809,7 +809,7 @@ class OfDatastoreCentralized(models.AbstractModel):
                         right and isinstance(right, (tuple, list)) and all(isinstance(item, basestring) for item in right):
                     brand_domain.append(('name', operator, right))
                 else:
-                    brand_domain.append((id, operator, right))
+                    brand_domain.append(('id', operator, right))
         brands = self.env['of.product.brand'].search(brand_domain)
         ds_supplier = brands.mapped('datastore_supplier_id')
 
