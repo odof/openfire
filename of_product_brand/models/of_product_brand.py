@@ -145,11 +145,11 @@ class ProductTemplate(models.Model):
                 code = elem[2:]
                 if not code:
                     continue
-                b = brand_obj.search([('code', '=', code)])
+                b = brand_obj.search([('code', '=ilike', code)])
                 if not b:
-                    b = brand_obj.search[('name', '=ilike', code)]
+                    b = brand_obj.search([('name', '=ilike', code)])
                     if not b:
-                        b = brand_obj.search([('name', 'ilike', code)])
+                        b = brand_obj.search([('name', '=ilike', code + '%')])
                 if b:
                     brands += b
             else:

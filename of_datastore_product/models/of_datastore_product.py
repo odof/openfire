@@ -841,8 +841,8 @@ class OfDatastoreCentralized(models.AbstractModel):
             if arg[0].startswith('ds_'):
                 arg[0] = arg[0][3:]
             elif arg[0] in ('categ_id', 'brand_id'):
-                obj_name = self._fields[arg[0]].obj
-                new_arg = parse_domain(arg, obj_name)
+                obj_name = self._fields[arg[0]].comodel_name
+                new_arg = parse_domain(arg, self.env[obj_name])
                 if new_arg:
                     arg[0], arg[1], arg[2] = new_arg
         return brands, domain
@@ -1014,6 +1014,72 @@ class OfDatastoreCentralized(models.AbstractModel):
             res = super(OfDatastoreCentralized, self)._search(args, offset=offset, limit=limit, order=order, count=count, access_rights_uid=access_rights_uid)
         return res
 
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        # Cette portion de code est une copie de celle présente dans le module of_product_brand
+        brand_obj = self.env['of.product.brand']
+        brands = brand_obj.browse()
+        elems = []
+        for elem in name.split(" "):
+            if elem.startswith('m:') or elem.startswith('M:'):
+                code = elem[2:]
+                if not code:
+                    continue
+                b = brand_obj.search([('code', '=ilike', code)])
+                if not b:
+                    b = brand_obj.search([('name', '=ilike', code)])
+                    if not b:
+                        b = brand_obj.search([('name', '=ilike', code + '%')])
+                if b:
+                    brands += b
+            else:
+                elems.append(elem)
+        name = " ".join(elems)
+
+        # Début du code spécifique à la recherche sur base fournisseur
+        new_args = args
+        if brands:
+            new_args = [('brand_id', 'in', brands._ids)] + args
+        res = super(OfDatastoreCentralized, self).name_search(name=name, args=new_args, operator=operator, limit=limit)
+
+        if not brands:
+            # La recherche sur base centrale ne se fait que si la marque a été explicitement invoquée
+            return res
+
+        supplier = brands.mapped('datastore_supplier_id')
+        if len(supplier._ids) != 1:
+            # Les marques doivent être centralisées, une seule base centrale à la fois
+            return res
+
+        if limit != 8 or len(res) == limit:
+            # La recherche sur une base fournisseur ne se fait en automatique que pour les recherches
+            #   dynamiques des champs many2one (limit=8)
+            return res
+        if len(res) == 7:
+            # Le 8e produit ne sert qu'a savoir si on affiche "Plus de resultats"
+            return res + [False]
+
+        # Recherche des produits dans la base centrale
+        client = supplier.connect()[supplier.id]
+        if isinstance(client, basestring):
+            #Echec de la connexion a la base fournisseur
+            return res
+
+        brands = brands.filtered('datastore_supplier_id')
+
+        # Recherche des produits non déjà enregistrés
+        orig_ids = self.search([('brand_id', 'in', brands._ids), ('of_datastore_res_id', '!=', False)]).mapped('of_datastore_res_id')
+
+        # Mise a jour des paramètres de recherche
+        new_args = [('brand_id', 'in', brands.mapped('datastore_brand_id')), ('id', 'not in', orig_ids)] + args
+
+        ds_product_obj = supplier.of_datastore_get_model(client, 'product.product')
+        res2 = supplier.of_datastore_name_search(ds_product_obj, name, new_args, operator, limit-len(res))
+        supplier_ind = DATASTORE_IND * supplier['id']
+        res += [[-(pid + supplier_ind), pname] for pid, pname in res2]
+
+        return res
+
 
 class ProductTemplate(models.Model):
     _name = "product.template"
@@ -1030,6 +1096,81 @@ class ProductProduct(models.Model):
 
 class OfProductKitLine(models.Model):
     _inherit = "of.product.kit.line"
+
+    @api.multi
+    def _read_datastore(self, fields_to_read, create_mode=False):
+        u"""
+        Lit les données des kits dans leur base fournisseur.
+        @param ids: id modifié des produits, en valeur négative
+        """
+        supplier_obj = self.env['of.datastore.supplier']
+        product_obj = self.env['product.product']
+        res = []
+
+        # Kits par fournisseur
+        datastore_kit_ids = {}
+        for full_id in self._ids:
+            supplier_id = -full_id / DATASTORE_IND
+            datastore_kit_ids.setdefault(supplier_id, []).append((-full_id) % DATASTORE_IND)
+
+        supplier_ids = datastore_kit_ids.keys()
+        suppliers = supplier_obj.browse(supplier_ids)
+
+        clients = suppliers.of_datastore_connect()
+        for supplier in suppliers:
+            client = clients[supplier.id]
+            ds_kit_obj = supplier.of_datastore_get_model(client, 'of.product.kit.line')
+
+            # Donnees de la base fournisseur
+            kits_data = supplier.of_datastore_read(ds_kit_obj, datastore_kit_ids[supplier.id], [])
+            ds_product_ids = [kit['product_id'][0] for kit in kits_data]
+
+            # Detection des composants du kit deja importes
+            products = product_obj.search([('brand_id', 'in', supplier.brand_ids._ids), ('of_datastore_res_id', 'in', ds_product_ids)])
+
+            product_match = {product.datastore_product_id: product for product in products}
+            product_names = dict(products.name_get())
+
+            # Affectation des ids des composants
+            supplier_value = supplier.id * DATASTORE_IND
+            for kit in kits_data:
+                product_id, product_name = kit['product_id']
+                if product_id in product_match:
+                    # Composant deja importe
+                    product_id = product_match[product_id]
+                    product_name = product_names[product_id]
+                else:
+                    # Composant virtuel
+                    product_id = -(product_id + supplier_value)
+                kit['product_id'] = (product_id,product_name)
+                kit['id'] = -(kit['id'] + supplier_value)
+            res += kits_data
+        return res
+
+    @api.multi
+    def read(self, fields=None, load='_classic_read'):
+        lines = self.filtered(lambda o:o.id > 0)
+        ds_lines = self - lines
+
+        # kits sur la base courante
+        res = super(OfProductKitLine, self).read(fields, load=load)
+        
+        if ds_lines:
+            res += ds_lines._read_datastore(fields)
+        return res
+
+    @api.model
+    def create(self, vals):
+        # par defaut .get() retourne None si la clef n'existe pas, et None == -1
+        if vals.get('product_id', 0) < 0:
+            vals['product_id'] = self.pool['product.product'].datastore_import(vals['product_id'])
+        return super(OfProductKitLine, self).create(vals)
+
+    @api.multi
+    def write(self, vals):
+        if vals.get('product_id', 0) < 0:
+            vals['product_id'] = self.pool['product.product'].datastore_import(vals['product_id'])
+        return super(OfProductKitLine, self).write(vals)
 
 
 # Création/édition d'objets incluant un article centralisé
