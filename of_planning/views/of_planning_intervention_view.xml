@@ -602,14 +602,16 @@
 <!--#############################################_________Menus__________#####################################################-->
 <!--##########################################################################################################################-->
 
-        <menuitem id="menu_of_planning_configuration" name="Intervention" parent="hr.menu_human_resources_configuration" groups="hr.group_hr_manager" sequence="10"/>
+    <menuitem id="menu_of_planning" name="Planning intervention" groups="base.group_system" sequence="2"/>
+
+        <menuitem id="menu_of_planning_configuration" name="Configuration" parent="of_planning.menu_of_planning" groups="hr.group_hr_manager" sequence="20"/>
             <menuitem name="Employés" id="menu_hr_employee_tree" parent="menu_of_planning_configuration" sequence="1" action="action_hr_employee_tree"/>
             <menuitem name="Équipes" id="menu_of_planning_equipe_tree" parent="menu_of_planning_configuration" sequence="2" action="action_of_planning_equipe_tree"/>
             <menuitem name="Erreurs" id="menu_of_planning_intervention_raison_tree" parent="menu_of_planning_configuration" sequence="3" action="action_of_planning_intervention_raison_tree"/>
             <menuitem name="Tâches" id="menu_of_planning_tache_tree" parent="menu_of_planning_configuration" sequence="3" action="action_of_planning_tache_tree"/>
             <!--menuitem name="Types de coûts" id="menu_pnanning_of_employee_typcout_tree" parent="menu_of_planning_configuration" sequence="5" action="action_of_planning_employee_typcout_tree"/-->
 
-        <menuitem id="menu_of_planning_intervention" name="Interventions" parent="sales_team.menu_base_partner" groups="of_group_planning_intervention_user" sequence="10"/>
+        <menuitem id="menu_of_planning_intervention" name="Interventions" parent="of_planning.menu_of_planning" groups="of_group_planning_intervention_user" sequence="10"/>
             <menuitem id="menu_of_planning_intervention_calendar" name="Planning" parent="menu_of_planning_intervention" sequence="1" action="action_of_planning_intervention_calendar"/>
             <!--menuitem id="menu_of_planning_intervention_global" name="Global" parent="menu_of_planning_intervention" sequence="1" action="action_of_planning_intervention_calendar"/>
             <menuitem id="menu_of_planning_intervention_po" name="Poêle" parent="menu_of_planning_intervention" sequence="4" action="action_of_planning_intervention_po_calendar"/>
