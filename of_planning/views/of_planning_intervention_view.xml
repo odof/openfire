@@ -602,7 +602,7 @@
 <!--#############################################_________Menus__________#####################################################-->
 <!--##########################################################################################################################-->
 
-    <menuitem id="menu_of_planning" name="Planning intervention" groups="base.group_system" sequence="2"/>
+    <menuitem id="menu_of_planning" name="Planning intervention" groups="of_group_planning_intervention_user" sequence="2"/>
 
         <menuitem id="menu_of_planning_configuration" name="Configuration" parent="of_planning.menu_of_planning" groups="hr.group_hr_manager" sequence="20"/>
             <menuitem name="Employés" id="menu_hr_employee_tree" parent="menu_of_planning_configuration" sequence="1" action="action_hr_employee_tree"/>
