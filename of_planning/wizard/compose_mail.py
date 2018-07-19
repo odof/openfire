@@ -11,7 +11,7 @@ class OfComposeMail(models.TransientModel):
         if o._name == 'of.planning.intervention':
             result.update({
                 'interventions': [o],
-                'partner'      : o.part_id or False,
+                'partner'      : o.partner_id or False,
                 'address'      : o.address_id or False,
                 'address_pose' : o.address_id or False,
                 'shop'         : o.company_id,
@@ -28,6 +28,7 @@ class OfComposeMail(models.TransientModel):
 
     @api.model
     def _get_dict_values(self, o, objects=None):
+        fisc_position_obj = self.env['account.fiscal.position']
         if not objects:
             objects = self._get_objects(o)
         if not self._context.get('tz'):
@@ -62,6 +63,7 @@ class OfComposeMail(models.TransientModel):
                     fpos = self.env['account.fiscal.position'].get_fiscal_position(partner.id, delivery_id=intervention.address_id.id)
                 if fpos:
                     tache_product_tax = 0.0
+                    fpos = fisc_position_obj.browse(fpos)
                     for tax in fpos.tax_ids:
                         tache_product_tax += tax.tax_src_id.amount
 

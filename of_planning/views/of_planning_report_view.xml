@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-    <data>
+<odoo>
 
         <!-- Attestation ramonage -->
         <report 
@@ -41,5 +40,16 @@
 
         <menuitem id="menu_of_planning_report" name="Impression" parent="menu_of_planning_intervention" action="action_of_planning_report" sequence="100"/>
 
-    </data>
-</openerp>  
+    <act_window
+            name="Envoyer un courrier"
+            res_model="of.compose.mail"
+            src_model="of.planning.intervention"
+            view_mode="form"
+            key2="client_print_multi"
+            view_id="of_gesdoc.view_courrier_wizard"
+            id="action_view_courrier_wizard_intervention"
+            target="new"
+            context="{'model':'of.planning.intervention'}"
+        />
+
+</odoo>
