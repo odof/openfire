@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+import re
+
+def remove_html_balise(text):
+    regex_remove = re.compile("<.*?>")  # permet de chercher toute chaine de charactère commançant par '<' et se terminant par '>'
+    regex_replace = re.compile("</p>|</br>|</li>")  # liste des expression a remplacer par '\n'
+    text = text.replace('\n', '').replace('\r', '')  # on enlève tout les retours à la ligne
+    text = regex_replace.sub('\n', text)
+    text = regex_remove.sub('', text)
+    return text
 
 class OfComposeMail(models.TransientModel):
     _inherit = 'of.compose.mail'
@@ -82,6 +91,7 @@ class OfComposeMail(models.TransientModel):
             'duree_intervention': duree,
             'tache': intervention and intervention.tache_id and intervention.tache_id.name or '',
             'tache_product_ttc': tache_product_ttc,
+            'interv_description': intervention and intervention.description and remove_html_balise(intervention.description)
         })
         # Pour rétrocompatibilité
         result.update({
