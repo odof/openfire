@@ -61,6 +61,10 @@ class OfDatastoreConnector(models.AbstractModel):
                     error_msg = _('Connection successful')
             connector.error_msg = error_msg
 
+    @api.model
+    def _get_context(self):
+        return {key:val for key,val in self._context.iteritems() if key in ('lang', 'tz')}
+
     @api.multi
     def of_datastore_connect(self):
         # Connection à la base du fournisseur
@@ -116,24 +120,26 @@ class OfDatastoreConnector(models.AbstractModel):
 
     @api.model
     def of_datastore_search(self, ds_model, args, offset=None, limit=None, order=None, count=None):
-        kwargs = {key: val
-                  for key,val in [('offset', offset),
-                                  ('limit', limit),
-                                  ('order', order),
-                                  ('count', count),
-                                  ('context', dict(self._context))]
-                  if val is not None}
+        kwargs = {
+            key: val
+            for key,val in [('offset', offset),
+                            ('limit', limit),
+                            ('order', order),
+                            ('count', count),
+                            ('context', self._get_context())]
+            if val is not None}
         return ds_model.search(args, **kwargs)
 
     @api.model
     def of_datastore_name_search(self, ds_model, name=None, args=None, operator=None, limit=None):
-        kwargs = {key: val
-                  for key,val in [('name', name),
-                                  ('args', args),
-                                  ('operator', operator),
-                                  ('limit', limit),
-                                  ('context', dict(self._context))]
-                  if val is not None}
+        kwargs = {
+            key: val
+            for key,val in [('name', name),
+                            ('args', args),
+                            ('operator', operator),
+                            ('limit', limit),
+                            ('context', self._get_context())]
+            if val is not None}
         return ds_model.name_search(**kwargs)
 
     @api.model
@@ -141,22 +147,25 @@ class OfDatastoreConnector(models.AbstractModel):
         return ds_model.name_get(ids)
 
     @api.model
-    def of_datastore_read(self, ds_model, ids, fields=None, load=None):
+    def of_datastore_read(self, ds_model, ids, fields=None, load=None, check_fields=True):
+        if check_fields:
+            fields = [f for f in fields if f in ds_model.fields_get_keys()]
         kwargs = {
             key: val
             for key,val in [('fields', fields),
                             ('load', load),
-                            ('context', dict(self._context))]
+                            ('context', self._get_context())]
             if val is not None}
         return ds_model.read(ids, **kwargs)
 
     @api.model
     def of_datastore_read_group(self, ds_model, domain, fields, groupby, offset=None, limit=None, orderby=None, lazy=None, context=None):
-        kwargs = {key: val
-                  for key,val in [('offset', offset),
-                                  ('limit', limit),
-                                  ('orderby', orderby),
-                                  ('lazy', lazy),
-                                  ('context', context)]
-                  if val is not None}
+        kwargs = {
+            key: val
+            for key,val in [('offset', offset),
+                            ('limit', limit),
+                            ('orderby', orderby),
+                            ('lazy', lazy),
+                            ('context', self._get_context())]
+            if val is not None}
         return ds_model.read_group(domain, fields, groupby, **kwargs)
