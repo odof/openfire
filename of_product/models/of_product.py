@@ -31,6 +31,7 @@ class ProductTemplate(models.Model):
     of_seller_remise = fields.Float(related="seller_ids.remise")
     of_seller_product_code = fields.Char(related="seller_ids.product_code")
     of_seller_product_category_name = fields.Char(related="seller_ids.of_product_category_name")
+    of_seller_delay = fields.Integer(related="seller_ids.delay")
 
     @api.multi
     @api.depends('lst_price', 'standard_price')

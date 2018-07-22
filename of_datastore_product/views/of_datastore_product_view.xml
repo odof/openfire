@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 
+    <template id="assets_backend" name="of_web_widgets assets" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" href="/of_datastore_product/static/src/css/of_datastore_product.css"/>
+            <script type="text/javascript" src="/of_datastore_product/static/src/js/of_datastore_product.js"></script>
+        </xpath>
+    </template>
+
     <!-- Fournisseur -->
     <record id="of_datastore_supplier_view_form" model="ir.ui.view">
         <field name="name">of.datastore.supplier.form</field>

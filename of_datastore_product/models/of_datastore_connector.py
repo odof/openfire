@@ -56,7 +56,7 @@ class OfDatastoreConnector(models.AbstractModel):
                     error_msg = _("You must fill the field \"%s\"") % self.env['ir.model.fields'].search([('model', '=', self._name), ('name', '=', field_name)]).name_get()[0][1]
                     break
             else:
-                error_msg = connector.of_datastore_connect()[connector.id]
+                error_msg = connector.of_datastore_connect()
                 if not isinstance(error_msg, basestring):
                     error_msg = _('Connection successful')
             connector.error_msg = error_msg
@@ -67,8 +67,7 @@ class OfDatastoreConnector(models.AbstractModel):
 
     @api.multi
     def of_datastore_connect(self):
-        # Connection à la base du fournisseur
-        res = {}
+        # Connexion à la base du fournisseur
         # Utilisation d'un thread pour stopper une connexion trop longue
         class FuncThread(threading.Thread):
             def __init__(self):
@@ -102,17 +101,17 @@ class OfDatastoreConnector(models.AbstractModel):
                     self.result = cli.get_model('res.users').search([]) and cli or ''
                 except Exception, exc:
                     self.result = _(str(exc))
+        self.ensure_one()
+        supplier = self
 
-        for supplier in self:
-            it = FuncThread()
-            it.start()
-            it.join(10) # attente 10 secondes ou jusqu'à la fin du thread
-            if it.isAlive():
-                client = _(u"Délai de connexion expiré")
-            else:
-                client = it.result
-            res[supplier.id] = client
-        return res
+        it = FuncThread()
+        it.start()
+        it.join(10) # attente 10 secondes ou jusqu'à la fin du thread
+        if it.isAlive():
+            client = _(u"Délai de connexion expiré")
+        else:
+            client = it.result
+        return client
 
     @api.model
     def of_datastore_get_model(self, ds_client, model_name):
