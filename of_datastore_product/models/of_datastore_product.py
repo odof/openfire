@@ -376,6 +376,11 @@ class OfProductBrand(models.Model):
                     'rounding'   : ds_obj['rounding'],
                 }
                 result = obj_obj.create(uom_data)
+        else:
+            if obj_obj._rec_name:
+                result = obj_obj.search([(self._rec_name, '=', res_name)])
+                if len(result) != 1:
+                    result = False
         match_dict[res_id] = result
         return result
 
@@ -825,7 +830,7 @@ class ProductTemplate(models.Model):
             product_obj = supplier_obj.of_datastore_get_model('product.product')
             product_ids += supplier_obj.of_datastore_search(product_obj, [('product_tmpl_id', 'in', datastore_product_ids[supplier.id])])
 
-        return self.env['product.product'].browse(product_ids).of_datastore_import()
+        return self.env['product.product'].browse(product_ids).of_datastore_import().mapped('product_tmpl_id')
 
 
 class ProductProduct(models.Model):
@@ -841,6 +846,20 @@ class ProductProduct(models.Model):
         res = super(ProductProduct, self).name_search(name, new_args, operator, limit)
         return self._of_datastore_name_search(res, brands, name, args, operator, limit)
 
+    @api.model
+    def of_datastore_get_import_fields(self):
+        unused_fields = self._get_datastore_unused_fields()
+        templ_fields = self.env['product.template']._fields
+        fields = [f for f,c in self._fields.iteritems()
+                  if (not c.compute
+                      or (c._description_related == ('product_tmpl_id', f)
+                          and not templ_fields[f].compute))
+                  and f not in unused_fields
+                  and f != 'product_tmpl_id']
+
+        fields.append('kit_line_ids')
+        return fields
+
     @api.multi
     def of_datastore_import(self):
         if len(self) == 1:
@@ -853,17 +872,7 @@ class ProductProduct(models.Model):
             if result:
                 return result
 
-        unused_fields = self._get_datastore_unused_fields()
-        templ_fields = self.env['product.template']._fields
-        fields_to_read = [f for f,c in self._fields.iteritems()
-                          if (not c.compute
-                              or (c._description_related == ('product_tmpl_id', f)
-                                  and not templ_fields[f].compute))
-                          and f not in unused_fields
-                          and f != 'product_tmpl_id']
-
-        fields_to_read.append('kit_line_ids')
-
+        fields_to_read = self.of_datastore_get_import_fields()
         result = self.browse()
         for product_data in self._read_datastore(fields_to_read, create_mode=True):
             result += self.create(product_data)
@@ -936,13 +945,13 @@ class OfProductKitLine(models.Model):
     def create(self, vals):
         # par defaut .get() retourne None si la clef n'existe pas, et None == -1
         if vals.get('product_id', 0) < 0:
-            vals['product_id'] = self.pool['product.product'].datastore_import(vals['product_id'])
+            vals['product_id'] = self.env['product.product'].datastore_import(vals['product_id'])
         return super(OfProductKitLine, self).create(vals)
 
     @api.multi
     def write(self, vals):
         if vals.get('product_id', 0) < 0:
-            vals['product_id'] = self.pool['product.product'].datastore_import(vals['product_id'])
+            vals['product_id'] = self.env['product.product'].datastore_import(vals['product_id'])
         return super(OfProductKitLine, self).write(vals)
 
 

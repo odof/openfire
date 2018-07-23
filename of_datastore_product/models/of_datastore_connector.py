@@ -63,7 +63,7 @@ class OfDatastoreConnector(models.AbstractModel):
 
     @api.model
     def _get_context(self):
-        return {key:val for key,val in self._context.iteritems() if key in ('lang', 'tz')}
+        return {key:val for key,val in self._context.iteritems() if key in ('lang', 'tz', 'active_test')}
 
     @api.multi
     def of_datastore_connect(self):
@@ -158,7 +158,7 @@ class OfDatastoreConnector(models.AbstractModel):
         return ds_model.read(ids, **kwargs)
 
     @api.model
-    def of_datastore_read_group(self, ds_model, domain, fields, groupby, offset=None, limit=None, orderby=None, lazy=None, context=None):
+    def of_datastore_read_group(self, ds_model, domain, fields, groupby, offset=None, limit=None, orderby=None, lazy=None):
         kwargs = {
             key: val
             for key,val in [('offset', offset),

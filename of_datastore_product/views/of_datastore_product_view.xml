@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 
+    <!-- Import des fichiers javascripts/css -->
     <template id="assets_backend" name="of_web_widgets assets" inherit_id="web.assets_backend">
         <xpath expr="." position="inside">
             <link rel="stylesheet" href="/of_datastore_product/static/src/css/of_datastore_product.css"/>
