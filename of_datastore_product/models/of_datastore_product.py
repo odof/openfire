@@ -301,7 +301,7 @@ class OfProductBrand(models.Model):
     @api.multi
     def datastore_match(self, client, obj, res_id, res_name, product, match_dicts, create=True):
         """ Tente d'associer un objet de la base centrale à un id de la base de l'utilisateur
-        @param client: client erppeek connecté à la base du fournisseur
+        @param client: client connecté à la base du fournisseur
         @param obj: nom de l'objet à faire correspondre
         @param res_id: id de l'instance de l'objet à faire correspondre
         @param match_dicts: dictionnaire des correspondances par objet
@@ -898,8 +898,7 @@ class OfProductKitLine(models.Model):
             supplier_id = -full_id / DATASTORE_IND
             datastore_kit_ids.setdefault(supplier_id, []).append((-full_id) % DATASTORE_IND)
 
-        supplier_ids = datastore_kit_ids.keys()
-        for supplier in supplier_obj.browse(supplier_ids):
+        for supplier in supplier_obj.browse(datastore_kit_ids):
             client = supplier.of_datastore_connect()
             ds_kit_obj = supplier.of_datastore_get_model(client, 'of.product.kit.line')
 
