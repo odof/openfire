@@ -69,7 +69,7 @@ class AccountInvoiceLine(models.Model):
     @api.onchange('product_id')
     def _onchange_product_id(self):
         taxes = self.invoice_line_tax_ids
-        res = super(AccountInvoiceLine,self)._onchange_product_id()
+        res = super(AccountInvoiceLine, self)._onchange_product_id()
         if self._context.get('of_force_product_onchange_tax') or self.invoice_line_tax_ids == taxes:
             # Odoo recalcule le compte comptable en fonction de la position fiscale et du nouvel article sélectionné
             # On doit donc s'assurer de ré-appliquer les règles OpenFire de la taxe
@@ -99,3 +99,21 @@ class SaleOrderLine(models.Model):
             account = tax.map_account(account)
         res['account_id'] = account.id
         return res
+
+class AccountInvoice(models.Model):
+    _inherit = "account.invoice"
+
+    def _prepare_invoice_line_from_po_line(self, line):
+        invoice_line_obj = self.env['account.invoice.line']
+        tax_obj = self.env['account.tax']
+        data = super(AccountInvoice, self)._prepare_invoice_line_from_po_line(line)
+
+        account = invoice_line_obj.get_invoice_line_account(self.type, line.product_id, line.order_id.fiscal_position_id, self.company_id)
+        if data['invoice_line_tax_ids']:
+            tax_ids = tax_obj.browse(data['invoice_line_tax_ids'])
+            for tax in tax_ids:
+                account = tax.map_account(account)
+
+        if account:
+            data['account_id'] = account.id
+        return data
