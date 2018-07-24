@@ -99,9 +99,6 @@
                 <group colspan="2" invisible="context.get('uid') != 1">
                     <field name="datastore_supplier_id"/>
                 </group>
-                <!--
-                <field name="datastore_supplier_id" invisible="context.get('uid') != 1"/>
-                -->
                 <div colspan="2" attrs="{'invisible':[('datastore_supplier_id', '=', False)]}">
                     <span>Cette marque est connectée au tarif centralisé</span>
                 </div>
@@ -110,11 +107,40 @@
                 <separator string="Informations tarif centralisé" colspan="2"/>
                 <field name="datastore_note_maj" colspan="2" nolabel="1"/>
             </xpath>
+
+            <!-- Force le recalcul des catégories du fournisseur -->
+            <xpath expr="//field[@name='categ_ids']" position="attributes">
+                <attribute name="context">{'of_datastore_update_categ': True}</attribute>
+            </xpath>
+            <!-- Mise en couleur des catégories -->
+            <xpath expr="//field[@name='categ_ids']/tree" position="attributes">
+                <attribute name="colors">grey:is_datastore_matched==False</attribute>
+            </xpath>
+            <xpath expr="//field[@name='categ_ids']/tree" position="inside">
+                <field name="is_datastore_matched" invisible="1"/>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- Articles -->
+    <record id="of_datastore_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.kit.product.template.common.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='options']" position="inside">
+                <div>
+                    <field name="of_datastore_res_id" widget="boolean" readonly="1"/>
+                    <label string="Connected"/>
+                </div>
+            </xpath>
         </field>
     </record>
 
     <!-- recherche d'articles sur base centralisée -->
-    <record id="of_product_brand_product_template_search_view" model="ir.ui.view">
+    <record id="of_datastore_product_template_search_view" model="ir.ui.view">
         <field name="name">product.template.search</field>
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_search_view"/>

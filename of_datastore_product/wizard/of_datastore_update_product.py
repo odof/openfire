@@ -85,7 +85,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
 
         supplier_value = supplier.id * DATASTORE_IND
         no_match_ids = [product.id for product in products if not product.of_datastore_res_id]
-        id_match = {-(product.of_datastore_res_id + supplier_value): product
+        id_match = {product.of_datastore_res_id: product
                     for product in products if product.of_datastore_res_id}
 
         # Certaines références ont pu être supprimées de la base centrale
@@ -98,7 +98,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         # --- Matching des références avec la base centrale ---
         # Conversion des références article
         convert_func = supplier.get_product_code_convert_func()
-        code_to_match_dict = {convert_func[product.brand_id](product.default_code): product.default_code
+        code_to_match_dict = {convert_func[product.brand_id](product.default_code): product
                               for product in product_obj.browse(no_match_ids)}
         # Récupération des correspondances de la base centrale
         ds_product_obj = supplier.of_datastore_get_model(client, 'product.product')
@@ -108,7 +108,6 @@ class OfDatastoreUpdateProduct(models.TransientModel):
                 product = code_to_match_dict[ds_product_data['default_code']]
 
                 no_match_ids.remove(product.id)
-                ds_product_id = -(ds_product_data['id'] + supplier_value)
                 if ds_product_id in id_match:
                     raise ValidationError(_('Two products try to reference the same centralized product : [%s] [%s]') %
                                           (product.default_code, id_match[ds_product_id].default_code))
@@ -131,33 +130,123 @@ class OfDatastoreUpdateProduct(models.TransientModel):
 
         # --- Mise à jour des articles ---
         fields_to_update = product_obj.of_datastore_get_import_fields()
-        ds_products_data = product_obj.browse(ds_product_ids + ds_product_new_ids).read_datastore(fields_to_update, create_mode=True)
+        ds_product_ids = [-(ds_product_id + supplier_value) for ds_product_id in ds_product_ids]
+        ds_products_data = product_obj.browse(ds_product_ids)._of_read_datastore(fields_to_update, create_mode=True)
         warning_msg = _('This product is no longer available on centralized database')
         for ds_product_data in itertools.chain(no_match_ids, ds_products_data):
             if isinstance(ds_product_data, (int, long)):
                 product = product_obj.browse(ds_product_data)
                 ds_product_data = {'active': False}
-            product = id_match.pop(ds_product_data.pop('id'))
+            else:
+                product = id_match.pop(ds_product_data['of_datastore_res_id'])
 
             # Mise a jour produits actifs/inactifs
 #             if self.u_active:
             if ds_product_data['active']:
-                if product.availability == 'warning':
-                    product.availability = 'empty'
-                else:
-                    # On ne réactive que les articles en disponibilité 'Avertissement' pour éviter de réactiver un article désactivé manuellement
+                if product.purchase_ok:
+                    # On ne réactive que les articles qui ne peuvent pas être achetés pour éviter de réactiver un article désactivé manuellement
                     del ds_product_data['active']
+                else:
+                    ds_product_data['purchase_ok'] = True
+                    if product.active:
+                        del ds_product_data['active']
             else:
                 if product.active:
-                    if product.virtual_available <= 0:
-                        ds_product_data['active'] = False
-                    if product.state != 'warning':
-                        ds_product_data['availability'] = 'warning'
-                        ds_product_data['availability_warning'] = warning_msg
+                    if product.purchase_ok:
+                        ds_product_data['purchase_ok'] = False
+                    if product.virtual_available > 0:
+                        del ds_product_data['active']
 
             if ds_product_data:
                 product.write(ds_product_data)
         return len(no_match_ids), len(ds_product_ids), len(ds_product_new_ids)
+
+#     def _update_supplier_products(self, supplier, products):
+#         """
+#         Met a jour les produits products depuis la base fournisseur supplier
+#         @param supplier: browse_record of_datastore_supplier
+#         @param products: browse_record_list product.product
+#         """
+#         product_obj = self.env['product.product']
+# 
+#         supplier_value = supplier.id * DATASTORE_IND
+#         no_match_ids = [product.id for product in products if not product.of_datastore_res_id]
+#         id_match = {-(product.of_datastore_res_id + supplier_value): product
+#                     for product in products if product.of_datastore_res_id}
+# 
+#         # Certaines références ont pu être supprimées de la base centrale
+#         client = supplier.of_datastore_connect()
+#         ds_product_obj = supplier.of_datastore_get_model(client, 'product.product')
+#         ds_product_ids = [-(ds_product_id + supplier_value) for ds_product_id in id_match]
+#         ds_product_ids = supplier.with_context(active_test=False).of_datastore_search(ds_product_obj, [('id', 'in', ds_product_ids)])
+#         ds_product_ids = [-(ds_product_id + supplier_value) for ds_product_id in ds_product_ids]
+# 
+#         no_match_ids += [id_match[ds_product_id].id for ds_product_id in id_match if ds_product_id not in ds_product_ids]            
+# 
+#         # --- Matching des références avec la base centrale ---
+#         # Conversion des références article
+#         convert_func = supplier.get_product_code_convert_func()
+#         code_to_match_dict = {convert_func[product.brand_id](product.default_code): product
+#                               for product in product_obj.browse(no_match_ids)}
+#         # Récupération des correspondances de la base centrale
+#         ds_product_obj = supplier.of_datastore_get_model(client, 'product.product')
+#         ds_product_new_ids = supplier.of_datastore_search(ds_product_obj, [('default_code', 'in', code_to_match_dict.keys())])
+#         if ds_product_new_ids:
+#             for ds_product_data in supplier.of_datastore_read(ds_product_obj, ds_product_new_ids, ['default_code']):
+#                 product = code_to_match_dict[ds_product_data['default_code']]
+# 
+#                 no_match_ids.remove(product.id)
+#                 ds_product_id = -(ds_product_data['id'] + supplier_value)
+#                 if ds_product_id in id_match:
+#                     raise ValidationError(_('Two products try to reference the same centralized product : [%s] [%s]') %
+#                                           (product.default_code, id_match[ds_product_id].default_code))
+#                 id_match[ds_product_id] = product
+#         ds_product_ids += ds_product_new_ids
+# #         update_dict = {
+# #             'u_name': ('name', ),
+# #             'u_code': ('of_seller_product_code', 'default_code'),
+# #             'u_tarif': ('list_price', 'standard_price', 'of_seller_pp_ht', 'of_seller_price'),
+# #             'u_uom': ('uom_id', 'uom_po_id'),
+# #             'u_cg': ('of_seller_delay', ),
+# #             'u_categ': ('of_seller_product_category_name', 'categ_id'),
+# #             'u_kit': ('of_is_kit', 'kit_line_ids', 'of_pricing'),
+# #             # active est géré à part car on ne réactive pas un article désactivé manuellement
+# #             'u_active': tuple(),
+# #             # Les champs à toujours mettre à jour
+# #             'id': (),
+# #         }
+# #         fields_to_update = [field for key,fields in update_dict.iteritems() for field in fields if self[key]]
+# 
+#         # --- Mise à jour des articles ---
+#         fields_to_update = product_obj.of_datastore_get_import_fields()
+#         ds_products_data = product_obj.browse(ds_product_ids + ds_product_new_ids)._of_read_datastore(fields_to_update, create_mode=True)
+#         warning_msg = _('This product is no longer available on centralized database')
+#         for ds_product_data in itertools.chain(no_match_ids, ds_products_data):
+#             if isinstance(ds_product_data, (int, long)):
+#                 product = product_obj.browse(ds_product_data)
+#                 ds_product_data = {'active': False}
+#             else:
+#                 product = id_match.pop(ds_product_data['of_datastore_res_id'])
+# 
+#             # Mise a jour produits actifs/inactifs
+# #             if self.u_active:
+#             if ds_product_data['active']:
+#                 if product.availability == 'warning':
+#                     product.availability = 'empty'
+#                 else:
+#                     # On ne réactive que les articles en disponibilité 'Avertissement' pour éviter de réactiver un article désactivé manuellement
+#                     del ds_product_data['active']
+#             else:
+#                 if product.active:
+#                     if product.virtual_available <= 0:
+#                         ds_product_data['active'] = False
+#                     if product.state != 'warning':
+#                         ds_product_data['availability'] = 'warning'
+#                         ds_product_data['availability_warning'] = warning_msg
+# 
+#             if ds_product_data:
+#                 product.write(ds_product_data)
+#         return len(no_match_ids), len(ds_product_ids), len(ds_product_new_ids)
 
     @api.multi
     def update_products(self):
@@ -215,9 +304,9 @@ class OfDatastoreUpdateProduct(models.TransientModel):
             nolk_cnt += nolk
         if updt_cnt:
             notes.append(u"Produits mis à jour : %s" % (updt_cnt))
-        if updt_cnt:
+        if link_cnt:
             notes.append(u"Correspondances ajoutées/mises à jour avec la base centrale : %s" % (link_cnt))
-        if updt_cnt:
+        if nolk_cnt:
             notes.append(u"Produits non mis à jour par absence de correspondance : %s" % (nolk_cnt))
 
 #         # Enregistrement des choix
