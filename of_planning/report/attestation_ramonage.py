@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo.report import report_sxw
+from datetime import datetime
 
 class attestation_ramonage(report_sxw.rml_parse):
     def __init__(self, cr, uid, name, context):
@@ -14,7 +15,7 @@ class attestation_ramonage(report_sxw.rml_parse):
     def format_date(self, date=False):
         if date:
             date = str(date)
-            return date[:10]
+            return datetime.strptime(date[:10], '%Y-%m-%d').strftime("%d/%m/%Y")
         else:
             return False
 
