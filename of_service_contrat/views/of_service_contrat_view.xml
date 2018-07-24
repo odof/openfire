@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_service_contrat_view_service" model="ir.ui.view">
+        <field name="name">of.service.contrat.view</field>
+        <field name="model">of.service</field>
+        <field name="inherit_id" ref="of_service.view_of_service_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_fin']" position="before">
+                <field name="contrat"/>
+                <field name="date_contrat"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_service_contrat_mail_template_form" model="ir.ui.view">
+        <field name="name">of.service.contrat.mail.template.form</field>
+        <field name="model">of.mail.template</field>
+        <field name="inherit_id" ref="of_gesdoc.of_mail_template_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='type']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
