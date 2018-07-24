@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
-from addons.of_datastore_product.of_datastore_product import DATASTORE_IND
+from odoo import models, fields, api, _
+from odoo.addons.of_datastore_product.models.of_datastore_product import DATASTORE_IND
 import time
 import itertools
-from reportlab.lib.randomtext import objects
 from odoo.exceptions import ValidationError
 
 class OfDatastoreUpdateProduct(models.TransientModel):
@@ -29,7 +28,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
 #     remember = fields.Boolean(string=u"Se souvenir de mes préférences",
 #                               help=u"Si cette case est cochée, vos préférences seront conservées pour votre prochaine mise à jour avec ce fournisseur")
 #     brand_ids = fields.One2many('of.product.brand', compute='_compute_brand_ids', string='Marques')
-    note = fields.Text("Notes")
+#     note = fields.Text("Notes")
     is_update = fields.Boolean(u'Afficher les options de mise à jour', default=lambda self: self._default_is_update())
 
 #     @api.depends()
@@ -45,36 +44,36 @@ class OfDatastoreUpdateProduct(models.TransientModel):
 #                     brands = objects.mapped('brand_id')
 #             wizard.brand_ids = brands
 
-    @api.model
-    def default_get(self, fields_list):
-        """
-        Récupère les préférences enregitrées pour le fournisseur
-        """
-        defaults = super(OfDatastoreUpdateProduct, self).default_get(fields_list)
-        model = self._context.get('active_model')
-        if not model:
-            return defaults
-        ds_supplier_id = False
-        objects = self.env['model'].browse(self._context['active_ids'])
-        if model == 'of.product.brand':
-            for brand in objects:
-                if brand.datastore_supplier_id:
-                    ds_supplier_id = brand.datastore_supplier_id.id
-                    break
-        elif model == 'product.product':
-            for product in objects:
-                if product.of_datastore_supplier_id:
-                    ds_supplier_id = product.of_datastore_supplier_id.id
-                    break
-        if ds_supplier_id:
-            defaults['ds_supplier_id'] = ds_supplier_id
-            # code repris et modifié de default_get pour intégrer la condition sur le fournisseur
-            ir_values_dict = self.env['ir.values'].get_defaults_dict(self._name, "supplier_%s" % ds_supplier_id)
-            for name in fields_list:
-                if name in ir_values_dict:
-                    defaults[name] = ir_values_dict[name]
-                    continue
-        return defaults
+#     @api.model
+#     def default_get(self, fields_list):
+#         """
+#         Récupère les préférences enregitrées pour le fournisseur
+#         """
+#         defaults = super(OfDatastoreUpdateProduct, self).default_get(fields_list)
+#         model = self._context.get('active_model')
+#         if not model:
+#             return defaults
+#         ds_supplier_id = False
+#         objects = self.env[model].browse(self._context['active_ids'])
+#         if model == 'of.product.brand':
+#             for brand in objects:
+#                 if brand.datastore_supplier_id:
+#                     ds_supplier_id = brand.datastore_supplier_id.id
+#                     break
+#         elif model in ('product.product', 'product.template'):
+#             for product in objects:
+#                 if product.of_datastore_supplier_id:
+#                     ds_supplier_id = product.of_datastore_supplier_id.id
+#                     break
+#         if ds_supplier_id:
+#             defaults['ds_supplier_id'] = ds_supplier_id
+#             # code repris et modifié de default_get pour intégrer la condition sur le fournisseur
+#             ir_values_dict = self.env['ir.values'].get_defaults_dict(self._name, "supplier_%s" % ds_supplier_id)
+#             for name in fields_list:
+#                 if name in ir_values_dict:
+#                     defaults[name] = ir_values_dict[name]
+#                     continue
+#         return defaults
 
     def _update_supplier_products(self, supplier, products):
         """
@@ -85,7 +84,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         product_obj = self.env['product.product']
 
         supplier_value = supplier.id * DATASTORE_IND
-        no_match_ids = self.act and [product.id for product in products if not product.of_datastore_res_id]
+        no_match_ids = [product.id for product in products if not product.of_datastore_res_id]
         id_match = {-(product.of_datastore_res_id + supplier_value): product
                     for product in products if product.of_datastore_res_id}
 
@@ -94,7 +93,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         ds_product_obj = supplier.of_datastore_get_model(client, 'product.product')
         ds_product_ids = supplier.with_context(active_test=False).of_datastore_search(ds_product_obj, [('id', 'in', id_match.keys())])
 
-        no_match_ids += [id_match[ds_product_id] for ds_product_id in id_match if ds_product_id not in ds_product_ids]            
+        no_match_ids += [id_match[ds_product_id].id for ds_product_id in id_match if ds_product_id not in ds_product_ids]            
 
         # --- Matching des références avec la base centrale ---
         # Conversion des références article
@@ -176,13 +175,13 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         if active_model == 'of.product.brand':
             brands = model_obj.browse(active_ids)
             suppliers = brands.mapped('datastore_supplier_id')
-            datastore_products = {supplier: supplier.product_ids for supplier in suppliers}
-            
-            for brand in brands:
-                if brand.datastore_supplier_id not in datastore_products:
-                    datastore_products[brand.datastore_supplier_id] = brand.product_ids
-                else:
-                    datastore_products[brand.datastore_supplier_id] += brand.product_ids
+            datastore_products = {supplier: supplier.brand_ids.mapped('product_variant_ids') for supplier in suppliers}
+
+#             for brand in brands:
+#                 if brand.datastore_supplier_id not in datastore_products:
+#                     datastore_products[brand.datastore_supplier_id] = brand.product_variant_ids
+#                 else:
+#                     datastore_products[brand.datastore_supplier_id] += brand.product_variant_ids
         elif active_model in ('product.product', 'product.template'):
             to_create = [product_id for product_id in active_ids if product_id < 0]
             if to_create:
@@ -193,18 +192,17 @@ class OfDatastoreUpdateProduct(models.TransientModel):
             products = model_obj.browse(to_update)
             if active_model == 'product.template':
                 products = products.mapped('product_variant_ids')
-            for product in model_obj.browse(to_update):
-                if product.datastore_supplier_id in datastore_products:
-                    datastore_products[product.datastore_supplier_id] += product
+            for product in products:
+                supplier = product.of_datastore_supplier_id or False
+                if supplier in datastore_products:
+                    datastore_products[supplier] += product
                 else:
-                    datastore_products[product.datastore_supplier_id] = product
+                    datastore_products[supplier] = product
 
             # Produits sans base fournisseur
             products = datastore_products.pop(False,[])
             if products:
-                notes_warning = ["",u"Produits sans base fournisseur associée :"]
-                for product in products:
-                    notes_warning.append(" - "+product.partner_ref)
+                notes_warning = ["",u"Produits sans base fournisseur associée : %s" % len(products)]
 
         # Recherche des valeurs à mettre à jour
         updt_cnt = 0
@@ -232,7 +230,9 @@ class OfDatastoreUpdateProduct(models.TransientModel):
 #                                               condition='supplier_%s' % supplier.id)
 
         notes[0] = u"Mise à jour des produits terminée à %s" % (time.strftime('%Hh%M:%S'),)
-        self.note = "\n".join(notes + notes_warning)
+        note = "\n".join(notes + notes_warning)
+
+        return self.env['of.popup.wizard'].popup_return(note, titre=_('Import/update notes'))
 
         action = self.env.ref('of_datastore_product.action_of_datastore_update_product').read()[0]
         action['res_id'] = self.ids[0]

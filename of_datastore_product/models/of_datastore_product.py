@@ -822,13 +822,15 @@ class ProductTemplate(models.Model):
             datastore_product_ids.setdefault(supplier_id, []).append((-full_id) % DATASTORE_IND)
 
         product_ids = []
-        for supplier in supplier_obj.browse(datastore_product_ids.key()):
+        for supplier in supplier_obj.browse(datastore_product_ids.keys()):
+            supplier_value = supplier.id * DATASTORE_IND
             client = supplier.of_datastore_connect()
             if isinstance(client, basestring):
                 raise ValidationError(u"Erreur de connexion à la base centrale " + supplier.name)
 
-            product_obj = supplier_obj.of_datastore_get_model('product.product')
-            product_ids += supplier_obj.of_datastore_search(product_obj, [('product_tmpl_id', 'in', datastore_product_ids[supplier.id])])
+            product_obj = supplier_obj.of_datastore_get_model(client, 'product.product')
+            product_ids += [-(product_id + supplier_value)
+                            for product_id in supplier_obj.of_datastore_search(product_obj, [('product_tmpl_id', 'in', datastore_product_ids[supplier.id])])]
 
         return self.env['product.product'].browse(product_ids).of_datastore_import().mapped('product_tmpl_id')
 

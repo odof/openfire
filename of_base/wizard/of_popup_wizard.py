@@ -9,7 +9,7 @@ class OfPopupWizard(models.TransientModel):
     message = fields.Text(string='Message')
 
     # Usage : return self.env['of.popup.wizard'].popup_return(message[, titre])
-    @api.multi
+    @api.model
     def popup_return(self, message, titre="Information"):
         return {
             'type': 'ir.actions.act_window',

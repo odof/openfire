@@ -631,7 +631,7 @@ class OfImport(models.Model):
             if brand_id:
                 brand = self.env['of.product.brand'].browse(brand_id)
             else:
-                brand = res_objet and res_objet.brand_id
+                brand = res_objet.brand_id
                 # Si brand n'est pas défini, une exception sera automatiquement générée plus tard
                 # car la marque est un champ obligatoire pour l'import de tarif
 
@@ -900,7 +900,7 @@ class OfImport(models.Model):
                                 if brand_id:
                                     brand = self.env['of.product.brand'].browse(brand_id)
                                 else:
-                                    brand = res_objet and res_objet.brand_id
+                                    brand = res_objet.brand_id
 
                                 if brand:
                                     prefixe = brand.code + '_'

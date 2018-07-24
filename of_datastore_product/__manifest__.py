@@ -55,9 +55,9 @@ Ce module nécessite l'installation de openerplib sur le serveur : sudo easy_ins
     "demo_xml" : [ ],
     "data" : [
 #         'security/ir.model.access.csv',
-#         'wizard/of_datastore_update_product.xml',
 #         'wizard/of_remove_unused_products.xml',
         'wizard/of_datastore_import_brand.xml',
+        'wizard/of_datastore_update_product.xml',
         'views/of_datastore_product_view.xml',
     ],
 #     'css' : [
