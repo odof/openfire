@@ -18,6 +18,7 @@
                         <separator string="Paramètres"/>
                         <group colspan="2">
                             <field name="active"/>
+                            <field name="type" invisible="1"/>
                             <field name="sans_add" attrs="{'invisible': [('file','!=',False)]}"/>
                             <field name="sans_header" attrs="{'invisible': [('file','!=',False)]}"/>
                             <field name="fillable" attrs="{'invisible': [('file','=',False)]}"/>

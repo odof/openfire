@@ -40,6 +40,7 @@ class OfMailTemplate(models.Model):
     chp_ids = fields.One2many('of.gesdoc.chp', 'template_id', string='Liste des champs')
     fillable = fields.Boolean(u"Laisser éditable", help="Autorise la modification du fichier pdf après téléchargement")
     note_fields = fields.Text(compute='get_note_fields', string='Liste des valeurs', default=_get_note_fields)
+    type = fields.Selection([], string="Type de document")
 
     @api.one
     def copy(self, default=None):
