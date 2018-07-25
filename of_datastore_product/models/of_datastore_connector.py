@@ -97,7 +97,7 @@ class OfDatastoreConnector(models.AbstractModel):
                                                     database=supplier.db_name,
                                                     login=supplier.login, password=supplier.new_password or supplier.password)
 
-                    # Operation pour verifier la connexion
+                    # Opération pour vérifier la connexion
                     self.result = cli.get_model('res.users').search([]) and cli or ''
                 except Exception, exc:
                     self.result = _(str(exc))
@@ -106,9 +106,9 @@ class OfDatastoreConnector(models.AbstractModel):
 
         it = FuncThread()
         it.start()
-        it.join(10) # attente 10 secondes ou jusqu'à la fin du thread
+        it.join(10)  # attente de 10 secondes ou jusqu'à la fin de l'opération
         if it.isAlive():
-            client = _(u"Délai de connexion expiré")
+            client = _('Connection timeout')
         else:
             client = it.result
         return client

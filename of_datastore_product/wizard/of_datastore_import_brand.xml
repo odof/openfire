@@ -12,7 +12,7 @@
                     <field name="product_categ_id" required="1"/>
                     <field name="line_ids">
                         <tree string="Brands" colors="green:state=='do';grey:state=='dont';">
-                            <button name="button_inverse" string="Inverser" type="object" icon="fa-refresh"
+                            <button name="button_inverse" string="Reverse" type="object" icon="fa-refresh"
                                 attrs="{'invisible':[('state','=','done')]}"/>
                             <field name="logo" invisible="1"/>
                             <field name="datastore_brand_id" invisible="1"/>

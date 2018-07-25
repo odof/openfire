@@ -8,7 +8,7 @@ class ImportBrand(models.TransientModel):
 
     datastore_supplier_id = fields.Many2one('of.datastore.supplier', string='Connector')
     partner_id = fields.Many2one('res.partner', string='Supplier', domain=[('supplier', '=', True)])
-    product_categ_id = fields.Many2one('product.category', string=u"Catégorie")
+    product_categ_id = fields.Many2one('product.category', string="Category")
     line_ids = fields.One2many('of.datastore.import.brand.line', 'wizard_id')
 
     @api.multi
@@ -34,13 +34,13 @@ class ImportBrandLine(models.TransientModel):
 
     wizard_id = fields.Many2one('of.datastore.import.brand')
     name = fields.Char(string='Name', required=True)
-    datastore_brand_id = fields.Integer(string=u"Identifiant tarif centralisé")
+    datastore_brand_id = fields.Integer(string='Centralized ID')
     code = fields.Char(string='code', required=True, readonly=True)
     partner_id = fields.Many2one('res.partner', string='Supplier', domain=[('supplier', '=', True)])
     product_categ_id = fields.Many2one('product.category', string=u"Catégorie")
     logo = fields.Binary(string='Logo')
     note_maj = fields.Text(string=u"Notes de mise à jour")
-    state = fields.Selection([('do', u'Inclus'), ('dont', u'Exclus'), ('done', 'Existe')])
+    state = fields.Selection([('do', u'Included'), ('dont', u'Excluded'), ('done', 'Exists')])
 
     @api.multi
     def button_inverse(self):

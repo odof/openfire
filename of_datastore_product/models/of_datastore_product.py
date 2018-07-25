@@ -1,30 +1,11 @@
 # -*- coding: utf-8 -*-
-import copy
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
-from odoo.tools.safe_eval import safe_eval
 from odoo.osv.expression import NEGATIVE_TERM_OPERATORS, TERM_OPERATORS_NEGATION, TRUE_LEAF, FALSE_LEAF
 
 DATASTORE_IND = 100000000  # 100.000.000 ids devraient suffire pour les produits. Les chiffres suivants serviront pour le fournisseur
 
-"""
-NOTES
-=====
-
-Matching des catégories de produits
------------------------------------
-Les catégories de produits proposées ne devraient être que celles effectivement utilisées (au moins un article actif)
-Par extension, un article inactif côté fournisseur ne devrait jamais être affiché côté distributeur
-
-Les paramètres de connexion serveur doivent être gérés dans un objet caché, disponible uniquement pour le compte administrateur.
-Cela règle le problème de l'export de données donnant accès à l'identifiant et au mot de passe de la base fournisseur (sauf manipulation des droits)
-"""
-
-#@todo: Matching des comptes comptables, taxes, kits
-
-# Table permettant de faire correspondre un fournisseur à une base de données
-# Pour la recherche de produits, il va falloir un id
 class OfDatastoreSupplier(models.Model):
     _name = 'of.datastore.supplier'
     _inherit = 'of.datastore.connector'
@@ -132,9 +113,9 @@ class OfDatastoreSupplier(models.Model):
 class OfDatastoreSupplierBrand(models.AbstractModel):
     _name = 'of.datastore.supplier.brand'
 
-    name = fields.Char(string="Marque fournisseur", required=True, readonly=True)
-    datastore_brand_id = fields.Integer(string="Identifiant marque fournisseur", required=True, readonly=True)
-    brand_id = fields.Many2one('of.product.brand', String="Correspondance")
+    name = fields.Char(string='Supplier brand', required=True, readonly=True)
+    datastore_brand_id = fields.Integer(string='Supplier brand ID', required=True, readonly=True)
+    brand_id = fields.Many2one('of.product.brand', string="Brand")
     product_count = fields.Integer(string='# products', readonly=True)
     note_maj = fields.Text(string='Notes MAJ', readonly=True)
 
@@ -207,19 +188,17 @@ class OfProductBrand(models.Model):
     _inherit = 'of.product.brand'
 
     datastore_supplier_id = fields.Many2one('of.datastore.supplier', string=u"Connecteur tarif centralisé")
-    datastore_brand_id = fields.Integer(string=u"Identifiant tarif centralisé")
+    datastore_brand_id = fields.Integer(string='Centralized ID')
 
-    all_categ_ids = fields.One2many(
-        'of.import.product.categ.config', compute="_compute_all_categ_ids", inverse="_inverse_all_categ_ids", string="Catégories")
-#     error_msg = fields.Char(string='Connection message', compute='_compute_all_categ_ids')
     datastore_note_maj = fields.Text(string='Notes MAJ', compute='_compute_datastore_note_maj')
     datastore_product_count = fields.Integer(
         '# Products', compute='_compute_datastore_note_maj',
         help="The number of products of this brand")
 
-
+    @api.multi
     def read(self, fields=None, load='_classic_read'):
         if self._context.get('of_datastore_update_categ') and fields and 'categ_ids' in fields:
+            self = self.with_context(of_datastore_update_categ=False)
             categ_obj = self.env['of.import.product.categ.config']
             try:
                 categ_obj.check_access_rights('create')
@@ -249,11 +228,14 @@ class OfProductBrand(models.Model):
                     stored_categs = {categ.categ_origin: categ for categ in brand.categ_ids}
 
                     # Récupération des catégories de produits de la base du fournisseur
-                    ds_categ_obj = supplier.of_datastore_get_model(client, 'product.category')
-                    ds_categ_ids = supplier.of_datastore_search(ds_categ_obj, [])
+                    # On ne prend que les catégories contenant au moins 1 article de la marque
+                    ds_product_obj = supplier.of_datastore_get_model(client, 'product.template')
+                    ds_products_vals = supplier.with_context(active_test=False).of_datastore_read_group(
+                        ds_product_obj, [('brand_id', '=', brand.datastore_brand_id)], ['categ_id'], 'categ_id', offset=None, limit=None, orderby=None, lazy=None)
+
                     categs = categ_obj.browse()
-                    for categ in supplier.of_datastore_read(ds_categ_obj, ds_categ_ids, ['name']):
-                        categ_origin = categ['name']
+                    for ds_product in ds_products_vals:
+                        categ_origin = ds_product['categ_id'][1]
                         stored_categ = stored_categs.pop(categ_origin, False) 
                         if stored_categ:
                             if not stored_categ.is_datastore_matched:
@@ -270,11 +252,10 @@ class OfProductBrand(models.Model):
                         else:
                             categ.unlink()
 
-                    brand.categ_ids = categs  # Mise des catégories dans l'ordre défini par ds_categ_ids
+                    brand.categ_ids = categs
             except:
                 pass
         return super(OfProductBrand, self).read(fields, load=load)
-
 
     @api.depends('datastore_supplier_id')
     def _compute_all_categ_ids(self):
@@ -283,8 +264,8 @@ class OfProductBrand(models.Model):
 
         categ_obj = self.env['of.import.product.categ.config']
         supplier_clients = {}
-        # Récupération dans supplier_categs des correspondances deja renseignées
 
+        # Récupération dans supplier_categs des correspondances deja renseignées
         for brand in self:
             supplier = brand.datastore_supplier_id
             if not supplier:
@@ -328,48 +309,6 @@ class OfProductBrand(models.Model):
                     categ.unlink()
 
             brand.all_categ_ids = all_categs.sorted('categ_origin')  # Mise des catégories dans l'ordre défini par ds_categ_ids
-
-#     @api.depends('datastore_supplier_id')
-#     def _compute_all_categ_ids(self):
-#         if not self:
-#             return {}
-# 
-#         supplier_clients = {}
-#         # Récupération dans supplier_categs des correspondances deja renseignées
-# 
-#         for brand in self:
-#             supplier = brand.datastore_supplier_id
-#             if supplier not in supplier_clients:
-#                 supplier_clients[supplier] = supplier.of_datastore_connect()
-#             client = supplier_clients[supplier]
-# 
-#             if isinstance(client, basestring):
-#                 # Echec de la connexion à la base fournisseur
-#                 brand.all_categ_ids = [categ.id for categ in brand.categ_ids]
-# #                 brand.error_msg = client
-# #                 brand.note_maj = ''
-#                 brand.datastore_note_maj = 'Error\n' + client
-#                 continue
-#             stored_categs = {categ.orig_id: categ for categ in brand.categ_ids}
-# 
-#             # Récupération des catégories de produits de la base du fournisseur
-#             ds_categ_obj = supplier.of_datastore_get_model(client, 'product.category')
-#             ds_categ_ids = supplier.of_datastore_search(ds_categ_obj, [])
-#             data = {}
-#             for orig_id, orig_name in supplier.of_datastore_name_get(ds_categ_obj, ds_categ_ids):
-#                 stored_categ = stored_categs.get(orig_id)
-#                 if stored_categ:
-#                     if stored_categ.orig_name == orig_name:
-#                         line_data = (4, stored_categ.id)
-#                     else:
-#                         line_data = (1, stored_categ.id, {'orig_name': orig_name})
-#                 else:
-#                     line_data = (0, 0, {'supplier_id': supplier.id,
-#                                         'orig_id'    : orig_id,
-#                                         'orig_name'  : orig_name})
-#                 data[orig_id] = line_data
-# 
-#             brand.all_categ_ids = [data[i] for i in ds_categ_ids]  # Mise des catégories dans l'ordre défini par ds_categ_ids
 
     def _inverse_categ_ids(self):
         for supplier in self:
@@ -516,11 +455,13 @@ class OfProductBrand(models.Model):
 class OfDatastoreCentralized(models.AbstractModel):
     _name = 'of.datastore.centralized'
 
-    of_datastore_res_id = fields.Integer(string="Identifiant base fournisseur")
+    of_datastore_res_id = fields.Integer(string="ID on supplier database")
 
     @api.model
     def _get_datastore_unused_fields(self):
-        # Champs qu'on ne veut pas récupérer chez le fournisseur (quantités en stock)
+        u"""
+            retourne la liste des champs qu'on ne veut pas récupérer chez le fournisseur (par ex. les quantités en stock).
+        """
         cr = self._cr
 
         # On ne veut aucun des champs ajoutés par les modules stock, mrp, purchase
@@ -565,22 +506,19 @@ class OfDatastoreCentralized(models.AbstractModel):
 
         # Produits par fournisseur
         for full_id in self._ids:
-#            brand_id = -full_id / DATASTORE_IND
-#            brand_product_ids.setdefault(brand_id, []).append((-full_id) % DATASTORE_IND)
-
             supplier_id = -full_id / DATASTORE_IND
             datastore_product_ids.setdefault(supplier_id, []).append((-full_id) % DATASTORE_IND)
-
-#        suppliers = {supplier.id: supplier for supplier in suppliers}
 
         # Champs a valeurs spécifiques
         fields_defaults = [
             ('of_datastore_supplier_id'       , lambda: create_mode and supplier_id or supplier.name_get()[0]),
             ('of_datastore_res_id'            , lambda: vals['id']),
             ('of_seller_pp_ht'                , lambda: vals['list_price']),
+            ('of_seller_product_category_name', lambda: vals['categ_id'][1]),
+            ('of_tmpl_datastore_res_id'       , lambda: vals['product_tmpl_id'][0]),
+            # Attention, l'ordre des deux lignes suivantes est important
             ('of_seller_product_code'         , lambda: vals['default_code']),
             ('default_code'                   , lambda: default_code_func[brand](vals['default_code'])),
-            ('of_seller_product_category_name', lambda: vals['categ_id'][1]),
         ]
 
         fields_defaults = [(k, v) for k, v in fields_defaults if k in fields_to_read]
@@ -590,7 +528,7 @@ class OfDatastoreCentralized(models.AbstractModel):
                 if field not in fields_to_read:
                     fields_to_read.append(field)
 
-            # Creation de la relation fournisseur
+            # Création de la relation fournisseur
             fields_defaults.append(('seller_ids', lambda: [(5, ), (0, 0, {
                     'name'   : brand.partner_id.id,
                     'min_qty': 1,
@@ -661,17 +599,6 @@ class OfDatastoreCentralized(models.AbstractModel):
 
                 # ---- Champs many2one ---
                 for field in datastore_read_m2o_fields:
-                    if field == 'product_tmpl_id':
-                        vals['of_tmpl_datastore_res_id'] = vals[field][0]
-
-#                         # product_tmpl_id ne doit pas etre False, notamment a cause de la fonction pricelist.price_get_multi qui genererait une erreur
-#                         # Pour eviter des effets de bord, on met une valeur negative
-#                         if create_mode: # haha
-#                             vals[field] = -(vals[field][0] + supplier_value)
-#                         else:
-#                             vals[field] = (-(vals[field][0] + supplier_value), vals[field][1])
-#                         continue
-
                     # Conversion du many2one pour la base courante
                     if vals[field]:
                         obj = self._fields[field].comodel_name
@@ -703,7 +630,6 @@ class OfDatastoreCentralized(models.AbstractModel):
                 # --- Champs spéciaux ---
                 
                 # Prix d'achat/vente
-                list_price = vals['list_price']
                 vals.update(brand.compute_product_price(vals['list_price'], categ_name, obj_dict['uom_id'], obj_dict['uom_po_id'],
                                                         product=product, price=None, remise=None))
 
@@ -727,8 +653,6 @@ class OfDatastoreCentralized(models.AbstractModel):
     def read(self, fields=None, load='_classic_read'):
         new_ids = [i for i in self._ids if i>0]
         datastore_ids = [i for i in self._ids if i<0]
-#         if self._context.get('of_datastore_product_search'):
-#             self = self.with_context(of_datastore_product_search=False)
 
         # Produits sur la base courante
         res = super(OfDatastoreCentralized, self.browse(new_ids)).read(fields, load=load)
@@ -742,7 +666,7 @@ class OfDatastoreCentralized(models.AbstractModel):
 
     @api.model
     def of_datastore_update_domain(self, domain):
-        """
+        u"""
         Vérifie si le domaine indique une recherche sur une base de données fournisseur.
         Si oui, retourne le domaine de recherche adapté pour la base de données fournisseur.
         @requires: Si args contient un tuple dont le premier argument est 'ds_supplier_search_id', le second argument doit être '='
@@ -803,10 +727,9 @@ class OfDatastoreCentralized(models.AbstractModel):
                     arg[0], arg[1], arg[2] = new_arg
         return brands, domain
 
-
     @api.model
     def _of_datastore_update_domain_item(self, domain, obj):
-        """ Convertit un élément du domaine pour utilisation sur la base centrale
+        u""" Convertit un élément du domaine pour utilisation sur la base centrale
         @type domain: Tuple (left, operator, right)
         @var obj: Objet sur lequel doit s'appliquer le domaine
         @type obj: Browse record
@@ -958,7 +881,7 @@ class ProductTemplate(models.Model):
             supplier_value = supplier.id * DATASTORE_IND
             client = supplier.of_datastore_connect()
             if isinstance(client, basestring):
-                raise ValidationError(u"Erreur de connexion à la base centrale " + supplier.name)
+                raise ValidationError(u"Erreur de connexion à la base centrale %s" % supplier.name)
 
             product_obj = supplier_obj.of_datastore_get_model(client, 'product.product')
             product_ids += [-(product_id + supplier_value)
@@ -1051,7 +974,7 @@ class OfProductKitLine(models.Model):
             kits_data = supplier.of_datastore_read(ds_kit_obj, datastore_kit_ids[supplier.id], [])
             ds_product_ids = [kit['product_id'][0] for kit in kits_data]
 
-            # Detection des composants du kit deja importes
+            # Détection des composants du kit déjà importés
             products = product_obj.search([('brand_id', 'in', supplier.brand_ids._ids), ('of_datastore_res_id', 'in', ds_product_ids)])
 
             product_match = {product.of_datastore_res_id: product for product in products}
@@ -1062,7 +985,7 @@ class OfProductKitLine(models.Model):
             for kit in kits_data:
                 product_id, product_name = kit['product_id']
                 if product_id in product_match:
-                    # Composant deja importe
+                    # Composant déjà importé
                     product_id = product_match[product_id]
                     product_name = product_names[product_id]
                 else:
