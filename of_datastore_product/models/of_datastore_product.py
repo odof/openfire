@@ -539,7 +539,7 @@ class OfDatastoreCentralized(models.AbstractModel):
             for vals in datastore_product_data:
                 # --- Calculs préalables ---
                 brand = match_dicts['brand_id'][vals['brand_id'][0]]
-                product = self.search([('of_datastore_res_id', '=', vals['id'])])
+                product = self.search([('brand_id', '=', brand.id), ('of_datastore_res_id', '=', vals['id'])])
                 if self._name == 'product.product':
                     product = product.product_tmpl_id
                 categ_name = vals['categ_id'][1]
@@ -661,12 +661,8 @@ class OfDatastoreCentralized(models.AbstractModel):
 
         # Recherche des produits non déjà enregistrés
         if not self._context.get('datastore_stored'):
-            self._cr.execute(
-                'SELECT of_datastore_res_id '
-                'FROM product_product '
-                'WHERE brand_id in %s AND of_datastore_res_id IS NOT NULL',
-                (tuple(brands.ids), ))
-            orig_ids = [row[0] for row in self._cr.fetchall()]
+            orig_ids = self.sudo().with_context(active_test=False).search([('brand_id', 'in', brands._ids),
+                                                                           ('of_datastore_res_id', '!=', False)])._ids
             domain.append(('id', 'not in', orig_ids))
 
         parse_domain = self._of_datastore_update_domain_item
@@ -877,6 +873,9 @@ class ProductProduct(models.Model):
                   f != 'product_tmpl_id']
 
         fields += [
+            # Champs relatifs au modèle d'article
+            'of_tmpl_datastore_res_id',
+
             # Champs relatifs au au fournisseur
             'of_seller_pp_ht',
             'of_seller_product_code',
@@ -957,7 +956,7 @@ class OfProductKitLine(models.Model):
             # Détection des composants du kit déjà importés
             products = product_obj.search([('brand_id', 'in', supplier.brand_ids._ids), ('of_datastore_res_id', 'in', ds_product_ids)])
 
-            product_match = {product.of_datastore_res_id: product for product in products}
+            product_match = {product.of_datastore_res_id: product.id for product in products}
             product_names = dict(products.name_get())
 
             # Affectation des ids des champs relationnels
