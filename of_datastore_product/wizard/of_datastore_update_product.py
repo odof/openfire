@@ -49,10 +49,11 @@ class OfDatastoreUpdateProduct(models.TransientModel):
                 product = code_to_match_dict[ds_product_data['default_code']]
 
                 no_match_ids.remove(product.id)
-                if ds_product_id in id_match:
+                if ds_product_data['id'] in id_match:
                     raise ValidationError(_('Two products try to reference the same centralized product : [%s] [%s]') %
                                           (product.default_code, id_match[ds_product_id].default_code))
-                id_match[ds_product_id] = product
+                product.of_datastore_res_id = ds_product_data['id']
+                id_match[ds_product_data['id']] = product
         ds_product_ids += ds_product_new_ids
 
         # --- Mise à jour des articles ---
@@ -82,6 +83,18 @@ class OfDatastoreUpdateProduct(models.TransientModel):
                     if product.virtual_available > 0:
                         del ds_product_data['active']
 
+            ds_product_data = {
+                field: val
+                for field, val in ds_product_data.iteritems()
+                if ((product._fields[field].type != 'many2one' or (val != product[field].id))
+                    if product._fields[field].comodel_name
+                    else val != product[field])
+            }
+            if 'uom_id' in ds_product_data:
+                # Ligne copiée depuis le module stock dans product.template.write()
+                done_moves = self.env['stock.move'].search([('product_id', '=', product.id)], limit=1)
+                if done_moves:
+                    del ds_product_data['uom_id']
             if ds_product_data:
                 product.write(ds_product_data)
         return len(no_match_ids), len(ds_product_ids), len(ds_product_new_ids)

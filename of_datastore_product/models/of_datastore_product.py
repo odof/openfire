@@ -116,6 +116,12 @@ class OfDatastoreSupplier(models.Model):
             default_code_func[brand] = eval(func)
         return default_code_func
 
+    @api.multi
+    def read(self, fields=None, load='_classic_read'):
+        if fields and all(field in ('brand_ids', 'db_name') for field in fields):
+            self = self.sudo()
+        return super(OfDatastoreSupplier, self).read(fields, load=load)
+
 class OfDatastoreSupplierBrand(models.AbstractModel):
     _name = 'of.datastore.supplier.brand'
 
@@ -572,7 +578,7 @@ class OfDatastoreCentralized(models.AbstractModel):
                         # Preparation des lignes
                         obj = self._fields[field].comodel_name
                         obj_obj = self.env[obj]
-                        vals[field] = [(0, 0, obj_obj.copy_data(line_id)) for line_id in line_ids]
+                        vals[field] = [(0, 0, line.copy_data()[0]) for line in obj_obj.browse(line_ids)]
                     else:
                         # Conversion en id datastore
                         # Parcours avec indice pour ne pas recreer la liste
@@ -737,7 +743,7 @@ class OfDatastoreCentralized(models.AbstractModel):
             client = supplier.of_datastore_connect()
             if isinstance(client, basestring):
                 # Échec de la connexion à la base fournisseur
-                raise UserError(u'Erreur accès '+supplier.name, client)
+                raise UserError(u'Erreur accès '+supplier.db_name, client)
 
             ds_product_obj = supplier_obj.of_datastore_get_model(client, self._name)
             res = supplier_obj.of_datastore_search(ds_product_obj, args, offset, limit, order, count)
@@ -901,8 +907,27 @@ class ProductProduct(models.Model):
         return result
 
 
+# Création/édition d'objets incluant un article centralisé
+class OfDatastoreProductReference(models.AbstractModel):
+    _name = 'of.datastore.product.reference'
+
+    @api.model
+    def create(self, vals):
+        # par défaut .get() retourne None si la clef n'existe pas, et None == -1
+        if vals.get('product_id', 0) < 0:
+            vals['product_id'] = self.env['product.product'].browse(vals['product_id']).of_datastore_import().id
+        return super(OfDatastoreProductReference, self).create(vals)
+
+    @api.multi
+    def write(self, vals):
+        if vals.get('product_id', 0) < 0:
+            vals['product_id'] = self.env['product.product'].browse(vals['product_id']).of_datastore_import().id
+        return super(OfDatastoreProductReference, self).write(vals)
+
+
 class OfProductKitLine(models.Model):
-    _inherit = "of.product.kit.line"
+    _name = 'of.product.kit.line'
+    _inherit = ['of.product.kit.line', 'of.datastore.product.reference']
 
     @api.multi
     def _of_read_datastore(self, fields_to_read, create_mode=False):
@@ -911,6 +936,7 @@ class OfProductKitLine(models.Model):
         @param ids: id modifié des produits, en valeur négative
         """
         supplier_obj = self.env['of.datastore.supplier']
+        brand_obj = self.env['of.product.brand']
         product_obj = self.env['product.product']
         res = []
 
@@ -934,9 +960,11 @@ class OfProductKitLine(models.Model):
             product_match = {product.of_datastore_res_id: product for product in products}
             product_names = dict(products.name_get())
 
-            # Affectation des ids des composants
+            # Affectation des ids des champs relationnels
             supplier_value = supplier.id * DATASTORE_IND
+            match_dicts = {}
             for kit in kits_data:
+                # Articles
                 product_id, product_name = kit['product_id']
                 if product_id in product_match:
                     # Composant déjà importé
@@ -947,6 +975,11 @@ class OfProductKitLine(models.Model):
                     product_id = -(product_id + supplier_value)
                 kit['product_id'] = (product_id, product_name)
                 kit['id'] = -(kit['id'] + supplier_value)
+
+                # Unités de mesure
+                uom_id, uom_name = kit['product_uom_id']
+                uom_id = brand_obj.datastore_match(client, 'product.uom', uom_id, uom_name, False, match_dicts, create=create_mode).id
+                kit['product_uom_id'] = (uom_id, uom_name)
             res += kits_data
         return res
 
@@ -961,37 +994,6 @@ class OfProductKitLine(models.Model):
         if ds_lines:
             res += ds_lines._of_read_datastore(fields)
         return res
-
-    @api.model
-    def create(self, vals):
-        # par defaut .get() retourne None si la clef n'existe pas, et None == -1
-        if vals.get('product_id', 0) < 0:
-            vals['product_id'] = self.env['product.product'].datastore_import(vals['product_id'])
-        return super(OfProductKitLine, self).create(vals)
-
-    @api.multi
-    def write(self, vals):
-        if vals.get('product_id', 0) < 0:
-            vals['product_id'] = self.env['product.product'].datastore_import(vals['product_id'])
-        return super(OfProductKitLine, self).write(vals)
-
-
-# Création/édition d'objets incluant un article centralisé
-class OfDatastoreProductReference(models.AbstractModel):
-    _name = 'of.datastore.product.reference'
-
-    @api.model
-    def create(self, vals):
-        # par défaut .get() retourne None si la clef n'existe pas, et None == -1
-        if vals.get('product_id', 0) < 0:
-            vals['product_id'] = self.env['product.product'].browse(vals['product_id']).of_datastore_import().id
-        return super(OfDatastoreProductReference, self).create(vals)
-
-    @api.multi
-    def write(self, vals):
-        if vals.get('product_id', 0) < 0:
-            vals['product_id'] = self.env['product.product'].browse(vals['product_id']).of_datastore_import().id
-        return super(OfDatastoreProductReference, self).write(vals)
 
 
 class SaleOrderLine(models.Model):
