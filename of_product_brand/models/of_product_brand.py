@@ -5,6 +5,7 @@ from odoo.exceptions import ValidationError
 
 class OfProductBrand(models.Model):
     _name = 'of.product.brand'
+    _order = 'name'
 
     name = fields.Char(string='Name', required=True)
     code = fields.Char(string='Code', required=True, oldname='prefix')
@@ -135,7 +136,7 @@ class ProductTemplate(models.Model):
                     self.brand_id = False
 
     @api.model
-    def name_search(self, name='', args=None, operator='ilike', limit=100):
+    def of_name_search_extract_brands(self, name):
         brand_obj = self.env['of.product.brand']
         brands = brand_obj.browse()
         elems = []
@@ -144,16 +145,21 @@ class ProductTemplate(models.Model):
                 code = elem[2:]
                 if not code:
                     continue
-                b = brand_obj.search([('code', '=', code)])
+                b = brand_obj.search([('code', '=ilike', code)])
                 if not b:
-                    b = brand_obj.search[('name', '=ilike', code)]
+                    b = brand_obj.search([('name', '=ilike', code)])
                     if not b:
-                        b = brand_obj.search([('name', 'ilike', code)])
+                        b = brand_obj.search([('name', '=ilike', code + '%')])
                 if b:
                     brands += b
             else:
                 elems.append(elem)
         name = " ".join(elems)
+        return name, brands
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        name, brands = self.of_name_search_extract_brands(name)
         if brands:
             args = [('brand_id', 'in', brands._ids)] + args
         return super(ProductTemplate, self).name_search(name, args, operator, limit)
@@ -198,24 +204,7 @@ class ProductProduct(models.Model):
 
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
-        brand_obj = self.env['of.product.brand']
-        brands = brand_obj.browse()
-        elems = []
-        for elem in name.split(" "):
-            if elem.startswith('m:') or elem.startswith('M:'):
-                code = elem[2:]
-                if not code:
-                    continue
-                b = brand_obj.search([('code', '=ilike', code)])
-                if not b:
-                    b = brand_obj.search([('name', '=ilike', code)])
-                    if not b:
-                        b = brand_obj.search([('name', '=ilike', code + '%')])
-                if b:
-                    brands += b
-            else:
-                elems.append(elem)
-        name = " ".join(elems)
+        name, brands = self.env['product.template'].of_name_search_extract_brands(name)
         if brands:
             args = [('brand_id', 'in', brands._ids)] + args
         return super(ProductProduct, self).name_search(name, args, operator, limit)

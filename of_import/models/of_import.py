@@ -12,7 +12,7 @@ from odoo import api, fields, models
 from odoo.tools.translate import _
 from odoo.tools.safe_eval import safe_eval
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import except_orm, UserError, ValidationError
 
 try:
     from cStringIO import StringIO
@@ -52,9 +52,12 @@ CODE_IMPORT_ERREUR = -1
 CODE_IMPORT_CREATION = 0
 CODE_IMPORT_MODIFICATION = 1
 
-class OfImportError(Exception):
+# class OfImportError(Exception):
+#     def __init__(self, msg):
+#         self.msg = msg
+class OfImportError(except_orm):
     def __init__(self, msg):
-        self.msg = msg
+        super(OfImportError, self).__init__(msg)
 
 class OfImportProductConfigTemplate(models.AbstractModel):
     _name = 'of.import.product.config.template'
@@ -176,7 +179,7 @@ class OFProductBrand(models.Model):
         fields = self.get_config_field_list()
         domain = ['|'] * (len(fields) - 1) + [(field, '!=', False) for field in fields]
         for brand in self:
-            brand.product_config_ids = product_obj.search([('brand_id', '=', self.id)] + domain)
+            brand.product_config_ids = product_obj.search([('brand_id', '=', brand.id)] + domain)
 
     @api.multi
     def _inverse_product_config_ids(self):
@@ -270,14 +273,15 @@ class OFProductBrand(models.Model):
                         eval_dict['pa'] = product.of_seller_price
                     else:
                         # La formule n'est pas renseignée et aucune valeur ne peut être déduite
-                        raise OfImportError(u"Aucune formule n'est renseignée pour %s de cet article." % (text, ))
+                        raise OfImportError(u"Aucune formule n'est renseignée pour %s de cet article (marque à configurer : %s)." % (text, self.name))
                 else:
-                    raise OfImportError(u"Aucune formule n'est renseignée pour %s de cet article." % (text, ))
+                    raise OfImportError(u"Aucune formule n'est renseignée pour %s de cet article (marque à configurer : %s)." % (text, self.name))
 
         values['of_seller_price'] = eval_dict['pa']
         values['list_price'] *= udm_ratio
         values['standard_price'] *= udm_ratio
 
+        values['of_seller_price'] = eval_dict['pa']
         return values
 
     @api.multi
@@ -627,7 +631,7 @@ class OfImport(models.Model):
             if brand_id:
                 brand = self.env['of.product.brand'].browse(brand_id)
             else:
-                brand = res_objet and res_objet.brand_id
+                brand = res_objet.brand_id
                 # Si brand n'est pas défini, une exception sera automatiquement générée plus tard
                 # car la marque est un champ obligatoire pour l'import de tarif
 
@@ -896,7 +900,7 @@ class OfImport(models.Model):
                                 if brand_id:
                                     brand = self.env['of.product.brand'].browse(brand_id)
                                 else:
-                                    brand = res_objet and res_objet.brand_id
+                                    brand = res_objet.brand_id
 
                                 if brand:
                                     prefixe = brand.code + '_'

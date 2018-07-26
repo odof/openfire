@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_of_datastore_update_product_form" model="ir.ui.view">
+        <field name="name">of.datastore.update.product.form</field>
+        <field name="model">of.datastore.update.product</field>
+        <field name="arch" type="xml">
+            <form string="Products import/update">
+                <field name="is_update" invisible="1"/>
+                <span>If you continue, the selected products will be imported/updated.</span>
+                <footer>
+                    <button name="update_products" type="object" string="Update" class="btn-primary" attrs="{'invisible': [('is_update','=',False)]}"/>
+                    <button name="update_products" type="object" string="Import" class="btn-primary" attrs="{'invisible': [('is_update','=',True)]}"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+    <act_window id="action_of_datastore_update_product_template"
+        key2="client_action_multi" name="Products import/update"
+        res_model="of.datastore.update.product" src_model="product.template"
+        view_mode="form" target="new" view_type="form" />
+
+    <act_window id="action_of_datastore_update_product_product"
+        key2="client_action_multi" name="Products import/update"
+        res_model="of.datastore.update.product" src_model="product.product"
+        view_mode="form" target="new" view_type="form" />
+
+    <act_window id="action_of_datastore_update_product_brand"
+        name="Products import/update"
+        res_model="of.datastore.update.product" src_model="of.product.brand"
+        view_mode="form" target="new" view_type="form" />
+
+</odoo>

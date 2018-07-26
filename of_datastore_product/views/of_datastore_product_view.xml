@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+
+    <!-- Import des fichiers javascripts/css -->
+    <template id="assets_backend" name="of_web_widgets assets" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" href="/of_datastore_product/static/src/css/of_datastore_product.css"/>
+            <script type="text/javascript" src="/of_datastore_product/static/src/js/of_datastore_product.js"></script>
+        </xpath>
+    </template>
+
+    <!-- Fournisseur -->
+    <record id="of_datastore_supplier_view_form" model="ir.ui.view">
+        <field name="name">of.datastore.supplier.form</field>
+        <field name="model">of.datastore.supplier</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="button_import_brands" string="Import brands" type="object"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group colspan="2" col="4">
+                            <field name="db_name"/>
+                            <field name="server_address"/>
+                            <field name="login"/>
+                            <field name="new_password" password="True" placeholder="***"/>
+                            <field name="password" invisible="1"/>
+                            <field name="active"/>
+                            <newline/>
+                            <button name="button_dummy" string="Test connection" type="object"/>
+                            <newline/>
+                            <field name="error_msg" colspan="4"/>
+                        </group>
+
+                        <separator name="datastore_brand_ids" string="Supplier brands" create="false" delete="false"/>
+                        <field name="datastore_brand_ids" nolabel="1" colspan="2">
+                            <tree editable="bottom" create="false" delete="false" colors="red:not brand_id;">
+                                <field name="datastore_brand_id" invisible="1"/>
+                                <field name="name"/>
+                                <field name="brand_id"/>
+                                <field name="note_maj"/>
+                                <field name="product_count"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_datastore_supplier_view_tree" model="ir.ui.view">
+        <field name="name">of.datastore.supplier.tree</field>
+        <field name="model">of.datastore.supplier</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree colors="gray:active == False">
+                <field name="active" invisible="1"/>
+                <field name="db_name"/>
+                <field name="display_brand_ids" widget="many2many_tags"/>
+                <button name="action_import_brands" string="Importer brands" type="object" icon="fa-cloud-download"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_datastore_supplier_action" model="ir.actions.act_window">
+        <field name="name">Centralized databases</field>
+        <field name="res_model">of.datastore.supplier</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_datastore_supplier_view_tree"/>
+        <field name="context">{'active_test':False}</field>
+    </record>
+
+    <!-- Marque -->
+    <record id="of_datastore_brand_product_action" model="ir.actions.act_window">
+        <field name="name">Centralized products</field>
+        <field name="res_model">product.template</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{'search_default_brand_id':active_id, 'search_default_of_datastore_search':True}</field>
+    </record>
+
+    <record id="of_datastore_product_brand_view_form" model="ir.ui.view">
+        <field name="name">of.datastore.product.brand.form.view</field>
+        <field name="model">of.product.brand</field>
+        <field name="inherit_id" ref="of_import.of_product_brand_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="%(of_datastore_brand_product_action)d" type="action" class="oe_stat_button" icon="fa-th-list">
+                    <field string="Centralized products" name="datastore_product_count" widget="statinfo"/>
+                </button>
+            </xpath>
+            <xpath expr="//notebook" position="before">
+                <group colspan="2" invisible="context.get('uid') != 1">
+                    <field name="datastore_supplier_id"/>
+                </group>
+                <div colspan="2" attrs="{'invisible':[('datastore_supplier_id', '=', False)]}">
+                    <span>This brand is connected to the centralized pricelist.</span>
+                </div>
+            </xpath>
+            <xpath expr="//page[@name='notes']" position="inside">
+                <separator string="Centralized products notes" colspan="2"/>
+                <field name="datastore_note_maj" colspan="2" nolabel="1"/>
+            </xpath>
+
+            <!-- Mise en couleur des catégories -->
+            <xpath expr="//field[@name='categ_ids']/tree" position="attributes">
+                <attribute name="colors">grey:is_datastore_matched==False</attribute>
+            </xpath>
+            <xpath expr="//field[@name='categ_ids']/tree" position="inside">
+                <field name="is_datastore_matched" invisible="1"/>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- Force le recalcul des catégories du fournisseur -->
+    <record id="of_product_brand.of_product_brand_action" model="ir.actions.act_window">
+        <field name="context">{'of_datastore_update_categ': True}</field>
+    </record>
+
+    <!-- Articles -->
+    <record id="of_datastore_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.kit.product.template.common.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='options']" position="inside">
+                <div>
+                    <field name="of_datastore_res_id" widget="boolean" readonly="1"/>
+                    <label string="Connected"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- recherche d'articles sur base centralisée -->
+    <record id="of_datastore_product_template_search_view" model="ir.ui.view">
+        <field name="name">product.template.search</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='inactive']" position="before">
+                <filter string="Search on centralized database" name="of_datastore_search" domain="['of_datastore_product_search']"/>
+                <separator/>
+            </xpath>
+        </field>
+    </record>
+
+    <menuitem name="C.P.Connector" id="menu_of_datastore_supplier" parent="base.menu_administration" sequence="1" action="of_datastore_supplier_action"/>
+
+</openerp>
