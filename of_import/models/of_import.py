@@ -960,7 +960,7 @@ class OfImport(models.Model):
         try:
             self._post_calcule_ligne(champs_fichier, ligne, model_data, res_objet, valeurs)  # Champs à importer (pour envoi à fonction create ou write)
         except OfImportError, e:
-            erreur(u"Ligne %s : %s %s non importé.\n" % (i, e.msg, model_data['nom_objet'].capitalize()))
+            erreur(u"Ligne %s : %s %s non importé.\n" % (i, e.name, model_data['nom_objet'].capitalize()))
 
         if not res_objet:
             # En cas de création, on doit vérifier que tous les champs Odoo requis ont bien été renseignés.
@@ -1190,7 +1190,7 @@ class OfImport(models.Model):
                         sortie_succes += message
             except OfImportError, e:
                 code = CODE_IMPORT_ERREUR
-                sortie_erreur += e.msg
+                sortie_erreur += e.name
 
             if code == CODE_IMPORT_ERREUR:
                 nb_echoue += 1
