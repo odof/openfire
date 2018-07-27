@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_fusion_commande_fournisseur_wizard" model="ir.ui.view">
+        <field name="name">Fusion commande fournisseur</field>
+        <field name="model">of.fusion.commande.fournisseur</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Fusion de commande">
+                <field name="texte" readonly="1" nolabel="1"/>
+                <field name="affichage" invisible="1"/>
+                <footer>
+                    <button name="button_merge_orders" string="Fusionner commandes" type="object" class="oe_highlight" attrs="{'invisible': [('affichage', '=', True)]}"/>
+                    <button string="Annuler" special="cancel" class="btn-default" attrs="{'invisible': [('affichage', '=', True)]}"/>
+                    <!-- Bouton Ok et Annler font la même chose mais ne sont pas perçu de la même façon -->
+                    <button string="OK" special="cancel" class="oe_highlight" attrs="{'invisible': [('affichage', '=', False)]}"/>
+                </footer>
+            </form>
+         </field>
+    </record>
+
+    <act_window id="action_view_fusion_commande_fournisseur_wizard"
+                key2="client_action_multi"
+                name="Fusion de commande"
+                res_model="of.fusion.commande.fournisseur"
+                src_model="purchase.order"
+                view_mode="form"
+                view_type="form"
+                multi="True"
+                view_id="view_fusion_commande_fournisseur_wizard"
+                target="new"/>
+
+</odoo>
