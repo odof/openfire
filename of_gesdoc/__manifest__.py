@@ -2,7 +2,7 @@
 {
     'name': 'OpenFire Gestion des documents',
     'author': 'OpenFire',
-    'version': '10.0',
+    'version': '10.0.1.0.0',
     'category': 'Gestion Documents',
     'description': u"""Module OpenFire pour la gestion de documents.
 ---------------------------------------------

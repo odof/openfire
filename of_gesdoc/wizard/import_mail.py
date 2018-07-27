@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
 
@@ -43,17 +43,19 @@ class OfGesdocImport(models.TransientModel):
                 }))
         self.chp_ids = chps
 
+    @api.model
     def import_data_obj(self, data, obj):
         """
         @param data: dictionnaire {champ_openfire: valeur}
         @param obj: objet cible
         """
 
-    @api.one
+    @api.multi
     def import_data(self, data):
         """
         @param data: dictionnaire {champ_openfire: valeur}
         """
+        self.ensure_one()
 
     @api.multi
     def compute(self):

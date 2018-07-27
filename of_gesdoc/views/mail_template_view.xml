@@ -21,14 +21,14 @@
                             <field name="type" invisible="1"/>
                             <field name="sans_add" attrs="{'invisible': [('file','!=',False)]}"/>
                             <field name="sans_header" attrs="{'invisible': [('file','!=',False)]}"/>
-                            <field name="fillable" attrs="{'invisible': [('file','=',False)]}"/>
+                            <field name="fillable" attrs="{'invisible': ['|',('file','=',False),('chp_ids','=',[])]}"/>
                         </group>
                         <separator string="Importer un formulaire Acrobat"/>
                         <group colspan="2">
                             <field name="file_name" invisible="1"/>
                             <field name="file" filename="file_name"/>
                         </group>
-                        <group colspan="2" attrs="{'invisible': [('file','=',False)]}">
+                        <group colspan="2" attrs="{'invisible': ['|',('file','=',False),('chp_ids','=',[])]}">
                             <field name="chp_ids" nolabel="1" colspan="2">
                                 <tree string="Champs" create="false" delete="false" editable="bottom">
                                     <field name="name"/>
@@ -42,7 +42,7 @@
                             <separator string="Contenu" colspan="4"/>
                             <field name="body_text" nolabel="1" colspan="4"/>
                         </group>
-                        <group colspan="2">
+                        <group colspan="2" attrs="{'invisible': [('file','!=',False),('chp_ids','=',[])]}">
                             <field name="note_fields"/>
                         </group>
                     </group>

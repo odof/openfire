@@ -7,11 +7,12 @@ import base64
 
 try:
     from pdfminer.pdfparser import PDFParser
+    from pdfminer.psparser import PSLiteral
     from pdfminer.pdfdocument import PDFDocument
     from pdfminer.pdftypes import resolve1
     from pdfminer.utils import decode_text
 except ImportError:
-    PDFParser = PDFDocument = resolve1 = decode_text = None
+    PDFParser = PSLiteral = PDFDocument = resolve1 = decode_text = None
 
 class OfMailTemplate(models.Model):
     "Templates for printing mail"
@@ -56,14 +57,19 @@ class OfMailTemplate(models.Model):
             pf = StringIO.StringIO(base64.decodestring(self.file))
             parser = PDFParser(pf)
             doc = PDFDocument(parser)
-            fields = resolve1(doc.catalog['AcroForm'])['Fields']
+            fields = resolve1(doc.catalog.get('AcroForm', {})).get('Fields', [])
 
             for i in fields:
                 field = resolve1(i)
                 name = field.get('T').decode("unicode-escape", 'ignore')
-                value = pre_vals.get(name)\
-                    or (field.get('V') and decode_text(field['V']))\
-                    or ''
+                value = pre_vals.get(name)
+                if not value:
+                    value = field.get('V')
+                    if value:
+                        if isinstance(value, basestring):
+                            value = decode_text(value)
+                        elif isinstance(value, PSLiteral):
+                            value = value.name
                 chps.append((0, 0, {
                     'name': name,
                     'value_openfire': value,

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from openerp import models, api
+from odoo import models, api
 import time
 
 class of_gesdoc_import(models.TransientModel):
     _inherit = 'of.gesdoc.import'
 
+    @api.model
     def import_data_obj(self, data, obj):
         if obj._name == 'project.issue':
             result = {field[3:]: data[field] for field in ('pi_name', 'pi_description') if field in data}
@@ -20,7 +21,7 @@ class of_gesdoc_import(models.TransientModel):
             result = super(of_gesdoc_import, self).import_data_obj(data, obj)
         return result
 
-    @api.one
+    @api.multi
     def import_data(self, data):
         result = super(of_gesdoc_import, self).import_data(data)
         if 'pi_of_code' in data:
