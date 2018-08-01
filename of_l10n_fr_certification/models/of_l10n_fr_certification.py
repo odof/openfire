@@ -117,6 +117,6 @@ class ir_module_module(models.Model):
     @api.multi
     def write(self, vals):
         # Empêcher une désinstallation du module.
-        if self.search([('name', '=', 'of_l10n_fr_certification'), ('id', 'in', isinstance(self._ids, (int, long)) and [self._ids] or self._ids)]) and vals.get('state') == 'to remove':
-            raise UserError(_(u"Vous ne pouvez pas désinstaller le module of_l10n_fr_certification."))
+        if self.search([('name', 'in', ('l10n_fr_certification', 'of_l10n_fr_certification')), ('id', 'in', isinstance(self._ids, (int, long)) and [self._ids] or self._ids)]) and vals.get('state') == 'to remove':
+            raise UserError(_(u"Vous ne pouvez pas désinstaller les modules l10n_fr_certification et of_l10n_fr_certification."))
         return super(ir_module_module, self).write(vals)
