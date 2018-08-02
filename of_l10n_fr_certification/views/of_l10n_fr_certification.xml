@@ -2,6 +2,33 @@
 <openerp>
     <data>
 
+        <!-- Vue formulaire facture clients message de confirmation validation facture -->
+        <record id="of_l10n_fr_certification_invoice_form" model="ir.ui.view">
+            <field name="name">of.l10n.fr.certification.invoice.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <button name="invoice_open" states="proforma2" position="attributes">
+                    <attribute name="confirm">Êtes-vous sûr de vouloir valider cette facture ? En application de la réglementation, vous ne pouvez pas modifier une facture validée. Vous ne pourrez que faire un avoir. Assurez-vous que les éléments de la facture soient définitifs avant de la valider.</attribute>
+                </button>
+                <button name="invoice_open" states="draft" position="attributes">
+                    <attribute name="confirm">Êtes-vous sûr de vouloir valider cette facture ? En application de la réglementation, vous ne pouvez pas modifier une facture validée. Vous ne pourrez que faire un avoir. Assurez-vous que les éléments de la facture soient définitifs avant de la valider.</attribute>
+                </button>
+            </field>
+        </record>
+
+        <!-- Vue formulaire facture fournisseurs message de confirmation validation facture -->
+        <record id="of_l10n_fr_certification_invoice_supplier_form" model="ir.ui.view">
+            <field name="name">of.l10n.fr.certification.invoice.supplier.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_form"/>
+            <field name="arch" type="xml">
+                <button name="invoice_open" position="attributes">
+                    <attribute name="confirm">Êtes-vous sûr de vouloir valider cette facture ? En application de la réglementation, vous ne pouvez pas modifier une facture validée. Vous ne pourrez que faire un avoir. Assurez-vous que les éléments de la facture soient définitifs avant de la valider.</attribute>
+                </button>
+            </field>
+        </record>
+
         <!-- Historique paiements : vue liste -->
         <record model="ir.ui.view" id="of_log_paiement_tree">
             <field name="name">of.log.paiement.tree</field>
