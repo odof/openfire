@@ -15,6 +15,7 @@ Personnalisations des fonctions de base Odoo :
 - Ajoute le groupe utilisateur "Intranet"
 - Affiche l'adresse du contact dans le menu déroulant de sélection d'un partenaire
 - Affiche l'adresse au format français par défaut quand le pays n'est pas renseigné et non le format US
+- API fonction permettant d'afficher un message dans une fenêtre au cours de l'exécution d'une fonction
 """,
     "website" : "www.openfire.fr",
     "depends" : ["product"], # Migration 8 vers 9 "email_template",
@@ -27,10 +28,9 @@ Personnalisations des fonctions de base Odoo :
         'security/of_group_intranet_security.xml',
         'of_base_view.xml',
         'wizard/wizard_change_active_product.xml',
+        'wizard/of_popup_wizard_view.xml',
     ],
     'installable': True,
     'application': False,
     'auto_install': False,
 }
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
