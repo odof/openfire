@@ -13,7 +13,7 @@ Certification logiciel de caisse :
 - Créer une extourne comptable lors de la modification/annulation des paiements
 - Téléchargement du certificat de conformité
 - Message de confirmation lors d'une validation de facture
-- Empêche la désinstallation des modules Odoo et Openfire de certification comptable 
+- Empêche la désinstallation des modules Odoo et Openfire de certification comptable
  """,
     "depends" : [
         'of_account_payment_mode',

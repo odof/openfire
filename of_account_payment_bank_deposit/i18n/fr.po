@@ -168,7 +168,7 @@ msgstr "Statut"
 #. module: of_account_payment_bank_deposit
 #: selection:of.account.payment.bank.deposit,state:0
 msgid "Unposted"
-msgstr "Unposted"
+msgstr "Non comptabilisé"
 
 #. module: of_account_payment_bank_deposit
 #: code:addons/of_account_payment_bank_deposit/models/of_account_payment_bank_deposit.py:104
@@ -186,4 +186,3 @@ msgstr "Vous ne pouvez pas définir un paiement sur plusieurs remises en banque"
 #: model:ir.ui.view,arch_db:of_account_payment_bank_deposit.of_view_account_payment_bank_deposit_search
 msgid "date"
 msgstr "date"
-
