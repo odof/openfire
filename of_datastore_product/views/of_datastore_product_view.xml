@@ -59,7 +59,7 @@
                 <field name="active" invisible="1"/>
                 <field name="db_name"/>
                 <field name="display_brand_ids" widget="many2many_tags"/>
-                <button name="action_import_brands" string="Importer brands" type="object" icon="fa-cloud-download"/>
+                <button name="action_import_brands" string="Import brands" type="object" icon="fa-cloud-download"/>
             </tree>
         </field>
     </record>
@@ -87,6 +87,10 @@
         <field name="model">of.product.brand</field>
         <field name="inherit_id" ref="of_import.of_product_brand_view_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//header/button[1]" position="before">
+                <button name="%(action_of_datastore_update_product_brand)d" type="action" string="Update products"
+                        attrs="{'invisible':[('datastore_supplier_id','=',False)]}"/>
+            </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="%(of_datastore_brand_product_action)d" type="action" class="oe_stat_button" icon="fa-th-list">
                     <field string="Centralized products" name="datastore_product_count" widget="statinfo"/>
@@ -122,6 +126,7 @@
     </record>
 
     <!-- Articles -->
+    <!-- Vue formulaire -->
     <record id="of_datastore_product_template_form_view" model="ir.ui.view">
         <field name="name">of.kit.product.template.common.form</field>
         <field name="model">product.template</field>
@@ -137,7 +142,36 @@
         </field>
     </record>
 
-    <!-- recherche d'articles sur base centralisée -->
+    <!-- Vue liste -->
+    <record id="view_of_datastore_product_tree" model="ir.ui.view">
+        <field name="name">product.datastore.tree.inherit</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="stock.view_stock_product_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                <attribute name="decoration-danger">virtual_available&lt;0 and not of_datastore_has_link</attribute>
+            </xpath>
+            <xpath expr="//tree" position="inside">
+                <field name="of_datastore_has_link" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_of_datastore_product_template_tree" model="ir.ui.view">
+        <field name="name">product.datastore.stock.tree.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="stock.view_stock_product_template_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                <attribute name="decoration-danger">virtual_available&lt;0 and not of_datastore_has_link</attribute>
+            </xpath>
+            <xpath expr="//tree" position="inside">
+                <field name="of_datastore_has_link" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Recherche d'articles sur base centralisée -->
     <record id="of_datastore_product_template_search_view" model="ir.ui.view">
         <field name="name">product.template.search</field>
         <field name="model">product.template</field>

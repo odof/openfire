@@ -9,7 +9,7 @@ DATASTORE_IND = 100000000  # 100.000.000 ids devraient suffire pour les produits
 class OfDatastoreSupplier(models.Model):
     _name = 'of.datastore.supplier'
     _inherit = 'of.datastore.connector'
-    _description = u"Connecteur au tarif centralisé"
+    _description = 'Centralized products connector'
     _rec_name = 'db_name'
     _order = "db_name"
 
@@ -128,7 +128,7 @@ class OfDatastoreSupplierBrand(models.AbstractModel):
     name = fields.Char(string='Supplier brand', required=True, readonly=True)
     datastore_brand_id = fields.Integer(string='Supplier brand ID', required=True, readonly=True)
     brand_id = fields.Many2one('of.product.brand', string="Brand")
-    product_count = fields.Integer(string='# products', readonly=True)
+    product_count = fields.Integer(string='# Products', readonly=True)
     note_maj = fields.Text(string='Update notes', readonly=True)
 
     @api.multi
@@ -199,7 +199,7 @@ class OfImportProductCategConfig(models.Model):
 class OfProductBrand(models.Model):
     _inherit = 'of.product.brand'
 
-    datastore_supplier_id = fields.Many2one('of.datastore.supplier', string=u"Connecteur tarif centralisé")
+    datastore_supplier_id = fields.Many2one('of.datastore.supplier', string='Centralized products connector')
     datastore_brand_id = fields.Integer(string='Centralized ID')
 
     datastore_note_maj = fields.Text(string='Update notes', compute='_compute_datastore_note_maj')
@@ -211,6 +211,7 @@ class OfProductBrand(models.Model):
     def read(self, fields=None, load='_classic_read'):
         if self._context.get('of_datastore_update_categ') and fields and 'categ_ids' in fields:
             self = self.with_context(of_datastore_update_categ=False)
+            categ_ids = {name: categ_id for categ_id, name in self.env['product.category'].search([]).name_get()}
             categ_obj = self.env['of.import.product.categ.config']
             try:
                 categ_obj.check_access_rights('create')
@@ -254,7 +255,12 @@ class OfProductBrand(models.Model):
                                 stored_categ.is_datastore_matched = True
                             categs += stored_categ
                         else:
-                            categs += categ_obj.create({'brand_id': brand.id, 'categ_origin': categ_origin, 'is_datastore_matched': True})
+                            categs += categ_obj.create({
+                                'brand_id': brand.id,
+                                'of_import_categ_id': categ_ids.get(categ_origin, False),
+                                'categ_origin': categ_origin,
+                                'is_datastore_matched': True,
+                            })
                     for categ in stored_categs.itervalues():
                         if categ.of_import_price or categ.of_import_remise or categ.of_import_cout or categ.of_import_categ_id:
                             # Une configuration a été saisie, on la garde par sentimentalité
@@ -432,6 +438,11 @@ class OfDatastoreCentralized(models.AbstractModel):
         # Ajout de certains champs
         res += [
             'purchase_method',
+
+            # Champs de notes
+            'description_sale',
+            'description_purchase',
+            'description_picking',
         ]
 
         # On ne veut pas non-plus les champs one2many ou many2many (seller_ids, packagind_ids, champs liés aux variantes....)
@@ -471,6 +482,7 @@ class OfDatastoreCentralized(models.AbstractModel):
             ('of_seller_pp_ht'                , lambda: vals['list_price']),
             ('of_seller_product_category_name', lambda: vals['categ_id'][1]),
             ('of_tmpl_datastore_res_id'       , lambda: vals['product_tmpl_id'][0]),
+            ('description_norme'              , lambda: product.description_norme or vals['description_norme']),
             # Attention, l'ordre des deux lignes suivantes est important
             ('of_seller_product_code'         , lambda: vals['default_code']),
             ('default_code'                   , lambda: default_code_func[brand](vals['default_code'])),
@@ -585,6 +597,7 @@ class OfDatastoreCentralized(models.AbstractModel):
                         vals[field] = line_ids
 
                 # --- Champs spéciaux ---
+                vals['of_datastore_has_link'] = bool(product)
 
                 # Prix d'achat/vente
                 vals.update(brand.compute_product_price(vals['list_price'], categ_name, obj_dict['uom_id'], obj_dict['uom_po_id'],
@@ -660,9 +673,9 @@ class OfDatastoreCentralized(models.AbstractModel):
         brands = brands.filtered('datastore_supplier_id')
 
         # Recherche des produits non déjà enregistrés
-        if not self._context.get('datastore_stored'):
+        if self._context.get('datastore_not_stored'):
             orig_ids = self.sudo().with_context(active_test=False).search([('brand_id', 'in', brands._ids),
-                                                                           ('of_datastore_res_id', '!=', False)])._ids
+                                                                           ('of_datastore_res_id', '!=', False)]).mapped('of_datastore_res_id')
             domain.append(('id', 'not in', orig_ids))
 
         parse_domain = self._of_datastore_update_domain_item
@@ -713,12 +726,9 @@ class OfDatastoreCentralized(models.AbstractModel):
         obj = obj.search(obj_domain)
 
         result = False
-        if not obj:
-            result = (left, new_operator, [])
-        # Conversion des ids courants en ids de la base centralisée
-        elif obj._name == 'of.product.brand':
+        if obj._name == 'of.product.brand':
             # La correspondance des marques se fait sur le nom
-            result = (left, operator, obj.mapped('name'))
+            result = (left, new_operator, obj.mapped('name'))
 
         return result
 
@@ -811,6 +821,12 @@ class ProductTemplate(models.Model):
 
     # ce champ va permettre de faire une recherche sur le tarif centralisé
     of_datastore_supplier_id = fields.Many2one('of.datastore.supplier', related='brand_id.datastore_supplier_id')
+    of_datastore_has_link = fields.Boolean(_compute='_compute_of_datastore_has_link')
+
+    @api.depends()
+    def _compute_of_datastore_has_link(self):
+        for product in self:
+            product.of_datastore_has_link = False
 
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):

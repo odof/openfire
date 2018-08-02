@@ -69,6 +69,7 @@ Paramètres de ventes (sale.config.settings)
         "of_gesdoc",
         "of_product",
         "sale",
+        "sale_margin",
     ],
     'external_dependancies': {
         'python': ['pdfminer', 'pypdftk', 'pyPdf'],

@@ -2,7 +2,6 @@
 
 from odoo import models, fields, api, _
 from ..models.of_datastore_product import DATASTORE_IND
-import time
 import itertools
 from odoo.exceptions import ValidationError
 
@@ -14,11 +13,12 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         active_ids = self._context.get('active_ids') or [0]
         return max(active_ids) > 0
 
+    noup_name = fields.Boolean(string='Don\'t update product name')
     is_update = fields.Boolean('Show update options', default=lambda self: self._default_is_update())
 
     def _update_supplier_products(self, supplier, products):
         """
-        Met a jour les produits products depuis la base fournisseur supplier
+        Met à jour les produits products depuis la base fournisseur supplier
         @param supplier: browse_record of_datastore_supplier
         @param products: browse_record_list product.product
         """
@@ -58,6 +58,8 @@ class OfDatastoreUpdateProduct(models.TransientModel):
 
         # --- Mise à jour des articles ---
         fields_to_update = product_obj.of_datastore_get_import_fields()
+        if self.noup_name:
+            fields_to_update.remove('name')
         ds_product_ids = [-(ds_product_id + supplier_value) for ds_product_id in ds_product_ids]
         ds_products_data = product_obj.browse(ds_product_ids)._of_read_datastore(fields_to_update, create_mode=True)
         for ds_product_data in itertools.chain(no_match_ids, ds_products_data):
@@ -119,7 +121,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
             to_create = [product_id for product_id in active_ids if product_id < 0]
             if to_create:
                 model_obj.browse(to_create).of_datastore_import()
-                notes.append(u"Produits créés : %s" % (len(to_create)))
+                notes.append(_('Created products : %s') % (len(to_create)))
 
             to_update = [product_id for product_id in active_ids if product_id > 0]
             products = model_obj.browse(to_update)
@@ -135,7 +137,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
             # Produits sans base fournisseur
             products = datastore_products.pop(False, [])
             if products:
-                notes_warning = ["", u"Produits sans base fournisseur associée : %s" % len(products)]
+                notes_warning = ["", _('Products whose brand is not centralized : %s') % len(products)]
 
         # Recherche des valeurs à mettre à jour
         updt_cnt = 0
@@ -147,13 +149,13 @@ class OfDatastoreUpdateProduct(models.TransientModel):
             link_cnt += link
             nolk_cnt += nolk
         if updt_cnt:
-            notes.append(u"Produits mis à jour : %s" % (updt_cnt))
+            notes.append(_('Updated products : %s') % (updt_cnt))
         if link_cnt:
-            notes.append(u"Correspondances ajoutées/mises à jour avec la base centrale : %s" % (link_cnt))
+            notes.append(_('Added/updated links to centralized products : %s') % (link_cnt))
         if nolk_cnt:
-            notes.append(u"Produits non mis à jour par absence de correspondance : %s" % (nolk_cnt))
+            notes.append(_('Products not update because not linked : %s') % (nolk_cnt))
 
-        notes[0] = u"Mise à jour des produits terminée à %s" % (time.strftime('%Hh%M:%S'),)
+        notes[0] = _('Products update ended : %s') % (fields.Datetime().convert_to_display_name(fields.Datetime.now(), self))
         note = "\n".join(notes + notes_warning)
 
         return self.env['of.popup.wizard'].popup_return(note, titre=_('Import/update notes'))
