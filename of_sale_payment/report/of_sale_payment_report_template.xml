@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="of_sale_payment_saleorder_document_with_payments" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//div[@name='total']" position="replace">
+            <div class="row" name="total">
+                <div class="col-xs-4 pull-right">
+                    <table class="table table-condensed">
+                        <tr class="border-black">
+                            <td><strong>Total sans taxes</strong></td>
+                            <td class="text-right">
+                                <span t-field="doc.amount_untaxed"
+                                    t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
+                            </td>
+                        </tr>
+                        <t t-foreach="doc._get_tax_amount_by_group()" t-as="amount_by_group">
+                            <tr>
+                                <td><span t-esc="amount_by_group[0] or 'Taxes'"/></td>
+                                <td class="text-right">
+                                    <span t-esc="amount_by_group[1]"
+                                        t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
+                                </td>
+                            </tr>
+                        </t>
+                        <tr class="border-black">
+                            <td><strong>Total</strong></td>
+                            <td class="text-right">
+                                <span t-field="doc.amount_total"
+                                    t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
+                            </td>
+                            <!-- Affichage la sommes de paiements lettrés avec les factures -->
+                            <t t-if="doc.payment_ids and doc.state != 'draft' and doc._invoices_state() and doc.of_print_payments">
+                                <tr t-foreach="doc._get_sum_payment()" t-as="payment">
+                                    <td class="col-xs-8 pull-right">
+                                        <i name="payments_data"><span>Payé le </span><span t-field="payment[0].date"/></i>
+                                    </td>
+                                    <td>
+                                        <span class="pull-right text-right"><t t-esc="payment[1]" t-options='{"widget": "monetary", "display_currency": "doc.currency_id"}'/></span>
+                                    </td>
+                                </tr>
+                            </t>
+                            <!-- Si aucun paiement lettré affiche tout les paiements -->
+                            <t t-if="doc.payment_ids and doc.state != 'draft' and not doc._invoices_state() and doc.of_print_payments">
+                                <tr t-foreach="doc.payment_ids" t-as="payment">
+                                    <td class="col-xs-8 pull-right">
+                                        <i name="payments_data"><span>Payé le </span><span t-field="payment.payment_date"/></i>
+                                    </td>
+                                    <td>
+                                        <span class="pull-right text-right"><t t-esc="payment['amount']" t-options='{"widget": "monetary", "display_currency": "doc.currency_id"}'/></span>
+                                        <!--span class="pull-right text-right"><t t-esc="payment['amount']" t-esc-options='{"widget": "monetary", "display_currency": "o.currency_id"}'/></span-->
+                                    </td>
+                                </tr>
+                            </t>
+                        </tr>
+                        <t t-if="doc.payment_ids and doc.state != 'draft' and doc.of_print_payments">
+                            <tr class="border-black">
+                                <td><strong>Montant dû</strong></td>
+                                    <td class="text-right">
+                                    <span t-field="doc.of_total_with_payment"
+                                        t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
+                                </td>
+                            </tr>
+                        </t>
+                    </table>
+               </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>

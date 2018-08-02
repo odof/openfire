@@ -1,39 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
 
-        <record id="action_sale_order_payment" model="ir.actions.act_window">
-            <field name="name">Enregistrer un paiement</field>
-            <field name="res_model">account.payment</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">form</field>
-            <field name="view_id" ref="account.view_account_payment_invoice_form"/>
-            <field name="context">{'default_order_ids': [(4, active_id, None)]}</field>
-            <field name="target">new</field>
-        </record>
+    <record id="action_sale_order_payment" model="ir.actions.act_window">
+        <field name="name">Enregistrer un paiement</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="account.view_account_payment_invoice_form"/>
+        <field name="context">{'default_order_ids': [(4, active_id, None)]}</field>
+        <field name="target">new</field>
+    </record>
 
-        <!-- Ajout champ frais de port product.product -->
-        <record id="of_sale_view_order_form" model="ir.ui.view">
-            <field name="name">of.sale.order.form</field>
-            <field name="model">sale.order</field>
-            <field name="inherit_id" ref="sale.view_order_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//button[@name='print_quotation']" position="after">
-                    <button name="%(action_sale_order_payment)d" type="action" states="sale" string="Enregistrer un paiement" groups="account.group_account_invoice" class="oe_highlight"/>
-                </xpath>
+    <!-- Ajout champ frais de port product.product -->
+    <record id="of_sale_view_order_form" model="ir.ui.view">
+        <field name="name">of.sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='print_quotation']" position="after">
+                <button name="%(action_sale_order_payment)d" type="action" states="sale" string="Enregistrer un paiement" groups="account.group_account_invoice" class="oe_highlight"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_view_account_payment_order_form" model="ir.ui.view">
+        <field name="name">of.account.payment.order.form</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_invoice_form"/>
+        <field name="arch" type="xml">
+            <field name="invoice_ids" position="after">
+                <field name="order_ids" invisible="1"/>
             </field>
-        </record>
+        </field>
+    </record>
 
-        <record id="of_view_account_payment_order_form" model="ir.ui.view">
-            <field name="name">of.account.payment.order.form</field>
-            <field name="model">account.payment</field>
-            <field name="inherit_id" ref="account.view_account_payment_invoice_form"/>
-            <field name="arch" type="xml">
-                <field name="invoice_ids" position="after">
-                    <field name="order_ids" invisible="1"/>
-                </field>
-            </field>
-        </record>
+    <!-- Action afficher payments list -->
+    <record id="of_sale_payment_open_payments" model="ir.actions.act_window">
+        <field name="name">Paiements</field>
+        <field name="res_model">account.payment</field>
+        <field name="domain">[]</field> <!-- Force empty -->
+        <field name="view_type">form</field>
+    </record>
 
-    </data>
+    <!-- Smart button des paiements sur les bons de commande -->
+    <record id="of_sale_payment_button_payment_view" model="ir.ui.view">
+        <field name="name">of.sale.payement.button.payments</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="/form/sheet/div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" name="action_view_payments" type="object" icon="fa-usd" attrs="{'invisible': [('of_payment_sum', '=', 0)]}">
+                    <div class="o_form_field o_stat_info">
+                        <span class="o_stat_value"><field name="of_payment_sum" widget='monetary' options="{'currency_field': 'currency_id'}"/></span>
+                        <span class="o_stat_text">Paiements</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Smart button des paiements sur les bons de commande -->
+    <record id="of_sale_payment_button_payment_view_partner" model="ir.ui.view">
+        <field name="name">of.sale.payement.button.payments</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="/form/sheet/div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" name="action_view_payments" type="object" icon="fa-usd">
+                    <div class="o_form_field o_stat_info">
+                        <span class="o_stat_value"><field name="of_payment_total" widget='monetary' options="{'currency_field': 'currency_id'}"/></span>
+                        <span class="o_stat_text">Paiements</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Action afficher achats list -->
+    <record id="of_sale_payment_open_sale_orders" model="ir.actions.act_window">
+        <field name="name">Commandes</field>
+        <field name="res_model">sale.order</field>
+        <field name="domain">[]</field> <!-- Force empty -->
+        <field name="view_type">form</field>
+    </record>
+
+    <record id="of_sale_payment_button_sale_order_view" model="ir.ui.view">
+        <field name="name">of.sale.payement.button.orders</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="/form/sheet/div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" name="action_view_orders" type="object" icon="fa-usd" attrs="{'invisible': [('of_order_count', '=', 0)]}">
+                    <field string="Commandes" name="of_order_count" widget="statinfo"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_payment_impression" model="ir.ui.view">
+        <field name="name">of.sale.payement.impression</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page//group[@name='technical']" position="after">
+                <group string="Impression" name='impression'>
+                    <field name="of_print_payments"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
