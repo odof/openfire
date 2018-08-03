@@ -417,13 +417,13 @@ msgstr "Import/mise à jour d'articles"
 #. module: of_datastore_product
 #: code:addons/of_datastore_product/wizard/of_datastore_update_product.py:140
 #, python-format
-msgid "Products whose brand is not centralized : %s"
+msgid "Products the brand of which is not centralized : %s"
 msgstr "Articles dont la marque n'est pas centralisée : %s"
 
 #. module: of_datastore_product
 #: code:addons/of_datastore_product/wizard/of_datastore_update_product.py:156
 #, python-format
-msgid "Products not update because not linked : %s"
+msgid "Products not updated because not linked : %s"
 msgstr "Articles non mis à jour par absence de correspondance : %s"
 
 #. module: of_datastore_product

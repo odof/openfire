@@ -126,7 +126,10 @@ class OfDatastoreUpdateProduct(models.TransientModel):
             to_update = [product_id for product_id in active_ids if product_id > 0]
             products = model_obj.browse(to_update)
             if active_model == 'product.template':
-                products = products.mapped('product_variant_ids')
+                product_obj = self.env['product.product']
+                products = product_obj.with_context(active_test=False).search([('product_tmpl_id', 'in', products._ids)])
+                # Retrait du contexte active_test
+                products = product_obj.browse(products._ids)
             for product in products:
                 supplier = product.of_datastore_supplier_id or False
                 if supplier in datastore_products:
@@ -137,7 +140,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
             # Produits sans base fournisseur
             products = datastore_products.pop(False, [])
             if products:
-                notes_warning = ["", _('Products whose brand is not centralized : %s') % len(products)]
+                notes_warning = ["", _('Products the brand of which is not centralized : %s') % len(products)]
 
         # Recherche des valeurs à mettre à jour
         updt_cnt = 0
@@ -153,7 +156,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         if link_cnt:
             notes.append(_('Added/updated links to centralized products : %s') % (link_cnt))
         if nolk_cnt:
-            notes.append(_('Products not update because not linked : %s') % (nolk_cnt))
+            notes.append(_('Products not updated because not linked : %s') % (nolk_cnt))
 
         notes[0] = _('Products update ended : %s') % (fields.Datetime().convert_to_display_name(fields.Datetime.now(), self))
         note = "\n".join(notes + notes_warning)
