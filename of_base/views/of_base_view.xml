@@ -152,5 +152,21 @@
             <field name="groups_id" eval="[(6,0,[ref('of_group_root_only')])]"/>
         </record>
 
+    <!-- Attribut invisible pour n'être visible que sur les actions et non le bouton envoyer par email -->
+    <record model="ir.ui.view" id="of_base_email_compose_message_wizard_form">
+        <field name="name">mail.compose.message.form</field>
+        <field name="model">mail.compose.message</field>
+        <field name="inherit_id" ref="mail.email_compose_message_wizard_form"/>
+        <field name="groups_id" eval="[(4,ref('base.group_user'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='body']" position="before">
+                <field name="of_computed_body" options="{'style-inline': true}" attrs="{'invisible':[('composition_mode', '!=', 'mass_mail')]}"/>
+            </xpath>
+            <xpath expr="//footer/button[@special='cancel']" position="after">
+                <button string="(Re)calculer le champ texte" name="button_reload_computed_body" type="object"  class="btn-primary" attrs="{'invisible':[('composition_mode', '!=', 'mass_mail')]}"/>
+            </xpath>
+        </field>
+    </record>
+
     </data>
 </odoo>

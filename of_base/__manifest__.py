@@ -20,9 +20,10 @@ Personnalisation des fonctions de base Odoo :
 - Désactive l'envoi des notifications par courriel des changements d'affectation des commandes et factures
 - Restreint l'accès au menu "Applications" à l'utilisateur administrateur
 - API fonction permettant d'afficher un message dans une fenêtre au cours de l'exécution d'une fonction 
+- Ajout d'un champ calculé et d'un bouton sur les actions d'envoi de mail pour avoir une pré-visualisation du mail
 """,
     'website' : "www.openfire.fr",
-    'depends' : ["product"],
+    'depends' : ["product", "mail"],
     'category' : "OpenFire",
     'data' : [
         'data/report_paperformat.xml',
