@@ -45,18 +45,6 @@ class SaleOrder(models.Model):
         op = 'in' if (operator == '=') == value else 'not in'
         return [('id', op, orders.ids)]
 
-    @api.depends('order_line', 'amount_untaxed')
-    def _compute_of_marge(self):
-        for order in self:
-            total_cout = 0.0
-            for line in order.order_line:
-                cout = line.product_id.cost_comps if line.of_is_kit else line.product_id.standard_price
-                total_cout += line.product_id.uom_id._compute_price(cout, line.product_uom) * line.product_uom_qty
-            # Il n'est pas nécessaire de faire des arrondis (parce que je l'ai décidé)
-            order.of_total_cout = total_cout
-            order.of_marge = order.amount_untaxed - total_cout
-            order.of_marge_pc = 100 * (1 - total_cout / order.amount_untaxed) if order.amount_untaxed else -100
-
     @api.multi
     def _prepare_invoice(self):
         """
@@ -105,6 +93,19 @@ class SaleOrderLine(models.Model):
              "if set to 'computed', the price will be computed according to the components of the kit.")
 
     sale_kits_to_unlink = fields.Boolean(string="sale kits to unlink?", default=False, help="True if at least 1 sale kit needs to be deleted from database")
+
+    def _compute_margin(self, order_id, product_id, product_uom_id):
+        if not product_id.of_is_kit:
+            return super(SaleOrderLine, self)._compute_margin(order_id, product_id, product_uom_id)
+        frm_cur = self.env.user.company_id.currency_id
+        to_cur = order_id.pricelist_id.currency_id
+        purchase_price = product_id.cost_comps
+        if product_uom_id != product_id.uom_id:
+            purchase_price = product_id.uom_id._compute_price(purchase_price, product_uom_id)
+        ctx = self.env.context.copy()
+        ctx['date'] = order_id.date_order
+        price = frm_cur.with_context(ctx).compute(purchase_price, to_cur, round=False)
+        return price
 
     @api.depends('kit_id.kit_line_ids')
     def _compute_price_comps(self):
@@ -324,34 +325,6 @@ class SaleOrderLine(models.Model):
                 new_line = ai_line_obj.create(vals)
                 # now new_line has an id
                 new_line.init_kit_from_so_line(line.id)
-
-    """
-    implementation future -> marges dans les devis
-    @api.depends('product_id', 'purchase_price', 'product_uom_qty', 'price_unit', 'cost_comps')
-    def _product_margin(self):
-        # Override of function from sale_margin
-        for line in self:
-            currency = line.order_id.pricelist_id.currency_id
-            if line.of_is_kit:
-                cost = line.cost_comps or line.product_id.cost_comps
-            else:
-                cost = line.purchase_price or line.product_id.standard_price
-            line.margin = currency.round(line.price_subtotal - (cost * line.product_uom_qty))
-
-    def _compute_margin(self, order_id, product_id, product_uom_id):
-        # Override of function from sale_margin
-        frm_cur = self.env.user.company_id.currency_id
-        to_cur = order_id.pricelist_id.currency_id
-        if product_id.of_is_kit:
-            purchase_price = product_id.cost_comps
-        else:
-            purchase_price = product_id.standard_price
-        if product_uom_id != product_id.uom_id:
-            purchase_price = product_id.uom_id._compute_price(purchase_price, product_uom_id)
-        ctx = self.env.context.copy()
-        ctx['date'] = order_id.date_order
-        price = frm_cur.with_context(ctx).compute(purchase_price, to_cur, round=False)
-        return price"""
 
     @api.model
     def create(self, vals):
