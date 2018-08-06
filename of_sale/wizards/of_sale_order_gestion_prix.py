@@ -28,8 +28,8 @@ class GestionPrix(models.TransientModel):
     methode_remise = fields.Selection(
         [
             ('prix_ttc_cible', 'montant total TTC cible'),
-            ('montant_ttc', 'montant TTC à déduire'),
-            ('pc', '% de remise sur les lignes sélectionnées'),
+            ('montant_ttc', u'montant TTC à déduire'),
+            ('pc', u'% de remise sur les lignes sélectionnées'),
             ('pc_marge', '% marge'),
             ('reset', 'remettre au prix magasin'),  # Avec application de la liste de prix du client
         ],
@@ -39,7 +39,7 @@ class GestionPrix(models.TransientModel):
     line_ids = fields.One2many('of.sale.order.gestion.prix.line', 'wizard_id', string=u'Lignes impactées', readonly=True)
     valeur = fields.Float(string='Valeur', digits=dp.get_precision('Sale Price'))
 
-    marge_initiale = fields.Monetary(string='marge initiale', related='order_id.of_marge', related_sudo=False)
+    marge_initiale = fields.Monetary(string='marge initiale', related='order_id.margin', related_sudo=False)
     pc_marge_initiale = fields.Float(string='% marge initiale', related='order_id.of_marge_pc', related_sudo=False)
     montant_total_ttc_initial = fields.Monetary(string='Total TTC initial', related='order_id.amount_total', readonly=True)
 
@@ -47,7 +47,7 @@ class GestionPrix(models.TransientModel):
     marge_simul = fields.Monetary(string=u'marge simulée', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul')
     pc_marge_simul = fields.Float(string=u'% marge simulée', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul')
     montant_total_ttc_simul = fields.Monetary(
-        string='Total TTC simulé', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul')
+        string=u'Total TTC simulé', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul')
     afficher_remise = fields.Boolean(
         string='Afficher dans notes',
         help=u"Affiche le montant de la remise effectuée dans les notes du devis/de la commande.")
@@ -339,8 +339,7 @@ class GestionPrixLine(models.TransientModel):
     def _compute_cout(self):
         for line in self:
             order_line = line.order_line_id
-            cout_unit = order_line.product_id.uom_id._compute_price(order_line.product_id.standard_price, order_line.product_uom)
-            line.cout = cout_unit * order_line.product_uom_qty
+            line.cout = order_line.purchase_price * order_line.product_uom_qty
 
     @api.multi
     def button_inverse(self):

@@ -57,8 +57,7 @@ class SaleOrder(models.Model):
     of_notes_client = fields.Text(related='partner_id.comment', string="Notes client", readonly=True)
     of_mail_template_ids = fields.Many2many("of.mail.template", string=u"Insérer documents", help=u"Intégrer des documents pdf au devis/bon de commande (exemple : CGV)")
 
-    of_total_cout = fields.Monetary(compute='_compute_of_marge', string='Marge')
-    of_marge = fields.Monetary(compute='_compute_of_marge', string='Marge')
+    of_total_cout = fields.Monetary(compute='_compute_of_marge', string='Prix de revient')
     of_marge_pc = fields.Float(compute='_compute_of_marge', string='Marge %')
 
     @api.depends('state', 'order_line', 'order_line.qty_to_invoice', 'order_line.product_uom_qty')
@@ -73,15 +72,11 @@ class SaleOrder(models.Model):
             else:
                 order.of_to_invoice = True
 
-    @api.depends('order_line', 'amount_untaxed')
+    @api.depends('margin', 'amount_untaxed')
     def _compute_of_marge(self):
         for order in self:
-            cout = 0.0
-            for line in order.order_line:
-                cout += line.product_id.uom_id._compute_price(line.product_id.standard_price, line.product_uom) * line.product_uom_qty
-            # Il n'est pas nécessaire de faire des arrondis (parce que je l'ai décidé)
+            cout = order.amount_untaxed - order.margin
             order.of_total_cout = cout
-            order.of_marge = order.amount_untaxed - cout
             order.of_marge_pc = 100 * (1 - cout / order.amount_untaxed) if order.amount_untaxed else -100
 
     @api.multi
