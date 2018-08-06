@@ -3,7 +3,7 @@
 from odoo import models, fields, api
 
 class OfPopupWizard(models.TransientModel):
-    """API fonction permettant d'afficher un message dans une fenêtre au cours de l'exécution d'une fonction""" 
+    """API fonction permettant d'afficher un message dans une fenêtre au cours de l'exécution d'une fonction"""
     _name = "of.popup.wizard"
 
     message = fields.Text(string='Message')

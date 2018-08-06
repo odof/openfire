@@ -19,7 +19,7 @@ Personnalisation des fonctions de base Odoo :
 - Ajout de la recherche multi-mots pour les articles
 - Désactive l'envoi des notifications par courriel des changements d'affectation des commandes et factures
 - Restreint l'accès au menu "Applications" à l'utilisateur administrateur
-- API fonction permettant d'afficher un message dans une fenêtre au cours de l'exécution d'une fonction 
+- API fonction permettant d'afficher un message dans une fenêtre au cours de l'exécution d'une fonction
 - Ajout d'un champ calculé et d'un bouton sur les actions d'envoi de mail pour avoir une pré-visualisation du mail
 """,
     'website' : "www.openfire.fr",
