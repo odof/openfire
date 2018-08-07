@@ -28,35 +28,24 @@
                                 <span t-field="doc.amount_total"
                                     t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
                             </td>
-                            <!-- Affichage la sommes de paiements lettrés avec les factures -->
-                            <t t-if="doc.payment_ids and doc.state != 'draft' and doc._invoices_state() and doc.of_print_payments">
-                                <tr t-foreach="doc._get_sum_payment()" t-as="payment">
+
+                            <t t-if="doc.payment_ids and doc.state != 'draft' and doc.of_print_payments">
+                                <tr t-foreach="doc._of_get_payment_display_amounts()" t-as="payment">
                                     <td class="col-xs-8 pull-right">
-                                        <i name="payments_data"><span>Payé le </span><span t-field="payment[0].date"/></i>
+                                        <i name="payments_data"><span t-esc="payment[0].get_payment_mode_display()"/></i>
                                     </td>
                                     <td>
-                                        <span class="pull-right text-right"><t t-esc="payment[1]" t-options='{"widget": "monetary", "display_currency": "doc.currency_id"}'/></span>
+                                        <span class="pull-right text-right"><t t-esc="payment[1]" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></span>
                                     </td>
                                 </tr>
                             </t>
-                            <!-- Si aucun paiement lettré affiche tout les paiements -->
-                            <t t-if="doc.payment_ids and doc.state != 'draft' and not doc._invoices_state() and doc.of_print_payments">
-                                <tr t-foreach="doc.payment_ids" t-as="payment">
-                                    <td class="col-xs-8 pull-right">
-                                        <i name="payments_data"><span>Payé le </span><span t-field="payment.payment_date"/></i>
-                                    </td>
-                                    <td>
-                                        <span class="pull-right text-right"><t t-esc="payment['amount']" t-options='{"widget": "monetary", "display_currency": "doc.currency_id"}'/></span>
-                                        <!--span class="pull-right text-right"><t t-esc="payment['amount']" t-esc-options='{"widget": "monetary", "display_currency": "o.currency_id"}'/></span-->
-                                    </td>
-                                </tr>
-                            </t>
+
                         </tr>
                         <t t-if="doc.payment_ids and doc.state != 'draft' and doc.of_print_payments">
                             <tr class="border-black">
                                 <td><strong>Montant dû</strong></td>
                                     <td class="text-right">
-                                    <span t-field="doc.of_total_with_payment"
+                                    <span t-field="doc.of_balance"
                                         t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
                                 </td>
                             </tr>

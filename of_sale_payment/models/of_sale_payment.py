@@ -8,40 +8,33 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     payment_ids = fields.Many2many('account.payment', 'sale_order_account_payment_rel', 'order_id', 'payment_id', string="Paiements", copy=False, readonly=True)
-    of_payment_sum = fields.Float(compute='_compute_of_payment_sum')
-    of_total_with_payment = fields.Float(compute="_compute_total_with_payment")
-    of_print_payments = fields.Boolean('Impression des paiments')
+    of_payment_amount = fields.Float(compute='_compute_of_payment_amount')
+    of_balance = fields.Float(compute="_compute_of_balance")
+    of_print_payments = fields.Boolean(string='Impression des paiements')
 
     @api.depends('payment_ids')
-    @api.multi
-    def _compute_of_payment_sum(self):
+    def _compute_of_payment_amount(self):
         for sale_order in self:
-            sale_order.of_payment_sum = sum(sale_order.payment_ids.mapped('amount'))
-
-    def _invoices_state(self):
-        for invoice in self.invoice_ids:
-            if invoice.state != 'draft' and sum([payment[1] for payment in invoice._get_sum_payment()]) > 0.0:
-                return True
-        return False
-
-    @api.multi
-    def _get_sum_payment(self):
-        total = []
-        for invoice in self.invoice_ids:
-            total += invoice._get_sum_payment()
-        return total
+            sale_order.of_payment_amount = sum(sale_order.payment_ids.mapped('amount'))
 
     @api.depends('payment_ids', 'amount_total')
-    @api.multi
-    def _compute_total_with_payment(self):
+    def _compute_of_balance(self):
         for sale_order in self:
             total_payments = 0.0
-            if not sale_order._invoices_state():
+            total_payments = sum([payment[1] for payment in sale_order.invoice_ids._of_get_payment_display_amounts()])
+            if total_payments <= 0.0:
+                # S'il on n'obtient pas de paiement positif par les factures, on prends les paiements liés à la commande
                 total_payments = sum(sale_order.payment_ids.mapped('amount'))
-            else:
-                for invoice in sale_order.invoice_ids:
-                    total_payments += sum([payment[1] for payment in invoice._get_sum_payment()])
-            sale_order.of_total_with_payment = max(sale_order.amount_total - total_payments, 0.0)
+            sale_order.of_balance = max(sale_order.amount_total - total_payments, 0.0)
+
+    @api.multi
+    def _of_get_payment_display_amounts(self):
+        self.ensure_one()
+        result = self.invoice_ids._of_get_payment_display_amounts()
+        if sum([payment[1] for payment in result]) <= 0.0:
+            # S'il on n'obtient pas de paiement positif par les factures, on prends les paiements liés à la commande
+            result = [(payment, payment.amount) for payment in self.payment_ids]
+        return result
 
     @api.multi
     def action_view_payments(self):
@@ -49,19 +42,14 @@ class SaleOrder(models.Model):
         action['domain'] = [('order_ids', 'in', self._ids)]
         return action
 
-    @api.multi
-    def button_payment(self):
-        self.ensure_one()
-
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
     order_ids = fields.Many2many('sale.order', 'sale_order_account_payment_rel', 'payment_id', 'order_id', string="Commandes client", copy=False, readonly=True)
-    of_order_count = fields.Integer(compute='_compute_order_count')
+    of_order_count = fields.Integer(compute='_compute_of_order_count')
 
     @api.depends('order_ids')
-    @api.multi
-    def _compute_order_count(self):
+    def _compute_of_order_count(self):
         for payment in self:
             payment.of_order_count = len(payment.order_ids)
 
@@ -118,7 +106,7 @@ class AccountPayment(models.Model):
                 if order.payment_term_id:
                     amount_to_pay = 0
                     to_pay = order.payment_term_id.compute(order.amount_total)[0]
-                    for _, am in to_pay:
+                    for d, am in to_pay:
                         # Autorisation de 1€ d'ecart entre le montant payé et le montant dû
                         if amount_to_pay - 1 > amount_paid:
                             amount = round(amount_to_pay - amount_paid)
@@ -146,7 +134,7 @@ class AccountInvoice(models.Model):
 
     # Seuls les paiements liés au bon de commande de la facture peuvent être utilisé sur la facture (demande d'Aymeric)
     # Quand on enregistre un paiement depuis une facture il est automatiquement lié aux bon de commandes
-    # Surcharge de la fonction pour modifier domain
+    # Surcharge de la fonction pour modifier le domain
     @api.one
     def _get_outstanding_info_JSON(self):
         self.outstanding_credits_debits_widget = json.dumps(False)
@@ -189,17 +177,14 @@ class AccountInvoice(models.Model):
 
         credit_aml = self.env['account.move.line'].browse(credit_aml_id)
         if credit_aml.payment_id:
-            order_ids = set()
-            for invoice_line in self.invoice_line_ids:
-                for order_line in invoice_line.sale_line_ids:
-                    order_ids.add(order_line.order_id.id)
+            order_ids = self.invoice_line_ids.mapped('sale_line_ids').mapped('order_id')._ids
 
             credit_aml.payment_id.write({'order_ids': [(4, order_id, None) for order_id in order_ids]})
         return res
 
     # Copie du code d'odoo pour l'affichage du montant lettré avec la facture (module account, account_invoice.py _get_payment_info_JSON)
     @api.multi
-    def _get_sum_payment(self):
+    def _of_get_payment_display_amounts(self):
         total = []
         for invoice in self:
             for payment in invoice.payment_move_line_ids:
@@ -218,17 +203,16 @@ class AccountInvoice(models.Model):
                     amount_to_show = amount_currency
                 else:
                     amount_to_show = payment.company_id.currency_id.with_context(date=payment.date).compute(amount, invoice.currency_id)
-                total.append((payment, amount_to_show))
+                total.append((payment.payment_id, amount_to_show))
         return total
 
 class OfResPartner(models.Model):
     _inherit = "res.partner"
 
     of_payment_ids = fields.One2many('account.payment', 'partner_id', string="Paiements")
-    of_payment_total = fields.Float(compute="_compute_payment_total", string="Nombre de paiement")
+    of_payment_total = fields.Float(compute="_compute_payment_total", string="Total des paiements")
 
     @api.depends('of_payment_ids')
-    @api.multi
     def _compute_payment_total(self):
         for partner in self:
             partner.of_payment_total = sum(partner.of_payment_ids.mapped('amount'))

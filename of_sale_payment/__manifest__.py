@@ -2,7 +2,7 @@
 
 {
     "name" : "OpenFire Sale Payments",
-    "version" : "10.0",
+    "version" : "10.0.1.0.0",
     "author" : "OpenFire",
     "description" : """
 Paiements depuis les bons de commande client
@@ -14,7 +14,7 @@ Paiements depuis les bons de commande client
 - Modification de l'impression de devis/commande
 """,
     "website" : "www.openfire.fr",
-    "depends" : ["of_sale", "account"],
+    "depends" : ["of_sale", "of_account_payment_mode"],
     "category" : "OpenFire",
     "data" : [
         'views/of_sale_payment_view.xml',

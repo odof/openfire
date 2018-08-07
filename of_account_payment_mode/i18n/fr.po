@@ -87,6 +87,12 @@ msgid "Name"
 msgstr "Nom"
 
 #. module: of_account_payment_mode
+#: code:addons/of_account_payment_mode/models/of_account_payment_mode.py:118
+#, python-format
+msgid "Paid on %s"
+msgstr "Payé le %s"
+
+#. module: of_account_payment_mode
 #: model:ir.model.fields,field_description:of_account_payment_mode.field_of_account_payment_mode_partner_id
 msgid "Partner"
 msgstr "Partenaire"

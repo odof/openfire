@@ -4,6 +4,8 @@ from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 import traceback
 
+from odoo.addons.mail.models.mail_template import format_date
+
 class OfAccountPaymentMode(models.Model):
     _name = 'of.account.payment.mode'
     _description = 'Payment mode'
@@ -101,32 +103,40 @@ class AccountPayment(models.Model):
     # Champ Categories (Tags)
     of_tag_ids = fields.Many2many('of.payment.tags', string=u'Catégorie', help=u"Sélectionnez la catégorie de paiement")
 
+    @api.multi
+    def get_payment_mode_display(self):
+        self.ensure_one()
+
+        payment_mode = self.of_payment_mode_id
+        result = False
+
+        if payment_mode.config_affichage:
+            affichage = self.env['mail.template'].render_template(payment_mode.config_affichage, 'account.payment', self.id, post_process=False)
+            result = affichage
+
+        if not result:
+            result = _('Paid on %s') % format_date(self.env, self.payment_date)
+
+        return result
+
+
 class OFPaymentTags(models.Model):
     """ Tags of payment / Catégorie de paiement """
     _name = "of.payment.tags"
     _description = u"Catégorie de paiement"
 
-    name = fields.Char(string = u'Nom catégorie', help = u'Nom catégorie')
+    name = fields.Char(string=u'Nom catégorie', help=u'Nom catégorie')
     color = fields.Integer(string=u'Couleur')
-    tag_description = fields.Text(string = u'Description de la catégorie', help = u'Description de la catégorie de paiement')
+    tag_description = fields.Text(string=u'Description de la catégorie', help=u'Description de la catégorie de paiement')
 
     _sql_constraints = [('name_uniq', 'unique (name)', u"Le nom de la catégorie existe déjà !")]
 
 class OFAccountInvoice(models.Model):
     _inherit = "account.invoice"
 
-    @api.multi
-    def get_payment_mode_data(self, move_line_id):
+    @api.model
+    def get_payment_mode_display(self, move_line_id):
         self.ensure_one()
 
         move_line = self.env['account.move.line'].browse(move_line_id)
-        payment = move_line.payment_id
-        mode_data = payment.of_payment_mode_id
-        result = False
-        mode_config_affichage = mode_data.config_affichage
-
-        if mode_config_affichage:
-            affichage = self.env['mail.template'].render_template(mode_config_affichage, 'account.payment', payment.id, post_process=False)
-            result = affichage
-
-        return result
+        return move_line.payment_id.get_payment_mode_display()
