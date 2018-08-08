@@ -6,6 +6,18 @@
 <!--############################ ______ Ventes ______ ############################-->
 <!--##############################################################################-->
 
+        <!-- Filtres recherche devis / commande -->
+        <record id="of_sale_view_devis_search" model="ir.ui.view">
+            <field name="name">of.view.novagroupe.devis.search</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search" position="inside">
+                    <field name="of_etiquette_partenaire_ids" string="Étiquettes client" widget="many2one"/>
+                </xpath>
+            </field>
+        </record>
+
         <record id="of_sale_order_view_search_inherit_sale" model="ir.ui.view">
             <field name="name">of.sale.order.search.inherit.sale</field>
             <field name="model">sale.order</field>
@@ -13,6 +25,18 @@
             <field name="arch" type="xml">
                 <xpath expr="//filter[3]" position="after">
                     <filter string="À facturer entièrement" domain="[('of_to_invoice','=',True)]"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Ajout etiquettes partenaire sur les devis -->
+        <record id="of_sale_view_devis" model="ir.ui.view">
+            <field name="name">of.sale.view.devis</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_crm.sale_view_inherit123"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='tag_ids']" position="after">
+                    <field name="of_etiquette_partenaire_ids" widget="many2many_tags" readonly="1"/>
                 </xpath>
             </field>
         </record>

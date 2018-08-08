@@ -2,6 +2,8 @@
 
 from odoo import api, fields, models
 
+NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
+
 class AccountConfigSettings(models.TransientModel):
     _inherit = 'account.config.settings'
 
@@ -15,6 +17,8 @@ class AccountConfigSettings(models.TransientModel):
 
 class AccountInvoice(models.Model):
     _inherit = "account.invoice"
+
+    of_etiquette_partenaire_ids = fields.Many2many('res.partner.category', related='partner_id.category_id', string=u"Étiquettes client")
 
     # Date d'échéance des factures
     # Surcharge de la méthode pour permettre la comparaison avec le paramètrage du mode de calcul de la date d'échéance (manuel/auto).

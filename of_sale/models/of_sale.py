@@ -16,6 +16,8 @@ try:
 except ImportError:
     pypdftk = None
 
+NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
+
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
@@ -59,6 +61,8 @@ class SaleOrder(models.Model):
 
     of_total_cout = fields.Monetary(compute='_compute_of_marge', string='Prix de revient')
     of_marge_pc = fields.Float(compute='_compute_of_marge', string='Marge %')
+
+    of_etiquette_partenaire_ids = fields.Many2many('res.partner.category', related='partner_id.category_id', string=u"Étiquettes client")
 
     @api.depends('state', 'order_line', 'order_line.qty_to_invoice', 'order_line.product_uom_qty')
     def _compute_of_to_invoice(self):
