@@ -39,6 +39,9 @@ class SaleOrder(models.Model):
     def pdf_afficher_email(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_email')
 
+    def get_color_section(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'of_color_bg_section')
+
     def _search_of_to_invoice(self, operator, value):
         # Récupération des bons de commande non entièrement livrés
         self._cr.execute("SELECT DISTINCT order_id\n"
@@ -237,6 +240,9 @@ class OFSaleConfiguration(models.TransientModel):
     pdf_adresse_email = fields.Boolean(
         string="(OF) E-mail", required=True, default=False,
         help=u"Afficher l'adresse email dans les rapport PDF ?")
+    of_color_bg_section = fields.Char(
+        string="(OF) Couleur fond titres section",
+        help=u"Choisissez un couleur de fond pour les titres de section", default="#F0F0F0")
 
     @api.multi
     def set_pdf_adresse_nom_parent_defaults(self):
@@ -276,3 +282,23 @@ class OFSaleConfiguration(models.TransientModel):
     def set_of_deposit_product_categ_id_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_deposit_product_categ_id_setting', self.of_deposit_product_categ_id_setting.id)
+
+    @api.multi
+    def set_of_color_bg_section_defaults(self):
+        return self.env['ir.values'].sudo().set_default('sale.config.settings', 'of_color_bg_section', self.of_color_bg_section)
+
+class AccountInvoice(models.Model):
+    _inherit = "account.invoice"
+
+    def get_color_section(self):
+        return self.env['ir.values'].get_default('account.config.settings', 'of_color_bg_section')
+
+class AccountConfigSettings(models.TransientModel):
+    _inherit = 'account.config.settings'
+
+    of_color_bg_section = fields.Char(string="(OF) Couleur fond titres section", help=u"Choisissez un couleur de fond pour les titres de section", default="#F0F0F0")
+
+    @api.multi
+    def set_of_color_bg_section_defaults(self):
+        return self.env['ir.values'].sudo().set_default('account.config.settings', 'of_color_bg_section', self.of_color_bg_section)
+

@@ -102,7 +102,7 @@
 
                             <t t-if="layout_category_size > 1 or page_size > 1" groups="sale.group_sale_layout">
                                 <tr class="active">
-                                    <td colspan="7" style="font-weight: bold; border-bottom: 1px solid black;">&amp;bull;
+                                    <td colspan="7" t-att-style="'background-color: ' + doc.get_color_section() + '; font-weight:  bold; border-bottom: 1px solid black;'">&amp;bull;
                                         <t t-esc="layout_category['name']"/>
                                     </td>
                                 </tr>
@@ -282,7 +282,7 @@
 
                         <t t-if="layout_category_size > 1 or page_size > 1" groups="sale.group_sale_layout">
                             <tr class="active">
-                                <td colspan="7" style="font-weight: bold; border-bottom: 1px solid black;">&amp;bull;
+                                <td colspan="7" t-att-style="'background-color: ' + o.get_color_section() + '; font-weight:  bold; border-bottom: 1px solid black;'">&amp;bull;
                                     <t t-esc="layout_category['name']"/>
                                 </td>
                             </tr>
