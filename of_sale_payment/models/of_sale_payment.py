@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import json
-from odoo.tools import float_is_zero
-from odoo import models, fields, api, _
+from odoo import models, fields, api
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -132,44 +130,6 @@ class AccountPayment(models.Model):
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
-    # Seuls les paiements liés au bon de commande de la facture peuvent être utilisé sur la facture (demande d'Aymeric)
-    # Quand on enregistre un paiement depuis une facture il est automatiquement lié aux bon de commandes
-    # Surcharge de la fonction pour modifier le domain
-    @api.one
-    def _get_outstanding_info_JSON(self):
-        self.outstanding_credits_debits_widget = json.dumps(False)
-        if self.state == 'open':
-            domain = [('account_id', '=', self.account_id.id), ('partner_id', '=', self.env['res.partner']._find_accounting_partner(self.partner_id).id), ('reconciled', '=', False), ('amount_residual', '!=', 0.0), ('payment_id', 'in', self.invoice_line_ids.mapped('sale_line_ids').mapped('order_id').mapped('payment_ids').ids)]
-            if self.type in ('out_invoice', 'in_refund'):
-                domain.extend([('credit', '>', 0), ('debit', '=', 0)])
-                type_payment = _('Outstanding credits')
-            else:
-                domain.extend([('credit', '=', 0), ('debit', '>', 0)])
-                type_payment = _('Outstanding debits')
-            info = {'title': '', 'outstanding': True, 'content': [], 'invoice_id': self.id}
-            lines = self.env['account.move.line'].search(domain)
-            currency_id = self.currency_id
-            if len(lines) != 0:
-                for line in lines:
-                    # get the outstanding residual value in invoice currency
-                    if line.currency_id and line.currency_id == self.currency_id:
-                        amount_to_show = abs(line.amount_residual_currency)
-                    else:
-                        amount_to_show = line.company_id.currency_id.with_context(date=line.date).compute(abs(line.amount_residual), self.currency_id)
-                    if float_is_zero(amount_to_show, precision_rounding=self.currency_id.rounding):
-                        continue
-                    info['content'].append({
-                        'journal_name': line.ref or line.move_id.name,
-                        'amount': amount_to_show,
-                        'currency': currency_id.symbol,
-                        'id': line.id,
-                        'position': currency_id.position,
-                        'digits': [69, self.currency_id.decimal_places],
-                    })
-                info['title'] = type_payment
-                self.outstanding_credits_debits_widget = json.dumps(info)
-                self.has_outstanding = True
-
     @api.multi
     def assign_outstanding_credit(self, credit_aml_id):
         # A l'assignation d'un paiement à une facture, on le lie également aux bons de commande associés
@@ -206,7 +166,7 @@ class AccountInvoice(models.Model):
                 total.append((payment.payment_id, amount_to_show))
         return total
 
-class OfResPartner(models.Model):
+class ResPartner(models.Model):
     _inherit = "res.partner"
 
     of_payment_ids = fields.One2many('account.payment', 'partner_id', string="Paiements")
