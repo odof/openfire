@@ -40,21 +40,25 @@ class OFAccountPaymentWizard(models.TransientModel):
 
         # On récupère les valeurs du paiement à modifier/à rembourser pour les proposer par défaut dans le nouveau paiement.
         values = []
-        # Les catégories de paiement (étiquettes)
-        if payment.of_tag_ids:
-            for tag_id in payment.of_tag_ids:
-                values.append(tag_id.id)
 
         context = {
             'default_partner_id': payment.partner_id.id or False,
-            'default_of_payment_mode_id': payment.of_payment_mode_id.id or False,
             'default_amount': payment.amount or False,
             'default_payment_date': fields.Date.context_today(payment),
-            'default_of_ref_reglement': payment.of_ref_reglement or False,
             'default_communication': payment.communication or False,
-            'default_of_tag_ids': values or False,
             'default_partner_type': payment.partner_type
         }
+
+        # On vérifie si le module of_account_payment_mode est installé (existence du champ of_payment_mode_id).
+        # Si oui, on ajoute les valeurs des champs supplémentaires qu'il a ajouté.
+        if getattr(payment, 'of_payment_mode_id', False):
+            # Les catégories de paiement (étiquettes)
+            if payment.of_tag_ids:
+                for tag_id in payment.of_tag_ids:
+                    values.append(tag_id.id)
+            context['default_of_payment_mode_id'] = payment.of_payment_mode_id.id or False
+            context['default_of_ref_reglement'] = payment.of_ref_reglement or False
+            context['default_of_tag_ids'] = values or False
 
         if type_paiement == 'refund':
             name = 'Remboursement de paiement'

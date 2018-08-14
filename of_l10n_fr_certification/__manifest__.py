@@ -16,8 +16,6 @@ Certification logiciel de caisse :
 - Empêche la désinstallation des modules Odoo et Openfire de certification comptable
  """,
     "depends" : [
-        'of_account_payment_mode',
-        'of_base',
         'account_reversal'
     ],
     "update_xml" : [
