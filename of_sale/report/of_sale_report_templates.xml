@@ -275,6 +275,7 @@
                         <th t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">Réduc.(%)</th>
                         <th class="text-right">TVA</th>
                         <th class="text-right" groups="sale.group_show_price_subtotal">Prix HT</th>
+                        <th class="text-right price_tax_included" groups="sale.group_show_price_total">Prix TTC</th>
                     </tr>
                 </thead>
                 <tbody class="invoice_tbody">
@@ -308,7 +309,8 @@
                                     <span t-field="l.uom_id"  groups="product.group_uom"/>
                                 </td>
                                 <td class="text-right">
-                                    <span t-field="l.price_unit"/>
+                                    <!-- Nous avons retiré la précision du champ python, il faut donc la forcer dans le qweb -->
+                                    <span t-field="l.price_unit" t-options="{'precision':2}"/>
                                 </td>
                                 <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
                                     <span t-field="l.discount"/>
@@ -318,6 +320,10 @@
                                 </td>
                                 <td class="text-right" groups="sale.group_show_price_subtotal">
                                     <span t-field="l.price_subtotal"
+                                        t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                </td>
+                                <td class="text-right" groups="sale.group_show_price_total">
+                                    <span t-field="l.price_total"
                                         t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                                 </td>
                             </tr>
