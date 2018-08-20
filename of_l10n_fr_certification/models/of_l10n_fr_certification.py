@@ -107,13 +107,16 @@ class AccountPayment(models.Model):
 
             # On teste si le module of_account_payment_mode est installé (existence du champ of_payment_mode_id).
             # Si oui, on inclus les valeurs des champs supplémentaires qu'il a ajouté.
-            if getattr(self, 'of_payment_mode_id', False):
+            if 'of_payment_mode_id' in self._fields:
                 module_of_account_payment_mode = True
             else:
                 module_of_account_payment_mode = False
 
             # On les parcourt un par un.
             for paiement in paiements:
+                # Si c'est seulement une modification du paiement pour inscrire le no d'une remise en banque, on ne fait pas d'enregistrement dans l'historique.
+                if 'of_deposit_id' in vals and len(vals) == 1:
+                    continue
                 # On récupère l'état du paiement lors de sa dernière modification.
                 self._cr.execute(u"SELECT state from of_log_paiement WHERE paiement_id = %s ORDER BY id DESC LIMIT 1", (paiement.id,))
                 state_avant = self._cr.fetchone()
