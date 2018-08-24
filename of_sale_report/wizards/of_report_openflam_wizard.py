@@ -22,7 +22,7 @@ class OFRapportOpenflamWizard(models.TransientModel):
             result.append(('stats', "Statistiques de ventes"))
         return result
 
-    file_name = fields.Char('Nom du fichier', size=64, default=u'Encours des commandes de vente.xlsx')
+    file_name = fields.Char('Nom du fichier', size=64)
     file = fields.Binary('file')
     company_ids = fields.Many2many('res.company', string=u'Sociétés')
     user_company_id = fields.Many2one('res.company', compute="_compute_company_id")
@@ -38,6 +38,15 @@ class OFRapportOpenflamWizard(models.TransientModel):
     filtre_client = fields.Boolean(string="Filtre par client")
     filtre_article = fields.Boolean(string="Filtre par article")
 
+    debut_n = fields.Date(string=u"Début période principale")
+    fin_n = fields.Date(string=u"Fin période principale")
+    debut_n1 = fields.Date(string=u"Début période à comparer")
+    fin_n1 = fields.Date(string=u"Fin période à comparer")
+    type_filtre_date = fields.Selection([('period', u'Périodes'), ('date', 'Date')], string="Type de filtre", default="period")
+    brand_ids = fields.Many2many('of.product.brand', string="Marques")
+    stats_brand = fields.Boolean(string="Stats/marques/clients", default=True)
+    etiquette_ids = fields.Many2many('res.partner.category', string=u"Étiquettes clients")
+
     @api.depends('report_model')
     def _compute_company_id(self):
         user_obj = self.env['res.users']
@@ -45,16 +54,9 @@ class OFRapportOpenflamWizard(models.TransientModel):
         self.user_company_id = user.company_id
 
     @api.multi
-    def _action_return(self):
-        action = self.env.ref('of_sale_report.action_of_rapport_openflam').read()[0]
-        action['views'] = [(self.env.ref('of_sale_report.of_rapport_openflam_view_form').id, 'form')]
-        action['res_id'] = self.ids[0]
-        return action
-
-    @api.multi
     def _dummy_function(self):
         self.file = False
-        return self._action_return()
+        return {"type": "ir.actions.do_nothing"}
 
     def _get_styles_excel(self, workbook):
         # color_light_gray = '#C0C0C0'
@@ -336,8 +338,7 @@ class OFRapportOpenflamWizard(models.TransientModel):
         fp.seek(0)
         data = fp.read()
         fp.close()
-        self.file = base64.b64encode(data)
-        return self._action_return()
+        return base64.b64encode(data)
 
     @api.multi
     def _create_echeancier_excel(self):
@@ -451,8 +452,7 @@ class OFRapportOpenflamWizard(models.TransientModel):
         fp.seek(0)
         data = fp.read()
         fp.close()
-        self.file = base64.b64encode(data)
-        return self._action_return()
+        return base64.b64encode(data)
 
     @api.multi
     def _create_stats_excel(self):
@@ -463,73 +463,101 @@ class OFRapportOpenflamWizard(models.TransientModel):
         # --- Couleur de police ---
         styles = self._get_styles_excel(workbook)
 
+        n_start = self.period_n.date_start if self.type_filtre_date == 'period' else self.debut_n
+        n_end = self.period_n.date_end if self.type_filtre_date == 'period' else self.fin_n
+        n1_start = self.period_n1.date_start if self.type_filtre_date == 'period' else self.debut_n1
+        n1_end = self.period_n1.date_end if self.type_filtre_date == 'period' else self.fin_n1
         #  Création des domaines
         sale_order_domain = [
             ('state', '!=', 'draft'),
             '|',
-            '&', ('confirmation_date', '>=', self.period_n.date_start), ('confirmation_date', '<=', self.period_n.date_end),
-            '&', ('confirmation_date', '>=', self.period_n1.date_start), ('confirmation_date', '<=', self.period_n1.date_end)]
+            '&', ('confirmation_date', '>=', n_start), ('confirmation_date', '<=', n_end),
+            '&', ('confirmation_date', '>=', n1_start), ('confirmation_date', '<=', n1_end)]
 
         if self.company_ids:
             sale_order_domain += [('company_id', 'in', self.company_ids._ids)]
         if self.partner_ids and self.filtre_client:
             sale_order_domain += [('partner_id', 'in', self.partner_ids._ids)]
+        if self.etiquette_ids and self.filtre_client:
+            sale_order_domain += [('partner_id.category_id', 'in', self.etiquette_ids._ids)]
         line_domain = []
         if self.product_ids and self.filtre_article:
             line_domain += [('product_id', 'in', self.product_ids._ids)]
         if self.category_ids and self.filtre_article:
             line_domain += [('product_id.categ_id', 'child_of', self.category_ids._ids)]
+        if self.brand_ids and self.filtre_article:
+            line_domain += [('product_id.brand_id', 'in', self.brand_ids._ids)]
 
         orders = self.env['sale.order'].search(sale_order_domain)
         line_domain += [('order_id', 'in', orders._ids)]
         lines = self.env['sale.order.line'].search(line_domain).sorted('order_partner_id')
 
-        vals = {}  # must be vals = {client: {produit: {period_n:{qty: x, prix:y}, period_n1:{qty: x, prix:y}}, qté: 'x'}}
-        vals2 = {}  # must be vals2 = {categ: {client: {period_n:{qty: x, prix:y}, period_n1:{qty: x, prix:y}}, qté: 'x'}}
+        stats_partner = {}  # must be stats_partner = {client: {produit: {period_n:{qty: x, prix:y}, period_n1:{qty: x, prix:y}}, qté: 'x'}}
+        stats_categ = {}  # must be stats_categ = {categ: {client: {period_n:{qty: x, prix:y}, period_n1:{qty: x, prix:y}}, qté: 'x'}}
+        stats_brand = {}  # must be stats_brand = {marque: {client: {period_n:{qty: x, prix:y}, period_n1:{qty: x, prix:y}}, qté: 'x'}}
 
         # Récupération des valeurs dans les dictionnaires
         for line in lines:
             if line.product_uom_qty == 0:
                 continue
 
-            if line.order_partner_id not in vals:
-                vals[line.order_partner_id] = {'qté': 0}
-            valeurs = vals[line.order_partner_id]
-            if line.product_id not in valeurs:
-                valeurs[line.product_id] = {self.period_n: {'qté': 0, 'prix': 0}, self.period_n1: {'qté': 0, 'prix': 0}}
-            valeurs = valeurs[line.product_id]
+            if line.order_partner_id not in stats_partner:
+                stats_partner[line.order_partner_id] = {'qté': 0}
+            partners_and_products = stats_partner[line.order_partner_id]
+            if line.product_id not in partners_and_products:
+                partners_and_products[line.product_id] = {n_start: {'qté': 0, 'prix': 0}, n1_start: {'qté': 0, 'prix': 0}}
+            partners_and_products = partners_and_products[line.product_id]
 
-            if line.product_id.categ_id not in vals2:
-                vals2[line.product_id.categ_id] = {'qté': 0}
-            valeurs2 = vals2[line.product_id.categ_id]
+            if line.product_id.categ_id not in stats_categ:
+                stats_categ[line.product_id.categ_id] = {'qté': 0}
+            categs_and_partners = stats_categ[line.product_id.categ_id]
             categ = line.product_id.categ_id
-            if line.order_partner_id not in valeurs2:
-                valeurs2[line.order_partner_id] = {self.period_n: {'qté': 0, 'prix': 0}, self.period_n1: {'qté': 0, 'prix': 0}}
-            valeurs2 = valeurs2[line.order_partner_id]
+            if line.order_partner_id not in categs_and_partners:
+                categs_and_partners[line.order_partner_id] = {n_start: {'qté': 0, 'prix': 0}, n1_start: {'qté': 0, 'prix': 0}}
+            categs_and_partners = categs_and_partners[line.order_partner_id]
 
-            if line.order_id.confirmation_date >= self.period_n.date_start and line.order_id.confirmation_date <= self.period_n.date_end:
-                vals[line.order_partner_id]['qté'] += line.product_uom_qty
-                vals2[categ]['qté'] += line.product_uom_qty
-                valeurs[self.period_n]['qté'] += line.product_uom_qty
-                valeurs[self.period_n]['prix'] += line.price_unit * line.product_uom_qty
-                valeurs2[self.period_n]['qté'] += line.product_uom_qty
-                valeurs2[self.period_n]['prix'] += line.price_unit * line.product_uom_qty
+            if line.product_id.brand_id not in stats_brand:
+                stats_brand[line.product_id.brand_id] = {'qté': 0, 'ca': 0, 'qté1': 0, 'ca1': 0}
+            brands_and_partners = stats_brand[line.product_id.brand_id]
+            brand = line.product_id.brand_id
+            if line.order_partner_id not in brands_and_partners:
+                brands_and_partners[line.order_partner_id] = {n_start: {'qté': 0, 'prix': 0}, n1_start: {'qté': 0, 'prix': 0}}
+            brands_and_partners = brands_and_partners[line.order_partner_id]
+
+            if line.order_id.confirmation_date >= n_start and line.order_id.confirmation_date <= n_end:
+                stats_partner[line.order_partner_id]['qté'] += line.product_uom_qty
+                stats_categ[categ]['qté'] += line.product_uom_qty
+                stats_brand[brand]['qté'] += line.product_uom_qty
+                stats_brand[brand]['ca'] += line.price_unit * line.product_uom_qty
+                partners_and_products[n_start]['qté'] += line.product_uom_qty
+                partners_and_products[n_start]['prix'] += line.price_unit * line.product_uom_qty
+                categs_and_partners[n_start]['qté'] += line.product_uom_qty
+                categs_and_partners[n_start]['prix'] += line.price_unit * line.product_uom_qty
+                brands_and_partners[n_start]['qté'] += line.product_uom_qty
+                brands_and_partners[n_start]['prix'] += line.price_unit * line.product_uom_qty
 
             else:
-                valeurs[self.period_n1]['qté'] += line.product_uom_qty
-                valeurs[self.period_n1]['prix'] += line.price_unit * line.product_uom_qty
-                valeurs2[self.period_n1]['qté'] += line.product_uom_qty
-                valeurs2[self.period_n1]['prix'] += line.price_unit * line.product_uom_qty
+                stats_brand[brand]['qté1'] += line.product_uom_qty
+                stats_brand[brand]['ca1'] += line.price_unit * line.product_uom_qty
+                partners_and_products[n1_start]['qté'] += line.product_uom_qty
+                partners_and_products[n1_start]['prix'] += line.price_unit * line.product_uom_qty
+                categs_and_partners[n1_start]['qté'] += line.product_uom_qty
+                categs_and_partners[n1_start]['prix'] += line.price_unit * line.product_uom_qty
+                brands_and_partners[n1_start]['qté'] += line.product_uom_qty
+                brands_and_partners[n1_start]['prix'] += line.price_unit * line.product_uom_qty
 
         # un premier tri qui permet d'avoir les tableaux dans l'ordre décroissant
-        sorted_partner = sorted(vals.items(), key=lambda data: data[1]['qté'], reverse=True)
-        sorted_categ = sorted(vals2.items(), key=lambda data: data[1]['qté'], reverse=True)
+        sorted_partner = sorted(stats_partner.items(), key=lambda data: data[1]['qté'], reverse=True)
+        sorted_categ = sorted(stats_categ.items(), key=lambda data: data[1]['qté'], reverse=True)
+        sorted_brand = sorted(stats_brand.items(), key=lambda data: data[1]['qté'], reverse=True)
 
         stats = {}
         if self.stats_partner:
             stats['partner'] = (sorted_partner, 'Statistiques de ventes par client')
         if self.stats_product:
             stats['categ'] = (sorted_categ, u'Statistiques de ventes par catégorie de produit')
+        if self.stats_brand:
+            stats['brand'] = (sorted_brand, u'statistiques de ventes par marques')
 
         for page in stats:
             values, name = stats[page]
@@ -548,20 +576,72 @@ class OFRapportOpenflamWizard(models.TransientModel):
             worksheet.set_column(4, 4, 16)      # Largeur colonne 'Période N CA'
             worksheet.set_column(5, 5, 16)      # Largeur colonne 'Période N-1 CA'
             worksheet.set_column(6, 6, 12)      # Largeur colonne 'Evo % CA'
+            worksheet.set_row(0, 20)
+            worksheet.set_row(1, 20)
 
             worksheet.merge_range(0, 0, 0, 1, 'Nom du fichier', styles['text_title_ita_border'])
             worksheet.merge_range(0, 2, 0, 5, u'Date de création', styles['text_title_ita_border'])
             worksheet.merge_range(0, 6, 0, 8, u'Société(s)' , styles['text_title_ita_border'])
-            worksheet.merge_range(0, 9, 0, 11, u'Périodes : N / N-1' , styles['text_title_ita_border'])
+            worksheet.merge_range(0, 9, 0, 11, u'Périodes : N / N-1' if self.type_filtre_date == 'period' else 'Dates', styles['text_title_ita_border'])
             worksheet.merge_range(1, 0, 1, 1, name, styles['text_title_border'])
             worksheet.merge_range(1, 2, 1, 5, self.date, styles['text_title_border'])
             worksheet.merge_range(1, 6, 1, 8, ", ".join(self.company_ids.mapped('name')), styles['text_title_border_wrap'])
-            worksheet.merge_range(1, 9, 1, 11, self.period_n.name + ' / ' + self.period_n1.name, styles['text_title_border_wrap'])
+            if self.type_filtre_date == 'period':
+                worksheet.merge_range(1, 9, 1, 11, self.period_n.name + ' / ' + self.period_n1.name, styles['text_title_border_wrap'])
+            else:
+                worksheet.merge_range(1, 9, 1, 11, self.debut_n + ' - ' + self.fin_n + '\n' + self.debut_n1 + ' - ' + self.fin_n1, styles['text_title_border_wrap'])
 
             line_number = 3
 
+            # Ajout d'un récap pour les marques
+            if page == 'brand':
+                worksheet.merge_range(line_number, 0, line_number + 1, 0, u"Récap. marques", styles['text_title_border_red'])
+                worksheet.merge_range(line_number, 1, line_number, 3,  u'Qté - Commandes en cours', styles['text_title_border'])
+                worksheet.merge_range(line_number, 4, line_number, 6, u'CA', styles['text_title_border'])
+                line_number += 1
+                worksheet.write(line_number, 1, 'N', styles['text_title_border'])
+                worksheet.write(line_number, 2, 'N-1', styles['text_title_border'])
+                worksheet.write(line_number, 3, 'Evo %', styles['text_title_border'])
+                worksheet.write(line_number, 4, 'N', styles['text_title_border'])
+                worksheet.write(line_number, 5, 'N-1', styles['text_title_border'])
+                worksheet.write(line_number, 6, 'Evo %', styles['text_title_border'])
+                line_number += 1
+                line_keep = line_number
+
+                for obj, valeurs in values:
+                    qty_n = valeurs['qté']
+                    qty_n1 = valeurs['qté1']
+                    price_n = valeurs['ca']
+                    price_n1 = valeurs['ca1']
+                    worksheet.write(line_number, 0, obj.name, styles['text_border_left'])
+                    worksheet.write(line_number, 1, qty_n, styles['number_border'])
+                    worksheet.write(line_number, 2, qty_n1, styles['number_border'])
+                    worksheet.write(line_number, 3, '=(%s / %s - 1) * 100' % (xl_rowcol_to_cell(line_number, 1),
+                                                                              xl_rowcol_to_cell(line_number, 2)) if qty_n1 else 100, styles['number_border'])
+                    worksheet.write(line_number, 4, price_n, styles['number_border'])
+                    worksheet.write(line_number, 5, price_n1, styles['number_border'])
+                    worksheet.write(line_number, 6, '=(%s / %s - 1) * 100' % (xl_rowcol_to_cell(line_number, 4),
+                                                                              xl_rowcol_to_cell(line_number, 5)) if price_n1 else 100, styles['number_border'])
+                    line_number += 1
+
+                worksheet.write(line_number, 0, 'TOTAL', styles['text_title_border_blue_left'])
+                for column in range(1, 7):
+                    if column in (3, 6):
+                        worksheet.write(line_number, column, '=IF(%s>0,(%s / %s - 1) * 100,100)' % (xl_rowcol_to_cell(line_number, column-1),
+                                                                                                    xl_rowcol_to_cell(line_number, column-2),
+                                                                                                    xl_rowcol_to_cell(line_number, column-1)), styles['number_title_border_blue'])
+                    else:
+                        worksheet.write(line_number, column, '=SUM(%s:%s)' % (xl_rowcol_to_cell(line_keep, column),
+                                                                              xl_rowcol_to_cell(line_number - 1, column)), styles['number_title_border_blue'])
+                line_number += 2
+                # fin du récap des marques
+
             for obj, valeurs in values:
                 del valeurs['qté']  # On a plus besoin de la quantité dans le dictionnaire donc on l'enlève pour pouvoir trier correctement
+                if 'qté1' in valeurs:  # Si ils sont présents on les enlève
+                    del valeurs['qté1']
+                    del valeurs['ca']
+                    del valeurs['ca1']
                 worksheet.merge_range(line_number, 0, line_number + 1, 0, obj.name, styles['text_title_border_red'])
                 worksheet.merge_range(line_number, 1, line_number, 3,  u'Qté - Commandes en cours', styles['text_title_border'])
                 worksheet.merge_range(line_number, 4, line_number, 6, u'CA', styles['text_title_border'])
@@ -574,13 +654,13 @@ class OFRapportOpenflamWizard(models.TransientModel):
                 worksheet.write(line_number, 6, 'Evo %', styles['text_title_border'])
                 line_number += 1
                 line_keep = line_number
-                valeurs = sorted(valeurs.items(), key=lambda data: data[1][self.period_n1]['qté'])  # Tri secondaire par period_n1 croissant
-                valeurs = sorted(valeurs, key=lambda data: data[1][self.period_n]['qté'], reverse=True)  # Tri principal par period_n décroissant
+                valeurs = sorted(valeurs.items(), key=lambda data: data[1][n1_start]['qté'])  # Tri secondaire par period_n1 croissant
+                valeurs = sorted(valeurs, key=lambda data: data[1][n_start]['qté'], reverse=True)  # Tri principal par period_n décroissant
                 for entry, data in valeurs:
-                    qty_n = data[self.period_n]['qté']
-                    qty_n1 = data[self.period_n1]['qté']
-                    price_n = data[self.period_n]['prix']
-                    price_n1 = data[self.period_n1]['prix']
+                    qty_n = data[n_start]['qté']
+                    qty_n1 = data[n1_start]['qté']
+                    price_n = data[n_start]['prix']
+                    price_n1 = data[n1_start]['prix']
                     worksheet.write(line_number, 0, entry.name, styles['text_border_left'])
                     worksheet.write(line_number, 1, qty_n, styles['number_border'])
                     worksheet.write(line_number, 2, qty_n1, styles['number_border'])
@@ -606,8 +686,7 @@ class OFRapportOpenflamWizard(models.TransientModel):
         fp.seek(0)
         data = fp.read()
         fp.close()
-        self.file = base64.b64encode(data)
-        return self._action_return()
+        return base64.b64encode(data)
 
     FUNDICT = {
         'encours' : '_create_encours_excel',
@@ -616,6 +695,9 @@ class OFRapportOpenflamWizard(models.TransientModel):
         'autre' : '_dummy_function'
     }
 
+    # Grâce return do_nothing
+    # on peut appuyer sur le bouton et ne pas avoir à renvoyer la vue
+    # pour mettre à jour les informations
     @api.multi
     def button_print(self):
         file_name = {
@@ -625,4 +707,5 @@ class OFRapportOpenflamWizard(models.TransientModel):
             'autre': 'Autre.xlsx'
         }
         self.file_name = file_name[self.report_model]
-        return getattr(self, self.FUNDICT[self.report_model])()
+        self.file = getattr(self, self.FUNDICT[self.report_model])()
+        return {"type": "ir.actions.do_nothing"}

@@ -121,6 +121,7 @@
     <record id="of_view_partner_geocoding_search" model="ir.ui.view">
         <field name="name">of.view.geocoding.search</field>
         <field name="model">res.partner</field>
+        <field name="priority">20</field>
         <field name="arch" type="xml">
             <search>
                 <field name="precision" string="Précision"/>
@@ -142,8 +143,8 @@
                 <filter name="geocoding_not_tried" string="Géocodage non tenté" domain="[('geocoding','=','not_tried')]"/>
                 <filter name="geocoding_manual" string="Géocodage manuel" domain="[('geocoding','=','manual')]"/>
                 <separator/>
-                <filter name="precision_haut" string="Précision haut" domain="[('precision','=','high')]"/> 
-                <filter name="precision_medium" string="Précision moyen" domain="[('precision','=','medium')]"/>     
+                <filter name="precision_haut" string="Précision haut" domain="[('precision','=','high')]"/>
+                <filter name="precision_medium" string="Précision moyen" domain="[('precision','=','medium')]"/>
                 <filter name="precision_low" string="Précision bas" domain="[('precision','=','low')]"/>
                 <separator/>
                 <filter name="geocodeur_of" string="Géocodeur OpenFire" domain="[('geocodeur','=','nominatim_openfire')]"/>
@@ -241,6 +242,7 @@
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="of_view_partner_geocoding"/>
+        <field name="search_view_id" ref="of_geolocalize.of_view_partner_geocoding_search"/>
         <field name="help">Géolocalisation</field>
     </record>
 
