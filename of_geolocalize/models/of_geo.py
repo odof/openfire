@@ -22,7 +22,7 @@ class ResCompany(models.Model):
         ('success_google', u"Réussi"),
         ('failure', u"Échoué"),
         ('manual', u"Manuel")
-        ], default='not_tried', readonly=True, help="field defining the state of the geocoding for this partner", related='partner_id.geocoding', required=True)
+        ], default='not_tried', readonly=True, help="field defining the state of the geocoding for this partner", related='partner_id.geocoding')
     geocodeur = fields.Selection([
         ('nominatim_openfire', u"OpenFire"),
         ('nominatim_osm', u"OpenStreetMap"),
