@@ -1,0 +1,167 @@
+<odoo>
+
+    <!-- ############################### -->
+    <!-- ###### Modes de paiement ###### -->
+    <!-- ############################### -->
+
+    <!-- Ajouter compte en banque aux modes de paiement -->
+    <record id="of_paiement_edi_payment_mode_form" model="ir.ui.view">
+        <field name="name">of.paiement.edi.payment.mode.form</field>
+        <field name="model">of.account.payment.mode</field>
+        <field name="inherit_id" ref="of_account_payment_mode.of_view_account_payment_mode_form"/>
+        <field name="arch" type="xml">
+            <field name="journal_id" position="after">
+                <field name="partner_id" invisible="1"/>
+                <field name="bank_id" domain="[('partner_id','=',partner_id)]"/>
+            </field>
+        </field>
+    </record>
+
+
+    <!-- ########################### -->
+    <!-- ###### Paiements edi ###### -->
+    <!-- ########################### -->
+
+    <!-- Ajouter champs no NNE et ICS dans configuration société -->
+    <record id="of_paiement_edi_company" model="ir.ui.view">
+        <field name="name">of.paiement.edi.company</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <field name="company_registry" position="after">
+                <field name="of_num_nne"/>
+                <field name="of_num_ics"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Ajouter champs SIRET (company_registry), RUM et date mandat dans configuration partenaire -->
+    <record id="of_paiement_edi_partner" model="ir.ui.view">
+        <field name="name">of.paiement.edi.partner</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="groups_id" eval="[(4, ref('account.group_account_invoice'))]"/>
+        <field name="arch" type="xml">
+            <field name="property_account_position_id" position="before">
+                <field name="company_registry"/> <!--  Migration -->
+                <field name="of_sepa_rum"/>
+                <field name="of_sepa_date_mandat"/>
+                <field name="of_sepa_type_prev"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Vue liste paiement EDI (paiement par fichier informatique) -->
+    <record id="of_paiement_edi_tree" model="ir.ui.view">
+        <field name="name">Paiement EDI</field>
+        <field name="model">of.paiement.edi</field>
+        <field name="arch" type="xml">
+            <tree string="Paiement EDI (par échange de données informatisées)"
+                  decoration-info="aff_bouton_genere_fich">
+                <field name="aff_bouton_genere_fich" invisible="1"/>
+                <field name="create_date" string="Date de création"/>
+                <field name="type_paiement"/>
+                <field name="mode_paiement_id"/>
+                <field name="date_remise"/>
+                <field name="date_valeur"/>
+                <field name="date_echeance"/>
+                <field name="type_remise_lcr"/>
+                <field name="code_dailly_lcr"/>
+                <field name="motif"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vue formulaire paiement EDI (paiement par fichier informatique) -->
+    <record id="of_paiement_edi_form" model="ir.ui.view">
+        <field name="name">Paiement EDI</field>
+        <field name="model">of.paiement.edi</field>
+        <field name="arch" type="xml">
+            <form string="Paiement EDI (par échange de données informatisées)">
+                <notebook>
+                    <page name="prev_sepa_lcr" string="Prélèvements SEPA/LCR">
+                        <field name="nom_fichier" invisible="1"/>
+                        <field name="aff_bouton_paiement" invisible="1"/>
+                        <field name="aff_bouton_genere_fich" invisible="1"/>
+                        <field name="type_paiement" invisible="1"/>
+                        <field name="journal_id" invisible="1"/>
+                        <group col="4">
+                            <field name="mode_paiement_id" domain="[('journal_type','=','bank')]" widget="selection" attrs="{'readonly':[('aff_bouton_genere_fich','=',False)]}"/>
+                            <field name="date_remise" attrs="{'readonly':[('aff_bouton_genere_fich','=',False)]}"/>
+                            <field name="date_valeur" attrs="{'readonly':[('aff_bouton_genere_fich','=',False)]}"/>
+                            <field name="date_echeance" attrs="{'readonly':[('aff_bouton_genere_fich','=',False)]}"/>
+                            <field name="type_remise_lcr" attrs="{'readonly':[('aff_bouton_genere_fich','=',False)]}"/>
+                            <field name="motif" attrs="{'readonly':[('aff_bouton_genere_fich','=',False)]}"/>
+                            <field name="code_dailly_lcr" attrs="{'readonly':[('aff_bouton_genere_fich','=',False)]}"/>
+                        </group>
+                        <field name="edi_line_ids" attrs="{'readonly':[('aff_bouton_genere_fich','=',False)]}" style="max-height: 300px; overflow: auto;">
+                            <tree string="Factures à payer" editable="top">
+                                <field name="montant_prelevement" invisible="1"/>
+                                <field name="invoice_id"/>
+                                <field name="date_facture" readonly="1"/>
+                                <field name="partner" readonly="1"/>
+                                <field name="total_ttc" readonly="1"/>
+                                <field name="balance" readonly="1"/>
+                                <field name="methode_calcul_montant"/>
+                                <field name="montant_prelevement" attrs="{'readonly':[('methode_calcul_montant','!=','fixe')]}"/>
+                                <field name="pc_prelevement" attrs="{'readonly':[('methode_calcul_montant','!=','pc')]}"/>
+                            </tree>
+                        </field>
+                        <group col="3">
+                            <button name="action_paiement_lcr" string="Générer fichier LCR" type="object" icon="fa-file-text" attrs="{'invisible':[('aff_bouton_genere_fich','=',False)]}"/>
+                            <button name="action_paiement_sepa_prev" string="Générer fichier prélèvement SEPA" type="object" icon="fa-file-text" attrs="{'invisible':[('aff_bouton_genere_fich','=',False)]}"/>
+                            <button name="action_enregistre_paiements" string="Valider le paiement des factures" type="object" icon="fa-arrow-right" attrs="{'invisible':[('aff_bouton_paiement','=',False)]}"/>
+                        </group>
+                        <group>
+                            <field name="fichier" filename="nom_fichier" readonly="1" attrs="{'invisible':['|',('fichier','=',''),('aff_bouton_genere_fich','!=',False)]}"/>
+                        </group>
+                        <field name="sortie" readonly="1" style="max-height: 200px; overflow: auto;"/>
+                    </page>
+                    <page name="aide" string="Aide">
+                        <group colspan="2" col="1" string="Informations">
+                            <p>La société, le compte bancaire émetteur et le journal comptable sont ceux du mode de paiement choisi.</p>
+                            <p>Le compte bancaire des tirés est celui du client attaché à la facture.</p>
+                            <p><b>Pour LCR :</b></p>
+                            <ul>
+                                <li>Le fichier génère des lettres de change non acceptées.</li>
+                                <li>Le n° SIREN se configure pour l'émetteur dans le champs ''Registre de la société'' dans la configuration de la société et pour les clients, dans l'onglet achats/ventes des paramètres clients.</li>
+                                <li>Le numéro national émetteur (NNE) se configure dans les paramètres de la société émettrice.</li>
+                            </ul>
+                            <p><b>Pour prélèvement SEPA :</b></p>
+                            <ul>
+                                <li>Le fichier génère des prélèvements récurrents mandat CORE.</li>
+                                <li>Les mandats se configurent dans l'onglet Achats-Ventes du client.</li>
+                                <li>L'identifiant créancier SEPA (ICS) se configure dans les paramètres de la société émettrice.</li>
+                            </ul>
+                        </group>
+                    </page>
+                </notebook>
+            </form>
+        </field>
+    </record>
+
+    <!-- Ajout menu paiement par EDI -->
+    <record id="of_action_paiement_edi" model="ir.actions.act_window">
+        <field name="name">Prélèvements SEPA/LCR</field>
+        <field name="res_model">of.paiement.edi</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem action="of_action_paiement_edi" id="of_menu_paiement_edi"
+        parent="account.menu_finance_receivables" sequence="50" groups="account.group_account_manager,account.group_account_user"/>
+
+    <!-- Ajout action prélèvements SEPA, LCR par EDI dans vue formulaire factures -->
+    <act_window
+        id="action_of_paiement_edi_form"
+        name="Prélèvements SEPA, LCR par EDI"
+        res_model="of.paiement.edi"
+        src_model="account.invoice"
+        multi="True"
+        view_mode="form"
+        view_type="form"
+        view_id="of_paiement_edi_form"
+        target="current"
+        groups="account.group_account_manager,account.group_account_user" />
+
+</odoo>
