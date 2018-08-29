@@ -88,7 +88,6 @@ class GestionPrix(models.TransientModel):
                       reverse=True)
 
     @api.multi
-    def calculer(self, simuler=False):
-        super(GestionPrix, self).calculer(simuler=simuler)
-        if not simuler:
-            self.order_id.order_line._refresh_price_unit()
+    def _appliquer(self, values):
+        super(GestionPrix, self)._appliquer(values)
+        self.order_id.order_line._refresh_price_unit()
