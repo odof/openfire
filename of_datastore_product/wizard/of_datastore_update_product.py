@@ -116,7 +116,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         if active_model == 'of.product.brand':
             brands = model_obj.browse(active_ids)
             suppliers = brands.mapped('datastore_supplier_id')
-            datastore_products = {supplier: supplier.brand_ids.mapped('product_variant_ids') for supplier in suppliers}
+            datastore_products = {supplier: (supplier.brand_ids & brands).mapped('product_variant_ids') for supplier in suppliers}
         elif active_model in ('product.product', 'product.template'):
             to_create = [product_id for product_id in active_ids if product_id < 0]
             if to_create:
