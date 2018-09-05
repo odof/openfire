@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Vue services formulaire : ajout onglet parc installé -->
+    <record id="view_of_service_parc_installe_service_form" model="ir.ui.view">
+        <field name="name">of.parc.installe.service.form</field>
+        <field name="model">of.service</field>
+        <field name="inherit_id" ref="of_service.view_of_service_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[1]" position="before">
+                <page string="Produit installé">
+                    <group>
+                        <field name="parc_installe_id" domain="[('site_adresse_id', 'child_of', [partner_id])]"/>
+                        <field name="parc_installe_product_id"/>
+                        <field name="parc_installe_site_adresse_id"/>
+                        <field name="parc_installe_note"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Action pour ouvrir le parc installé depuis vue service -->
+    <record id="of_service_parc_installe_open_service" model="ir.actions.act_window">
+        <field name="name">Services</field>
+        <field name="res_model">of.service</field>
+        <field name="domain">[]</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+   <!-- Planning intervention : ajout champ parc installé lié -->
+    <record id="view_of_service_parc_installe_planning_form" model="ir.ui.view">
+        <field name="name">of.parc.installe.planning.intervention.form</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_project_issue.of_planning_intervention_sav_liee"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='sav_id']" position="after">
+                <field name="parc_installe_id" domain="[('site_adresse_id', '=', address_id)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Vue parc installé : ajout smart button service, champ date fin garantie et historique intervention -->
+    <record id="view_of_service_parc_installe_form_extended" model="ir.ui.view">
+        <field name="name">of.parc.installe.form.extended</field>
+        <field name="model">of.parc.installe</field>
+        <field name="inherit_id" ref="of_parc_installe.of_parc_installe_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" name="action_view_service" type="object" icon="fa-archive">
+                    <div class="o_form_field o_stat_info">
+                        <span class="o_stat_value"><field name="service_count"/></span>
+                        <span class="o_stat_text">Services</span>
+                    </div>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='date_installation']" position="after">
+                <field name="date_fin_garantie"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Historique des interventions">
+                    <group name="intervention">
+                        <field name="intervention_ids" nolabel="1" context="{'default_address_id':site_adresse_id, 'default_parc_installe_id':id}">
+                            <tree string="intervention" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done'">
+                                <field name="date"/>
+                                <field name="equipe_id"/>
+                                <field name="tache_id"/>
+                                <field name="duree" context="{'tz': 'Europe/Paris'}" string="Durée" widget="float_time"/>
+                                <button name="button_open_of_planning_intervention" class="oe_link" type="object" string="Ouvrir"/>
+                                <field name="state" invisible="1"/>
+                            </tree>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -24,4 +24,3 @@ Module Parc installé : gestion des produits installés avec no de série.
     ],
     'installable': True,
 }
-# vim:expandtab:smartindent:tabstop=4:sorderttabstop=4:shiftwidth=4:

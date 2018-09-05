@@ -11,6 +11,7 @@ class of_parc_installe(models.Model):
     name = fields.Char("No de série", size=64, required=False)
     date_service = fields.Date("Date vente", required=False)
     date_installation = fields.Date("Date d'installation", required=False)
+    date_fin_garantie = fields.Date(string="Fin de garantie")
     product_id = fields.Many2one('product.product', 'Produit', required=True, ondelete='restrict')
     product_category_id = fields.Char(u'Famille', related="product_id.categ_id.name", readonly=True)
     client_id = fields.Many2one('res.partner', 'Client', required=True, domain="[('parent_id','=',False)]", ondelete='restrict')
@@ -104,6 +105,8 @@ class project_issue(models.Model):
     of_parc_installe_site_nom = fields.Char(u"Lieu d'installation", related="of_produit_installe_id.site_adresse_id.name", readonly=True)
     of_parc_installe_site_adresse = fields.Char(u"Adresse d'installation", related="of_produit_installe_id.site_adresse_id.contact_address", search='_search_of_parc_installe_site_adresse', readonly=True)
     of_parc_installe_note = fields.Text('Note produit installé', related="of_produit_installe_id.note", readonly=True)
+    of_parc_installe_fin_garantie = fields.Date(string='Fin de garantie', related="of_produit_installe_id.date_fin_garantie", readonly=True)
+
 
 
     @api.onchange('of_produit_installe_id')

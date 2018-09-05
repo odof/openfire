@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Ajout de la machine installée dans la fiche intervention -->
+    <template id="of_parc_installe_extension_fiche_intervention_report" inherit_id="of_planning.of_fiche_intervention_report_template">
+        <xpath expr="//t[@t-if='o.description and o.cleantext_description']" position="before">
+            <t t-if="o.parc_installe_id">
+                <div class="row h4 mb4">
+                    <div class="col-xs-12"><strong>Parc installé</strong></div>
+                </div>
+                <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black; margin-bottom: 12px">
+                    <div class="h5" style="padding: 0px 16px;">
+                        <div>
+                            <div class="h5" style="padding: 0px 16px;">
+                                <div>
+                                    <span>N° de série&amp;nbsp;:</span>
+                                    <t t-if="o.parc_installe_id.name">
+                                        <strong><span t-field="o.parc_installe_id.name"/></strong>
+                                    </t>
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
+                            <div class="h5" style="padding: 0px 16px;">
+                                <div>
+                                    <span>Modèle&amp;nbsp;:</span>
+                                    <t t-if="o.parc_installe_id.product_id.name">
+                                        <strong><span t-field="o.parc_installe_id.product_id.name"/></strong>
+                                    </t>
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
+                            <div class="h5" style="padding: 0px 16px;">
+                                <div>
+                                    <span>Installateur&amp;nbsp;:</span>
+                                    <t t-if="o.parc_installe_id.installateur_id">
+                                        <span t-field="o.parc_installe_id.installateur_id.name"/>
+                                    </t>
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
+                            <div class="h5" style="padding: 0px 16px;">
+                                <div>
+                                    <span>Date d'installation&amp;nbsp;:</span>
+                                    <t t-if="o.parc_installe_id.date_installation">
+                                        <span t-field="o.parc_installe_id.date_installation"/>
+                                    </t>
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
+                            <div class="h5" style="padding: 0px 16px;">
+                                <div>
+                                    <span>Notes&amp;nbsp;:</span>
+                                    <t t-if="o.parc_installe_id.note">
+                                        <span t-field="o.parc_installe_id.note"/>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </template>
+
+</odoo>
