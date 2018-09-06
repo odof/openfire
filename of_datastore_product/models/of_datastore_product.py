@@ -602,6 +602,11 @@ class OfDatastoreCentralized(models.AbstractModel):
                 # Prix d'achat/vente
                 vals.update(brand.compute_product_price(vals['list_price'], categ_name, obj_dict['uom_id'], obj_dict['uom_po_id'],
                                                         product=product, price=None, remise=None))
+                # Calcul de la marge et de la remise
+                if 'of_seller_remise' in fields_to_read:
+                    vals['of_seller_remise'] = (vals['of_seller_pp_ht'] - vals['of_seller_price']) * 100 / vals['of_seller_pp_ht']
+                if 'marge' in fields_to_read:
+                    vals['marge'] = (vals['list_price'] - vals['standard_price']) * 100 / vals['list_price']
 
             if not create_mode:
                 # Conversion au format many2one (id,name)
@@ -653,7 +658,7 @@ class OfDatastoreCentralized(models.AbstractModel):
             if not isinstance(arg, (list, tuple)):
                 continue
             if arg[0] == 'brand_id':
-                _, operator, right = arg
+                operator, right = arg[1], arg[2]
                 # resolve string-based m2o criterion into IDs
                 if isinstance(right, basestring) or \
                         right and isinstance(right, (tuple, list)) and all(isinstance(item, basestring) for item in right):
@@ -666,7 +671,7 @@ class OfDatastoreCentralized(models.AbstractModel):
         if not ds_supplier:
             if brands:
                 raise UserError(_('Selected brands are not centralized : %s') % ", ".join(brands.mapped('name')))
-            return False, FALSE_LEAF
+            return False, [FALSE_LEAF]
 
         if len(ds_supplier) > 1:
             raise UserError(_('You must select one or several brands using the same centralized database (provided by the same supplier).'))
