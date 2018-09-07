@@ -193,7 +193,7 @@
                                 <field name="tag_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
                                 <field name="user_id" domain="[('share', '=', False)]" string="Commercial"
                                   context="{'default_groups_ref': ['base.group_user', 'base.group_partner_manager', 'sales_team.group_sale_salesman_all_leads'], 'team_id': team_id}"/>
-                                <field name="of_prospecteur"/>
+                                <field name="of_prospecteur_id"/>
                                 <field name="lost_reason" attrs="{'invisible': [('stage_probability', '!=', 0)]}"/>
 
                                 <!-- Invisible champs -->
@@ -427,7 +427,7 @@
                                 <field name="tag_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
                                 <field name="user_id" domain="[('share', '=', False)]" string="Commercial"
                                   context="{'default_groups_ref': ['base.group_user', 'base.group_partner_manager', 'sales_team.group_sale_salesman_all_leads'], 'team_id': team_id}"/>
-                                <field name="of_prospecteur"/>
+                                <field name="of_prospecteur_id"/>
                                 <field name="lost_reason" attrs="{'invisible': [('stage_probability', '!=', 0)]}"/>
 
                                 <!-- Invisible champs -->
@@ -636,7 +636,7 @@
                     <field name="of_customer_state" attrs="{'invisible': [('customer', '=', False)]}"/>
                 </xpath>
                 <field name="user_id" position="after">
-                    <field name="of_prospecteur"/>
+                    <field name="of_prospecteur_id"/>
                 </field>
             </field>
         </record>
@@ -684,7 +684,7 @@
                     <separator/>
                 </xpath>
                 <field name="user_id" position="after">
-                    <field name="of_prospecteur"/>
+                    <field name="of_prospecteur_id"/>
                 </field>
             </field>
         </record>

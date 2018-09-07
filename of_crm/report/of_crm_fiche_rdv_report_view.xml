@@ -132,8 +132,8 @@
                                          <t t-if="o.user_id">
                                              <div><span>Commercial&amp;nbsp;: </span><span t-field="o.user_id"/></div>
                                          </t>
-                                         <t t-if="o.of_prospecteur">
-                                             <div><span>Prospecteur&amp;nbsp;: </span><span t-field="o.of_prospecteur"/></div>
+                                         <t t-if="o.of_prospecteur_id">
+                                             <div><span>Prospecteur&amp;nbsp;: </span><span t-field="o.of_prospecteur_id"/></div>
                                          </t>
                                      </div>
 

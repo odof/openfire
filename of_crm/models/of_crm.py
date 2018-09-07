@@ -45,7 +45,7 @@ class CrmLead(models.Model):
     of_website = fields.Char(related="partner_id.website")
     of_description_projet = fields.Html('Notes de projet') # champs inutile a supprimer bientot
     of_ref = fields.Char(string=u"Référence", copy=False)
-    of_prospecteur = fields.Many2one("res.users", string="Prospecteur")
+    of_prospecteur_id = fields.Many2one("res.users", string="Prospecteur", oldname='of_prospecteur')
     of_date_prospection = fields.Date(string="Date de prospection", default=fields.Date.today)
     # @TODO: implémenter la maj automatique de la date de cloture en fonction du passage de probabilité à 0 ou 100
     of_date_cloture = fields.Date(string=u"Date de clôture")
@@ -271,7 +271,7 @@ Ce champ se met à jour automatiquement sur confirmation de commande et sur vali
     """)
 
     meeting_ids = fields.Many2many('calendar.event', 'calendar_event_res_partner_rel', string='Meetings')
-    of_prospecteur = fields.Many2one("res.users", string="Prospecteur")
+    of_prospecteur_id = fields.Many2one("res.users", string="Prospecteur", oldname='of_prospecteur')
 
     @api.model
     def _init_prospects(self):
