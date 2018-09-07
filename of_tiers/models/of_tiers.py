@@ -68,12 +68,11 @@ class ResPartner(models.Model):
         for partner in partners:
             data = {}
             # Si est un client
-            if partner.customer:
+            if partner.customer and self.company_id.of_code_client:
+                # Création du compte de tiers
+                code, name = safe_eval(self.company_id.of_code_client, {'partner': partner})
                 if (partner.property_account_receivable_id or default_account_receivable) == default_account_receivable:
                     type_id = data_obj.get_object_reference('account', 'data_account_type_receivable')[1]
-                    if not self.company_id.of_code_client:
-                        return
-                    code, name = safe_eval(self.company_id.of_code_client, {'partner': partner})
                     account_data = {
                         'internal_type': 'receivable',
                         'user_type_id': type_id,
@@ -85,16 +84,16 @@ class ResPartner(models.Model):
                         'company_id': default_account_receivable.company_id.id
                     }
                     data['property_account_receivable_id'] = ac_obj.create(account_data)
-                elif partner.property_account_receivable_id.name != partner.name:
-                    partner.property_account_receivable_id.name = partner.name
+                elif partner.property_account_receivable_id.name != name:
+                    # Mise à jour du libellé du compte de tiers
+                    partner.property_account_receivable_id.name = name
 
             # Si est un fournisseur
-            if partner.supplier:
+            if partner.supplier and self.company_id.of_code_fournisseur:
+                # Création du compte de tiers
+                code, name = safe_eval(self.company_id.of_code_fournisseur, {'partner': partner})
                 if (partner.property_account_payable_id or default_account_payable) == default_account_payable:
                     type_id = data_obj.get_object_reference('account', 'data_account_type_payable')[1]
-                    if not self.company_id.of_code_fournisseur:
-                        return
-                    code, name = safe_eval(self.company_id.of_code_fournisseur, {'partner': partner})
                     account = {
                         'internal_type': 'payable',
                         'user_type_id': type_id,
@@ -106,8 +105,9 @@ class ResPartner(models.Model):
                         'company_id': default_account_payable.company_id.id
                     }
                     data['property_account_payable_id'] = ac_obj.create(account)
-                elif partner.property_account_payable_id.name != partner.name:
-                    partner.property_account_payable_id.name = partner.name
+                elif partner.property_account_payable_id.name != name:
+                    # Mise à jour du libellé du compte de tiers
+                    partner.property_account_payable_id.name = name
 
             if data:
                 partner.write(data)
