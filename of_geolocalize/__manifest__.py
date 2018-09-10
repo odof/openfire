@@ -53,7 +53,6 @@ Fonctionnalités
         'views/of_geo_views.xml',
         'data/ir_config_parameters_of_geo.xml',
     ],
-    'active': True,
     'installable': True,
     'application': False,
     'auto_install': False,

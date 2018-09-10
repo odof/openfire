@@ -23,5 +23,4 @@ Module gestion de prêt d'appareil
         'security/ir.model.access.csv',
     ],
     'installable': False,
-    'active': False,
 }

@@ -47,7 +47,6 @@ Inclut la gestion des équipes d'intervention.
     'css' : [
         'static/src/css/of_planning.css',
     ],
-    'active': True,
     'installable': True,
     'application': False,
     'auto_install': False,

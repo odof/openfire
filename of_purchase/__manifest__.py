@@ -42,7 +42,6 @@ Fonctionnalités
         'report/purchase_reports.xml',
         'views/of_purchase_view.xml',
     ],
-    'active': True,
     'installable': True,
     'application': False,
     'auto_install': False,

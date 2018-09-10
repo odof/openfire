@@ -33,7 +33,6 @@ Ce module ajoute des fonctionnalités demandées par une société.
     'data' : [
         'views/of_zz_1_views.xml',
     ],
-    'active': True,
     'installable': True,
     'application': False,
     'auto_install': False,

@@ -83,7 +83,6 @@ Paramètres de ventes (sale.config.settings)
         'wizards/of_sale_order_gestion_prix_views.xml',
         'wizards/sale_make_invoice_advance_views.xml',
     ],
-    'active': True,
     'installable': True,
     'application': False,
     'auto_install': False,

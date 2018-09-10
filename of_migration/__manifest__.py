@@ -20,6 +20,4 @@ Le processus de migration se lance par XML/RPC par l'appel de la fonction of.mig
     'data': [
     ],
     'installable': False,
-    'active': False,
 }
-# vim:expandtab:smartindent:tabstop=4:sorderttabstop=4:shiftwidth=4:

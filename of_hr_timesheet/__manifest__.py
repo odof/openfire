@@ -34,7 +34,6 @@ Ce module personnalise le module Odoo des feuilles de temps.
         'views/of_hr_timesheet_views.xml',
         'security/ir.model.access.csv',
     ],
-    'active': True,
     'installable': True,
     'application': False,
     'auto_install': False,

@@ -75,7 +75,6 @@ Exemples :
 La remise est appliquée sur le prix public pour calculer le prix d'achat.
 
 Exemples :
- rc : Utiliser la remise conseillée
  40.5 : Forcer une remise de 40,5% (Attention, utiliser un . et non pas une virgule!)
  cumul(10,5) : Appliquer la remise conseillée, puis une remise de 10%, puis une remise de 5%
  cumul(14.5) : Équivalent à la ligne précedente, une remise de 10% puis 5% fait 14.5% au total

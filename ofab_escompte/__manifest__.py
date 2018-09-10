@@ -42,7 +42,6 @@ Fonctionnalités
         'views/ofab_escompte_views.xml',
         'reports/ofab_escompte_reports_views.xml',
     ],
-    'active': True,
     'installable': True,
     'application': False,
     'auto_install': False,

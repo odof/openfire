@@ -25,6 +25,5 @@ Module OpenFire d'utilitaires.
             'data/of_utils_data.xml',
         ],
         "installable": True,
-        'active': False,
 }
 
