@@ -224,7 +224,7 @@
                     </div>
                 </group>
                 <group string="Comportement des fonctions automatiques" name="comportement_config">
-                	<field name="show_stats"/>
+                    <field name="show_stats"/>
                     <field name="geocoding_on_write" widget="radio"/>
                     <field name="geocoding_on_create" widget="radio"/>
                     <field name="geocoder_by_default" widget="radio"/>

@@ -86,7 +86,7 @@ class OFGeoWizard(models.TransientModel):
     ban_fail = 0
 
     google_try = 0
-    google_success = 0  #(web and API queries)
+    google_success = 0  # (web and API queries)
     google_fail = 0
 
     # Get taux success from last record in the of.geo.wizard
@@ -101,7 +101,7 @@ class OFGeoWizard(models.TransientModel):
 
     @api.model
     def _get_taux_success_osm(self):
-        try: 
+        try:
             last_record = self.env['of.geo.wizard'].search([])[-1]
             taux_success_osm = last_record.taux_success_osm
         except:
@@ -109,7 +109,7 @@ class OFGeoWizard(models.TransientModel):
         return taux_success_osm
 
     @api.model
-    def _get_taux_success_ban(self): 
+    def _get_taux_success_ban(self):
         try:
             last_record = self.env['of.geo.wizard'].search([])[-1]
             taux_success_ban = last_record.taux_success_ban
@@ -118,7 +118,7 @@ class OFGeoWizard(models.TransientModel):
         return taux_success_ban
 
     @api.model
-    def _get_taux_success_google(self):  # from last record in the of.geo.wizard 
+    def _get_taux_success_google(self):  # from last record in the of.geo.wizard
         try:
             last_record = self.env['of.geo.wizard'].search([])[-1]
             taux_success_google = last_record.taux_success_google
@@ -249,7 +249,7 @@ class OFGeoWizard(models.TransientModel):
         API_URL = self.env['ir.config_parameter'].get_param('url_openfire').strip()
 
         # Test geocoder URL
-        if self.use_nominatim_openfire == True and API_URL == False:
+        if self.use_nominatim_openfire and not API_URL:
             raise UserError(u"L'URL du géocodeur OpenFire n'est pas configurée. Vérifiez votre paramétrage ou désactivez ce géocodeur")
         if API_URL.startswith('https://') or API_URL.startswith('http://'):
             pass
@@ -330,7 +330,7 @@ class OFGeoWizard(models.TransientModel):
                         # Detect different zip (mark as failure if dif)
                         if partner.zip:
                             res_zip = fields[-2]
-                            zip_ratio = self.similar(partner.zip,res_zip)
+                            zip_ratio = self.similar(partner.zip, res_zip)
                             if zip_ratio < 0.9:
                                 precision = ""
                     elif ratio < 0.7:
@@ -349,7 +349,7 @@ class OFGeoWizard(models.TransientModel):
                     longitud = 0
                     precision = "unknown"
 
-        return geocoding,geocodeur,latitud,longitud,precision
+        return geocoding, geocodeur, latitud, longitud, precision
 
     # Géocodage avec OSM
     def geo_osm(self, partner):
@@ -364,7 +364,7 @@ class OFGeoWizard(models.TransientModel):
         API_URL = partner.env['ir.config_parameter'].get_param('url_osm')
 
         # Teste URL géocodage
-        if self.use_nominatim_osm == True and API_URL == False:
+        if self.use_nominatim_osm and not API_URL:
             raise UserError(u"L'URL du géocodeur OpenStreetMap n'est pas configurée. Vérifiez votre paramétrage ou désactivez ce géocodeur")
         if API_URL.startswith('https://') or API_URL.startswith('http://'):
             pass
@@ -445,7 +445,7 @@ class OFGeoWizard(models.TransientModel):
                         # Detect different zip (mark as failure if dif)
                         if partner.zip:
                             res_zip = fields[-2]
-                            zip_ratio = self.similar(partner.zip,res_zip)
+                            zip_ratio = self.similar(partner.zip, res_zip)
                             if zip_ratio < 0.9:
                                 precision = ""
                     elif ratio < 0.7:
@@ -464,7 +464,7 @@ class OFGeoWizard(models.TransientModel):
                     longitud = 0
                     precision = "unknown"
 
-        return geocoding,geocodeur,latitud,longitud,precision
+        return geocoding, geocodeur, latitud, longitud, precision
 
     # Geocoding with BANO
     def geo_ban(self, partner):
@@ -479,7 +479,7 @@ class OFGeoWizard(models.TransientModel):
         API_URL = partner.env['ir.config_parameter'].get_param('url_bano').strip()
 
         # Test geocoder URL
-        if self.use_bano == True and API_URL == False:
+        if self.use_bano and not API_URL:
             raise UserError(u"L'URL du géocodeur BANO n'est pas configurée. Vérifiez votre paramétrage ou désactivez ce géocodeur")
         if API_URL.startswith('https://') or API_URL.startswith('http://'):
             pass
@@ -569,7 +569,7 @@ class OFGeoWizard(models.TransientModel):
                             # Detect different zip (mark as failure if dif)
                             if partner.zip:
                                 query_zip = partner.zip.strip()
-                                zip_ratio = self.similar(query_zip,response_zip)
+                                zip_ratio = self.similar(query_zip, response_zip)
                                 if zip_ratio < 0.9:
                                     precision = ""
 
@@ -577,7 +577,7 @@ class OFGeoWizard(models.TransientModel):
                             precision = "medium"
                             if partner.zip:
                                 query_zip = partner.zip.strip()
-                                zip_ratio = self.similar(query_zip,response_zip)
+                                zip_ratio = self.similar(query_zip, response_zip)
                                 if zip_ratio < 0.9:
                                     precision = ""
 
@@ -585,14 +585,14 @@ class OFGeoWizard(models.TransientModel):
                         # Check zip
                         if partner.zip:
                             query_zip = partner.zip.strip()
-                            zip_ratio = self.similar(query_zip,response_zip)
+                            zip_ratio = self.similar(query_zip, response_zip)
                             if zip_ratio < 0.9:
                                 precision = ""
                         # Check city and city name
                         if partner.city:
                             query_city = partner.city.strip().upper()
-                            city_ratio = self.similar(query_city,response_city)
-                            city_name_ratio =self.similar(query_city,response_city_name)
+                            city_ratio = self.similar(query_city, response_city)
+                            city_name_ratio = self.similar(query_city, response_city_name)
                             best_city_response = max(city_ratio, city_name_ratio)
                             if best_city_response < 0.6:
                                 precision = "low"
@@ -610,7 +610,7 @@ class OFGeoWizard(models.TransientModel):
                     longitud = 0
                     precision = "unknown"
 
-        return geocoding,geocodeur,latitud,longitud,precision
+        return geocoding, geocodeur, latitud, longitud, precision
 
     # Geocoding with GoogleMaps
     def geo_google(self, partner):
@@ -626,7 +626,7 @@ class OFGeoWizard(models.TransientModel):
         API_URL = partner.env['ir.config_parameter'].get_param('url_google').strip()
 
         # Test geocoder URL
-        if self.use_google == True and API_URL == False:
+        if self.use_google and not API_URL:
             raise UserError(u"L'URL du géocodeur Google Maps n'est pas configurée. Vérifiez votre paramétrage ou désactivez ce géocodeur")
         if API_URL.startswith('https://') or API_URL.startswith('http://'):
             pass
@@ -697,8 +697,7 @@ class OFGeoWizard(models.TransientModel):
                         precision = "high"
 
                     if precision == "high":
-                        if results['geometry']['location_type'] == "ROOFTOP" \
-                        or results['geometry']['location_type'] == "RANGE_INTERPOLATED":
+                        if results['geometry']['location_type'] in ("ROOFTOP", "RANGE_INTERPOLATED"):
 
                             # Simplify response address
                             response_address = results['formatted_address'].replace(',', '').upper().strip()
@@ -719,8 +718,7 @@ class OFGeoWizard(models.TransientModel):
                             latitud = results['geometry']['location']['lat']
                             longitud = results['geometry']['location']['lng']
 
-                        elif results['geometry']['location_type'] == "GEOMETRIC_CENTER" \
-                        or results['geometry']['location_type'] == "APPROXIMATE":
+                        elif results['geometry']['location_type'] in ("GEOMETRIC_CENTER", "APPROXIMATE"):
                             latitud = results['geometry']['location']['lat']
                             longitud = results['geometry']['location']['lng']
                             precision = "medium"
@@ -787,8 +785,7 @@ class OFGeoWizard(models.TransientModel):
 
                         if precision == "high":
 
-                            if results['geometry']['location_type'] == "ROOFTOP" \
-                            or results['geometry']['location_type'] == "RANGE_INTERPOLATED":
+                            if results['geometry']['location_type'] in ("ROOFTOP" , "RANGE_INTERPOLATED"):
 
                                 # Simplify response address
                                 response_address = results['formatted_address'].replace(',', '').upper().strip()
@@ -809,8 +806,7 @@ class OFGeoWizard(models.TransientModel):
                                 latitud = results['geometry']['location']['lat']
                                 longitud = results['geometry']['location']['lng']
 
-                            elif results['geometry']['location_type'] == "GEOMETRIC_CENTER" \
-                            or results['geometry']['location_type'] == "APPROXIMATE":
+                            elif results['geometry']['location_type'] in ("GEOMETRIC_CENTER", "APPROXIMATE"):
                                 latitud = results['geometry']['location']['lat']
                                 longitud = results['geometry']['location']['lng']
                                 precision = "medium"
@@ -837,7 +833,7 @@ class OFGeoWizard(models.TransientModel):
                             latitud = 0
                             longitud = 0
                             precision = "unknown"
-                    except: # No results API
+                    except:  # No results API
                         self.google_fail += 1
                         geocoding = 'failure'
                         latitud = 0
@@ -856,13 +852,13 @@ class OFGeoWizard(models.TransientModel):
                     longitud = 0
                     precision = "unknown"
 
-        return geocoding,geocodeur,latitud,longitud,precision
+        return geocoding, geocodeur, latitud, longitud, precision
 
     # Erase button
     @api.multi
     def action_reset_geo_val_selected(self):
         for partner in self.partner_ids:
-            if not partner.geocoding == 'manual': # Protect manual geocoding
+            if not partner.geocoding == 'manual':  # Protect manual geocoding
                 partner.write({
                     'geocoding': 'not_tried',
                     'geocodeur': 'unknown',
@@ -872,7 +868,7 @@ class OFGeoWizard(models.TransientModel):
                     'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
                     'geocoding_response': u"Réinitialisé",
                 })
-        return { "type": "ir.actions.do_nothing", }
+        return {"type": "ir.actions.do_nothing"}
 
     # INDIVIDUAL GEOCODING
     def action_button_geo_openfire(self):
@@ -883,7 +879,7 @@ class OFGeoWizard(models.TransientModel):
 
         # Test geocoder URL
         API_URL = partner.env['ir.config_parameter'].get_param('url_openfire')
-        if API_URL == False:
+        if not API_URL:
             raise UserError(u"L'URL du géocodeur OpenFire n'est pas configurée. Vérifiez votre paramétrage ou utilisez un autre géocodeur")
         if API_URL.startswith('https://') or API_URL.startswith('http://'):
             pass
@@ -910,7 +906,7 @@ class OFGeoWizard(models.TransientModel):
 
         # Test geocoder URL
         API_URL = partner.env['ir.config_parameter'].get_param('url_osm')
-        if API_URL == False:
+        if not API_URL:
             raise UserError(u"L'URL du géocodeur OpenStreetMap n'est pas configurée. Vérifiez votre paramétrage ou utilisez un autre géocodeur")
         if API_URL.startswith('https://') or API_URL.startswith('http://'):
             pass
@@ -938,7 +934,7 @@ class OFGeoWizard(models.TransientModel):
 
         # Test geocoder URL
         API_URL = partner.env['ir.config_parameter'].get_param('url_bano')
-        if API_URL == False:
+        if not API_URL:
             raise UserError(u"L'URL du géocodeur BANO n'est pas configurée. Vérifiez votre paramétrage ou utilisez un autre géocodeur")
         if API_URL.startswith('https://') or API_URL.startswith('http://'):
             pass
@@ -965,7 +961,7 @@ class OFGeoWizard(models.TransientModel):
 
         # Test geocoder URL
         API_URL = partner.env['ir.config_parameter'].get_param('url_google')
-        if API_URL == False:
+        if not API_URL:
             raise UserError(u"L'URL du géocodeur Google Maps n'est pas configurée. Vérifiez votre paramétrage ou utilisez un autre géocodeur")
         if API_URL.startswith('https://') or API_URL.startswith('http://'):
             pass
@@ -1000,7 +996,7 @@ class OFGeoWizard(models.TransientModel):
 
         # Check config errors
         # Test if at least one geocoder has been choosen
-        if self.use_nominatim_openfire == False and self.use_nominatim_osm == False and self.use_bano == False and self.use_google == False:
+        if not (self.use_nominatim_openfire or self.use_nominatim_osm or self.use_bano or self.use_google):
             raise UserError(u"Vous devez choisir au moins un géocodeur.")
 
         # SECUENTIAL GEOCODING
@@ -1111,7 +1107,7 @@ class OFGeoWizard(models.TransientModel):
                             cmpt += 1
 
                 # Not_tried no failure and best precision
-                elif self.best_precision: 
+                elif self.best_precision:
                     if partner.geocoding not in ('success_openfire', 'success_osm', 'success_bano', 'success_google', 'manual', 'no_address'):
                         results = geocoder_function(partner)
                         get_precision = results[4]
@@ -1213,4 +1209,4 @@ class OFGeoWizard(models.TransientModel):
             if cmpt % 100 == 0:
                 self._cr.commit()
 
-        return { "type": "ir.actions.do_nothing", }
+        return {"type": "ir.actions.do_nothing"}
