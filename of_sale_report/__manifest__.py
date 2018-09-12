@@ -5,7 +5,7 @@
     "version": "10.0.1.0.0",
     "author": "OpenFire",
     'license': '',
-    'category': 'OpenFire modules',
+    "category": "OpenFire",
     "description": """
 Rapports de vente OpenFire
 ==========================
@@ -19,7 +19,6 @@ Rapports de vente OpenFire
         "of_purchase",
         "of_sale",
     ],
-    "category": "OpenFire",
     "data": [
         'views/of_sale_report_views.xml',
         'wizards/of_report_openflam_wizard.xml',

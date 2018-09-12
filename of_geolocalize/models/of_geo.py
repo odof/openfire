@@ -36,7 +36,7 @@ class ResCompany(models.Model):
         ('high', "Haut"),
         ('medium', "Moyen"),
         ('low', "Bas"),
-        ('no_address',u"--"),
+        ('no_address', u"--"),
         ('unknown', u"Indéterminé"),
         ('not_tried', u"Pas tenté"),
         ], default='not_tried', readonly=True, related='partner_id.precision', help=u"Niveau de précision de la géolocalisation")
@@ -74,7 +74,7 @@ class ResPartner(models.Model):
         ('high', "Haut"),
         ('medium', "Moyen"),
         ('low', "Bas"),
-        ('no_address',u"--"),
+        ('no_address', u"--"),
         ('unknown', u"Indéterminé"),
         ('not_tried', u"Pas tenté"),
         ], default='not_tried', readonly=True, help=u"Niveau de précision de la géolocalisation")
@@ -87,14 +87,14 @@ class ResPartner(models.Model):
             if self.street and self.street2:
                 query += self.street + ' ' + self.street2
                 # Save street without numbers to compare
-                self.street_query = filter(lambda c: not c.isdigit(), query) 
+                self.street_query = filter(lambda c: not c.isdigit(), query)
             else:
                 if self.street:
                     query += self.street
                 if self.street2:
                     query += self.street2
                 # Save street without numbers to compare
-                self.street_query = filter(lambda c: not c.isdigit(), query) 
+                self.street_query = filter(lambda c: not c.isdigit(), query)
 
             if self.zip:
                 query += ' ' + self.zip
@@ -149,8 +149,8 @@ class ResPartner(models.Model):
                 # Reset geocoder use
                 use_openfire = use_osm = use_bano = use_google = False
 
-                # Set geocoder by default 
-                if res_geocoder_by_default == False:
+                # Set geocoder by default
+                if not res_geocoder_by_default:
                     use_openfire = True
                 elif res_geocoder_by_default == u'1':
                     use_osm = True
@@ -180,50 +180,38 @@ class ResPartner(models.Model):
         res_geocoding_on_write = self.env['ir.config_parameter'].get_param('geocoding_on_write')
 
         # Determine if geocoding was manual and write geodata for it.
-        do_geocoding_auto = "no"
-        if ('street' in vals) or ('street2' in vals) or ('zip' in vals) or ('city' in vals) or ('street' in vals) or ('country_id' in vals) \
-         and ('geocoding' not in vals) and ('geocodeur' not in vals) and ('date_last_localization' not in vals) and ('precision' not in vals):
-            # Detect change in lat lng
-            if 'geo_lat' not in vals and 'geo_lng' not in vals:  # Only change address.
-                if res_geocoding_on_write:  # Do geocoding automatic
-                    do_geocoding_auto = "yes"
-                else:  # if config gecoding on write False, set as not tried
-                    do_geocoding_auto = "no"
-                    vals['geocoding'] = "not_tried"
-                    vals['geocodeur'] = "unknown"
-                    vals['geo_lat'] = 0
-                    vals['geo_lng'] = 0
-                    vals['precision'] = "not_tried"
-                    vals['date_last_localization'] = fields.Datetime.context_timestamp(self, fields.datetime.now())
-            elif 'geo_lat' in vals or 'geo_lng' in vals:
-                do_geocoding_auto = "no"
-                vals['geocoding'] = "manual"
-                vals['geocodeur'] = "manual"
-                vals['precision'] = "manual"
-                vals['date_last_localization'] = fields.Datetime.context_timestamp(self, fields.datetime.now())
-            else:
-                do_geocoding_auto = "no"
+        do_geocoding_auto = False
+
         # Change coordinates but not geocoding (geo data manual entry)
-        elif ('geo_lat' in vals) or ('geo_lng' in vals):
-            if not ('geocoding' in vals):
-                do_geocoding_auto = "no"
-                vals['geocoding'] = "manual"
-                vals['geocodeur'] = "manual"
-                vals['precision'] = "manual"
+        if ('geo_lat' in vals or 'geo_lng' in vals) and 'geocoding' not in vals:
+            vals['geocoding'] = "manual"
+            vals['geocodeur'] = "manual"
+            vals['precision'] = "manual"
+            vals['date_last_localization'] = fields.Datetime.context_timestamp(self, fields.datetime.now())
+        elif (
+            any(field in vals for field in ('street', 'street2', 'zip', 'city', 'state_id', 'country_id')) and
+            not any(field in vals for field in ('geocoding', 'geocodeur', 'date_last_localization', 'precision'))
+        ):
+            if res_geocoding_on_write:  # Do geocoding automatic
+                do_geocoding_auto = True
+            else:  # if config gecoding on write False, set as not tried
+                vals['geocoding'] = "not_tried"
+                vals['geocodeur'] = "unknown"
+                vals['geo_lat'] = 0
+                vals['geo_lng'] = 0
+                vals['precision'] = "not_tried"
                 vals['date_last_localization'] = fields.Datetime.context_timestamp(self, fields.datetime.now())
-        else:
-            do_geocoding_auto = "no"
 
         # DO GEOCODING AUTOMATIC (through wizard)
-        if do_geocoding_auto == 'yes':
+        if do_geocoding_auto:
             # Get geocoder by default
             res_geocoder_by_default = self.env['ir.config_parameter'].get_param('geocoder_by_default')
 
             # Reset geocoder use
             use_openfire = use_osm = use_bano = use_google = False
 
-            # Set geocoder by default 
-            if res_geocoder_by_default == False:
+            # Set geocoder by default
+            if not res_geocoder_by_default:
                 use_openfire = True
             elif res_geocoder_by_default == u'1':
                 use_osm = True
@@ -338,22 +326,22 @@ class OFGeoConfiguration(models.TransientModel):
 
     @api.model
     def _get_default_show_stats(self):
-        saved_show_stats = self.env['ir.config_parameter'].get_param('show_stats','')
+        saved_show_stats = self.env['ir.config_parameter'].get_param('show_stats', '')
         return saved_show_stats
 
     @api.model
     def _get_default_geocoding_on_write(self):
-        saved_geocoding_on_write = self.env['ir.config_parameter'].get_param('geocoding_on_write','')
+        saved_geocoding_on_write = self.env['ir.config_parameter'].get_param('geocoding_on_write', '')
         return saved_geocoding_on_write
 
     @api.model
     def _get_default_geocoding_on_create(self):
-        saved_geocoding_on_create = self.env['ir.config_parameter'].get_param('geocoding_on_create','')
+        saved_geocoding_on_create = self.env['ir.config_parameter'].get_param('geocoding_on_create', '')
         return saved_geocoding_on_create
 
     @api.model
     def _get_default_geocoder_by_default(self):
-        saved_geocoder = self.env['ir.config_parameter'].get_param('geocoder_by_default','')
+        saved_geocoder = self.env['ir.config_parameter'].get_param('geocoder_by_default', '')
         return saved_geocoder
 
     # Config fields
@@ -373,18 +361,18 @@ class OFGeoConfiguration(models.TransientModel):
     geocoding_on_write = fields.Selection([
         (0, u"Ne pas recalculer les valeurs du géocodage automatiquement (Les coordonnées GPS sont remises à zéro si elles ne sont pas entrées en même temps.)"),
         (1, u"Recalculer les valeurs de géocodage (Le géocodage est tenté si les coordonnées GPS ne sont pas entrées en même temps.)"),
-        ], u"Si un adresse est modifiée", default=_get_default_geocoding_on_write,
-        help = u"Recalculer automatiquement les valeurs de géocodage lorsque l'adresse d'un partenaire est modifiée")
+        ], u"Si une adresse est modifiée", default=_get_default_geocoding_on_write,
+        help=u"Recalculer automatiquement les valeurs de géocodage lorsque l'adresse d'un partenaire est modifiée")
     geocoding_on_create = fields.Selection([
         (0, u"Ne pas calculer les valeurs de géocodage (recommandé lorsqu'un grand nombre de partenaires sont importés)"),
         (1, u"Calculer les valeurs de géocodage automatiquement"),
         ], u"Si un partenaire est ajouté", default=_get_default_geocoding_on_create,
-        help = u"Calculer automatiquement les valeurs de géocodage lorsqu'un nouveau partenaire est ajouté")
+        help=u"Calculer automatiquement les valeurs de géocodage lorsqu'un nouveau partenaire est ajouté")
     geocoder_by_default = fields.Selection([
         (0, "OpenFire"),
         (1, "OpenStreetMap"),
         (2, u"Base Adresse Nationale Ouverte (BANO)"),
-        (3,"Google Maps")],u"Géocodeur fonctions automatiques", default=_get_default_geocoder_by_default,
+        (3, "Google Maps")], u"Géocodeur fonctions automatiques", default=_get_default_geocoder_by_default,
         help=u"Géocodeur par défaut pour fonctions automatiques")
 
     # Save fields
@@ -444,4 +432,3 @@ class OFGeoConfiguration(models.TransientModel):
         self.ensure_one()
         value = getattr(self, 'geocoder_by_default', '')
         self.env['ir.config_parameter'].set_param('geocoder_by_default', value)
-

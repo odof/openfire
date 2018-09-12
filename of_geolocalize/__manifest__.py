@@ -36,7 +36,7 @@ Fonctionnalités
  - Contrôle de la précision par rapport à la réponse du serveur (différents algorithmes)
  - Contrôle des faux positifs comparant la requête envoyée avec la réponse du serveur (différents filtres)
  - Possibilité de choisir la meilleure précision des différents géocodeurs utilisés (cela prend plus de temps)
- - Statistiques globales recalculées dans chaque exécution en fonction des résultats déjà enregistrés 
+ - Statistiques globales recalculées dans chaque exécution en fonction des résultats déjà enregistrés
  - Statistiques par geocodeur mesurées à chaque exécution (incluant le taux de réussite)
  - Paramétrage pour l'APIs, l'URLs de geocodeurs et des fonctions automatiques de géocodage
  - Recherches et filtres pour traitement de geodonnès
@@ -46,7 +46,7 @@ Fonctionnalités
         'base',
     ],
     'external_dependancies': {
-        'python': ['requests', 'googlemaps',],
+        'python': ['requests', 'googlemaps'],
     },
     'data' : [
         'wizards/of_geo_wizard_views.xml',

@@ -16,23 +16,40 @@
                     <field name="user_company_id" invisible="1"/>
                     <field name="company_ids" widget="many2many_tags" domain="[('id', 'child_of', user_company_id)]"/>
                 </group>
-                <group attrs="{'invisible': [('report_model', 'not in', 'stats')]}" col="4" colspan="2">
+                <group attrs="{'invisible': [('report_model', 'not in', ('stats', ))]}" col="4" colspan="2">
                     <separator string="Tableaux" colspan="4"/>
                     <field name="stats_partner"/>
                     <field name="stats_product"/>
-                    <separator string="Périodes" colspan="4"/>
-                    <field name="period_n" domain="[('type_id.fiscal_month', '=', True)]" attrs="{'required' : [('report_model', '=', 'stats')]}"/>
-                    <field name="period_n1" domain="[('type_id.fiscal_month', '=', True)]" attrs="{'required' : [('report_model', '=', 'stats')]}"/>
-                    <separator string="Filtres" colspan="4"/>
+                    <field name="stats_brand"/>
+                    <separator string="Périodes / Dates" colspan="4"/>
+                    <field name="type_filtre_date" attrs="{'required' : [('report_model', '=', 'stats')]}"/>
                 </group>
-                <group attrs="{'invisible': [('report_model', 'not in', 'stats')]}" col="2">
+                <group attrs="{'invisible': [('report_model', 'not in', ('stats', ))]}" col="4">
+                    <group colspan="2">
+                        <field name="period_n" domain="[('type_id.fiscal_month', '=', True)]" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'period')], 'invisible': [('type_filtre_date', 'not in', 'period')]}"/>
+                        <field name="debut_n" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'date')], 'invisible': [('type_filtre_date', 'not in', 'date')]}"/>
+                        <field name="fin_n" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'date')], 'invisible': [('type_filtre_date', 'not in', 'date')]}"/>
+                    </group>
+                    <group colspan="2">
+                        <field name="period_n1" domain="[('type_id.fiscal_month', '=', True)]" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'period')], 'invisible': [('type_filtre_date', 'not in', 'period')]}"/>
+                        <field name="debut_n1" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'date')], 'invisible': [('type_filtre_date', 'not in', 'date')]}"/>
+                        <field name="fin_n1" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'date')], 'invisible': [('type_filtre_date', 'not in', 'date')]}"/>
+                    </group>
+                </group>
+                <separator string="Filtres" colspan="4" attrs="{'invisible': [('report_model', 'not in', ('stats', ))]}" col="2"/>
+                <group attrs="{'invisible': [('report_model', 'not in', ('stats', ))]}" col="2">
                     <field name="filtre_client"/>
-                    <field name="partner_ids" attrs="{'invisible': [('filtre_client', '=', False)]}"/>
+                    <field name="etiquette_ids" widget="many2many_tags" attrs="{'invisible': [('filtre_client', '=', False)]}"/>
+                    <!-- Domaine fait ainsi pour permettre facilement de ne pas utiliser le domaine si il n'y a pas d'étiquette_ids -->
+                    <field name="partner_ids" domain="[('category_id', etiquette_ids and 'child_of' or 'ilike', etiquette_ids and etiquette_ids[0][2] or '')]" attrs="{'invisible': [('filtre_client', '=', False)]}">
+                    </field>
                 </group>
-                <group attrs="{'invisible': [('report_model', 'not in', 'stats')]}" col="2">
+                <group attrs="{'invisible': [('report_model', 'not in', ('stats', ))]}" col="2">
                     <field name="filtre_article"/>
                     <field name="category_ids" widget="many2many_tags" attrs="{'invisible': [('filtre_article', '=', False)]}"/>
-                    <field name="product_ids" domain="[('categ_id', 'in', category_ids and category_ids[0][2])]" attrs="{'invisible': [('filtre_article', '=', False)]}"/>
+                    <field name="brand_ids" widget="many2many_tags" attrs="{'invisible': [('filtre_article', '=', False)]}"/>
+                    <field name="product_ids" domain="[('categ_id', category_ids and 'child_of' or 'ilike', category_ids and category_ids[0][2] or ''),
+                                                        ('brand_id', brand_ids and 'in' or 'ilike', brand_ids and brand_ids[0][2] or '')]" attrs="{'invisible': [('filtre_article', '=', False)]}"/>
                 </group>
                 <footer>
                     <button string="Annuler" special="cancel" class="btn-default"/>
