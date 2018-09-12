@@ -168,6 +168,11 @@ class GestionPrix(models.TransientModel):
         return lines.sorted('quantity', reverse=True)
 
     @api.multi
+    def _appliquer(self, values):
+        for line, vals in values.iteritems():
+            line.write(vals)
+
+    @api.multi
     def calculer(self, simuler=False):
         """
         Calcule les nouveaux prix des articles sélectionnés en fonction de la méthode de calcul choisie.
@@ -265,8 +270,8 @@ class GestionPrix(models.TransientModel):
                                                        line_rounding=line_rounding)
             # Recalcul de 'total_excluded' et 'total_included' sans les arrondis
             if not round_tax:
-                amout_tax = sum(tax['amount'] for tax in taxes['taxes'])
-                taxes.update({'total_excluded': taxes['base'], 'total_included': taxes['base'] + amout_tax})
+                amount_tax = sum(tax['amount'] for tax in taxes['taxes'])
+                taxes.update({'total_excluded': taxes['base'], 'total_included': taxes['base'] + amount_tax})
 
             if self.methode_remise != 'reset':
                 to_distribute -= taxes[tax_field]
@@ -287,13 +292,13 @@ class GestionPrix(models.TransientModel):
             return
 
         total_ttc_init = order.amount_total
-        for line, vals in values.iteritems():
-            line.write(vals)
+        self._appliquer(values)
+        total_ttc_fin = order.amount_total
 
         # On ajoute le libellé de la remise dans les notes du devis si case cochée
         if self.afficher_remise:
             text = u"Remise exceptionnelle déduite de %s.\n"
-            text = text % (format_amount(self.env, total_ttc_init - order.amount_total, cur))
+            text = text % (format_amount(self.env, total_ttc_init - total_ttc_fin, cur))
             order.note = text + (order.note or '')
 
     @api.multi
