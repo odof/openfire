@@ -6,6 +6,7 @@
             <script type="text/javascript" src="/of_web_widgets/static/src/js/of_kanban_widgets.js"></script>
             <script type="text/javascript" src="/of_web_widgets/static/src/js/of_form_relational_widgets.js"></script>
             <script type="text/javascript" src="/of_web_widgets/static/src/js/of_form_common.js"></script>
+            <script type="text/javascript" src="/of_web_widgets/static/src/js/of_data.js"></script>
         </xpath>
     </template>
 </odoo>

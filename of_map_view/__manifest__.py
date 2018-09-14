@@ -11,7 +11,7 @@
         Contains a built-in implementation for res.partner.
     """,
     'website': 'openfire.fr',
-    'depends': ['web', 'of_geolocalize'],
+    'depends': ['web', 'of_geolocalize', 'contacts', 'of_web_widgets'],
     'data': [
         'data/ir_config_parameter_data.xml',
         'views/of_map_templates.xml',
