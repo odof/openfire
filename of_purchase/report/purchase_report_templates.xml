@@ -7,7 +7,7 @@
         <xpath expr="//div[@class='row'][1]" position="replace">
             <div name="addresses" class="row">
                 <div class="col-xs-6">
-                    <strong>Adresse de Livraison&amp;nbsp;:</strong>
+                    <strong>Adresse de livraison&amp;nbsp;:</strong>
                     <div t-if="o.dest_address_id">
                         <span t-field="o.dest_address_id.name"/>
                         <div t-field="o.dest_address_id" t-options='{"widget": "contact", "fields": ["address", "phone", "fax"], "no_marker": True, "phone_icons": True}'/>
@@ -38,12 +38,12 @@
                     <div name="refs" class="mt8" id="informations" style="display: table">
                         <div t-if="o.sale_order_id" style="display: table-cell; width: 4px;"/>
                         <div t-if="o.sale_order_id" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
-                            <strong>Réf. Commande Client&amp;nbsp;:</strong>
+                            <strong>Réf. commande client&amp;nbsp;:</strong>
                             <p t-field="o.sale_order_id"/>
                         </div>
                         <div t-if="o.partner_ref" style="display: table-cell; width: 4px;"/>
                         <div t-if="o.partner_ref" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
-                            <strong>Réf. Fournisseur&amp;nbsp;:</strong>
+                            <strong>Réf. fournisseur&amp;nbsp;:</strong>
                             <p t-field="o.partner_ref"/>
                         </div>
                         <div t-if="o.customer_id" style="display: table-cell; width: 4px;"/>
@@ -67,6 +67,12 @@
         <xpath expr="//h2[2]" position="attributes">
             <attribute name="style">display: none</attribute>
         </xpath>
+        <xpath expr="//table[@class='table table-condensed']/thead/tr/th[2]" position="replace">
+            <th><strong>TVA</strong></th>
+        </xpath>
+        <xpath expr="//div[@class='row'][2]/div[1]/table[1]/tr[2]/td[1]" position="replace">
+            <td>TVA</td>
+        </xpath>
     </template>
 
     <!-- Modifications demande de prix -->
@@ -75,7 +81,7 @@
         <xpath expr="//div[@class='row mt32 mb32'][1]" position="replace">
             <div name="addresses" class="row">
                 <div class="col-xs-6">
-                    <strong>Adresse de Livraison&amp;nbsp;:</strong>
+                    <strong>Adresse de livraison&amp;nbsp;:</strong>
                     <div t-if="o.dest_address_id">
                         <span t-field="o.dest_address_id.name"/>
                         <div t-field="o.dest_address_id" t-options='{"widget": "contact", "fields": ["address", "phone", "fax"], "no_marker": True, "phone_icons": True}'/>
@@ -108,7 +114,7 @@
         <xpath expr="//table/tbody/tr/td[3]" position="attributes">
             <attribute name="t-if">not o.delivery_expected</attribute>
         </xpath>
-        <!-- Retrait des prix pour la commande sans prix (Interroger docs et non o, car le context de o a été écrasé dans la vue parente) -->
+        <!-- Retrait des prix pour la commande sans prix (interroger docs et non o, car le context de o a été écrasé dans la vue parente) -->
         <!-- Titres du tableau -->
         <xpath expr="//table/thead/tr/th[2]" position="attributes">
             <attribute name="t-if">not docs._context.get('of_sans_prix')</attribute>
