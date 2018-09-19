@@ -128,7 +128,8 @@ class ResPartner(models.Model):
     @api.multi
     def write(self, vals):
         super(ResPartner, self).write(vals)
-        self._update_account()
+        for partner in self:
+            partner._update_account()
         return True
 
     @api.multi
