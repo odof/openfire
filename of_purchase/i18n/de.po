@@ -1,0 +1,44 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_purchase
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-09-24 07:37+0000\n"
+"PO-Revision-Date: 2018-09-24 07:37+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_purchase
+#: model:ir.ui.view,arch_db:of_purchase.of_report_purchaseorder_document
+msgid "<strong>TVA</strong>"
+msgstr "<strong>Steuern</strong>"
+
+#. module: of_purchase
+#: model:ir.model.fields,field_description:of_purchase.field_purchase_order_customer_id
+#: model:ir.ui.view,arch_db:of_purchase.of_view_purchase_order_customer_filter
+msgid "Client"
+msgstr "Klient"
+
+#. module: of_purchase
+#: model:ir.model,name:of_purchase.model_procurement_order
+msgid "Procurement"
+msgstr "Beschaffung"
+
+#. module: of_purchase
+#: model:ir.model,name:of_purchase.model_purchase_order
+msgid "Purchase Order"
+msgstr "Beschaffungsauftrag"
+
+#. module: of_purchase
+#: model:ir.model,name:of_purchase.model_sale_order
+msgid "Sales Order"
+msgstr "Verkaufsauftrag"
+
+
