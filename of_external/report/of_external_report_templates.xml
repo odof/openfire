@@ -42,8 +42,13 @@
 
                 <div name="doc_title" style="font-size: large; text-align: center; padding: 4px 0px;">
                     <strong>
-                    <!-- Si le document possède un type -->
-                    <t t-if="o">
+                    <!-- Affichage du titre du document -->
+                    <!-- Si le le titre est passé dans le context, on le prend. -->
+                    <!-- Sinon, on affiche le titre standard en fonction de sa nature. -->
+                    <t t-if="docs._context.get('of_report_name')">
+                        <span t-raw="docs._context.get('of_report_name')"><br/></span>
+                    </t>
+                    <t t-elif="o">
                         <!-- si le document est de type facture -->
                         <t t-if="o._name == 'account.invoice'">
                             <span t-if="o.type == 'out_invoice' and (o.state == 'open' or o.state == 'paid')">Facture<br/></span>
