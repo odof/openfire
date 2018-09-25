@@ -31,15 +31,15 @@ class ProductPricelist(models.Model):
             return {}
  
         categ_ids = {}
-        brand_ids = {}
+        brand_ids = {}  # Modification Openfire
         for p in products:
             categ = p.categ_id
-            brand_ids[p.brand_id.id] = True
+            brand_ids[p.brand_id.id] = True  # Modification Openfire
             while categ:
                 categ_ids[categ.id] = True
                 categ = categ.parent_id
         categ_ids = categ_ids.keys()
-        brand_ids = brand_ids.keys()
+        brand_ids = brand_ids.keys()  # Modification Openfire
  
         is_product_template = products[0]._name == "product.template"
         if is_product_template:
@@ -52,7 +52,7 @@ class ProductPricelist(models.Model):
             prod_tmpl_ids = [product.product_tmpl_id.id for product in products]
  
         # Load all rules
-        # Ajout de la recherche sur of_brand_id
+        # Début modifications Openfire
         self._cr.execute(
             'SELECT item.id '
             'FROM product_pricelist_item AS item '
@@ -67,7 +67,8 @@ class ProductPricelist(models.Model):
             'AND (item.date_end IS NULL OR item.date_end>=%s)'
             'ORDER BY item.applied_on, item.min_quantity desc, categ.parent_left desc',
             (prod_tmpl_ids, prod_ids, categ_ids, brand_ids, self.id, date, date))
- 
+        # Fin modifications Openfire
+
         item_ids = [x[0] for x in self._cr.fetchall()]
         items = self.env['product.pricelist.item'].browse(item_ids)
         results = {}
@@ -118,9 +119,10 @@ class ProductPricelist(models.Model):
                     if not cat:
                         continue
 
-                # Ajout de la vérification sur la marque
+                # Début modifications Openfire
                 if rule.of_brand_id and rule.of_brand_id.id != product.brand_id.id:
                     continue
+                # Fin modifications Openfire
 
                 if rule.base == 'pricelist' and rule.base_pricelist_id:
                     price_tmp = rule.base_pricelist_id._compute_price_rule([(product, qty, partner)])[product.id][0]  # TDE: 0 = price, 1 = rule
@@ -240,9 +242,7 @@ class SaleOrderLine(models.Model):
         """
         res = super(SaleOrderLine, self).product_id_change()
         if self.of_coef_usage:
-            if not self.product_id:
-                coef = self.order_id.of_coef
-            else:
+            if self.product_id:
                 items = self.order_id.pricelist_id.item_ids.filtered(lambda i: i.applied_on == '0_product_variant' and i.product_id.id == self.product_id.id and i.compute_price == 'coef')
                 if not items:
                     items = self.order_id.pricelist_id.item_ids.filtered(lambda i: i.applied_on == '1_product' and i.product_tpl_id.id == self.product_id.product_tpl_id.id and i.compute_price == 'coef')
@@ -250,9 +250,16 @@ class SaleOrderLine(models.Model):
                     items = self.order_id.pricelist_id.item_ids.filtered(lambda i: i.applied_on == '2_product_category' and i.categ_id.id == self.product_id.categ_id.id and i.compute_price == 'coef')
                 if not items:
                     items = self.order_id.pricelist_id.item_ids.filtered(lambda i: i.applied_on == '2.5_brand' and i.of_brand_id.id == self.product_id.brand_id.id and i.compute_price == 'coef')
-                coef = items and items[0].of_coef or self.of_coef
-            self.update({'price_unit': (self.product_id and self.product_id.of_seller_price or 0) * coef, 'of_coef': coef})
+                self.of_coef = items and items[0].of_coef or self.of_coef
+            self.product_uom_change()
         return res
+
+    @api.onchange('product_uom_qty', 'product_uom')
+    def product_uom_change(self):
+        super(SaleOrderLine, self).product_uom_change()
+        if self.of_coef_usage:
+            factor = (self.product_uom and self.product_uom.factor_inv or 0) * self.product_uom_qty
+            self.price_unit = (self.product_id and self.product_id.of_seller_price or 0) * self.of_coef * factor
 
     @api.onchange('of_coef', 'product_id.of_seller_price')
     def onchange_of_coef(self):
@@ -260,14 +267,14 @@ class SaleOrderLine(models.Model):
         et que le coefficient ou le prix d'achat est modifié
         """
         if self.of_coef_usage:
-            self.price_unit = (self.product_id and self.product_id.of_seller_price or 0) * self.of_coef
+            self.product_uom_change()
 
     @api.onchange('of_coef_usage')
     def onchange_of_coef_usage(self):
         """ Permet de recalculer le prix si on décide d'utiliser le coefficient ou non
         """
         if self.of_coef_usage:
-            self.price_unit = (self.product_id and self.product_id.of_seller_price or 0) * self.of_coef
+            self.product_uom_change()
         if not self.of_coef_usage and self.product_id:
             product = self.product_id.with_context(
                 lang=self.order_id.partner_id.lang,
