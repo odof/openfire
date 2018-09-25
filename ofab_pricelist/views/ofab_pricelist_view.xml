@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Le champ 'of_coef_usage' permet d'identifier si la liste de prix va uiliser des coefficient et sera repris
+         sur les ligne d'un devis/bon de commande -->
+    <record id="ofab_pricelist_product_pricelist_view" model="ir.ui.view">
+        <field name="name">ofab.pricelist.product.pricelist.item.form</field>
+        <field name="model">product.pricelist</field>
+        <field name="inherit_id" ref="sale.product_pricelist_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='discount_policy']" position="after">
+                <field name="of_coef_usage" />
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Permet d'appliquer certaines règles de liste de prix sur les marques en plus des choix précédents
+         ainsi que l'ajout d'un calcul via coefficient -->
+    <record id="ofab_pricelist_product_pricelist_item_form_view" model="ir.ui.view">
+        <field name="name">ofab.pricelist.product.pricelist.item.form</field>
+        <field name="model">product.pricelist.item</field>
+        <field name="inherit_id" ref="product.product_pricelist_item_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='categ_id']" position="before">
+                <field name="of_brand_id" attrs="{'invisible':[('applied_on', '!=', '2.5_brand')],'required':[('applied_on', '=', '2.5_brand')]}"/>
+            </xpath>
+            <xpath expr="//group[2]/group[1]/div" position="inside">
+                <div attrs="{'invisible':[('compute_price', '!=', 'coef')]}">
+                    <field name="of_coef" nolabel= "1" options="{'currency_field': 'currency_id'}"/></div>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Ajout des champs nécessaires pour calculer le prix de vente en fonction d'un coefficient -->
+    <record id="ofab_pricelist_view_order_form" model="ir.ui.view">
+        <field name="name">ofab.pricelist.sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='pricelist_id']" position="after">
+                <field name="of_coef" readonly="0"/>
+                <field name="of_coef_usage" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']" position="attributes">
+                <attribute name="context">{'hide_sale': context.get('hide_sale'), 'default_of_coef': of_coef, 'default_of_coef_usage': of_coef_usage}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form/group/group[2]" position="inside">
+                <field name="of_coef_usage" readonly="0"/>
+                <field name="of_coef" readonly="0" attrs="{'invisible': [('of_coef_usage', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
