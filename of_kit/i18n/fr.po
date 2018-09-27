@@ -42,7 +42,7 @@ msgstr "<br/>\n"
 #: model:ir.ui.view,arch_db:of_kit.of_kit_report_invoice_document
 #: model:ir.ui.view,arch_db:of_kit.of_report_saleorder_document
 msgid "<i style=\"font-size: small\">displayed quantities of kit components are their total quantities.</i>"
-msgstr "<i style=\"font-size: small\">La quantité affichée des composant de kits est leur quantité totale.</i>"
+msgstr "<i style=\"font-size: small\">La quantité affichée des composants de kits est leur quantité totale.</i>"
 
 #. module: of_kit
 #: model:ir.ui.view,arch_db:of_kit.of_account_invoice_kit_line_view_form
