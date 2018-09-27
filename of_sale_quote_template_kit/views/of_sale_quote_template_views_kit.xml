@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Configuration modèle de devis : ajout des champs des kits -->
+    <record id="view_sale_quote_template_kit_form" model="ir.ui.view">
+        <field name="name">sale.quote.template.kit.form</field>
+        <field name="model">sale.quote.template</field>
+        <field name="inherit_id" ref="of_sale_quote_template.view_sale_quote_template_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='quote_line']/form/group/group/field[@name='product_id']" position="after">
+                <field name="sale_kits_to_unlink" invisible="1"/>
+                <field name="of_is_kit"/>
+                <field name="of_pricing" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
+                <field name="kit_id" widget="one2one" options="{'text_empty': 'Créer Composants', 'text_nonempty': 'Voir Composants'}"
+                  attrs="{'invisible': [('of_is_kit', '=', False)]}"
+                  context="{'hide_sale': context.get('hide_sale')}"/>
+            </xpath>
+            <xpath expr="//field[@name='quote_line']/form/group/group/field[@name='price_unit']" position="after">
+                <field name="price_comps" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
