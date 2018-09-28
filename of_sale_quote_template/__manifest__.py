@@ -30,6 +30,7 @@ Si une ligne d'article n'a pas pu être ajoutée, le champ 'Note d'insertion' ap
     ],
     "data": [
         'views/of_sale_quote_template_views.xml',
+        'security/ir.model.access.csv',
     ],
     'installable': True,
     'application': False,
