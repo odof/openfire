@@ -515,6 +515,13 @@ class OfSaleOrderKitLine(models.Model):
     qty_delivered = fields.Float(string='Delivered Qty', copy=False, digits=dp.get_precision('Product Unit of Measure'), default=0.0)
     qty_delivered_updateable = fields.Boolean(compute='_compute_qty_delivered_updateable', string='Can Edit Delivered', readonly=True, default=True)
     invoiced = fields.Boolean("Invoiced", compute="_compute_invoiced")  # for readonly in XML
+    route_id = fields.Many2one('stock.location.route', string="Route", compute="_compute_route")
+
+    @api.depends('kit_id', 'kit_id.order_line_id', 'kit_id.order_line_id.route_id')
+    def _compute_route(self):
+        """ Reprend la route de la ligne de commande """
+        for kit_line in self:
+            kit_line.route_id = kit_line.kit_id.order_line_id.route_id.id
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
