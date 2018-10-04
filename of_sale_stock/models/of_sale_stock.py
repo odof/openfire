@@ -49,6 +49,14 @@ class SaleOrder(models.Model):
 
     of_picking_min_date = fields.Datetime(compute=lambda x: False, search='_search_of_picking_min_date', string="Date bon de livraison")
     of_picking_date_done = fields.Datetime(compute=lambda x: False, search='_search_of_picking_date_done', string="Date transfert bon de livraison")
+    of_route_id = fields.Many2one('stock.location.route', string="Route")
+
+    @api.onchange('of_route_id')
+    def onchange_route(self):
+        """ Permet de modifier la route utilisée des lignes de commande depuis le devis """
+        if self.of_route_id:
+            for line in self.order_line:
+                line.route_id = self.of_route_id.id
 
     @api.model
     def _search_of_picking_min_date(self, operator, value):
@@ -77,6 +85,18 @@ class SaleOrder(models.Model):
 
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
+
+    @api.onchange('route_id')
+    def _get_route_id(self):
+        """ Permet de mettre la valeur par défaut de 'Route'
+        (ne peut pas utiliser le contexte en xml car écrasé par une autre vue,
+        ne pas transformer en champ calculé pour éviter la perte de données,
+        ne peut pas mettre de fonction pour la valeur par défaut car appelé avant
+        celle de 'order_id' ce qui empêche de peupler)
+        """
+        for line in self:
+            if line.order_id and line.order_id.of_route_id and not line.route_id:
+                line.route_id = line.order_id.of_route_id.id
 
     @api.onchange('product_uom_qty', 'product_uom', 'route_id')
     def _onchange_product_id_check_availability(self):
