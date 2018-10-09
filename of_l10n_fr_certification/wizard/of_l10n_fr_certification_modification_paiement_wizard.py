@@ -94,6 +94,17 @@ class OFAccountPaymentWizard(models.TransientModel):
 
                 if payment.state in ['draft']:  # Si paiement déjà en brouillon, pas la peine de passer par une contrepartie comptable pour modifier le paiement.
                     raise UserError(_(u"Le paiement est en brouillon (non validé en comptabilité). Vous pouvez le modifier directement sans faire une extourne comptable."))
+
+                # Remboursement
+                # Dans le cas d'un remboursement, Il n'y a aucun lettrage après.
+                # On peut donc faire un remboursement d'un paiement déjà lettré.
+                if self.type_modification_payment == 'refund':
+                    return self.get_action_payment_form(payment, 'refund')
+
+                # Si on arrive ici, c'est une annulation ou une modification.
+                # On va lettrer ensuite les écritures, donc les écritures d'origine ne doivent pas l'être.
+                # On teste si c'est le cas.
+
                 # On vérifie si le module OF remise en banque (of_account_payment_bank_deposit) est installé (existence du champ of_deposit_id).
                 # Si oui, on vérifie que le paiement n'est pas remis en banque.
                 if getattr(payment, 'of_deposit_id', False) and self.type_modification_payment != 'refund':
@@ -104,10 +115,6 @@ class OFAccountPaymentWizard(models.TransientModel):
                 for move_line in payment.move_line_ids:
                     if move_line.reconciled:
                         raise UserError(_(u"Le paiement est lettré. Vous ne pouvez modifier ou annuler qu'un paiement qui n'est pas lettré."))
-
-                # Remboursement
-                if self.type_modification_payment == 'refund':
-                    return self.get_action_payment_form(payment, 'refund')
 
                 # Annulation
                 if self.type_modification_payment == 'cancel':
