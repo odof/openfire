@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name' : "OpenFire / Comptabilité",
-    'version' : "10.0",
+    'version' : "10.0.1.0.0",
     'author' : "OpenFire",
     'license': '',
     'website' : "www.openfire.fr",
@@ -17,6 +17,7 @@ Module de comptabilité OpenFire.
   - Afficher la date d'échéance dans la vue facture sans être en mode développeur
   - Permettre de modifier la date d'échéance manuellement (option dans les paramètres de configuration comptabilité : suivant les conditions de règlement/modification manuelle possible)
   - Permettre d'afficher et de rechercher des étiquettes client dans les factures
+  - Ajout d'un champ 'Exporté' pour savoir ce qui a été exporté
 """,
     'depends' : [
         'account',
@@ -25,6 +26,7 @@ Module de comptabilité OpenFire.
     'demo_xml' : [],
     'data': [
         'views/of_account_view.xml',
+        'wizards/wizard_edit_export_view.xml'
     ],
     'installable': True,
 }

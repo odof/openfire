@@ -109,3 +109,8 @@ class AccountMoveLine(models.Model):
                             'date_maturity': lines[0]['date_maturity'],
                         })
         return result
+
+class AccountMove(models.Model):
+    _inherit = "account.move"
+
+    of_export = fields.Boolean(string=u'Exporté')
