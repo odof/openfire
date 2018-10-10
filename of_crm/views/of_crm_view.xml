@@ -8,6 +8,14 @@
             crm.lead (as Lead) views
         -->
 
+        <!-- Ajout dans le contexte "hide_sale: True" qui a été oublié par Odoo pour ne pas afficher les champs "Livré" et "Facturé" dans ligne de commande d'un devis affiché depuis le smart bottom "Devis" du pipeline -->
+        <record id="sale_crm.sale_action_quotations_new"  model="ir.actions.act_window">
+            <field name="context">{'search_default_opportunity_id': active_id, 'default_opportunity_id': active_id, 'hide_sale': True}</field>
+        </record>
+        <record id="sale_crm.sale_action_quotations"  model="ir.actions.act_window">
+            <field name="context">{'search_default_opportunity_id': active_id, 'default_opportunity_id': active_id, 'hide_sale': True}</field>
+        </record>
+
         <!-- CRM Lead Form View  -->
         <record model="ir.ui.view" id="of_crm_case_form_view_leads">
             <field name="name">of.crm.lead.form - Leads</field>
