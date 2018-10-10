@@ -2,8 +2,6 @@
 
 
 from odoo import api, fields, models
-from odoo.tools import float_is_zero, float_compare, DEFAULT_SERVER_DATETIME_FORMAT
-from odoo.exceptions import UserError, ValidationError
 
 import odoo.addons.decimal_precision as dp
 
@@ -25,6 +23,8 @@ class SaleQuoteTemplate(models.Model):
     of_comment_template2_id = fields.Many2one("base.comment.template", string=u"Utiliser un modèle")
     of_note1 = fields.Html('Commentaire du haut')
     of_note2 = fields.Html('Commentaire du bas')
+    of_fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale")
+    of_payment_term_id = fields.Many2one('account.payment.term', string="Conditions de règlement")
 
     @api.onchange('of_comment_template1_id')
     def _set_note1(self):
@@ -174,6 +174,10 @@ class SaleOrder(models.Model):
             self.note1 = template.of_note1
         if template.of_note2:
             self.note2 = template.of_note2
+        if template.of_fiscal_position_id and not self.fiscal_position_id:
+            self.fiscal_position_id = template.of_fiscal_position_id.id
+        if template.of_payment_term_id and not self.payment_term_id:
+            self.payment_term_id = template.of_payment_term_id.id
 
         docs = [(5, 0, 0)]
         for doc in template.of_mail_template_ids:

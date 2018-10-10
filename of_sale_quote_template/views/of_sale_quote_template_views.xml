@@ -33,6 +33,12 @@
                             <field name="name" placeholder="Modèle de devis"/>
                         </h1>
                     </div>
+                    <group>
+                        <group>
+                            <field name="of_fiscal_position_id"/>
+                            <field name="of_payment_term_id"/>
+                        </group>
+                    </group>
                     <notebook>
                         <page string="Lignes d'article">
                             <field name="quote_line" mode="tree,kanban">
@@ -74,9 +80,7 @@
                             </field>
                         </page>
                         <page string="Documents joints">
-                            <group>
-                                <field name="of_mail_template_ids"/>
-                            </group>
+                            <field name="of_mail_template_ids"/>
                         </page>
                         <page string="Commentaires">
                             <group string="Commentaires du haut">
