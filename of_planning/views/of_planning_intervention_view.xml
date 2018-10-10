@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
-
 
 <!--##########################################################################################################################-->
 <!--#############################################______Historique du client______#############################################-->
@@ -13,39 +11,27 @@
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
                 <page name="historique" position="inside">
+                    <field name="id" invisible="1"/>
                     <group name="histo_interventions" string="Interventions">
-                        <field name="intervention_partner_ids" colspan="4" nolabel="1" attrs="{'invisible': [('parent_id','!=', False)]}">
-                            <tree string="Plannings" editable="bottom">
-                                <field name="address_id" domain="[('parent_id','=',parent.id)]"/>
+                        <field name="intervention_partner_ids" colspan="4" nolabel="1" attrs="{'invisible': [('parent_id','!=', False)]}"
+                               context="{'form_view_ref':'of_planning.of_planning_intervention_view_form2'}">
+                            <tree string="Plannings">
                                 <field name="tache_id"/>
                                 <field name="equipe_id"/>
                                 <field name="date" string="Date"/>
                                 <field name="duree" string="Durée" widget="float_time"/>
-                                <field name="hor_md" string="AM-" widget="float_time"/>
-                                <field name="hor_mf" string="-AM" widget="float_time"/>
-                                <field name="hor_ad" string="PM-" widget="float_time"/>
-                                <field name="hor_af" string="-PM" widget="float_time"/>
-                                <field name="hor_sam" string="Sam."/>
-                                <field name="hor_dim" string="Dim."/>
-                                <field name="verif_dispo"/>
                                 <field name="state"/>
                                 <field name="name" string="Libellé"/>
                                 <field name="description"/>
                             </tree>
                         </field>
-                        <field name="intervention_address_ids" colspan="4" nolabel="1" attrs="{'invisible': [('parent_id','=', False)]}">
+                        <field name="intervention_address_ids" colspan="4" nolabel="1" attrs="{'invisible': [('parent_id','=', False)]}"
+                                context="{'form_view_ref':'of_planning.of_planning_intervention_view_form2', 'default_address_id':id}">
                             <tree string="Plannings">
                                 <field name="equipe_id"/>
                                 <field name="tache_id"/>
                                 <field name="date" string="Date"/>
                                 <field name="duree" string="Durée" widget="float_time"/>
-                                <field name="hor_md" string="AM-" widget="float_time"/>
-                                <field name="hor_mf" string="-AM" widget="float_time"/>
-                                <field name="hor_ad" string="PM-" widget="float_time"/>
-                                <field name="hor_af" string="-PM" widget="float_time"/>
-                                <field name="hor_sam" string="Sam."/>
-                                <field name="hor_dim" string="Dim."/>
-                                <field name="verif_dispo"/>
                                 <field name="state"/>
                                 <field name="name" string="Libellé"/>
                                 <field name="description"/>
@@ -125,7 +111,6 @@
                     </header>
                     <sheet>
                         <group>
-                        <field name="jour"/>
                             <group col="2">
                                 <field name="equipe_id" autofocus="autofocus" context="{'tz': 'Europe/Paris'}"/>
                                 <field name="address_id" domain="[('customer','=',True)]" colspan="2" context="{'tz': 'Europe/Paris'}"/>
@@ -136,6 +121,7 @@
                             <group col="2">
                                 <field name="tache_id" context="{'tz': 'Europe/Paris'}"/>
                                 <field name="date" context="{'tz': 'Europe/Paris'}"/>
+                                <field name="jour"/>
                                 <field name="duree" context="{'tz': 'Europe/Paris'}" string="Durée" widget="float_time"/>
                                 <field name="date_deadline"/>
                                 <field name="verif_dispo"/>
@@ -189,6 +175,18 @@
                 </form>
             </field>
         </record>
+
+    <record id="of_planning_intervention_view_form2" model="ir.ui.view" >
+        <field name="name">of.planning.intervention.form2</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='address_id']" position="attributes">
+                <attribute name="domain">['&amp;', ('customer', '=', True), '|', ('id', '=', parent.id), ('parent_id', '=', parent.id)]</attribute>
+            </xpath>
+        </field>
+    </record>
 
 <!--###################################################______Vue tree______###################################################-->
 
@@ -684,5 +682,4 @@
             <field name="view_type">form</field>
         </record>
 
-    </data>
 </odoo>

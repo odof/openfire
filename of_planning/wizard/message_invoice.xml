@@ -1,5 +1,4 @@
-<openerp>
-    <data>
+<odoo>
         <!-- Imprimer le message de la creation de facture -->
 
         <record id="of_planning_message_invoice" model="ir.ui.view">
@@ -16,5 +15,4 @@
             </field>
         </record>
 
-    </data>
-</openerp>
+</odoo>

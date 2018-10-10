@@ -60,4 +60,3 @@ class PlanningImpressionWizard(models.TransientModel):
                 'report_name': report_type_name[self.type],
                 'datas' : data,
             }
-
