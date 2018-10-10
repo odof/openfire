@@ -110,5 +110,3 @@ class OfComposeMail(models.TransientModel):
         result = super(OfComposeMail, self)._get_model_action_dict()
         result['of.planning.pose'] = 'of_planning.courriers_pose'
         return result
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

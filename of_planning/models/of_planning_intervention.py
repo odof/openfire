@@ -37,12 +37,6 @@ class OfPlanningEquipe(models.Model):
     _description = u"Équipe d'intervention"
     _order = "sequence, name"
 
-#     def _get_employee_equipes(self, cr, uid, ids, context=None):
-#         result = []
-#         for emp in self.read(cr, uid, ids, ['equipe_ids']):
-#             result += emp['equipe_ids']
-#         return list(set(result))
-
     name = fields.Char(u'Équipe', size=128, required=True)
     note = fields.Text('Description')
     employee_ids = fields.Many2many('hr.employee', 'of_planning_employee_rel', 'equipe_id', 'employee_id', u'Employés')
@@ -90,19 +84,54 @@ class OfPlanningInterventionRaison(models.Model):
 class OfPlanningIntervention(models.Model):
     _name = "of.planning.intervention"
     _description = "Planning d'intervention OpenFire"
-    _inherit = ["of.readgroup","of.calendar.mixin"]
+    _inherit = ["of.readgroup", "of.calendar.mixin"]
     _order = 'date'
 
-#     def _get_color(self, cr, uid, ids, *args):
-#         result = {}
-#         for intervention in self.browse(cr, uid, ids):
-#             equipe = intervention.equipe_id
-#             cal_color = equipe and equipe.color_id
-#             result[intervention.id] = cal_color and (intervention.state == 'draft' and cal_color.color2 or cal_color.color) or ''
-#         return result
+    name = fields.Char(string=u'Libellé', required=True)
+    date = fields.Datetime(string='Date intervention', required=True)
+    date_deadline = fields.Datetime(compute="_compute_date_deadline", string='Date Fin', store=True)
+    duree = fields.Float(string=u'Durée intervention', required=True, digits=(12, 5))
+    user_id = fields.Many2one('res.users', string='Utilisateur', default=lambda self: self.env.uid)
+    partner_id = fields.Many2one('res.partner', string='Client', compute='_compute_partner_id', store=True)
+    address_id = fields.Many2one('res.partner', string='Adresse')
+    partner_city = fields.Char(related='address_id.city')
+    raison_id = fields.Many2one('of.planning.intervention.raison', string='Raison')
+    tache_id = fields.Many2one('of.planning.tache', string='Tâche', required=True)
+    equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe', required=True, oldname='poseur_id')
+    employee_ids = fields.Many2many(related='equipe_id.employee_ids', string='Intervenants', readonly=True)
+    state = fields.Selection([
+        ('draft', 'Brouillon'),
+        ('confirm', u'Confirmé'),
+        ('done', u'Réalisé'),
+        ('cancel', u'Annulé'),
+        ('postponed', u'Reporté'),
+        ], string=u'État', index=True, readonly=True, default='draft')
+    company_id = fields.Many2one('res.company', string='Magasin', default=lambda self: self.env.user.company_id.id)
+    description = fields.Html(string='Description')  # Non utilisé, changé pour notes intervention
+    hor_md = fields.Float(string=u'Matin début', required=True, digits=(12, 5))
+    hor_mf = fields.Float(string='Matin fin', required=True, digits=(12, 5))
+    hor_ad = fields.Float(string=u'Après-midi début', required=True, digits=(12, 5))
+    hor_af = fields.Float(string=u'Après-midi fin', required=True, digits=(12, 5))
+    hor_sam = fields.Boolean(string='Samedi')
+    hor_dim = fields.Boolean(string='Dimanche')
+
+    category_id = fields.Many2one(related='tache_id.category_id', string=u"Type de tâche")
+    verif_dispo = fields.Boolean(string=u'Vérif', help=u"Vérifier la disponibilité de l'équipe sur ce créneau", default=True)
+    gb_employee_id = fields.Many2one('hr.employee', compute=lambda *a, **k: {}, search='_search_gb_employee_id',
+                                     string="Intervenant", of_custom_groupby=True)
+
+    color_ft = fields.Char(related="equipe_id.color_ft", readonly=True)
+    color_bg = fields.Char(related="equipe_id.color_bg", readonly=True)
+
+    order_id = fields.Many2one("sale.order", string="Commande associée")
+    of_notes_intervention = fields.Html(related='order_id.of_notes_intervention', readonly=True)
+    of_notes_client = fields.Text(related='partner_id.comment', string="Notes client", readonly=True)
+    cleantext_description = fields.Text(compute='_compute_cleantext_description')
+    cleantext_intervention = fields.Text(compute='_compute_cleantext_intervention')
+    jour = fields.Char("Jour", compute="_compute_jour")
 
     @api.depends('date', 'duree', 'hor_md', 'hor_mf', 'hor_ad', 'hor_af', 'hor_sam', 'hor_dim')
-    def _get_date_deadline(self):
+    def _compute_date_deadline(self):
         for intervention in self:
             if intervention.hor_md > 24 or intervention.hor_mf > 24 or intervention.hor_ad > 24 or intervention.hor_af > 24:
                 raise UserError(u"L'heure doit être inferieure ou égale à 24")
@@ -147,7 +176,7 @@ class OfPlanningIntervention(models.Model):
             # Calcul du nombre de jours
             jours, duree = duree // duree_jour, duree % duree_jour
             # Correction erreur d'arrondi
-            if duree * 60 < 1: # ça dépasse de moins d'une minute
+            if duree * 60 < 1:  # ça dépasse de moins d'une minute
                 # Le travail se termine à la fin de la journée
                 duree = duree_jour
                 jours -= 1
@@ -173,7 +202,7 @@ class OfPlanningIntervention(models.Model):
             intervention.date_deadline = date_deadline
 
     @api.depends('address_id', 'address_id.parent_id')
-    def _get_partner_id(self):
+    def _compute_partner_id(self):
         for intervention in self:
             partner = intervention.address_id or False
             if partner:
@@ -181,84 +210,44 @@ class OfPlanningIntervention(models.Model):
                     partner = partner.parent_id
             intervention.partner_id = partner and partner.id
 
-    def search_gb_employee_id(self, operator, value):
+    def _search_gb_employee_id(self, operator, value):
         return [('equipe_id.employee_ids', operator, value)]
 
-    name = fields.Char(string=u'Libellé', required=True)
-    date = fields.Datetime(string='Date intervention', required=True)
-    date_deadline = fields.Datetime(compute="_get_date_deadline", string='Date Fin', store=True)
-    duree = fields.Float(string=u'Durée intervention', required=True, digits=(12, 5))
-    user_id = fields.Many2one('res.users', string='Utilisateur', default=lambda self: self.env.uid)
-    partner_id = fields.Many2one('res.partner', string='Client', compute='_get_partner_id', store=True)
-    address_id = fields.Many2one('res.partner', string='Adresse')
-    partner_city = fields.Char(related='address_id.city')
-    raison_id = fields.Many2one('of.planning.intervention.raison', string='Raison')
-    tache_id = fields.Many2one('of.planning.tache', string='Tâche', required=True)
-    equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe', required=True, oldname='poseur_id')
-    employee_ids = fields.Many2many(related='equipe_id.employee_ids', string='Intervenants', readonly=True)
-    state = fields.Selection([
-        ('draft', 'Brouillon'),
-        ('confirm', u'Confirmé'),
-        ('done', u'Réalisé'),
-        ('cancel', u'Annulé'),
-        ('postponed', u'Reporté'),
-        ], string=u'État', index=True, readonly=True, default='draft')
-#     state = fields.Many2one('of.planning.intervention.state', string=u"État")
-    company_id = fields.Many2one('res.company', string='Magasin', default=lambda self: self.env.user.company_id.id)
-    description = fields.Html(string='Description') # Non utilisé, changé pour notes intervention
-    hor_md = fields.Float(string=u'Matin début', required=True, digits=(12, 5))
-    hor_mf = fields.Float(string='Matin fin', required=True, digits=(12, 5))
-    hor_ad = fields.Float(string=u'Après-midi début', required=True, digits=(12, 5))
-    hor_af = fields.Float(string=u'Après-midi fin', required=True, digits=(12, 5))
-    hor_sam = fields.Boolean(string='Samedi')
-    hor_dim = fields.Boolean(string='Dimanche')
-
-    category_id = fields.Many2one(related='tache_id.category_id', string=u"Type de tâche")
-    verif_dispo = fields.Boolean(string=u'Vérif', help=u"Vérifier la disponibilité de l'équipe sur ce créneau", default=True)
-    gb_employee_id = fields.Many2one('hr.employee', compute='lambda *a, **k:{}', search='search_gb_employee_id',
-                                     string="Intervenant", of_custom_groupby=True)
-
-    color_ft = fields.Char(related="equipe_id.color_ft", readonly=True)
-    color_bg = fields.Char(related="equipe_id.color_bg", readonly=True)
-    #state_int = fields.Integer(string="Valeur d'état", compute="_compute_state_int")
-
-#    _columns = {
-#         'color'                : fields_old.function(_get_color, type='char', help=u"Couleur utilisée pour le planning. Dépend de l'équipe d'intervention et de l'état de l'intervention"),
-#         'sidebar_color'        : fields_old.related('equipe_id','color_id','color', type='char', help="Couleur pour le menu droit du planning (couleur de base de l'équipe d'intervention)"),
-#    }
-
-    order_id = fields.Many2one("sale.order", string="Commande associée")
-    of_notes_intervention = fields.Html(related='order_id.of_notes_intervention', readonly=True)
-    of_notes_client = fields.Text(related='partner_id.comment', string="Notes client", readonly=True)
-    cleantext_description = fields.Text(compute='_detect_description_vide')
-    cleantext_intervention = fields.Text(compute='_detect_intervention_vide')
-
-    # detectetion champs seulement avec balises html
     @api.depends('description')
-    def _detect_description_vide(self):
+    def _compute_cleantext_description(self):
         cleanr = re.compile('<.*?>')
         for interv in self:
             cleantext = re.sub(cleanr, '', interv.description)
             interv.cleantext_description = cleantext
 
     @api.depends('order_id.of_notes_intervention')
-    def _detect_intervention_vide(self):
+    def _compute_cleantext_intervention(self):
         cleanr = re.compile('<.*?>')
         for interv in self:
             cleantext = re.sub(cleanr, '', interv.order_id.of_notes_intervention)
             interv.cleantext_intervention = cleantext
 
+    @api.depends('date')
+    def _compute_jour(self):
+        for inter in self:
+            t = ''
+            if inter.date:
+                dt = datetime.strptime(inter.date, DEFAULT_SERVER_DATETIME_FORMAT)
+                dt = fields.Datetime.context_timestamp(self, dt)  # openerp's ORM method
+                t = dt.strftime("%A").capitalize()  # the day_name is Sunday here
+            inter.jour = t
+
     @api.depends('state')
     def _compute_state_int(self):
         for interv in self:
             if interv.state and interv.state == "draft":
-                interv.state_int = 0;
+                interv.state_int = 0
             elif interv.state and interv.state == "confirm":
-                interv.state_int = 1;
+                interv.state_int = 1
             elif interv.state and interv.state == "done":
-                interv.state_int = 2;
-            elif interv.state and interv.state in ("cancel","postponed"):
-                interv.state_int = 3;
+                interv.state_int = 2
+            elif interv.state and interv.state in ("cancel", "postponed"):
+                interv.state_int = 3
 
     @api.model
     def get_state_int_map(self):
@@ -350,7 +339,7 @@ class OfPlanningIntervention(models.Model):
                 ('state', 'not in', ('cancel', 'postponed')),
             ])
             if rdv:
-                raise ValidationError('Attention', u'Cette équipe a déjà %s rendez-vous sur ce créneau' % (len(rdv),))
+                raise ValidationError(u'Cette équipe a déjà %s rendez-vous sur ce créneau' % (len(rdv),))
         return super(OfPlanningIntervention, self).create(vals)
 
     @api.multi
@@ -504,38 +493,13 @@ class OfPlanningIntervention(models.Model):
             'context'  : {'default_msg': msg}
         }
 
-    jour = fields.Char("jour", compute="_compute_jour")
-    
-    def _compute_jour(self):
-        for inter in self:
-            dt = datetime.strptime(inter.date, DEFAULT_SERVER_DATETIME_FORMAT)
-            dt = fields.Datetime.context_timestamp(self, dt)   # openerp's ORM method 
-            t = dt.strftime("%A")        # the day_name is Sunday here
-            inter.jour = t
-            
-    @api.model
-    def get_titre(self):
-        date_start_date = self.localcontext['date_start']
-        date_stop_date = self.localcontext['date_stop']
-
-        week_number = date_start_date.isocalendar()[1]
-
-        date_start_extend = ""
-        if date_start_date.year != date_stop_date.year:
-            date_start_extend = date_start_date.strftime(" %B %Y")
-        elif date_start_date.month != date_stop_date.month:
-            date_start_extend = date_start_date.strftime(" %Y")
-
-        title = "Planning des Interventions - Semaine %s du %s%s au %s%s" % (week_number, date_start_date.day, date_start_extend, date_stop_date.day, date_stop_date.strftime(" %B %Y"))
-        return title
-
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
     intervention_partner_ids = fields.One2many('of.planning.intervention', 'partner_id', "Interventions client")
     intervention_address_ids = fields.One2many('of.planning.intervention', 'address_id', "Interventions adresse")
 
-class OFSaleOrder(models.Model):
+class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     # Utilisé pour ajouter bouton Interventions à Devis (see order_id many2one field above)

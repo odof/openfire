@@ -31,7 +31,11 @@ class ReportPlanningGeneralSemaine(models.AbstractModel):
         date_start = self.localcontext['date_start']
         date_stop = self.localcontext['date_stop']
 
-        title = "Planning d'intervention - Semaine %s du %s%s au %s%s" % (date_start.isocalendar()[1], date_start.day, date_start.strftime(" %B"), date_stop.day, date_stop.strftime(" %B %Y") )
+        title = "Planning d'intervention - Semaine %s du %s%s au %s%s" % (date_start.isocalendar()[1],
+                                                                          date_start.day,
+                                                                          date_start.strftime(" %B"),
+                                                                          date_stop.day,
+                                                                          date_stop.strftime(" %B %Y"))
         return title
 
     def get_dates(self, date_start=None):
@@ -78,13 +82,13 @@ class ReportPlanningGeneralSemaine(models.AbstractModel):
                 equipe_jours_dict[day][0] = True
         days.sort()
 
-        for _,intervs_dict in res:
+        for _, intervs_dict in res:
             for day, (imp_detail, intervs) in intervs_dict.iteritems():
                 if imp_detail:
                     intervs_dict[day] = [(heure, interv.partner_id.name or '', interv.state == 'confirm') for heure, interv in intervs]
                 else:
                     maxi = {}
-                    for _,j in intervs :
+                    for _, j in intervs :
                         if j.tache_id in maxi:
                             maxi[j.tache_id] += 1
                         else:
@@ -96,7 +100,7 @@ class ReportPlanningGeneralSemaine(models.AbstractModel):
         if res:
             return [res, days]
         else:
-            return [[],[]]
+            return [[], []]
 
     def int_to_day(self, day_int):
         return ("Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche")[day_int]

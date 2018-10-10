@@ -3,9 +3,9 @@
 from odoo.report import report_sxw
 from datetime import datetime
 
-class attestation_ramonage(report_sxw.rml_parse):
+class AttestationRamonage(report_sxw.rml_parse):
     def __init__(self, cr, uid, name, context):
-        super(attestation_ramonage, self).__init__(cr, uid, name, context)
+        super(AttestationRamonage, self).__init__(cr, uid, name, context)
         self.localcontext.update({
             'get_client_info'   : self.get_client_info,
             'format_date'       : self.format_date,
@@ -72,5 +72,5 @@ report_sxw.report_sxw(
     'report.of_planning.attestation_ramonage',
     'of.planning.intervention',
     'addons/of_planning/report/attestation_ramonage.rml',
-    parser=attestation_ramonage
+    parser=AttestationRamonage
 )
