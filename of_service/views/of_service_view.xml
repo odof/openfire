@@ -21,39 +21,45 @@
                                     options='{"terminology": "archive"}'/>
                             </button>
                         </div>
+                        <div class="oe_title">
+                            <separator string="Service"/>
+                        </div>
                         <group>
                             <field name="partner_id" invisible="context.get('hide_service_partner_id')"/>
                             <field name="address_id" invisible="context.get('hide_service_address_id')"/>
-                            <separator string="Informations générales" colspan="2"/>
+
                             <field name="tache_id"/>
                             <!-- <field name="template_id"/> -->
                             <field name="date_next"/>
                             <field name="date_fin"/>
                             <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}"/>
                             <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                            <field name="note"/>
                         </group>
-                        <separator string="Notes"/>
-                        <field name="note"/>
-                        <separator string="Interventions"/>
-                        <field name="planning_ids" nolabel="1" colspan="2">
-                            <tree string="Liste des interventions" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done'">
-                                <field name="name" string="Libellé"/>
-                                <field name="date"/>
-                                <field name="duree" string="Durée" widget="float_time"/>
-                                <field name="equipe_id"/>
-                                <field name="company_id"/>
-                                <field name="state"/>
+                        <notebook>
+                            <page string="Interventions">
+                                <field name="planning_ids" nolabel="1" colspan="2">
+                                    <tree string="Liste des interventions" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done'">
+                                        <field name="name" string="Libellé"/>
+                                        <field name="date"/>
+                                        <field name="duree" string="Durée" widget="float_time"/>
+                                        <field name="equipe_id"/>
+                                        <field name="company_id"/>
+                                        <field name="state"/>
 
-                                <!-- Afficher les fleches pour passer a d'autres statuts -->
-                                <button name="change_state_before" type="object" icon="gtk-go-back"/>
-                                <button name="change_state_after" type="object" icon="gtk-go-forward"/>
+                                        <!-- Afficher les flèches pour passer à d'autres statuts -->
+                                        <button name="change_state_before" type="object" icon="gtk-go-back"/>
+                                        <button name="change_state_after" type="object" icon="gtk-go-forward"/>
 
-                                <!-- Afficher l'icône quand le status est Confirmé et Réalisé -->
-                                <button name="state_conf" type="object" icon="gtk-no" attrs="{'invisible':[('state', '!=', 'Confirme')]}"/>
-                                <button name="state_pose" type="object" icon="gtk-apply" attrs="{'invisible':[('state', '!=', 'Pose')]}"/>
-                                <field name="description"/>
-                            </tree>
-                        </field>
+                                        <!-- Afficher l'icône quand le status est confirmé et réalisé -->
+                                        <button name="state_conf" type="object" icon="gtk-no" attrs="{'invisible':[('state', '!=', 'Confirme')]}"/>
+                                        <button name="state_pose" type="object" icon="gtk-apply" attrs="{'invisible':[('state', '!=', 'Pose')]}"/>
+                                        <field name="description"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+
                     </sheet>
                 </form>
             </field>
@@ -151,7 +157,7 @@
                </search>
             </field>
         </record>
-        
+
         <!-- Service Map View -->
         <record id="of_service_map_view" model="ir.ui.view">
             <field name="name">of.service.map</field>
@@ -232,21 +238,21 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,map,form</field>
         </record>
-        
+
         <record id="action_service_tree_view" model="ir.actions.act_window.view">
             <field eval="0" name="sequence"/>
             <field name="view_mode">tree</field>
             <field name="view_id" ref="view_of_service_tree"/>
             <field name="act_window_id" ref="action_of_service_form"/>
         </record>
-        
+
         <record id="action_service_map_view" model="ir.actions.act_window.view">
             <field eval="1" name="sequence"/>
             <field name="view_mode">map</field>
             <field name="view_id" ref="of_service_map_view"/>
             <field name="act_window_id" ref="action_of_service_form"/>
         </record>
-        
+
         <record id="action_service_form_view" model="ir.actions.act_window.view">
             <field name="sequence" eval="2"/>
             <field name="view_mode">form</field>

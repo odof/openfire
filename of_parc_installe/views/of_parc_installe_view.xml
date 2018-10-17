@@ -56,10 +56,12 @@
                                 <field name="active" widget="boolean_button" options="{&quot;terminology&quot;: &quot;archive&quot;}"/>
                             </button>
                         </div>
-                        <div class="oe_title">
-                            <h1><field name="name" placeholder="No de série ..."/></h1>
-                            <h1><field name="product_id" placeholder="Article ..."/></h1>
-                        </div>
+                        <separator string="Produit installé"/>
+                        <group name="produit_installe">
+                            <field name="name" placeholder="No de série ..." colspan="2"/>
+                            <field name="product_id" placeholder="Article ..."/>
+                            <field name="product_category_id"/>
+                        </group>
                         <group>
                             <group name="client" string="Client">
                                 <field name="client_id"/>
@@ -81,7 +83,6 @@
                         </group>
                         <group name="produit_installe" string="Produit installé">
                             <group name="produit">
-                                <field name="product_category_id"/>
                                 <field name="date_service"/>
                                 <field name="date_installation"/>
                             </group>
@@ -89,20 +90,24 @@
                         <group name="note">
                             <field name="note"/>
                         </group>
-                        <group name="sav" string="Historique de la machine">
-                            <field name="project_issue_ids" nolabel="1" context="{'default_partner_id':id}">
-                                <tree string="SAV">
-                                    <field name="of_code" string="Dossier"/>
-                                    <field name="date"/>
-                                    <field name="name" string="Requête"/>
-                                    <field name="of_categorie_id" string="Famille"/>
-                                    <field name="of_produit_installe_id" string="S/N"/>
-                                    <field name="user_id" string="Responsable"/>
-                                    <field name="stage_id"/>
-                                    <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
-                                </tree>
-                            </field>
-                        </group>
+                        <notebook>
+                            <page string="Historique SAV">
+                                <group name="sav">
+                                    <field name="project_issue_ids" nolabel="1" context="{'default_partner_id': client_id, 'default_of_produit_installe_id': id}">
+                                        <tree string="SAV">
+                                            <field name="of_code" string="Dossier"/>
+                                            <field name="date"/>
+                                            <field name="name" string="Requête"/>
+                                            <field name="of_categorie_id" string="Famille"/>
+                                            <field name="of_produit_installe_id" string="S/N"/>
+                                            <field name="user_id" string="Responsable"/>
+                                            <field name="stage_id"/>
+                                            <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                            </page>
+                        </notebook>
                     </sheet>
                 </form>
             </field>
@@ -137,18 +142,19 @@
             <field name="name">of.produit_installe.sav.lie</field>
             <field name="model">project.issue</field>
             <field name="inherit_id" ref="project_issue.project_issue_form_view"/>
-            <field name="arch" type="xml" >
-                <xpath expr='//form/sheet/group' position="after">
-                    <group string="Produit installé" colspan="4">
-                        <field name="of_produit_installe_id" string="No de série" context="{'default_client_id': partner_id}"/>
-                        <field name="product_name_id"/>
-                        <field name="product_category_id"/>
-                        <field name="of_parc_installe_client_nom"/>
-                        <field name="of_parc_installe_client_adresse"/>
-                        <field name="of_parc_installe_site_nom"/>
-                        <field name="of_parc_installe_site_adresse"/>
-                        <field name="of_parc_installe_note"/>
-                    </group>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook/page[1]" position="before">
+                    <page string="Produit installé">
+                        <group colspan="4">
+                            <field name="of_produit_installe_id" string="No de série" context="{'default_client_id': partner_id}"/>
+                            <field name="product_name_id"/>
+                            <field name="product_category_id"/>
+                            <field name="of_parc_installe_site_nom"/>
+                            <field name="of_parc_installe_site_adresse"/>
+                            <field name="of_parc_installe_fin_garantie"/>
+                            <field name="of_parc_installe_note"/>
+                        </group>
+                    </page>
                 </xpath>
             </field>
         </record>
@@ -197,7 +203,7 @@
 <!-- *************************************************** -->
 
         <!-- Menu parc installé -->
-        <menuitem id="menu_of_parc_installe" action="action_view_of_parc_installe" name="Parc installé" 
+        <menuitem id="menu_of_parc_installe" action="action_view_of_parc_installe" name="Parc installé"
              parent="sales_team.menu_sales" groups="project.group_project_user" sequence="100"/>
 
 <!-- *************************************************** -->
