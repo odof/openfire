@@ -66,6 +66,7 @@ class SaleOrder(models.Model):
     of_marge_pc = fields.Float(compute='_compute_of_marge', string='Marge %')
 
     of_etiquette_partenaire_ids = fields.Many2many('res.partner.category', related='partner_id.category_id', string=u"Étiquettes client")
+    of_client_view = fields.Boolean(string='Vue client/vendeur')
 
     @api.depends('state', 'order_line', 'order_line.qty_to_invoice', 'order_line.product_uom_qty')
     def _compute_of_to_invoice(self):
@@ -100,6 +101,11 @@ class SaleOrder(models.Model):
                 # Utilisation des documents pdf fournis
                 data.append(mail_template.file)
         return data
+
+    def toggle_view(self):
+        """ Permet de basculer entre la vue vendeur/client
+        """
+        self.of_client_view = not self.of_client_view
 
 class Report(models.Model):
     _inherit = "report"
@@ -141,6 +147,7 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     price_unit = fields.Float(digits=False)
+    of_client_view = fields.Boolean(string="Vue client/vendeur", related="order_id.of_client_view")
 
     @api.multi
     @api.onchange('product_id')
@@ -301,4 +308,3 @@ class AccountConfigSettings(models.TransientModel):
     @api.multi
     def set_of_color_bg_section_defaults(self):
         return self.env['ir.values'].sudo().set_default('account.config.settings', 'of_color_bg_section', self.of_color_bg_section)
-

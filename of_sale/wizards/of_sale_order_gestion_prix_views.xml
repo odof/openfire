@@ -13,6 +13,15 @@
                     <button name="bouton_annuler" string="Retour à la commande" type="object"/>
                 </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_view" type="object" class="oe_stat_button" icon="fa-pencil-square-o" groups="of_sale.of_group_sale_marge_manager">
+                            <field name="of_client_view" widget="boolean_button"
+                                   options="{'terminology': {'string_true': 'Vue client',
+                                                             'hover_true': 'Vue client',
+                                                             'string_false': 'Vue vendeur',
+                                                             'hover_false': 'Vue vendeur' }}"/>
+                        </button>
+                    </div>
                     <group>
                         <field name="methode_remise" required="1"/>
                         <field name="valeur"
@@ -35,11 +44,12 @@
                             <button name="button_inverse" string="Inverser" type="object" icon="fa-refresh"/>
                             <field name="text_selected"/>
                             <field name="order_line_id"/>
-                            <field name="cout"/>
+                            <field name="cout" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
                             <field name="prix_total_ht"/>
                             <field name="prix_total_ht_simul"/>
                             <field name="prix_total_ttc"/>
                             <field name="prix_total_ttc_simul"/>
+                            <field name="of_client_view" invisible="1"/>
                         </tree>
                     </field>
 
@@ -49,10 +59,10 @@
                     <group col="4" string="Total devis/commande">
                         <field name="montant_total_ttc_initial"/>
                         <field name="montant_total_ttc_simul"/>
-                        <field name="marge_initiale"/>
-                        <field name="marge_simul"/>
-                        <field name="pc_marge_initiale"/>
-                        <field name="pc_marge_simul"/>
+                        <field name="marge_initiale" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
+                        <field name="marge_simul" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
+                        <field name="pc_marge_initiale" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
+                        <field name="pc_marge_simul" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
                     </group>
                 </sheet>
             </form>

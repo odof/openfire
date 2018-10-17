@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+
+    <!--###########################################______Création de la categorie______###################################################-->
+
+        <record model="ir.module.category" id="of_sale_marge">
+            <field name="name">OF Marge</field>
+            <field name="description">Définit les droits d'accès aux marges.</field>
+            <field name="sequence">92</field>
+        </record>
+
+    <!--#############################################______Création des groupes______#####################################################-->
+
+        <record id="of_group_sale_marge_manager" model="res.groups">
+            <field name="name">Responsable</field>
+            <field name="category_id" ref="of_sale_marge"/>
+        </record>
+    </data>
+</openerp>
