@@ -101,12 +101,10 @@ class OFAccountPaymentWizard(models.TransientModel):
                 # Si oui, on vérifie que le paiement n'est pas remis en banque.
                 if getattr(payment, 'of_deposit_id', False) and self.type_modification_payment != 'refund':
                     raise UserError(_(u"Le paiement a été remis en banque. Vous ne pouvez pas modifier ou annuler un paiement remis en banque."))
-                if payment.has_invoices:
-                    raise UserError(_(u"Le paiement est lié à une facture (lettrage). Vous ne pouvez modifier ou annuler un paiement que s'il n'est pas lettré. Annulez auparavant le lien entre la facture et le paiement pour pouvoir modifier ce paiement."))
                 # On vérifie s'il n'y a pas un autre lettrage.
                 for move_line in payment.move_line_ids:
                     if move_line.reconciled:
-                        raise UserError(_(u"Le paiement est lettré. Vous ne pouvez modifier ou annuler qu'un paiement qui n'est pas lettré."))
+                        raise UserError(_(u"Le paiement est lettré (lié à une facture par exemple). Vous ne pouvez modifier ou annuler qu'un paiement qui n'est pas lettré. Annulez le lettrage auparavant."))
 
                 # Annulation
                 if self.type_modification_payment == 'cancel':
