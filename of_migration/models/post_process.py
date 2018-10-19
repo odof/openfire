@@ -188,7 +188,7 @@ class import_post_process(models.AbstractModel):
             if res_model in skip_models:
                 continue
             if res_model not in self.env:
-                message.append(u"Modèle '%s' non trouvé")
+                message.append(u"Modèle '%s' non trouvé" % res_model)
                 continue
 
             # Champ res_id

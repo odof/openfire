@@ -204,7 +204,7 @@ class OfProductBrand(models.Model):
 
     datastore_note_maj = fields.Text(string='Update notes', compute='_compute_datastore_note_maj')
     datastore_product_count = fields.Integer(
-        '# Products', compute='_compute_datastore_note_maj',
+        string='# Products', compute='_compute_datastore_note_maj',
         help="The number of products of this brand")
 
     @api.multi
@@ -844,7 +844,6 @@ class ProductTemplate(models.Model):
 
     @api.multi
     def of_datastore_import(self):
-        self.ensure_one()
         supplier_obj = self.env['of.datastore.supplier']
 
         # Produits par fournisseur

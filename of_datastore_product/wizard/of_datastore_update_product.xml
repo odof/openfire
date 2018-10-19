@@ -12,6 +12,7 @@
                 <div>
                     <label for="noup_name"/>
                     <field name="noup_name"/>
+                    <field name="type" invisible="1"/>
                 </div>
                 <footer>
                     <button name="update_products" type="object" string="Update" class="btn-primary" attrs="{'invisible': [('is_update','=',False)]}"/>
@@ -38,6 +39,16 @@
         <field name="res_model">of.datastore.update.product</field>
         <field name="view_mode">form</field>
         <field name="view_type">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Ajout de l'action d'import de tout les articles de la marque -->
+    <record id="action_of_datastore_import_product_brand" model="ir.actions.act_window">
+        <field name="name">Import all products</field>
+        <field name="res_model">of.datastore.update.product</field>
+        <field name="view_mode">form</field>
+        <field name="view_type">form</field>
+        <field name="context">{'default_type': 'import'}</field>
         <field name="target">new</field>
     </record>
 

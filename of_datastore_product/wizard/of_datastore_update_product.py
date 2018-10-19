@@ -15,6 +15,40 @@ class OfDatastoreUpdateProduct(models.TransientModel):
 
     noup_name = fields.Boolean(string='Don\'t update product name')
     is_update = fields.Boolean('Show update options', default=lambda self: self._default_is_update())
+    # Ajout du field type pour permettre l'import de tous les articles depuis la marque
+    type = fields.Selection([('update', 'Update'), ('import', 'Import')], string="Type", default="update")
+
+    def _update_links(self, supplier, client, product_ids, id_match):
+        """
+        Matching des références avec la base centrale
+        Cette fonction lie les articles (product.product) au TC si une référence correspond.
+        Les articles correctement liés sont alors retirés de la liste product_ids et ajoutés au dictionnaire id_match.
+        @param supplier: browse_record of_datastore_supplier
+        @param client: informations connecteur TC
+        @param product_ids: liste d'ids des articles qui ne sont liés à un article du TC
+        @param id_match: dictionnaire d'ids TC et leurs correpondances sur la base
+        @return: Liste des ids des articles de la base centrale correctement liés
+        """
+        product_obj = self.env['product.product']
+        ds_product_obj = supplier.of_datastore_get_model(client, 'product.product')
+        # --- Matching des références avec la base centrale ---
+        # Conversion des références article
+        convert_func = supplier.get_product_code_convert_func()
+        code_to_match_dict = {convert_func[product.brand_id](product.default_code): product
+                              for product in product_obj.browse(product_ids)}
+        # Récupération des correspondances de la base centrale
+        ds_product_new_ids = supplier.of_datastore_search(ds_product_obj, [('default_code', 'in', code_to_match_dict.keys())])
+        if ds_product_new_ids:
+            for ds_product_data in supplier.of_datastore_read(ds_product_obj, ds_product_new_ids, ['default_code']):
+                product = code_to_match_dict[ds_product_data['default_code']]
+
+                product_ids.remove(product.id)
+                if ds_product_data['id'] in id_match:
+                    raise ValidationError(_('Two products try to reference the same centralized product : [%s] [%s]') %
+                                          (product.default_code, id_match[ds_product_data['id']].default_code))
+                product.of_datastore_res_id = ds_product_data['id']
+                id_match[ds_product_data['id']] = product
+        return ds_product_new_ids
 
     def _update_supplier_products(self, supplier, products):
         """
@@ -36,24 +70,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
 
         no_match_ids += [id_match[ds_product_id].id for ds_product_id in id_match if ds_product_id not in ds_product_ids]
 
-        # --- Matching des références avec la base centrale ---
-        # Conversion des références article
-        convert_func = supplier.get_product_code_convert_func()
-        code_to_match_dict = {convert_func[product.brand_id](product.default_code): product
-                              for product in product_obj.browse(no_match_ids)}
-        # Récupération des correspondances de la base centrale
-        ds_product_obj = supplier.of_datastore_get_model(client, 'product.product')
-        ds_product_new_ids = supplier.of_datastore_search(ds_product_obj, [('default_code', 'in', code_to_match_dict.keys())])
-        if ds_product_new_ids:
-            for ds_product_data in supplier.of_datastore_read(ds_product_obj, ds_product_new_ids, ['default_code']):
-                product = code_to_match_dict[ds_product_data['default_code']]
-
-                no_match_ids.remove(product.id)
-                if ds_product_data['id'] in id_match:
-                    raise ValidationError(_('Two products try to reference the same centralized product : [%s] [%s]') %
-                                          (product.default_code, id_match[ds_product_id].default_code))
-                product.of_datastore_res_id = ds_product_data['id']
-                id_match[ds_product_data['id']] = product
+        ds_product_new_ids = self._update_links(supplier, client, no_match_ids, id_match)
         ds_product_ids += ds_product_new_ids
 
         # --- Mise à jour des articles ---
@@ -103,6 +120,10 @@ class OfDatastoreUpdateProduct(models.TransientModel):
 
     @api.multi
     def update_products(self):
+        """
+        Fonction qui permet de mettre à jour ou importer les produits de la base TC
+        vers la base client
+        """
         self.ensure_one()
         active_model = self._context.get('active_model')
         active_ids = self._context.get('active_ids')
@@ -110,6 +131,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
 
         notes = [""]
         notes_warning = []
+        to_create = []
 
         # Preparation de la liste de produits par fournisseur
         datastore_products = {}
@@ -117,13 +139,11 @@ class OfDatastoreUpdateProduct(models.TransientModel):
             brands = model_obj.browse(active_ids)
             suppliers = brands.mapped('datastore_supplier_id')
             datastore_products = {supplier: (supplier.brand_ids & brands).mapped('product_variant_ids') for supplier in suppliers}
+
         elif active_model in ('product.product', 'product.template'):
             to_create = [product_id for product_id in active_ids if product_id < 0]
-            if to_create:
-                model_obj.browse(to_create).of_datastore_import()
-                notes.append(_('Created products : %s') % (len(to_create)))
-
             to_update = [product_id for product_id in active_ids if product_id > 0]
+
             products = model_obj.browse(to_update)
             if active_model == 'product.template':
                 product_obj = self.env['product.product']
@@ -142,15 +162,37 @@ class OfDatastoreUpdateProduct(models.TransientModel):
             if products:
                 notes_warning = ["", _('Products the brand of which is not centralized : %s') % len(products)]
 
-        # Recherche des valeurs à mettre à jour
-        updt_cnt = 0
-        link_cnt = 0
-        nolk_cnt = 0
+        #  Mise à jour des produits/ajout des liens TC avant de créer les nouveaux produits sur base client
+        updt_cnt = link_cnt = nolk_cnt = 0
         for supplier, products in datastore_products.iteritems():
             nolk, updt, link = self._update_supplier_products(supplier, products)
             updt_cnt += updt
             link_cnt += link
             nolk_cnt += nolk
+
+        #  Import de tous les produits non liés de la marque
+        if active_model == 'of.product.brand' and self.type == 'import':
+            model_obj = self.env['product.product']
+            unwanted_ids = []
+            for brand in brands:
+                unwanted_ids += model_obj.search([('brand_id', '=', brand.id),
+                                                  ('of_datastore_res_id', '!=', False)]).mapped('of_datastore_res_id')
+
+            for brand in brands:
+                supplier = brand.datastore_supplier_id
+                supplier_value = supplier.id * DATASTORE_IND
+                client = supplier.of_datastore_connect()
+                ds_product_obj = supplier.of_datastore_get_model(client, 'product.product')
+                ds_product_ids = supplier.of_datastore_search(ds_product_obj, [('brand_id', '=', brand.datastore_brand_id), ('id', 'not in', unwanted_ids)])
+                ds_product_ids = [-(ds_product_id + supplier_value) for ds_product_id in ds_product_ids]
+                to_create += ds_product_ids
+
+        if to_create:
+            model_obj.browse(to_create).of_datastore_import()
+            notes.append(_('Created products : %s') % (len(to_create)))
+
+        # Recherche des valeurs à mettre à jour
+
         if updt_cnt:
             notes.append(_('Updated products : %s') % (updt_cnt))
         if link_cnt:
