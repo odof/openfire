@@ -9,6 +9,7 @@ from odoo import api, models, fields
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools.safe_eval import safe_eval
 
+from odoo.tools.float_utils import float_compare
 
 class OfPlanningTache(models.Model):
     _name = "of.planning.tache"
@@ -132,6 +133,7 @@ class OfPlanningIntervention(models.Model):
 
     @api.depends('date', 'duree', 'hor_md', 'hor_mf', 'hor_ad', 'hor_af', 'hor_sam', 'hor_dim')
     def _compute_date_deadline(self):
+        compare_precision = 5
         for intervention in self:
             if intervention.hor_md > 24 or intervention.hor_mf > 24 or intervention.hor_ad > 24 or intervention.hor_af > 24:
                 raise UserError(u"L'heure doit être inferieure ou égale à 24")
@@ -164,9 +166,11 @@ class OfPlanningIntervention(models.Model):
             dt_heure = dt_local.hour + (dt_local.minute + dt_local.second / 60.0) / 60.0
             # Déplacement de l'horaire de début au début de la journée pour faciliter le calcul
             duree = intervention.duree
-            if intervention.hor_md <= dt_heure <= intervention.hor_mf:
+            if float_compare(dt_heure, intervention.hor_md, compare_precision) >= 0 and float_compare(intervention.hor_mf, dt_heure, compare_precision) >= 0:
+                # intervention.hor_md <= dt_heure <= intervention.hor_mf
                 duree += dt_heure - intervention.hor_md
-            elif intervention.hor_ad <= dt_heure <= intervention.hor_af:
+            elif float_compare(dt_heure, intervention.hor_ad, compare_precision) >= 0 and float_compare(intervention.hor_af, dt_heure, compare_precision) >= 0:
+                # intervention.hor_ad <= dt_heure <= intervention.hor_af:
                 duree += duree_matin + dt_heure - intervention.hor_ad
             else:
                 # L'horaire de debut des travaux est en dehors des heures de travail
@@ -328,24 +332,8 @@ class OfPlanningIntervention(models.Model):
             intervention.state = previous_state[intervention.state]
         return True
 
-    @api.model
-    def create(self, vals):
-        # Vérification de la disponibilité du créneau
-        if vals.get('verif_dispo') and vals.get('date') and vals.get('date_deadline'):
-            rdv = self.search([
-                ('equipe_id', '=', vals.get('equipe_id')),
-                ('date', '<', vals['date_deadline']),
-                ('date_deadline', '>', vals['date']),
-                ('state', 'not in', ('cancel', 'postponed')),
-            ])
-            if rdv:
-                raise ValidationError(u'Cette équipe a déjà %s rendez-vous sur ce créneau' % (len(rdv),))
-        return super(OfPlanningIntervention, self).create(vals)
-
     @api.multi
-    def write(self, vals):
-        super(OfPlanningIntervention, self).write(vals)
-
+    def do_verif_dispo(self):
         # Vérification de la validité du créneau
         for intervention in self:
             if intervention.verif_dispo:
@@ -358,6 +346,17 @@ class OfPlanningIntervention(models.Model):
                 ])
                 if rdv:
                     raise ValidationError(u'Cette équipe a déjà %s rendez-vous sur ce créneau' % (len(rdv),))
+
+    @api.model
+    def create(self, vals):
+        res = super(OfPlanningIntervention, self).create(vals)
+        res.do_verif_dispo()
+        return res
+
+    @api.multi
+    def write(self, vals):
+        super(OfPlanningIntervention, self).write(vals)
+        self.do_verif_dispo()
         return True
 
     @api.model
