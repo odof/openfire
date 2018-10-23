@@ -46,7 +46,7 @@
                 </div>
             </div>
 
-            <div class="row mt32 mb32">
+            <div class="row mt32 mb32" name="vos_references">
                 <div class="col-xs-12">
                     <div><strong>Vos références&amp;nbsp;: </strong></div>
                     <div class="mt8" id="informations" style="display: table">
