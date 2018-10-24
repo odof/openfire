@@ -34,31 +34,31 @@
             <div class="col-xs-12">
                 <div><strong>References: </strong></div>
                 <div class="mt8" id="informations" style="display: table">
-                    <div t-if="o.name" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                    <div name="doc_description" t-if="o.name" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                         <strong>Doc Descr.:</strong>
                         <p t-field="o.name"/>
                     </div>
                     <div t-if="o.name" style="display: table-cell; width: 4px;"/>
 
-                    <div t-if="o.partner_id.ref" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                    <div name="ref_client" t-if="o.partner_id.ref" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                         <strong>Customer Ref:</strong>
                         <p t-field="o.partner_id.ref"/>
                     </div>
                     <div t-if="o.partner_id.ref" style="display: table-cell; width: 4px;"/>
 
-                    <div t-if="o.origin" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                    <div name="origine" t-if="o.origin" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                         <strong>Origin:</strong>
                         <p t-field="o.origin"/>
                     </div>
                     <div t-if="o.origin" style="display: table-cell; width: 4px;"/>
 
-                    <div t-if="o.date_due and o.type == 'out_invoice' and (o.state == 'open' or o.state == 'paid')" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                    <div name="date_echeance" t-if="o.date_due and o.type == 'out_invoice' and (o.state == 'open' or o.state == 'paid')" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                         <strong>Due Date:</strong>
                         <p t-field="o.date_due"/>
                     </div>
                     <div t-if="o.date_due and o.type == 'out_invoice' and (o.state == 'open' or o.state == 'paid')" style="display: table-cell; width: 4px;"/>
 
-                    <div t-if="o.user_id" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                    <div name="commercial" t-if="o.user_id" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                         <strong>Salesperson:</strong>
                         <p>
                             <span t-field="o.user_id"/><br t-if="o.user_id.phone or o.user_id.mobile"/>
@@ -68,7 +68,7 @@
                     </div>
                     <div t-if="o.user_id" style="display: table-cell; width: 4px;"/>
 
-                    <div t-if="o.reference and o.type == 'in_invoice'" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                    <div name="doc_ref" t-if="o.reference and o.type == 'in_invoice'" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                         <strong>Doc Ref:</strong>
                         <p t-field="o.reference"/>
                     </div>

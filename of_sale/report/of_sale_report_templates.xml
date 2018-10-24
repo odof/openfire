@@ -50,19 +50,19 @@
                 <div class="col-xs-12">
                     <div><strong>Vos références&amp;nbsp;: </strong></div>
                     <div class="mt8" id="informations" style="display: table">
-                        <div t-if="doc.partner_id.ref" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                        <div name="ref_client" t-if="doc.partner_id.ref" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                             <strong>Réf. client&amp;nbsp;:</strong>
                             <p t-field="doc.partner_id.ref"/>
                         </div>
                         <div t-if="doc.partner_id.ref" style="display: table-cell; width: 4px;"/>
 
-                        <div t-if="doc.client_order_ref" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                        <div name="ref_commande" t-if="doc.client_order_ref" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                             <strong>Réf. commande&amp;nbsp;:</strong>
                             <p t-field="doc.client_order_ref"/>
                         </div>
                         <div t-if="doc.client_order_ref" style="display: table-cell; width: 4px"/>
 
-                        <div t-if="doc.user_id" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                        <div name="commercial" t-if="doc.user_id" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                             <strong>Commercial(e)&amp;nbsp;:</strong>
                             <p>
                                 <span t-field="doc.user_id"/><br t-if="doc.user_id.phone or doc.user_id.mobile"/>
