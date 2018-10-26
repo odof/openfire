@@ -114,3 +114,20 @@ class AccountMove(models.Model):
     _inherit = "account.move"
 
     of_export = fields.Boolean(string=u'Exporté')
+
+class AccountPayment(models.Model):
+    _inherit = "account.payment"
+
+    @api.multi
+    def button_invoices(self):
+        """ (smart button facture sur les paiements)
+        Choisit les vues en fonctions du type de partenaire
+        """
+        vals = super(AccountPayment, self).button_invoices()
+        if (self.partner_type == "customer"):
+            vals['views'] = [(self.env.ref('account.invoice_tree').id, 'tree'),
+                             (self.env.ref('account.invoice_form').id, 'form')]
+        elif (self.partner_type == "supplier"):
+            vals['views'] = [(self.env.ref('account.invoice_supplier_tree').id, 'tree'),
+                             (self.env.ref('account.invoice_supplier_form').id, 'form')]
+        return vals
