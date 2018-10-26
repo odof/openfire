@@ -1,0 +1,31 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* ofab_escompte
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-10-24 13:23+0000\n"
+"PO-Revision-Date: 2018-10-24 13:23+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: ofab_escompte
+#: model:ir.ui.view,arch_db:ofab_escompte.ofab_escompte_report_invoice_document
+msgid "<strong>Net à payer</strong>"
+msgstr "<strong>Netto te betalen</strong>"
+
+#. module: ofab_escompte
+#: model:ir.ui.view,arch_db:ofab_escompte.ofab_escompte_report_invoice_document
+msgid "<strong>Sous-total HT</strong>"
+msgstr "<strong>Sous-total HT</strong>"
+
+#. module: ofab_escompte
+#: model:ir.ui.view,arch_db:ofab_escompte.ofab_escompte_report_invoice_document
+msgid "<strong>Total HT</strong>"
+msgstr "<strong>Totaal exclusief BTW</strong>"
