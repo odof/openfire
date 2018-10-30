@@ -65,9 +65,10 @@
                         <div name="commercial" t-if="doc.user_id" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                             <strong>Commercial(e)&amp;nbsp;:</strong>
                             <p>
-                                <span t-field="doc.user_id"/><br t-if="doc.user_id.phone or doc.user_id.mobile"/>
-                                <span t-if="doc.user_id.phone" t-field="doc.user_id.phone"/><br t-if="doc.user_id.phone and (doc.user_id.mobile or doc.user_id.email)"/>
-                                <span t-if="doc.user_id.mobile" t-field="doc.user_id.mobile"/>
+                                <t t-if="doc.user_id.name"><span t-field="doc.user_id.name"/><br/></t>
+                                <t t-if="doc.user_id.phone"><span t-field="doc.user_id.phone"/><br/></t>
+                                <t t-if="doc.user_id.mobile"><span t-field="doc.user_id.mobile"/><br/></t>
+                                <t t-if="doc.user_id.fax">Fax. <span t-field="doc.user_id.fax"/><br/></t>
                             </p>
                         </div>
                         <div t-if="doc.user_id" style="display: table-cell; width: 4px;"/>
