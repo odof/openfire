@@ -24,15 +24,21 @@ class GestionPrix(models.TransientModel):
     _name = 'of.sale.order.gestion.prix'
     _description = 'Gestion des prix'
 
+    def _get_selection_mode_calcul(self):
+        """Renvoit les possibilités de mode de calcul en fonction du droit d'afficher les marges."""
+        liste = [
+                ('prix_ttc_cible', 'montant total TTC cible'),
+                ('montant_ttc', u'montant TTC à déduire'),
+                ('pc', u'% de remise sur les lignes sélectionnées')
+            ]
+        if self.user_has_groups('of_sale.of_group_sale_marge_manager'):
+            liste.append(('pc_marge', '% marge'))
+        liste.append(('reset', 'remettre au prix magasin')) # Avec application de la liste de prix du client
+        return liste
+
+
     order_id = fields.Many2one('sale.order', string='Devis/commande', required=True, ondelete='cascade')
-    methode_remise = fields.Selection(
-        [
-            ('prix_ttc_cible', 'montant total TTC cible'),
-            ('montant_ttc', u'montant TTC à déduire'),
-            ('pc', u'% de remise sur les lignes sélectionnées'),
-            ('pc_marge', '% marge'),
-            ('reset', 'remettre au prix magasin'),  # Avec application de la liste de prix du client
-        ],
+    methode_remise = fields.Selection(selection=_get_selection_mode_calcul,
         default='prix_ttc_cible',
         string=u"Mode de calcul",
         help=u"Détermine comment est calculée la remise sur les lignes sélectionnées du devis")
@@ -65,6 +71,7 @@ class GestionPrix(models.TransientModel):
             ('0', u"Arrondir à l'euro le plus proche"),
             ('1', u"Arrondir aux 10 centimes les plus proches"),
         ], string=u"Précision d'arrondi", default='0')
+    of_client_view = fields.Boolean(string='Vue client/vendeur', related="order_id.of_client_view")
 
     @api.depends('line_ids.prix_total_ttc_simul')
     def _compute_montant_simul(self):
@@ -309,6 +316,10 @@ class GestionPrix(models.TransientModel):
     def bouton_exclure_tout(self):
         self.line_ids.filtered('is_selected').write({'is_selected': False})
 
+    def toggle_view(self):
+        """ Permet de basculer entre la vue vendeur/client
+        """
+        self.of_client_view = not self.of_client_view
 
 class GestionPrixLine(models.TransientModel):
     """Liste des lignes dans le wizard"""
@@ -333,6 +344,7 @@ class GestionPrixLine(models.TransientModel):
 
     prix_total_ttc_simul = fields.Float(u"Prix total TTC simulé", readonly=True)
     prix_total_ht_simul = fields.Float(u"Prix total HT simulé", readonly=True)
+    of_client_view = fields.Boolean(string='Vue client/vendeur', related="wizard_id.of_client_view")
 
     @api.depends('is_selected')
     def _compute_text_selected(self):
