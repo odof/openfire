@@ -12,7 +12,6 @@
                     <button name="bouton_valider" class="oe_highlight" string="Appliquer au devis/bon de commande (non réversible)" type="object" confirm="Confirmez-vous l'application des nouveaux prix calculés au devis/bon de commande (non réversible) ?"/>
                     <button name="bouton_annuler" string="Retour à la commande" type="object"/>
                 </header>
-                <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button name="toggle_view" type="object" class="oe_stat_button" icon="fa-pencil-square-o" groups="of_sale.of_group_sale_marge_manager">
                             <field name="of_client_view" widget="boolean_button"
@@ -23,48 +22,49 @@
                         </button>
                     </div>
                     <group>
-                        <field name="methode_remise" required="1"/>
-                        <field name="valeur"
-                               attrs="{'invisible':[('methode_remise','not in',('prix_ttc_cible','montant_ttc','pc','pc_marge'))],
-                                       'required': [('methode_remise','in',('prix_ttc_cible','montant_ttc','pc','pc_marge'))]}"/>
-                        <label for="arrondi_mode"/>
-                        <div name="arrondi">
-                            <field name="arrondi_mode" class="oe_inline" attrs="{'invisible':[('methode_remise','=',False)]}"/>
-                            <field name="arrondi_prec" class="oe_inline" nolabel="1"
-                                   style="margin-left:10px;"
-                                   attrs="{'invisible':['|', ('methode_remise','=',False), ('arrondi_mode','=','no')],
-                                           'required': [('methode_remise','!=',False), ('arrondi_mode','in',('total_excluded', 'total_included'))]}"/>
-                        </div>
-                        <field name="afficher_remise"/>
-                    </group>
+                    <field name="methode_remise" required="1"/>
+                    <field name="valeur"
+                           attrs="{'invisible':[('methode_remise','not in',('prix_ttc_cible','montant_ttc','pc','pc_marge'))],
+                                   'required': [('methode_remise','in',('prix_ttc_cible','montant_ttc','pc','pc_marge'))]}"/>
+                    <label for="arrondi_mode"/>
+                    <div name="arrondi">
+                        <field name="arrondi_mode" class="oe_inline" attrs="{'invisible':[('methode_remise','=',False)]}"/>
+                        <field name="arrondi_prec" class="oe_inline" nolabel="1"
+                               style="margin-left:10px;"
+                               attrs="{'invisible':['|', ('methode_remise','=',False), ('arrondi_mode','=','no')],
+                                       'required': [('methode_remise','!=',False), ('arrondi_mode','in',('total_excluded', 'total_included'))]}"/>
+                    </div>
+                    <field name="afficher_remise"/>
+                </group>
 
-                    <field name="line_ids">
-                        <tree string="Lignes de commande" colors="green:is_selected==True;grey:is_selected==False;">
-                            <field name="is_selected" invisible="1"/>
-                            <button name="button_inverse" string="Inverser" type="object" icon="fa-refresh"/>
-                            <field name="text_selected"/>
-                            <field name="order_line_id"/>
-                            <field name="cout" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
-                            <field name="prix_total_ht"/>
-                            <field name="prix_total_ht_simul"/>
-                            <field name="prix_total_ttc"/>
-                            <field name="prix_total_ttc_simul"/>
-                            <field name="of_client_view" invisible="1"/>
-                        </tree>
-                    </field>
+                <field name="line_ids">
+                    <tree string="Lignes de commande" colors="green:is_selected==True;grey:is_selected==False;">
+                        <field name="is_selected" invisible="1"/>
+                        <button name="button_inverse" string="Inverser" type="object" icon="fa-refresh"/>
+                        <field name="text_selected"/>
+                        <field name="order_line_id"/>
+                        <field name="cout" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
+                        <field name="prix_total_ht"/>
+                        <field name="prix_total_ht_simul"/>
+                        <field name="marge" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
+                        <field name="pc_marge" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
+                        <field name="prix_total_ttc"/>
+                        <field name="prix_total_ttc_simul"/>
+                        <field name="of_client_view" invisible="1"/>
+                    </tree>
+                </field>
 
-                    <button name="bouton_inclure_tout" type="object" class="oe_left btn-default" string="Tout inclure"/>
-                    <button name="bouton_exclure_tout" type="object" class="oe_left btn-default" string="Tout exclure"/>
+                <button name="bouton_inclure_tout" type="object" class="oe_left btn-default" string="Tout inclure"/>
+                <button name="bouton_exclure_tout" type="object" class="oe_left btn-default" string="Tout exclure"/>
 
-                    <group col="4" string="Total devis/commande">
-                        <field name="montant_total_ttc_initial"/>
-                        <field name="montant_total_ttc_simul"/>
-                        <field name="marge_initiale" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
-                        <field name="marge_simul" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
-                        <field name="pc_marge_initiale" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
-                        <field name="pc_marge_simul" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
-                    </group>
-                </sheet>
+                <group col="4" string="Total devis/commande">
+                    <field name="montant_total_ttc_initial"/>
+                    <field name="montant_total_ttc_simul"/>
+                    <field name="marge_initiale" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
+                    <field name="marge_simul" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
+                    <field name="pc_marge_initiale" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
+                    <field name="pc_marge_simul" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
+                </group>
             </form>
         </field>
     </record>

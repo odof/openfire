@@ -342,8 +342,10 @@ class GestionPrixLine(models.TransientModel):
     prix_total_ttc = fields.Monetary(string='Prix total TTC initial', related='order_line_id.price_total', readonly=True)
     remise = fields.Float(related='order_line_id.discount', readonly=True)
 
-    prix_total_ttc_simul = fields.Float(u"Prix total TTC simulé", readonly=True)
-    prix_total_ht_simul = fields.Float(u"Prix total HT simulé", readonly=True)
+    prix_total_ttc_simul = fields.Float(string=u"Prix total TTC simulé", readonly=True)
+    prix_total_ht_simul = fields.Float(string=u"Prix total HT simulé", readonly=True)
+    marge = fields.Float(string=u"Marge HT", compute='_compute_marge_simul')
+    pc_marge = fields.Float(string=u"% Marge", compute='_compute_marge_simul')
     of_client_view = fields.Boolean(string='Vue client/vendeur', related="wizard_id.of_client_view")
 
     @api.depends('is_selected')
@@ -357,6 +359,15 @@ class GestionPrixLine(models.TransientModel):
         for line in self:
             order_line = line.order_line_id
             line.cout = order_line.purchase_price * order_line.product_uom_qty
+
+    @api.depends('prix_total_ht_simul')
+    def _compute_marge_simul(self):
+        for line in self:
+            achat = line.cout
+            vente = line.prix_total_ht_simul
+
+            line.marge = vente - achat
+            line.pc_marge = 100 * (1 - achat / vente) if vente else -100
 
     @api.multi
     def button_inverse(self):
