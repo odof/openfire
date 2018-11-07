@@ -51,8 +51,9 @@
         <field name="model">stock.move</field>
         <field name="inherit_id" ref="stock.view_move_picking_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//tree//field[@name='product_id']" position="after">
-                <field name="name" groups="of_sale_stock.group_description_BL_variant"></field>
+            <xpath expr="//tree//field[@name='name']" position="attributes">
+                <attribute name="invisible">0</attribute>
+                <attribute name="groups">of_sale_stock.group_description_BL_variant</attribute>
             </xpath>
         </field>
     </record>
