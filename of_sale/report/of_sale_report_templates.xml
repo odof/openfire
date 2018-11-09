@@ -193,6 +193,10 @@
                 </div>
             </div>
 
+            <p t-if="doc.of_date_vt">
+                <t t-set="date_order" t-value="doc.of_date_vt[8:10] + '/' + doc.of_date_vt[5:7] + '/' + doc.of_date_vt[0:4]"/>
+                Date de visite technique : <span t-esc="date_order"/>.
+            </p>
             <p t-field="doc.note"/>
             <p t-if="doc.payment_term_id.note">
                 <span t-field="doc.payment_term_id.note"/>
