@@ -22,8 +22,27 @@ class of_product_nomenclature(models.Model):
         if default is None:
             default = {}
         default = default.copy()
-        default['name'] = '(copie)' + self.name
+        self = self.with_context(of_prefixe_traduction_copie="(copie)")
         return super(of_product_nomenclature, self).copy(default)
+
+
+class IrTranslation(models.Model):
+    _inherit = 'ir.translation'
+
+    @api.model
+    def create(self, vals):
+        "Pour fonction dupliquer, renomme aussi la traduction avec un préfixe passé dans le contexte [souvent (copie)]"
+        prefixe = self._context.get('of_prefixe_traduction_copie')
+        if prefixe:
+            if vals.get('source'):
+                # Définir la valeur du champ source écrase aussi la valeur du champ src
+                vals['source'] = prefixe + vals['source']
+                if 'src' in vals:
+                    vals['src'] = vals['source']
+            if vals.get('value'):
+                vals['value'] = prefixe + vals['value']
+        return super(IrTranslation, self).create(vals)
+
 
 class of_product_nomenclature_line(models.Model):
     "Liste des composants nomenclature produit"
