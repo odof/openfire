@@ -77,6 +77,6 @@
             context="{'model':'res.partner'}"
             groups="of_planning.of_group_planning_intervention_user"
         />
-        
+
     </data>
 </odoo>  

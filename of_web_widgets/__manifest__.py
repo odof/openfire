@@ -13,7 +13,7 @@ Module OpenFire de widgets
 
 """,
     "website": "www.openfire.fr",
-    "depends": ["web","web_kanban"],
+    "depends": ["web", "web_kanban"],
     "data": [
         "views/of_web_widgets_templates.xml",
     ],
