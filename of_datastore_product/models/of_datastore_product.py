@@ -286,19 +286,19 @@ class OfProductBrand(models.Model):
         # Regroupement des marques par base centrale
         for brand in self:
             if brand.datastore_supplier_id:
-                suppliers_brands.setdefault(brand.datastore_supplier_id, []).append(brand.name)
+                suppliers_brands.setdefault(brand.datastore_supplier_id, []).append(brand.datastore_brand_id)
 
         suppliers_data = {}
-        for supplier, brand_names in suppliers_brands.iteritems():
+        for supplier, brand_ids in suppliers_brands.iteritems():
             client = supplier.of_datastore_connect()
             if isinstance(client, basestring):
                 suppliers_data[supplier] = u"Échec de la connexion à la base centrale\n\n" + client
                 continue
             ds_brand_obj = supplier.of_datastore_get_model(client, 'of.product.brand')
-            ds_brand_ids = supplier.of_datastore_search(ds_brand_obj, [('name', 'in', brand_names)])
+            ds_brand_ids = supplier.of_datastore_search(ds_brand_obj, [('id', 'in', brand_ids)])
             suppliers_data[supplier] = {
-                data['name']: (data['note_maj'], data['product_count'])
-                for data in supplier.of_datastore_read(ds_brand_obj, ds_brand_ids, ['name', 'note_maj', 'product_count'])
+                data['id']: (data['note_maj'], data['product_count'])
+                for data in supplier.of_datastore_read(ds_brand_obj, ds_brand_ids, ['note_maj', 'product_count'])
             }
 
         for brand in self:
@@ -307,10 +307,10 @@ class OfProductBrand(models.Model):
                 note = u"Marque non associée à une base centrale"
             elif isinstance(suppliers_data[brand.datastore_supplier_id], basestring):
                 note = suppliers_data[brand.datastore_supplier_id]
-            elif brand.name not in suppliers_data[brand.datastore_supplier_id]:
+            elif brand.datastore_brand_id not in suppliers_data[brand.datastore_supplier_id]:
                 note = u"Marque non présente sur la base centrale"
             else:
-                note, product_count = suppliers_data[brand.datastore_supplier_id][brand.name]
+                note, product_count = suppliers_data[brand.datastore_supplier_id][brand.datastore_brand_id]
             brand.datastore_note_maj = note
             brand.datastore_product_count = product_count
 
@@ -607,6 +607,10 @@ class OfDatastoreCentralized(models.AbstractModel):
                     vals['of_seller_remise'] = (vals['of_seller_pp_ht'] - vals['of_seller_price']) * 100 / vals['of_seller_pp_ht']
                 if 'marge' in fields_to_read:
                     vals['marge'] = (vals['list_price'] - vals['standard_price']) * 100 / vals['list_price']
+
+                # Suppression des valeurs non voulues
+                for field in added_fields:
+                    vals.pop(field, False)
 
             if not create_mode:
                 # Conversion au format many2one (id,name)
