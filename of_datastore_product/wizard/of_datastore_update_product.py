@@ -74,11 +74,13 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         ds_product_ids += ds_product_new_ids
 
         # --- Mise à jour des articles ---
+        products_write_data = {}
         fields_to_update = product_obj.of_datastore_get_import_fields()
         if self.noup_name:
             fields_to_update.remove('name')
         ds_product_ids = [-(ds_product_id + supplier_value) for ds_product_id in ds_product_ids]
         ds_products_data = product_obj.browse(ds_product_ids)._of_read_datastore(fields_to_update, create_mode=True)
+
         for ds_product_data in itertools.chain(no_match_ids, ds_products_data):
             if isinstance(ds_product_data, (int, long)):
                 product = product_obj.browse(ds_product_data)
@@ -142,7 +144,14 @@ class OfDatastoreUpdateProduct(models.TransientModel):
                     else:
                         raise ValidationError("Mise à jour de tarif : type de renvoi de fournisseur non prévu\ncode: %s" % (old_sellers, ))
             if ds_product_data:
-                product.write(ds_product_data)
+                # L'appel write() est reporté après tous les calculs.
+                # En effet, write() vide certaines données en cache
+                #   (les données qui sont compute =True et store=False, e.g. of_datastore_has_link, of_seller_price, etc.)
+                # Lorsqu'Odoo recalcule ces données, il le fait, à chaque itération, sur la totalité des articles (ds_product_ids),
+                #   ce qui provoque un temps de calcul en O(n²) au lieu de O(n)
+                products_write_data[product] = ds_product_data
+        for product, product_data in products_write_data.iteritems():
+            product.write(product_data)
         return len(no_match_ids), len(ds_product_ids), len(ds_product_new_ids)
 
     @api.multi
