@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_acompte_invoice_form" model="ir.ui.view">
+        <field name="name">of.sale.acompte.invoice.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[1]/group[1]" position="replace">
+                <group class="oe_subtotal_footer oe_right">
+                    <field name="amount_untaxed"/>
+                    <field name="amount_tax"/>
+                    <field name="amount_total" class="oe_subtotal_footer_separator"/>
+                    <field name="payments_widget" colspan="2" nolabel="1" widget="payment"/>
+                    <field name="residual" class="oe_subtotal_footer_separator" attrs="{'invisible': [('state', '=', 'draft')]}"/>
+                    <field name="reconciled" invisible="1"/>
+                    <field name="outstanding_credits_debits_widget" colspan="2" nolabel="1" widget="payment" attrs="{'invisible': [('state', 'not in', 'open')]}"/>
+                    <field name="of_equal" invisible="1"/>
+                    <div attrs="{'invisible': [('of_equal', '!=', False)]}" class="oe_grey" colspan="4">
+                        Le total du montant des factures d'acompte est différent de celui des paiements.<br/>
+                        Vérifier que les factures d'acompte ont bien été payées.
+                    </div>
+                    <field name="of_residual" attrs="{'invisible': [('of_equal', '!=', False)]}" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_acompte_view_account_config_settings" model="ir.ui.view">
+        <field name="name">of.sale.acompte.view.account.config.settings</field>
+        <field name="model">account.config.settings</field>
+        <field name="inherit_id" ref="account.view_account_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/group[@name='rubrique_report']" position="inside">
+                <label for="of_impression_acomptes"/>
+                <div name="of_impression_acomptes">
+                    <field name="of_impression_acomptes" class="oe_inline"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
