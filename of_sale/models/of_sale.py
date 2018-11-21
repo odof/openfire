@@ -39,6 +39,9 @@ class SaleOrder(models.Model):
     def pdf_afficher_email(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_email')
 
+    def pdf_afficher_date_validite(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_date_validite_devis')
+
     def get_color_section(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'of_color_bg_section')
 
@@ -238,6 +241,9 @@ class OFSaleConfiguration(models.TransientModel):
         string="(OF) Réf. produits", required=True, default=False,
         help="Afficher les références produits dans les rapports PDF ?")
 
+    pdf_date_validite_devis = fields.Boolean(string="(OF) Date validité devis", required=True, default=False,
+            help="Afficher la date de validité dans le rapport PDF des devis ?")
+
     pdf_adresse_nom_parent = fields.Boolean(
         string=u"(OF) Nom parent contact", required=True, default=False,
         help=u"Afficher le nom du 'parent' du contact au lieu du nom du contact dans les rapport PDF ?")
@@ -293,6 +299,11 @@ class OFSaleConfiguration(models.TransientModel):
     def set_pdf_display_product_ref_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'pdf_display_product_ref_setting', self.pdf_display_product_ref_setting)
+
+    @api.multi
+    def set_pdf_date_validite_devis_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_date_validite_devis', self.pdf_date_validite_devis)
 
     @api.multi
     def set_of_deposit_product_categ_id_defaults(self):

@@ -190,6 +190,11 @@
                             <field name="pdf_display_product_ref_setting" class="oe_inline"/>
                             <span>Afficher les références produits dans les rapports PDF</span>
                         </div>
+                        <label for="pdf_date_validite_devis"/>
+                        <div name="pdf_date_validite_devis">
+                            <field name="pdf_date_validite_devis" class="oe_inline"/>
+                            <span>Afficher la date de validité dans le rapport PDF des devis</span>
+                        </div>
                         <label for="of_color_bg_section"/>
                         <div name="of_color_bg_section_setting">
                             <field name="of_color_bg_section" class="oe_inline" widget="color"/>

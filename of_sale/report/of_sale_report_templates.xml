@@ -78,6 +78,10 @@
                             <strong>Conditions de règlement&amp;nbsp;:</strong>
                             <p t-field="doc.payment_term_id"/>
                         </div>
+                        <div name="date_validite" t-if="doc.validity_date and doc.state in ('draft', 'sent') and doc.pdf_afficher_date_validite()" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                            <strong>Date de validité&amp;nbsp;:</strong>
+                            <p t-field="doc.validity_date"/>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -126,7 +130,7 @@
                                         <span t-field="l.name" style="display: none;"/>
                                     </td>
                                     <td class="text-right">
-                                        <span t-field="l.product_uom_qty"/>
+                                        <span t-esc="(str(l.product_uom_qty)).rstrip('0').rstrip('.').replace('.', ',')"/>
                                         <span t-field="l.product_uom" groups="product.group_uom"/>
                                     </td>
                                     <td class="text-right">
@@ -310,7 +314,7 @@
                                 </td>
                                 <td class="hidden"><span t-field="l.origin"/></td>
                                 <td class="text-right">
-                                    <span t-field="l.quantity"/>
+                                    <span t-esc="(str(l.quantity)).rstrip('0').rstrip('.').replace('.', ',')"/>
                                     <span t-field="l.uom_id"  groups="product.group_uom"/>
                                 </td>
                                 <td class="text-right">

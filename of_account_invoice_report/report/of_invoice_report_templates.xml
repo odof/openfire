@@ -98,7 +98,7 @@
                         <td><span t-field="l.name"/></td>
                         <td class="hidden"><span t-field="l.origin"/></td>
                         <td class="text-right">
-                            <span t-field="l.quantity"/>
+                            <span t-esc="(str(l.quantity)).rstrip('0').rstrip('.').replace('.', ',')"/>
                             <span t-field="l.uom_id"  groups="product.group_uom"/>
                         </td>
                         <td class="text-right">
