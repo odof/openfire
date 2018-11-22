@@ -523,7 +523,7 @@
                 </field>
             </field>
         </record>
-        
+
         <record id="view_of_sale_profcommi_user" model="ir.ui.view">
             <field name="name">of.res.users.planning.tree</field>
             <field name="model">res.users</field>
@@ -559,7 +559,7 @@
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="hr.view_employee_tree"/>
         </record>
-        
+
         <record id="action_of_planning_equipe_tree" model="ir.actions.act_window">
             <field name="name">Equipes</field>
             <field name="res_model">of.planning.equipe</field>
@@ -567,7 +567,7 @@
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="view_of_planning_equipe_tree"/>
         </record>
-        
+
         <record id="action_of_planning_tache_tree" model="ir.actions.act_window">
             <field name="name">Tâches</field>
             <field name="res_model">of.planning.tache</field>
@@ -585,9 +585,9 @@
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="of_planning.of_planning_intervention_raison_tree"/>
         </record>
-        
+
     <!--################################################_Type cout employee_######################################################-->
-    
+
         <!--record id="action_of_planning_employee_typcout_tree" model="ir.actions.act_window">
             <field name="name">Types de coûts</field>
             <field name="res_model">hr.employee.typcout</field>
@@ -600,7 +600,7 @@
 <!--#############################################_________Menus__________#####################################################-->
 <!--##########################################################################################################################-->
 
-    <menuitem id="menu_of_planning" name="Planning intervention" groups="of_group_planning_intervention_user" sequence="2"/>
+    <menuitem id="menu_of_planning" name="Interventions" groups="of_group_planning_intervention_user" sequence="2" web_icon="of_planning,static/description/icon.png"/>
 
         <menuitem id="menu_of_planning_configuration" name="Configuration" parent="of_planning.menu_of_planning" groups="hr.group_hr_manager" sequence="20"/>
             <menuitem name="Employés" id="menu_hr_employee_tree" parent="menu_of_planning_configuration" sequence="1" action="action_hr_employee_tree"/>
@@ -621,14 +621,14 @@
             name="Envoyer un courrier"
             res_model="of.compose.mail"
             src_model="of.planning.intervention"
-            view_mode="form"    
+            view_mode="form"
             key2="client_print_multi"
             view_id="of_gesdoc.view_courrier_wizard"
             id="action_view_planning_courrier_wizard_account"
             context="{'model':'of.planning.intervention'}"
             target="new"
         /-->
-        
+
     <!-- Ajouter menu Envoyer un courriel dans Planning Intervention -->
         <!-- <act_window
           name="Envoyer un courriel"
@@ -636,10 +636,10 @@
           src_model="of.planning.intervention"
           view_mode="form"
           key2="client_print_multi"
-          id="of_planning_email" 
+          id="of_planning_email"
           target="new"/> -->
         <!--delete model="ir.actions.act_window" id="of_planning_email"/-->
-        
+
         <!-- Creation la facture depuis planning intervention -->
 
         <record id="action_of_create_invoice_intervention" model="ir.actions.server">
