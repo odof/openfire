@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<odoo>
+    <template id="report_saleorder_document_inherit_ecotax" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//span[@t-field='l.name']" position="after">
+            <t t-if="l.product_id.ecotax_amount">
+                <br/>
+                <span class="small">
+                    Price including ecotax
+                    <span t-field="l.product_id.ecotax_amount"
+                          t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
+                    per unit
+                </span>
+            </t>
+        </xpath>
+    </template>
+</odoo>
