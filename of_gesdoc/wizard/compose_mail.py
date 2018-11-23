@@ -180,7 +180,7 @@ class OfComposeMail(models.TransientModel):
         lettre_obj = self.env['of.mail.template']
         tmp = self.read()
         data = {
-            'ids' : self._context.get('data_ids', []),
+            'ids' : self._context.get('active_ids', []),
             'model' : self._context.get('model', []),
             'form' : tmp and tmp[0] or {},
         }
@@ -201,7 +201,7 @@ class OfComposeMail(models.TransientModel):
             comment = partner.comment or ''
             if comment and comment[-1] != '\n':
                 text = '\n' + text
-            partner.comment = partner.comment + text
+            partner.comment = comment + text
 
         # test if user has checked 'sans adresse' and 'sans entete'
         # self._log_event(cr, uid, ids, data, context=context)

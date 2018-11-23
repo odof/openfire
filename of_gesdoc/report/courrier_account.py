@@ -28,7 +28,7 @@ class CourrierAccount(report_sxw.rml_parse):
         pad = pad_obj.browse(self.cr, self.uid, partner.address_invoice_id.id)
         return pad
 
-report_sxw.report_sxw('report.of_gesdoc.courriers_account', 'account.invoice', "addons/of_gesdoc/report/CourrierAccount.rml", parser=CourrierAccount, header=True)
-report_sxw.report_sxw('report.of_gesdoc.courriers_account_se', 'account.invoice', "addons/of_gesdoc/report/CourrierAccount_se.rml", parser=CourrierAccount, header=True)
-report_sxw.report_sxw('report.of_gesdoc.courriers_account_sehead', 'account.invoice', "addons/of_gesdoc/report/CourrierAccount_sehead.rml", parser=CourrierAccount, header=False)
-report_sxw.report_sxw('report.of_gesdoc.courriers_account_se_sehead', 'account.invoice', "addons/of_gesdoc/report/CourrierAccount_se.rml", parser=CourrierAccount, header=False)
+report_sxw.report_sxw('report.of_gesdoc.courriers_account', 'account.invoice', "addons/of_gesdoc/report/courrier_account.rml", parser=CourrierAccount, header=True)
+report_sxw.report_sxw('report.of_gesdoc.courriers_account_se', 'account.invoice', "addons/of_gesdoc/report/courrier_account_se.rml", parser=CourrierAccount, header=True)
+report_sxw.report_sxw('report.of_gesdoc.courriers_account_sehead', 'account.invoice', "addons/of_gesdoc/report/courrier_account_sehead.rml", parser=CourrierAccount, header=False)
+report_sxw.report_sxw('report.of_gesdoc.courriers_account_se_sehead', 'account.invoice', "addons/of_gesdoc/report/courrier_account_se.rml", parser=CourrierAccount, header=False)
