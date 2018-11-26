@@ -9,10 +9,13 @@
     </template>
 
     <!-- Remise des lignes de factures -->
-    <template id="of_report_invoice_document" inherit_id="account.report_invoice_document">
-        <span t-field="l.discount" position="replace">
+    <template id="of_report_invoice_document" inherit_id="sale.report_invoice_layouted">
+        <xpath expr="//table[@groups='!sale.group_sale_layout']//span[@t-field='l.discount']" position="replace">
             <span t-esc="l.of_discount_formula and l.of_discount_formula.replace(' ', u'\u00A0')"/> <!-- 00A0 = Espace insécable -->
-        </span>
+        </xpath>
+        <xpath expr="//t[@groups='sale.group_sale_layout']//span[@t-field='l.discount']" position="replace">
+            <span t-esc="l.of_discount_formula and l.of_discount_formula.replace(' ', u'\u00A0')"/> <!-- 00A0 = Espace insécable -->
+        </xpath>
     </template>
 
 </odoo>

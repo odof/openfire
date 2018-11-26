@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name': 'OpenFire New Kits',
+    'name': 'OpenFire Kits',
     'author': 'OpenFire',
     'version': '10.0.1.0.0',
     'category': 'OpenFire modules',
     'summary': 'Kits',
     'description': """
-        Module de Kits openfire: \n
-        \t- Création de kits directement dans les Articles
+        Module de kits openfire : \n
+        \t- Création de kits directement dans les articles
         \t- Ajout des champs 'is_kit' et 'pricing' dans les produits, lignes de commandes, de factures et composants
         \t- Ajout des kits dans les devis, bons de commandes et factures clients
         \t- Possibilité de création de kits à la volée dans les devis, bons de commandes et factures clients
         \t- Approvisionnement des composants sur confirmation de commande
-        \t- Conversion de bons de commandes en factures
-        \t- 3 modes d'affichage des kits dans les rapports PDF: aucun, restreint et étendu
-        \t- Prix d'achat des kits en fonction de leurs composants et marges dans les Devis
+        \t- Conversion de bon de commande en facture
+        \t- 3 modes d'affichage des kits dans les rapports PDF : aucun, restreint et étendu
+        \t- Prix d'achat des kits en fonction de leurs composants et marges dans les devis
     """,
     'website': 'openfire.fr',
     'depends': [
