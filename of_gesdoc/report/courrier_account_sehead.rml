@@ -69,10 +69,10 @@
           </para>
         </td>
         <td>
-          <para style="default_10">[[ adr_get(o).title and adr_get(o).title.shortcut or '' ]] [[ adr_get(o).name or o.partner_id and o.partner_id.name or '' ]]</para>
-          <para style="default_10">[[ adr_get(o).street or '' ]]</para>
-          <para style="default_10">[[ adr_get(o).street2 or '' ]]</para>
-          <para style="default_10">[[ adr_get(o).zip or '' ]] [[ adr_get(o).city or '' ]]</para>
+          <para style="default_10">[[ o.partner_id.title and o.partner_id.title.shortcut or '' ]] [[ o.partner_id.name or o.partner_id and o.partner_id.name or '' ]]</para>
+          <para style="default_10">[[ o.partner_id.street or '' ]]</para>
+          <para style="default_10">[[ o.partner_id.street2 or '' ]]</para>
+          <para style="default_10">[[ o.partner_id.zip or '' ]] [[ o.partner_id.city or '' ]]</para>
           <para style="default"><font color="white"> </font></para>
           <para style="default_10">[[ o.company_id.partner_id.city ]], le [[ time.strftime("%d/%m/%Y", time.localtime()) ]]</para>
         </td>
