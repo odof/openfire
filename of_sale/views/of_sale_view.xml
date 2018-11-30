@@ -145,6 +145,54 @@
                 <xpath expr="//field[@name='confirmation_date']" position="after">
                     <field name="of_date_vt"/>
                 </xpath>
+                <!-- Ajout échéances  invisible="1"-->
+                <xpath expr="//group[@name='sale_total']" position="after">
+                    <group colspan="4">
+                        <separator string="Échéances" colspan="4"/>
+                        <field name="onchange_esc" invisible="1"/>
+                        <field name="echeance_last_percent" invisible="1"/>
+                        <field name="echeance_last_amount" invisible="1"/>
+                        <group col="4" colspan="4">
+                            <div colspan="4" class="oe_grey"  attrs="{'invisible': [('echeance_last_a_jour','=',True)]}">
+                                <i>Pour voir les changements apportés à l'échéance Balance, veuillez sauvegarder ou cocher cette case: </i>
+                                <field name="echeance_last_a_jour" nolabel="1"/>
+                            </div>
+                            <field name="echeance_line_ids" nolabel="1" colspan="4">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="last" invisible="1"/>
+                                    <field name="name"/>
+                                    <field name="days"/>
+                                    <field name="option"/>
+                                    <field name="percent"/>
+                                    <field name="amount" attrs="{'readonly': [('last','=',True)]}"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_sale_echeance_form" model="ir.ui.view">
+            <field name="name">of.sale.echeance.form</field>
+            <field name="model">of.sale.echeance</field>
+            <field name="arch" type="xml">
+                <form>
+                    <field name="last" invisible="1"/>
+                    <field name="currency_id" invisible="1"/>
+                    <group>
+                        <group>
+                            <field name="days"/>
+                            <field name="option"/>
+                        </group>
+                        <group>
+                            <field name="percent"/>
+                            <field name="amount" attrs="{'readonly': [('last','=',True)]}"/>
+                        </group>
+                    </group>
+                </form>
             </field>
         </record>
 
@@ -201,6 +249,11 @@
                         <div name="pdf_date_validite_devis">
                             <field name="pdf_date_validite_devis" class="oe_inline"/>
                             <span>Afficher la date de validité dans le rapport PDF des devis</span>
+                        </div>
+                        <label for="pdf_afficher_multi_echeances"/>
+                        <div name="pdf_afficher_multi_echeances">
+                            <field name="pdf_afficher_multi_echeances" class="oe_inline"/>
+                            <span>Afficher les échéances multiples dans les rapports PDF</span>
                         </div>
                         <label for="of_color_bg_section"/>
                         <div name="of_color_bg_section_setting">

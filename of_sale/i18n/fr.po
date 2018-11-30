@@ -267,3 +267,48 @@ msgstr "sale.config.settings"
 #: model:ir.ui.view,arch_db:of_sale.of_sale_order_view_search_inherit_sale
 msgid "À facturer entièrement"
 msgstr "À facturer entièrement"
+
+#. module: of_sale
+#: selection:of.sale.echeance,option:0
+msgid "Day(s) after the end of the invoice month (Net EOM)"
+msgstr "Jour(s) après la fin du mois de la facture"
+
+#. module: of_sale
+#: selection:of.sale.echeance,option:0
+msgid "Day(s) after the invoice date"
+msgstr "Jour(s) après la date de facturation"
+
+#. module: of_sale
+#: selection:of.sale.echeance,option:0
+msgid "Last day of current month"
+msgstr "Dernier jour du mois courant"
+
+#. module: of_sale
+#: selection:of.sale.echeance,option:0
+msgid "Last day of following month"
+msgstr "Dernier jour du mois prochain"
+
+#. module: of_sale
+#: selection:of.sale.echeance,option:0
+msgid "Day(s) after the confirmation date"
+msgstr "Jour(s) après la date de confirmation"
+
+#. module: of_sale
+#: selection:of.sale.echeance,option:0
+msgid "Day(s) after the end of the order month (Net EOM)"
+msgstr "Jour(s) après la fin du mois de la commande"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_echeance_days
+msgid "Number of Days"
+msgstr "Nombre de jours"
+
+#. module: of_sale
+#: selection:account.payment.term.line,option:0
+msgid "Day(s) after the confirmation date"
+msgstr "Jour(s) après la date de commande"
+
+#. module: of_sale
+#: selection:account.payment.term.line,option:0
+msgid "Day(s) after the end of the order month (Net EOM)"
+msgstr "Jour(s) après la fin du mois de la commande"

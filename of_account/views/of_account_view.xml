@@ -33,6 +33,58 @@
             <xpath expr="//field[@name='date_due']" position="replace">
                 <field name="date_due"/>
             </xpath>
+            <!-- échéancier -->
+            <xpath expr="//field[@name='date_due']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='comment']" position="before">
+                <field name="onchange_esc" invisible="1"/>
+                <field name="echeance_last_percent" invisible="1"/>
+                <field name="echeance_last_amount" invisible="1"/>
+                <group col="4">
+                    <separator string="Échéances" colspan="4"/>
+                    <div colspan="4" class="oe_grey"  attrs="{'invisible': [('echeance_last_a_jour','=',True)]}">
+                        <i>Pour voir les changements apportés à l'échéance Balance, veuillez sauvegarder ou cocher cette case: </i>
+                        <field name="echeance_last_a_jour" nolabel="1"/>
+                    </div>
+                    <field name="echeance_line_ids" nolabel="1" colspan="4">
+                        <tree editable="top" colors="red:color=='red';#4C4C4C:color=='black';">
+                            <field name="last" invisible="1"/>
+                            <field name="name"/>
+                            <field name="date_deadline"/>
+                            <field name="percent"/>
+                            <field name="amount"/>
+                            <field name="amount_paid" readonly="1"/>
+                            <field name="paid" invisible="1"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="color" invisible="1"/>
+                        </tree>
+                    </field>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_account_echeance_line_form" model="ir.ui.view">
+        <field name="name">of.account.echeance.form</field>
+        <field name="model">of.account.echeance</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="last" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="color" invisible="1"/>
+                <group>
+                    <group>
+                        <field name="date_deadline"/>
+                        <field name="paid"/>
+                    </group>
+                    <group>
+                        <field name="percent"/>
+                        <field name="amount" attrs="{'readonly': [('last','=',True)]}"/>
+                        <field name="amount_paid" readonly="1"/>
+                    </group>
+                </group>
+            </form>
         </field>
     </record>
 
@@ -107,6 +159,29 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='tax_ids']" position="after">
                 <field name="debit" string="Montant" filter_domain="['|',('debit','=',self),('credit','=',self)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Ajout name dans les lignes d'échéances -->
+    <record id="of_view_payment_term_line_tree" model="ir.ui.view">
+        <field name="name">of.account.payment.term.line.tree</field>
+        <field name="model">account.payment.term.line</field>
+        <field name="inherit_id" ref="account.view_payment_term_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='value']" position="before">
+                <field name="name"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_view_payment_term_line_form" model="ir.ui.view">
+        <field name="name">of.account.payment.term.line.form</field>
+        <field name="inherit_id" ref="account.view_payment_term_line_form"/>
+        <field name="model">account.payment.term.line</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='value']" position="before">
+                <field name="name"/>
             </xpath>
         </field>
     </record>

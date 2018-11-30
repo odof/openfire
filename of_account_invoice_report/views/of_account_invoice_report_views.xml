@@ -46,6 +46,11 @@
                     <field name="pdf_display_product_ref" class="oe_inline"/>
                     <span>Afficher les références produits dans les rapports PDF</span>
                 </div>
+                <label for="pdf_afficher_multi_echeances"/>
+                <div name="pdf_afficher_multi_echeances">
+                    <field name="pdf_afficher_multi_echeances" class="oe_inline"/>
+                    <span>Afficher les échéances multiples dans les rapports PDF</span>
+                </div>
             </xpath>
         </field>
     </record>

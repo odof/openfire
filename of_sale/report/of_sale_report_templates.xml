@@ -196,6 +196,37 @@
                     </table>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-xs-8" t-if="doc.pdf_afficher_multi_echeances()" string="Échéances">
+                    <div><strong>Échéances&amp;nbsp;: </strong></div>
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Nombre de jours</th>
+                                <th>Option</th>
+                                <th class="text-right">Pourcentage</th>
+                                <th class="text-right">Montant</th>
+                                <!--th class="text-right">Amount paid</th-->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="doc.echeance_line_ids" t-as="e">
+                                <td><span t-field="e.name"/></td>
+                                <td class="text-right"><span t-field="e.days"/></td>
+                                <td><span t-field="e.option"/></td>
+                                <td class="text-right"><span t-field="e.percent"/> %</td>
+                                <td class="text-right">
+                                    <span t-field="e.amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                </td>
+                                <!--td class="text-right">
+                                    <span t-field="e.amount_paid" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                </td-->
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
             <p t-if="doc.of_date_vt">
                 <t t-set="date_order" t-value="doc.of_date_vt[8:10] + '/' + doc.of_date_vt[5:7] + '/' + doc.of_date_vt[0:4]"/>
