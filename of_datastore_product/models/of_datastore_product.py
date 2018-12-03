@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
+from odoo import models, fields, api, registry, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.osv.expression import NEGATIVE_TERM_OPERATORS, TERM_OPERATORS_NEGATION, TRUE_LEAF, FALSE_LEAF
+from odoo.tools.safe_eval import safe_eval
 
+from contextlib import contextmanager
+from threading import Lock
 DATASTORE_IND = 100000000  # 100.000.000 ids devraient suffire pour les produits. Les chiffres suivants serviront pour le fournisseur
 
 class OfDatastoreSupplier(models.Model):
@@ -360,7 +363,7 @@ class OfProductBrand(models.Model):
             if product:
                 result = product
             else:
-                result = obj_obj.search([('of_datastore_res_id', '=', res_id)])
+                result = obj_obj.search([('brand_id', '=', self.id), ('of_datastore_res_id', '=', res_id)])
                 if not result:
                     if create:
                         result = False
@@ -412,11 +415,106 @@ class OfProductBrand(models.Model):
         match_dict[res_id] = result
         return result
 
+class OfDatastoreCache(models.TransientModel):
+    # Odoo V10 a un code javascript très sale (quasi totalement réécrit en V11)
+    # Lors de la saisie d'un kit, pour une seule ligne de composant saisie, il appelle 3 fois name_get() et 3 fois onchange() !
+    # Cela est ensuite multiplié par le nombre de lignes saisies (raffraichissement de la vue liste)
+    # Le temps d'affichage est alors énorme...
+    # Faute de retravailler le javascript, nous allons mettre les données recueillies dans un cache, ce qui limitera les
+    #   appels aux bases centrales
+    _name = 'of.datastore.cache'
+    _datastore_cache_locks = {'main': Lock()}
+
+    model = fields.Char(string='Model', required=True)
+    res_id = fields.Integer(string='Resource id', required=True)
+    vals = fields.Char(string='Values', help="Dictionnary of values for this object", required=True)
+
+    @contextmanager
+    def _get_cache_token(self, key, blocking=True):
+        """
+        Fonction de jeton permettant d'éviter à différents threads d'accéder simultanément à la même clef.
+        Ainsi, si plusieurs threads veulent récupérer les mêmes données sur une base centrale,
+          seul le premier sera autorisé à le faire pendant que les autres attendront le résultat.
+        @param key: clef permettant d'identifier un jeton (dans la pratique il s'agit de l'id du connecteur à la base centrale)
+        @param blocking: Si vrai, le processus attendra jusqu'à la libération du jeton, si faux la fonction renverra faux si le jeton n'est pas disponible.
+        @return: Le modèle 'of.datastore.cache' avec un nouveau cursor si le jeton a pu être obtenu, faux sinon
+        """
+        if key not in self._datastore_cache_locks:
+            self._datastore_cache_locks['main'].acquire()
+            if key not in self._datastore_cache_locks:
+                self._datastore_cache_locks[key] = Lock()
+            self._datastore_cache_locks['main'].release()
+
+        acquired = self._datastore_cache_locks[key].acquire(blocking)
+        try:
+            if acquired:
+                cr = registry(self._cr.dbname).cursor()
+                result = self.env(cr=cr)['of.datastore.cache']
+            yield result
+            cr.commit()
+        finally:
+            if acquired:
+                try:
+                    cr.close()
+                except:
+                    pass
+                self._datastore_cache_locks[key].release()
+
+    @api.model
+    def store_values(self, model, vals):
+        """ Fonction de mise à jour du cache.
+        Cette fonction ne devrait jamais être appelée sans avoir au préalable acquis un token avec _get_cache_token
+        """
+        res_ids = [v['id'] for v in vals]
+        stored = {ds_cache.res_id: ds_cache for ds_cache in self.search([('model', '=', model), ('res_id', 'in', res_ids)])}
+        for v in vals:
+            ds_cache = stored.get(v['id'])
+            v = self.env[model]._convert_to_cache(v, update=True, validate=False)
+            res_id = v.pop('id')
+            if ds_cache:
+                ds_cache_vals = safe_eval(ds_cache.vals)
+                ds_cache_vals.update(v)
+                # Appel explicite de write, une affectation avec '=' ne marcherait pas si on est dans un on_change
+                ds_cache.write({'vals': str(ds_cache_vals)})
+            else:
+                self.create({
+                    'model': model,
+                    'res_id': res_id,
+                    'vals': str(v),
+                })
+
+    @api.model
+    def apply_values(self, record):
+        record.ensure_one()
+
+        stored = {ds_cache.res_id: ds_cache for ds_cache in self.search([('model', '=', record._name), ('res_id', 'in', record._ids)])}
+
+        if record.id in stored:
+            ds_cache = stored[record.id]
+            record._cache.update(record._convert_to_cache(safe_eval(ds_cache.vals), validate=False))
 
 class OfDatastoreCentralized(models.AbstractModel):
     _name = 'of.datastore.centralized'
 
     of_datastore_res_id = fields.Integer(string="ID on supplier database")
+
+    @classmethod
+    def _browse(cls, ids, env, prefetch=None):
+        # Il est important d'hériter de _browse() et non de browse()
+        #  car c'est _browse() qui est appelé dans fields.Many2one.convert_to_record()
+        result = super(OfDatastoreCentralized, cls)._browse(ids, env, prefetch=prefetch)
+        if ids:
+            if len(ids) > 1:
+                for _ in result:
+                    # L'itération sur result va appeler la fonction _browse() pour chaque élément
+                    #   et donc passer dans le else: ci-dessous
+                    pass
+            else:
+                try:
+                    env['of.datastore.cache'].apply_values(result)
+                except:
+                    pass
+        return result
 
     @api.model
     def _get_datastore_unused_fields(self):
@@ -440,9 +538,9 @@ class OfDatastoreCentralized(models.AbstractModel):
             'purchase_method',
 
             # Champs de notes
-            'description_sale',
-            'description_purchase',
-            'description_picking',
+            'description_sale',  # Description pour les devis
+            'description_purchase',  # Description pour les fournisseurs
+            'description_picking',  # Description pour le ramassage
         ]
 
         # On ne veut pas non-plus les champs one2many ou many2many (seller_ids, packagind_ids, champs liés aux variantes....)
@@ -505,12 +603,29 @@ class OfDatastoreCentralized(models.AbstractModel):
         unused_fields = self._get_datastore_unused_fields()
         datastore_fields = [field for field in fields_to_read if field not in unused_fields]
 
-        # Ajout de champs nécessaires aux calculs
-        added_fields = [field for field in ('brand_id', 'categ_id', 'product_tmpl_id', 'default_code', 'uom_id',
-                                            'uom_po_id', 'list_price')
-                        if field in self._fields and
-                        field not in datastore_fields]
-        datastore_fields += added_fields
+        if datastore_fields:
+            # Ajout de champs nécessaires aux calculs. Ces champs seront supprimés après la lecture
+            # Ces champs n'ont pas besoin d'être ajoutés quand datastore_fields est vide (évite un accès à la base centrale)
+            # Champs ajoutés :
+            required_fields = [
+                # - brand_id : La marque, depuis laquelle on extrait les règles de lecture
+                'brand_id',
+                # - categ_id : La catégorie, qui peut correspondre à des règles de lexture plus spécifiques dans la marque
+                'categ_id',
+                # - product_tmpl_id : L'article de base, utile pour of_tmpl_datastore_res_id
+                'product_tmpl_id',
+                # - default_code : La référence de l'article, utile pour of_seller_product_code
+                'default_code',
+                # - uom_id et uom_po_id : Les unités de mesure et de mesure d'achat de l'article, utiles pour calculer les prix d'achat/vente
+                'uom_id',
+                'uom_po_id',
+                # - list_price : Le prix d'achat de l'article, à partir duquel sont réalisés les calculs pour le prix de vente et le coût
+                'list_price',
+            ]
+            added_fields = [field for field in required_fields
+                            if field in self._fields and
+                            field not in datastore_fields]
+            datastore_fields += added_fields
 
         m2o_fields = [
             field for field in datastore_fields
@@ -522,15 +637,20 @@ class OfDatastoreCentralized(models.AbstractModel):
 
         for supplier_id, product_ids in datastore_product_ids.iteritems():
             supplier_value = supplier_id * DATASTORE_IND
+            if not datastore_fields:
+                if create_mode:
+                    result += [{'id': product_id} for product_id in product_ids]
+                else:
+                    # Pas d'accès à la base centrale, on remplit l'id et on met tout le reste à False ou []
+                    datastore_defaults = {field: [] if self._fields[field].type in ('one2many', 'many2many') else False
+                                          for field in fields_to_read if field != 'id'}
+                    result += [dict(datastore_defaults, id=-(product_id + supplier_value)) for product_id in product_ids]
+                continue
             supplier = supplier_obj.browse(supplier_id)
             client = supplier.of_datastore_connect()
             ds_product_obj = supplier_obj.of_datastore_get_model(client, self._name)
 
-            if datastore_fields:
-                datastore_product_data = supplier_obj.of_datastore_read(ds_product_obj, product_ids, datastore_fields, '_classic_read')
-            else:
-                # Si il n'y a plus aucun field, ds_product_obj.read lirait TOUS les field disponibles, ce qui aurait l'effet inverse (et genererait des erreurs de droits)
-                datastore_product_data = [{'id': product_id} for product_id in product_ids]
+            datastore_product_data = supplier_obj.of_datastore_read(ds_product_obj, product_ids, datastore_fields, '_classic_read')
 
             if not create_mode:
                 # Les champs manquants dans la table du fournisseur ne sont pas renvoyés, sans générer d'erreur
@@ -557,7 +677,7 @@ class OfDatastoreCentralized(models.AbstractModel):
                 categ_name = vals['categ_id'][1]
                 obj_dict = {}
 
-                # Calcul des valeurs specifiques
+                # Calcul des valeurs spécifiques
                 for field, val in fields_defaults:
                     vals[field] = val()
                 if create_mode:
@@ -574,10 +694,16 @@ class OfDatastoreCentralized(models.AbstractModel):
                         res = brand.datastore_match(client, obj, vals[field][0], vals[field][1], product, match_dicts, create=create_mode)
                         if field in ('categ_id', 'uom_id', 'uom_po_id'):
                             obj_dict[field] = res
-                        res_id = res and res.id
-                        vals[field] = res_id
-                        if res_id:
-                            field_res_ids[field].add(res_id)
+                        if res:
+                            if res.id < 0:
+                                # Valeur de la base centrale
+                                # Normalement uniquement utilisé pour product_tmpl_id
+                                vals[field] = (res.id, vals[field][1])
+                            else:
+                                vals[field] = res.id
+                                field_res_ids[field].add(res.id)
+                        else:
+                            vals[field] = False
 
                 # --- Champs x2many ---
                 for field in o2m_fields:
@@ -609,8 +735,9 @@ class OfDatastoreCentralized(models.AbstractModel):
                     vals['marge'] = (vals['list_price'] - vals['standard_price']) * 100 / vals['list_price']
 
                 # Suppression des valeurs non voulues
-                for field in added_fields:
-                    vals.pop(field, False)
+                # Suppression désactivée ... après tout, c'est calculé maintenant, autant le garder en cache
+                # for field in added_fields:
+                #     vals.pop(field, False)
 
             if not create_mode:
                 # Conversion au format many2one (id,name)
@@ -622,25 +749,73 @@ class OfDatastoreCentralized(models.AbstractModel):
                     res_obj = self.env[obj].browse(res_ids)
                     res_names = {v[0]: v for v in res_obj.sudo().name_get()}
                     for vals in datastore_product_data:
-                        if vals[field]:
+                        if isinstance(vals.get(field), (int, long)):
                             vals[field] = res_names[vals[field]]
 
             result += datastore_product_data
+
         return result
 
     @api.multi
     def read(self, fields=None, load='_classic_read'):
         new_ids = [i for i in self._ids if i > 0]
-        datastore_ids = [i for i in self._ids if i < 0]
 
         # Produits sur la base courante
         res = super(OfDatastoreCentralized, self.browse(new_ids)).read(fields, load=load)
 
-        if datastore_ids:
+        if len(new_ids) != len(self._ids):
             # Si fields est vide, on récupère tous les champs accessibles pour l'objet (copié depuis BaseModel.read())
             self.check_access_rights('read')
             fields = self.check_field_access_rights('read', fields)
-            res += self.browse(datastore_ids)._of_read_datastore(fields, create_mode=False)
+            fields = set(fields)
+            if 'id' in fields:
+                fields.remove('id')
+
+            # Séparation des ids par base centrale
+            datastore_product_ids = {}
+            for full_id in self._ids:
+                if full_id < 0:
+                    datastore_product_ids.setdefault(-full_id / DATASTORE_IND, []).append(full_id)
+
+            res = {vals['id']: vals for vals in res}
+            for supplier_id, datastore_ids in datastore_product_ids.iteritems():
+                with self.env['of.datastore.cache']._get_cache_token(supplier_id) as of_cache:
+                    # Vérification des données dans notre cache
+                    cached_products = of_cache.search([('model', '=', self._name), ('res_id', 'in', datastore_ids)])
+
+                    # Les articles non en cache sont à lire
+                    new_ids = set(datastore_ids) - set(cached_products.mapped('res_id'))
+
+                    # Si au moins un opjet est inexistant en cache, tous les champs sont à lire
+                    new_fields = set(fields) if new_ids else set()
+
+                    # Les articles dont au moins un champ n'est pas en cache sont aussi à lire, pour au moins ce champ
+                    for cached_product in cached_products:
+                        product_data = safe_eval(cached_product.vals)
+                        missing_fields = fields - set(product_data.keys())
+                        if missing_fields:
+                            new_fields |= missing_fields
+                            new_ids.add(cached_product.res_id)
+
+                    if new_ids:
+                        # Lecture des données sur la base centrale
+                        data = self.browse(new_ids)._of_read_datastore(new_fields, create_mode=False)
+
+                        # Stockage des données dans notre cache
+                        of_cache.store_values(self._name, data)
+
+                    # Une fois les données en cache, récupère toutes les données pour ensuite
+                    #   libérer le cache pour les autres processus en attente
+                    cached_products = of_cache.search([('model', '=', self._name), ('res_id', 'in', datastore_ids)])
+                    data = cached_products.read(['res_id', 'vals'])
+                for d in data:
+                    vals = safe_eval(d['vals'])
+                    vals = {field: vals[field] for field in fields}
+                    vals['id'] = d['res_id']
+                    res[d['res_id']] = vals
+
+            # Remise des résultats dans le bon ordre
+            res = [res[i] for i in self._ids]
         return res
 
     @api.model
