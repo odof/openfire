@@ -415,6 +415,35 @@ class OfProductBrand(models.Model):
         match_dict[res_id] = result
         return result
 
+    @api.multi
+    def clear_datastore_cache(self):
+        """ Fonction de nettoyage du cache.
+        Le cache étant un TransientModel, il est automatiquement nettoyé tous les jours
+        La fonction _transient_vacuum() d'Odoo efface tous les TransientModel dont le write_date ou create_date
+          est vieux de plus d'une heure)
+         - Tous les jours, via le cron base.autovacuum_job
+         - Tous les 20 appels de _create()
+        Cette fonction de nettoyage permet un nettoyage manuel supplémentaire par base centrale.
+        Le but est de pouvoir nettoyer par connecteur TC si besoin, notamment lorsque les règles
+          de calcul ont été modifiées dans la marque.
+        """
+        suppliers = self.mapped('datastore_supplier_id')
+        domain = [('model', 'in', ('product.product', 'product.template'))] + ['|'] * (len(self._ids) - 1)
+        for supplier in suppliers:
+            domain += [
+                '&',
+                ('res_id', '<=', -DATASTORE_IND * supplier.id),
+                ('res_id', '>', -DATASTORE_IND * (supplier.id + 1))
+            ]
+        self.env['of.datastore.cache'].search(domain).unlink()
+
+    @api.multi
+    def write(self, vals):
+        res = super(OfProductBrand, self).write(vals)
+        if vals and self:
+            self.clear_datastore_cache()
+        return res
+
 class OfDatastoreCache(models.TransientModel):
     # Odoo V10 a un code javascript très sale (quasi totalement réécrit en V11)
     # Lors de la saisie d'un kit, pour une seule ligne de composant saisie, il appelle 3 fois name_get() et 3 fois onchange() !
