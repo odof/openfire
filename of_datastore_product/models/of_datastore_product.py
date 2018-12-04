@@ -532,17 +532,12 @@ class OfDatastoreCentralized(models.AbstractModel):
         # Il est important d'hériter de _browse() et non de browse()
         #  car c'est _browse() qui est appelé dans fields.Many2one.convert_to_record()
         result = super(OfDatastoreCentralized, cls)._browse(ids, env, prefetch=prefetch)
-        if ids:
-            if len(ids) > 1:
-                for _ in result:
-                    # L'itération sur result va appeler la fonction _browse() pour chaque élément
-                    #   et donc passer dans le else: ci-dessous
-                    pass
-            else:
-                try:
-                    env['of.datastore.cache'].apply_values(result)
-                except:
-                    pass
+        for i in ids:
+            if i < 0:
+                # Appel de super() pour éviter un appel récursif infini
+                record = super(OfDatastoreCentralized, cls)._browse((i, ), env, prefetch=prefetch)
+                if not record._cache:
+                    env['of.datastore.cache'].apply_values(record)
         return result
 
     @api.model
