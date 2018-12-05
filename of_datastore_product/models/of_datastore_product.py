@@ -794,6 +794,8 @@ class OfDatastoreCentralized(models.AbstractModel):
             fields = set(fields)
             if 'id' in fields:
                 fields.remove('id')
+            obj_fields = [self._fields[field] for field in fields]
+            use_name_get = (load == '_classic_read')
 
             # Séparation des ids par base centrale
             datastore_product_ids = {}
@@ -834,7 +836,9 @@ class OfDatastoreCentralized(models.AbstractModel):
                     data = cached_products.read(['res_id', 'vals'])
                 for d in data:
                     vals = safe_eval(d['vals'])
-                    vals = {field: vals[field] for field in fields}
+                    # Filtre des champs à récupérer et conversion au format read
+                    vals = {field.name: field.convert_to_read(field.convert_to_record(vals[field.name], self), self, use_name_get)
+                            for field in obj_fields}
                     vals['id'] = d['res_id']
                     res[d['res_id']] = vals
 
