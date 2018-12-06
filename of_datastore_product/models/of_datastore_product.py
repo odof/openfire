@@ -525,7 +525,7 @@ class OfDatastoreCache(models.TransientModel):
 class OfDatastoreCentralized(models.AbstractModel):
     _name = 'of.datastore.centralized'
 
-    of_datastore_res_id = fields.Integer(string="ID on supplier database")
+    of_datastore_res_id = fields.Integer(string="ID on supplier database", index=True)
 
     @classmethod
     def _browse(cls, ids, env, prefetch=None):
@@ -584,6 +584,12 @@ class OfDatastoreCentralized(models.AbstractModel):
                             En mode create on remplit seller_ids
         """
         supplier_obj = self.env['of.datastore.supplier']
+
+        # self_obj permet de faire des appels de fonctions avec le décorateur api.model sans envoyer tous les ids.
+        # En effet, ce décorateur n'efface pas les ids contenus dans l'objet pour appeler la fonction.
+        # Cela représente un coût en temps d'exécution, qui devient conséquent lorsqu'on ajoute les données
+        #   du of.datastore.cache (fonction _browse ci-dessus, appelée notamment lors des appels self.check_access_rights)
+        self_obj = self.env[self._name]
         result = []
 
         if 'id' in fields_to_read:  # Le champ id sera de toute façon ajouté, le laisser génèrera des erreurs
@@ -695,7 +701,7 @@ class OfDatastoreCentralized(models.AbstractModel):
             for vals in datastore_product_data:
                 # --- Calculs préalables ---
                 brand = match_dicts['brand_id'][vals['brand_id'][0]]
-                product = self.search([('brand_id', '=', brand.id), ('of_datastore_res_id', '=', vals['id'])])
+                product = self_obj.search([('brand_id', '=', brand.id), ('of_datastore_res_id', '=', vals['id'])])
                 if self._name == 'product.product':
                     product = product.product_tmpl_id
                 categ_name = vals['categ_id'][1]
@@ -1116,20 +1122,22 @@ class ProductProduct(models.Model):
 
     @api.multi
     def of_datastore_import(self):
+        # Voir commentaire dans _of_read_datastore sur l'utilité du self_obj
+        self_obj = self.env[self._name]
         if len(self) == 1:
             # Detection de l'existance du produit
             # Ce cas peut se produire dans un object de type commance, si plusieurs lignes ont la meme reference
             supplier = self.env['of.datastore.supplier'].browse(-self.id / DATASTORE_IND)
 
-            result = self.search([('brand_id', 'in', supplier.brand_ids._ids),
-                                  ('of_datastore_res_id', '=', (-self.id) % DATASTORE_IND)])
+            result = self_obj.search([('brand_id', 'in', supplier.brand_ids._ids),
+                                      ('of_datastore_res_id', '=', (-self.id) % DATASTORE_IND)])
             if result:
                 return result
 
         fields_to_read = self.of_datastore_get_import_fields()
         result = self.browse()
         for product_data in self._of_read_datastore(fields_to_read, create_mode=True):
-            result += self.create(product_data)
+            result += self_obj.create(product_data)
         return result
 
 
