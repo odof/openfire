@@ -18,6 +18,7 @@ Module de comptabilité OpenFire.
   - Permettre de modifier la date d'échéance manuellement (option dans les paramètres de configuration comptabilité : suivant les conditions de règlement/modification manuelle possible)
   - Permettre d'afficher et de rechercher des étiquettes client dans les factures
   - Ajout d'un champ 'Exporté' pour savoir ce qui a été exporté
+  - Modifie le libellé des écritures comptables (Factures : client + n° facture, Paiement : client + n° facture/n° commande)
 """,
     'depends' : [
         'account',
