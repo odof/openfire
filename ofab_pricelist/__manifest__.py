@@ -35,6 +35,7 @@ Fonctionnalités
         'product',
         'sale',
         'of_product_brand',
+        'of_kit',
     ],
     'data' : [
         'views/ofab_pricelist_view.xml',
