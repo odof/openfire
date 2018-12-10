@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 
 NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
 
@@ -37,6 +37,15 @@ class AccountInvoice(models.Model):
             pterm_list = pterm.with_context(currency_id=self.company_id.currency_id.id).compute(value=1, date_ref=date_invoice)[0]
             if (param_date_due and not self.date_due) or not param_date_due:  # On rajoute la vérification pour permettre de modifier manuellement la date d'échéance.
                 self.date_due = max(line[0] for line in pterm_list)
+
+    @api.multi
+    def action_invoice_open(self):
+        """Mettre le libellé des écritures comptables d'une facture avec nom client (30 1er caractères) + no facture"""
+        res = super(AccountInvoice, self).action_invoice_open()
+        ref = self.partner_id.name[:30] + ' ' + self.number
+        self.move_id.line_ids.write({'name': ref})
+        self.move_id.write({'ref': ref})
+        return res
 
 class AccountAccount(models.Model):
     _inherit = "account.account"
@@ -110,6 +119,23 @@ class AccountMoveLine(models.Model):
                         })
         return result
 
+    def reconcile(self, writeoff_acc_id=False, writeoff_journal_id=False):
+        """Mettre le libellé des écritures comptables d'un paiement avec nom client (30 1er caractères) + no facture"""
+        res = super(AccountMoveLine, self).reconcile(writeoff_acc_id=writeoff_acc_id, writeoff_journal_id=writeoff_journal_id)
+        filt = self.filtered(lambda line: (line.reconciled or (line.matched_debit_ids and len(line.matched_debit_ids) == 1)) and line.payment_id)
+        for line in filt:
+            line_ids = self.env['account.move.line']
+            if line.account_id.reconcile:
+                for reconciled_lines in line.matched_debit_ids:
+                    line_ids += reconciled_lines.debit_move_id
+                invoice_ids = line_ids.mapped('invoice_id')
+                line.move_id.write({'ref': line.payment_id.communication})
+                if len(invoice_ids) == 1:
+                    name_infos = [invoice_ids.partner_id.name[:30], invoice_ids.number]
+                    name = (' ').join([text for text in name_infos if text])
+                    line.move_id.line_ids.with_context(check_move_validity=False).write({'name': name})
+        return res
+
 class AccountMove(models.Model):
     _inherit = "account.move"
 
@@ -131,3 +157,13 @@ class AccountPayment(models.Model):
             vals['views'] = [(self.env.ref('account.invoice_supplier_tree').id, 'tree'),
                              (self.env.ref('account.invoice_supplier_form').id, 'form')]
         return vals
+
+    def post(self):
+        """Lors d'un lettrage d'un paiement, rajoute le libellé sur toutes les écritures du paiement."""
+        res = super(AccountPayment, self).post()
+        client_line = self.move_line_ids.filtered(lambda line: line.credit > 0)
+        if client_line.name == _("Customer Payment"):
+            self.move_line_ids.write({"name": self.partner_id.name[:30] + " " + self.communication})  # Permet d'avoir toutes les lignes avec le même libellé
+        else:
+            self.move_line_ids.write({"name": client_line.name})
+        return res
