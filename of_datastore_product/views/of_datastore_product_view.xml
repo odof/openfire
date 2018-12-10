@@ -102,15 +102,15 @@
                 </button>
             </xpath>
             <xpath expr="//notebook" position="before">
-                <group colspan="2" invisible="context.get('uid') != 1">
-                    <field name="datastore_supplier_id"/>
-                </group>
                 <div colspan="2" attrs="{'invisible':[('datastore_supplier_id', '=', False)]}">
                     <span>This brand is connected to the centralized pricelist.</span>
                 </div>
             </xpath>
             <xpath expr="//page[@name='notes']" position="inside">
                 <separator string="Centralized products notes" colspan="2"/>
+                <group colspan="2" invisible="context.get('uid') != 1">
+                    <field name="datastore_supplier_id" readonly="1"/>
+                </group>
                 <field name="datastore_note_maj" colspan="2" nolabel="1"/>
             </xpath>
 
