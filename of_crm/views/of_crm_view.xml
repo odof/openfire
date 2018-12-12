@@ -822,7 +822,7 @@
             <field name="res_model">res.partner</field>
             <field name="view_type">form</field>
             <field name="view_mode">kanban,tree,form</field>
-            <field name="context">{"search_default_confirmed": 1}</field>
+            <field name="context">{"search_default_confirmed": 1, "default_of_customer_state": "customer"}</field>
             <field name="search_view_id" ref="of_crm_view_res_partner_filter"/>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
@@ -841,7 +841,7 @@
             <field name="res_model">res.partner</field>
             <field name="view_type">form</field>
             <field name="view_mode">kanban,tree,form</field>
-            <field name="context">{"search_default_lead": 1}</field>
+            <field name="context">{"search_default_lead": 1, "default_of_customer_state": "lead"}</field>
             <field name="search_view_id" ref="of_crm_view_res_partner_filter"/>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
@@ -879,6 +879,21 @@
                         <field name="crm_suivi"/>
                         <field name="crm_suivi_notes"/>
                     </group>
+                </xpath>
+            </field>
+        </record>
+
+<!-- #######################################################################################
+                                      CALENDAR EVENT
+############################################################################################ -->
+
+        <record id="of_view_calendar_event_form_crm" model="ir.ui.view">
+            <field name="name">of.calendar.event.form.crm</field>
+            <field name="model">calendar.event</field>
+            <field name="inherit_id" ref="of_calendar.of_view_calendar_event_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='user_id']" position="after">
+                    <field name="opportunity_id"/>
                 </xpath>
             </field>
         </record>
