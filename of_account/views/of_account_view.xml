@@ -99,4 +99,16 @@
         </field>
     </record>
 
+    <!-- Rechercher écritures comptables sur le débit et crédit en même temps -->
+    <record id="of_account_view_account_move_line_filter" model="ir.ui.view">
+        <field name="name">of.account.view.account.move.line.filter</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="account.view_account_move_line_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tax_ids']" position="after">
+                <field name="debit" string="Montant" filter_domain="['|',('debit','=',self),('credit','=',self)]"/>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
