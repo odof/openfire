@@ -37,6 +37,7 @@ CalendarView.include({
         this.dispo_field = attrs.dispo_field;
         this.force_color_field = attrs.force_color_field;
         this.selected_field = attrs.selected_field;
+
         this.color_ft_field = attrs.color_ft_field;
         this.color_bg_field = attrs.color_bg_field;
         if (this.custom_colors && !(attrs.color_ft_field && attrs.color_bg_field)) {
@@ -272,6 +273,97 @@ CalendarView.include({
         this.$calendar.fullCalendar('addEventSource', this.event_source);
     },
     /**
+     *  render states caption if display_states in attributes
+     */
+    init_working_hours_fields: function () {
+        var self = this;
+        var dfd = $.Deferred();
+        if (this.attendee_model && this.working_hours) {
+            var model = new Model(this.attendee_model)
+            $.when(model.call('get_working_hours_fields'))
+            .then(function (res){
+                self.working_hours_fields = {};
+
+                self.working_hours_fields.mor_start_field = res["morning_start_field"];
+                self.working_hours_fields.mor_end_field = res["morning_end_field"];
+                self.working_hours_fields.aft_start_field = res["afternoon_start_field"];
+                self.working_hours_fields.aft_end_field = res["afternoon_end_field"];
+
+                dfd.resolve();
+            });
+        }else{
+            this.working_hours_fields = null;
+            dfd.resolve();
+        }
+        return $.when(dfd);
+    },
+    /**
+     *  Sets up this.minTime and this.maxTime
+     */
+    set_min_max_time: function() {
+        var self = this;
+        var dfd = $.Deferred();
+        if (!isNullOrUndef(this.working_hours_fields)) {
+            var model = new Model(this.attendee_model);
+            var ms = this.working_hours_fields.mor_start_field;
+            var me = this.working_hours_fields.mor_end_field;
+            var as = this.working_hours_fields.aft_start_field;
+            var ae = this.working_hours_fields.aft_end_field;
+            var fields = [ms, me, as, ae, "tz", "tz_offset"];
+            self.working_hours = {};
+            model.query(fields)
+            .all()
+            .then(function (res) {
+                /*
+                prendre toutes les horaires, les mettres en UTC, les comparer pour avoir le min et max
+                mettre le min et max en localetime pour set minTime et maxTime (plage horaire affichée du calendrier)
+                */
+                var date_today = new Date();
+                var str_UTC = date_today.toUTCString();
+                var str_prefix = str_UTC.substring(0,17);
+                var str_suffix = str_UTC.substring(25);
+                var descript = {type: "float_time"};
+                var minTime, minUTC, maxTime, maxUTC;
+
+                _.each(res, function(record){
+                    var min_time = formats.format_value(record[ms],descript) + ":00";
+                    var max_time = formats.format_value(record[ae],descript) + ":00";
+                    record.min_UTC = str_prefix + min_time + str_suffix + record.tz_offset;
+                    record.max_UTC = str_prefix + max_time + str_suffix + record.tz_offset;
+                    record.min_date_UTC = new Date(record.min_UTC);
+                    record.max_date_UTC = new Date(record.max_UTC);
+
+                    if (isNullOrUndef(minUTC)) minUTC = record.min_date_UTC;
+                    if (record.min_date_UTC.getTime() < minUTC.getTime()) minUTC = record.min_date_UTC;
+                    if (isNullOrUndef(maxUTC)) maxUTC = record.max_date_UTC;
+                    if (record.max_date_UTC.getTime() > maxUTC.getTime()) maxUTC = record.max_date_UTC;
+
+                    self.working_hours[record.id] = {
+                        mor_start: min_time,
+                        mor_end: formats.format_value(record[me],descript) + ":00",
+                        aft_start: formats.format_value(record[as],descript) + ":00",
+                        aft_end: max_time,
+                        tz: record["tz"],
+                        tz_offset: record["tz_offset"],
+                        str_suffix: " GMT" + record["tz_offset"],
+                    }
+                });
+                if (isNullOrUndef(minUTC)) minUTC = new Date(str_prefix + "00:00:00" + str_suffix );
+                if (isNullOrUndef(maxUTC)) maxUTC = new Date(str_prefix + "00:00:00" + str_suffix );
+                minTime = minUTC.toLocaleTimeString();
+                maxTime = maxUTC.toLocaleTimeString();
+
+                self.minTime = minTime;
+                self.maxTime = maxTime;
+                dfd.resolve();
+            });
+        }else{
+            dfd.resolve();
+        }
+        return $.when(dfd);
+    },
+    /**
+     *  Override of parent function
      *  render states caption if display_states in attributes
      */
     init_working_hours_fields: function () {
