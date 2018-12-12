@@ -39,6 +39,9 @@ class SaleOrder(models.Model):
     def pdf_afficher_email(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_email')
 
+    def pdf_afficher_date_validite(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_date_validite_devis')
+
     def get_color_section(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'of_color_bg_section')
 
@@ -66,6 +69,16 @@ class SaleOrder(models.Model):
     of_marge_pc = fields.Float(compute='_compute_of_marge', string='Marge %')
 
     of_etiquette_partenaire_ids = fields.Many2many('res.partner.category', related='partner_id.category_id', string=u"Étiquettes client")
+    of_client_view = fields.Boolean(string='Vue client/vendeur')
+
+    of_date_vt = fields.Date(string="Date visite technique", help=u"Si renseignée apparaîtra sur le devis / Bon de commande")
+
+    @api.multi
+    def _prepare_invoice(self):
+        #ajout de la date de la visite technique dans la vue formulaire de la facture
+        invoice_vals = super(SaleOrder, self)._prepare_invoice()
+        invoice_vals['of_date_vt'] = self.of_date_vt
+        return invoice_vals
 
     @api.depends('state', 'order_line', 'order_line.qty_to_invoice', 'order_line.product_uom_qty')
     def _compute_of_to_invoice(self):
@@ -100,6 +113,11 @@ class SaleOrder(models.Model):
                 # Utilisation des documents pdf fournis
                 data.append(mail_template.file)
         return data
+
+    def toggle_view(self):
+        """ Permet de basculer entre la vue vendeur/client
+        """
+        self.of_client_view = not self.of_client_view
 
 class Report(models.Model):
     _inherit = "report"
@@ -141,6 +159,7 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     price_unit = fields.Float(digits=False)
+    of_client_view = fields.Boolean(string="Vue client/vendeur", related="order_id.of_client_view")
 
     @api.multi
     @api.onchange('product_id')
@@ -222,6 +241,9 @@ class OFSaleConfiguration(models.TransientModel):
         string="(OF) Réf. produits", required=True, default=False,
         help="Afficher les références produits dans les rapports PDF ?")
 
+    pdf_date_validite_devis = fields.Boolean(string="(OF) Date validité devis", required=True, default=False,
+            help="Afficher la date de validité dans le rapport PDF des devis ?")
+
     pdf_adresse_nom_parent = fields.Boolean(
         string=u"(OF) Nom parent contact", required=True, default=False,
         help=u"Afficher le nom du 'parent' du contact au lieu du nom du contact dans les rapport PDF ?")
@@ -279,6 +301,11 @@ class OFSaleConfiguration(models.TransientModel):
             'sale.config.settings', 'pdf_display_product_ref_setting', self.pdf_display_product_ref_setting)
 
     @api.multi
+    def set_pdf_date_validite_devis_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_date_validite_devis', self.pdf_date_validite_devis)
+
+    @api.multi
     def set_of_deposit_product_categ_id_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_deposit_product_categ_id_setting', self.of_deposit_product_categ_id_setting.id)
@@ -289,6 +316,8 @@ class OFSaleConfiguration(models.TransientModel):
 
 class AccountInvoice(models.Model):
     _inherit = "account.invoice"
+
+    of_date_vt = fields.Date(string="Date visite technique")
 
     def get_color_section(self):
         return self.env['ir.values'].get_default('account.config.settings', 'of_color_bg_section')
@@ -301,4 +330,3 @@ class AccountConfigSettings(models.TransientModel):
     @api.multi
     def set_of_color_bg_section_defaults(self):
         return self.env['ir.values'].sudo().set_default('account.config.settings', 'of_color_bg_section', self.of_color_bg_section)
-

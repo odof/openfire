@@ -14,6 +14,7 @@
         'of_planning',
         'of_service',
         'of_geolocalize',
+        'of_map_view',
         # 'of_gesdoc',
         # 'of_imports',
         'of_base_location',

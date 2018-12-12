@@ -26,8 +26,8 @@ function print_fail_message() {
 
 var OFKanbanSelection = AbstractField.extend({
     // inspired by web_kanban.widgets.KanbanSelection and web.form_widgets.FieldSelection
-	template: "OFKanbanSelection",
-	className: "of_kanban_selection",
+    template: "OFKanbanSelection",
+    className: "of_kanban_selection",
     defaults: _.extend({},{
     }),
 
@@ -55,14 +55,14 @@ var OFKanbanSelection = AbstractField.extend({
         //console.log("OFKanbanSelection.prepare_dropdown_selection this",this);
         var def = $.Deferred();
         this.query_values().then(function () { // this.query_values() will set self.field.selection
-        	_.map(self.field.selection || [], function(res) {
-        		var value = {
-        			'id': res[0],
-	                'name': res[1],
-	            };
-	            _data.push(value);
-        	});
-        	def.resolve();
+            _.map(self.field.selection || [], function(res) {
+                var value = {
+                    'id': res[0],
+                    'name': res[1],
+                };
+                _data.push(value);
+            });
+            def.resolve();
         });
         return $.when(def).then(function(){return _data;}); // asynchronicity
     },
@@ -73,10 +73,10 @@ var OFKanbanSelection = AbstractField.extend({
         var self = this;
         var value;
         if (this.read_only_mode) { // make it not selectable in read_only mode
-        	this.$el.text(formats.format_value(this.get('value'), this, ''));
+            this.$el.text(formats.format_value(this.get('value'), this, ''));
         }else{
-        	this.prepare_dropdown_selection().then(function(res){
-	        	self.values = res;
+            this.prepare_dropdown_selection().then(function(res){
+                self.values = res;
                 var current_value;
                 if (self.is_false()) {
                     current_value = {'id': -2, 'name': _t('Click to set value')};
@@ -90,19 +90,19 @@ var OFKanbanSelection = AbstractField.extend({
                         }
                     }) || {'id': -1, 'name': _t('Unknown / Unset')};
                 };
-		        //console.log("current_value: ",current_value);
-		        var args = { // arguments passed to qweb template
-		            current_value: current_value,
-		            values: _.without(self.values, current_value) // don't display current value in dropdown menu
-		        }
-		        //console.log("args: ",args);
-		        self.$el.html(QWeb.render(self.template, args));
-		        self.$('a').click(function (ev) {
-		            ev.preventDefault();
-		        });
-		        self.$('a').click(self.set_kanban_selection.bind(self));
-		        //console.log("$el",self.$el);
-	    	});
+                //console.log("current_value: ",current_value);
+                var args = { // arguments passed to qweb template
+                    current_value: current_value,
+                    values: _.without(self.values, current_value) // don't display current value in dropdown menu
+                }
+                //console.log("args: ",args);
+                self.$el.html(QWeb.render(self.template, args));
+                self.$('a').click(function (ev) {
+                    ev.preventDefault();
+                });
+                self.$('a').click(self.set_kanban_selection.bind(self));
+                //console.log("$el",self.$el);
+            });
         }
     },
     /**
@@ -137,13 +137,13 @@ var OFKanbanSelection = AbstractField.extend({
         var def2 = $.Deferred();
         var prom = def2.promise({target: vals});
         this.records_orderer.add(def).then(function(values) {
-        	//console.log("values: ",values); // an array of arrays of the form [id,'name']
+            //console.log("values: ",values); // an array of arrays of the form [id,'name']
             if (! _.isEqual(values, self.field.selection)) {
                 self.field.selection = values;
                 vals = values;
                 def2.resolve()
             }else{
-            	def2.resolve()
+                def2.resolve()
             }
         });
         return prom;
@@ -317,7 +317,7 @@ var OFKanbanDate = AbstractField.extend({
 });
 
 var OFKanbanChar = AbstractField.extend({
-	className: "of_kanban_char",
+    className: "of_kanban_char",
     events: {
         'change': 'handle_change',
     },
@@ -325,7 +325,7 @@ var OFKanbanChar = AbstractField.extend({
 
     }),
 
-	init: function(parent, field, $node, options) {
+    init: function(parent, field, $node, options) {
         this._super.apply(this, arguments);
         this.name = $node.attr('name');
         this.parent = parent;
@@ -338,46 +338,46 @@ var OFKanbanChar = AbstractField.extend({
      *  inits this.$input and attaches it to this.$el
      */
     init_input: function() {
-    	var input_attrs = {
-    		type: 'text',
-    		class: 'of_kanban_char_input',
-    	};
+        var input_attrs = {
+            type: 'text',
+            class: 'of_kanban_char_input',
+        };
         if (!this.is_false()) {
             input_attrs['value'] = this.get('value');
         }
-    	this.$input = this.make('input',input_attrs);
-    	this.$el.append(this.$input);
+        this.$input = this.make('input',input_attrs);
+        this.$el.append(this.$input);
     },
     /**
      *  renders the element
      */
     renderElement: function() {
-    	var self = this;
+        var self = this;
         if (this.read_only_mode) {
             this.$el.text(formats.format_value(this.get('value'), this, ''));
         }else{
-        	this.init_input();
-	        // don't open popup on click
-	        this.$el.click(function (ev) {
-	            ev.preventDefault();
-	        });
-	    }
+            this.init_input();
+            // don't open popup on click
+            this.$el.click(function (ev) {
+                ev.preventDefault();
+            });
+        }
     },
     /**
      *  handles change of value. called after clicking somewhere else than this.$el
      */
     handle_change: function () {
-    	//console.log("OFKanbanChar.handle_change");
-    	if (this.$input.value !== this.get('value')) {
-    		this.set_value();
-    	}
+        //console.log("OFKanbanChar.handle_change");
+        if (this.$input.value !== this.get('value')) {
+            this.set_value();
+        }
     },
     /**
      *  sets value and updates record
      */
     set_value: function() {
-    	this.set('value',this.$input.value);
-    	//console.log("this.get('value'): ",this.get('value'));
+        this.set('value',this.$input.value);
+        //console.log("this.get('value'): ",this.get('value'));
         var dict = {};
         var value = this.$input.value;
         dict[this.name] = value;
@@ -501,12 +501,12 @@ var OFKanbanBool = AbstractField.extend({
 
 var OFFAButton = Widget.extend({
     // fontawesome button
-	template: "OFFAButton",
-	defaults: _.extend({},{
-		fa_class: 'fa fa-square-o fa-lg',
-	}),
+    template: "OFFAButton",
+    defaults: _.extend({},{
+        fa_class: 'fa fa-square-o fa-lg',
+    }),
 
-	init: function(parent, options) {
+    init: function(parent, options) {
         this._super.apply(this, arguments);
         //this.name = $node.attr('name');
         this.parent = parent;
@@ -528,10 +528,10 @@ var OFFAButton = Widget.extend({
      *  renders this.$el and binds click event
      */
     renderElement: function() {
-    	var self = this;
+        var self = this;
         this.$el = $(QWeb.render(this.template, {widget: this}).trim());
         this.init_icon();
-    	this.$el.click(function (ev) {
+        this.$el.click(function (ev) {
             ev.preventDefault();
             self.parent.trigger_up('of_fa_button_clicked');
         });
@@ -541,9 +541,9 @@ var OFFAButton = Widget.extend({
      *  makes the icon and attaches it to this.$el. Called by renderElement
      */
     init_icon: function() {
-    	var icon_attrs = {
-    		class: this.options.fa_class + " of_fa_button_i",
-    	};
+        var icon_attrs = {
+            class: this.options.fa_class + " of_fa_button_i",
+        };
         this.$icon = this.make('i',icon_attrs);
         this.$el.append(this.$icon);
     },
@@ -557,13 +557,13 @@ var OFFAButton = Widget.extend({
 
 var OFFAToggleButton = OFFAButton.extend({
     // fontawesome toggleable button
-	defaults: _.extend({},{
-		fa_class_down: 'fa fa-square-o fa-lg',
-		fa_class_up: 'fa fa-check-square-o fa-lg',
-		default_up: false,
-	}),
+    defaults: _.extend({},{
+        fa_class_down: 'fa fa-square-o fa-lg',
+        fa_class_up: 'fa fa-check-square-o fa-lg',
+        default_up: false,
+    }),
 
-	init: function(parent, options) {
+    init: function(parent, options) {
         this._super.apply(this, arguments);
         this.is_up = this.options.default_up;
         //console.log("of_fa_toggle_button init this and arguments: ", this, arguments);
@@ -571,43 +571,43 @@ var OFFAToggleButton = OFFAButton.extend({
     /**
      *  override to implement toggleability
      */
-	init_icon: function() {
-		var the_class;
-		if (this.options.default_up) {
-			the_class = this.options.fa_class_up + " of_fa_button_i";
-		}else{
-			the_class = this.options.fa_class_down + " of_fa_button_i";
-		}
-    	var icon_attrs = {
-    		class: the_class,
-    	};
+    init_icon: function() {
+        var the_class;
+        if (this.options.default_up) {
+            the_class = this.options.fa_class_up + " of_fa_button_i";
+        }else{
+            the_class = this.options.fa_class_down + " of_fa_button_i";
+        }
+        var icon_attrs = {
+            class: the_class,
+        };
         this.$icon = this.make('i',icon_attrs);
         this.$el.append(this.$icon);
     },
     /**
      *  toggles up the button
      */
-	do_toggle_up: function() {
-		this.is_up = true;
-		this.$icon.className = this.options.fa_class_up + " of_fa_button_i";
-	},
+    do_toggle_up: function() {
+        this.is_up = true;
+        this.$icon.className = this.options.fa_class_up + " of_fa_button_i";
+    },
     /**
      *  toggles down the button
      */
-	do_toggle_down: function() {
-		this.is_up = false;
-		this.$icon.className = this.options.fa_class_down + " of_fa_button_i";
-	},
+    do_toggle_down: function() {
+        this.is_up = false;
+        this.$icon.className = this.options.fa_class_down + " of_fa_button_i";
+    },
     /**
      *  toggles the button
      */
-	do_toggle: function() {
-		if (this.is_up) {
-			this.do_toggle_down();
-		}else{
-			this.do_toggle_up();
-		}
-	}
+    do_toggle: function() {
+        if (this.is_up) {
+            this.do_toggle_down();
+        }else{
+            this.do_toggle_up();
+        }
+    }
 })
 
 web_k_registry

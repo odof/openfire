@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
-<!--###############################################################################################################
-##############################       PISTES & OPPORTUNITES (crm.lead, crm.stage)
-#################################################################################################################-->
+
+<!-- #######################################################################################
+                          PISTES & OPPORTUNITES (crm.lead, crm.stage)
+############################################################################################ -->
         <!--
             crm.lead (as Lead) views
         -->
@@ -458,6 +458,7 @@
                                     <group string="Géolocalisation" name="geoloc">
                                         <field name="geo_lat"/>
                                         <field name="geo_lng"/>
+                                        <field name="precision"/>
                                     </group>
 
                                     <group string="Options" name="options">
@@ -605,9 +606,108 @@
             </field>
         </record>
 
-<!--###############################################################################################################
-##############################       VENTES
-#################################################################################################################-->
+        <!-- ########## Ajout vue map ########## -->
+
+        <record id="of_crm_map_view" model="ir.ui.view">
+            <field name="name">of.crm.map</field>
+            <field name="model">crm.lead</field>
+            <field name="arch" type="xml">
+                <map string="Map" class="o_crm_lead_map" latitude_field="geo_lat" longitude_field="geo_lng" color_field="of_color_map">
+                    <field name="active" invisible="1"/>
+                    <field name="of_color_map" required="1"/>
+                    <field name="geo_lat" required="1"/>
+                    <field name="geo_lng" required="1"/>
+                    <field name="precision"/>
+                    <field name="id"/>
+                    <field name="name"/>
+                    <field name="contact_name"/>
+                    <field name="zip"/>
+                    <field name="city"/>
+                    <field name="phone"/>
+                    <field name="mobile"/>
+                    <field name="next_activity_name"/>
+                    <field name="date_action"/>
+                    <field name="tag_ids"/>
+                    <templates>
+                        <t t-name="of_map_record_box">
+                            <div t-attf-class="#{map_record_color(record.of_color_map.raw_value)} of_map_record_global_click"><!-- TODO: gestion couleur -->
+                                <div class="of_map_record_buttons">
+                                    <i class="of_map_record_close fa fa-lg fa-times"/>
+                                    <!--i class="of_map_record_min fa fa-lg fa-minus"/>  later implementation...
+                                    <i class="of_map_record_max fa fa-lg fa-square"/-->
+                                </div>
+                                <div name="content" class="of_map_record_content">
+                                    <t t-if="record.name.raw_value != record.partner_name.raw_value">
+                                        <strong><field name="name"/></strong><br/>
+                                    </t>
+                                    <t t-if="record.partner_name.raw_value">
+                                        <i class="fa fa-user"/><span class="of_ws"/>
+                                        <strong><field name="partner_name"/></strong><br/>
+                                    </t>
+                                    <t t-if="record.city.raw_value">
+                                        <i class="fa fa-map-marker"/><span class="of_ws"/>
+                                        <field name="zip"/><span class="of_ws"/>
+                                        <field name="city"/><br/>
+                                    </t>
+                                    <t t-if="record.phone.raw_value">
+                                        <i class="fa fa-phone"/><span class="of_ws"/>
+                                        <field name="phone"/><br/>
+                                    </t>
+                                    <t t-if="record.mobile.raw_value">
+                                        <i class="fa fa-phone"/><span class="of_ws"/>
+                                        <field name="mobile"/><br/>
+                                    </t>
+                                    <t t-if="record.date_action.raw_value">
+                                        <i class="fa fa-calendar-o"/><span class="of_ws"/>
+                                        <field name="next_activity_name"/><span class="of_ws"/>
+                                        <field name="date_action"/><br/>
+                                    </t>
+                                    <t t-if="record.tag_ids.raw_value">
+                                        <field name="tag_ids" of_options='{"exclude_vals": ["client","prospect"]}'/>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                        <t t-name="of_map_marker_tooltip">
+                            <div name="marker_tooltip">
+                                <field name="name"/><br/>
+                                Précision:
+                                <t t-if='["manual","high","medium","low"].includes(record.precision.raw_value)'>
+                                    <field name="precision"/>
+                                </t>
+                                <t t-else="">
+                                    <span class="of_ws"/>
+                                    Indeterminée
+                                </t>
+                            </div>
+                        </t>
+                    </templates>
+                </map>
+            </field>
+        </record>
+
+        <!-- Ajout vue map. Cette action est utilisée quand l'utilisateur rafraîchit la page 'votre pipeline' -->
+        <record model="ir.actions.act_window" id="crm.crm_lead_opportunities_tree_view">
+            <field name="view_mode">kanban,tree,graph,pivot,form,calendar,map</field>
+            <field name="view_ids"
+                   eval="[(5, 0, 0),
+                          (0, 0, {'view_mode': 'kanban', 'view_id': ref('crm.crm_case_kanban_view_leads')}),
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('crm.crm_case_tree_view_oppor')}),
+                          (0, 0, {'view_mode': 'map', 'view_id': ref('of_crm_map_view')}),
+                          (0, 0, {'view_mode': 'form', 'view_id': ref('crm.crm_case_form_view_oppor')}),
+                          (0, 0, {'view_mode': 'calendar'}),
+                          (0, 0, {'view_mode': 'pivot'}),
+                          (0, 0, {'view_mode': 'graph'})]"/>
+            <field name="context">{
+                    'default_type': 'opportunity',
+                    'default_user_id': uid,
+            }</field>
+        </record>
+
+
+<!-- #######################################################################################
+                                        VENTES
+############################################################################################ -->
         <record id="of_crm_view_order_form" model="ir.ui.view">
             <field name="name">of.crm.sale.order.form</field>
             <field name="model">sale.order</field>
@@ -628,9 +728,9 @@
             </field>
         </record>
 
-<!--###############################################################################################################
-##############################       PARTENAIRES
-#################################################################################################################-->
+<!--########################################################################################
+                                       PARTENAIRES
+############################################################################################ -->
         <record id="of_crm_view_partner_form" model="ir.ui.view">
             <field name="name">of.crm.res.partner.form</field>
             <field name="model">res.partner</field>
@@ -741,9 +841,11 @@
             name="Prospects"
             sequence="3"/>
 
-<!--###############################################################################################################
-##############################       SOCIETES
-#################################################################################################################-->
+
+<!-- #######################################################################################
+                                      SOCIETES
+############################################################################################ -->
+
         <record id="of_crm_view_company_form" model="ir.ui.view">
             <field name="name">of.crm.company.form</field>
             <field name="model">res.company</field>
@@ -761,5 +863,5 @@
                 </xpath>
             </field>
         </record>
-    </data>
+
 </odoo>

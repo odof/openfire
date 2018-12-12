@@ -258,8 +258,12 @@ class SaleOrderLine(models.Model):
     def product_uom_change(self):
         super(SaleOrderLine, self).product_uom_change()
         if self.of_coef_usage:
-            factor = (self.product_uom and self.product_uom.factor_inv or 0) * self.product_uom_qty
-            self.price_unit = (self.product_id and self.product_id.of_seller_price or 0) * self.of_coef * factor
+            factor = self.product_uom and self.product_uom.factor_inv or 1
+            if self.of_is_kit:
+                self.price_unit = (self.kit_id and self.kit_id.cost_comps or 0) * self.of_coef * factor
+            else:
+                purchase_factor = self.product_id and self.product_id.uom_po_id and self.product_id.uom_po_id.factor or 1
+                self.price_unit = (self.product_id and self.product_id.of_seller_price or 0) * self.of_coef * factor * purchase_factor
 
     @api.onchange('of_coef', 'product_id.of_seller_price')
     def onchange_of_coef(self):

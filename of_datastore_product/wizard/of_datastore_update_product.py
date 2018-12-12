@@ -74,11 +74,13 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         ds_product_ids += ds_product_new_ids
 
         # --- Mise à jour des articles ---
+        products_write_data = {}
         fields_to_update = product_obj.of_datastore_get_import_fields()
         if self.noup_name:
             fields_to_update.remove('name')
         ds_product_ids = [-(ds_product_id + supplier_value) for ds_product_id in ds_product_ids]
         ds_products_data = product_obj.browse(ds_product_ids)._of_read_datastore(fields_to_update, create_mode=True)
+
         for ds_product_data in itertools.chain(no_match_ids, ds_products_data):
             if isinstance(ds_product_data, (int, long)):
                 product = product_obj.browse(ds_product_data)
@@ -114,8 +116,42 @@ class OfDatastoreUpdateProduct(models.TransientModel):
                 done_moves = self.env['stock.move'].search([('product_id', '=', product.id)], limit=1)
                 if done_moves:
                     del ds_product_data['uom_id']
+
+            if ds_product_data.get('seller_ids'):
+                # La fonction _of_read_datastore renvoie un seller_ids de la forme [(5, ), (0, 0, {...})]
+                # Cela pose un problème de performance, car le (5, ) appelle la fonction unlink(), qui vide toutes les valeurs en cache
+                # On retire donc le code (5, ) et on remplace au besoin le (0, ) par un (1, )
+                old_sellers = ds_product_data['seller_ids']
+                sellers = ds_product_data['seller_ids'] = []
+                for seller in old_sellers:
+                    if seller[0] == 5:
+                        continue
+                    if seller[0] == 0:
+                        if not product.seller_ids:
+                            sellers.append(seller)
+                        elif len(product.seller_ids) == 1:
+                            sellers.append((1, product.seller_ids.id, seller[2]))
+                        else:
+                            supplier_id = seller[2]['name']
+                            for old_seller in product.seller_ids:
+                                if old_seller.name.id == supplier_id:
+                                    # Edition du fournisseur correspondant
+                                    sellers.append((1, old_seller.id, seller[2]))
+                                    break
+                            else:
+                                # Plusieurs fournisseurs sans possibilité de choisir... on en crée un autre !
+                                sellers.append(seller)
+                    else:
+                        raise ValidationError("Mise à jour de tarif : type de renvoi de fournisseur non prévu\ncode: %s" % (old_sellers, ))
             if ds_product_data:
-                product.write(ds_product_data)
+                # L'appel write() est reporté après tous les calculs.
+                # En effet, write() vide certaines données en cache
+                #   (les données qui sont compute =True et store=False, e.g. of_datastore_has_link, of_seller_price, etc.)
+                # Lorsqu'Odoo recalcule ces données, il le fait, à chaque itération, sur la totalité des articles (ds_product_ids),
+                #   ce qui provoque un temps de calcul en O(n²) au lieu de O(n)
+                products_write_data[product] = ds_product_data
+        for product, product_data in products_write_data.iteritems():
+            product.write(product_data)
         return len(no_match_ids), len(ds_product_ids), len(ds_product_new_ids)
 
     @api.multi

@@ -18,7 +18,7 @@
                             <span> - </span>
                         </td>
                         <td class="text-right">
-                            <span t-field="comp.qty_total"/>
+                            <span t-esc="(str(comp.qty_total)).rstrip('0').rstrip('.').replace('.', ',')"/>
                             <span t-field="comp.product_uom_id" groups="product.group_uom"/>
                         </td>
                         <td t-if="display_discount" class="text-right">
@@ -59,7 +59,7 @@
                             <span style="padding: 0 8px;">-&gt;</span><span t-esc="comp.get_report_name()"/>
                         </td>
                         <td class="text-right">
-                            <span t-field="comp.qty_total"/>
+                            <span t-esc="(str(comp.qty_total)).rstrip('0').rstrip('.').replace('.', ',')"/>
                             <span t-field="comp.product_uom_id" groups="product.group_uom"/>
                         </td>
                         <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">

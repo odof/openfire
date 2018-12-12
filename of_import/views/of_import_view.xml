@@ -148,6 +148,8 @@ Cette action irréversible recalculera la catégorie, le prix d'achat et le prix
                             <group>
                                 <field name="name"/>
                                 <field name="prefixe"/>
+                                <field name="show_lang" invisible="1"/>
+                                <field name="lang_id" widget="selection" attrs="{'invisible': [('show_lang', '=', False)]}"/>
                                 <field name="separateur"/>
                                 <!-- <field name="separateur1" widget="selection" attrs="{'invisible': [('file_type', '!=', 'csv')]}"/> -->
                                 <!-- <field name="separateur2" placeholder="Séparateur personnalisé" options="{'no_open': True}" attrs="{'invisible': [('separateur1', '!=', 'x')]}"/> -->
@@ -190,7 +192,8 @@ Cette action irréversible recalculera la catégorie, le prix d'achat et le prix
                     </group>
                     <separator string="Champs disponibles"/>
                     <group colspan="4" col="4">
-                        <field name="sortie_note" nolabel="1" attrs="{'invisible': [('state','!=','brouillon')]}"/>
+                        <field name="sortie_note" nolabel="1" attrs="{'invisible': [('state','!=','brouillon')]}"
+                               style="max-height: 500px; overflow: auto;"/>
                     </group>
                 </form>
             </field>

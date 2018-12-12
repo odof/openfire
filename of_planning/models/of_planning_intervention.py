@@ -228,7 +228,7 @@ class OfPlanningIntervention(models.Model):
     def _compute_cleantext_intervention(self):
         cleanr = re.compile('<.*?>')
         for interv in self:
-            cleantext = re.sub(cleanr, '', interv.order_id.of_notes_intervention)
+            cleantext = re.sub(cleanr, '', interv.order_id.of_notes_intervention or '')
             interv.cleantext_intervention = cleantext
 
     @api.depends('date')

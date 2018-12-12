@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="list_editor_form" model="ir.ui.view">
+		<field name="model">list.editor</field>
+		<field name="type">form</field>
+		<field name="arch" type="xml">
+			<form string="List Editor">
+                <group>
+                    <field name="full_key" invisible="1"/>
+                    <field name="default_visible_columns" invisible="1"/>
+                    <field name="fields_sequence" invisible="1"/>
+                    <field name="model_id" required="1" readonly="1"/>
+                    <field name="visible_fields" widget="my_many2many_tags" required="1"/>
+                </group>
+                <group>
+                    <group>
+                        <field name="editable" class="oe_inline"/>
+                    </group>
+                </group>
+				<footer>
+                    <button name="create_or_edit" class="btn-primary change" type="object" string="Change" />
+					<button special="cancel" class="btn-default" string="Cancel" />
+                    <button name="restore" type="object" string="Restore" class="btn-danger pull-right"/>
+				</footer>
+			</form>
+		</field>
+    </record>
+</odoo>

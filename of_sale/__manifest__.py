@@ -63,6 +63,11 @@ Paramètres de ventes (sale.config.settings)
 - redéfinition templates sale.report_saleorder_document, sale.report_invoice_document_inherit_sale et sale.report_invoice_layouted
 - permettre le réglage de la couleur de fond des titres de section dans les bons de commandes et les factures (paramètres de comptabilité pour les factures)
 
+Droits utilisateurs:
+--------------------
+
+- Ajout d'un droit pour avoir accès aux données relatives aux marges (dans devis/commande, fiche article et la gestion des prix)
+- Ajout d'un smart button sur les devis pour afficher/cacher les données relatives aux marges
 """,
     'depends' : [
         "of_account_invoice_report",  # définition des paramètres d'adresse dans les rapports
@@ -78,6 +83,7 @@ Paramètres de ventes (sale.config.settings)
         'python': ['pdfminer', 'pypdftk', 'pyPdf'],
     },
     'data' : [
+        'security/of_sale_security.xml',
         'views/of_sale_view.xml',
         'report/of_sale_report_templates.xml',
         'wizards/of_sale_order_gestion_prix_views.xml',

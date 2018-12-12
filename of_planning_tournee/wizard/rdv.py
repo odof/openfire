@@ -26,6 +26,7 @@ class OfTourneeRdv(models.TransientModel):
     @api.model
     def _default_partner(self):
         partner_id = self._context.get('active_model', '') == 'res.partner' and self._context['active_ids'][0]
+
         if partner_id:
             partner = self.env['res.partner'].browse(partner_id)
             while partner.parent_id:
@@ -36,6 +37,7 @@ class OfTourneeRdv(models.TransientModel):
     @api.model
     def _default_service(self):
         service_obj = self.env['of.service']
+
         partner = self._default_partner()
         if not partner:
             return False
@@ -51,7 +53,7 @@ class OfTourneeRdv(models.TransientModel):
             # La fonction est appelée à partir d'une adresse
             return partner_obj.browse(self._context['active_ids'][0])
 
-        address_id = partner.address_get(['delivery'])['delivery']
+        address_id = partner and partner.address_get(['delivery'])['delivery']
         if address_id:
             address = partner_obj.browse(address_id)
             if not (address.geo_lat or address.geo_lng):

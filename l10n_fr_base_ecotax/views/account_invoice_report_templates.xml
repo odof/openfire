@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<odoo>
+    <template id="report_invoice_document_inherit_ecotax" inherit_id="sale.report_invoice_layouted">
+        <xpath expr="//table[@groups='!sale.group_sale_layout']//span[@t-field='l.name']" position="after">
+            <t t-if="l.product_id.ecotax_amount">
+                <br/>
+                <span class="small">
+                    Price including ecotax
+                    <span t-field="l.product_id.ecotax_amount"
+                          t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                    per unit
+                </span>
+            </t>
+        </xpath>
+        <xpath expr="//t[@groups='sale.group_sale_layout']//span[@t-field='l.name']" position="after">
+            <t t-if="l.product_id.ecotax_amount">
+                <br/>
+                <span class="small">
+                    Price including ecotax
+                    <span t-field="l.product_id.ecotax_amount"
+                          t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                    per unit
+                </span>
+            </t>
+        </xpath>
+    </template>
+</odoo>

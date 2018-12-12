@@ -99,7 +99,7 @@ class OfProductBrand(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    brand_id = fields.Many2one('of.product.brand', string='Brand', required=True)
+    brand_id = fields.Many2one('of.product.brand', string='Brand', required=True, index=True)
     of_seller_name = fields.Many2one(related="seller_ids.name")
     of_previous_brand_id = fields.Many2one('of.product.brand', compute='_compute_of_previous_brand_id')
 

@@ -199,8 +199,11 @@ class SaleOrder(models.Model):
         """ Permet d'ajouter les données liées aux kits dnas les lignes de commande
         """
         data = super(SaleOrder, self)._get_data_from_template(line, price, discount)
+        sale_kit_vals = line.product_id.get_saleorder_kit_data()
+        sale_kit_vals["qty_order_line"] = line.product_uom_qty
+        new_vals = self.env["of.saleorder.kit"].create(sale_kit_vals)
         data.update({
-            'kit_id' : line.kit_id,
+            'kit_id' : new_vals,
             'of_is_kit' : line.of_is_kit,
             'price_comps' : line.price_comps,
             'of_pricing' : line.of_pricing,

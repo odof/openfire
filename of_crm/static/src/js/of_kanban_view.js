@@ -4,10 +4,10 @@ odoo.define('of_crm.KanbanView', function (require) {
 var KanbanView = require('web_kanban.KanbanView')
 
 KanbanView.include({
-	/**
-	 *  changement de prospect à client et vice versa par drag n drop
-	 */
-	add_record_to_column: function (event) {
+    /**
+     *  Changement de prospect à client et vice-versa par drag and drop
+     */
+    add_record_to_column: function (event) {
         var self = this;
         var column = event.target;
         var record = event.data.record;

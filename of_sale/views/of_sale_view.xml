@@ -41,6 +41,52 @@
             </field>
         </record>
 
+        <!-- Ajout des droits sur les marges/prix d'achats -->
+        <record id="of_sale_margin_sale_order_line" model="ir.ui.view">
+            <field name="name">of.sale.margin.sale.order.line</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_margin.sale_margin_sale_order_line"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']/form//field[@name='purchase_price']" position="attributes">
+                    <attribute name="groups">-base.group_user, of_sale.of_group_sale_marge_manager</attribute>
+                    <attribute name="attrs">{'invisible': [('of_client_view', '=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form//field[@name='purchase_price']" position="after">
+                    <field name="of_client_view" invisible="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Ajout des droits sur les marges/prix d'achats -->
+        <record id="of_sale_margin_sale_order_line_form" model="ir.ui.view">
+            <field name="name">of.sale.margin.sale.order.line.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_margin.sale_margin_sale_order_line_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']/tree//field[@name='purchase_price']" position="attributes">
+                    <attribute name="groups">-base.group_user, of_sale.of_group_sale_marge_manager</attribute>
+                    <attribute name="attrs">{'invisible': [('of_client_view', '=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree" position="inside">
+                    <field name="of_client_view" invisible="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Ajout des droits sur les marges/prix d'achats -->
+        <record id="of_sale_margin_sale_order" model="ir.ui.view">
+            <field name="name">of.sale.margin.sale.order</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_margin.sale_margin_sale_order"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='margin']" position="attributes">
+                    <attribute name="groups">-base.group_user, of_sale.of_group_sale_marge_manager</attribute>
+                    <attribute name="attrs">{'invisible': [('of_client_view', '=', True)]}</attribute>
+                </xpath>
+            </field>
+        </record>
+
+
         <!-- Ajout champ frais de port product.product -->
         <record id="of_sale_view_order_form" model="ir.ui.view">
             <field name="name">of.sale.order.form</field>
@@ -49,6 +95,16 @@
             <field name="arch" type="xml">
                 <xpath expr="//header" position="inside">
                     <button name="button_gestion_prix" type="object" string="Gestion prix" attrs="{'invisible': [('invoice_status', '=', 'invoiced')]}"/>
+                </xpath>
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <!-- Ajout d'un bouton pour switcher entre vue client et vue vendeur' -->
+                    <button name="toggle_view" type="object" class="oe_stat_button" icon="fa-pencil-square-o" groups="of_sale.of_group_sale_marge_manager">
+                        <field name="of_client_view" widget="boolean_button"
+                               options="{'terminology': {'string_true': 'Vue client',
+                                                         'hover_true': 'Vue client',
+                                                         'string_false': 'Vue vendeur',
+                                                         'hover_false': 'Vue vendeur' }}"/>
+                    </button>
                 </xpath>
                 <field name="date_order" position="attributes">
                     <attribute name="widget">date</attribute>
@@ -78,6 +134,9 @@
                 <xpath expr="//page//group[@name='technical']" position="after">
                     <separator string="Documents joints" colspan="4"/>
                     <field name="of_mail_template_ids" widget="many2many" nolabel="1"/>
+                </xpath>
+                <xpath expr="//field[@name='confirmation_date']" position="after">
+                    <field name="of_date_vt"/>
                 </xpath>
             </field>
         </record>
@@ -131,6 +190,11 @@
                             <field name="pdf_display_product_ref_setting" class="oe_inline"/>
                             <span>Afficher les références produits dans les rapports PDF</span>
                         </div>
+                        <label for="pdf_date_validite_devis"/>
+                        <div name="pdf_date_validite_devis">
+                            <field name="pdf_date_validite_devis" class="oe_inline"/>
+                            <span>Afficher la date de validité dans le rapport PDF des devis</span>
+                        </div>
                         <label for="of_color_bg_section"/>
                         <div name="of_color_bg_section_setting">
                             <field name="of_color_bg_section" class="oe_inline" widget="color"/>
@@ -143,6 +207,35 @@
                         <field name="stock_warning_setting" class="oe_inline"/>
                         <span>Afficher les messages d'avertissement de stock</span>
                     </div>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_sale_product_form_view" model="ir.ui.view">
+            <field name="name">of.sale.product.form.view</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="of_product.of_product_product_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='group_standard_price']/label[@for='of_seller_price']" position="attributes">
+                    <attribute name="groups">of_sale.of_group_sale_marge_manager</attribute>
+                </xpath>
+                <xpath expr="//group[@name='group_standard_price']/div[1]" position="attributes">
+                    <attribute name="groups">of_sale.of_group_sale_marge_manager</attribute>
+                </xpath>
+                <xpath expr="//group[@name='group_standard_price']/field[@name='of_seller_remise']" position="attributes">
+                    <attribute name="groups">of_sale.of_group_sale_marge_manager</attribute>
+                </xpath>
+                <xpath expr="//group[@name='group_general']/label[@for='standard_price']" position="attributes">
+                    <attribute name="groups">-base.group_user, of_sale.of_group_sale_marge_manager</attribute>
+                </xpath>
+                <xpath expr="//group[@name='group_general']/div[@name='standard_price_uom']" position="attributes">
+                    <attribute name="groups">-base.group_user, of_sale.of_group_sale_marge_manager</attribute>
+                </xpath>
+                <xpath expr="//group[@name='group_general']/label[@for='marge']" position="attributes">
+                    <attribute name="groups">of_sale.of_group_sale_marge_manager</attribute>
+                </xpath>
+                <xpath expr="//group[@name='group_general']/span" position="attributes">
+                    <attribute name="groups">of_sale.of_group_sale_marge_manager</attribute>
                 </xpath>
             </field>
         </record>
@@ -162,6 +255,18 @@
             </xpath>
         </field>
     </record>
+
+    <!-- Ajout de la date visite technique dans la rubrique "Autres informations" de la vue formulaire de la facture -->
+        <record id="of_account_invoice_view_form" model="ir.ui.view">
+            <field name="name">of.account.invoice.view.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='date_due']" position="after">
+                    <field name="of_date_vt"/>
+                </xpath>
+            </field>
+        </record>
 
 <!--##############################################################################-->
 <!--########################### ______ Sociétés ______ ###########################-->

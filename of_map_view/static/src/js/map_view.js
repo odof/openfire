@@ -3,6 +3,7 @@ odoo.define('of_map_view.MapView', function (require) {
 
 var core = require('web.core');
 var data = require('web.data');
+var data_manager = require('web.data_manager');
 var Model = require('web.DataModel');
 var View = require('web.View');
 var Pager = require('web.Pager');
@@ -11,8 +12,12 @@ var session = require('web.session');
 var utils = require('web.utils');
 var ActionManager = require('web.ActionManager');
 var map_controls = require('of_map_view.map_controls');
+var map_utils = require('of_map_view.map_utils');
 var Widget = require('web.Widget');
+var QWeb = require('web.QWeb');
 var mixins = core.mixins;
+var formats = require('web.formats');
+var time = require('web.time');
 
 /**
  *	TODO: add warning when using OSM tile server
@@ -24,14 +29,26 @@ var TILE_SERVER_ADDR = '//{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png';
 var Class = core.Class;
 var _t = core._t;
 var _lt = core._lt;
-var QWeb = core.qweb;
+var qweb = core.qweb;
+
+var iconUrls = {
+        "black": '/of_map_view/static/src/img/marker-icon-black.png',
+        "blue": '/of_map_view/static/src/img/marker-icon-blue.png',
+        "green": '/of_map_view/static/src/img/marker-icon-green.png',
+        "grey": '/of_map_view/static/src/img/marker-icon-grey.png',
+        "gray": '/of_map_view/static/src/img/marker-icon-grey.png',
+        "orange": '/of_map_view/static/src/img/marker-icon-orange.png',
+        "red": '/of_map_view/static/src/img/marker-icon-red.png',
+        "violet": '/of_map_view/static/src/img/marker-icon-violet.png',
+        "yellow": '/of_map_view/static/src/img/marker-icon-yellow.png',
+};
 
 var MapView = View.extend({
     template: 'MapView',
     display_name: _lt('Map'),
     icon: 'fa fa-map-marker',
     view_type: "map",
-    className: "o_map_view",
+    className: "of_map_view",
     _model: null,
     defaults: _.extend({}, View.prototype.defaults, {
         // records can be selected one by one
@@ -55,6 +72,7 @@ var MapView = View.extend({
     }),
     custom_events: {
         'map_record_open': 'open_record',
+        'map_do_action': 'open_action',
     },
     /**
      *
@@ -63,8 +81,19 @@ var MapView = View.extend({
         //console.log("MapView.init: ",arguments);
         this._super.apply(this, arguments);
 
+        this.qweb = new QWeb(session.debug, {_s: session.origin}, false);
+
         this._model = new Model(this.dataset.model);
+
+        this.lat_field = this.fields_view.arch.attrs.latitude_field;
+        this.lng_field = this.fields_view.arch.attrs.longitude_field;
         this.name = "" + this.fields_view.arch.attrs.string;
+        this.fields = this.fields_view.fields;
+        this.fields_keys = _.keys(this.fields_view.fields);
+
+        this.grouped = undefined;  // later implementation
+        this.group_by_field = undefined;  // later implementation
+        this.default_group_by = this.fields_view.arch.attrs.default_group_by;  // later implementation
 
         // the view's number of records per page (|| section), defaults to 80
         this._limit = (this.options.limit ||
@@ -75,38 +104,43 @@ var MapView = View.extend({
         // the index of the first displayed record (starting from 1)
         this.current_min = 1;
 
-        this.init_record_options();
+        this.data = undefined;
+
+        this.search_orderer = new utils.DropMisordered();
+
+        this.many2manys = this.fields_view.many2manys || [];
+        this.m2m_context = {};
+        this.m2m_options = {};
 
         this.map = null;
-        this.current_record_nb = 0;
         this.nondisplayable_records = [];
         this.records = [];
 
-        this.fsd = false; // first search done
-
+        //console.log("MapView.init this: ",this);
     },
-    /*
-     *  Inits record fields. latitude and longitude to place records on the map
-     *  header_fields and body_fields are used by the record displayer to style record data. See map_controls and map_records
+    /**
+     *  Inits record fields. latitude and longitude to place records on the map. color when needed
+     *  See map_controls and map_records
      */
     init_record_options: function() {
         //console.log("MapView.init_record_fields");
         this.record_options = {};
-        this.record_options.latitude_field = this.fields_view.arch.attrs.latitude_field;
-        this.record_options.longitude_field = this.fields_view.arch.attrs.longitude_field;
-        this.record_options.header_fields = [];
-        this.record_options.body_fields = [];
-
-        for (var i=0, ii=this.fields_view.arch.children.length; i < ii; i++) {
-            var child = this.fields_view.arch.children[i];
-            if (child.tag === "field") {
-                if (child.attrs.class === "oe_map_displayer_header") {
-                    this.record_options.header_fields.push(child.attrs.name);
-                }else if (child.attrs.class === "oe_map_displayer_body") {
-                    this.record_options.body_fields.push(child.attrs.name);
-                }
-            }
-        };
+        this.record_options.latitude_field = this.lat_field;
+        this.record_options.longitude_field = this.lng_field;
+        this.record_options.color_field = this.fields_view.arch.attrs.color_field;
+    },
+    init_displayer_options: function() {
+        this.displayer_options = {};
+        this.displayer_options.qweb = this.qweb;
+        this.displayer_options.legends = [];
+        if (this.fields_view.arch.attrs.color_field) {
+            var legend_color = {
+                name: 'legend_color',
+                method: 'get_color_map',
+                template: 'MapView.legend.colors'
+            };
+            this.displayer_options.legends.push(legend_color);
+        }
     },
     /**
      * Method called between init and start. Performs asynchronous calls required by start.
@@ -114,18 +148,43 @@ var MapView = View.extend({
     willStart: function() {
         //console.log("MapView.willStart: ",arguments);
         var self = this;
-        var rendered_prom = this.$el.html(QWeb.render(this.template, this)).promise();
+
+        // add qweb templates
+        for (var i=0, ii=this.fields_view.arch.children.length; i < ii; i++) {
+            var child = this.fields_view.arch.children[i];
+            if (child.tag === "templates") {
+                map_utils.transform_qweb_template(child, this.fields_view, this.many2manys, this.m2m_options);
+                // transform_qweb_template(), among other things, identifies and processes the
+                // many2manys. Unfortunately, it modifies the fields_view in place and, as
+                // the fields_view is stored in the JS cache, the many2manys are only identified the
+                // first time the fields_view is processed. We thus store the identified many2manys
+                // on the fields_view, so that we can retrieve them later. A better fix would be to
+                // stop modifying shared resources in place.
+                this.fields_view.many2manys = this.many2manys;
+                this.qweb.add_template(utils.json_node_to_xml(child));
+                break;
+            } else if (child.tag === 'field') {
+                var ftype = child.attrs.widget || this.fields[child.attrs.name].type;
+                if(ftype === "many2many" && "context" in child.attrs) {
+                    this.m2m_context[child.attrs.name] = child.attrs.context;
+                }
+            }
+        }
+        this.init_record_options();
+        this.init_displayer_options();
+
+        var rendered_prom = this.$el.html(qweb.render(this.template, this)).promise();
         var options = {};
         if (!this.options.map_center_and_zoom) { // the map will use default center and zoom config, found in ir.config_parameter
-        	options.map_center_and_zoom = true;
+            options.map_center_and_zoom = true;
         }
         if (!this.options.tile_server_addr) { // the map will use default tile server config, found in ir.config_parameter
-        	options.tile_server_addr = true;
+            options.tile_server_addr = true;
         }
 
         var q = true;
         if (options.map_center_and_zoom || options.tile_server_addr) {
-        	q = this.get_default_map_config(options).promise();
+            q = this.get_default_map_config(options).promise();
         }
         return $.when(this._super(),rendered_prom,q);
     },
@@ -144,23 +203,50 @@ var MapView = View.extend({
         this.$el.addClass(this.fields_view.arch.attrs.class || "o_map_view");
         var options = {center: this.options.map_center_and_zoom[0], zoom: this.options.map_center_and_zoom[1]};
         if (this.options.tile_server_addr) options.tile_server_addr = this.options.tile_server_addr;
+        options.displayer_options = this.displayer_options;
         var args = {view: this, options};
         //console.log("map options: ",options);
         this.map = new MapView.Map(args);
 
         return this._super();
     },
-
+    /**
+     * adds (if necessary) domain to only search for displayable records. Return new domain
+     *
+     * @returns {Array} new domain
+     */
+    _transform_domain: function(domain) {
+        //console.log("_transform_domain: ",domain);
+        // @TODO: make precision dynamic
+        //var d1 = ["precision", "in", ["manual","high","medium","low"]];
+        var d2 = [this.lat_field, '!=', 0.0];
+        var d3 = [this.lng_field, '!=', 0.0];
+        //var a_concat_1 = [ d1 ];
+        var a_concat = [ '|', d2, d3 ];
+        if (!domain || !domain.length) {
+            return a_concat;
+        }
+        for (var i=0; i<domain.length; i++) {
+            if (JSON.stringify(domain[i]) === JSON.stringify(d2)) {
+                return domain;
+            }
+        }
+        return _.union(domain, a_concat);
+    },
     /**
      * Handler for the result of eval_domain_and_context, actually perform the searching by calling private method
      */
     do_search: function (domain, context, group_by) {
         //console.log("MapView.do_search: ",arguments);
         var self = this;
+        // don't take into account nondisplayable records
+        this.domain = this._transform_domain(domain);
+        this.context = context;
+        this.group_by = group_by;
         // only do the search if the map is attached. Workaround the auto_search option not working properly.
         if (this.map.is_attached()) {
             //console.log('this.map.is_attached()');
-            this._do_search(domain, context, group_by);
+            this._do_search(this.domain, context, group_by);
         }else{
             //console.log('do_search not done, map not attached');
         }
@@ -170,62 +256,127 @@ var MapView = View.extend({
      */
     _do_search: function (domain, context, group_by) {
         //console.log("MapView._do_search: ",arguments);
-        if (this.domain === domain && this.group_by === group_by && this.fsd) { // the first search has been done
-            this.load_records(true);
-        }else{
-            this.fsd = true;
-            this.domain = domain;
-            this.context = context;
-            this.group_by = group_by;
-            this.current_min = 1;
-            this.load_records();
+        var self = this;
+        this.nondisplayable_records = [];
+        var group_by_field = group_by && group_by[0] || this.default_group_by;
+        var field = this.fields[group_by_field];
+        var options = {};
+        var fields_def;
+        if (field === undefined) {
+            fields_def = data_manager.load_fields(this.dataset).then(function (fields) {
+                self.fields = fields;
+                field = self.fields[group_by_field];
+            });
         }
+        var load_def = $.when(fields_def).then(function() {
+            var grouped_by_m2o = field && (field.type === 'many2one');
+            options = _.extend(options, {
+                search_domain: domain,
+                search_context: context,
+                group_by_field: group_by_field,
+                grouped: group_by && group_by.length || self.default_group_by,
+                grouped_by_m2o: grouped_by_m2o,
+                relation: (grouped_by_m2o ? field.relation : undefined),
+            });
+            return options.grouped ? console.log("group_by not implemented yet!") : self.load_records(self.current_min-1);
+        });
+        return this.search_orderer
+            .add(load_def)
+            .then(function (data) {
+                _.extend(self, options);
+                if (options.grouped) {
+                    /*var new_ids = _.union.apply(null, _.map(data.groups, function (group) {
+                        return group.dataset.ids;
+                    }));
+                    self.dataset.alter_ids(new_ids);*/  // later implementation
+                    console.log("group_by not implemented yet!");
+                }
+                self.data = data;
+            });
     },
     /**
-     *  Loads the records
-     *
-     *  @param {Boolean} same true if the dataset is the same. defaults to false
+     *  Loads the records. calls this.get_records when needed
      */
-    load_records: function (same=false) {
+    load_records: function (offset=0, origin="search") {
         //console.log("MapView.load_records: ",arguments);
-        
         var self = this;
-        
-        if (!same){
-            this.get_records(this.domain).then(function(records){
-                self.current_record_nb = records.length;
-                //console.log("current number of records : "+self.current_record_nb);
-                self.update_pager(1);
-                if (self.map.is_attached()) {
-                    var opts = self.record_options;
-                    self.map.reset_layer_groups().then(function(){
-                    	if (self.current_record_nb === 0) {
-                    		//console.log("no displayable record");
-                    		self.map.nocontent_displayer.update_content();
-                    		self.map.nocontent_displayer.do_toggle(true);
-                    	}else{
-                    		self.map.nocontent_displayer.do_toggle(false);
-                    		self.map.add_layer_group(records,opts);
-                    	}
-                    	//console.log("MapView.load_records: this, displayable, nondisplayable",self,self.records,self.nondisplayable_records);
+        var dfd_1 = $.Deferred();
+        var dfd_2 = $.Deferred();
+        if (origin === "search" || origin === "reload") {  // get records from datasbase
+            dfd_1 = this.get_records(offset, origin)
+                    .then(function(){
+                        self.map.reset_layer_groups();
+                    })
+                    .then(function() {
+                        if (self.records.length) {
+                            self.map.add_layer_group(self.records,self.record_options);
+                            self.map.nocontent_displayer.do_hide();
+                        }else{
+                            self.map.nocontent_displayer.do_show();
+                        }
+                        self.map.nocontent_displayer.update_content();
                     });
-                }else{
-                    throw new Error(_.str.sprintf( _t("the map is not attached to its container")));
-                }; 
-            });
-        }else{
-            // supposed to happen not to get the records again, nor reset the layer groups
-            console.log('SEARCH same=true');
+        }else if (this.records[offset] == undefined){  // get records from database
+            dfd_1 = this.get_records(offset, origin)
+                    .then(function(){
+                        var all_ids = self.records.map(x => x.id || undefined);
+                        var actual_ids = all_ids.filter(function(el){return !!el;})
+
+                        self.dataset.add_ids(actual_ids);
+                        self.dataset._length = all_ids.length;  // workaround some bug in odoo code to keep pager with right values
+                        var layer_group = self.map.layer_groups[self.map.current_layer_group_index];
+                        layer_group.update_records(self.records);
+                        layer_group.do_show_range(offset,false,true,true);
+                    });
+        }else{  // records already loaded
+            var all_ids = self.records.map(x => x.id || undefined);
+            var actual_ids = all_ids.filter(function(el){return !!el;})
+
+            self.dataset.add_ids(actual_ids);
+            self.dataset._length = all_ids.length;  // workaround some bug in odoo code to keep pager with right values
+            var layer_group = self.map.layer_groups[self.map.current_layer_group_index];
+            layer_group.do_show_range(offset,false,true,true);
+            dfd_1.resolve();
         }
 
         this.do_push_state({
-            min: this.current_min,
+            min: offset + 1,
             limit: this._limit
         });
 
-        return $.when();
+        return $.when(dfd_1)
+            .then(function(){
+                self.update_pager(offset + 1);
+            });
     },
-
+    /**
+     *  get records from database and update self.records
+     *
+     *  @return {jQuery.Deferred}
+     */
+    get_records: function (offset=0, origin="search") {
+        //console.log("MapView.get_records: ",arguments);
+        var self = this;
+        var options = {
+            'limit': this._limit,
+            'offset': offset,
+            'domain': this.domain,
+            'context': this.context,
+        };
+        var read_fields = this.fields_keys.concat(['__last_update']);
+        return this.dataset.read_slice(read_fields, options)
+                .then(function(records){
+                    var lgt = self.dataset.size();
+                    if (origin === "search" || origin === "reload") {
+                        self.records = new Array(lgt);
+                    }
+                    for (var i = 0; i < records.length; ++i) {
+                        var le_index = i + offset;
+                        self.records[le_index] = records[i];
+                    }
+                    return $.when();
+                });
+    },
     /**
      *	
      *
@@ -243,60 +394,37 @@ var MapView = View.extend({
         var p2 = dfd_2.promise();
 
         if (options.map_center_and_zoom) {
-        	//console.log('getting map center and zoom');
-        	self.options.map_center_and_zoom = [];
-        	ir_config.call('get_param',['Map_Default_Center_Latitude']).then(function(lat) {
-        		self.options.map_center_and_zoom[0] = [];
-        		self.options.map_center_and_zoom[0][0] = lat;
-        		return ir_config.call('get_param',['Map_Default_Center_Longitude']);
-        	}).then(function(lng) {
-        		self.options.map_center_and_zoom[0][1] = lng;
-        		return ir_config.call('get_param',['Map_Default_Zoom']);
-        	}).then(function(zoom) {
-        		self.options.map_center_and_zoom[1] = zoom;
-        		//console.log('map_center_and_zoom: ',self.options.map_center_and_zoom);
-        		dfd_1.resolve();
-        	});
+            //console.log('getting map center and zoom');
+            self.options.map_center_and_zoom = [];
+            ir_config.call('get_param',['Map_Default_Center_Latitude']).then(function(lat) {
+                self.options.map_center_and_zoom[0] = [];
+                self.options.map_center_and_zoom[0][0] = lat;
+                return ir_config.call('get_param',['Map_Default_Center_Longitude']);
+            }).then(function(lng) {
+                self.options.map_center_and_zoom[0][1] = lng;
+                return ir_config.call('get_param',['Map_Default_Zoom']);
+            }).then(function(zoom) {
+                self.options.map_center_and_zoom[1] = zoom;
+                //console.log('map_center_and_zoom: ',self.options.map_center_and_zoom);
+                dfd_1.resolve();
+            });
         }else{
-        	dfd_1.resolve();
+            dfd_1.resolve();
         }
         if (options.tile_server_addr) {
-        	//console.log('getting tile server address');
-        	ir_config.call('get_param',['Map_Tile_Server_Address']).then(function(res){
-        		if (res !== 'undefined') {
-        			self.options.tile_server_addr = res;
-        			//console.log("tile server address should be: ",res);
-        		}
-        		dfd_2.resolve();
-        	});
+            //console.log('getting tile server address');
+            ir_config.call('get_param',['Map_Tile_Server_Address']).then(function(res){
+                if (res !== 'undefined') {
+                    self.options.tile_server_addr = res;
+                    //console.log("tile server address should be: ",res);
+                }
+                dfd_2.resolve();
+            });
         }else{
-        	dfd_2.resolve();
+            dfd_2.resolve();
         }
 
         return $.when(p1,p2);
-    },
-    /**
-     *  Records without latitude or without longitude will not be loaded.
-     *  @return {Array} records An array of arrays of the form [ [record_fields0], [record_fields1] ... ]
-     */
-    get_records: function (domain=this.domain) {
-        //console.log("MapView.get_records: ",arguments);
-        var self = this;
-        this.nondisplayable_records = [];
-
-        return this.dataset.read_slice(_.keys(this.fields_view.fields), {'domain':domain}).then(function(records){
-            //console.log(records);
-            var res = []
-            for (var i=0; i<records.length; i++) {
-            	if (records[i][self.record_options.latitude_field] !== 0 && records[i][self.record_options.longitude_field] !== 0) {
-            		res.push(records[i]);
-            	}else{
-            		self.nondisplayable_records.push(records[i]);
-            	}
-            }
-            self.records = res;
-            return res;
-        });
     },
     /**
      * Handles signal for the addition of a new record (can be a creation,
@@ -321,6 +449,42 @@ var MapView = View.extend({
         }
     },
     /**
+     *  Handles signal to open an action
+     */
+    open_action: function (event) {
+        var self = this;
+        if (event.data.context) {
+            event.data.context = new data.CompoundContext(event.data.context)
+                .set_eval_context({
+                    active_id: event.target.id,
+                    active_ids: [event.target.id],
+                    active_model: this.model,
+                });
+        }
+        this.do_execute_action(event.data, this.dataset, event.target.id, _.bind(self.reload_record, this, event.target));
+    },
+    reload_record: function (record) {
+        var self = this;
+        this.dataset.read_ids([record.id], this.fields_keys.concat(['__last_update'])).done(function(records) {
+            if (records.length) {
+                record.update(records[0]);
+                record.postprocess_m2m_tags();
+            } else {
+                record.destroy();
+            }
+        });
+    },
+    /**
+     *  postprocessing of fields type many2many
+     *  make the rpc request for all ids/model and insert value inside .of_map_field_many2manytags fields
+     */
+    postprocess_m2m_tags: function(records) {
+        records = records instanceof Array ? records : [records];
+        _.each(records, function(record){
+            record.postprocess_m2m_tags();
+        });
+    },
+    /**
      * Instantiate and render the pager and add listeners on it.
      * Set this.pager
      * @param {jQuery} [$node] a jQuery node where the pager should be inserted
@@ -337,13 +501,16 @@ var MapView = View.extend({
                 //console.log("pager_changed: ",this.pager);
                 
                 var limit_changed = (self._limit !== new_state.limit);
-
-                self._limit = new_state.limit;
+                var layer_group = self.map.layer_groups[self.map.current_layer_group_index];
                 self.current_min = new_state.current_min;
-                var current_max = this.pager.state.current_max;
-                //console.log('current_min: ',self.current_min);
-                //console.log('current_max: ',current_max);
-                self.map.layer_groups[self.map.current_layer_group_index].do_show_range(self.current_min-1,current_max,true);
+                if (limit_changed) {
+                    layer_group._limit = new_state.limit;
+                    self._limit = new_state.limit;
+                    var current_max = this.pager.state.current_max;
+                    self.load_records(self.current_min - 1, origin="pager");
+                }else{
+                    self.load_records(self.current_min - 1, origin="pager");
+                }
             });
         }
     },
@@ -354,10 +521,8 @@ var MapView = View.extend({
      */
     update_pager: function (current_min) { 
         //console.log("MapView.update_pager");
-        var lngth = this.current_record_nb;
-        //console.log("current nb of records in the pager: "+lngth);
         if (this.pager) {
-            var new_state = { size: lngth, limit: this._limit };
+            var new_state = { size: this.dataset.size(), limit: this._limit };
             if (current_min) {
                 new_state.current_min = current_min;
             }
@@ -368,10 +533,10 @@ var MapView = View.extend({
      * No idea what this is for... apparently triggered when the web page gets refreshed?
      */
     do_load_state: function(state, warm) { 
-        console.log("MapView.do_load_state: ",state,warm);
+        //console.log("MapView.do_load_state: ",state,warm);
         var reload = false;
         if (state.min && this.current_min !== state.min) {
-            this.current_min = state.min;
+            //this.current_min = state.min;
             reload = true;
         }
         if (state.limit) {
@@ -384,14 +549,15 @@ var MapView = View.extend({
             }
         }
         if (reload) {
-            this.load_records(true);
+            this.update_pager(state.min);
+            //this.load_records(this.current_min - 1, origin="reload");
         }
     },
     /**
      * remove the map on destroy() so it doesn't generate an error when trying to load the map view of another model.
      */
     destroy: function () {
-    	//console.log("MapView.destroy")
+        //console.log("MapView.destroy")
         this.map.the_map.remove();
         this.map.the_map = null;
         return this._super.apply(this, arguments);
@@ -404,8 +570,8 @@ MapView.Map = Widget.extend({
     },
     defaults: _.extend({},{
         center: [48.056,-2.818], // BRETAGNE
-        zoom: 8, 
-        minZoom: 7, 
+        zoom: 8,
+        minZoom: 5,
         maxZoom: 18,
         tile_server_addr: TILE_SERVER_ADDR,
         container_id: 'lf_map', // the id of the container for the map
@@ -433,13 +599,28 @@ MapView.Map = Widget.extend({
         //console.log("MapView.Map inited: ", this);
     },
     /**
+     *  Instantiate the legend displayer for the map. See map_controls.
+     */
+    add_legend_displayer: function () {
+        //console.log("MapView.Map.add_legend_displayer");
+        // make sure to only add it once.
+        if (!this.legend_displayer) {
+            this.legend_displayer = new map_controls.LegendDisplayer(this.view,this.options.displayer_options);
+            this.legend_displayer.addTo(this.the_map);
+        }else{
+            console.log('this.legend_displayer is already set');
+        }
+
+        return $.when();
+    },
+    /**
      *  Instantiate the record displayer for the map. See map_controls.
      */
     add_record_displayer: function () {
         //console.log("MapView.Map.add_record_displayer");
         // make sure to only add it once.
         if (!this.record_displayer) {
-            this.record_displayer = new map_controls.RecordDisplayer(this.view,this.view.record_options.header_fields,this.view.record_options.body_fields);
+            this.record_displayer = new map_controls.RecordDisplayer(this.view,this.options.displayer_options);
             this.record_displayer.addTo(this.the_map);
         }else{
             console.log('this.record_displayer is already set');
@@ -451,15 +632,15 @@ MapView.Map = Widget.extend({
      *  Instantiate the nocontent displayer for the map. See map_controls.
      */
     add_nocontent_displayer: function () {
-    	//console.log("MapView.Map.add_nocontent_displayer");
+        //console.log("MapView.Map.add_nocontent_displayer");
         // make sure to only add it once.
         if (!this.nocontent_displayer) {
-        	var options = {};
+            var options = {};
 
-        	this.nocontent_displayer = new map_controls.NoContentDisplayer(this.view,options);
-        	this.nocontent_displayer.addTo(this.the_map);
+            this.nocontent_displayer = new map_controls.NoContentDisplayer(this.view,options);
+            this.nocontent_displayer.addTo(this.the_map);
         }else{
-        	console.log('this.nocontent_displayer is already set');
+            console.log('this.nocontent_displayer is already set');
         }
 
         return $.when();
@@ -480,13 +661,14 @@ MapView.Map = Widget.extend({
         //console.log("MapView.Map.on_map_attached");=
         var p1 = this.add_record_displayer();
         var p2 = this.add_nocontent_displayer();
+        var p3 = this.add_legend_displayer();
         //this.add_buttons(); // later, later...
 
         var self = this;
 
-        $.when(p1,p2).then(function(){
-        	var v = self.view;
-        	v.do_search(v.domain,v.context,v.group_by);
+        $.when(p1,p2,p3).then(function(){
+            var v = self.view;
+            v.do_search(v.domain,v.context,v.group_by);
         });
         
     },
@@ -517,7 +699,9 @@ MapView.Map = Widget.extend({
         if (this.is_attached()) {
             if (!this.the_map.hasLayer(layer_group.the_layer)) {
                 var self = this;
-                layer_group.render(set_bounds);
+                layer_group.renderElement(true);
+            }else{
+                console.log("??????");
             }
             return $.when();
         }else{
@@ -566,9 +750,9 @@ MapView.Map = Widget.extend({
                 console.log("given string doesn't match any of the available modes. modes are 'visible', 'current', current_visible' and 'all'");
         };
         //console.log("the_map: ",this.the_map);
-        this.the_map.fitBounds(bounds);
-        if (this.the_map.getZoom() === 18) {
-        	this.the_map.setZoom(15);
+        this.the_map.fitBounds(bounds, {padding: [30, 30]});
+        if (this.the_map.getZoom() > 15) {
+            this.the_map.setZoom(15);
         }
     },
 
@@ -633,7 +817,6 @@ MapView.Map = Widget.extend({
             for (var i=0; i<this.layer_groups.length; i++) {
                 current_layer = this.layer_groups[i].the_layer;
                 if (this.the_map.hasLayer(current_layer)) {
-                    //console.log("removing layer...");
                     this.the_map.removeLayer(current_layer);
                 }else{
                     console.log("the_map doesn't have the layer...")
@@ -657,19 +840,19 @@ MapView.Map = Widget.extend({
         //console.log("MapView.Map.attach_to_container");
         var self = this;
         if ($('#'+container_id).length > 0) {
-        	//console.log("this.the_map before test: ",this.the_map);
+            //console.log("this.the_map before test: ",this.the_map);
 
-        	if (this.the_map === null || this.the_map === undefined) {
-	            this.the_map = L.map(this.options.container_id, { 
-	                center: this.options.center, 
-	                zoom: this.options.zoom, 
-	                minZoom: this.options.minZoom, 
-	                maxZoom: this.options.maxZoom,
-	            });
-	            L.tileLayer(tile_server_addr).addTo(this.the_map);
-	        }else{
-	        	console.log("the map has already been initialised");
-	        }
+            if (this.the_map === null || this.the_map === undefined) {
+                this.the_map = L.map(this.options.container_id, { 
+                    center: this.options.center, 
+                    zoom: this.options.zoom, 
+                    minZoom: this.options.minZoom, 
+                    maxZoom: this.options.maxZoom,
+                });
+                L.tileLayer(tile_server_addr).addTo(this.the_map);
+            }else{
+                console.log("the map has already been initialised");
+            }
             
             return $.when().then(function(){
                 //console.log('map attached!!!!!! by id. at try number '+(self.cmptry+1));
@@ -697,6 +880,7 @@ MapView.Map = Widget.extend({
 MapView.LayerGroup = Widget.extend({
     defaults: _.extend({},{
         custom_icon: true,
+        color_icons: true,
         // custom icon options. 
         icon_options: {
             unselected: {
@@ -725,19 +909,73 @@ MapView.LayerGroup = Widget.extend({
         this.records = records || [];
         this.options = _.defaults(options,this.defaults);
         this.icon = null;
-        this.the_layer = null;
+        this.the_layer = new L.LayerGroup();
+        // the view's number of records per page (|| section), defaults to 80
+        this._limit = map.view._limit;
+        // the index of the first displayed record (starting from 1)
+        this.current_min = 1;
+        //this.pages = {};
 
         this.visible = this.options.visible;
         if (!this.visible) this.do_toggle(false);
         
         this.map = map;
         this.current_selection = {}; // id dictionary of records currently selected. of the form id: record
+        //console.log("MapView.LayerGroup this: ",this);
+    },
+    /**
+     *
+     */
+    update_records: function(new_records) {
+        for (var i=0; i<this.records.length; i++) {
+            if (this.records[i] == undefined && new_records[i] != undefined) {
+                this.records[i] = new_records[i];
+            }
+        }
+    },
+    /**
+     *  renders one record
+     */
+    render_one_record: function(i,mode="index",visible=true) {
+        //console.log("MapView.LayerGroup.render_one_record: ",this.records[i]);
+        var self = this;
+
+        if (mode == "index") {
+            if (this.records[i] == undefined) {
+                console.log("undefined record at index ",i);
+                return;
+            }
+            var lat, lng, marker, icon, id;
+            lat = this.records[i][this.options.latitude_field];
+            lng = this.records[i][this.options.longitude_field];
+
+            if (this.options.custom_icon) {
+                var options = this.options.icon_options.unselected;
+                options['id'] = 'icon_'+this.records[i].id;
+                options["iconUrl"] = this.get_color_url(this.records[i]);
+
+                icon = L.icon.glyph(options);
+
+                marker = new MapView.Marker([lat, lng],this,this.records[i],{icon:icon});
+            }else{
+                marker = new MapView.Marker([lat, lng],this,this.records[i]);
+            }
+            this.the_layer.addLayer(marker);
+            marker.set_ids_dict_ref();
+
+            this.records[i]["rendered"] = true;
+        }else{
+            //console.log("mode not yet implemented")
+        }
+
+        return $.when();
     },
     /**
      *  Adds markers to the layer for each record. Adds leaflet id reference in this.map.ids_dict
      */ 
-    render: function(set_bounds=true) {
-        //console.log("MapView.LayerGroup.render");
+    renderElement: function(set_bounds=true) {
+        //console.log("MapView.LayerGroup.renderElement");
+        this._super();
         var self = this;
         if (this.the_layer!==null) {
             this.the_layer.clearLayers();
@@ -746,13 +984,19 @@ MapView.LayerGroup = Widget.extend({
         var lat, lng, marker, icon, id;
         for (var i=0; i<this.records.length; i++) {
             //console.log(this.records[i]);
+            if (this.records[i] == undefined || this.records[i].rendered) {
+                continue;
+            }
             lat = this.records[i][this.options.latitude_field];
             lng = this.records[i][this.options.longitude_field];
 
             if (this.options.custom_icon) {
                 var options = this.options.icon_options.unselected;
                 options['id'] = 'icon_'+this.records[i].id;
+                options["iconUrl"] = this.get_color_url(this.records[i]);
+
                 icon = L.icon.glyph(options);
+
                 marker = new MapView.Marker([lat, lng],this,this.records[i],{icon:icon});
             }else{
                 marker = new MapView.Marker([lat, lng],this,this.records[i]);
@@ -760,16 +1004,27 @@ MapView.LayerGroup = Widget.extend({
                     
             this.the_layer.addLayer(marker);
             marker.set_ids_dict_ref();
+            this.records[i]["rendered"] = true;
         }
 
         if (this.options.auto_addTo) {
             this.the_layer.addTo(this.map.the_map);
             this.visible = true;
-            this.do_show_range(0,this.map.view._limit,set_bounds);
+            this.do_show_range(this.map.view.current_min-1,false,true,set_bounds);
         }
 
-        //console.log(this);
         return $.when(); 
+    },
+    /**
+     *  returns the URL for the icon, given the color_field. defaults to blue.
+     */
+    get_color_url: function (record) {
+        var color_field =  this.options.color_field;
+        if (color_field) {
+            return iconUrls[record[color_field]];
+        }else{
+            return iconUrls["blue"];
+        }
     },
     /**
      *  Gets the bounds of all markers in this layer group
@@ -779,10 +1034,16 @@ MapView.LayerGroup = Widget.extend({
     get_bounds: function () {
         //console.log("MapView.LayerGroup.get_bounds");
         var bounds = new L.LatLngBounds();
+        var zerozero = [0,0];
+        var marker_latlng;
 
         for (var id in this.the_layer._layers) {
-            var layer = this.the_layer._layers[id];
-            bounds.extend(layer.getBounds ? layer.getBounds() : layer.getLatLng());
+            var marker = this.the_layer._layers[id];
+            marker_latlng = [marker._latlng["lat"],marker._latlng["lng"]];
+            if (JSON.stringify(marker_latlng) != JSON.stringify(zerozero)) {
+                bounds = bounds.extend(marker.getBounds ? marker.getBounds() : marker.getLatLng());
+            }
+            bounds.extend(marker.getBounds ? marker.getBounds() : marker.getLatLng());
         }
         return bounds;
     },
@@ -794,13 +1055,24 @@ MapView.LayerGroup = Widget.extend({
     get_visible_bounds: function () {
         //console.log("MapView.LayerGroup.get_visible_bounds");
         var bounds = new L.LatLngBounds();
+        var zerozero = [0,0];
+        var marker_latlng;
+        //console.log("this.the_layer._layers: ",this.the_layer._layers);
 
         for (var id in this.the_layer._layers) {
-            var layer = this.the_layer._layers[id];
-            if (layer.visible) {
-                bounds.extend(layer.getBounds ? layer.getBounds() : layer.getLatLng());
+            var marker = this.the_layer._layers[id];
+
+            marker_latlng = [marker._latlng["lat"],marker._latlng["lng"]];
+            //console.log("marker_latlng: ",marker_latlng);
+            if (marker.visible && JSON.stringify(marker_latlng) != JSON.stringify(zerozero)) {
+                bounds = bounds.extend(marker.getBounds ? marker.getBounds() : marker.getLatLng());
+            }else if (JSON.stringify(marker_latlng) == JSON.stringify(zerozero)) {
+                //console.log("zerozero marker");
+            }else{
+                //console.log("invisible marker");
             }
         }
+        //console.log("BOUNDS: ",bounds);
         return bounds;
     },
 
@@ -814,7 +1086,7 @@ MapView.LayerGroup = Widget.extend({
         //console.log("MapView.LayerGroup.has_record");
         var found = false;
         for (var i=0; i<this.records.length && found === false; i++) {
-            if (this.records[i].id === id) { // record found
+            if (this.records[i] != undefined && this.records[i].id === id) { // record found
                 found = true;
                 break;
             }
@@ -857,14 +1129,17 @@ MapView.LayerGroup = Widget.extend({
         this.current_selection = {};
     },
     /**
-     *  Displays (make visible) all markers in range [ i1,i2 [
+     *  Displays (make visible) all markers in range [ i1,i2 [, calls this.render_one_record to render markers not yet rendered.
      *
      *  @param {Int} i1 Start index of the range, included in the range.
      *  @param {Int} i2 End index of the range, not included in the range.
      *  @param {Boolean} hide_rest True to hide the rest of the markers, ie to only show the given range. Defaults to false
      */
     do_show_range: function (i1,i2,hide_rest=false,set_bounds=true) {
-        //console.log("MapView.LayerGroup.do_show_range");
+        //console.log("MapView.LayerGroup.do_show_range: ",i1,i2,hide_rest,set_bounds);
+        if (!i2){ // full page
+            i2 = i1 + this._limit;
+        }
         if (i2 > this.records.length) { // foolproofing
             i2 = this.records.length;
         }
@@ -874,9 +1149,17 @@ MapView.LayerGroup = Widget.extend({
         var lf_id;
         //console.log(this.map.ids_dict);
         for (var i=i1; i<i2; i++) {
+            if (this.records[i] == undefined) {
+                console.log("undefined record");
+                continue;
+            }
+            if (!this.records[i].rendered) {
+                this.render_one_record(i,"index",true);
+            }
             lf_id = this.map.ids_dict[this.records[i].id];
             this.the_layer._layers[lf_id].do_toggle(true);
         }
+
         if (hide_rest) {
             this.do_hide_range(0,i1);
             this.do_hide_range(i2,this.records.length);
@@ -891,7 +1174,10 @@ MapView.LayerGroup = Widget.extend({
      *  @param {Boolean} show_rest True to show the rest of the markers, ie to only hide the given range. Defaults to false
      */
     do_hide_range: function (i1,i2,show_rest=false) {
-        //console.log("MapView.LayerGroup.do_hide_range");
+        //console.log("MapView.LayerGroup.do_hide_range",i1,i2,show_rest);
+        if (i2 != 0 && !i2){ // full page
+            i2 = i1 + this._limit;
+        }
         if (i2 > this.records.length) { // foolproofing
             i2 = this.records.length;
         }
@@ -899,7 +1185,9 @@ MapView.LayerGroup = Widget.extend({
             i1 = 0;
         }
         for (var i=i1; i<i2; i++) {
-            this.the_layer._layers[ this.map.ids_dict[this.records[i].id] ].do_toggle(false);
+            if (!!this.records[i] && this.records[i].rendered) {
+                this.the_layer._layers[ this.map.ids_dict[this.records[i].id] ].do_toggle(false);
+            }
         }
         if (show_rest) {
             this.do_show_range(0,i1);
@@ -967,10 +1255,13 @@ MapView.Marker = L.Marker.extend({
     initialize: function (latlng, group, record, options) {
         //console.log("MapView.Marker.init")
         L.setOptions(this, options);
+        var self = this;
         this._latlng = L.latLng(latlng);
-        this.record = record;
         this.id = record.id;
         this.group = group;
+        this.fields = this.group.map.view.fields;
+        this.record = this.transform_record(record);
+        //console.log("RECORD: ",this.record);
         
         // true if the marker is currently visible on the map, ie if it's on the current pager's selection
         this.visible = true;
@@ -978,10 +1269,58 @@ MapView.Marker = L.Marker.extend({
         this.selected = false;
         // true if the marker is highlighted, ie it's selected and the mouse is over it
         this.highlighted = false;
+        // for QWeb
+        this.qweb = this.group.map.view.qweb;
+        if (this.qweb.templates["of_map_marker_tooltip"]) {  // in case the template is not defined
+            this.many2manys = this.group.map.view.many2manys;
+            this.m2m_context = this.group.map.view.m2m_context;
+            this.qweb_context = {
+                record: this.record,
+                //widget: this,
+                read_only_mode: this.read_only_mode,
+                user_context: session.user_context,
+                formats: formats,
+            };
+            this.tooltip = this.qweb.render("of_map_marker_tooltip", this.qweb_context) || null;
+        }
         this.on('dblclick',this.open_record);
         this.on('click',this.do_toggle_selected);
         this.on('mouseover',this.do_toggle_highlighted);
         this.on('mouseout',this.do_toggle_highlighted);
+        this.on("add",this.bind_tooltip);
+    },
+    /**
+     *  binds tooltip to the marker if any
+     */
+    bind_tooltip: function() {
+        var $el = $("#glyph_icon_" + this.id).parent();
+        if ($el.length && this.tooltip) {
+            $el.tooltip({
+                'html': true,
+                'title': this.tooltip,
+                'delay': {'show': 50}
+            })
+        }else{
+            //console.log("TODAVIA NO");
+        }
+    },
+    /**
+     *  transforms the record so it can be used by QWeb renderer
+     */
+    transform_record: function(record) {
+        var self = this;
+        var new_record = {};
+        _.each(_.extend(_.object(_.keys(this.fields), []), record), function(value, name) {
+            var r = _.clone(self.fields[name] || {});
+            if ((r.type === 'date' || r.type === 'datetime') && value) {
+                r.raw_value = time.auto_str_to_date(value);
+            } else {
+                r.raw_value = value;
+            }
+            r.value = formats.format_value(value, r);
+            new_record[name] = r;
+        });
+        return new_record;
     },
     /**
      *  Adds a reference to the map's ids_dict: this.id -> this._leaflet_id. Called when the marker is added to its layer group
@@ -1019,7 +1358,7 @@ MapView.Marker = L.Marker.extend({
         if (changed) {
             if (this.selected) {
                 //console.log('marker selected: ',this);
-                this.group.map.record_displayer.add_record(this.record,this.group.map.view.record_options);
+                this.group.map.record_displayer.add_record(this,this.group.map.view.record_options);
             }else{
                 this.group.map.record_displayer.remove_record(this.id);
             }
@@ -1042,7 +1381,7 @@ MapView.Marker = L.Marker.extend({
         }
     },
     /**
-     *  Updates the icon's glyph. Called when a marker is selected, ie by click on its icon
+     *  Updates the icon's glyph. Called when a marker is selected or unselected, ie by click on its icon
      */
     update_glyph: function() {
         //console.log("MapView.Marker.update_glyph");
@@ -1063,7 +1402,25 @@ MapView.Marker = L.Marker.extend({
             console.log("update_glyph: couldn't find glyph id"+glyph_id);
         }
     },
+    /**
+     *  Updates the marker color. Called when a map_record is updated
+     */
+    update_color: function (color) {
+        //console.log("Update color: ",this);
+        var options;
+        this.selected ? options = this.group.options.icon_options.selected : options = this.group.options.icon_options.unselected;
+        options['id'] = 'icon_'+this.id;
+        options["iconUrl"] = iconUrls[color];
 
+        var icon = L.icon.glyph(options);
+        this.setIcon(icon);
+    },
+    /**
+     *  returns the URL for the icon. defaults to blue.
+     */
+    get_color_url: function (record) {
+        return this.group.get_color_url(record);
+    },
     /**
      *  Displays (make visible) the marker
      */

@@ -137,24 +137,6 @@ class ResUsers(models.Model):
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    # (fonction temporaire) Supprimer balises html de of_notes_client, ajout du contenu de of_client_notes au champ comment, supprimer la colonne of_client_notes
-    @api.model_cr_context
-    def _auto_init(self):
-        # Teste si le champ of_notes_client existe.
-        super(ResPartner, self)._auto_init()
-        self._cr.execute(" SELECT * FROM information_schema.columns WHERE table_name = 'res_partner' AND column_name = 'of_notes_client';")
-        if bool(self._cr.fetchall()):
-            self._cr.execute("SELECT id, of_notes_client, comment FROM res_partner WHERE of_notes_client IS NOT NULL")
-            for partner_id, notes, comment in self._cr.fetchall():
-                if notes == '<p><br></p>':
-                    notes = ""
-                if notes:
-                    if comment:
-                        notes = "<br>---<br>" + notes
-                    self._cr.execute("UPDATE res_partner SET comment = CONCAT(comment, '\n', %s) WHERE id = %s;", (notes, partner_id))
-            self._cr.execute(u"UPDATE res_partner SET comment = REPLACE(comment, '<em style=\"color: grey;\">Attention, ces notes sont synchronisées entre contacts, devis et plannings d''intervention.</em>', '');")
-            self._cr.execute("ALTER TABLE res_partner RENAME COLUMN of_notes_client TO of_notes_client_bck;")
-
     # Pour afficher l'adresse au format français par défaut quand le pays n'est pas renseigné et non le format US
     @api.multi
     def _display_address(self, without_company=False):

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates inherit_id="web.template">
+    <t t-extend="WebClient.DebugManager.Global">
+        <t t-jquery="li.divider:first" t-operation="before" >
+            <t t-if="manager.list_editor">
+                <li><a href="#" data-action="toggle_list_editor">Disable List Editor</a></li>
+            </t>
+            <t t-else="">
+                <li><a href="#" data-action="toggle_list_editor">Enable List Editor</a></li>
+            </t>
+        </t>
+    </t>
+</templates>

@@ -52,7 +52,7 @@ class CourrierCrm(report_sxw.rml_parse):
             result[0]['city'] = ''
         return [result[0]]
 
-report_sxw.report_sxw('report.of_gesdoc.courriers_crm', 'crm.lead', "addons/of_gesdoc/report/CourrierCrm.rml", parser=CourrierCrm, header=True)
-report_sxw.report_sxw('report.of_gesdoc.courriers_crm_se', 'crm.lead', "addons/of_gesdoc/report/CourrierCrm_se.rml", parser=CourrierCrm, header=True)
-report_sxw.report_sxw('report.of_gesdoc.courriers_crm_sehead', 'crm.lead', "addons/of_gesdoc/report/CourrierCrm.rml", parser=CourrierCrm, header=False)
-report_sxw.report_sxw('report.of_gesdoc.courriers_crm_se_sehead', 'crm.lead', "addons/of_gesdoc/report/CourrierCrm_se.rml", parser=CourrierCrm, header=False)
+report_sxw.report_sxw('report.of_gesdoc.courriers_crm', 'crm.lead', "addons/of_gesdoc/report/courrier_crm.rml", parser=CourrierCrm, header=True)
+report_sxw.report_sxw('report.of_gesdoc.courriers_crm_se', 'crm.lead', "addons/of_gesdoc/report/courrier_crm_se.rml", parser=CourrierCrm, header=True)
+report_sxw.report_sxw('report.of_gesdoc.courriers_crm_sehead', 'crm.lead', "addons/of_gesdoc/report/courrier_crm.rml", parser=CourrierCrm, header=False)
+report_sxw.report_sxw('report.of_gesdoc.courriers_crm_se_sehead', 'crm.lead', "addons/of_gesdoc/report/courrier_crm_se.rml", parser=CourrierCrm, header=False)

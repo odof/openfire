@@ -2,14 +2,16 @@
 
 from odoo import api, models, fields
 from datetime import date
+from datetime import timedelta
 
 class OfService(models.Model):
     _name = "of.service"
+    _inherit = "of.map.view.mixin"
     _description = "Service"
 
     def _get_default_jours(self):
         # Lundi à vendredi comme valeurs par défaut
-        jours = self.env['of.jours'].search([('numero', 'in', (1,2,3,4,5))], order="numero")
+        jours = self.env['of.jours'].search([('numero', 'in', (1, 2, 3, 4, 5))], order="numero")
         res = [jour.id for jour in jours]
         return res
 
@@ -59,30 +61,49 @@ class OfService(models.Model):
         rows = cr.fetchall()
         return [('id', 'in', rows and zip(*rows)[0])]
 
-    def _get_color(self):
+    @api.multi
+    @api.depends('date_next')
+    def _compute_color(self):
         u""" COULEURS :
-        Gris  : service dont l'adresse n'a pas de coordonnées GPS
-        Rouge : service dont la date de dernière intervention est inférieure à la date courante (ou à self._context.get('date_next_max'))
+        Gris  : service dont l'adresse n'a pas de coordonnées GPS, ou service inactif
+        Orange: service dont la date de prochaine intervention est dans moins d'un mois
+        Rouge : service dont la date de prochaine intervention est inférieure à la date courante (ou à self._context.get('date_next_max'))
         Noir  : autres services
         """
-        date_next_max = self._context.get('date_next_max') or fields.Date.today()
+        date_next_max = fields.Date.from_string(self._context.get('date_next_max') or fields.Date.today())
 
         for service in self:
-            if not (service.address_id.geo_lat or service.address_id.geo_lng):
+            date_next = fields.Date.from_string(service.date_next)
+            if not (service.address_id.geo_lat or service.address_id.geo_lng) or not service.active:
                 service.color = 'gray'
-            elif service.date_next <= date_next_max:
+            elif date_next <= date_next_max:
                 service.color = 'red'
+            elif date_next <= date_next_max + timedelta(days=30):
+                service.color = 'orange'
             else:
                 service.color = 'black'
+
+    @api.model
+    def get_color_map(self):
+        u"""
+        fonction pour la légende de la vue map
+        """
+        title = "Prochaine Intervention"
+        v0 = {'label': "Plus d'un mois", 'value': 'black'}
+        v1 = {'label': u'Ce mois-ci', 'value': 'orange'}
+        v2 = {'label': u'En retard', 'value': 'red'}
+        return {"title": title, "values": (v0, v1, v2)}
 
     # template_id = fields.Many2one('of.mail.template', string='Contrat')
     partner_id = fields.Many2one('res.partner', string='Partenaire', ondelete='restrict')
     address_id = fields.Many2one('res.partner', string="Adresse", ondelete='restrict')
 
-    # 3 champs ajoutés pour la vue map
+    # Champs ajoutés pour la vue map
     geo_lat = fields.Float(related='address_id.geo_lat')
     geo_lng = fields.Float(related='address_id.geo_lng')
+    precision = fields.Selection(related='address_id.precision')
     partner_name = fields.Char(related='partner_id.name')
+    partner_mobile = fields.Char(related='partner_id.mobile')
 
     tache_id = fields.Many2one('of.planning.tache', string=u'Tâche', required=True)
     name = fields.Char(u"Libellé", related='tache_id.name', store=True)
@@ -113,7 +134,7 @@ class OfService(models.Model):
     date_controle = fields.Date(string=u"Date de contrôle", compute='lambda *a, **k:{}')
 
     # Couleur de contrôle
-    color = fields.Char(compute='_get_color', string='Couleur')
+    color = fields.Char(compute='_compute_color', string='Couleur', store=False)
 
     @api.onchange('date_next')
     def _onchange_date_next(self):
@@ -166,6 +187,6 @@ class OfService(models.Model):
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    service_address_ids = fields.One2many('of.service', 'address_id', string='Services', context={'active_test':False})
-    service_partner_ids = fields.One2many('of.service', 'partner_id', string='Services du partenaire', context={'active_test':False},
+    service_address_ids = fields.One2many('of.service', 'address_id', string='Services', context={'active_test': False})
+    service_partner_ids = fields.One2many('of.service', 'partner_id', string='Services du partenaire', context={'active_test': False},
                                           help="Services liés au partenaire, incluant les services des contacts associés")

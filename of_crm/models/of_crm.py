@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, tools
+from odoo import models, fields, api
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
 from datetime import datetime
+from datetime import timedelta
 
 import time
 import logging
-#from odoo.fields import Datetime
+
 _logger = logging.getLogger(__name__)
 
 class CrmLead(models.Model):
-    _inherit = 'crm.lead'
+    _name = 'crm.lead'
+    _inherit = ['crm.lead', 'of.map.view.mixin']
 
     @api.model
     def _init_clients(self):
@@ -43,7 +45,7 @@ class CrmLead(models.Model):
         account_obj._parent_store_compute()
 
     of_website = fields.Char(related="partner_id.website")
-    of_description_projet = fields.Html('Notes de projet') # champs inutile a supprimer bientot
+    of_description_projet = fields.Html('Notes de projet')  # champs inutile à supprimer bientôt
     of_ref = fields.Char(string=u"Référence", copy=False)
     of_prospecteur_id = fields.Many2one("res.users", string="Prospecteur", oldname='of_prospecteur')
     of_date_prospection = fields.Date(string="Date de prospection", default=fields.Date.today)
@@ -52,6 +54,7 @@ class CrmLead(models.Model):
     of_infos_compl = fields.Html(string="Autres infos")
     geo_lat = fields.Float(related="partner_id.geo_lat")
     geo_lng = fields.Float(related="partner_id.geo_lng")
+    precision = fields.Selection(related='partner_id.precision')
     stage_probability = fields.Float(related="stage_id.probability", readonly=True)
 
     of_projet_line_ids = fields.One2many('of.crm.projet.line', 'lead_id', string=u'Entrées')
@@ -84,6 +87,42 @@ class CrmLead(models.Model):
     of_color_bg = fields.Char(string="Couleur de fond", compute="_compute_custom_colors")
     # city completion
     zip_id = fields.Many2one('res.better.zip', 'City/Location')
+
+    # Pour l'infobulle de la vue map
+    next_activity_name = fields.Char(related='next_activity_id.name')
+    of_color_map = fields.Char(string="Couleur du marqueur", compute="_compute_of_color_map")
+
+    @api.multi
+    @api.depends('date_action')
+    def _compute_of_color_map(self):
+        date_today = fields.Date.from_string(fields.Date.today())
+
+        for lead in self:
+            color = 'gray'
+            if lead.date_action:
+                date_action = fields.Date.from_string(lead.date_action)
+                if date_action > date_today + timedelta(days=30):  # prochaine action dans plus d'un mois
+                    color = "blue"
+                elif date_action >= date_today:  # prochaine action dans moins d'un mois
+                    color = "orange"
+                else:  # prochaine action en retard
+                    color = "red"
+            lead.of_color_map = color
+
+    @api.model
+    def get_color_map(self):
+        u"""
+        fonction pour la légende de la vue map
+        """
+        return {
+            'title': u"Prochaine Activité",
+            'values': (
+                {'label': u'Aucune', 'value': 'gray'},
+                {'label': u"Plus d'un mois", 'value': 'blue'},
+                {'label': u'Ce mois-ci', 'value': 'orange'},
+                {'label': u'En retard', 'value': 'red'},
+            )
+        }
 
     @api.onchange('zip_id')
     def onchange_zip_id(self):
@@ -215,7 +254,7 @@ class CrmLead(models.Model):
     @api.depends('description')
     def _compute_description_rapport(self):
         for lead in self:
-            lead.description_rapport = lead.description and lead.description.replace("<p>", "").replace("</p>","<br/>")
+            lead.description_rapport = lead.description and lead.description.replace("<p>", "").replace("</p>", "<br/>")
 
     @api.multi
     def write(self, vals):
@@ -251,9 +290,12 @@ class CrmTeam(models.Model):
     _inherit = 'crm.team'
 
     # Retrait des filtres de recherche par défaut dans la vue 'Votre pipeline'
+    # Ajout de la vue map. Cette action est appelée depuis le menu 'votre pipeline', l'action xml est appelée en rafraîchissant la page (?!?)
     @api.model
     def action_your_pipeline(self):
         action = super(CrmTeam, self).action_your_pipeline()
+        map_view_id = self.env.ref('of_crm.of_crm_map_view').id
+        action['views'].insert(2, [map_view_id, 'map'])
         action['context'] = {key: val for key, val in action['context'].iteritems() if not key.startswith('search_default_')}
         return action
 
@@ -338,9 +380,9 @@ Ce champ se met à jour automatiquement sur confirmation de commande et sur vali
     @api.onchange('customer')
     def _onchange_customer(self):
         for partner in self:
-            if partner.customer and partner.of_customer_state =='other':
+            if partner.customer and partner.of_customer_state == 'other':
                 partner.of_customer_state = 'lead'
-            elif not partner.customer and partner.of_customer_state !='other':
+            elif not partner.customer and partner.of_customer_state != 'other':
                 partner.of_customer_state = 'other'
 
     @api.model
@@ -348,9 +390,9 @@ Ce champ se met à jour automatiquement sur confirmation de commande et sur vali
         """
         On creation of a partner, will set of_customer_state field.
         """
-        if not vals.get('customer'): # partner is not a customer -> set to 'other'
+        if not vals.get('customer'):  # partner is not a customer -> set to 'other'
             vals['of_customer_state'] = 'other'
-        elif vals.get('of_customer_state', 'other') == 'other': # partner is a customer -> defaults to 'lead'
+        elif vals.get('of_customer_state', 'other') == 'other':  # partner is a customer -> defaults to 'lead'
             vals['of_customer_state'] = 'lead'
 
         partner = super(ResPartner, self).create(vals)
@@ -407,4 +449,3 @@ class AccountInvoice(models.Model):
                 partners += invoice.partner_id
         partners.write({'of_customer_state': 'customer'})
         return res
-

@@ -20,4 +20,27 @@
 
     <!-- map container -->
     <div t-name="MapView" id="lf_map" style="min-width: 500px; min-height: 500px; width: 100%; height: 100%;"/>
+
+	<t t-name="MapView.record">
+        <t t-raw="widget.content"/>
+	</t>
+
+    <t t-name="MapView.legend.colors">
+        <t t-if="lines">
+            <div name="of_map_legend_color" class="of_map_legend_color">
+                <div>
+                    <t t-esc="title"/>
+                </div>
+                <!-- colors parameter given in LegendDisplayer out of model function 'get_color_map' -->
+                <t t-foreach="lines" t-as="color">
+                    <t t-if="color_value.value || color_value.value===0"><!-- don't display if no value given (or undefined) -->
+                        <div class="of_map_legend_color_line" t-attf-style="color: #{color_value.value}">
+                            <i class="fa fa-lg fa-map-marker" t-attf-style="color: #{color_value.value}"/><span class="of_ws"/>
+                            <t t-esc="color_value.label" t-attf-style="color: #{color_value.value}"/>
+                        </div>
+                    </t>
+                </t>
+            </div>
+        </t>
+    </t>
 </template>

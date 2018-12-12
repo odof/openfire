@@ -332,11 +332,21 @@ class ProductTemplate(models.Model):
 
 class OfImport(models.Model):
     _name = 'of.import'
+    _order = 'date desc'
+
+    @api.model
+    def _default_lang_id(self):
+        lang = self.env['res.lang'].search([('code', '=', 'en_US')])
+        if not lang:
+            lang = self.env['res.lang'].search([('code', '=', self.env.lang)])
+        return lang
 
     user_id = fields.Many2one('res.users', u'Utilisateur', readonly=True, default=lambda self: self._uid)
 
     name = fields.Char(u'Nom', size=64, required=True)
     type_import = fields.Selection([('product.template', u'Articles'), ('res.partner', u'Partenaires'), ('crm.lead', u'Pistes/opportunités'), ('res.partner.bank', u'Comptes en banques partenaire'), ('of.service', u'Services OpenFire')], string=u"Type d'import", required=True)
+    lang_id = fields.Many2one('res.lang', string="Langue principale", default=lambda self: self._default_lang_id())
+    show_lang = fields.Boolean(compute='_compute_show_lang', string="Afficher la langue principale")
 
     date = fields.Datetime('Date', required=True, default=lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'), help=u"Date qui sera affectée aux imports comme date de valeur.")
     date_debut_import = fields.Datetime(u'Début', readonly=True)
@@ -364,6 +374,18 @@ class OfImport(models.Model):
     sortie_succes = fields.Text(u'Information', readonly=True)
     sortie_avertissement = fields.Text(u'Avertissements', readonly=True)
     sortie_erreur = fields.Text(u'Erreurs', readonly=True)
+
+    @api.multi
+    @api.depends('lang_id')
+    def _compute_show_lang(self):
+        if self.env['res.lang'].search([('code', '=', 'en_US')]):
+            # Si la langue américaine est installée, elle est obligatoirement la langue principale
+            show_lang = False
+        else:
+            # Si une seule langue est installée, elle est obligatoirement la langue principale
+            show_lang = self.env['res.lang'].search([('translatable', '=', True)], count=True) > 1
+        for imp in self:
+            imp.show_lang = show_lang
 
     @api.depends('file', 'file_name')
     def _compute_file_type(self):
@@ -413,12 +435,13 @@ class OfImport(models.Model):
         else:
             self.time_lapse = False
 
-    @api.depends('type_import')
+    @api.depends('type_import', 'lang_id')
     def _compute_sortie_note(self):
         "Met à jour la liste des champs Odoo disponibles pour l'import dans le champ note"
         for imp in self:
             sortie_note = ''
-            for champ, valeur in self.get_champs_odoo(self.type_import).items():
+            for champ, valeur in sorted(self.get_champs_odoo(imp.type_import, imp.lang_id.code or self.env.lang).items(),
+                                        key=lambda v: (v[1]['description'], v[0])):
                 if champ in ('tz', 'lang'):  # Champs qui plantent lors de l'import, on les ignore.
                     continue
                 sortie_note += "- " + valeur['description'] + " : " + champ
@@ -532,7 +555,8 @@ class OfImport(models.Model):
                     header = values
                     yield values
 
-    def get_champs_odoo(self, model=''):
+    @api.model
+    def get_champs_odoo(self, model='', lang=False):
         "Renvoie un dictionnaire contenant les caractéristiques des champs Odoo en fonction du type d'import sélectionné (champ type_import)"
 
         if not model:
@@ -540,15 +564,40 @@ class OfImport(models.Model):
 
         champs_odoo = {}
 
+        langues = self.env['res.lang'].search([('translatable', '=', True), ('active', '=', True)]).mapped('code')
+        if len(langues) == 1:
+            # Si il n'y a qu'une langue active, Odoo ne s'occupe pas des traductions.
+            langues = []
+        else:
+            langues = [langue for langue in langues if langue != 'en_US' and langue != lang]
+
         # On récupère la liste des champs de l'objet depuis ir.model.fields
         obj = self.env['ir.model.fields'].search([('model', '=', model)])
         for champ in obj:
+            field = self.env[model]._fields[champ.name]
+            if (field.compute or not field.store) and not field.inverse:
+                continue
             champs_odoo[champ.name] = {
                 'description': champ.field_description,
                 'requis': champ.required,
                 'type': champ.ttype,
                 'relation': champ.relation,
-                'relation_champ': champ.relation_field}
+                'relation_champ': champ.relation_field,
+                'langue': False,
+                'traduit': champ.translate,
+            }
+
+            if champ.translate:
+                for langue in langues:
+                    champs_odoo["[%s]%s" % (langue, champ.name)] = {
+                        'description': champ.field_description,
+                        'requis': False,
+                        'type': champ.ttype,
+                        'relation': champ.relation,
+                        'relation_champ': champ.relation_field,
+                        'langue': langue,
+                        'traduit': False,
+                    }
 
         # Des champs qui sont obligatoires peuvent avoir une valeur par défaut (donc in fine pas d'obligation de les renseigner).
         # On récupère les champs qui ont une valeur par défaut et on indique qu'ils ne sont pas obligatoires.
@@ -681,6 +730,11 @@ class OfImport(models.Model):
             erreur_msg[0] += msg
             if not simuler:
                 raise OfImportError(erreur_msg[0])
+        # Pour gérer les traductions, on importe d'abord avec la langue par défaut (en_US),
+        # puis on met à jour les champs pour chaque valeur traduite importée
+        self = self.with_context(lang='en_US')
+        valeurs_trad = {}
+
         model = self.type_import
         model_obj = self.env[model_data['model']].with_context(from_import=True)
         product_categ_obj = self.env['product.category']
@@ -885,7 +939,19 @@ class OfImport(models.Model):
                 # Pour tous les autres types de champ (char, text, date, ...)
                 # On ne fait que prendre sa valeur sans traitement particulier
                 else:
-                    if ligne[champ_fichier] == "#vide":
+                    # La gestion des traductions de champs se fera à part
+
+                    if champs_odoo[champ_fichier_sansrel]['traduit'] and ligne[champ_fichier] != '':
+                        lang = self.lang_id.code or 'en_US'
+                        if lang != 'en_US':
+                            vals_trad = valeurs_trad.setdefault(lang, {})
+                            vals_trad[champ_fichier_sansrel] = '' if ligne[champ_fichier] == "#vide" else ligne[champ_fichier]
+                    if champs_odoo[champ_fichier_sansrel]['langue']:
+                        if ligne[champ_fichier] != '':
+                            lang = champs_odoo[champ_fichier_sansrel]['langue']
+                            vals_trad = valeurs_trad.setdefault(lang, {})
+                            vals_trad[champ_fichier_sansrel[len(lang) + 2:]] = '' if ligne[champ_fichier] == "#vide" else ligne[champ_fichier]
+                    elif ligne[champ_fichier] == "#vide":
                         valeurs[champ_fichier_sansrel] = ''
                     elif ligne[champ_fichier] != '':
                         valeur = ligne[champ_fichier]
@@ -974,6 +1040,8 @@ class OfImport(models.Model):
                 try:
                     if not simuler:
                         res_objet.write(valeurs)
+                        for lang, vals in valeurs_trad.iteritems():
+                            res_objet.with_context(lang=lang).write(vals)
                     code = CODE_IMPORT_MODIFICATION
                     message = u"MAJ %s %s (ligne %s)\n" % (model_data['nom_objet'], libelle_ref, i)
                 except Exception, exp:
@@ -982,14 +1050,23 @@ class OfImport(models.Model):
                 # L'enregistrement n'existe pas dans la base, on l'importe (création)
                 try:
                     if not simuler:
-                        model_obj.create(valeurs)
+                        res_objet = model_obj.create(valeurs)
+                        for lang, vals in valeurs_trad.iteritems():
+                            res_objet.with_context(lang=lang).write(vals)
                     code = CODE_IMPORT_CREATION
                     message = u"Création %s %s (ligne %s)\n" % (model_data['nom_objet'], libelle_ref, i)
                 except Exception, exp:
                     message = u"Ligne %s : échec création %s %s - Erreur : %s\n" % (i, model_data['nom_objet'], libelle_ref, str(exp).decode('utf8', 'ignore'))
 
         if not simuler:
-            self._cr.commit()
+            if code == CODE_IMPORT_ERREUR:
+                # Si l'erreur est de type SQL, le cursor est en 'ABORT STATE' et commit() et rollback()
+                #   ont le même effet.
+                # En revanche, si l'erreur est une erreur python, le cursor est correct et un commit()
+                #   risque de valider un import incomplet.
+                self._cr.rollback()
+            else:
+                self._cr.commit()
         return code, message
 
     @api.multi
@@ -1034,7 +1111,7 @@ class OfImport(models.Model):
         model_data['model'] = model
 
         # Initialisation variables
-        champs_odoo = self.get_champs_odoo(model)  # On récupère la liste des champs de l'objet (depuis ir.model.fields)
+        champs_odoo = self.get_champs_odoo(model, self.lang_id.code or self.env.lang)  # On récupère la liste des champs de l'objet (depuis ir.model.fields)
         date_debut = time.strftime('%Y-%m-%d %H:%M:%S')
 
         if simuler:
@@ -1127,7 +1204,7 @@ class OfImport(models.Model):
                 sortie_avertissement += u"Info : colonne \"%s\" dans le fichier d'import non reconnue. Ignorée lors de l'import.\n" % champ_fichier
             else:
                 # Vérification que le champ relation (si est indiqué) est correct.
-                if champ_relation and champs_odoo[champ_fichier]['type'] in ('many2one') and not champs_odoo[champ_fichier]['relation_champ']:
+                if champ_relation and champs_odoo[champ_fichier]['type'] in ('many2one', ) and not champs_odoo[champ_fichier]['relation_champ']:
                     if not self.env['ir.model.fields'].search([('model', '=', champs_odoo[champ_fichier]['relation']),
                                                                ('name', '=', champ_relation)]):
                         sortie_erreur += u"Le champ relation \"%s\" (après le /) de la colonne \"%s\" n'existe pas.\n" % (champ_relation, champ_fichier)
