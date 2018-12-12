@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="calendar.categ_meet1" model="calendar.event.type">
+            <field name="name">RDV Client</field>
+        </record>
+
+        <record id="calendar.categ_meet11" model="calendar.event.type">
+            <field name="name">RDV Fournisseur</field>
+        </record>
+
+        <record id="calendar.categ_meet2" model="calendar.event.type">
+            <field name="name">RDV Interne</field>
+        </record>
+
+        <record id="calendar.categ_meet3" model="calendar.event.type">
+            <field name="name">RDV Off-site</field>
+        </record>
+
+        <record id="calendar.categ_meet31" model="calendar.event.type">
+            <field name="name">RDV On-site</field>
+        </record>
+
+        <record id="calendar.categ_meet4" model="calendar.event.type">
+            <field name="name">Discussion Ouverte</field>
+        </record>
+
+        <record id="calendar.categ_meet5" model="calendar.event.type">
+            <field name="name">RDV Rétro-alimentation</field>
+        </record>
+
+    </data>
+</odoo>

@@ -175,7 +175,6 @@ class OfPlanningEquipe(models.Model):
         if self.address_id:
             self.address_retour_id = self.address_id
 
-
 class OfPlanningTournee(models.Model):
     _name = "of.planning.tournee"
     _description = "Tournée"
@@ -193,10 +192,6 @@ class OfPlanningTournee(models.Model):
     epi_lon = fields.Float(string=u'Épicentre Lon', digits=(12, 12), required=True)
     address_depart_id = fields.Many2one('res.partner', string='Adresse départ')
     address_retour_id = fields.Many2one('res.partner', string='Adresse retour')
-    intervention_ids = fields.One2many(
-        # aaaa 'tournee_id' est inutile si il y a un compute. Vérifier l'intérêt du compute ici
-        'of.planning.intervention', 'tournee_id', u'Interventions liées', copy=False, order="date",
-        compute="_compute_intervention_ids")
 
     zip_id = fields.Many2one('res.better.zip', 'Ville')
     distance = fields.Float(string='Eloignement (km)', digits=(12, 4), required=True, default=20.0)
@@ -277,16 +272,6 @@ class OfPlanningTournee(models.Model):
                 if e > last_end:
                     last_end = e
             tournee.is_complet = is_complet
-
-    @api.multi
-    @api.depends('equipe_id', 'date', 'intervention_ids.date', 'intervention_ids.equipe_id')
-    def _compute_intervention_ids(self):
-        intervention_obj = self.env['of.planning.intervention']
-        for tournee in self:
-            interventions = intervention_obj.search(['tournee_id', '=', tournee.id])
-            for intervention in interventions:
-                if type(intervention.id) is int:
-                    tournee.intervention_ids = [(4, intervention.id, False)]
 
     @api.multi
     def _get_dummy_fields(self):
