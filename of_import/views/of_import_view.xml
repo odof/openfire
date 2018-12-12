@@ -11,11 +11,13 @@
             <xpath expr="//header" position="inside">
                 <button name="%(action_of_import_update_product_brand_products)d" type="action" string="Appliquer les règles"/>
             </xpath>
+            <xpath expr="//field[@name='use_prefix']" position="replace"/>
+            <xpath expr="//field[@name='show_in_sales']" position="replace"/>
             <xpath expr="//label[@for='note']" position="replace"/>
             <xpath expr="//field[@name='note']" position="replace"/>
             <xpath expr="//sheet" position="inside">
                 <notebook>
-                    <page name="import_config" string="Paramétrage">
+                    <page name="import_config" string="Import">
                         <group name="import_config">
                             <separator string="Paramètres d'import par défaut" colspan="2"/>
                             <field name="of_import_categ_id"/>
@@ -48,6 +50,12 @@ Cette action irréversible recalculera la catégorie, le prix d'achat et le prix
 Cette action irréversible recalculera la catégorie, le prix d'achat et le prix de vente de l'article."/>
                                 </tree>
                             </field>
+                        </group>
+                    </page>
+                    <page name="config" string="Paramètres">
+                        <group name="config">
+                            <field name="use_prefix"/>
+                            <field name="show_in_sales"/>
                         </group>
                     </page>
                     <page name="notes" string="Notes">

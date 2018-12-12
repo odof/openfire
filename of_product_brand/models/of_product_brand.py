@@ -20,6 +20,9 @@ class OfProductBrand(models.Model):
         help="The number of products of this brand")
     note = fields.Text(string='Notes')
     product_change_warn = fields.Boolean(compute="_compute_product_change_warn")
+    show_in_sales = fields.Boolean(
+        string="Afficher dans les lignes de ventes",
+        help="Si cette option est cochée, la marque sera ajoutée au début du descriptif des lignes de commandes et factures")
 
     def _compute_product_count(self):
         read_group_res = self.env['product.template'].read_group([('brand_id', 'in', self.ids)], ['brand_id'], ['brand_id'])
@@ -221,3 +224,37 @@ class Partner(models.Model):
     def _compute_supplier_brand_count(self):
         for partner in self:
             partner.supplier_brand_count = len(partner.brand_ids)
+
+class SaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
+
+    @api.onchange('product_id')
+    def product_id_change(self):
+        super(SaleOrderLine, self).product_id_change()
+        if self.product_id.brand_id.show_in_sales:
+            # Ajout de la marque dans le descriptif de l'article
+            brand_code = self.product_id.brand_id.name + ' - '
+            if self.name[0] == '[':
+                i = self.name.find(']') + 1
+                if self.name[i] == ' ':
+                    i += 1
+                self.name = self.name[:i] + brand_code + self.name[i:]
+            else:
+                self.name = brand_code + self.name
+
+class AccountInvoiceLine(models.Model):
+    _inherit = 'account.invoice.line'
+
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        super(AccountInvoiceLine, self)._onchange_product_id()
+        if self.product_id.brand_id.show_in_sales:
+            # Ajout de la marque dans le descriptif de l'article
+            brand_code = self.product_id.brand_id.name + ' - '
+            if self.name[0] == '[':
+                i = self.name.find(']') + 1
+                if self.name[i] == ' ':
+                    i += 1
+                self.name = self.name[:i] + brand_code + self.name[i:]
+            else:
+                self.name = brand_code + self.name
