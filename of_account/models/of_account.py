@@ -42,7 +42,7 @@ class AccountInvoice(models.Model):
     def action_invoice_open(self):
         """Mettre le libellé des écritures comptables d'une facture avec nom client (30 1er caractères) + no facture"""
         res = super(AccountInvoice, self).action_invoice_open()
-        ref = self.partner_id.name[:30] + ' ' + self.number
+        ref = (self.partner_id.name or self.partner_id.parent_id.name or '')[:30] + ' ' + self.number
         self.move_id.line_ids.write({'name': ref})
         self.move_id.write({'ref': ref})
         return res
@@ -131,7 +131,7 @@ class AccountMoveLine(models.Model):
                 invoice_ids = line_ids.mapped('invoice_id')
                 line.move_id.write({'ref': line.payment_id.communication})
                 if len(invoice_ids) == 1:
-                    name_infos = [invoice_ids.partner_id.name[:30], invoice_ids.number]
+                    name_infos = [(invoice_ids.partner_id.name or invoice_ids.partner_id.parent_id.name or '')[:30], invoice_ids.number]
                     name = (' ').join([text for text in name_infos if text])
                     line.move_id.line_ids.with_context(check_move_validity=False).write({'name': name})
         return res
@@ -163,7 +163,7 @@ class AccountPayment(models.Model):
         res = super(AccountPayment, self).post()
         client_line = self.move_line_ids.filtered(lambda line: line.credit > 0)
         if client_line.name == _("Customer Payment"):
-            self.move_line_ids.write({"name": self.partner_id.name[:30] + " " + self.communication})  # Permet d'avoir toutes les lignes avec le même libellé
+            self.move_line_ids.write({"name": (self.partner_id.name or self.partner_id.parent_id.name or '')[:30] + " " + self.communication})  # Permet d'avoir toutes les lignes avec le même libellé
         else:
             self.move_line_ids.write({"name": client_line.name})
         return res
