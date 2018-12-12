@@ -4,7 +4,6 @@
         <t t-jquery="span[t-attf-class='color_filter o_underline_color_#{filters_value.color}']" t-operation="replace">
             <!-- if custom colors -->
             <t t-if="filters_value.custom_colors">
-                <!--span t-attf-style="border-bottom: 4px solid #{filters_value.color_bg};"-->
                 <span t-attf-style="
                     color: #{filters_value.color_ft}; 
                     background: #{filters_value.color_bg}; 
@@ -16,6 +15,15 @@
             </t>
             <t t-if="!filters_value.custom_colors"><!-- copy of parent XML -->
                 <span t-attf-class="color_filter o_underline_color_#{filters_value.color}"><t t-esc="filters_value.label"/></span>
+            </t>
+        </t>
+        <!-- if radio filters -->
+        <t t-jquery="input[name='selection']" t-operation="replace">
+            <t t-if="filters_radio">
+                <input type="radio" name="selection" t-att-value="filters_value.value" t-att-checked="(filters_value.is_checked ? true : undefined)"/><span/>
+            </t>
+            <t t-if="!filters_radio">
+                <input type="checkbox" name="selection" t-att-value="filters_value.value" t-att-checked="(filters_value.is_checked ? true : undefined)"/><span/>
             </t>
         </t>
     </t>

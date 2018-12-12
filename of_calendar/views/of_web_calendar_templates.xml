@@ -6,6 +6,7 @@
 
                 <!-- <script type="text/javascript" src="/of_calendar_test/static/src/js/widgets.js"></script> -->
                 <script type="text/javascript" src="/of_calendar/static/src/js/calendar_view.js"></script>
+                <script type="text/javascript" src="/of_calendar/static/src/js/calendar_relational.js"></script>
             </xpath>
         </template>
 </odoo>
