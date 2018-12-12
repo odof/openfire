@@ -4,12 +4,18 @@ from __builtin__ import False
 from datetime import datetime, timedelta
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 import re
+import pytz
 
 from odoo import api, models, fields
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools.safe_eval import safe_eval
 
 from odoo.tools.float_utils import float_compare
+
+@api.model
+def _tz_get(self):
+    # put POSIX 'Etc/*' entries at the end to avoid confusing users - see bug 1086728
+    return [(tz, tz) for tz in sorted(pytz.all_timezones, key=lambda tz: tz if not tz.startswith('Etc/') else '_')]
 
 class OfPlanningTache(models.Model):
     _name = "of.planning.tache"
@@ -52,6 +58,12 @@ class OfPlanningEquipe(models.Model):
     sequence = fields.Integer(u'Séquence', help=u"Ordre d'affichage (plus petit en premier)")
     color_ft = fields.Char(string="Couleur de texte", help="Choisissez votre couleur", default="#0D0D0D")
     color_bg = fields.Char(string="Couleur de fond", help="Choisissez votre couleur", default="#F0F0F0")
+    tz = fields.Selection(_tz_get, string='Timezone', default=lambda self: self._context.get('tz'),
+                          help="The Team's timezone, used to output proper date and time values "
+                               "inside printed reports. It is important to set a value for this field. "
+                               "You should use the same timezone that is otherwise used to pick and "
+                               "render date and time values: your computer's timezone.")
+    tz_offset = fields.Char(compute='_compute_tz_offset', string='Timezone offset', invisible=True)
 
     @api.onchange('employee_ids')
     def onchange_employees(self):
@@ -75,6 +87,20 @@ class OfPlanningEquipe(models.Model):
                 raise ValidationError(u"L'heure de début ne peut pas être supérieure à l'heure de fin")
             if(hors[1] > hors[2]):
                 raise ValidationError(u"L'heure de l'après-midi ne peut pas être inférieure à l'heure du matin")
+
+    @api.depends('tz')
+    def _compute_tz_offset(self):
+        for equipe in self:
+            equipe.tz_offset = datetime.now(pytz.timezone(equipe.tz or 'GMT')).strftime('%z')
+
+    @api.model
+    def get_working_hours_fields(self):
+        return {
+            "morning_start_field": "hor_md",
+            "morning_end_field": "hor_mf",
+            "afternoon_start_field": "hor_ad",
+            "afternoon_end_field": "hor_af"
+        }
 
 class OfPlanningInterventionRaison(models.Model):
     _name = "of.planning.intervention.raison"
@@ -115,6 +141,14 @@ class OfPlanningIntervention(models.Model):
     hor_af = fields.Float(string=u'Après-midi fin', required=True, digits=(12, 5))
     hor_sam = fields.Boolean(string='Samedi')
     hor_dim = fields.Boolean(string='Dimanche')
+    tz = fields.Selection(related="equipe_id.tz")
+    tz_offset = fields.Char(related="equipe_id.tz_offset")
+
+    # 3 champs ajoutés pour la vue map
+    geo_lat = fields.Float(related='address_id.geo_lat')
+    geo_lng = fields.Float(related='address_id.geo_lng')
+    precision = fields.Selection(related='address_id.precision')
+    partner_name = fields.Char(related='partner_id.name')
 
     category_id = fields.Many2one(related='tache_id.category_id', string=u"Type de tâche")
     verif_dispo = fields.Boolean(string=u'Vérif', help=u"Vérifier la disponibilité de l'équipe sur ce créneau", default=True)
