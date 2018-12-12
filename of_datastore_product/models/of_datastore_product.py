@@ -363,8 +363,14 @@ class OfProductBrand(models.Model):
             if product:
                 result = product
             else:
-                result = obj_obj.search([('brand_id', '=', self.id), ('of_datastore_res_id', '=', res_id)])
-                if not result:
+                # Ajouter un search par article est couteux.
+                # Tant pis pour les règles d'accès, on fait une recherche SQL
+                self._cr.execute("SELECT id FROM product_template WHERE brand_id = %s AND of_datastore_res_id = %s",
+                                 (self.id, res_id))
+                result = self._cr.fetchall()
+                if result:
+                    result = obj_obj.browse(result[0][0])
+                else:
                     if create:
                         result = False
                     else:
@@ -516,11 +522,13 @@ class OfDatastoreCache(models.TransientModel):
     def apply_values(self, record):
         record.ensure_one()
 
-        stored = {ds_cache.res_id: ds_cache for ds_cache in self.search([('model', '=', record._name), ('res_id', 'in', record._ids)])}
-
-        if record.id in stored:
-            ds_cache = stored[record.id]
-            record._cache.update(record._convert_to_cache(safe_eval(ds_cache.vals), validate=False))
+        # Requête SQL pour gagner en performance
+        self._cr.execute("SELECT vals FROM of_datastore_cache WHERE model = %s AND res_id = %s",
+                         (record._name, record.id))
+        vals = self._cr.fetchall()
+        if vals:
+            vals = safe_eval(vals[0][0])
+            record._cache.update(record._convert_to_cache(vals, validate=False))
 
 class OfDatastoreCentralized(models.AbstractModel):
     _name = 'of.datastore.centralized'
@@ -701,7 +709,12 @@ class OfDatastoreCentralized(models.AbstractModel):
             for vals in datastore_product_data:
                 # --- Calculs préalables ---
                 brand = match_dicts['brand_id'][vals['brand_id'][0]]
-                product = self_obj.search([('brand_id', '=', brand.id), ('of_datastore_res_id', '=', vals['id'])])
+                # Ajouter un search par article est couteux.
+                # Tant pis pour les règles d'accès, on fait une recherche SQL
+                self._cr.execute("SELECT id FROM product_template WHERE brand_id = %s AND of_datastore_res_id = %s",
+                                 (brand.id, vals['id']))
+                product_id = self._cr.fetchall()
+                product = self_obj.browse(product_id and product_id[0][0])
                 if self._name == 'product.product':
                     product = product.product_tmpl_id
                 categ_name = vals['categ_id'][1]
@@ -802,6 +815,11 @@ class OfDatastoreCentralized(models.AbstractModel):
                 fields.remove('id')
             obj_fields = [self._fields[field] for field in fields]
             use_name_get = (load == '_classic_read')
+            # Gestion à part des modèles d'articles, sans quoi of_read_datastore sera appelé pour name_get()
+            #   une fois par modèle.
+            read_tmpl = self._fields.get('product_tmpl_id') in obj_fields
+            tmpl_values = {}
+            tmpl_ids = []
 
             # Séparation des ids par base centrale
             datastore_product_ids = {}
@@ -818,7 +836,7 @@ class OfDatastoreCentralized(models.AbstractModel):
                     # Les articles non en cache sont à lire
                     new_ids = set(datastore_ids) - set(cached_products.mapped('res_id'))
 
-                    # Si au moins un opjet est inexistant en cache, tous les champs sont à lire
+                    # Si au moins un objet est inexistant en cache, tous les champs sont à lire
                     new_fields = set(fields) if new_ids else set()
 
                     # Les articles dont au moins un champ n'est pas en cache sont aussi à lire, pour au moins ce champ
@@ -828,6 +846,8 @@ class OfDatastoreCentralized(models.AbstractModel):
                         if missing_fields:
                             new_fields |= missing_fields
                             new_ids.add(cached_product.res_id)
+                        elif read_tmpl:
+                            tmpl_ids.append(product_data['product_tmpl_id'][0])
 
                     if new_ids:
                         # Lecture des données sur la base centrale
@@ -836,17 +856,34 @@ class OfDatastoreCentralized(models.AbstractModel):
                         # Stockage des données dans notre cache
                         of_cache.store_values(self._name, data)
 
+                        if read_tmpl:
+                            for d in data:
+                                tmpl_values[d['product_tmpl_id'][0]] = d['product_tmpl_id']
                     # Une fois les données en cache, récupère toutes les données pour ensuite
                     #   libérer le cache pour les autres processus en attente
                     cached_products = of_cache.search([('model', '=', self._name), ('res_id', 'in', datastore_ids)])
+
                     data = cached_products.read(['res_id', 'vals'])
+
+                if read_tmpl:
+                    obj_fields.remove(self._fields['product_tmpl_id'])
+                    if tmpl_ids:
+                        # Retrait de valeurs éventuellement renseignées (normalement inutile vu que nos bases n'utilisent pas les variantes)
+                        tmpl_ids = [tmpl_id for tmpl_id in tmpl_ids if tmpl_id not in tmpl_values]
+                        if tmpl_ids:
+                            for vals in self.env['product.template'].browse(tmpl_ids).name_get():
+                                tmpl_values[vals[0]] = vals
+
                 for d in data:
-                    vals = safe_eval(d['vals'])
+                    eval_vals = safe_eval(d['vals'])
                     # Filtre des champs à récupérer et conversion au format read
-                    vals = {field.name: field.convert_to_read(field.convert_to_record(vals[field.name], self), self, use_name_get)
+                    vals = {field.name: field.convert_to_read(field.convert_to_record(eval_vals[field.name], self), self, use_name_get)
                             for field in obj_fields}
                     vals['id'] = d['res_id']
                     res[d['res_id']] = vals
+
+                    if read_tmpl:
+                        vals['product_tmpl_id'] = tmpl_values[eval_vals['product_tmpl_id'][0]]
 
             # Remise des résultats dans le bon ordre
             res = [res[i] for i in self._ids]
