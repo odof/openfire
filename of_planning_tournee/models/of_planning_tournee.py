@@ -175,7 +175,6 @@ class OfPlanningEquipe(models.Model):
         if self.address_id:
             self.address_retour_id = self.address_id
 
-
 class OfPlanningTournee(models.Model):
     _name = "of.planning.tournee"
     _description = "Tournée"
