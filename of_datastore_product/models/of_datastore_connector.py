@@ -149,7 +149,8 @@ class OfDatastoreConnector(models.AbstractModel):
     @api.model
     def of_datastore_read(self, ds_model, ids, fields=None, load=None, check_fields=True):
         if check_fields:
-            fields = [f for f in fields if f in ds_model.fields_get_keys()]
+            ds_fields = ds_model.fields_get_keys()
+            fields = [f for f in fields if f in ds_fields]
         kwargs = {
             key: val
             for key, val in [('fields', fields),

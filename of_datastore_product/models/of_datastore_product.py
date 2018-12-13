@@ -600,6 +600,26 @@ class OfDatastoreCentralized(models.AbstractModel):
         self_obj = self.env[self._name]
         result = []
 
+        # Certains champs sont nécessaires pour le calcul d'autres champs :
+        # - brand_id : La marque, depuis laquelle on extrait les règles de lecture
+        # - categ_id : La catégorie, qui peut correspondre à des règles de lexture plus spécifiques dans la marque
+        # - product_tmpl_id : L'article de base, utile pour of_tmpl_datastore_res_id
+        # - default_code : La référence de l'article, utile pour of_seller_product_code
+        # - uom_id et uom_po_id : Les unités de mesure et de mesure d'achat de l'article, utiles pour calculer les prix d'achat/vente
+        # - list_price : Le prix d'achat de l'article, à partir duquel sont réalisés les calculs pour le prix de vente et le coût
+        # En mode création (create_mode == True), ces champs sont obligatoires donc déjà présents dans fields_to_read.
+        # En lecture classique (create_mode == False), nous testons si au moins un champ de fields_to_read
+        #   nécessite un accès distant (avec self._get_datastore_unused_fields()).
+        #   Si c'est le cas, nous chargeons fields_to_read avec tous les champs de l'objet courant afin de peupler
+        #   notre cache et ainsi d'éviter de multiplier les accès distants.
+        unused_fields = self._get_datastore_unused_fields()
+        if not create_mode:
+            # Pour la lecture classique, on veut stocker tous les champs en cache pour éviter de futurs accès distants
+            for field in fields_to_read:
+                if field not in unused_fields:
+                    fields_to_read += [field for field in self._fields if field not in fields_to_read]
+                    break
+
         if 'id' in fields_to_read:  # Le champ id sera de toute façon ajouté, le laisser génèrera des erreurs
             fields_to_read.remove('id')
 
@@ -638,32 +658,7 @@ class OfDatastoreCentralized(models.AbstractModel):
                 'delay'  : vals['of_seller_delay'],
             })]))
 
-        unused_fields = self._get_datastore_unused_fields()
         datastore_fields = [field for field in fields_to_read if field not in unused_fields]
-
-        if datastore_fields:
-            # Ajout de champs nécessaires aux calculs. Ces champs seront supprimés après la lecture
-            # Ces champs n'ont pas besoin d'être ajoutés quand datastore_fields est vide (évite un accès à la base centrale)
-            # Champs ajoutés :
-            required_fields = [
-                # - brand_id : La marque, depuis laquelle on extrait les règles de lecture
-                'brand_id',
-                # - categ_id : La catégorie, qui peut correspondre à des règles de lexture plus spécifiques dans la marque
-                'categ_id',
-                # - product_tmpl_id : L'article de base, utile pour of_tmpl_datastore_res_id
-                'product_tmpl_id',
-                # - default_code : La référence de l'article, utile pour of_seller_product_code
-                'default_code',
-                # - uom_id et uom_po_id : Les unités de mesure et de mesure d'achat de l'article, utiles pour calculer les prix d'achat/vente
-                'uom_id',
-                'uom_po_id',
-                # - list_price : Le prix d'achat de l'article, à partir duquel sont réalisés les calculs pour le prix de vente et le coût
-                'list_price',
-            ]
-            added_fields = [field for field in required_fields
-                            if field in self._fields and
-                            field not in datastore_fields]
-            datastore_fields += added_fields
 
         m2o_fields = [
             field for field in datastore_fields
@@ -851,7 +846,7 @@ class OfDatastoreCentralized(models.AbstractModel):
 
                     if new_ids:
                         # Lecture des données sur la base centrale
-                        data = self.browse(new_ids)._of_read_datastore(new_fields, create_mode=False)
+                        data = self.browse(new_ids)._of_read_datastore(list(new_fields), create_mode=False)
 
                         # Stockage des données dans notre cache
                         of_cache.store_values(self._name, data)
