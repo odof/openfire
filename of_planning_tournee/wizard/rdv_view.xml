@@ -2,60 +2,120 @@
 <odoo>
     <data>
 
-        <record id="view_res_wizard" model="ir.ui.view">
+        <record id="view_rdv_intervention_wizard" model="ir.ui.view">
             <field name="name">Planifier une intervention</field>
             <field name="model">of.tournee.rdv</field>
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Planifier une intervention">
-                    <group name="informations" col="4">
-                        <field name="partner_id" invisible="1"/>
-                        <separator string="Informations" colspan="4"/>
-                        <field name="partner_address_id" string="Adresse" widget="selection" colspan="4"/>
-                        <field name="mode"/>
-                        <field name="date_recherche"/>
-                        <field name="service_id"/>
-                        <field name="tache_id"/>
-                        <field name="equipe_id_pre"/>
-                        <field name="duree" widget="float_time"/>
-
-                        <field name="date_display" nolabel="1" colspan="2" attrs="{'invisible': [('date_display', '=', '')]}"/>
+                    <field name="zero_result" invisible="1"/>
+                    <field name="zero_dispo" invisible="1"/>
+                    <field name="partner_id" invisible="1"/>
+                    <group attrs="{'invisible': [('display_search', '!=', False)]}">
+                        <field name="display_search"/>
                     </group>
-                    <group name="propositions" col="4" attrs="{'invisible':[('planning_ids','=',[])]}">
-                        <field name="planning_ids" colspan="4" nolabel="1" readonly="1">
-                            <tree string="Propositions des RDVs" colors="green:intervention_id==False">
-                                <field name="description" readonly="1"/>
-                                <field name="equipe_id" readonly="1"/>
-                                <field name="intervention_id"/>
-                                <field name="dist_prec"/>
-                                <field name="dist_suiv"/>
-                                <field name="distance"/>
-                            </tree>
-                            <form string="Propositions des RDVs">
-                                <field name="description" readonly="1"/>
-                                <field name="equipe_id" readonly="1"/>
-                                <field name="dist_prec"/>
-                                <field name="dist_suiv"/>
-                                <field name="distance"/>
-                            </form>
-                        </field>
-
-                        <field name="date_propos" invisible="1"/>
+                    <group name="informations de recherche" attrs="{'invisible': [('display_search', '=', False)]}">
+                        <group colspan="4" col="4">
+                            <separator string="Informations" colspan="4"/>
+                            <!--label for="partner_address_id" colspan="1"/-->
+                            <field name="partner_address_id" string="Adresse" widget="selection" colspan="4"/>
+                        </group>
+                        <group>
+                            <field name="service_id"/>
+                            <field name="tache_id"/>
+                            <field name="creer_recurrence" attrs="{'invisible': [('service_id', '!=', False)]}"/>
+                            <field name="duree" widget="float_time"/>
+                            <field name="equipe_id_pre"/>
+                        </group>
+                        <group>
+                            <field name="date_recherche_debut"/>
+                            <field name="date_recherche_fin"/>
+                            <field name="mode_recherche"/>
+                            <field name="max_recherche"/>
+                            <field name="mode_result"/>
+                        </group>
+                    </group>
+                    <group invisible="1">
+                        <field name="geo_lat"/>
+                        <field name="geo_lng"/>
+                        <field name="precision"/>
+                    </group>
+                    <group name="zero_result" col="4" attrs="{'invisible':[('zero_result','!=',True)]}">
+                        <separator string="Aucun résultat" colspan="4"/>
+                    </group>
+                    <group name="zero_dispo" col="4" attrs="{'invisible':[('zero_dispo','!=',True)]}">
+                        <separator string="Aucun résultat suffisament proche" colspan="4"/>
+                        <field name="display_res"/>
+                    </group>
+                    <group name="propositions" col="4" attrs="{'invisible':[('display_res','!=',True)]}">
+                        <field name="res_line_id" invisible="1"/>
                         <separator string="Résultat" colspan="4"/>
                         <field name="name"/>
                         <field name="equipe_id" domain="[('id', 'in', context.get('equipe_domain',[]))]"/>
+                        <field name="date_propos"/>
                         <field name="date_propos_hour" widget="float_time"/>
                         <field name="date_next"/>
                         <newline/>
                         <label colspan="4" string="Description" align="0.00"/>
                         <field name="description" colspan="4" nolabel="1"/>
+
+                        <field name="planning_ids" mode="calendar" colspan="4" nolabel="1" readonly="1">
+                            <calendar string="Calendrier" date_start="debut_dt" color="equipe_id" date_stop="fin_dt" all_day="allday"
+                                attendee_model="of.planning.equipe" color_ft_field="color_ft" color_bg_field="color_bg" custom_colors="1"
+                                working_hours="1" filters_radio="1" dispo_field="disponible" show_first_evt="1" display_states="1"
+                                force_color_field="force_color">
+                                <field name="name"/>
+                                <field name="state_int" invisible="1"/>
+                                <field name="disponible" invisible="1"/>
+                                <field name="force_color" invisible="1"/>
+                                <field name="color_ft" invisible="1"/>
+                                <field name="color_bg" invisible="1"/>
+                            </calendar>
+                            <form string="Créneau">
+                                <field name="allday" invisible="1"/>
+                                <group attrs="{'invisible':[('allday','!=',False)]}">
+                                    <group>
+                                        <field name="date" readonly="1"/>
+                                        <field name="description" readonly="1"/>
+                                        <field name="equipe_id" readonly="1"/>
+                                        <field name="intervention_id" readonly="1"/>
+                                        <field name="disponible" readonly="1"/>
+                                    </group>
+                                    <group>
+                                        <field name="dist_prec" readonly="1"/>
+                                        <field name="dist_suiv" readonly="1"/>
+                                        <field name="distance" readonly="1"/>
+                                    </group>
+                                    <group>
+                                        <field name="geo_lat" readonly="1"/>
+                                        <field name="geo_lng" readonly="1"/>
+                                        <field name="precision" readonly="1"/>
+                                    </group>
+                                    <group>
+                                        <field name="duree_prec" readonly="1"/>
+                                        <field name="duree_suiv" readonly="1"/>
+                                        <field name="duree" readonly="1"/>
+                                    </group>
+                                    <group attrs="{'invisible':['|',('intervention_id','!=',False),('selected','!=',True)]}">
+                                        <field name="selected"/>
+                                    </group>
+                                </group>
+                                <div attrs="{'invisible':[('allday','!=',True)]}">
+                                    Ce créneau est virtuel. Il existe seulement pour montrer les limites de la recherche.
+                                </div>
+                                <footer>
+                                    <button name="button_select" string="Sélectionner ce créneau" type="object" colspan="4" class="btn-primary"
+                                        attrs="{'invisible': ['|','|',('allday','!=',False),('intervention_id','!=',False),('selected','!=',False)]}"/>
+                                </footer>
+                            </form>
+                        </field>
                     </group>
                     <footer>
-                        <button name="button_calcul" string="Recherche de créneau" type="object" colspan="4" class="btn-primary"
+                        <button name="button_calcul" string="Rechercher" type="object" colspan="4" class="btn-primary"
                                 attrs="{'invisible': [('date_propos','!=',False)]}"/>
-                        <button name="button_calcul_suivant" string="Créneau suivant" type="object" colspan="2" class="btn-default"
-                                attrs="{'invisible': [('date_propos','=',False)]}"/>
-                        <button name="button_calcul" string="Recommencer la recherche depuis le début" type="object" colspan="2" class="btn-default"
+                        <!--button name="button_calcul_suivant" string="Créneau suivant" type="object" colspan="2" class="btn-default"
+                                attrs="{'invisible': [('date_propos','=',False)]}"/ a voir si réimplémenter cette fonctionnalité-->
+                        <button name="button_calcul" string="Rechercher" type="object" colspan="2" class="btn-default"
                                 attrs="{'invisible': [('date_propos','=',False)]}"/>
                         <button string="Confirmer RDV" name="button_confirm" type="object" class="btn-primary"
                                 attrs="{'invisible': ['|','|','|',('name','=',False),('equipe_id','=',False),('date_propos','=',False),('date_propos_hour','=',False)]}"/>
@@ -65,18 +125,56 @@
             </field>
         </record>
 
+        <record id="view_rdv_line_wizard" model="ir.ui.view">
+            <field name="name">ligne de rdv</field>
+            <field name="model">of.tournee.rdv.line</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Créneau">
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="description" readonly="1"/>
+                            <field name="equipe_id" readonly="1"/>
+                            <field name="intervention_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="dist_prec"/>
+                            <field name="dist_suiv"/>
+                            <field name="distance"/>
+                        </group>
+                        <group>
+                            <field name="geo_lat"/>
+                            <field name="geo_lng"/>
+                            <field name="precision"/>
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+
         <act_window
             name="Planifier une intervention"
             res_model="of.tournee.rdv"
             src_model="res.partner"
-            view_mode="form"    
-            view_id="view_res_wizard"
-            id="action_view_res_wizard"
+            view_mode="form"
+            view_id="view_rdv_intervention_wizard"
+            id="action_view_rdv_intervention_wizard_client"
             key2="client_action_multi"
-            target="new"        
-            context="{'model':'res.partner'}"
+            target="new"
             groups="of_planning.of_group_planning_intervention_user"
         />
 
+        <act_window
+            name="Planifier une intervention"
+            res_model="of.tournee.rdv"
+            src_model="of.service"
+            view_mode="form"
+            view_id="view_rdv_intervention_wizard"
+            id="action_view_rdv_intervention_wizard_service"
+            key2="client_action_multi"
+            target="new"
+            groups="of_planning.of_group_planning_intervention_user"
+        />
     </data>
 </odoo>  
