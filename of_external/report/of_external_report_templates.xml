@@ -85,7 +85,7 @@
                 </div>
                 <div name="doc_number" class="of_doc_infochip_line" col="2">
                     <div style="text-align: left; display: inline-block;">N° :</div>
-                    <div name="doc_number" style="text-align: right; float: right; display: inline-block;">
+                    <div name="champ_number" style="text-align: right; float: right; display: inline-block;">
                         <strong>
                         <!-- Si le document possède un type -->
                         <t t-if="o">
@@ -112,7 +112,7 @@
                 </div>
                 <div name="doc_date" class="of_doc_infochip_line" col="2">
                     <div style="text-align: left; display: inline-block;">Date :</div>
-                    <div name="doc_date" style="text-align: right; float: right; display: inline-block;">
+                    <div name="champ_date" style="text-align: right; float: right; display: inline-block;">
                         <strong>
                         <!-- Si le document possède un type -->
                         <t t-if="o">
