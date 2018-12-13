@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_account_view_account_invoice_report_search" model="ir.ui.view">
+        <field name="name">of.account.view.account.invoice.report.search</field>
+        <field name="model">account.invoice.report</field>
+        <field name="inherit_id" ref="account.view_account_invoice_report_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@expand='1']/separator" position="before">
+                <field string="Marque" name="of_brand_id" context="{'group_by' : 'of_brand_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_account_view_account_invoice_report_pivot" model="ir.ui.view">
+        <field name="name">of.account.view.account.invoice.report.pivot</field>
+        <field name="model">account.invoice.report</field>
+        <field name="inherit_id" ref="account.view_account_invoice_report_pivot"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='price_total']" position="after">
+                <field name="of_diff_price" type="measure"/>
+                <field name="of_diff_qty" type="measure"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

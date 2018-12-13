@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_view_order_product_search" model="ir.ui.view">
+        <field name="name">of.sale.view.order.product.search</field>
+        <field name="model">sale.report</field>
+        <field name="inherit_id" ref="sale.view_order_product_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@expand='1']/separator" position="before">
+                <field string="Marque" name="of_brand_id" context="{'group_by' : 'of_brand_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_view_order_product_pivot" model="ir.ui.view">
+        <field name="name">of.sale.view.order.product.pivot</field>
+        <field name="model">sale.report</field>
+        <field name="inherit_id" ref="sale.view_order_product_pivot"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='price_subtotal']" position="after">
+                <field name="of_diff_price" type="measure" color="green"/>
+                <field name="of_diff_margin" type="measure"/>
+                <field name="of_diff_qty_delivered" type="measure"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
