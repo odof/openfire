@@ -177,8 +177,23 @@ class OfDatastoreUpdateProduct(models.TransientModel):
             datastore_products = {supplier: (supplier.brand_ids & brands).mapped('product_variant_ids') for supplier in suppliers}
 
         elif active_model in ('product.product', 'product.template'):
-            to_create = [product_id for product_id in active_ids if product_id < 0]
+            model_obj.search('')
+            to_create = set([product_id for product_id in active_ids if product_id < 0])
             to_update = [product_id for product_id in active_ids if product_id > 0]
+
+            if to_create:
+                # Détection des articles déjà importés
+                create_product_ids = {}
+                for full_id in to_create:
+                    supplier_id = -full_id / DATASTORE_IND
+                    create_product_ids.setdefault(supplier_id, []).append((-full_id) % DATASTORE_IND)
+                for supplier_id, product_ids in create_product_ids.iteritems():
+                    supplier_ind = DATASTORE_IND * supplier_id
+                    existing = model_obj.with_context(active_test=False).search(
+                        [('brand_id.datastore_supplier_id', '=', supplier_id),
+                         ('of_datastore_res_id', 'in', product_ids)])
+                    to_update += existing._ids
+                    to_create -= set(-(product.of_datastore_res_id + supplier_ind) for product in existing)
 
             products = model_obj.browse(to_update)
             if active_model == 'product.template':

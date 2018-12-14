@@ -706,7 +706,7 @@ class OfDatastoreCentralized(models.AbstractModel):
                 brand = match_dicts['brand_id'][vals['brand_id'][0]]
                 # Ajouter un search par article est couteux.
                 # Tant pis pour les règles d'accès, on fait une recherche SQL
-                self._cr.execute("SELECT id FROM product_template WHERE brand_id = %s AND of_datastore_res_id = %s",
+                self._cr.execute("SELECT id FROM " + self._table + " WHERE brand_id = %s AND of_datastore_res_id = %s",
                                  (brand.id, vals['id']))
                 product_id = self._cr.fetchall()
                 product = self_obj.browse(product_id and product_id[0][0])
@@ -1139,6 +1139,7 @@ class ProductProduct(models.Model):
 
         fields += [
             # Champs relatifs au modèle d'article
+            'product_tmpl_id',
             'of_tmpl_datastore_res_id',
 
             # Champs relatifs au au fournisseur
@@ -1158,7 +1159,7 @@ class ProductProduct(models.Model):
         self_obj = self.env[self._name]
         if len(self) == 1:
             # Detection de l'existance du produit
-            # Ce cas peut se produire dans un object de type commance, si plusieurs lignes ont la meme reference
+            # Ce cas peut se produire dans un object de type commande, si plusieurs lignes ont la meme reference
             supplier = self.env['of.datastore.supplier'].browse(-self.id / DATASTORE_IND)
 
             result = self_obj.search([('brand_id', 'in', supplier.brand_ids._ids),
