@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 
 NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
 
@@ -129,7 +130,12 @@ class AccountMoveLine(models.Model):
                 for reconciled_lines in line.matched_debit_ids:
                     line_ids += reconciled_lines.debit_move_id
                 invoice_ids = line_ids.mapped('invoice_id')
-                line.move_id.write({'ref': line.payment_id.communication})
+                try:
+                    line.move_id.write({'ref': line.payment_id.communication or ''})
+                except UserError:
+                    # Avec le module OCA des verrouillages d'écritures, le write peut générer une erreur
+                    # Il ne faut pas qu'elle soit bloquante pour les lettrages
+                    pass
                 if len(invoice_ids) == 1:
                     name_infos = [(invoice_ids.partner_id.name or invoice_ids.partner_id.parent_id.name or '')[:30], invoice_ids.number]
                     name = (' ').join([text for text in name_infos if text])
@@ -163,7 +169,7 @@ class AccountPayment(models.Model):
         res = super(AccountPayment, self).post()
         client_line = self.move_line_ids.filtered(lambda line: line.credit > 0)
         if client_line.name == _("Customer Payment"):
-            self.move_line_ids.write({"name": (self.partner_id.name or self.partner_id.parent_id.name or '')[:30] + " " + self.communication})  # Permet d'avoir toutes les lignes avec le même libellé
+            self.move_line_ids.write({"name":((self.partner_id.name or self.partner_id.parent_id.name or '')[:30] + " " + (self.communication or '')).strip()})  # Permet d'avoir toutes les lignes avec le même libellé
         else:
             self.move_line_ids.write({"name": client_line.name})
         return res
