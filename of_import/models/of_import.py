@@ -441,10 +441,10 @@ class OfImport(models.Model):
         for imp in self:
             sortie_note = ''
             for champ, valeur in sorted(self.get_champs_odoo(imp.type_import, imp.lang_id.code or self.env.lang).items(),
-                                        key=lambda v: (v[1]['description'], v[0])):
+                    key=lambda v: (v[1]['description'], v[0])):
                 if champ in ('tz', 'lang'):  # Champs qui plantent lors de l'import, on les ignore.
                     continue
-                sortie_note += "- " + valeur['description'] + " : " + champ
+                sortie_note += "- " + (valeur['description'] or '') + " : " + champ
                 if valeur['type'] == 'selection':
                     sortie_note += u" [ valeurs autorisées : "
                     for cle in self.env[self.type_import]._fields[champ].get_values(self.env):
@@ -571,32 +571,32 @@ class OfImport(models.Model):
         else:
             langues = [langue for langue in langues if langue != 'en_US' and langue != lang]
 
-        # On récupère la liste des champs de l'objet depuis ir.model.fields
-        obj = self.env['ir.model.fields'].search([('model', '=', model)])
+        # On récupère la liste des champs depuis fields_get.
+        obj = self.env[model].fields_get(attributes=['field_description', 'required', 'type', 'relation', 'relation_field', 'translate', 'string'])
         for champ in obj:
-            field = self.env[model]._fields[champ.name]
+            field = self.env[model]._fields[champ]
             if (field.compute or not field.store) and not field.inverse:
                 continue
-            champs_odoo[champ.name] = {
-                'description': champ.field_description,
-                'requis': champ.required,
-                'type': champ.ttype,
-                'relation': champ.relation,
-                'relation_champ': champ.relation_field,
+            champs_odoo[champ] = {
+                'description': obj[champ].get('string'),
+                'requis': obj[champ].get('required'),
+                'type': obj[champ].get('type'),
+                'relation': obj[champ].get('relation'),
+                'relation_champ': obj[champ].get('relation_field'),
                 'langue': False,
-                'traduit': champ.translate,
+                'traduit': obj[champ].get('translate')
             }
 
-            if champ.translate:
+            if obj[champ].get('translate'):
                 for langue in langues:
-                    champs_odoo["[%s]%s" % (langue, champ.name)] = {
-                        'description': champ.field_description,
-                        'requis': False,
-                        'type': champ.ttype,
-                        'relation': champ.relation,
-                        'relation_champ': champ.relation_field,
-                        'langue': langue,
-                        'traduit': False,
+                    champs_odoo["[%s]%s" % (langue, champ)] = {
+                    'description': obj[champ].get('string'),
+                    'requis': False,
+                    'type': obj[champ].get('type'),
+                    'relation': obj[champ].get('relation'),
+                    'relation_champ': obj[champ].get('relation_field'),
+                    'langue': langue,
+                    'traduit': False
                     }
 
         # Des champs qui sont obligatoires peuvent avoir une valeur par défaut (donc in fine pas d'obligation de les renseigner).
