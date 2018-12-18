@@ -144,6 +144,8 @@
                     <field name="intervention_ids"/>
                     -->
                     <field name="is_confirme"/>
+                    <field name="intervention_ids"/>
+                    <button name="%(action_of_planning_tournee_interventions_map)d" type="action" string="Voir la Carte" />
                     <button name="open_planification" type="object" string="Planifier" attrs="{'invisible': [('is_complet', '=', True)]}"/>
                 </tree>
             </field>

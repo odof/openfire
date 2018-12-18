@@ -628,7 +628,7 @@ class OfTourneePlanificationPlanning(models.TransientModel):
                 'description': description,
                 'verif_dispo': True,
             }
-            intervention_obj.create(values)
+            interv = intervention_obj.create(values)
 
             # Mise à jour de la date minimale de prochaine intervention dans le service
             if planning.date_next:

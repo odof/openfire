@@ -288,6 +288,18 @@ class OfPlanningTournee(models.Model):
                     tournee.intervention_ids = [(4, intervention.id, False)]
 
     @api.multi
+    @api.depends('equipe_id', 'date', 'intervention_ids.date', 'intervention_ids.equipe_id')
+    def _compute_intervention_ids(self):
+        intervention_obj = self.env["of.planning.intervention"]
+        for tournee in self:
+            interventions = intervention_obj.search(["tournee_id","=",tournee.id])
+        interventions = self.env["of.planning.intervention"].search([])
+        interventions._compute_tournee_id()
+        for intervention in interventions:
+            if type(intervention.id) is int:
+                intervention.tournee_id.intervention_ids = [(4, intervention.id, False)]
+
+    @api.multi
     def _get_dummy_fields(self):
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')
