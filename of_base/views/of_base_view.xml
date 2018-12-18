@@ -152,6 +152,11 @@
             <field name="groups_id" eval="[(6,0,[ref('of_group_root_only')])]"/>
         </record>
 
+        <!-- Permet de cacher le menu Groupes pour tout le monde sauf admin -->
+        <record id="base.menu_action_res_groups" model="ir.ui.menu">
+            <field name="groups_id" eval="[(6,0,[ref('of_group_root_only')])]"/>
+        </record>
+
     <!-- Attribut invisible pour n'être visible que sur les actions et non le bouton envoyer par email -->
     <record model="ir.ui.view" id="of_base_email_compose_message_wizard_form">
         <field name="name">mail.compose.message.form</field>
