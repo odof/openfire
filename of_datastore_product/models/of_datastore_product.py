@@ -122,6 +122,8 @@ class OfDatastoreSupplier(models.Model):
     @api.multi
     def read(self, fields=None, load='_classic_read'):
         if fields and all(field in ('brand_ids', 'db_name') for field in fields):
+            # Un utilisateur non admin ne doit avoir accès qu'aux marques et db_name du connecteur TC
+            # (surtout pas aux accès login/password)
             self = self.sudo()
         return super(OfDatastoreSupplier, self).read(fields, load=load)
 
@@ -592,12 +594,7 @@ class OfDatastoreCentralized(models.AbstractModel):
                             En mode create on remplit seller_ids
         """
         supplier_obj = self.env['of.datastore.supplier']
-
-        # self_obj permet de faire des appels de fonctions avec le décorateur api.model sans envoyer tous les ids.
-        # En effet, ce décorateur n'efface pas les ids contenus dans l'objet pour appeler la fonction.
-        # Cela représente un coût en temps d'exécution, qui devient conséquent lorsqu'on ajoute les données
-        #   du of.datastore.cache (fonction _browse ci-dessus, appelée notamment lors des appels self.check_access_rights)
-        self_obj = self.env[self._name]
+        product_tmpl_obj = self.env['product.template']
         result = []
 
         # Certains champs sont nécessaires pour le calcul d'autres champs :
@@ -633,7 +630,7 @@ class OfDatastoreCentralized(models.AbstractModel):
 
         # Champs a valeurs spécifiques
         fields_defaults = [
-            ('of_datastore_supplier_id'       , lambda: create_mode and supplier_id or supplier.name_get()[0]),
+            ('of_datastore_supplier_id'       , lambda: create_mode and supplier_id or supplier.sudo().name_get()[0]),
             ('of_datastore_res_id'            , lambda: vals['id']),
             ('of_seller_pp_ht'                , lambda: vals['list_price']),
             ('of_seller_product_category_name', lambda: vals['categ_id'][1]),
@@ -706,12 +703,17 @@ class OfDatastoreCentralized(models.AbstractModel):
                 brand = match_dicts['brand_id'][vals['brand_id'][0]]
                 # Ajouter un search par article est couteux.
                 # Tant pis pour les règles d'accès, on fait une recherche SQL
-                self._cr.execute("SELECT id FROM " + self._table + " WHERE brand_id = %s AND of_datastore_res_id = %s",
-                                 (brand.id, vals['id']))
-                product_id = self._cr.fetchall()
-                product = self_obj.browse(product_id and product_id[0][0])
-                if self._name == 'product.product':
-                    product = product.product_tmpl_id
+                if self._name == 'product.template':
+                    self._cr.execute("SELECT id FROM product_template "
+                                     "WHERE brand_id = %s AND of_datastore_res_id = %s",
+                                     (brand.id, vals['id']))
+                else:
+                    self._cr.execute("SELECT t.id FROM product_product p "
+                                     "INNER JOIN product_template t ON t.id=p.product_tmpl_id "
+                                     "WHERE t.brand_id = %s AND p.of_datastore_res_id = %s",
+                                     (brand.id, vals['id']))
+                rows = self._cr.fetchall()
+                product = product_tmpl_obj.browse(rows and rows[0][0])
                 categ_name = vals['categ_id'][1]
                 obj_dict = {}
 
@@ -1155,7 +1157,11 @@ class ProductProduct(models.Model):
 
     @api.multi
     def of_datastore_import(self):
-        # Voir commentaire dans _of_read_datastore sur l'utilité du self_obj
+        # self_obj permet de faire des appels de fonctions avec le décorateur api.model sans envoyer tous les ids.
+        # En effet, ce décorateur n'efface pas les ids contenus dans l'objet pour appeler la fonction.
+        # Cela représente un coût en temps d'exécution, qui devient conséquent lorsqu'on ajoute les données
+        #   du of.datastore.cache (fonction _browse dans OfDatastoreCentralized, appelée notamment lors des
+        #   appels self.check_access_rights)
         self_obj = self.env[self._name]
         if len(self) == 1:
             # Detection de l'existance du produit
