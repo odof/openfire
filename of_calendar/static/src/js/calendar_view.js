@@ -497,7 +497,9 @@ CalendarView.include({
      */
     _set_all_custom_colors: function() {
         var self = this;
+        console.log("self.all_filters:",self.all_filters);
         var ids = _.reject(_.keys(self.all_filters),function(num){ return num == 'undefined'; });
+        console.log("ids: ",ids);
 
         var dfd = $.Deferred();
         var p = dfd.promise({target: kays});
@@ -509,10 +511,12 @@ CalendarView.include({
             model_name = self.attendee_model;
         }
         var Attendees = new Model(model_name);
+        console.log("ATTENDEES: ",Attendees, self.color_ft_field, self.color_bg_field);
         Attendees.query(['id', self.color_ft_field, self.color_bg_field]) // retrieve colors from db
             .filter([['id','in',ids]]) // id
             .all()
             .then(function (attendees){
+                console.log("attendees: ",attendees);
                 for (var i=0; i<attendees.length; i++) {
                     var a = attendees[i];
                     var key = a.id;
@@ -546,14 +550,19 @@ CalendarView.include({
             dfd.resolve();
         }else{
             $.when(self._set_all_custom_colors()).then(function(kays) {
-                /*for (var i=0; i<filters.length; i++) { // doesn't work somehow. doesn't need to work apparently
+                console.log("kays: ",kays);
+                for (var i=0; i<filters.length; i++) { // doesn't work somehow. doesn't need to work apparently
                     if (filters[i].value in kays) {
+                        console.log("yep");
                         var index = filters[i].value;
                         filters[i]['color_bg'] = self.all_filters[index].color_bg;
                         filters[i]['color_ft'] = self.all_filters[index].color_ft;
                         filters[i]['custom_colors'] = true;
+                    }else{
+                        console.log("nope");
                     }
-                }*/
+                }
+                console.log("A filters:",filters);
                 dfd.resolve();
             });
         }
@@ -778,6 +787,7 @@ SidebarFilter.include({
                 return _.contains(self.view.now_filter_ids, filter.value);
             });
             var filters_radio = self.filters_radio || false;
+            console.log("filters: ",filters);
             self.$('.o_calendar_contacts').html(QWeb.render('CalendarView.sidebar.contacts', { filters: filters, filters_radio: filters_radio }));
         });
     },
