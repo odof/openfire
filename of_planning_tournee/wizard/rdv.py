@@ -45,6 +45,7 @@ class OfTourneeRdv(models.TransientModel):
     @api.model
     def _default_partner(self):
         active_model = self._context.get('active_model', '')
+        partner_id = False
         if active_model == "res.partner":
             partner_id = self._context['active_ids'][0]
         elif active_model == "of.service":

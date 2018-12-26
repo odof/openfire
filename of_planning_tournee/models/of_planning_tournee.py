@@ -63,7 +63,7 @@ class OfPlanningIntervention(models.Model):
         tournees = self.env['of.planning.tournee'].browse(list(set(tournee_ids)))
         tournees._compute_is_complet()
 
-    tournee_id = fields.Many2one('of.planning.tournee', compute='_compute_tournee_id', string='Planification')
+    tournee_id = fields.Many2one('of.planning.tournee', compute='_compute_tournee_id', store=True, string='Planification')
     partner_city = fields.Char(related='address_id.city', store=True)
 
     @api.multi
@@ -425,12 +425,23 @@ class OfPlanningTournee(models.Model):
     epi_lon = fields.Float(string=u'Épicentre Lon', digits=(12, 12), required=True)
     address_depart_id = fields.Many2one('res.partner', string='Adresse départ')
     address_retour_id = fields.Many2one('res.partner', string='Adresse retour')
+    intervention_ids = fields.One2many('of.planning.intervention', 'tournee_id', u'Interventions liées', copy=False, order="date", compute="_compute_intervention_ids")
 
     zip_id = fields.Many2one('res.better.zip', 'Ville')
     distance = fields.Float(string='Eloignement (km)', digits=(12, 4), required=True, default=20.0)
     is_complet = fields.Boolean(compute="_compute_is_complet", string='Complet', store=True)
     is_bloque = fields.Boolean(string=u'Bloqué', help=u'Journée bloquée : ne sera pas proposée à la planification')
     is_confirme = fields.Boolean(string=u'Confirmé', default=True, help=u'Une tournée non confirmée sera supprimée si on lui retire ses rendez-vous')
+
+    @api.multi
+    @api.depends('equipe_id', 'date', 'intervention_ids.date', 'intervention_ids.equipe_id')
+    def _compute_intervention_ids(self):
+        intervention_obj = self.env["of.planning.intervention"]
+        for tournee in self:
+            interventions = intervention_obj.search(["tournee_id","=",tournee.id])
+            for intervention in interventions:
+                if type(intervention.id) is int:
+                    tournee.intervention_ids = [(4, intervention.id, False)]
 
     @api.multi
     def _get_dummy_fields(self):
