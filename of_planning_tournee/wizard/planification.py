@@ -617,6 +617,7 @@ class OfTourneePlanificationPlanning(models.TransientModel):
                 'hor_af'     : equipe.hor_af,
                 'partner_id' : service.partner_id.id,
                 'address_id' : address.id,
+                'service_id' : service.id,
                 'tache_id'   : service.tache_id.id,
                 'equipe_id'  : equipe.id,
                 'date'       : date_str,
@@ -628,7 +629,7 @@ class OfTourneePlanificationPlanning(models.TransientModel):
                 'description': description,
                 'verif_dispo': True,
             }
-            intervention_obj.create(values)
+            interv = intervention_obj.create(values)
 
             # Mise à jour de la date minimale de prochaine intervention dans le service
             if planning.date_next:
