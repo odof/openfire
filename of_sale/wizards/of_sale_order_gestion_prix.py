@@ -27,18 +27,18 @@ class GestionPrix(models.TransientModel):
     def _get_selection_mode_calcul(self):
         """Renvoit les possibilités de mode de calcul en fonction du droit d'afficher les marges."""
         liste = [
-                ('prix_ttc_cible', 'montant total TTC cible'),
-                ('montant_ttc', u'montant TTC à déduire'),
-                ('pc', u'% de remise sur les lignes sélectionnées')
-            ]
+            ('prix_ttc_cible', 'montant total TTC cible'),
+            ('montant_ttc', u'montant TTC à déduire'),
+            ('pc', u'% de remise sur les lignes sélectionnées')
+        ]
         if self.user_has_groups('of_sale.of_group_sale_marge_manager'):
             liste.append(('pc_marge', '% marge'))
-        liste.append(('reset', 'remettre au prix magasin')) # Avec application de la liste de prix du client
+        liste.append(('reset', 'remettre au prix magasin'))  # Avec application de la liste de prix du client
         return liste
 
-
     order_id = fields.Many2one('sale.order', string='Devis/commande', required=True, ondelete='cascade')
-    methode_remise = fields.Selection(selection=_get_selection_mode_calcul,
+    methode_remise = fields.Selection(
+        selection=_get_selection_mode_calcul,
         default='prix_ttc_cible',
         string=u"Mode de calcul",
         help=u"Détermine comment est calculée la remise sur les lignes sélectionnées du devis")

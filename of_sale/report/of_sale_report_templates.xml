@@ -197,31 +197,23 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-xs-8" t-if="doc.pdf_afficher_multi_echeances()" string="Échéances">
-                    <div><strong>Échéances&amp;nbsp;: </strong></div>
+                <div class="col-xs-6" t-if="doc.pdf_afficher_multi_echeances()" string="Échéances">
+                    <t t-set="show_ech_name" t-value="bool(doc.of_echeance_line_ids.filtered('date'))"/>
                     <table class="table table-condensed">
                         <thead>
                             <tr>
-                                <th>Nom</th>
-                                <th>Nombre de jours</th>
-                                <th>Option</th>
-                                <th class="text-right">Pourcentage</th>
+                                <th>Vos échéances</th>
+                                <th t-if="show_ech_name">Date</th>
                                 <th class="text-right">Montant</th>
-                                <!--th class="text-right">Amount paid</th-->
                             </tr>
                         </thead>
                         <tbody>
-                            <tr t-foreach="doc.echeance_line_ids" t-as="e">
+                            <tr t-foreach="doc.of_echeance_line_ids" t-as="e">
                                 <td><span t-field="e.name"/></td>
-                                <td class="text-right"><span t-field="e.days"/></td>
-                                <td><span t-field="e.option"/></td>
-                                <td class="text-right"><span t-field="e.percent"/> %</td>
+                                <td t-if="show_ech_name"><span t-field="e.date"/></td>
                                 <td class="text-right">
                                     <span t-field="e.amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                 </td>
-                                <!--td class="text-right">
-                                    <span t-field="e.amount_paid" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                                </td-->
                             </tr>
                         </tbody>
                     </table>

@@ -84,6 +84,7 @@ Droits utilisateurs:
     },
     'data' : [
         'security/of_sale_security.xml',
+        'security/ir.model.access.csv',
         'views/of_sale_view.xml',
         'report/of_sale_report_templates.xml',
         'wizards/of_sale_order_gestion_prix_views.xml',

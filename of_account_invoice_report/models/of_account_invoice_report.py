@@ -23,9 +23,6 @@ class AccountInvoice(models.Model):
     def pdf_afficher_email(self):
         return self.env['ir.values'].get_default('account.config.settings', 'pdf_adresse_email')
 
-    def pdf_afficher_multi_echeances(self):
-        return self.env['ir.values'].get_default('account.config.settings', 'pdf_afficher_multi_echeances')
-
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
@@ -64,8 +61,6 @@ class AccountConfigSettings(models.TransientModel):
             help=u"Afficher l'adresse email dans les rapport PDF ?")
     pdf_display_product_ref = fields.Boolean(string="(OF) Réf. produits", required=True, default=False,
             help="Afficher les références produits dans les rapports PDF ?")
-    pdf_afficher_multi_echeances = fields.Boolean(string="(OF) Multi-échéances", required=True, default=True,
-            help="Afficher les échéances multiples dans les rapports PDF ?")
 
     @api.multi
     def set_pdf_adresse_nom_parent_defaults(self):
@@ -94,7 +89,3 @@ class AccountConfigSettings(models.TransientModel):
     @api.multi
     def set_pdf_display_product_ref_defaults(self):
         return self.env['ir.values'].sudo().set_default('account.config.settings', 'pdf_display_product_ref', self.pdf_display_product_ref)
-
-    @api.multi
-    def set_pdf_afficher_multi_echeances_defaults(self):
-        return self.env['ir.values'].sudo().set_default('account.config.settings', 'pdf_afficher_multi_echeances', self.pdf_afficher_multi_echeances)

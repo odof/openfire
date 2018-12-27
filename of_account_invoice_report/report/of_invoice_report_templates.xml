@@ -189,32 +189,6 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="col-xs-6" t-if="o.pdf_afficher_multi_echeances()">
-                    <table class="table table-condensed">
-                        <thead>
-                            <tr>
-                                <th>Nom</th>
-                                <th>Deadline</th>
-                                <th class="text-right">Percent</th>
-                                <th class="text-right">Amount</th>
-                                <th class="text-right">Amount paid</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr t-foreach="o.echeance_line_ids" t-as="e">
-                                <td><span t-field="e.name"/></td>
-                                <td><span t-field="e.date_deadline"/></td>
-                                <td class="text-right"><span t-field="e.percent"/> %</td>
-                                <td class="text-right">
-                                    <span t-field="e.amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                                </td>
-                                <td class="text-right">
-                                    <span t-field="e.amount_paid" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
             </div>
 
             <!-- à conserver: héritage -->

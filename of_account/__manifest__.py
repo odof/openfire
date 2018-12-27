@@ -16,9 +16,11 @@ Module de comptabilité OpenFire.
   - Afficher le boutton "Envoyer par email" dans tous les cas sauf pour les factures annulées et brouillon
   - Afficher la date d'échéance dans la vue facture sans être en mode développeur
   - Permettre de modifier la date d'échéance manuellement (option dans les paramètres de configuration comptabilité : suivant les conditions de règlement/modification manuelle possible)
-  - Permettre d'afficher et de rechercher des étiquettes client dans les factures
-  - Ajout d'un champ 'Exporté' pour savoir ce qui a été exporté
-  - Modifie le libellé des écritures comptables (Factures : client + n° facture, Paiement : client + n° facture/n° commande)
+  - Permettre d'afficher et de rechercher des étiquettes client
+
+ - Ajout d'un champ 'Exporté' pour savoir ce qui a été exporté
+ - Modifie le libellé des écritures comptables (Factures : client + n° facture, Paiement : client + n° facture/n° commande)
+ - Ajout d'options dans les conditions de règlement (inspiré du module OCA account_payment_term_extension).
 """,
     'depends' : [
         'account',

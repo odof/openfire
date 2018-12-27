@@ -188,23 +188,8 @@ msgstr "Afficher les références produits dans les Rapports PDF ?"
 
 #. module: account
 #: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "Percent"
-msgstr "Pourcentage"
-
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "Deadline"
-msgstr "Échéance"
-
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
 msgid "Amount"
 msgstr "Montant"
-
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "Amount paid"
-msgstr "Montant payé"
 
 #. module: account
 #: model:ir.ui.view,arch_db:account.report_invoice_document
