@@ -130,6 +130,7 @@ class OfTourneeRdv(models.TransientModel):
     geo_lng = fields.Float(related='partner_address_id.geo_lng', readonly=True)
     precision = fields.Selection(related='partner_address_id.precision', readonly=True)
     partner_name = fields.Char(related='partner_id.name')
+    ignorer_geo = fields.Boolean("Ignorer données géographiques")
 
     @api.onchange('mode_result')
     def _onchange_mode_result(self):
@@ -513,7 +514,8 @@ class OfTourneeRdv(models.TransientModel):
         # Calcul des durées et distances
         d_debut = d_avant_recherche + un_jour
         d_fin = d_apres_recherche - un_jour
-        wizard_line_obj.calc_distances_dates_equipes(d_debut, d_fin, equipes)
+        if not self.ignorer_geo:
+            wizard_line_obj.calc_distances_dates_equipes(d_debut, d_fin, equipes)
 
         nb, nb_dispo, first_res = wizard_line_obj.get_nb_dispo(self)
 
