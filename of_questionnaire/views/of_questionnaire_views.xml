@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="of_questionnaire_view_form" model="ir.ui.view">
+        <field name="name">of.questionnaire.view.form</field>
+        <field name="model">of.questionnaire</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Nom du questionnaire"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="type"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="Questions" string="Questions">
+                            <group>
+                                <field name="line_ids" mode="tree" widget="many2many" colspan="4" nolabel="1" context="{'default_type': type, 'hide_type': True}" domain="[('type', '=', type)]">
+                                    <tree editable="bottom">
+                                        <field name="sequence" invisible="1"/>
+                                        <field name="name"/>
+                                        <field name="answer_type"/>
+                                        <field name="answer" attrs="{'invisible': [('answer_type', 'in', ('bool', 'text'))],
+                                                                     'required': [('answer_type', 'in', ('one', 'list'))]}"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_questionnaire_view_tree" model="ir.ui.view">
+        <field name="name">of.questionnaire.view.tree</field>
+        <field name="model">of.questionnaire</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="type"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_questionnaire_line_view_form" model="ir.ui.view">
+        <field name="name">of.questionnaire.line.view.form</field>
+        <field name="model">of.questionnaire.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Question"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="sequence"/>
+                            <field name="type" invisible="context.get('hide_type')"/>
+                            <field name="answer_type"/>
+                            <field name="answer" attrs="{'invisible': [('answer_type', 'in', ('bool', 'text'))],
+                                                         'required': [('answer_type', 'in', ('one', 'list'))]}"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_questionnaire_line_view_tree" model="ir.ui.view">
+        <field name="name">of.questionnaire.line.view.tree</field>
+        <field name="model">of.questionnaire.line</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="answer_type"/>
+                <field name="answer"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="action_of_questionnaire" model="ir.actions.act_window">
+        <field name="name">Questionnaires</field>
+        <field name="res_model">of.questionnaire</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_questionnaire.of_questionnaire_view_tree"/>
+    </record>
+    
+    <record id="action_of_questionnaire_line" model="ir.actions.act_window">
+        <field name="name">Questions</field>
+        <field name="res_model">of.questionnaire.line</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_questionnaire.of_questionnaire_line_view_tree"/>
+    </record>
+
+    <menuitem name="Questionnaires" id="menu_of_questionnaire" parent="of_planning.menu_of_planning_configuration" sequence="10" action="action_of_questionnaire"/>
+    <menuitem name="Questions" id="menu_of_questionnaire_line" parent="of_planning.menu_of_planning_configuration" sequence="10" action="action_of_questionnaire_line"/>
+
+    <record id="of_questionnaire_of_planning_intervention_view_form" model="ir.ui.view">
+        <field name="name">of.questionnaire.ofplanning.intervention.view.form</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <notebook>
+                    <page string="Questionnaire">
+                        <group>
+                            <field name="questionnaire_id"/>
+                        </group>
+                        <field name="question_ids" mode="tree" widget="one2many_list" nolabel="1">
+                            <tree>
+                                <field name="sequence" widget="handle"/>
+                                <field name="name"/>
+                                <field name="answer_type"/>
+                                <field name="possible_answer"/>
+                                <field name="definitive_answer" />
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
