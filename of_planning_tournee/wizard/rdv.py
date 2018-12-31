@@ -33,6 +33,10 @@ PICK_MODES = [
     ('distance', u'Au plus proche'),
 ]
 
+ROUTING_BASE_URL = u"http://51.38.41.131:5000/"
+ROUTING_VERSION = u"v1"
+ROUTING_PROFILE = u"driving"
+
 def hours_to_strs(*hours):
     """ Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'
     """
@@ -688,7 +692,7 @@ class OfTourneeRdvLine(models.TransientModel):
                 str_coords = u""
                 coords = []
                 #TODO: utiliser le serveur OSRM OpenFire
-                query = u"https://router.project-osrm.org/route/v1/driving/"
+                query = ROUTING_BASE_URL + u"route/" + ROUTING_VERSION + u"/" + ROUTING_PROFILE + u"/"
                 ### listess de coordonnées: ATTENTION OSRM prend ses coordonnées sous form (lng,lat)
                 # point de départ
                 if origine.geo_lat != 0 or origine.geo_lng != 0:
