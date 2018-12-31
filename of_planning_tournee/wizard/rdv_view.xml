@@ -30,7 +30,6 @@
                         <group>
                             <field name="date_recherche_debut"/>
                             <field name="date_recherche_fin"/>
-                            <field name="ignorer_geo"/>
                             <field name="mode_recherche" attrs="{'invisible': [('ignorer_geo', '!=', False)]}"/>
                             <field name="max_recherche" attrs="{'invisible': [('ignorer_geo', '!=', False)]}"/>
                             <field name="mode_result" attrs="{'invisible': [('ignorer_geo', '!=', False)]}"/>
