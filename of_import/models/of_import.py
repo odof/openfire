@@ -441,7 +441,7 @@ class OfImport(models.Model):
         for imp in self:
             sortie_note = ''
             for champ, valeur in sorted(self.get_champs_odoo(imp.type_import, imp.lang_id.code or self.env.lang).items(),
-                    key=lambda v: (v[1]['description'], v[0])):
+                                        key=lambda v: (v[1]['description'], v[0])):
                 if champ in ('tz', 'lang'):  # Champs qui plantent lors de l'import, on les ignore.
                     continue
                 sortie_note += "- " + (valeur['description'] or '') + " : " + champ
@@ -590,13 +590,13 @@ class OfImport(models.Model):
             if obj[champ].get('translate'):
                 for langue in langues:
                     champs_odoo["[%s]%s" % (langue, champ)] = {
-                    'description': obj[champ].get('string'),
-                    'requis': False,
-                    'type': obj[champ].get('type'),
-                    'relation': obj[champ].get('relation'),
-                    'relation_champ': obj[champ].get('relation_field'),
-                    'langue': langue,
-                    'traduit': False
+                        'description': obj[champ].get('string'),
+                        'requis': False,
+                        'type': obj[champ].get('type'),
+                        'relation': obj[champ].get('relation'),
+                        'relation_champ': obj[champ].get('relation_field'),
+                        'langue': langue,
+                        'traduit': False
                     }
 
         # Des champs qui sont obligatoires peuvent avoir une valeur par défaut (donc in fine pas d'obligation de les renseigner).
@@ -730,9 +730,9 @@ class OfImport(models.Model):
             erreur_msg[0] += msg
             if not simuler:
                 raise OfImportError(erreur_msg[0])
-        # Pour gérer les traductions, on importe d'abord avec la langue par défaut (en_US),
-        # puis on met à jour les champs pour chaque valeur traduite importée
-        self = self.with_context(lang='en_US')
+        # On se place dans la langue du fichier d'import (notamment pour la recherche des champs many2one).
+        if self.lang_id.code and self.lang_id.code != self.env.lang:
+            self = self.with_context(lang=self.lang_id.code)
         valeurs_trad = {}
 
         model = self.type_import
@@ -990,14 +990,10 @@ class OfImport(models.Model):
                 # Récupération si possible de la valeur finale (par ex. si préfixe ajouté), sinon de la valeur dans le fichier (si champ non importable)
                 valeur = valeurs.get(model_data['champ_primaire'], ligne[model_data['champ_primaire']])
 
-                if valeur in doublons:
-                    doublons[valeur][0] += 1
-                    doublons[valeur][1] += ", " + str(i)
-                    # Si la référence est un champ vide, on ne s'arrête pas, ça sera une création, mais on garde une copie des lignes pour faire un message d'avertissement.
-                    if valeur != "":
-                        erreur('')
-                else:
-                    doublons[valeur] = [1, str(i)]
+                # Si la référence est un champ vide, on ne s'arrête pas, ça sera une création,
+                #   mais on garde une copie des lignes pour faire un message d'avertissement.
+                if valeur and valeur in doublons:
+                    erreur('')
 
                 # On regarde si l'enregistrement existe déjà dans la base
                 domain = [(model_data['champ_primaire'], '=', valeur)]
@@ -1039,7 +1035,9 @@ class OfImport(models.Model):
                 # Il y a un (et un seul) enregistrement dans la base avec cette référence. On le met à jour.
                 try:
                     if not simuler:
-                        res_objet.write(valeurs)
+                        # Pour gérer les traductions, on importe d'abord avec la langue par défaut (en_US),
+                        # puis on met à jour les champs pour chaque valeur traduite importée.
+                        res_objet.with_context(lang='en_US').write(valeurs)
                         for lang, vals in valeurs_trad.iteritems():
                             res_objet.with_context(lang=lang).write(vals)
                     code = CODE_IMPORT_MODIFICATION
@@ -1050,13 +1048,23 @@ class OfImport(models.Model):
                 # L'enregistrement n'existe pas dans la base, on l'importe (création)
                 try:
                     if not simuler:
-                        res_objet = model_obj.create(valeurs)
+                        # Pour gérer les traductions, on importe d'abord avec la langue par défaut (en_US),
+                        # puis on met à jour les champs pour chaque valeur traduite importée.
+                        res_objet = model_obj.with_context(lang='en_US').create(valeurs)
                         for lang, vals in valeurs_trad.iteritems():
                             res_objet.with_context(lang=lang).write(vals)
                     code = CODE_IMPORT_CREATION
                     message = u"Création %s %s (ligne %s)\n" % (model_data['nom_objet'], libelle_ref, i)
                 except Exception, exp:
                     message = u"Ligne %s : échec création %s %s - Erreur : %s\n" % (i, model_data['nom_objet'], libelle_ref, str(exp).decode('utf8', 'ignore'))
+
+        if (simuler or code != CODE_IMPORT_ERREUR) and model_data['champ_primaire'] in valeurs:
+            ref = valeurs[model_data['champ_primaire']]
+            if ref in doublons:
+                doublons[ref][0] += 1
+                doublons[ref][1] += ", " + str(i)
+            else:
+                doublons[ref] = [1, str(i)]
 
         if not simuler:
             if code == CODE_IMPORT_ERREUR:
@@ -1140,10 +1148,10 @@ class OfImport(models.Model):
         if model == 'product.template':
             # Définition de l'ordre de lecture des champs. La marque doit être lue en premier
             champs_fichier = sorted(champs_fichier,
-                                    key=lambda champ: (champ.split('/')[0] == 'brand_id' and 10) or
-                                                      (champ == model_data['champ_reference'] and 20) or
-                                                      (champ == model_data['champ_primaire'] and 30) or
-                                                      40)
+                                    key=lambda champ: ((champ.split('/')[0] == 'brand_id' and 10) or
+                                                       (champ == model_data['champ_reference'] and 20) or
+                                                       (champ == model_data['champ_primaire'] and 30) or
+                                                       40))
 
             # L'import de tarif nécessite l'existence de la marque associée aux articles
             if self.prefixe:
@@ -1174,9 +1182,9 @@ class OfImport(models.Model):
         else:
             # Définition de l'ordre de lecture des champs. La marque doit être lue en premier
             champs_fichier = sorted(champs_fichier,
-                                    key=lambda champ: (champ == model_data['champ_reference'] and 10) or
-                                                      (champ == model_data['champ_primaire'] and 20) or
-                                                      30)
+                                    key=lambda champ: ((champ == model_data['champ_reference'] and 10) or
+                                                       (champ == model_data['champ_primaire'] and 20) or
+                                                       30))
 
         # Vérification si le champ primaire est bien dans le fichier d'import (si le champ primaire est défini)
         if model_data['champ_primaire'] and model_data['champ_primaire'] not in champs_fichier:
