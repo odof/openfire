@@ -599,7 +599,7 @@ class OfDatastoreCentralized(models.AbstractModel):
 
         # Certains champs sont nécessaires pour le calcul d'autres champs :
         # - brand_id : La marque, depuis laquelle on extrait les règles de lecture
-        # - categ_id : La catégorie, qui peut correspondre à des règles de lexture plus spécifiques dans la marque
+        # - categ_id : La catégorie, qui peut correspondre à des règles de lecture plus spécifiques dans la marque
         # - product_tmpl_id : L'article de base, utile pour of_tmpl_datastore_res_id
         # - default_code : La référence de l'article, utile pour of_seller_product_code
         # - uom_id et uom_po_id : Les unités de mesure et de mesure d'achat de l'article, utiles pour calculer les prix d'achat/vente
@@ -767,7 +767,7 @@ class OfDatastoreCentralized(models.AbstractModel):
 
                 # Prix d'achat/vente
                 vals.update(brand.compute_product_price(vals['list_price'], categ_name, obj_dict['uom_id'], obj_dict['uom_po_id'],
-                                                        product=product, price=None, remise=None))
+                                                        product=product, price=vals['standard_price'], remise=None))
                 # Calcul de la marge et de la remise
                 if 'of_seller_remise' in fields_to_read:
                     vals['of_seller_remise'] = (vals['of_seller_pp_ht'] - vals['of_seller_price']) * 100 / vals['of_seller_pp_ht']
@@ -1134,7 +1134,9 @@ class ProductProduct(models.Model):
         templ_fields = self.env['product.template']._fields
         fields = [f for f, c in self._fields.iteritems()
                   if (not c.compute or
+                      c.company_dependent or
                       (c._description_related == ('product_tmpl_id', f) and
+                       # @todo: Autoriser les champs company_dependent de product.template
                        not templ_fields[f].compute)) and
                   f not in unused_fields and
                   f != 'product_tmpl_id']
