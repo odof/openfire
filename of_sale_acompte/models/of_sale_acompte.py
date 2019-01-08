@@ -42,9 +42,9 @@ class AccountInvoice(models.Model):
             invoice.of_amount_total_without_advance = invoice.of_amount_untaxed_without_advance
             for line in lines:
                 price_unit = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-                taxes = line.invoice_line_tax_ids.compute_all(price_unit, self.currency_id, line.quantity, line.product_id, self.partner_id)['taxes']
+                taxes = line.invoice_line_tax_ids.compute_all(price_unit, invoice.currency_id, line.quantity, line.product_id, invoice.partner_id)['taxes']
                 for tax in taxes:
-                    val = self._prepare_tax_line_vals(line, tax)
+                    val = invoice._prepare_tax_line_vals(line, tax)
                     invoice.of_amount_total_without_advance += val['amount']
 
     @api.multi
@@ -92,7 +92,7 @@ class AccountInvoice(models.Model):
                 invoice.of_acomptes_payments_widget = json.dumps(widget)
             else:
                 invoice.of_acomptes_payments_widget = False
-            widget, amount = invoice._get_widgets(self)
+            widget, amount = invoice._get_widgets(invoice)
             invoice.of_residual = total - amount
 
     @api.multi
