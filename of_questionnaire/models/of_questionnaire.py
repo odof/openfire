@@ -36,18 +36,13 @@ class OfQuestionnaireLineCategory(models.Model):
 class OfPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
-    questionnaire_id = fields.Many2one('of.questionnaire', string="Questionnaire")
+    model_id = fields.Many2one('of.planning.intervention.model', string=u"Modèle d'intervention")
     question_ids = fields.One2many('of.planning.intervention.question', 'intervention_id', string="Questions")
 
-    @api.multi
-    def write(self, values):
-        res = super(OfPlanningIntervention, self).write(values)
-        return res
-
-    @api.onchange('questionnaire_id')
+    @api.onchange('model_id')
     def onchange_questionnaire(self):
         new_ids = []
-        for question in self.questionnaire_id.line_ids:
+        for question in self.model_id.question_ids:
             vals = {'name': question.name,
                     'sequence': question.sequence,
                     'answer_type': question.answer_type,
@@ -57,6 +52,13 @@ class OfPlanningIntervention(models.Model):
                 }
             new_ids.append((0, 0, vals))
         self.question_ids = new_ids
+
+class OfPlanningInterventionModel(models.Model):
+    _name = "of.planning.intervention.model"
+
+    name = fields.Char(string=u"Nom du modèle", required=True)
+    questionnaire_id = fields.Many2one('of.questionnaire', string="Questionnaire")
+    question_ids = fields.Many2many('of.questionnaire.line', related="questionnaire_id.line_ids", string="Questions", readonly=True)
 
 class OfPlanningInterventionQuestion(models.Model):
     _name="of.planning.intervention.question"

@@ -136,7 +136,44 @@
         <field name="view_id" ref="of_questionnaire.of_questionnaire_line_category_view_tree"/>
     </record>
 
-    <menuitem name="Config. Questionnaires" id="menu_of_questionnaire_config" parent="of_planning.menu_of_planning_configuration" sequence="10" />
+    <record id="of_planning_intervention_model_view_form" model="ir.ui.view">
+        <field name="name">of.planning.intervention.model.view.form</field>
+        <field name="model">of.planning.intervention.model</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Nom du modèle"/></h1>
+                    </div>
+                    <group>
+                        <field name="questionnaire_id"/>
+                        <field name="question_ids"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_planning_intervention_model_view_tree" model="ir.ui.view">
+        <field name="name">of.planning.intervention.model.view.tree</field>
+        <field name="model">of.planning.intervention.model</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_planning_intervention_model" model="ir.actions.act_window">
+        <field name="name">Modèle d'intervention</field>
+        <field name="res_model">of.planning.intervention.model</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_questionnaire.of_planning_intervention_model_view_tree"/>
+    </record>
+
+    <menuitem name="Modèle d'intervention" id="menu_of_planning_intervention_model" parent="of_planning.menu_of_planning_configuration" sequence="9" action="action_of_planning_intervention_model"/>
+    <menuitem name="Config. Questionnaires" id="menu_of_questionnaire_config" parent="of_planning.menu_of_planning_configuration" sequence="10"/>
     <menuitem name="Questionnaires" id="menu_of_questionnaire" parent="of_questionnaire.menu_of_questionnaire_config" sequence="0" action="action_of_questionnaire"/>
     <menuitem name="Questions" id="menu_of_questionnaire_line" parent="of_questionnaire.menu_of_questionnaire_config" sequence="1" action="action_of_questionnaire_line"/>
     <menuitem name="Catégorie de question" id="menu_of_questionnaire_line_category" parent="of_questionnaire.menu_of_questionnaire_config" sequence="2" action="action_of_questionnaire_line_category"/>
@@ -150,7 +187,7 @@
                 <notebook>
                     <page string="Questionnaire">
                         <group>
-                            <field name="questionnaire_id"/>
+                            <field name="model_id"/>
                         </group>
                         <field name="question_ids" mode="tree" widget="one2many_list" nolabel="1">
                             <tree>
