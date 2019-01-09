@@ -85,7 +85,7 @@ class OfPlanningInterventionRaison(models.Model):
 class OfPlanningIntervention(models.Model):
     _name = "of.planning.intervention"
     _description = "Planning d'intervention OpenFire"
-    _inherit = ["of.readgroup", "of.calendar.mixin"]
+    _inherit = ["of.readgroup", "of.calendar.mixin", 'mail.thread']
     _order = 'date'
 
     name = fields.Char(string=u'Libellé', required=True)

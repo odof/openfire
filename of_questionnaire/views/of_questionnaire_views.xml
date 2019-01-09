@@ -46,6 +46,14 @@
         </field>
     </record>
 
+    <record id="action_of_questionnaire" model="ir.actions.act_window">
+        <field name="name">Questionnaires</field>
+        <field name="res_model">of.questionnaire</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_questionnaire.of_questionnaire_view_tree"/>
+    </record>
+
     <record id="of_questionnaire_line_view_form" model="ir.ui.view">
         <field name="name">of.questionnaire.line.view.form</field>
         <field name="model">of.questionnaire.line</field>
@@ -59,6 +67,7 @@
                         <group>
                             <field name="sequence"/>
                             <field name="type" invisible="context.get('hide_type')"/>
+                            <field name="category_id"/>
                             <field name="answer_type"/>
                             <field name="answer" attrs="{'invisible': [('answer_type', 'in', ('bool', 'text'))],
                                                          'required': [('answer_type', 'in', ('one', 'list'))]}"/>
@@ -81,15 +90,6 @@
         </field>
     </record>
 
-
-    <record id="action_of_questionnaire" model="ir.actions.act_window">
-        <field name="name">Questionnaires</field>
-        <field name="res_model">of.questionnaire</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
-        <field name="view_id" ref="of_questionnaire.of_questionnaire_view_tree"/>
-    </record>
-    
     <record id="action_of_questionnaire_line" model="ir.actions.act_window">
         <field name="name">Questions</field>
         <field name="res_model">of.questionnaire.line</field>
@@ -98,8 +98,48 @@
         <field name="view_id" ref="of_questionnaire.of_questionnaire_line_view_tree"/>
     </record>
 
-    <menuitem name="Questionnaires" id="menu_of_questionnaire" parent="of_planning.menu_of_planning_configuration" sequence="10" action="action_of_questionnaire"/>
-    <menuitem name="Questions" id="menu_of_questionnaire_line" parent="of_planning.menu_of_planning_configuration" sequence="10" action="action_of_questionnaire_line"/>
+    <record id="of_questionnaire_line_category_view_form" model="ir.ui.view">
+        <field name="name">of.questionnaire.line.category.view.form</field>
+        <field name="model">of.questionnaire.line.category</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Nom de la catégorie"/></h1>
+                    </div>
+                    <group>
+                        <field name="description"/>
+                        <field name="sequence"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_questionnaire_line_category_view_tree" model="ir.ui.view">
+        <field name="name">of.questionnaire.line.category.view.tree</field>
+        <field name="model">of.questionnaire.line.category</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="description"/>
+                <field name="sequence"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_questionnaire_line_category" model="ir.actions.act_window">
+        <field name="name">Catégorie de question</field>
+        <field name="res_model">of.questionnaire.line.category</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_questionnaire.of_questionnaire_line_category_view_tree"/>
+    </record>
+
+    <menuitem name="Config. Questionnaires" id="menu_of_questionnaire_config" parent="of_planning.menu_of_planning_configuration" sequence="10" />
+    <menuitem name="Questionnaires" id="menu_of_questionnaire" parent="of_questionnaire.menu_of_questionnaire_config" sequence="0" action="action_of_questionnaire"/>
+    <menuitem name="Questions" id="menu_of_questionnaire_line" parent="of_questionnaire.menu_of_questionnaire_config" sequence="1" action="action_of_questionnaire_line"/>
+    <menuitem name="Catégorie de question" id="menu_of_questionnaire_line_category" parent="of_questionnaire.menu_of_questionnaire_config" sequence="2" action="action_of_questionnaire_line_category"/>
 
     <record id="of_questionnaire_of_planning_intervention_view_form" model="ir.ui.view">
         <field name="name">of.questionnaire.ofplanning.intervention.view.form</field>
@@ -115,6 +155,7 @@
                         <field name="question_ids" mode="tree" widget="one2many_list" nolabel="1">
                             <tree>
                                 <field name="sequence" widget="handle"/>
+                                <field name="category_id" invisible="1"/>
                                 <field name="name"/>
                                 <field name="answer_type"/>
                                 <field name="possible_answer"/>
