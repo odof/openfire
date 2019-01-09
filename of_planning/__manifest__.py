@@ -39,6 +39,7 @@ Inclut la gestion des équipes d'intervention.
         'security/of_planning_security.xml',
         'security/ir.model.access.csv',
         'wizard/message_invoice.xml',
+        'views/of_res_config_views.xml',
         'views/of_planning_intervention_view.xml',
         'views/of_planning_report_view.xml',
         'report/of_planning_fiche_intervention_view.xml',
