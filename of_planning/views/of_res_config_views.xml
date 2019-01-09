@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Intervention config wizard -->
+    <record id="view_of_intervention_settings" model="ir.ui.view">
+        <field name="name">view.of.intervention.settings</field>
+        <field name="model">of.intervention.settings</field>
+        <field name="arch" type="xml">
+            <form string="Configure Interventions" class="oe_form_configuration" name="intervention_config_form">
+                <header>
+                    <button string="Appliquer" type="object" name="execute" class="oe_highlight"/>
+                    <button string="Annuler" type="object" name="cancel" class="oe_link" special="cancel"/>
+                </header>
+                <group string="Société" groups="base.group_multi_company">
+                    <label for="id" string="Société"/>
+                    <div>
+                        <field name="company_id" options="{'no_create': True}" class="oe_inline"/>
+                    </div>
+                </group>
+                <group name="intervention" string="Intervention">
+                    <label for="id" string="Configuration des interventions" style="width: 250px"/>
+                    <div name="general_config">
+                        <div>
+                            <field name="display_realtime_gantt" class="oe_inline" style="vertical-align: middle;"/>
+                            <label for="display_realtime_gantt" style="vertical-align: middle;"/>
+                        </div>
+                        <div>
+                            <field name="supp_finish_interv" class="oe_inline" style="vertical-align: middle;"/>
+                            <label for="supp_finish_interv" style="vertical-align: middle;"/>
+                        </div>
+                        <div>
+                            <field name="generate_recurent" class="oe_inline" style="vertical-align: middle;"/>
+                            <label for="generate_recurent" style="vertical-align: middle;"/>
+                        </div>
+                        <div>
+                            <field name="allow_same_time_interv" class="oe_inline" style="vertical-align: middle;"/>
+                            <label for="allow_same_time_interv" style="vertical-align: middle;"/>
+                        </div>
+                        <div>
+                            <field name="allow_reminder_push_notif_stop" class="oe_inline" style="vertical-align: middle;"/>
+                            <label for="allow_reminder_push_notif_stop" style="vertical-align: middle;"/>
+                        </div>
+                    </div>
+                </group>
+                <group name="moblie_app" string="Application">
+                    <label for="id" string="Configuration de l'application mobile" style="width: 250px"/>
+                    <div name="appli">
+                        <div>
+                            <field name="display_timer" class="oe_inline" style="vertical-align: middle;"/>
+                            <label for="display_timer" style="vertical-align: middle;"/>
+                        </div>
+                        <div>
+                            <field name="use_signature" class="oe_inline" style="vertical-align: middle;"/>
+                            <label for="use_signature" style="vertical-align: middle;"/>
+                            <div style="margin-left: 25px; margin-bottom: 3px;" attrs="{'invisible':[('use_signature','=',False)]}">
+                                <!-- ajout champs signatures obligatoires, visibles que si les signatures sont activées -->
+                                <field name="mandatory_function" style="vertical-align: middle;"/>
+                                <label for="mandatory_function" style="vertical-align: middle;"/>
+                            </div>
+                        </div>
+                        <div>
+                            <field name="use_photos" class="oe_inline" style="vertical-align: middle;"/>
+                            <label for="use_photos" style="vertical-align: middle;"/>
+                        </div>
+                        <div>
+                            <field name="multi_started_interv" class="oe_inline" style="vertical-align: middle;"/>
+                            <label for="multi_started_interv" style="vertical-align: middle;"/>
+                        </div>
+                        <div>
+                            <field name="use_sale_order" class="oe_inline" style="vertical-align: middle;"/>
+                            <label for="use_sale_order" style="vertical-align: middle;"/>
+                        </div>
+                        <div>
+                            <field name="auto_assign_interv" class="oe_inline" style="vertical-align: middle;"/>
+                            <label for="auto_assign_interv" style="vertical-align: middle;"/>
+                        </div>
+                    </div>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_intervention_settings" model="ir.actions.act_window">
+        <field name="name">Configure Interventions</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.intervention.settings</field>
+        <field name="view_id" ref="view_of_intervention_settings"/>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+    </record>
+</odoo>
