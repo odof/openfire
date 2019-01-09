@@ -24,6 +24,14 @@ class OfQuestionnaireLine(models.Model):
                                     ('one', u"Plusieurs choix, une seule réponse possible"),
                                     ('list', u"plusieurs choix, plusieurs réponses possibles")], string="Type de réponse", default='bool', required=True)
     answer = fields.Text(string=u"Réponses possibles")
+    category_id = fields.Many2one('of.questionnaire.line.category', string=u"Catégorie")
+
+class OfQuestionnaireLineCategory(models.Model):
+    _name = "of.questionnaire.line.category"
+
+    name = fields.Char(string=u"Catégorie")
+    sequence = fields.Integer(string=u"Séquence", default=10)
+    description = fields.Text(string="Description")
 
 class OfPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
@@ -44,6 +52,7 @@ class OfPlanningIntervention(models.Model):
                     'sequence': question.sequence,
                     'answer_type': question.answer_type,
                     'possible_answer': question.answer,
+                    'category_id': question.category_id.id,
                     'intervention_id': self.id,
                 }
             new_ids.append((0, 0, vals))
@@ -59,5 +68,6 @@ class OfPlanningInterventionQuestion(models.Model):
                                     ('one', u"Plusieurs choix, une seule réponse possible"),
                                     ('list', u"plusieurs choix, plusieurs réponses possibles")], string="Type de réponse", default='bool', required=True)
     possible_answer = fields.Text(string=u"Réponses possibles")
+    category_id = fields.Many2one('of.questionnaire.line.category', string=u"Catégorie")
     definitive_answer = fields.Text(string=u"Réponse")
     intervention_id = fields.Many2one('of.planning.intervention', string="Intervention")

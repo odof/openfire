@@ -34,7 +34,11 @@ Inclut la gestion des équipes d'intervention.
         'of_gesdoc',
         'of_calendar',
         'of_kit',
+<<<<<<< 609298a38d422f89ec02975ad4cafb5785e4540c
         'of_utils',
+=======
+        'mail',
+>>>>>>> WIP
     ],
     'data' : [
         'security/of_planning_security.xml',
