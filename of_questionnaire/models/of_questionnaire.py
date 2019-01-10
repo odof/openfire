@@ -38,6 +38,14 @@ class OfPlanningIntervention(models.Model):
 
     model_id = fields.Many2one('of.planning.intervention.model', string=u"Modèle d'intervention")
     question_ids = fields.One2many('of.planning.intervention.question', 'intervention_id', string="Questions")
+    number = fields.Char(String=u"Numéro")
+
+    @api.multi
+    def button_confirm(self):
+        ret = super(OfPlanningIntervention, self).button_confirm()
+        if self.model_id:
+            self.write({'number': self.model_id.sequence_id.next_by_id()})
+        return ret
 
     @api.onchange('model_id')
     def onchange_questionnaire(self):
@@ -57,8 +65,44 @@ class OfPlanningInterventionModel(models.Model):
     _name = "of.planning.intervention.model"
 
     name = fields.Char(string=u"Nom du modèle", required=True)
+    active = fields.Boolean(string="Active", default=True)
+    code = fields.Char(string="Code", compute="_compute_code", inverse="_inverse_code", store=True, required=True)
     questionnaire_id = fields.Many2one('of.questionnaire', string="Questionnaire")
     question_ids = fields.Many2many('of.questionnaire.line', related="questionnaire_id.line_ids", string="Questions", readonly=True)
+    sequence_id = fields.Many2one('ir.sequence', string=u"Séquence")
+
+    @api.depends('sequence_id')
+    def _compute_code(self):
+        for intervention_model in self:
+            intervention_model.code = intervention_model.sequence_id.prefix
+
+    def _inverse_code(self):
+        for intervention_model in self:
+            if not intervention_model.code:
+                continue
+            intervention_model.sequence_id.sudo().write({'prefix': intervention_model.code})
+
+    @api.model
+    def create(self, vals):
+        if not vals.get('sequence_id'):
+            vals.update({'sequence_id': self.sudo()._create_sequence(vals).id})
+
+        intervention_model = super(OfPlanningInterventionModel, self).create(vals)
+        return intervention_model
+
+    @api.model
+    def _create_sequence(self, vals, refund=False):
+        """ Create new no_gap entry sequence for every new Journal"""
+        seq = {
+            'name': u'Séquence ' + vals['name'],
+            'implementation': 'no_gap',
+            'prefix': vals['code'],
+            'padding': 4,
+            'number_increment': 1,
+        }
+        if 'company_id' in vals:
+            seq['company_id'] = vals['company_id']
+        return self.env['ir.sequence'].create(seq)
 
 class OfPlanningInterventionQuestion(models.Model):
     _name="of.planning.intervention.question"
