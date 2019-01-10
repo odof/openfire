@@ -17,7 +17,9 @@
                     <group name="informations de recherche" attrs="{'invisible': [('display_search', '=', False)]}">
                         <group colspan="4" col="4">
                             <separator string="Informations" colspan="4"/>
-                            <!--label for="partner_address_id" colspan="1"/-->
+                            <!--label for="partner_address_id" colspan="1"/
+                             attrs="{'invisible': [('ignorer_geo', '!=', False)]}"
+                            -->
                             <field name="partner_address_id" string="Adresse" widget="selection" colspan="4"/>
                         </group>
                         <group>
@@ -30,9 +32,9 @@
                         <group>
                             <field name="date_recherche_debut"/>
                             <field name="date_recherche_fin"/>
-                            <field name="mode_recherche" attrs="{'invisible': [('ignorer_geo', '!=', False)]}"/>
-                            <field name="max_recherche" attrs="{'invisible': [('ignorer_geo', '!=', False)]}"/>
-                            <field name="mode_result" attrs="{'invisible': [('ignorer_geo', '!=', False)]}"/>
+                            <field name="mode_recherche"/>
+                            <field name="max_recherche"/>
+                            <field name="mode_result"/>
                         </group>
                     </group>
                     <group invisible="1">
