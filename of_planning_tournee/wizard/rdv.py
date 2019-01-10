@@ -14,7 +14,7 @@ try:
     import requests
 except ImportError:
     requests = None
-
+import urllib3
 from odoo import api, models, fields
 from datetime import datetime, timedelta, date as d_date
 import pytz
@@ -33,7 +33,7 @@ PICK_MODES = [
     ('distance', u'Au plus proche'),
 ]
 
-ROUTING_BASE_URL = u"http://51.38.41.131:5000/"
+ROUTING_BASE_URL = u"http://s-hotel.openfire.fr:5000/"
 ROUTING_VERSION = u"v1"
 ROUTING_PROFILE = u"driving"
 
