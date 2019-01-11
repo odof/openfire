@@ -228,6 +228,7 @@ class OfPlanningIntervention(models.Model):
     def _compute_cleantext_intervention(self):
         cleanr = re.compile('<.*?>')
         for interv in self:
+            print interv.name
             cleantext = re.sub(cleanr, '', interv.order_id.of_notes_intervention or '')
             interv.cleantext_intervention = cleantext
 

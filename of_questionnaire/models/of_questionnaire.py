@@ -39,6 +39,21 @@ class OfPlanningIntervention(models.Model):
     model_id = fields.Many2one('of.planning.intervention.model', string=u"Modèle d'intervention")
     question_ids = fields.One2many('of.planning.intervention.question', 'intervention_id', string="Questions")
     number = fields.Char(String=u"Numéro")
+    calendar_name = fields.Char(string="Calendar Name", compute="_compute_calendar_name")
+
+    @api.depends('name', 'number')
+    def _compute_calendar_name(self):
+        for intervention in self:
+            intervention.calendar_name = intervention.number or intervention.name
+
+    @api.multi
+    def write(self, vals):
+        res = super(OfPlanningIntervention, self).write(vals)
+        for interv in self:
+            if interv.model_id and interv.state in ('confirm', 'done', 'postponed') and not interv.number:
+                interv.number = interv.model_id.sequence_id.next_by_id()
+#                super(OfPlanningIntervention, interv).write({'number': interv.model_id.sequence_id.next_by_id()})
+        return res
 
     @api.multi
     def button_confirm(self):
