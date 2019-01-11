@@ -1,0 +1,4 @@
+id,name,model,function,interval_number,interval_type,numbercall,active,args
+sms_check,SMS Check,of.sms.account,check_all_messages,1,hours,-1,true,()
+sms_queue_check,SMS Queue Check,of.sms.message,process_sms_queue,1,minutes,-1,true,"(20,)"
+sms_notif_daily,Daily SMS notif check,of.sms.alarm_manager,sms_notif_daily,1,days,-1,true,"(['of.planning.intervention'],)"

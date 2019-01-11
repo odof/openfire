@@ -1,0 +1,2 @@
+id,gateway_model_name,name,can_receive_sms
+sms_ovh,of.sms.gateway.ovh,OVH,False

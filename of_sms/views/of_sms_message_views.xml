@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ######################################################################################################################### -->
+    <!-- #############################                TEMPLATES                ################################################### -->
+    <!-- ######################################################################################################################### -->
+    <record id="of_sms_template_view_form" model="ir.ui.view">
+          <field name="name">of.sms.template.view.form</field>
+          <field name="model">of.sms.template</field>
+          <field name="arch" type="xml">
+              <form string="Templates">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/><h1><field name="name" required="1"/></h1>
+                            <group>
+                                <field name="model_id" required="1" options="{'no_create': True}"/>
+                                <field name="model" invisible="1"/>
+                                <field name="from_mobile_verified_id"/>
+                                <field name="from_mobile"/>
+                                <field name="sms_to"/>
+                                <field name="media_id" filename="media_filename"/>
+                                <field name="media_filename" invisible="1"/>
+                                <!--<field name="media_ids"/>-->
+                            </group>
+                        </div>
+                        <notebook>
+                            <page string="Content">
+                                <field name="template_body"/>
+                            </page>
+                            <page string="Dynamic Placeholder Generator">
+                                <group>
+                                    <field name="model_object_field_id" domain="[('model_id','=',model_id),('ttype','!=','one2many'),('ttype','!=','many2many')]"/>
+                                    <field name="sub_object_id" readonly="1"/>
+                                    <field name="sub_model_object_field_id" domain="[('model_id','=',sub_object_id),('ttype','!=','one2many'),('ttype','!=','many2many')]" attrs="{'readonly':[('sub_object_id','=',False)],'required':[('sub_object_id','!=',False)]}"/>
+                                    <field name="null_value"/>
+                                    <field name="copyvalue"/>
+                                </group>
+                            </page>
+                        </notebook>
+                       </sheet>
+                </form>
+          </field>
+      </record>
+
+      <record id="of_sms_template_view_tree" model="ir.ui.view">
+          <field name="name">of.sms.template.view.tree</field>
+          <field name="model">of.sms.template</field>
+          <field name="arch" type="xml">
+              <tree>
+                  <field name="name"/>
+                  <field name="model"/>
+                  <field name="from_mobile"/>
+                  <field name="sms_to"/>
+              </tree>
+          </field>
+      </record>
+
+    <!-- ######################################################################################################################### -->
+    <!-- #############################                MESSAGES                 ################################################### -->
+    <!-- ######################################################################################################################### -->
+
+    <record id="of_sms_message_view_form" model="ir.ui.view">
+        <field name="name">of.sms.message.view.form</field>
+        <field name="model">of.sms.message</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false" string="SMS Messages">
+                <group>
+                    <field name="message_date"/>
+                    <field name="sms_gateway_message_id"/>
+                    <field name="account_id"/>
+                    <field name="model_id"/>
+                    <field name="record_id"/>
+                    <field name="by_partner_id"/>
+                    <field name="direction"/>
+                    <field name="record_name"/>
+                    <field name="from_mobile"/>
+                    <field name="to_mobile"/>
+                    <field name="status_string"/>
+                    <field name="status_code"/>
+                    <field name="sms_content"/>
+                    <field name="attachment_ids"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_sms_message_view_tree" model="ir.ui.view">
+        <field name="name">of.sms.message.view.tree</field>
+        <field name="model">of.sms.message</field>
+        <field name="arch" type="xml">
+            <tree edit="false" create="false">
+                <field name="by_partner_id"/>
+                <field name="account_id"/>
+                <field name="record_name"/>
+                <field name="direction"/>
+                <field name="message_date"/>
+                <field name="from_mobile"/>
+                <field name="to_mobile"/>
+                <field name="status_code"/>
+                <field name="sms_content"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_sms_message_view_kanban" model="ir.ui.view">
+        <field name="name">of.sms.message.view.kanban</field>
+        <field name="model">of.sms.message</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="record_name"/>
+                <field name="sms_content"/>
+                <field name="direction"/>
+                <field name="record_id"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_vignette oe_semantic_html_override esms_history_kanban" style="min-width:100%;">
+                                <a type="open">
+                                    <div t-if="record.direction.raw_value == 'I'" style="text-align:right;">
+                                        <span style="height:100%;float:right;margin-left:5px;">
+                                            <img t-att-src="kanban_image('res.partner', 'image_small', record_id)"/>
+                                        </span>
+                                        <span class="oe_partner_heading">
+                                            To: <field name="to_mobile"/>
+                                        </span>
+                                        <br/>
+                                        <field name="sms_content"/>
+                                        <br/><br/>
+                                        By <field name="by_partner_id"/> on <field name="message_date"/>
+                                    </div>
+                                    <div t-if="record.direction.raw_value == 'O'" style="text-align:left;">
+                                        <span style="height:100%;float:left;margin-right:5px;">
+                                            <img t-att-src="kanban_image('res.partner', 'image_small', record_id)"/>
+                                        </span>
+                                        <span class="oe_partner_heading">
+                                            To: <field name="record_name"/>
+                                        </span>
+                                        <br/>
+                                        <field name="sms_content"/>
+                                        <br/>
+                                        Status: <field name="status_code"/>
+                                        <br/>
+                                        By 
+                                        <t t-if="record.by_partner_id.raw_value">
+                                            <field name="by_partner_id"/> 
+                                        </t>
+                                        <t t-else="">
+                                            Server
+                                        </t>
+                                        on 
+                                        <field name="message_date"/>
+                                    </div>
+                                </a>
+                            </div>
+                        </t>
+                    </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ######################################################################################################################### -->
+    <!-- #############################                COMPOSE                  ################################################### -->
+    <!-- ######################################################################################################################### -->
+
+    <record id="of_sms_compose_view_form" model="ir.ui.view">
+        <field name="name">of.sms.compose.view.form</field>
+        <field name="model">of.sms.compose</field>
+        <field name="arch" type="xml">
+            <form>
+                <span style="color:red;font-size:20px;">
+                    <field name="error_message"/>
+                </span>
+                <group>
+                    <field name="record_id" invisible="1"/>
+                    <field name="model" invisible="1"/>
+                    <field name="sms_template_id" domain="[('model_id.model','=',model)]" />
+                    <field name="from_mobile_id"/>
+                    <field name="to_number" />
+                    <field name="sms_content"/>
+                    <field name="media_id" filename="media_filename"/>
+                    <field name="media_filename" invisible="1"/>
+                    <field name="delivery_time"/>
+                </group>
+                <footer>
+                    <button type="object" name="send_entity" string="Send SMS"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- ######################################################################################################################### -->
+    <!-- #############################             ACTIONS & MENUS             ################################################### -->
+    <!-- ######################################################################################################################### -->
+
+    <record id="of_sms_template_action" model="ir.actions.act_window">
+        <field name="name">SMS/MMS Templates</field>
+        <field name="res_model">of.sms.template</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Create an SMS template</p>
+        </field>
+    </record>
+
+    <record id="of_sms_message_action" model="ir.actions.act_window">
+        <field name="name">SMS / MMS Messages</field>
+        <field name="res_model">of.sms.message</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">SMS Messages</p>
+        </field>
+    </record>
+
+    <menuitem id="of_sms_template_menu" name="Templates" parent="of_sms_parent_menu" action="of_sms_template_action" sequence="40"/>
+    <menuitem id="of_sms_message_menu" name="Messages" parent="of_sms_parent_menu" action="of_sms_message_action" sequence="30"/>
+</odoo>
