@@ -182,9 +182,12 @@
                     <span>
                         <t t-if="company.name"><span t-field="company.name"/></t>
                         <t t-if="company.company_registry"> - <span t-field="company.company_registry"/></t>
-                        <t t-if="company.ape"> - APE <span t-field="company.ape"/></t>
-                        <br/>
-                        <t t-if="company.siret">SIRET <span t-field="company.siret"/></t>
+                        <t t-if = "'ape' in company._fields">
+                            <!-- Champs relatifs au module l10n_fr -->
+                            <t t-if="company.ape"> - APE <span t-field="company.ape"/></t>
+                            <br/>
+                            <t t-if="company.siret">SIRET <span t-field="company.siret"/></t>
+                        </t>
                     </span>
                     <t t-if="company.vat"> - TVA&amp;nbsp;: <span t-field="company.vat"/></t>
                     <ul t-if="not company.custom_footer" class="list-inline" name="financial_infos"></ul>
