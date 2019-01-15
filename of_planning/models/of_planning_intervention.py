@@ -131,6 +131,20 @@ class OfPlanningIntervention(models.Model):
     cleantext_intervention = fields.Text(compute='_compute_cleantext_intervention')
     jour = fields.Char("Jour", compute="_compute_jour")
 
+    model_id = fields.Many2one('of.planning.intervention.model', string=u"Modèle d'intervention")
+    number = fields.Char(String=u"Numéro")
+    calendar_name = fields.Char(string="Calendar Name", compute="_compute_calendar_name")
+
+    @api.depends('name', 'number')
+    def _compute_calendar_name(self):
+        for intervention in self:
+            intervention.calendar_name = intervention.number or intervention.name
+
+    @api.onchange('model_id')
+    def onchange_model(self):
+        if self.state == "draft" and self.model_id:
+            self.tache_id = self.model_id.tache_id
+
     @api.depends('date', 'duree', 'hor_md', 'hor_mf', 'hor_ad', 'hor_af', 'hor_sam', 'hor_dim')
     def _compute_date_deadline(self):
         compare_precision = 5
@@ -289,6 +303,8 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def button_confirm(self):
+        if self.model_id:
+            self.write({'number': self.model_id.sequence_id.next_by_id()})
         return self.write({'state': 'confirm'})
 
     @api.multi
@@ -358,6 +374,9 @@ class OfPlanningIntervention(models.Model):
     def write(self, vals):
         super(OfPlanningIntervention, self).write(vals)
         self.do_verif_dispo()
+        for interv in self:
+            if interv.model_id and interv.state in ('confirm', 'done', 'postponed') and not interv.number:
+                interv.number = interv.model_id.sequence_id.next_by_id()
         return True
 
     @api.model
@@ -526,3 +545,45 @@ class SaleOrder(models.Model):
             })
             action['context'] = str(context)
         return action
+
+class OfPlanningInterventionModel(models.Model):
+    _name = "of.planning.intervention.model"
+
+    name = fields.Char(string=u"Nom du modèle", required=True)
+    active = fields.Boolean(string="Active", default=True)
+    code = fields.Char(string="Code", compute="_compute_code", inverse="_inverse_code", store=True, required=True)
+    sequence_id = fields.Many2one('ir.sequence', string=u"Séquence")
+    tache_id = fields.Many2one('of.planning.tache', string=u"Tâche")
+
+    @api.depends('sequence_id')
+    def _compute_code(self):
+        for intervention_model in self:
+            intervention_model.code = intervention_model.sequence_id.prefix
+
+    def _inverse_code(self):
+        for intervention_model in self:
+            if not intervention_model.code:
+                continue
+            intervention_model.sequence_id.sudo().write({'prefix': intervention_model.code})
+
+    @api.model
+    def create(self, vals):
+        if not vals.get('sequence_id'):
+            vals.update({'sequence_id': self.sudo()._create_sequence(vals).id})
+
+        intervention_model = super(OfPlanningInterventionModel, self).create(vals)
+        return intervention_model
+
+    @api.model
+    def _create_sequence(self, vals, refund=False):
+        """ Create new no_gap entry sequence for every new Journal"""
+        seq = {
+            'name': u'Séquence ' + vals['name'],
+            'implementation': 'no_gap',
+            'prefix': vals['code'],
+            'padding': 4,
+            'number_increment': 1,
+        }
+        if 'company_id' in vals:
+            seq['company_id'] = vals['company_id']
+        return self.env['ir.sequence'].create(seq)
