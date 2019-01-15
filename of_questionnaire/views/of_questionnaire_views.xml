@@ -136,63 +136,22 @@
         <field name="view_id" ref="of_questionnaire.of_questionnaire_line_category_view_tree"/>
     </record>
 
-    <record id="of_planning_intervention_model_view_form" model="ir.ui.view">
-        <field name="name">of.planning.intervention.model.view.form</field>
+    <record id="of_questionnaire_of_planning_intervention_model_view_form" model="ir.ui.view">
+        <field name="name">of.questionnaire.of.planning.intervention.model.view.form</field>
         <field name="model">of.planning.intervention.model</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_model_view_form"/>
         <field name="arch" type="xml">
-            <form>
-                <sheet>
-                    <div class="oe_button_box of_width_600" name="button_box_custom" >
-                        <!-- Bouton Actif -->
-                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive" display="inline-block">
-                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
-                        </button>
-                    </div>
-                    <div class="oe_title">
-                        <h1><field name="name" placeholder="Nom du modèle"/></h1>
-                    </div>
-                    <group>
-                        <group>
-                            <field name="code"/>
-                        </group>
-                    </group>
-                    <notebook>
-                        <page string="Configuration">
-                            <group>
-                                <field name="sequence_id" colspan="2" readonly="1"/>
-                            </group>
-                        </page>
-                        <page string="Questionnaire">
-                            <group>
-                                <field name="questionnaire_id"/>
-                            </group>
-                            <field name="question_ids" nolabel="1"/>
-                        </page>
-                    </notebook>
-                </sheet>
-            </form>
+        <xpath expr="//notebook" position="inside">
+            <page string="Questionnaire">
+                <group>
+                    <field name="questionnaire_id"/>
+                </group>
+                <field name="question_ids" nolabel="1"/>
+            </page>
+        </xpath>
         </field>
     </record>
 
-    <record id="of_planning_intervention_model_view_tree" model="ir.ui.view">
-        <field name="name">of.planning.intervention.model.view.tree</field>
-        <field name="model">of.planning.intervention.model</field>
-        <field name="arch" type="xml">
-            <tree>
-                <field name="name"/>
-            </tree>
-        </field>
-    </record>
-
-    <record id="action_of_planning_intervention_model" model="ir.actions.act_window">
-        <field name="name">Modèle d'intervention</field>
-        <field name="res_model">of.planning.intervention.model</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
-        <field name="view_id" ref="of_questionnaire.of_planning_intervention_model_view_tree"/>
-    </record>
-
-    <menuitem name="Modèle d'intervention" id="menu_of_planning_intervention_model" parent="of_planning.menu_of_planning_configuration" sequence="9" action="action_of_planning_intervention_model"/>
     <menuitem name="Config. Questionnaires" id="menu_of_questionnaire_config" parent="of_planning.menu_of_planning_configuration" sequence="10"/>
     <menuitem name="Questionnaires" id="menu_of_questionnaire" parent="of_questionnaire.menu_of_questionnaire_config" sequence="0" action="action_of_questionnaire"/>
     <menuitem name="Questions" id="menu_of_questionnaire_line" parent="of_questionnaire.menu_of_questionnaire_config" sequence="1" action="action_of_questionnaire_line"/>
@@ -203,16 +162,8 @@
         <field name="model">of.planning.intervention</field>
         <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//sheet/group/group[1]" position="before">
-                <div class="oe_title" name="num">
-                    <h1><field name="number" placeholder="N° d'intervention" readonly="1" attrs="{'invisible': [('model_id', '=', False)]}"/></h1>
-                </div>
-            </xpath>
             <xpath expr="//notebook" position="inside">
                 <page string="Questionnaire">
-                    <group>
-                        <field name="model_id" attrs="{'readonly': [('number', '!=', False), ('state', 'not in', ('draft', 'cancel'))]}"/>
-                    </group>
                     <field name="question_ids" mode="tree" widget="one2many_list" nolabel="1">
                         <tree>
                             <field name="sequence" widget="handle"/>
@@ -224,31 +175,6 @@
                         </tree>
                     </field>
                 </page>
-            </xpath>
-        </field>
-    </record>
-
-    <record id="of_questionnaire_of_planning_intervention_view_calendar" model="ir.ui.view">
-        <field name="name">of.questionnaire.of.planning.intervention.view.calendar</field>
-        <field name="model">of.planning.intervention</field>
-        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_calendar"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='name']" position="before">
-                <field name="calendar_name"/>
-            </xpath>
-            <xpath expr="//field[@name='name']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
-        </field>
-    </record>
-
-    <record id="of_questionnaire_of_planning_intervention_filter" model="ir.ui.view">
-        <field name="name">of.questionnaire.of.planning.intervention.filter</field>
-        <field name="model">of.planning.intervention</field>
-        <field name="inherit_id" ref="of_planning.of_planning_intervention_filter"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='name']" position="attributes">
-                <attribute name="filter_domain">['|', ('name','ilike',self), ('number','ilike',self)]</attribute>
             </xpath>
         </field>
     </record>

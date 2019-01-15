@@ -62,7 +62,7 @@
                     </group>
                     <newline/>
                     <group>
-                        <field name="name"/>
+                        <field name="name" filter_domain="['|', ('name','ilike',self), ('number','ilike',self)]"/>
                         <field name="date"/>
                         <field name="duree"/>
                         <field name="user_id" widget="selection"/>
@@ -111,6 +111,10 @@
                     </header>
                     <sheet>
                         <group>
+                            <div class="oe_title" name="num">
+                                <h1><field name="number" placeholder="N° d'intervention" readonly="1"/></h1>
+                                <!-- attrs="{'invisible': [('model_id', '=', False)]}" -->
+                            </div>
                             <group col="2">
                                 <field name="equipe_id" autofocus="autofocus"/>
                                 <field name="address_id" domain="[('customer','=',True)]" colspan="2"/>
@@ -119,8 +123,14 @@
                                 <field name="name" string="Libellé"/>
                             </group>
                             <group col="2">
+<<<<<<< 0a9082966d93bf1716ba49f2212b364ea0001446
                                 <field name="tache_id"/>
                                 <field name="date"/>
+=======
+                                <field name="model_id" attrs="{'readonly': [('number', '!=', False), ('state', 'not in', ('draft', 'cancel'))]}"/>
+                                <field name="tache_id" context="{'tz': 'Europe/Paris'}"/>
+                                <field name="date" context="{'tz': 'Europe/Paris'}"/>
+>>>>>>> of_planning : Ajout du modèle d'intervention + menu dans configuration
                                 <field name="jour"/>
                                 <field name="duree" string="Durée" widget="float_time"/>
                                 <field name="date_deadline"/>
@@ -238,7 +248,7 @@
             <field name="arch" type="xml">
                 <calendar string="Calendrier" date_start="date" color="equipe_id" date_stop="date_deadline" display_states="1" quick_add="0"
                     attendee_model="of.planning.equipe" color_ft_field="color_ft" color_bg_field="color_bg" custom_colors="1">
-                    <field name="name"/>
+                    <field name="calendar_name"/>
                     <field name="state" invisible="1"/>
                     <field name="state_int" invisible="1"/>
                     <field name="color_ft" invisible="1"/>
@@ -681,5 +691,64 @@
             <field name="domain">[]</field> <!-- Force empty -->
             <field name="view_type">form</field>
         </record>
+
+<!--##########################################################################################################################-->
+<!--############################################_________Modèle__________#####################################################-->
+<!--##########################################################################################################################-->
+
+    <record id="of_planning_intervention_model_view_form" model="ir.ui.view">
+        <field name="name">of.planning.intervention.model.view.form</field>
+        <field name="model">of.planning.intervention.model</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box of_width_600" name="button_box_custom" >
+                        <!-- Bouton Actif -->
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive" display="inline-block">
+                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Nom du modèle"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="tache_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Configuration">
+                            <group>
+                                <field name="sequence_id" colspan="2" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_planning_intervention_model_view_tree" model="ir.ui.view">
+        <field name="name">of.planning.intervention.model.view.tree</field>
+        <field name="model">of.planning.intervention.model</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="tache_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_planning_intervention_model" model="ir.actions.act_window">
+        <field name="name">Modèle d'intervention</field>
+        <field name="res_model">of.planning.intervention.model</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_planning.of_planning_intervention_model_view_tree"/>
+    </record>
+
+    <menuitem name="Modèle d'intervention" id="menu_of_planning_intervention_model" parent="of_planning.menu_of_planning_configuration" sequence="9" action="action_of_planning_intervention_model"/>
+
 
 </odoo>
