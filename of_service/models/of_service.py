@@ -191,7 +191,7 @@ class OFPlanningIntervention(models.Model):
 
     @api.onchange('address_id')
     def _onchange_address_id(self):
-        super(OfPlanningIntervention, self)._onchange_address_id()
+        super(OFPlanningIntervention, self)._onchange_address_id()
         if self.address_id and self.address_id.service_address_ids:
             self.service_id = self.address_id.service_address_ids[0]
 
