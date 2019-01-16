@@ -11,6 +11,7 @@ var Model = require('web.DataModel');
 var Widget = require('web.Widget');
 var formats = require("web.formats");
 var utils = require("web.utils");
+var time = require('web.time');
 var data = require("web.data");
 
 var SidebarFilter = widgets.SidebarFilter;
@@ -35,6 +36,7 @@ CalendarView.include({
         this.show_first_evt = !isNullOrUndef(attrs.show_first_evt) && _.str.toBool(attrs.show_first_evt); // true or 1 if we want to jump to the first event
         this.dispo_field = attrs.dispo_field;
         this.force_color_field = attrs.force_color_field;
+        this.selected_field = attrs.selected_field;
         this.color_ft_field = attrs.color_ft_field;
         this.color_bg_field = attrs.color_bg_field;
         if (this.custom_colors && !(attrs.color_ft_field && attrs.color_bg_field)) {
@@ -482,12 +484,134 @@ CalendarView.include({
         return res;
     },
     /**
-     *  Override of parent function. Adds custom colors to events.
-     *  debug the end of parent function
+     * Override copy of parent function. Add custom colors and suffix
+     * Transform OpenERP event object to fullcalendar event object
      */
     event_data_transform: function(evt) {
+        //console.log("event_data_transform evt:",evt);
         var self = this;
-        var r = self._super.apply(self, arguments); // inherit function event_data_transform
+        var date_start;
+        var date_stop;
+        var date_delay = evt[this.date_delay] || 1.0,
+            all_day = this.all_day ? evt[this.all_day] : false,
+            res_computed_text = '',
+            the_title = '',
+            attendees = [];
+
+        if (!all_day) {
+            date_start = time.auto_str_to_date(evt[this.date_start]);
+            date_stop = this.date_stop ? time.auto_str_to_date(evt[this.date_stop]) : null;
+        } else {
+            date_start = time.auto_str_to_date(evt[this.date_start].split(' ')[0],'start');
+            date_stop = this.date_stop ? time.auto_str_to_date(evt[this.date_stop].split(' ')[0],'start') : null;
+        }
+
+        if (this.info_fields) {
+            var temp_ret = {};
+            res_computed_text = this.how_display_event;
+            //console.log("self.fields: ",self.fields);
+            _.each(this.info_fields, function (fieldname) {
+                var value = evt[fieldname];
+                if (_.contains(["many2one"], self.fields[fieldname].type)) {
+                    if (value === false) {
+                        temp_ret[fieldname] = null;
+                    }
+                    else if (value instanceof Array) {
+                        temp_ret[fieldname] = value[1]; // no name_get to make
+                    }
+                    else if (_.contains(["date", "datetime"], self.fields[fieldname].type)) {
+                        temp_ret[fieldname] = formats.format_value(value, self.fields[fieldname]);
+                    }
+                    else {
+                        throw new Error("Incomplete data received from dataset for record " + evt.id);
+                    }
+                }
+                else if (_.contains(["one2many","many2many"], self.fields[fieldname].type)) {
+                    if (value === false) {
+                        temp_ret[fieldname] = null;
+                    }
+                    else if (value instanceof Array)  {
+                        temp_ret[fieldname] = value; // if x2many, keep all id !
+                    }
+                    else {
+                        throw new Error("Incomplete data received from dataset for record " + evt.id);
+                    }
+                }
+                else {
+                    temp_ret[fieldname] = value;
+                }
+                ///////////////////////////////////////////////////////////////////////////////////////////// this part is new
+                if (!isNullOrUndef(self.fields[fieldname].__attrs["suffix"])) {
+                    temp_ret[fieldname] = temp_ret[fieldname] + self.fields[fieldname].__attrs["suffix"];
+                }
+                ////////////////////////////////////////////////////////////////////////////////////////////////
+                //console.log("temp_ret[fieldname]: ",temp_ret[fieldname]);
+                res_computed_text = res_computed_text.replace("["+fieldname+"]",temp_ret[fieldname]);
+            });
+
+            if (res_computed_text.length) {
+                the_title = res_computed_text;
+            }
+            else {
+                var res_text= [];
+                _.each(temp_ret, function(val,key) {
+                    if( typeof(val) === 'boolean' && val === false ) { }
+                    else { res_text.push(val); }
+                });
+                the_title = res_text.join(', ');
+            }
+            the_title = _.escape(the_title);
+
+            var the_title_avatar = '';
+
+            if (! _.isUndefined(this.attendee_people)) {
+                var MAX_ATTENDEES = 3;
+                var attendee_showed = 0;
+                var attendee_other = '';
+
+                _.each(temp_ret[this.attendee_people],
+                    function (the_attendee_people) {
+                        attendees.push(the_attendee_people);
+                        attendee_showed += 1;
+                        if (attendee_showed<= MAX_ATTENDEES) {
+                            if (self.avatar_model !== null) {
+                                       the_title_avatar += '<img title="' + _.escape(self.all_attendees[the_attendee_people]) + '" class="o_attendee_head"  \
+                                                        src="/web/image/' + self.avatar_model + '/' + the_attendee_people + '/image_small"></img>';
+                            }
+                            else {
+                                if (!self.colorIsAttendee || the_attendee_people != temp_ret[self.color_field]) {
+                                        var tempColor = (self.all_filters[the_attendee_people] !== undefined) 
+                                                    ? self.all_filters[the_attendee_people].color
+                                                    : (self.all_filters[-1] ? self.all_filters[-1].color : 1);
+                                        the_title_avatar += '<i class="fa fa-user o_attendee_head o_underline_color_'+tempColor+'" title="' + _.escape(self.all_attendees[the_attendee_people]) + '" ></i>';
+                                }//else don't add myself
+                            }
+                        }
+                        else {
+                                attendee_other += _.escape(self.all_attendees[the_attendee_people]) +", ";
+                        }
+                    }
+                );
+                if (attendee_other.length>2) {
+                    the_title_avatar += '<span class="o_attendee_head" title="' + attendee_other.slice(0, -2) + '">+</span>';
+                }
+            }
+        }
+
+        if (!date_stop && date_delay) {
+            var m_start = moment(date_start).add(date_delay,'hours');
+            date_stop = m_start.toDate();
+        }
+        var r = {
+            'start': moment(date_start).toString(),
+            'end': moment(date_stop).toString(),
+            'title': the_title,
+            'attendee_avatars': the_title_avatar,
+            'allDay': (this.fields[this.date_start].type == 'date' || (this.all_day && evt[this.all_day]) || false),
+            'id': evt.id,
+            'attendees':attendees
+        };
+        ////////////////////////////////////////////////////////////////////////////////// This part is modified
         if (self.custom_colors) {
             if (evt[self.force_color_field]) {
                 r.backgroundColor = evt[self.force_color_field];
@@ -506,6 +630,10 @@ CalendarView.include({
                 throw new Error(_t("Missing fields in calendar view definition: '" + self.color_ft_field + "' and/or '" + self.color_bg_field + "'."));
             }
             r.className = ["of_custom_color"];
+            if (evt[self.selected_field]) {
+                //console.log("HAHAHA event selected: ",evt);
+                r.className.push("of_pulse");
+            }
             if (self.display_states) {
                 r.className.push("of_calendar_state_" + evt["state_int"]);
                 r.borderColor = "rgba( 0, 0, 0, 0.0)"; // border to represent state
@@ -525,6 +653,7 @@ CalendarView.include({
                 r.className = 'o_calendar_color_'+ (self.all_filters[-1] ? self.all_filters[-1].color : 1);
             }
         };
+        ////////////////////////////////////////////////////////////////////////////////////////////
         return r;
     },
 });

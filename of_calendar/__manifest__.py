@@ -44,6 +44,7 @@ Leur balise calendar devra contenir l'attribut display_states="1".
         "calendar",
         "web_calendar",
         "of_web_widgets",
+        "of_utils",
     ],
     "data": [
         "data/ir_config_parameter_data.xml",
