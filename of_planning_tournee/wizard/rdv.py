@@ -101,7 +101,7 @@ class OfTourneeRdv(models.TransientModel):
         return False
 
     name = fields.Char(string=u'Libellé', size=64, required=False)
-    description = fields.Text(string='Description')
+    description = fields.Html(string='Description')
     tache_id = fields.Many2one('of.planning.tache', string='Prestation', required=True)
     equipe_id = fields.Many2one('of.planning.equipe', string=u"Équipe")
     equipe_id_pre = fields.Many2one('of.planning.equipe', string=u'Équipe', domain="[('tache_ids','in',tache_id)]")
@@ -114,6 +114,12 @@ class OfTourneeRdv(models.TransientModel):
     partner_id = fields.Many2one('res.partner', string='Client', required=True, readonly=True, default=_default_partner)
     partner_address_id = fields.Many2one('res.partner', string="Adresse d'intervention", required=True, default=_default_address,
                                          domain="['|', ('id', '=', partner_id), ('parent_id', '=', partner_id)]")
+    partner_address_street = fields.Char(related="partner_address_id.street", readonly=True)
+    partner_address_street2 = fields.Char(related="partner_address_id.street2", readonly=True)
+    partner_address_city = fields.Char(related="partner_address_id.city", readonly=True)
+    partner_address_state_id = fields.Many2one(related="partner_address_id.state_id", readonly=True)
+    partner_address_zip = fields.Char(related="partner_address_id.zip", readonly=True)
+    partner_address_country_id = fields.Many2one(related="partner_address_id.country_id", readonly=True)
     date_display = fields.Char(string='Jour du RDV', size=64, readonly=True)
     service_id = fields.Many2one('of.service', string='Service client', default=_default_service,
                                  domain="[('partner_id', '=', partner_id)]")
@@ -136,9 +142,9 @@ class OfTourneeRdv(models.TransientModel):
     partner_name = fields.Char(related='partner_id.name')
     ignorer_geo = fields.Boolean("Ignorer données géographiques")
 
-    @api.onchange('mode_result')
+    """@api.onchange('mode_result')
     def _onchange_mode_result(self):
-        u"""Sélectionne le résultat en fonction du mode de résultat (au plus proche ou au plus tôt)"""
+        u" ""Sélectionne le résultat en fonction du mode de résultat (au plus proche ou au plus tôt)" ""
         self.ensure_one()
         if not (self.planning_ids and self.display_search):
             return
@@ -185,6 +191,7 @@ class OfTourneeRdv(models.TransientModel):
             self.res_line_id.selected = False
             self.update(vals)
             self.res_line_id.selected = True
+            self.res_line_id.selected_hour = self.res_line_id.date_flo"""
 
     @api.onchange('mode_recherche')
     def _onchange_mode_recherche(self):
@@ -542,7 +549,7 @@ class OfTourneeRdv(models.TransientModel):
                 'date_propos'     : dt_propos, # datetime utc
                 'date_propos_hour': first_res.date_flo,
                 'res_line_id'     : first_res.id,
-                'display_search'  : False,
+                #'display_search'  : False,
                 'display_res'     : True,
                 'zero_result'     : False,
                 'zero_dispo'      : False,
@@ -554,14 +561,14 @@ class OfTourneeRdv(models.TransientModel):
                 vals['date_next'] = "%s-%02i-01" % (d_first_res.year + 1, d_first_res.month)
 
             if nb_dispo == 0:
-                vals['display_search'] = True
-                vals['display_res'] = False
+                #vals['display_search'] = True
+                vals['display_res'] = True
                 vals['zero_dispo'] = True
 
         else:
             vals = {
-                'display_search': True,
-                'display_res' : False,
+                #'display_search': True,
+                'display_res' : True,
                 'zero_result': True,
                 'zero_dispo': False,
             }
@@ -569,6 +576,7 @@ class OfTourneeRdv(models.TransientModel):
         self.write(vals)
         if self.res_line_id:
             self.res_line_id.selected = True
+            self.res_line_id.selected_hour = self.res_line_id.date_flo
 
     @api.multi
     def _get_service_data(self, mois):
@@ -747,7 +755,7 @@ class OfTourneeRdvLine(models.TransientModel):
                                     vals_prec[u"name"] = "TROP LOINS"
                                     vals_prec[u"disponible"] = False
                                 # trajet aller-retour plus long que la durée de l'intervention
-                                elif creneaux[i-1].disponible and vals[u"duree"] > creneaux[i].wizard_id.duree:
+                                elif creneaux[i-1].disponible and vals[u"duree"] > creneaux[i].wizard_id.duree * 60:
                                     vals[u"force_color"] = "#AA0000"
                                     vals[u"name"] = "TROP COURT"
                                     vals[u"disponible"] = False
@@ -770,7 +778,7 @@ class OfTourneeRdvLine(models.TransientModel):
                                 vals[u"name"] = "TROP LOINS"
                                 vals[u"disponible"] = False
                             # trajet aller-retour plus long que la durée de l'intervention
-                            elif creneaux[i].disponible and vals[u"duree"] > creneaux[i].wizard_id.duree:
+                            elif creneaux[i].disponible and vals[u"duree"] > creneaux[i].wizard_id.duree * 60:
                                 vals[u"force_color"] = "#AA0000"
                                 vals[u"name"] = "TROP COURT"
                                 vals[u"disponible"] = False
@@ -801,15 +809,15 @@ class OfTourneeRdvLine(models.TransientModel):
     fin_dt = fields.Datetime(string="Fin")
     date_flo = fields.Float(string='Date', required=True, digits=(12, 5))
     date_flo_deadline = fields.Float(string='Date', required=True, digits=(12, 5))
-    description = fields.Char(string='RDV', size=128)
+    description = fields.Char(string='Créneau', size=128)
     wizard_id = fields.Many2one('of.tournee.rdv', string="RDV", required=True, ondelete='cascade')
     equipe_id = fields.Many2one('of.planning.equipe', string='Equipe')
     intervention_id = fields.Many2one('of.planning.intervention', string="Planning")
     name = fields.Char(string="name", default="DISPONIBLE")
-    distance = fields.Float(string='Dist.tot. (km)',help="distance prec + distance suiv")
+    distance = fields.Float(string='Dist.tot. (km)', digits=(12, 2), help="distance prec + distance suiv")
     dist_prec = fields.Float(string='Dist.Prec. (km)')
     dist_suiv = fields.Float(string='Dist.Suiv. (km)')
-    duree = fields.Float(string=u'Durée.tot. (min)',help="durée prec + durée suiv")
+    duree = fields.Float(string=u'Durée.tot. (min)', digits=(12, 2),help="durée prec + durée suiv")
     duree_prec = fields.Float(string=u'Durée.Prec. (min)')
     duree_suiv = fields.Float(string=u'Durée.Suiv. (min)')
     color_ft = fields.Char(related="equipe_id.color_ft", readonly=True)
@@ -818,6 +826,8 @@ class OfTourneeRdvLine(models.TransientModel):
     force_color = fields.Char("Couleur")
     allday = fields.Boolean('All Day', default=False)
     selected = fields.Boolean(u'Créneau sélectionné', default=False)
+    selected_hour = fields.Float(string='Heure du RDV', digits=(2, 2))
+    selected_description = fields.Html(string="Description", related="wizard_id.description")
 
     geo_lat = fields.Float(string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo", readonly=True)
     geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_geo", readonly=True)
@@ -874,6 +884,19 @@ class OfTourneeRdvLine(models.TransientModel):
         return (v0, v1, v2, v3)
 
     @api.multi
+    def button_confirm(self):
+        """Sélectionne ce créneau en temps que résultat. Appelé depuis la vue form du créneau"""
+        self.ensure_one()
+        if not self._context.get('tz'):
+            self = self.with_context(tz='Europe/Paris')
+        tz = pytz.timezone(self._context['tz'])
+        d = fields.Date.from_string(self.date)
+        dt_propos = datetime.combine(d, datetime.min.time()) + timedelta(hours=self.selected_hour) # datetime local
+        dt_propos = tz.localize(dt_propos, is_dst=None).astimezone(pytz.utc) # datetime utc
+        self.wizard_id.date_propos = dt_propos
+        return self.wizard_id.button_confirm()
+
+    @api.multi
     def button_select(self):
         """Sélectionne ce créneau en temps que résultat. Appelé depuis la vue form du créneau"""
         self.ensure_one()
@@ -881,6 +904,7 @@ class OfTourneeRdvLine(models.TransientModel):
         selected_line = rdv_line_obj.search([("selected","=",True)])
         selected_line.selected = False
         self.selected = True
+        self.selected_hour = self.date_flo
 
         address = self.wizard_id.partner_address_id
         name = address.name or (address.parent_id and address.parent_id.name) or ''
