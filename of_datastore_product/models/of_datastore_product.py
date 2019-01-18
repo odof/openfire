@@ -1041,7 +1041,7 @@ class OfDatastoreCentralized(models.AbstractModel):
         orig_ids = self.search([('brand_id', 'in', brands._ids), ('of_datastore_res_id', '!=', False)]).mapped('of_datastore_res_id')
 
         # Mise a jour des paramètres de recherche
-        new_args = [('brand_id', 'in', brands.mapped('datastore_brand_id')), ('id', 'not in', orig_ids)] + args
+        new_args = [('brand_id', 'in', brands.mapped('datastore_brand_id')), ('id', 'not in', orig_ids)] + list(args or [])
 
         ds_product_obj = supplier.of_datastore_get_model(client, self._name)
         res2 = supplier.of_datastore_name_search(ds_product_obj, name, new_args, operator, limit-len(res))
@@ -1085,7 +1085,7 @@ class ProductTemplate(models.Model):
         name, brands = self.of_name_search_extract_brands(name)
         new_args = args
         if brands:
-            new_args = [('brand_id', 'in', brands._ids)] + args
+            new_args = [('brand_id', 'in', brands._ids)] + list(args or [])
         res = super(ProductTemplate, self).name_search(name, new_args, operator, limit)
         res = self._of_datastore_name_search(res, brands, name, args, operator, limit)
 
@@ -1122,9 +1122,16 @@ class ProductProduct(models.Model):
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
         name, brands = self.env['product.template'].of_name_search_extract_brands(name)
+        if args and len(args) == 1 and args[0][0] == 'brand_id' and args[0][1] == '=':
+            if args[0][2] and not brands:
+                if isinstance(args[0][2], basestring):
+                    brands = self.env['of.product.brand'].search(['|', ('name', '=', args[0][2]), ('code', '=', args[0][2])])
+                else:
+                    brands = self.env['of.product.brand'].browse(args[0][2])
+            args = []
         new_args = args
         if brands:
-            new_args = [('brand_id', 'in', brands._ids)] + args
+            new_args = [('brand_id', 'in', brands._ids)] + list(args or [])
         res = super(ProductProduct, self).name_search(name, new_args, operator, limit)
         return self._of_datastore_name_search(res, brands, name, args, operator, limit)
 
@@ -1275,6 +1282,24 @@ class SaleOrderLine(models.Model):
     _name = 'sale.order.line'
     _inherit = ['sale.order.line', 'of.datastore.product.reference']
 
+    of_brand_id = fields.Many2one(
+        'of.product.brand', string="Filtre de marque",
+        help=u"Ce champ permet de restreindre les articles proposés à une seule marque.\n"
+             u"Renseigner ce champ permet aussi la recherche dans le tarif centralisé.\n"
+             u"Utilisation équivalente au code m:XXX dans la recherche d'article, où XXX est le code de la marque")
+
+    @api.multi
+    @api.onchange('product_id')
+    def product_id_change(self):
+        if self.product_id and self.of_brand_id and self.product_id.brand_id != self.of_brand_id:
+            self.of_brand_id = False
+        return super(SaleOrderLine, self).product_id_change()
+
+    @api.multi
+    @api.onchange('of_brand_id')
+    def _onchange_of_brand_id(self):
+        if self.product_id and self.of_brand_id and self.product_id.brand_id != self.of_brand_id:
+            self.product_id = False
 
 class SaleOrderLineComp(models.Model):
     _name = 'of.saleorder.kit.line'

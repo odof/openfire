@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
+<odoo>
 
     <!-- Import des fichiers javascripts/css -->
     <template id="assets_backend" name="of_web_widgets assets" inherit_id="web.assets_backend">
@@ -189,6 +189,21 @@
         </field>
     </record>
 
+    <!-- Vue formulaire devis/commande : champ filtre sur la marque -->
+    <record id="of_datastore_sale_view_order_form" model="ir.ui.view">
+        <field name="name">of.datastore.sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="before">
+                <field name="of_brand_id" options="{'no_create_edit':True}"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="attributes">
+                <attribute name="domain">[('brand_id', '=', of_brand_id)]</attribute>
+            </xpath>
+        </field>
+    </record>
+
     <menuitem name="C.P.Connector" id="menu_of_datastore_supplier" parent="base.menu_administration" sequence="1" action="of_datastore_supplier_action"/>
 
-</openerp>
+</odoo>
