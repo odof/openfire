@@ -33,7 +33,7 @@ class AccountInvoiceReport(models.Model):
 
     def _group_by(self):
         res = super(AccountInvoiceReport, self)._group_by()
-        res += ", of_brand_id"
+        res += ", pt.brand_id"
         return res
 
     @api.model

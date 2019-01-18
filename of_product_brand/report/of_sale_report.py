@@ -28,7 +28,7 @@ class SaleReport(models.Model):
 
     def _group_by(self):
         res = super(SaleReport, self)._group_by()
-        res += ", of_brand_id"
+        res += ", t.brand_id"
         return res
 
     @api.model
