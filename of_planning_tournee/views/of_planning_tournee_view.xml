@@ -139,10 +139,11 @@
                     <field name="address_retour_id"/>
                     <field name="is_complet"/>
                     <field name="is_bloque"/>
-                    <!--field name="docs_name"/-->
-                    <field name="is_confirme"/>
-                    <field name="intervention_ids"/>
+                    <!--field name="docs_name"/
                     <button name="%(action_of_planning_tournee_interventions_map)d" type="action" string="Voir la Carte" />
+                    <field name="intervention_ids"/>
+                    -->
+                    <field name="is_confirme"/>
                     <button name="open_planification" type="object" string="Planifier" attrs="{'invisible': [('is_complet', '=', True)]}"/>
                 </tree>
             </field>

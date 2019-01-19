@@ -104,7 +104,7 @@ class OfTourneeRdv(models.TransientModel):
     description = fields.Html(string='Description')
     tache_id = fields.Many2one('of.planning.tache', string='Prestation', required=True)
     equipe_id = fields.Many2one('of.planning.equipe', string=u"Équipe")
-    equipe_id_pre = fields.Many2one('of.planning.equipe', string=u'Équipe', domain="[('tache_ids','in',tache_id)]")
+    pre_equipe_ids = fields.Many2many('of.planning.equipe', string=u'Équipes', domain="[('tache_ids','in',tache_id)]")
     duree = fields.Float(string=u'Durée', required=True, digits=(12, 5))
     planning_ids = fields.One2many('of.tournee.rdv.line', 'wizard_id', string='Proposition de RDVs')
     date_propos = fields.Datetime(string=u'RDV Début')
@@ -140,6 +140,7 @@ class OfTourneeRdv(models.TransientModel):
     geo_lng = fields.Float(related='partner_address_id.geo_lng', readonly=True)
     precision = fields.Selection(related='partner_address_id.precision', readonly=True)
     partner_name = fields.Char(related='partner_id.name')
+    geocode_retry = fields.Boolean("Geocodage retenté")
     ignorer_geo = fields.Boolean("Ignorer données géographiques")
 
     """@api.onchange('mode_result')
@@ -235,15 +236,16 @@ class OfTourneeRdv(models.TransientModel):
                                                ('tache_id', '=', self.tache_id.id)], limit=1)
                 if service:
                     vals["service_id"] = service
-                    update = True
 
             if self.tache_id.duree:
                 vals["duree"] = self.tache_id.duree
-                update = True
 
-            if self.equipe_id_pre not in self.tache_id.equipe_ids:
-                vals["equipe_id_pre"] = False
-                update = True
+            equipes = []
+            for equipe in self.pre_equipe_ids:
+                if equipe in self.tache_id.equipe_ids:
+                    equipes.push(equipe.id)
+            vals["pre_equipe_ids"] = equipes
+            update = True
 
         if not service:
             vals["service_id"] = False
@@ -276,6 +278,19 @@ class OfTourneeRdv(models.TransientModel):
             if planning.equipe_id.id not in equipe_ids:
                 equipe_ids.append(planning.equipe_id.id)
         return equipe_ids
+
+    @api.multi
+    def button_geocode(self):
+        self.ensure_one()
+        if self.geocode_retry:
+            raise UserError("Votre géocodeur par défaut n'a pas réussi a géocoder cette adresse")
+        address_id = self.partner_address_id
+        geo_wizard_obj = self.env['of.geo.wizard']
+        geo_wizard_obj.geo_code(False,address_id)
+        self.geocode_retry = True
+        if self.geo_lat != 0 or self.geo_lng !=0:
+            self.ignorer_geo = False
+        return {'type': 'ir.actions.do_nothing'}
 
     """
     a voir si réimplémenter cette fonctionnalité
@@ -339,13 +354,15 @@ class OfTourneeRdv(models.TransientModel):
             planning_del_ids.unlink()
 
         # Récupération des équipes
+        equipes = self.env['of.planning.equipe']
         if not self.tache_id.equipe_ids:
             raise UserError(u"Aucune équipe ne peut réaliser cette tâche.")
-        if self.equipe_id_pre:
-            if self.equipe_id_pre in self.tache_id.equipe_ids:
-                equipes = self.equipe_id_pre
-            else:
-                raise UserError(u"Cette équipe n'a pas la compétence pour réaliser cette prestation.")
+        if self.pre_equipe_ids:
+            for equipe in self.pre_equipe_ids:
+                if equipe in self.tache_id.equipe_ids:
+                    equipes |= equipe
+            if len(equipes) == 0:
+                raise UserError(u"Aucune des équipes sélectionnées n'a la compétence pour réaliser cette prestation.")
         else:
             equipes = self.tache_id.equipe_ids
 
@@ -695,7 +712,7 @@ class OfTourneeRdvLine(models.TransientModel):
                     arrivee = creneaux[0].equipe_id.address_retour_id or creneaux[0].equipe_id.address_id or creneaux[0].equipe_id.employee_ids[0].address_id
                 str_coords = u""
                 coords = []
-                #TODO: utiliser le serveur OSRM OpenFire
+
                 query = ROUTING_BASE_URL + u"route/" + ROUTING_VERSION + u"/" + ROUTING_PROFILE + u"/"
                 ### listess de coordonnées: ATTENTION OSRM prend ses coordonnées sous form (lng,lat)
                 # point de départ

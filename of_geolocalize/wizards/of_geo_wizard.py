@@ -236,6 +236,42 @@ class OFGeoWizard(models.TransientModel):
         return SequenceMatcher(None, a, b).ratio()
 
     # GEOCODERS
+    def geo_code(self, geocodeur, partner):
+        if not partner:
+            return False
+        if not geocodeur:
+            geocoder_by_default = self.env['ir.config_parameter'].get_param('geocoder_by_default')
+
+            if int(geocoder_by_default) == 0: # Openfire
+                geocodeur = "nominatim_openfire"
+            elif int(geocoder_by_default) == 1: # OpenStreetMap
+                geocodeur = "nominatim_osm"
+            elif int(geocoder_by_default) == 2: # BANO
+                geocodeur = "bano"
+            elif int(geocoder_by_default) == 3: # Google maps
+                geocodeur = "google_maps"
+
+        geo_wizard_obj = self.env['of.geo.wizard']
+        if geocodeur == "nominatim_openfire": # Openfire
+            results = self.geo_openfire(partner)
+        elif geocodeur == "nominatim_osm": # OpenStreetMap
+            results = self.geo_osrm(partner)
+        elif geocodeur == "bano": # BANO
+            results = self.geo_ban(partner)
+        elif geocodeur == "google_maps": # Google maps
+            results = self.geo_google(partner)
+
+        partner.write({
+            'geocoding': results[0],
+            'geocodeur': results[1],
+            'geo_lat': results[2],
+            'geo_lng': results[3],
+            'precision': results[4],
+            'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
+            'geocoding_response': json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
+        })
+        return True
+
     # Geocoding with OPENFIRE
     def geo_openfire(self, partner):
         # Variables
