@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ######################################################################################################################### -->
+    <!-- #############################                ACCOUNT                  ################################################### -->
+    <!-- ######################################################################################################################### -->
+
+    <record id="of_sms_account_view_form" model="ir.ui.view">
+        <field name="name">of.sms.account.view.form</field>
+        <field name="model">of.sms.account</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="account_gateway_id" widget="selection"/>
+                    <field name="gateway_model" invisible="1"/>
+                </group>
+                <h2 id="gatewayhook">Gateway Settings</h2>
+                <group>
+                    <field name="account_name"/>
+                    <field name="account_login"/>
+                    <field name="account_password"/>
+                    <field name="number_ids"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_sms_account_view_tree" model="ir.ui.view">
+        <field name="name">of.sms.account.view.tree</field>
+        <field name="model">of.sms.account</field>
+        <field name="arch" type="xml">     
+            <tree>
+                <field name="name"/>
+                <field name="account_gateway_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!--record id="sms_account_view_form_inherit_sms_frame_twilio" model="ir.ui.view">
+        <field name="name">sms.account.view.form</field>
+        <field name="model">sms.account</field>
+        <field name="inherit_id" ref="sms_frame.sms_account_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//h2[@id='gatewayhook']" position="after">
+                <div attrs="{'invisible': [('gateway_model', '!=', 'sms.gateway.twilio')]}">
+                    <group>
+                        <field name="twilio_account_sid"/>
+                        <field name="twilio_auth_token"/>
+                        <field name="twilio_last_check_date"/>
+                        <button name="twilio_quick_setup" type="object" string="Quick Setup" help="Points Twilio to your odoo server"/>
+                    </group>
+                </div>
+            </xpath>
+        </field>
+    </record-->
+
+    <!-- ######################################################################################################################### -->
+    <!-- #############################                NUMBER                   ################################################### -->
+    <!-- ######################################################################################################################### -->
+
+    <record id="of_sms_number_view_fornm" model="ir.ui.view">
+        <field name="name">(OF) esms stored_numbers form view</field>
+        <field name="model">of.sms.number</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="mobile_number"/>
+                    <field name="account_id"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_sms_number_view_tree" model="ir.ui.view">
+        <field name="name">(OF) esms stored_number tree view</field>
+        <field name="model">of.sms.number</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="mobile_number"/>
+                <field name="account_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ######################################################################################################################### -->
+    <!-- #############################                CONFIG                   ################################################### -->
+    <!-- ######################################################################################################################### -->
+
+    <!-- View config -->
+    <record id="of_sms_menu_config_view" model="ir.ui.view">
+        <field name="name">Paramétrage SMS</field>
+        <field name="model">of.sms.config.settings</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Paramétrage SMS">
+                <header>
+                    <button string="Appliquer" type="object" name="execute" class="oe_highlight" confirm="Êtes-vous sûr de valider les modifications?"/>
+                    <button string="Annuler" type="object" name="cancel" class="oe_link" special="cancel"/>
+                </header>
+                <group string="Alertes SMS - Interventions" name="alertes_sms">
+                    <label for="alerte_interventions_equipes_veille"/>
+                    <div name="alerte_interventions_equipes_veille">
+                        <field name="alerte_interventions_equipes_veille" class="oe_inline"/>
+                        <span>Envoyer des alertes SMS aux équipes d'interventions contenant un récapitulatif des interventions du lendemain</span>
+                    </div>
+                    <label for="alerte_interventions_clients_veille"/>
+                    <div name="alerte_interventions_clients_veille">
+                        <field name="alerte_interventions_clients_veille" class="oe_inline"/>
+                        <span>Envoyer des alertes SMS aux clients d'interventions contenant un récapitulatif de l'intervention du lendemain</span>
+                    </div>
+                </group>
+                
+            </form>
+        </field>
+    </record>
+
+    <!-- ######################################################################################################################### -->
+    <!-- #############################             ACTIONS & MENUS             ################################################### -->
+    <!-- ######################################################################################################################### -->
+
+    <record id="of_sms_account_action" model="ir.actions.act_window">
+        <field name="name">(OF) SMS Gateway Account</field>
+        <field name="res_model">of.sms.account</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Add SMS Gateway Accounts</p>
+        </field>
+    </record>
+
+    <record id="of_sms_number_action" model="ir.actions.act_window">
+        <field name="name">(OF) SMS stored number</field>
+        <field name="res_model">of.sms.number</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p>List of stored mobile numbers.</p>
+        </field>
+    </record>
+
+    <record id="of_sms_config_action" model="ir.actions.act_window">
+        <field name="name">Paramétrage SMS</field>
+        <field name="res_model">of.sms.config.settings</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="view_id" ref="of_sms_menu_config_view"/>
+        <field name="help">Paramétrage SMS</field>
+    </record>
+
+    <menuitem id="of_sms_parent_menu" parent="base.menu_custom" name="(OF) SMS" sequence="1"/>
+    <menuitem id="of_sms_account_menu" name="Accounts" parent="of_sms_parent_menu" action="of_sms_account_action" sequence="10"/>
+    <menuitem id="of_sms_number_menu" name="Mobile Numbers" parent="of_sms_parent_menu" action="of_sms_number_action" sequence="20"/>
+    <menuitem id="of_sms_config_menu" action="of_sms_config_action" name="Configuration" parent="of_sms_parent_menu" sequence="80"/>
+
+</odoo>

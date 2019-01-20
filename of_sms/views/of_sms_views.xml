@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sms_account_view_form_inherit_sms_frame_ovh" model="ir.ui.view">
+        <field name="name">sms.account.view.form</field>
+        <field name="model">sms.account</field>
+        <field name="inherit_id" ref="sms_frame.sms_account_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//h2[@id='gatewayhook']" position="after">
+                <div attrs="{'invisible': [('gateway_model', '!=', 'of.sms.gateway.ovh')]}">
+                    <group>
+                        <field name="ovh_account_name"/>
+                        <field name="ovh_login"/>
+                        <field name="ovh_password" password="True"/>
+                    </group>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+
+
+</odoo>
