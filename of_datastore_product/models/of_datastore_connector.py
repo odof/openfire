@@ -3,6 +3,7 @@ import logging
 import threading
 
 from odoo import models, fields, api, _
+import xmlrpclib
 
 _logger = logging.getLogger(__name__)
 
@@ -99,6 +100,8 @@ class OfDatastoreConnector(models.AbstractModel):
 
                     # Opération pour vérifier la connexion
                     self.result = cli.get_model('res.users').search([]) and cli or ''
+                except xmlrpclib.Fault, exc:
+                    self.result = exc.faultCode
                 except Exception, exc:
                     self.result = _(str(exc))
         self.ensure_one()
