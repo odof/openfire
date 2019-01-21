@@ -610,7 +610,7 @@
 
     <menuitem id="menu_of_planning" name="Interventions" groups="of_group_planning_intervention_user" sequence="2" web_icon="of_planning,static/description/icon.png"/>
 
-        <menuitem id="menu_of_planning_configuration" name="Configuration" parent="of_planning.menu_of_planning" groups="hr.group_hr_manager" sequence="20"/>
+        <menuitem id="menu_of_planning_configuration" name="Configuration" parent="of_planning.menu_of_planning" groups="hr.group_hr_manager" sequence="100"/>
             <menuitem name="Employés" id="menu_hr_employee_tree" parent="menu_of_planning_configuration" sequence="1" action="action_hr_employee_tree"/>
             <menuitem name="Équipes" id="menu_of_planning_equipe_tree" parent="menu_of_planning_configuration" sequence="2" action="action_of_planning_equipe_tree"/>
             <menuitem name="Erreurs" id="menu_of_planning_intervention_raison_tree" parent="menu_of_planning_configuration" sequence="3" action="action_of_planning_intervention_raison_tree"/>
@@ -625,6 +625,13 @@
             <menuitem id="menu_of_planning_intervention_po" name="Poêle" parent="menu_of_planning_intervention" sequence="4" action="action_of_planning_intervention_po_calendar"/>
             <menuitem id="menu_of_planning_intervention_ch" name="Cheminée" parent="menu_of_planning_intervention" sequence="4" action="action_of_planning_intervention_ch_calendar"/>
             <menuitem id="menu_of_planning_entretien" name="Ramonage Entretien SAV" parent="menu_of_planning_intervention" sequence="5" action="action_of_planning_entretien_calendar"/-->
+
+        <menuitem id="menu_of_planning_clients" name="Clients" parent="of_planning.menu_of_planning" sequence="20"/>
+            <menuitem id="menu_of_planning_clients_clients" name="Clients" parent="of_planning.menu_of_planning_clients" action="base.action_partner_form" sequence="10"/>
+
+        <menuitem id="menu_of_planning_vente" name="Articles" parent="of_planning.menu_of_planning" sequence="30"/>
+            <menuitem id="menu_of_planning_vente_articles" name="Articles" parent="of_planning.menu_of_planning_vente" action="product.product_template_action" sequence="10"/>
+            <menuitem id="menu_of_planning_vente_kits" name="Kits" parent="of_planning.menu_of_planning_vente" action="of_kit.of_template_open_kit" sequence="20"/>
 
     <!-- Ajouter menu Envoyer un courrier dans Planning Intervention -->
         <!--act_window

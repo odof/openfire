@@ -14,7 +14,6 @@ class OfQuestionnaireLine(models.Model):
     _name = "of.questionnaire.line"
     _order = "sequence"
 
-
     name = fields.Char(string="Question", required=True)
     sequence = fields.Integer(string=u"Séquence")
     type = fields.Selection([('intervention', "Question d'intervention"),
@@ -37,8 +36,9 @@ class OfPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
     question_ids = fields.One2many('of.planning.intervention.question', 'intervention_id', string="Questions")
+    equipement_id = fields.Many2one('of.parc.installe', string=u"Équipement")
 
-    @api.onchange('model_id')
+    @api.onchange('model_id', 'equipement_id')
     def onchange_questionnaire(self):
         new_ids = []
         for question in self.model_id.question_ids:
@@ -48,6 +48,17 @@ class OfPlanningIntervention(models.Model):
                     'possible_answer': question.answer,
                     'category_id': question.category_id.id,
                     'intervention_id': self.id,
+                    'type': question.type,
+                }
+            new_ids.append((0, 0, vals))
+        for question in self.equipement_id.question_ids:
+            vals = {'name': question.name,
+                    'sequence': question.sequence,
+                    'answer_type': question.answer_type,
+                    'possible_answer': question.answer,
+                    'category_id': question.category_id.id,
+                    'intervention_id': self.id,
+                    'type': question.type,
                 }
             new_ids.append((0, 0, vals))
         self.question_ids = new_ids
@@ -70,4 +81,12 @@ class OfPlanningInterventionQuestion(models.Model):
     possible_answer = fields.Text(string=u"Réponses possibles")
     category_id = fields.Many2one('of.questionnaire.line.category', string=u"Catégorie")
     definitive_answer = fields.Text(string=u"Réponse")
+    type = fields.Selection([('intervention', "Question d'intervention"),
+                             ('product', u"Question d'équipement")], required=True, string="Type de question")
     intervention_id = fields.Many2one('of.planning.intervention', string="Intervention")
+
+class OfParcInstalle(models.Model):
+    _inherit = "of.parc.installe"
+
+    questionnaire_id = fields.Many2one('of.questionnaire', string="Questionnaire")
+    question_ids = fields.Many2many('of.questionnaire.line', related="questionnaire_id.line_ids", string="Questions", readonly=True)
