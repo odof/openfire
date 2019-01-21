@@ -1,5 +1,20 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+<!-- *************************** Questionnaires ***************************-->
+
+    <record id="of_questionnaire_filter" model="ir.ui.view">
+        <field name="name">of.questionnaire.filter</field>
+        <field name="model">of.questionnaire</field>
+        <field name="arch" type="xml">
+            <search string="Recherche">
+                <group>
+                    <filter string="Intervention" name="type_intervention" domain="[('type','=','intervention')]"/>
+                    <filter string="Équipement" name="type_product" domain="[('type','=','product')]"/>
+                </group>
+            </search>
+        </field>
+    </record>
 
     <record id="of_questionnaire_view_form" model="ir.ui.view">
         <field name="name">of.questionnaire.view.form</field>
@@ -12,7 +27,7 @@
                     </div>
                     <group>
                         <group>
-                            <field name="type"/>
+                            <field name="type" readonly="context.get('lock_type')"/>
                         </group>
                     </group>
                     <notebook>
@@ -54,6 +69,21 @@
         <field name="view_id" ref="of_questionnaire.of_questionnaire_view_tree"/>
     </record>
 
+<!-- *************************** Questions ***************************-->
+
+        <record id="of_questionnaire_line_filter" model="ir.ui.view">
+        <field name="name">of.questionnaire.line.filter</field>
+        <field name="model">of.questionnaire.line</field>
+        <field name="arch" type="xml">
+            <search string="Recherche">
+                <group>
+                    <filter string="Intervention" name="type_intervention" domain="[('type','=','intervention')]"/>
+                    <filter string="Équipement" name="type_product" domain="[('type','=','product')]"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
     <record id="of_questionnaire_line_view_form" model="ir.ui.view">
         <field name="name">of.questionnaire.line.view.form</field>
         <field name="model">of.questionnaire.line</field>
@@ -84,6 +114,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name"/>
+                <field name="type"/>
                 <field name="answer_type"/>
                 <field name="answer"/>
             </tree>
@@ -97,6 +128,8 @@
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="of_questionnaire.of_questionnaire_line_view_tree"/>
     </record>
+
+<!-- *************************** Catégorie de question ***************************-->
 
     <record id="of_questionnaire_line_category_view_form" model="ir.ui.view">
         <field name="name">of.questionnaire.line.category.view.form</field>
@@ -136,6 +169,15 @@
         <field name="view_id" ref="of_questionnaire.of_questionnaire_line_category_view_tree"/>
     </record>
 
+<!-- *************************** Menus ***************************-->
+
+    <menuitem name="Config. Questionnaires" id="menu_of_questionnaire_config" parent="of_planning.menu_of_planning_configuration" sequence="10"/>
+    <menuitem name="Questionnaires" id="menu_of_questionnaire" parent="of_questionnaire.menu_of_questionnaire_config" sequence="0" action="action_of_questionnaire"/>
+    <menuitem name="Questions" id="menu_of_questionnaire_line" parent="of_questionnaire.menu_of_questionnaire_config" sequence="1" action="action_of_questionnaire_line"/>
+    <menuitem name="Catégorie de question" id="menu_of_questionnaire_line_category" parent="of_questionnaire.menu_of_questionnaire_config" sequence="2" action="action_of_questionnaire_line_category"/>
+
+<!-- *************************** Modèle d'intervention ***************************-->
+
     <record id="of_questionnaire_of_planning_intervention_model_view_form" model="ir.ui.view">
         <field name="name">of.questionnaire.of.planning.intervention.model.view.form</field>
         <field name="model">of.planning.intervention.model</field>
@@ -144,7 +186,7 @@
         <xpath expr="//notebook" position="inside">
             <page string="Questionnaire">
                 <group>
-                    <field name="questionnaire_id"/>
+                    <field name="questionnaire_id" domain="[('type', '=', 'intervention')])" context="{'default_type': 'product', 'lock_type': True}"/>
                 </group>
                 <field name="question_ids" nolabel="1"/>
             </page>
@@ -152,10 +194,7 @@
         </field>
     </record>
 
-    <menuitem name="Config. Questionnaires" id="menu_of_questionnaire_config" parent="of_planning.menu_of_planning_configuration" sequence="10"/>
-    <menuitem name="Questionnaires" id="menu_of_questionnaire" parent="of_questionnaire.menu_of_questionnaire_config" sequence="0" action="action_of_questionnaire"/>
-    <menuitem name="Questions" id="menu_of_questionnaire_line" parent="of_questionnaire.menu_of_questionnaire_config" sequence="1" action="action_of_questionnaire_line"/>
-    <menuitem name="Catégorie de question" id="menu_of_questionnaire_line_category" parent="of_questionnaire.menu_of_questionnaire_config" sequence="2" action="action_of_questionnaire_line_category"/>
+<!-- *************************** Interventions ***************************-->
 
     <record id="of_questionnaire_of_planning_intervention_view_form" model="ir.ui.view">
         <field name="name">of.questionnaire.of.planning.intervention.view.form</field>
@@ -164,10 +203,14 @@
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
                 <page string="Questionnaire">
-                    <field name="question_ids" mode="tree" widget="one2many_list" nolabel="1">
+                    <group>
+                        <field name="equipement_id" domain="[('client_id', '=', address_id)]"/>
+                    </group>
+                    <field name="question_ids" mode="tree" nolabel="1">
                         <tree>
                             <field name="sequence" widget="handle"/>
                             <field name="category_id" invisible="1"/>
+                            <field name="type" readonly="1"/>
                             <field name="name"/>
                             <field name="answer_type"/>
                             <field name="possible_answer"/>
@@ -175,6 +218,24 @@
                         </tree>
                     </field>
                 </page>
+            </xpath>
+        </field>
+    </record>
+
+<!-- *************************** Parc installé ***************************-->
+
+    <record id="of_questionnaire_of_parc_installe_form_view" model="ir.ui.view">
+        <field name="name">of.questionnaire.of.parc.installe.form.view</field>
+        <field name="model">of.parc.installe</field>
+        <field name="inherit_id" ref="of_parc_installe.of_parc_installe_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+            <page string="Questionnaire">
+                <group>
+                    <field name="questionnaire_id" domain="[('type', '=', 'product')])" context="{'default_type': 'product', 'lock_type': True}"/>
+                </group>
+                <field name="question_ids" nolabel="1"/>
+            </page>
             </xpath>
         </field>
     </record>
