@@ -274,7 +274,7 @@ class OFRapportOpenflamWizard(models.TransientModel):
         line_number += 1
         solde = 0
         week, total = [], []
-        order_domain = [('state', '!=', 'draft')]
+        order_domain = [('state', 'in', ['sale', 'done'])]
         if self.company_ids._ids:
             order_domain = (order_domain and ['&']) + [('company_id', 'in', self.company_ids._ids)] + order_domain
         orders = self.env['sale.order'].search(order_domain).sorted(key=lambda r: r.of_date_de_pose)
