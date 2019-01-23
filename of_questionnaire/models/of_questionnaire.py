@@ -36,9 +36,8 @@ class OfPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
     question_ids = fields.One2many('of.planning.intervention.question', 'intervention_id', string="Questions")
-    equipement_id = fields.Many2one('of.parc.installe', string=u"Équipement")
 
-    @api.onchange('model_id', 'equipement_id')
+    @api.onchange('model_id', 'parc_installe_ids')
     def onchange_questionnaire(self):
         new_ids = []
         for question in self.model_id.question_ids:
@@ -51,16 +50,18 @@ class OfPlanningIntervention(models.Model):
                     'type': question.type,
                 }
             new_ids.append((0, 0, vals))
-        for question in self.equipement_id.question_ids:
-            vals = {'name': question.name,
-                    'sequence': question.sequence,
-                    'answer_type': question.answer_type,
-                    'possible_answer': question.answer,
-                    'category_id': question.category_id.id,
-                    'intervention_id': self.id,
-                    'type': question.type,
-                }
-            new_ids.append((0, 0, vals))
+        for parc_installe in self.parc_installe_ids:
+            for question in parc_installe.question_ids:
+                vals = {'name': question.name,
+                        'sequence': question.sequence,
+                        'answer_type': question.answer_type,
+                        'possible_answer': question.answer,
+                        'category_id': question.category_id.id,
+                        'intervention_id': self.id,
+                        'type': question.type,
+                        'parc_installe_id': parc_installe.id,
+                    }
+                new_ids.append((0, 0, vals))
         self.question_ids = new_ids
 
 class OfPlanningInterventionModel(models.Model):
@@ -71,6 +72,7 @@ class OfPlanningInterventionModel(models.Model):
 
 class OfPlanningInterventionQuestion(models.Model):
     _name="of.planning.intervention.question"
+    _order= "type, sequence"
 
     name = fields.Char(string="Question", required=True)
     sequence = fields.Integer(string=u"Séquence")
@@ -84,6 +86,7 @@ class OfPlanningInterventionQuestion(models.Model):
     type = fields.Selection([('intervention', "Question d'intervention"),
                              ('product', u"Question d'équipement")], required=True, string="Type de question")
     intervention_id = fields.Many2one('of.planning.intervention', string="Intervention")
+    parc_installe_id = fields.Many2one('of.parc.installe', string=u"Équipement")
 
 class OfParcInstalle(models.Model):
     _inherit = "of.parc.installe"
