@@ -283,7 +283,7 @@
                 </group>
             </xpath>
             <xpath expr="//field[@name='order_line']" position="attributes">
-                <attribute name="context">{'hide_sale': context.get('hide_sale')}</attribute>
+                <attribute name="context">{'default_of_client_view': of_client_view, 'hide_sale': context.get('hide_sale')}</attribute>
             </xpath>
             <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="after">
                 <field name="sale_kits_to_unlink" invisible="1"/>
