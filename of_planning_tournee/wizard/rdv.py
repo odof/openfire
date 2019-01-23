@@ -25,14 +25,18 @@ class OfTourneeRdv(models.TransientModel):
 
     @api.model
     def _default_partner(self):
-        partner_id = self._context.get('active_model', '') == 'res.partner' and self._context['active_ids'][0]
+        # Suivant que la prise de rdv se fait depuis la fiche client ou un service
+        if self._context.get('active_model', '') == 'res.partner':
+            partner_id = self._context['active_ids'][0]
+        elif self._context.get('active_model', '') == 'of.service':
+            partner_id = self.env['of.service'].browse(self._context['active_ids'][0]).partner_id.id
+        else:
+            return False
 
-        if partner_id:
-            partner = self.env['res.partner'].browse(partner_id)
-            while partner.parent_id:
-                partner = partner.parent_id
-            return partner
-        return False
+        partner = self.env['res.partner'].browse(partner_id)
+        while partner.parent_id:
+            partner = partner.parent_id
+        return partner
 
     @api.model
     def _default_service(self):
