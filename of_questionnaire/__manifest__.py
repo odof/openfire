@@ -30,7 +30,7 @@ Fonctionnalités
 """,
     'depends' : [
         'of_planning',
-        'of_parc_installe',
+        'of_service_parc_installe',
         ],
     'data' : [
         'views/of_questionnaire_views.xml',

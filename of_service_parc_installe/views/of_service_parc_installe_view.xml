@@ -34,8 +34,15 @@
         <field name="model">of.planning.intervention</field>
         <field name="inherit_id" ref="of_project_issue.of_planning_intervention_sav_liee"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='sav_id']" position="after">
-                <field name="parc_installe_id" domain="[('site_adresse_id', '=', address_id)]"/>
+            <xpath expr="//notebook/page[1]" position="before">
+                <page string="Équipements" name="equipement">
+                    <field name="parc_installe_ids" mode="tree" domain="[('site_adresse_id', '=', address_id)]">
+                        <tree>
+                            <field name="name" readonly="1"/>
+                            <field name="product_category_id" readonly="1"/>
+                        </tree>
+                    </field>
+                </page>
             </xpath>
         </field>
     </record>
@@ -60,7 +67,7 @@
             <xpath expr="//notebook" position="inside">
                 <page string="Historique des interventions">
                     <group name="intervention">
-                        <field name="intervention_ids" nolabel="1" context="{'default_address_id':site_adresse_id, 'default_parc_installe_id':id}">
+                        <field name="intervention_ids" nolabel="1" context="{'default_address_id':site_adresse_id, 'default_parc_installe_id':id}" widget="one2many_list">
                             <tree string="intervention" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done'">
                                 <field name="date"/>
                                 <field name="equipe_id"/>
