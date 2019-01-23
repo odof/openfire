@@ -22,7 +22,7 @@
                                 <field name="duree" string="Durée" widget="float_time"/>
                                 <field name="state"/>
                                 <field name="name" string="Libellé"/>
-                                <field name="description"/>
+                                <field name="cleantext_description" string="Description"/>
                             </tree>
                         </field>
                         <field name="intervention_address_ids" colspan="4" nolabel="1" attrs="{'invisible': [('parent_id','=', False)]}"
@@ -34,7 +34,7 @@
                                 <field name="duree" string="Durée" widget="float_time"/>
                                 <field name="state"/>
                                 <field name="name" string="Libellé"/>
-                                <field name="description"/>
+                                <field name="cleantext_description" string="Description"/>
                                 <field name="category_id"/>
                             </tree>
                         </field>
@@ -214,7 +214,7 @@
                     <!-- Afficher l'icône quand le statut est confirmé et réalisé -->
                     <button name="button_confirm" type="object" icon="gtk-no" attrs="{'invisible':[('state', '!=', 'confirm')]}"/>
                     <button name="button_done" type="object" icon="gtk-apply" attrs="{'invisible':[('state', '!=', 'done')]}"/>
-                    <field name="description"/>
+                    <field name="cleantext_description" string="Description"/>
                 </tree>
             </field>
         </record>

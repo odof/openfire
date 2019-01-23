@@ -199,7 +199,7 @@
                                 <field name="date_deadline" string="Date fin"/>
                                 <field name="state"/>
                                 <field name="name"/>
-                                <field name="description"/>
+                                <field name="cleantext_description" string="Description"/>
                             </tree>
                         </field>
                     </group>

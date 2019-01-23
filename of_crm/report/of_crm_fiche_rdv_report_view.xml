@@ -7,12 +7,12 @@
         <field name="page_height">0</field>
         <field name="page_width">0</field>
         <field name="orientation">Portrait</field>
-        <field name="margin_top">28</field>
+        <field name="margin_top">35</field>
         <field name="margin_bottom">10</field>
         <field name="margin_left">12</field>
         <field name="margin_right">12</field>
         <field name="header_line" eval="False" />
-        <field name="header_spacing">18</field>
+        <field name="header_spacing">25</field>
         <field name="dpi">90</field>
     </record>
 
@@ -47,7 +47,7 @@
             <div class="row">
                 <div class="col-xs-3 text-center">
                     <div style="max-width: 90%; max-height: 90%; vertical-align: middle; margin-top">
-                        <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo" style="max-width: 100%; max-height: 200px;"/>
+                        <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo" style="max-width: 250px; max-height: 100px;"/>
                     </div>
                 </div>
                 <div class="h4 col-xs-6 text-center" style="padding-top: 2px">
