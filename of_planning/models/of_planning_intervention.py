@@ -134,6 +134,8 @@ class OfPlanningIntervention(models.Model):
     model_id = fields.Many2one('of.planning.intervention.model', string=u"Modèle d'intervention")
     number = fields.Char(String=u"Numéro")
     calendar_name = fields.Char(string="Calendar Name", compute="_compute_calendar_name")
+    raison_fin = fields.Many2one('of.planning.intervention.fin', string=u"Raison de fin")
+    notes_fin = fields.Text(string="Notes de fin d'intervention")
 
     @api.depends('name', 'number')
     def _compute_calendar_name(self):
@@ -586,3 +588,12 @@ class OfPlanningInterventionModel(models.Model):
         if 'company_id' in vals:
             seq['company_id'] = vals['company_id']
         return self.env['ir.sequence'].create(seq)
+
+class OfPlanningInterventionFin(models.Model):
+    _name = 'of.planning.intervention.fin'
+
+    name  = fields.Char(string="Nom", size=512)
+    force_new = fields.Boolean(string="Forcer nouvelle intervention")
+    force_sign = fields.Boolean(string="Signature obligatoire")
+    force_questions = fields.Boolean(string="Questionnaire obligatoire")
+    sequence = fields.Integer(string=u"Séquence")
