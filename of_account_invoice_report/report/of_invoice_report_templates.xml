@@ -10,7 +10,7 @@
         <div class="page">
             <div name="invoice_address" class="row">
                 <div class="col-xs-6"></div>
-                <div class="col-xs-5 col-xs-offset-1">
+                <div class="col-xs-5 col-xs-offset-1" style="font-size: large">
                     <t t-set="the_address" t-value="o.partner_id"/>
                     <t t-if="o.pdf_afficher_nom_parent()">
                         <t t-if="the_address.parent_id"><t t-set="the_address" t-value="the_address.parent_id"/></t>
