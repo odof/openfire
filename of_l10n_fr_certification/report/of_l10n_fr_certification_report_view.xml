@@ -42,7 +42,7 @@
                 Je soussigné, Kremer Aymeric, représentant légal de la SAS OpenFire, fournisseur du logiciel de gestion OpenFire 10.0 basé sur Odoo 10.0, atteste que ce logiciel, mis sur le marché à compter du 01/01/2018 dans sa version majeure OF10.0 satisfait aux conditions d’inaltérabilité, de sécurisation, de conservation et d’archivage des données en vue du contrôle de l’administration fiscale, prévues au 3° bis du I de l’article 286 du code général des impôts.
             </p>
             <p>
-                Le présent certificat, renouvelable, est valable jusqu’au 31/12/2018.<br/>
+                Le présent certificat, renouvelable, est valable jusqu’au 31/12/<t t-esc="docs.get_date()[-4:]"/>.<br/>
                 <br/>
                 Fait à Rennes (35),<br/> 
                 Le <t t-esc="docs.get_date()"/>.<br/>
