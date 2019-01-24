@@ -221,7 +221,7 @@ class OfPlanningIntervention(models.Model):
     def _compute_cleantext_description(self):
         cleanr = re.compile('<.*?>')
         for interv in self:
-            cleantext = re.sub(cleanr, '', interv.description)
+            cleantext = re.sub(cleanr, '', interv.description or '')
             interv.cleantext_description = cleantext
 
     @api.depends('order_id.of_notes_intervention')
