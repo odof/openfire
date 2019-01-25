@@ -166,7 +166,7 @@ class OfPlanningIntervention(models.Model):
     jour = fields.Char("Jour", compute="_compute_jour")
 
     model_id = fields.Many2one('of.planning.intervention.model', string=u"Modèle d'intervention")
-    number = fields.Char(String=u"Numéro")
+    number = fields.Char(String=u"Numéro", copy=False)
     calendar_name = fields.Char(string="Calendar Name", compute="_compute_calendar_name")
     raison_fin = fields.Many2one('of.planning.intervention.fin', string=u"Raison de fin")
     notes_fin = fields.Text(string="Notes de fin d'intervention")
