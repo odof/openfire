@@ -7,7 +7,7 @@
 
 {
     'name' : "OpenFire / Modes de paiement",
-    'version' : "1.1",
+    'version' : "10.0.1.0.0",
     'author' : "OpenFire",
     'website' : "www.openfire.fr",
     'category' : "Generic Modules/Sales & Purchases",
@@ -23,7 +23,7 @@
     ],
     'data' : [
         'security/ir.model.access.csv',
-        'of_mode_paiement_edi_view.xml',
+        'views/of_mode_paiement_edi_view.xml',
     ],
     'installable': True,
 }
