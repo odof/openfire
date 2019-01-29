@@ -463,7 +463,6 @@ class OfPaiementEdi(models.Model):
                     sortie += rib[0].bank_name + " "
                 sortie += u"BIC : " + rib[0].bank_bic + u" IBAN : " + str(rib[0].acc_number).upper() + u"] - <b>Montant : " + str('%.2f' % montant_du).replace('.', ',') + u" euros</b></li>\n"
                 # Fin parcours chaque facture d'un type
-            sortie += u"</ul>\n"
 
             # Si pas de facture à payer en fonction de l'échéancier dans ce lot, on passe au lot suivant
             if nb_transaction_lot == 0:
@@ -539,7 +538,9 @@ class OfPaiementEdi(models.Model):
             chaine_transaction = ""
             # Fin parcours par type
 
-        # Fin parcourt de toutes les factures
+        # Fin parcours de toutes les factures
+        sortie += u"</ul>\n"
+
         # On ajoute l'en-tête.
         chaine_entete += """<?xml version="1.0" encoding="utf-8"?>
         <Document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:iso:std:iso:20022:tech:xsd:pain.008.001.02">
