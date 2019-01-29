@@ -789,7 +789,8 @@ class OfDatastoreCentralized(models.AbstractModel):
                     res_obj = self.env[obj].browse(res_ids)
                     res_names = {v[0]: v for v in res_obj.sudo().name_get()}
                     for vals in datastore_product_data:
-                        if isinstance(vals.get(field), (int, long)):
+                        # Test en deux temps car en python, False est une instance de int
+                        if vals.get(field) and isinstance(vals[field], (int, long)):
                             vals[field] = res_names[vals[field]]
 
             result += datastore_product_data
