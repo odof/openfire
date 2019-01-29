@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<odoo>
+<!--#############################################################################################################
+    ####        I R . C R O N
+    #############################################################################################################-->
+
+    <record id="of_cron_sms_check" model="ir.cron">
+        <field name="name">SMS Check</field>
+        <field name="model">of.sms.account</field>
+        <field name="function">check_all_messages</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="number_call">-1</field>
+        <field name="active">true</field>
+        <field name="args">()</field>
+    </record>
+
+    <record id="of_cron_sms_queue_check" model="ir.cron">
+        <field name="name">SMS Queue Check</field>
+        <field name="model">of.sms.message</field>
+        <field name="function">process_sms_queue</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">minutes</field>
+        <field name="number_call">-1</field>
+        <field name="active">true</field>
+        <field name="args">(20,)</field>
+    </record>
+
+    <record id="of_cron_sms_notif_daily" model="ir.cron">
+        <field name="name">Daily SMS Notif Check</field>
+        <field name="model">of.sms.message</field>
+        <field name="function">process_sms_queue</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="number_call">-1</field>
+        <field name="active">true</field>
+        <field name="args">(['of.planning.intervention'],)</field>
+    </record>
+
+<!--#############################################################################################################
+    ####        M A I L . M E S S A G E . S U B T Y P E
+    #############################################################################################################-->
+
+    <record id="of_sms_subtype" model="mail.message.subtype">
+        <field name="name">SMS</field>
+        <field name="internal">1</field>
+        <field name="default">0</field>
+        <field name="sequence">2</field>
+    </record>
+
+<!--#############################################################################################################
+    ####        C A L E N D A R . A L A R M
+    #############################################################################################################-->
+
+    <record id="of_sms_alarm_1" model="calendar.alarm">
+        <field name="name">[SMS] 1 hour</field>
+        <field name="type">sms</field>
+        <field name="duration">1</field>
+        <field name="interval">hours</field>
+    </record>
+
+    <record id="of_sms_alarm_2" model="calendar.alarm">
+        <field name="name">[SMS] 2 hour</field>
+        <field name="type">sms</field>
+        <field name="duration">2</field>
+        <field name="interval">hours</field>
+    </record>
+
+    <record id="of_sms_alarm_3" model="calendar.alarm">
+        <field name="name">[SMS] 3 hour</field>
+        <field name="type">sms</field>
+        <field name="duration">3</field>
+        <field name="interval">hours</field>
+    </record>
+
+    <record id="of_sms_alarm_4" model="calendar.alarm">
+        <field name="name">[SMS] 4 hour</field>
+        <field name="type">sms</field>
+        <field name="duration">4</field>
+        <field name="interval">hours</field>
+    </record>
+
+    <record id="of_sms_alarm_5" model="calendar.alarm">
+        <field name="name">[SMS] 5 hour</field>
+        <field name="type">sms</field>
+        <field name="duration">5</field>
+        <field name="interval">hours</field>
+    </record>
+
+    <record id="of_sms_alarm_6" model="calendar.alarm">
+        <field name="name">[SMS] 6 hour</field>
+        <field name="type">sms</field>
+        <field name="duration">6</field>
+        <field name="interval">hours</field>
+    </record>
+
+<!--#############################################################################################################
+    ####        O F . S M S . G A T E W A Y
+    #############################################################################################################-->
+
+    <record id="of_sms_gateway_ovh" model="of.sms.gateway">
+        <field name="name">OVH</field>
+        <field name="gateway_model_name">of.sms.gateway.ovh</field>
+        <field name="can_receive_sms">false</field>
+    </record>
+
+<!--#############################################################################################################
+    ####        O F . S M S . G A T E W A Y . O V H
+    #############################################################################################################-->
+
+    <record id="of_sms_gateway_gateway_ovh" model="of.sms.gateway.ovh">
+        <field name="name">OVH</field>
+        <field name="api_url">https://www.ovh.com/cgi-bin/sms/http2sms.cgi?</field>
+    </record>
+
+<!--#############################################################################################################
+    ####        O F . S M S . T E M P L A T E
+    #############################################################################################################-->
+
+    <record id="of_sms_calendar_reminder" model="of.sms.template">
+        <field name="name">Calendar Reminder</field>
+        <field name="model_id" ref="calendar.model_calendar_event"/>
+        <field name="sms_to"></field>
+        <field name="template_body">Reminder: ${object.display_name} at ${object.start_datetime}</field>
+    </record>
+
+    <record id="of_sms_calendar_reminder_attendee" model="of.sms.template">
+        <field name="name">Calendar Reminder Attendee</field>
+        <field name="model_id" ref="calendar.model_calendar_attendee"/>
+        <field name="sms_to">${object.partner_id.mobile}</field>
+        <field name="template_body">Hello ${object.partner_id.name}, this is a reminder for ${object.event_id.display_name} at ${object.event_id.start_datetime}</field>
+    </record>
+
+    <record id="of_sms_calendar_reminder_1_day" model="of.sms.template">
+        <field name="name">Calendar Reminder 1 Day</field>
+        <field name="model_id" ref="calendar.model_calendar_event"/>
+        <field name="sms_to"></field>
+        <field name="template_body">Reminder: Tomorrow at ${object.start_datetime} : ${object.display_name}</field>
+    </record>
+
+    <record id="of_sms_calendar_reminder_attendee_1_day" model="of.sms.template">
+        <field name="name">Calendar Reminder Attendee 1 Day</field>
+        <field name="model_id" ref="calendar.model_calendar_attendee"/>
+        <field name="sms_to">${object.partner_id.mobile}</field>
+        <field name="template_body">Hello ${object.partner_id.name}, this is a reminder for ${object.event_id.display_name} Tomorrow at ${object.event_id.start_datetime}</field>
+    </record>
+
+</odoo>

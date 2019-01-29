@@ -9,7 +9,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="of_sms.of_sms_account_view_form"/>
-            <field name="context" eval="{'default_name':'OVH Account','default_account_gateway_id':ref('sms_ovh')}"/>
+            <field name="context" eval="{'default_name':'OVH Account','default_account_gateway_id':ref('of_sms_gateway_ovh')}"/>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">Add SMS Gateway Accounts</p>
             </field>
@@ -57,6 +57,36 @@
         <field name="model" eval="'res.partner'"/>
         <field name="name">SMS Partner</field>
         <field name="value" eval="'ir.actions.server,%d'%of_sms_partner_more_menu_server_action"/>
+    </record>
+
+    <record id="of_sms_lead_more_menu_server_action" model="ir.actions.server">
+        <field name="name">(OF) SMS Partner</field>
+        <field name="model_id" ref="model_crm_lead"/>
+        <field name="condition">True</field>
+        <field name="state">code</field>
+        <field name="code">action = record.sms_action()</field>
+    </record>
+
+    <record id="of_sms_lead_more_menu_client_action" model="ir.values">
+        <field name="key2" eval="'client_action_multi'" />
+        <field name="model" eval="'crm.lead'"/>
+        <field name="name">SMS Partner</field>
+        <field name="value" eval="'ir.actions.server,%d'%of_sms_lead_more_menu_server_action"/>
+    </record>
+
+    <record id="of_sms_intervention_more_menu_server_action" model="ir.actions.server">
+        <field name="name">(OF) SMS Partner</field>
+        <field name="model_id" ref="model_of_planning_intervention"/>
+        <field name="condition">True</field>
+        <field name="state">code</field>
+        <field name="code">action = record.sms_action()</field>
+    </record>
+
+    <record id="of_sms_intervention_more_menu_client_action" model="ir.values">
+        <field name="key2" eval="'client_action_multi'" />
+        <field name="model" eval="'of.planning.intervention'"/>
+        <field name="name">SMS Partner</field>
+        <field name="value" eval="'ir.actions.server,%d'%of_sms_intervention_more_menu_server_action"/>
     </record>
 
     <record id="of_view_partner_form_inherit_of_sms" model="ir.ui.view">

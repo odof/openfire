@@ -18,6 +18,23 @@ class OFPlanningIntervention(models.Model):
     _name = "of.planning.intervention"
     _inherit = ["of.planning.intervention", 'mail.thread']
 
+    mobile = fields.Char(related='partner_id.mobile')
+
+    @api.multi
+    def sms_action(self):
+        self.ensure_one()
+        default_mobile = self.env['of.sms.number'].search([])[0]
+        to_mobile = self.partner_id.mobile or self.address_id.mobile
+        return {
+            'name': 'SMS Compose',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'of.sms.compose',
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+            'context': {'default_from_mobile_id': default_mobile.id,'default_to_number':to_mobile, 'default_record_id':self.id,'default_model':'of.planning.intervention'}
+         }
+
     def alerte_interventions_equipes_veille(self):
         return self.env['ir.values'].get_default('of.sms.config.settings', 'alerte_interventions_equipes_veille')
 

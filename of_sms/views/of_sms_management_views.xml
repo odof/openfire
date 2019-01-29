@@ -18,7 +18,7 @@
                 <group>
                     <field name="account_name"/>
                     <field name="account_login"/>
-                    <field name="account_password"/>
+                    <field name="account_password" password="True"/>
                     <field name="number_ids"/>
                 </group>
             </form>

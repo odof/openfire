@@ -37,6 +37,7 @@ class OFSMSGatewayOVH(models.Model):
     _name = "of.sms.gateway.ovh"
     _description = "OVH SMS Gateway"
 
+    name = fields.Char(required=True, string='Gateway Name', default="OVH")
     api_url = fields.Char(string='API URL',default=u"https://www.ovh.com/cgi-bin/sms/http2sms.cgi?")
 
     def send_message(self, sms_gateway_id, from_number, to_number, sms_content, my_model_name='', my_record_id=0, media=None, queued_sms_message=None, media_filename=False):

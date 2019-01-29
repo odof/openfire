@@ -62,3 +62,20 @@ class ResCountrySms(models.Model):
     _inherit = "res.country"
 
     mobile_prefix = fields.Char(string="Mobile Prefix")
+
+class CRMLead(models.Model):
+    _inherit = "crm.lead"
+
+    @api.multi
+    def sms_action(self):
+        self.ensure_one()
+        default_mobile = self.env['of.sms.number'].search([])[0]
+        return {
+            'name': 'SMS Compose',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'of.sms.compose',
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+            'context': {'default_from_mobile_id': default_mobile.id,'default_to_number':self.mobile, 'default_record_id':self.id,'default_model':'crm.lead'}
+         }
