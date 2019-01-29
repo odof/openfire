@@ -272,6 +272,25 @@
     <xpath expr="//table" position="attributes">
         <attribute name="groups">!sale.group_sale_layout</attribute>
     </xpath>
+    <!-- Correction du header des lignes de la facture non personnalisée  -->
+    <xpath expr="//table/thead/tr/th[last()]" position="attributes">
+        <attribute name="groups">sale.group_show_price_subtotal</attribute>
+    </xpath>
+    <xpath expr="//table/thead/tr" position="inside">
+        <th class="text-right" groups="sale.group_show_price_total">Prix TTC</th>
+    </xpath>
+
+    <!-- Correction des lignes de la facture non personnalisée  -->
+    <xpath expr="//table//span[@t-field='l.price_subtotal']" position="attributes">
+        <attribute name="groups">sale.group_show_price_subtotal</attribute>
+    </xpath>
+    <xpath expr="//table//span[@t-field='l.price_subtotal']/.." position="after">
+        <td class="text-right" groups="sale.group_show_price_total">
+            <span t-field="l.price_total"
+                t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+        </td>
+    </xpath>
+
     <xpath expr="//table" position="after">
         <t groups="sale.group_sale_layout" t-foreach="o.order_lines_layouted()" t-as="page">
             <table class="table table-condensed">
