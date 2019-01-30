@@ -14,7 +14,7 @@
                     <!-- Les multi-logos viennent là. -->
                     <div name="company_header_center_top" style="display: block;"/>
 
-                    <div name="company_address_right" t-if="company.of_position_header_lines == 'logo_right'" style="min-width: 99%; display: inline-block;">
+                    <div name="company_address_right" t-if="company.of_position_header_lines == 'logo_right'" style="min-width: 99%;">
                         <div style="display: inline-block; min-width: 99%; vertical-align: top;">
                             <span t-esc="company.get_line_content('header', 1)" t-attf-style="font-size: #{company.of_custom_header_line_1_size};"/><br/>
                             <span t-esc="company.get_line_content('header', 2)" t-attf-style="font-size: #{company.of_custom_header_line_2_size};"/><br/>

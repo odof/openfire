@@ -150,7 +150,7 @@ l'intervention</td>
 	          <td>[[ i.duree and 'h'.join(str(datetime.timedelta(hours=i.duree)).split(':')[:-1]) or '' ]]</td>
 	          <td>[[ i.state or '' ]]</td>
 	          <td>[[ i.equipe_id.name or '' ]]</td>
-	          <td>[[ i.description or '' ]]</td>
+	          <td>[[ i.cleantext_description or '' ]]</td>
 	      </tr>
   	  </blockTable>
   </section>
