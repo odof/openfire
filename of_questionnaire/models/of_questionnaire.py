@@ -37,7 +37,7 @@ class OfPlanningIntervention(models.Model):
 
     question_ids = fields.One2many('of.planning.intervention.question', 'intervention_id', string="Questions")
 
-    @api.onchange('model_id', 'parc_installe_ids')
+    @api.onchange('model_id', 'parc_installe_id')
     def onchange_questionnaire(self):
         new_ids = []
         for question in self.model_id.question_ids:
@@ -50,18 +50,17 @@ class OfPlanningIntervention(models.Model):
                     'type': question.type,
                 }
             new_ids.append((0, 0, vals))
-        for parc_installe in self.parc_installe_ids:
-            for question in parc_installe.question_ids:
-                vals = {'name': question.name,
-                        'sequence': question.sequence,
-                        'answer_type': question.answer_type,
-                        'possible_answer': question.answer,
-                        'category_id': question.category_id.id,
-                        'intervention_id': self.id,
-                        'type': question.type,
-                        'parc_installe_id': parc_installe.id,
-                    }
-                new_ids.append((0, 0, vals))
+        for question in self.parc_installe_id.question_ids:
+            vals = {'name': question.name,
+                    'sequence': question.sequence,
+                    'answer_type': question.answer_type,
+                    'possible_answer': question.answer,
+                    'category_id': question.category_id.id,
+                    'intervention_id': self.id,
+                    'type': question.type,
+                    'parc_installe_id': self.parc_installe_id.id,
+                }
+            new_ids.append((0, 0, vals))
         self.question_ids = new_ids
 
 class OfPlanningInterventionModel(models.Model):

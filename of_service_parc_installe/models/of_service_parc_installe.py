@@ -13,7 +13,7 @@ class OfService(models.Model):
 class OfPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
-    parc_installe_ids = fields.Many2many('of.parc.installe', 'of_planning_intervention_parc_installe_rel', 'intervention_id', 'parc_installe_id', string=u"Parc installé")
+    parc_installe_id = fields.Many2one('of.parc.installe', string=u"Parc installé")
 
     @api.multi
     def button_open_of_planning_intervention(self):
@@ -30,7 +30,7 @@ class OfPlanningIntervention(models.Model):
 class OfParcInstalle(models.Model):
     _inherit = "of.parc.installe"
 
-    intervention_ids = fields.Many2many('of.planning.intervention', 'of_planning_intervention_parc_installe_rel', 'parc_installe_id', 'intervention_id', string="Interventions")
+    intervention_ids = fields.One2many('of.planning.intervention', 'parc_installe_id', string="Interventions")
     service_count = fields.Integer(compute="_get_service_count")
 
     @api.multi
