@@ -76,6 +76,10 @@
                         <t t-if="o._name == 'stock.picking'">
                             <span name="bon_livraison" style="font-size: medium;">Bon de livraison</span>
                         </t>
+                        <!-- si le document est de type intervention -->
+                        <t t-if="o._name == 'of.planning.intervention'">
+                            <span name="intervention" style="font-size: medium;">Rapport d'intervention</span>
+                        </t>
                     </t>
                     <!-- Si le document ne possède pas de type (exemple: aperçu de rapport) -->
                     <t t-if="not o">
@@ -101,6 +105,11 @@
                             <!-- si le document est de type préparation/livraison-->
                             <t t-if="o._name == 'stock.picking'">
                                 <span t-field="o.name" style="margin-left: -4px; font-size: medium;"/>
+                            </t>
+                            <!-- si le document est de type intervention -->
+                            <t t-if="o._name == 'of.planning.intervention'">
+                                <span t-if="o.number" t-field="o.number"/>
+                                <span t-else="">-</span>
                             </t>
                         </t>
                         <!-- Si le document ne possède pas de type (exemple: aperçu de rapport) -->
@@ -154,6 +163,18 @@
                                 <t t-else="">
                                     <span>-</span>
                                 </t>
+                            </t>
+                            <!-- si le document est de type intervention -->
+                            <t t-if="o._name == 'of.planning.intervention'">
+                                <t t-if="o.real_start">
+                                    <t t-set="date_intervention" t-value="o.real_start[8:10] + '/' + o.real_start[5:7] + '/' + o.real_start[0:4]"/>
+                                    <span t-esc="date_intervention"/>
+                                </t>
+                                <t t-else="o.date">
+                                    <t t-set="date_intervention" t-value="o.date[8:10] + '/' + o.date[5:7] + '/' + o.date[0:4]"/>
+                                    <span t-esc="date_intervention"/>
+                                </t>
+                                <span t-if="not o.real_start and not o.date">-</span>
                             </t>
                         </t>
                         <!-- Si le document ne possède pas de type (exemple: aperçu de rapport) -->
