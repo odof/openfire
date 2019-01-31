@@ -202,7 +202,7 @@
 
 <!-- *************************** Menus ***************************-->
 
-    <menuitem name="Config. Questionnaires" id="menu_of_questionnaire_config" parent="of_planning.menu_of_planning_configuration" sequence="10"/>
+    <menuitem name="Config. Questionnaires" id="menu_of_questionnaire_config" parent="of_planning.menu_of_planning_configuration" sequence="20"/>
     <menuitem name="Questionnaires" id="menu_of_questionnaire" parent="of_questionnaire.menu_of_questionnaire_config" sequence="0" action="action_of_questionnaire"/>
     <menuitem name="Questions" id="menu_of_questionnaire_line" parent="of_questionnaire.menu_of_questionnaire_config" sequence="1" action="action_of_questionnaire_line"/>
     <menuitem name="Catégorie de question" id="menu_of_questionnaire_line_category" parent="of_questionnaire.menu_of_questionnaire_config" sequence="2" action="action_of_questionnaire_line_category"/>
