@@ -626,13 +626,15 @@
     <menuitem id="menu_of_planning" name="Interventions" groups="of_group_planning_intervention_user" sequence="2" web_icon="of_planning,static/description/icon.png"/>
 
         <menuitem id="menu_of_planning_configuration" name="Configuration" parent="of_planning.menu_of_planning" groups="hr.group_hr_manager" sequence="100"/>
-            <menuitem name="Employés" id="menu_hr_employee_tree" parent="menu_of_planning_configuration" sequence="1" action="action_hr_employee_tree"/>
-            <menuitem name="Équipes" id="menu_of_planning_equipe_tree" parent="menu_of_planning_configuration" sequence="2" action="action_of_planning_equipe_tree"/>
-            <menuitem name="Erreurs" id="menu_of_planning_intervention_raison_tree" parent="menu_of_planning_configuration" sequence="3" action="action_of_planning_intervention_raison_tree"/>
-            <menuitem name="Tâches" id="menu_of_planning_tache_tree" parent="menu_of_planning_configuration" sequence="3" action="action_of_planning_tache_tree"/>
+            <menuitem name="Employés" id="menu_hr_employee_tree" parent="menu_of_planning_configuration" sequence="80" action="action_hr_employee_tree"/>
+            <menuitem name="Équipes" id="menu_of_planning_equipe_tree" parent="menu_of_planning_configuration" sequence="90" action="action_of_planning_equipe_tree"/>
+            <menuitem name="Erreurs" id="menu_of_planning_intervention_raison_tree" parent="menu_of_planning_configuration" sequence="100" action="action_of_planning_intervention_raison_tree"/>
+            <menuitem name="Tâches" id="menu_of_planning_tache_tree" parent="menu_of_planning_configuration" sequence="110" action="action_of_planning_tache_tree"/>
             <!--menuitem name="Types de coûts" id="menu_pnanning_of_employee_typcout_tree" parent="menu_of_planning_configuration" sequence="5" action="action_of_planning_employee_typcout_tree"/-->
             <menuitem id="menu_intervention_general_settings" name="Configuration" parent="menu_of_planning_configuration"
                 sequence="0" action="of_planning.action_intervention_settings" groups="base.group_system"/>
+            <menuitem id="menu_of_planning_mail_templates" parent="menu_of_planning_configuration" action="of_gesdoc.action_of_mail_template_tree_all"
+                  sequence="70" name="Formulaires"/>
 
         <menuitem id="menu_of_planning_intervention" name="Interventions" parent="of_planning.menu_of_planning" groups="of_group_planning_intervention_user" sequence="10"/>
             <menuitem id="menu_of_planning_intervention_calendar" name="Planning" parent="menu_of_planning_intervention" sequence="1" action="action_of_planning_intervention_calendar"/>
@@ -770,7 +772,7 @@
         <field name="view_id" ref="of_planning.of_planning_intervention_model_view_tree"/>
     </record>
 
-    <menuitem name="Modèle d'intervention" id="menu_of_planning_intervention_model" parent="of_planning.menu_of_planning_configuration" sequence="9" action="action_of_planning_intervention_model"/>
+    <menuitem name="Modèle d'intervention" id="menu_of_planning_intervention_model" parent="of_planning.menu_of_planning_configuration" sequence="10" action="action_of_planning_intervention_model"/>
 
 <!--##########################################################################################################################-->
 <!--########################################_________Raison de fin__________##################################################-->
@@ -821,6 +823,6 @@
         <field name="view_id" ref="of_planning.of_planning_intervention_fin_view_tree"/>
     </record>
 
-    <menuitem name="Raison fin d'intervention" id="menu_of_planning_intervention_din" parent="of_planning.menu_of_planning_configuration" sequence="10" action="action_of_planning_intervention_fin"/>
+    <menuitem name="Raison fin d'intervention" id="menu_of_planning_intervention_din" parent="of_planning.menu_of_planning_configuration" sequence="30" action="action_of_planning_intervention_fin"/>
 
 </odoo>
