@@ -199,7 +199,7 @@
                 <field name="of_brand_id" options="{'no_create_edit':True}"/>
             </xpath>
             <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="attributes">
-                <attribute name="domain">[('brand_id', '=', of_brand_id)]</attribute>
+                <attribute name="domain">of_brand_id and [('brand_id', '=', of_brand_id)] or []</attribute>
             </xpath>
         </field>
     </record>
