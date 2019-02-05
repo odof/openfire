@@ -463,7 +463,7 @@
                   attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
             </xpath>
             <xpath expr="//form//field[@name='price_unit']" position="attributes">
-                <attribute name="attrs">{'invisible': [('of_pricing', '=', 'computed')]}</attribute>
+                <attribute name="attrs">{'invisible': [('of_pricing', '=', 'computed'), ('of_is_kit', '=', True)]}</attribute>
             </xpath>
             <xpath expr="//form//field[@name='price_unit']" position="after">
                 <field name="price_comps" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
