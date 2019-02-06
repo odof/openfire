@@ -196,6 +196,29 @@
                     </table>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-xs-6" t-if="doc.pdf_afficher_multi_echeances()" string="Échéances">
+                    <t t-set="show_ech_name" t-value="bool(doc.of_echeance_line_ids.filtered('date'))"/>
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Vos échéances</th>
+                                <th t-if="show_ech_name">Date</th>
+                                <th class="text-right">Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="doc.of_echeance_line_ids" t-as="e">
+                                <td><span t-field="e.name"/></td>
+                                <td t-if="show_ech_name"><span t-field="e.date"/></td>
+                                <td class="text-right">
+                                    <span t-field="e.amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
             <p t-if="doc.of_date_vt">
                 <t t-set="date_order" t-value="doc.of_date_vt[8:10] + '/' + doc.of_date_vt[5:7] + '/' + doc.of_date_vt[0:4]"/>

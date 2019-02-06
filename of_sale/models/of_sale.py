@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
-
+import odoo.addons.decimal_precision as dp
+from odoo.tools import float_compare
 import os
 import base64
 import tempfile
+import itertools
+from dateutil.relativedelta import relativedelta
+from collections import defaultdict
 
 try:
     import pyPdf
@@ -20,6 +24,9 @@ NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
+
+    def pdf_afficher_multi_echeances(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_afficher_multi_echeances')
 
     def pdf_afficher_nom_parent(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_nom_parent')
@@ -73,12 +80,109 @@ class SaleOrder(models.Model):
 
     of_date_vt = fields.Date(string="Date visite technique", help=u"Si renseignée apparaîtra sur le devis / Bon de commande")
 
+    of_echeance_line_ids = fields.One2many('of.sale.echeance', 'order_id', string=u"Échéances")
+
+    of_echeances_modified = fields.Boolean(u"Les échéances ont besoin d'être recalculées", compute="_compute_of_echeances_modified")
+
+    @api.depends('of_echeance_line_ids', 'amount_total')
+    def _compute_of_echeances_modified(self):
+        for order in self:
+            order.of_echeances_modified = bool(order.of_echeance_line_ids and
+                                               float_compare(order.amount_total,
+                                                             sum(order.of_echeance_line_ids.mapped('amount')),
+                                                             precision_rounding=.01))
+
     @api.multi
-    def _prepare_invoice(self):
-        #ajout de la date de la visite technique dans la vue formulaire de la facture
-        invoice_vals = super(SaleOrder, self)._prepare_invoice()
-        invoice_vals['of_date_vt'] = self.of_date_vt
-        return invoice_vals
+    def _of_compute_echeances(self):
+        self.ensure_one()
+        if not self.payment_term_id:
+            return False
+        dates = {
+            'order': self.state not in ('draft', 'sent', 'cancel') and self.confirmation_date,
+            'invoice': self.invoice_status == 'invoiced' and self.invoice_ids[0].date_invoice,
+            'default': False,
+        }
+        amounts = self.payment_term_id.compute(self.amount_total, dates=dates)[0]
+
+        amount_total = self.amount_total
+        pct_left = 100.0
+        pct = 0
+        result = [(5, )]
+        for term, (date, amount) in itertools.izip(self.payment_term_id.line_ids, amounts):
+            pct_left -= pct
+            pct = round(100 * amount / amount_total, 2) if amount_total else 0
+
+            line_vals = {
+                'name': term.name,
+                'percent': pct,
+                'amount': amount,
+                'date': date,
+            }
+            result.append((0, 0, line_vals))
+        if len(result) > 1:
+            result[-1][2]['percent'] = pct_left
+        return result
+
+    @api.onchange('payment_term_id')
+    def _onchange_payment_term_id(self):
+        if self.payment_term_id:
+            self.of_echeance_line_ids = self._of_compute_echeances()
+
+    @api.onchange('amount_total')
+    def _onchange_amount_total(self):
+        self._onchange_payment_term_id()
+
+    @api.multi
+    def of_update_dates_echeancier(self):
+        for order in self:
+            if not order.payment_term_id:
+                continue
+
+            dates = {
+                'order': order.confirmation_date,
+                'invoice': self.invoice_status == 'invoiced' and self.invoice_ids[0].date_invoice,
+                'default': False,
+            }
+            force_dates = [echeance.date for echeance in order.of_echeance_line_ids]
+            echeances = self.payment_term_id.compute(self.amount_total, dates=dates, force_dates=force_dates)[0]
+
+            if len(echeances) != len(order.of_echeance_line_ids):
+                continue
+
+            for echeance, ech_calc in itertools.izip(self.of_echeance_line_ids, echeances):
+                if ech_calc[0] and not echeance.date:
+                    echeance.date = ech_calc[0]
+
+    @api.multi
+    def action_confirm(self):
+        super(SaleOrder, self).action_confirm()
+        self.of_update_dates_echeancier()
+        return True
+
+    @api.multi
+    def of_recompute_echeance_last(self):
+        for order in self:
+            if not order.of_echeance_line_ids:
+                continue
+
+            percent = 100.0
+            amount = order.amount_total
+            for echeance in order.of_echeance_line_ids:
+                if echeance.last:
+                    echeance.write({
+                        'percent': percent,
+                        'amount': amount,
+                    })
+                else:
+                    percent -= echeance.percent
+                    amount -= echeance.amount
+
+    @api.multi
+    def write(self, vals):
+        res = super(SaleOrder, self).write(vals)
+        # Recalcul de la dernière échéance si besoin
+        self.filtered('of_echeances_modified').of_recompute_echeance_last()
+        return res
 
     @api.depends('state', 'order_line', 'order_line.qty_to_invoice', 'order_line.product_uom_qty')
     def _compute_of_to_invoice(self):
@@ -241,8 +345,9 @@ class OFSaleConfiguration(models.TransientModel):
         string="(OF) Réf. produits", required=True, default=False,
         help="Afficher les références produits dans les rapports PDF ?")
 
-    pdf_date_validite_devis = fields.Boolean(string="(OF) Date validité devis", required=True, default=False,
-            help="Afficher la date de validité dans le rapport PDF des devis ?")
+    pdf_date_validite_devis = fields.Boolean(
+        string="(OF) Date validité devis", required=True, default=False,
+        help="Afficher la date de validité dans le rapport PDF des devis ?")
 
     pdf_adresse_nom_parent = fields.Boolean(
         string=u"(OF) Nom parent contact", required=True, default=False,
@@ -262,6 +367,9 @@ class OFSaleConfiguration(models.TransientModel):
     pdf_adresse_email = fields.Boolean(
         string="(OF) E-mail", required=True, default=False,
         help=u"Afficher l'adresse email dans les rapport PDF ?")
+    pdf_afficher_multi_echeances = fields.Boolean(
+        string="(OF) Multi-échéances", required=True, default=False,
+        help="Afficher les échéances multiples dans les rapports PDF ?")
     of_color_bg_section = fields.Char(
         string="(OF) Couleur fond titres section",
         help=u"Choisissez un couleur de fond pour les titres de section", default="#F0F0F0")
@@ -314,6 +422,10 @@ class OFSaleConfiguration(models.TransientModel):
     def set_of_color_bg_section_defaults(self):
         return self.env['ir.values'].sudo().set_default('sale.config.settings', 'of_color_bg_section', self.of_color_bg_section)
 
+    @api.multi
+    def set_pdf_afficher_multi_echeances_defaults(self):
+        return self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_afficher_multi_echeances', self.pdf_afficher_multi_echeances)
+
 class AccountInvoice(models.Model):
     _inherit = "account.invoice"
 
@@ -321,6 +433,16 @@ class AccountInvoice(models.Model):
 
     def get_color_section(self):
         return self.env['ir.values'].get_default('account.config.settings', 'of_color_bg_section')
+
+    @api.multi
+    def action_invoice_open(self):
+        """Mise à jour des dates de l'échéancier"""
+        res = super(AccountInvoice, self).action_invoice_open()
+        acompte_categ_id = self.env['ir.values'].get_default('sale.config.settings', 'of_deposit_product_categ_id_setting')
+        lines = self.mapped('invoice_line_ids').filtered(lambda line: line.product_id.categ_id.id != acompte_categ_id)
+        orders = lines.mapped('sale_line_ids').mapped('order_id')
+        orders.of_update_dates_echeancier()
+        return res
 
 class AccountConfigSettings(models.TransientModel):
     _inherit = 'account.config.settings'
@@ -330,3 +452,66 @@ class AccountConfigSettings(models.TransientModel):
     @api.multi
     def set_of_color_bg_section_defaults(self):
         return self.env['ir.values'].sudo().set_default('account.config.settings', 'of_color_bg_section', self.of_color_bg_section)
+
+class OFSaleEcheance(models.Model):
+    _name = "of.sale.echeance"
+    _order = "order_id, sequence, id"
+
+    name = fields.Char(string="Nom", required=True, default=u"Échéance")
+    order_id = fields.Many2one("sale.order", string="Commande")
+    currency_id = fields.Many2one(related="order_id.currency_id", readonly=True)  # TODO ADAPT SALE
+    amount = fields.Monetary(string="Montant", currency_field='currency_id')
+    percent = fields.Float(string=u"Pourcentage", digits=dp.get_precision('Product Price'))
+    last = fields.Boolean(string="Dernière Échéance", compute="_compute_last")
+
+    sequence = fields.Integer(default=10, help="Gives the sequence order when displaying a list of payment term lines.")
+    date = fields.Date(string='Date')
+
+    days = fields.Integer(string='Number of Days', required=True, default=0)
+    option = fields.Selection(
+        [
+            ('day_after_invoice_date', 'Day(s) after the invoice date'),
+            ('fix_day_following_month', 'Day(s) after the end of the invoice month (Net EOM)'),
+            ('last_day_following_month', 'Last day of following month'),
+            ('last_day_current_month', 'Last day of current month'),
+            ('day_after_order_date', 'Day(s) after the confirmation date'),
+            ('fix_day_following_order_month', 'Day(s) after the end of the order month (Net EOM)'),
+        ],
+        default='day_after_invoice_date', required=True, string='Options'
+        )
+
+    @api.multi
+    def _compute_last(self):
+        for order in self.mapped('order_id'):
+            for echeance in order.of_echeance_line_ids:
+                echeance.last = echeance == order.of_echeance_line_ids[-1]
+
+    @api.onchange("amount")
+    def _onchange_amount(self):
+        """Met à jour le pourcentage en fonction du montant"""
+        order_amount = self._context.get('order_amount', self.order_id.amount_total)
+        # Test: si le nouveau montant est calculé depuis le pourcentage, on ne le recalcule pas
+        test_amount = order_amount * self.percent / 100
+        if float_compare(self.amount, test_amount, precision_rounding=.01):
+            self.percent = self.amount * 100 / order_amount if order_amount else 0
+
+    @api.onchange("percent")
+    def _onchange_percent(self):
+        """Met à jour le montant en fonction du pourcentage"""
+        order_amount = self._context.get('order_amount', self.order_id.amount_total)
+        # Test: si le nouveau pourcentage est calculé depuis le montant, on ne le recalcule pas
+        test_percent = self.amount * 100 / order_amount if order_amount else 0
+        if float_compare(self.percent, test_percent, precision_rounding=.01):
+            self.amount = order_amount * self.percent / 100
+
+class AccountPaymentTermLine(models.Model):
+    _inherit = "account.payment.term.line"
+
+    @api.model
+    def _get_of_option_date(self):
+        result = super(AccountPaymentTermLine, self)._get_of_option_date()
+        for i in xrange(len(result)):
+            if result[i][0] == 'invoice':
+                i += 1
+                break
+        return result[:i] + [('order', 'Date de commande')] + result[i:]

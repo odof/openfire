@@ -29,6 +29,83 @@
             </field>
         </record>
 
+        <!-- Ajout champ frais de port product.product -->
+        <record id="of_sale_view_order_form" model="ir.ui.view">
+            <field name="name">of.sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header" position="inside">
+                    <button name="button_gestion_prix" type="object" string="Gestion prix" attrs="{'invisible': [('invoice_status', '=', 'invoiced')]}"/>
+                </xpath>
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <!-- Ajout d'un bouton pour switcher entre vue client et vue vendeur' -->
+                    <button name="toggle_view" type="object" class="oe_stat_button" icon="fa-pencil-square-o" groups="of_sale.of_group_sale_marge_manager">
+                        <field name="of_client_view" widget="boolean_button"
+                               options="{'terminology': {'string_true': 'Vue client',
+                                                         'hover_true': 'Vue client',
+                                                         'string_false': 'Vue vendeur',
+                                                         'hover_false': 'Vue vendeur' }}"/>
+                    </button>
+                </xpath>
+                <field name="date_order" position="attributes">
+                    <attribute name="widget">date</attribute>
+                </field>
+                <!-- Ajout onglet Notes : client, facture, intervention -->
+                <xpath expr="//notebook" position="inside">
+                     <page string="Notes">
+                        <!-- Notes client -->
+                        <group attrs="{'invisible':[('of_notes_client','=',False)]}">
+                            <separator string="Notes client" colspan="4"/>
+                            <field name="of_notes_client" colspan="4" nolabel="1" readonly="1"
+                                help="Ces notes proviennent de la fiche client sous la rubrique 'Notes internes'. Ils sont uniquement modifiables dans la fiche client."/>
+                         </group>
+                         <!-- Notes Facture -->
+                        <separator string="Notes facture" colspan="4"/>
+                        <field name="of_notes_facture" colspan="4" nolabel="1" widget="html"/>
+                        <!-- Notes intervention -->
+                        <separator string="Notes intervention" colspan="4"/>
+                        <field name="of_notes_intervention" colspan="4" nolabel="1" widget="html"
+                            help="Ces notes sont visualisées dans planning d'intervention et imprimées dans la fiche d'intervention."/>
+                        <div class="oe_edit_only" colspan="4">
+                            * Les données saisies dans ce champ seront visualisées dans planning d'intervention et imprimées dans la fiche d'intervention.
+                        </div>
+                     </page>
+                </xpath>
+                <!-- Ajout option Documents joints -->
+                <xpath expr="//page//group[@name='technical']" position="after">
+                    <separator string="Documents joints" colspan="4"/>
+                    <field name="of_mail_template_ids" widget="many2many" nolabel="1"/>
+                </xpath>
+                <xpath expr="//field[@name='confirmation_date']" position="after">
+                    <field name="of_date_vt"/>
+                </xpath>
+                <!-- Ajout échéances  invisible="1"-->
+                <xpath expr="//group[@name='sale_total']" position="before">
+                    <group col="1" style="width:60%">
+                        <separator string="Échéancier prévisionnel"/>
+                        <field name="of_echeances_modified" invisible="1"/>
+                        <field name="of_echeance_line_ids" nolabel="1">
+                            <tree editable="bottom" create="false" delete="false">
+                                <field name="sequence" invisible="1"/>
+                                <field name="last" invisible="1"/>
+                                <field name="name"/>
+                                <field name="date"/>
+                                <field name="percent" attrs="{'readonly': [('last','=',True)]}" sum="Total"/>
+                                <field name="amount" attrs="{'readonly': [('last','=',True)]}" sum="Total"/>
+                                <field name="currency_id" invisible="1"/>
+                            </tree>
+                        </field>
+                        <span>
+                        <button name="button_dummy"
+                            string="(mise à jour)" type="object" class="oe_edit_only oe_link oe_right"
+                            attrs="{'invisible': [('of_echeances_modified', '=', False)]}"/>
+                        </span>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
         <!-- Ajout etiquettes partenaire sur les devis -->
         <record id="of_sale_view_devis" model="ir.ui.view">
             <field name="name">of.sale.view.devis</field>
@@ -83,68 +160,32 @@
                     <attribute name="groups">-base.group_user, of_sale.of_group_sale_marge_manager</attribute>
                     <attribute name="attrs">{'invisible': [('of_client_view', '=', True)]}</attribute>
                 </xpath>
+                <xpath expr="//field[@name='margin']" position="after">
+                    <field name="of_marge_pc"
+                           groups="-base.group_user, of_sale.of_group_sale_marge_manager"
+                           attrs="{'invisible': [('of_client_view', '=', True)]}"/>
+                </xpath>
             </field>
         </record>
 
-
-        <!-- Ajout champ frais de port product.product -->
-        <record id="of_sale_view_order_form" model="ir.ui.view">
-            <field name="name">of.sale.order.form</field>
-            <field name="model">sale.order</field>
-            <field name="inherit_id" ref="sale.view_order_form"/>
+        <record id="of_sale_echeance_form" model="ir.ui.view">
+            <field name="name">of.sale.echeance.form</field>
+            <field name="model">of.sale.echeance</field>
             <field name="arch" type="xml">
-                <xpath expr="//header" position="inside">
-                    <button name="button_gestion_prix" type="object" string="Gestion prix" attrs="{'invisible': [('invoice_status', '=', 'invoiced')]}"/>
-                </xpath>
-                <xpath expr="//div[@name='button_box']" position="inside">
-                    <!-- Ajout d'un bouton pour switcher entre vue client et vue vendeur' -->
-                    <button name="toggle_view" type="object" class="oe_stat_button" icon="fa-pencil-square-o" groups="of_sale.of_group_sale_marge_manager">
-                        <field name="of_client_view" widget="boolean_button"
-                               options="{'terminology': {'string_true': 'Vue client',
-                                                         'hover_true': 'Vue client',
-                                                         'string_false': 'Vue vendeur',
-                                                         'hover_false': 'Vue vendeur' }}"/>
-                    </button>
-                </xpath>
-                <!-- Transfert de l'information vue vendeur aux lignes de commande nouvellement créées -->
-                <xpath expr="//field[@name='order_line']/tree" position="attributes">
-                    <attribute name="context">{'default_of_client_view': of_client_view}</attribute>
-                </xpath>
-
-                <field name="date_order" position="attributes">
-                    <attribute name="widget">date</attribute>
-                </field>
-                <!-- Ajout onglet Notes : client, facture, intervention -->
-                <xpath expr="//notebook" position="inside">
-                     <page string="Notes">
-                        <!-- Notes client -->
-                        <group attrs="{'invisible':[('of_notes_client','=',False)]}">
-                            <separator string="Notes client" colspan="4"/>
-                            <field name="of_notes_client" colspan="4" nolabel="1" readonly="1"
-                                help="Ces notes proviennent de la fiche client sous la rubrique 'Notes internes'. Ils sont uniquement modifiables dans la fiche client."/>
-                         </group>
-                         <!-- Notes Facture -->
-                        <separator string="Notes facture" colspan="4"/>
-                        <field name="of_notes_facture" colspan="4" nolabel="1" widget="html"/>
-                        <!-- Notes intervention -->
-                        <separator string="Notes intervention" colspan="4"/>
-                        <field name="of_notes_intervention" colspan="4" nolabel="1" widget="html"
-                            help="Ces notes sont visualisées dans planning d'intervention et imprimées dans la fiche d'intervention."/>
-                        <div class="oe_edit_only" colspan="4">
-                            * Les données saisies dans ce champ seront visualisées dans planning d'intervention et imprimées dans la fiche d'intervention.
-                        </div>
-                     </page>
-                </xpath>
-                <!-- Ajout option Documents joints -->
-                <xpath expr="//page//group[@name='technical']" position="after">
-                    <group name="of_docs">
-                        <separator string="Documents joints" colspan="2"/>
-                       <field name="of_mail_template_ids" widget="many2many_tags" nolabel="1"/>
+                <form>
+                    <field name="last" invisible="1"/>
+                    <field name="currency_id" invisible="1"/>
+                    <group>
+                        <group>
+                            <field name="days"/>
+                            <field name="option"/>
+                        </group>
+                        <group>
+                            <field name="percent"/>
+                            <field name="amount" attrs="{'readonly': [('last','=',True)]}"/>
+                        </group>
                     </group>
-                </xpath>
-                <xpath expr="//field[@name='confirmation_date']" position="after">
-                    <field name="of_date_vt"/>
-                </xpath>
+                </form>
             </field>
         </record>
 
@@ -201,6 +242,11 @@
                         <div name="pdf_date_validite_devis">
                             <field name="pdf_date_validite_devis" class="oe_inline"/>
                             <span>Afficher la date de validité dans le rapport PDF des devis</span>
+                        </div>
+                        <label for="pdf_afficher_multi_echeances"/>
+                        <div name="pdf_afficher_multi_echeances">
+                            <field name="pdf_afficher_multi_echeances" class="oe_inline"/>
+                            <span>Afficher les échéances multiples dans les rapports PDF</span>
                         </div>
                         <label for="of_color_bg_section"/>
                         <div name="of_color_bg_section_setting">
