@@ -675,3 +675,22 @@ class OfSaleOrderKitLine(models.Model):
             if pos != -1:
                 name = name[pos+1:]
         return name.strip()
+
+    @api.multi
+    def write(self, values):
+        lines = False
+        if 'qty_per_kit' in values:
+            precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
+            lines = self.filtered(
+                lambda r: r.order_id.state == 'sale' and float_compare(r.qty_per_kit, values['qty_per_kit'], precision_digits=precision) == -1)
+        res = super(OfSaleOrderKitLine, self).write(values)
+        if lines:
+            lines._action_procurement_create()
+        return res
+
+    @api.model
+    def create(self, values):
+        res = super(OfSaleOrderKitLine, self).create(values)
+        if res.order_id.state == 'sale':
+            res._action_procurement_create()
+        return res
