@@ -167,7 +167,10 @@
             </div>
         </div>
     </div>
+    </template>
 
+    <!-- Désactivation des codes barres dans l'en-tête -->
+    <template id="stock.external_layout_header_barcode_right" inherit_id="report.external_layout_header" primary="True">
     </template>
 
     <template id="report.external_layout_footer">
