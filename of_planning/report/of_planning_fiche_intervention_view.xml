@@ -200,12 +200,14 @@
                                 </div>
                                 <div style="display: table-cell; width: 50%; border-left: 1px solid lightgray">
                                     <div class="h5" style="padding: 0px 16px;">
+                                        <div><strong>Adresse d'intervention</strong></div>
                                         <t t-if="o.address_id">
-                                            <div><strong>Adresse d'intervention</strong></div>
                                             <div style="padding-top: 4px" t-field="o.address_id" t-field-options="{'widget': 'contact', 'fields': ['address'], 'no_marker': true }"/>
                                         </t>
+                                        <t t-elif="order.partner_shipping_id">
+                                            <div style="padding-top: 4px" t-field="order.partner_shipping_id" t-field-options="{'widget': 'contact', 'fields': ['address'], 'no_marker': true }"/>
+                                        </t>
                                         <t t-else="">
-                                            <div><strong>Adresse d'intervention</strong></div>
                                             <!-- Espace vide pour écrire l'adresse à la main -->
                                             <div>&amp;nbsp;</div>
                                             <div>&amp;nbsp;</div>
