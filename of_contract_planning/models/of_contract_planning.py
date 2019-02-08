@@ -240,7 +240,8 @@ class OfContract(models.Model):
         invoice = self.env['account.invoice'].create(invoice_vals)
         if self.recurring_invoicing_type:
             pass
-        for line in self.service_ids.filtered('product_id'):
+#         self.service_ids._recompute_todo(self.service_ids._fields['date_next'])
+        for line in self.service_ids.filtered('product_id').filtered(lambda l: fields.Date.from_string(l.next_date) <= old_date):
             invoice_line_vals = self._prepare_invoice_line(line, invoice.id)
             self.env['account.invoice.line'].create(invoice_line_vals)
             line.write({'previous_date': fields.Date.to_string(old_date)})
@@ -333,7 +334,7 @@ class OfService(models.Model):
     color = fields.Char(compute='_compute_color', string='Couleur', store=False)
 
     intervention_model_id = fields.Many2one('of.planning.intervention.model', string=u"Modèle d'intervention")
-    contract_id = fields.Many2one('account.analytic.account', string=u"Contrat")
+    contract_id = fields.Many2one('of.contract', string=u"Contrat")
     frequency = fields.Integer(string=u"Fréquence", default=1)
     frequency_type = fields.Selection([('daily', 'Jour(s)'),
          ('weekly', 'Semaine(s)'),
@@ -342,7 +343,7 @@ class OfService(models.Model):
          ('yearly', u'Année(s)'),
          ], default='monthly')
     previous_date = fields.Date(string=u"Dernière facturation")
-    next_date = fields.Date(string="Prochaine facturation", compute="_compute_next_date")
+    next_date = fields.Date(string="Prochaine facturation", compute="_compute_next_date", store=True)
 
     @api.onchange('intervention_model_id')
     def onchange_intervention_model(self):
