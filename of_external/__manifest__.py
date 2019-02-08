@@ -21,6 +21,7 @@ Utilisation des variables Mako pour intégrer des champs aux lignes d'en-tête e
         'report',
         'of_base',
         'mail',
+        'stock',
     ],
     'data': [
         'wizard/of_external_wizard_views.xml',
