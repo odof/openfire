@@ -179,8 +179,6 @@
         <menuitem name="Tournées" id="menu_of_planning_tournee_tree" parent="of_planning.menu_of_planning_intervention" sequence="7"
                   action="action_of_planning_tournee_tree"/>
 
-<<<<<<< 471d674bcac677b54bfdfb68a0d80a434f1e81a3
-=======
         <menuitem name="Géolocalisation" id="menu_of_planning_clients_geoloc" parent="of_planning.menu_of_planning_clients" sequence="50"
                   action="of_geolocalize.of_action_of_geo_menu"/>
 
@@ -198,7 +196,6 @@
             groups="of_planning.of_group_planning_intervention_user"
         />
 
->>>>>>> of_parc_installe, of_planning, of_planning_tournee, of_project_issue : Ajout/Modification des menus
         <!-- vue map des services -->
         <record id="of_planning_tournee_service_map_view" model="ir.ui.view">
             <field name="name">of.planning.tournee.service.view.map</field>

@@ -123,14 +123,9 @@
                                 <field name="name" string="Libellé"/>
                             </group>
                             <group col="2">
-<<<<<<< 0a9082966d93bf1716ba49f2212b364ea0001446
-                                <field name="tache_id"/>
-                                <field name="date"/>
-=======
                                 <field name="model_id" attrs="{'readonly': [('number', '!=', False), ('state', 'not in', ('draft', 'cancel'))]}"/>
                                 <field name="tache_id" context="{'tz': 'Europe/Paris'}"/>
                                 <field name="date" context="{'tz': 'Europe/Paris'}"/>
->>>>>>> of_planning : Ajout du modèle d'intervention + menu dans configuration
                                 <field name="jour"/>
                                 <field name="duree" string="Durée" widget="float_time"/>
                                 <field name="date_deadline"/>
