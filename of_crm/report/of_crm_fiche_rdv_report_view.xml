@@ -201,7 +201,7 @@
                                  <div style="width: 50%; display: table-cell; padding: 0px 16px;">
                                      <div class="h5">
                                          <t t-if="o.planned_revenue">
-                                             <div><span>Budget&amp;nbsp;: </span><span t-field="o.planned_revenue"/> €</div>
+                                             <div><span>Budget&amp;nbsp;: </span><span t-field="o.planned_revenue" t-options='{"widget": "monetary", "display_currency": o.company_currency}'/></div>
                                          </t>
                                          <t t-if="o.probability">
                                              <div><span>Probabilité&amp;nbsp;: </span><span t-field="o.probability"/><span> %</span></div>
