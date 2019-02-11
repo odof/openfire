@@ -182,20 +182,6 @@
         <menuitem name="Géolocalisation" id="menu_of_planning_clients_geoloc" parent="of_planning.menu_of_planning_clients" sequence="50"
                   action="of_geolocalize.of_action_of_geo_menu"/>
 
-        <!-- appelée depuis l'infobulle en vue map -->
-        <act_window
-            name="Planifier une intervention"
-            res_model="of.tournee.rdv"
-            src_model="of.service"
-            view_mode="form"
-            view_id="view_res_wizard"
-            id="action_view_res_wizard_service"
-            key2="client_action_multi"
-            target="new"
-            context="{'model':'of.service'}"
-            groups="of_planning.of_group_planning_intervention_user"
-        />
-
         <!-- vue map des services -->
         <record id="of_planning_tournee_service_map_view" model="ir.ui.view">
             <field name="name">of.planning.tournee.service.view.map</field>
