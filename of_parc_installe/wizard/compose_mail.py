@@ -28,9 +28,11 @@ class OfComposeMail(models.TransientModel):
 
         sav = objects.get('sav')
         parc = objects.get('parc_installe')
+        product = (parc and parc.product_id) or (sav and sav.product_name_id)
         result.update({
             'pi_produit_installe': parc and parc.name or '',
             'pi_name'            : parc and parc.name or '',
-            'pi_product_name'    : sav and sav.product_name_id and sav.product_name_id.name_get()[0][1] or '',
+            'pi_marque'          : product and ('brand_id' in product._fields) and product.brand_id.name or '',
+            'pi_product_name'    : product and product.name_get()[0][1] or '',
         })
         return result
