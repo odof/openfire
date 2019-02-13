@@ -68,6 +68,8 @@ Droits utilisateurs:
 
 - Ajout d'un droit pour avoir accès aux données relatives aux marges (dans devis/commande, fiche article et la gestion des prix)
 - Ajout d'un smart button sur les devis pour afficher/cacher les données relatives aux marges
+
+- Rendre visible les menus "Étiquettes de contact" et "Catégories d'articles" sans le mode développeur.
 """,
     'depends' : [
         "of_account_invoice_report",  # définition des paramètres d'adresse dans les rapports

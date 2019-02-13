@@ -155,4 +155,7 @@
         </field>
     </record>
 
+    <!-- Rendre visible le menu "Écritures comptables" sans le mode débogue. -->
+    <menuitem action="account.action_account_moves_all_a" id="account.menu_action_account_moves_all" parent="account.menu_finance_entries" sequence="1" groups="-base.group_no_one" />
+
 </odoo>
