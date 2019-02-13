@@ -162,10 +162,10 @@ class AccountInvoice(models.Model):
         """Récupère la liste des taxes par groupe pour lorsque l'option afficher l'acompte en pied de facture, le prendre comme un paiement et alors ne pas inclure la TVA."""
         if self.env['ir.values'].get_default('account.config.settings', 'of_impression_acomptes') != 'as_payment':
             return super(AccountInvoice, self)._get_tax_amount_by_group()
-        return self._get_abs_taxes_values()
+        return self._get_taxes_values()
 
     @api.multi
-    def _get_abs_taxes_values(self):
+    def _get_taxes_values(self):
         """ [IMPRESSION]
         Permet de récupérer la valeur des différentes taxes sans inclure les acomptes.
         """
@@ -182,7 +182,7 @@ class AccountInvoice(models.Model):
                 tax_browse =  tax_obj.browse([tax['id']])
                 res.setdefault(tax_browse.tax_group_id, 0.0)
                 val = self._prepare_tax_line_vals(line, tax)
-                res[tax_browse.tax_group_id] += abs(val['amount'])
+                res[tax_browse.tax_group_id] += val['amount']
         res = sorted(res.items(), key=lambda l: l[0].sequence)
         res = [(
             r[0].name, r[1], formatLang(self.with_context(lang=self.partner_id.lang).env, r[1], currency_obj=currency)
