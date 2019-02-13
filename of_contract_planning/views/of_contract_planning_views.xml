@@ -51,17 +51,19 @@
                         <field name="name" class="oe_inline" placeholder="e.g. Project XYZ"/>
                     </h1>
                 </div>
-                <group>
-                    <field name="partner_id"/>
-                    <field name="company_id"/>
+                <group col="4">
+                    <group colspan="2">
+                        <field name="partner_id"/>
+                        <field name="company_id"/>
+                    </group>
                 </group>
                 <separator string="Factures récurrentes"/>
                 <group col="4">
                     <group col="2" colspan="2">
 <!--                         <field name="contract_template_id" colspan="4"/> -->
                         <field name="recurring_invoicing_type"/>
-                        <label for="recurring_interval"/>
-                        <div>
+                        <label for="recurring_interval" attrs="{'invisible': [('recurring_invoicing_type', '!=', 'contract')]}"/>
+                        <div attrs="{'invisible': [('recurring_invoicing_type', '!=', 'contract')]}">
                             <field name="recurring_interval" class="oe_inline"/>
                             <field name="recurring_rule_type" class="oe_inline"/>
                         </div>
@@ -70,7 +72,7 @@
                     </group>
                     <group col="2" colspan="2">
                         <field name="journal_id"/>
-                        <field name="pricelist_id"/>
+                        <field name="pricelist_id" invisible="1"/>
                         <field name="date_end"/>
                         <field name="fiscal_position_id"/>
                     </group>

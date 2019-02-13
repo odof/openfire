@@ -4,6 +4,7 @@ from odoo import models, fields, api
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from odoo.addons import decimal_precision as dp
+from odoo.exceptions import UserError
 from odoo.exceptions import ValidationError
 from odoo.tools.translate import _
 
@@ -18,11 +19,11 @@ class OfAccountInvoice(models.Model):
 
     of_contract_id = fields.Many2one('of.contract', string="(OF) Contrat")
 
-
 class OfAccountInvoiceLine(models.Model):
     _inherit = "account.invoice.line"
 
     of_contract_id = fields.Many2one('of.contract', string="(OF) Contrat")
+    of_service_id = fields.Many2one('of.service', string="(OF) Service")
 
 class OfContract(models.Model):
     _name = "of.contract"
@@ -61,8 +62,8 @@ class OfContract(models.Model):
         [('contract', u'Récurrence du contrat'),
          ('services', u'Récurrence des services'),
          ],
-        default='services',
-        string='Invoicing type',
+        default='contract',
+        string='Type de facturation',
         help="Specify if process date is 'from' or 'to' invoicing date",
     )
     recurring_interval = fields.Integer(
@@ -95,6 +96,7 @@ class OfContract(models.Model):
         default=fields.Date.context_today,
         copy=False,
         string='Date de la prochaine facture',
+        compute="_compute_next_date",
     )
     fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale")
     next_subtotal = fields.Monetary(string="Prochain montant HT", compute='_compute_next_total', currency_field='company_currency_id')
@@ -102,10 +104,33 @@ class OfContract(models.Model):
     next_total = fields.Monetary(string="Prochain Total", compute='_compute_next_total', currency_field='company_currency_id')
     company_currency_id = fields.Many2one('res.currency', related='company_id.currency_id', string="Company Currency", readonly=True)
 
-    @api.depends('service_ids', 'recurring_rule_type', 'recurring_interval')
+    last_invoicing_date = fields.Date(string=u"Date de dernière facturation", copy=False)
+
+    @api.depends('recurring_invoicing_type', 'last_invoicing_date', 'date_start')
+    def _compute_next_date(self):
+        for contract in self:
+            if contract.recurring_invoicing_type == 'contract':
+                if contract.last_invoicing_date:
+                    contract.recurring_next_date = fields.Date.to_string(fields.Date.from_string(contract.last_invoicing_date) + self.get_relative_delta(
+                        contract.recurring_rule_type, contract.recurring_interval))
+                else:
+                    contract.recurring_next_date = fields.Date.to_string(datetime.today())
+            else:
+                lines = contract.service_ids.filtered(lambda l: l.product_id)
+                if lines:
+                    date_next = fields.Date.from_string(lines[0].next_date)
+                    for line in lines:
+                        date = fields.Date.from_string(line.next_date)
+                        if date and date < date_next:
+                            date_next = date
+                    contract.recurring_next_date = date_next and fields.Date.to_string(date_next) or fields.Date.to_string(datetime.today())
+                else:
+                    contract.recurring_next_date = contract.date_start
+
+    @api.depends('service_ids', 'recurring_rule_type', 'recurring_interval', 'fiscal_position_id')
     def _compute_next_total(self):
         for contract in self:
-            next_date = fields.Date.from_string(contract.recurring_next_date) or self.context.get('recurring_next_date') and fields.Date.from_string(self.context.get('recurring_next_date')) or fields.Date.from_string(fields.Date.today())
+            next_date = fields.Date.from_string(contract.recurring_next_date) or self._context.get('recurring_next_date') and fields.Date.from_string(self.context.get('recurring_next_date')) or fields.Date.from_string(fields.Date.today())
             lines = contract.service_ids.filtered(lambda l: l.product_id and (fields.Date.from_string(l.next_date) or fields.Date.from_string(fields.Date.today())) <= next_date)
             subtotal = sum(lines.mapped('price_subtotal'))
             contract.next_subtotal = subtotal
@@ -166,14 +191,29 @@ class OfContract(models.Model):
     def onchange_partner(self):
         self.fiscal_position_id = self.partner_id.property_account_position_id
 
+    def get_quantity(self, line, old_date):
+        if self.recurring_invoicing_type == 'services':
+            return line.quantity
+        else:
+            begin = fields.Date.from_string(line.first_invoicing) or fields.Date.from_string(self.recurring_next_date)
+            quant = sum(self.env['account.invoice.line'].search([('of_service_id', '=', line.id)]).mapped('quantity'))
+            to_invoice_quant = line.quantity
+            while (begin < old_date):
+                begin += self.get_relative_delta(line.frequency_type, line.frequency)
+                to_invoice_quant += line.quantity
+            if begin > old_date:
+                to_invoice_quant -= 1
+            return to_invoice_quant - quant
+
     @api.model
-    def _prepare_invoice_line(self, line, invoice_id):
+    def _prepare_invoice_line(self, line, invoice_id, old_date):
         invoice_line = self.env['account.invoice.line'].new({
             'invoice_id': invoice_id,
             'product_id': line.product_id.id,
-            'quantity': line.quantity,
+            'quantity': self.get_quantity(line, old_date),
             'uom_id': line.uom_id.id,
             'discount': line.discount,
+            'of_service_id': line.id,
         })
         # Get other invoice line values from product onchange
         invoice_line._onchange_product_id()
@@ -228,9 +268,11 @@ class OfContract(models.Model):
             'company_id': self.company_id.id,
             'of_contract_id': self.id,
             'user_id': self.partner_id.user_id.id,
+            'fiscal_position_id': self.fiscal_position_id.id,
         })
         # Get other invoice values from partner onchange
         invoice._onchange_partner_id()
+        invoice.fiscal_position_id = self.fiscal_position_id.id
         return invoice._convert_to_write(invoice._cache)
 
     @api.multi
@@ -238,13 +280,13 @@ class OfContract(models.Model):
         self.ensure_one()
         invoice_vals = self._prepare_invoice()
         invoice = self.env['account.invoice'].create(invoice_vals)
-        if self.recurring_invoicing_type:
-            pass
-#         self.service_ids._recompute_todo(self.service_ids._fields['date_next'])
         for line in self.service_ids.filtered('product_id').filtered(lambda l: fields.Date.from_string(l.next_date) <= old_date):
-            invoice_line_vals = self._prepare_invoice_line(line, invoice.id)
+            invoice_line_vals = self._prepare_invoice_line(line, invoice.id, old_date)
             self.env['account.invoice.line'].create(invoice_line_vals)
-            line.write({'previous_date': fields.Date.to_string(old_date)})
+            if line.first_invoicing:
+                line.write({'previous_date': fields.Date.to_string(old_date)})
+            else:
+                line.write({'previous_date': fields.Date.to_string(old_date), 'first_invoicing': fields.Date.to_string(old_date)})
         invoice.compute_taxes()
         return invoice
 
@@ -256,13 +298,13 @@ class OfContract(models.Model):
         invoices = self.env['account.invoice']
         for contract in self:
             if len(contract.service_ids) == 0:
-                continue
-            ref_date = contract.recurring_next_date or fields.Date.today()
+                raise UserError(u"Impossible de créer une facture car le contrat n'a aucune ligne facturable pour le contrat %s : %s." % (contract.name, contract.partner_id.name))
+            ref_date = contract.recurring_next_date
             if (contract.date_start > ref_date or
                     contract.date_end and contract.date_end < ref_date):
                 raise ValidationError(
-                    u"Vous devez revoir les dates de début et de fin !\n%s" %
-                    contract.name
+                    u"Vous devez revoir les dates de début et de fin pour le contrat %s : %s." %
+                    (contract.name, contract.partner_id.name)
                 )
             old_date = fields.Date.from_string(ref_date)
             new_date = old_date + self.get_relative_delta(
@@ -277,7 +319,7 @@ class OfContract(models.Model):
             # Re-read contract with correct company
             invoices |= contract.with_context(ctx)._create_invoice(old_date)
             contract.write({
-                'recurring_next_date': fields.Date.to_string(new_date)
+                'last_invoicing_date': fields.Date.to_string(old_date)
             })
         return invoices
 
@@ -342,32 +384,35 @@ class OfService(models.Model):
          ('monthlylastday', 'Month(s) last day'),
          ('yearly', u'Année(s)'),
          ], default='monthly')
+    first_invoicing = fields.Date(string=u"Première facturation")
     previous_date = fields.Date(string=u"Dernière facturation")
-    next_date = fields.Date(string="Prochaine facturation", compute="_compute_next_date", store=True)
+    next_date = fields.Date(string="Prochaine facturation", compute="_compute_next_date", store=False)
 
     @api.onchange('intervention_model_id')
     def onchange_intervention_model(self):
         if self.intervention_model_id.tache_id:
             self.tache_id = self.intervention_model_id.tache_id
 
-    @api.depends('previous_date')
+    @api.model
+    def get_relative_delta(self, recurring_rule_type, interval):
+        if recurring_rule_type == 'daily':
+            return relativedelta(days=interval)
+        elif recurring_rule_type == 'weekly':
+            return relativedelta(weeks=interval)
+        elif recurring_rule_type == 'monthly':
+            return relativedelta(months=interval)
+        elif recurring_rule_type == 'monthlylastday':
+            return relativedelta(months=interval, day=31)
+        else:
+            return relativedelta(years=interval)
+
+    @api.depends('previous_date', 'contract_id', 'product_id')
     def _compute_next_date(self):
         for line in self:
             if line.previous_date:
-                relative_time = relativedelta()
-                if line.frequency_type == 'daily':
-                    relative_time = relativedelta(days=line.frequency)
-                elif line.frequency_type == 'weekly':
-                    relative_time = relativedelta(weeks=line.frequency)
-                elif line.frequency_type == 'monthly':
-                    relative_time = relativedelta(months=line.frequency)
-                elif line.frequency_type == 'monthlylastday':
-                    relative_time = relativedelta(months=line.frequency)  # DOIT ÊTRE CHANGÉ
-                elif line.frequency_type == 'yearly':
-                    relative_time = relativedelta(years=line.frequency)
-                line.next_date = (datetime.strptime(line.previous_date, "%Y-%m-%d") + relative_time).strftime("%Y-%m-%d")
+                line.next_date = fields.Date.to_string(fields.Date.from_string(line.previous_date) + self.get_relative_delta(line.frequency_type, line.frequency))
             else:
-                line.next_date = line.contract_id.recurring_next_date
+                line.next_date = line.contract_id.recurring_next_date or line.contract_id.date_start or fields.Date.to_string(datetime.today())
 
     product_id = fields.Many2one(
         'product.product',

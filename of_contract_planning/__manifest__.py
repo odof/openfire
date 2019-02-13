@@ -24,6 +24,8 @@ Contrat OpenFire
     "data": [
         'views/of_contract_planning_views.xml',
         'security/ir.model.access.csv',
+        'wizards/of_contract_planning_wizard_view.xml',
+        'wizards/rdv_views.xml',
     ],
     'installable': True,
     'application': False,
