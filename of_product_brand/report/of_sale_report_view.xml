@@ -9,6 +9,9 @@
             <xpath expr="//group[@expand='1']/separator" position="before">
                 <field string="Marque" name="of_brand_id" context="{'group_by' : 'of_brand_id'}"/>
             </xpath>
+            <xpath expr="//field[@name='date']" position="after">
+                <field name="of_confirmation_date"/>
+            </xpath>
         </field>
     </record>
 
