@@ -17,6 +17,25 @@
         </field>
     </record>
 
+    <!-- ############################### -->
+    <!-- ###### Comptes en banque ###### -->
+    <!-- ############################### -->
+
+    <!-- Ajouter aux comptes en banque les données relatives au mandat SEPA -->
+    <record id="of_res_partner_bank_form" model="ir.ui.view">
+        <field name="name">of.res.partner.bank.form</field>
+        <field name="model">res.partner.bank</field>
+        <field name="inherit_id" ref="base.view_partner_bank_form"/>
+        <field name="arch" type="xml">
+            <field name="bank_id" position="after">
+                <newline/>
+                <separator string="Mandat SEPA" colspan="4"/>
+                <field name="of_sepa_rum"/>
+                <field name="of_sepa_date_mandat"/>
+                <field name="of_sepa_type_prev"/>
+            </field>
+        </field>
+    </record>
 
     <!-- ########################### -->
     <!-- ###### Paiements edi ###### -->
@@ -35,7 +54,7 @@
         </field>
     </record>
 
-    <!-- Ajouter champs SIRET (company_registry), RUM et date mandat dans configuration partenaire -->
+    <!-- Ajouter champs SIRET (company_registry) dans partenaires -->
     <record id="of_paiement_edi_partner" model="ir.ui.view">
         <field name="name">of.paiement.edi.partner</field>
         <field name="model">res.partner</field>
@@ -44,9 +63,7 @@
         <field name="arch" type="xml">
             <field name="property_account_position_id" position="before">
                 <field name="company_registry"/> <!--  Migration -->
-                <field name="of_sepa_rum"/>
-                <field name="of_sepa_date_mandat"/>
-                <field name="of_sepa_type_prev"/>
+                <p colspan="2">Note : le mandat SEPA (RUM) se configure dorénavant au niveau des comptes en banque (onglet Ventes et achats).</p>
             </field>
         </field>
     </record>
@@ -130,7 +147,7 @@
                             <p><b>Pour prélèvement SEPA :</b></p>
                             <ul>
                                 <li>Le fichier génère des prélèvements récurrents mandat CORE.</li>
-                                <li>Les mandats se configurent dans l'onglet Achats-Ventes du client.</li>
+                                <li>Les mandats (RUM) se configurent dans le compte en banque de la personne débitée.</li>
                                 <li>L'identifiant créancier SEPA (ICS) se configure dans les paramètres de la société émettrice.</li>
                             </ul>
                         </group>
