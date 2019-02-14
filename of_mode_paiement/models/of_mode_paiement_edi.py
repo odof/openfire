@@ -22,8 +22,8 @@ class ResCompany(models.Model):
     of_num_ics = fields.Char(u"Identifiant créancier SEPA (ICS)", size=32, required=False, help=u"Identifiant créancier SEPA (ICS) pour opérations bancaires SEPA par échange de fichiers informatiques")
 
 
-class ResPartner(models.Model):
-    _inherit = "res.partner"
+class ResPartnerBank(models.Model):
+    _inherit = "res.partner.bank"
 
     of_sepa_rum = fields.Char(u"Référence unique du mandat (RUM) SEPA", size=35, required=False, help=u"Référence unique du mandat (RUM) SEPA pour opérations bancaires par échange de fichiers informatiques")
     of_sepa_date_mandat = fields.Date(u"Date de signature du mandat SEPA", required=False, help=u"Date de signature du mandat SEPA pour opérations bancaires par échange de fichiers informatiques")
@@ -36,7 +36,16 @@ class ResPartner(models.Model):
               u"- Mettre à 1er prélèvement quand aucun prélèvement n'a été effectué avec ce mandat.\n"
               u"Lors d'un 1er prélèvement, cette option passera automatiquement à prélèvement récurrent en cours.\n\n"
               u"- Mettre à prélèvement récurrent en cours lorsqu'un prélèvement a déjà été effectué avec ce mandat.\n\n"))
-    company_registry = fields.Char(u'Registre de la société', size=64)  # Migration : on ajoute le champ company_registry pour les partenaires. Il est définit dans of_sales mais on le rajoute au cas où of_sales ne serait pas installé.
+
+
+class ResPartner(models.Model):
+    _inherit = "res.partner"
+
+    # On ajoute le champ company_registry (SIRET/SIREN) 
+    pour les partenaires.
+    # Il est définit dans le module OCA l10n_fr_siret mais on le rajoute au cas où ce module ne serait pas installé.
+    company_registry = fields.Char(u'Registre de la société', size=64)
+
 
 class OfPaiementEdi(models.Model):
     """Paiement par échange de fichier informatique"""
@@ -185,7 +194,7 @@ class OfPaiementEdi(models.Model):
         else:
             chaine += " " * 6
         chaine += self.chaine2ascii_taille_fixe_maj(self.mode_paiement_id.company_id.name, 24)  # Raison sociale de l'émetteur en majuscule sans accent et ponctuation interdite tronquée ou complétée à 24 caractères
-        if self.mode_paiement_id.bank_id.bank_id.name:                        # Domiciliation (nom) bancaire du tirant
+        if self.mode_paiement_id.bank_id.bank_id.name:  # Domiciliation (nom) bancaire du tirant
             chaine += self.chaine2ascii_taille_fixe_maj(self.mode_paiement_id.bank_id.bank_id.name, 24)
             sortie += self.mode_paiement_id.bank_id.bank_id.name
 
@@ -216,11 +225,11 @@ class OfPaiementEdi(models.Model):
         # code monnaie (euro)
         chaine += "E"
 
-        # Référence bancaire émetteur - Configuré dans Odoo soit en IBAN
+        # Référence bancaire émetteur - Configuré dans Odoo au format IBAN.
         temp = self.mode_paiement_id.bank_id.acc_number
         if temp:
             temp = temp.replace("IBAN", "").replace(" ", "").upper()
-        if temp and len(temp) == 27 and temp[0:2] == "FR":  # Si IBAN renseigné et français, on se base dessus
+        if temp and len(temp) == 27 and temp[0:2] == "FR":  # Si IBAN renseigné et français, on se base dessus.
             chaine += temp[4:9]     # Code banque
             sortie += u" Banque : " + temp[4:9]
             chaine += temp[9:14]    # Code guichet
@@ -237,7 +246,6 @@ class OfPaiementEdi(models.Model):
             chaine += " " * 6
         chaine += " " * 10  # Zone réservée
 
-        # Avant 03/01/2019 temp = liste_factures[0].company_id.company_registry    # No SIREN
         temp = self.mode_paiement_id.company_id.company_registry    # No SIREN
         if not temp:
             chaine += " " * 15
@@ -396,46 +404,79 @@ class OfPaiementEdi(models.Model):
                 rib = self._get_partner_rib(facture.invoice_id.partner_id)
                 if not rib:
                     raise UserError(u"Erreur ! (#ED436)\n\nPas de compte bancaire trouvé pour " + facture.invoice_id.partner_id.display_name + u".\n\nPour effectuer une opération SEPA, un compte en banque doit être défini pour le client de chaque facture.")
+
+                """ Info : arborescence xml générée dans cette partie
+                <!-- Niveau transaction -->
+                <DrctDbtTxInf> <!-- Débit à effectuer (plusieurs possible) -->
+                    <PmtId>
+                        <EndToEndId>...</EndToEndId> <!-- Identifiant de transaction envoyé au débiteur obligatoire -->
+                    </PmtId>
+                    <InstdAmt Ccy="EUR">...</InstdAmt> <!-- Montant de la transaction obligatoire -->
+                    <DrctDbtTx>
+                        <MndtRltdInf> <!-- Informations relatives au mandat -->
+                            <MndtId>...</MndtId> <!-- Code RUM -->
+                            <DtOfSgntr>...</DtOfSgntr> <!-- Date de signature du mandat -->
+                            <AmdmntInd>false</AmdmntInd> <!-- facultatif Indicateur permettant de signaler une modification d'une ou plusieurs données du mandat. Valeurs : "true" (si il y a des modifications) "false" (pas de modification). Valeur par défaut : "false" -->
+                        </MndtRltdInf>
+                    </DrctDbtTx>
+                    <DbtrAgt> <!-- Référence banque débiteur -->
+                        <FinInstnId>
+                            <BIC>...</BIC> <!-- Code SWIFT banque débiteur -->
+                        </FinInstnId>
+                    </DbtrAgt>
+                    <Dbtr> <!-- Information sur le débiteur obligatoire mais balises filles facultatives-->
+                        <Nm>...</Nm> <!-- Nom débiteur -->
+                    </Dbtr>
+                    <DbtrAcct> <!-- Informations sur le compte à débiter obligatoire -->
+                        <Id>
+                            <IBAN>...</IBAN>
+                        </Id>
+                    </DbtrAcct>
+                    <RmtInf> <!-- Information sur la remise de la transaction obligatoire -->
+                        <Ustrd>...</Ustrd> <!-- Libellé apparaissant sur le relevé du débiteur -->
+                    </RmtInf>
+                </DrctDbtTxInf>
+                <!-- Fin niveau transaction -->"""
+
                 chaine_transaction += """
-                        <!-- Niveau transaction -->
-                        <DrctDbtTxInf> <!-- Débit à effectuer (plusieurs possible) -->
+                        <DrctDbtTxInf>
                             <PmtId>
-                                <EndToEndId>PREV""" + time.strftime('%S%M%H%d%m%Y') + str(index) + """</EndToEndId> <!-- Identifiant de transaction envoyé au débiteur obligatoire -->
+                                <EndToEndId>PREV""" + time.strftime('%S%M%H%d%m%Y') + str(index) + """</EndToEndId>
                             </PmtId>
                             <InstdAmt Ccy="EUR">""" + str('%.2f' % montant_du)
                 index = index + 1
-                chaine_transaction += """</InstdAmt> <!-- Montant de la transaction obligatoire -->
+                chaine_transaction += """</InstdAmt>
                             <DrctDbtTx>
-                                <MndtRltdInf> <!-- Informations relatives au mandat -->
+                                <MndtRltdInf>
                                     <MndtId>"""
                 if facture.invoice_id.partner_id.of_sepa_rum:
                     chaine_transaction += str(facture.invoice_id.partner_id.of_sepa_rum)
                 else:
-                    raise UserError(u"Erreur ! (#ED438)\n\nPas de référence unique du mandat (RUM) trouvé pour " + facture.invoice_id.partner_id.display_name + u".\n\nLe RUM est obligatoire pour effectuer un prélèvement SEPA et se configure dans l'onglet Achats-Ventes du client.")
-                chaine_transaction += """</MndtId> <!-- Code RUM -->
+                    raise UserError(u"Erreur ! (#ED438)\n\nPas de référence unique du mandat (RUM) trouvé pour " + facture.invoice_id.partner_id.display_name + u" (facture " + facture.invoice_id.number + ").\n\nLe RUM est obligatoire pour effectuer un prélèvement SEPA et se configure dans l'onglet Achats-Ventes du client.")
+                chaine_transaction += """</MndtId>
                                     <DtOfSgntr>"""
                 if facture.invoice_id.partner_id.of_sepa_date_mandat:
                     chaine_transaction += str(facture.invoice_id.partner_id.of_sepa_date_mandat)
                 else:
                     raise UserError(u"Erreur ! (#ED440)\n\nPas de date de signature du mandat SEPA trouvé pour " + facture.invoice_id.partner_id.display_name + u".\n\nCette date est obligatoire pour effectuer un prélèvement SEPA et se configure dans l'onglet Achats-Ventes du client.")
-                chaine_transaction += """</DtOfSgntr> <!-- Date de signature du mandat -->
-                                    <AmdmntInd>false</AmdmntInd> <!-- facultatif Indicateur permettant de signaler une modification d'une ou plusieurs données du mandat. Valeurs : "true" (si il y a des modifications) "false" (pas de modification). Valeur par défaut : "false" -->
+                chaine_transaction += """</DtOfSgntr>
+                                    <AmdmntInd>false</AmdmntInd>
                                 </MndtRltdInf>
                             </DrctDbtTx>
-                            <DbtrAgt> <!-- Référence banque débiteur -->
+                            <DbtrAgt>
                                 <FinInstnId>
                                     <BIC>"""
                 if rib[0].bank_id.bic:
                     chaine_transaction += str(rib[0].bank_id.bic)
                 else:
                     raise UserError(u"Erreur ! (#ED445)\n\nPas de code BIC (SWIFT) de la banque trouvé pour " + facture.invoice_id.partner_id.display_name + u".\n\nIl est nécessaire de fournir ce code pour effectuer une opération SEPA.")
-                chaine_transaction += """</BIC> <!-- Code SWIFT banque débiteur -->
+                chaine_transaction += """</BIC>
                                 </FinInstnId>
                             </DbtrAgt>
-                            <Dbtr> <!-- Information sur le débiteur obligatoire mais balises filles facultatives-->
-                                <Nm>""" + self.chaine2ascii_taillemax(facture.invoice_id.partner_id.display_name, 70) + """</Nm> <!-- Nom débiteur -->
+                            <Dbtr>
+                                <Nm>""" + self.chaine2ascii_taillemax(facture.invoice_id.partner_id.display_name, 70) + """</Nm>
                             </Dbtr>
-                            <DbtrAcct> <!-- Informations sur le compte à débiter obligatoire -->
+                            <DbtrAcct>
                                 <Id>
                                     <IBAN>"""
                 if rib[0].acc_number:
@@ -448,12 +489,11 @@ class OfPaiementEdi(models.Model):
                 if self.motif:    # On insère le motif
                     if self.motif == 'nofacture' and facture.invoice_id.number:
                         chaine_transaction += """
-                            <RmtInf> <!-- Information sur la remise de la transaction obligatoire -->
-                                <Ustrd>Facture """ + self.chaine2ascii_taillemax(facture.invoice_id.number, 140) + """</Ustrd> <!-- Libellé apparaissant sur le relevé du débiteur -->
+                            <RmtInf>
+                                <Ustrd>Facture """ + self.chaine2ascii_taillemax(facture.invoice_id.number, 140) + """</Ustrd>
                             </RmtInf>"""
                 chaine_transaction += """
-                        </DrctDbtTxInf>
-                        <!-- Fin niveau transaction -->"""
+                        </DrctDbtTxInf>"""
                 nb_transaction = nb_transaction + 1
                 nb_transaction_lot = nb_transaction_lot + 1
                 montant_total = montant_total + montant_du
@@ -469,28 +509,75 @@ class OfPaiementEdi(models.Model):
                 continue
 
             # On génére le lot
+
+            """ Info : arborescence xml générée dans cette partie
+            <!-- Lot de transaction -->
+            <PmtInf> <!-- Instructions de prélèvements obligatoire au moins une fois-->
+                <PmtInfId>...</PmtInfId> <!-- Identifiant du lot de transactions Peut être la même valeur que GrpHdr si un seul lot de transaction obligatoire -->
+                <PmtMtd>DD</PmtMtd> <!-- Méthode de paiement obligatoire -->
+                <NbOfTxs>...</NbOfTxs> <!-- Nb de transaction du lot facultatif -->
+                <CtrlSum>...</CtrlSum> <!-- Cumul des sommes des transactions du lot facultatif -->
+                <PmtTpInf> <!-- Information sur le type de paiement Normalement facultatif mais certaines banques attendent cet élément -->
+                    <SvcLvl> <!-- Niveau de service -->
+                        <Cd>SEPA</Cd> <!-- Contient la valeur SEPA -->
+                    </SvcLvl>
+                    <LclInstrm>
+                        <Cd>CORE</Cd> <!-- CORE pour les débits avec une personne physique, B2B pour les débits entre entreprises -->
+                    </LclInstrm>
+                    <SeqTp>...</SeqTp> <!-- Type de séquence : OOFF pour un débit ponctuel, FIRST pour un 1er débit régulier, RCUR pour un débit régulier récurrent, FINAL pour un dernier débit récurrent -->
+                </PmtTpInf>
+                <ReqdColltnDt>...</ReqdColltnDt> <!-- Date d'échéance -->
+                <Cdtr> <!-- Information sur le créancier -->
+                    <Nm>...</Nm> <!-- Nom du créancier facultatif -->
+                </Cdtr>
+                <CdtrAcct> <!-- Information du compte du créditeur -->
+                    <Id> <!-- Peut aussi contenir balise CCy pour monnaie au format ISO -->
+                        <IBAN>...</IBAN>
+                    </Id>
+                </CdtrAcct>
+                <CdtrAgt> <!-- Banque du créancier -->
+                    <FinInstnId>
+                        <BIC>...</BIC> <!-- Code SWIFT de la banque facultatif -->
+                    </FinInstnId>
+                </CdtrAgt>
+                <ChrgBr>SLEV</ChrgBr> <!-- Valeur fixe SLEV -->
+                <CdtrSchmeId> <!-- Identification du créancier -->
+                    <Id>
+                        <PrvtId>
+                            <Othr>
+                                <Id>...</Id> <!-- Identifiant du créancier ICS -->
+                                <SchmeNm>
+                                    <Prtry>SEPA</Prtry> <!-- De valeur fixe SEPA -->
+                                </SchmeNm>
+                            </Othr>
+                        </PrvtId>
+                    </Id>
+                </CdtrSchmeId>
+            </PmtInf>
+            <!-- Fin lot de transaction -->
+            """
+
             chaine_lot += """
-                <!-- Lot de transaction -->
-                <PmtInf> <!-- Instructions de prélèvements obligatoire au moins une fois-->
-                    <PmtInfId>LOT""" + time.strftime('%S%M%H%d%m%Y') + str(index) + """</PmtInfId> <!-- Identifiant du lot de transactions Peut être la même valeur que GrpHdr si un seul lot de transaction obligatoire -->
-                    <PmtMtd>DD</PmtMtd> <!-- Méthode de paiement obligatoire -->
-                    <NbOfTxs>""" + str(nb_transaction_lot) + """</NbOfTxs> <!-- Nb de transaction du lot facultatif -->
-                    <CtrlSum>""" + str('%.2f' % montant_total_lot) + """</CtrlSum> <!-- Cumul des sommes des transactions du lot facultatif -->
-                    <PmtTpInf> <!-- Information sur le type de paiement Normalement facultatif mais certaines banques attendent cet élément -->
-                        <SvcLvl> <!-- Niveau de service -->
-                            <Cd>SEPA</Cd> <!-- Contient la valeur SEPA -->
+                <PmtInf>
+                    <PmtInfId>LOT""" + time.strftime('%S%M%H%d%m%Y') + str(index) + """</PmtInfId>
+                    <PmtMtd>DD</PmtMtd>
+                    <NbOfTxs>""" + str(nb_transaction_lot) + """</NbOfTxs>
+                    <CtrlSum>""" + str('%.2f' % montant_total_lot) + """</CtrlSum>
+                    <PmtTpInf>
+                        <SvcLvl>
+                            <Cd>SEPA</Cd>
                         </SvcLvl>
                         <LclInstrm>
-                            <Cd>CORE</Cd> <!-- CORE pour les débits avec une personne physique, B2B pour les débits entre entreprises -->
+                            <Cd>CORE</Cd>
                         </LclInstrm>
-                        <SeqTp>""" + str(type_prev) + """</SeqTp> <!-- Type de séquence : OOFF pour un débit ponctuel, FIRST pour un 1er débit régulier, RCUR pour un débit régulier récurrent, FINAL pour un dernier débit récurrent -->
+                        <SeqTp>""" + str(type_prev) + """</SeqTp>
                     </PmtTpInf>
-                    <ReqdColltnDt>""" + self.date_echeance + """</ReqdColltnDt> <!-- Date d'échéance -->
-                    <Cdtr> <!-- Information sur le créancier -->
-                        <Nm>""" + self.chaine2ascii_taillemax(self.mode_paiement_id.company_id.name, 70) + """</Nm> <!-- Nom du créancier facultatif -->
+                    <ReqdColltnDt>""" + self.date_echeance + """</ReqdColltnDt>
+                    <Cdtr>
+                        <Nm>""" + self.chaine2ascii_taillemax(self.mode_paiement_id.company_id.name, 70) + """</Nm>
                     </Cdtr>
-                    <CdtrAcct> <!-- Information du compte du créditeur -->
-                        <Id> <!-- Peut aussi contenir balise CCy pour monnaie au format ISO -->
+                    <CdtrAcct>
+                        <Id>
                             <IBAN>"""
             index = index + 1
             if self.mode_paiement_id.bank_id.acc_number:
@@ -500,18 +587,18 @@ class OfPaiementEdi(models.Model):
             chaine_lot += """</IBAN>
                         </Id>
                     </CdtrAcct>
-                    <CdtrAgt> <!-- Banque du créancier -->
+                    <CdtrAgt>
                         <FinInstnId>
                             <BIC>"""
             if self.mode_paiement_id.bank_id.bank_bic:
                 chaine_lot += str(self.mode_paiement_id.bank_id.bank_bic)
             else:
                 raise UserError(u"Erreur ! (#ED425)\n\nPas de code BIC (SWIFT) de la banque attachée au mode de paiement " + self.mode_paiement_id.name + u".\n\nIl est nécessaire de fournir ce code pour effectuer une opération SEPA.")
-            chaine_lot += """</BIC> <!-- Code SWIFT de la banque facultatif -->
+            chaine_lot += """</BIC>
                         </FinInstnId>
                     </CdtrAgt>
-                    <ChrgBr>SLEV</ChrgBr> <!-- Valeur fixe SLEV -->
-                    <CdtrSchmeId> <!-- Identification du créancier -->
+                    <ChrgBr>SLEV</ChrgBr>
+                    <CdtrSchmeId>
                         <Id>
                             <PrvtId>
                                 <Othr>
@@ -520,9 +607,9 @@ class OfPaiementEdi(models.Model):
                 chaine_lot += str(self.mode_paiement_id.company_id.of_num_ics)
             else:
                 raise UserError(u"Erreur ! (#ED430)\n\nPas d'identifiant créancier SEPA (ICS) trouvé pour l'émetteur (" + self.mode_paiement_id.company_id.name + u").\n\nCet identifiant est obligatoire pour effectuer un prélèvement SEPA et se configure dans configuration/société/" + self.mode_paiement_id.company_id.name + ".")
-            chaine_lot += """</Id> <!-- Identifiant du créancier ICS -->
+            chaine_lot += """</Id>
                                     <SchmeNm>
-                                        <Prtry>SEPA</Prtry> <!-- De valeur fixe SEPA -->
+                                        <Prtry>SEPA</Prtry>
                                     </SchmeNm>
                                 </Othr>
                             </PrvtId>
@@ -530,9 +617,7 @@ class OfPaiementEdi(models.Model):
                     </CdtrSchmeId>"""
             # On ajoute les transactions
             chaine_lot = chaine_lot + chaine_transaction + """
-                </PmtInf>
-                <!-- Fin lot de transaction -->
-            """
+                </PmtInf>\n"""
             montant_total_lot = 0
             nb_transaction_lot = 0
             chaine_transaction = ""
@@ -542,20 +627,36 @@ class OfPaiementEdi(models.Model):
         sortie += u"</ul>\n"
 
         # On ajoute l'en-tête.
-        chaine_entete += """<?xml version="1.0" encoding="utf-8"?>
+
+        """ Info : arborescence xml générée dans cette partie
+        <?xml version="1.0" encoding="utf-8"?>
         <Document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:iso:std:iso:20022:tech:xsd:pain.008.001.02">
             <CstmrDrctDbtInitn>
                 <GrpHdr> <!-- En tête -->
-                    <MsgId>MES""" + time.strftime('%S%M%H%d%m%Y') + str(index) + """</MsgId> <!-- Identifiant unique du message M -->
-                    <CreDtTm>""" + str(self.date_creation).replace(' ', 'T') + """</CreDtTm>    <!-- Date de création au format ISO M -->
-                    <NbOfTxs>""" + str(nb_transaction) + """</NbOfTxs>    <!-- Nb total de transactions dans le fichier M -->
-                    <CtrlSum>""" + str('%.2f' % montant_total) + """</CtrlSum> <!-- somme totale des transactions point pour décimale -->
+                    <MsgId>...</MsgId> <!-- Identifiant unique du message M -->
+                    <CreDtTm>...</CreDtTm>    <!-- Date de création au format ISO M -->
+                    <NbOfTxs>...</NbOfTxs>    <!-- Nb total de transactions dans le fichier M -->
+                    <CtrlSum>...</CtrlSum> <!-- somme totale des transactions point pour décimale -->
                     <InitgPty>    <!-- élément de type Partyidentification32 Partie initiatrice de la transaction peut contenir nom créancier adresse Obligatoire mais peut être vide -->
+                        <Nm>...</Nm>
+                    </InitgPty>
+                </GrpHdr> <!-- Fin en-tête -->
+            </CstmrDrctDbtInitn>
+        </Document>
+        """
+
+        chaine_entete += """<?xml version="1.0" encoding="utf-8"?>
+        <Document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:iso:std:iso:20022:tech:xsd:pain.008.001.02">
+            <CstmrDrctDbtInitn>
+                <GrpHdr>
+                    <MsgId>MES""" + time.strftime('%S%M%H%d%m%Y') + str(index) + """</MsgId>
+                    <CreDtTm>""" + str(self.date_creation).replace(' ', 'T') + """</CreDtTm>
+                    <NbOfTxs>""" + str(nb_transaction) + """</NbOfTxs>
+                    <CtrlSum>""" + str('%.2f' % montant_total) + """</CtrlSum>
+                    <InitgPty>
                         <Nm>""" + self.chaine2ascii_taillemax(self.mode_paiement_id.company_id.name, 70) + """</Nm>
                     </InitgPty>
-                </GrpHdr>
-                <!-- Fin en-tête -->
-                """
+                </GrpHdr>\n"""
         index = index + 1
         # On met l'en-tête de début et les balises de fin
         chaine = chaine_entete + chaine_lot + """
@@ -627,10 +728,14 @@ class OfPaiementEdi(models.Model):
     @api.multi
     def action_enregistre_paiements(self):
         """Enregistre les paiements des factures suite à un paiement EDI"""
+        #print time.strftime('%Y-%m-%d %H:%M:%S'), u"Début récup données"
         sortie = ""
         if not self.aff_bouton_paiement:
             raise UserError(u"Erreur ! (#ED303)\n\nVous avez modifié la liste des factures depuis la dernière génération du fichier de paiements.\n\nRegénérez une nouvelle fois le fichier avant d'effectuer une nouvelle validation des paiements.")
 
+        paiements = []
+
+        # Pour des raisons de performance d'Odoo (cache), on récupère d'abord les données dans une liste, puis on enregistre les paiements.
         for edi_ligne in self.edi_line_ids:
 
             montant_du = edi_ligne.montant_prelevement
@@ -644,8 +749,7 @@ class OfPaiementEdi(models.Model):
             if montant_du > edi_ligne.invoice_id.residual:
                 raise UserError(u"Erreur ! (#ED305)\n\nLe montant à payer pour la facture " + edi_ligne.invoice_id.number + u" est supérieur au restant dû.\n\nLes paiements de cette facture ont dû changer depuis la génération du fichier.\n\nRectifiez le montant à prélever et générez à nouveau le fichier avant de valider les paiements.")
 
-            # On crée le paiement.
-            payment = self.env['account.payment'].create({
+            paiements.append({
                 'invoice_ids': [(6, 0, [edi_ligne.invoice_id.id])],
                 'amount': montant_du,
                 'payment_date': self.date_remise,
@@ -660,14 +764,26 @@ class OfPaiementEdi(models.Model):
                 'of_payment_mode_id': self.mode_paiement_id.id,
             })
 
-            if not payment:
-                raise UserError(u"Erreur ! (#ED310)\n\nErreur création du paiement pour la facture du " + edi_ligne.invoice_id.date_invoice + u", client : " + edi_ligne.invoice_id.partner_id.display_name + u", montant restant à payer : " + str('%.2f' % montant_du).replace('.', ',') + u" euros.\n\nAucun paiement n'a été en conséquence validé.")
-            payment.post()  # On le confirme.
+        #print time.strftime('%Y-%m-%d %H:%M:%S'), u"Début validation paiement"
+        payment_obj = self.env['account.payment']
 
+        # On parcourt à nouveau les paiements pour les valider.
+        for paiement in paiements:
+            #print time.strftime('%Y-%m-%d %H:%M:%S'), u"Paiement suivant create"
+            # On crée le paiement.
+            payment = payment_obj.create(paiement)
+
+            #print time.strftime('%Y-%m-%d %H:%M:%S'), u"fin create"
+
+            if not payment:
+                facture = self.env['account.invoice'].browse(paiement['invoice_ids'][0][2])
+                raise UserError(u"Erreur ! (#ED310)\n\nErreur création du paiement pour la facture n° " + facture.number + u" du " + facture.date_invoice + u", client : " + facture.partner_id.display_name + u".\n\nAucun paiement n'a été en conséquence validé.")
+            payment.post()  # On le confirme.
+            #print time.strftime('%Y-%m-%d %H:%M:%S'), u"fin test ok create"
             # Si c'est un prélèvement SEPA, on met le champ type de prélèvement SEPA de chaque client à récurrent en cours si était à 1er prélèvement à venir
-            if self.type_paiement == 'Pr. SEPA' and edi_ligne.invoice_id.partner_id.of_sepa_type_prev == 'FRST':
-                if not edi_ligne.invoice_id.partner_id.write({'of_sepa_type_prev': 'RCUR'}):
-                    raise UserError(u"Erreur ! (#ED320)\n\nErreur dans l'enregistrement du type de prélèvement SEPA pour : " + edi_ligne.invoice_id.partner_id.display_name + u".\n\nAucun paiement n'a été en conséquence validé.")
+            #if self.type_paiement == 'Pr. SEPA' and edi_ligne.invoice_id.partner_id.of_sepa_type_prev == 'FRST':
+            #    if not edi_ligne.invoice_id.partner_id.write({'of_sepa_type_prev': 'RCUR'}):
+            #        raise UserError(u"Erreur ! (#ED320)\n\nErreur dans l'enregistrement du type de prélèvement SEPA pour : " + edi_ligne.invoice_id.partner_id.display_name + u".\n\nAucun paiement n'a été en conséquence validé.")
 
         sortie = u"<p>Le paiement des factures a été effectué.</p>\n<p>Il vous reste à transmettre le fichier à votre banque.</p>\n<p>-----------------------------------------------</p>\n" + sortie
 
@@ -678,6 +794,7 @@ class OfPaiementEdi(models.Model):
             'aff_bouton_paiement': False,
             'aff_bouton_genere_fich': False
         })
+        #print time.strftime('%Y-%m-%d %H:%M:%S'), "Fin validation paiement"
         return {'type': 'ir.actions.do_nothing'}
 
     def chaine2ascii_taille_fixe_maj(self, chaine, longueur):
