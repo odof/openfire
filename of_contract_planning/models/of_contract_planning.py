@@ -127,26 +127,31 @@ class OfContract(models.Model):
                 else:
                     contract.recurring_next_date = contract.date_start
 
-    @api.depends('service_ids', 'recurring_rule_type', 'recurring_interval', 'fiscal_position_id')
+    @api.depends('service_ids', 'recurring_rule_type', 'recurring_interval', 'fiscal_position_id', 'recurring_invoicing_type')
     def _compute_next_total(self):
         for contract in self:
             next_date = fields.Date.from_string(contract.recurring_next_date) or self._context.get('recurring_next_date') and fields.Date.from_string(self.context.get('recurring_next_date')) or fields.Date.from_string(fields.Date.today())
             lines = contract.service_ids.filtered(lambda l: l.product_id and (fields.Date.from_string(l.next_date) or fields.Date.from_string(fields.Date.today())) <= next_date)
-            subtotal = sum(lines.mapped('price_subtotal'))
-            contract.next_subtotal = subtotal
-            if contract.fiscal_position_id.default_tax_ids:
-                tax_amount = contract.fiscal_position_id.default_tax_ids[0].amount / 100.0
-                total_tax = sum([line.price_subtotal * tax_amount for line in lines])
-                contract.next_taxes = total_tax
-            else:
-                tax = self.env['ir.values'].get_default('acconut.config.settings', 'default_sale_tax_id')
-                if tax:
-                    tax_amount = tax.amount / 100
+            c_subtotal = 0
+            c_total_tax = 0
+            for line in lines:
+                subtotal = line.price_subtotal * self.get_quantity(line, next_date)
+                c_subtotal += subtotal
+                if contract.fiscal_position_id.default_tax_ids:
+                    tax_amount = contract.fiscal_position_id.default_tax_ids[0].amount / 100.0
+                    total_tax = line.price_subtotal * self.get_quantity(line, next_date) * tax_amount 
+                    contract.next_taxes = total_tax
                 else:
-                    tax_amount = 0
-                total_tax = sum([line.price_subtotal * tax_amount for line in lines])
-                contract.next_taxes = total_tax
-            contract.next_total = total_tax + subtotal
+                    tax = self.env['ir.values'].get_default('acconut.config.settings', 'default_sale_tax_id')
+                    if tax:
+                        tax_amount = tax.amount / 100
+                    else:
+                        tax_amount = 0
+                total_tax = line.price_subtotal * self.get_quantity(line, next_date) * tax_amount
+                c_total_tax += total_tax
+            contract.next_taxes = c_total_tax
+            contract.next_subtotal = c_subtotal
+            contract.next_total = c_total_tax + c_subtotal
 
     @api.model
     def _insert_markers(self, line, date_start, next_date, date_format):

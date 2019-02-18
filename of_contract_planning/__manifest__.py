@@ -7,7 +7,7 @@
     'license': 'AGPL-3',
     "description": """
 Contrat OpenFire
-==============================================
+================
 
 - Ajout des contrats spécifiques OpenFire
 - Modification des services pour fonctionner avec les contrats.
@@ -25,7 +25,6 @@ Contrat OpenFire
         'views/of_contract_planning_views.xml',
         'security/ir.model.access.csv',
         'wizards/of_contract_planning_wizard_view.xml',
-        'wizards/rdv_views.xml',
     ],
     'installable': True,
     'application': False,
