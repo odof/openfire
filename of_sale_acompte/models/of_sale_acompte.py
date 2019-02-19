@@ -57,7 +57,7 @@ class AccountInvoice(models.Model):
         if not invoice.payments_widget:
             return {}, 0
         json_acceptable_string = invoice.payments_widget.replace("'", "\'")
-        widget = json.loads(json_acceptable_string)
+        widget = json.loads(json_acceptable_string) or {}
         total = 0
         if isinstance(widget, dict) and 'content' in widget:
             for payment in widget["content"]:
