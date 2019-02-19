@@ -13,14 +13,14 @@
 ##############################################################################
 
 {
-    'name' : "OpenFire - Liste de prix",
+    'name' : "OpenFire / Liste de prix",
     'version' : "10.0.1.0.0",
     'author' : "OpenFire",
     'website' : "www.openfire.fr",
     'category': "Module Fabricants OpenFire",
     'summary': u"Gestion des Listes de prix",
     'description': u"""
-Module OpenFire - Liste de prix
+Module OpenFire / Liste de prix
 ===============================
 Ce module modifie le fonctionnement des listes de prix.
 

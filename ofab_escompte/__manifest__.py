@@ -13,14 +13,14 @@
 ##############################################################################
 
 {
-    'name' : "OpenFire - Escomptes",
+    'name' : "OpenFire / Escomptes",
     'version' : "10.0.1.0.0",
     'author' : "OpenFire",
     'website' : "www.openfire.fr",
     'category': "Module Fabricants OpenFire",
     'summary': u"Gestion des escomptes",
     'description': u"""
-Module OpenFire - Escomptes
+Module OpenFire / Escomptes
 ===========================
 Ce module permet l'impression de factures avec les escomptes résumés. 
 

@@ -12,7 +12,7 @@
 ##############################################################################
 
 {
-    'name' : u"OpenFire Fusion commandes fournisseur",
+    'name' : u"OpenFire / Fusion commandes fournisseur",
     'version' : "10.0.1.0.0",
     'author' : "OpenFire",
     'website' : "www.openfire.fr",
@@ -20,7 +20,7 @@
     'license': '',
     'summary': u"Openfire Fusion des commandes fournisseurs",
     'description': u"""
-Module OpenFire - Fusion des commandes fournisseur
+Module OpenFire / Fusion des commandes fournisseur
 ==================================================
 Modifications OpenFire pour les commandes fournisseur
 

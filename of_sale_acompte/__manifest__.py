@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {
-    "name" : "OpenFire - Impression acomptes factures",
+    "name" : "OpenFire / Impression acomptes factures",
     "version" : "10.0.1.0.0",
     "author" : "OpenFire",
     "description" : u"""

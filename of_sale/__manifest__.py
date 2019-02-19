@@ -21,7 +21,7 @@
     'summary': u"Personnalisation des ventes OpenFire",
     'description': u"""
 
-Module OpenFire - Ventes
+Module OpenFire / Ventes
 ========================
 
 Modification de l'affichage du formulaire de devis/commande client.

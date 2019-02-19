@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {
-    "name" : "OpenFire Base centrale des articles",
+    "name" : "OpenFire / Base centrale des articles",
     "version" : "10.0.1.0.0",
     "author" : "OpenFire",
     "website" : "http://www.openfire.fr",

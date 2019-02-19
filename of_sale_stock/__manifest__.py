@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {
-    "name": "OpenFire Sale Stock",
+    "name": "OpenFire / Stock ventes",
     "version": "10.0.1.0.0",
     "author": "OpenFire",
     'license': 'AGPL-3',

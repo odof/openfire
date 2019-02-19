@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name' : "OpenFire bandeau base",
+    'name' : "OpenFire / Bandeau base",
     'version' : "1.1",
     'author' : "OpenFire",
     'complexity': "easy",

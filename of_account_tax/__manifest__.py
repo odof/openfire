@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+
 {
-    'name': 'OpenFire Taxes',
+    'name': 'OpenFire / Taxes',
     'version': '10.0.1.0.0',
     'category': 'Accounting',
     'summary': 'OpenFire Taxes',
@@ -20,4 +21,3 @@ Une table de correspondance de comptes comptables est également ajoutée au niv
     'installable': True,
     'auto_install': False,
 }
-# -*- coding: utf-8 -*-

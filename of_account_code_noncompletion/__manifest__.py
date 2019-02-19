@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name': 'OpenFire code compte comptable non complétion',
+    'name': 'OpenFire / Code compte comptable non complétion',
     'author': 'OpenFire',
     'version': '10.0',
     'category': 'OpenFire modules',

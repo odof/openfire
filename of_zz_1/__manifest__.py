@@ -10,14 +10,14 @@
 ##############################################################################
 
 {
-    'name' : "OpenFire - Module spécifique 1",
+    'name' : "OpenFire / Module spécifique 1",
     'version' : "10.0.1.0.0",
     'author' : "OpenFire",
     'website' : "www.openfire.fr",
     'category': "Module OpenFire",
     'summary': u"Fonctionnalités spécifiques 1",
     'description': u"""
-Module OpenFire - 1
+Module OpenFire spécifique 1
 ============================
 Ce module ajoute des fonctionnalités demandées par une société.
 

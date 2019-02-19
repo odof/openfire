@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name': 'OpenFire en-tête et pied de page personnalisés',
+    'name': 'OpenFire / En-tête et pied de page personnalisés',
     'author': 'OpenFire',
     'version': '10.0',
     'category': 'OpenFire modules',

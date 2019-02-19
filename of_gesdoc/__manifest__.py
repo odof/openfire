@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'OpenFire Gestion des documents',
+    'name': 'OpenFire / Gestion des documents',
     'author': 'OpenFire',
     'version': '10.0.1.0.0',
     'category': 'Gestion Documents',

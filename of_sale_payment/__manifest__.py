@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {
-    "name" : "OpenFire Sale Payments",
+    "name" : "OpenFire / Paiements ventes",
     "version" : "10.0.1.0.0",
     "author" : "OpenFire",
     "description" : """

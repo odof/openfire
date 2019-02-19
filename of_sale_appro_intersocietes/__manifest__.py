@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {
-    "name" : "OpenFire Approvisionnement intersociétés",
+    "name" : "OpenFire / Approvisionnement intersociétés",
     "version" : "10.0.1.0.0",
     "author" : "OpenFire",
     "description" : """

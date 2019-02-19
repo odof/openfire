@@ -12,13 +12,13 @@
 ##############################################################################
 
 {
-    'name' : u"OpenFire Géolocalisation",
+    'name' : u"OpenFire / Géolocalisation",
     'version' : "10.0.1.0.0",
     'license': '',
     'author' : "OpenFire",
     'website' : "www.openfire.fr",
     'category': "Module OpenFlam",
-    'summary': u"Géolocalisation des partenaires",
+    'summary': u"Géolocalisation des adresses des partenaires",
     'description': u"""
 Module de Géocodage OpenFire
 ============================

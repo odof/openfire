@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name' : "OpenFire UTM",
+    'name' : "OpenFire / UTM",
     'version' : "10.0",
     'author' : "OpenFire",
     'website' : "http://openfire.fr",

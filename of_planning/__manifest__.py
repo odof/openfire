@@ -12,14 +12,14 @@
 ##############################################################################
 
 {
-    'name' : "OpenFire - Planning",
+    'name' : "OpenFire / Planning",
     'version' : "10.0.1.0.0",
     'author' : "OpenFire",
     'website' : "www.openfire.fr",
     'category': "Generic Modules",
     'summary': u"Gestion des interventions",
     'description': u"""
-Module OpenFire - Planning
+Module OpenFire / Planning
 ==========================
 
 Module OpenFire des plannings d'intervention.

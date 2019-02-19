@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name' : 'OpenFire - Comptes de tiers',
+    'name' : 'OpenFire / Comptes de tiers',
     'version' : '10.0.1.0.0',
     'summary': 'Utilisation de comptes de tiers pour les clients et fournisseurs',
     'description': """
-OpenFire - Comptes de tiers
+OpenFire / Comptes de tiers
 ===========================
 Utilisation de comptes de tiers
     """,

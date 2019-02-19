@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name' : "OpenFire CRM",
+    'name' : "OpenFire / CRM",
     'version' : "10.0.1.0.0",
     'author' : "OpenFire",
     'website' : "http://openfire.fr",

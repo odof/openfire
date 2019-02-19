@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name': 'OpenFire Map View',
+    'name': 'OpenFire / Vue carte (cartographie)',
     'author': 'OpenFire',
     'version': '10.0',
     'category': 'OpenFire modules',

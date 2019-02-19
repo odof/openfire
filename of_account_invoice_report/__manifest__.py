@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name': 'OpenFire - Impression Factures',
+    'name': 'OpenFire / Impression factures',
     'author': 'OpenFire',
     'version': '10.0',
     'category': 'OpenFire modules',

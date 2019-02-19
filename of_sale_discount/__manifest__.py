@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {
-    "name" : "OpenFire Sale Discount",
+    "name" : "OpenFire / Remise vente",
     "version" : "10.0.1.0.0",
     "author" : "OpenFire",
     "description" : """

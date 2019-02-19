@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name' : "OpenFire Base",
+    'name' : "OpenFire / Base",
     'version' : "10.0",
     'author' : "OpenFire",
     'license': '',

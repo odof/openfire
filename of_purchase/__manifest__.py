@@ -12,14 +12,14 @@
 ##############################################################################
 
 {
-    'name' : u"OpenFire Purchase",
+    'name' : u"OpenFire / Achats",
     'version' : "10.0.1.0.0",
     'author' : "OpenFire",
     'website' : "www.openfire.fr",
     'category': "Purchases",
     'summary': u"OpenFire Purchases",
     'description': u"""
-Module OpenFire - Purchase
+Module OpenFire / Achats
 ==========================
 Modifications OpenFire pour les commandes fournisseur
 

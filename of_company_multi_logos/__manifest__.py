@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name': 'OpenFire multi logos',
+    'name': 'OpenFire / Multi-logos',
     'author': 'OpenFire',
     'version': '10.0',
     'category': 'OpenFire modules',
-    'summary': 'Multi logos',
+    'summary': 'Multi-logos',
     'description': """
         Permet aux sociétés d'avoir plusieurs logos en tant que logos secondaires.
         Ces logos sont affichés dans l'onglet "Logos" de la fiche société et dans les entêtes des rapports externes.

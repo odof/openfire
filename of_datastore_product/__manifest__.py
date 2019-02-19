@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {
-    "name" : "OpenFire Tarifs centralisés",
+    "name" : "OpenFire / Tarifs centralisés",
     "version" : "10.0.1.0.0",
     "author" : "OpenFire",
     "website" : "http://www.openfire.fr",

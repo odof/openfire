@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name' : "OpenFire Base MultiSociété",
+    'name' : "OpenFire / Base multi-sociétés",
     'version' : "10.0.1.0.0",
     'author' : "OpenFire",
     'complexity': "easy",
     # Réduction de la séquence pour permettre un chargement avant celui des autres modules (à réduire encore au besoin)
     'sequence': 40,
     'description' : """
-Personnalisation de la multi-société :
+Personnalisation multi-sociétés :
 
 - Les champs company-dependent se lisent au niveau de la société comptable au lieu de la société courante.
 - Modification des droits pour permettre l'utilisation de la configuration comptable des sociétés parentes.

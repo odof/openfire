@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name' : "OpenFire Payment Bank Deposit",
+    'name' : "OpenFire / Remises en banque",
     'version' : "10.0.1.0.0",
     'license': '',
     'author' : "OpenFire",
     'website' : "www.openfire.fr",
     'category': "Accounting",
-    'summary': u"Allow bank deposit",
+    'summary': u"Remises en banque",
     'description': u"""
-Module OpenFire - Payment Bank Deposit
-======================================
+Module OpenFire / Remises en banque
+===================================
 
 Fonctionnalités
 ----------------

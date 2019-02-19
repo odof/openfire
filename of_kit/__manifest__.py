@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name': 'OpenFire Kits',
+    'name': 'OpenFire / Kits',
     'author': 'OpenFire',
     'version': '10.0.1.0.0',
     'category': 'OpenFire modules',
     'summary': 'Kits',
     'description': """
-        Module de kits openfire : \n
+        Module de kits OpenFire : \n
         \t- Création de kits directement dans les articles
         \t- Ajout des champs 'is_kit' et 'pricing' dans les produits, lignes de commandes, de factures et composants
         \t- Ajout des kits dans les devis, bons de commandes et factures clients

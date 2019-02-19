@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {
-    "name": "OpenFire Normes",
+    "name": "OpenFire / Normes",
     "version": "10.0.1.0.0",
     "author": "OpenFire",
     'category': 'OpenFire modules',

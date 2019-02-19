@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {
-    "name": "OpenFire Rapprochements bancaires",
+    "name": "OpenFire / Rapprochements bancaires",
     "version": "10.0.1.0.0",
     "author": "OpenFire",
     'license': 'AGPL-3',
