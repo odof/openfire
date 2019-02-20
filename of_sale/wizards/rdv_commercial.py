@@ -15,6 +15,7 @@ try:
 except ImportError:
     requests = None
 
+import urllib3
 from odoo import api, models, fields
 from datetime import datetime, timedelta, date as d_date
 import pytz
@@ -583,7 +584,7 @@ class OfRDVCommercialLine(models.TransientModel):
             coords = []
             #TODO: utiliser le serveur OSRM OpenFire
             query = u"https://router.project-osrm.org/route/v1/driving/"
-            ### listess de coordonnées: ATTENTION OSRM prend ses coordonnées sous form (lng,lat)
+            ### listess de coordonnées: ATTENTION OSRM prend ses coordonnées sous forme (lng,lat)
             # point de départ
             if origine.geo_lat != 0 or origine.geo_lng != 0:
                 str_coords += str(origine.geo_lng) + "," + str(origine.geo_lat)
