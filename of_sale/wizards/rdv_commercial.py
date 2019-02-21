@@ -346,17 +346,21 @@ class OFRDVCommercial(models.TransientModel):
             dt_jour_deb = tz.localize(datetime.strptime(str_d_recherche+" 00:00:00", "%Y-%m-%d %H:%M:%S"))
             dt_jour_fin = tz.localize(datetime.strptime(str_d_recherche+" 23:59:00", "%Y-%m-%d %H:%M:%S"))
             # Récupération des évenements déjà planifiées
-            events = calendar_obj.search([('start_date', '=', str_d_recherche)], order='start_date')
+            events = calendar_obj.search([
+                                        ('start_datetime', '<=', str_d_recherche),
+                                        ('stop_datetime', '>=', str_d_recherche),
+                                        #('start_date', '=', str_d_recherche)
+                                        ], order='start_date')
             for event in events:
                 if self.user_id.partner_id.id not in event.partner_ids._ids:
                     events -= event
 
-            event_dates = []
+            event_dates_all = []
             for event in events:
-                event_date = [event]
+                event_dates = [event]
                 for event_date in (event.start_datetime, event.stop_datetime):
                     # Conversion des dates de début et de fin en nombres flottants et à l'heure locale
-                    dt_event_local = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(intervention_date))
+                    dt_event_local = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(event_date))
 
                     # Comme on n'affiche que les heures, il faut s'assurer de rester dans le bon jour
                     #   (pour les interventions étalées sur plusieurs jours)
@@ -365,15 +369,15 @@ class OFRDVCommercial(models.TransientModel):
                     flo_dt_event_local = round(dt_event_local.hour +
                                            dt_event_local.minute / 60.0 +
                                            dt_event_local.second / 3600.0, 5)
-                    event_date.append(flo_dt_event_local)
-                event_dates.append(event_date)
+                    event_dates.append(flo_dt_event_local)
+                event_dates_all.append(event_dates)
 
             deb = self.hor_md
             fin = self.hor_mf
             ad = self.hor_ad
             creneaux = []
             #TODO: possibilité intervention chevauchant la nuit
-            for event, event_deb, event_fin in event_dates + [(False, 24, 24)]:
+            for event, event_deb, event_fin in event_dates_all + [(False, 24, 24)]:
                 if deb < event_deb and deb < fin:
                     # Un trou dans le planning, suffisant pour un créneau?
                     if deb < ad and event_deb >= ad:
@@ -399,7 +403,7 @@ class OFRDVCommercial(models.TransientModel):
             if not creneaux:
                 # Aucun creneau libre pour cette équipe
                 continue
-            # création des créneaux dispo
+            # création des créneaux dispos
             for event_deb, event_fin, in creneaux:
                 description = "%s-%s" % tuple(hours_to_strs(event_deb, event_fin))
 
@@ -421,8 +425,8 @@ class OFRDVCommercial(models.TransientModel):
                     'calendar_id': False,
                     'ignorer_geo': self.ignorer_geo,
                 })
-            # création des créneaux d'intervention
-            for event, event_deb, event_fin in event_dates:
+            # création des créneaux de rdvs
+            for event, event_deb, event_fin in event_dates_all:
                 description = "%s-%s" % tuple(hours_to_strs(event_deb, event_fin))
 
                 dt_debut = datetime.combine(d_recherche, datetime.min.time()) + timedelta(hours=event_deb)
@@ -538,6 +542,10 @@ class OFRDVCommercial(models.TransientModel):
         if (not self.hor_md) or (not self.hor_mf) or (not self.hor_ad) or (not self.hor_af):
             raise UserError("Il faut configurer l'horaire de travail de toutes les équipes.")
 
+        """partner_attendees = self.env['res.partner']
+        partner_attendees |= self.partner_id
+        partner_attendees |= self.user_id.partner_id"""
+
         values = {
             'name': self.name,
             'state': 'open',
@@ -546,7 +554,8 @@ class OFRDVCommercial(models.TransientModel):
             'user_id': self.user_id.id,
             'allday': self.allday,
             'description': self.description or '',
-            #'partner_ids': [(4,self.user_id.partner_id.id,False),(4,self.partner_id,False)],
+            'partner_ids': [(4,self.user_id.partner_id.id,False),(4,self.partner_id.id,False)],
+            #'partner_ids': partner_attendees,
         }
 
         calendar_obj.create(values)

@@ -177,5 +177,29 @@
             key2="client_action_multi"
             target="new"
         />
+
+        <!-- Ajout bouton planifier un RDV commercial dans vue form partenaire-->
+        <record id="of_view_partner_form_rdv_commercial" model="ir.ui.view">
+            <field name="name">res.partner.form.rdv.commercial</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="of_base.of_base_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header" position="inside">
+                    <button name="%(action_view_rdv_commercial_wizard_client)d" string="Planifier RDV Commercial" type="action"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_of_crm_form_rdv_intervention" model="ir.ui.view">
+            <field name="name">of.crm.form.rdv.commercial</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="of_crm.of_crm_case_form_view_oppor"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header" position="inside">
+                    <button name="%(action_view_rdv_commercial_wizard_crm)d" string="Planifier RDV Commercial" type="action"/>
+                </xpath>
+            </field>
+        </record>
+
     </data>
 </odoo>  
