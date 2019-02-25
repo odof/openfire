@@ -351,6 +351,11 @@ class OfService(models.Model):
 
     tache_id = fields.Many2one('of.planning.tache', string=u'Tâche', required=False)
     name = fields.Char(u"Libellé", related='tache_id.name', store=False)
+    company_id = fields.Many2one(
+        'res.company',
+        string=u'Société',
+        default=lambda self: self.env.user.company_id,
+    )
 
     mois_ids = fields.Many2many('of.mois', 'service_mois', 'service_id', 'mois_id', string='Mois', required=False)
     jour_ids = fields.Many2many('of.jours', 'service_jours', 'service_id', 'jour_id', string='Jours', required=False)
