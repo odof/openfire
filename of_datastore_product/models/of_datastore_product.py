@@ -1028,7 +1028,7 @@ class OfDatastoreCentralized(models.AbstractModel):
             return res
         if len(res) == 7:
             # Le 8e produit ne sert qu'à savoir si on affiche "Plus de résultats"
-            return res + [False]
+            return res + [(False, '')]
 
         # Recherche des produits dans la base centrale
         client = supplier.of_datastore_connect()
