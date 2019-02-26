@@ -5,8 +5,8 @@ from odoo import models, fields, api, _
 class OFNormeProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    norme_id = fields.Many2one("of.product.norme",string="Norme",ondelete="set null")
-    description_norme = fields.Text("Descriptif de norme",translate=True)
+    norme_id = fields.Many2one("of.product.norme", string=u"Norme", ondelete="set null")
+    description_norme = fields.Text(u"Descriptif de norme", translate=True)
 
     @api.multi
     @api.onchange('norme_id')
@@ -17,15 +17,29 @@ class OFNormeProductTemplate(models.Model):
             else:
                 product_tmpl.description_norme = None
 
+
+class OFNormeProductProduct(models.Model):
+    _inherit = 'product.product'
+
+    @api.multi
+    @api.onchange('norme_id')
+    def _onchange_norme_id(self):
+        for product in self:
+            if product.norme_id:
+                product.description_norme = product.norme_id.description
+            else:
+                product.description_norme = None
+
+
 class OFProductNorme(models.Model):
     _name = 'of.product.norme'
     _order = 'name'
 
-    name = fields.Char(string="Code")
-    libelle = fields.Char(string="Libellé",translate=True)
-    description = fields.Text(string="Description",translate=True)
-    active = fields.Boolean(string="Active", default=True)
-    display_docs = fields.Boolean("Afficher en impression",default=True)
+    name = fields.Char(string=u"Code")
+    libelle = fields.Char(string=u"Libellé", translate=True)
+    description = fields.Text(string=u"Description", translate=True)
+    active = fields.Boolean(string=u"Active", default=True)
+    display_docs = fields.Boolean(string=u"Afficher en impression", default=True)
 
     @api.multi
     def write(self,vals):
