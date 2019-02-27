@@ -177,8 +177,8 @@
                     <field name="currency_id" invisible="1"/>
                     <group>
                         <group>
-                            <field name="days"/>
-                            <field name="option"/>
+                            <field name="name"/>
+                            <field name="date"/>
                         </group>
                         <group>
                             <field name="percent"/>

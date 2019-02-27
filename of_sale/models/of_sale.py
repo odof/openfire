@@ -467,19 +467,6 @@ class OFSaleEcheance(models.Model):
     sequence = fields.Integer(default=10, help="Gives the sequence order when displaying a list of payment term lines.")
     date = fields.Date(string='Date')
 
-    days = fields.Integer(string='Number of Days', required=True, default=0)
-    option = fields.Selection(
-        [
-            ('day_after_invoice_date', 'Day(s) after the invoice date'),
-            ('fix_day_following_month', 'Day(s) after the end of the invoice month (Net EOM)'),
-            ('last_day_following_month', 'Last day of following month'),
-            ('last_day_current_month', 'Last day of current month'),
-            ('day_after_order_date', 'Day(s) after the confirmation date'),
-            ('fix_day_following_order_month', 'Day(s) after the end of the order month (Net EOM)'),
-        ],
-        default='day_after_invoice_date', required=True, string='Options'
-        )
-
     @api.multi
     def _compute_last(self):
         for order in self.mapped('order_id'):
