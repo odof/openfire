@@ -61,7 +61,7 @@
                 <separator string="Factures récurrentes"/>
                 <group col="4">
                     <group col="2" colspan="2">
-<!--                         <field name="contract_template_id" colspan="4"/> -->
+                        <field name="template_id"/>
                         <field name="recurring_invoicing_type"/>
                         <label for="recurring_interval" attrs="{'invisible': [('recurring_invoicing_type', '!=', 'contract')]}"/>
                         <div attrs="{'invisible': [('recurring_invoicing_type', '!=', 'contract')]}">
@@ -84,6 +84,7 @@
                            context="{'form_view_ref': 'of_contract_planning.of_contract_view_of_service_parc_installe_service_form',
                                      'default_partner_id': partner_id,
                                      'default_company_id': company_id,
+                                     'default_frequency' : recurring_interval,
                                      'default_frequency_type': recurring_rule_type,
                                      'recurring_next_date': recurring_next_date}">
                         <tree>
@@ -102,6 +103,15 @@
                             <field name="next_date"/>
                             <field name="parc_installe_id"/>
                             <field name="intervention_model_id"/>
+                            <!-- Doivent être présent en invisible pour les onchanges -->
+                            <field name="partner_id" invisible="1"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="product_name" invisible="1"/>
+                            <field name="address_id" invisible="1"/>
+                            <field name="tache_id" invisible="1"/>
+                            <field name="date_next" invisible="1"/>
+                            <field name="mois_ids" invisible="1"/>
+                            <field name="jour_ids" invisible="1"/>
                         </tree>
                     </field>
                 </group>
@@ -126,6 +136,90 @@
     <menuitem name="Contrats" id="menu_contrats" parent="of_planning.menu_of_planning_intervention" sequence="80" action="action_contract"/>
 
 <!-- ******************************************************************************************* -->
+<!-- ************************************ MODÈLE DE CONTRAT ************************************ -->
+<!-- ******************************************************************************************* -->
+
+    <record id="of_contract_template_tree_view" model="ir.ui.view">
+        <field name="name">of_contract_tree_view</field>
+        <field name="model">of.contract.template</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="recurring_interval"/>
+                <field name="recurring_rule_type"/>
+                <field name="recurring_invoicing_type"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_contract_template_form_view" model="ir.ui.view">
+        <field name="name">of_contract_form_view</field>
+        <field name="model">of.contract.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <div class="oe_title">
+                    <label for="name" class="oe_edit_only"/>
+                    <h1>
+                        <field name="name" class="oe_inline" placeholder="e.g. Project XYZ"/>
+                    </h1>
+                </div>
+                <separator string="Factures récurrentes"/>
+                <group col="4">
+                    <group col="2" colspan="2">
+                        <field name="recurring_invoicing_type"/>
+                        <label for="recurring_interval" attrs="{'invisible': [('recurring_invoicing_type', '!=', 'contract')]}"/>
+                        <div attrs="{'invisible': [('recurring_invoicing_type', '!=', 'contract')]}">
+                            <field name="recurring_interval" class="oe_inline"/>
+                            <field name="recurring_rule_type" class="oe_inline"/>
+                        </div>
+                    </group>
+                    <group col="2" colspan="2">
+                        <field name="journal_id"/>
+                        <field name="pricelist_id" invisible="1"/>
+                        <field name="fiscal_position_id"/>
+                    </group>
+                </group>
+                <separator string="Lignes"/>
+                <group>
+                    <field name="service_ids" mode="tree" nolabel="1"
+                           context="{'form_view_ref': 'of_contract_planning.of_contract_view_of_service_parc_installe_service_form',
+                                     'default_frequency' : recurring_interval,
+                                     'default_frequency_type': recurring_rule_type}">
+                        <tree>
+                            <field name="sequence" widget="handle"/>
+                            <field name="product_id"/>
+                            <field name="quantity"/>
+                            <field name="uom_id"/>
+                            <field name="automatic_price"/>
+                            <field name="specific_price" invisible="1"/>
+                            <field name="price_unit"/>
+                            <field name="price_subtotal"/>
+                            <field name="discount"/>
+                            <field name="frequency"/>
+                            <field name="frequency_type"/>
+                            <field name="previous_date"/>
+                            <field name="next_date"/>
+                            <field name="parc_installe_id"/>
+                            <field name="intervention_model_id"/>
+                        </tree>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_contract_template" model="ir.actions.act_window">
+        <field name="name">Contrats</field>
+        <field name="res_model">of.contract.template</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_contract_template_tree_view"/>
+    </record>
+
+    <menuitem name="Modèles de contrats" id="menu_contract_template" parent="of_planning.menu_of_planning_configuration" sequence="75" action="action_contract_template"/>
+
+
+<!-- ******************************************************************************************* -->
 <!-- ***************************************** SERVICE ***************************************** -->
 <!-- ******************************************************************************************* -->
 
@@ -141,12 +235,12 @@
             <xpath expr="//field[@name='tache_id']" position="attributes">
                 <attribute name="attrs">{'required': [('intervention_model_id', '!=', False)]}</attribute>
             </xpath>
-            <xpath expr="//field[@name='address_id']" position="attributes">
-                <attribute name="attrs">{'required': ['|', ('intervention_model_id', '!=', False), ('tache_id', '!=', False)]}</attribute>
+            <xpath expr="//field[@name='address_id']" position="before">
+                <field name="contract_template_id" invisible="1"/>
             </xpath>
-<!--             <xpath expr="//field[@name='name']" position="attributes"> -->
-<!--                 <attribute name="attrs">{'required': ['|', ('intervention_model_id', '!=', False), ('tache_id', '!=', False)]}</attribute> -->
-<!--             </xpath> -->
+            <xpath expr="//field[@name='address_id']" position="attributes">
+                <attribute name="attrs">{'required': ['|', '&amp;', ('intervention_model_id', '!=', False), ('contract_template_id', '=', False), '&amp;', ('tache_id', '!=', False), ('contract_template_id', '=', False)]}</attribute>
+            </xpath>
             <xpath expr="//field[@name='mois_ids']" position="attributes">
                 <attribute name="attrs">{'required': ['|', ('intervention_model_id', '!=', False), ('tache_id', '!=', False)]}</attribute>
             </xpath>

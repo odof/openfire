@@ -32,6 +32,10 @@ class OfContract(models.Model):
     name = fields.Char(
         required=True,
     )
+    template_id = fields.Many2one(
+        comodel_name='of.contract.template',
+        string=u'Modèle'
+        )
     partner_id = fields.Many2one(
         comodel_name="res.partner",
         string="Client",
@@ -346,6 +350,81 @@ class OfContract(models.Model):
             action = {'type': 'ir.actions.act_window_close'}
         return action
 
+    @api.onchange('template_id')
+    def onchange_template(self):
+        if self.template_id:
+            service_obj = self.env['of.service']
+            self.recurring_invoicing_type = self.template_id.recurring_invoicing_type
+            self.recurring_interval = self.template_id.recurring_interval
+            self.recurring_rule_type = self.template_id.recurring_rule_type
+            self.journal_id = self.template_id.journal_id
+            self.fiscal_position_id = self.template_id.fiscal_position_id
+            self.service_ids = service_obj
+            for service in self.template_id.service_ids:
+                service_data = service.copy_data()[0]
+                service_data['partner_id'] = self.partner_id.id
+                service_data['contract_template_id'] = False
+                service_data['company_id'] = self.company_id.id
+                self.service_ids += service_obj.new(service_data)
+
+class OfContractTemplate(models.Model):
+    _name = "of.contract.template"
+
+    name = fields.Char(
+        required=True,
+    )
+    pricelist_id = fields.Many2one(
+        comodel_name='product.pricelist',
+        string='Liste de prix',
+    )
+    service_ids = fields.One2many(
+        comodel_name='of.service',
+        inverse_name='contract_template_id',
+        string='Services',
+    )
+    recurring_rule_type = fields.Selection(
+        [('daily', 'Jour(s)'),
+         ('weekly', 'Semaine(s)'),
+         ('monthly', 'Mois'),
+         ('monthlylastday', 'Month(s) last day'),
+         ('yearly', u'Année(s)'),
+         ],
+        default='monthly',
+        string=u'Réccurence',
+        help="Specify Interval for automatic invoice generation.",
+        required=True
+    )
+    recurring_invoicing_type = fields.Selection(
+        [('contract', u'Récurrence du contrat'),
+         ('services', u'Récurrence des services'),
+         ],
+        default='contract',
+        string='Type de facturation',
+        help="Specify if process date is 'from' or 'to' invoicing date",
+    )
+    recurring_interval = fields.Integer(
+        default=1,
+        string=u'Répéter chaque',
+        help="Repeat every (Days/Week/Month/Year)",
+        required=True,
+    )
+    journal_id = fields.Many2one(
+        'account.journal',
+        string='Journal',
+        default=lambda s: s._default_journal(),
+        domain="[('type', '=', 'sale'),('company_id', '=', company_id)]",
+    )
+    fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale")
+
+    @api.model
+    def _default_journal(self):
+        company_id = self.env.context.get(
+            'company_id', self.env.user.company_id.id)
+        domain = [
+            ('type', '=', 'sale'),
+            ('company_id', '=', company_id)]
+        return self.env['account.journal'].search(domain, limit=1)
+
 class OfService(models.Model):
     _inherit= "of.service"
 
@@ -387,6 +466,7 @@ class OfService(models.Model):
 
     intervention_model_id = fields.Many2one('of.planning.intervention.model', string=u"Modèle d'intervention")
     contract_id = fields.Many2one('of.contract', string=u"Contrat")
+    contract_template_id = fields.Many2one('of.contract.template', string=u"Modèle de contrat")
     frequency = fields.Integer(string=u"Fréquence", default=1)
     frequency_type = fields.Selection([('daily', 'Jour(s)'),
          ('weekly', 'Semaine(s)'),
