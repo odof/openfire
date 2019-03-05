@@ -16,6 +16,11 @@
             <script type="text/javascript" src="/of_map_view/static/src/js/map_controls.js"></script>
             <script type="text/javascript" src="/of_map_view/static/src/js/map_record.js"></script>
             <script type="text/javascript" src="/of_map_view/static/src/js/map_view.js"></script>
+            <!-- pour tests - ->
+            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+            <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+            <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+            <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script-->
         </xpath>
     </template>
     
