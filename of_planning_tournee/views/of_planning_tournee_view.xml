@@ -28,8 +28,9 @@
             <field name="arch" type="xml">
                 <group name="horaires" position="before">
                     <group name="adresse" colspan="2">
-                        <separator string="Adresse départ" colspan="2"/>
+                        <separator string="Adresses" colspan="2"/>
                         <field name="address_id"/>
+                        <field name="address_retour_id"/>
                     </group>
                 </group>
             </field>
@@ -62,6 +63,8 @@
                         <field name="date_jour"/>
                         <field name="date"/>
                         <field name="equipe_id"/>
+                        <field name="address_depart_id"/>
+                        <field name="address_retour_id"/>
                         <field name="distance" attrs="{'required': [('is_bloque', '=', False)]}"/>
                         <group colspan="4" col="8">
                             <field name="is_complet"/>
@@ -83,6 +86,41 @@
             </field>
         </record>
 
+        <record id="of_planning_tournee_view_interventions_form_map" model="ir.ui.view" >
+            <field name="name">of.planning.tournee.form.map</field>
+            <field name="model">of.planning.tournee</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Tournée">
+                    <group>
+                        <field name="date_jour" invisible="1"/>
+                        <field name="date" invisible="1"/>
+                        <field name="equipe_id" invisible="1"/>
+                        <field name="zip_id" invisible="1"/>
+                        <field name="epi_lat" invisible="1"/>
+                        <field name="epi_lon" invisible="1"/>
+                        <field name="distance" invisible="1"/>
+                        <field name="address_depart_id" invisible="1"/>
+                        <field name="address_retour_id" invisible="1"/>
+                        <field name="is_complet" invisible="1"/>
+                        <field name="is_bloque" invisible="1"/>
+                        <!--field name="docs_name"/-->
+                        <field name="is_confirme" invisible="1"/>
+                        <field name="intervention_ids"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_of_planning_tournee_interventions_map" model="ir.actions.act_window">
+            <field name="name">Interventions de la tournée</field>
+            <field name="res_model">of.planning.tournee</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="view_id" ref="of_planning_tournee_view_interventions_form_map"/>
+        </record>
+
         <record id="of_planning_tournee_view_tree" model="ir.ui.view">
             <field name="name">of.planning.tournee.tree</field>
             <field name="model">of.planning.tournee</field>
@@ -97,9 +135,14 @@
                     <field name="epi_lat" attrs="{'required': [('is_bloque', '=', False)]}"/>
                     <field name="epi_lon" attrs="{'required': [('is_bloque', '=', False)]}"/>
                     <field name="distance" attrs="{'required': [('is_bloque', '=', False)]}"/>
+                    <field name="address_depart_id"/>
+                    <field name="address_retour_id"/>
                     <field name="is_complet"/>
                     <field name="is_bloque"/>
-                    <!--field name="docs_name"/-->
+                    <!--field name="docs_name"/
+                    <button name="%(action_of_planning_tournee_interventions_map)d" type="action" string="Voir la Carte" />
+                    <field name="intervention_ids"/>
+                    -->
                     <field name="is_confirme"/>
                     <button name="open_planification" type="object" string="Planifier" attrs="{'invisible': [('is_complet', '=', True)]}"/>
                 </tree>
@@ -136,20 +179,6 @@
         <menuitem name="Tournées" id="menu_of_planning_tournee_tree" parent="of_planning.menu_of_planning_intervention" sequence="7"
                   action="action_of_planning_tournee_tree"/>
 
-        <!-- appelée depuis l'infobulle en vue map -->
-        <act_window
-            name="Planifier une intervention"
-            res_model="of.tournee.rdv"
-            src_model="of.service"
-            view_mode="form"
-            view_id="view_res_wizard"
-            id="action_view_res_wizard_service"
-            key2="client_action_multi"
-            target="new"
-            context="{'model':'of.service'}"
-            groups="of_planning.of_group_planning_intervention_user"
-        />
-
         <!-- vue map des services -->
         <record id="of_planning_tournee_service_map_view" model="ir.ui.view">
             <field name="name">of.planning.tournee.service.view.map</field>
@@ -166,7 +195,7 @@
                     <t t-set="service_id" t-value="record.id.raw_value"/>
                     <t t-set="address_id" t-value="record.address_id.raw_value[0]"/> <!-- dans le contexte d'une vue map, address_id n'est jamais undefined -->
                     <t t-set="partner_id" t-value="record.partner_id.raw_value[0] || address_id"/>
-                    <a name="%(of_planning_tournee.action_view_res_wizard_service)d" type="action"
+                    <a name="%(of_planning_tournee.action_view_rdv_intervention_wizard_service)d" type="action"
                       t-attf-data-context="{'default_partner_id': {{partner_id}}, 'default_service_id': {{service_id}}, 'default_address_id': {{address_id}},}">
                         <i class="fa fa-calendar-o"/><span class="of_ws"/>
                         <span>Planifier une intervention</span><br/>

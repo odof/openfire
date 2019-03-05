@@ -194,6 +194,19 @@ class OfTourneePlanification(models.TransientModel):
     zip_id = fields.Many2one(related='tournee_id.zip_id')
     distance = fields.Float(related='tournee_id.distance')
     equipe_id = fields.Many2one(related='tournee_id.equipe_id')
+    address_depart_id = fields.Many2one(related='tournee_id.address_depart_id')
+    address_retour_id = fields.Many2one(related='tournee_id.address_retour_id')
+
+    @api.onchange('equipe_id')
+    def _onchange_equipe_id(self):
+        if self.equipe_id:
+            self.address_depart_id = self.equipe_id.address_id
+            self.address_retour_id = self.equipe_id.address_retour_id
+
+    @api.onchange('address_depart_id')
+    def _onchange_address_depart_id(self):
+        if self.address_depart_id:
+            self.address_retour_id = self.address_depart_id
 
     @api.multi
     def _get_show_action(self):
@@ -221,6 +234,7 @@ class OfTourneePlanification(models.TransientModel):
         partner_obj = self.env['res.partner']
 
         equipe = self.equipe_id
+        address_depart_id = self.address_depart_id or self.equipe_id.address_id
         plan_partners = []
         date_planifi_list = []   # debut, fin, line_id
 
@@ -237,7 +251,7 @@ class OfTourneePlanification(models.TransientModel):
                 plan_partners.append(line)
                 if line.date_flo and line.date_flo_deadline and (plan_partner_ids is not False):
                     date_planifi_list.append([line.date_flo, line.date_flo_deadline, line.id])
-        if not (equipe.geo_lat or equipe.geo_lng):
+        if not (address_depart_id.geo_lat or address_depart_id.geo_lng):
             raise UserError(u"Vous devez configurer l'adresse de l'équipe")
         if not plan_partners:
             return
@@ -318,8 +332,8 @@ class OfTourneePlanification(models.TransientModel):
             if is_planifi:
                 continue
             if not (last_geo_lat or last_geo_lng):
-                last_geo_lat = equipe.geo_lat
-                last_geo_lng = equipe.geo_lng
+                last_geo_lat = address_depart_id.geo_lat
+                last_geo_lng = address_depart_id.geo_lng
 
             # Creneau disponible
             if isinstance(new_planning, (list, tuple)):
@@ -603,6 +617,7 @@ class OfTourneePlanificationPlanning(models.TransientModel):
                 'hor_af'     : equipe.hor_af,
                 'partner_id' : service.partner_id.id,
                 'address_id' : address.id,
+                'service_id' : service.id,
                 'tache_id'   : service.tache_id.id,
                 'equipe_id'  : equipe.id,
                 'date'       : date_str,
@@ -614,7 +629,7 @@ class OfTourneePlanificationPlanning(models.TransientModel):
                 'description': description,
                 'verif_dispo': True,
             }
-            intervention_obj.create(values)
+            interv = intervention_obj.create(values)
 
             # Mise à jour de la date minimale de prochaine intervention dans le service
             if planning.date_next:

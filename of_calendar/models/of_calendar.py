@@ -57,7 +57,7 @@ class OFCalendarMixin(models.AbstractModel):
 
     state_int = fields.Integer(string="Valeur d'état", compute="_compute_state_int", help="valeur allant de 0 à 3 inclus")
 
-    @api.depends('state')
+    #@api.depends('state')
     def _compute_state_int(self):
         """
         Function to give an integer value (0,1,2 or 3) depending on the state. ONLY 4 values are implemented.
@@ -73,5 +73,16 @@ class OFCalendarMixin(models.AbstractModel):
         'value' ranges from 0 to 3 included.
         'label' is a string that will be displayed in the caption.
         See template 'CalendarView.sidebar.captions'
+        """
+        raise NotImplementedError("A class inheriting from this one must implement a 'get_state_int_map' function")
+
+class OFCalendarAttendeeMixin(models.AbstractModel):
+    _name = "of.calendar.attendee.mixin"
+
+    @api.model
+    def get_working_hours_fields(self):
+        """
+        Returns a dictionnary with 4 properties: morning_start, morning_end, afternoon_start, afternoon_end
+        these properties have names of corresponding fields as values
         """
         raise NotImplementedError("A class inheriting from this one must implement a 'get_state_int_map' function")

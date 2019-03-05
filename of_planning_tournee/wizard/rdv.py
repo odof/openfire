@@ -1,18 +1,36 @@
 # -*- encoding: utf-8 -*-
 
+try:
+    import json
+except ImportError:
+    json = None
+
+try:
+    import urllib
+except ImportError:
+    urllib = None
+
+try:
+    import requests
+except ImportError:
+    requests = None
+import urllib3
 from odoo import api, models, fields
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date as d_date
 import pytz
 import math
 from math import cos
 from odoo.addons.of_planning_tournee.models.of_planning_tournee import distance_points
 from odoo.exceptions import UserError
 
-RES_MODES = [
-    ('tournee', u'Tournées uniquement'),
-    ('hors_tournee', u'Tournées et hors tournées'),
-    ('all', u'Tous créneaux, même sur tournées éloignées'),
+SEARCH_MODES = [
+    ('distance', u'Distance (km)'),
+    ('duree', u'Durée (min)'),
 ]
+
+ROUTING_BASE_URL = u"http://s-hotel.openfire.fr:5000/"
+ROUTING_VERSION = u"v1"
+ROUTING_PROFILE = u"driving"
 
 def hours_to_strs(*hours):
     """ Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'
@@ -40,24 +58,34 @@ class OfTourneeRdv(models.TransientModel):
 
     @api.model
     def _default_service(self):
-        service_obj = self.env['of.service']
-
-        partner = self._default_partner()
-        if not partner:
+        active_model = self._context.get('active_model', '')
+        if active_model == "of.service":
+            service_id = self._context['active_ids'][0]
+            service = self.env["of.service"].browse(service_id)
+            return service
+        elif active_model == "res.partner":
+            service_obj = self.env['of.service']
+            partner = self._default_partner()
+            if not partner:
+                return False
+            services = service_obj.search([('partner_id', '=', partner.id)], limit=1)
+            return services
+        else:
             return False
-        services = service_obj.search([('partner_id', '=', partner.id)], limit=1)
-        return services
 
     @api.model
     def _default_address(self):
         partner_obj = self.env['res.partner']
+        active_model = self._context.get('active_model', '')
+        if active_model == "of.service":
+            service_id = self._context['active_ids'][0]
+            service = self.env["of.service"].browse(service_id)
+            partner = service.partner_id
+            address_id = service.address_id.id
+        elif active_model == "res.partner":
+            partner = partner_obj.browse(self._context['active_ids'][0])
+            address_id = partner.address_get(['delivery'])['delivery']
 
-        partner = self._default_partner()
-        if partner and partner.id != self._context['active_ids'][0]:
-            # La fonction est appelée à partir d'une adresse
-            return partner_obj.browse(self._context['active_ids'][0])
-
-        address_id = partner and partner.address_get(['delivery'])['delivery']
         if address_id:
             address = partner_obj.browse(address_id)
             if not (address.geo_lat or address.geo_lng):
@@ -65,49 +93,108 @@ class OfTourneeRdv(models.TransientModel):
                                               '|', ('geo_lat', '!=', 0), ('geo_lng', '!=', 0)], limit=1)
                 if not address:
                     address = partner_obj.search(['|', ('id', '=', partner.id), ('parent_id', '=', partner.id)])
-        return address_id
+            return address
+        return False
 
     name = fields.Char(string=u'Libellé', size=64, required=False)
-    description = fields.Text(string='Description')
+    description = fields.Html(string='Description')
     tache_id = fields.Many2one('of.planning.tache', string='Prestation', required=True)
     equipe_id = fields.Many2one('of.planning.equipe', string=u"Équipe")
-    equipe_id_pre = fields.Many2one('of.planning.equipe', string=u'Équipe', domain="[('tache_ids','in',tache_id)]")
+    pre_equipe_ids = fields.Many2many('of.planning.equipe', string=u'Équipes', domain="[('tache_ids','in',tache_id)]")
     duree = fields.Float(string=u'Durée', required=True, digits=(12, 5))
     planning_ids = fields.One2many('of.tournee.rdv.line', 'wizard_id', string='Proposition de RDVs')
     date_propos = fields.Datetime(string=u'RDV Début')
     date_propos_hour = fields.Float(string=u'Heude de début', digits=(12, 5))
-    date_recherche = fields.Date(string='À partir du', required=True, default=lambda *a: (date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
+    date_recherche_debut = fields.Date(string='À partir du', required=True, default=lambda *a: (d_date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
+    date_recherche_fin = fields.Date(string="Jusqu'au", required=True, default=lambda *a: (d_date.today() + timedelta(days=7)).strftime('%Y-%m-%d'))
     partner_id = fields.Many2one('res.partner', string='Client', required=True, readonly=True, default=_default_partner)
     partner_address_id = fields.Many2one('res.partner', string="Adresse d'intervention", required=True, default=_default_address,
                                          domain="['|', ('id', '=', partner_id), ('parent_id', '=', partner_id)]")
+    partner_address_street = fields.Char(related="partner_address_id.street", readonly=True)
+    partner_address_street2 = fields.Char(related="partner_address_id.street2", readonly=True)
+    partner_address_city = fields.Char(related="partner_address_id.city", readonly=True)
+    partner_address_state_id = fields.Many2one(related="partner_address_id.state_id", readonly=True)
+    partner_address_zip = fields.Char(related="partner_address_id.zip", readonly=True)
+    partner_address_country_id = fields.Many2one(related="partner_address_id.country_id", readonly=True)
     date_display = fields.Char(string='Jour du RDV', size=64, readonly=True)
     service_id = fields.Many2one('of.service', string='Service client', default=_default_service,
                                  domain="[('partner_id', '=', partner_id)]")
+    creer_recurrence = fields.Boolean(string="Créer récurrence?",default=True,help="Si cette case est cochée et qu'il n'existe pas de service lié à cette intervention, en crééra un.")
     date_next = fields.Date(string=u'Prochaine intervention', help=u"Date à partir de laquelle programmer la prochaine intervention")
-    mode = fields.Selection(RES_MODES, string="Mode de recherche", required=True, default="hors_tournee")
+    mode_recherche = fields.Selection(SEARCH_MODES, string="Mode de recherche", required=True, default="distance")
+    max_recherche = fields.Float(string="Maximum")
+
+    zero_result = fields.Boolean(string="Recherche infructueuse",default=False,help="Aucun résultat")
+    zero_dispo = fields.Boolean(string="Recherche infructueuse",default=False,help="Aucun résultat sufisament proche")
+    display_res = fields.Boolean(string=u"Voir Résultats",default=False)
+    res_line_id = fields.Many2one("of.tournee.rdv.line",string="Créneau Sélectionné")
+
+    # champs ajoutés pour la vue map
+    geo_lat = fields.Float(related='partner_address_id.geo_lat', readonly=True)
+    geo_lng = fields.Float(related='partner_address_id.geo_lng', readonly=True)
+    precision = fields.Selection(related='partner_address_id.precision', readonly=True)
+    partner_name = fields.Char(related='partner_id.name')
+    geocode_retry = fields.Boolean("Geocodage retenté")
+    ignorer_geo = fields.Boolean("Ignorer données géographiques")
+
+    @api.onchange('mode_recherche')
+    def _onchange_mode_recherche(self):
+        self.ensure_one()
+        if self.mode_recherche and self.mode_recherche == u"distance":
+            self.max_recherche = 50
+        elif self.mode_recherche:
+            self.max_recherche = 60
+
+    @api.onchange('date_recherche_debut')
+    def _onchange_date_recherche_debut(self):
+        self.ensure_one()
+        if self.date_recherche_debut:
+            d_drd = fields.Date.from_string(self.date_recherche_debut)
+            d_drf = d_drd + timedelta(days=6)
+            self.date_recherche_fin = fields.Date.to_string(d_drf)
+
+    @api.onchange('date_recherche_fin')
+    def _onchange_date_recherche_fin(self):
+        self.ensure_one()
+        if self.date_recherche_fin and self.date_recherche_fin < self.date_recherche_debut:
+            raise UserError(u"La date de fin de recherche doit être postérieure à la date de début de recherche")
 
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
         service_obj = self.env['of.service']
-        services = False
+        service = False
+        search_service = False
+        vals = {}
+        update = False
         if self.tache_id:
             if self.service_id:
                 if self.service_id.tache_id.id == self.tache_id.id:
-                    services = True
+                    service = True
                 else:
-                    services = service_obj.search([('partner_id', '=', self.partner_id.id),
-                                                   ('tache_id', '=', self.tache_id.id)], limit=1)
-                    if services:
-                        self.service_id = services
+                    search_service = True
+            else:
+                search_service = True
+            if search_service:
+                service = service_obj.search([('partner_id', '=', self.partner_id.id),
+                                               ('tache_id', '=', self.tache_id.id)], limit=1)
+                if service:
+                    vals["service_id"] = service
 
             if self.tache_id.duree:
-                self.duree = self.tache_id.duree
+                vals["duree"] = self.tache_id.duree
 
-            if self.equipe_id_pre not in self.tache_id.equipe_ids:
-                self.equipe_id_pre = False
+            equipes = []
+            for equipe in self.pre_equipe_ids:
+                if equipe in self.tache_id.equipe_ids:
+                    equipes.push(equipe.id)
+            vals["pre_equipe_ids"] = equipes
+            update = True
 
-        if not services:
-            self.service_ids = False
+        if not service:
+            vals["service_id"] = False
+            update = True
+        if update:
+            self.update(vals)
 
     @api.onchange('service_id')
     def _onchange_service(self):
@@ -116,14 +203,15 @@ class OfTourneeRdv(models.TransientModel):
 
         service = self.service_id
         notes = [service.tache_id.name]
-#        if service.template_id:
-#            notes.append(service.template_id.name)
         if service.note:
             notes.append(service.note)
 
-        self.description = "\n".join(notes)
-        self.tache_id = service.tache_id
-        self.partner_address_id = service.address_id
+        vals = {
+            'description': "\n".join(notes),
+            'tache_id': service.tache_id,
+            'partner_address_id': service.address_id,
+        }
+        self.update(vals)
 
     @api.multi
     def _get_equipe_possible(self):
@@ -134,27 +222,23 @@ class OfTourneeRdv(models.TransientModel):
                 equipe_ids.append(planning.equipe_id.id)
         return equipe_ids
 
-    # Note: Séparation en 3 fonctions car, avec une seule fonction button_calcul(self, creneau_suivant=False),
-    #       Odoo place le contexte dans cette variable si elle n'est pas fournie en paramètre ...
     @api.multi
-    def button_calcul_suivant(self):
-        # Calcule a prochaine intervention à partir de la dernière intervention proposée
-        self.compute(creneau_suivant=True)
-        context = dict(self._context, equipe_domain=self._get_equipe_possible())
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'of.tournee.rdv',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_id': self.id,
-            'target': 'new',
-            'context': context,
-        }
+    def button_geocode(self):
+        self.ensure_one()
+        if self.geocode_retry:
+            raise UserError("Votre géocodeur par défaut n'a pas réussi a géocoder cette adresse")
+        address_id = self.partner_address_id
+        geo_wizard_obj = self.env['of.geo.wizard']
+        geo_wizard_obj.geo_code(False,address_id)
+        self.geocode_retry = True
+        if self.geo_lat != 0 or self.geo_lng !=0:
+            self.ignorer_geo = False
+        return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
     def button_calcul(self):
         # Calcule a prochaine intervention à partir du lendemain de la date courante
-        self.compute(creneau_suivant=False)
+        self.compute()
         context = dict(self._context, equipe_domain=self._get_equipe_possible())
         return {
             'type': 'ir.actions.act_window',
@@ -167,8 +251,8 @@ class OfTourneeRdv(models.TransientModel):
         }
 
     @api.multi
-    def compute(self, creneau_suivant):
-        u"""Calcul du prochain créneau disponible
+    def compute(self):
+        u"""Calcul des prochains créneaux disponibles
         NOTE : Si un service est sélectionné incluant le samedi et/ou le dimanche,
                ceux-cis seront traités comme des jours normaux du point de vue des équipes
         """
@@ -188,156 +272,131 @@ class OfTourneeRdv(models.TransientModel):
         jours = [jour.numero for jour in service.jour_ids] if service else range(1, 6)
 
         # Suppression des anciens créneaux
-        planning_del_ids = wizard_line_obj.search([('wizard_id', '=', self.id)])
+        planning_del_ids = wizard_line_obj.search([])#[('wizard_id', '=', self.id)])
         if planning_del_ids:
             planning_del_ids.unlink()
 
         # Récupération des équipes
+        equipes = self.env['of.planning.equipe']
         if not self.tache_id.equipe_ids:
             raise UserError(u"Aucune équipe ne peut réaliser cette tâche.")
-        if self.equipe_id_pre:
-            if self.equipe_id_pre in self.tache_id.equipe_ids:
-                equipes = self.equipe_id_pre
-            else:
-                raise UserError(u"Cette équipe n'a pas la compétence pour réaliser cette prestation.")
+        if self.pre_equipe_ids:
+            for equipe in self.pre_equipe_ids:
+                if equipe in self.tache_id.equipe_ids:
+                    equipes |= equipe
+            if len(equipes) == 0:
+                raise UserError(u"Aucune des équipes sélectionnées n'a la compétence pour réaliser cette prestation.")
         else:
             equipes = self.tache_id.equipe_ids
 
         un_jour = timedelta(days=1)
-        if creneau_suivant:
-            # Récupération de la dernière date affichée
-            date_date = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(self.date_propos)).date()
-            # Recherche à partir du jour suivant
-            date_min = fields.Date.to_string(date_date + un_jour)
-            date_jour = date_date.isoweekday()
-        else:
-            date_min = self.date_recherche
-            date_date = date_jour = False
 
-        tournees = False
-        if self.mode != 'all':
-            # Recherche des tournees disponibles
-            query = "SELECT id FROM of_planning_tournee "
-            where_calc = "WHERE equipe_id IN %%s AND date >= '%s' AND NOT is_bloque AND NOT is_complet " % (date_min,)
+        d_avant_recherche = fields.Date.from_string(self.date_recherche_debut) - un_jour
+        avant_recherche = fields.Date.to_string(d_avant_recherche)
+        dt_avant_recherche_debut = tz.localize(datetime.strptime(avant_recherche+" 00:00:00", "%Y-%m-%d %H:%M:%S")) # local datetime
+        dt_avant_recherche_fin = tz.localize(datetime.strptime(avant_recherche+" 23:59:00", "%Y-%m-%d %H:%M:%S")) # local datetime
+        d_apres_recherche = fields.Date.from_string(self.date_recherche_fin) + un_jour
+        apres_recherche = fields.Date.to_string(d_apres_recherche)
+        dt_apres_recherche_debut = tz.localize(datetime.strptime(apres_recherche+" 00:00:00", "%Y-%m-%d %H:%M:%S")) # local datetime
+        dt_apres_recherche_fin = tz.localize(datetime.strptime(apres_recherche+" 23:59:00", "%Y-%m-%d %H:%M:%S")) # local datetime
+
+        for equipe in equipes: # Création des créneaux de début et fin de recherche
+            wizard_line_obj.create({
+                'name': 'Début de la recherche',
+                'debut_dt': dt_avant_recherche_debut,
+                'fin_dt': dt_avant_recherche_fin,
+                'date_flo': 0.0,
+                'date_flo_deadline': 23.9,
+                'date': d_avant_recherche,
+                'wizard_id': self.id,
+                'equipe_id': equipe.id,
+                'intervention_id': False,
+                'disponible': False,
+                'allday': True,
+            })
+            wizard_line_obj.create({
+                'name': 'Fin de la recherche',
+                'debut_dt': dt_apres_recherche_debut,
+                'fin_dt': dt_apres_recherche_fin,
+                'date_flo': 0.0,
+                'date_flo_deadline': 23.9,
+                'date': d_apres_recherche,
+                'wizard_id': self.id,
+                'equipe_id': equipe.id,
+                'intervention_id': False,
+                'disponible': False,
+                'allday': True,
+            })
+
+        d_recherche = d_avant_recherche
+        u"""
+        Parcours tous les jours inclus entre la date de début de recherche et la date de fin de recherche.
+        Prends en compte les équipes qui peuvent effectuer la tache, et qui sont disponibles
+        Ne prends pas en compte les jours non travaillés @TODO: passer les jours travaillés en many2many vers of.jour (module of_utils)
+        """
+        while d_recherche < d_apres_recherche:
+            d_recherche += un_jour
+            num_jour = d_recherche.isoweekday()
+
+            # Restriction aux jours spécifiés dans le service
+            while num_jour not in jours:
+                d_recherche += un_jour
+                num_jour = (num_jour + 1) % 7
+            # Arreter la recherche si on dépasse la date de fin
+            if d_recherche >= d_apres_recherche:
+                continue
+            str_d_recherche = fields.Date.to_string(d_recherche)
+
+            equipe_ids = equipes._ids if len(equipes._ids) > 1 else [equipes._ids[0]]
+            # interdiction de chercher dans les tournées bloquées ou complètes
+            query = "SELECT equipe_id FROM of_planning_tournee "
+            where_calc = "WHERE equipe_id IN %%s AND date = '%s' AND (is_bloque OR is_complet) " % (str_d_recherche,)
             where_params = [equipes._ids]
-
-            if service:
-                where_calc += "AND EXTRACT(DOW FROM date) IN %s "
-                where_params.append(tuple(jours))
-
-            if address.geo_lat or address.geo_lng:
-                geo_lat_client = address.geo_lat or 0
-                geo_lng_client = address.geo_lng or 0
-            else:
-                # @todo: Tenter de calculer les coordonnées GPS à l'aide de l'adresse
-                raise UserError(u"Le contact n'a pas de coordonnées GPS : %s" % (address.name,))
-
-            lat = math.radians(geo_lat_client)
-            lon = math.radians(geo_lng_client)
-            dist_constante = 2.0*6366
-            where_item = "AND asin(sqrt(pow(sin((radians(epi_lat) - (%s)) / 2.0), 2) " \
-                         "+ cos(radians(epi_lat)) * (%s) * pow(sin((radians(epi_lon) - (%s)) / 2.0), 2))) " \
-                         "* %s < distance "
-
-            where_calc += where_item % (lat, cos(lat), lon, dist_constante)
-
-            self._cr.execute(query + where_calc, where_params)
-            tournee_ids = [row[0] for row in self._cr.fetchall()]
-
-            # Restriction aux donnees accessibles a l'utilisateur
-            tournees = tournee_obj.search([('id', 'in', tournee_ids)])
-
-        propos = []
-        while not propos:
-            # Recherche jour par jour
-            if self.mode == 'tournee':
-                if not tournees:
-                    raise UserError("Aucun créneau trouvé sur les tournées existantes")
-                date = tournees[0].date
-                date_date = fields.Date.from_string(date)
-
-                equipes_dispo = []
-                for tournee in tournees:
-                    if tournee.date != date:
-                        break
-                    equipes_dispo.append(tournee.equipe_id.id)
-                tournees = tournees[len(equipes_dispo):]  # @todo: Vérifier ce code ([:] depuis un recordset)
-                #                                           sinon: tournees = tournee_obj.browse(tournees._ids[len(equipes_dispo):])
-                equipes_dispo = list(set(equipes_dispo))  # Pour le cas où il y aurait plusieurs tournées créées par erreur pour une même équipe
-            else:
-                if date_date:
-                    date_date += un_jour
-                    date_jour = (date_jour + 1) % 7
-                else:
-                    date_date = fields.Date.from_string(date_min)
-                    date_jour = date_date.isoweekday()
-
-                # Restriction aux jours spécifiés dans le service
-                while date_jour not in jours:
-                    date_jour = (date_jour + 1) % 7
-                    date_date += un_jour
-                date = fields.Date.to_string(date_date)
-
-                # En mode hors tournée, interdiction de chercher dans les tournées éloignées
-                # En mode tous créneaux, interdiction de chercher dans les tournées bloquées ou complètes
-                query = "SELECT equipe_id FROM of_planning_tournee "
-                where_calc = "WHERE equipe_id IN %%s AND date = '%s' " % (date,)
-                where_params = [equipes._ids]
-
-                if self.mode == 'hors_tournee':
-                    if tournees:
-                        where_calc += "AND id NOT IN %s "
-                        where_params.append(tournees._ids)
-                else:
-                    where_calc += "AND (is_bloque OR is_complet) "
-
-                self._cr.execute(query + where_calc, where_params)
-                equipes_bloquees = [row[0] for row in self._cr.fetchall()]
-                equipes_dispo = [equipe_id for equipe_id in equipes._ids if equipe_id not in equipes_bloquees]
-            if not equipes_dispo:
+            self._cr.execute(query + where_calc,where_params)
+            equipes_bloquees = [row[0] for row in self._cr.fetchall()]
+            equipes_dispo = [equipe_id for equipe_id in equipes._ids if equipe_id not in equipes_bloquees]
+            if not equipes_dispo: # rechercher le jour suivant
                 continue
 
             # Recherche de creneaux pour la date voulue et les équipes sélectionnées
-            date_jour_deb = tz.localize(datetime.strptime(date+" 00:00:00", "%Y-%m-%d %H:%M:%S"))
-            date_jour_fin = tz.localize(datetime.strptime(date+" 23:59:00", "%Y-%m-%d %H:%M:%S"))
+            dt_jour_deb = tz.localize(datetime.strptime(str_d_recherche+" 00:00:00", "%Y-%m-%d %H:%M:%S"))
+            dt_jour_fin = tz.localize(datetime.strptime(str_d_recherche+" 23:59:00", "%Y-%m-%d %H:%M:%S"))
+            # Récupération des interventions déjà planifiées
             interventions = intervention_obj.search([('equipe_id', 'in', equipes_dispo),
-                                                     ('date', '<=', date),
-                                                     ('date_deadline', '>=', date),
+                                                     ('date', '<=', str_d_recherche),
+                                                     ('date_deadline', '>=', str_d_recherche),
                                                      ('state', 'in', ('draft', 'confirm')),
                                                      ], order='date')
 
-            # Récupération des interventions déjà planifiées
             equipe_intervention_dates = {equipe_id: [] for equipe_id in equipes_dispo}
             for intervention in interventions:
                 intervention_dates = [intervention]
                 for intervention_date in (intervention.date, intervention.date_deadline):
                     # Conversion des dates de début et de fin en nombres flottants et à l'heure locale
-                    date_local = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(intervention_date))
+                    dt_intervention_local = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(intervention_date))
 
                     # Comme on n'affiche que les heures, il faut s'assurer de rester dans le bon jour
                     #   (pour les interventions étalées sur plusieurs jours)
-                    date_local = max(date_local, date_jour_deb)
-                    date_local = min(date_local, date_jour_fin)
-                    date_local_flo = round(date_local.hour +
-                                           date_local.minute / 60.0 +
-                                           date_local.second / 3600.0, 5)
-                    intervention_dates.append(date_local_flo)
+                    dt_intervention_local = max(dt_intervention_local, dt_jour_deb)
+                    dt_intervention_local = min(dt_intervention_local, dt_jour_fin)
+                    flo_dt_intervention_local = round(dt_intervention_local.hour +
+                                           dt_intervention_local.minute / 60.0 +
+                                           dt_intervention_local.second / 3600.0, 5)
+                    intervention_dates.append(flo_dt_intervention_local)
 
-                equipe_intervention_dates[intervention.equipe_id.id].append(intervention_dates)
+                equipe_intervention_dates[intervention.equipe_id.id].append(intervention_dates) # (intervention_id, flo_debut, flo_fin)
 
             # @todo: Gestion des employés dans plusieurs équipes
             for equipe in equipe_obj.browse(equipes_dispo):
                 intervention_dates = equipe_intervention_dates[equipe.id]
-
                 deb = equipe.hor_md
                 fin = equipe.hor_mf
                 ad = equipe.hor_ad
                 creneaux = []
-
+                #TODO: possibilité intervention chevauchant la nuit
                 for intervention, intervention_deb, intervention_fin in intervention_dates + [(False, 24, 24)]:
                     if deb < intervention_deb and deb < fin:
                         # Un trou dans le planning, suffisant pour un créneau?
-
                         if deb < ad and intervention_deb >= ad:
                             # On passe du matin à l'après-midi
                             # On vérifie la durée cumulée de la matinée et de l'après-midi car une intervention peut
@@ -358,58 +417,103 @@ class OfTourneeRdv(models.TransientModel):
                         fin = equipe.hor_af
                     elif intervention_fin > deb:
                         deb = intervention_fin
-
                 if not creneaux:
                     # Aucun creneau libre pour cette équipe
                     continue
-
-                propos = min(propos, creneaux[0]) or creneaux[0]
-
+                # création des créneaux dispo
                 for intervention_deb, intervention_fin, equipe in creneaux:
                     description = "%s-%s" % tuple(hours_to_strs(intervention_deb, intervention_fin))
 
+                    dt_debut = datetime.combine(d_recherche, datetime.min.time()) + timedelta(hours=intervention_deb)
+                    dt_debut = tz.localize(dt_debut, is_dst=None).astimezone(pytz.utc)
+                    dt_fin = datetime.combine(d_recherche, datetime.min.time()) + timedelta(hours=intervention_fin)
+                    dt_fin = tz.localize(dt_fin, is_dst=None).astimezone(pytz.utc)
+
                     wizard_line_obj.create({
+                        'debut_dt': dt_debut,
+                        'fin_dt': dt_fin,
                         'date_flo': intervention_deb,
                         'date_flo_deadline': intervention_fin,
+                        'date': str_d_recherche,
                         'description': description,
                         'wizard_id': self.id,
                         'equipe_id': equipe.id,
                         'intervention_id': False,
                     })
+                # création des créneaux d'intervention
                 for intervention, intervention_deb, intervention_fin in intervention_dates:
                     description = "%s-%s" % tuple(hours_to_strs(intervention_deb, intervention_fin))
 
+                    dt_debut = datetime.combine(d_recherche, datetime.min.time()) + timedelta(hours=intervention_deb)
+                    dt_debut = tz.localize(dt_debut, is_dst=None).astimezone(pytz.utc)
+                    dt_fin = datetime.combine(d_recherche, datetime.min.time()) + timedelta(hours=intervention_fin)
+                    dt_fin = tz.localize(dt_fin, is_dst=None).astimezone(pytz.utc)
+
                     wizard_line_obj.create({
+                        'debut_dt': dt_debut, # datetime utc
+                        'fin_dt': dt_fin, # datetime utc
                         'date_flo': intervention_deb,
                         'date_flo_deadline': intervention_fin,
+                        'date': str_d_recherche,
                         'description': description,
                         'wizard_id': self.id,
                         'equipe_id': intervention.equipe_id.id,
                         'intervention_id': intervention.id,
+                        'name': intervention.name,
+                        'disponible': False,
                     })
+        # Calcul des durées et distances
+        d_debut = d_avant_recherche + un_jour
+        d_fin = d_apres_recherche - un_jour
+        if not self.ignorer_geo:
+            wizard_line_obj.calc_distances_dates_equipes(d_debut, d_fin, equipes)
 
-        # libelle de RDV
-        address = self.partner_address_id
-        name = address.name or (address.parent_id and address.parent_id.name) or ''
-        name += address.zip and (" " + address.zip) or ""
-        name += address.city and (" " + address.city) or ""
+        nb, nb_dispo, first_res = wizard_line_obj.get_nb_dispo(self)
 
-        datetime_propos = datetime.combine(date_date, datetime.min.time()) + timedelta(hours=propos[0])
-        datetime_propos = tz.localize(datetime_propos, is_dst=None).astimezone(pytz.utc)
+        vals ={}
+        # Sélection du résultat
+        if nb > 0:
+            address = self.partner_address_id
+            name = address.name or (address.parent_id and address.parent_id.name) or ''
+            name += address.zip and (" " + address.zip) or ""
+            name += address.city and (" " + address.city) or ""
 
-        vals = {
-            'date_display'    : date_date.strftime('%A %d %B %Y'),
-            'name'            : name,
-            'equipe_id'       : propos[2].id,
-            'date_propos'     : datetime_propos,
-            'date_propos_hour': propos[0],
-        }
+            d_first_res = fields.Date.from_string(first_res.date)
+            dt_propos = datetime.combine(d_first_res, datetime.min.time()) + timedelta(hours=first_res.date_flo) # datetime naive
+            dt_propos = tz.localize(dt_propos, is_dst=None).astimezone(pytz.utc) # datetime utc
 
-        if self.service_id:
-            vals['date_next'] = self.service_id.get_next_date(date_date.strftime('%Y-%m-%d'))
+            vals = {
+                'date_display'    : first_res.date,
+                'name'            : name,
+                'equipe_id'       : first_res.equipe_id.id,
+                'date_propos'     : dt_propos, # datetime utc
+                'date_propos_hour': first_res.date_flo,
+                'res_line_id'     : first_res.id,
+                'display_res'     : True,
+                'zero_result'     : False,
+                'zero_dispo'      : False,
+            }
+
+            if self.service_id:
+                vals['date_next'] = self.service_id.get_next_date(d_first_res.strftime('%Y-%m-%d'))
+            else:
+                vals['date_next'] = "%s-%02i-01" % (d_first_res.year + 1, d_first_res.month)
+
+            if nb_dispo == 0:
+                vals['display_res'] = True
+                vals['zero_dispo'] = True
+
         else:
-            vals['date_next'] = "%s-%02i-01" % (date_date.year + 1, date_date.month)
+            vals = {
+                'display_res' : True,
+                'zero_result': True,
+                'zero_dispo': False,
+            }
+
         self.write(vals)
+        if self.res_line_id:
+            self.res_line_id.selected = True
+            self.res_line_id.selected_hour = self.res_line_id.date_flo
 
     @api.multi
     def _get_service_data(self, mois):
@@ -432,25 +536,34 @@ class OfTourneeRdv(models.TransientModel):
         intervention_obj = self.env['of.planning.intervention']
         service_obj = self.env['of.service']
 
-        # verifier que la date de début est dans les créneaux
+        # verifier que la date de début et la date de fin sont dans les créneaux
         equipe = self.equipe_id
-        date_display = self.date_display
-        date_propos_hour = self.date_propos_hour
-        date_date = datetime.strptime(date_display.encode('utf8'), "%A %d %B %Y")
-
-        date_propos_local_datetime_sanszone = date_date + timedelta(minutes=round(date_propos_hour*60))
-        local_dt = tz.localize(date_propos_local_datetime_sanszone, is_dst=None)
-        date_propos_utc = local_dt.astimezone(pytz.utc)
-        date_propos = date_propos_utc.strftime('%Y-%m-%d %H:%M:%S')
-
-        date_propos_deadline_local_datetime_sanszone = date_propos_local_datetime_sanszone + timedelta(hours=self.duree)
-        for planning in self.planning_ids:
-            if (not planning.intervention_id) and (planning.equipe_id.id == equipe.id):
-                debut = datetime.combine(date_date, datetime.min.time()) + timedelta(hours=planning.date_flo)
-                fin = datetime.combine(date_date, datetime.min.time()) + timedelta(hours=planning.date_flo_deadline)
-                if (date_propos_local_datetime_sanszone >= debut) and (date_propos_local_datetime_sanszone <= fin) and \
-                   (date_propos_deadline_local_datetime_sanszone >= debut) and (date_propos_deadline_local_datetime_sanszone <= fin):
+        td_pause_midi = timedelta(hours=equipe.hor_ad - equipe.hor_mf)
+        td_pause_nuit = timedelta(hours=24 - equipe.hor_af + equipe.hor_md)
+        dt_propos = fields.Datetime.from_string(self.date_propos) # datetime utc proposition de rdv
+        dt_propos_deadline = dt_propos + timedelta(hours=self.duree) # datetime utc proposition fin de rdv
+        propos_deadline_flo = self.date_propos_hour + self.duree
+        found = False
+        err = False
+        for planning in self.planning_ids.search([("equipe_id","=",equipe.id)],order="debut_dt"):
+            debut_dt = fields.Datetime.from_string(planning.debut_dt)
+            fin_dt = fields.Datetime.from_string(planning.fin_dt)
+            if err:
+                continue
+            elif debut_dt <= dt_propos and fin_dt >= dt_propos and not planning.intervention_id: # le debut du rdv est dans un créneau dispo
+                found = True
+                if debut_dt <= dt_propos_deadline and fin_dt >= dt_propos_deadline: # le rdv se termine dans ce même créneau
                     break
+                elif self.date_propos_hour <= equipe.hor_mf and dt_propos_deadline > fin_dt: # chevauchement pause midi
+                    dt_propos_deadline += td_pause_midi
+                    propos_deadline_flo += equipe.hor_ad - equipe.hor_mf
+                elif self.date_propos_hour <= equipe.hor_af and dt_propos_deadline > fin_dt: # chevauchement nuit
+                    dt_propos_deadline += td_pause_nuit
+                    propos_deadline_flo = (propos_deadline_flo + 24 - equipe.hor_af + equipe.hor_md) % 24
+            elif found and planning.intervention_id: # une intervention entre le début et la fin du rdv
+                err = True
+            elif found and debut_dt <= dt_propos_deadline and fin_dt >= dt_propos_deadline and not planning.intervention_id: # la fin du rdv est dans un créneau dispo
+                break
         else:
             raise UserError(u"Vérifier la date de RDV et l'équipe technique")
 
@@ -466,7 +579,7 @@ class OfTourneeRdv(models.TransientModel):
             'address_id': self.partner_address_id.id,
             'tache_id': self.tache_id.id,
             'equipe_id': self.equipe_id.id,
-            'date': date_propos,
+            'date': self.date_propos,
             'duree': self.duree,
             'user_id': self._uid,
             'company_id': self.partner_address_id.company_id and self.partner_address_id.company_id.id,
@@ -482,76 +595,265 @@ class OfTourneeRdv(models.TransientModel):
 
         intervention_obj.create(values)
 
-        # Creation/mise à jour du service
+        # Creation/mise à jour du service si creer_recurrence
         if self.date_next:
             if self.service_id:
                 self.service_id.write({'date_next': self.date_next})
-            else:
-                service_obj.create(self._get_service_data(date_propos_utc.month))
+            elif self.creer_recurrence:
+                service_obj.create(self._get_service_data(dt_propos.month))
         return {'type': 'ir.actions.act_window_close'}
 
 
 class OfTourneeRdvLine(models.TransientModel):
     _name = 'of.tournee.rdv.line'
     _description = 'Propositions des RDVs'
+    _order = "date, equipe_id, date_flo"
+    _inherit = "of.calendar.mixin"
 
-    @api.depends()
-    def _calc_distances(self):
-        jours_res = {}
-        for line in self:
-            jours_res.setdefault(line.wizard_id, {}).setdefault(line.equipe_id, []).append(line)
+    @api.model
+    def calc_distances_dates_equipes(self,date_debut,date_fin,equipes):
+        u"""
+            une requete http par jour par équipe. En cas de problemes de performances on pourra se débrouiller pour faire une requête par équipe 
+        """
+        un_jour = timedelta(days=1)
+        date_courante = date_debut
+        while date_courante <= date_fin:
+            for equipe in equipes:
+                creneaux = self.search([('date', '=', date_courante),('equipe_id', '=', equipe.id)],order="debut_dt")
+                interventions = creneaux.mapped("intervention_id")
+                tournee = interventions.mapped("tournee_id")
+                if len(creneaux) == 0:
+                    continue
+                if len(tournee) == 1: # si tournee on favorise le point de départ de la tournee plutot que celui de l'équipe
+                    origine = tournee.address_depart_id or creneaux[0].equipe_id.address_id
+                    arrivee = tournee.address_retour_id or creneaux[0].equipe_id.address_retour_id or creneaux[0].equipe_id.address_id
+                else:
+                    origine = creneaux[0].equipe_id.address_id or creneaux[0].equipe_id.employee_ids[0].address_id
+                    arrivee = creneaux[0].equipe_id.address_retour_id or creneaux[0].equipe_id.address_id or creneaux[0].equipe_id.employee_ids[0].address_id
+                str_coords = u""
+                coords = []
 
-        for wizard, equipes in jours_res.iteritems():
-            partner_address = wizard.partner_address_id
-            for equipe, lines in equipes.iteritems():
-                lines_libres = []
-                last_gps = (equipe.address_id.geo_lat, equipe.address_id.geo_lng)
-                next_gps = False
-                lines.sort(key=lambda p: p.date_flo)
-                for line in lines+[False]:
-                    if line is False:
-                        address = equipe.address_id
-                        next_gps = (address.geo_lat, address.geo_lng)
-                    elif line.intervention_id:
-                        address = line.intervention_id.address_id
-                        next_gps = (address.geo_lat, address.geo_lng)
+                query = ROUTING_BASE_URL + u"route/" + ROUTING_VERSION + u"/" + ROUTING_PROFILE + u"/"
+                ### listess de coordonnées: ATTENTION OSRM prend ses coordonnées sous form (lng,lat)
+                # point de départ
+                if origine.geo_lat != 0 or origine.geo_lng != 0:
+                    str_coords += str(origine.geo_lng) + "," + str(origine.geo_lat)
+                    coords.append((origine.geo_lng,origine.geo_lat))
+                else:
+                    raise UserError("l'origine n'est pas géolocalisée")
+                # créneaux et interventions
+                for line in creneaux:
+                    if line.geo_lat != 0 or line.geo_lng != 0:
+                        str_coords += u";" + str(line.geo_lng) + u"," + str(line.geo_lat)
+                        coords.append((line.geo_lng,line.geo_lat))
+                # point d'arrivée
+                if arrivee.geo_lat != 0 or arrivee.geo_lng != 0:
+                    str_coords += u";" + str(arrivee.geo_lng) + "," + str(arrivee.geo_lat)
+                    coords.append((arrivee.geo_lng,arrivee.geo_lat))
+                else:
+                    raise UserError("le point de retour n'est pas géolocalisé")
+                query_send = urllib.quote(query.strip().encode('utf8')).replace('%3A', ':')
+                full_query = query_send + str_coords + "?"
+                try:
+                    req = requests.get(full_query)
+                    res = req.json()
+                except Exception as e:
+                    raise UserError((u"Impossible de contacter le serveur de routing. Assurez-vous que votre connexion Internet est opérationnelle et que l'URL est définie (%s)") % e)
 
-                        line.distance = ''
-                        line.dist_prec = ''
-                        line.dist_suiv = ''
-                    else:
-                        lines_libres.append(line)
+                if res and res.get(u"routes",False):
+                    legs = res[u"routes"][0][u"legs"]
+                    if len(creneaux) == len(res[u"routes"][0][u"legs"]) - 1: # depart -> creneau -> arrivee : 2 routes 1 creneau
+                        mode_recherche = creneaux[0].wizard_id.mode_recherche
+                        maxi = creneaux[0].wizard_id.max_recherche
+                        for i in range(len(creneaux)):
+                            vals = {}
+                            if i >= 1 and not (creneaux[i-1].intervention_id or creneaux[i].intervention_id):
+                                # les creneaux précedant et actuel sont disponible, considérer qu'ils sont le même en terme de distances
+                                vals[u"dist_prec"] = legs[i-1][u"distance"] / 1000
+                                vals[u"duree_prec"] = legs[i-1][u"duration"] / 60
+                                if i < len(creneaux) - 1:
+                                    vals[u"dist_suiv"] = legs[i+1][u"distance"] / 1000
+                                    vals[u"duree_suiv"] = legs[i+1][u"duration"] / 60
+                                vals[u"distance"] = vals[u"dist_prec"] + vals.get(u"dist_suiv",0)
+                                vals[u"duree"] = vals[u"duree_prec"] + vals.get(u"duree_suiv",0)
+                                vals_prec = {}
+                                vals_prec[u"dist_suiv"] = vals.get(u"dist_suiv",0)
+                                vals_prec[u"duree_suiv"] = vals.get(u"duree_suiv",0)
+                                vals_prec[u"distance"] = creneaux[i-1].dist_prec + vals_prec[u"dist_suiv"]
+                                vals_prec[u"duree"] = creneaux[i-1].duree_prec + vals_prec[u"duree_suiv"]
+                                # créneau plus loins que la recherche accepte
+                                if creneaux[i-1].disponible and mode_recherche == u"distance" and vals_prec[u"distance"] > maxi:
+                                    vals_prec[u"force_color"] = "#FF0000"
+                                    vals_prec[u"name"] = "TROP LOINS"
+                                    vals_prec[u"disponible"] = False
+                                # créneau plus loins que la recherche accepte
+                                elif creneaux[i-1].disponible and mode_recherche == u"duree" and vals_prec[u"duree"] > maxi:
+                                    vals_prec[u"force_color"] = "#FF0000"
+                                    vals_prec[u"name"] = "TROP LOINS"
+                                    vals_prec[u"disponible"] = False
+                                # trajet aller-retour plus long que la durée de l'intervention
+                                elif creneaux[i-1].disponible and vals[u"duree"] > creneaux[i].wizard_id.duree * 60:
+                                    vals[u"force_color"] = "#AA0000"
+                                    vals[u"name"] = "TROP COURT"
+                                    vals[u"disponible"] = False
+                                creneaux[i-1].update(vals_prec)
+                            else:
+                                vals[u"dist_prec"] = legs[i][u"distance"] / 1000
+                                vals[u"duree_prec"] = legs[i][u"duration"] / 60
+                                vals[u"dist_suiv"] = legs[i+1][u"distance"] / 1000 # legs[i+1] ok car len(legs) == len(creneaux) + 1
+                                vals[u"duree_suiv"] = legs[i+1][u"duration"] / 60
+                                vals[u"distance"] = vals[u"dist_prec"] + vals.get(u"dist_suiv",0)
+                                vals[u"duree"] = vals[u"duree_prec"] + vals.get(u"duree_suiv",0)
+                            # créneau plus loins que la recherche accepte
+                            if creneaux[i].disponible and mode_recherche == u"distance" and vals[u"distance"] > maxi:
+                                vals[u"force_color"] = "#FF0000"
+                                vals[u"name"] = "TROP LOINS"
+                                vals[u"disponible"] = False
+                            # créneau plus loins que la recherche accepte
+                            elif creneaux[i].disponible and mode_recherche == u"duree" and vals[u"duree"] > maxi:
+                                vals[u"force_color"] = "#FF0000"
+                                vals[u"name"] = "TROP LOINS"
+                                vals[u"disponible"] = False
+                            # trajet aller-retour plus long que la durée de l'intervention
+                            elif creneaux[i].disponible and vals[u"duree"] > creneaux[i].wizard_id.duree * 60:
+                                vals[u"force_color"] = "#AA0000"
+                                vals[u"name"] = "TROP COURT"
+                                vals[u"disponible"] = False
 
-                    if next_gps:
-                        for line in lines_libres:
-                            erreur = False
-                            dist_tot = 0
-                            vals = []
-                            for gps in (last_gps, next_gps):
-                                if gps[0]:
-                                    dist = distance_points(gps[0], gps[1], partner_address.geo_lat, partner_address.geo_lng)
-                                    dist_tot += dist
-                                    vals.append("%0.2f" % dist)
-                                else:
-                                    vals.append('?')
-                                    erreur = '?'
+                            creneaux[i].update(vals)
+                else:
+                    raise UserWarning("Erreur inattendue de routing")
+            date_courante += un_jour
 
-                            line.distance = erreur or "%0.2f" % dist_tot
-                            line.dist_prec = vals[0]
-                            line.dist_suiv = vals[1]
-                        lines_libres = []
-                        last_gps = next_gps
-                        next_gps = False
+    @api.model
+    def get_nb_dispo(self,wizard):
+        """Retourne le nombre de créneaux disponibles (qui correspondent aux criteres de recherche), 
+            le nomre de créneau trop loins, et le premier resultat (en fonction du critere de résultat"""
+        # ne pas inclure les lignes associées a une intervention ni les lignes de début et fin de recherche
+        lines = self.search([('wizard_id', '=', wizard.id),('allday', '=', False),('intervention_id', '=', False)],order="distance,debut_dt") # events allDay sont debut et fin de recherche
+        lines_dispo = self.search([('wizard_id', '=', wizard.id),('disponible', '=', True)],order="distance,debut_dt")
+        nb = len(lines)
+        nb_dispo = len(lines_dispo)
+        first_res = lines_dispo and lines_dispo[0] or lines and lines[0] or False
+        return (nb,nb_dispo,first_res)
 
+    date = fields.Date(string="Date")
+    debut_dt = fields.Datetime(string="Début")
+    fin_dt = fields.Datetime(string="Fin")
     date_flo = fields.Float(string='Date', required=True, digits=(12, 5))
     date_flo_deadline = fields.Float(string='Date', required=True, digits=(12, 5))
-    description = fields.Char(string='RDV', size=128)
+    description = fields.Char(string='Créneau', size=128)
     wizard_id = fields.Many2one('of.tournee.rdv', string="RDV", required=True, ondelete='cascade')
     equipe_id = fields.Many2one('of.planning.equipe', string='Equipe')
     intervention_id = fields.Many2one('of.planning.intervention', string="Planning")
+    name = fields.Char(string="name", default="DISPONIBLE")
+    distance = fields.Float(string='Dist.tot. (km)', digits=(12, 2), help="distance prec + distance suiv")
+    dist_prec = fields.Float(string='Dist.Prec. (km)')
+    dist_suiv = fields.Float(string='Dist.Suiv. (km)')
+    duree = fields.Float(string=u'Durée.tot. (min)', digits=(12, 2),help="durée prec + durée suiv")
+    duree_prec = fields.Float(string=u'Durée.Prec. (min)')
+    duree_suiv = fields.Float(string=u'Durée.Suiv. (min)')
+    color_ft = fields.Char(related="equipe_id.color_ft", readonly=True)
+    color_bg = fields.Char(related="equipe_id.color_bg", readonly=True)
+    disponible = fields.Boolean(string="Est dispo", default=True)
+    force_color = fields.Char("Couleur")
+    allday = fields.Boolean('All Day', default=False)
+    selected = fields.Boolean(u'Créneau sélectionné', default=False)
+    selected_hour = fields.Float(string='Heure du RDV', digits=(2, 2))
+    selected_description = fields.Html(string="Description", related="wizard_id.description")
 
-    distance = fields.Char(compute="_calc_distances", string='Dist.tot.')
-    dist_prec = fields.Char(compute="_calc_distances", string='Dist.Prec.')
-    dist_suiv = fields.Char(compute="_calc_distances", string='Dist.Suiv')
+    geo_lat = fields.Float(string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo", readonly=True)
+    geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_geo", readonly=True)
+    precision = fields.Selection([
+        ('manual', "Manuel"),
+        ('high', "Haut"),
+        ('medium', "Moyen"),
+        ('low', "Bas"),
+        ('no_address', u"--"),
+        ('unknown', u"Indéterminé"),
+        ('not_tried', u"Pas tenté"),
+        ], default='not_tried', readonly=True, help=u"Niveau de précision de la géolocalisation", compute="_compute_geo")
 
-    _order = "date_flo"
+    @api.multi
+    @api.depends("intervention_id")
+    def _compute_geo(self):
+        for line in self:
+            if line.intervention_id: # correspond a un creneau d'intervention
+                vals = {
+                    'geo_lat': line.intervention_id.geo_lat,
+                    'geo_lng': line.intervention_id.geo_lng,
+                    'precision': line.intervention_id.precision,
+                }
+            else: # correspond a un creneau libre
+                vals = {
+                    'geo_lat': line.wizard_id.geo_lat,
+                    'geo_lng': line.wizard_id.geo_lng,
+                    'precision': line.wizard_id.precision,
+                }
+            line.update(vals)
+
+    @api.depends('intervention_id')
+    def _compute_state_int(self):
+        """de of.calendar.mixin"""
+        for line in self:
+            interv = line.intervention_id
+            if interv:
+                if interv.state and interv.state == "draft":
+                    line.state_int = 0
+                elif interv.state and interv.state == "confirm":
+                    line.state_int = 1
+                elif interv.state and interv.state == "done":
+                    line.state_int = 2
+            else:
+                line.state_int = 3
+
+    @api.model
+    def get_state_int_map(self):
+        """de of.calendar.mixin"""
+        v0 = {'label': 'Brouillon', 'value': 0}
+        v1 = {'label': u'Confirmé', 'value': 1}
+        v2 = {'label': u'Réalisé', 'value': 2}
+        v3 = {'label': u'Disponibilité', 'value': 3}
+        return (v0, v1, v2, v3)
+
+    @api.multi
+    def button_confirm(self):
+        """Sélectionne ce créneau en temps que résultat. Appelé depuis la vue form du créneau"""
+        self.ensure_one()
+        if not self._context.get('tz'):
+            self = self.with_context(tz='Europe/Paris')
+        tz = pytz.timezone(self._context['tz'])
+        d = fields.Date.from_string(self.date)
+        dt_propos = datetime.combine(d, datetime.min.time()) + timedelta(hours=self.selected_hour) # datetime local
+        dt_propos = tz.localize(dt_propos, is_dst=None).astimezone(pytz.utc) # datetime utc
+        self.wizard_id.date_propos = dt_propos
+        return self.wizard_id.button_confirm()
+
+    @api.multi
+    def button_select(self):
+        """Sélectionne ce créneau en temps que résultat. Appelé depuis la vue form du créneau"""
+        self.ensure_one()
+        rdv_line_obj = self.env["of.tournee.rdv.line"]
+        selected_line = rdv_line_obj.search([("selected","=",True)])
+        selected_line.selected = False
+        self.selected = True
+        self.selected_hour = self.date_flo
+
+        address = self.wizard_id.partner_address_id
+        name = address.name or (address.parent_id and address.parent_id.name) or ''
+        name += address.zip and (" " + address.zip) or ""
+        name += address.city and (" " + address.city) or ""
+        wizard_vals = {
+            'date_display'    : self.date,#.strftime('%A %d %B %Y'),
+            'name'            : name,
+            'equipe_id'       : self.equipe_id.id,
+            'date_propos'     : self.debut_dt,
+            'date_propos_hour': self.date_flo,
+            'res_line_id'     : self.id,
+        }
+        if self.wizard_id.service_id:
+            d_date = fields.Date.from_string(self.date)
+            wizard_vals['date_next'] = self.wizard_id.service_id.get_next_date(d_date.strftime('%Y-%m-%d'))
+        self.wizard_id.write(wizard_vals)
+
+        return {'type': 'ir.actions.do_nothing'}

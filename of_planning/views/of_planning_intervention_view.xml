@@ -112,17 +112,17 @@
                     <sheet>
                         <group>
                             <group col="2">
-                                <field name="equipe_id" autofocus="autofocus" context="{'tz': 'Europe/Paris'}"/>
-                                <field name="address_id" domain="[('customer','=',True)]" colspan="2" context="{'tz': 'Europe/Paris'}"/>
-                                <field name="user_id" context="{'tz': 'Europe/Paris'}"/>
+                                <field name="equipe_id" autofocus="autofocus"/>
+                                <field name="address_id" domain="[('customer','=',True)]" colspan="2"/>
+                                <field name="user_id"/>
                                 <field name="company_id" widget="selection"/>
-                                <field name="name" string="Libellé" context="{'tz': 'Europe/Paris'}"/>
+                                <field name="name" string="Libellé"/>
                             </group>
                             <group col="2">
-                                <field name="tache_id" context="{'tz': 'Europe/Paris'}"/>
-                                <field name="date" context="{'tz': 'Europe/Paris'}"/>
+                                <field name="tache_id"/>
+                                <field name="date"/>
                                 <field name="jour"/>
-                                <field name="duree" context="{'tz': 'Europe/Paris'}" string="Durée" widget="float_time"/>
+                                <field name="duree" string="Durée" widget="float_time"/>
                                 <field name="date_deadline"/>
                                 <field name="verif_dispo"/>
                             </group>
@@ -134,19 +134,22 @@
                                 <separator string="Horaires de travail" colspan="4"/>
                                 <group colspan="4">
                                     <label for="hor_md" string="Matin"/>
-                                    <field name="hor_md" nolabel="1" widget="float_time" string="Matin :" context="{'tz': 'Europe/Paris'}"/>
+                                    <field name="hor_md" nolabel="1" widget="float_time" string="Matin :"/>
                                     <label for="hor_mf" string="&#160;"/>
-                                    <field name="hor_mf" nolabel="1" widget="float_time" context="{'tz': 'Europe/Paris'}"/>
+                                    <field name="hor_mf" nolabel="1" widget="float_time"/>
                                 </group>
                                 <group colspan="4">
                                     <label for="hor_ad" string="Après-midi"/>
-                                    <field name="hor_ad" nolabel="1" widget="float_time" context="{'tz': 'Europe/Paris'}"/>
+                                    <field name="hor_ad" nolabel="1" widget="float_time"/>
                                     <label for="hor_af" string="&#160;"/>
-                                    <field name="hor_af" nolabel="1" widget="float_time" context="{'tz': 'Europe/Paris'}"/>
+                                    <field name="hor_af" nolabel="1" widget="float_time"/>
                                    </group>
-                                <group colspan="2" col="2">
-                                    <field name="hor_sam" context="{'tz': 'Europe/Paris'}"/>
-                                    <field name="hor_dim" context="{'tz': 'Europe/Paris'}"/>
+                                <group colspan="4" col="2">
+                                    <field name="hor_sam"/>
+                                    <field name="hor_dim"/>
+                                    <!--field name="jour_ids" widget="many2many_checkboxes" invisible="1"/ later...-->
+                                    <field name="tz" invisible="1" widget="timezone_mismatch" options="{'tz_offset_field': 'tz_offset'}" />
+                                    <field name="tz_offset" invisible="1"/>
                                 </group>
                             </group>
 
@@ -225,7 +228,7 @@
             <field name="name">of.planning.intervention.calendar</field>
             <field name="model">of.planning.intervention</field>
             <field name="arch" type="xml">
-                <calendar string="Calendrier" date_start="date" color="equipe_id" date_stop="date_deadline" display_states="1"
+                <calendar string="Calendrier" date_start="date" color="equipe_id" date_stop="date_deadline" display_states="1" quick_add="0"
                     attendee_model="of.planning.equipe" color_ft_field="color_ft" color_bg_field="color_bg" custom_colors="1">
                     <field name="name"/>
                     <field name="state" invisible="1"/>
@@ -235,21 +238,6 @@
                     <!--field name="color" invisible="1"/>
                     <field name="sidebar_color" invisible="1"/-->
                 </calendar>
-            </field>
-        </record>
-
-<!--#############################################________Vue gant________#####################################################-->
-
-        <record id="of_planning_intervention_view_gantt" model="ir.ui.view" >
-            <field name="name">of.planning.intervention.gantt</field>
-            <field name="model">of.planning.intervention</field>
-            <field name="arch" type="xml" >
-                <gantt color="equipe_id" date_start="date" date_stop="date_deadline" string="Planning" mode="month">
-                    <level object="of.planning.equipe" link="equipe_id" domain="[]">
-                        <field name="name"/>
-                        <field name="state"/>
-                    </level>
-                </gantt>
             </field>
         </record>
 
@@ -400,6 +388,8 @@
                                 <field name="hor_ad" nolabel="1" widget="float_time"/>
                                 <span> - </span>
                                 <field name="hor_af" nolabel="1" widget="float_time"/>
+                                <field name="tz" widget="timezone_mismatch" options="{'tz_offset_field': 'tz_offset'}" />
+                                <field name="tz_offset" invisible="1"/>
                             </group>
                         </group>
                         <notebook>
@@ -544,7 +534,7 @@
             <field name="name">Planning d'intervention</field>
             <field name="res_model">of.planning.intervention</field>
             <field name="view_type">form</field>
-            <field name="view_mode">calendar,form,gantt,tree</field>
+            <field name="view_mode">calendar,form,tree</field>
             <field name="context">{'search_default_state_confirm':1,'search_default_state_done':1,'search_default_state_draft':1}</field>
             <field name="view_id" ref="of_planning_intervention_view_calendar"/>
             <field name="search_view_id" ref="of_planning_intervention_filter"/>

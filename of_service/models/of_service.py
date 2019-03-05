@@ -184,6 +184,22 @@ class OfService(models.Model):
         res = super(OfService, self).read(fields, load)
         return res
 
+class OFPlanningIntervention(models.Model):
+    _inherit = "of.planning.intervention"
+
+    service_id = fields.Many2one('of.service',string="Service")
+
+    @api.onchange('address_id')
+    def _onchange_address_id(self):
+        super(OFPlanningIntervention, self)._onchange_address_id()
+        if self.address_id and self.address_id.service_address_ids:
+            self.service_id = self.address_id.service_address_ids[0]
+
+    @api.onchange('service_id')
+    def _onchange_service_id(self):
+        if self.service_id:
+            self.tache_id = self.service_id.tache_id
+
 class ResPartner(models.Model):
     _inherit = "res.partner"
 

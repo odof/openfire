@@ -22,6 +22,7 @@ Module OpenFire d'utilitaires.
         "data" : [
             'security/ir.model.access.csv',
             #'views/of_utils_views.xml',
+            'views/of_utils_templates.xml',
             'data/of_utils_data.xml',
         ],
         "installable": True,

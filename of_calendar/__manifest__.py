@@ -14,6 +14,7 @@ Module OpenFire des calendrier
 - Ajout des champs 'of_color_ft' et 'of_color_bg' dans res.users et res.partner
 - Ajout choix des couleurs dans les calendriers
 - Ajout configuration du drag and drop dans les paramètres systèmes (configuration -> technique -> paramètres)
+- Ajout de la possibilité d'afficher une vue calendar d'un champ One2many
 
 Vue calendar
 ------------
@@ -21,6 +22,11 @@ Vue calendar
 - attribut 'custom_colors': mettre à "1" pour utiliser les couleurs custom
 - attribut 'attendee_model': nom du modèle des participants, inutile si 'use_contacts' à "1". exemple: attendee_model="res.partner"
 - attribut 'color_bg_field' et 'color_ft_field': nom des champs de couleur de texte et de fond
+- attribut 'working_hours': mettre à "1" pour n'afficher que les horaires travaillés. Nécéssite 'attendee_model' héritant de "of.calendar.attendee.mixin"
+- attribut 'filters_radio': mettre à "1" pour que les filtres de la barre latérale soient de type radio button
+- attribut 'show_first_evt': mettre à "1" pour sauter au premier évenement disponible trouvé lors de la recherche
+- attribut 'dispo_field': champ de disponibilité utilisé si 'show_first_evt' est à "1"
+- attribut 'force_color_field': champ utilisé pour forcer la couleur d'un évenement
 - si 'use_contacts' à "1": 'color_bg_field' est à 'of_color_bg' (le champ de res.partner)
 - si 'use_contacts' à "0": 'color_bg_field' est le nom du champs couleur de l'objet du calendrier. exemple 'of_color_bg' pour "calendar.event"
 - ajout gestion de l'attribut invisible="1" dans les fields de la vue calendar
@@ -37,6 +43,8 @@ Leur balise calendar devra contenir l'attribut display_states="1".
         "web_widget_color",
         "calendar",
         "web_calendar",
+        "of_web_widgets",
+        "of_utils",
     ],
     "data": [
         "data/ir_config_parameter_data.xml",

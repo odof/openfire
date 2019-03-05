@@ -63,7 +63,7 @@ class OfPlanningIntervention(models.Model):
         tournees = self.env['of.planning.tournee'].browse(list(set(tournee_ids)))
         tournees._compute_is_complet()
 
-    tournee_id = fields.Many2one('of.planning.tournee', compute='_compute_tournee_id', string='Planification')
+    tournee_id = fields.Many2one('of.planning.tournee', compute='_compute_tournee_id', store=True, string='Planification')
     partner_city = fields.Char(related='address_id.city', store=True)
 
     @api.multi
@@ -196,7 +196,8 @@ class OfPlanningIntervention(models.Model):
 class OfPlanningEquipe(models.Model):
     _inherit = "of.planning.equipe"
 
-    address_id = fields.Many2one('res.partner', string='Adresse')
+    address_id = fields.Many2one('res.partner', string='Adresse de départ')
+    address_retour_id  = fields.Many2one('res.partner', string='Adresse de retour')
     geo_lat = fields.Float(related='address_id.geo_lat')
     geo_lng = fields.Float(related='address_id.geo_lng')
 
@@ -204,7 +205,12 @@ class OfPlanningEquipe(models.Model):
     def _onchange_employee_ids(self):
         if self.employee_ids:
             self.address_id = self.employee_ids[0].address_home_id
+            self.address_retour_id = self.address_id
 
+    @api.onchange('address_id')
+    def _onchange_address_id(self):
+        if self.address_id:
+            self.address_retour_id = self.address_id
 
 # class OfParamDocs(models.Model):
 #     _name = 'of.param.docs'
@@ -417,12 +423,25 @@ class OfPlanningTournee(models.Model):
     equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe', required=True)
     epi_lat = fields.Float(string=u'Épicentre Lat', digits=(12, 12), required=True)
     epi_lon = fields.Float(string=u'Épicentre Lon', digits=(12, 12), required=True)
+    address_depart_id = fields.Many2one('res.partner', string='Adresse départ')
+    address_retour_id = fields.Many2one('res.partner', string='Adresse retour')
+    intervention_ids = fields.One2many('of.planning.intervention', 'tournee_id', u'Interventions liées', copy=False, order="date", compute="_compute_intervention_ids")
 
     zip_id = fields.Many2one('res.better.zip', 'Ville')
     distance = fields.Float(string='Eloignement (km)', digits=(12, 4), required=True, default=20.0)
     is_complet = fields.Boolean(compute="_compute_is_complet", string='Complet', store=True)
     is_bloque = fields.Boolean(string=u'Bloqué', help=u'Journée bloquée : ne sera pas proposée à la planification')
     is_confirme = fields.Boolean(string=u'Confirmé', default=True, help=u'Une tournée non confirmée sera supprimée si on lui retire ses rendez-vous')
+
+    @api.multi
+    @api.depends('equipe_id', 'date', 'intervention_ids.date', 'intervention_ids.equipe_id')
+    def _compute_intervention_ids(self):
+        intervention_obj = self.env["of.planning.intervention"]
+        for tournee in self:
+            interventions = intervention_obj.search(["tournee_id","=",tournee.id])
+            for intervention in interventions:
+                if type(intervention.id) is int:
+                    tournee.intervention_ids = [(4, intervention.id, False)]
 
     @api.multi
     def _get_dummy_fields(self):
@@ -453,13 +472,24 @@ class OfPlanningTournee(models.Model):
     ]
 
     _rec_name = 'date'
-    _order = 'date'
+    _order = 'date DESC'
 
     @api.onchange('zip_id')
     def _onchange_zip_id(self):
         if self.zip_id:
             self.epi_lat = self.zip_id.geo_lat
             self.epi_lon = self.zip_id.geo_lng
+
+    @api.onchange('equipe_id')
+    def _onchange_equipe_id(self):
+        if self.equipe_id:
+            self.address_depart_id = self.equipe_id.address_id
+            self.address_retour_id = self.equipe_id.address_retour_id
+
+    @api.onchange('address_depart_id')
+    def _onchange_address_depart_id(self):
+        if self.address_depart_id:
+            self.address_retour_id = self.address_depart_id
 
     @api.model
     def create(self, vals):
