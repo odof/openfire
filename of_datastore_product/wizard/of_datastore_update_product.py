@@ -161,6 +161,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         vers la base client
         """
         self.ensure_one()
+        product_obj = self.env['product.product']
         active_model = self._context.get('active_model')
         active_ids = self._context.get('active_ids')
         model_obj = self.env[active_model]
@@ -174,7 +175,13 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         if active_model == 'of.product.brand':
             brands = model_obj.browse(active_ids)
             suppliers = brands.mapped('datastore_supplier_id')
-            datastore_products = {supplier: (supplier.brand_ids & brands).mapped('product_variant_ids') for supplier in suppliers}
+            datastore_products = {
+                # Récupération de tous les articles même inactifs de la marque.
+                # On appelle product_obj.browse pour conserver le context d'origine et éviter des recalculs de cache.
+                supplier: product_obj.browse((supplier.brand_ids & brands)
+                                             .with_context(active_test=False)
+                                             .mapped('product_variant_ids')._ids)
+                for supplier in suppliers}
 
         elif active_model in ('product.product', 'product.template'):
             model_obj.search('')
@@ -197,7 +204,6 @@ class OfDatastoreUpdateProduct(models.TransientModel):
 
             products = model_obj.browse(to_update)
             if active_model == 'product.template':
-                product_obj = self.env['product.product']
                 products = product_obj.with_context(active_test=False).search([('product_tmpl_id', 'in', products._ids)])
                 # Retrait du contexte active_test
                 products = product_obj.browse(products._ids)
