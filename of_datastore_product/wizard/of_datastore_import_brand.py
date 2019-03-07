@@ -9,7 +9,7 @@ class ImportBrand(models.TransientModel):
     datastore_supplier_id = fields.Many2one('of.datastore.supplier', string='Connector')
     partner_id = fields.Many2one('res.partner', string='Supplier', domain=[('supplier', '=', True)])
     product_categ_id = fields.Many2one('product.category', string="Category")
-    line_ids = fields.One2many('of.datastore.import.brand.line', 'wizard_id')
+    line_ids = fields.One2many('of.datastore.import.brand.line', 'wizard_id', string='Brands')
 
     @api.multi
     def button_import_brands(self):

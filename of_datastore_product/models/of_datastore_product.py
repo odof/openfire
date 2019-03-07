@@ -9,6 +9,30 @@ from contextlib import contextmanager
 from threading import Lock
 DATASTORE_IND = 100000000  # 100.000.000 ids devraient suffire pour les produits. Les chiffres suivants serviront pour le fournisseur
 
+def _of_datastore_is_computed_field(model_obj, field_name):
+    env = model_obj.env
+    field = model_obj._fields[field_name]
+    if not field.compute:
+        return False
+    if field.company_dependent:
+        return False
+    if not field._description_related:
+        return True
+
+    # Traitement particulier des champs related en fonction de la relation
+    if model_obj._of_datastore_is_computed_field(field._description_related[0]):
+        return True
+    f = model_obj._fields[field._description_related[0]]
+    for f_name in field._description_related[1:]:
+        obj = env[f.comodel_name]
+        if not hasattr(obj, '_of_datastore_is_computed_field'):
+            # L'objet référencé n'est pas un objet centralisé
+            return True
+        if obj._of_datastore_is_computed_field(f_name):
+            return True
+        f = obj._fields[f_name]
+    return False
+
 class OfDatastoreSupplier(models.Model):
     _name = 'of.datastore.supplier'
     _inherit = 'of.datastore.connector'
@@ -215,7 +239,7 @@ class OfProductBrand(models.Model):
     @api.multi
     def read(self, fields=None, load='_classic_read'):
         if self._context.get('of_datastore_update_categ') and fields and 'categ_ids' in fields:
-            self = self.with_context(of_datastore_update_categ=False)
+            self = self.with_context(of_datastore_update_categ=False, no_clear_datastore_cache=True)
             categ_ids = {name: categ_id for categ_id, name in self.env['product.category'].search([]).name_get()}
             categ_obj = self.env['of.import.product.categ.config']
             try:
@@ -448,7 +472,7 @@ class OfProductBrand(models.Model):
     @api.multi
     def write(self, vals):
         res = super(OfProductBrand, self).write(vals)
-        if vals and self:
+        if vals and self and not self._context.get('no_clear_datastore_cache'):
             self.clear_datastore_cache()
         return res
 
@@ -502,11 +526,15 @@ class OfDatastoreCache(models.TransientModel):
         """ Fonction de mise à jour du cache.
         Cette fonction ne devrait jamais être appelée sans avoir au préalable acquis un token avec _get_cache_token
         """
+        model_obj = self.env[model]
         res_ids = [v['id'] for v in vals]
         stored = {ds_cache.res_id: ds_cache for ds_cache in self.search([('model', '=', model), ('res_id', 'in', res_ids)])}
         for v in vals:
+            # Les champs calculés ne doivent pas être stockés
+            v = {key: val for key, val in v.iteritems() if not model_obj._of_datastore_is_computed_field(key)}
+
             ds_cache = stored.get(v['id'])
-            v = self.env[model]._convert_to_cache(v, update=True, validate=False)
+            v = model_obj._convert_to_cache(v, update=True, validate=False)
             res_id = v.pop('id')
             if ds_cache:
                 ds_cache_vals = safe_eval(ds_cache.vals)
@@ -524,10 +552,15 @@ class OfDatastoreCache(models.TransientModel):
     def apply_values(self, record):
         record.ensure_one()
 
+        # Nouveau curseur pour récupérer les données en DB indépendamment de ce processus.
+        # Indispensable dans la mesure où store_values() s'applique sur un curseur séparé, généré par _get_cache_token()
+        cr = registry(self._cr.dbname).cursor()
+
         # Requête SQL pour gagner en performance
-        self._cr.execute("SELECT vals FROM of_datastore_cache WHERE model = %s AND res_id = %s",
-                         (record._name, record.id))
-        vals = self._cr.fetchall()
+        cr.execute("SELECT vals FROM of_datastore_cache WHERE model = %s AND res_id = %s",
+                   (record._name, record.id))
+        vals = cr.fetchall()
+        cr.close()
         if vals:
             vals = safe_eval(vals[0][0])
             record._cache.update(record._convert_to_cache(vals, validate=False))
@@ -553,7 +586,7 @@ class OfDatastoreCentralized(models.AbstractModel):
     @api.model
     def _get_datastore_unused_fields(self):
         u"""
-            retourne la liste des champs qu'on ne veut pas récupérer chez le fournisseur (par ex. les quantités en stock).
+            Retourne la liste des champs qu'on ne veut pas récupérer chez le fournisseur (par ex. les quantités en stock).
         """
         cr = self._cr
 
@@ -585,6 +618,18 @@ class OfDatastoreCentralized(models.AbstractModel):
                     res.append(field_name)
         return res
 
+    @api.model
+    def _of_datastore_is_computed_field(self, field_name):
+        return _of_datastore_is_computed_field(self, field_name)
+
+    @api.model
+    def _of_get_datastore_computed_fields(self):
+        u"""
+            Retourne la liste des champs qu'on ne veut pas récupérer chez le fournisseur
+            mais qu'il faudra calculer en local (par ex. le champ price qui dépend de la liste de prix du context).
+        """
+        return [field for field in self._fields if self._of_datastore_is_computed_field(field)]
+
     @api.multi
     def _of_read_datastore(self, fields_to_read, create_mode=False):
         u"""
@@ -609,7 +654,7 @@ class OfDatastoreCentralized(models.AbstractModel):
         #   nécessite un accès distant (avec self._get_datastore_unused_fields()).
         #   Si c'est le cas, nous chargeons fields_to_read avec tous les champs de l'objet courant afin de peupler
         #   notre cache et ainsi d'éviter de multiplier les accès distants.
-        unused_fields = self._get_datastore_unused_fields()
+        unused_fields = self._get_datastore_unused_fields() + self._of_get_datastore_computed_fields()
         if not create_mode:
             # Pour la lecture classique, on veut stocker tous les champs en cache pour éviter de futurs accès distants
             for field in fields_to_read:
@@ -770,9 +815,9 @@ class OfDatastoreCentralized(models.AbstractModel):
                                                         product=product, price=vals['standard_price'], remise=None))
                 # Calcul de la marge et de la remise
                 if 'of_seller_remise' in fields_to_read:
-                    vals['of_seller_remise'] = (vals['of_seller_pp_ht'] - vals['of_seller_price']) * 100 / vals['of_seller_pp_ht']
+                    vals['of_seller_remise'] = vals['of_seller_pp_ht'] and (vals['of_seller_pp_ht'] - vals['of_seller_price']) * 100 / vals['of_seller_pp_ht']
                 if 'marge' in fields_to_read:
-                    vals['marge'] = (vals['list_price'] - vals['standard_price']) * 100 / vals['list_price']
+                    vals['marge'] = vals['list_price'] and (vals['list_price'] - vals['standard_price']) * 100 / vals['list_price']
 
                 # Suppression des valeurs non voulues
                 # Suppression désactivée ... après tout, c'est calculé maintenant, autant le garder en cache
@@ -794,8 +839,16 @@ class OfDatastoreCentralized(models.AbstractModel):
                             vals[field] = res_names[vals[field]]
 
             result += datastore_product_data
-
         return result
+
+    def _recompute_check(self, field):
+        # Les champs calculés et stockés en base de données doivent toujours être recalculés dans le cas des éléments centralisés.
+        result = super(OfDatastoreCentralized, self)._recompute_check(field)
+        res1 = self.filtered(lambda record: record.id < 0)
+        if result and res1:
+            res1 |= result
+        # En cas d'ensemble vide, c'est result qui est renvoyé, qui vaut None
+        return res1 or result
 
     @api.multi
     def read(self, fields=None, load='_classic_read'):
@@ -805,6 +858,7 @@ class OfDatastoreCentralized(models.AbstractModel):
         res = super(OfDatastoreCentralized, self.browse(new_ids)).read(fields, load=load)
 
         if len(new_ids) != len(self._ids):
+            cache_obj = self.env['of.datastore.cache']
             # Si fields est vide, on récupère tous les champs accessibles pour l'objet (copié depuis BaseModel.read())
             self.check_access_rights('read')
             fields = self.check_field_access_rights('read', fields)
@@ -872,16 +926,18 @@ class OfDatastoreCentralized(models.AbstractModel):
                             for vals in self.env['product.template'].browse(tmpl_ids).name_get():
                                 tmpl_values[vals[0]] = vals
 
-                for d in data:
-                    eval_vals = safe_eval(d['vals'])
+                for obj in self.browse(datastore_ids):
+                    # Il faut charger les valeurs dans le cache manuellement car elles ne se chargent de façon
+                    #   automatique que si le cache est vide, ce qui n'est plus le cas à ce stade.
+                    cache_obj.apply_values(obj)
                     # Filtre des champs à récupérer et conversion au format read
-                    vals = {field.name: field.convert_to_read(field.convert_to_record(eval_vals[field.name], self), self, use_name_get)
+                    vals = {field.name: field.convert_to_read(obj[field.name], self, use_name_get)
                             for field in obj_fields}
-                    vals['id'] = d['res_id']
-                    res[d['res_id']] = vals
+                    vals['id'] = obj.id
+                    res[obj.id] = vals
 
                     if read_tmpl:
-                        vals['product_tmpl_id'] = tmpl_values[eval_vals['product_tmpl_id'][0]]
+                        vals['product_tmpl_id'] = tmpl_values[obj.product_tmpl_id.id]
 
             # Remise des résultats dans le bon ordre
             res = [res[i] for i in self._ids]
@@ -1068,6 +1124,24 @@ class OfDatastoreCentralized(models.AbstractModel):
         return res
 
 
+class Property(models.Model):
+    _inherit = 'ir.property'
+
+    @api.model
+    def get_multi(self, name, model, ids):
+        """ Surcharge pour récupérer une valeur company_dependent d'un article centralisé.
+        """
+        result = {}
+        model_obj = self.env[model]
+        if ids and hasattr(model_obj, '_of_read_datastore'):
+            ds_ids = [i for i in ids if i < 0]
+            if ds_ids:
+                ids = [i for i in ids if i >= 0]
+                result = {d['id']: d[name] for d in model_obj.browse(ds_ids)._of_read_datastore([name])}
+        result.update(super(Property, self).get_multi(name, model, ids))
+        return result
+
+
 class ProductTemplate(models.Model):
     _name = "product.template"
     _inherit = ['product.template', 'of.datastore.centralized']
@@ -1089,6 +1163,12 @@ class ProductTemplate(models.Model):
             new_args = [('brand_id', 'in', brands._ids)] + list(args or [])
         res = super(ProductTemplate, self).name_search(name, new_args, operator, limit)
         res = self._of_datastore_name_search(res, brands, name, args, operator, limit)
+
+    @api.model
+    def _of_datastore_is_computed_field(self, field_name):
+        if field_name == 'default_code':
+            return False
+        return super(ProductTemplate, self)._of_datastore_is_computed_field(field_name)
 
     @api.multi
     def of_datastore_import(self):
@@ -1139,13 +1219,9 @@ class ProductProduct(models.Model):
     @api.model
     def of_datastore_get_import_fields(self):
         unused_fields = self._get_datastore_unused_fields()
-        templ_fields = self.env['product.template']._fields
-        fields = [f for f, c in self._fields.iteritems()
-                  if (not c.compute or
-                      c.company_dependent or
-                      (c._description_related == ('product_tmpl_id', f) and
-                       # @todo: Autoriser les champs company_dependent de product.template
-                       not templ_fields[f].compute)) and
+        computed_fields = self._of_get_datastore_computed_fields()
+        fields = [f for f in self._fields
+                  if f not in computed_fields and
                   f not in unused_fields and
                   f != 'product_tmpl_id']
 
@@ -1188,6 +1264,16 @@ class ProductProduct(models.Model):
         for product_data in self._of_read_datastore(fields_to_read, create_mode=True):
             result += self_obj.create(product_data)
         return result
+
+
+class ProductSupplierInfo(models.Model):
+    _inherit = 'product.supplierinfo'
+
+    # Ajout de la fonction _of_datastore_is_computed_field.
+    # Cela autorise la lecture des champs relationnels des articles vers cette classe depuis le tarif centralisé.
+    @api.model
+    def _of_datastore_is_computed_field(self, field_name):
+        return _of_datastore_is_computed_field(self, field_name)
 
 
 # Création/édition d'objets incluant un article centralisé

@@ -1,13 +1,13 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-#   * of_datastore_product
+# * of_datastore_product
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-25 14:53+0000\n"
-"PO-Revision-Date: 2018-07-25 14:53+0000\n"
+"POT-Creation-Date: 2019-03-07 15:36+0000\n"
+"PO-Revision-Date: 2019-03-07 15:36+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -22,7 +22,7 @@ msgid "# Products"
 msgstr "Nb. articles"
 
 #. module: of_datastore_product
-#: code:addons/of_datastore_product/wizard/of_remove_unused_products.py:21
+#: code:addons/of_datastore_product/wizard/of_remove_unused_products.py:24
 #, python-format
 msgid "%i products were removed"
 msgstr "%i articles ont été supprimés"
@@ -43,7 +43,7 @@ msgid "Active"
 msgstr "Actif"
 
 #. module: of_datastore_product
-#: code:addons/of_datastore_product/wizard/of_datastore_update_product.py:154
+#: code:addons/of_datastore_product/wizard/of_datastore_update_product.py:268
 #, python-format
 msgid "Added/updated links to centralized products : %s"
 msgstr "Correspondances ajoutées/mises à jour avec la base centrale : %s"
@@ -83,6 +83,15 @@ msgid "Category"
 msgstr "Catégorie"
 
 #. module: of_datastore_product
+#: model:ir.model.fields,help:of_datastore_product.field_sale_order_line_of_brand_id
+msgid "Ce champ permet de restreindre les articles proposés à une seule marque.\n"
+"Renseigner ce champ permet aussi la recherche dans le tarif centralisé.\n"
+"Utilisation équivalente au code m:XXX dans la recherche d'article, où XXX est le code de la marque"
+msgstr "Ce champ permet de restreindre les articles proposés à une seule marque.\n"
+"Renseigner ce champ permet aussi la recherche dans le tarif centralisé.\n"
+"Utilisation équivalente au code m:XXX dans la recherche d'article, où XXX est le code de la marque"
+
+#. module: of_datastore_product
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_import_brand_line_datastore_brand_id
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_product_brand_datastore_brand_id
 msgid "Centralized ID"
@@ -100,11 +109,12 @@ msgid "Centralized products"
 msgstr "Articles centralisés"
 
 #. module: of_datastore_product
+#: model:ir.model,name:of_datastore_product.model_of_datastore_supplier
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_product_brand_datastore_supplier_id
 #: model:ir.model.fields,field_description:of_datastore_product.field_product_product_of_datastore_supplier_id
 #: model:ir.model.fields,field_description:of_datastore_product.field_product_template_of_datastore_supplier_id
 msgid "Centralized products connector"
-msgstr "Connecteur tarif centralisé"
+msgstr "Connecteur au tarif centralisé"
 
 #. module: of_datastore_product
 #: model:ir.ui.view,arch_db:of_datastore_product.of_datastore_product_brand_view_form
@@ -122,18 +132,13 @@ msgid "Connected"
 msgstr "Connecté"
 
 #. module: of_datastore_product
-#: model:ir.model,name:of_datastore_product.model_of_datastore_supplier
-msgid "Centralized products connector"
-msgstr "Connecteur au tarif centralisé"
-
-#. module: of_datastore_product
-#: code:addons/of_datastore_product/models/of_datastore_connector.py:61
+#: code:addons/of_datastore_product/models/of_datastore_connector.py:62
 #, python-format
 msgid "Connection successful"
 msgstr "Connexion réussie"
 
 #. module: of_datastore_product
-#: code:addons/of_datastore_product/models/of_datastore_connector.py:112
+#: code:addons/of_datastore_product/models/of_datastore_connector.py:115
 #, python-format
 msgid "Connection timeout"
 msgstr "Délai de connexion expiré"
@@ -163,6 +168,7 @@ msgid "Create brands"
 msgstr "Créer les marques"
 
 #. module: of_datastore_product
+#: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_cache_create_uid
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_import_brand_create_uid
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_import_brand_line_create_uid
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_supplier_create_uid
@@ -172,6 +178,7 @@ msgid "Created by"
 msgstr "Créé par"
 
 #. module: of_datastore_product
+#: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_cache_create_date
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_import_brand_create_date
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_import_brand_line_create_date
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_supplier_create_date
@@ -181,7 +188,7 @@ msgid "Created on"
 msgstr "Créé le"
 
 #. module: of_datastore_product
-#: code:addons/of_datastore_product/wizard/of_datastore_update_product.py:124
+#: code:addons/of_datastore_product/wizard/of_datastore_update_product.py:261
 #, python-format
 msgid "Created products : %s"
 msgstr "Articles créés : %s"
@@ -193,11 +200,12 @@ msgid "Database"
 msgstr "Base de données"
 
 #. module: of_datastore_product
-#: model:ir.model.fields,field_description:of_datastore_product.field_product_product_of_seller_delay
-msgid "Delivery Lead Time"
-msgstr "Délai de livraison"
+#: model:ir.model.fields,help:of_datastore_product.field_of_datastore_cache_vals
+msgid "Dictionnary of values for this object"
+msgstr "Dictionnaire de valeur pour cet objet"
 
 #. module: of_datastore_product
+#: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_cache_display_name
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_centralized_display_name
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_connector_display_name
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_import_brand_display_name
@@ -216,7 +224,7 @@ msgid "Don't update product name"
 msgstr "Ne pas mettre à jour la description"
 
 #. module: of_datastore_product
-#: code:addons/of_datastore_product/models/of_datastore_product.py:138
+#: code:addons/of_datastore_product/models/of_datastore_product.py:167
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_connector_error_msg
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_supplier_error_msg
 #, python-format
@@ -234,6 +242,12 @@ msgid "Exists"
 msgstr "Existe"
 
 #. module: of_datastore_product
+#: model:ir.model.fields,field_description:of_datastore_product.field_sale_order_line_of_brand_id
+msgid "Filtre de marque"
+msgstr "Filtre de marque"
+
+#. module: of_datastore_product
+#: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_cache_id
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_centralized_id
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_connector_id
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_import_brand_id
@@ -261,6 +275,7 @@ msgstr "Si vous continuez, les articles sélectionnés seront importés/mis à j
 
 #. module: of_datastore_product
 #: model:ir.ui.view,arch_db:of_datastore_product.view_of_datastore_update_product_form
+#: selection:of.datastore.update.product,type:0
 msgid "Import"
 msgstr "Importer"
 
@@ -268,6 +283,12 @@ msgstr "Importer"
 #: model:ir.model,name:of_datastore_product.model_of_datastore_update_product
 msgid "Import / update products"
 msgstr "Importer / mettre à jour les articles"
+
+#. module: of_datastore_product
+#: model:ir.actions.act_window,name:of_datastore_product.action_of_datastore_import_product_brand
+#: model:ir.ui.view,arch_db:of_datastore_product.of_datastore_product_brand_view_form
+msgid "Import all products"
+msgstr "Importer tous les articles"
 
 #. module: of_datastore_product
 #: model:ir.actions.act_window,name:of_datastore_product.action_of_datastore_import_brand
@@ -282,13 +303,7 @@ msgid "Import supplier brands"
 msgstr "Importer les marques du fournisseur"
 
 #. module: of_datastore_product
-#: model:ir.actions.act_window,name:of_datastore_product.action_of_datastore_update_product_product
-#: model:ir.actions.act_window,name:of_datastore_product.action_of_datastore_update_product_template
-msgid "Products import/update"
-msgstr "Import/MAJ des articles"
-
-#. module: of_datastore_product
-#: code:addons/of_datastore_product/wizard/of_datastore_update_product.py:162
+#: code:addons/of_datastore_product/wizard/of_datastore_update_product.py:277
 #, python-format
 msgid "Import/update notes"
 msgstr "Notes d'import/de mise à jour"
@@ -297,6 +312,11 @@ msgstr "Notes d'import/de mise à jour"
 #: selection:of.datastore.import.brand.line,state:0
 msgid "Included"
 msgstr "Inclus"
+
+#. module: of_datastore_product
+#: model:ir.model,name:of_datastore_product.model_product_supplierinfo
+msgid "Information about a product vendor"
+msgstr "Information sur le vendeur de l'article"
 
 #. module: of_datastore_product
 #: model:ir.model,name:of_datastore_product.model_stock_inventory_line
@@ -314,6 +334,7 @@ msgid "Is centralized"
 msgstr "Est centralisé"
 
 #. module: of_datastore_product
+#: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_cache___last_update
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_centralized___last_update
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_connector___last_update
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_import_brand___last_update
@@ -327,6 +348,7 @@ msgid "Last Modified on"
 msgstr "Dernière Modification le"
 
 #. module: of_datastore_product
+#: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_cache_write_uid
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_import_brand_line_write_uid
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_import_brand_write_uid
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_supplier_write_uid
@@ -336,6 +358,7 @@ msgid "Last Updated by"
 msgstr "Dernière mise à jour par"
 
 #. module: of_datastore_product
+#: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_cache_write_date
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_import_brand_line_write_date
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_import_brand_write_date
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_supplier_write_date
@@ -345,13 +368,8 @@ msgid "Last Updated on"
 msgstr "Dernière mise à jour le"
 
 #. module: of_datastore_product
-#: model:ir.model.fields,help:of_datastore_product.field_product_product_of_seller_delay
-msgid "Lead time in days between the confirmation of the purchase order and the receipt of the products in your warehouse. Used by the scheduler for automatic computation of the purchase order planning."
-msgstr "Délai (en jours) entre la confirmation du bon de commande et la réception des articles dans votre entrepôt. Sert au planificateur à calculer le planning des achats automatiquement."
-
-#. module: of_datastore_product
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_import_brand_line_ids
-msgid "Line ids"
+msgid "Brands"
 msgstr "Marques"
 
 #. module: of_datastore_product
@@ -364,6 +382,11 @@ msgstr "Identifiant"
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_import_brand_line_logo
 msgid "Logo"
 msgstr "Logo"
+
+#. module: of_datastore_product
+#: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_cache_model
+msgid "Model"
+msgstr "Modèle"
 
 #. module: of_datastore_product
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_import_brand_line_name
@@ -381,12 +404,7 @@ msgstr "Aucun résultat à afficher..."
 #: model:ir.model.fields,field_description:of_datastore_product.field_product_product_of_datastore_has_link
 #: model:ir.model.fields,field_description:of_datastore_product.field_product_template_of_datastore_has_link
 msgid "Of datastore has link"
-msgstr ""
-
-#. module: of_datastore_product
-#: model:ir.model.fields,field_description:of_datastore_product.field_product_product_of_previous_brand_id
-msgid "Of previous brand id"
-msgstr "Of previous brand id"
+msgstr "Of datastore has link"
 
 #. module: of_datastore_product
 #: model:ir.ui.view,arch_db:of_datastore_product.view_of_datastore_update_product_form
@@ -410,31 +428,39 @@ msgid "Product Template"
 msgstr "Modèle d'article"
 
 #. module: of_datastore_product
+#: model:ir.actions.act_window,name:of_datastore_product.action_of_datastore_update_product_product
+#: model:ir.actions.act_window,name:of_datastore_product.action_of_datastore_update_product_template
 #: model:ir.ui.view,arch_db:of_datastore_product.view_of_datastore_update_product_form
 msgid "Products import/update"
-msgstr "Import/mise à jour d'articles"
+msgstr "Import/MAJ des articles"
 
 #. module: of_datastore_product
-#: code:addons/of_datastore_product/wizard/of_datastore_update_product.py:140
-#, python-format
-msgid "Products the brand of which is not centralized : %s"
-msgstr "Articles dont la marque n'est pas centralisée : %s"
-
-#. module: of_datastore_product
-#: code:addons/of_datastore_product/wizard/of_datastore_update_product.py:156
+#: code:addons/of_datastore_product/wizard/of_datastore_update_product.py:272
 #, python-format
 msgid "Products not updated because not linked : %s"
 msgstr "Articles non mis à jour par absence de correspondance : %s"
 
 #. module: of_datastore_product
-#: code:addons/of_datastore_product/wizard/of_remove_unused_products.py:21
+#: code:addons/of_datastore_product/wizard/of_remove_unused_products.py:24
 #: model:ir.ui.view,arch_db:of_datastore_product.view_of_remove_unused_products_form
 #, python-format
 msgid "Products removal"
 msgstr "Suppression d'articles"
 
 #. module: of_datastore_product
-#: code:addons/of_datastore_product/wizard/of_datastore_update_product.py:158
+#: code:addons/of_datastore_product/wizard/of_datastore_update_product.py:270
+#, python-format
+msgid "Products removed from centralized database : %s"
+msgstr "Articles supprimés du catalogue : %s"
+
+#. module: of_datastore_product
+#: code:addons/of_datastore_product/wizard/of_datastore_update_product.py:231
+#, python-format
+msgid "Products the brand of which is not centralized : %s"
+msgstr "Articles dont la marque n'est pas centralisée : %s"
+
+#. module: of_datastore_product
+#: code:addons/of_datastore_product/wizard/of_datastore_update_product.py:274
 #, python-format
 msgid "Products update ended : %s"
 msgstr "Mise à jour des articles terminée : %s"
@@ -453,6 +479,11 @@ msgstr "Supprimer"
 #: model:ir.actions.act_window,name:of_datastore_product.action_of_remove_unused_products
 msgid "Remove unused products"
 msgstr "Supprimer les articles inutilisés"
+
+#. module: of_datastore_product
+#: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_cache_res_id
+msgid "Resource id"
+msgstr "Resource id"
 
 #. module: of_datastore_product
 #: model:ir.ui.view,arch_db:of_datastore_product.of_datastore_import_brand_view_form
@@ -477,7 +508,7 @@ msgid "Search on centralized database"
 msgstr "Chercher sur base centralisée"
 
 #. module: of_datastore_product
-#: code:addons/of_datastore_product/models/of_datastore_product.py:668
+#: code:addons/of_datastore_product/models/of_datastore_product.py:981
 #, python-format
 msgid "Selected brands are not centralized : %s"
 msgstr "Les marques sélectionnées ne sont pas centralisées : %s"
@@ -548,15 +579,21 @@ msgid "There is already a connection to this database"
 msgstr "Une connexion à cette base existe déjà"
 
 #. module: of_datastore_product
-#: code:addons/of_datastore_product/wizard/of_datastore_update_product.py:53
+#: code:addons/of_datastore_product/wizard/of_datastore_update_product.py:47
 #, python-format
 msgid "Two products try to reference the same centralized product : [%s] [%s]"
 msgstr "Deux articles essaient de référencer le même article centralisé : [%s] [%s]"
 
 #. module: of_datastore_product
+#: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_update_product_type
+msgid "Type"
+msgstr "Type"
+
+#. module: of_datastore_product
 #: model:ir.ui.view,arch_db:of_datastore_product.view_of_datastore_update_product_form
+#: selection:of.datastore.update.product,type:0
 msgid "Update"
-msgstr "Mettre à jour"
+msgstr "Mise à jour"
 
 #. module: of_datastore_product
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_import_brand_line_note_maj
@@ -572,16 +609,15 @@ msgid "Update products"
 msgstr "Mettre à jour les articles"
 
 #. module: of_datastore_product
-#: model:ir.actions.act_window,name:of_datastore_product.action_of_datastore_import_product_brand
-#: model:ir.ui.view,arch_db:of_datastore_product.of_datastore_product_brand_view_form
-msgid "Import all products"
-msgstr "Importer tous les articles"
-
-#. module: of_datastore_product
-#: code:addons/of_datastore_product/wizard/of_datastore_update_product.py:152
+#: code:addons/of_datastore_product/wizard/of_datastore_update_product.py:266
 #, python-format
 msgid "Updated products : %s"
 msgstr "Articles mis à jour : %s"
+
+#. module: of_datastore_product
+#: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_cache_vals
+msgid "Values"
+msgstr "Valeurs"
 
 #. module: of_datastore_product
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_import_brand_line_wizard_id
@@ -589,13 +625,13 @@ msgid "Wizard id"
 msgstr "Wizard id"
 
 #. module: of_datastore_product
-#: code:addons/of_datastore_product/models/of_datastore_connector.py:56
+#: code:addons/of_datastore_product/models/of_datastore_connector.py:57
 #, python-format
 msgid "You must fill the field \"%s\""
 msgstr "Vous devez remplir le champ \"%s\""
 
 #. module: of_datastore_product
-#: code:addons/of_datastore_product/models/of_datastore_product.py:672
+#: code:addons/of_datastore_product/models/of_datastore_product.py:985
 #, python-format
 msgid "You must select one or several brands using the same centralized database (provided by the same supplier)."
 msgstr "Vous devez sélectionner une ou plusieurs marques connectées au même tarif centralisé (fournies par le même distributeur)."

@@ -57,8 +57,10 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         @param products: browse_record_list product.product
         """
         product_obj = self.env['product.product']
+        product_template_obj = self.env['product.template']
 
         supplier_value = supplier.id * DATASTORE_IND
+        # Détection des articles non liés à la base centrale.
         no_match_ids = [product.id for product in products if not product.of_datastore_res_id]
         id_match = {product.of_datastore_res_id: product
                     for product in products if product.of_datastore_res_id}
@@ -68,10 +70,16 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         ds_product_obj = supplier.of_datastore_get_model(client, 'product.product')
         ds_product_ids = supplier.with_context(active_test=False).of_datastore_search(ds_product_obj, [('id', 'in', id_match.keys())])
 
-        no_match_ids += [id_match[ds_product_id].id for ds_product_id in id_match if ds_product_id not in ds_product_ids]
+        # Articles dont le lien existait mais dont la cible n'existe plus
+        unmatched_ids = [id_match[ds_product_id].id for ds_product_id in id_match if ds_product_id not in ds_product_ids]
+        no_match_ids += unmatched_ids
 
         ds_product_new_ids = self._update_links(supplier, client, no_match_ids, id_match)
         ds_product_ids += ds_product_new_ids
+
+        # Les articles dont le lien existait et a été brisé doivent être désactivés.
+        # En revanche les articles qui n'étaient déjà pas liés ne doivent pas subir de mise à jour.
+        unmatched_ids = [i for i in unmatched_ids if i in no_match_ids]
 
         # --- Mise à jour des articles ---
         products_write_data = {}
@@ -81,7 +89,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         ds_product_ids = [-(ds_product_id + supplier_value) for ds_product_id in ds_product_ids]
         ds_products_data = product_obj.browse(ds_product_ids)._of_read_datastore(fields_to_update, create_mode=True)
 
-        for ds_product_data in itertools.chain(no_match_ids, ds_products_data):
+        for ds_product_data in itertools.chain(unmatched_ids, ds_products_data):
             if isinstance(ds_product_data, (int, long)):
                 product = product_obj.browse(ds_product_data)
                 ds_product_data = {'active': False}
@@ -152,7 +160,16 @@ class OfDatastoreUpdateProduct(models.TransientModel):
                 products_write_data[product] = ds_product_data
         for product, product_data in products_write_data.iteritems():
             product.write(product_data)
-        return len(no_match_ids), len(ds_product_ids), len(ds_product_new_ids)
+
+        # Mise à jour du paramètre active des product.template
+        # Activation
+        product_template_obj.search([('active', '=', False), ('product_variant_ids.active', '=', True)]).write({'active': True})
+        # Désactivation des modèles d'articles qui n'ont pas au moins un article (variante) actif.
+        active_templates = product_template_obj.search([('active', '=', True)])
+        active_product_templates = product_obj.search([('active', '=', True)]).mapped('product_tmpl_id')
+        (active_templates - active_product_templates).write({'active': False})
+
+        return len(no_match_ids), len(unmatched_ids), len(ds_product_ids), len(ds_product_new_ids)
 
     @api.multi
     def update_products(self):
@@ -220,11 +237,12 @@ class OfDatastoreUpdateProduct(models.TransientModel):
                 notes_warning = ["", _('Products the brand of which is not centralized : %s') % len(products)]
 
         #  Mise à jour des produits/ajout des liens TC avant de créer les nouveaux produits sur base client
-        updt_cnt = link_cnt = nolk_cnt = 0
+        updt_cnt = link_cnt = unlk_cnt = nolk_cnt = 0
         for supplier, products in datastore_products.iteritems():
-            nolk, updt, link = self._update_supplier_products(supplier, products)
+            nolk, unlk, updt, link = self._update_supplier_products(supplier, products)
             updt_cnt += updt
             link_cnt += link
+            unlk_cnt += unlk
             nolk_cnt += nolk
 
         #  Import de tous les produits non liés de la marque
@@ -254,6 +272,8 @@ class OfDatastoreUpdateProduct(models.TransientModel):
             notes.append(_('Updated products : %s') % (updt_cnt))
         if link_cnt:
             notes.append(_('Added/updated links to centralized products : %s') % (link_cnt))
+        if unlk_cnt:
+            notes.append(_('Products removed from centralized database : %s') % (unlk_cnt))
         if nolk_cnt:
             notes.append(_('Products not updated because not linked : %s') % (nolk_cnt))
 

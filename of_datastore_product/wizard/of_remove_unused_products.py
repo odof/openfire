@@ -10,12 +10,15 @@ class OfRemoveUnusedProducts(models.TransientModel):
         cpt = 0
         brands = self.env['of.product.brand'].browse(self._context['active_ids']).with_context(active_test=False)
 
-        with registry(self._cr.dbname).cursor() as cr:
-            for product in self.env(cr=cr)['product.template'].browse(brands.mapped('product_ids')._ids):
+        # Attention, le curseur temporaire ne doit pas s'appeler cr.
+        # La fonction de traduction _() cherche l'existence d'une variable cr dans la fonction appelante.
+        # Elle utiliserait donc un cursor déjà fermé, ce qui annulerait la traduction.
+        with registry(self._cr.dbname).cursor() as cr_temp:
+            for product in self.env(cr=cr_temp)['product.template'].browse(brands.mapped('product_ids')._ids):
                 try:
                     product.unlink()
-                    cr.commit()
+                    cr_temp.commit()
                     cpt += 1
                 except:
-                    cr.rollback()
+                    cr_temp.rollback()
         return self.env['of.popup.wizard'].popup_return(_('%i products were removed') % cpt, titre=_('Products removal'))
