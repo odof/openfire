@@ -140,16 +140,16 @@ class SaleOrder(models.Model):
 
             dates = {
                 'order': order.confirmation_date,
-                'invoice': self.invoice_status == 'invoiced' and self.invoice_ids[0].date_invoice,
+                'invoice': order.invoice_status == 'invoiced' and order.invoice_ids[0].date_invoice,
                 'default': False,
             }
             force_dates = [echeance.date for echeance in order.of_echeance_line_ids]
-            echeances = self.payment_term_id.compute(self.amount_total, dates=dates, force_dates=force_dates)[0]
+            echeances = order.payment_term_id.compute(order.amount_total, dates=dates, force_dates=force_dates)[0]
 
             if len(echeances) != len(order.of_echeance_line_ids):
                 continue
 
-            for echeance, ech_calc in itertools.izip(self.of_echeance_line_ids, echeances):
+            for echeance, ech_calc in itertools.izip(order.of_echeance_line_ids, echeances):
                 if ech_calc[0] and not echeance.date:
                     echeance.date = ech_calc[0]
 
