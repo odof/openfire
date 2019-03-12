@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="of_panne_filter" model="ir.ui.view">
+        <field name="name">of.panne.filter</field>
+        <field name="model">of.panne</field>
+        <field name="arch" type="xml">
+            <search string="Recherche">
+                <group>
+                    <field name="partner_id"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_panne_view_form" model="ir.ui.view">
+        <field name="name">of.panne.view.form</field>
+        <field name="model">of.panne</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="of_panne.action_of_panne_wizard_view" string="Sélectionner équipe" type="action" class="btn-primary" attrs="{'invisible': [('state', '!=', 'todo')]}"/>
+                    <field name="state" widget="statusbar" nolabel="1" statusbar_visible="todo,doing,done" readonly="1"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Nom"/></h1>
+                    </div>
+                    <group>
+                        <field name="partner_id"/>
+                        <field name="parc_installe_id" domain="['|', ('client_id', partner_id and '=' or 'ilike', partner_id or ''), ('site_adresse_id', partner_id and '=' or 'ilike', partner_id or '')]"/>
+                        <field name="intervention_model_id"/>
+                        <field name="tache_id"/>
+                    </group>
+                    <separator string="Notes"/>
+                    <group>
+                        <field name="notes"/>
+                        <field name="notes_client"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_panne_view_tree" model="ir.ui.view">
+        <field name="name">of.panne.view.tree</field>
+        <field name="model">of.panne</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="partner_id"/>
+                <field name="parc_installe_id"/>
+                <field name="notes"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_panne" model="ir.actions.act_window">
+        <field name="name">Pannes</field>
+        <field name="res_model">of.panne</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_panne.of_panne_view_tree"/>
+    </record>
+
+    <menuitem name="Pannes" id="menu_of_secteur_config" parent="of_planning.menu_of_planning_intervention" sequence="1" action="of_panne.action_of_panne"/>
+
+</odoo>

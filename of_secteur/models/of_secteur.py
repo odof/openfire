@@ -12,6 +12,7 @@ class OfSecteur(models.Model):
 
     name = fields.Char(string='Nom', required=True)
     shortcut = fields.Char(string=u'Nom abrégé')
+    color = fields.Char(string="Couleur", default="#F0F0F0")
     parc_installe_ids = fields.One2many('of.parc.installe', 'secteur_id', string=u"Parc installé")
 
     @api.multi
