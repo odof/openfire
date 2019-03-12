@@ -2,6 +2,7 @@
 
 {
     'name': 'OpenFire / Taxes',
+    'author': 'OpenFire',
     'version': '10.0.1.0.0',
     'category': 'Accounting',
     'summary': 'OpenFire Taxes',

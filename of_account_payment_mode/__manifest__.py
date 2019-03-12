@@ -2,6 +2,7 @@
 
 {
     'name' : 'OpenFire / Payment modes',
+    'author': 'OpenFire',
     'version' : '10.0.1.0.0',
     'summary': 'Use distinct payment modes within journals',
     'description': """
@@ -9,8 +10,7 @@ OpenFire Payment modes
 ======================
     - Ajout des catégories de paiement (étiquettes) dans les paramètres de paiement.
     - Ajout dans modes de paiement des paramètres d'affichage configurables pour la facture imprimée.
-
-    """,
+""",
     'category': 'Accounting',
     'depends' : [
         'account',
