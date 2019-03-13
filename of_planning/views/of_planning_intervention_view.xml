@@ -62,7 +62,7 @@
                     </group>
                     <newline/>
                     <group>
-                        <field name="name"/>
+                        <field name="name" filter_domain="['|', ('name','ilike',self), ('number','ilike',self)]"/>
                         <field name="date"/>
                         <field name="duree"/>
                         <field name="user_id" widget="selection"/>
@@ -111,6 +111,10 @@
                     </header>
                     <sheet>
                         <group>
+                            <div class="oe_title" name="num">
+                                <h1><field name="number" placeholder="N° d'intervention" readonly="1"/></h1>
+                                <!-- attrs="{'invisible': [('model_id', '=', False)]}" -->
+                            </div>
                             <group col="2">
                                 <field name="equipe_id" autofocus="autofocus"/>
                                 <field name="address_id" domain="[('customer','=',True)]" colspan="2"/>
@@ -119,11 +123,13 @@
                                 <field name="name" string="Libellé"/>
                             </group>
                             <group col="2">
+                                <field name="model_id" attrs="{'readonly': [('number', '!=', False), ('state', 'not in', ('draft', 'cancel'))]}"/>
                                 <field name="tache_id"/>
                                 <field name="date"/>
                                 <field name="jour"/>
                                 <field name="duree" string="Durée" widget="float_time"/>
                                 <field name="date_deadline"/>
+                                <field name="date_butoire" invisible="1"/>
                                 <field name="verif_dispo"/>
                             </group>
                             <group name="liens" invisible="1">
@@ -152,29 +158,47 @@
                                     <field name="tz_offset" invisible="1"/>
                                 </group>
                             </group>
+                        </group>
 
                             <!-- Description -->
-                            <separator string="Description" colspan="4"/>
-                            <field colspan="4" name="description" nolabel="1" context="{'tz': 'Europe/Paris'}" witget="html"
-                                help="Ce champ sera imprimé dans la fiche d'intervention."/>
-                            <div class="oe_edit_only" colspan="4" style="margin-top: -20px; padding-top: 0px">
-                                * Les données saisies dans ce champ seront imprimées dans la fiche d'intervention.
-                            </div>
+                        <notebook>
+                            <page string="Description">
+                                <separator string="Desciption" colspan="4"/>
+                                <field colspan="4" name="description" nolabel="1" context="{'tz': 'Europe/Paris'}" witget="html"
+                                    help="Ce champ sera imprimé dans la fiche d'intervention."/>
+                                <div class="oe_edit_only" colspan="4" style="margin-top: -20px; padding-top: 0px">
+                                    * Les données saisies dans ce champ seront imprimées dans la fiche d'intervention.
+                                </div>
 
-                            <!-- Notes client -->
-                            <group attrs="{'invisible':[('of_notes_client','=',False)]}" colspan="4">
-                                <separator string="Notes client" colspan="4"/>
-                                <field name="of_notes_client" colspan="4" nolabel="1" readonly="1"
-                                    help="Ces notes proviennent de la fiche client sous la rubrique 'Notes internes'. Ils sont uniquement modifiables dans la fiche client."/>
-                            </group>
-                            <!-- Notes intervention -->
-                            <group attrs="{'invisible':[('of_notes_intervention','=',False)]}" colspan="4">
-                                <separator string="Notes intervention" colspan="4"/>
-                                <field name="of_notes_intervention" nolabel="1"
-                                    help="Ces notes proviennent du devis / commande sous la rubrique 'Notes intervention'. Ils sont uniquement modifiables dans le  devis / commande (voir la commande associée)."/>
-                            </group>
-                        </group>
+                                <!-- Notes client -->
+                                <group attrs="{'invisible':[('of_notes_client','=',False)]}" colspan="4">
+                                    <separator string="Notes client" colspan="4"/>
+                                    <field name="of_notes_client" colspan="4" nolabel="1" readonly="1"
+                                        help="Ces notes proviennent de la fiche client sous la rubrique 'Notes internes'. Ils sont uniquement modifiables dans la fiche client."/>
+                                </group>
+                                <!-- Notes intervention -->
+                                <group attrs="{'invisible':[('of_notes_intervention','=',False)]}" colspan="4">
+                                    <separator string="Notes intervention" colspan="4"/>
+                                    <field name="of_notes_intervention" nolabel="1"
+                                        help="Ces notes proviennent du devis / commande sous la rubrique 'Notes intervention'. Ils sont uniquement modifiables dans le  devis / commande (voir la commande associée)."/>
+                                </group>
+                            </page>
+                            <page string="Compte rendu de l'intervention" name="recap">
+                                <group name="fin_intervention" string="État de fin d'intervention" col="4">
+                                    <group colspan="2">
+                                        <field name="raison_fin"/>
+                                    </group>
+                                    <group colspan="2">
+                                        <field name="notes_fin" nolabel="1" placeholder="Notes de fin d'intervention"/>
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
                     </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
                 </form>
             </field>
         </record>
@@ -230,7 +254,7 @@
             <field name="arch" type="xml">
                 <calendar string="Calendrier" date_start="date" color="equipe_id" date_stop="date_deadline" display_states="1" quick_add="0"
                     attendee_model="of.planning.equipe" color_ft_field="color_ft" color_bg_field="color_bg" custom_colors="1">
-                    <field name="name"/>
+                    <field name="calendar_name"/>
                     <field name="state" invisible="1"/>
                     <field name="state_int" invisible="1"/>
                     <field name="color_ft" invisible="1"/>
@@ -615,6 +639,13 @@
             <menuitem id="menu_of_planning_intervention_ch" name="Cheminée" parent="menu_of_planning_intervention" sequence="4" action="action_of_planning_intervention_ch_calendar"/>
             <menuitem id="menu_of_planning_entretien" name="Ramonage Entretien SAV" parent="menu_of_planning_intervention" sequence="5" action="action_of_planning_entretien_calendar"/-->
 
+        <menuitem id="menu_of_planning_clients" name="Clients" parent="of_planning.menu_of_planning" sequence="20"/>
+            <menuitem id="menu_of_planning_clients_clients" name="Clients" parent="of_planning.menu_of_planning_clients" action="base.action_partner_form" sequence="10"/>
+
+        <menuitem id="menu_of_planning_vente" name="Articles" parent="of_planning.menu_of_planning" sequence="30"/>
+            <menuitem id="menu_of_planning_vente_articles" name="Articles" parent="of_planning.menu_of_planning_vente" action="product.product_template_action" sequence="10"/>
+            <menuitem id="menu_of_planning_vente_kits" name="Kits" parent="of_planning.menu_of_planning_vente" action="of_kit.of_template_open_kit" sequence="20"/>
+
     <!-- Ajouter menu Envoyer un courrier dans Planning Intervention -->
         <!--act_window
             name="Envoyer un courrier"
@@ -680,5 +711,114 @@
             <field name="domain">[]</field> <!-- Force empty -->
             <field name="view_type">form</field>
         </record>
+
+<!--##########################################################################################################################-->
+<!--############################################_________Modèle__________#####################################################-->
+<!--##########################################################################################################################-->
+
+    <record id="of_planning_intervention_model_view_form" model="ir.ui.view">
+        <field name="name">of.planning.intervention.model.view.form</field>
+        <field name="model">of.planning.intervention.model</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box of_width_600" name="button_box_custom" >
+                        <!-- Bouton Actif -->
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive" display="inline-block">
+                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Nom du modèle"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="tache_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Configuration">
+                            <group>
+                                <field name="sequence_id" colspan="2" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_planning_intervention_model_view_tree" model="ir.ui.view">
+        <field name="name">of.planning.intervention.model.view.tree</field>
+        <field name="model">of.planning.intervention.model</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="tache_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_planning_intervention_model" model="ir.actions.act_window">
+        <field name="name">Modèle d'intervention</field>
+        <field name="res_model">of.planning.intervention.model</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_planning.of_planning_intervention_model_view_tree"/>
+    </record>
+
+    <menuitem name="Modèle d'intervention" id="menu_of_planning_intervention_model" parent="of_planning.menu_of_planning_configuration" sequence="10" action="action_of_planning_intervention_model"/>
+
+<!--##########################################################################################################################-->
+<!--########################################_________Raison de fin__________##################################################-->
+<!--##########################################################################################################################-->
+
+    <record id="of_planning_intervention_fin_view_form" model="ir.ui.view">
+        <field name="name">of.planning.intervention.fin.view.form</field>
+        <field name="model">of.planning.intervention.fin</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" default_focus="1" placeholder="Name"/>
+                        </h1>
+                    </div>
+                    <group string="Option">
+                        <field name="force_new"/>
+                        <field name="force_sign"/>
+                        <field name="force_questions"/>
+                    </group>
+                    <group groups="base.group_no_one">
+                        <field name="sequence"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_planning_intervention_fin_view_tree" model="ir.ui.view">
+        <field name="name">of.planning.intervention.fin.view.tree</field>
+        <field name="model">of.planning.intervention.fin</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="force_new"/>
+                <field name="force_sign"/>
+                <field name="force_questions"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_planning_intervention_fin" model="ir.actions.act_window">
+        <field name="name">Modèle d'intervention</field>
+        <field name="res_model">of.planning.intervention.fin</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_planning.of_planning_intervention_fin_view_tree"/>
+    </record>
+
+    <menuitem name="Raison fin d'intervention" id="menu_of_planning_intervention_din" parent="of_planning.menu_of_planning_configuration" sequence="30" action="action_of_planning_intervention_fin"/>
 
 </odoo>
