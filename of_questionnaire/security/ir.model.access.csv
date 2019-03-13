@@ -1,0 +1,13 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_of_questionnaire_user","of.questionnaire","model_of_questionnaire","base.group_user",1,0,0,0
+"access_of_questionnaire_manager","of.questionnaire","model_of_questionnaire","of_planning.of_group_planning_intervention_manager",1,1,1,1
+"access_of_questionnaire_line_user","of.questionnaire.line","model_of_questionnaire_line","base.group_user",1,0,0,0
+"access_of_questionnaire_line_manager","of.questionnaire.line","model_of_questionnaire_line","of_planning.of_group_planning_intervention_manager",1,1,1,1
+"access_of_questionnaire_line_category_user","of.questionnaire.line.category","model_of_questionnaire_line_category","base.group_user",1,0,0,0
+"access_of_questionnaire_line_category_manager","of.questionnaire.line.category","model_of_questionnaire_line_category","of_planning.of_group_planning_intervention_manager",1,1,1,1
+"access_of_questionnaire_line_reponse_user","of.questionnaire.line.reponse","model_of_questionnaire_line_reponse","base.group_user",1,0,0,0
+"access_of_questionnaire_line_reponse_manager","of.questionnaire.line.reponse","model_of_questionnaire_line_reponse","of_planning.of_group_planning_intervention_manager",1,1,1,1
+"access_of_planning_intervention_question_user","of.planning.intervention.question","model_of_planning_intervention_question","base.group_user",1,0,0,0
+"access_of_planning_intervention_question_manager","of.planning.intervention.question","model_of_planning_intervention_question","of_planning.of_group_planning_intervention_manager",1,1,1,1
+"access_of_parc_installe_question_user","of.parc.installe.question","model_of_parc_installe_question","base.group_user",1,0,0,0
+"access_of_parc_installe_question_manager","of.parc.installe.question","model_of_parc_installe_question","of_planning.of_group_planning_intervention_manager",1,1,1,1

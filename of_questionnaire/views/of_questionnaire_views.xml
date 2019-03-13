@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- *************************** Questionnaires ***************************-->
+
+    <record id="of_questionnaire_filter" model="ir.ui.view">
+        <field name="name">of.questionnaire.filter</field>
+        <field name="model">of.questionnaire</field>
+        <field name="arch" type="xml">
+            <search string="Recherche">
+                <group>
+                    <filter string="Intervention" name="type_intervention" domain="[('type','=','intervention')]"/>
+                    <filter string="Équipement" name="type_product" domain="[('type','=','product')]"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_questionnaire_view_form" model="ir.ui.view">
+        <field name="name">of.questionnaire.view.form</field>
+        <field name="model">of.questionnaire</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Nom du questionnaire"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="type" readonly="context.get('lock_type')"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="Questions" string="Questions">
+                            <group>
+                                <field name="line_ids" mode="tree" widget="many2many" colspan="4" nolabel="1" context="{'default_type': type, 'hide_type': True}" domain="[('type', '=', type)]">
+                                    <tree editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="name"/>
+                                        <field name="answer_type"/>
+                                        <field name="answer" attrs="{'invisible': [('answer_type', 'in', ('bool', 'text'))],
+                                                                     'required': [('answer_type', 'in', ('one', 'list'))]}"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_questionnaire_view_tree" model="ir.ui.view">
+        <field name="name">of.questionnaire.view.tree</field>
+        <field name="model">of.questionnaire</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="type"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_questionnaire" model="ir.actions.act_window">
+        <field name="name">Questionnaires</field>
+        <field name="res_model">of.questionnaire</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_questionnaire.of_questionnaire_view_tree"/>
+    </record>
+
+<!-- *************************** Questions ***************************-->
+
+        <record id="of_questionnaire_line_filter" model="ir.ui.view">
+        <field name="name">of.questionnaire.line.filter</field>
+        <field name="model">of.questionnaire.line</field>
+        <field name="arch" type="xml">
+            <search string="Recherche">
+                <group>
+                    <filter string="Intervention" name="type_intervention" domain="[('type','=','intervention')]"/>
+                    <filter string="Équipement" name="type_product" domain="[('type','=','product')]"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_questionnaire_line_view_form" model="ir.ui.view">
+        <field name="name">of.questionnaire.line.view.form</field>
+        <field name="model">of.questionnaire.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Question"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="sequence"/>
+                            <field name="type" invisible="context.get('hide_type')"/>
+                            <field name="category_id"/>
+                            <field name="answer_type"/>
+                            <field name="answer_ids" widget="many2many_tags"
+                                   attrs="{'invisible': [('answer_type', 'in', ('bool', 'text'))],
+                                           'required': [('answer_type', 'in', ('one', 'list'))]}"/>
+                            <field name="answer" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_questionnaire_line_view_tree" model="ir.ui.view">
+        <field name="name">of.questionnaire.line.view.tree</field>
+        <field name="model">of.questionnaire.line</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="type"/>
+                <field name="answer_type"/>
+                <field name="answer"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_questionnaire_line" model="ir.actions.act_window">
+        <field name="name">Questions</field>
+        <field name="res_model">of.questionnaire.line</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_questionnaire.of_questionnaire_line_view_tree"/>
+    </record>
+
+<!-- *************************** Catégorie de question ***************************-->
+
+    <record id="of_questionnaire_line_category_view_form" model="ir.ui.view">
+        <field name="name">of.questionnaire.line.category.view.form</field>
+        <field name="model">of.questionnaire.line.category</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Nom de la catégorie"/></h1>
+                    </div>
+                    <group>
+                        <field name="description"/>
+                        <field name="sequence"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_questionnaire_line_category_view_tree" model="ir.ui.view">
+        <field name="name">of.questionnaire.line.category.view.tree</field>
+        <field name="model">of.questionnaire.line.category</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="description"/>
+                <field name="sequence"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_questionnaire_line_category" model="ir.actions.act_window">
+        <field name="name">Catégorie de question</field>
+        <field name="res_model">of.questionnaire.line.category</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_questionnaire.of_questionnaire_line_category_view_tree"/>
+    </record>
+
+<!-- *************************** Questions d'intervention ***************************-->
+
+    <record id="of_planning_intervention_question_view_form" model="ir.ui.view">
+        <field name="name">of.planning.intervention.question.view.form</field>
+        <field name="model">of.planning.intervention.question</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Question"/></h1>
+                    </div>
+                    <field name="intervention_id" invisible="1"/>
+                    <field name="sequence" invisible="1"/>
+                    <field name="type" invisible="1"/>
+                    <field name="parc_installe_id" invisible="1" readonly="1"/>
+                    <field name="answer" invisible="1"/>
+                    <group>
+                        <group>
+
+                            <field name="category_id"/>
+                            <field name="answer_type"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="answer_ids" widget="many2many_tags"
+                               attrs="{'invisible': [('answer_type', 'in', ('bool', 'text'))],
+                                       'required': [('answer_type', 'in', ('one', 'list'))]}"/>
+                        <field name="definitive_answer" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+<!-- *************************** Menus ***************************-->
+
+    <menuitem name="Config. Questionnaires" id="menu_of_questionnaire_config" parent="of_planning.menu_of_planning_configuration" sequence="20"/>
+    <menuitem name="Questionnaires" id="menu_of_questionnaire" parent="of_questionnaire.menu_of_questionnaire_config" sequence="0" action="action_of_questionnaire"/>
+    <menuitem name="Questions" id="menu_of_questionnaire_line" parent="of_questionnaire.menu_of_questionnaire_config" sequence="1" action="action_of_questionnaire_line"/>
+    <menuitem name="Catégorie de question" id="menu_of_questionnaire_line_category" parent="of_questionnaire.menu_of_questionnaire_config" sequence="2" action="action_of_questionnaire_line_category"/>
+
+<!-- *************************** Modèle d'intervention ***************************-->
+
+    <record id="of_questionnaire_of_planning_intervention_template_view_form" model="ir.ui.view">
+        <field name="name">of.questionnaire.of.planning.intervention.template.view.form</field>
+        <field name="model">of.planning.intervention.template</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_template_view_form"/>
+        <field name="arch" type="xml">
+        <xpath expr="//notebook" position="inside">
+            <page string="Questionnaire">
+                <group>
+                    <field name="questionnaire_id" domain="[('type', '=', 'intervention')])" context="{'default_type': 'product', 'lock_type': True}"/>
+                </group>
+                <field name="question_ids" nolabel="1"/>
+            </page>
+        </xpath>
+        </field>
+    </record>
+
+<!-- *************************** Interventions ***************************-->
+
+    <record id="of_questionnaire_of_planning_intervention_view_form" model="ir.ui.view">
+        <field name="name">of.questionnaire.of.planning.intervention.view.form</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="recap" string="Compte rendu de l'intervention">
+                    <separator string="Questionnaire"/>
+                    <field name="questionnaire_id" domain="[('type', '=', 'intervention')])" options="{'no_create': True}"/>
+                    <field name="question_ids" mode="tree" nolabel="1" context="{'address_id': address_id, 'default_type': 'intervention'}">
+                        <tree>
+                            <field name="sequence" widget="handle"/>
+                            <field name="category_id" invisible="1"/>
+                            <field name="type" invisible="1"/>
+                            <field name="name"/>
+                            <field name="answer_type" invisible="1"/>
+                            <field name="answer_ids" invisible="1"/>
+                            <field name="answer"/>
+                            <field name="definitive_answer" readonly="1"/>
+                            <field name="parc_installe_id" invisible="1"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+<!-- *************************** Parc installé ***************************-->
+
+    <record id="of_parc_installe_question_view_form" model="ir.ui.view">
+        <field name="name">of_parc_installe_question_view_form</field>
+        <field name="model">of.parc.installe.question</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Question"/></h1>
+                    </div>
+                    <field name="parc_installe_id" invisible="1"/>
+                    <field name="sequence" invisible="1"/>
+                    <field name="type" invisible="1"/>
+                    <field name="answer" invisible="1"/>
+                    <group>
+                        <group>
+
+                            <field name="category_id"/>
+                            <field name="answer_type"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="answer_ids" widget="many2many_tags"
+                               attrs="{'invisible': [('answer_type', 'in', ('bool', 'text'))],
+                                       'required': [('answer_type', 'in', ('one', 'list'))]}"/>
+                        <field name="definitive_answer" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_questionnaire_of_parc_installe_form_view" model="ir.ui.view">
+        <field name="name">of.questionnaire.of.parc.installe.form.view</field>
+        <field name="model">of.parc.installe</field>
+        <field name="inherit_id" ref="of_parc_installe.of_parc_installe_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Questionnaire">
+                    <group>
+                        <field name="questionnaire_id" domain="[('type', '=', 'product')])" options="{'no_create': True}"/>
+                    </group>
+                    <field name="question_ids" nolabel="1" context="{'default_type': 'product'}">
+                        <tree>
+                            <field name="sequence" widget="handle"/>
+                            <field name="category_id" />
+                            <field name="type" invisible="1"/>
+                            <field name="name"/>
+                            <field name="answer_type"/>
+                            <field name="answer_ids" invisible="1"/>
+                            <field name="answer"/>
+                            <field name="definitive_answer" readonly="1"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

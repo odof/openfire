@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_repondre_questionnaire_view_form" model="ir.ui.view">
+        <field name="name">Réponses</field>
+        <field name="model">of.repondre.questionnaire.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Répondre au questionnaire">
+                <div class="oe_title">
+                    <h1><field name="question" readonly="1"/></h1>
+                </div>
+                <field name="question_ids" invisible="1"/>
+                <field name="question_id" invisible="1"/>
+                <field name="answer_type" invisible="1"/>
+                <group name="answers">
+                    <field name="answer_bool" attrs="{'invisible': [('answer_type', '!=', 'bool')]}"/>
+                    <field name="answer_text" attrs="{'invisible': [('answer_type', '!=', 'text')]}"/>
+                    <field name="answer_id" attrs="{'invisible': [('answer_type', '!=', 'one')]}" domain="[('planning_question_ids', 'in', [question_id])]" options="{'no_create': True}"/>
+                    <field name="answer_ids" attrs="{'invisible': [('answer_type', '!=', 'list')]}" domain="[('planning_question_ids', 'in', [question_id])]" widget="many2many_tags" options="{'no_create': True}"/>
+                </group>
+                <footer>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                    <button string="Valider" name="validate_answer" type="object" class="btn-primary"/>
+                    <button string="Passer la question" name="next_question" type="object" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window id="action_of_repondre_questionnaire"
+            key2="client_action_multi"
+            name="Répondre au questionnaire"
+            res_model="of.repondre.questionnaire.wizard"
+            src_model="of.planning.intervention"
+            view_mode="form"
+            view_type="form"
+            view_id="of_repondre_questionnaire_view_form"
+            target="new"/>
+
+    <record id="of_repondre_questionnaire_planning_intervention_view_form" model="ir.ui.view">
+        <field name="name">of.repondre.questionnaire.planning.intervention.view.form</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_questionnaire.of_questionnaire_of_planning_intervention_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='recap']//field[@name='questionnaire_id']" position="after">
+                <button class="oe_right" name="of_questionnaire.action_of_repondre_questionnaire"
+                        string="Répondre"
+                        context="{'question_ids': question_ids}"
+                        attrs="{'invisible': ['|', ('state', 'in', ('draft', 'cancel', 'postponed')), ('question_ids', '=', False)]}"
+                        type="action"/>
+            </xpath>
+            <xpath expr="//notebook/page[@name='recap']//field[@name='question_ids']/tree//field[@name='definitive_answer']" position="after">
+                <field name="id" invisible="1"/>
+                <button name="of_questionnaire.action_of_repondre_questionnaire" type="action" icon="fa-pencil" context="{'default_question_id': id}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
