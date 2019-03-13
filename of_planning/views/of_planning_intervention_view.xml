@@ -75,7 +75,7 @@
                     </group>
                     <newline/>
                     <group>
-                        <field name="name"/>
+                        <field name="name" filter_domain="['|', ('name','ilike',self), ('number','ilike',self)]"/>
                         <field name="date_date"/>
                         <field name="date_date" string="Semaine intervention"
                                context="{'of_date_search_mode':'week'}"/>
@@ -127,6 +127,9 @@
                         </div>
                     </header>
                     <sheet>
+                        <div class="oe_title" name="num">
+                            <h1><field name="number" placeholder="N° d'intervention" readonly="1"/></h1>
+                        </div>
                         <group>
                             <group col="2">
                                 <field name="equipe_id" autofocus="autofocus"/>
@@ -136,6 +139,7 @@
                                 <field name="name" string="Libellé"/>
                             </group>
                             <group col="2">
+                                <field name="template_id" attrs="{'readonly': [('number', '!=', False), ('state', 'not in', ('draft', 'cancel'))]}"/>
                                 <field name="tache_id"/>
                                 <field name="date"/>
                                 <field name="jour"/>
@@ -169,29 +173,37 @@
                                     <field name="tz_offset" invisible="1"/>
                                 </group>
                             </group>
+                        </group>
 
                             <!-- Description -->
-                            <separator string="Description" colspan="4"/>
-                            <field colspan="4" name="description" nolabel="1" context="{'tz': 'Europe/Paris'}" witget="html"
-                                help="Ce champ sera imprimé dans la fiche d'intervention."/>
-                            <div class="oe_edit_only" colspan="4" style="margin-top: -20px; padding-top: 0px">
-                                * Les données saisies dans ce champ seront imprimées dans la fiche d'intervention.
-                            </div>
+                        <notebook>
+                            <page string="Description">
+                                <separator string="Description" colspan="4"/>
+                                <field colspan="4" name="description" nolabel="1" context="{'tz': 'Europe/Paris'}" witget="html"
+                                    help="Ce champ sera imprimé dans la fiche d'intervention."/>
+                                <div class="oe_edit_only" colspan="4" style="margin-top: -20px; padding-top: 0px">
+                                    * Les données saisies dans ce champ seront imprimées dans la fiche d'intervention.
+                                </div>
 
-                            <!-- Notes client -->
-                            <group attrs="{'invisible':[('of_notes_client','=',False)]}" colspan="4">
-                                <separator string="Notes client" colspan="4"/>
-                                <field name="of_notes_client" colspan="4" nolabel="1" readonly="1"
-                                    help="Ces notes proviennent de la fiche client sous la rubrique 'Notes internes'. Ils sont uniquement modifiables dans la fiche client."/>
-                            </group>
-                            <!-- Notes intervention -->
-                            <group attrs="{'invisible':[('of_notes_intervention','=',False)]}" colspan="4">
-                                <separator string="Notes intervention" colspan="4"/>
-                                <field name="of_notes_intervention" nolabel="1"
-                                    help="Ces notes proviennent du devis / commande sous la rubrique 'Notes intervention'. Ils sont uniquement modifiables dans le  devis / commande (voir la commande associée)."/>
-                            </group>
-                        </group>
+                                <!-- Notes client -->
+                                <group attrs="{'invisible':[('of_notes_client','=',False)]}" colspan="4">
+                                    <separator string="Notes client" colspan="4"/>
+                                    <field name="of_notes_client" colspan="4" nolabel="1" readonly="1"
+                                        help="Ces notes proviennent de la fiche client sous la rubrique 'Notes internes'. Elles sont uniquement modifiables dans la fiche client."/>
+                                </group>
+                                <!-- Notes intervention -->
+                                <group attrs="{'invisible':[('of_notes_intervention','=',False)]}" colspan="4">
+                                    <separator string="Notes intervention" colspan="4"/>
+                                    <field name="of_notes_intervention" nolabel="1"
+                                        help="Ces notes proviennent du devis / commande sous la rubrique 'Notes intervention'. Elles sont uniquement modifiables dans le devis / commande (voir la commande associée)."/>
+                                </group>
+                            </page>
+                        </notebook>
                     </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
                 </form>
             </field>
         </record>
@@ -247,7 +259,7 @@
             <field name="arch" type="xml">
                 <calendar string="Calendrier" date_start="date" color="equipe_id" date_stop="date_deadline" display_states="1" quick_add="0"
                     attendee_model="of.planning.equipe" color_ft_field="color_ft" color_bg_field="color_bg" custom_colors="1">
-                    <field name="name"/>
+                    <field name="calendar_name"/>
                     <field name="state" invisible="1"/>
                     <field name="state_int" invisible="1"/>
                     <field name="color_ft" invisible="1"/>
@@ -606,10 +618,67 @@
         </record-->
 
 <!--##########################################################################################################################-->
+<!--############################################_________Modèle__________#####################################################-->
+<!--##########################################################################################################################-->
+
+    <record id="of_planning_intervention_template_view_form" model="ir.ui.view">
+        <field name="name">of.planning.intervention.template.view.form</field>
+        <field name="model">of.planning.intervention.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box of_width_600" name="button_box_custom" >
+                        <!-- Bouton Actif -->
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive" display="inline-block">
+                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Nom du modèle"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="tache_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Configuration">
+                            <group>
+                                <field name="sequence_id" colspan="2"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_planning_intervention_template_view_tree" model="ir.ui.view">
+        <field name="name">of.planning.intervention.template.view.tree</field>
+        <field name="model">of.planning.intervention.template</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="tache_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_planning_intervention_template" model="ir.actions.act_window">
+        <field name="name">Modèle d'intervention</field>
+        <field name="res_model">of.planning.intervention.template</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_planning.of_planning_intervention_template_view_tree"/>
+    </record>
+
+<!--##########################################################################################################################-->
 <!--#############################################_________Menus__________#####################################################-->
 <!--##########################################################################################################################-->
 
     <menuitem id="menu_of_planning" name="Interventions" groups="of_group_planning_intervention_user" sequence="2" web_icon="of_planning,static/description/icon.png"/>
+
         <menuitem id="menu_of_planning_intervention" name="Interventions" parent="of_planning.menu_of_planning" groups="of_group_planning_intervention_user" sequence="10"/>
             <menuitem id="menu_of_planning_intervention_calendar" name="Planning" parent="of_planning.menu_of_planning_intervention" sequence="1" action="action_of_planning_intervention_calendar"/>
 
@@ -621,16 +690,12 @@
             <menuitem id="menu_of_planning_vente_kits" name="Kits" parent="of_planning.menu_of_planning_vente" action="of_kit.of_template_open_kit" sequence="20"/>
 
         <menuitem id="menu_of_planning_configuration" name="Configuration" parent="of_planning.menu_of_planning" groups="hr.group_hr_manager" sequence="100"/>
+            <menuitem name="Modèles d'intervention" id="menu_of_planning_intervention_template" parent="of_planning.menu_of_planning_configuration" sequence="10" action="action_of_planning_intervention_template"/>
             <menuitem name="Modèles de courriers" id="menu_of_planning_mail_templates" parent="of_planning.menu_of_planning_configuration" sequence="70" action="of_gesdoc.action_of_mail_template_tree_all" />
             <menuitem name="Employés" id="menu_hr_employee_tree" parent="of_planning.menu_of_planning_configuration" sequence="80" action="action_hr_employee_tree"/>
             <menuitem name="Équipes" id="menu_of_planning_equipe_tree" parent="of_planning.menu_of_planning_configuration" sequence="90" action="action_of_planning_equipe_tree"/>
             <menuitem name="Erreurs" id="menu_of_planning_intervention_raison_tree" parent="of_planning.menu_of_planning_configuration" sequence="100" action="action_of_planning_intervention_raison_tree"/>
             <menuitem name="Tâches" id="menu_of_planning_tache_tree" parent="of_planning.menu_of_planning_configuration" sequence="110" action="action_of_planning_tache_tree"/>
-
-            <!--menuitem id="menu_of_planning_intervention_global" name="Global" parent="menu_of_planning_intervention" sequence="1" action="action_of_planning_intervention_calendar"/>
-            <menuitem id="menu_of_planning_intervention_po" name="Poêle" parent="menu_of_planning_intervention" sequence="4" action="action_of_planning_intervention_po_calendar"/>
-            <menuitem id="menu_of_planning_intervention_ch" name="Cheminée" parent="menu_of_planning_intervention" sequence="4" action="action_of_planning_intervention_ch_calendar"/>
-            <menuitem id="menu_of_planning_entretien" name="Ramonage Entretien SAV" parent="menu_of_planning_intervention" sequence="5" action="action_of_planning_entretien_calendar"/-->
 
     <!-- Ajouter menu Envoyer un courrier dans Planning Intervention -->
         <!--act_window

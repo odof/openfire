@@ -113,7 +113,7 @@ class OfPlanningInterventionRaison(models.Model):
 class OfPlanningIntervention(models.Model):
     _name = "of.planning.intervention"
     _description = "Planning d'intervention OpenFire"
-    _inherit = ["of.readgroup", "of.calendar.mixin"]
+    _inherit = ["of.readgroup", "of.calendar.mixin", 'mail.thread']
     _order = 'date'
 
     name = fields.Char(string=u'Libellé', required=True)
@@ -167,6 +167,10 @@ class OfPlanningIntervention(models.Model):
     cleantext_intervention = fields.Text(compute='_compute_cleantext_intervention')
     jour = fields.Char("Jour", compute="_compute_jour")
     date_date = fields.Date(string='Jour intervention', compute='_compute_date_date', search='_search_date_date', readonly=True)
+
+    template_id = fields.Many2one('of.planning.intervention.template', string=u"Modèle d'intervention")
+    number = fields.Char(String=u"Numéro", copy=False)
+    calendar_name = fields.Char(string="Calendar Name", compute="_compute_calendar_name")
 
     @api.depends('date', 'duree', 'hor_md', 'hor_mf', 'hor_ad', 'hor_af', 'hor_sam', 'hor_dim')
     def _compute_date_deadline(self):
@@ -320,6 +324,30 @@ class OfPlanningIntervention(models.Model):
             elif interv.state and interv.state in ("cancel", "postponed"):
                 interv.state_int = 3
 
+    @api.depends('name', 'number')
+    def _compute_calendar_name(self):
+        for intervention in self:
+            intervention.calendar_name = intervention.number or intervention.name
+
+    @api.onchange('template_id')
+    def onchange_template_id(self):
+        if self.state == "draft" and self.template_id:
+            self.tache_id = self.template_id.tache_id
+
+    @api.multi
+    def of_get_report_name(self, docs):
+        return "Rapport d'intervention"
+
+    @api.multi
+    def of_get_report_number(self, docs):
+        return self.number
+
+    @api.multi
+    def of_get_report_date(self, docs):
+        planning_date = fields.Datetime.from_string(self.date)
+        lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
+        return planning_date.strftime(lang.date_format)
+
     @api.model
     def get_state_int_map(self):
         v0 = {'label': 'Brouillon', 'value': 0}
@@ -414,16 +442,24 @@ class OfPlanningIntervention(models.Model):
                 if rdv:
                     raise ValidationError(u'Cette équipe a déjà %s rendez-vous sur ce créneau' % (len(rdv),))
 
+    @api.multi
+    def _affect_number(self):
+        for interv in self:
+            if interv.template_id and interv.state in ('confirm', 'done', 'postponed') and not interv.number:
+                interv.write({'number': self.template_id.sequence_id.next_by_id()})
+
     @api.model
     def create(self, vals):
         res = super(OfPlanningIntervention, self).create(vals)
         res.do_verif_dispo()
+        res._affect_number()
         return res
 
     @api.multi
     def write(self, vals):
         super(OfPlanningIntervention, self).write(vals)
         self.do_verif_dispo()
+        self._affect_number()
         return True
 
     @api.model
@@ -592,3 +628,47 @@ class SaleOrder(models.Model):
             })
             action['context'] = str(context)
         return action
+
+class OfPlanningInterventionTemplate(models.Model):
+    _name = 'of.planning.intervention.template'
+
+    name = fields.Char(string=u"Nom du modèle", required=True)
+    active = fields.Boolean(string="Active", default=True)
+    code = fields.Char(string="Code", compute="_compute_code", inverse="_inverse_code", store=True, required=True)
+    sequence_id = fields.Many2one('ir.sequence', string=u"Séquence", readonly=True)
+    tache_id = fields.Many2one('of.planning.tache', string=u"Tâche")
+
+    @api.depends('sequence_id')
+    def _compute_code(self):
+        for template in self:
+            template.code = template.sequence_id.prefix
+
+    def _inverse_code(self):
+        sequence_obj = self.env['ir.sequence']
+        for template in self:
+            if not template.code:
+                continue
+            sequence_name = u"Modèle d'intervention " + template.code
+            sequence_code = self._name
+            # Si une séquence existe déjà avec ce code, on la reprend
+            sequence = sequence_obj.search([('code', '=', sequence_code), ('prefix', '=', self.code)])
+            if sequence:
+                template.sequence_id = sequence
+                continue
+
+            if template.sequence_id:
+                # Si la séquence n'est pas utilisée par un autre modèle, on la modifie directement,
+                # sinon il faudra en re-créer une.
+                if not self.search([('sequence_id', '=', template.sequence_id.id), ('id', '!=', template.id)]):
+                    template.sequence_id.write({'prefix': template.code, 'name': sequence_name})
+                    continue
+
+            # Création d'une séquence pour le modèle
+            sequence_data = {
+                'name': sequence_name,
+                'code': sequence_code,
+                'implementation': 'no_gap',
+                'prefix': template.code,
+                'padding': 4,
+            }
+            template.sequence_id = self.env['ir.sequence'].create(sequence_data)
