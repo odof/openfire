@@ -620,6 +620,9 @@ class OfDatastoreCentralized(models.AbstractModel):
 
     @api.model
     def _of_datastore_is_computed_field(self, field_name):
+        if field_name == 'of_seller_name':
+            # Le fournisseur est directement défini par la marque
+            return True
         return _of_datastore_is_computed_field(self, field_name)
 
     @api.model
