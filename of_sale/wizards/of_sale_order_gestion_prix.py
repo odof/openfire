@@ -113,7 +113,7 @@ class GestionPrix(models.TransientModel):
             taxes = {'total_excluded': 0.0, 'total_included': 0.0}
         else:
             # Prix HT unitaire final de la ligne
-            price_unit = order_line.price_unit * to_distribute / total
+            price_unit = (order_line.price_unit or 1.0) * to_distribute / total
             if rounding:
                 price_unit = currency.round(price_unit)
 
@@ -191,6 +191,10 @@ class GestionPrix(models.TransientModel):
         round_tax = self.env.user.company_id.tax_calculation_rounding_method != 'round_globally'
 
         lines_select = self.line_ids.filtered(lambda line: line.is_selected and line.order_line_id.price_unit)
+        if not lines_select:
+            # Toutes les lignes sélectionnées ont un prix unitaire à 0
+            lines_select = self.line_ids.filtered(lambda line: line.is_selected)
+        nb_select = len(lines_select)
         lines_nonselect = self.line_ids - lines_select
 
         # Les totaux des lignes non sélectionnées sont gardés en précison standard
@@ -203,7 +207,7 @@ class GestionPrix(models.TransientModel):
         for line in lines_select.with_context(round=False):
             # Calcul manuel des taxes avec context['round']==False pour conserver la précision des calculs
             order_line = line.order_line_id
-            price = order_line.price_unit * (1 - (order_line.discount or 0.0) / 100.0)
+            price = (order_line.price_unit or 1.0) * (1 - (order_line.discount or 0.0) / 100.0)
             taxes = order_line.tax_id.compute_all(price, order_line.currency_id, order_line.product_uom_qty,
                                                   product=order_line.product_id, partner=order_line.order_id.partner_id)
             if line.is_selected:
@@ -215,8 +219,6 @@ class GestionPrix(models.TransientModel):
         if self.methode_remise == 'prix_ttc_cible':
             if self.valeur <= 0:
                 raise UserError(u"(Erreur #RG105)\nVous devez saisir un montant total TTC cible.")
-            if self.valeur < total_ttc_nonselect:
-                raise UserError(u"(Erreur #RG110)\nLe montant TTC cible est trop faible.\nLe montant de la remise résultante est supérieur au montant total des articles sur lesquels s'applique la remise.")
         elif self.methode_remise == 'montant_ttc':
             if not self.valeur:
                 raise UserError(u"(Erreur #RG115)\nVous devez saisir un montant TTC à déduire.")
@@ -271,7 +273,7 @@ class GestionPrix(models.TransientModel):
             else:
                 vals, taxes = self._calcule_vals_ligne(order_line,
                                                        to_distribute,
-                                                       total_select,
+                                                       total_select or nb_select,
                                                        currency=cur,
                                                        rounding=line != lines_select[-1],  # On arrondit toutes les lignes sauf la dernière
                                                        line_rounding=line_rounding)
@@ -283,6 +285,7 @@ class GestionPrix(models.TransientModel):
             if self.methode_remise != 'reset':
                 to_distribute -= taxes[tax_field]
                 total_select -= line_taxes[line.id][tax_field]
+                nb_select -= 1
 
             values.update(vals)
 
