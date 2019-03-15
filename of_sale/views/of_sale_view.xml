@@ -293,6 +293,11 @@
             </field>
         </record>
 
+        <!-- Rendre visible le menu "Étiquettes de contact" sans le mode débogue. -->
+        <menuitem action="base.action_partner_category_form" id="sales_team.menu_partner_category_form" name="Contact Tags" sequence="1" parent="sales_team.menu_config_address_book" groups="-base.group_no_one"/>
+        <!-- Rendre visible le menu "Catégories d'articles" sans le mode débogue. -->
+        <menuitem action="product.product_category_action_form" id="sale.menu_product_category_action_form" parent="sale.prod_config_main" sequence="2" groups="-base.group_no_one"/>
+
 <!--##############################################################################-->
 <!--########################### ______ Compta ______ #############################-->
 <!--##############################################################################-->
