@@ -1,11 +1,18 @@
 <?xml version="1.0"?>
 <odoo>
 
+<!-- ******************************* Pannes *******************************-->
+
     <record id="of_panne_filter" model="ir.ui.view">
         <field name="name">of.panne.filter</field>
         <field name="model">of.panne</field>
         <field name="arch" type="xml">
             <search string="Recherche">
+                <group>
+                    <filter string="À prendre en charge" name="state_todo" icon="terp-folder-violet" domain="[('state','=','todo')]"/>
+                    <filter string="Prise en charge" name="state_doing" icon="terp-folder-violet" domain="[('state','=','doing')]"/>
+                    <filter string="Terminée" name="state_done" icon="terp-folder-violet" domain="[('state','=','done')]"/>
+                </group>
                 <group>
                     <field name="partner_id"/>
                 </group>
@@ -23,14 +30,27 @@
                     <field name="state" widget="statusbar" nolabel="1" statusbar_visible="todo,doing,done" readonly="1"/>
                 </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
+                        </button>
+                        <button class="oe_stat_button" name="action_view_interventions" type="object" icon="fa-wrench">
+                            <field string="Interventions" name="intervention_id" widget="statinfo"/>
+                        </button>
+                    </div>
                     <div class="oe_title">
                         <h1><field name="name" placeholder="Nom"/></h1>
                     </div>
-                    <group>
-                        <field name="partner_id"/>
-                        <field name="parc_installe_id" domain="['|', ('client_id', partner_id and '=' or 'ilike', partner_id or ''), ('site_adresse_id', partner_id and '=' or 'ilike', partner_id or '')]"/>
-                        <field name="intervention_model_id"/>
-                        <field name="tache_id"/>
+                    <group col="4">
+                        <group colspan="2">
+                            <field name="partner_id"/>
+                            <field name="parc_installe_id" domain="['|', ('client_id', partner_id and '=' or 'ilike', partner_id or ''), ('site_adresse_id', partner_id and '=' or 'ilike', partner_id or '')]"/>
+                            <field name="intervention_model_id"/>
+                            <field name="tache_id"/>
+                        </group>
+                        <group colspan="2">
+                            <field name="equipe_id" readonly="1"/>
+                        </group>
                     </group>
                     <separator string="Notes"/>
                     <group>
@@ -50,6 +70,7 @@
                 <field name="partner_id"/>
                 <field name="parc_installe_id"/>
                 <field name="notes"/>
+                <field name="state"/>
             </tree>
         </field>
     </record>
@@ -63,5 +84,18 @@
     </record>
 
     <menuitem name="Pannes" id="menu_of_secteur_config" parent="of_planning.menu_of_planning_intervention" sequence="1" action="of_panne.action_of_panne"/>
+
+<!-- **************************** Interventions ***************************-->
+
+    <record id="of_panne_of_planning_intervention_view_form" model="ir.ui.view">
+        <field name="name">of.panne.of.planning.intervention.view.form</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='liens']" position="inside">
+                <field name="panne_id" domain="[('partner_id', '=', address_id)])" context="{'default_partner_id': address_id, 'default_tache_id': tache_id, 'default_intervention_model_id' : model_id}"/>
+            </xpath>
+        </field>
+    </record>
 
 </odoo>
