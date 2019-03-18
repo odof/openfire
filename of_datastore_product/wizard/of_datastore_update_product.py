@@ -125,6 +125,11 @@ class OfDatastoreUpdateProduct(models.TransientModel):
                 if done_moves:
                     del ds_product_data['uom_id']
 
+            if 'uom_po_id' in ds_product_data:
+                # Ligne copiée depuis le module account dans product.template.write()
+                if self.env['account.move.line'].search_count([('product_id', 'in', products.ids)]):
+                    del ds_product_data['uom_po_id']
+
             if ds_product_data.get('seller_ids'):
                 # La fonction _of_read_datastore renvoie un seller_ids de la forme [(5, ), (0, 0, {...})]
                 # Cela pose un problème de performance, car le (5, ) appelle la fonction unlink(), qui vide toutes les valeurs en cache
