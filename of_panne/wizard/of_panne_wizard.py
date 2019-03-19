@@ -8,15 +8,15 @@ class OfPanneWizard(models.TransientModel):
     equipe_id = fields.Many2one('of.planning.equipe', string=u"Équipe", required=True)
 
     def select_team(self):
-        vals = self._intervention_fields(self.env['of.panne'].browse(self._context.get('active_ids')), self.equipe_id)
+        vals = self.intervention_fields(self.env['of.panne'].browse(self._context.get('active_ids')), self.equipe_id, self.create_uid)
         intervention = self.env['of.planning.intervention'].create(vals)
         self.env['of.panne'].browse(self._context.get('active_ids')).write({'equipe_id': self.equipe_id.id, 'state': 'doing', 'intervention_id': intervention.id})
 
-    def _intervention_fields(self, panne, equipe):
+    def intervention_fields(self, panne, equipe, user):
         return {'address_id' : panne.partner_id.id,
                 'tache_id' : panne.tache_id.id,  # Not null
-                'user_id' : self.create_uid.id,
-                'company_id' : self.create_uid.company_id.id,
+                'user_id' : user.id,
+                'company_id' : user.company_id.id,
                 'verif_dispo' : False,
                 'equipe_id' : equipe.id,  # Not null
                 'duree' : panne.tache_id.duree,  # Not null
