@@ -16,6 +16,7 @@ class OfPanne(models.Model):
     notes = fields.Text(string="Notes")
     notes_client = fields.Text(related='partner_id.comment', string="Notes client", readonly=True)
     state = fields.Selection([('todo', u'À prendre en charge'), ('doing', 'Prise en charge'), ('done', u'Terminée')], string=u"État", compute="_compute_state", store=True)
+    panne_ids = fields.One2many('of.panne', related="parc_installe_id.panne_ids", string="Historique")
 
     @api.depends('intervention_id', 'intervention_id.state')
     def _compute_state(self):
@@ -50,3 +51,7 @@ class OfPlanningIntervention(models.Model):
 
     panne_id = fields.Many2one('of.panne', string=u"Panne liée")
 
+class OfParcInstalle(models.Model):
+    _inherit = "of.parc.installe"
+
+    panne_ids = fields.One2many('of.panne', 'parc_installe_id', string="Pannes")

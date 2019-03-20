@@ -52,11 +52,29 @@
                             <field name="equipe_id" readonly="1"/>
                         </group>
                     </group>
-                    <separator string="Notes"/>
-                    <group>
-                        <field name="notes"/>
-                        <field name="notes_client"/>
-                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <separator string="Notes"/>
+                            <group>
+                                <field name="notes"/>
+                                <field name="notes_client"/>
+                            </group>
+                        </page>
+                        <page string="Historique">
+                            <group name="panne">
+                                <field name="panne_ids" nolabel="1" options="{'no_delete': True, 'no_create': True}">
+                                    <tree string="Pannes">
+                                        <field name="create_date" string="Date"/>
+                                        <field name="name"/>
+                                        <field name="equipe_id"/>
+                                        <field name="tache_id"/>
+                                        <field name="state"/>
+                                        <field name="notes"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
@@ -94,6 +112,32 @@
         <field name="arch" type="xml">
             <xpath expr="//group[@name='liens']" position="inside">
                 <field name="panne_id" domain="[('partner_id', '=', address_id)])" context="{'default_partner_id': address_id, 'default_tache_id': tache_id, 'default_intervention_model_id' : model_id}"/>
+            </xpath>
+        </field>
+    </record>
+
+<!-- **************************** Parc installe ***************************-->
+
+    <record id="of_panne_of_parc_installe_form_view" model="ir.ui.view">
+        <field name="name">of.panne.of.parc.installe.form.view</field>
+        <field name="model">of.parc.installe</field>
+        <field name="inherit_id" ref="of_parc_installe.of_parc_installe_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Historique Panne">
+                    <group name="panne">
+                        <field name="panne_ids" nolabel="1" options="{'no_delete': True, 'no_create': True}">
+                            <tree string="Pannes">
+                                <field name="create_date" string="Date"/>
+                                <field name="name"/>
+                                <field name="equipe_id"/>
+                                <field name="tache_id"/>
+                                <field name="state"/>
+                                <field name="notes"/>
+                            </tree>
+                        </field>
+                    </group>
+                </page>
             </xpath>
         </field>
     </record>
