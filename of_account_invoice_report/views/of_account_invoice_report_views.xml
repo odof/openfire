@@ -1,5 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+    <record id="of_sale_report_total_view_tree" model="ir.ui.view">
+        <field name="name">Impression des totaux dans les factures de vente</field>
+        <field name="model">of.invoice.report.total.group</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence"/>
+                <field name="name"/>
+                <field name="subtotal_name"/>
+                <field name="position"/>
+                <field name="invoice"/>
+                <field name="order"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_sale_report_total_view_form" model="ir.ui.view">
+        <field name="name">Impression des totaux dans les factures de vente</field>
+        <field name="model">of.invoice.report.total.group</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="subtotal_name"/>
+                    <field name="categ_ids">
+                        <tree>
+                            <field name="name" string="Nom catégorie"/>
+                        </tree>
+                    </field>
+                    <field name="product_ids">
+                        <tree>
+                            <field name="default_code"/>
+                            <field name="name"/>
+                            <field name="categ_id"/>
+                        </tree>
+                    </field>
+                    <field name="position"/>
+                    <field name="invoice"/>
+                    <field name="order"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_of_sale_report_total_view_form" model="ir.actions.act_window">
+        <field name="name">Impression des totaux dans les factures de vente</field>
+        <field name="res_model">of.invoice.report.total.group</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem action="action_of_sale_report_total_view_form" id="menu_action_of_sale_report_total_view_form"
+              parent="account.account_management_menu"/>
+
     <record id="of_view_account_config_settings" model="ir.ui.view">
         <field name="name">(OF) account settings</field>
         <field name="model">account.config.settings</field>

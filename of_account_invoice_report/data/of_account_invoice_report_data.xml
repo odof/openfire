@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="of_invoice_report_total_group_paiements" model="of.invoice.report.total.group">
+        <field name="name">Paiements</field>
+        <field name="subtotal_name">Restant dû</field>
+        <field name="sequence" eval="100"/>
+        <field name="invoice" eval="True"/>
+    </record>
+
+</odoo>

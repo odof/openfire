@@ -3,9 +3,9 @@
 {
     'name': 'OpenFire / Impression factures',
     'author': 'OpenFire',
-    'version': '10.0',
+    'version': '10.0.1.0.0',
     'category': 'OpenFire modules',
-    'summary': 'Affichage des acomptes dans les factures',
+    'summary': 'Affichage des paiements dans les factures',
     'description': """
 Module de factures :
 
@@ -18,6 +18,7 @@ Module de factures :
         'of_account',
     ],
     'data': [
+        'data/of_account_invoice_report_data.xml',
         'report/of_invoice_report_templates.xml',
         'views/of_account_invoice_report_views.xml',
     ],

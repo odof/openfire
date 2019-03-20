@@ -94,7 +94,7 @@
                     </tr>
                 </thead>
                 <tbody class="invoice_tbody">
-                    <tr t-foreach="o.invoice_line_ids" t-as="l">
+                    <tr t-foreach="o._of_get_printable_lines()" t-as="l">
                         <td><span t-field="l.name"/></td>
                         <td class="hidden"><span t-field="l.origin"/></td>
                         <td class="text-right">
@@ -121,43 +121,30 @@
             <div class="row">
                 <div name="subdivision" class="col-xs-4 pull-right">
                     <table class="table table-condensed">
+                        <!-- Affichage des paiements et autres groupes de sous-totaux -->
+                        <t t-set='totals_group' t-value="o._of_get_printable_totals()"/>
                         <tr class="border-black">
                             <td><strong>Subtotal</strong></td>
                             <td class="text-right">
-                                <span t-field="o.amount_untaxed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                <span><t t-esc="totals_group['subtotal']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></span>
                             </td>
                         </tr>
-                        <t t-foreach="o._get_tax_amount_by_group()" t-as="amount_by_group">
-                            <tr>
-                                <td><span t-esc="amount_by_group[0] if len(o.tax_line_ids) > 1 else (o.tax_line_ids.tax_id.description or o.tax_line_ids.tax_id.name)"/></td>
-                                <td class="text-right">
-                                    <span t-esc="amount_by_group[1]" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                                </td>
-                            </tr>
-                        </t>
-                        <tr class="border-black">
-                            <td><strong>Total</strong></td>
-                            <td class="text-right">
-                                 <span t-field="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                            </td>
-                        </tr>
-                        <t t-set="payments" t-value="json.loads(o.payments_widget)"/>
-                        <t t-if="payments">
-                            <tr t-foreach="payments['content']" t-as="payment">
+                        <t t-foreach="totals_group['untaxed'] + totals_group['taxes'] + totals_group['total']" t-as="total_group">
+                            <!-- Données sous la forme [[('Libellé', montant), ...], ('Libellé total', montant_total)] -->
+                            <tr t-foreach="total_group[0]" t-as="total_line">
                                 <td class="col-xs-8 pull-right">
-                                    <t t-set="payment_entry" t-value="o.env['account.move'].browse(payment['move_id'])"/>
-                                    <i name="payments_data"><span>Paid on </span><span t-field="payment_entry.date"/></i>
+                                    <span>
+                                        <t t-esc="total_line[0]"/>
+                                    </span>
                                 </td>
                                 <td>
-                                    <span class="pull-right text-right"><t t-esc="payment['amount']" t-options='{"widget": "monetary", "display_currency": "o.currency_id"}'/></span>
-                                    <!--span class="pull-right text-right"><t t-esc="payment['amount']" t-esc-options='{"widget": "monetary", "display_currency": "o.currency_id"}'/></span-->
+                                    <span class="pull-right text-right"><t t-esc="total_line[1]" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></span>
                                 </td>
                             </tr>
                             <tr class="border-black">
-                                <td><strong>Amount left </strong></td>
+                                <td><strong><t t-esc="total_group[1][0]"/></strong></td>
                                 <td class="text-right">
-                                    <span t-field="o.residual" t-options='{"widget": "monetary", "display_currency": "o.currency_id"}'/>
-                                    <!--span t-field="o.residual" t-field-options='{"widget": "monetary", "display_currency": "o.currency_id"}'/-->
+                                    <span t-esc="total_group[1][1]" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
                                 </td>
                             </tr>
                         </t>
@@ -180,10 +167,10 @@
                             <tr t-foreach="o.tax_line_ids" t-as="t">
                                 <td><span t-field="t.tax_id.description"/></td>
                                 <td class="text-right">
-                                    <span t-field="t.base" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    <span t-field="t.base" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
                                 </td>
                                 <td class="text-right">
-                                    <span t-field="t.amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    <span t-field="t.amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
                                 </td>
                             </tr>
                         </tbody>

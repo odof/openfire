@@ -1,14 +1,13 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-#	* account
 #	* of_account_invoice_report
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-30 09:11+0000\n"
-"PO-Revision-Date: 2017-11-30 09:11+0000\n"
+"POT-Creation-Date: 2019-03-20 15:07+0000\n"
+"PO-Revision-Date: 2019-03-20 15:07+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,6 +15,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
 
+#. module: of_account_invoice_report
 #: model:ir.model.fields,field_description:of_account_invoice_report.field_account_config_settings_pdf_adresse_civilite
 msgid "(OF) Civilités"
 msgstr "(OF) Civilités"
@@ -51,6 +51,12 @@ msgid "(OF) Téléphone"
 msgstr "(OF) Téléphone"
 
 #. module: of_account_invoice_report
+#: code:addons/of_account_invoice_report/models/of_account_invoice_report.py:72
+#, python-format
+msgid "<i>Paid on %s</i>"
+msgstr "<i>Payé le %s</i>"
+
+#. module: of_account_invoice_report
 #: model:ir.ui.view,arch_db:of_account_invoice_report.of_view_account_config_settings
 msgid "<span>Afficher l'adresse email dans les rapports PDF</span>"
 msgstr "<span>Afficher l'adresse email dans les rapports PDF</span>"
@@ -80,76 +86,15 @@ msgstr "<span>Afficher le numéro de téléphone dans les rapports PDF</span>"
 msgid "<span>Afficher les références produits dans les rapports PDF</span>"
 msgstr "<span>Afficher les références produits dans les rapports PDF</span>"
 
-#. module: account
-#: model:ir.ui.view,arch_db:account.account_invoice_report_duplicate
-msgid "<span>Duplicate</span>"
-msgstr "<span>Duplicata</span>"
-
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "<span>Paid on </span>"
-msgstr "<span>Payé le </span>"
-
 #. module: of_account_invoice_report
 #: model:ir.ui.view,arch_db:of_account_invoice_report.of_view_account_config_settings
 msgid "<span>Remplacer le nom du contact par celui du parent dans les rapports PDF</span>"
 msgstr "<span>Remplacer le nom du contact par celui du parent dans les rapports PDF</span>"
 
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "<strong>Amount left </strong>"
-msgstr "<strong>Montant dû </strong>"
-
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "<strong>Customer Ref:</strong>"
-msgstr "<strong>Réf. client :</strong>"
-
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "<strong>Doc Descr.:</strong>"
-msgstr "<strong>Descr. doc :</strong>"
-
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "<strong>Doc Ref:</strong>"
-msgstr "<strong>Réf. doc :</strong>"
-
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "<strong>Due Date:</strong>"
-msgstr "<strong>Date d'échéance :</strong>"
-
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "<strong>Fiscal Position Remark:</strong>"
-msgstr "<strong>Remarque sur le régime fiscal :</strong>"
-
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "<strong>References: </strong>"
-msgstr "<strong>Référence :</strong>"
-
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "<strong>Salesperson:</strong>"
-msgstr "<strong>Vendeur :</strong>"
-
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "<strong>Origin:</strong>"
-msgstr "<strong>Origine :</strong>"
-
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "<strong>Subtotal</strong>"
-msgstr "<strong>Sous-total</strong>"
-
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-#: model:ir.ui.view,arch_db:account.report_journal
-msgid "<strong>Total</strong>"
-msgstr "<strong>Total</strong>"
+#. module: of_account_invoice_report
+#: model:ir.model.fields,field_description:of_account_invoice_report.field_of_invoice_report_total_group_position
+msgid "Afficher dans les montants"
+msgstr "Afficher dans les montants"
 
 #. module: of_account_invoice_report
 #: model:ir.model.fields,help:of_account_invoice_report.field_account_config_settings_pdf_adresse_email
@@ -183,83 +128,120 @@ msgstr "Afficher le numéro de téléphone mobile dans les rapport PDF ?"
 
 #. module: of_account_invoice_report
 #: model:ir.model.fields,help:of_account_invoice_report.field_account_config_settings_pdf_display_product_ref
-msgid "Afficher les références produits dans les Rapports PDF ?"
-msgstr "Afficher les références produits dans les Rapports PDF ?"
+msgid "Afficher les références produits dans les rapports PDF ?"
+msgstr "Afficher les références produits dans les rapports PDF ?"
 
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "Amount"
-msgstr "Montant"
+#. module: of_account_invoice_report
+#: model:ir.model.fields,field_description:of_account_invoice_report.field_of_invoice_report_total_group_order
+msgid "Concerne les commandes clients"
+msgstr "Concerne les commandes clients"
 
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "Base"
-msgstr "Base"
+#. module: of_account_invoice_report
+#: model:ir.model.fields,field_description:of_account_invoice_report.field_of_invoice_report_total_group_invoice
+msgid "Concerne les factures"
+msgstr "Concerne les factures"
 
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "Description"
-msgstr "Description"
+#. module: of_account_invoice_report
+#: model:ir.model.fields,field_description:of_account_invoice_report.field_of_invoice_report_total_group_create_uid
+msgid "Created by"
+msgstr "Créé par"
 
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "Disc.(%)"
-msgstr "Rem.(%)"
+#. module: of_account_invoice_report
+#: model:ir.model.fields,field_description:of_account_invoice_report.field_of_invoice_report_total_group_create_date
+msgid "Created on"
+msgstr "Créé le"
 
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "Fax"
-msgstr "Fax"
+#. module: of_account_invoice_report
+#: model:ir.model.fields,field_description:of_account_invoice_report.field_of_invoice_report_total_group_display_name
+msgid "Display Name"
+msgstr "Nom affiché"
 
-#. modules: account, of_account_invoice_report
+#. module: of_account_invoice_report
+#: model:ir.model.fields,field_description:of_account_invoice_report.field_of_invoice_report_total_group_product_ids
+msgid "Filtre sur articles"
+msgstr "Filtre sur articles"
+
+#. module: of_account_invoice_report
+#: model:ir.model.fields,field_description:of_account_invoice_report.field_of_invoice_report_total_group_categ_ids
+msgid "Filtre sur catégories"
+msgstr "Filtre sur catégories"
+
+#. module: of_account_invoice_report
+#: model:ir.model.fields,help:of_account_invoice_report.field_of_invoice_report_total_group_order
+msgid "Fonctionnalité en cours de développement"
+msgstr "Fonctionnalité en cours de développement"
+
+#. module: of_account_invoice_report
+#: selection:of.invoice.report.total.group,position:0
+msgid "Hors taxe"
+msgstr "Hors taxe"
+
+#. module: of_account_invoice_report
+#: model:ir.model.fields,field_description:of_account_invoice_report.field_of_invoice_report_total_group_id
+msgid "ID"
+msgstr "ID"
+
+#. module: of_account_invoice_report
+#: model:ir.actions.act_window,name:of_account_invoice_report.action_of_sale_report_total_view_form
+#: model:ir.ui.menu,name:of_account_invoice_report.menu_action_of_sale_report_total_view_form
+msgid "Impression des totaux dans les factures de vente"
+msgstr "Impression des totaux dans les factures de vente"
+
+#. module: of_account_invoice_report
+#: model:ir.model,name:of_account_invoice_report.model_of_invoice_report_total_group
+msgid "Impression des totaux de factures et commandes de vente"
+msgstr "Impression des totaux de factures et commandes de vente"
+
+#. module: of_account_invoice_report
 #: model:ir.model,name:of_account_invoice_report.model_account_invoice
 msgid "Invoice"
 msgstr "Facture"
 
-#. modules: account, of_account_invoice_report
+#. module: of_account_invoice_report
 #: model:ir.model,name:of_account_invoice_report.model_account_invoice_line
 msgid "Invoice Line"
 msgstr "Ligne de facture"
 
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "Qty"
-msgstr "Qté"
+#. module: of_account_invoice_report
+#: model:ir.model.fields,field_description:of_account_invoice_report.field_of_invoice_report_total_group___last_update
+msgid "Last Modified on"
+msgstr "Dernière Modification le"
 
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "Source Doc"
-msgstr "Doc source:"
+#. module: of_account_invoice_report
+#: model:ir.model.fields,field_description:of_account_invoice_report.field_of_invoice_report_total_group_write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
 
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "TIN:"
-msgstr "TVA :"
+#. module: of_account_invoice_report
+#: model:ir.model.fields,field_description:of_account_invoice_report.field_of_invoice_report_total_group_write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
 
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "Tax"
-msgstr "Taxe"
+#. module: of_account_invoice_report
+#: model:ir.model.fields,field_description:of_account_invoice_report.field_of_invoice_report_total_group_subtotal_name
+msgid "Libellé du sous-total"
+msgstr "Libellé du sous-total"
 
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "Tax Excluded Price"
-msgstr "Prix HT"
+#. module: of_account_invoice_report
+#: model:ir.model.fields,field_description:of_account_invoice_report.field_of_invoice_report_total_group_name
+msgid "Nom"
+msgstr "Nom"
 
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "Taxes"
-msgstr "TVA"
+#. module: of_account_invoice_report
+#: model:ir.model.fields,field_description:of_account_invoice_report.field_of_invoice_report_total_group_sequence
+msgid "Séquence"
+msgstr "Séquence"
 
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "Tél."
-msgstr "Tél."
+#. module: of_account_invoice_report
+#: selection:of.invoice.report.total.group,position:0
+msgid "TTC"
+msgstr "TTC"
 
-#. module: account
-#: model:ir.ui.view,arch_db:account.report_invoice_document
-msgid "Unit Price"
-msgstr "Prix unitaire"
+#. module: of_account_invoice_report
+#: code:addons/of_account_invoice_report/models/of_account_invoice_report.py:151
+#, python-format
+msgid "Total"
+msgstr "Total"
 
 #. module: of_account_invoice_report
 #: model:ir.model,name:of_account_invoice_report.model_account_config_settings

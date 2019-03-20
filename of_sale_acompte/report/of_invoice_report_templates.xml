@@ -2,46 +2,6 @@
 <odoo>
 
     <template  id="of_sale_acompte_report_invoice_document" inherit_id="account.report_invoice_document">
-        <xpath expr="//div[@class='page']/div[@name='invoice_address']" position="before">
-            <t t-set="impression_acompte" t-value="o.env['ir.values'].get_default('account.config.settings', 'of_impression_acomptes')"/>
-        </xpath>
-        <!-- Permet de récupérer les lignes à afficher -->
-        <xpath expr="//tbody//tr[1]" position="attributes">
-            <attribute name="t-foreach">o._get_printable_lines(o.invoice_line_ids)</attribute>
-        </xpath>
-        <!-- Permet de récupérer les paiements à afficher (et les paiements des acomptes si l'option est sélectionnée) -->
-        <xpath expr="//div[@name='subdivision']/table/t[@t-set='payments']" position="attributes">
-            <attribute name="t-value">o._get_payments_and_acomptes()</attribute>
-        </xpath>
-        <xpath expr="//div[@name='subdivision']/table/t[last()]/tr[1]/td[1]/i" position="attributes">
-            <attribute name="t-if">not payment.get('replace', False)</attribute>
-        </xpath>
-        <xpath expr="//div[@name='subdivision']/table/t[last()]/tr[1]/td[1]/i" position="after">
-            <i t-if="payment.get('replace', False)"><span t-esc="payment.get('name', '')"/></i>
-        </xpath>
-
-        <!-- Permet d'afficher différents montants suivant le paramètrage -->
-        <xpath expr="//div[@name='subdivision']/table/tr[1]/td[2]/span" position="attributes">
-            <attribute name="t-if">not o._acomptes_as_payments()</attribute>
-        </xpath>
-        <xpath expr="//div[@name='subdivision']/table/tr[1]/td[2]/span" position="after">
-            <span t-if="o._acomptes_as_payments()" t-field="o.of_amount_untaxed_without_advance" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
-        </xpath>
-
-        <xpath expr="//div[@name='subdivision']/table/tr[2]/td[2]/span" position="attributes">
-            <attribute name="t-if">not o._acomptes_as_payments()</attribute>
-        </xpath>
-        <xpath expr="//div[@name='subdivision']/table/tr[2]/td[2]/span" position="after">
-            <span t-if="o._acomptes_as_payments()" t-field="o.of_amount_total_without_advance" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
-        </xpath>
-
-        <xpath expr="//div[@name='subdivision']/table/t[last()]/tr[last()]/td[2]/span" position="attributes">
-            <attribute name="t-if">not o._acomptes_as_payments()</attribute>
-        </xpath>
-        <xpath expr="//div[@name='subdivision']/table/t[last()]/tr[last()]/td[2]/span" position="after">
-            <span t-if="o._acomptes_as_payments()" t-field="o.of_residual" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;o.currency_id&quot;}"/>
-        </xpath>
-
     </template>
 
 
