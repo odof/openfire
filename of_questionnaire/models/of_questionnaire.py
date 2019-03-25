@@ -63,6 +63,24 @@ class OfPlanningIntervention(models.Model):
             new_ids.append((0, 0, vals))
         self.question_ids = new_ids
 
+    @api.multi
+    def _filter_answers_category(self, questions):
+        self.ensure_one()
+        if questions:
+            question_categories = {}
+            for question in questions:
+                if not question.category_id:
+                    if 'uncategorized' not in question_categories:
+                        question_categories['uncategorized'] = (1000, [])
+                    question_categories['uncategorized'][1].append((question.name, question.definitive_answer))
+                else:
+                    if question.category_id.name not in question_categories:
+                        question_categories[question.category_id.name] = (question.category_id.sequence, [])
+                    question_categories[question.category_id.name][1].append((question.name, question.definitive_answer))
+            return sorted(question_categories.items(), key=lambda data: data[1][0], reverse=False)
+        else:
+            return []
+
 class OfPlanningInterventionModel(models.Model):
     _inherit = "of.planning.intervention.model"
 

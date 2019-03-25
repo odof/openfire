@@ -34,7 +34,6 @@ Inclut la gestion des équipes d'intervention.
         'of_gesdoc',
         'of_calendar',
         'of_kit',
-        'of_utils',
         'mail',
     ],
     'data' : [

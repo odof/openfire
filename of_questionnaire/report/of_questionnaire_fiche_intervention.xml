@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Ajout de la machine installée dans la fiche intervention -->
+    <template id="of_questionnaire_extension_fiche_intervention_report" inherit_id="of_service_parc_installe.of_parc_installe_extension_fiche_intervention_report">
+        <xpath expr="//t[@t-if='o.parc_installe_id']" position="after">
+            <t t-set="lines" t-value="o._filter_answers_category(o.question_ids.filtered(lambda q: q.type == 'intervention'))"/>
+            <table class="row" style="width: 100%; margin-bottom: 12px;" t-if="lines">
+                <thead style="padding: 0px 16px 16px 16px;">
+                    <tr>
+                        <th style="padding: 8px 16px 8px 16px;width: 40%; border-left: 1px solid black;; border-top: 1px solid black; border-bottom: 1px solid black;">Question</th>
+                        <th class="text-right" style="padding: 8px 16px 8px 16px;border-right: 1px solid black; border-top: 1px solid black; border-bottom: 1px solid black;">Réponse</th>
+                    </tr>
+                </thead>
+                <tbody class="sale_tbody" style="padding: 8px 16px 8px 16px; border-bottom: 1px solid lightgray">
+                    <tr t-foreach="lines" t-as="q">
+                        <tr class="active">
+                            <td colspan="7" t-att-style="'padding: 8px 16px 8px 16px;background-color: #d4d4d4; font-weight:  bold; border-left: 1px solid lightgray; border-right: 1px solid lightgray; width: 100%'">&amp;bull;
+                                <t t-esc="q[0]"/>
+                            </td>
+                        </tr>
+
+                        <tr t-foreach="q[1][1]" t-as="question">
+                            <td style="padding: 8px 16px 8px 16px;display: table-cell; border-left: 1px solid lightgray;">
+                                <span t-esc="question[0]"/>
+                            </td>
+                            <td class="text-right" style="padding: 8px 16px 8px 16px;display: table-cell; border-right: 1px solid lightgray;">
+                                <span t-esc="question[1]"/>
+                            </td>
+                        </tr>
+                    </tr>
+                </tbody>
+            </table>
+        </xpath>
+    </template>
+
+</odoo>

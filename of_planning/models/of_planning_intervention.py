@@ -372,8 +372,6 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def button_confirm(self):
-        if self.model_id:
-            self.write({'number': self.model_id.sequence_id.next_by_id()})
         return self.write({'state': 'confirm'})
 
     @api.multi
@@ -433,10 +431,17 @@ class OfPlanningIntervention(models.Model):
                 if rdv:
                     raise ValidationError(u'Cette équipe a déjà %s rendez-vous sur ce créneau' % (len(rdv),))
 
+    @api.one
+    def _affect_number(self):
+        if self.model_id and self.state in ('confirm', 'done', 'postponed') and not self.number:
+            self.write({'number' :self.model_id.sequence_id.next_by_id()})
+
     @api.model
     def create(self, vals):
         res = super(OfPlanningIntervention, self).create(vals)
         res.do_verif_dispo()
+        for interv in res:
+            interv._affect_number()
         return res
 
     @api.multi
@@ -444,8 +449,7 @@ class OfPlanningIntervention(models.Model):
         super(OfPlanningIntervention, self).write(vals)
         self.do_verif_dispo()
         for interv in self:
-            if interv.model_id and interv.state in ('confirm', 'done', 'postponed') and not interv.number:
-                interv.number = interv.model_id.sequence_id.next_by_id()
+            interv._affect_number()
         return True
 
     @api.model
