@@ -173,7 +173,7 @@ class OfPlanningIntervention(models.Model):
     calendar_name = fields.Char(string="Calendar Name", compute="_compute_calendar_name")
     raison_fin = fields.Many2one('of.planning.intervention.fin', string=u"Raison de fin")
     notes_fin = fields.Text(string="Notes de fin d'intervention")
-    date_butoire = fields.Date(string="Date butoire")
+    date_butoir = fields.Date(string="Date butoir")
 
     @api.depends('name', 'number')
     def _compute_calendar_name(self):
