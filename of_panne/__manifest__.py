@@ -30,10 +30,12 @@ Fonctionnalités
 """,
     'depends' : [
         'of_service_parc_installe',
+        'of_planning',
         ],
     'data' : [
         'views/of_panne_views.xml',
-        'wizard/of_panne_wizard_view.xml'
+        'wizard/of_panne_wizard_view.xml',
+        'security/ir.model.access.csv',
     ],
     'installable': True,
     'application': False,
