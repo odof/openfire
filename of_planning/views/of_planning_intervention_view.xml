@@ -129,7 +129,7 @@
                                 <field name="jour"/>
                                 <field name="duree" string="Durée" widget="float_time"/>
                                 <field name="date_deadline"/>
-                                <field name="date_butoire"/>
+                                <field name="date_butoir"/>
                                 <field name="verif_dispo"/>
                             </group>
                             <group name="liens" invisible="1">
@@ -231,6 +231,7 @@
                     <field name="tache_id"/>
                     <field name="address_id"/>
                     <field name="partner_city"/>
+                    <field name="date_butoir"/>
                     <field name="company_id"/>
                     <field name="state"/>
 
