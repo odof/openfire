@@ -6,6 +6,7 @@
             <field name="model">of.panne.wizard</field>
             <field name="arch" type="xml">
                 <form string="Sélection d'équie">
+                    <span>Sélectionnez l'équipe qui prend en charge la panne.</span>
                     <group>
                         <field name="equipe_id"/>
                     </group>

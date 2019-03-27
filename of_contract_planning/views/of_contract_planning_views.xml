@@ -133,7 +133,7 @@
         <field name="view_id" ref="of_contract_tree_view"/>
     </record>
 
-    <menuitem name="Contrats" id="menu_contrats" parent="of_planning.menu_of_planning_intervention" sequence="80" action="action_contract"/>
+    <menuitem name="Contrats" id="menu_contrats" parent="of_planning.menu_of_planning_clients" sequence="40" action="action_contract"/>
 
 <!-- ******************************************************************************************* -->
 <!-- ************************************ MODÈLE DE CONTRAT ************************************ -->
@@ -282,6 +282,17 @@
                         </group>
                     </group>
                 </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_contract_view_of_service_form_rdv_intervention" model="ir.ui.view">
+        <field name="name">of_contract_view_of_service_form_rdv_intervention</field>
+        <field name="model">of.service</field>
+        <field name="inherit_id" ref="of_planning_tournee.view_of_service_form_rdv_intervention"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button" position="attributes">
+                <attribute name="attrs">{'invisible': [('tache_id', '=', False)]}</attribute>
             </xpath>
         </field>
     </record>

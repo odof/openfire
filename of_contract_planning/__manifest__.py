@@ -19,6 +19,7 @@ Contrat OpenFire
         "of_contract",
         "of_service_parc_installe",
         "of_account",
+        "of_planning_tournee",
     ],
     "category": "OpenFire",
     "data": [

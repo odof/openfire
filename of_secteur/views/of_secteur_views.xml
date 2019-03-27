@@ -57,7 +57,7 @@
         <field name="view_id" ref="of_secteur.of_secteur_view_tree"/>
     </record>
 
-    <menuitem name="Secteurs" id="menu_of_secteur_config" parent="of_planning.menu_of_planning_clients" sequence="25" action="of_secteur.action_of_secteur"/>
+    <menuitem name="Secteurs" id="menu_of_secteur_config" parent="of_planning.menu_of_planning_configuration" sequence="25" action="of_secteur.action_of_secteur"/>
 
 <!-- *************************** Parc installé ***************************-->
 
