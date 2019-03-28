@@ -21,7 +21,7 @@ class OFCRMActivityLog(models.TransientModel):
                     'title': log.title_action and " - %s" % log.title_action or "",
                     'note': crm_suivi_notes and log.note and "<br/><em>%s</em>" % log.note.replace("<p>", "<span style='padding-left: 16px;'>").replace("</p>","</span><br/>").replace("<br></span><br/>","</span><br/>") or "",
                 }
-                suivi = log.lead_id.description
+                suivi = log.lead_id.description or ''
                 suivi = new_line + suivi
                 log.lead_id.write({'description': suivi})
         return super(OFCRMActivityLog, self).action_log()
