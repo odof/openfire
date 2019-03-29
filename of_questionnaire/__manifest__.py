@@ -13,20 +13,22 @@
 ##############################################################################
 
 {
-    'name' : "OpenFire - Questionnaire",
+    'name' : "OpenFire / Questionnaire",
     'version' : "0.1.0.0",
     'author' : "OpenFire",
     'website' : "www.openfire.fr",
-    'category': "A REMPLACER",
-    'summary': u"A REMPLACER",
+    'category': "questionnaire",
+    'summary': u"Ajout des questionnaires",
     'description': u"""
 Module OpenFire - Questionnaire
 ===============================
-Ce module modifie/Ajoute
+Ce module ajoute les questionnaires d'intervention et d'équipement
 
 Fonctionnalités
 ----------------
- - 
+ - Ajout des questionnaire avec 2 types disponibles (intervention et équipement)
+ - Permet de choisir un questionnaire par défaut sur un modèle d'intervention
+ - Permet la sélection d'un questionnaire sur les interventions (les questions du questionnaire sont copiées dans l'intervention)
 """,
     'depends' : [
         'of_planning',
@@ -34,6 +36,7 @@ Fonctionnalités
         ],
     'data' : [
         'views/of_questionnaire_views.xml',
+        'report/of_questionnaire_fiche_intervention.xml',
         'security/ir.model.access.csv',
     ],
     'installable': True,

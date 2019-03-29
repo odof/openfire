@@ -340,8 +340,6 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def button_confirm(self):
-        if self.model_id:
-            self.write({'number': self.model_id.sequence_id.next_by_id()})
         return self.write({'state': 'confirm'})
 
     @api.multi

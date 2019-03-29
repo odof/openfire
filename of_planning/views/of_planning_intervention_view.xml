@@ -113,7 +113,6 @@
                         <group>
                             <div class="oe_title" name="num">
                                 <h1><field name="number" placeholder="N° d'intervention" readonly="1"/></h1>
-                                <!-- attrs="{'invisible': [('model_id', '=', False)]}" -->
                             </div>
                             <group col="2">
                                 <field name="equipe_id" autofocus="autofocus"/>
@@ -614,10 +613,116 @@
         </record-->
 
 <!--##########################################################################################################################-->
+<!--############################################_________Modèle__________#####################################################-->
+<!--##########################################################################################################################-->
+
+    <record id="of_planning_intervention_model_view_form" model="ir.ui.view">
+        <field name="name">of.planning.intervention.model.view.form</field>
+        <field name="model">of.planning.intervention.model</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box of_width_600" name="button_box_custom" >
+                        <!-- Bouton Actif -->
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive" display="inline-block">
+                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Nom du modèle"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="tache_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Configuration">
+                            <group>
+                                <field name="sequence_id" colspan="2" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_planning_intervention_model_view_tree" model="ir.ui.view">
+        <field name="name">of.planning.intervention.model.view.tree</field>
+        <field name="model">of.planning.intervention.model</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="tache_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_planning_intervention_model" model="ir.actions.act_window">
+        <field name="name">Modèle d'intervention</field>
+        <field name="res_model">of.planning.intervention.model</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_planning.of_planning_intervention_model_view_tree"/>
+    </record>
+
+<!--##########################################################################################################################-->
+<!--########################################_________Raison de fin__________##################################################-->
+<!--##########################################################################################################################-->
+
+    <record id="of_planning_intervention_fin_view_form" model="ir.ui.view">
+        <field name="name">of.planning.intervention.fin.view.form</field>
+        <field name="model">of.planning.intervention.fin</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" default_focus="1" placeholder="Name"/>
+                        </h1>
+                    </div>
+                    <group string="Option">
+                        <field name="force_new"/>
+                        <field name="force_sign"/>
+                        <field name="force_questions"/>
+                    </group>
+                    <group groups="base.group_no_one">
+                        <field name="sequence"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_planning_intervention_fin_view_tree" model="ir.ui.view">
+        <field name="name">of.planning.intervention.fin.view.tree</field>
+        <field name="model">of.planning.intervention.fin</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="force_new"/>
+                <field name="force_sign"/>
+                <field name="force_questions"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_planning_intervention_fin" model="ir.actions.act_window">
+        <field name="name">Modèle d'intervention</field>
+        <field name="res_model">of.planning.intervention.fin</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_planning.of_planning_intervention_fin_view_tree"/>
+    </record>
+
+<!--##########################################################################################################################-->
 <!--#############################################_________Menus__________#####################################################-->
 <!--##########################################################################################################################-->
 
     <menuitem id="menu_of_planning" name="Interventions" groups="of_group_planning_intervention_user" sequence="2" web_icon="of_planning,static/description/icon.png"/>
+
         <menuitem id="menu_of_planning_intervention" name="Interventions" parent="of_planning.menu_of_planning" groups="of_group_planning_intervention_user" sequence="10"/>
             <menuitem id="menu_of_planning_intervention_calendar" name="Planning" parent="of_planning.menu_of_planning_intervention" sequence="1" action="action_of_planning_intervention_calendar"/>
 
@@ -629,23 +734,13 @@
             <menuitem id="menu_of_planning_vente_kits" name="Kits" parent="of_planning.menu_of_planning_vente" action="of_kit.of_template_open_kit" sequence="20"/>
 
         <menuitem id="menu_of_planning_configuration" name="Configuration" parent="of_planning.menu_of_planning" groups="hr.group_hr_manager" sequence="100"/>
-            <menuitem name="Modèles de courriers" id="menu_of_planning_mail_templates" parent="of_planning.menu_of_planning_configuration" sequence="70" action="of_gesdoc.action_of_mail_template_tree_all" />
+            <menuitem name="Modèle d'intervention" id="menu_of_planning_intervention_model" parent="of_planning.menu_of_planning_configuration" sequence="10" action="action_of_planning_intervention_model"/>
+            <menuitem name="Raison fin d'intervention" id="menu_of_planning_intervention_din" parent="of_planning.menu_of_planning_configuration" sequence="30" action="action_of_planning_intervention_fin"/>
+            <menuitem id="menu_of_planning_mail_templates" parent="of_planning.menu_of_planning_configuration" action="of_gesdoc.action_of_mail_template_tree_all" sequence="70" name="Formulaires"/>
             <menuitem name="Employés" id="menu_hr_employee_tree" parent="of_planning.menu_of_planning_configuration" sequence="80" action="action_hr_employee_tree"/>
             <menuitem name="Équipes" id="menu_of_planning_equipe_tree" parent="of_planning.menu_of_planning_configuration" sequence="90" action="action_of_planning_equipe_tree"/>
             <menuitem name="Erreurs" id="menu_of_planning_intervention_raison_tree" parent="of_planning.menu_of_planning_configuration" sequence="100" action="action_of_planning_intervention_raison_tree"/>
             <menuitem name="Tâches" id="menu_of_planning_tache_tree" parent="of_planning.menu_of_planning_configuration" sequence="110" action="action_of_planning_tache_tree"/>
-
-            <!--menuitem id="menu_of_planning_intervention_global" name="Global" parent="menu_of_planning_intervention" sequence="1" action="action_of_planning_intervention_calendar"/>
-            <menuitem id="menu_of_planning_intervention_po" name="Poêle" parent="menu_of_planning_intervention" sequence="4" action="action_of_planning_intervention_po_calendar"/>
-            <menuitem id="menu_of_planning_intervention_ch" name="Cheminée" parent="menu_of_planning_intervention" sequence="4" action="action_of_planning_intervention_ch_calendar"/>
-            <menuitem id="menu_of_planning_entretien" name="Ramonage Entretien SAV" parent="menu_of_planning_intervention" sequence="5" action="action_of_planning_entretien_calendar"/-->
-
-        <menuitem id="menu_of_planning_clients" name="Clients" parent="of_planning.menu_of_planning" sequence="20"/>
-            <menuitem id="menu_of_planning_clients_clients" name="Clients" parent="of_planning.menu_of_planning_clients" action="base.action_partner_form" sequence="10"/>
-
-        <menuitem id="menu_of_planning_vente" name="Articles" parent="of_planning.menu_of_planning" sequence="30"/>
-            <menuitem id="menu_of_planning_vente_articles" name="Articles" parent="of_planning.menu_of_planning_vente" action="product.product_template_action" sequence="10"/>
-            <menuitem id="menu_of_planning_vente_kits" name="Kits" parent="of_planning.menu_of_planning_vente" action="of_kit.of_template_open_kit" sequence="20"/>
 
     <!-- Ajouter menu Envoyer un courrier dans Planning Intervention -->
         <!--act_window
@@ -712,114 +807,5 @@
             <field name="domain">[]</field> <!-- Force empty -->
             <field name="view_type">form</field>
         </record>
-
-<!--##########################################################################################################################-->
-<!--############################################_________Modèle__________#####################################################-->
-<!--##########################################################################################################################-->
-
-    <record id="of_planning_intervention_model_view_form" model="ir.ui.view">
-        <field name="name">of.planning.intervention.model.view.form</field>
-        <field name="model">of.planning.intervention.model</field>
-        <field name="arch" type="xml">
-            <form>
-                <sheet>
-                    <div class="oe_button_box of_width_600" name="button_box_custom" >
-                        <!-- Bouton Actif -->
-                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive" display="inline-block">
-                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
-                        </button>
-                    </div>
-                    <div class="oe_title">
-                        <h1><field name="name" placeholder="Nom du modèle"/></h1>
-                    </div>
-                    <group>
-                        <group>
-                            <field name="code"/>
-                            <field name="tache_id"/>
-                        </group>
-                    </group>
-                    <notebook>
-                        <page string="Configuration">
-                            <group>
-                                <field name="sequence_id" colspan="2" readonly="1"/>
-                            </group>
-                        </page>
-                    </notebook>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-    <record id="of_planning_intervention_model_view_tree" model="ir.ui.view">
-        <field name="name">of.planning.intervention.model.view.tree</field>
-        <field name="model">of.planning.intervention.model</field>
-        <field name="arch" type="xml">
-            <tree>
-                <field name="name"/>
-                <field name="tache_id"/>
-            </tree>
-        </field>
-    </record>
-
-    <record id="action_of_planning_intervention_model" model="ir.actions.act_window">
-        <field name="name">Modèle d'intervention</field>
-        <field name="res_model">of.planning.intervention.model</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
-        <field name="view_id" ref="of_planning.of_planning_intervention_model_view_tree"/>
-    </record>
-
-    <menuitem name="Modèle d'intervention" id="menu_of_planning_intervention_model" parent="of_planning.menu_of_planning_configuration" sequence="10" action="action_of_planning_intervention_model"/>
-
-<!--##########################################################################################################################-->
-<!--########################################_________Raison de fin__________##################################################-->
-<!--##########################################################################################################################-->
-
-    <record id="of_planning_intervention_fin_view_form" model="ir.ui.view">
-        <field name="name">of.planning.intervention.fin.view.form</field>
-        <field name="model">of.planning.intervention.fin</field>
-        <field name="arch" type="xml">
-            <form>
-                <sheet>
-                    <div class="oe_title">
-                        <h1>
-                            <field name="name" default_focus="1" placeholder="Name"/>
-                        </h1>
-                    </div>
-                    <group string="Option">
-                        <field name="force_new"/>
-                        <field name="force_sign"/>
-                        <field name="force_questions"/>
-                    </group>
-                    <group groups="base.group_no_one">
-                        <field name="sequence"/>
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-    <record id="of_planning_intervention_fin_view_tree" model="ir.ui.view">
-        <field name="name">of.planning.intervention.fin.view.tree</field>
-        <field name="model">of.planning.intervention.fin</field>
-        <field name="arch" type="xml">
-            <tree>
-                <field name="name"/>
-                <field name="force_new"/>
-                <field name="force_sign"/>
-                <field name="force_questions"/>
-            </tree>
-        </field>
-    </record>
-
-    <record id="action_of_planning_intervention_fin" model="ir.actions.act_window">
-        <field name="name">Modèle d'intervention</field>
-        <field name="res_model">of.planning.intervention.fin</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
-        <field name="view_id" ref="of_planning.of_planning_intervention_fin_view_tree"/>
-    </record>
-
-    <menuitem name="Raison fin d'intervention" id="menu_of_planning_intervention_din" parent="of_planning.menu_of_planning_configuration" sequence="30" action="action_of_planning_intervention_fin"/>
 
 </odoo>
