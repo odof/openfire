@@ -28,80 +28,35 @@ class OfAccountInvoiceLine(models.Model):
 class OfContract(models.Model):
     _name = "of.contract"
 
-    invoice_count = fields.Integer(string='# of Invoices', compute='_get_invoiced', readonly=True)
-    name = fields.Char(
-        required=True,
-    )
-    template_id = fields.Many2one(
-        comodel_name='of.contract.template',
-        string=u'Modèle'
-        )
-    partner_id = fields.Many2one(
-        comodel_name="res.partner",
-        string="Client",
-        required=True,
-    )
-    pricelist_id = fields.Many2one(
-        comodel_name='product.pricelist',
-        string='Liste de prix',
-    )
-    service_ids = fields.One2many(
-        comodel_name='of.service',
-        inverse_name='contract_id',
-        string='Services',
-    )
+    invoice_count = fields.Integer(string='Nombre de facture', compute='_get_invoice_count', readonly=True)
+    name = fields.Char(string="Nom", required=True)
+    template_id = fields.Many2one('of.contract.template', string=u'Modèle')
+    partner_id = fields.Many2one("res.partner", string="Client", required=True,)
+    pricelist_id = fields.Many2one('product.pricelist', string='Liste de prix')
+    service_ids = fields.One2many('of.service', 'contract_id', string='Services')
     recurring_rule_type = fields.Selection(
         [('daily', 'Jour(s)'),
          ('weekly', 'Semaine(s)'),
          ('monthly', 'Mois'),
          ('monthlylastday', 'Month(s) last day'),
          ('yearly', u'Année(s)'),
-         ],
-        default='monthly',
-        string=u'Réccurence',
-        help="Specify Interval for automatic invoice generation.",
-        required=True
-    )
+         ], default='monthly', string=u'Réccurence', help="Interval de temps entre chaque facturation", required=True)
     recurring_invoicing_type = fields.Selection(
         [('contract', u'Récurrence du contrat'),
          ('services', u'Récurrence des services'),
-         ],
-        default='contract',
-        string='Type de facturation',
-        help="Specify if process date is 'from' or 'to' invoicing date",
+         ], default='contract', string='Type de facturation',
+        help=u"Défini si la facturation est faite en fonction de l'interval du contrat ou de l'interval des éléments de facturation")
+    recurring_invoicing_payment = fields.Selection(
+        [('pre-paid', 'Pre-paid'),
+         ('post-paid', 'Post-paid'),
+         ], default='pre-paid', string='Invoicing type', help="Specify if process date is 'from' or 'to' invoicing date",
     )
-    recurring_interval = fields.Integer(
-        default=1,
-        string=u'Répéter chaque',
-        help="Repeat every (Days/Week/Month/Year)",
-        required=True,
-    )
-    journal_id = fields.Many2one(
-        'account.journal',
-        string='Journal',
-        default=lambda s: s._default_journal(),
-        domain="[('type', '=', 'sale'),('company_id', '=', company_id)]",
-    )
-    company_id = fields.Many2one(
-        'res.company',
-        string=u'Société',
-        required=True,
-        default=lambda self: self.env.user.company_id,
-    )
-    date_start = fields.Date(
-        string=u'Date début',
-        default=fields.Date.context_today,
-    )
-    date_end = fields.Date(
-        string='Date fin',
-        index=True,
-    )
-    recurring_next_date = fields.Date(
-        default=fields.Date.context_today,
-        copy=False,
-        string='Date de la prochaine facture',
-        compute="_compute_next_date",
-    )
+    recurring_interval = fields.Integer(string=u'Répéter chaque', default=1, required=True)
+    journal_id = fields.Many2one('account.journal', string='Journal', default=lambda s: s._default_journal(), domain="[('type', '=', 'sale'),('company_id', '=', company_id)]")
+    company_id = fields.Many2one('res.company', string=u'Société', required=True, default=lambda self: self.env.user.company_id)
+    date_start = fields.Date(string=u'Date début', default=fields.Date.context_today)
+    date_end = fields.Date(string='Date fin')
+    recurring_next_date = fields.Date(string='Date de la prochaine facture', compute="_compute_next_date")
     fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale")
     next_subtotal = fields.Monetary(string="Prochain montant HT", compute='_compute_next_total', currency_field='company_currency_id')
     next_taxes = fields.Monetary(string="Taxes ", compute='_compute_next_total', currency_field='company_currency_id')
@@ -112,6 +67,8 @@ class OfContract(models.Model):
 
     @api.depends('recurring_invoicing_type', 'last_invoicing_date', 'date_start')
     def _compute_next_date(self):
+        """ Calcul de la date de prochaine facturation en fonction du type d'interval choisit (facture ou éléments)
+        """
         for contract in self:
             if contract.recurring_invoicing_type == 'contract':
                 if contract.last_invoicing_date:
@@ -133,6 +90,8 @@ class OfContract(models.Model):
 
     @api.depends('service_ids', 'recurring_rule_type', 'recurring_interval', 'fiscal_position_id', 'recurring_invoicing_type')
     def _compute_next_total(self):
+        """ Calcul le montant total de la prochaine facture
+        """
         for contract in self:
             next_date = fields.Date.from_string(contract.recurring_next_date) or self._context.get('recurring_next_date') and fields.Date.from_string(self.context.get('recurring_next_date')) or fields.Date.from_string(fields.Date.today())
             lines = contract.service_ids.filtered(lambda l: l.product_id and (fields.Date.from_string(l.next_date) or fields.Date.from_string(fields.Date.today())) <= next_date)
@@ -159,8 +118,10 @@ class OfContract(models.Model):
 
     @api.model
     def _insert_markers(self, line, date_start, next_date, date_format):
+        """ Fonction reprise des contrats de l'OCA (vérifier la fonctionnalité)
+        """
         contract = line.contract_id
-        if contract.recurring_invoicing_type == 'pre-paid':
+        if contract.recurring_invoicing_payment == 'pre-paid':
             date_from = date_start
             date_to = next_date - relativedelta(days=1)
         else:
@@ -201,6 +162,8 @@ class OfContract(models.Model):
         self.fiscal_position_id = self.partner_id.property_account_position_id
 
     def get_quantity(self, line, old_date):
+        """ Récupère la quantité en fonction du type d'interval choisit (facture ou éléments)
+        """
         if self.recurring_invoicing_type == 'services':
             return line.quantity
         else:
@@ -306,7 +269,7 @@ class OfContract(models.Model):
         """
         invoices = self.env['account.invoice']
         for contract in self:
-            if len(contract.service_ids) == 0:
+            if len(contract.service_ids) == 0 or not contract.service_ids.mapped('product_id'):
                 raise UserError(u"Impossible de créer une facture car le contrat n'a aucune ligne facturable pour le contrat %s : %s." % (contract.name, contract.partner_id.name))
             ref_date = contract.recurring_next_date
             if (contract.date_start > ref_date or
@@ -333,7 +296,7 @@ class OfContract(models.Model):
         return invoices
 
     @api.depends('partner_id')
-    def _get_invoiced(self):
+    def _get_invoice_count(self):
         for contract in self:
             contract.invoice_count = len(self.env['account.invoice'].search([('of_contract_id', '=', contract.id)]))
 
@@ -355,6 +318,7 @@ class OfContract(models.Model):
         if self.template_id:
             service_obj = self.env['of.service']
             self.recurring_invoicing_type = self.template_id.recurring_invoicing_type
+            self.recurring_invoicing_payment = self.template_id.recurring_invoicing_payment
             self.recurring_interval = self.template_id.recurring_interval
             self.recurring_rule_type = self.template_id.recurring_rule_type
             self.journal_id = self.template_id.journal_id
@@ -370,50 +334,29 @@ class OfContract(models.Model):
 class OfContractTemplate(models.Model):
     _name = "of.contract.template"
 
-    name = fields.Char(
-        required=True,
-    )
-    pricelist_id = fields.Many2one(
-        comodel_name='product.pricelist',
-        string='Liste de prix',
-    )
-    service_ids = fields.One2many(
-        comodel_name='of.service',
-        inverse_name='contract_template_id',
-        string='Services',
-    )
+    name = fields.Char(required=True)
+    pricelist_id = fields.Many2one('product.pricelist', string='Liste de prix',)
+    service_ids = fields.One2many('of.service', 'contract_template_id', string='Services')
     recurring_rule_type = fields.Selection(
         [('daily', 'Jour(s)'),
          ('weekly', 'Semaine(s)'),
          ('monthly', 'Mois'),
          ('monthlylastday', 'Month(s) last day'),
          ('yearly', u'Année(s)'),
-         ],
-        default='monthly',
-        string=u'Réccurence',
-        help="Specify Interval for automatic invoice generation.",
+         ], default='monthly', string=u'Réccurence', help="Interval de temps entre chaque facturation",
         required=True
     )
     recurring_invoicing_type = fields.Selection(
         [('contract', u'Récurrence du contrat'),
          ('services', u'Récurrence des services'),
-         ],
-        default='contract',
-        string='Type de facturation',
-        help="Specify if process date is 'from' or 'to' invoicing date",
-    )
-    recurring_interval = fields.Integer(
-        default=1,
-        string=u'Répéter chaque',
-        help="Repeat every (Days/Week/Month/Year)",
-        required=True,
-    )
-    journal_id = fields.Many2one(
-        'account.journal',
-        string='Journal',
-        default=lambda s: s._default_journal(),
-        domain="[('type', '=', 'sale'),('company_id', '=', company_id)]",
-    )
+         ], default='contract', string='Type de facturation',
+        help=u"Défini si la facturation est faite en fonction de l'interval du contrat ou de l'interval des éléments de facturation")
+    recurring_invoicing_payment = fields.Selection(
+        [('pre-paid', 'Pre-paid'),
+         ('post-paid', 'Post-paid'),
+         ], default='pre-paid', string='Invoicing type', help="Specify if process date is 'from' or 'to' invoicing date")
+    recurring_interval = fields.Integer(string=u'Répéter chaque', default=1, required=True)
+    journal_id = fields.Many2one('account.journal', string='Journal', default=lambda s: s._default_journal(), domain="[('type', '=', 'sale'),('company_id', '=', company_id)]")
     fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale")
 
     @api.model
@@ -430,11 +373,7 @@ class OfService(models.Model):
 
     tache_id = fields.Many2one('of.planning.tache', string=u'Tâche', required=False)
     name = fields.Char(u"Libellé", related='tache_id.name', store=False)
-    company_id = fields.Many2one(
-        'res.company',
-        string=u'Société',
-        default=lambda self: self.env.user.company_id,
-    )
+    company_id = fields.Many2one('res.company', string=u'Société', default=lambda self: self.env.user.company_id)
 
     mois_ids = fields.Many2many('of.mois', 'service_mois', 'service_id', 'mois_id', string='Mois', required=False)
     jour_ids = fields.Many2many('of.jours', 'service_jours', 'service_id', 'jour_id', string='Jours', required=False)
@@ -504,62 +443,21 @@ class OfService(models.Model):
             else:
                 line.next_date = line.contract_id.recurring_next_date or line.contract_id.date_start or fields.Date.to_string(datetime.today())
 
-    product_id = fields.Many2one(
-        'product.product',
-        string='Article',
-    )
-    product_name = fields.Text(
-        string='Description',
-    )
-    quantity = fields.Float(
-        default=1.0,
-    )
-    uom_id = fields.Many2one(
-        'product.uom',
-        string=u'Unité de mesure',
-    )
-    automatic_price = fields.Boolean(
-        string="Prix automatique",
-        help="If this is marked, the price will be obtained automatically "
-             "applying the pricelist to the product. If not, you will be "
-             "able to introduce a manual price",
-    )
-    specific_price = fields.Float(
-        string=u'Prix spécifique',
-    )
-    price_unit = fields.Float(
-        string='Prix unitaire',
-        compute="_compute_price_unit",
-        inverse="_inverse_price_unit",
-    )
-    price_subtotal = fields.Float(
-        compute='_compute_price_subtotal',
-        digits=dp.get_precision('Account'),
-        string='Sous-total',
-    )
-    discount = fields.Float(
-        string='Remise (%)',
-        digits=dp.get_precision('Discount'),
-        help='Discount that is applied in generated invoices.'
-             ' It should be less or equal to 100',
-    )
-    sequence = fields.Integer(
-        string=u"Séquence",
-        default=10,
-        help="Sequence of the contract line when displaying contracts",
-    )
+    product_id = fields.Many2one('product.product', string='Article')
+    product_name = fields.Text(string='Description')
+    quantity = fields.Float(string=u"Qté", default=1.0)
+    uom_id = fields.Many2one('product.uom', string=u'Unité de mesure',)
+    automatic_price = fields.Boolean(string="Prix automatique", default=True, help=u"Si coché, prend automatiquement le prix de l'article")
+    specific_price = fields.Float(string=u'Prix spécifique')
+    price_unit = fields.Float(string='Prix unitaire', compute="_compute_price_unit", inverse="_inverse_price_unit")
+    price_subtotal = fields.Float(string="Sous-total", compute='_compute_price_subtotal', digits=dp.get_precision('Account'))
+    discount = fields.Float(string='Remise (%)', digits=dp.get_precision('Discount'), help=u'Remise appliquée pour les factures')
+    sequence = fields.Integer(string=u"Séquence", default=10, help=u"Séquence de la ligne dans le contrat")
 
-    @api.depends(
-        'automatic_price',
-        'specific_price',
-        'product_id',
-        'quantity',
-        'contract_id.pricelist_id',
-        'contract_id.partner_id',
-    )
+    @api.depends('automatic_price', 'specific_price', 'product_id', 'quantity', 'contract_id.pricelist_id', 'contract_id.partner_id')
     def _compute_price_unit(self):
-        """Get the specific price if no auto-price, and the price obtained
-        from the pricelist otherwise.
+        """Calcule le prix unitaire. Si automatic_price est alors fait en fonction de la liste de prix.
+        Sinon fait en fonction du prix spécifique
         """
         for line in self:
             if line.automatic_price:
@@ -574,13 +472,16 @@ class OfService(models.Model):
                 line.price_unit = line.specific_price
 
     def _inverse_price_unit(self):
-        """Store the specific price in the no auto-price records."""
+        """ Rempli specific_price si automatic_price est False
+        """
         for line in self.filtered(lambda x: not x.automatic_price):
             line.specific_price = self.price_unit
 
     @api.multi
     @api.depends('quantity', 'price_unit', 'discount')
     def _compute_price_subtotal(self):
+        """ Calcul le sous-total de la ligne
+        """
         for line in self:
             subtotal = line.quantity * line.price_unit
             discount = line.discount / 100
@@ -594,6 +495,8 @@ class OfService(models.Model):
     @api.multi
     @api.constrains('discount')
     def _check_discount(self):
+        """ Contrainte pour s'assurer que la remise ne soit pas supérieure à 100%
+        """
         for line in self:
             if line.discount > 100:
                 raise ValidationError(
