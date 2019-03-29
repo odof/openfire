@@ -20,6 +20,7 @@ class Inventory(models.Model):
 
 class InventoryLine(models.Model):
     _inherit = "stock.inventory.line"
+    _order = "product_id, inventory_id, location_id, prod_lot_id"
 
     of_note = fields.Text(string="Notes")
 
