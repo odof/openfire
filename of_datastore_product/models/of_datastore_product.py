@@ -680,7 +680,7 @@ class OfDatastoreCentralized(models.AbstractModel):
         fields_defaults = [
             ('of_datastore_supplier_id'       , lambda: create_mode and supplier_id or supplier.sudo().name_get()[0]),
             ('of_datastore_res_id'            , lambda: vals['id']),
-            ('of_seller_pp_ht'                , lambda: vals['list_price']),
+            ('of_seller_pp_ht'                , lambda: vals['of_seller_pp_ht']),
             ('of_seller_product_category_name', lambda: vals['categ_id'][1]),
             ('of_tmpl_datastore_res_id'       , lambda: vals['product_tmpl_id'][0]),
             ('description_norme'              , lambda: product.description_norme or vals['description_norme']),
@@ -814,7 +814,7 @@ class OfDatastoreCentralized(models.AbstractModel):
                 vals['of_datastore_has_link'] = bool(product)
 
                 # Prix d'achat/vente
-                vals.update(brand.compute_product_price(vals['list_price'], categ_name, obj_dict['uom_id'], obj_dict['uom_po_id'],
+                vals.update(brand.compute_product_price(vals['of_seller_pp_ht'], categ_name, obj_dict['uom_id'], obj_dict['uom_po_id'],
                                                         product=product, price=vals['standard_price'], remise=None))
                 # Calcul de la marge et de la remise
                 if 'of_seller_remise' in fields_to_read:
