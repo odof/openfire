@@ -210,11 +210,29 @@ class SaleOrder(models.Model):
         @todo: Permettre l'utilisation de courriers classiques et le remplissage des champs.
         """
         self.ensure_one()
+        compose_mail_obj = self.env['of.compose.mail']
+        attachment_obj = self.env['ir.attachment']
         data = []
         for mail_template in self.of_mail_template_ids:
             if mail_template.file:
                 # Utilisation des documents pdf fournis
-                data.append(mail_template.file)
+                if not mail_template.chp_ids:
+                    data.append(mail_template.file)
+                    continue
+                # calcul des champs remplis sur le modèle de courrier
+                values = compose_mail_obj._get_dict_values(self)
+                datas = {}
+                for chp in mail_template.chp_ids:
+                    datas[chp.name or ''] = chp.to_export and chp.value_openfire and compose_mail_obj.format_body(chp.value_openfire % values) or ''
+                attachment = attachment_obj.search([('res_model', '=', mail_template._name),
+                                                    ('res_field', '=', 'file'),
+                                                    ('res_id', '=', mail_template.id)])
+                file_path = attachment_obj._full_path(attachment.store_fname)
+                generated_pdf = pypdftk.fill_form(file_path, datas, flatten=not mail_template.fillable)
+                os.rename(generated_pdf, generated_pdf + '.pdf')
+                with open(generated_pdf + '.pdf', "rb") as encode:
+                    encoded_file = base64.b64encode(encode.read())
+                data.append(encoded_file)
         return data
 
     def toggle_view(self):

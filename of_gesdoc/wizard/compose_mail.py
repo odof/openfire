@@ -105,7 +105,7 @@ class OfComposeMail(models.TransientModel):
             ('amount_total', o, ''),
             ('origin', o, ''),
             ('date_order', order or o, ''),
-            ('date_confirm', order or o, ''),
+            ('confirmation_date', order or o, ''),
             ('date_invoice', invoice or o, ''),
             ('residual', invoice or o, ''),
             ('number', invoice, ''),
@@ -115,8 +115,8 @@ class OfComposeMail(models.TransientModel):
 
         res = {key: getattr(obj, key, default) for key, obj, default in values}
 
-        res['date_confirm_order'] = res['date_confirm']
-        del res['date_confirm']
+        res['date_confirm_order'] = res['confirmation_date']
+        del res['confirmation_date']
         res['user'] = res['user_id'] and res['user_id'].name
         del res['user_id']
 
