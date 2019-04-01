@@ -44,10 +44,13 @@ Leur balise calendar devra contenir l'attribut display_states="1".
         "calendar",
         "web_calendar",
         "of_web_widgets",
+        "of_geolocalize",
+        "hr",
         "of_utils",
     ],
     "data": [
         "data/ir_config_parameter_data.xml",
+        "data/of_calendar_data.xml",
         "views/of_web_calendar_templates.xml",
         "views/of_calendar_views.xml",
     ],

@@ -30,7 +30,7 @@ CalendarView.include({
         this._super.apply(this, arguments);
 
         var attrs = this.fields_view.arch.attrs;
-        this.working_hours = !isNullOrUndef(attrs.working_hours) && _.str.toBool(attrs.working_hours); // true or 1 if we want to display working hours
+        this.working_hours = !isNullOrUndef(attrs.working_hours) && attrs.working_hours; // "parent" or "attendees"
         this.filters_radio = !isNullOrUndef(attrs.filters_radio) && _.str.toBool(attrs.filters_radio); // true or 1 if we want filters to be of type radio
         this.custom_colors = !isNullOrUndef(attrs.custom_colors) && _.str.toBool(attrs.custom_colors); // true or 1 if we want to use custom colors
         this.show_first_evt = !isNullOrUndef(attrs.show_first_evt) && _.str.toBool(attrs.show_first_evt); // true or 1 if we want to jump to the first event
@@ -56,6 +56,18 @@ CalendarView.include({
         for (var fld = 0; fld < this.fields_view.arch.children.length; fld++) {
             if (isNullOrUndef(this.fields_view.arch.children[fld].attrs.invisible)) {
                 this.info_fields.push(this.fields_view.arch.children[fld].attrs.name); // don't add field to description if invisible="1"
+            }
+        }
+        this.icons = {}; // bottom icons
+        for (var fld = 0; fld < this.fields_view.arch.children.length; fld++) {
+            var fieldIcon = this.fields_view.arch.children[fld].attrs.icon;
+            if (!isNullOrUndef(fieldIcon)) { // is an icon field
+                var fieldName = this.fields_view.arch.children[fld].attrs.name
+                var iconPosition = this.fields_view.arch.children[fld].attrs.position
+                if (isNullOrUndef(iconPosition)) { // default
+                    iconPosition = "right";
+                }
+                this.icons[fieldName] = '<i class="fa fa-lg fa-' + fieldIcon + ' of_calendar_evt_bot of_calendar_evt_' + iconPosition + '"/>'
             }
         }
 
@@ -278,8 +290,14 @@ CalendarView.include({
     init_working_hours_fields: function () {
         var self = this;
         var dfd = $.Deferred();
-        if (this.attendee_model && this.working_hours) {
-            var model = new Model(this.attendee_model)
+        var model;
+        if (this.attendee_model && this.working_hours == "attendees") {
+            model = new Model(this.attendee_model);
+        }else if (this.working_hours == "parent" && this.parent_model) { // only in One2many
+            model = new Model(this.parent_model);
+        }
+
+        if (!isNullOrUndef(model)) {
             $.when(model.call('get_working_hours_fields'))
             .then(function (res){
                 self.working_hours_fields = {};
@@ -291,11 +309,12 @@ CalendarView.include({
 
                 dfd.resolve();
             });
+
         }else{
-            this.working_hours_fields = null;
+            this.working_hours_fields = undefined;
             dfd.resolve();
         }
-        return $.when(dfd);
+        return $.when(dfd);//.then(function(){console.log("YAY: ",self.working_hours_fields)});
     },
     /**
      *  Sets up this.minTime and this.maxTime
@@ -303,7 +322,9 @@ CalendarView.include({
     set_min_max_time: function() {
         var self = this;
         var dfd = $.Deferred();
-        if (!isNullOrUndef(this.working_hours_fields)) {
+        if (isNullOrUndef(this.working_hours_fields)) {
+            dfd.resolve();
+        }else if (this.attendee_model && this.working_hours == "attendees") { // working hours are stored in attendees model
             var model = new Model(this.attendee_model);
             var ms = this.working_hours_fields.mor_start_field;
             var me = this.working_hours_fields.mor_end_field;
@@ -318,27 +339,28 @@ CalendarView.include({
                 prendre toutes les horaires, les mettres en UTC, les comparer pour avoir le min et max
                 mettre le min et max en localetime pour set minTime et maxTime (plage horaire affichée du calendrier)
                 */
-                var date_today = new Date();
-                var str_UTC = date_today.toUTCString();
-                var str_prefix = str_UTC.substring(0,17);
-                var str_suffix = str_UTC.substring(25);
-                var descript = {type: "float_time"};
-                var minTime, minUTC, maxTime, maxUTC;
+                //console.log("res: ",res);
+                var date_today = new Date(); // today by default
+                var str_UTC = date_today.toUTCString(); // str UTC
+                var str_prefix = str_UTC.substring(0,17); // str UTC without time
+                var str_suffix = str_UTC.substring(25); // str UTC without time (eg GMT+0100)
+                var descript = {type: "float_time"}; // to format float into hh:mm
+                var minTime, minUTC, maxTime, maxUTC, min_time, max_time;
 
                 _.each(res, function(record){
-                    var min_time = formats.format_value(record[ms],descript) + ":00";
-                    var max_time = formats.format_value(record[ae],descript) + ":00";
+                    min_time = formats.format_value(record[ms],descript) + ":00"; // time formatted hh:mm:ss
+                    max_time = formats.format_value(record[ae],descript) + ":00"; // time formatted hh:mm:ss
                     record.min_UTC = str_prefix + min_time + str_suffix + record.tz_offset;
                     record.max_UTC = str_prefix + max_time + str_suffix + record.tz_offset;
                     record.min_date_UTC = new Date(record.min_UTC);
                     record.max_date_UTC = new Date(record.max_UTC);
 
-                    if (isNullOrUndef(minUTC)) minUTC = record.min_date_UTC;
-                    if (record.min_date_UTC.getTime() < minUTC.getTime()) minUTC = record.min_date_UTC;
-                    if (isNullOrUndef(maxUTC)) maxUTC = record.max_date_UTC;
-                    if (record.max_date_UTC.getTime() > maxUTC.getTime()) maxUTC = record.max_date_UTC;
+                    if (isNullOrUndef(minUTC)) minUTC = record.min_date_UTC; // set min
+                    if (record.min_date_UTC.getTime() < minUTC.getTime()) minUTC = record.min_date_UTC; // update min
+                    if (isNullOrUndef(maxUTC)) maxUTC = record.max_date_UTC; // set max
+                    if (record.max_date_UTC.getTime() > maxUTC.getTime()) maxUTC = record.max_date_UTC; // update max
 
-                    self.working_hours[record.id] = {
+                    self.working_hours[record.id] = { // keep a trace
                         mor_start: min_time,
                         mor_end: formats.format_value(record[me],descript) + ":00",
                         aft_start: formats.format_value(record[as],descript) + ":00",
@@ -348,15 +370,37 @@ CalendarView.include({
                         str_suffix: " GMT" + record["tz_offset"],
                     }
                 });
-                if (isNullOrUndef(minUTC)) minUTC = new Date(str_prefix + "00:00:00" + str_suffix );
-                if (isNullOrUndef(maxUTC)) maxUTC = new Date(str_prefix + "00:00:00" + str_suffix );
-                minTime = minUTC.toLocaleTimeString();
-                maxTime = maxUTC.toLocaleTimeString();
+                if (isNullOrUndef(minUTC)) minUTC = new Date(str_prefix + "00:00:00" + str_suffix ); // if no records
+                if (isNullOrUndef(maxUTC)) maxUTC = new Date(str_prefix + "00:00:00" + str_suffix ); // if no records
+                minTime = minUTC.toLocaleTimeString(); // local time format hh:mm:ss
+                maxTime = maxUTC.toLocaleTimeString(); // local time format hh:mm:ss
 
                 self.minTime = minTime;
                 self.maxTime = maxTime;
+                //console.log("self.minTime: ",self.minTime);
                 dfd.resolve();
             });
+        }else if (this.working_hours == "parent" && this.parent_model) { // only in O2M case
+            var date_today = new Date(); // today by default
+            var str_UTC = date_today.toUTCString(); // str UTC
+            var str_prefix = str_UTC.substring(0,17); // str UTC without time
+            var str_suffix = "";
+            if (this.parent_values["tz_offset"]) str_suffix = str_UTC.substring(25) + this.parent_values["tz_offset"]; // str UTC without time (eg GMT+0100)
+            var descript = {type: "float_time"}; // to format float into hh:mm
+            var ms = this.working_hours_fields.mor_start_field;
+            var ae = this.working_hours_fields.aft_end_field;
+            var min_time = formats.format_value(this.parent_values[ms] - 0.5,descript) + ":00"; // mintime UTC minus 1h format hh:mm:ss
+            var max_time = formats.format_value(this.parent_values[ae] + 0.5,descript) + ":00"; // maxtime UTC plus 1h format hh:mm:ss
+            var min_UTC = str_prefix + min_time + str_suffix; // str UTC
+            var max_UTC = str_prefix + max_time + str_suffix; // str UTC
+            var min_date_UTC = new Date(min_UTC); // date UTC
+            var max_date_UTC = new Date(max_UTC); // date UTC
+            var minTime = min_date_UTC.toLocaleTimeString(); // local time format hh:mm:ss
+            var maxTime = max_date_UTC.toLocaleTimeString(); // local time format hh:mm:ss
+
+            self.minTime = minTime;
+            self.maxTime = maxTime;
+            dfd.resolve();
         }else{
             dfd.resolve();
         }
@@ -713,6 +757,11 @@ CalendarView.include({
             'attendees':attendees
         };
         ////////////////////////////////////////////////////////////////////////////////// This part is modified
+        for (var key in self["icons"]) {
+            if (evt[key]) {
+                r.title = r.title + self["icons"][key];
+            }
+        }
         if (self.custom_colors) {
             if (evt[self.force_color_field]) {
                 r.backgroundColor = evt[self.force_color_field];
