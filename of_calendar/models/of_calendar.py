@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, models, fields
+from odoo import api, models, fields, _
+from odoo.exceptions import UserError
 
 class OFUsers(models.Model):
     _inherit = 'res.users'
@@ -24,10 +25,182 @@ class OFPartners(models.Model):
                 partner.of_color_ft = "#0D0D0D"
                 partner.of_color_bg = "#F0F0F0"
 
+class HREmployee(models.Model):
+    _inherit = 'hr.employee'
+
+    def _get_default_jours(self):
+        # Lundi à vendredi comme valeurs par défaut
+        jours = self.env['of.jours'].search([('numero', 'in', (1, 2, 3, 4, 5))], order="numero")
+        res = [jour.id for jour in jours]
+        return res
+
+    hor_md = fields.Float(string=u'Matin début', required=True, digits=(12, 1),default=9)
+    hor_mf = fields.Float(string='Matin fin', required=True, digits=(12, 1),default=12)
+    hor_ad = fields.Float(string=u'Après-midi début', required=True, digits=(12, 1),default=14)
+    hor_af = fields.Float(string=u'Après-midi fin', required=True, digits=(12, 1),default=18)
+    jour_ids = fields.Many2many('of.jours', 'employee_jours_rel', 'employee_id', 'jour_id', string='Jours travaillés', required=True, default=_get_default_jours)
+
+    address_depart_id = fields.Many2one('res.partner', string='Adresse de départ')
+    address_retour_id  = fields.Many2one('res.partner', string='Adresse de retour')
+
+    of_color_ft = fields.Char(string="Couleur de texte", compute="_compute_colors")
+    of_color_bg = fields.Char(string="Couleur de fond", compute="_compute_colors")
+
+    @api.depends("user_id")
+    def _compute_colors(self):
+        for employee in self:
+            if employee.user_id:
+                employee.of_color_ft = employee.user_id.of_color_ft
+                employee.of_color_bg = employee.user_id.of_color_bg
+            else:
+                employee.of_color_ft = "#0D0D0D"
+                employee.of_color_bg = "#F0F0F0"
+
+    _sql_constraints = [
+        ('hor_md_mf_constraint', 'CHECK ( hor_md <= hor_mf )', _(u"L'Heure de début de matinée doit être antérieure à l'heure de fin de matinée")),
+        ('hor_mf_ad_constraint', 'CHECK ( hor_mf <= hor_ad )', _(u"L'Heure de fin de matinée doit être antérieure à l'heure de début d'après-midi")),
+        ('hor_ad_af_constraint', 'CHECK ( hor_ad <= hor_af )', _(u"L'Heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi")),
+    ]
+
+    @api.onchange('hor_md')
+    def _onchange_hor_md(self):
+        self.ensure_one()
+        if self.hor_md and self.hor_mf and self.hor_md > self.hor_mf:
+            raise UserError(u"L'Heure de début de matinée doit être antérieure à l'heure de fin de matinée")
+
+    @api.onchange('hor_mf')
+    def _onchange_hor_mf(self):
+        self.ensure_one()
+        if self.hor_md and self.hor_mf and self.hor_md > self.hor_mf:
+            raise UserError(u"L'Heure de début de matinée doit être antérieure à l'heure de fin de matinée")
+        elif self.hor_mf and self.hor_ad and self.hor_mf > self.hor_ad:
+            raise UserError(u"L'Heure de fin de matinée doit être antérieure à l'heure de début d'après-midi")
+
+    @api.onchange('hor_ad')
+    def _onchange_hor_ad(self):
+        self.ensure_one()
+        if self.hor_ad and self.hor_af and self.hor_ad > self.hor_af:
+            raise UserError(u"L'Heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi")
+        elif self.hor_mf and self.hor_ad and self.hor_mf > self.hor_ad:
+            raise UserError(u"L'Heure de fin de matinée doit être antérieure à l'heure de début d'après-midi")
+
+    @api.onchange('hor_af')
+    def _onchange_hor_af(self):
+        self.ensure_one()
+        if self.hor_ad and self.hor_af and self.hor_ad > self.hor_af:
+            raise UserError(u"L'Heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi")
+
+    @api.onchange('address_id')
+    def _onchange_address(self):
+        self.ensure_one()
+        if self.address_id:
+            super(HREmployee, self)._onchange_address()
+            self.address_depart_id = self.address_id.id
+            self.address_retour_id = self.address_id.id
+
+    @api.onchange('address_depart_id')
+    def _onchange_address_depart(self):
+        self.ensure_one()
+        if self.address_depart_id:
+            self.address_retour_id = self.address_depart_id.id
+
+    @api.model
+    def get_working_hours_fields(self):
+        return {
+            "morning_start_field": "hor_md",
+            "morning_end_field": "hor_mf",
+            "afternoon_start_field": "hor_ad",
+            "afternoon_end_field": "hor_af"
+        }
+
+class OFMeetingType(models.Model):
+    _inherit = 'calendar.event.type'
+
+    active = fields.Boolean("Actif",default=True)
+
 class OFMeeting(models.Model):
     _inherit = "calendar.event"
 
+    lieu = fields.Selection([
+        ("onsite", "Dans les locaux"),
+        ("phone", "Au téléphone"),
+        ("offsite", "À l'exterieur"),
+        ], string="Lieu du RDV", required=True, default="onsite")
+    #user_company_ids = fields.Many2many('res.company', 'calendar_user_company_rel', 'calendar_id', 'company_id', u"sociétés du propriétaire",compute="_compute_user_company_ids")#,store=True)#related="user_id.company_ids", readonly=True)
+    # tentative de domain ratée
+    lieu_company_id = fields.Many2one("res.company",string="(Précisez)")#,domain="[('id', 'in', user_company_ids and user_company_ids._ids)]")
+    lieu_rdv_id = fields.Many2one("res.partner",string="(Précisez)")
+    on_phone = fields.Boolean(u'Au téléphone', compute="_compute_on_phone")
     color_partner_id = fields.Many2one("res.partner", "Partner whose color we will take", compute='_compute_color_partner', store=False)
+    geo_lat = fields.Float(string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo", readonly=True, store=True)
+    geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_geo", readonly=True, store=True)
+    precision = fields.Selection([
+        ('manual', "Manuel"),
+        ('high', "Haut"),
+        ('medium', "Moyen"),
+        ('low', "Bas"),
+        ('no_address', u"--"),
+        ('unknown', u"Indéterminé"),
+        ('not_tried', u"Pas tenté"),
+        ], default='not_tried', readonly=True, help=u"Niveau de précision de la géolocalisation", compute="_compute_geo", store=True)
+
+    @api.multi
+    @api.depends("lieu")
+    def _compute_on_phone(self):
+        for meeting in self:
+            if meeting.lieu and meeting.lieu == "phone":
+                meeting.on_phone = True
+
+    @api.multi
+    @api.depends("lieu","lieu_company_id","lieu_rdv_id")
+    def _compute_geo(self):
+        for meeting in self:
+            if meeting.lieu and meeting.lieu == "onsite": # dans les locaux
+                vals = {
+                    'geo_lat': meeting.lieu_company_id.geo_lat,
+                    'geo_lng': meeting.lieu_company_id.geo_lng,
+                    'precision': meeting.lieu_company_id.precision,
+                }
+            elif meeting.lieu and meeting.lieu == "offsite": # a l'exterieur
+                vals = {
+                    'geo_lat': meeting.lieu_rdv_id.geo_lat,
+                    'geo_lng': meeting.lieu_rdv_id.geo_lng,
+                    'precision': meeting.lieu_rdv_id.precision,
+                }
+            else:
+                vals = {
+                    'geo_lat': 0,
+                    'geo_lng': 0,
+                    'precision': 'no_address',
+                }
+            meeting.update(vals)
+
+
+    """tentative de domain ratée
+    @api.multi
+    @api.depends("user_id.company_ids")
+    def _compute_user_company_ids(self):
+        for meeting in self:
+            la_list = []
+            #meeting.user_company_ids = [(5,0,0)] + [(4,le_id,False) for le_id in meeting.user_id.company_ids._ids]
+            if meeting.user_id.id:
+                company_ids = meeting.user_id.company_ids
+                la_list = [x.id for x in company_ids]
+            meeting.user_company_ids = [(6,0,la_list)]"""
+
+    @api.onchange('lieu')
+    def _onchange_lieu(self):
+        self.ensure_one()
+        if not self.lieu:
+            self.lieu_rdv_id = False
+            self.lieu_company_id = False
+            return
+        if not self.lieu  == "offsite": # réinitialise
+            self.lieu_rdv_id = False
+        if self.lieu == "onsite": # on site
+            self.lieu_company_id = self.user_id.company_id.id
+        else: # réinitialise
+            self.lieu_company_id = False
 
     """
     These fields would be necessary if use_contacts="0" in <calendar>. See event_data_transform function in .js file
