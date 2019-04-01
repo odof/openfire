@@ -8,6 +8,17 @@ class StockInventory(models.Model):
     _inherit = "stock.inventory"
     _order = "date desc, name"
 
+    @api.multi
+    def _get_inventory_lines_values(self):
+        res = super(StockInventory, self)._get_inventory_lines_values()
+        for vals in res:
+            product = vals.get('product_id') and self.env['product.product'].browse(vals['product_id'])
+            uom = vals.get('product_uom_id') and self.env['product.uom'].browse(vals['product_uom_id'])
+            if product and uom:
+                # On ramène la quantité saisie à l'unité de mesure d'achat
+                qty = uom._compute_quantity(1.0, product.uom_po_id)
+                vals['product_value_unit'] = product.standard_price * qty
+        return res
 
 class StockInventoryLine(models.Model):
     _inherit = "stock.inventory.line"
