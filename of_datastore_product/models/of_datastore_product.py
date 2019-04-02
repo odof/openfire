@@ -901,8 +901,8 @@ class OfDatastoreCentralized(models.AbstractModel):
                         if missing_fields:
                             new_fields |= missing_fields
                             new_ids.add(cached_product.res_id)
-                        elif read_tmpl:
-                            tmpl_ids.append(product_data['product_tmpl_id'][0])
+                        if read_tmpl and 'product_tmpl_id' in product_data:
+                            tmpl_values[product_data['product_tmpl_id'][0]] = product_data['product_tmpl_id']
 
                     if new_ids:
                         # Lecture des données sur la base centrale
@@ -911,23 +911,9 @@ class OfDatastoreCentralized(models.AbstractModel):
                         # Stockage des données dans notre cache
                         of_cache.store_values(self._name, data)
 
-                        if read_tmpl:
+                        if read_tmpl and 'product_tmpl_id' in new_fields:
                             for d in data:
                                 tmpl_values[d['product_tmpl_id'][0]] = d['product_tmpl_id']
-                    # Une fois les données en cache, récupère toutes les données pour ensuite
-                    #   libérer le cache pour les autres processus en attente
-                    cached_products = of_cache.search([('model', '=', self._name), ('res_id', 'in', datastore_ids)])
-
-                    data = cached_products.read(['res_id', 'vals'])
-
-                if read_tmpl:
-                    obj_fields.remove(self._fields['product_tmpl_id'])
-                    if tmpl_ids:
-                        # Retrait de valeurs éventuellement renseignées (normalement inutile vu que nos bases n'utilisent pas les variantes)
-                        tmpl_ids = [tmpl_id for tmpl_id in tmpl_ids if tmpl_id not in tmpl_values]
-                        if tmpl_ids:
-                            for vals in self.env['product.template'].browse(tmpl_ids).name_get():
-                                tmpl_values[vals[0]] = vals
 
                 for obj in self.browse(datastore_ids):
                     # Il faut charger les valeurs dans le cache manuellement car elles ne se chargent de façon
