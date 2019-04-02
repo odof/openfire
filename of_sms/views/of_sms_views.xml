@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- After installation of the module, open the related menu -->
+        <record id="of_sms_account_action_ovh" model="ir.actions.act_window">
+            <field name="name">Compte SMS OVH</field>
+            <field name="res_model">of.sms.account</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="of_sms.of_sms_account_view_form"/>
+            <field name="context" eval="{'default_name':'OVH Account','default_account_gateway_id':ref('of_sms_gateway_ovh')}"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Ajouter un compte d'une passerelle SMS</p>
+            </field>
+        </record>
+
+        <record id="base.open_menu" model="ir.actions.todo">
+            <field name="action_id" ref="of_sms_account_action_ovh"/>
+            <field name="state">open</field>
+        </record>
+
+    </data>
+
+    <!-- Action "Envoyer SMS" dans vue formaulaire partenaires et prospects (res.partner) -->
+    <record id="of_sms_partner_more_menu_server_action" model="ir.actions.server">
+        <field name="name">Envoyer SMS</field>
+        <field name="model_id" ref="model_res_partner"/>
+        <field name="condition">True</field>
+        <field name="state">code</field>
+        <field name="code">action = record.sms_action()</field>
+    </record>
+    <record id="of_sms_partner_more_menu_client_action" model="ir.values">
+        <field name="name">SMS Partner</field>
+        <field name="model" eval="'res.partner'"/>
+        <field name="key2" eval="'client_action_multi'" />
+        <field name="value" eval="'ir.actions.server,%d'%of_sms_partner_more_menu_server_action"/>
+    </record>
+
+    <!-- Action "Envoyer SMS" dans vue formaulaire opportunités/pipeline (crm.lead) -->
+    <record id="of_sms_lead_more_menu_server_action" model="ir.actions.server">
+        <field name="name">Envoyer SMS</field>
+        <field name="model_id" ref="model_crm_lead"/>
+        <field name="condition">True</field>
+        <field name="state">code</field>
+        <field name="code">action = record.sms_action()</field>
+    </record>
+    <record id="of_sms_lead_more_menu_client_action" model="ir.values">
+        <field name="name">SMS Partner</field>
+        <field name="model" eval="'crm.lead'"/>
+        <field name="key2" eval="'client_action_multi'" />
+        <field name="value" eval="'ir.actions.server,%d'%of_sms_lead_more_menu_server_action"/>
+    </record>
+
+    <!-- Action "Envoyer SMS" dans planning intervention -->
+    <record id="of_sms_intervention_more_menu_server_action" model="ir.actions.server">
+        <field name="name">Envoyer SMS</field>
+        <field name="model_id" ref="model_of_planning_intervention"/>
+        <field name="condition">True</field>
+        <field name="state">code</field>
+        <field name="code">action = record.sms_action()</field>
+    </record>
+    <record id="of_sms_intervention_more_menu_client_action" model="ir.values">
+        <field name="name">SMS Partner</field>
+        <field name="model" eval="'of.planning.intervention'"/>
+        <field name="key2" eval="'client_action_multi'" />
+        <field name="value" eval="'ir.actions.server,%d'%of_sms_intervention_more_menu_server_action"/>
+    </record>
+
+    <!-- Vue partenaire formulaire : ajouter exemple de paramètre (placeholder) pour le champ mobile format international -->
+    <record id="of_view_partner_form_inherit_of_sms" model="ir.ui.view">
+        <field name="name">E.164 mobile placeholder</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <field name="mobile" position="replace">
+                <field name="mobile" placeholder="Format E.164 - ex : +61 427 671 760"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- ***** PLANNING INTERVENTION ***** -->
+
+    <!-- Ajout dans les messages (historique actions sur ce document en bas de page) du planning intervention envoi SMS -->
+    <record id="of_planning_intervention_view_form_inherit_sms" model="ir.ui.view">
+        <field name="name">of.planning.intervention.form.inherit.sms</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="after">
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread" options='{"thread_level": 1}'/>
+                </div>
+            </xpath>
+            <field name="verif_dispo" position="after">
+                <field name="of_envoye_par_sms_client"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- ######################################################################################################################### -->
+    <!-- #############################                ACCOUNT                  ################################################### -->
+    <!-- ######################################################################################################################### -->
+
+    <record id="of_sms_account_view_form" model="ir.ui.view">
+        <field name="name">of.sms.account.view.form</field>
+        <field name="model">of.sms.account</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="account_gateway_id" widget="selection"/>
+                    <field name="gateway_model" invisible="1"/>
+                </group>
+                <h2 id="gatewayhook">Paramètres passerelle SMS</h2>
+                <group>
+                    <field name="account_name"/>
+                    <field name="account_login"/>
+                    <field name="account_password" password="True"/>
+                    <field name="number_ids"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_sms_account_view_tree" model="ir.ui.view">
+        <field name="name">of.sms.account.view.tree</field>
+        <field name="model">of.sms.account</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="account_gateway_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ######################################################################################################################### -->
+    <!-- #############################            NUMBER (émetteur)            ################################################### -->
+    <!-- ######################################################################################################################### -->
+
+    <record id="of_sms_number_view_fornm" model="ir.ui.view">
+        <field name="name">(OF) sms stored_numbers form view</field>
+        <field name="model">of.sms.number</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="mobile_number"/>
+                    <field name="account_id"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_sms_number_view_tree" model="ir.ui.view">
+        <field name="name">(OF) sms stored_number tree view</field>
+        <field name="model">of.sms.number</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="mobile_number"/>
+                <field name="account_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ######################################################################################################################### -->
+    <!-- #############################                CONFIG                   ################################################### -->
+    <!-- ######################################################################################################################### -->
+
+    <!-- View config -->
+    <record id="of_sms_menu_config_view" model="ir.ui.view">
+        <field name="name">Paramétrage SMS</field>
+        <field name="model">of.sms.config.settings</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Paramétrage SMS">
+                <header>
+                    <button string="Appliquer" type="object" name="execute" class="oe_highlight" confirm="Êtes-vous sûr de valider les modifications?"/>
+                    <button string="Annuler" type="object" name="cancel" class="oe_link" special="cancel"/>
+                </header>
+                <group string="Alertes SMS - Interventions" name="alertes_sms">
+                    <label for="alerte_interventions_equipes_veille"/>
+                    <div name="alerte_interventions_equipes_veille">
+                        <field name="alerte_interventions_equipes_veille" class="oe_inline"/>
+                        <span>Envoyer des alertes SMS aux équipes d'interventions contenant un récapitulatif des interventions du lendemain</span>
+                    </div>
+                    <label for="alerte_interventions_clients_veille"/>
+                    <div name="alerte_interventions_clients_veille">
+                        <field name="alerte_interventions_clients_veille" class="oe_inline"/>
+                        <span>Envoyer des alertes SMS aux clients d'interventions contenant un récapitulatif de l'intervention du lendemain</span>
+                    </div>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <!-- ######################################################################################################################### -->
+    <!-- #############################             ACTIONS & MENUS             ################################################### -->
+    <!-- ######################################################################################################################### -->
+
+    <record id="of_sms_account_action" model="ir.actions.act_window">
+        <field name="name">(OF) SMS Gateway Account</field>
+        <field name="res_model">of.sms.account</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Configure un compte passerelle SMS</p>
+        </field>
+    </record>
+
+    <record id="of_sms_number_action" model="ir.actions.act_window">
+        <field name="name">(OF) SMS stored number</field>
+        <field name="res_model">of.sms.number</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p>List of stored mobile numbers.</p>
+        </field>
+    </record>
+
+    <record id="of_sms_config_action" model="ir.actions.act_window">
+        <field name="name">Paramétrage SMS</field>
+        <field name="res_model">of.sms.config.settings</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="view_id" ref="of_sms_menu_config_view"/>
+        <field name="help">Paramétrage SMS</field>
+    </record>
+
+    <menuitem id="of_sms_parent_menu" parent="base.menu_administration" name="SMS" sequence="1"/>
+    <menuitem id="of_sms_account_menu" name="Comptes passerelles" parent="of_sms_parent_menu" action="of_sms_account_action" sequence="10"/>
+    <menuitem id="of_sms_number_menu" name="Comptes émetteurs" parent="of_sms_parent_menu" action="of_sms_number_action" sequence="20"/>
+    <menuitem id="of_sms_config_menu" action="of_sms_config_action" name="Configuration" parent="of_sms_parent_menu" sequence="80"/>
+
+    <!-- ######################################################################################################################### -->
+    <!-- #############################                TEMPLATES                ################################################### -->
+    <!-- ######################################################################################################################### -->
+
+    <record id="of_sms_template_view_form" model="ir.ui.view">
+        <field name="name">of.sms.template.view.form</field>
+        <field name="model">of.sms.template</field>
+        <field name="arch" type="xml">
+            <form string="Templates">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/><h1><field name="name" required="1"/></h1>
+                        <group>
+                            <field name="model_id" required="1" options="{'no_create': True}"/>
+                            <field name="model" invisible="1"/>
+                            <field name="from_mobile_verified_id"/>
+                            <field name="from_mobile"/>
+                            <field name="sms_to"/>
+                        </group>
+                    </div>
+                    <notebook>
+                        <page string="Content">
+                            <field name="template_body"/>
+                        </page>
+                        <page string="Dynamic Placeholder Generator">
+                            <group>
+                                <field name="model_object_field_id" domain="[('model_id','=',model_id),('ttype','!=','one2many'),('ttype','!=','many2many')]"/>
+                                <field name="sub_object_id" readonly="1"/>
+                                <field name="sub_model_object_field_id" domain="[('model_id','=',sub_object_id),('ttype','!=','one2many'),('ttype','!=','many2many')]" attrs="{'readonly':[('sub_object_id','=',False)],'required':[('sub_object_id','!=',False)]}"/>
+                                <field name="null_value"/>
+                                <field name="copyvalue"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_sms_template_view_tree" model="ir.ui.view">
+        <field name="name">of.sms.template.view.tree</field>
+        <field name="model">of.sms.template</field>
+        <field name="arch" type="xml">
+            <tree>
+              <field name="name"/>
+              <field name="model"/>
+              <field name="from_mobile"/>
+              <field name="sms_to"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <!-- ######################################################################################################################### -->
+    <!-- #############################                MESSAGES                 ################################################### -->
+    <!-- ######################################################################################################################### -->
+
+    <record id="of_sms_message_view_form" model="ir.ui.view">
+        <field name="name">of.sms.message.view.form</field>
+        <field name="model">of.sms.message</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false" string="SMS Messages">
+                <group>
+                    <field name="message_date"/>
+                    <field name="sms_gateway_message_id"/>
+                    <field name="account_id"/>
+                    <field name="model_id"/>
+                    <field name="record_id"/>
+                    <field name="by_partner_id"/>
+                    <field name="direction"/>
+                    <field name="record_name"/>
+                    <field name="from_mobile"/>
+                    <field name="to_mobile"/>
+                    <field name="status_string"/>
+                    <field name="status_code"/>
+                    <field name="sms_content"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_sms_message_view_tree" model="ir.ui.view">
+        <field name="name">of.sms.message.view.tree</field>
+        <field name="model">of.sms.message</field>
+        <field name="arch" type="xml">
+            <tree edit="false" create="false">
+                <field name="by_partner_id"/>
+                <field name="account_id"/>
+                <field name="record_name"/>
+                <field name="direction"/>
+                <field name="message_date"/>
+                <field name="from_mobile"/>
+                <field name="to_mobile"/>
+                <field name="status_code"/>
+                <field name="sms_content"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_sms_message_view_kanban" model="ir.ui.view">
+        <field name="name">of.sms.message.view.kanban</field>
+        <field name="model">of.sms.message</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="record_name"/>
+                <field name="sms_content"/>
+                <field name="direction"/>
+                <field name="record_id"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_vignette oe_semantic_html_override esms_history_kanban" style="min-width:100%;">
+                                <a type="open">
+                                    <div t-if="record.direction.raw_value == 'I'" style="text-align:right;">
+                                        <span style="height:100%;float:right;margin-left:5px;">
+                                            <img t-att-src="kanban_image('res.partner', 'image_small', record_id)"/>
+                                        </span>
+                                        <span class="oe_partner_heading">
+                                            To: <field name="to_mobile"/>
+                                        </span>
+                                        <br/>
+                                        <field name="sms_content"/>
+                                        <br/><br/>
+                                        By <field name="by_partner_id"/> on <field name="message_date"/>
+                                    </div>
+                                    <div t-if="record.direction.raw_value == 'O'" style="text-align:left;">
+                                        <span style="height:100%;float:left;margin-right:5px;">
+                                            <img t-att-src="kanban_image('res.partner', 'image_small', record_id)"/>
+                                        </span>
+                                        <span class="oe_partner_heading">
+                                            To: <field name="record_name"/>
+                                        </span>
+                                        <br/>
+                                        <field name="sms_content"/>
+                                        <br/>
+                                        Status: <field name="status_code"/>
+                                        <br/>
+                                        By 
+                                        <t t-if="record.by_partner_id.raw_value">
+                                            <field name="by_partner_id"/> 
+                                        </t>
+                                        <t t-else="">
+                                            Server
+                                        </t>
+                                        on 
+                                        <field name="message_date"/>
+                                    </div>
+                                </a>
+                            </div>
+                        </t>
+                    </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ######################################################################################################################### -->
+    <!-- #############################                COMPOSE                  ################################################### -->
+    <!-- ######################################################################################################################### -->
+
+    <record id="of_sms_compose_view_form" model="ir.ui.view">
+        <field name="name">of.sms.compose.view.form</field>
+        <field name="model">of.sms.compose</field>
+        <field name="arch" type="xml">
+            <form>
+                <span style="color:red;font-size:20px;">
+                    <field name="error_message"/>
+                </span>
+                <group>
+                    <field name="record_id" invisible="1"/>
+                    <field name="model" invisible="1"/>
+                    <field name="sms_template_id" domain="[('model_id.model','=',model)]" />
+                    <field name="from_mobile_id"/>
+                    <field name="to_number" />
+                    <field name="sms_content"/>
+                    <field name="delivery_time"/>
+                    <field name="is_commercial"/>
+                </group>
+                <footer>
+                    <button type="object" name="send_entity" string="Envoyer SMS"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+    <!-- ######################################################################################################################### -->
+    <!-- #############################             ACTIONS & MENUS             ################################################### -->
+    <!-- ######################################################################################################################### -->
+
+    <record id="of_sms_template_action" model="ir.actions.act_window">
+        <field name="name">Modèles SMS</field>
+        <field name="res_model">of.sms.template</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Create an SMS template</p>
+        </field>
+    </record>
+
+    <record id="of_sms_message_action" model="ir.actions.act_window">
+        <field name="name">Messages SMS</field>
+        <field name="res_model">of.sms.message</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">Messages SMS</p>
+        </field>
+    </record>
+
+    <menuitem id="of_sms_template_menu" name="Modèles" parent="of_sms_parent_menu" action="of_sms_template_action" sequence="40"/>
+    <menuitem id="of_sms_message_menu" name="SMS émis/reçus" parent="of_sms_parent_menu" action="of_sms_message_action" sequence="30"/>
+
+</odoo>
