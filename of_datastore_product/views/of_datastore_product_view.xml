@@ -94,7 +94,7 @@
                 <button name="%(action_of_datastore_import_product_brand)d" type="action" string="Import all products"
                         attrs="{'invisible':[('datastore_supplier_id','=',False)]}"
                         context="{'default_type': 'import'}"
-                        groups="base.group_system"/>
+                        groups="of_base.of_group_root_only"/>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="%(of_datastore_brand_product_action)d" type="action" class="oe_stat_button" icon="fa-th-list">

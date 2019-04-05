@@ -874,7 +874,6 @@ class OfDatastoreCentralized(models.AbstractModel):
             #   une fois par modèle.
             read_tmpl = self._fields.get('product_tmpl_id') in obj_fields
             tmpl_values = {}
-            tmpl_ids = []
 
             # Séparation des ids par base centrale
             datastore_product_ids = {}

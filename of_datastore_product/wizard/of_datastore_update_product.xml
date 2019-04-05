@@ -6,17 +6,28 @@
         <field name="model">of.datastore.update.product</field>
         <field name="arch" type="xml">
             <form string="Products import/update">
+                <field name="nb_local_products" invisible="1"/>
                 <field name="is_update" invisible="1"/>
-                <p class="text-warning">If you continue, the selected products will be imported/updated.</p>
-                <h3>Options :</h3>
-                <div>
-                    <label for="noup_name"/>
-                    <field name="noup_name"/>
-                    <field name="type" invisible="1"/>
+                <field name="type" invisible="1"/>
+                <p attrs="{'invisible': [('nb_local_products', '&lt;=', 1500)]}">
+Vous tentez de mettre à jour un tarif ayant plus de 1500 références présentes localement dans votre base.<br/>
+Afin d’améliorer la qualité et la rapidité de cette mise à jour, veuillez d’abord supprimer les références non utilisées.<br/>
+Pour faire cela, depuis la marque : Action &gt; Supprimer les articles non utilisés.<br/>
+Ces références seront toujours accessibles via le tarif centralisé.<br/>
+                </p>
+                <div attrs="{'invisible': [('nb_local_products', '&gt;', 1500)]}">
+                    <p class="text-warning">If you continue, the selected products will be imported/updated.</p>
+                    <h3>Options :</h3>
+                    <div>
+                        <label for="noup_name"/>
+                        <field name="noup_name"/>
+                    </div>
                 </div>
                 <footer>
-                    <button name="update_products" type="object" string="Update" class="btn-primary" attrs="{'invisible': [('is_update','=',False)]}"/>
-                    <button name="update_products" type="object" string="Import" class="btn-primary" attrs="{'invisible': [('is_update','=',True)]}"/>
+                    <button name="update_products" type="object" string="Update" class="btn-primary"
+                            attrs="{'invisible': ['|',('nb_local_products', '&gt;', 1500),('is_update','=',False)]}"/>
+                    <button name="update_products" type="object" string="Import" class="btn-primary"
+                            attrs="{'invisible': ['|',('nb_local_products', '&gt;', 1500),('is_update','=',True)]}"/>
                     <button special="cancel" string="Cancel"/>
                 </footer>
             </form>
