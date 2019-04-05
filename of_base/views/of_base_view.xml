@@ -42,6 +42,16 @@
                     <page name="historique" string="Historique">
                     </page>
                 </page>
+                <!-- Permet de voir les catégories du parent -->
+                <xpath expr="//field[@name='category_id']" position="before">
+                    <field name="of_parent_category_id" widget="many2many_tags" attrs="{'invisible': [('parent_id', '=', False)]}"/>
+                </xpath>
+                <xpath expr="//form//notebook//page[@name='sales_purchases']//field[@name='customer']" position="attributes">
+                    <attribute name="attrs">{'readonly': [('parent_id', '!=', False), ('is_company', '=', False)]}</attribute>
+                </xpath>
+                <xpath expr="//form//notebook//page[@name='sales_purchases']//field[@name='supplier']" position="attributes">
+                    <attribute name="attrs">{'readonly': [('parent_id', '!=', False), ('is_company', '=', False)]}</attribute>
+                </xpath>
                 <xpath expr='//form/sheet/notebook/page/field/kanban/templates/t/div/div/field' position="after">
                     <t t-if="record.type.raw_value"> (<field name="type"/>)</t>
                 </xpath>
