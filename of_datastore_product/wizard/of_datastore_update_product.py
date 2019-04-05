@@ -4,6 +4,9 @@ from odoo import models, fields, api, _
 from ..models.of_datastore_product import DATASTORE_IND
 import itertools
 from odoo.exceptions import ValidationError
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class OfDatastoreUpdateProduct(models.TransientModel):
     _name = "of.datastore.update.product"
@@ -204,6 +207,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
                                              .with_context(active_test=False)
                                              .mapped('product_variant_ids')._ids)
                 for supplier in suppliers}
+            _logger.info(u"OF TC : Début de mise à jour de marque : %s", ', '.join(brands.mapped('name')))
 
         elif active_model in ('product.product', 'product.template'):
             model_obj.search('')
@@ -271,7 +275,9 @@ class OfDatastoreUpdateProduct(models.TransientModel):
             model_obj.browse(to_create).of_datastore_import()
             notes.append(_('Created products : %s') % (len(to_create)))
 
-        # Recherche des valeurs à mettre à jour
+        if active_model == 'of.product.brand':
+            _logger.info(u"OF TC : Fin de mise à jour de marque : %s ; Up=%s, Lnk=%s, Unlk=%s, Nolk=%s",
+                         ', '.join(brands.mapped('name')), updt_cnt, link_cnt, unlk_cnt, nolk_cnt)
 
         if updt_cnt:
             notes.append(_('Updated products : %s') % (updt_cnt))
