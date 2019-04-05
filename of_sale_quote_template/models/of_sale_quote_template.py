@@ -144,8 +144,13 @@ class SaleOrder(models.Model):
         if not self.of_template_id:
             return
         template = self.of_template_id.with_context(lang=self.partner_id.lang)
+        order_line_obj = self.env['sale.order.line']
 
-        order_lines = [(5, 0, 0)]
+        regime = self.env['ir.values'].get_default('sale.config.settings', 'of_quote_template')
+        if regime == 'add':
+            order_lines = self.order_line
+        else:
+            order_lines = order_line_obj
         inactif = False  # Permet de savoir si il y a un article inactif
         for line in template.quote_line:
             discount = 0
@@ -163,7 +168,7 @@ class SaleOrder(models.Model):
                 data = self._get_data_from_template(line, price, discount)
                 if self.pricelist_id:
                     data.update(self.env['sale.order.line']._get_purchase_price(self.pricelist_id, line.product_id, line.product_uom_id, fields.Date.context_today(self)))
-                order_lines.append((0, 0, data))
+                order_lines += order_line_obj.new(data)
 
         self.order_line = order_lines
         self._compute_prices_from_template()
@@ -185,3 +190,15 @@ class SaleOrder(models.Model):
         self.of_mail_template_ids = docs
         if inactif:  #  @TODO : voir si peut être fait avec une fenêtre en javascript.
             self.of_note_insertion = u"Un ou plusieurs articles du modèle ne sont plus utilisés ou ne peuvent être vendus et n'ont donc pas été importés."
+
+class OFSaleConfiguration(models.TransientModel):
+    _inherit = 'sale.config.settings'
+
+    of_quote_template = fields.Selection([('add', u'Ajoute les lignes de commande du modèle au devis'), ('replace', u'Remplace les lignes de commande du devis par celles du modèle')],
+        string=u"(OF) Modèle de devis", required=True, default='replace',
+        help=u"Ceci ne modifie que le fonctionnement des lignes de commandes du modèle."
+             u"Les autres informations (ex: position fiscale) ne sont pas impactées par ce paramètre et seront toujours remplacer par ceux du dernier modèle choisi")
+
+    @api.multi
+    def set_of_quote_template_defaults(self):
+        return self.env['ir.values'].sudo().set_default('sale.config.settings', 'of_quote_template', self.of_quote_template)
