@@ -7,8 +7,7 @@ import os
 import base64
 import tempfile
 import itertools
-from dateutil.relativedelta import relativedelta
-from collections import defaultdict
+import json
 
 try:
     import pyPdf
@@ -259,6 +258,18 @@ class Report(models.Model):
                     result = file(merge_pdf, "rb").read()
         return result
 
+class OFInvoiceReportTotalGroup(models.Model):
+    _inherit = 'of.invoice.report.total.group'
+    _description = "Impression des totaux de factures et commandes de vente"
+
+    @api.multi
+    def filter_lines(self, lines):
+        self.ensure_one()
+        if not self.is_group_paiements():
+            return super(OFInvoiceReportTotalGroup, self).filter_lines(lines)
+        return lines.filtered(lambda l: (l.product_id in self.product_ids or
+                                         l.product_id.categ_id in self.categ_ids))
+
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
@@ -430,6 +441,37 @@ class AccountInvoice(models.Model):
     _inherit = "account.invoice"
 
     of_date_vt = fields.Date(string="Date visite technique")
+    of_sale_order_ids = fields.Many2many('sale.order', compute="_compute_of_sale_order_ids", string="Bons de commande")
+    of_residual = fields.Float(string=u"Somme du montant non payé des factures d'acompte et de la facture finale", compute="_compute_of_residual")
+    of_residual_equal = fields.Boolean(compute="_compute_of_residual")
+
+    def _compute_of_sale_order_ids(self):
+        for invoice in self:
+            invoice.of_sale_order_ids = invoice.invoice_line_ids.mapped('sale_line_ids').mapped('order_id')
+
+    def _compute_of_residual(self):
+        group_paiements = self.env['of.invoice.report.total.group'].get_group_paiements()
+        if not group_paiements.invoice:
+            # Si le groupe des paiements est désactivé on ne gère pas les acomptes
+            group_paiements = group_paiements.browse([])
+        products = group_paiements.product_ids
+        if group_paiements.categ_ids:
+            products |= self.env['product.product'].search([('categ_id', 'in', group_paiements.categ_ids._ids)])
+        if not products:
+            for invoice in self:
+                invoice.of_residual = invoice.residual
+                invoice.of_residual_equal = True
+            return
+        for invoice in self:
+            lines = invoice.invoice_line_ids.filtered(lambda l: l.product_id in products)
+            if not lines:
+                invoice.of_residual = invoice.residual
+                invoice.of_residual_equal = True
+                continue
+            order_lines = lines.mapped('sale_line_ids')
+            invoices = invoice | order_lines.mapped('invoice_lines').mapped('invoice_id')
+            invoice.of_residual = sum(invoices.mapped('residual'))
+            invoice.of_residual_equal = invoice.state == 'draft' or float_compare(invoice.of_residual, invoice.residual, 2) == 0
 
     def get_color_section(self):
         return self.env['ir.values'].get_default('account.config.settings', 'of_color_bg_section')
@@ -443,6 +485,55 @@ class AccountInvoice(models.Model):
         orders = lines.mapped('sale_line_ids').mapped('order_id')
         orders.of_update_dates_echeancier()
         return res
+
+    @api.multi
+    def _of_get_printable_payments(self, lines):
+        """ [IMPRESSION]
+        Renvoie les lignes à afficher.
+        Permet l'affichage des paiements dans une commande, même si ce n'est pas le but premier.
+        Pour afficher correctement les paiement d'une commande, il faudrait aussi chercher les paiements sans facture.
+        """
+        account_move_line_obj = self.env['account.move.line']
+        # Liste des factures et factures d'acompte
+        order_lines = lines if lines._name == 'sale.order.line' else lines.mapped('sale_line_ids')
+        invoices = self | order_lines.mapped('invoice_lines').mapped('invoice_id')
+
+        # Retour de tous les paiements des factures
+        # On distingue les paiements de la facture principale de ceux des factures liées
+        result_dict = {}
+        for invoice in invoices:
+            widget = json.loads(invoice.payments_widget.replace("'", "\'"))
+            if not widget:
+                continue
+            for payment in widget.get('content', []):
+                # Les paiements sont classé dans l'ordre chronologique
+                sort_key = (payment['date'], invoice.date_invoice, invoice.number)
+
+                move_line = account_move_line_obj.browse(payment['payment_id'])
+                name = self._of_get_payment_display(move_line)
+                result_dict[sort_key] = (name, payment['amount'])
+        result = [result_dict[key] for key in sorted(result_dict)]
+        return result
+
+    @api.multi
+    def order_lines_layouted(self):
+        """
+        Retire les lignes de facture qui doivent êtres affichées dans les totaux.
+        """
+        report_pages_full = super(AccountInvoice, self).order_lines_layouted()
+        report_lines = self._of_get_printable_lines()
+        report_pages = []
+        for page_full in report_pages_full:
+            page = []
+            for group in page_full:
+                lines = [line for line in group['lines'] if line in report_lines]
+                if lines:
+                    group['lines'] = lines
+                    page.append(group)
+            if page:
+                report_pages.append(page)
+        return report_pages
+
 
 class AccountConfigSettings(models.TransientModel):
     _inherit = 'account.config.settings'

@@ -6,9 +6,6 @@
             <xpath expr="//div[@name='subdivision']" position="attributes">
                 <attribute name="class">col-xs-6 pull-right</attribute>
             </xpath>
-            <xpath expr="//i[@name='payments_data']" position="replace">
-                <i name="payments_data"><span t-esc="o.get_payment_mode_display(payment['payment_id'])"/></i>
-            </xpath>
         </template> 
     </data>
 </odoo>

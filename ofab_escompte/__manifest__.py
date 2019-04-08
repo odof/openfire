@@ -22,12 +22,11 @@
     'description': u"""
 Module OpenFire / Escomptes
 ===========================
-Ce module permet l'impression de factures avec les escomptes résumés. 
+Ce module permet l'impression de factures avec les escomptes résumés.
 
 Fonctionnalités
 ----------------
  - Ajout d'un type 'escompte' dans les catégories d'article
- - L'article escompte n'est pas imprimé dans le corps des factures mais le montant est repris au niveau des totaux
 
 """,
     'depends' : [
@@ -46,4 +45,3 @@ Fonctionnalités
     'application': False,
     'auto_install': False,
 }
-# vim:expandtab:smartindent:tabstop=4:sorderttabstop=4:shiftwidth=4:
