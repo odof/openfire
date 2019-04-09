@@ -49,15 +49,33 @@ class AccountInvoice(models.Model):
                                    '|', ('product_ids', 'in', product_ids), ('categ_ids', 'in', categ_ids)])
 
         result = []
+        # Le groupe des paiements peut absorber des lignes d'autres groupes.
+        # Il faut donc le traiter en priorité.
         for group in groups:
-            group_lines = group.filter_lines(lines)
-            if group_lines is not False:
-                result.append((group, group_lines))
-                lines -= group_lines
+            if group.is_group_paiements():
+                group_paiement_lines = group.filter_lines(lines)
+                if group_paiement_lines is not False:
+                    lines -= group_paiement_lines
+                break
+
+        # Séparation des lignes en groupes
+        for group in groups:
+            if group.is_group_paiements():
+                result.append((group, group_paiement_lines))
+            else:
+                group_lines = group.filter_lines(lines)
+                if group_lines is not False:
+                    result.append((group, group_lines))
+                    lines -= group_lines
+
         if lines:
             result = [(False, lines)] + result
         else:
             result = [(False, self.invoice_line_ids)]
+            # On ajoute quand-même les paiements
+            for group in groups:
+                if group.is_group_paiements():
+                    result.append((group, lines))  # lines est vide
         return result
 
     @api.multi

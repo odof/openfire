@@ -258,6 +258,7 @@ class Report(models.Model):
                     result = file(merge_pdf, "rb").read()
         return result
 
+
 class OFInvoiceReportTotalGroup(models.Model):
     _inherit = 'of.invoice.report.total.group'
     _description = "Impression des totaux de factures et commandes de vente"
@@ -267,8 +268,21 @@ class OFInvoiceReportTotalGroup(models.Model):
         self.ensure_one()
         if not self.is_group_paiements():
             return super(OFInvoiceReportTotalGroup, self).filter_lines(lines)
-        return lines.filtered(lambda l: (l.product_id in self.product_ids or
-                                         l.product_id.categ_id in self.categ_ids))
+        # Retour des lignes dont l'article correspond à un groupe de rapport de facture
+        #   et dont la ligne de commande associée a une date antérieure
+        #   (seul un paiement d'une facture antérieure doit figurer sur une facture)
+        lines = lines.filtered(lambda l: ((l.product_id in self.product_ids or
+                                           l.product_id.categ_id in self.categ_ids) and
+                                          l.sale_line_ids and l.sale_line_ids[0].create_date < l.create_date))
+        # Si une facture d'acompte possède plusieurs lignes, il est impératif de les gérer de la même façon
+        sale_lines = lines.mapped('sale_line_ids')
+        for sale_line in sale_lines:
+            sale_line_invoices = sale_line.invoice_lines.mapped('invoice_id')
+            for sale_line2 in sale_line.order_id.order_line:
+                if sale_line2 != sale_line and sale_line2.invoice_lines.mapped('invoice_id') == sale_line_invoices:
+                    lines |= sale_line2.invoice_lines.filtered(lambda l: l.invoice_id == self)
+        return lines
+
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
@@ -507,7 +521,7 @@ class AccountInvoice(models.Model):
                 continue
             for payment in widget.get('content', []):
                 # Les paiements sont classé dans l'ordre chronologique
-                sort_key = (payment['date'], invoice.date_invoice, invoice.number)
+                sort_key = (payment['date'], invoice.date_invoice, invoice.number, payment['payment_id'])
 
                 move_line = account_move_line_obj.browse(payment['payment_id'])
                 name = self._of_get_payment_display(move_line)

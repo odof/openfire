@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, models, fields
+from odoo import api, models, fields, _
 from odoo.exceptions import UserError
 
 
@@ -42,7 +42,11 @@ class SaleAdvancePaymentInv(models.TransientModel):
         invoice = super(SaleAdvancePaymentInv, self)._create_invoice(order, so_line, amount)
         # La méthode _onchange_tax est définie dans le module of_account_tax et recalcule le compte comptable de
         # la ligne de facture en fonction de ses taxes.
-        invoice.invoice_line_ids.onchange_tax_ids()
+        for line in invoice.invoice_line_ids:
+            line.onchange_tax_ids()
+        # Modification du libellé de la ligne d'acompte
+        if self._context.get('of_acompte_line_name'):
+            invoice.invoice_line_ids[0].name = self._context['of_acompte_line_name']
         return invoice
 
     @api.multi
@@ -55,7 +59,10 @@ class SaleAdvancePaymentInv(models.TransientModel):
             sale_orders = self.env['sale.order'].browse(self._context.get('active_ids', []))
             for order in sale_orders:
                 self.amount = amount * order.amount_total / order.amount_untaxed
-                result = super(SaleAdvancePaymentInv, self.with_context(active_ids=order.ids)).create_invoices()
+                result = super(SaleAdvancePaymentInv,
+                               self.with_context(active_ids=order.ids,
+                                                 of_acompte_line_name=_("Down payment of %s%%") % (amount,))
+                               ).create_invoices()
             if len(sale_orders) > 1 and self._context.get('open_invoices', False):
                 result = sale_orders.action_view_invoice()
         else:
