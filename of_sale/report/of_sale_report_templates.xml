@@ -173,26 +173,35 @@
             </t>
 
             <div class="row" name="total">
-                <div class="col-xs-4 pull-right">
+                <div name="subdivision" class="col-xs-4 pull-right">
                     <table class="table table-condensed">
+                        <!-- Affichage des paiements et autres groupes de sous-totaux -->
+                        <t t-set='totals_group' t-value="doc._of_get_printable_totals()"/>
                         <tr class="border-black">
                             <td><strong>Total hors taxe</strong></td>
                             <td class="text-right">
-                                <span t-field="doc.amount_untaxed" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;doc.pricelist_id.currency_id&quot;}"/>
+                                <span><t t-esc="totals_group['subtotal']" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/></span>
                             </td>
                         </tr>
-                        <tr>
-                            <td>TVA</td>
-                            <td class="text-right">
-                                <span t-field="doc.amount_tax" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;doc.pricelist_id.currency_id&quot;}"/>
-                            </td>
-                        </tr>
-                        <tr class="border-black">
-                            <td><strong>Total</strong></td>
-                            <td class="text-right">
-                                <span t-field="doc.amount_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;doc.pricelist_id.currency_id&quot;}"/>
-                            </td>
-                        </tr>
+                        <t t-foreach="totals_group['untaxed'] + totals_group['taxes'] + totals_group['total']" t-as="total_group">
+                            <!-- Données sous la forme [[('Libellé', montant), ...], ('Libellé total', montant_total)] -->
+                            <tr t-foreach="total_group[0]" t-as="total_line">
+                                <td class="col-xs-8 pull-right">
+                                    <span>
+                                        <t t-esc="total_line[0]"/>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="pull-right text-right"><t t-esc="total_line[1]" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/></span>
+                                </td>
+                            </tr>
+                            <tr class="border-black">
+                                <td><strong><t t-esc="total_group[1][0]"/></strong></td>
+                                <td class="text-right">
+                                    <span t-esc="total_group[1][1]" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                </td>
+                            </tr>
+                        </t>
                     </table>
                 </div>
             </div>

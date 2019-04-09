@@ -2,35 +2,40 @@
 
 from odoo import models, fields, api
 
+from odoo.addons.mail.models.mail_template import format_date
+
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     payment_ids = fields.Many2many('account.payment', 'sale_order_account_payment_rel', 'order_id', 'payment_id', string="Paiements", copy=False, readonly=True)
     of_payment_amount = fields.Float(compute='_compute_of_payment_amount')
-    of_balance = fields.Float(compute="_compute_of_balance")
-    of_print_payments = fields.Boolean(string='Impression des paiements')
 
     @api.depends('payment_ids')
     def _compute_of_payment_amount(self):
         for sale_order in self:
             sale_order.of_payment_amount = sum(sale_order.payment_ids.mapped('amount'))
 
-    @api.depends('payment_ids', 'amount_total')
-    def _compute_of_balance(self):
-        for sale_order in self:
-            total_payments = sum(sale_order.payment_ids.mapped('amount'))
-            sale_order.of_balance = max(sale_order.amount_total - total_payments, 0.0)
-
-    @api.multi
-    def _of_get_payment_display_amounts(self):
-        self.ensure_one()
-        return [(payment, payment.amount) for payment in self.payment_ids]
-
     @api.multi
     def action_view_payments(self):
         action = self.env.ref('of_sale_payment.of_sale_payment_open_payments').read()[0]
         action['domain'] = [('order_ids', 'in', self._ids)]
         return action
+
+    @api.multi
+    def _of_get_printable_payments(self, order_lines):
+        """
+        Récupération des paiements liés à la commande si aucun autre paiement est affiché
+        """
+        result = super(SaleOrder, self)._of_get_printable_payments(order_lines)
+        invoice_obj = self.env['account.invoice']
+        account_move_line_obj = self.env['account.move.line']
+        if not result:
+            for payment in self.payment_ids:
+                # Les paiements sont classés dans l'ordre chronologique
+                move_line = account_move_line_obj.browse(payment['payment_id'])
+                name = invoice_obj._of_get_payment_display(move_line)
+                result.append((name, payment['amount']))
+        return result
 
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
@@ -133,30 +138,6 @@ class AccountInvoice(models.Model):
 
             credit_aml.payment_id.write({'order_ids': [(4, order_id, None) for order_id in order_ids]})
         return res
-
-    # Copie du code d'odoo pour l'affichage du montant lettré avec la facture (module account, account_invoice.py _get_payment_info_JSON)
-    @api.multi
-    def _of_get_payment_display_amounts(self):
-        total = []
-        for invoice in self:
-            for payment in invoice.payment_move_line_ids:
-                payment_currency_id = False
-                if invoice.type in ('out_invoice', 'in_refund'):
-                    amount = sum([p.amount for p in payment.matched_debit_ids if p.debit_move_id in invoice.move_id.line_ids])
-                    amount_currency = sum([p.amount_currency for p in payment.matched_debit_ids if p.debit_move_id in invoice.move_id.line_ids])
-                    if payment.matched_debit_ids:
-                        payment_currency_id = all([p.currency_id == payment.matched_debit_ids[0].currency_id for p in payment.matched_debit_ids]) and payment.matched_debit_ids[0].currency_id or False
-                elif invoice.type in ('in_invoice', 'out_refund'):
-                    amount = sum([p.amount for p in payment.matched_credit_ids if p.credit_move_id in invoice.move_id.line_ids])
-                    amount_currency = sum([p.amount_currency for p in payment.matched_credit_ids if p.credit_move_id in invoice.move_id.line_ids])
-                    if payment.matched_credit_ids:
-                        payment_currency_id = all([p.currency_id == payment.matched_credit_ids[0].currency_id for p in payment.matched_credit_ids]) and payment.matched_credit_ids[0].currency_id or False
-                if payment_currency_id and payment_currency_id == invoice.currency_id:
-                    amount_to_show = amount_currency
-                else:
-                    amount_to_show = payment.company_id.currency_id.with_context(date=payment.date).compute(amount, invoice.currency_id)
-                total.append((payment.payment_id, amount_to_show))
-        return total
 
 class ResPartner(models.Model):
     _inherit = "res.partner"

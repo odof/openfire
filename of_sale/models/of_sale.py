@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 import odoo.addons.decimal_precision as dp
 from odoo.tools import float_compare
 import os
@@ -240,6 +240,213 @@ class SaleOrder(models.Model):
         """
         self.of_client_view = not self.of_client_view
 
+    @api.multi
+    def _of_get_total_lines_by_group(self):
+        """
+        Retourne les lignes de la commande, séparées en fonction du groupe dans lequel les afficher.
+        Les groupes sont ceux définis par l'objet of.invoice.report.total, permettant de déplacer le rendu des
+          lignes de commande sous le total hors taxe ou TTC.
+        Les groupes sont affichés dans leur ordre propre, puis les lignes dans l'ordre de leur apparition dans la commande.
+        @param return: Liste de couples (groupe, lignes de commande). Le premier élément vaut (False, Lignes non groupées).
+        """
+        self.ensure_one()
+        group_obj = self.env['of.invoice.report.total.group']
+
+        lines = self.order_line
+        products = lines.mapped('product_id')
+        product_ids = list(products._ids)
+        categ_ids = list(products.mapped('categ_id')._ids)
+        groups = group_obj.search([('order', '=', True),
+                                   '|', ('id', '=', group_obj.get_group_paiements().id),
+                                   '|', ('product_ids', 'in', product_ids), ('categ_ids', 'in', categ_ids)])
+
+        result = []
+        for group in groups:
+            if group.is_group_paiements():
+                group_paiement_lines = group.filter_lines(lines)
+                if group_paiement_lines is not False:
+                    lines -= group_paiement_lines
+                break
+        for group in groups:
+            if group.is_group_paiements():
+                result.append((group, group_paiement_lines))
+            else:
+                group_lines = group.filter_lines(lines)
+                if group_lines is not False:
+                    # On ajoute cette vérification pour ne pas afficher des lignes à 0 dans les paiements et
+                    # ne pas afficher le groupe si toutes les lignes sont à 0.
+                    group_lines_2 = group_lines.filtered(lambda l: l.price_subtotal)
+                    if group_lines_2:
+                        result.append((group, group_lines_2))
+                    lines -= group_lines  # On enlève quand même toutes les lignes du groupe pour ne pas qu'elle s'affichent
+        if lines:
+            result = [(False, lines)] + result
+        else:
+            result = [(False, self.order_line.mapped('invoice_lines'))]
+            # On ajoute quand-même les paiements
+            for group in groups:
+                if group.is_group_paiements():
+                    result.append((group, lines))  # lines est vide
+        return result
+
+    @api.multi
+    def _of_get_printable_lines(self):
+        """ [IMPRESSION]
+        Renvoie les lignes à afficher
+        """
+        return self._of_get_total_lines_by_group()[0][1]
+
+    def _prepare_tax_line_vals(self, line, tax):
+        """ Emulation de la fonction du même nom du modèle 'account.invoice'
+            Permet de récupérer la clé de groupement dans _of_get_printable_totals
+        """
+        vals = {
+            'name': tax['name'],
+            'tax_id': tax['id'],
+            'amount': tax['amount'],
+            'base': tax['base'],
+            'manual': False,
+            'sequence': tax['sequence'],
+            'account_analytic_id': tax['analytic'] or False,
+            'account_id': tax['account_id'] or tax['refund_account_id'] or False,
+
+        }
+        return vals
+
+    @api.multi
+    def _of_get_printable_totals(self):
+        """ [IMPRESSION]
+        Retourne un dictionnaire contenant les valeurs à afficher dans les totaux de la commande pdf.
+        Dictionnaire de la forme :
+        {
+            'subtotal' : Total HT des lignes affichées,
+            'untaxed' : [[('libellé', montant),...], ('libellé total': montant_total)]
+            'taxes' : idem,
+            'total' : idem,
+        }
+        Les listes untaxed, taxes et total pourraient être regroupés en une seule.
+        Ce format pourra aider aux héritages (?).
+        """
+        self.ensure_one()
+        tax_obj = self.env['account.tax']
+        round_curr = self.currency_id.round
+
+        group_lines = self._of_get_total_lines_by_group()
+
+        result = {}
+        result['subtotal'] = sum(group_lines[0][1].mapped('price_subtotal'))
+        total_amount = result['subtotal']
+
+        i = 1
+        untaxed_lines = group_lines[0][1]
+        # --- Sous-totaux hors taxes ---
+        result_untaxed = []
+        while i < len(group_lines) and group_lines[i][0].position == '0-ht':
+            group, lines = group_lines[i]
+            i += 1
+            untaxed_lines |= lines
+            lines_vals = []
+            for line in lines:
+                lines_vals.append((line.of_get_line_name()[0], line.price_subtotal))
+                total_amount += line.price_subtotal
+            total_vals = (group.subtotal_name, round_curr(total_amount))
+            result_untaxed.append([lines_vals, total_vals])
+        result['untaxed'] = result_untaxed
+
+        # --- Ajout des taxes ---
+        # Code copié depuis account.invoice.get_taxes_values()
+        tax_grouped = {}
+        for line in untaxed_lines:
+            price_unit = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
+            taxes = line.tax_id.compute_all(price_unit, self.currency_id, line.product_uom_qty, line.product_id, self.partner_id)['taxes']
+            for tax_val in taxes:
+                val = self._prepare_tax_line_vals(line, tax_val)
+                tax = tax_obj.browse(tax_val['id'])
+                key = tax.get_grouping_key(val)
+
+                if key not in tax_grouped:
+                    tax_grouped[key] = val
+                    tax_grouped[key]['name'] = tax.description or tax.name
+                    tax_grouped[key]['group'] = tax.tax_group_id
+                else:
+                    tax_grouped[key]['amount'] += val['amount']
+        # Taxes groupées par groupe de taxes (cf account.invoice._get_tax_amount_by_group())
+        tax_vals_dict = {}
+        for tax in sorted(tax_grouped.values(), key=lambda t: t['name']):
+            amount = round_curr(tax['amount'])
+            tax_vals_dict.setdefault(tax['group'], [tax['group'].name, 0])
+            tax_vals_dict[tax['group']][1] += amount
+            total_amount += amount
+        result['taxes'] = [[tax_vals_dict.values(), (_("Total"), round_curr(total_amount))]]
+
+        # --- Sous-totaux TTC ---
+        result_total = []
+        while i < len(group_lines):
+            # Tri des paiements par date
+            group, lines = group_lines[i]
+            i += 1
+            if group.is_group_paiements():
+                lines_vals = self._of_get_printable_payments(lines)
+                if not lines_vals:
+                    continue
+                for line in lines_vals:
+                    total_amount -= line[1]
+            else:
+                lines_vals = []
+                for line in lines:
+                    lines_vals.append((line.of_get_line_name()[0], line.price_total))
+                    total_amount += line.price_total
+            total_vals = (group.subtotal_name, round_curr(total_amount))
+            result_total.append([lines_vals, total_vals])
+        result['total'] = result_total
+
+        return result
+
+    @api.multi
+    def order_lines_layouted(self):
+        """
+        Retire les lignes de commande qui doivent êtres affichées dans les totaux.
+        """
+        report_pages_full = super(SaleOrder, self).order_lines_layouted()
+        report_lines = self._of_get_printable_lines()
+        report_pages = []
+        for page_full in report_pages_full:
+            page = []
+            for group in page_full:
+                lines = [line for line in group['lines'] if line in report_lines]
+                if lines:
+                    group['lines'] = lines
+                    page.append(group)
+            if page:
+                report_pages.append(page)
+        return report_pages
+
+    @api.multi
+    def _of_get_printable_payments(self, order_lines):
+        """ [IMPRESSION]
+        Renvoie les lignes à afficher.
+        Permet l'affichage des paiements dans une commande.
+        On ne va pas chercher les paiements affectés à la commande car le lien est ajouté dans of_sale_payment
+        """
+        invoice_obj = self.env['account.invoice']
+        account_move_line_obj = self.env['account.move.line']
+        # Liste des factures et factures d'acompte
+        invoices = self.mapped('order_line').mapped('invoice_lines').mapped('invoice_id')
+
+        # Retour de tous les paiements des factures
+        # On distingue les paiements de la facture principale de ceux des factures liées
+        result = []
+        for invoice in invoices:
+            widget = json.loads(invoice.payments_widget.replace("'", "\'"))
+            if not widget:
+                continue
+            for payment in widget.get('content', []):
+                # Les paiements sont classés dans l'ordre chronologique
+                move_line = account_move_line_obj.browse(payment['payment_id'])
+                name =  invoice_obj._of_get_payment_display(move_line)
+                result.append((name, payment['amount']))
+        return result
+
 class Report(models.Model):
     _inherit = "report"
 
@@ -289,18 +496,24 @@ class OFInvoiceReportTotalGroup(models.Model):
         # Retour des lignes dont l'article correspond à un groupe de rapport de facture
         #   et dont la ligne de commande associée a une date antérieure
         #   (seul un paiement d'une facture antérieure doit figurer sur une facture)
-        lines = lines.filtered(lambda l: ((l.product_id in self.product_ids or
-                                           l.product_id.categ_id in self.categ_ids) and
-                                          l.sale_line_ids and l.sale_line_ids[0].create_date < l.create_date))
-        # Si une facture d'acompte possède plusieurs lignes, il est impératif de les gérer de la même façon
-        invoices = lines.mapped('invoice_id')
-        sale_lines = lines.mapped('sale_line_ids')
-        for sale_line in sale_lines:
-            sale_line_invoices = sale_line.invoice_lines.mapped('invoice_id')
-            for sale_line2 in sale_line.order_id.order_line:
-                if sale_line2 != sale_line and sale_line2.invoice_lines.mapped('invoice_id') == sale_line_invoices:
-                    lines |= sale_line2.invoice_lines.filtered(lambda l: l.invoice_id in invoices)
-        return lines
+        if lines._name == 'account.invoice.line':
+            lines = lines.filtered(lambda l: ((l.product_id in self.product_ids or
+                                               l.product_id.categ_id in self.categ_ids) and
+                                              l.sale_line_ids and l.sale_line_ids[0].create_date < l.create_date))
+            # Si une facture d'acompte possède plusieurs lignes, il est impératif de les gérer de la même façon
+            invoices = lines.mapped('invoice_id')
+            sale_lines = lines.mapped('sale_line_ids')
+            for sale_line in sale_lines:
+                sale_line_invoices = sale_line.invoice_lines.mapped('invoice_id')
+                for sale_line2 in sale_line.order_id.order_line:
+                    if sale_line2 != sale_line and sale_line2.invoice_lines.mapped('invoice_id') == sale_line_invoices:
+                        lines |= sale_line2.invoice_lines.filtered(lambda l: l.invoice_id in invoices)
+            return lines
+        else:
+            return lines.filtered(lambda l: l.product_id in self.product_ids or
+                                            l.product_id.categ_id in self.categ_ids)
+
+
 
 
 class SaleOrderLine(models.Model):
