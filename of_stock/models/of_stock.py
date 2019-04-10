@@ -24,6 +24,18 @@ class InventoryLine(models.Model):
 
     of_note = fields.Text(string="Notes")
 
+    @api.multi
+    def _write(self, vals):
+        # Impossible de mettre à jour le référence/nom de l'article si présent
+        # dans une ligne d'inventaire d'une autre société que la société courante de l'utilisateur.
+        # Donc sudo pour bypasser les problèmes de droits.
+        for key in vals.keys():
+            if key not in ['product_name', 'product_code']:
+                break
+        else:
+            self = self.sudo()
+        return super(InventoryLine, self)._write(vals)
+
     @api.model
     def create(self, values):
         # Retrait de la contrainte sur les lignes d'inventaire
