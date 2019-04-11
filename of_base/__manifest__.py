@@ -21,6 +21,7 @@ Personnalisation des fonctions de base Odoo :
 - Restreint l'accès au menu "Applications" à l'utilisateur administrateur
 - API fonction permettant d'afficher un message dans une fenêtre au cours de l'exécution d'une fonction
 - Ajout d'un champ calculé et d'un bouton sur les actions d'envoi de mail pour avoir une pré-visualisation du mail
+- Permet à l'auteur d'un mail de le recevoir en copie (par défaut odoo retire l'expéditeur de la liste des destinataires)
 """,
     'website' : "www.openfire.fr",
     'depends' : ["product", "mail"],
