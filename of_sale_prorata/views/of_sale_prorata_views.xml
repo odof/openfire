@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Bons de commande -->
+    <record id="of_sale_view_order_form" model="ir.ui.view">
+        <field name="name">of.sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="of_button_situation" type="object" string="Situation"
+                        attrs="{'invisible': [('of_nb_situations','=',0)]}"/>
+            </xpath>
+
+            <xpath expr="//group[@name='sale_pay']" position="inside">
+                <field name="of_prorata_percent"/>
+                <field name="of_retenue_garantie_pct"/>
+                <field name="of_nb_situations"/>
+                <field name="of_prochaine_situation"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Factures -->
+
+    <record id="of_sale_prorata_invoice_form" model="ir.ui.view">
+        <field name="name">of.sale.prorata.invoice.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[1]/group[@class='oe_subtotal_footer oe_right']" position="before">
+                <div class="oe_left">
+                    <group>
+                        <field name="of_retenue_garantie_pct"/>
+                    </group>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+
+    <!-- Configuration -->
+
+    <record id="of_sale_prorata_view_sale_config_settings" model="ir.ui.view">
+        <field name="name">of sale prorata settings</field>
+        <field name="model">sale.config.settings</field>
+        <field name="inherit_id" ref="sale.view_sales_config"/>
+        <field name="arch" type="xml">
+                <xpath expr="//field[@name='deposit_product_id_setting']" position="after">
+                    <field name="of_product_prorata_id_setting" class="oe_inline"
+                           context="{'default_type':'service', 'default_default_code':'PRORATA'}"/>
+                    <field name="of_product_situation_id_setting" class="oe_inline"
+                           context="{'default_type':'service', 'default_default_code':'SITUATION'}"/>
+                </xpath>
+        </field>
+    </record>
+
+</odoo>

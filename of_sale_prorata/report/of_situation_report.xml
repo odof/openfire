@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<report
+    string="Rapport de situation"
+    id="action_of_report_situation"
+    model="of.wizard.situation"
+    report_type="qweb-pdf"
+    name="of_sale_prorata.of_report_situation"
+    file="of_sale_prorata.of_report_situation"
+/>
+
+<template id="of_report_situation_document">
+    <t t-call="report.external_layout">
+        <t t-set="doc" t-value="doc.with_context({'lang':doc.order_id.partner_id.lang})"/>
+        <t t-set="order" t-value="doc.order_id"/>
+        <div class="page">
+            <div class="oe_structure"/>
+            <h2>Situation au <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d')"/> - <span t-field="order.name"/></h2>
+
+            <table class="table table-condensed">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th class="text-right">TVA</th>
+                        <th class="text-right">Total&amp;nbsp;HT</th>
+                        <th class="text-right">Total&amp;nbsp;TTC</th>
+                        <th class="text-right">Avancement précédent</th>
+                        <th class="text-right">Situation&amp;nbsp;<span t-field="order.of_prochaine_situation"/></th>
+                        <th class="text-right">Avancement à date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- tr t-foreach="order.order_line" t-as="l" -->
+                    <tr t-foreach="doc.line_ids" t-as="l">
+                        <td><span t-field="l.name"/></td>
+                        <td class="text-right">
+                            <span t-esc="', '.join(map(lambda x: (x.description or x.name), l.tax_id))"/>
+                        </td>
+                        <td class="text-right">
+                            <span t-field="l.price_subtotal" t-options='{"widget": "monetary", "display_currency": order.currency_id}'/>
+                        </td>
+                        <td class="text-right">
+                            <span t-field="l.price_total" t-options='{"widget": "monetary", "display_currency": order.currency_id}'/>
+                            </td>
+                        <td class="text-right">
+                            <span t-field="l.sit_val_prec"/>&amp;nbsp;%
+                        </td>
+                        <td class="text-right">
+                            <span t-field="l.sit_val_n"/>&amp;nbsp;%
+                        </td>
+                        <td class="text-right">
+                            <span t-field="l.sit_val_suiv"/>&amp;nbsp;%
+                        </td>
+                    </tr>
+                </tbody>
+                    <tr class="border-black">
+                        <td>Total</td>
+                        <td></td>
+                        <td class="text-right"><span t-field="order.amount_untaxed"/></td>
+                        <td class="text-right"><span t-field="order.amount_total"/></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Total situation TTC</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="text-right"><span t-field="doc.amount_invoiced_ttc" t-options='{"widget": "monetary", "display_currency": order.currency_id}'/></td>
+                        <td class="text-right"><span t-field="doc.amount" t-options='{"widget": "monetary", "display_currency": order.currency_id}'/></td>
+                        <td class="text-right"><span t-field="doc.amount_next_ttc" t-options='{"widget": "monetary", "display_currency": order.currency_id}'/></td>
+                    </tr>
+                    <tr>
+                        <td>Avancement</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="text-right"><span t-esc="int(order.amount_total and round(doc.amount_invoiced_ttc * 100.0 / order.amount_total or 0))"/>%</td>
+                        <td class="text-right"><span t-esc="int(order.amount_total and round(doc.amount * 100.0 / order.amount_total or 0))"/>%</td>
+                        <td class="text-right"><span t-esc="int(order.amount_total and round(doc.amount_next_ttc * 100.0 / order.amount_total or 0))"/>%</td>
+                    </tr>
+            </table>
+        </div>
+    </t>
+</template>
+
+<template id="of_report_situation">
+    <t t-call="report.html_container">
+        <t t-foreach="docs" t-as="doc">
+            <t t-call="of_sale_prorata.of_report_situation_document" t-lang="doc.order_id.partner_id.lang"/>
+        </t>
+    </t>
+</template>
+</odoo>
