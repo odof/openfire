@@ -20,12 +20,12 @@ class ResCompany(models.Model):
     of_custom_header_line_3_size = fields.Selection([('medium', 'Moyen'), ('small', 'Petit'), ('smaller', 'Plus petit'), ('x-small', u'Très petit')], string='Taille', default='medium', required=True)
     of_position_header_lines = fields.Selection(
         [
-        ('logo_under', u"Sous le logo"),
-        ('logo_right', u"À droite du logo"),
+            ('logo_under', u"Sous le logo"),
+            ('logo_right', u"À droite du logo"),
         ], string="Position", default="logo_right",
-            help=u"Position des lignes d'en-tête relativement au logo de société\n"
-                u"Sous le logo : les lignes d'en-tête seront placées sous le logo de société.\n"
-                u"À droite du logo : les lignes d'en-tête seront placées à droite du logo.")
+        help=u"Position des lignes d'en-tête relativement au logo de société\n"
+             u"Sous le logo : les lignes d'en-tête seront placées sous le logo de société.\n"
+             u"À droite du logo : les lignes d'en-tête seront placées à droite du logo.")
 
     @api.multi
     def get_line_content(self, header_or_footer="header", number=1):
@@ -46,3 +46,11 @@ class ResCompany(models.Model):
                 field_to_render = self.of_custom_footer_line_3
         content = self.env['mail.template'].render_template(field_to_render, 'res.company', self.id, post_process=False)
         return content
+
+class View(models.Model):
+    _inherit = 'ir.ui.view'
+
+    @api.multi
+    def render(self, values=None, engine='ir.qweb'):
+        # Ajout de la possibilité d'appeler hasattr depuis une vue qweb
+        return super(View, self).render(dict(values, hasattr=hasattr), engine)
