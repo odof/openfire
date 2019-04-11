@@ -275,12 +275,13 @@ class OFInvoiceReportTotalGroup(models.Model):
                                            l.product_id.categ_id in self.categ_ids) and
                                           l.sale_line_ids and l.sale_line_ids[0].create_date < l.create_date))
         # Si une facture d'acompte possède plusieurs lignes, il est impératif de les gérer de la même façon
+        invoices = lines.mapped('invoice_id')
         sale_lines = lines.mapped('sale_line_ids')
         for sale_line in sale_lines:
             sale_line_invoices = sale_line.invoice_lines.mapped('invoice_id')
             for sale_line2 in sale_line.order_id.order_line:
                 if sale_line2 != sale_line and sale_line2.invoice_lines.mapped('invoice_id') == sale_line_invoices:
-                    lines |= sale_line2.invoice_lines.filtered(lambda l: l.invoice_id == self)
+                    lines |= sale_line2.invoice_lines.filtered(lambda l: l.invoice_id in invoices)
         return lines
 
 
@@ -501,16 +502,32 @@ class AccountInvoice(models.Model):
         return res
 
     @api.multi
+    def _of_get_linked_invoices(self, lines):
+        """ [IMPRESSION]
+        Retourne les factures liées à la facture courante.
+        Les factures liées sont celles dont une ligne est liée à la même ligne de commande qu'une ligne de lines.
+        Toute facture liée à une facture liée est également retournée.
+        @param lines : Lignes de la facture courante sur lesquelles le lien est déterminé
+        """
+        invoices = self
+        to_check = lines.mapped('sale_line_ids').mapped('invoice_lines').mapped('invoice_id')
+        while to_check:
+            invoices |= to_check
+            to_check = (to_check
+                        .mapped('invoice_line_ids')
+                        .mapped('sale_line_ids')
+                        .mapped('invoice_lines')
+                        .mapped('invoice_id')) - invoices
+        return invoices
+
+    @api.multi
     def _of_get_printable_payments(self, lines):
         """ [IMPRESSION]
         Renvoie les lignes à afficher.
-        Permet l'affichage des paiements dans une commande, même si ce n'est pas le but premier.
-        Pour afficher correctement les paiement d'une commande, il faudrait aussi chercher les paiements sans facture.
         """
         account_move_line_obj = self.env['account.move.line']
         # Liste des factures et factures d'acompte
-        order_lines = lines if lines._name == 'sale.order.line' else lines.mapped('sale_line_ids')
-        invoices = self | order_lines.mapped('invoice_lines').mapped('invoice_id')
+        invoices = self._of_get_linked_invoices(lines)
 
         # Retour de tous les paiements des factures
         # On distingue les paiements de la facture principale de ceux des factures liées
