@@ -271,6 +271,8 @@ class SaleOrderLine(models.Model):
         components = self.kit_id.kit_line_ids or []
         precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
         for comp in components:
+            if comp.product_id.type == "service":
+                continue
             if comp.qty_delivered < comp.qty_total and not float_is_zero(comp.qty_delivered - comp.qty_total, precision_digits=precision):
                 return False
         return True
