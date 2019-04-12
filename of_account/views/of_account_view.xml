@@ -99,6 +99,21 @@
         </field>
     </record>
 
+    <!-- Pour préremplir compte de tiers en fonction du partenaire saisi et date de la dernière écriture du journal par défaut. -->
+    <record id="of_account_view_account_move_form" model="ir.ui.view">
+        <field name="name">of.account.move.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='ref']" position="after">
+                <field name="partner_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']" position="attributes">
+                <attribute name="context">{'line_ids': line_ids, 'journal_id': journal_id, 'default_partner_id': partner_id, 'default_name': ref}</attribute>
+            </xpath>
+        </field>
+    </record>
+
     <!-- Rechercher écritures comptables sur le débit et crédit en même temps -->
     <record id="of_account_view_account_move_line_filter" model="ir.ui.view">
         <field name="name">of.account.view.account.move.line.filter</field>
