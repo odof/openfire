@@ -49,8 +49,11 @@
                         <span t-raw="docs._context.get('of_report_name')"><br/></span>
                     </t>
                     <t t-elif="o">
-                        <!-- si le document est de type facture -->
-                        <t t-if="o._name == 'account.invoice'">
+                        <t t-if="hasattr(o, 'of_get_report_name')">
+                            <span t-esc="o.of_get_report_name(docs)"/>
+                        </t>
+                        <t t-elif="o._name == 'account.invoice'">
+                            <!-- si le document est de type facture -->
                             <span t-if="o.type == 'out_invoice' and (o.state == 'open' or o.state == 'paid')">Facture<br/></span>
                             <span t-if="o.type == 'out_invoice' and o.state == 'proforma2'">Facture PRO-FORMA<br/></span>
                             <span t-if="o.type == 'out_invoice' and o.state == 'draft'">Facture brouillon<br/></span>
@@ -59,21 +62,21 @@
                             <span t-if="o.type == 'in_refund'">Avoir fournisseur<br/></span>
                             <span t-if="o.type == 'in_invoice'">Facture fournisseur<br/></span>
                         </t>
-                        <!-- Si le document est de type devis -->
-                        <t t-if="o._name == 'sale.order'">
+                        <t t-elif="o._name == 'sale.order'">
+                            <!-- Si le document est de type devis -->
                             <span t-if="o.state in ['draft','sent']">Devis</span>
                             <span t-if="o.state not in ['draft','sent']">Bon de commande</span>
                             <br/>
                         </t>
-                        <!-- si le document est de type achat -->
-                        <t t-if="o._name == 'purchase.order'">
+                        <t t-elif="o._name == 'purchase.order'">
+                            <!-- si le document est de type achat -->
                             <span t-if="o.state in ['draft','sent']">Demande de prix</span>
                             <span t-if="o.state == 'to approve'">À approuver</span>
                             <span t-if="o.state in ['purchase','done']">Commande fournisseur</span>
                             <span t-if="o.state == 'cancel'">Annulé</span>
                         </t>
-                        <!-- si le document est de type bon de préparation -->
-                        <t t-if="o._name == 'stock.picking'">
+                        <t t-elif="o._name == 'stock.picking'">
+                            <!-- si le document est de type bon de préparation -->
                             <span name="bon_livraison" style="font-size: medium;">Bon de livraison</span>
                         </t>
                     </t>
@@ -89,17 +92,20 @@
                         <strong>
                         <!-- Si le document possède un type -->
                         <t t-if="o">
-                            <!-- si le document est de type facture -->
-                            <t t-if="o._name == 'account.invoice'">
+                            <t t-if="hasattr(o, 'of_get_report_number')">
+                                <span t-esc="o.of_get_report_number(docs)"/>
+                            </t>
+                            <t t-elif="o._name == 'account.invoice'">
+                                <!-- si le document est de type facture -->
                                 <span t-if="o.number" t-field="o.number"/>
                                 <span t-if="not o.number">-</span>
                             </t>
-                            <!-- si le document est de type devis ou achat-->
-                            <t t-if="o._name == 'sale.order' or o._name == 'purchase.order'">
+                            <t t-elif="o._name == 'sale.order' or o._name == 'purchase.order'">
+                                <!-- si le document est de type devis ou achat-->
                                 <span t-field="o.name"/>
                             </t>
-                            <!-- si le document est de type préparation/livraison-->
-                            <t t-if="o._name == 'stock.picking'">
+                            <t t-elif="o._name == 'stock.picking'">
+                                <!-- si le document est de type préparation/livraison-->
                                 <span t-field="o.name" style="margin-left: -4px; font-size: medium;"/>
                             </t>
                         </t>
@@ -116,13 +122,16 @@
                         <strong>
                         <!-- Si le document possède un type -->
                         <t t-if="o">
-                            <!-- Si le document est de type facture -->
-                            <t t-if="o._name == 'account.invoice'">
+                            <t t-if="hasattr(o, 'of_get_report_date')">
+                                <span t-esc="o.of_get_report_date(docs)"/>
+                            </t>
+                            <t t-elif="o._name == 'account.invoice'">
+                                <!-- Si le document est de type facture -->
                                 <span t-if="o.date_invoice" t-field="o.date_invoice"></span>
                                 <span t-if="not o.date_invoice">-</span>
                             </t>
-                            <!-- Si le document est de type devis-->
-                            <t t-if="o._name == 'sale.order'">
+                            <t t-elif="o._name == 'sale.order'">
+                                <!-- Si le document est de type devis-->
                                 <t t-if="o.date_order and not o.confirmation_date">
                                     <t t-set="date_order" t-value="o.date_order[8:10] + '/' + o.date_order[5:7] + '/' + o.date_order[0:4]"/>
                                     <span t-esc="date_order"/>
@@ -133,16 +142,16 @@
                                 </t>
                                 <span t-if="not o.date_order and not o.confirmation_date">-</span>
                             </t>
-                            <!-- Si le document est de type achat -->
-                            <t t-if="o._name == 'purchase.order'">
+                            <t t-elif="o._name == 'purchase.order'">
+                                <!-- Si le document est de type achat -->
                                 <t t-if="o.date_order">
                                     <t t-set="date_order" t-value="o.date_order[8:10] + '/' + o.date_order[5:7] + '/' + o.date_order[0:4]"/>
                                     <span t-esc="date_order"/>
                                 </t>
                                 <span t-if="not o.date_order">-</span>
                             </t>
-                            <!--Si le document est de type préparation/livraison -->
-                            <t t-if="o._name == 'stock.picking'">
+                            <t t-elif="o._name == 'stock.picking'">
+                                <!--Si le document est de type préparation/livraison -->
                                 <t t-if="o.date_done">
                                     <t t-set="date_done" t-value="o.date_done[8:10] + '/' + o.date_done[5:7] + '/' + o.date_done[0:4]"/>
                                     <span t-esc="date_done"/>
