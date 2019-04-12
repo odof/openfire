@@ -40,9 +40,6 @@ class HREmployee(models.Model):
     hor_af = fields.Float(string=u'Après-midi fin', required=True, digits=(12, 1),default=18)
     jour_ids = fields.Many2many('of.jours', 'employee_jours_rel', 'employee_id', 'jour_id', string='Jours travaillés', required=True, default=_get_default_jours)
 
-    address_depart_id = fields.Many2one('res.partner', string='Adresse de départ')
-    address_retour_id  = fields.Many2one('res.partner', string='Adresse de retour')
-
     of_color_ft = fields.Char(string="Couleur de texte", compute="_compute_colors")
     of_color_bg = fields.Char(string="Couleur de fond", compute="_compute_colors")
 
@@ -90,20 +87,6 @@ class HREmployee(models.Model):
         if self.hor_ad and self.hor_af and self.hor_ad > self.hor_af:
             raise UserError(u"L'Heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi")
 
-    @api.onchange('address_id')
-    def _onchange_address(self):
-        self.ensure_one()
-        if self.address_id:
-            super(HREmployee, self)._onchange_address()
-            self.address_depart_id = self.address_id.id
-            self.address_retour_id = self.address_id.id
-
-    @api.onchange('address_depart_id')
-    def _onchange_address_depart(self):
-        self.ensure_one()
-        if self.address_depart_id:
-            self.address_retour_id = self.address_depart_id.id
-
     @api.model
     def get_working_hours_fields(self):
         return {
@@ -121,6 +104,10 @@ class OFMeetingType(models.Model):
 class OFMeeting(models.Model):
     _inherit = "calendar.event"
 
+    #redefinition
+    description = fields.Html('Description', states={'done': [('readonly', True)]})
+    location = fields.Char('Location', compute="_compute_location", stroe=True, track_visibility='onchange', help="Location of Event")
+
     lieu = fields.Selection([
         ("onsite", "Dans les locaux"),
         ("phone", "Au téléphone"),
@@ -130,6 +117,12 @@ class OFMeeting(models.Model):
     # tentative de domain ratée
     lieu_company_id = fields.Many2one("res.company",string="(Précisez)")#,domain="[('id', 'in', user_company_ids and user_company_ids._ids)]")
     lieu_rdv_id = fields.Many2one("res.partner",string="(Précisez)")
+    lieu_address_street = fields.Char(string="Rue", compute="_compute_geo")
+    lieu_address_street2 = fields.Char(string="Rue (2)", compute="_compute_geo")
+    lieu_address_city = fields.Char(string="Ville", compute="_compute_geo")
+    lieu_address_state_id = fields.Many2one("res.country.state", string=u"Région", compute="_compute_geo")
+    lieu_address_zip = fields.Char(string="Code postal", compute="_compute_geo")
+    lieu_address_country_id = fields.Many2one("res.country", string="Pays", compute="_compute_geo")
     on_phone = fields.Boolean(u'Au téléphone', compute="_compute_on_phone")
     color_partner_id = fields.Many2one("res.partner", "Partner whose color we will take", compute='_compute_color_partner', store=False)
     geo_lat = fields.Float(string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo", readonly=True, store=True)
@@ -157,24 +150,71 @@ class OFMeeting(models.Model):
         for meeting in self:
             if meeting.lieu and meeting.lieu == "onsite": # dans les locaux
                 vals = {
+                    "lieu_address_street": meeting.lieu_company_id.street,
+                    "lieu_address_street2": meeting.lieu_company_id.street2,
+                    "lieu_address_city": meeting.lieu_company_id.city,
+                    "lieu_address_state_id": meeting.lieu_company_id.state_id.id,
+                    "lieu_address_zip": meeting.lieu_company_id.zip,
+                    "lieu_address_country_id": meeting.lieu_company_id.country_id.id,
                     'geo_lat': meeting.lieu_company_id.geo_lat,
                     'geo_lng': meeting.lieu_company_id.geo_lng,
                     'precision': meeting.lieu_company_id.precision,
                 }
             elif meeting.lieu and meeting.lieu == "offsite": # a l'exterieur
                 vals = {
+                    "lieu_address_street": meeting.lieu_rdv_id.street,
+                    "lieu_address_street2": meeting.lieu_rdv_id.street2,
+                    "lieu_address_city": meeting.lieu_rdv_id.city,
+                    "lieu_address_state_id": meeting.lieu_rdv_id.state_id.id,
+                    "lieu_address_zip": meeting.lieu_rdv_id.zip,
+                    "lieu_address_country_id": meeting.lieu_rdv_id.country_id.id,
                     'geo_lat': meeting.lieu_rdv_id.geo_lat,
                     'geo_lng': meeting.lieu_rdv_id.geo_lng,
                     'precision': meeting.lieu_rdv_id.precision,
                 }
             else:
                 vals = {
+                    "lieu_address_street": False,
+                    "lieu_address_street2": False,
+                    "lieu_address_city": False,
+                    "lieu_address_state_id": False,
+                    "lieu_address_zip": False,
+                    "lieu_address_country_id": False,
                     'geo_lat': 0,
                     'geo_lng': 0,
                     'precision': 'no_address',
                 }
             meeting.update(vals)
 
+    @api.multi
+    @api.depends("lieu","lieu_company_id","lieu_rdv_id","precision")
+    def _compute_location(self):
+        for meeting in self:
+            if meeting.precision != "no_address":
+                le_tab = []
+                le_texte = ""
+                """
+                On remplit le tableau puis on crée le texte
+                """
+                if meeting.lieu_address_street:
+                    le_tab.append(meeting.lieu_address_street)
+                if meeting.lieu_address_street2:
+                    le_tab.append(meeting.lieu_address_street2)
+                if meeting.lieu_address_city and meeting.lieu_address_zip:
+                    le_tab.append(meeting.lieu_address_zip + " " + meeting.lieu_address_city)
+                elif meeting.lieu_address_city:
+                    le_tab.append(meeting.lieu_address_city)
+                elif meeting.lieu_address_zip:
+                    le_tab.append(meeting.lieu_address_zip)
+                if meeting.lieu_address_state_id:
+                    le_tab.append(meeting.lieu_address_state_id.name)
+                if meeting.lieu_address_country_id:
+                    le_tab.append(meeting.lieu_address_country_id.name)
+                if len(le_tab) > 0:
+                    le_texte += le_tab[0]
+                for i in range(1,len(le_tab)):
+                    le_texte += ", " + le_tab[i]
+                meeting.location = le_texte
 
     """tentative de domain ratée
     @api.multi
@@ -191,16 +231,23 @@ class OFMeeting(models.Model):
     @api.onchange('lieu')
     def _onchange_lieu(self):
         self.ensure_one()
-        if not self.lieu:
+        if not self.lieu or self.lieu  == "phone": # réinitialise
             self.lieu_rdv_id = False
             self.lieu_company_id = False
-            return
-        if not self.lieu  == "offsite": # réinitialise
-            self.lieu_rdv_id = False
-        if self.lieu == "onsite": # on site
+        elif self.lieu == "onsite": # on site
             self.lieu_company_id = self.user_id.company_id.id
-        else: # réinitialise
+            self.lieu_rdv_id = self.user_id.company_id.partner_id.id
+        else: # off site
             self.lieu_company_id = False
+
+    @api.onchange('lieu_company_id')
+    def _onchange_lieu_company_id(self):
+        self.ensure_one()
+        if not self.lieu or not self.lieu == "onsite":
+            return
+        if not self.lieu_company_id:
+            return
+        self.lieu_rdv_id = self.lieu_company_id.partner_id.id
 
     """
     These fields would be necessary if use_contacts="0" in <calendar>. See event_data_transform function in .js file

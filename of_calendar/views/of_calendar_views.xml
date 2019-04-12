@@ -46,9 +46,7 @@
                         <field name="hor_af" widget="float_time" colspan="1" nolabel="1"/>
                         <field name="jour_ids" widget="many2many_tags" colspan="3"/>
                     </group>
-                    <group name="interventions" string="Interventions" colspan="2">
-                        <field name="address_depart_id" string="Adresse de départ par défaut"/>
-                        <field name="address_retour_id" string="Adresse de retour par défaut"/>
+                    <group colspan="2">
                     </group>
                 </group>
             </xpath>
@@ -67,14 +65,30 @@
             <xpath expr="//h1" position="attributes">
                 <attribute name="class">oe_edit_only</attribute>
             </xpath>
+            <xpath expr="//field[@name='categ_ids']" position="replace"></xpath>
+            <xpath expr="//field[@name='alarm_ids']" position="replace"></xpath>
             <xpath expr="//field[@name='location']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
+            <xpath expr="//field[@name='allday']" position="after">
+                <field name="categ_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
+                <field name="alarm_ids" widget="many2many_tags"/>
+            </xpath>
             <xpath expr="//field[@name='location']" position="before">
-                <!--field name="user_company_ids" invisible="1"/-->
+                <!--field name="user_company_ids" invisible="1"/
+                <field name="lieu_address_state_id" class="o_address_state" options='{"no_open": True}' context="{'country_id': country_id, 'zip': zip}"/>
+                -->
                 <field name="lieu" widget="selection"/>
                 <field name="lieu_company_id" widget="selection" attrs="{'invisible': [('lieu', '!=', 'onsite')],'required': [('lieu', '=', 'onsite')]}"/>
                 <field name="lieu_rdv_id" options="{'no_open': True, 'no_create': True}" attrs="{'invisible': [('lieu', '!=', 'offsite')],'required': [('lieu', '=', 'offsite')]}"/>
+                <label for="lieu_address_street" string="Adresse: " colspan="2" style="margin-bottom: 4px"/>
+                <div class="o_address_format oe_grey" colspan="2"><i>
+                    <field name="lieu_address_street" class="o_address_street"/>
+                    <field name="lieu_address_street2" class="o_address_street"/>
+                    <field name="lieu_address_city" class="o_address_city"/>
+                    <field name="lieu_address_zip" class="o_address_zip"/>
+                    <field name="lieu_address_country_id" class="o_address_country" options='{"no_open": True, "no_create": True}'/></i>
+                </div>
             </xpath>
         </field>
     </record>
