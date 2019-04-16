@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
@@ -63,6 +63,10 @@ class OfWizardSituation(models.TransientModel):
             wizard.amount_invoiced_ttc = values[1][2]
             wizard.amount_to_invoice_ht = values[2][0]
             wizard.amount = values[2][2]
+
+    @api.multi
+    def name_get(self):
+        return [(record.id, "Situation n°%i" % record.prochaine_situation) for record in self]
 
     def action_dummy(self):
         return True
