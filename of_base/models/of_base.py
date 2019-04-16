@@ -289,12 +289,13 @@ class ResPartner(models.Model):
         email_channels = message.channel_ids.filtered(lambda channel: channel.email_send)
         # Auparavant, Odoo éliminait l'auteur du mail comme destinataire.
         # On empêche cette éliminination et l'appel du super ajoute les autres destinataires. 
-        self.sudo().search([
-            '|',
-            ('id', 'in', self.ids),
-            ('channel_ids', 'in', email_channels.ids),
-            ('email', '=', message_sudo.author_id and message_sudo.author_id.email or message.email_from),
-            ('notify_email', '!=', 'none')])._notify_by_email(message, force_send=force_send, send_after_commit=send_after_commit, user_signature=user_signature)
+        if self._context.get('mail_notify_author'):
+            self.sudo().search([
+                '|',
+                ('id', 'in', self.ids),
+                ('channel_ids', 'in', email_channels.ids),
+                ('email', '=', message_sudo.author_id and message_sudo.author_id.email or message.email_from),
+                ('notify_email', '!=', 'none')])._notify_by_email(message, force_send=force_send, send_after_commit=send_after_commit, user_signature=user_signature)
         return super(ResPartner, self)._notify(message, force_send, send_after_commit, user_signature)
 
 class Module(models.Model):
@@ -414,8 +415,13 @@ class MailComposer(models.TransientModel):
         self._compute_of_computed_body()
         return {"type": "ir.actions.do_nothing"}
 
-    # Permet à l'auteur du mail de le recevoir en copie.
+    # Permet à l'auteur du mail de le recevoir en copie si le paramètre du modèle est vrai.
     @api.multi
     def send_mail_action(self):
-        res = super(MailComposer, self.with_context(mail_notify_author=True)).send_mail_action()
+        res = super(MailComposer, self.with_context(mail_notify_author=self.template_id and self.template_id.of_copie_expediteur)).send_mail_action()
         return res
+
+class MailTemplate(models.Model):
+    _inherit = 'mail.template'
+
+    of_copie_expediteur = fields.Boolean(string=u"Copie du mail à l'expéditeur")

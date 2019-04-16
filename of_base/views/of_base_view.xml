@@ -173,5 +173,16 @@
         </field>
     </record>
 
+    <record model="ir.ui.view" id="of_base_email_template_form">
+        <field name="name">of.base.email.template.form</field>
+        <field name="model">mail.template</field>
+        <field name="inherit_id" ref="mail.email_template_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='email_from']" position="after">
+                <field name="of_copie_expediteur"/>
+            </xpath>
+        </field>
+    </record>
+
     </data>
 </odoo>
