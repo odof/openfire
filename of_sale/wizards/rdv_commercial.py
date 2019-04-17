@@ -616,7 +616,7 @@ class OFRDVCommercial(models.TransientModel):
                 address = self.partner_address_id
             name = address.name or (address.parent_id and address.parent_id.name) or ''
             if self.lieu == 'phone':
-                name += ' (téléphonique)'
+                name += u' (téléphonique)'
             else:
                 name += address.zip and (" " + address.zip) or ""
                 name += address.city and (" " + address.city) or ""
@@ -967,7 +967,7 @@ class OfRDVCommercialLine(models.TransientModel):
             address = self.wizard_id.partner_address_id
         name = address.name or (address.parent_id and address.parent_id.name) or ''
         if self.wizard_id.lieu == 'phone':
-            name += ' (téléphonique)'
+            name += u' (téléphonique)'
         else:
             name += address.zip and (" " + address.zip) or ""
             name += address.city and (" " + address.city) or ""
