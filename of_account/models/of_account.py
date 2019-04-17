@@ -48,6 +48,19 @@ class AccountInvoice(models.Model):
         self.move_id.write({'ref': ref})
         return res
 
+    @api.multi
+    def write(self, vals):
+        if 'tax_line_ids' in vals:
+            # Lorsque les lignes de taxes sont changées / ajoutés sur une facture elles doivent toutes être
+            # recréées, il faut donc unlink toutes les lignes qui ne sont pas des codes 0 (create)
+            lines_to_keep = []
+            for line in vals['tax_line_ids']:
+                if line[0] == 0:
+                    lines_to_keep.append(line)
+            if lines_to_keep:
+                vals['tax_line_ids'] = [(5, )] + lines_to_keep
+        return super(AccountInvoice, self).write(vals)
+
 class AccountAccount(models.Model):
     _inherit = "account.account"
 
