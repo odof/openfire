@@ -136,6 +136,11 @@
                         <group name="advanced_settings_group_2" col="4"></group>
                     </page>
                 </notebook>
+                <xpath expr="//field[@name='company_registry']" position="after">
+                    <field name="of_juridique"/>
+                    <field name="of_capital"/>
+                    <field name="of_assu_dec"/>
+                </xpath>
             </field>
         </record>
 

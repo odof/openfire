@@ -288,7 +288,7 @@ class ResPartner(models.Model):
         message_sudo = message.sudo()
         email_channels = message.channel_ids.filtered(lambda channel: channel.email_send)
         # Auparavant, Odoo éliminait l'auteur du mail comme destinataire.
-        # On empêche cette éliminination et l'appel du super ajoute les autres destinataires. 
+        # On empêche cette éliminination et l'appel du super ajoute les autres destinataires.
         if self._context.get('mail_notify_author'):
             self.sudo().search([
                 '|',
@@ -425,3 +425,10 @@ class MailTemplate(models.Model):
     _inherit = 'mail.template'
 
     of_copie_expediteur = fields.Boolean(string=u"Copie du mail à l'expéditeur")
+
+class ResCompany(models.Model):
+    _inherit = "res.company"
+
+    of_juridique = fields.Char(string="Forme juridique")
+    of_capital = fields.Char(string="Capital social")
+    of_assu_dec = fields.Char(string=u"Assurance décennale")
