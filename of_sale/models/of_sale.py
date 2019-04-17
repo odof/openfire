@@ -573,23 +573,6 @@ class AccountInvoiceLine(models.Model):
             self.name += '\n' + product.description_fabricant
         return res
 
-class ResPartner(models.Model):
-    _inherit = 'res.partner'
-
-    hor_md = fields.Float(string=u'Matin début', required=True, digits=(12, 1),default=9) #TODO onchange user_id
-    hor_mf = fields.Float(string='Matin fin', required=True, digits=(12, 1),default=12)
-    hor_ad = fields.Float(string=u'Après-midi début', required=True, digits=(12, 1),default=14)
-    hor_af = fields.Float(string=u'Après-midi fin', required=True, digits=(12, 1),default=18)
-
-    @api.model
-    def get_working_hours_fields(self):
-        return {
-            "morning_start_field": "hor_md",
-            "morning_end_field": "hor_mf",
-            "afternoon_start_field": "hor_ad",
-            "afternoon_end_field": "hor_af"
-        }
-
 class Company(models.Model):
     _inherit = 'res.company'
 

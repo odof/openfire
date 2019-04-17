@@ -29,10 +29,19 @@ SEARCH_MODES = [
     ('duree', u'Durée (min)'),
 ]
 
-PICK_MODES = [
+ROUTING_BASE_URL = u"http://s-hotel.openfire.fr:5000/"
+ROUTING_VERSION = u"v1"
+ROUTING_PROFILE = u"driving"
+
+"""PICK_MODES = [
     ('date', u'Au plus tôt'),
     ('distance', u'Au plus proche'),
-]
+]"""
+
+@api.model
+def _tz_get(self):
+    # put POSIX 'Etc/*' entries at the end to avoid confusing users - see bug 1086728
+    return [(tz, tz) for tz in sorted(pytz.all_timezones, key=lambda tz: tz if not tz.startswith('Etc/') else '_')]
 
 def hours_to_strs(*hours):
     """ Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'
@@ -71,7 +80,7 @@ class OFRDVCommercial(models.TransientModel):
         return lead
 
     @api.model
-    def _default_commercial(self): ###a verif
+    def _default_user(self):
         active_model = self._context.get('active_model', '')
         if active_model == "crm.lead":
             lead_id = self._context['active_ids'][0]
@@ -89,6 +98,14 @@ class OFRDVCommercial(models.TransientModel):
             return False
 
     @api.model
+    def _default_employee(self):
+        user_id = self._default_user()
+        if user_id and len(user_id.employee_ids) > 0:
+            return user_id.employee_ids[0]
+        else:
+            return False
+
+    @api.model
     def _default_address(self): ###a verif
         partner_obj = self.env['res.partner']
         active_model = self._context.get('active_model', '')
@@ -96,9 +113,13 @@ class OFRDVCommercial(models.TransientModel):
             lead_id = self._context['active_ids'][0]
             lead = self.env["crm.lead"].browse(lead_id)
             address_id = lead.partner_id.id
+            self = self.with_context(modmod = 1)
         elif active_model == "res.partner":
             partner = partner_obj.browse(self._context['active_ids'][0])
             address_id = partner.address_get(['delivery'])['delivery']
+            self = self.with_context(modmod = 2)
+        else:
+            address_id = False
 
         if address_id:
             address = partner_obj.browse(address_id)
@@ -106,7 +127,7 @@ class OFRDVCommercial(models.TransientModel):
                 address = partner_obj.search(['|', ('id', '=', address.id), ('parent_id', '=', address.id),
                                               '|', ('geo_lat', '!=', 0), ('geo_lng', '!=', 0)], limit=1)
                 if not address:
-                    address = partner_obj.search(['|', ('id', '=', address.id), ('parent_id', '=', address.id)], limit=1)
+                    address = partner_obj.search(['|', ('id', '=', address_id), ('parent_id', '=', address_id)], limit=1)
             return address
         return False
 
@@ -116,87 +137,184 @@ class OFRDVCommercial(models.TransientModel):
         res = [jour.id for jour in jours]
         return res
 
-    name = fields.Char(string=u'Libellé', size=64, required=False)
-    description = fields.Text(string='Description')
-    user_id = fields.Many2one('res.users', string=u"Commercial", required=True, default=_default_commercial)
-    duree = fields.Float(string=u'Durée', required=True, digits=(12, 2),default=0.25)
+    name = fields.Char(string=u'Libellé', size=64, required=False, default="Planifier RDVcom")
+    description = fields.Html(string='Description')
+    user_id = fields.Many2one('res.users', string=u"Compte Commercial", required=True, default=_default_user)
+    employee_id = fields.Many2one('hr.employee', string=u"Commercial", required=True, default=_default_employee)
+    duree = fields.Float(string=u'Durée du RDV', required=True, digits=(12, 2),default=1)
     creneau_ids = fields.One2many('of.rdv.commercial.line', 'wizard_id', string='Proposition de RDVs')
     date_propos = fields.Datetime(string=u'RDV Début')
     date_propos_hour = fields.Float(string=u'Heude de début', digits=(12, 5))
     date_recherche_debut = fields.Date(string='À partir du', required=True, default=lambda *a: (d_date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
     date_recherche_fin = fields.Date(string="Jusqu'au", required=True, default=lambda *a: (d_date.today() + timedelta(days=7)).strftime('%Y-%m-%d'))
     partner_id = fields.Many2one('res.partner', string='Client', required=True, readonly=True, default=_default_partner)
-    rdv_address_id = fields.Many2one('res.partner', string="Adresse du RDV", default=_default_address,
+    partner_name = fields.Char(related='partner_id.name')
+    partner_child_ids = fields.One2many(related="partner_id.child_ids",readonly=True) # pour domain dans XML
+    partner_address_id = fields.Many2one('res.partner', string="Adresse du RDV", default=_default_address,
                                          domain="['|', ('id', '=', partner_id), ('parent_id', '=', partner_id)]")
     date_display = fields.Char(string='Jour du RDV', size=64, readonly=True)
     lead_id = fields.Many2one('crm.lead', string='Opportunité', default=_default_lead, domain="[('partner_id', '=', partner_id)]")
     mode_recherche = fields.Selection(SEARCH_MODES, string="Mode de recherche", required=True, default="distance")
-    mode_result = fields.Selection(PICK_MODES, string="Choix de la proposition", required=True, default="distance")
+    #mode_result = fields.Selection(PICK_MODES, string="Choix de la proposition", required=True, default="distance")
     max_recherche = fields.Float(string="Maximum")
     allday = fields.Boolean('All Day', default=False)
     hor_md = fields.Float(string=u'Matin début', required=True, digits=(12, 1),default=9) #TODO onchange user_id
     hor_mf = fields.Float(string='Matin fin', required=True, digits=(12, 1),default=12)
     hor_ad = fields.Float(string=u'Après-midi début', required=True, digits=(12, 1),default=14)
     hor_af = fields.Float(string=u'Après-midi fin', required=True, digits=(12, 1),default=18)
-    jour_ids = fields.Many2many('of.jours', 'rdvcom_jours', 'rdvcom_id', 'jour_id', string='Jours travillés', required=True, default=_get_default_jours)
+    jour_ids = fields.Many2many('of.jours', 'rdvcom_jours', 'rdvcom_id', 'jour_id', string='Jours travaillés', required=True, default=_get_default_jours)
+    tz = fields.Selection(_tz_get, string='Timezone', default=lambda self: self._context.get('tz'),
+                          help="The Team's timezone, used to output proper date and time values "
+                               "inside printed reports. It is important to set a value for this field. "
+                               "You should use the same timezone that is otherwise used to pick and "
+                               "render date and time values: your computer's timezone.")
+    tz_offset = fields.Char(compute='_compute_tz_offset', string='Timezone offset')
 
     zero_result = fields.Boolean(string="Recherche infructueuse",default=False,help="Aucun résultat")
     zero_dispo = fields.Boolean(string="Recherche infructueuse",default=False,help="Aucun résultat sufisament proche")
     display_search = fields.Boolean(string=u"Voir critères de recherche",default=True)
     display_res = fields.Boolean(string=u"Voir Résultats",default=False)
+    display_horaires = fields.Boolean(string="Voir horaires",default=False)
     res_line_id = fields.Many2one("of.rdv.commercial.line",string="Créneau Sélectionné")
 
+    lieu = fields.Selection([
+        ("customer", "Chez le client"),
+        ("phone", "Au téléphone"),
+        ("company", "Dans les locaux"),
+        ("other", "Autre")
+        ], string="Lieu du RDV", required=True, default="customer")
+
+    lieu_company_id = fields.Many2one("res.company",string="(précisez)")
+    lieu_rdv_id = fields.Many2one("res.partner", string="(précisez)")
+    lieu_address_street = fields.Char(string="Rue", compute="_compute_address")
+    lieu_address_street2 = fields.Char(string="Rue (2)", compute="_compute_address")
+    lieu_address_city = fields.Char(string="Ville", compute="_compute_address")
+    lieu_address_state_id = fields.Many2one("res.country.state", string=u"Région", compute="_compute_address")
+    lieu_address_zip = fields.Char(string="Code postal", compute="_compute_address")
+    lieu_address_country_id = fields.Many2one("res.country", string="Pays", compute="_compute_address")
+
     # champs ajoutés pour la vue map
-    geo_lat = fields.Float(related='rdv_address_id.geo_lat', readonly=True)
-    geo_lng = fields.Float(related='rdv_address_id.geo_lng', readonly=True)
-    precision = fields.Selection(related='rdv_address_id.precision', readonly=True)
-    partner_name = fields.Char(related='partner_id.name')
+    geo_lat = fields.Float(string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_address")
+    geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_address")
+    precision = fields.Selection([
+        ('manual', "Manuel"),
+        ('high', "Haut"),
+        ('medium', "Moyen"),
+        ('low', "Bas"),
+        ('no_address', u"--"),
+        ('unknown', u"Indéterminé"),
+        ('not_tried', u"Pas tenté"),
+        ], default='not_tried', help=u"Niveau de précision de la géolocalisation", compute="_compute_address")
     ignorer_geo = fields.Boolean(u"Ignorer données géographiques")
 
-    @api.onchange('mode_result')
-    def _onchange_mode_result(self): ###a verif
-        u"""Sélectionne le résultat en fonction du mode de résultat (au plus proche ou au plus tôt)"""
+    of_color_ft = fields.Char(string="Couleur de texte", compute="_compute_colors")
+    of_color_bg = fields.Char(string="Couleur de fond", compute="_compute_colors")
+
+    @api.multi
+    @api.depends("lieu","partner_address_id","lieu_company_id","lieu_rdv_id")
+    def _compute_address(self):
+        for wizard in self:
+            if wizard.lieu == "customer":
+                values = {
+                    "lieu_address_street": wizard.partner_address_id.street,
+                    "lieu_address_street2": wizard.partner_address_id.street2,
+                    "lieu_address_city": wizard.partner_address_id.city,
+                    "lieu_address_state_id": wizard.partner_address_id.state_id.id,
+                    "lieu_address_zip": wizard.partner_address_id.zip,
+                    "lieu_address_country_id": wizard.partner_address_id.country_id.id,
+                    "geo_lat": wizard.partner_address_id.geo_lat,
+                    "geo_lng": wizard.partner_address_id.geo_lng,
+                    "precision": wizard.partner_address_id.precision,
+                }
+            elif wizard.lieu == "company":
+                values = {
+                    "lieu_address_street": wizard.lieu_company_id.partner_id.street,
+                    "lieu_address_street2": wizard.lieu_company_id.partner_id.street2,
+                    "lieu_address_city": wizard.lieu_company_id.partner_id.city,
+                    "lieu_address_state_id": wizard.lieu_company_id.partner_id.state_id.id,
+                    "lieu_address_zip": wizard.lieu_company_id.partner_id.zip,
+                    "lieu_address_country_id": wizard.lieu_company_id.partner_id.country_id.id,
+                    "geo_lat": wizard.lieu_company_id.partner_id.geo_lat,
+                    "geo_lng": wizard.lieu_company_id.partner_id.geo_lng,
+                    "precision": wizard.lieu_company_id.partner_id.precision,
+                }
+            elif wizard.lieu == "other":
+                values = {
+                    "lieu_address_street": wizard.lieu_rdv_id.street,
+                    "lieu_address_street2": wizard.lieu_rdv_id.street2,
+                    "lieu_address_city": wizard.lieu_rdv_id.city,
+                    "lieu_address_state_id": wizard.lieu_rdv_id.state_id.id,
+                    "lieu_address_zip": wizard.lieu_rdv_id.zip,
+                    "lieu_address_country_id": wizard.lieu_rdv_id.country_id.id,
+                    "geo_lat": wizard.lieu_rdv_id.geo_lat,
+                    "geo_lng": wizard.lieu_rdv_id.geo_lng,
+                    "precision": wizard.lieu_rdv_id.precision,
+                }
+            else:
+                values = {
+                    "lieu_address_street": False,
+                    "lieu_address_street2": False,
+                    "lieu_address_city": False,
+                    "lieu_address_state_id": False,
+                    "lieu_address_zip": False,
+                    "lieu_address_country_id": False,
+                    "geo_lat": False,
+                    "geo_lng": False,
+                    "precision": "no_address",
+                }
+            wizard.update(values)
+
+    @api.depends('tz')
+    def _compute_tz_offset(self):
+        for wizard in self:
+            wizard.tz_offset = datetime.now(pytz.timezone(wizard.tz or 'GMT')).strftime('%z')
+
+    @api.depends("user_id")
+    def _compute_colors(self):
+        for wizard in self:
+            if wizard.user_id:
+                wizard.of_color_ft = wizard.user_id.of_color_ft
+                wizard.of_color_bg = wizard.user_id.of_color_bg
+            else:
+                wizard.of_color_ft = "#0D0D0D"
+                wizard.of_color_bg = "#F0F0F0"
+
+
+    @api.onchange('lieu')
+    def _onchange_lieu(self):
         self.ensure_one()
-        if not (self.creneau_ids and self.display_search):
+        if not self.lieu:
             return
-        if not self._context.get('tz'):
-            self = self.with_context(tz='Europe/Paris')
-        tz = pytz.timezone(self._context['tz'])
-        if self.mode_result == "distance":
-            le_order = "distance,debut_dt"
-        else:
-            le_order = "debut_dt,distance"
-        # ne pas inclure les lignes associées a une intervention ni les lignes de début et fin de recherche
-        lines = self.creneau_ids.search([('virtuel', '=', False),('calendar_id', '=', False)],order=le_order)
-        lines_dispo = self.creneau_ids.search([('disponible', '=', True)],order=le_order)
-        nb = len(lines)
-        nb_dispo = len(lines_dispo)
-        first_res = lines_dispo and lines_dispo[0] or lines and lines[0] or False
-        vals ={}
-        if first_res and first_res.id != self.res_line_id.id:
-            address = self.rdv_address_id
-            name = address.name or (address.parent_id and address.parent_id.name) or ''
-            name += address.zip and (" " + address.zip) or ""
-            name += address.city and (" " + address.city) or ""
+        if self.lieu == "phone":
+            self.ignorer_geo = True
+            self.lieu_rdv_id = False
+            self.lieu_company_id = False
+        elif self.lieu == "company":
+            self.ignorer_geo = False
+            self.lieu_company_id = self.user_id.company_id.id
+            self.lieu_rdv_id = self.user_id.company_id.partner_id.id
+        elif self.lieu == "customer":
+            self.ignorer_geo = False
+            self.lieu_company_id = False
+            self.lieu_rdv_id = self.partner_address_id.id
+        else: # other
+            self.lieu_company_id = False
+            self.ignorer_geo = False
 
-            d_first_res = fields.Date.from_string(first_res.date)
-            dt_propos = datetime.combine(d_first_res, datetime.min.time()) + timedelta(hours=first_res.date_flo)
-            dt_propos = tz.localize(dt_propos, is_dst=None).astimezone(pytz.utc)
-
+    @api.onchange('employee_id')
+    def _onchange_employee_id(self):
+        """Met a jour les horaires de travail, adresses de départ et d'arrivée"""
+        self.ensure_one()
+        if self.employee_id:
             vals = {
-                'res_line_id'     : first_res.id,
-                'date_display'    : first_res.date,
-                'name'            : name,
-                'user_id'         : first_res.user_id.id,
-                'date_propos'     : dt_propos,
-                'date_propos_hour': first_res.date_flo,
-                'zero_result'     : False,
-                'zero_dispo'      : nb_dispo == 0,
-            }
-
-            self.res_line_id.selected = False
+                "hor_md": self.employee_id.hor_md,
+                "hor_mf": self.employee_id.hor_mf,
+                "hor_ad": self.employee_id.hor_ad,
+                "hor_af": self.employee_id.hor_af,
+                "jour_ids": [(5,0,0)] + [(4,le_id,False) for le_id in self.employee_id.jour_ids._ids],
+                "user_id": self.employee_id.user_id,
+                }
             self.update(vals)
-            self.res_line_id.selected = True
 
     @api.onchange('mode_recherche')
     def _onchange_mode_recherche(self):
@@ -220,6 +338,15 @@ class OFRDVCommercial(models.TransientModel):
         if self.date_recherche_fin and self.date_recherche_fin < self.date_recherche_debut:
             raise UserError(u"La date de fin de recherche doit être postérieure à la date de début de recherche")
 
+    @api.model
+    def get_working_hours_fields(self):
+        return {
+            "morning_start_field": "hor_md",
+            "morning_end_field": "hor_mf",
+            "afternoon_start_field": "hor_ad",
+            "afternoon_end_field": "hor_af"
+        }
+
     """
     a voir si réimplémenter cette fonctionnalité
     # Note: Séparation en 3 fonctions car, avec une seule fonction button_calcul(self, creneau_suivant=False),
@@ -238,6 +365,22 @@ class OFRDVCommercial(models.TransientModel):
             'target': 'new',
             'context': context,
         }"""
+
+    @api.multi
+    def button_horaires_show(self):
+        """Montre les horaires pour pouvoir les modifier"""
+        self.ensure_one()
+        self.display_horaires = True
+
+        return {'type': 'ir.actions.do_nothing'}
+
+    @api.multi
+    def button_horaires_hide(self):
+        """Cache les horaires"""
+        self.ensure_one()
+        self.display_horaires = False
+
+        return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
     def button_calcul(self):
@@ -270,11 +413,10 @@ class OFRDVCommercial(models.TransientModel):
         wizard_line_obj = self.env['of.rdv.commercial.line']
         calendar_obj = self.env['calendar.event']
 
-        address = self.rdv_address_id
         jours = [jour.numero for jour in self.jour_ids] if self.jour_ids else range(1, 6)
 
         # Suppression des anciens créneaux
-        creneau_del_ids = wizard_line_obj.search([])#[('wizard_id', '=', self.id)])
+        creneau_del_ids = wizard_line_obj.search([('wizard_id', '=', self.id)])
         if creneau_del_ids:
             creneau_del_ids.unlink()
 
@@ -388,7 +530,8 @@ class OFRDVCommercial(models.TransientModel):
                         duree = self.hor_mf - deb + event_deb - ad
                         if duree >= self.duree:
                             creneaux.append((deb, fin))
-                            creneaux.append((ad, event_deb))
+                            if ad < event_deb:
+                                creneaux.append((ad, event_deb))
                         fin = self.hor_af
                     else:
                         duree = min(event_deb, fin) - deb
@@ -424,6 +567,7 @@ class OFRDVCommercial(models.TransientModel):
                     'user_partner_id': self.user_id.partner_id.id,
                     'calendar_id': False,
                     'ignorer_geo': self.ignorer_geo,
+                    'on_phone': self.lieu and self.lieu == 'phone',
                 })
             # création des créneaux de rdvs
             for event, event_deb, event_fin in event_dates_all:
@@ -443,12 +587,15 @@ class OFRDVCommercial(models.TransientModel):
                     'description': description,
                     'wizard_id': self.id,
                     #'user_id': event.user_id.id,
-                    'user_partner_id': event.user_id.partner_id.id,
+                    'user_partner_id': self.user_id.partner_id.id,
                     'calendar_id': event.id,
-                    'partner_ids': event.partner_ids._ids,
+                    'categ_ids': [(4,le_id,False) for le_id in event.categ_ids._ids],
+                    'partner_ids': [(4,le_id,False) for le_id in event.partner_ids._ids],
+                    #'lieu_rdv_id': event.lieu_rdv_id.id or False,
                     'name': event.name,
                     'disponible': False,
                     'ignorer_geo': self.ignorer_geo,
+                    'on_phone': event.lieu and event.lieu == 'phone',
                 })
         # Calcul des durées et distances
         d_debut = d_avant_recherche + un_jour
@@ -461,10 +608,18 @@ class OFRDVCommercial(models.TransientModel):
         vals ={}
         # Sélection du résultat
         if nb > 0:
-            address = self.rdv_address_id
+            if self.lieu == 'company':
+                address = self.lieu_company_id
+            elif self.lieu == 'other':
+                address = self.lieu_rdv_id
+            else:
+                address = self.partner_address_id
             name = address.name or (address.parent_id and address.parent_id.name) or ''
-            name += address.zip and (" " + address.zip) or ""
-            name += address.city and (" " + address.city) or ""
+            if self.lieu == 'phone':
+                name += ' (téléphonique)'
+            else:
+                name += address.zip and (" " + address.zip) or ""
+                name += address.city and (" " + address.city) or ""
 
             d_first_res = fields.Date.from_string(first_res.date)
             dt_propos = datetime.combine(d_first_res, datetime.min.time()) + timedelta(hours=first_res.date_flo) # datetime naive
@@ -484,8 +639,6 @@ class OFRDVCommercial(models.TransientModel):
             }
 
             if nb_dispo == 0:
-                vals['display_search'] = True
-                vals['display_res'] = False
                 vals['zero_dispo'] = True
 
         else:
@@ -499,6 +652,7 @@ class OFRDVCommercial(models.TransientModel):
         self.write(vals)
         if self.res_line_id:
             self.res_line_id.selected = True
+            self.res_line_id.selected_hour = self.res_line_id.date_flo
 
     @api.multi
     def button_confirm(self):
@@ -542,9 +696,20 @@ class OFRDVCommercial(models.TransientModel):
         if (not self.hor_md) or (not self.hor_mf) or (not self.hor_ad) or (not self.hor_af):
             raise UserError("Il faut configurer l'horaire de travail de toutes les équipes.")
 
-        """partner_attendees = self.env['res.partner']
-        partner_attendees |= self.partner_id
-        partner_attendees |= self.user_id.partner_id"""
+        la_company = False
+        l_adresse = False
+        if self.lieu == "other":
+            le_lieu = "offsite"
+            l_adresse = self.lieu_rdv_id
+        elif self.lieu == "customer":
+            le_lieu = "offsite"
+            l_adresse = self.partner_address_id
+        elif self.lieu == "company":
+            le_lieu = "onsite"
+            la_company = self.lieu_company_id
+            l_adresse = self.lieu_company_id.partner_id
+        else: # on phone
+            le_lieu = "phone"
 
         values = {
             'name': self.name,
@@ -555,10 +720,14 @@ class OFRDVCommercial(models.TransientModel):
             'allday': self.allday,
             'description': self.description or '',
             'partner_ids': [(4,self.user_id.partner_id.id,False),(4,self.partner_id.id,False)],
-            #'partner_ids': partner_attendees,
+            'lieu': le_lieu,
+            'lieu_rdv_id': l_adresse and l_adresse.id,
+            'lieu_company_id': la_company and la_company.id,
         }
 
-        calendar_obj.create(values)
+        le_rdv = calendar_obj.create(values)
+
+        le_rdv.attendee_ids.do_accept()
 
         return {'type': 'ir.actions.act_window_close'}
 
@@ -572,47 +741,37 @@ class OfRDVCommercialLine(models.TransientModel):
     @api.model
     def calc_distances_dates(self,date_debut,date_fin):
         u"""
-            une requete http par jour par équipe. En cas de problemes de performances on pourra se débrouiller pour faire une requête par équipe 
+            une requete http par jour. En cas de problemes de performances on pourra se débrouiller pour faire une requête par équipe 
         @TODO: revoir cette fonction, origine
         """
         un_jour = timedelta(days=1)
         date_courante = date_debut
         while date_courante <= date_fin:
-            creneaux = self.search([('date', '=', date_courante)],order="debut_dt")
-            interventions = creneaux.mapped("calendar_id")
-            #tournee = interventions.mapped("tournee_id")
+            creneaux_pre = self.search([('date', '=', date_courante)],order="debut_dt")
+            creneaux_pre._compute_geo()
+            creneaux = creneaux_pre.search([('date', '=', date_courante),'|',('geo_lat','!=',0.0),('geo_lng','!=',0.0)],order="debut_dt")
             if len(creneaux) == 0:
+                date_courante += un_jour
                 continue
-            """if len(tournee) == 1: # si tournee on favorise le point de départ de la tournee plutot que celui de l'équipe
-                origine = tournee.address_depart_id or creneaux[0].user_id.address_id
-                arrivee = tournee.address_retour_id or creneaux[0].user_id.address_retour_id or creneaux[0].user_id.address_id
-            else:
-                origine = creneaux[0].user_id.address_id or creneaux[0].user_id.employee_ids[0].address_id
-                arrivee = creneaux[0].user_id.address_retour_id or creneaux[0].user_id.address_id or creneaux[0].user_id.employee_ids[0].address_id"""
+
             str_coords = u""
             coords = []
-            #TODO: utiliser le serveur OSRM OpenFire
-            query = u"https://router.project-osrm.org/route/v1/driving/"
+            query = ROUTING_BASE_URL + u"route/" + ROUTING_VERSION + u"/" + ROUTING_PROFILE + u"/"
+
             ### listess de coordonnées: ATTENTION OSRM prend ses coordonnées sous forme (lng,lat)
-            # point de départ
-            if origine.geo_lat != 0 or origine.geo_lng != 0:
-                str_coords += str(origine.geo_lng) + "," + str(origine.geo_lat)
-                coords.append((origine.geo_lng,origine.geo_lat))
-            else:
-                raise UserError("l'origine n'est pas géolocalisée")
-            # créneaux et interventions
-            for line in creneaux:
-                if line.geo_lat != 0 or line.geo_lng != 0:
-                    str_coords += u";" + str(line.geo_lng) + u"," + str(line.geo_lat)
-                    coords.append((line.geo_lng,line.geo_lat))
-            # point d'arrivée
-            if arrivee.geo_lat != 0 or arrivee.geo_lng != 0:
-                str_coords += u";" + str(arrivee.geo_lng) + "," + str(arrivee.geo_lat)
-                coords.append((arrivee.geo_lng,arrivee.geo_lat))
-            else:
-                raise UserError("le point de retour n'est pas géolocalisé")
+            str_coords += str(creneaux[0].geo_lng) + u"," + str(creneaux[0].geo_lat)
+            coords.append((creneaux[0].geo_lng,creneaux[0].geo_lat))
+            # créneaux et rdvs
+            for line in creneaux[1:]:
+                #if line.geo_lat != 0 or line.geo_lng != 0: <- plus besoin: seulement créneaux géolocalisés dans la recherche
+                str_coords += u";" + str(line.geo_lng) + u"," + str(line.geo_lat)
+                coords.append((line.geo_lng,line.geo_lat))
+
             query_send = urllib.quote(query.strip().encode('utf8')).replace('%3A', ':')
             full_query = query_send + str_coords + "?"
+            if len(coords) < 2:
+                date_courante += un_jour
+                continue
             try:
                 req = requests.get(full_query)
                 res = req.json()
@@ -621,65 +780,56 @@ class OfRDVCommercialLine(models.TransientModel):
 
             if res and res.get(u"routes",False):
                 legs = res[u"routes"][0][u"legs"]
-                if len(creneaux) == len(res[u"routes"][0][u"legs"]) - 1: # depart -> creneau -> arrivee : 2 routes 1 creneau
+                if len(creneaux) == len(res[u"routes"][0][u"legs"]) + 1: # creneau -> creneau -> creneau : 2 routes 3 creneaux
                     mode_recherche = creneaux[0].wizard_id.mode_recherche
                     maxi = creneaux[0].wizard_id.max_recherche
+                    vals = []
                     for i in range(len(creneaux)):
-                        vals = {}
+                        vals.append({})
+                        if i == 0: # premier créneau de la journée
+                            vals[i][u"dist_prec"] = 0
+                            vals[i][u"duree_prec"] = 0
+                        else:
+                            vals[i][u"dist_prec"] = legs[i-1][u"distance"] / 1000
+                            vals[i][u"duree_prec"] = legs[i-1][u"duration"] / 60
+                        if i == len(creneaux) - 1: # dernier créneau de la journée
+                            vals[i][u"dist_suiv"] = 0
+                            vals[i][u"duree_suiv"] = 0
+                        else:
+                            vals[i][u"dist_suiv"] = legs[i][u"distance"] / 1000
+                            vals[i][u"duree_suiv"] = legs[i][u"duration"] / 60
+
+                        vals[i][u"distance"] = vals[i].get(u"dist_prec",0) + vals[i].get(u"dist_suiv",0)
+                        vals[i][u"duree"] = vals[i].get(u"duree_prec",0) + vals[i].get(u"duree_suiv",0)
+
                         if i >= 1 and not (creneaux[i-1].calendar_id or creneaux[i].calendar_id):
                             # les creneaux précedant et actuel sont disponible, considérer qu'ils sont le même en terme de distances
-                            vals[u"dist_prec"] = legs[i-1][u"distance"] / 1000
-                            vals[u"duree_prec"] = legs[i-1][u"duration"] / 60
-                            if i < len(creneaux) - 1:
-                                vals[u"dist_suiv"] = legs[i+1][u"distance"] / 1000
-                                vals[u"duree_suiv"] = legs[i+1][u"duration"] / 60
-                            vals[u"distance"] = vals[u"dist_prec"] + vals.get(u"dist_suiv",0)
-                            vals[u"duree"] = vals[u"duree_prec"] + vals.get(u"duree_suiv",0)
-                            vals_prec = {}
-                            vals_prec[u"dist_suiv"] = vals.get(u"dist_suiv",0)
-                            vals_prec[u"duree_suiv"] = vals.get(u"duree_suiv",0)
-                            vals_prec[u"distance"] = creneaux[i-1].dist_prec + vals_prec[u"dist_suiv"]
-                            vals_prec[u"duree"] = creneaux[i-1].duree_prec + vals_prec[u"duree_suiv"]
-                            # créneau plus loins que la recherche accepte
-                            if creneaux[i-1].disponible and mode_recherche == u"distance" and vals_prec[u"distance"] > maxi:
-                                vals_prec[u"force_color"] = "#FF0000"
-                                vals_prec[u"name"] = "TROP LOINS"
-                                vals_prec[u"disponible"] = False
-                            # créneau plus loins que la recherche accepte
-                            elif creneaux[i-1].disponible and mode_recherche == u"duree" and vals_prec[u"duree"] > maxi:
-                                vals_prec[u"force_color"] = "#FF0000"
-                                vals_prec[u"name"] = "TROP LOINS"
-                                vals_prec[u"disponible"] = False
-                            # trajet aller-retour plus long que la durée de l'intervention
-                            elif creneaux[i-1].disponible and vals[u"duree"] > creneaux[i].wizard_id.duree:
-                                vals[u"force_color"] = "#AA0000"
-                                vals[u"name"] = "TROP COURT"
-                                vals[u"disponible"] = False
-                            creneaux[i-1].update(vals_prec)
-                        else:
-                            vals[u"dist_prec"] = legs[i][u"distance"] / 1000
-                            vals[u"duree_prec"] = legs[i][u"duration"] / 60
-                            vals[u"dist_suiv"] = legs[i+1][u"distance"] / 1000 # legs[i+1] ok car len(legs) == len(creneaux) + 1
-                            vals[u"duree_suiv"] = legs[i+1][u"duration"] / 60
-                            vals[u"distance"] = vals[u"dist_prec"] + vals.get(u"dist_suiv",0)
-                            vals[u"duree"] = vals[u"duree_prec"] + vals.get(u"duree_suiv",0)
-                        # créneau plus loins que la recherche accepte
-                        if creneaux[i].disponible and mode_recherche == u"distance" and vals[u"distance"] > maxi:
-                            vals[u"force_color"] = "#FF0000"
-                            vals[u"name"] = "TROP LOINS"
-                            vals[u"disponible"] = False
-                        # créneau plus loins que la recherche accepte
-                        elif creneaux[i].disponible and mode_recherche == u"duree" and vals[u"duree"] > maxi:
-                            vals[u"force_color"] = "#FF0000"
-                            vals[u"name"] = "TROP LOINS"
-                            vals[u"disponible"] = False
-                        # trajet aller-retour plus long que la durée de l'intervention
-                        elif creneaux[i].disponible and vals[u"duree"] > creneaux[i].wizard_id.duree:
-                            vals[u"force_color"] = "#AA0000"
-                            vals[u"name"] = "TROP COURT"
-                            vals[u"disponible"] = False
+                            vals[i][u"dist_prec"] = vals[i-1][u"dist_prec"]
+                            vals[i][u"duree_prec"] = vals[i-1][u"duree_prec"]
+                            vals[i-1][u"dist_suiv"] = vals[i][u"dist_suiv"]
+                            vals[i-1][u"duree_suiv"] = vals[i][u"duree_suiv"]
+                            vals[i][u"distance"] = vals[i][u"dist_suiv"] + vals[i-1][u"dist_prec"]
+                            vals[i][u"duree"] = vals[i][u"duree_suiv"] + vals[i-1][u"duree_prec"]
+                            vals[i-1][u"distance"] = vals[i][u"dist_suiv"] + vals[i-1][u"dist_prec"]
+                            vals[i-1][u"duree"] = vals[i][u"duree_suiv"] + vals[i-1][u"duree_prec"]
 
-                        creneaux[i].update(vals)
+                    for i in  range(len(creneaux)):
+                        # créneau plus loins que la recherche accepte
+                        if creneaux[i].disponible and mode_recherche == u"distance" and vals[i][u"distance"] > maxi:
+                            vals[i][u"force_color"] = "#FF0000"
+                            vals[i][u"name"] = "TROP LOINS"
+                            vals[i][u"disponible"] = False
+                        # créneau plus loins que la recherche accepte
+                        elif creneaux[i].disponible and mode_recherche == u"duree" and vals[i][u"duree"] > maxi:
+                            vals[i][u"force_color"] = "#FF0000"
+                            vals[i][u"name"] = "TROP LOINS"
+                            vals[i][u"disponible"] = False
+
+                        creneaux[i].update(vals[i])
+                else:
+                    raise UserWarning("Erreur de res: %s - %s, %d" % (len(creneaux),len(res[u"routes"][0][u"legs"]),modifier))
+            elif res and res["message"]:
+                raise UserWarning("Erreur de routing: %s" % res["message"])
             else:
                 raise UserWarning("Erreur inattendue de routing")
             date_courante += un_jour
@@ -688,13 +838,13 @@ class OfRDVCommercialLine(models.TransientModel):
     def get_nb_dispo(self,wizard):
         """Retourne le nombre de créneaux disponibles (qui correspondent aux criteres de recherche), 
             le nomre de créneau trop loins, et le premier resultat (en fonction du critere de résultat"""
-        if wizard.mode_result == "distance":
+        """if wizard.mode_result == "distance":
             le_order = "distance,debut_dt"
         else:
-            le_order = "debut_dt,distance"
+            le_order = "debut_dt,distance" """
         # ne pas inclure les lignes associées a une event ni les lignes de début et fin de recherche
-        lines = self.search([('wizard_id', '=', wizard.id),('virtuel', '=', False),('calendar_id', '=', False)],order=le_order) # events allDay sont debut et fin de recherche
-        lines_dispo = self.search([('wizard_id', '=', wizard.id),('disponible', '=', True)],order=le_order)
+        lines = self.search([('wizard_id', '=', wizard.id),('virtuel', '=', False),('calendar_id', '=', False)],order="distance,debut_dt") # events allDay sont debut et fin de recherche
+        lines_dispo = self.search([('wizard_id', '=', wizard.id),('disponible', '=', True)],order="distance,debut_dt")
         nb = len(lines)
         nb_dispo = len(lines_dispo)
         first_res = lines_dispo and lines_dispo[0] or lines and lines[0] or False
@@ -705,12 +855,14 @@ class OfRDVCommercialLine(models.TransientModel):
     fin_dt = fields.Datetime(string="Fin")
     date_flo = fields.Float(string='Date', required=True, digits=(12, 5))
     date_flo_deadline = fields.Float(string='Date', required=True, digits=(12, 5))
-    description = fields.Char(string='RDV', size=128)
+    description = fields.Char(string='Plage horaire', size=128)
     wizard_id = fields.Many2one('of.rdv.commercial', string="RDV", required=True, ondelete='cascade')
     user_id = fields.Many2one(related="wizard_id.user_id")
+    employee_id = fields.Many2one(related="wizard_id.employee_id")
     user_partner_id = fields.Many2one('res.partner',string="user partner")
     partner_ids = fields.Many2many('res.partner', 'calendar_event_res_rdvcom_rel', string='Attendees')
     calendar_id = fields.Many2one('calendar.event', string="Planning")
+    categ_ids = fields.Many2many('calendar.event.type', 'rdvcom_meeting_category_rel', 'rdvcomline_id', 'type_id', 'Tags')
     name = fields.Char(string="name", default="DISPONIBLE")
     distance = fields.Float(string='Dist.tot. (km)',help="distance prec + distance suiv")
     dist_prec = fields.Float(string='Dist.Prec. (km)')
@@ -725,10 +877,13 @@ class OfRDVCommercialLine(models.TransientModel):
     allday = fields.Boolean('All Day', default=False)
     virtuel = fields.Boolean('Virtuel', default=False)
     selected = fields.Boolean(u'Créneau sélectionné', default=False)
+    selected_hour = fields.Float(string='Heure du RDV', digits=(2, 2))
+    selected_description = fields.Html(string="Description", related="wizard_id.description")
+    on_phone = fields.Boolean(u'Au téléphone', default=False)
 
     ignorer_geo = fields.Boolean(u"Ignorer données géographiques")
-    geo_lat = fields.Float(string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo", readonly=True)
-    geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_geo", readonly=True)
+    geo_lat = fields.Float(string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo", readonly=True, store=True)
+    geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_geo", readonly=True, store=True)
     precision = fields.Selection([
         ('manual', "Manuel"),
         ('high', "Haut"),
@@ -737,7 +892,7 @@ class OfRDVCommercialLine(models.TransientModel):
         ('no_address', u"--"),
         ('unknown', u"Indéterminé"),
         ('not_tried', u"Pas tenté"),
-        ], default='not_tried', readonly=True, help=u"Niveau de précision de la géolocalisation", compute="_compute_geo")
+        ], default='not_tried', readonly=True, help=u"Niveau de précision de la géolocalisation", compute="_compute_geo", store=True)
 
     @api.multi
     @api.depends("calendar_id")
@@ -779,21 +934,43 @@ class OfRDVCommercialLine(models.TransientModel):
         v1 = {'label': u'Confirmé', 'value': 1}
         v2 = {'label': u'Réalisé', 'value': 2}
         v3 = {'label': u'Disponibilité', 'value': 3}
-        return (v0, v1, v2, v3)
+        return (v0, v1, False, v3)
+
+    @api.multi
+    def button_confirm(self):
+        """Sélectionne ce créneau en temps que résultat. Appelé depuis la vue form du créneau"""
+        self.ensure_one()
+        if not self._context.get('tz'):
+            self = self.with_context(tz='Europe/Paris')
+        tz = pytz.timezone(self._context['tz'])
+        d = fields.Date.from_string(self.date)
+        dt_propos = datetime.combine(d, datetime.min.time()) + timedelta(hours=self.selected_hour) # datetime local
+        dt_propos = tz.localize(dt_propos, is_dst=None).astimezone(pytz.utc) # datetime utc
+        self.wizard_id.date_propos = dt_propos
+        return self.wizard_id.button_confirm()
 
     @api.multi
     def button_select(self):
         """Sélectionne ce créneau en temps que résultat. Appelé depuis la vue form du créneau"""
         self.ensure_one()
         rdv_line_obj = self.env["of.rdv.commercial.line"]
-        selected_line = rdv_line_obj.search([("selected","=",True)])
+        selected_line = rdv_line_obj.search([("selected","=",True),("wizard_id","=",self.wizard_id.id)])
         selected_line.selected = False
         self.selected = True
+        self.selected_hour = self.date_flo
 
-        address = self.wizard_id.rdv_address_id
+        if self.wizard_id.lieu == 'company':
+            address = self.wizard_id.lieu_company_id
+        elif self.wizard_id.lieu == 'other':
+            address = self.wizard_id.lieu_rdv_id
+        else:
+            address = self.wizard_id.partner_address_id
         name = address.name or (address.parent_id and address.parent_id.name) or ''
-        name += address.zip and (" " + address.zip) or ""
-        name += address.city and (" " + address.city) or ""
+        if self.wizard_id.lieu == 'phone':
+            name += ' (téléphonique)'
+        else:
+            name += address.zip and (" " + address.zip) or ""
+            name += address.city and (" " + address.city) or ""
         wizard_vals = {
             'date_display'    : self.date,#.strftime('%A %d %B %Y'),
             'name'            : name,
