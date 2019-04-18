@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="of_secteur_filter" model="ir.ui.view">
+        <field name="name">of.secteur.filter</field>
+        <field name="model">of.secteur</field>
+        <field name="arch" type="xml">
+            <search string="Recherche">
+                <group>
+                    <field name="name" filter_domain="['|',('name','ilike',self),('shortcut','ilike',self)]"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_secteur_view_form" model="ir.ui.view">
+        <field name="name">of.secteur.view.form</field>
+        <field name="model">of.secteur</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Nom du secteur"/></h1>
+                    </div>
+                    <group>
+                        <field name="shortcut"/>
+                        <field name="color" widget="color"/>
+                    </group>
+                    <notebook>
+                        <page name="parc_installe" string="Parc installé">
+                            <group>
+                                <field name="parc_installe_ids" nolabel="1" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_secteur_view_tree" model="ir.ui.view">
+        <field name="name">of.secteur.view.tree</field>
+        <field name="model">of.secteur</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="shortcut"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_secteur" model="ir.actions.act_window">
+        <field name="name">Secteurs</field>
+        <field name="res_model">of.secteur</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_secteur.of_secteur_view_tree"/>
+    </record>
+
+    <menuitem name="Secteurs" id="menu_of_secteur_config" parent="of_planning.menu_of_planning_configuration" sequence="25" action="of_secteur.action_of_secteur"/>
+
+<!-- *************************** Parc installé ***************************-->
+
+    <record id="of_secteur_of_parc_installe_form_view" model="ir.ui.view">
+        <field name="name">of.secteur.of.parc.installe.form.view</field>
+        <field name="model">of.parc.installe</field>
+        <field name="inherit_id" ref="of_parc_installe.of_parc_installe_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='client']" position="inside">
+                <field name="secteur_id"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
