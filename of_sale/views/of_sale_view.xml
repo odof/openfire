@@ -73,8 +73,9 @@
                 </xpath>
                 <!-- Ajout option Documents joints -->
                 <xpath expr="//page//group[@name='technical']" position="after">
-                    <separator string="Documents joints" colspan="4"/>
-                    <field name="of_mail_template_ids" widget="many2many" nolabel="1"/>
+                    <group string="Documents joints" name="docs">
+                        <field name="of_mail_template_ids" widget="many2many_tags" nolabel="1"/>
+                    </group>
                 </xpath>
                 <xpath expr="//field[@name='confirmation_date']" position="after">
                     <field name="of_date_vt"/>
