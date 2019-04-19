@@ -149,6 +149,8 @@
                             <field name="hor_ad" widget="float_time" attrs="{'invisible': [('display_horaires','!=',True)]}"/>
                             <field name="hor_af" widget="float_time" attrs="{'invisible': [('display_horaires','!=',True)]}"/>
                             <field name="jour_ids" widget="many2many_tags" attrs="{'invisible': [('display_horaires','!=',True)]}"/>
+                            <field name="tz" widget="timezone_mismatch" options="{'tz_offset_field': 'tz_offset'}" attrs="{'invisible': [('display_horaires','!=',True)]}"/>
+                            <field name="tz_offset" invisible="1"/>
                         </group>
                         <group colspan="2" col="2">
                             <field name="lead_id"/>

@@ -2,6 +2,13 @@
 
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError
+import pytz
+from datetime import datetime
+
+@api.model
+def _tz_get(self):
+    # put POSIX 'Etc/*' entries at the end to avoid confusing users - see bug 1086728
+    return [(tz, tz) for tz in sorted(pytz.all_timezones, key=lambda tz: tz if not tz.startswith('Etc/') else '_')]
 
 class OFUsers(models.Model):
     _inherit = 'res.users'
@@ -39,9 +46,20 @@ class HREmployee(models.Model):
     hor_ad = fields.Float(string=u'Après-midi début', required=True, digits=(12, 1),default=14)
     hor_af = fields.Float(string=u'Après-midi fin', required=True, digits=(12, 1),default=18)
     jour_ids = fields.Many2many('of.jours', 'employee_jours_rel', 'employee_id', 'jour_id', string='Jours travaillés', required=True, default=_get_default_jours)
+    tz = fields.Selection(_tz_get, string='Fuseau horaire', default=lambda self: self.env.user.tz or 'Europe/Paris', required=True,
+                          help="The Team's timezone, used to output proper date and time values "
+                               "inside printed reports. It is important to set a value for this field. "
+                               "You should use the same timezone that is otherwise used to pick and "
+                               "render date and time values: your computer's timezone.")
+    tz_offset = fields.Char(compute='_compute_tz_offset', string='Timezone offset')
 
     of_color_ft = fields.Char(string="Couleur de texte", compute="_compute_colors")
     of_color_bg = fields.Char(string="Couleur de fond", compute="_compute_colors")
+
+    @api.depends('tz')
+    def _compute_tz_offset(self):
+        for wizard in self:
+            wizard.tz_offset = datetime.now(pytz.timezone(wizard.tz or 'GMT')).strftime('%z')
 
     @api.depends("user_id")
     def _compute_colors(self):

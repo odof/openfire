@@ -45,6 +45,8 @@
                         <field name="hor_ad" string="Après-midi" widget="float_time" colspan="2"/>
                         <field name="hor_af" widget="float_time" colspan="1" nolabel="1"/>
                         <field name="jour_ids" widget="many2many_tags" colspan="3"/>
+                        <field name="tz" widget="timezone_mismatch" options="{'tz_offset_field': 'tz_offset'}" colspan="3"/>
+                        <field name="tz_offset" invisible="1" colspan="3"/>
                     </group>
                     <group colspan="2">
                     </group>

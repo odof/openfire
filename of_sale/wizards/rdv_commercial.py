@@ -163,7 +163,7 @@ class OFRDVCommercial(models.TransientModel):
     hor_ad = fields.Float(string=u'Après-midi début', required=True, digits=(12, 1),default=14)
     hor_af = fields.Float(string=u'Après-midi fin', required=True, digits=(12, 1),default=18)
     jour_ids = fields.Many2many('of.jours', 'rdvcom_jours', 'rdvcom_id', 'jour_id', string='Jours travaillés', required=True, default=_get_default_jours)
-    tz = fields.Selection(_tz_get, string='Timezone', default=lambda self: self._context.get('tz'),
+    tz = fields.Selection(_tz_get, string='Fuseau horaire', default=lambda self: self.env.user.tz or 'Europe/Paris',
                           help="The Team's timezone, used to output proper date and time values "
                                "inside printed reports. It is important to set a value for this field. "
                                "You should use the same timezone that is otherwise used to pick and "
@@ -311,6 +311,7 @@ class OFRDVCommercial(models.TransientModel):
                 "hor_mf": self.employee_id.hor_mf,
                 "hor_ad": self.employee_id.hor_ad,
                 "hor_af": self.employee_id.hor_af,
+                "tz": self.employee_id.tz,
                 "jour_ids": [(5,0,0)] + [(4,le_id,False) for le_id in self.employee_id.jour_ids._ids],
                 "user_id": self.employee_id.user_id,
                 }
