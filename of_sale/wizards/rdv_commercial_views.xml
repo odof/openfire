@@ -10,6 +10,7 @@
                 <form string="Planifier un rendez-vous">
                     <script>
                         $(document).ready(function(){
+                            // élargir le pop-up
                             $(".modal-dialog").width('80%');
                         });
                     </script>
@@ -17,23 +18,12 @@
                     <field name="zero_dispo" invisible="1"/>
                     <field name="partner_child_ids" invisible="1"/>
                     <field name="display_horaires" invisible="1"/>
-                    <field name="tz" invisible="1"/>
                     <field name="tz_offset" invisible="1"/>
                     <field name="user_id" widget="selection" invisible="1"/>
                     <field name="display_res" invisible="1"/>
-                    <!-- dump
-                    <group attrs="{'invisible': [('display_search', '!=', False)]}">
-                        <field name="display_search"/>
-                    </group>
-                     attrs="{'invisible': [('display_search', '=', False)]}"
-                     -->
                     <group name="zero_result" col="4" attrs="{'invisible':[('zero_result','!=',True)]}">
                         <separator string="Aucun résultat" colspan="4"/>
                     </group>
-                    <!--group name="zero_dispo" col="4" attrs="{'invisible':[('zero_dispo','!=',True)]}">
-                        <separator string="Aucun résultat suffisament proche" colspan="4"/>
-                        <field name="display_res"/>
-                    </group-->
                     <group name="propositions" col="4" attrs="{'invisible':[('display_res','!=',True)]}">
                         <field name="res_line_id" invisible="1"/>
                         <separator string="Aucun résultat suffisament proche" colspan="4" attrs="{'invisible':[('zero_dispo','!=',True)]}"/>
@@ -44,8 +34,7 @@
                         <newline/>
                         <label colspan="4" string="Description" align="0.00" invisible="1"/>
                         <field name="description" colspan="4" nolabel="1" invisible="1"/>
-<!-- dump working_hours="1"  attendee="partner_ids" readonly="1"  -->
-                        <field name="creneau_ids" mode="calendar" colspan="4" nolabel="1" context="{'hor_md': hor_md}">
+                        <field name="creneau_ids" mode="calendar" colspan="4" nolabel="1" options="{'no_create': True}">
                             <calendar string="Calendrier" date_start="debut_dt" color="employee_id" date_stop="fin_dt" all_day="allday"
                                 attendee_model="hr.employee" color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1"
                                 filters_radio="1" dispo_field="disponible" show_first_evt="1" working_hours="parent"
@@ -64,6 +53,7 @@
                                 <!--  -->
                                 <script>
                                     $(document).ready(function(){
+                                        // Cacher les boutons "Sauvegarder" et "Annuler" quand on clique sur un créneau du calendrier
                                         var len = $(".modal-footer").length;
                                         $(".modal-footer").eq(len-1).hide();
                                     });
@@ -74,7 +64,7 @@
                                 <field name="ignorer_geo" invisible="1"/>
                                 <field name="disponible" readonly="1" invisible="1"/>
                                 <group attrs="{'invisible':[('virtuel','!=',False)]}">
-                                    <group><!-- dump  -->
+                                    <group>
                                         <field name="date" readonly="1"/>
                                         <field name="description" readonly="1"/>
                                         <field name="calendar_id" readonly="1" attrs="{'invisible': [('calendar_id', '=', False)]}"/>
@@ -150,7 +140,6 @@
                             <field name="hor_af" widget="float_time" attrs="{'invisible': [('display_horaires','!=',True)]}"/>
                             <field name="jour_ids" widget="many2many_tags" attrs="{'invisible': [('display_horaires','!=',True)]}"/>
                             <field name="tz" widget="timezone_mismatch" options="{'tz_offset_field': 'tz_offset'}" attrs="{'invisible': [('display_horaires','!=',True)]}"/>
-                            <field name="tz_offset" invisible="1"/>
                         </group>
                         <group colspan="2" col="2">
                             <field name="lead_id"/>
