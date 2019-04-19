@@ -231,7 +231,7 @@ var MapView = View.extend({
                 return domain;
             }
         }
-        return _.union(domain, a_concat);
+        return domain.concat(a_concat);
     },
     /**
      * Handler for the result of eval_domain_and_context, actually perform the searching by calling private method
