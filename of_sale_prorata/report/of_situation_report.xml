@@ -16,7 +16,7 @@
         <t t-set="order" t-value="doc.order_id"/>
         <div class="page">
             <div class="oe_structure"/>
-            <h2>Situation au <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d')"/> - <span t-field="order.name"/></h2>
+            <h2>Situation au <span t-field="doc.date_rapport_situation"/> - <span t-field="order.name"/></h2>
 
             <table class="table table-condensed">
                 <thead>
@@ -55,7 +55,7 @@
                     </tr>
                 </tbody>
                     <tr class="border-black">
-                        <td>Total</td>
+                        <td><strong>Total</strong></td>
                         <td></td>
                         <td class="text-right"><span t-field="order.amount_untaxed"/></td>
                         <td class="text-right"><span t-field="order.amount_total"/></td>
@@ -64,7 +64,7 @@
                         <td></td>
                     </tr>
                     <tr>
-                        <td>Total situation TTC</td>
+                        <td><strong>Total situation TTC</strong></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -73,7 +73,7 @@
                         <td class="text-right"><span t-field="doc.amount_next_ttc" t-options='{"widget": "monetary", "display_currency": order.currency_id}'/></td>
                     </tr>
                     <tr>
-                        <td>Avancement</td>
+                        <td><strong>Avancement</strong></td>
                         <td></td>
                         <td></td>
                         <td></td>

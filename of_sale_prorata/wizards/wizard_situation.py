@@ -27,7 +27,7 @@ class OfWizardSituation(models.TransientModel):
     amount = fields.Float(
         compute='_compute_amounts', multi='amount', digits=dp.get_precision('Product Price'), string='Montant de situation')
 
-    prochaine_situation = fields.Integer(related='order_id.of_prochaine_situation', string="Prochaine situation", readonly=True)
+    prochaine_situation = fields.Integer(related='order_id.of_prochaine_situation', string="Situation en cours", readonly=True)
     date_rapport_situation = fields.Date(string='Date rapport situation', required=True, default=lambda self: time.strftime('%Y-%m-%d'))
 
     def _compute_amounts(self):
@@ -209,9 +209,10 @@ class OfWizardSituation(models.TransientModel):
                 line.invoice_line_create(invoice.id, line.qty_to_invoice)
 
         invoice.compute_taxes()
+        if invoice.amount_total < 0:
+            raise UserError(u"Vous ne pouvez pas générer une facture de situation d'un montant négatif")
         # Alternative possible : mettre ce texte dans les notes de haut de page du module OCA/sale_reporting/sale_comment_template
-        invoice.name = u"Situation n°%s d’avancement correspondant à %i%%" % (situation_number,
-                                                                              round(100.0 * total_untaxed / order.amount_untaxed))
+        invoice.name = u"Situation de travaux n°%s" % (situation_number, )
         invoice.message_post_with_view(
             'mail.message_origin_link',
             values={'self': invoice, 'origin': order},

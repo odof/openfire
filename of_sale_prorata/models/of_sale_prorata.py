@@ -132,7 +132,7 @@ class AccountInvoice(models.Model):
         string='Retenue de garantie')
     of_retenue_garantie_pct = fields.Float(
         string='Retenue de garantie(%)', digits=(4, 5),
-        help=u"Pourcentage appliqué sur le total TTC de la facture")
+        help=u"Pourcentage appliqué sur le total TTC de la facture (après application des charges de compte de prorata)")
 
     @api.depends('of_retenue_garantie_pct', 'amount_total')
     def _compute_of_retenue_garantie(self):
