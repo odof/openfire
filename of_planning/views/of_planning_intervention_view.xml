@@ -110,10 +110,10 @@
                         </div>
                     </header>
                     <sheet>
+                        <div class="oe_title" name="num">
+                            <h1><field name="number" placeholder="N° d'intervention" readonly="1"/></h1>
+                        </div>
                         <group>
-                            <div class="oe_title" name="num">
-                                <h1><field name="number" placeholder="N° d'intervention" readonly="1"/></h1>
-                            </div>
                             <group col="2">
                                 <field name="equipe_id" autofocus="autofocus"/>
                                 <field name="address_id" domain="[('customer','=',True)]" colspan="2"/>
