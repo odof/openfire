@@ -8,6 +8,12 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Planifier une intervention">
+                    <script>
+                        $(document).ready(function(){
+                            // élargir le pop-up
+                            $(".modal-dialog").width('80%');
+                        });
+                    </script>
                     <header>
                         <button name="button_geocode" string="Géolocaliser" type="object" style="margin-bottom: 10px;"
                           class="btn-primary" icon="fa-map-marker" help="Utiliser votre gécodeur par défaut pour tenter de géolocaliser l'adresse d'intervention"
@@ -96,7 +102,9 @@
                             <form string="Créneau">
                                 <script>
                                     $(document).ready(function(){
-                                    $(".modal-footer").hide();
+                                        // Cacher les boutons "Sauvegarder" et "Annuler" quand on clique sur un créneau du calendrier
+                                        var len = $(".modal-footer").length;
+                                        $(".modal-footer").eq(len-1).hide();
                                     });
                                 </script>
                                 <field name="allday" invisible="1"/>

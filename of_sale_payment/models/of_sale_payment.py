@@ -18,21 +18,13 @@ class SaleOrder(models.Model):
     @api.depends('payment_ids', 'amount_total')
     def _compute_of_balance(self):
         for sale_order in self:
-            total_payments = 0.0
-            total_payments = sum([payment[1] for payment in sale_order.invoice_ids._of_get_payment_display_amounts()])
-            if total_payments <= 0.0:
-                # S'il on n'obtient pas de paiement positif par les factures, on prends les paiements liés à la commande
-                total_payments = sum(sale_order.payment_ids.mapped('amount'))
+            total_payments = sum(sale_order.payment_ids.mapped('amount'))
             sale_order.of_balance = max(sale_order.amount_total - total_payments, 0.0)
 
     @api.multi
     def _of_get_payment_display_amounts(self):
         self.ensure_one()
-        result = self.invoice_ids._of_get_payment_display_amounts()
-        if sum([payment[1] for payment in result]) <= 0.0:
-            # S'il on n'obtient pas de paiement positif par les factures, on prends les paiements liés à la commande
-            result = [(payment, payment.amount) for payment in self.payment_ids]
-        return result
+        return [(payment, payment.amount) for payment in self.payment_ids]
 
     @api.multi
     def action_view_payments(self):

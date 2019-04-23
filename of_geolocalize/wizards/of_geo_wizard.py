@@ -3,15 +3,12 @@
 # Requires a nominatim server up and running (for OpenFire geocoder)
 # Requires request and googlemaps python packages (for Google Maps geocoder)
 
-try:
-    import json
-except ImportError:
-    json = None
+from odoo import api, fields, models
+from odoo.exceptions import UserError
+from difflib import SequenceMatcher
 
-try:
-    import urllib
-except ImportError:
-    urllib = None
+import json
+import urllib
 
 try:
     import requests
@@ -22,10 +19,6 @@ try:
     import googlemaps
 except ImportError:
     googlemaps = None
-
-from odoo import api, fields, models
-from odoo.exceptions import UserError
-from difflib import SequenceMatcher
 
 class OFGeoWizard(models.TransientModel):
     _name = "of.geo.wizard"
@@ -174,8 +167,6 @@ class OFGeoWizard(models.TransientModel):
 
         if self.overwrite_geoloc_all:
             self.nb_selected_partners_to_geoloc = nb_selected_partners - nb_selected_partners_no_address
-        elif self.overwrite_geoloc_all and self.overwrite_geoloc_except_manual:
-            self.nb_selected_partners_to_geoloc = nb_selected_partners - nb_selected_partners_no_address
         elif self.overwrite_geoloc_except_manual:
             self.nb_selected_partners_to_geoloc = nb_selected_partners - nb_selected_partners_no_address - nb_selected_partners_manual
         else:
@@ -234,43 +225,6 @@ class OFGeoWizard(models.TransientModel):
     # Funcion to check string similarity [difflib]
     def similar(self, a, b):
         return SequenceMatcher(None, a, b).ratio()
-
-    # GEOCODERS
-    def geo_code(self, geocodeur, partner):
-        if not partner:
-            return False
-        if not geocodeur:
-            geocoder_by_default = self.env['ir.config_parameter'].get_param('geocoder_by_default')
-
-            if int(geocoder_by_default) == 0: # Openfire
-                geocodeur = "nominatim_openfire"
-            elif int(geocoder_by_default) == 1: # OpenStreetMap
-                geocodeur = "nominatim_osm"
-            elif int(geocoder_by_default) == 2: # BANO
-                geocodeur = "bano"
-            elif int(geocoder_by_default) == 3: # Google maps
-                geocodeur = "google_maps"
-
-        geo_wizard_obj = self.env['of.geo.wizard']
-        if geocodeur == "nominatim_openfire": # Openfire
-            results = self.geo_openfire(partner)
-        elif geocodeur == "nominatim_osm": # OpenStreetMap
-            results = self.geo_osrm(partner)
-        elif geocodeur == "bano": # BANO
-            results = self.geo_ban(partner)
-        elif geocodeur == "google_maps": # Google maps
-            results = self.geo_google(partner)
-
-        partner.write({
-            'geocoding': results[0],
-            'geocodeur': results[1],
-            'geo_lat': results[2],
-            'geo_lng': results[3],
-            'precision': results[4],
-            'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
-            'geocoding_response': json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
-        })
-        return True
 
     # Geocoding with OPENFIRE
     def geo_openfire(self, partner):
@@ -1035,6 +989,12 @@ class OFGeoWizard(models.TransientModel):
         if not (self.use_nominatim_openfire or self.use_nominatim_osm or self.use_bano or self.use_google):
             raise UserError(u"Vous devez choisir au moins un géocodeur.")
 
+        prec_to_int = {
+            'high': 3,
+            'medium': 2,
+            'low': 1,
+        }
+
         # SECUENTIAL GEOCODING
         for use_geocoder, geocoder_function, geocoder_name in (
             (self.use_nominatim_openfire, self.geo_openfire, 'openfire'),
@@ -1046,183 +1006,17 @@ class OFGeoWizard(models.TransientModel):
                 continue
 
             for partner in self.partner_ids:
-
-                # Overwrite all best precision
-                if self.overwrite_geoloc_all and self.best_precision:
+                if (self.overwrite_geoloc_all or
+                    (self.overwrite_geoloc_except_manual and partner.geocoding != 'manual') or
+                    partner.geocoding not in ('success_openfire', 'success_osm', 'success_bano', 'success_google', 'manual', 'no_address')
+                    ):
                     results = geocoder_function(partner)
-                    get_precision = results[4]
-                    get_record_precision = partner.precision
-
-                    if get_precision == "high":
-                        get_precision = 3
-                    elif get_precision == "medium":
-                        get_precision = 2
-                    elif get_precision == "low":
-                        get_precision = 1
-                    else:
-                        get_precision = 0
-
-                    if get_record_precision == "high":
-                        get_record_precision = 3
-                    elif get_record_precision == "medium":
-                        get_record_precision = 2
-                    elif get_precision == "low":
-                        get_record_precision = 1
-                    else:
-                        get_record_precision = 0
-
-                    if get_precision > get_record_precision:
-                        partner.write({
-                            'geocoding': results[0],
-                            'geocodeur': results[1],
-                            'geo_lat': results[2],
-                            'geo_lng': results[3],
-                            'precision': results[4],
-                            'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
-                            'geocoding_response': json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
-                        })
-                        cmpt += 1
-                    elif get_precision == 0 and get_record_precision == 0:
-                        partner.write({
-                            'geocoding': results[0],
-                            'geocodeur': results[1],
-                            'geo_lat': results[2],
-                            'geo_lng': results[3],
-                            'precision': results[4],
-                            'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
-                            'geocoding_response': json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
-                        })
-                        cmpt += 1
-
-                # Overwrite all except manual and best precision
-                elif self.overwrite_geoloc_except_manual and self.best_precision:
-                    if partner.geocoding not in ('manual'):
-                        results = geocoder_function(partner)
-                        get_precision = results[4]
-                        get_record_precision = partner.precision
-
-                        if get_precision == "high":
-                            get_precision = 3
-                        elif get_precision == "medium":
-                            get_precision = 2
-                        elif get_precision == "low":
-                            get_precision = 1
-                        else:
-                            get_precision = 0
-
-                        if get_record_precision == "high":
-                            get_record_precision = 3
-                        elif get_record_precision == "medium":
-                            get_record_precision = 2
-                        elif get_precision == "low":
-                            get_record_precision = 1
-                        else:
-                            get_record_precision = 0
-
-                        if get_precision > get_record_precision:
-                            partner.write({
-                                'geocoding': results[0],
-                                'geocodeur': results[1],
-                                'geo_lat': results[2],
-                                'geo_lng': results[3],
-                                'precision': results[4],
-                                'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
-                                'geocoding_response': json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
-                            })
-                            cmpt += 1
-                        elif get_precision == 0 and get_record_precision == 0:
-                            partner.write({
-                                'geocoding': results[0],
-                                'geocodeur': results[1],
-                                'geo_lat': results[2],
-                                'geo_lng': results[3],
-                                'precision': results[4],
-                                'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
-                                'geocoding_response': json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
-                            })
-                            cmpt += 1
-
-                # Not_tried no failure and best precision
-                elif self.best_precision:
-                    if partner.geocoding not in ('success_openfire', 'success_osm', 'success_bano', 'success_google', 'manual', 'no_address'):
-                        results = geocoder_function(partner)
-                        get_precision = results[4]
-                        get_record_precision = partner.precision
-
-                        if get_precision == "high":
-                            get_precision = 3
-                        elif get_precision == "medium":
-                            get_precision = 2
-                        elif get_precision == "low":
-                            get_precision = 1
-                        else:
-                            get_precision = 0
-
-                        if get_record_precision == "high":
-                            get_record_precision = 3
-                        elif get_record_precision == "medium":
-                            get_record_precision = 2
-                        elif get_precision == "low":
-                            get_record_precision = 1
-                        else:
-                            get_record_precision = 0
-
-                        if get_precision > get_record_precision:
-                            partner.write({
-                                'geocoding': results[0],
-                                'geocodeur': results[1],
-                                'geo_lat': results[2],
-                                'geo_lng': results[3],
-                                'precision': results[4],
-                                'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
-                                'geocoding_response': json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
-                            })
-                            cmpt += 1
-                        elif get_precision == 0 and get_record_precision == 0:
-                            partner.write({
-                                'geocoding': results[0],
-                                'geocodeur': results[1],
-                                'geo_lat': results[2],
-                                'geo_lng': results[3],
-                                'precision': results[4],
-                                'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
-                                'geocoding_response': json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
-                            })
-                            cmpt += 1
-
-                # Overwrite all and not best precision
-                elif self.overwrite_geoloc_all and not self.best_precision:
-                    results = geocoder_function(partner)
-                    partner.write({
-                        'geocoding': results[0],
-                        'geocodeur': results[1],
-                        'geo_lat': results[2],
-                        'geo_lng': results[3],
-                        'precision': results[4],
-                        'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
-                        'geocoding_response': json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
-                    })
-                    cmpt += 1
-
-                # Overwrite all except manual and not best precision
-                elif self.overwrite_geoloc_except_manual and not self.best_precision:
-                    if partner.geocoding not in ('manual'):
-                        results = geocoder_function(partner)
-                        partner.write({
-                            'geocoding': results[0],
-                            'geocodeur': results[1],
-                            'geo_lat': results[2],
-                            'geo_lng': results[3],
-                            'precision': results[4],
-                            'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
-                            'geocoding_response': json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
-                        })
-                        cmpt += 1
-
-                # Not_tried no failure and not best precision
-                elif not self.best_precision:
-                    if partner.geocoding not in ('success_openfire', 'success_osm', 'success_bano', 'success_google', 'manual', 'no_address'):
-                        results = geocoder_function(partner)
+                    to_update = True
+                    if self.best_precision:
+                        get_precision = prec_to_int.get(results[4], 0)
+                        get_record_precision = prec_to_int.get(partner.precision)
+                        to_update = get_record_precision and get_precision > get_record_precision
+                    if to_update:
                         partner.write({
                             'geocoding': results[0],
                             'geocodeur': results[1],

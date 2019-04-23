@@ -57,7 +57,6 @@ class OFCalendarMixin(models.AbstractModel):
 
     state_int = fields.Integer(string="Valeur d'état", compute="_compute_state_int", help="valeur allant de 0 à 3 inclus")
 
-    #@api.depends('state')
     def _compute_state_int(self):
         """
         Function to give an integer value (0,1,2 or 3) depending on the state. ONLY 4 values are implemented.
