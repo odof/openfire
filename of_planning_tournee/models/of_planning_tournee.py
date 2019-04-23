@@ -1,31 +1,10 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
-from odoo import api, models, fields, registry
-from odoo.api import Environment
+from odoo import api, models, fields
 from odoo.exceptions import ValidationError
 
 import math
 from math import asin, sin, cos, sqrt
-
-def get_id(cr, uid, id, champ=False, table=False):
-    pre = ""
-    if table and champ:
-        try:
-            cr.execute("SELECT id from " + str(table) + " WHERE " + str(champ) + "='" + str(id) + "'")
-            pre = cr.fetchone()[0]
-        except:
-            pass
-    return pre
-
-def get_ch(cr, uid, id, champ=False, table=False):
-    pre = ""
-    if table and champ:
-        try:
-            cr.execute("SELECT " + str(champ) + " from " + str(table) + " WHERE id='" + str(id) + "'")
-            pre = cr.fetchone()[0]
-        except:
-            pass
-    return pre
 
 def distance_points(lat1, lon1, lat2, lon2):
     u"""
@@ -38,6 +17,9 @@ def distance_points(lat1, lon1, lat2, lon2):
 class OfPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
+    tournee_id = fields.Many2one('of.planning.tournee', compute='_compute_tournee_id', store=True, string='Planification')
+    partner_city = fields.Char(related='address_id.city', store=True)
+
     @api.multi
     @api.depends('equipe_id', 'date', 'tournee_id.date', 'tournee_id.equipe_id')
     def _compute_tournee_id(self):
@@ -46,25 +28,6 @@ class OfPlanningIntervention(models.Model):
             if intervention.equipe_id and intervention.date:
                 tournee = tournee_obj.search([('equipe_id', '=', intervention.equipe_id.id), ('date', '=', intervention.date[:10])], limit=1)
                 intervention.tournee_id = tournee
-
-    @api.depends('equipe_id', 'date', 'date_deadline')
-    def _compute_tournee_is_complet(self):
-        # Récupération des valeurs AVANT la modification
-        tournee_ids = []
-        with registry(self._cr.dbname).cursor() as cr:
-            self = self.with_env(self.env(cr=cr))
-            old_env = Environment(self._cr, self._uid, self._context)
-            for intervention in old_env['of.planning.intervention'].browse(self._ids):
-                if intervention.tournee_id:
-                    tournee_ids.append(intervention.tournee_id)
-        for intervention in self:
-            if intervention.tournee_id:
-                tournee_ids.append(intervention.tournee_id)
-        tournees = self.env['of.planning.tournee'].browse(list(set(tournee_ids)))
-        tournees._compute_is_complet()
-
-    tournee_id = fields.Many2one('of.planning.tournee', compute='_compute_tournee_id', store=True, string='Planification')
-    partner_city = fields.Char(related='address_id.city', store=True)
 
     @api.multi
     def create_tournee(self):
@@ -196,8 +159,8 @@ class OfPlanningIntervention(models.Model):
 class OfPlanningEquipe(models.Model):
     _inherit = "of.planning.equipe"
 
-    address_id = fields.Many2one('res.partner', string='Adresse de départ')
-    address_retour_id  = fields.Many2one('res.partner', string='Adresse de retour')
+    address_id = fields.Many2one('res.partner', string=u'Adresse de départ')
+    address_retour_id = fields.Many2one('res.partner', string='Adresse de retour')
     geo_lat = fields.Float(related='address_id.geo_lat')
     geo_lng = fields.Float(related='address_id.geo_lng')
 
@@ -212,89 +175,47 @@ class OfPlanningEquipe(models.Model):
         if self.address_id:
             self.address_retour_id = self.address_id
 
-# class OfParamDocs(models.Model):
-#     _name = 'of.param.docs'
-#     _description = u'Paramétrage des documents'
-#
-#     _columns = {
-#         'name': fields.char('Nom de document', size=128, required=True),
-#         'short_name': fields.char('ID', size=16, required=True),
-#         'model': fields.selection([('sale.order', 'Commande Client'), ('account.invoice', 'Facture Client'), ('of.planning.intervention', "Planning d'intervention")],
-#                                   'Domaine', required=True),
-#         'report_template': fields.many2one('ir.actions.report.xml', 'Rapport'),
-#         'mail_template': fields.many2one('mail.template', u'Mod\u00E8le de courrier'),
-#         'doc_type': fields.selection([('openfire', 'OpenFire'), ('mail', 'Courrier'), ('acrobat', 'Acrobat')], 'Type', readonly=True),
-#         'default_doc': fields.boolean(u'Défaut'),
-#         'planning_res_id': fields.many2one('of.planning.res', u'Tournée'),
-#     }
-#
-#     def onchange_report(self, cr, uid, ids, report_template):
-#         report_obj = self.pool['ir.actions.report.xml']
-#
-#         if report_template:
-#             name = report_obj.browse(cr, uid, report_template).name
-#             if name != 'Attestation TVA':
-#                 doc_type = 'openfire'
-#             else:
-#                 doc_type = 'acrobat'
-#             return {'value': {'mail_template': False, 'name': name, 'doc_type': doc_type}}
-#
-#     def onchange_mail(self, cr, uid, ids, mail_template):
-#         mail_tmpl_obj = self.pool['mail.template']
-#
-#         if mail_template:
-#             name = mail_tmpl_obj.browse(cr, uid, mail_template).name
-#             return {'value': {'report_template': False, 'name': name, 'doc_type': 'mail'}}
-#
-#     def create(self, cr, uid, data, context={}):
-#         doc_type = False
-#         report_template = False
-#         mail_template = False
-#         if 'report_template' in data.keys():
-#             if data['report_template']:
-#                 report_template = data['report_template']
-#         if 'mail_template' in data.keys():
-#             if data['mail_template']:
-#                 mail_template = data['mail_template']
-#         if report_template:
-#             if self.pool['ir.actions.report.xml'].browse(cr, uid, report_template).name == 'Attestation TVA':
-#                 doc_type = 'acrobat'
-#             else:
-#                 doc_type = 'openfire'
-#         elif mail_template:
-#             doc_type = 'mail'
-#
-#         if doc_type:
-#             data['doc_type'] = doc_type
-#         return super(of_param_docs, self).create(cr, uid, data, context)
-#
-#     def write(self, cr, uid, ids, data, context={}):
-#         doc_type = False
-#         report_template = False
-#         mail_template = False
-#         if 'report_template' in data.keys():
-#             if data['report_template']:
-#                 report_template = data['report_template']
-#         if 'mail_template' in data.keys():
-#             if data['mail_template']:
-#                 mail_template = data['mail_template']
-#         if report_template:
-#             if self.pool['ir.actions.report.xml'].browse(cr, uid, report_template).name == 'Attestation TVA':
-#                 doc_type = 'acrobat'
-#             else:
-#                 doc_type = 'openfire'
-#         elif mail_template:
-#             doc_type = 'mail'
-#         if doc_type:
-#             data['doc_type'] = doc_type
-#         return super(of_param_docs, self).write(cr, uid, ids, data, context)
-#
-# of_param_docs()
-
 
 class OfPlanningTournee(models.Model):
     _name = "of.planning.tournee"
     _description = "Tournée"
+    _order = 'date DESC'
+    _rec_name = 'date'
+
+    _sql_constraints = [
+        ('date_equipe_uniq', 'unique (date,equipe_id)', u"Il ne peut exister qu'une tournée par équipe pour un jour donné")
+    ]
+
+    date = fields.Date(string='Date', required=True)
+    date_jour = fields.Char(compute="_compute_date_jour", string="Jour")
+    equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe', required=True)
+    epi_lat = fields.Float(string=u'Épicentre Lat', digits=(12, 12), required=True)
+    epi_lon = fields.Float(string=u'Épicentre Lon', digits=(12, 12), required=True)
+    address_depart_id = fields.Many2one('res.partner', string='Adresse départ')
+    address_retour_id = fields.Many2one('res.partner', string='Adresse retour')
+    intervention_ids = fields.One2many(
+        # aaaa 'tournee_id' est inutile si il y a un compute. Vérifier l'intérêt du compute ici
+        'of.planning.intervention', 'tournee_id', u'Interventions liées', copy=False, order="date",
+        compute="_compute_intervention_ids")
+
+    zip_id = fields.Many2one('res.better.zip', 'Ville')
+    distance = fields.Float(string='Eloignement (km)', digits=(12, 4), required=True, default=20.0)
+    is_complet = fields.Boolean(compute="_compute_is_complet", string='Complet', store=True)
+    is_bloque = fields.Boolean(string=u'Bloqué', help=u'Journée bloquée : ne sera pas proposée à la planification')
+    is_confirme = fields.Boolean(string=u'Confirmé', default=True, help=u'Une tournée non confirmée sera supprimée si on lui retire ses rendez-vous')
+    date_min = fields.Date(related="date", string="Date min")
+    date_max = fields.Date(related="date", string="Date max")
+
+    @api.depends('date')
+    def _compute_date_jour(self):
+        if not self._context.get('tz'):
+            self = self.with_context(tz='Europe/Paris')
+        for tournee in self:
+            jour = ""
+            if tournee.date:
+                date_local = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(tournee.date))
+                jour = date_local.strftime("%A").capitalize()
+            tournee.date_jour = jour
 
     @api.multi
     @api.depends('equipe_id', 'date', 'is_bloque',
@@ -357,88 +278,12 @@ class OfPlanningTournee(models.Model):
                     last_end = e
             tournee.is_complet = is_complet
 
-    @api.depends('date')
-    def _get_jour(self):
-        if not self._context.get('tz'):
-            self = self.with_context(tz='Europe/Paris')
-        for tournee in self:
-            jour = ""
-            if tournee.date:
-                date_local = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(tournee.date))
-                jour = date_local.strftime("%A").capitalize()
-            tournee.date_jour = jour
-
-#     def _get_doc_name(self, cr, uid, ids, field, args, context=None):
-#         ids = isinstance(ids, int or long) and [ids] or ids
-#         doc_names = {}
-#         for res in self.browse(cr, uid, ids):
-#             names = ''
-#             if res.docs:
-#                 for doc in res.docs:
-#                     names += doc.short_name + ' '
-#             names = names.rstrip(' ')
-#             doc_names[res.id] = names
-#         return doc_names
-#
-#     def _set_doc_name(self, cr, uid, ids, name, value, arg, context):
-#         ids = isinstance(ids, int or long) and [ids] or ids
-#         param_docs_obj = self.pool['of.param.docs']
-#         param_docs = [(5, 0)]
-#         if value:
-#             short_name_list = value.split(' ')
-#             param_docs_ids = []
-#             if len(short_name_list):
-#                 param_docs_ids = param_docs_obj.search(cr, uid, [('short_name', 'in', tuple(short_name_list))])
-#             for param_doc in param_docs_ids:
-#                 param_docs.append((4, param_doc))
-#         for res in self.browse(cr, uid, ids):
-#             res.write({'docs': param_docs})
-#
-#     def _get_res(self, cr, uid, ids, context={}):
-#         ids = isinstance(ids, int or long) and [ids] or ids
-#         result = {}
-#         for param_docs in self.pool['of.param.docs'].browse(cr, uid, ids, context=context):
-#             result[param_docs.planning_res_id.id] = True
-#         return result.keys()
-#
-#     def _default_docs(self, cr, uid, contex={}):
-#         param_doc_obj = self.pool['of.param.docs']
-#         docs = [(5, 0)]
-#         default_doc_ids = param_doc_obj.search(cr, uid, [('default_doc', '=', True)])
-#         for dd in default_doc_ids:
-#             docs.append((4, dd))
-#         return docs
-#
-#     def _default_docs_name(self, cr, uid, contex={}):
-#         param_doc_obj = self.pool['of.param.docs']
-#         doc_names = ''
-#         default_doc_ids = param_doc_obj.search(cr, uid, [('default_doc', '=', True)])
-#         for dd in param_doc_obj.browse(cr, uid, default_doc_ids):
-#             doc_names += dd.short_name + ' '
-#         doc_names = doc_names.rstrip(' ')
-#         return doc_names
-
-    date = fields.Date(string='Date', required=True)
-    date_jour = fields.Char(compute="_get_jour", string="Jour")
-    equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe', required=True)
-    epi_lat = fields.Float(string=u'Épicentre Lat', digits=(12, 12), required=True)
-    epi_lon = fields.Float(string=u'Épicentre Lon', digits=(12, 12), required=True)
-    address_depart_id = fields.Many2one('res.partner', string='Adresse départ')
-    address_retour_id = fields.Many2one('res.partner', string='Adresse retour')
-    intervention_ids = fields.One2many('of.planning.intervention', 'tournee_id', u'Interventions liées', copy=False, order="date", compute="_compute_intervention_ids")
-
-    zip_id = fields.Many2one('res.better.zip', 'Ville')
-    distance = fields.Float(string='Eloignement (km)', digits=(12, 4), required=True, default=20.0)
-    is_complet = fields.Boolean(compute="_compute_is_complet", string='Complet', store=True)
-    is_bloque = fields.Boolean(string=u'Bloqué', help=u'Journée bloquée : ne sera pas proposée à la planification')
-    is_confirme = fields.Boolean(string=u'Confirmé', default=True, help=u'Une tournée non confirmée sera supprimée si on lui retire ses rendez-vous')
-
     @api.multi
     @api.depends('equipe_id', 'date', 'intervention_ids.date', 'intervention_ids.equipe_id')
     def _compute_intervention_ids(self):
-        intervention_obj = self.env["of.planning.intervention"]
+        intervention_obj = self.env['of.planning.intervention']
         for tournee in self:
-            interventions = intervention_obj.search(["tournee_id","=",tournee.id])
+            interventions = intervention_obj.search(['tournee_id', '=', tournee.id])
             for intervention in interventions:
                 if type(intervention.id) is int:
                     tournee.intervention_ids = [(4, intervention.id, False)]
@@ -451,28 +296,6 @@ class OfPlanningTournee(models.Model):
             d = fields.Date.context_today(self)
             tournee.date_min = d
             tournee.date_max = d
-
-#    date_min = fields.Date("Date min", compute='lambda self:for tournee in self:tournee.date_min=fields.Date.context_today(self)')
-#    date_max = fields.Date("Date max", compute='lambda self:for tournee in self:tournee.date_max=fields.Date.context_today(self)')
-
-    date_min = fields.Date(related="date", string="Date min")
-    date_max = fields.Date(related="date", string="Date max")
-
-#     docs = fields.One2many('of.param.docs', 'planning_res_id', 'Documents')
-#     docs_name = fields.function(_get_doc_name, fnct_inv=_set_doc_name, string='Documents', type='char', select=True,
-#                                   store={'of.planning.res': (lambda self, cr, uid, ids, c={}: ids, ['docs'], 20),
-#                                          'of.param.docs': (_get_res, ['short_name'], 20)})
-#     _defaults = {
-#         'docs'       : _default_docs,
-#         'docs_name'  : _default_docs_name,
-#     }
-
-    _sql_constraints = [
-        ('date_equipe_uniq', 'unique (date,equipe_id)', u"Il ne peut exister qu'une tournée par équipe pour un jour donné")
-    ]
-
-    _rec_name = 'date'
-    _order = 'date DESC'
 
     @api.onchange('zip_id')
     def _onchange_zip_id(self):

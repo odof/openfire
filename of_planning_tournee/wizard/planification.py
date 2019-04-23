@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from odoo import api, models, fields
 from datetime import datetime, timedelta
@@ -233,7 +233,6 @@ class OfTourneePlanification(models.TransientModel):
         self.ensure_one()
         partner_obj = self.env['res.partner']
 
-        equipe = self.equipe_id
         address_depart_id = self.address_depart_id or self.equipe_id.address_id
         plan_partners = []
         date_planifi_list = []   # debut, fin, line_id
@@ -629,7 +628,7 @@ class OfTourneePlanificationPlanning(models.TransientModel):
                 'description': description,
                 'verif_dispo': True,
             }
-            interv = intervention_obj.create(values)
+            intervention_obj.create(values)
 
             # Mise à jour de la date minimale de prochaine intervention dans le service
             if planning.date_next:

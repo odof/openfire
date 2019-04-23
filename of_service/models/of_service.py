@@ -187,7 +187,7 @@ class OfService(models.Model):
 class OFPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
-    service_id = fields.Many2one('of.service',string="Service")
+    service_id = fields.Many2one('of.service', string="Service")
 
     @api.onchange('address_id')
     def _onchange_address_id(self):

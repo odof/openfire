@@ -5,6 +5,8 @@
 
 from odoo import api, fields, models
 
+import json
+
 # Add geocoding fields to res.company model (all are related to partner_id)
 class ResCompany(models.Model):
     _inherit = "res.company"
@@ -82,54 +84,49 @@ class ResPartner(models.Model):
 
     # Get address data from db (same format for all geocoders)
     def get_addr_params(self):
-        query = ""
-        if self.street or self.street2:
-            if self.street and self.street2:
-                query += self.street + ' ' + self.street2
-                # Save street without numbers to compare
-                self.street_query = filter(lambda c: not c.isdigit(), query)
-            else:
-                if self.street:
-                    query += self.street
-                if self.street2:
-                    query += self.street2
-                # Save street without numbers to compare
-                self.street_query = filter(lambda c: not c.isdigit(), query)
+        if not (self.zip or self.city):
+            # Avoid requests with incomplete data
+            return ""
 
-            if self.zip:
-                query += ' ' + self.zip
-            if self.city:
-                query += ' ' + self.city
-            if self.country_id:
-                query += ' ' + self.country_id.name
-            else:
-                query += ' ' + "France"
+        # zip is not number (test france only)
+        if self.zip:
+            if not self.country_id.name or self.country_id.name.upper() == "FRANCE":
+                if not self.zip.strip().isdigit():
+                    return ""
 
-        elif self.zip or self.city:
-            if self.zip and self.city:
-                query += self.zip + ' ' + self.city
-            elif self.zip:
-                query += ' ' + self.zip
-            elif self.city:
-                query += ' ' + self.city
-            if self.country_id:
-                query += ' ' + self.country_id.name
-            else:
-                query += ' ' + "France"
-        else:
-            query = ""
+        params = [
+            filter(lambda c: not c.isdigit(), self.street or ''),
+            filter(lambda c: not c.isdigit(), self.street2 or ''),
+            self.zip,
+            self.city,
+            self.country_id.name or "France",
+        ]
+        params = [p and p.strip() for p in params]
+        params = [p for p in params if p]
+        return " ".join(params)
 
-        # Avoid requests with incomplete data
-        if query:
-            # zip is not number (test france only)
-            if self.zip:
-                if not self.country_id.name or self.country_id.name.upper() == "FRANCE":
-                    if not self.zip.isdigit():
-                        query = ""
-            # no zip no city
-            if not any((self.zip, self.city)):
-                query = ""
-        return query
+    @api.multi
+    def geo_code(self, geocodeur=False):
+        geo_obj = self.env['of.geo.wizard']
+        if not geocodeur:
+            geocodeur = self.env['ir.config_parameter'].get_param('geocoder_by_default')
+        geocode = {
+            'nominatim_openfire': geo_obj.geo_openfire,
+            'nominatim_osm': geo_obj.geo_osrm,
+            'bano': geo_obj.geo_ban,
+            'google_maps': geo_obj.geo_google,
+        }.get(geocodeur, geo_obj.geo_openfire)
+        for partner in self:
+            results = geocode(partner)
+            partner.write({
+                'geocoding': results[0],
+                'geocodeur': results[1],
+                'geo_lat': results[2],
+                'geo_lng': results[3],
+                'precision': results[4],
+                'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
+                'geocoding_response': json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
+            })
 
     # Conditional create when new partner is added
     @api.model
@@ -150,13 +147,13 @@ class ResPartner(models.Model):
                 use_openfire = use_osm = use_bano = use_google = False
 
                 # Set geocoder by default
-                if not res_geocoder_by_default:
+                if not res_geocoder_by_default or res_geocoder_by_default == 'nominatim_openfire':
                     use_openfire = True
-                elif res_geocoder_by_default == u'1':
+                elif res_geocoder_by_default == 'nominatim_osm':
                     use_osm = True
-                elif res_geocoder_by_default == u'2':
+                elif res_geocoder_by_default == 'bano':
                     use_bano = True
-                elif res_geocoder_by_default == u'3':
+                elif res_geocoder_by_default == 'google_maps':
                     use_google = True
 
                 # Create wizard objet to do the action
@@ -239,6 +236,22 @@ class ResPartner(models.Model):
 class OFGeoConfiguration(models.TransientModel):
     _name = 'of.geo.config.settings'
     _inherit = 'res.config.settings'
+
+    @api.model_cr_context
+    def _auto_init(self):
+        # A supprimer : conversion de système d'enregistrement du géocodeur par défaut
+        self._cr.execute(
+            "UPDATE ir_config_parameter "
+            "SET value = "
+            "CASE value "
+            " WHEN '0' THEN 'nominatim_openfire'"
+            " WHEN '1' THEN 'nominatim_osm'"
+            " WHEN '2' THEN 'bano'"
+            " WHEN '3' THEN 'google_maps'"
+            " ELSE value "
+            "END "
+            "WHERE key = 'geocoder_by_default'")
+        return super(OFGeoConfiguration, self)._auto_init()
 
     # Check, get and prefill URLs geocoders
     @api.multi
@@ -369,10 +382,10 @@ class OFGeoConfiguration(models.TransientModel):
         ], u"Si un partenaire est ajouté", default=_get_default_geocoding_on_create,
         help=u"Calculer automatiquement les valeurs de géocodage lorsqu'un nouveau partenaire est ajouté")
     geocoder_by_default = fields.Selection([
-        (0, "OpenFire"),
-        (1, "OpenStreetMap"),
-        (2, u"Base Adresse Nationale Ouverte (BANO)"),
-        (3, "Google Maps")], u"Géocodeur fonctions automatiques", default=_get_default_geocoder_by_default,
+        ('nominatim_openfire', "OpenFire"),
+        ('nominatim_osm', "OpenStreetMap"),
+        ('bano', u"Base Adresse Nationale Ouverte (BANO)"),
+        ('google_maps', "Google Maps")], u"Géocodeur fonctions automatiques", default=_get_default_geocoder_by_default,
         help=u"Géocodeur par défaut pour fonctions automatiques")
 
     # Save fields

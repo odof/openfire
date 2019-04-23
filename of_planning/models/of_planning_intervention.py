@@ -44,6 +44,9 @@ class OfPlanningEquipe(models.Model):
     _description = u"Équipe d'intervention"
     _order = "sequence, name"
 
+    def _default_tz(self):
+        return self.env.user.tz or 'Europe/Paris'
+
     name = fields.Char(u'Équipe', size=128, required=True)
     note = fields.Text('Description')
     employee_ids = fields.Many2many('hr.employee', 'of_planning_employee_rel', 'equipe_id', 'employee_id', u'Employés')
@@ -58,12 +61,15 @@ class OfPlanningEquipe(models.Model):
     sequence = fields.Integer(u'Séquence', help=u"Ordre d'affichage (plus petit en premier)")
     color_ft = fields.Char(string="Couleur de texte", help="Choisissez votre couleur", default="#0D0D0D")
     color_bg = fields.Char(string="Couleur de fond", help="Choisissez votre couleur", default="#F0F0F0")
-    tz = fields.Selection(_tz_get, string='Timezone', default=lambda self: self._context.get('tz'),
-                          help="The Team's timezone, used to output proper date and time values "
-                               "inside printed reports. It is important to set a value for this field. "
-                               "You should use the same timezone that is otherwise used to pick and "
-                               "render date and time values: your computer's timezone.")
+    tz = fields.Selection(
+        _tz_get, string='Fuseau horaire', required=True, default=lambda self: self._default_tz(),
+        help="Le fuseau horaire de l'équipe d'intervention")
     tz_offset = fields.Char(compute='_compute_tz_offset', string='Timezone offset', invisible=True)
+
+    @api.depends('tz')
+    def _compute_tz_offset(self):
+        for equipe in self:
+            equipe.tz_offset = datetime.now(pytz.timezone(equipe.tz or 'GMT')).strftime('%z')
 
     @api.onchange('employee_ids')
     def onchange_employees(self):
@@ -88,18 +94,13 @@ class OfPlanningEquipe(models.Model):
             if(hors[1] > hors[2]):
                 raise ValidationError(u"L'heure de l'après-midi ne peut pas être inférieure à l'heure du matin")
 
-    @api.depends('tz')
-    def _compute_tz_offset(self):
-        for equipe in self:
-            equipe.tz_offset = datetime.now(pytz.timezone(equipe.tz or 'GMT')).strftime('%z')
-
     @api.model
     def get_working_hours_fields(self):
         return {
             "morning_start_field": "hor_md",
             "morning_end_field": "hor_mf",
             "afternoon_start_field": "hor_ad",
-            "afternoon_end_field": "hor_af"
+            "afternoon_end_field": "hor_af",
         }
 
 class OfPlanningInterventionRaison(models.Model):
