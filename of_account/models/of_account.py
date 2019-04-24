@@ -155,10 +155,10 @@ class AccountMoveLine(models.Model):
                     line.move_id.line_ids.with_context(check_move_validity=False).write({'name': name})
         return res
 
-    # Lors d'une saisie d'une pièce comptable, pour préremplir le compte de tiers du partenaire saisi.
+    # Lors d'une saisie d'une pièce comptable, pour préremplir le compte de tiers du partenaire saisi (première ligne uniquement).
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
-        if self.partner_id and not self.account_id:
+        if self.partner_id and not self.account_id and not self._context.get('line_ids', False):
             if self.journal_id.type == 'sale': # Est un journal de vente, on prend le compte de tiers client.
                 self.account_id = self.partner_id.property_account_receivable_id
             elif self.journal_id.type == 'purchase': # Est un journal d'achat, on prend le compte de tiers fournisseur.
