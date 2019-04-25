@@ -31,6 +31,13 @@ class Company(models.Model):
             res = res.accounting_company_id
         return res
 
+    @api.multi
+    def _of_filter_taxes(self, taxes):
+        if not self or not taxes:
+            return taxes
+        accounting_company = self.accounting_company_id
+        return taxes.filtered(lambda tax: tax.company_id.accounting_company_id == accounting_company)
+
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
