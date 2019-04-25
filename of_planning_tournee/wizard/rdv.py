@@ -561,7 +561,7 @@ class OfTourneeRdv(models.TransientModel):
         if self._context.get('active_model') == 'crm.helpdesk':
             values['sav_id'] = self._context.get('active_id', False)
 
-        intervention_obj.create(values)
+        res = intervention_obj.create(values)
 
         # Creation/mise à jour du service si creer_recurrence
         if self.date_next:
@@ -569,7 +569,15 @@ class OfTourneeRdv(models.TransientModel):
                 self.service_id.write({'date_next': self.date_next})
             elif self.creer_recurrence:
                 service_obj.create(self._get_service_data(dt_propos.month))
-        return {'type': 'ir.actions.act_window_close'}
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'of.planning.intervention',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_id': res.id,
+            'target': 'current',
+            'context': self._context
+        }
 
     @api.multi
     def calc_distances_dates_equipes(self, date_debut, date_fin, equipes):
