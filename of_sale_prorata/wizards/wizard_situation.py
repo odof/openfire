@@ -142,7 +142,6 @@ class OfWizardSituation(models.TransientModel):
             'team_id': order.team_id.id,
             'user_id': order.user_id.id,
             'comment': order.note,
-            'of_retenue_garantie_pct' : order.of_retenue_garantie_pct,
         })
 
         account_situation = invoice_line_obj.get_invoice_line_account('out_invoice', product_situation,
@@ -191,6 +190,13 @@ class OfWizardSituation(models.TransientModel):
                 'invoice_line_tax_ids': [(6, 0, taxes._ids)],
                 'account_analytic_id': order.project_id.id or False,
             })
+
+        # --- Ajout de la retenue de garantie, le cas échéant ---
+        # La retenue de garantie se calcule avant l'application du prorata
+        if order.of_retenue_garantie_pct:
+            # La retenue de garantie se calcule sur le montant TTC, il faut donc calculer les taxes au préalable
+            invoice.compute_taxes()
+            invoice.of_add_retenue_line(order.of_retenue_garantie_pct, order)
 
         # --- Ajout de la ligne de prorata, le cas échéant ---
         if order.of_prorata_percent:

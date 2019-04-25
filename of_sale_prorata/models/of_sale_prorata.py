@@ -15,9 +15,9 @@ class SaleOrder(models.Model):
             products = product_obj.search([('name', 'ilike', 'prorata')])
         return products and products[0] or False
 
-    of_prorata_percent = fields.Float(string='Charges compte prorata(%)', digits=(4, 5))
+    of_prorata_percent = fields.Float(string='Compte prorata(%)', digits=(4, 5))
     of_retenue_garantie_pct = fields.Float(
-        string='Retenue de garantie(%)', digits=(4, 5),
+        string='Ret. garantie(%)', digits=(4, 5),
         help=u"Retenue calculée depuis le montant total de la commande")
     of_prochaine_situation = fields.Integer(
         compute='_compute_of_prochaine_situation', string="Prochaine situation",
@@ -43,27 +43,39 @@ class SaleOrder(models.Model):
         invoice_ids = super(SaleOrder, self).action_invoice_create(grouped=grouped, final=final)
 
         for order in self:
-            if not order.of_prorata_percent:
+            if not order.of_prorata_percent and not order.of_retenue_garantie_pct:
                 continue
-
-            amount_untaxed = 0.0
-            for line in order.order_line:
-                if line.product_uom_qty:
-                    amount_untaxed += line.price_subtotal
 
             for invoice in order.invoice_ids:
                 if invoice.id in invoice_ids:
-                    invoice.of_add_prorata_line(order.of_prorata_percent, base_amount=amount_untaxed)
-                    # Pour le cas normalement impossible où on fait des factures groupées avec des comptes prorata, on évite de doubler l'opération
-                    invoice_ids.remove(invoice.id)
                     break
-        return invoice_ids
+            else:
+                # Facture non trouvée ?
+                continue
 
-    @api.multi
-    def _prepare_invoice(self):
-        invoice_vals = super(SaleOrder, self)._prepare_invoice()
-        invoice_vals['of_retenue_garantie_pct'] = self.of_retenue_garantie_pct
-        return invoice_vals
+            # Calcul des totaux HT et TTC pour les lignes concernant le prorata et la retenue de garantie
+            cur = order.currency_id
+            round_globally = order.company_id.tax_calculation_rounding_method == 'round_globally'
+            amount_untaxed = 0.0
+            amount_tax = {}
+            for line in order.order_line:
+                if not line.product_uom_qty:
+                    continue
+                amount_untaxed += line.price_subtotal
+
+                tax = line.tax_id
+                amount_tax.setdefault(tax, 0.0)
+                taxes = tax.compute_all(line.price_subtotal, cur, 1.0, product=line.product_id, partner=order.partner_shipping_id)
+                if round_globally:
+                    price_tax = sum(t.get('amount', 0.0) for t in taxes.get('taxes', []))
+                else:
+                    price_tax = taxes['total_included'] - taxes['total_excluded']
+                amount_tax[tax] += price_tax
+            amount_tax = sum(cur.round(val) for val in amount_tax.itervalues())
+
+            invoice.of_add_retenue_line(order.of_retenue_garantie_pct, base_amount=amount_untaxed + amount_tax)
+            invoice.of_add_prorata_line(order.of_prorata_percent, base_amount=amount_untaxed)
+        return invoice_ids
 
     @api.multi
     def of_button_situation(self):
@@ -106,38 +118,59 @@ class SaleOrderLineSituation(models.Model):
     invoice_line_id = fields.Many2one('account.invoice.line', string='Ligne de facture', readonly=True)
 
 
-class AccountPayment(models.Model):
-    _inherit = 'account.payment'
-
-    @api.model
-    def default_get(self, fields):
-        rec = super(AccountPayment, self).default_get(fields)
-        invoice_ids = self.resolve_2many_commands('invoice_ids', rec.get('invoice_ids'), fields=['id'])
-        if len(invoice_ids) == 1:
-            invoice = self.env['account.invoice'].browse(invoice_ids[0]['id'])
-            if invoice.of_retenue_garantie and invoice.residual > invoice.of_retenue_garantie:
-                # Retrait de la retenue de garantie du montant à payer
-                rec['amount'] = invoice.residual - invoice.of_retenue_garantie
-            elif invoice.of_retenue_garantie:
-                # Paiement de la retenue de garantie de la facture, mais aussi des factures de situation
-                rec['amount'] = sum(invoice.of_sale_order_ids.mapped('invoice_ids').mapped('residual'))
-        return rec
-
-
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
-    of_retenue_garantie = fields.Float(
-        compute='_compute_of_retenue_garantie', digits=dp.get_precision('Product Price'),
-        string='Retenue de garantie')
-    of_retenue_garantie_pct = fields.Float(
-        string='Retenue de garantie(%)', digits=(4, 5),
-        help=u"Pourcentage appliqué sur le total TTC de la facture (après application des charges de compte de prorata)")
+    @api.multi
+    def of_add_retenue_line(self, retenue_garantie_pct, sale_order=False, base_amount=False):
+        self.ensure_one()
+        if not retenue_garantie_pct:
+            return
+        if base_amount is False:
+            base_amount = self.amount_total
+        order_line_obj = self.env['sale.order.line']
+        invoice_line_obj = self.env['account.invoice.line']
 
-    @api.depends('of_retenue_garantie_pct', 'amount_total')
-    def _compute_of_retenue_garantie(self):
-        for invoice in self:
-            invoice.of_retenue_garantie = invoice.currency_id.round(invoice.of_retenue_garantie_pct * invoice.amount_total * 0.01)
+        product_retenue_id = self.env['ir.values'].get_default('sale.config.settings', 'of_product_retenue_id_setting')
+        if not product_retenue_id:
+            raise UserError("Vous devez renseigner un article de retenue de garantie dans la configuration des ventes")
+        product_retenue = self.env['product.product'].browse(product_retenue_id)
+
+        # Normalement le compte devrait toujours être le 411700 et la taxe devrait toujours être à 0
+        account = invoice_line_obj.get_invoice_line_account('in_invoice', product_retenue, self.fiscal_position_id, self.company_id)
+        taxes = self.company_id._of_filter_taxes(product_retenue.taxes_id)
+        taxes = self.fiscal_position_id.map_tax(taxes, product_retenue, self.partner_id)
+        amount = self.currency_id.round(base_amount * retenue_garantie_pct * -0.01)
+
+        # --- Création de la ligne de commande si la commande est renseignée ---
+        so_line = sale_order and order_line_obj.create({
+            'name': "Retenue de garantie de %s%%" % (retenue_garantie_pct, ),
+            'price_unit': amount,
+            'product_uom_qty': 0.0,
+            'order_id': sale_order.id,
+            'discount': 0.0,
+            'product_uom': product_retenue.uom_id.id,
+            'product_id': product_retenue.id,
+            'tax_id': [(6, 0, taxes._ids)],
+        })
+
+        inv_line = invoice_line_obj.create({
+            'invoice_id': self.id,
+            'name': "Retenue de garantie de %s%%" % (retenue_garantie_pct, ),
+            'origin': self.origin,
+            'account_id': account.id,
+            'price_unit': amount,
+            'quantity': 1.0,
+            'discount': 0.0,
+            'uom_id': product_retenue.uom_id.id,
+            'product_id': product_retenue.id,
+            'sale_line_ids': so_line and [(6, 0, [so_line.id])] or [],
+            'invoice_line_tax_ids': [(6, 0, taxes._ids)],
+            'account_analytic_id': sale_order and sale_order.project_id.id or False,
+        })
+        # Ces lignes sont là par sécurité, mais normalement inutiles car taxe à 0 sur la ligne.
+        inv_line.onchange_tax_ids()
+        self.compute_taxes()
 
     @api.multi
     def of_add_prorata_line(self, pct, sale_order=False, base_amount=False):
@@ -151,7 +184,13 @@ class AccountInvoice(models.Model):
         if not pct:
             return
         if base_amount is False:
-            base_amount = self.amount_untaxed
+            product_retenue_id = self.env['ir.values'].get_default('sale.config.settings', 'of_product_retenue_id_setting')
+            if product_retenue_id:
+                # La retenue de garantie ne doit pas impacter le calcul du prorata
+                lines = self.invoice_line_ids.filtered(lambda line: line.product_id.id != product_retenue_id)
+                base_amount = sum(lines.mapped('price_subtotal'))
+            else:
+                base_amount = self.amount_untaxed
         if not base_amount:
             return
         order_line_obj = self.env['sale.order.line']
@@ -165,7 +204,7 @@ class AccountInvoice(models.Model):
         if product_prorata.description_sale:
             product_prorata_name += '\n' + product_prorata.description_sale
         # Utilisation des comptes/taxes à l'achat et non à la vente
-        taxes = product_prorata.supplier_taxes_id.filtered(lambda r: r.company_id == self.company_id)
+        taxes = self.company_id._of_filter_taxes(product_prorata.supplier_taxes_id)
         taxes = self.fiscal_position_id.map_tax(taxes, product_prorata, self.partner_id)
 
         # Calcul du montant de prorata
@@ -195,7 +234,7 @@ class AccountInvoice(models.Model):
         inv_line = invoice_line_obj.create({
             'invoice_id': self.id,
             'name': product_prorata_name,
-            'origin': sale_order and sale_order.name or False,
+            'origin': self.origin,
             'account_id': account.id,
             'price_unit': amount,
             'quantity': 1.0,
@@ -209,47 +248,6 @@ class AccountInvoice(models.Model):
         inv_line.onchange_tax_ids()
         self.compute_taxes()
 
-    @api.multi
-    def finalize_invoice_move_lines(self, move_lines):
-        """ Modification des écritures comptables générées pour traiter la retenue de garantie.
-        Ce code sert sert à extraire le montant de la retenue de garantie du compte 411 pour le placer dans
-          le compte spécifié dans la configuration de la société (normalement le compte 4117).
-        En raison de la complexité pour gérer ensuite la saisie des paiements à travers ces deux comptes,
-          le code suivant a été désactivé. Seul le compte client (411) sera utilisé.
-        """
-        return super(AccountInvoice, self).finalize_invoice_move_lines(move_lines)
-
-        if not self.of_retenue_garantie_pct:
-            return move_lines
-
-    @api.multi
-    def _of_get_printable_totals(self):
-        result = super(AccountInvoice, self)._of_get_printable_totals()
-        if self.of_retenue_garantie:
-            total = False
-            for line_type in ('total', 'taxes', 'subtotal'):
-                if result[line_type]:
-                    total = result[line_type][-1][1][1]
-                    break
-
-            invoices = self
-            for group, lines in self._of_get_total_lines_by_group():
-                if group and group.is_group_paiements():
-                    # Liste des factures et factures d'acompte
-                    invoices = self._of_get_linked_invoices(lines)
-            retenue_garantie = sum(invoices.mapped('of_retenue_garantie'))
-
-            round_curr = self.currency_id.round
-            if total > retenue_garantie:
-                # On retranche la retenue de garantie du montant à payer
-                #  SAUF si il ne reste plus que la retenue de garantie à payer
-                result['total'].append(
-                    [
-                        [("Retenue de garantie", round_curr(retenue_garantie))],
-                        ["A payer", round_curr(total - retenue_garantie)]
-                    ]
-                )
-        return result
 
 class Company(models.Model):
     _inherit = 'res.company'
@@ -283,6 +281,11 @@ class OFSaleConfiguration(models.TransientModel):
         string=u"(OF) Article de situation",
         help=u"Article utilisé pour les factures de situation")
 
+    of_product_retenue_id_setting = fields.Many2one(
+        'product.product',
+        string=u"(OF) Article de retenue de garantie",
+        help=u"Article utilisé pour la retenue de garantie")
+
     @api.multi
     def set_of_product_prorata_id_defaults(self):
         return self.env['ir.values'].sudo().set_default(
@@ -292,3 +295,8 @@ class OFSaleConfiguration(models.TransientModel):
     def set_of_product_situation_id_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_product_situation_id_setting', self.of_product_situation_id_setting.id)
+
+    @api.multi
+    def set_of_product_retenue_id_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'of_product_retenue_id_setting', self.of_product_retenue_id_setting.id)

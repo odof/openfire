@@ -10,6 +10,7 @@
                 <header>
                     <button name="button_make_invoice" string="Générer la facture de situation" type="object"
                             class="btn-primary" confirm="Vous allez générer la prochaine facture de situation."/>
+                    <button name="%(action_of_report_situation)d" string="Rapport de situation" type="action"/>
                 </header>
                 <sheet>
                     <field name="order_id" invisible="1"/>
