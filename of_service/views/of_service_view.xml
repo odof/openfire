@@ -318,6 +318,7 @@
 <!--##########################################################################################################################-->
 
         <menuitem id="menu_of_service" name="Services" parent="sales_team.menu_sales" sequence="105" action="action_of_service_form"/>
+        <menuitem id="menu_of_planning_service" name="Services" parent="of_planning.menu_of_planning_intervention" sequence="25" action="action_of_service_form"/>
 
     </data>
 </openerp>

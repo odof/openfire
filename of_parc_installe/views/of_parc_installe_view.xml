@@ -205,6 +205,8 @@
         <!-- Menu parc installé -->
         <menuitem id="menu_of_parc_installe" action="action_view_of_parc_installe" name="Parc installé"
              parent="sales_team.menu_sales" groups="project.group_project_user" sequence="100"/>
+        <menuitem id="menu_of_parc_installe_planning" action="action_view_of_parc_installe" name="Parc installé"
+            parent="of_planning.menu_of_planning_clients" groups="project.group_project_user" sequence="20"/>
 
 <!-- *************************************************** -->
 <!-- ********************* ACTIONS ********************* -->
