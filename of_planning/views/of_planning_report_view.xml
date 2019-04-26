@@ -38,7 +38,7 @@
             <field name="target">new</field>
         </record>
 
-        <menuitem id="menu_of_planning_report" name="Impression" parent="menu_of_planning_intervention" action="action_of_planning_report" sequence="100"/>
+        <menuitem id="menu_of_planning_report" name="Impression" parent="of_planning.menu_of_planning_intervention" action="action_of_planning_report" sequence="30"/>
 
     <act_window
             name="Envoyer un courrier"

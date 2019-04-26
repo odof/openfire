@@ -319,6 +319,12 @@
             groups="project.group_project_user"
             sequence="100"/>
 
+        <menuitem id="menu_of_planning_intervention_sav"
+            parent="of_planning.menu_of_planning_intervention"
+            action="action_of_project_issue_view"
+            groups="project.group_project_user"
+            sequence="40"/>
+
         <!-- Menu configuration catégories de SAV dans Ventes/Configuration-->
         <record id="of_project_issue_categorie_action_form" model="ir.actions.act_window">
             <field name="name">Catégories de SAV</field>
