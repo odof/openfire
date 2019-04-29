@@ -31,28 +31,38 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- tr t-foreach="order.order_line" t-as="l" -->
-                    <tr t-foreach="doc.line_ids" t-as="l">
-                        <td><span t-field="l.name"/></td>
-                        <td class="text-right">
-                            <span t-esc="', '.join(map(lambda x: (x.description or x.name), l.tax_id))"/>
-                        </td>
-                        <td class="text-right">
-                            <span t-field="l.price_subtotal" t-options='{"widget": "monetary", "display_currency": order.currency_id}'/>
-                        </td>
-                        <td class="text-right">
-                            <span t-field="l.price_total" t-options='{"widget": "monetary", "display_currency": order.currency_id}'/>
+                    <t t-foreach="doc.situation_lines_layouted()" t-as="layout_category">
+                        <t t-if="layout_category_size > 1" groups="sale.group_sale_layout">
+                            <tr class="active">
+                                <td colspan="7" style="font-weight: bold; border-bottom: 1px solid black;">&amp;bull;
+                                    <t t-esc="layout_category['name']"/>
+                                </td>
+                            </tr>
+                        </t>
+
+                        <!-- Lines associated -->
+                        <tr t-foreach="layout_category['lines']" t-as="l">
+                            <td><span t-field="l.name"/></td>
+                            <td class="text-right">
+                                <span t-esc="', '.join(map(lambda x: (x.description or x.name), l.tax_id))"/>
                             </td>
-                        <td class="text-right">
-                            <span t-field="l.sit_val_prec"/>&amp;nbsp;%
-                        </td>
-                        <td class="text-right">
-                            <span t-field="l.sit_val_n"/>&amp;nbsp;%
-                        </td>
-                        <td class="text-right">
-                            <span t-field="l.sit_val_suiv"/>&amp;nbsp;%
-                        </td>
-                    </tr>
+                            <td class="text-right">
+                                <span t-field="l.price_subtotal" t-options='{"widget": "monetary", "display_currency": order.currency_id}'/>
+                            </td>
+                            <td class="text-right">
+                                <span t-field="l.price_total" t-options='{"widget": "monetary", "display_currency": order.currency_id}'/>
+                                </td>
+                            <td class="text-right">
+                                <span t-field="l.sit_val_prec"/>&amp;nbsp;%
+                            </td>
+                            <td class="text-right">
+                                <span t-field="l.sit_val_n"/>&amp;nbsp;%
+                            </td>
+                            <td class="text-right">
+                                <span t-field="l.sit_val_suiv"/>&amp;nbsp;%
+                            </td>
+                        </tr>
+                    </t>
                 </tbody>
                     <tr class="border-black">
                         <td><strong>Total</strong></td>

@@ -46,6 +46,7 @@
         <field name="arch" type="xml">
             <tree editable="bottom" create="false">
                 <field name="name" readonly="1"/>
+                <field name="layout_category_id"/>
                 <field name="tax_id" widget="many2many_tags" readonly="1"/>
                 <field name="price_subtotal" sum="Total"/>
                 <field name="price_total" sum="Total"/>

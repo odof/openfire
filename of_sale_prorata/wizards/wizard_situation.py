@@ -235,6 +235,23 @@ class OfWizardSituation(models.TransientModel):
         return action
 
     @api.multi
+    def situation_lines_layouted(self):
+        self.ensure_one()
+        report_groups = []
+        order_line_situation = {line.order_line_id: line for line in self.line_ids}
+
+        for order_page in self.order_id.order_lines_layouted():
+            for order_group in order_page:
+                sit_lines = [order_line_situation[order_line] for order_line in order_group['lines']
+                             if order_line in order_line_situation]
+                if sit_lines:
+                    report_groups.append({
+                        'name': order_group['name'],
+                        'lines': sit_lines,
+                    })
+        return report_groups
+
+    @api.multi
     def of_get_report_name(self, docs):
         return "Situation %s" % self.order_id.of_prochaine_situation
 
@@ -253,6 +270,7 @@ class OfWizardSituationLine(models.TransientModel):
     name = fields.Char(compute='_compute_name', string='Description courte')
     situation_id = fields.Many2one('of.wizard.situation', string='Wizard', required=True)
     order_line_id = fields.Many2one('sale.order.line', "Ligne de commande", required=True, ondelete="cascade")
+    layout_category_id = fields.Many2one('sale.layout_category', related='order_line_id.layout_category_id', readonly=True)
 
     sit_val_n = fields.Integer(compute='_compute_sit_vals', inverse='_inverse_sit_val_n', string="Sit. n (%)")
     sit_val_prec = fields.Integer(compute='_compute_sit_vals', string="Total n-1 (%)")
