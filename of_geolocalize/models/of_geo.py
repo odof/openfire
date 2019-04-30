@@ -208,13 +208,13 @@ class ResPartner(models.Model):
             use_openfire = use_osm = use_bano = use_google = False
 
             # Set geocoder by default
-            if not res_geocoder_by_default:
+            if not res_geocoder_by_default or res_geocoder_by_default == 'nominatim_openfire':
                 use_openfire = True
-            elif res_geocoder_by_default == u'1':
+            elif res_geocoder_by_default == 'nominatim_osm':
                 use_osm = True
-            elif res_geocoder_by_default == u'2':
+            elif res_geocoder_by_default == 'bano':
                 use_bano = True
-            elif res_geocoder_by_default == u'3':
+            elif res_geocoder_by_default == 'google_maps':
                 use_google = True
 
             # Create wizard objet to do the action
