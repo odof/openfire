@@ -378,8 +378,11 @@ class OfTourneeRdv(models.TransientModel):
                             intervention_deb = min(intervention_deb, equipe.hor_af)
                             duree = equipe.hor_mf - deb + intervention_deb - ad
                             if duree >= self.duree:
+                                # deb < fin donc il y a du temps disponible le matin
                                 creneaux.append((deb, fin, equipe))
-                                creneaux.append((ad, intervention_deb, equipe))
+                                if ad < intervention_deb:
+                                    # Il y a du temps disponible entre le début d'après-midi et le début de l'intervention
+                                    creneaux.append((ad, intervention_deb, equipe))
                             fin = equipe.hor_af
                         else:
                             duree = min(intervention_deb, fin) - deb
