@@ -100,7 +100,7 @@ class OfWizardSituation(models.TransientModel):
                 continue
             for line in invoice.invoice_line_ids:
                 if is_valid_line(line):
-                    result.setdefault(line.invoice_line_tax_ids, [0.0, 0.0])[1] += line.price_subtotal
+                    result.setdefault(line.invoice_line_tax_ids, [0.0, 0.0])[1] += line.price_subtotal_signed
 
         for amounts in result.itervalues():
             amounts[0] = cur.round(amounts[0])
