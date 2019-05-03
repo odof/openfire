@@ -604,24 +604,34 @@ class OfTourneeRdv(models.TransientModel):
                     continue
                 tournee = creneaux.mapped("intervention_id").mapped("tournee_id")
                 # S'il y a une tournée, on favorise son point de départ plutôt que celui de l'équipe.
-                # Note : Une tournée est unique par équipe et par date (contrainte SQL) donc len(tournee) <= 1
+                # Note : une tournée est unique par équipe et par date (contrainte SQL) donc len(tournee) <= 1
                 origine = (tournee.address_depart_id or
                            equipe.address_id or
-                           equipe.employee_ids[0].address_id)
+                           equipe.employee_ids and equipe.employee_ids[0].address_id or
+                           False)
                 arrivee = (tournee.address_retour_id or
                            equipe.address_retour_id or
-                           equipe.address_id or
-                           equipe.employee_ids[0].address_id)
-                if origine.geo_lat == origine.geo_lng == 0:
-                    raise UserError(u"L'origine n'est pas géolocalisée.\nÉquipe : %s\nDate : %s" %
+                           equipe.employee_ids and equipe.employee_ids[0].address_id or
+                           False)
+                # Pas d'origine ou d'arrivée ni pour la tournée ni pour l'équipe et pas d'employés dans l'équipe
+                if not (equipe.employee_ids or (origine and arrivee)):
+                    raise UserError(u"L'équipe \"%s\" n'a pas d'employé." % equipe.name)
+                # Pas d'origine ni pour la tournée ni pour l'équipe ni pour ses employés
+                elif not origine:
+                    raise UserError(u"L'équipe \"%s\" n'a pas d'adresse de départ." % equipe.name)
+                # Pas d'arrivée ni pour la tournée ni pour l'équipe ni pour ses employés
+                elif not arrivee:
+                    raise UserError(u"L'équipe \"%s\" n'a pas d'adresse d'arrivée." % equipe.name)
+                elif origine.geo_lat == origine.geo_lng == 0:
+                    raise UserError(u"L'adresse de départ de l'équipe \"%s\" n'est pas géolocalisée.\nDate : %s" %
                                     (equipe.name, date_courante.strftime(lang.date_format)))
-                if arrivee.geo_lat == arrivee.geo_lng == 0:
-                    raise UserError(u"Le point de retour n'est pas géolocalisé.\nÉquipe : %s\nDate : %s" %
+                elif arrivee.geo_lat == arrivee.geo_lng == 0:
+                    raise UserError(u"L'adresse de retour de l'équipe \"%s\" n'est pas géolocalisée.\nDate : %s" %
                                     (equipe.name, date_courante.strftime(lang.date_format)))
 
                 query = ROUTING_BASE_URL + "route/" + ROUTING_VERSION + "/" + ROUTING_PROFILE + "/"
 
-                # Listes de coordonnées: ATTENTION OSRM prend ses coordonnées sous form (lng, lat)
+                # Listes de coordonnées : ATTENTION OSRM prend ses coordonnées sous form (lng, lat)
                 # Point de départ
                 str_coords = str(origine.geo_lng) + "," + str(origine.geo_lat)
 
@@ -644,7 +654,7 @@ class OfTourneeRdv(models.TransientModel):
                     req = requests.get(full_query)
                     res = req.json()
                 except Exception as e:
-                    raise UserError(u"Impossible de contacter le serveur de routing. Assurez-vous que votre connexion Internet est opérationnelle et que l'URL est définie (%s)" % e)
+                    raise UserError(u"Impossible de contacter le serveur de routage. Assurez-vous que votre connexion internet est opérationnelle et que l'URL est définie (%s)" % e)
 
                 if res and res.get('routes'):
                     legs = res['routes'][0]['legs']
