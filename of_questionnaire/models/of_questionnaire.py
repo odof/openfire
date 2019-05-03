@@ -36,30 +36,35 @@ class OfPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
     question_ids = fields.One2many('of.planning.intervention.question', 'intervention_id', string="Questions")
+    questionnaire_id = fields.Many2one('of.questionnaire', string="Questionnaire")
+
+    @api.model
+    def _get_question_vals(self, question):
+        return {'name': question.name,
+                'sequence': question.sequence,
+                'answer_type': question.answer_type,
+                'possible_answer': question.answer,
+                'category_id': question.category_id.id,
+                'intervention_id': self.id,
+                'type': question.type,
+            }
+
+    @api.onchange('questionnaire_id')
+    def onchange_questionnaire(self):
+        for question in self.questionnaire_id.line_ids:
+            vals = self._get_question_vals(question)
+            self.question_ids.new(vals)
+        self.questionnaire_id = False
+
 
     @api.onchange('model_id', 'parc_installe_id')
-    def onchange_questionnaire(self):
+    def onchange_model_or_parc(self):
         new_ids = []
         for question in self.model_id.question_ids:
-            vals = {'name': question.name,
-                    'sequence': question.sequence,
-                    'answer_type': question.answer_type,
-                    'possible_answer': question.answer,
-                    'category_id': question.category_id.id,
-                    'intervention_id': self.id,
-                    'type': question.type,
-                }
+            vals = self._get_question_vals(question)
             new_ids.append((0, 0, vals))
         for question in self.parc_installe_id.question_ids:
-            vals = {'name': question.name,
-                    'sequence': question.sequence,
-                    'answer_type': question.answer_type,
-                    'possible_answer': question.answer,
-                    'category_id': question.category_id.id,
-                    'intervention_id': self.id,
-                    'type': question.type,
-                    'parc_installe_id': self.parc_installe_id.id,
-                }
+            vals = self._get_question_vals(question)
             new_ids.append((0, 0, vals))
         self.question_ids = new_ids
 
@@ -88,8 +93,8 @@ class OfPlanningInterventionModel(models.Model):
     question_ids = fields.Many2many('of.questionnaire.line', related="questionnaire_id.line_ids", string="Questions", readonly=True)
 
 class OfPlanningInterventionQuestion(models.Model):
-    _name="of.planning.intervention.question"
-    _order= "type, sequence"
+    _name = "of.planning.intervention.question"
+    _order = "type, sequence"
 
     name = fields.Char(string="Question", required=True)
     sequence = fields.Integer(string=u"Séquence")
