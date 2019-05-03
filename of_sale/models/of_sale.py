@@ -223,7 +223,7 @@ class SaleOrder(models.Model):
                 values = compose_mail_obj._get_dict_values(self)
                 datas = {}
                 for chp in mail_template.chp_ids:
-                    datas[chp.name or ''] = chp.to_export and chp.value_openfire and compose_mail_obj.format_body(chp.value_openfire % values) or ''
+                    datas[chp.name or ''] = chp.to_export and chp.value_openfire and chp.value_openfire % values
                 attachment = attachment_obj.search([('res_model', '=', mail_template._name),
                                                     ('res_field', '=', 'file'),
                                                     ('res_id', '=', mail_template.id)])
