@@ -10,7 +10,23 @@
         <field name="inherit_id" ref="base.view_users_form"/>
         <field name="arch" type="xml">
             <xpath expr="//form//notebook//group[@name='messaging']" position="after">
+                <!-- ajout des couleurs custom dans la fiche utilisateur -->
                 <group string="Divers" name="divers">
+                    <field name="of_color_ft" widget="color"/>
+                    <field name="of_color_bg" widget="color"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_view_users_form_simple_modif" model="ir.ui.view">
+        <field name="name">of.users.preferences.form</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form_simple_modif"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='preferences']" position="after">
+                <!-- ajout des couleurs custom dans les préférences -->
+                <group>
                     <field name="of_color_ft" widget="color"/>
                     <field name="of_color_bg" widget="color"/>
                 </group>
