@@ -16,7 +16,6 @@ var X2ManyCalendarView = CalendarView.extend({
     // Make modifications here about things that are both usable for calendar views of Many2many and One2many fields
     init: function () {
         var self = this;
-        var args = arguments;
         this._super.apply(this, arguments);
         this.parent_model = arguments[1].parent_view.dataset.model; // model of parent view
         this.parent_values = arguments[1].parent_view.datarecord; // field values of parent view

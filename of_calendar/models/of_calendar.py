@@ -52,6 +52,8 @@ class HREmployee(models.Model):
                                "You should use the same timezone that is otherwise used to pick and "
                                "render date and time values: your computer's timezone.")
     tz_offset = fields.Char(compute='_compute_tz_offset', string='Timezone offset')
+    address_depart_id = fields.Many2one('res.partner', string=u'Adresse de départ')
+    address_retour_id = fields.Many2one('res.partner', string='Adresse de retour')
 
     of_color_ft = fields.Char(string="Couleur de texte", compute="_compute_colors")
     of_color_bg = fields.Char(string="Couleur de fond", compute="_compute_colors")
@@ -76,6 +78,18 @@ class HREmployee(models.Model):
         ('hor_mf_ad_constraint', 'CHECK ( hor_mf <= hor_ad )', _(u"L'Heure de fin de matinée doit être antérieure à l'heure de début d'après-midi")),
         ('hor_ad_af_constraint', 'CHECK ( hor_ad <= hor_af )', _(u"L'Heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi")),
     ]
+
+    @api.onchange('address_depart_id')
+    def _onchange_address_depart_id(self):
+        self.ensure_one()
+        if self.address_depart_id:
+            self.address_retour_id = self.address_depart_id
+
+    @api.onchange('user_id')
+    def _onchange_user_id(self):
+        self.ensure_one()
+        if self.user_id:
+            self.tz = self.user_id.tz
 
     @api.onchange('hor_md')
     def _onchange_hor_md(self):

@@ -48,7 +48,9 @@
                         <field name="tz" widget="timezone_mismatch" options="{'tz_offset_field': 'tz_offset'}" colspan="3"/>
                         <field name="tz_offset" invisible="1" colspan="3"/>
                     </group>
-                    <group colspan="2">
+                    <group name="deplacements" string="Déplacements" colspan="2">
+                        <field name="address_depart_id"/>
+                        <field name="address_retour_id"/>
                     </group>
                 </group>
             </xpath>
