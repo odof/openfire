@@ -14,6 +14,12 @@
                             $(".modal-dialog").width('80%');
                         });
                     </script>
+                    <header>
+                        <button name="button_geocode" string="Géolocaliser" type="object" style="margin-bottom: 10px;"
+                          class="btn-primary" icon="fa-map-marker" help="Utiliser votre gécodeur par défaut pour tenter de géolocaliser l'adresse d'intervention"
+                          attrs="{'invisible': ['|','|',('geo_lat', '!=', 0.0),('geo_lng', '!=', 0.0),('geocode_retry','!=',False)]}"/>
+                    </header>
+                    <field name="geocode_retry" invisible="1"/>
                     <field name="zero_result" invisible="1"/>
                     <field name="zero_dispo" invisible="1"/>
                     <field name="partner_child_ids" invisible="1"/>
@@ -40,6 +46,8 @@
                                 filters_radio="1" dispo_field="disponible" show_first_evt="1" working_hours="parent"
                                 force_color_field="force_color" display_states="1" selected_field="selected">
                                 <field name="name"/>
+                                <field name="distance" suffix=" km"/>
+                                <field name="duree" suffix=" min"/>
                                 <field name="on_phone" icon="phone" position="right" invisible="1"/>
                                 <field name="partner_ids" invisible="1"/>
                                 <field name="state_int" invisible="1"/>
@@ -115,6 +123,12 @@
                                 <field name="partner_address_id" string="(précisez)" widget="selection" attrs="{'invisible': ['|',('lieu', '!=', 'customer'),('partner_child_ids','=',[])]}"/>
                                 <field name="lieu_rdv_id" attrs="{'invisible': [('lieu', '!=', 'other')], 'required': [('lieu', '=', 'other')]}" options="{'no_open': True, 'no_create': True}"/>
                                 <field name="lieu_company_id" attrs="{'invisible': [('lieu', '!=', 'company')], 'required': [('lieu', '=', 'company')]}" options="{'no_open': True, 'no_create': True}"/>
+                                <div colspan="2" style="color:red;" attrs="{'invisible': ['|','|','|',('geo_lat', '!=', 0.0),('geo_lng', '!=', 0.0),('geocode_retry','!=',False),('ignorer_geo','!=',False)]}">
+                                    <i>Cette adresse n'est pas géocodée. pour continuer la recherche vous pouvez la géocoder ou ignorer les données géographiques</i>
+                                </div>
+                                <div colspan="2" style="color:red;" attrs="{'invisible': ['|','|','|',('geo_lat', '!=', 0.0),('geo_lng', '!=', 0.0),('geocode_retry','!=',True),('ignorer_geo','!=',False)]}">
+                                    <i>Votre géocodeur par défaut n'a pas réussi à géolocaliser cette adresse. pour continuer la recherche vous pouvez ignorer les données géographiques</i>
+                                </div>
                             </group>
                             <group colspan="2" col="2">
                                 <div class="o_address_format" colspan="2">
@@ -129,7 +143,7 @@
                         </group>
                         <group colspan="2" col="2">
                             <field name="duree" widget="float_time"/>
-                            <field name="employee_id" widget="selection"/>
+                            <field name="employee_id" options="{'no_create': True}"/>
                             <button name="button_horaires_show" string="Voir les horaires" type="object" colspan="2" class="btn-default"
                               attrs="{'invisible': [('display_horaires','!=',False)]}"/>
                             <button name="button_horaires_hide" string="Cacher les horaires" type="object" colspan="2" class="btn-default"

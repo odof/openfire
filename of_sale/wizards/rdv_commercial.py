@@ -158,7 +158,7 @@ class OFRDVCommercial(models.TransientModel):
     #mode_result = fields.Selection(PICK_MODES, string="Choix de la proposition", required=True, default="distance")
     max_recherche = fields.Float(string="Maximum")
     allday = fields.Boolean('All Day', default=False)
-    hor_md = fields.Float(string=u'Matin début', required=True, digits=(12, 1),default=9) #TODO onchange user_id
+    hor_md = fields.Float(string=u'Matin début', required=True, digits=(12, 1),default=9)
     hor_mf = fields.Float(string='Matin fin', required=True, digits=(12, 1),default=12)
     hor_ad = fields.Float(string=u'Après-midi début', required=True, digits=(12, 1),default=14)
     hor_af = fields.Float(string=u'Après-midi fin', required=True, digits=(12, 1),default=18)
@@ -206,6 +206,7 @@ class OFRDVCommercial(models.TransientModel):
         ('not_tried', u"Pas tenté"),
         ], default='not_tried', help=u"Niveau de précision de la géolocalisation", compute="_compute_address")
     ignorer_geo = fields.Boolean(u"Ignorer données géographiques")
+    geocode_retry = fields.Boolean("Geocodage retenté")
 
     of_color_ft = fields.Char(string="Couleur de texte", compute="_compute_colors")
     of_color_bg = fields.Char(string="Couleur de fond", compute="_compute_colors")
@@ -311,11 +312,15 @@ class OFRDVCommercial(models.TransientModel):
                 "hor_mf": self.employee_id.hor_mf,
                 "hor_ad": self.employee_id.hor_ad,
                 "hor_af": self.employee_id.hor_af,
-                "tz": self.employee_id.tz,
+                "tz": self.employee_id.tz or "Europe/Paris",
                 "jour_ids": [(5,0,0)] + [(4,le_id,False) for le_id in self.employee_id.jour_ids._ids],
                 "user_id": self.employee_id.user_id,
                 }
             self.update(vals)
+            if not self.user_id:
+                raise UserError(u"Cet employé n'est pas rattaché à un compte utilisateur. \nPour le rattacher à un compte utilisateur rendez-vous sur sa fiche employé, onglet 'paramètre RH', champ 'utilisateur lié'.")
+            if not self.jour_ids:
+                raise UserWarning(u"Cet employé n'a aucun jour dans sa liste des jours travaillés. \nVous pouvez configurer ses jours travaillés dans sa fiche employé.")
 
     @api.onchange('mode_recherche')
     def _onchange_mode_recherche(self):
@@ -384,6 +389,17 @@ class OFRDVCommercial(models.TransientModel):
         return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
+    def button_geocode(self):
+        self.ensure_one()
+        if self.geocode_retry:
+            raise UserError("Votre géocodeur par défaut n'a pas réussi a géocoder cette adresse")
+        self.partner_address_id.geo_code()
+        self.geocode_retry = True
+        if self.geo_lat != 0 or self.geo_lng != 0:
+            self.ignorer_geo = False
+        return {'type': 'ir.actions.do_nothing'}
+
+    @api.multi
     def button_calcul(self):
         # Calcule a prochaine intervention à partir du lendemain de la date courante
         self.compute()
@@ -417,9 +433,7 @@ class OFRDVCommercial(models.TransientModel):
         jours = [jour.numero for jour in self.jour_ids] if self.jour_ids else range(1, 6)
 
         # Suppression des anciens créneaux
-        creneau_del_ids = wizard_line_obj.search([('wizard_id', '=', self.id)])
-        if creneau_del_ids:
-            creneau_del_ids.unlink()
+        self.creneau_ids.unlink()
 
         un_jour = timedelta(days=1)
 
@@ -602,7 +616,7 @@ class OFRDVCommercial(models.TransientModel):
         d_debut = d_avant_recherche + un_jour
         d_fin = d_apres_recherche - un_jour
         if not self.ignorer_geo:
-            wizard_line_obj.calc_distances_dates(d_debut, d_fin)
+            wizard_line_obj.calc_distances_dates(d_debut, d_fin, self.id)
 
         nb, nb_dispo, first_res = wizard_line_obj.get_nb_dispo(self)
 
@@ -740,7 +754,7 @@ class OfRDVCommercialLine(models.TransientModel):
     _inherit = "of.calendar.mixin"
 
     @api.model
-    def calc_distances_dates(self,date_debut,date_fin):
+    def calc_distances_dates(self,date_debut,date_fin,wizard_id):
         u"""
             une requete http par jour. En cas de problemes de performances on pourra se débrouiller pour faire une requête par équipe 
         @TODO: revoir cette fonction, origine
@@ -748,25 +762,46 @@ class OfRDVCommercialLine(models.TransientModel):
         un_jour = timedelta(days=1)
         date_courante = date_debut
         while date_courante <= date_fin:
-            creneaux_pre = self.search([('date', '=', date_courante)],order="debut_dt")
+            creneaux_pre = self.search([('date', '=', date_courante),('wizard_id', '=', wizard_id)],order="debut_dt")
             creneaux_pre._compute_geo()
-            creneaux = creneaux_pre.search([('date', '=', date_courante),'|',('geo_lat','!=',0.0),('geo_lng','!=',0.0)],order="debut_dt")
+            creneaux = creneaux_pre.search([('date', '=', date_courante),('wizard_id', '=', wizard_id),'|',('geo_lat','!=',0.0),('geo_lng','!=',0.0)],order="debut_dt")
             if len(creneaux) == 0:
                 date_courante += un_jour
                 continue
+
+            origine = (creneaux[0].employee_id.address_depart_id or
+                       creneaux[0].employee_id.address_id or
+                       False)
+            retour = (creneaux[0].employee_id.address_retour_id or
+                       creneaux[0].employee_id.address_id or
+                       False)
+            if not origine:
+                raise UserError(u"L'adressse de départ du commercial est manquante. Pour la configurer rendez-vous dans le menu Employés")
+            if not retour:
+                raise UserError(u"L'adressse de retour du commercial est manquante. Pour la configurer rendez-vous dans le menu Employés")
+            if origine.geo_lat == origine.geo_lng == 0:
+                raise UserError(u"L'adressse de départ du commercial n'est pas géolocalisée.")
+            if retour.geo_lat == retour.geo_lng == 0:
+                raise UserError(u"L'adressse de retour du commercial n'est pas géolocalisé.")
 
             str_coords = u""
             coords = []
             query = ROUTING_BASE_URL + u"route/" + ROUTING_VERSION + u"/" + ROUTING_PROFILE + u"/"
 
+            ## coordonnées du point de départ
+            str_coords += str(origine.geo_lng) + u"," + str(origine.geo_lat)
+            coords.append((origine.geo_lng,origine.geo_lat))
+
             ### listess de coordonnées: ATTENTION OSRM prend ses coordonnées sous forme (lng,lat)
-            str_coords += str(creneaux[0].geo_lng) + u"," + str(creneaux[0].geo_lat)
-            coords.append((creneaux[0].geo_lng,creneaux[0].geo_lat))
             # créneaux et rdvs
-            for line in creneaux[1:]:
+            for line in creneaux:
                 #if line.geo_lat != 0 or line.geo_lng != 0: <- plus besoin: seulement créneaux géolocalisés dans la recherche
                 str_coords += u";" + str(line.geo_lng) + u"," + str(line.geo_lat)
                 coords.append((line.geo_lng,line.geo_lat))
+
+            ## coordonnées du point de retour
+            str_coords += u";" + str(retour.geo_lng) + u"," + str(retour.geo_lat)
+            coords.append((retour.geo_lng,retour.geo_lat))
 
             query_send = urllib.quote(query.strip().encode('utf8')).replace('%3A', ':')
             full_query = query_send + str_coords + "?"
@@ -781,28 +816,18 @@ class OfRDVCommercialLine(models.TransientModel):
 
             if res and res.get(u"routes",False):
                 legs = res[u"routes"][0][u"legs"]
-                if len(creneaux) == len(res[u"routes"][0][u"legs"]) + 1: # creneau -> creneau -> creneau : 2 routes 3 creneaux
+                if len(creneaux) == len(legs) - 1: # départ -> creneau -> retour : 2 routes 1 creneau
                     mode_recherche = creneaux[0].wizard_id.mode_recherche
                     maxi = creneaux[0].wizard_id.max_recherche
                     vals = []
                     for i in range(len(creneaux)):
                         vals.append({})
-                        if i == 0: # premier créneau de la journée
-                            vals[i][u"dist_prec"] = 0
-                            vals[i][u"duree_prec"] = 0
-                        else:
-                            vals[i][u"dist_prec"] = legs[i-1][u"distance"] / 1000
-                            vals[i][u"duree_prec"] = legs[i-1][u"duration"] / 60
-                        if i == len(creneaux) - 1: # dernier créneau de la journée
-                            vals[i][u"dist_suiv"] = 0
-                            vals[i][u"duree_suiv"] = 0
-                        else:
-                            vals[i][u"dist_suiv"] = legs[i][u"distance"] / 1000
-                            vals[i][u"duree_suiv"] = legs[i][u"duration"] / 60
-
+                        vals[i][u"dist_prec"] = legs[i][u"distance"] / 1000
+                        vals[i][u"duree_prec"] = legs[i][u"duration"] / 60
+                        vals[i][u"dist_suiv"] = legs[i+1][u"distance"] / 1000  # legs[i+1] ok car len(creneaux) == len(legs) - 1
+                        vals[i][u"duree_suiv"] = legs[i+1][u"duration"] / 60  # legs[i+1] ok car len(creneaux) == len(legs) - 1
                         vals[i][u"distance"] = vals[i].get(u"dist_prec",0) + vals[i].get(u"dist_suiv",0)
                         vals[i][u"duree"] = vals[i].get(u"duree_prec",0) + vals[i].get(u"duree_suiv",0)
-
                         if i >= 1 and not (creneaux[i-1].calendar_id or creneaux[i].calendar_id):
                             # les creneaux précedant et actuel sont disponible, considérer qu'ils sont le même en terme de distances
                             vals[i][u"dist_prec"] = vals[i-1][u"dist_prec"]
@@ -814,21 +839,15 @@ class OfRDVCommercialLine(models.TransientModel):
                             vals[i-1][u"distance"] = vals[i][u"dist_suiv"] + vals[i-1][u"dist_prec"]
                             vals[i-1][u"duree"] = vals[i][u"duree_suiv"] + vals[i-1][u"duree_prec"]
 
-                    for i in  range(len(creneaux)):
+                    for j in  range(len(creneaux)):
                         # créneau plus loins que la recherche accepte
-                        if creneaux[i].disponible and mode_recherche == u"distance" and vals[i][u"distance"] > maxi:
-                            vals[i][u"force_color"] = "#FF0000"
-                            vals[i][u"name"] = "TROP LOINS"
-                            vals[i][u"disponible"] = False
-                        # créneau plus loins que la recherche accepte
-                        elif creneaux[i].disponible and mode_recherche == u"duree" and vals[i][u"duree"] > maxi:
-                            vals[i][u"force_color"] = "#FF0000"
-                            vals[i][u"name"] = "TROP LOINS"
-                            vals[i][u"disponible"] = False
-
-                        creneaux[i].update(vals[i])
+                        if creneaux[j].disponible and vals[j][mode_recherche] > maxi:
+                            vals[j][u"force_color"] = "#FF0000"
+                            vals[j][u"name"] = "TROP LOINS"
+                            vals[j][u"disponible"] = False
+                        creneaux[j].update(vals[j])
                 else:
-                    raise UserWarning("Erreur de res: %s - %s, %d" % (len(creneaux),len(res[u"routes"][0][u"legs"]),modifier))
+                    raise UserWarning("Erreur de res: %s - %s" % (len(creneaux),len(res[u"routes"][0][u"legs"])))
             elif res and res["message"]:
                 raise UserWarning("Erreur de routing: %s" % res["message"])
             else:
