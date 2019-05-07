@@ -148,8 +148,6 @@ class CrmLead(models.Model):
         values = self._onchange_stage_id_values(self.stage_id.id)
         if values.get('probability') == 100 and self.of_customer_state and self.of_customer_state != "customer":
             values['of_customer_state'] = "customer"
-        elif values.get('probability') != 100 and self.of_customer_state and self.of_customer_state != "lead":
-            values['of_customer_state'] = "lead"
         self.update(values)
 
     @api.onchange('of_modele_id')
