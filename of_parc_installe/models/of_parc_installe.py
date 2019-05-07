@@ -9,7 +9,7 @@ class of_parc_installe(models.Model):
     _name = 'of.parc.installe'
     _description = "Parc installé"
 
-    name = fields.Char("No de série", size=64, required=False)
+    name = fields.Char("No de série", size=64, required=False, copy=False)
     date_service = fields.Date("Date vente", required=False)
     date_installation = fields.Date("Date d'installation", required=False)
     date_fin_garantie = fields.Date(string="Fin de garantie")
@@ -80,6 +80,28 @@ class of_parc_installe(models.Model):
                                   'default_of_produit_installe_id': parc_installe.id,
                                   'default_of_type': 'di'}
         return res
+
+    @api.multi
+    def name_get(self):
+        """Permet dans un SAV lors de la saisie du no de série d'une machine installée de proposer les machines du contact en premier précédées d'une puce."""
+        client_id = self._context.get('partner_id_no_serie_puce')
+        result = []
+        for record in self:
+            result.append((record.id, "-> " if record.client_id == client_id else "" + record.name + " - " + record.client_id.display_name))
+        return result
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        """Permet dans un SAV lors de la saisie du no de série d'une machine installée de proposer les machines du contact en premier précédées d'une puce."""
+        if self._context.get('partner_id_no_serie_puce'):
+            client_id = self._context.get('partner_id_no_serie_puce')
+            res = super(of_parc_installe, self).name_search(name, [['client_id', '=', client_id]], operator, limit) or []
+            limit = limit - len(res)
+            res = [(parc[0], "-> " + parc[1]) for parc in res]
+            res += super(of_parc_installe, self).name_search(name, [['client_id', '!=', client_id]], operator, limit) or []
+            return res
+        return super(of_parc_installe, self).name_search(name, args, operator, limit)
+
 
 class res_partner(models.Model):
     _inherit = "res.partner"
@@ -200,4 +222,3 @@ class project_issue(models.Model):
         # Si pas de no de série, on laisse la possibilité de choisir un article
         if self.of_produit_installe_id: # Si no de série existe, on récupère l'article associé
             self.on_change_of_produit_installe_id()
-

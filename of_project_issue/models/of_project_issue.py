@@ -160,7 +160,7 @@ class ProjectIssue(models.Model):
     _order = "date desc"
 
     @api.onchange('project_id')
-    def _on_change_project_id(self):
+    def _onchange_project_id(self):
         if not self.project_id:
             partner_id = self.partner_id
             email_from = self.email_from
