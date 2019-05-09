@@ -240,7 +240,7 @@
                                             <tr colspan="3">
                                                 <th class="col-xs-9" style="vertical-align: middle">Description</th>
                                                 <th class="col-xs-2 text-right">Quantité prévue</th>
-                                                <th class="col-xs-1 text-center">· posée</th>
+                                                <th class="col-xs-1 text-center">· Posé</th>
                                             </tr>
                                         </thead>
                                         <tbody class="sale_tbody">
@@ -255,16 +255,8 @@
                                                 <!-- Lignes de commande -->
                                                 <t t-foreach="layout_category['lines']" t-as="l">
                                                     <tr>
-                                                        <t t-set="the_name" t-value="l.of_get_line_name()"/>
-                                                        <t t-set="name_line" t-value="the_name[0]"/>
-                                                        <t t-set="the_name" t-value="the_name[1:]"/>
                                                         <td>
-                                                            <span t-esc="name_line"/>
-                                                            <br t-if="len(the_name) > 0"/>
-                                                            <t t-foreach="the_name" t-as="name_line">
-                                                                <span t-esc="name_line"/><br/>
-                                                            </t>
-                                                            <span t-field="l.name" style="display: none;"/>
+                                                            <span t-field="l.name"/>
                                                         </td>
                                                         <td class="text-right">
                                                             <span t-field="l.product_uom_qty"/>
@@ -285,8 +277,8 @@
                                                                     <span t-field="comp.qty_total"/>
                                                                     <span t-field="comp.product_uom_id" groups="product.group_uom"/>
                                                                 </td>
-                                                                <td class="text-right">
-                                                                    <span t-field="comp.qty_delivered"/>
+                                                                <td>
+                                                                    <span class="text-right"> </span>
                                                                 </td>
                                                             </tr>
                                                         </t>
