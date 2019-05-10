@@ -283,7 +283,7 @@ class OFInvoiceReportTotalGroup(models.Model):
     invoice = fields.Boolean(string='Concerne les factures', default=True)
     order = fields.Boolean(
         string='Concerne les commandes clients',
-        readonly=True, help=u"Fonctionnalité en cours de développement")
+        readonly=False)
     position = fields.Selection(
         [('0-ht', "Hors taxe"), ('1-ttc', "TTC")],
         string=u"Afficher dans les montants", required=True, default='1-ttc')

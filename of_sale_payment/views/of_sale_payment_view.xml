@@ -29,12 +29,6 @@
                     </div>
                 </button>
             </xpath>
-
-            <xpath expr="//page//group[@name='technical']" position="after">
-                <group string="Impression" name='impression'>
-                    <field name="of_print_payments"/>
-                </group>
-            </xpath>
         </field>
     </record>
 
