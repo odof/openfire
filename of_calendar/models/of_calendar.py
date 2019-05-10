@@ -141,11 +141,11 @@ class OFMeeting(models.Model):
     location = fields.Char('Location', compute="_compute_location", store=True, track_visibility='onchange', help="Location of Event")
 
     lieu = fields.Selection([
-        ("custom", "Adresse manuelle"),
         ("onsite", "Dans les locaux"),
         ("phone", "Au téléphone"),
         ("offsite", "À l'exterieur"),
-        ], string="Lieu du RDV", required=True, default="custom")
+        ("custom", "Adresse manuelle"),
+        ], string="Lieu du RDV", required=True, default="onsite")
     #user_company_ids = fields.Many2many('res.company', 'calendar_user_company_rel', 'calendar_id', 'company_id', u"sociétés du propriétaire",compute="_compute_user_company_ids")#,store=True)#related="user_id.company_ids", readonly=True)
     # tentative de domain ratée
     lieu_company_id = fields.Many2one("res.company",string="(Précisez)")#,domain="[('id', 'in', user_company_ids and user_company_ids._ids)]")
@@ -311,6 +311,17 @@ class OFMeeting(models.Model):
                 meeting.color_partner_id = meeting.user_id.partner_id
             else:
                 meeting.color_partner_id = (filter(lambda partner:partner.user_ids, meeting.partner_ids) or [False])[0]
+
+    @api.model
+    def create(self, vals):
+        """
+        En cas de création par google agenda, le champs "location" peut etre renseigné, or dans ce module on transforme ce champ en champ calculé
+        """
+        loc = vals.get("location", False)
+        if loc:  # created from google agenda most likely
+            vals["lieu_address_street"] = loc
+            vals["lieu"] = "custom"
+        return super(OFMeeting, self).create(vals)
 
 class OFCalendarMixin(models.AbstractModel):
     _name = "of.calendar.mixin"
