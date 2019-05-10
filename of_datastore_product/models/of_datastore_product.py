@@ -426,6 +426,9 @@ class OfProductBrand(models.Model):
                     # Ajout d'un filtre sur le nom pour préciser la recherche
                     uoms = obj_obj.search([('id', 'in', uoms.ids), ('name', '=ilike', res_name)]) or uoms
                 if len(uoms) > 1:
+                    # Ajout d'un filtre sur le nom pour préciser la recherche : même préfixe sur 4 lettres
+                    uoms = obj_obj.search([('id', 'in', uoms.ids), ('name', '=ilike', res_name[:4]+'%')]) or uoms
+                if len(uoms) > 1:
                     # Ajout d'un filtre sur la précision de l'arrondi pour préciser la recherche
                     uoms = obj_obj.search([('id', 'in', uoms.ids), ('rounding', '=', ds_obj['rounding'])]) or uoms
                 result = uoms[0]
