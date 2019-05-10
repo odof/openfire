@@ -138,23 +138,24 @@ class OFMeeting(models.Model):
 
     #redefinition
     description = fields.Html('Description', states={'done': [('readonly', True)]})
-    location = fields.Char('Location', compute="_compute_location", stroe=True, track_visibility='onchange', help="Location of Event")
+    location = fields.Char('Location', compute="_compute_location", store=True, track_visibility='onchange', help="Location of Event")
 
     lieu = fields.Selection([
+        ("custom", "Adresse manuelle"),
         ("onsite", "Dans les locaux"),
         ("phone", "Au téléphone"),
         ("offsite", "À l'exterieur"),
-        ], string="Lieu du RDV", required=True, default="onsite")
+        ], string="Lieu du RDV", required=True, default="custom")
     #user_company_ids = fields.Many2many('res.company', 'calendar_user_company_rel', 'calendar_id', 'company_id', u"sociétés du propriétaire",compute="_compute_user_company_ids")#,store=True)#related="user_id.company_ids", readonly=True)
     # tentative de domain ratée
     lieu_company_id = fields.Many2one("res.company",string="(Précisez)")#,domain="[('id', 'in', user_company_ids and user_company_ids._ids)]")
     lieu_rdv_id = fields.Many2one("res.partner",string="(Précisez)")
-    lieu_address_street = fields.Char(string="Rue", compute="_compute_geo")
-    lieu_address_street2 = fields.Char(string="Rue (2)", compute="_compute_geo")
-    lieu_address_city = fields.Char(string="Ville", compute="_compute_geo")
-    lieu_address_state_id = fields.Many2one("res.country.state", string=u"Région", compute="_compute_geo")
-    lieu_address_zip = fields.Char(string="Code postal", compute="_compute_geo")
-    lieu_address_country_id = fields.Many2one("res.country", string="Pays", compute="_compute_geo")
+    lieu_address_street = fields.Char(string="Rue")#, compute="_compute_geo")
+    lieu_address_street2 = fields.Char(string="Rue (2)")#, compute="_compute_geo")
+    lieu_address_city = fields.Char(string="Ville")#, compute="_compute_geo")
+    lieu_address_state_id = fields.Many2one("res.country.state", string=u"Région")#, compute="_compute_geo")
+    lieu_address_zip = fields.Char(string="Code postal")#, compute="_compute_geo")
+    lieu_address_country_id = fields.Many2one("res.country", string="Pays")#, compute="_compute_geo")
     on_phone = fields.Boolean(u'Au téléphone', compute="_compute_on_phone")
     color_partner_id = fields.Many2one("res.partner", "Partner whose color we will take", compute='_compute_color_partner', store=False)
     geo_lat = fields.Float(string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo", readonly=True, store=True)
@@ -204,7 +205,7 @@ class OFMeeting(models.Model):
                     'geo_lng': meeting.lieu_rdv_id.geo_lng,
                     'precision': meeting.lieu_rdv_id.precision,
                 }
-            else:
+            elif meeting.lieu and meeting.lieu == "phone": # au téléphone
                 vals = {
                     "lieu_address_street": False,
                     "lieu_address_street2": False,
@@ -216,10 +217,17 @@ class OFMeeting(models.Model):
                     'geo_lng': 0,
                     'precision': 'no_address',
                 }
+            else: # custom
+                vals = {
+                    'geo_lat': 0,
+                    'geo_lng': 0,
+                    'precision': 'not_tried',
+                }
             meeting.update(vals)
 
     @api.multi
-    @api.depends("lieu","lieu_company_id","lieu_rdv_id","precision")
+    @api.depends("lieu","lieu_company_id","lieu_rdv_id","precision","lieu_address_street","lieu_address_street2",
+                 "lieu_address_city","lieu_address_state_id","lieu_address_zip","lieu_address_country_id")
     def _compute_location(self):
         for meeting in self:
             if meeting.precision != "no_address":
