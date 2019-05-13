@@ -156,14 +156,14 @@ class OFRDVCommercial(models.TransientModel):
     lead_id = fields.Many2one('crm.lead', string='Opportunité', default=_default_lead, domain="[('partner_id', '=', partner_id)]")
     mode_recherche = fields.Selection(SEARCH_MODES, string="Mode de recherche", required=True, default="distance")
     #mode_result = fields.Selection(PICK_MODES, string="Choix de la proposition", required=True, default="distance")
-    max_recherche = fields.Float(string="Maximum")
+    max_recherche = fields.Float(string="Maximum", digits=(12, 0))
     allday = fields.Boolean('All Day', default=False)
     hor_md = fields.Float(string=u'Matin début', required=True, digits=(12, 1),default=9)
     hor_mf = fields.Float(string='Matin fin', required=True, digits=(12, 1),default=12)
     hor_ad = fields.Float(string=u'Après-midi début', required=True, digits=(12, 1),default=14)
     hor_af = fields.Float(string=u'Après-midi fin', required=True, digits=(12, 1),default=18)
     jour_ids = fields.Many2many('of.jours', 'rdvcom_jours', 'rdvcom_id', 'jour_id', string='Jours travaillés', required=True, default=_get_default_jours)
-    tz = fields.Selection(_tz_get, string='Fuseau horaire', default=lambda self: self.env.user.tz or 'Europe/Paris',
+    tz = fields.Selection(_tz_get, string='Fuseau horaire', default=lambda self: self.env.user.tz or 'Europe/Paris', required=True,
                           help="The Team's timezone, used to output proper date and time values "
                                "inside printed reports. It is important to set a value for this field. "
                                "You should use the same timezone that is otherwise used to pick and "
@@ -884,12 +884,12 @@ class OfRDVCommercialLine(models.TransientModel):
     calendar_id = fields.Many2one('calendar.event', string="Planning")
     categ_ids = fields.Many2many('calendar.event.type', 'rdvcom_meeting_category_rel', 'rdvcomline_id', 'type_id', 'Tags')
     name = fields.Char(string="name", default="DISPONIBLE")
-    distance = fields.Float(string='Dist.tot. (km)',help="distance prec + distance suiv")
-    dist_prec = fields.Float(string='Dist.Prec. (km)')
-    dist_suiv = fields.Float(string='Dist.Suiv. (km)')
-    duree = fields.Float(string=u'Durée.tot. (min)',help="durée prec + durée suiv")
-    duree_prec = fields.Float(string=u'Durée.Prec. (min)')
-    duree_suiv = fields.Float(string=u'Durée.Suiv. (min)')
+    distance = fields.Float(string='Dist.tot. (km)', help="distance prec + distance suiv", digits=(12, 1))
+    dist_prec = fields.Float(string='Dist.Prec. (km)', digits=(12, 1))
+    dist_suiv = fields.Float(string='Dist.Suiv. (km)', digits=(12, 1))
+    duree = fields.Float(string=u'Durée.tot. (min)',help="durée prec + durée suiv", digits=(12, 0))
+    duree_prec = fields.Float(string=u'Durée.Prec. (min)', digits=(12, 0))
+    duree_suiv = fields.Float(string=u'Durée.Suiv. (min)', digits=(12, 0))
     of_color_ft = fields.Char(related="user_id.of_color_ft", readonly=True)
     of_color_bg = fields.Char(related="user_id.of_color_bg", readonly=True)
     disponible = fields.Boolean(string="Est dispo", default=True)
