@@ -32,9 +32,9 @@ class SaleOrder(models.Model):
         if not result:
             for payment in self.payment_ids:
                 # Les paiements sont classés dans l'ordre chronologique
-                move_line = account_move_line_obj.browse(payment['payment_id'])
+                move_line = account_move_line_obj.browse(payment.id)
                 name = invoice_obj._of_get_payment_display(move_line)
-                result.append((name, payment['amount']))
+                result.append((name, payment.amount))
         return result
 
 class AccountPayment(models.Model):
