@@ -263,7 +263,17 @@
                     <group>
                         <field name="questionnaire_id" domain="[('type', '=', 'product')])" context="{'default_type': 'product', 'lock_type': True}"/>
                     </group>
-                    <field name="question_ids" nolabel="1"/>
+                    <field name="question_ids" nolabel="1">
+                        <tree>
+                            <field name="sequence" widget="handle"/>
+                            <field name="category_id" invisible="1"/>
+                            <field name="type" readonly="1" invisible="1"/>
+                            <field name="name"/>
+                            <field name="answer_type"/>
+                            <field name="possible_answer"/>
+                            <field name="definitive_answer" />
+                        </tree>
+                    </field>
                 </page>
             </xpath>
         </field>

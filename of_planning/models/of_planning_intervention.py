@@ -175,6 +175,18 @@ class OfPlanningIntervention(models.Model):
     notes_fin = fields.Text(string="Notes de fin d'intervention")
     date_butoir = fields.Date(string="Date butoir")
 
+    @api.multi
+    def of_get_report_name(self, docs):
+        return "Rapport intervention"
+
+    @api.multi
+    def of_get_report_number(self, docs):
+        return self.number
+
+    @api.multi
+    def of_get_report_date(self, docs):
+        return fields.Datetime.from_string(self.date).strftime("%d/%m/%Y")
+
     @api.depends('name', 'number')
     def _compute_calendar_name(self):
         for intervention in self:

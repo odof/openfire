@@ -39,7 +39,7 @@ class OfPlanningIntervention(models.Model):
     questionnaire_id = fields.Many2one('of.questionnaire', string="Questionnaire")
 
     @api.model
-    def _get_question_vals(self, question):
+    def _get_question_vals(self, question, parc_id=False):
         return {'name': question.name,
                 'sequence': question.sequence,
                 'answer_type': question.answer_type,
@@ -47,7 +47,7 @@ class OfPlanningIntervention(models.Model):
                 'category_id': question.category_id.id,
                 'intervention_id': self.id,
                 'type': question.type,
-            }
+            } if not parc_id else {'parc_installe_id': parc_id}
 
     @api.onchange('questionnaire_id')
     def onchange_questionnaire(self):
@@ -64,7 +64,7 @@ class OfPlanningIntervention(models.Model):
             vals = self._get_question_vals(question)
             new_ids.append((0, 0, vals))
         for question in self.parc_installe_id.question_ids:
-            vals = self._get_question_vals(question)
+            vals = self._get_question_vals(question, question.id)
             new_ids.append((0, 0, vals))
         self.question_ids = new_ids
 
@@ -86,6 +86,10 @@ class OfPlanningIntervention(models.Model):
         else:
             return []
 
+    @api.multi
+    def write(self, vals):
+        return super(OfPlanningIntervention, self).write(vals)
+
 class OfPlanningInterventionModel(models.Model):
     _inherit = "of.planning.intervention.model"
 
@@ -94,6 +98,52 @@ class OfPlanningInterventionModel(models.Model):
 
 class OfPlanningInterventionQuestion(models.Model):
     _name = "of.planning.intervention.question"
+    _order = "type, sequence"
+
+    name = fields.Char(string="Question", required=True, related="parc_installe_id.name", store=True, readonly=False)
+    sequence = fields.Integer(string=u"Séquence", related="parc_installe_id.sequence", store=True, readonly=False)
+    answer_type = fields.Selection([('bool', "Oui/Non"),
+                                    ('text', "Texte libre"),
+                                    ('one', u"Plusieurs choix, une seule réponse possible"),
+                                    ('list', u"plusieurs choix, plusieurs réponses possibles")],
+                                   string="Type de réponse",
+                                   default='bool',
+                                   required=True,
+                                   related="parc_installe_id.answer_type", store=True, readonly=False)
+    possible_answer = fields.Text(string=u"Réponses possibles", related="parc_installe_id.possible_answer", store=True, readonly=False)
+    category_id = fields.Many2one('of.questionnaire.line.category', string=u"Catégorie", related="parc_installe_id.category_id", store=True, readonly=False)
+    definitive_answer = fields.Text(string=u"Réponse", related="parc_installe_id.definitive_answer", store=True, readonly=False)
+    type = fields.Selection([('intervention', "Question d'intervention"),
+                             ('product', u"Question d'équipement")], required=True, string="Type de question", related="parc_installe_id.type", store=True, readonly=False)
+    intervention_id = fields.Many2one('of.planning.intervention', string="Intervention")
+    parc_installe_id = fields.Many2one('of.parc.installe.question', string=u"Équipement")
+
+class OfParcInstalle(models.Model):
+    _inherit = "of.parc.installe"
+
+    questionnaire_id = fields.Many2one('of.questionnaire', string="Questionnaire")
+    question_ids = fields.One2many('of.parc.installe.question', 'parc_installe_id', string="Questions")
+
+    @api.model
+    def _get_question_vals(self, question):
+        return {'name': question.name,
+                'sequence': question.sequence,
+                'answer_type': question.answer_type,
+                'possible_answer': question.answer,
+                'category_id': question.category_id.id,
+                'parc_installe_id': self.id,
+                'type': question.type,
+            }
+
+    @api.onchange('questionnaire_id')
+    def onchange_questionnaire(self):
+        for question in self.questionnaire_id.line_ids:
+            vals = self._get_question_vals(question)
+            self.question_ids.new(vals)
+        self.questionnaire_id = False
+
+class OfPlanningInterventionQuestion(models.Model):
+    _name = "of.parc.installe.question"
     _order = "type, sequence"
 
     name = fields.Char(string="Question", required=True)
@@ -107,11 +157,4 @@ class OfPlanningInterventionQuestion(models.Model):
     definitive_answer = fields.Text(string=u"Réponse")
     type = fields.Selection([('intervention', "Question d'intervention"),
                              ('product', u"Question d'équipement")], required=True, string="Type de question")
-    intervention_id = fields.Many2one('of.planning.intervention', string="Intervention")
     parc_installe_id = fields.Many2one('of.parc.installe', string=u"Équipement")
-
-class OfParcInstalle(models.Model):
-    _inherit = "of.parc.installe"
-
-    questionnaire_id = fields.Many2one('of.questionnaire', string="Questionnaire")
-    question_ids = fields.Many2many('of.questionnaire.line', related="questionnaire_id.line_ids", string="Questions", readonly=True)
