@@ -28,11 +28,10 @@ class SaleOrder(models.Model):
         """
         result = super(SaleOrder, self)._of_get_printable_payments(order_lines)
         invoice_obj = self.env['account.invoice']
-        account_move_line_obj = self.env['account.move.line']
         if not result:
             for payment in self.payment_ids:
                 # Les paiements sont classés dans l'ordre chronologique
-                move_line = account_move_line_obj.browse(payment.id)
+                move_line = payment.move_line_ids.filtered(lambda l: l.account_id == self.partner_id.property_account_receivable_id)
                 name = invoice_obj._of_get_payment_display(move_line)
                 result.append((name, payment.amount))
         return result
