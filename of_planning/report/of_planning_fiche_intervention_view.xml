@@ -220,6 +220,9 @@
                                         <t t-if="o.address_id">
                                             <div style="padding-top: 4px" t-field="o.address_id" t-field-options="{'widget': 'contact', 'fields': ['name', 'phone', 'mobile']}"/>
                                         </t>
+                                        <t t-elif="order.partner_shipping_id">
+                                            <div style="padding-top: 4px" t-field="order.partner_shipping_id" t-field-options="{'widget': 'contact', 'fields': ['name', 'phone', 'mobile']}"/>
+                                        </t>
                                     </div>
                                 </div>
                             </div>
