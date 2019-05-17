@@ -15,6 +15,7 @@
         <field name="name">of.sale.order.form</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="groups_id" eval="[(4, ref('account.group_account_invoice'))]"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='print_quotation']" position="after">
                 <button name="%(action_sale_order_payment)d" type="action" states="sale" string="Enregistrer un paiement" groups="account.group_account_invoice" class="oe_highlight"/>
