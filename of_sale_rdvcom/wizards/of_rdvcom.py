@@ -1,25 +1,8 @@
 # -*- encoding: utf-8 -*-
 
-try:
-    import json
-except ImportError:
-    json = None
-
-try:
-    import urllib
-except ImportError:
-    urllib = None
-
-try:
-    import requests
-except ImportError:
-    requests = None
-
-import urllib3
 from odoo import api, models, fields
 from datetime import datetime, timedelta, date as d_date
-import pytz
-import math
+import pytz, math, json, urllib, requests
 from math import cos
 from odoo.addons.of_planning_tournee.models.of_planning_tournee import distance_points
 from odoo.exceptions import UserError
@@ -113,11 +96,9 @@ class OFRDVCommercial(models.TransientModel):
             lead_id = self._context['active_ids'][0]
             lead = self.env["crm.lead"].browse(lead_id)
             address_id = lead.partner_id.id
-            self = self.with_context(modmod = 1)
         elif active_model == "res.partner":
             partner = partner_obj.browse(self._context['active_ids'][0])
             address_id = partner.address_get(['delivery'])['delivery']
-            self = self.with_context(modmod = 2)
         else:
             address_id = False
 
@@ -280,6 +261,11 @@ class OFRDVCommercial(models.TransientModel):
                 wizard.of_color_ft = "#0D0D0D"
                 wizard.of_color_bg = "#F0F0F0"
 
+    @api.onchange('partner_address_id','lieu_rdv_id','lieu_company_id')
+    def _onchange_adresse_rdv(self):
+        """réinitialise geocode_retry sur changement d'adresse du rdv"""
+        self.ensure_one()
+        self.geocode_retry = False
 
     @api.onchange('lieu')
     def _onchange_lieu(self):
@@ -344,6 +330,39 @@ class OFRDVCommercial(models.TransientModel):
         if self.date_recherche_fin and self.date_recherche_fin < self.date_recherche_debut:
             raise UserError(u"La date de fin de recherche doit être postérieure à la date de début de recherche")
 
+    @api.onchange('hor_md')
+    def _onchange_hor_md(self):
+        self.ensure_one()
+        if self.hor_md and self.hor_mf and self.hor_md > self.hor_mf:
+            raise UserError(u"L'Heure de début de matinée doit être antérieure à l'heure de fin de matinée")
+
+    @api.onchange('hor_mf')
+    def _onchange_hor_mf(self):
+        self.ensure_one()
+        if self.hor_md and self.hor_mf and self.hor_md > self.hor_mf:
+            raise UserError(u"L'Heure de début de matinée doit être antérieure à l'heure de fin de matinée")
+        elif self.hor_mf and self.hor_ad and self.hor_mf > self.hor_ad:
+            raise UserError(u"L'Heure de fin de matinée doit être antérieure à l'heure de début d'après-midi")
+
+    @api.onchange('hor_ad')
+    def _onchange_hor_ad(self):
+        self.ensure_one()
+        if self.hor_ad and self.hor_af and self.hor_ad > self.hor_af:
+            raise UserError(u"L'Heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi")
+        elif self.hor_mf and self.hor_ad and self.hor_mf > self.hor_ad:
+            raise UserError(u"L'Heure de fin de matinée doit être antérieure à l'heure de début d'après-midi")
+
+    @api.onchange('hor_af')
+    def _onchange_hor_af(self):
+        self.ensure_one()
+        if self.hor_ad and self.hor_af and self.hor_ad > self.hor_af:
+            raise UserError(u"L'Heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi")
+
+    @api.multi
+    def _check_horaires(self):
+        self.ensure_one()
+        return self.hor_md <= self.hor_mf and self.hor_mf <= self.hor_ad and self.hor_af
+
     @api.model
     def get_working_hours_fields(self):
         return {
@@ -393,7 +412,12 @@ class OFRDVCommercial(models.TransientModel):
         self.ensure_one()
         if self.geocode_retry:
             raise UserError("Votre géocodeur par défaut n'a pas réussi a géocoder cette adresse")
-        self.partner_address_id.geo_code()
+        if self.lieu == 'customer':
+            self.partner_address_id.geo_code()
+        elif self.lieu == 'company':
+            self.lieu_company_id.partner_id.geo_code()
+        else:
+            self.lieu_rdv_id.geo_code()
         self.geocode_retry = True
         if self.geo_lat != 0 or self.geo_lng != 0:
             self.ignorer_geo = False
@@ -422,6 +446,9 @@ class OFRDVCommercial(models.TransientModel):
         """
         #TODO: finir de commenter
         self.ensure_one()
+
+        if not self._check_horaires():
+            raise UserError(u"Vérifier les horaires de recherche")
 
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')
@@ -686,7 +713,7 @@ class OFRDVCommercial(models.TransientModel):
         propos_deadline_flo = self.date_propos_hour + self.duree
         found = False
         err = False
-        for planning in self.creneau_ids.search([],order="debut_dt"):
+        for planning in self.creneau_ids: # contrairement a rdv d'interventions, il n'y a qu'un seul commercial
             debut_dt = fields.Datetime.from_string(planning.debut_dt)
             fin_dt = fields.Datetime.from_string(planning.fin_dt)
             if err:
@@ -745,7 +772,6 @@ class OFRDVCommercial(models.TransientModel):
         le_rdv.attendee_ids.do_accept()
 
         return {'type': 'ir.actions.act_window_close'}
-
 
 class OfRDVCommercialLine(models.TransientModel):
     _name = 'of.rdv.commercial.line'

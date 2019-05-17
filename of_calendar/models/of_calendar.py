@@ -158,8 +158,8 @@ class OFMeeting(models.Model):
     lieu_address_country_id = fields.Many2one("res.country", string="Pays")#, compute="_compute_geo")
     on_phone = fields.Boolean(u'Au téléphone', compute="_compute_on_phone")
     color_partner_id = fields.Many2one("res.partner", "Partner whose color we will take", compute='_compute_color_partner', store=False)
-    geo_lat = fields.Float(string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo", readonly=True, store=True)
-    geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_geo", readonly=True, store=True)
+    geo_lat = fields.Float(string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo", store=True)
+    geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_geo", store=True)
     precision = fields.Selection([
         ('manual', "Manuel"),
         ('high', "Haut"),
@@ -168,7 +168,7 @@ class OFMeeting(models.Model):
         ('no_address', u"--"),
         ('unknown', u"Indéterminé"),
         ('not_tried', u"Pas tenté"),
-        ], default='not_tried', readonly=True, help=u"Niveau de précision de la géolocalisation", compute="_compute_geo", store=True)
+        ], default='not_tried', help=u"Niveau de précision de la géolocalisation", compute="_compute_geo", store=True)
 
     @api.multi
     @api.depends("lieu")
@@ -312,11 +312,72 @@ class OFMeeting(models.Model):
             else:
                 meeting.color_partner_id = (filter(lambda partner:partner.user_ids, meeting.partner_ids) or [False])[0]
 
+    @api.multi
+    def write(self, vals):
+        if vals.get('lieu_rdv_id', False) or vals.get('lieu_company_id', False):
+            le_lieu = vals.get('lieu', False)
+            if not le_lieu:
+                le_lieu = self.env["calendar.event"].browse(self._ids[0]).lieu
+            if le_lieu == "onsite":
+                la_company = self.env["res.company"].browse(vals.get("lieu_company_id",False))
+                vals["lieu_address_street"] = la_company.partner_id.street
+                vals["lieu_address_street2"] = la_company.partner_id.street2
+                vals["lieu_address_city"] = la_company.partner_id.city
+                vals["lieu_address_state_id"] = la_company.partner_id.state_id.id
+                vals["lieu_address_zip"] = la_company.partner_id.zip
+                vals["lieu_address_country_id"] = la_company.partner_id.country_id.id
+            elif le_lieu == "offsite":
+                le_partner = self.env["res.partner"].browse(vals.get("lieu_rdv_id"))
+                vals["lieu_address_street"] = le_partner.street
+                vals["lieu_address_street2"] = le_partner.street2
+                vals["lieu_address_city"] = le_partner.city
+                vals["lieu_address_state_id"] = le_partner.state_id.id
+                vals["lieu_address_zip"] = le_partner.zip
+                vals["lieu_address_country_id"] = le_partner.country_id.id
+            elif le_lieu == "phone":
+                vals["lieu_address_street"] = False
+                vals["lieu_address_street2"] = False
+                vals["lieu_address_city"] = False
+                vals["lieu_address_state_id"] = False
+                vals["lieu_address_zip"] = False
+                vals["lieu_address_country_id"] = False
+                vals["geo_lat"] = False
+                vals["geo_lng"] = False
+                vals["precision"] = "no_address"
+        return super(OFMeeting, self).write(vals)
+
     @api.model
     def create(self, vals):
         """
         En cas de création par google agenda, le champs "location" peut etre renseigné, or dans ce module on transforme ce champ en champ calculé
         """
+        le_lieu = vals.get('lieu', False)
+        if not le_lieu:
+            vals["lieu"] = "custom"
+        else:
+            if le_lieu == "onsite":
+                la_company = self.env["res.company"].browse(vals.get("lieu_company_id"))
+                vals["lieu_address_street"] = la_company.partner_id.street
+                vals["lieu_address_street2"] = la_company.partner_id.street2
+                vals["lieu_address_city"] = la_company.partner_id.city
+                vals["lieu_address_state_id"] = la_company.partner_id.state_id.id
+                vals["lieu_address_zip"] = la_company.partner_id.zip
+                vals["lieu_address_country_id"] = la_company.partner_id.country_id.id
+            elif le_lieu == "offsite":
+                le_partner = self.env["res.partner"].browse(vals.get("lieu_rdv_id"))
+                vals["lieu_address_street"] = le_partner.lieu_rdv_id.street
+                vals["lieu_address_street2"] = le_partner.lieu_rdv_id.street2
+                vals["lieu_address_city"] = le_partner.lieu_rdv_id.city
+                vals["lieu_address_state_id"] = le_partner.lieu_rdv_id.state_id.id
+                vals["lieu_address_zip"] = le_partner.lieu_rdv_id.zip
+                vals["lieu_address_country_id"] = le_partner.lieu_rdv_id.country_id.id
+            elif le_lieu == "phone":
+                vals["lieu_address_street"] = False
+                vals["lieu_address_street2"] = False
+                vals["lieu_address_city"] = False
+                vals["lieu_address_state_id"] = False
+                vals["lieu_address_zip"] = False
+                vals["lieu_address_country_id"] = False
         loc = vals.get("location", False)
         if loc:  # created from google agenda most likely
             vals["lieu_address_street"] = loc

@@ -1,25 +1,10 @@
 # -*- coding: utf-8 -*-
 
-try:
-    import json
-except ImportError:
-    json = None
-
-try:
-    import requests
-except ImportError:
-    requests = None
-
 from odoo import api, models, fields
 from datetime import datetime, timedelta, date as d_date
 import pytz
 from odoo.exceptions import UserError
-import urllib, urllib3
-
-try:
-    import requests
-except ImportError:
-    requests = None
+import urllib, json, requests
 
 SEARCH_MODES = [
     ('distance', u'Distance (km)'),
@@ -367,7 +352,7 @@ class OfTourneeRdv(models.TransientModel):
                                                       dt_intervention_local.second / 3600.0, 5)
                     intervention_dates.append(flo_dt_intervention_local)
 
-                equipe_intervention_dates[intervention.equipe_id.id].append(intervention_dates) # (intervention_id, flo_debut, flo_fin)
+                equipe_intervention_dates[intervention.equipe_id.id].append(intervention_dates)  # (intervention_id, flo_debut, flo_fin)
 
             # Calcul des créneaux
             # @todo: Gestion des employés dans plusieurs équipes
@@ -377,7 +362,7 @@ class OfTourneeRdv(models.TransientModel):
                 fin = equipe.hor_mf
                 ad = equipe.hor_ad
                 creneaux = []
-                #TODO: possibilité intervention chevauchant la nuit
+                # @todo: possibilité intervention chevauchant la nuit
                 for intervention, intervention_deb, intervention_fin in intervention_dates + [(False, 24, 24)]:
                     if deb < intervention_deb and deb < fin:
                         # Un trou dans le planning, suffisant pour un créneau?
