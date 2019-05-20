@@ -112,7 +112,7 @@ class ResPartner(models.Model):
             geocodeur = self.env['ir.config_parameter'].get_param('geocoder_by_default')
         geocode = {
             'nominatim_openfire': geo_obj.geo_openfire,
-            'nominatim_osm': geo_obj.geo_osrm,
+            'nominatim_osm': geo_obj.geo_osm,
             'bano': geo_obj.geo_ban,
             'google_maps': geo_obj.geo_google,
         }.get(geocodeur, geo_obj.geo_openfire)
