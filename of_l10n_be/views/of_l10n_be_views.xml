@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add setting 'of_color_bg_section' to account settings -->
+    <record id="of_account_config_settings_layouted_bg_color" model="ir.ui.view">
+        <field name="name">of account settings</field>
+        <field name="model">account.config.settings</field>
+        <field name="inherit_id" ref="of_account_invoice_report.of_view_account_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='invoice_taxes']/div[1]" position="after">
+                <div>
+                    <label for="of_default_sale_tax_service_id"/>
+                    <field name="of_default_sale_tax_service_id"
+                           domain="[('type_tax_use', 'in', ('sale', 'all')), ('company_id', '=', company_id)]"
+                           class="oe_inline"/>
+                </div>
+            </xpath>
+            <xpath expr="//div[@name='invoice_taxes']/div[3]" position="after">
+                <div>
+                    <label for="of_default_purchase_tax_service_id"/>
+                    <field name="of_default_purchase_tax_service_id"
+                           domain="[('type_tax_use', 'in', ('purchase', 'all')), ('company_id', '=', company_id)]"
+                           class="oe_inline"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
