@@ -18,6 +18,7 @@
         # 'of_gesdoc',
         # 'of_imports',
         'of_base_location',
+        'of_sale',
     ],
     "init_xml" : [],
     "demo_xml" : [],
