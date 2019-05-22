@@ -10,7 +10,7 @@
     </template>
 
     <!-- Ajoute le champ contremarque sur les lignes de l'impression commande fournisseur -->
-    <template id="of_report_purchaseorder_fusion_document" inherit_id="purchase.report_purchaseorder_document">
+    <template id="of_report_purchaseorder_fusion_document" inherit_id="purchase.report_purchaseorder_document" priority="100">
         <xpath expr="//table/thead/tr/th[last()]" position="after">
             <th><strong>Contremarque</strong></th>
         </xpath>
