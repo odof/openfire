@@ -16,11 +16,15 @@ Personnalisation multi-sociétés :
 - Modification des droits pour permettre la manipulation d'éléments comptables de la société comptable.
 """,
     'website' : "www.openfire.fr",
-    'depends' : ['account'],
+    'depends' : [
+        'account',
+        'sale',
+        ],
     'category' : "OpenFire",
     'data' : [
         'security/of_base_multicompany_security.xml',
         'views/account_invoice_view.xml',
+        'views/sale_order_view.xml',
     ],
     'installable': True,
     'application': False,

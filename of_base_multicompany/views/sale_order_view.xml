@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Permet de sélectionner les taxes de la société qui gère le plan comptable de la société du devis -->
+    <!-- car les magasins ne pourraient pas changer la taxe d'un article autrement -->
+    <record id="of_multicompany_view_order_form" model="ir.ui.view">
+        <field name="name">sale order</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/form/group/group[2]/field[@name='tax_id']" position="attributes">
+                <attribute name="domain">[('type_tax_use','=','sale'),('company_id','=',parent.accounting_company_id)]</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='tax_id']" position="attributes">
+                <attribute name="domain">[('type_tax_use','=','sale'),('company_id','=',parent.accounting_company_id)]</attribute>
+            </xpath>
+            <xpath expr="//notebook/page[2]//field[@name='company_id']" position="after">
+                <field name="accounting_company_id" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

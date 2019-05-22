@@ -101,3 +101,9 @@ class Property(models.Model):
         company = self.env['res.company'].browse(company_id)
         self = self.with_context(force_company=company.accounting_company_id.id)
         return super(Property, self).set_multi(name, model, values, default_value=default_value)
+
+class SaleOrder(models.Model):
+    _inherit = 'sale.order'
+
+    accounting_company_id = fields.Many2one(
+        'res.company', related='company_id.accounting_company_id', string=u"Société comptable")
