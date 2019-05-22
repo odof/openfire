@@ -76,4 +76,19 @@
         </field>
     </record>
 
+    <record id="of_service_parc_installe_view_partner_form" model="ir.ui.view">
+        <field name="name">of.service.parc.installe.view.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="of_service.of_service_view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='service_partner_ids']" position="attributes">
+                <attribute name="context">{'default_address_id':id, 'form_view_ref':'of_service_parc_installe.view_of_service_parc_installe_service_form'}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='service_address_ids']" position="attributes">
+                <attribute name="context">{'hide_service_address_id':True, 'form_view_ref':'of_service_parc_installe.view_of_service_parc_installe_service_form'}</attribute>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>

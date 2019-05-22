@@ -241,7 +241,7 @@
                     <page string="Service" name="service">
                         <!-- Affichage des services liés au partenaire -->
                         <field name="service_partner_ids" nolabel="1" attrs="{'invisible': [('parent_id','!=', False)]}"
-                               context="{'default_address_id':id, 'form_view_get':'of_planning_tournee.view_res_partner_of_service_form'}">
+                               context="{'default_address_id':id}">
                             <tree string="Service" colors="grey:active==False">
                                 <field name="address_id" domain="[('parent_id','=',parent.id)]"/>
                                 <field name="tache_id"/>
@@ -260,7 +260,7 @@
 
                         <!-- Affichage des services liés à l'adresse -->
                         <field name="service_address_ids" nolabel="1" attrs="{'invisible': [('parent_id','=', False)]}"
-                               context="{'hide_service_address_id':True, 'form_view_get':'of_planning_tournee.view_res_partner_of_service_form'}">
+                               context="{'hide_service_address_id':True}">
                             <tree string="Service" colors="grey:active==False">
                                 <field name="tache_id"/>
                                 <field name="mois_ids"/>
