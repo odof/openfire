@@ -30,17 +30,8 @@
                         <field name="amount_diff"/>
                         <field name="move_line_ids" widget="many2many"
                                options="{'not_delete':True, 'no_create_edit': True}"
-                               domain="[('account_id', '=', account_id), ('of_reconciliation_id', 'in', (False, id))]">
-                            <tree>
-                                <field name="date"/>
-                                <field name="name"/>
-                                <field name="journal_id"/>
-                                <field name="account_id"/>
-                                <field name="debit"/>
-                                <field name="credit"/>
-                                <field name="balance"/>
-                            </tree>
-                        </field>
+                               context="{'tree_view_ref':'of_account_bank_reconciliation.of_view_move_line_tree'}"
+                               domain="[('account_id', '=', account_id), ('of_reconciliation_id', 'in', (False, id))]"/>
                         <field name="note"/>
                     </group>
                 </sheet>
@@ -87,4 +78,20 @@
         </field>
     </record>
 
+    <!-- Journal entries -->
+    <record id="of_view_move_line_tree" model="ir.ui.view">
+        <field name="name">of.deposit.account.move.line.tree</field>
+        <field name="model">account.move.line</field>
+        <field name="priority" eval="100"/>
+        <field name="arch" type="xml">
+            <tree string="Journal Items">
+                <field name="date"/>
+                <field name="move_id"/>
+                <field name="name"/>
+                <field name="debit"/>
+                <field name="credit"/>
+                <field name="balance"/>
+            </tree>
+        </field>
+    </record>
 </odoo>
