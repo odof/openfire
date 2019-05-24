@@ -8,7 +8,7 @@
             </xpath>
         </template>
 
- 		<!-- Ajouter des champs à la liste des courriels --> 
+ 		<!-- Ajouter des champs à la liste des courriels -->
         <record id="of_view_mail_mail_tree" model="ir.ui.view">
             <field name="name">of.mail.mail.tree</field>
             <field name="model">mail.mail</field>
@@ -189,6 +189,20 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='email_from']" position="after">
                 <field name="of_copie_expediteur"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="of_base_view_general_configuration">
+        <field name="name">of.base.view.general.configuration</field>
+        <field name="model">base.config.settings</field>
+        <field name="inherit_id" ref="base_setup.view_general_configuration"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='google']" position="before">
+                <div>
+                    <label for="of_affichage_ville"/>
+                    <field name="of_affichage_ville"/>
+                </div>
             </xpath>
         </field>
     </record>
