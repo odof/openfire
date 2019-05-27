@@ -293,20 +293,21 @@ class OFRDVCommercial(models.TransientModel):
         """Met a jour les horaires de travail, adresses de départ et d'arrivée"""
         self.ensure_one()
         if self.employee_id:
-            vals = {
-                "hor_md": self.employee_id.hor_md,
-                "hor_mf": self.employee_id.hor_mf,
-                "hor_ad": self.employee_id.hor_ad,
-                "hor_af": self.employee_id.hor_af,
-                "tz": self.employee_id.tz or "Europe/Paris",
-                "jour_ids": [(5,0,0)] + [(4,le_id,False) for le_id in self.employee_id.jour_ids._ids],
-                "user_id": self.employee_id.user_id,
-                }
-            self.update(vals)
-            if not self.user_id:
+            if self.employee_id.user_id:
+                vals = {
+                    "hor_md": self.employee_id.hor_md,
+                    "hor_mf": self.employee_id.hor_mf,
+                    "hor_ad": self.employee_id.hor_ad,
+                    "hor_af": self.employee_id.hor_af,
+                    "tz": self.employee_id.tz or "Europe/Paris",
+                    "jour_ids": [(5,0,0)] + [(4,le_id,False) for le_id in self.employee_id.jour_ids._ids],
+                    "user_id": self.employee_id.user_id,
+                    }
+                self.update(vals)
+                if not self.jour_ids:
+                    raise UserWarning(u"Cet employé n'a aucun jour dans sa liste des jours travaillés. \nVous pouvez configurer ses jours travaillés dans sa fiche employé.")
+            else:
                 raise UserError(u"Cet employé n'est pas rattaché à un compte utilisateur. \nPour le rattacher à un compte utilisateur rendez-vous sur sa fiche employé, onglet 'paramètre RH', champ 'utilisateur lié'.")
-            if not self.jour_ids:
-                raise UserWarning(u"Cet employé n'a aucun jour dans sa liste des jours travaillés. \nVous pouvez configurer ses jours travaillés dans sa fiche employé.")
 
     @api.onchange('mode_recherche')
     def _onchange_mode_recherche(self):
@@ -426,6 +427,8 @@ class OFRDVCommercial(models.TransientModel):
     @api.multi
     def button_calcul(self):
         # Calcule a prochaine intervention à partir du lendemain de la date courante
+        if not self.employee_id.user_id:
+            raise UserError(u"Cet employé n'est pas rattaché à un compte utilisateur. \nPour le rattacher à un compte utilisateur rendez-vous sur sa fiche employé, onglet 'paramètre RH', champ 'utilisateur lié'.")
         self.compute()
         context = dict(self._context)
         return {
@@ -536,7 +539,8 @@ class OFRDVCommercial(models.TransientModel):
                                         #('start_date', '=', str_d_recherche)
                                         ], order='start_date')
             for event in events:
-                if self.user_id.partner_id.id not in event.partner_ids._ids:
+                if self.user_id.partner_id.id not in event.partner_ids._ids and self.partner_id.id not in event.partner_ids._ids:
+                    # ni le commercial ni le client ne font partie de cet event
                     events -= event
 
             event_dates_all = []
@@ -613,32 +617,33 @@ class OFRDVCommercial(models.TransientModel):
                 })
             # création des créneaux de rdvs
             for event, event_deb, event_fin in event_dates_all:
-                description = "%s-%s" % tuple(hours_to_strs(event_deb, event_fin))
+                if self.user_id.partner_id.id in event.partner_ids._ids:  # le commercial fait partie des participants
+                    description = "%s-%s" % tuple(hours_to_strs(event_deb, event_fin))
 
-                dt_debut = datetime.combine(d_recherche, datetime.min.time()) + timedelta(hours=event_deb)
-                dt_debut = tz.localize(dt_debut, is_dst=None).astimezone(pytz.utc)
-                dt_fin = datetime.combine(d_recherche, datetime.min.time()) + timedelta(hours=event_fin)
-                dt_fin = tz.localize(dt_fin, is_dst=None).astimezone(pytz.utc)
+                    dt_debut = datetime.combine(d_recherche, datetime.min.time()) + timedelta(hours=event_deb)
+                    dt_debut = tz.localize(dt_debut, is_dst=None).astimezone(pytz.utc)
+                    dt_fin = datetime.combine(d_recherche, datetime.min.time()) + timedelta(hours=event_fin)
+                    dt_fin = tz.localize(dt_fin, is_dst=None).astimezone(pytz.utc)
 
-                wizard_line_obj.create({
-                    'debut_dt': dt_debut, # datetime utc
-                    'fin_dt': dt_fin, # datetime utc
-                    'date_flo': event_deb,
-                    'date_flo_deadline': event_fin,
-                    'date': str_d_recherche,
-                    'description': description,
-                    'wizard_id': self.id,
-                    #'user_id': event.user_id.id,
-                    'user_partner_id': self.user_id.partner_id.id,
-                    'calendar_id': event.id,
-                    'categ_ids': [(4,le_id,False) for le_id in event.categ_ids._ids],
-                    'partner_ids': [(4,le_id,False) for le_id in event.partner_ids._ids],
-                    #'lieu_rdv_id': event.lieu_rdv_id.id or False,
-                    'name': event.name,
-                    'disponible': False,
-                    'ignorer_geo': self.ignorer_geo,
-                    'on_phone': event.lieu and event.lieu == 'phone',
-                })
+                    wizard_line_obj.create({
+                        'debut_dt': dt_debut, # datetime utc
+                        'fin_dt': dt_fin, # datetime utc
+                        'date_flo': event_deb,
+                        'date_flo_deadline': event_fin,
+                        'date': str_d_recherche,
+                        'description': description,
+                        'wizard_id': self.id,
+                        #'user_id': event.user_id.id,
+                        'user_partner_id': self.user_id.partner_id.id,
+                        'calendar_id': event.id,
+                        'categ_ids': [(4,le_id,False) for le_id in event.categ_ids._ids],
+                        'partner_ids': [(4,le_id,False) for le_id in event.partner_ids._ids],
+                        #'lieu_rdv_id': event.lieu_rdv_id.id or False,
+                        'name': event.name,
+                        'disponible': False,
+                        'ignorer_geo': self.ignorer_geo,
+                        'on_phone': event.lieu and event.lieu == 'phone',
+                    })
         # Calcul des durées et distances
         d_debut = d_avant_recherche + un_jour
         d_fin = d_apres_recherche - un_jour
@@ -765,6 +770,7 @@ class OFRDVCommercial(models.TransientModel):
             'lieu': le_lieu,
             'lieu_rdv_id': l_adresse and l_adresse.id,
             'lieu_company_id': la_company and la_company.id,
+            'opportunity_id': self.lead_id.id,
         }
 
         le_rdv = calendar_obj.create(values)
@@ -928,8 +934,8 @@ class OfRDVCommercialLine(models.TransientModel):
     on_phone = fields.Boolean(u'Au téléphone', default=False)
 
     ignorer_geo = fields.Boolean(u"Ignorer données géographiques")
-    geo_lat = fields.Float(string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo", readonly=True, store=True)
-    geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_geo", readonly=True, store=True)
+    geo_lat = fields.Float(string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo", readonly=True)
+    geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_geo", readonly=True)
     precision = fields.Selection([
         ('manual', "Manuel"),
         ('high', "Haut"),
@@ -938,7 +944,7 @@ class OfRDVCommercialLine(models.TransientModel):
         ('no_address', u"--"),
         ('unknown', u"Indéterminé"),
         ('not_tried', u"Pas tenté"),
-        ], default='not_tried', readonly=True, help=u"Niveau de précision de la géolocalisation", compute="_compute_geo", store=True)
+        ], default='not_tried', readonly=True, help=u"Niveau de précision de la géolocalisation", compute="_compute_geo")
 
     @api.multi
     @api.depends("calendar_id")

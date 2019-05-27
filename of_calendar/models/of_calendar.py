@@ -365,12 +365,12 @@ class OFMeeting(models.Model):
                 vals["lieu_address_country_id"] = la_company.partner_id.country_id.id
             elif le_lieu == "offsite":
                 le_partner = self.env["res.partner"].browse(vals.get("lieu_rdv_id"))
-                vals["lieu_address_street"] = le_partner.lieu_rdv_id.street
-                vals["lieu_address_street2"] = le_partner.lieu_rdv_id.street2
-                vals["lieu_address_city"] = le_partner.lieu_rdv_id.city
-                vals["lieu_address_state_id"] = le_partner.lieu_rdv_id.state_id.id
-                vals["lieu_address_zip"] = le_partner.lieu_rdv_id.zip
-                vals["lieu_address_country_id"] = le_partner.lieu_rdv_id.country_id.id
+                vals["lieu_address_street"] = le_partner.street
+                vals["lieu_address_street2"] = le_partner.street2
+                vals["lieu_address_city"] = le_partner.city
+                vals["lieu_address_state_id"] = le_partner.state_id.id
+                vals["lieu_address_zip"] = le_partner.zip
+                vals["lieu_address_country_id"] = le_partner.country_id.id
             elif le_lieu == "phone":
                 vals["lieu_address_street"] = False
                 vals["lieu_address_street2"] = False

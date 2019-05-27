@@ -865,4 +865,19 @@
             </field>
         </record>
 
+<!-- #######################################################################################
+                                      CALENDAR EVENT
+############################################################################################ -->
+
+        <record id="of_view_calendar_event_form_crm" model="ir.ui.view">
+            <field name="name">of.calendar.event.form.crm</field>
+            <field name="model">calendar.event</field>
+            <field name="inherit_id" ref="of_calendar.of_view_calendar_event_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='user_id']" position="after">
+                    <field name="opportunity_id"/>
+                </xpath>
+            </field>
+        </record>
+
 </odoo>

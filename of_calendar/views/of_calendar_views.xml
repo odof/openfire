@@ -94,6 +94,11 @@
                     <field name="lieu_address_country_id" placeholder="Country" class="o_address_country" options='{"no_open": True, "no_create": True}' attrs="{'readonly': [('lieu', 'in', ['offsite','onsite','phone'])]}"/></i>
                 </div>
             </xpath>
+            <!-- rendre l'onglet 'divers' visible tout le temps -->
+            <xpath expr="//page[4]" position="attributes">
+                <attribute name="groups"></attribute>
+                <attribute name="name">misc</attribute>
+            </xpath>
         </field>
     </record>
 
