@@ -34,6 +34,7 @@ CalendarView.include({
         this.filters_radio = !isNullOrUndef(attrs.filters_radio) && _.str.toBool(attrs.filters_radio); // true or 1 if we want filters to be of type radio
         this.custom_colors = !isNullOrUndef(attrs.custom_colors) && _.str.toBool(attrs.custom_colors); // true or 1 if we want to use custom colors
         this.show_first_evt = !isNullOrUndef(attrs.show_first_evt) && _.str.toBool(attrs.show_first_evt); // true or 1 if we want to jump to the first event
+        this.jump_to = !isNullOrUndef(attrs.jump_to) && attrs.jump_to; // "first" or "selected"
         this.dispo_field = attrs.dispo_field;
         this.force_color_field = attrs.force_color_field;
         this.selected_field = attrs.selected_field;
@@ -133,8 +134,12 @@ CalendarView.include({
                     context: context,
                 }).done(function(events) {
                     //////////////////////////////////////////////////////////////////////////////////// this part is new. Sets up first event to be displayed
+                    /*
+                        Comportement: dans tous les cas on cherche notre premier event (même si jump_to est a selected)
+                        comme ça si jump_to est a selected mais qu'il n'y a aucun event selected on sautera au premier
+                    */
                     self.first_evt = events.length > 0 && events[0] || undefined;
-                    if (self.show_first_evt && !isNullOrUndef(self.first_evt)) {
+                    if (!isNullOrUndef(self.jump_to) && !isNullOrUndef(self.first_evt)) {
                         var tmp, strdate1, strdate2, strtime1, strtime2;
                         strdate1 = self.first_evt[self.date_start].substring(0,10);
                         strtime1 = self.first_evt[self.date_start].substring(11);
@@ -156,6 +161,14 @@ CalendarView.include({
                                     strdate1 = strdate2;
                                     strtime1 = strtime2;
                                 }
+                            }
+                        }
+                    }
+                    if (self.jump_to == "selected" && !isNullOrUndef(self.first_evt)) {
+                        for (var i=1; i < events.length ; i++) {
+                            if (events[i][self.selected_field]) {
+                                self.first_evt = events[i];
+                                break;
                             }
                         }
                     }
