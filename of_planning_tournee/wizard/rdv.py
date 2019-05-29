@@ -33,10 +33,13 @@ class OfTourneeRdv(models.TransientModel):
     @api.model
     def _default_partner(self):
         # Suivant que la prise de rdv se fait depuis la fiche client ou un service
-        if self._context.get('active_model', '') == 'res.partner':
+        active_model = self._context.get('active_model', '')
+        if active_model == 'res.partner':
             partner_id = self._context['active_ids'][0]
-        elif self._context.get('active_model', '') == 'of.service':
+        elif active_model == 'of.service':
             partner_id = self.env['of.service'].browse(self._context['active_ids'][0]).partner_id.id
+        elif active_model == 'sale.order':
+            partner_id = self.env['sale.order'].browse(self._context['active_ids'][0]).partner_id.id
         else:
             return False
 
@@ -52,7 +55,7 @@ class OfTourneeRdv(models.TransientModel):
         if active_model == "of.service":
             service_id = self._context['active_ids'][0]
             service = self.env["of.service"].browse(service_id)
-        elif active_model == "res.partner":
+        elif active_model in ["res.partner", "sale.order"]:
             partner = self._default_partner()
             if partner:
                 service = self.env['of.service'].search([('partner_id', '=', partner.id)], limit=1)
@@ -69,6 +72,12 @@ class OfTourneeRdv(models.TransientModel):
         elif active_model == "res.partner":
             partner = partner_obj.browse(self._context['active_ids'][0])
             address = partner_obj.browse(partner.address_get(['delivery'])['delivery'])
+        elif active_model == "sale.order":
+            order = self.env['sale.order'].browse(self._context['active_ids'][0])
+            if not order:
+                return False
+            partner = order.partner_id
+            address = order.partner_shipping_id or order.partner_id
 
         if address and not (address.geo_lat or address.geo_lng):
             address = partner_obj.search(['|', ('id', '=', partner.id), ('parent_id', '=', partner.id),
@@ -87,9 +96,9 @@ class OfTourneeRdv(models.TransientModel):
     date_propos_hour = fields.Float(string=u'Heude de début', digits=(12, 5))
     date_recherche_debut = fields.Date(string='À partir du', required=True, default=lambda *a: (d_date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
     date_recherche_fin = fields.Date(string="Jusqu'au", required=True, default=lambda *a: (d_date.today() + timedelta(days=7)).strftime('%Y-%m-%d'))
-    partner_id = fields.Many2one('res.partner', string='Client', required=True, readonly=True, default=_default_partner)
+    partner_id = fields.Many2one('res.partner', string='Client', required=True, readonly=True, default=lambda x: x._default_partner())
     partner_address_id = fields.Many2one(
-        'res.partner', string="Adresse d'intervention", required=True, default=_default_address,
+        'res.partner', string="Adresse d'intervention", required=True, default=lambda x: x._default_address(),
         domain="['|', ('id', '=', partner_id), ('parent_id', '=', partner_id)]")
     partner_address_street = fields.Char(related="partner_address_id.street", readonly=True)
     partner_address_street2 = fields.Char(related="partner_address_id.street2", readonly=True)
@@ -99,7 +108,7 @@ class OfTourneeRdv(models.TransientModel):
     partner_address_country_id = fields.Many2one(related="partner_address_id.country_id", readonly=True)
     date_display = fields.Char(string='Jour du RDV', size=64, readonly=True)
     service_id = fields.Many2one(
-        'of.service', string='Service client', default=_default_service,
+        'of.service', string='Service client', default=lambda x: x._default_service(),
         domain="[('partner_id', '=', partner_id)]")
     creer_recurrence = fields.Boolean(
         string="Créer récurrence?", default=True,

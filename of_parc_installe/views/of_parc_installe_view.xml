@@ -50,6 +50,7 @@
             <field name="model">of.parc.installe</field>
             <field name="arch" type="xml">
                 <form>
+                    <header/>
                     <sheet string="Parc installé" name="parc_installe">
                         <div class="oe_button_box" name="button_box">
                             <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
@@ -65,16 +66,17 @@
                         <group>
                             <group name="client" string="Client">
                                 <field name="client_id"/>
-                                <label for="site_adresse_id" string="Site installation"/>
-                                <div>
-                                    <field name="site_adresse_id" nolabel="1" context="{'show_address': True}"/>
-                                    <field name="street_site_id" nolabel="1"/>
-                                    <field name="street2_site_id" nolabel="1"/>
-                                    <field name="zip_site_id" style="width: 20%" nolabel="1"/>
-                                    <field name="city_site_id" style="width: 40%" nolabel="1"/>
-                                    <field name="country_site_id" nolabel="1"/>
-                                    <field name="tel_site_id" nolabel="1"/>
+                                <field name="site_adresse_id" context="{'show_address': True}"/>
+                                <label for="street_site_id" string=" " class=""/>
+                                <div class="o_address_format">
+                                    <field name="street_site_id" class="o_address_street" nolabel="1"/>
+                                    <field name="street2_site_id" class="o_address_street" nolabel="1"/>
+                                    <field name="zip_site_id" class="o_address_zip" style="width: 20%" nolabel="1"/>
+                                    <field name="city_site_id" class="o_address_city" style="width: 40%" nolabel="1"/>
+                                    <field name="country_site_id" class="o_address_country" nolabel="1"/>
                                 </div>
+                                <label for="tel_site_id" string=" "/>
+                                <field name="tel_site_id" nolabel="1"/>
                             </group>
                             <group name="pose" string="Pose">
                                    <field name="revendeur_id"/>
@@ -113,6 +115,73 @@
             </field>
         </record>
 
+        <!-- Parc Installé Map View -->
+        <record id="of_parc_installe_map_view" model="ir.ui.view">
+            <field name="name">of.parc.installe.map</field>
+            <field name="model">of.parc.installe</field>
+            <field name="arch" type="xml">
+                <map string="Map" class="of_map_parc_installé" latitude_field="geo_lat" longitude_field="geo_lng">
+                    <field name="active" invisible="1"/>
+                    <field name="geo_lat" required="1"/>
+                    <field name="geo_lng" required="1"/>
+                    <field name="precision" required="1"/>
+                    <field name="id"/>
+                    <field name="client_name"/>
+                    <field name="zip_site_id"/>
+                    <field name="city_site_id"/>
+                    <field name="client_mobile"/>
+                    <field name="name"/>
+                    <templates>
+                        <t t-name="of_map_record_box">
+                            <div t-attf-class="of_map_record_global_click">
+                                <div class="of_map_record_buttons">
+                                    <i class="of_map_record_close fa fa-lg fa-times"/>
+                                    <!--i class="of_map_record_min fa fa-lg fa-minus"/>  later implementation...
+                                    <i class="of_map_record_max fa fa-lg fa-square"/-->
+                                </div>
+                                <div name="content" class="of_map_record_content">
+                                    <t t-if="record.client_name.raw_value">
+                                        <i class="of_map_record_main fa fa-user"/><span class="of_ws"/><strong><field name="client_name"/></strong><br/>
+                                    </t>
+                                    <t t-if="record.zip_site_id.raw_value">
+                                        <i class="of_map_record_main fa fa-map-marker"/><span class="of_ws"/><field name="zip_site_id"/><span class="of_ws"/><field name="city_site_id"/><br/>
+                                    </t>
+                                    <t t-if="record.client_mobile.raw_value">
+                                        <i class="of_map_record_main fa fa-phone"/><span class="of_ws"/><field name="client_mobile"/><br/>
+                                    </t>
+                                    <t t-if="record.name.raw_value">
+                                        <i class="of_map_record_main fa fa-hashtag"/><span class="of_ws"/><field name="name"/><br/>
+                                    </t>
+                                    <t t-if="record.date_service.raw_value">
+                                        <i class="of_map_record_main fa fa-calendar-o"/><span class="of_ws"/>Vente:<span class="of_ws"/><field name="date_service"/><br/>
+                                    </t>
+                                    <t t-if="record.date_installation.raw_value">
+                                        <i class="of_map_record_main fa fa-calendar-check-o"/><span class="of_ws"/>Instal:<span class="of_ws"/><field name="date_installation"/><br/>
+                                    </t>
+                                    <t t-if="record.date_fin_garantie.raw_value">
+                                        <i class="of_map_record_main fa fa-calendar-times-o"/><span class="of_ws"/>Garantie:<span class="of_ws"/><field name="date_fin_garantie"/><br/>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                        <t t-name="of_map_marker_tooltip">
+                            <div name="marker_tooltip">
+                                <i class="fa fa-user"/><span class="of_ws"/>
+                                <field name="client_name"/><br/>
+                                Précision:
+                                <t t-if='["manual","high","medium","low"].includes(record.precision.raw_value)'>
+                                    <field name="precision"/>
+                                </t>
+                                <t t-else="">
+                                    <span class="of_ws"/>
+                                    Indeterminée
+                                </t>
+                            </div>
+                        </t>
+                    </templates>
+                </map>
+            </field>
+        </record>
 
 <!-- *************************************************** -->
 <!-- *************** SAV (project.issue) *************** -->
@@ -159,6 +228,70 @@
             </field>
         </record>
 
+        <!-- SAV Map View -->
+        <record id="of_project_issue_map_view" model="ir.ui.view">
+            <field name="name">of.project.issue.map</field>
+            <field name="model">project.issue</field>
+            <field name="arch" type="xml">
+                <map string="Map" class="of_map_parc_installé" latitude_field="of_geo_lat" longitude_field="of_geo_lng" color_field="of_color_map">
+                    <field name="active" invisible="1"/>
+                    <field name="of_geo_lat" required="1"/>
+                    <field name="of_geo_lng" required="1"/>
+                    <field name="of_precision" required="1"/>
+                    <field name="of_color_map" required="1"/>
+                    <field name="id"/>
+                    <field name="of_parc_installe_client_nom"/>
+                    <field name="of_parc_installe_site_zip"/>
+                    <field name="of_parc_installe_site_city"/>
+                    <field name="of_partner_id_mobile"/>
+                    <field name="name"/>
+                    <field name="date_deadline"/>
+                    <templates>
+                        <t t-name="of_map_record_box">
+                            <div t-attf-class="of_map_record_global_click">
+                                <div class="of_map_record_buttons">
+                                    <i class="of_map_record_close fa fa-lg fa-times"/>
+                                    <!--i class="of_map_record_min fa fa-lg fa-minus"/>  later implementation...
+                                    <i class="of_map_record_max fa fa-lg fa-square"/-->
+                                </div>
+                                <div name="content" class="of_map_record_content">
+                                    <t t-if="record.of_parc_installe_client_nom.raw_value">
+                                        <i class="of_map_record_main fa fa-user"/><span class="of_ws"/><strong><field name="of_parc_installe_client_nom"/></strong><br/>
+                                    </t>
+                                    <t t-if="record.of_parc_installe_site_zip.raw_value">
+                                        <i class="of_map_record_main fa fa-map-marker"/><span class="of_ws"/><field name="of_parc_installe_site_zip"/><span class="of_ws"/><field name="of_parc_installe_site_city"/><br/>
+                                    </t>
+                                    <t t-if="record.of_partner_id_mobile.raw_value">
+                                        <i class="of_map_record_main fa fa-phone"/><span class="of_ws"/><field name="of_partner_id_mobile"/><br/>
+                                    </t>
+                                    <t t-if="record.name.raw_value">
+                                        <i class="of_map_record_main fa fa-bug"/><span class="of_ws"/><field name="name"/><br/>
+                                    </t>
+                                    <t t-if="record.date_deadline.raw_value">
+                                        <i class="of_map_record_main fa fa-calendar-o"/><span class="of_ws"/><field name="date_deadline"/><br/>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                        <t t-name="of_map_marker_tooltip">
+                            <div name="marker_tooltip">
+                                <i class="fa fa-user"/><span class="of_ws"/>
+                                <field name="of_parc_installe_client_nom"/><br/>
+                                Précision:
+                                <t t-if='["manual","high","medium","low"].includes(record.of_precision.raw_value)'>
+                                    <field name="of_precision"/>
+                                </t>
+                                <t t-else="">
+                                    <span class="of_ws"/>
+                                    Indeterminée
+                                </t>
+                            </div>
+                        </t>
+                    </templates>
+                </map>
+            </field>
+        </record>
+
 <!-- *************************************************** -->
 <!-- ********** VUE PARTENAIRES (res.partner) ********** -->
 <!-- *************************************************** -->
@@ -169,12 +302,17 @@
              <field name="type">ir.actions.act_window</field>
              <field name="res_model">of.parc.installe</field>
              <field name="view_type">form</field>
-             <field name="view_mode">tree,form</field>
+             <field name="view_mode">tree,form,map</field>
              <field name="search_view_id" ref="of_parc_installe_search_view"/>
              <field name="help">Parc des produits installés</field>
         </record>
 
-      <!-- Mettre revendeur, installateur, payeur dans formulaire partenaires -->
+        <!-- Action vue SAV -->
+        <record id="of_project_issue.action_of_project_issue_view" model="ir.actions.act_window">
+            <field name="view_mode">tree,kanban,map,form,pivot,graph</field>
+        </record>
+
+        <!-- Mettre revendeur, installateur, payeur dans formulaire partenaires -->
         <record id="of_res_partner_form_pi" model="ir.ui.view">
             <field name="name">of.res.partner.form.pi</field>
             <field name="model">res.partner</field>

@@ -215,6 +215,18 @@
             groups="of_planning.of_group_planning_intervention_user"
         />
 
+        <act_window
+            name="Planifier une intervention"
+            res_model="of.tournee.rdv"
+            src_model="sale.order"
+            view_mode="form"
+            view_id="view_rdv_intervention_wizard"
+            id="action_view_rdv_intervention_wizard_sale_order"
+            key2="client_action_multi"
+            target="new"
+            groups="of_planning.of_group_planning_intervention_user"
+        />
+
         <!-- Ajout bouton planifier une intervention dans vue form partenaire-->
         <record id="of_view_partner_form_rdv_intervention" model="ir.ui.view">
             <field name="name">res.partner.form.rdv.intervention</field>
@@ -227,6 +239,7 @@
             </field>
         </record>
 
+        <!-- Ajout bouton planifier une intervention dans vue form service-->
         <record id="view_of_service_form_rdv_intervention" model="ir.ui.view">
             <field name="name">of.service.form.rdv.intervention</field>
             <field name="model">of.service</field>
@@ -238,5 +251,16 @@
             </field>
         </record>
 
+        <!-- Ajout bouton planifier une intervention dans vue form devis/bon de commande-->
+        <record id="view_of_order_form_planning_tournee" model="ir.ui.view">
+            <field name="name">of.sale.order.form.planning.tournee</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header//field[@name='state']" position="before">
+                    <button name="%(action_view_rdv_intervention_wizard_sale_order)d" string="Planifier Intervention" type="action"/>
+                </xpath>
+            </field>
+        </record>
     </data>
-</odoo>  
+</odoo>

@@ -17,6 +17,7 @@ Module Parc installé : gestion des produits installés avec no de série.
     'depends' : [
         'product',
         'of_project_issue',
+        'of_map_view',
     ],
     'data' : [
         'security/ir.model.access.csv',

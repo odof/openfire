@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from datetime import timedelta
 from odoo import models, fields, api
 
 class of_parc_installe(models.Model):
@@ -15,6 +16,8 @@ class of_parc_installe(models.Model):
     product_id = fields.Many2one('product.product', 'Produit', required=True, ondelete='restrict')
     product_category_id = fields.Char(u'Famille', related="product_id.categ_id.name", readonly=True)
     client_id = fields.Many2one('res.partner', 'Client', required=True, domain="[('parent_id','=',False)]", ondelete='restrict')
+    client_name = fields.Char(related='client_id.name')  # for map view
+    client_mobile = fields.Char(related='client_id.mobile')  # for map view
     site_adresse_id = fields.Many2one('res.partner', 'Site installation', required=False, domain="['|',('parent_id','=',client_id),('id','=',client_id)]", ondelete='restrict')
     revendeur_id = fields.Many2one('res.partner', 'Revendeur', required=False,  domain="[('of_revendeur','=',True)]", ondelete='restrict')
     installateur_id = fields.Many2one('res.partner', 'Installateur', required=False, domain="[('of_installateur','=',True)]", ondelete='restrict')
@@ -30,7 +33,33 @@ class of_parc_installe(models.Model):
     project_issue_ids = fields.One2many('project.issue', 'of_produit_installe_id', 'SAV')
     active = fields.Boolean(string=u'Actif', default=True)
 
+    # Champs ajoutés pour la vue map
+    geo_lat = fields.Float('geo_lat', compute='_compute_geo')
+    geo_lng = fields.Float('geo_lng', compute='_compute_geo')
+    precision = fields.Selection([
+        ('manual', "Manuel"),
+        ('high', "Haut"),
+        ('medium', "Moyen"),
+        ('low', "Bas"),
+        ('no_address', u"--"),
+        ('unknown', u"Indéterminé"),
+        ('not_tried', u"Pas tenté"),
+        ], default='not_tried', string='precision', compute='_compute_geo')
+
     _sql_constraints = [('no_serie_uniq', 'unique(name)', u"Ce numéro de série est déjà utilisé et doit être unique.")]
+
+    @api.multi
+    @api.depends('client_id', 'site_adresse_id')
+    def _compute_geo(self):
+        for produit_installe in self:
+            if produit_installe.site_adresse_id:
+                produit_installe.geo_lat = produit_installe.site_adresse_id.geo_lat
+                produit_installe.geo_lng = produit_installe.site_adresse_id.geo_lng
+                produit_installe.precision = produit_installe.site_adresse_id.precision
+            else:
+                produit_installe.geo_lat = produit_installe.client_id.geo_lat
+                produit_installe.geo_lng = produit_installe.client_id.geo_lng
+                produit_installe.precision = produit_installe.client_id.precision
 
     @api.model
     def action_creer_sav(self):
@@ -64,7 +93,8 @@ class res_partner(models.Model):
             partner.of_parc_installe_count = self.env['of.parc.installe'].search_count([('client_id', '=', partner.id)])
 
 class project_issue(models.Model):
-    _inherit = "project.issue"
+    _name = 'project.issue'
+    _inherit = ['project.issue', 'of.map.view.mixin']
 
 #     def _get_product_sav_ids(self, cr, uid, ids, context={}):
 #         return self.pool['project.issue'].search(cr, uid, [('product_name_id','in',ids)], context=context)
@@ -103,15 +133,54 @@ class project_issue(models.Model):
     of_parc_installe_client_nom = fields.Char(u'Client produit installé', related="of_produit_installe_id.client_id.name", readonly=True)
     of_parc_installe_client_adresse = fields.Char(u'Adresse client', related="of_produit_installe_id.client_id.contact_address", readonly=True)
     of_parc_installe_site_nom = fields.Char(u"Lieu d'installation", related="of_produit_installe_id.site_adresse_id.name", readonly=True)
+    of_parc_installe_site_zip = fields.Char('Code Postal', size=24, related='of_produit_installe_id.site_adresse_id.zip')
+    of_parc_installe_site_city = fields.Char('Ville', related='of_produit_installe_id.site_adresse_id.city')
     of_parc_installe_site_adresse = fields.Char(u"Adresse d'installation", related="of_produit_installe_id.site_adresse_id.contact_address", search='_search_of_parc_installe_site_adresse', readonly=True)
     of_parc_installe_note = fields.Text('Note produit installé', related="of_produit_installe_id.note", readonly=True)
     of_parc_installe_fin_garantie = fields.Date(string='Fin de garantie', related="of_produit_installe_id.date_fin_garantie", readonly=True)
 
+    # Champs ajoutés pour la vue map
+    of_geo_lat = fields.Float(related='of_produit_installe_id.geo_lat')
+    of_geo_lng = fields.Float(related='of_produit_installe_id.geo_lng')
+    of_precision = fields.Selection(related='of_produit_installe_id.precision')
 
+    of_color_map = fields.Char(string="Couleur du marqueur", compute="_compute_of_color_map")
+
+    @api.multi
+    @api.depends('date_deadline')
+    def _compute_of_color_map(self):
+        date_today = fields.Date.from_string(fields.Date.today())
+
+        for issue in self:
+            color = 'gray'
+            if issue.date_deadline:
+                date_deadline = fields.Date.from_string(issue.date_deadline)
+                if date_deadline > date_today + timedelta(days=15):  # deadline dans plus de 2 semaines
+                    color = "blue"
+                elif date_deadline >= date_today:  # deadline dans moins de 2 semaines
+                    color = "orange"
+                else:  # deadline passée
+                    color = "red"
+            issue.of_color_map = color
+
+    @api.model
+    def get_color_map(self):
+        u"""
+        fonction pour la légende de la vue map
+        """
+        return {
+            'title': u"Échéance",
+            'values': (
+                {'label': u'Aucune', 'value': 'gray'},
+                {'label': u"Plus de 15 jours", 'value': 'blue'},
+                {'label': u'Moins de 15 jours', 'value': 'orange'},
+                {'label': u'En retard', 'value': 'red'},
+            )
+        }
 
     @api.onchange('of_produit_installe_id')
     def on_change_of_produit_installe_id(self):
-        # Si le no de série est saisi, on met le produit du no de série du parc installé. 
+        # Si le no de série est saisi, on met le produit du no de série du parc installé.
         if self.of_produit_installe_id:
             parc = self.env['of.parc.installe'].browse([self.of_produit_installe_id.id])
             if parc and parc.product_id:
