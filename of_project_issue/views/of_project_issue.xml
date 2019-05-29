@@ -93,6 +93,9 @@
             <field name="model">project.issue</field>
             <field name="inherit_id" ref="project_issue.project_issue_form_view"/>
             <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']/button[@name='toggle_active']" position="attributes">
+                    <attribute name="groups"></attribute>
+                </xpath>
                 <xpath expr="//form/sheet/group/group" position="attributes">
                     <attribute name="string">SAV</attribute>
                 </xpath>
