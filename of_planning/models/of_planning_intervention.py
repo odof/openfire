@@ -2,6 +2,7 @@
 
 from __builtin__ import False
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 import re
 import pytz
@@ -165,6 +166,7 @@ class OfPlanningIntervention(models.Model):
     cleantext_description = fields.Text(compute='_compute_cleantext_description')
     cleantext_intervention = fields.Text(compute='_compute_cleantext_intervention')
     jour = fields.Char("Jour", compute="_compute_jour")
+    date_date = fields.Date(string='Jour intervention', compute='_compute_date_date', search='_search_date_date', readonly=True)
 
     @api.depends('date', 'duree', 'hor_md', 'hor_mf', 'hor_ad', 'hor_af', 'hor_sam', 'hor_dim')
     def _compute_date_deadline(self):
@@ -275,6 +277,36 @@ class OfPlanningIntervention(models.Model):
                 dt = fields.Datetime.context_timestamp(self, dt)  # openerp's ORM method
                 t = dt.strftime("%A").capitalize()  # the day_name is Sunday here
             inter.jour = t
+
+    @api.depends('date')
+    def _compute_date_date(self):
+        for inter in self:
+            inter.date_date = inter.date
+
+    @api.model
+    def _search_date_date(self, operator, value):
+        mode = self._context.get('of_date_search_mode')
+        if mode in ('week', 'month'):
+            date = fields.Date.from_string(value)
+            if mode == 'week':
+                date_start = date - timedelta(days=date.weekday())
+                date_stop = date_start + timedelta(days=7)
+            else:
+                date_start = date - timedelta(days=date.day)
+                date_stop = date_start + relativedelta(months=1)
+            domain = ['&',
+                      ('date_deadline', '>=', fields.Date.to_string(date_start)),
+                      ('date', '<', fields.Date.to_string(date_stop))]
+        else:
+            if operator == '=':
+                domain = ['&', ('date_deadline', '>=', value), ('date', '<=', value)]
+            elif operator == '!=':
+                domain = ['|', ('date', '<', value), ('date_deadline', '>', value)]
+            elif operator in ('<', '<='):
+                domain = [('date', operator, value)]
+            else:
+                domain = [('date_deadline', operator, value)]
+        return domain
 
     @api.depends('state')
     def _compute_state_int(self):

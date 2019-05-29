@@ -59,11 +59,28 @@
                         <filter string="Réalisé" name="state_done" icon="terp-folder-blue" domain="[('state','=','done')]"/>
                         <filter string="Annulé" name="state_cancel" icon="terp-dialog-close-red" domain="[('state','=','cancel')]"/>
                         <filter string="Reporté" name="state_postponed" icon="terp-folder-green" domain="[('state','=','postponed')]"/>
+                        <separator/>
+                        <filter string="Semaine en cours" name="this_week"
+                                domain="[('date_deadline', u'&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
+                                         ('date', u'&lt;', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                        <filter string="Semaine prochaine" name="next_week"
+                                domain="[('date_deadline', u'&gt;=', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d')),
+                                         ('date', u'&lt;', (context_today() + datetime.timedelta(days=14-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                        <filter string="Mois en cours" name="this_month"
+                                domain="[('date_deadline', u'&gt;=', context_today().strftime('%Y-%m-01')),
+                                         ('date', u'&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d'))]"/>
+                        <filter string="Mois prochain" name="next_month"
+                                domain="[('date_deadline', u'&gt;=', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
+                                         ('date', u'&lt;', (context_today() + relativedelta(day=1,months=2)).strftime('%Y-%m-%d'))]"/>
                     </group>
                     <newline/>
                     <group>
                         <field name="name"/>
-                        <field name="date"/>
+                        <field name="date_date"/>
+                        <field name="date_date" string="Semaine intervention"
+                               context="{'of_date_search_mode':'week'}"/>
+                        <field name="date_date" string="Mois intervention"
+                               context="{'of_date_search_mode':'month'}"/>
                         <field name="duree"/>
                         <field name="user_id" widget="selection"/>
                         <field name="tache_id" widget="selection"/>
