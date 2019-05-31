@@ -267,7 +267,7 @@
         <record id="of_sale_product_form_view" model="ir.ui.view">
             <field name="name">of.sale.product.form.view</field>
             <field name="model">product.template</field>
-            <field name="inherit_id" ref="of_product.of_product_product_form_view"/>
+            <field name="inherit_id" ref="of_product.of_product_template_form_view"/>
             <field name="arch" type="xml">
                 <xpath expr="//group[@name='group_standard_price']/label[@for='of_seller_price']" position="attributes">
                     <attribute name="groups">of_sale.of_group_sale_marge_manager</attribute>

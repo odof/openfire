@@ -4,12 +4,16 @@
 <!--########################### ______ Produits ______ ###########################-->
 <!--##############################################################################-->
 
-        <record id="of_product_product_form_view" model="ir.ui.view">
+        <record id="of_product_template_form_view" model="ir.ui.view">
             <field name="name">of.product.template.common.form</field>
             <field name="model">product.template</field>
             <field name="inherit_id" ref="product.product_template_form_view"/>
             <field name="priority" eval="1"/>
             <field name="arch" type="xml">
+                <!-- étiquettes -->
+                <xpath expr="//field[@name='categ_id']" position="after">
+                    <field name="of_tag_ids" widget="many2many_tags"/>
+                </xpath>
                 <xpath expr="//group[@name='group_standard_price']" position="replace">
                     <group name="group_standard_price">
                         <separator string="Informations fournisseur" colspan="2"/>
@@ -63,6 +67,35 @@
             </field>
         </record>
 
+        <!-- Ajout des étiquettes sur la vue kanban -->
+        <record id="of_product_template_kanban_view" model="ir.ui.view">
+            <field name="name">of.product.template.product.kanban</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_kanban_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='currency_id']" position="after">
+                    <field name="of_tag_ids"/>
+                </xpath>
+                <xpath expr="//div[@class='o_kanban_image']" position="before">
+                    <div>
+                        <field name="of_tag_ids"/>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Ajout de la recherche sur étiquettes -->
+        <record id="of_product_template_search_view" model="ir.ui.view">
+            <field name="name">of.product.template.search</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_search_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='categ_id']" position="before">
+                    <field name="of_tag_ids"/>
+                </xpath>
+            </field>
+        </record>
+
 <!--##############################################################################-->
 <!--###################### ______ Infos Fournisseurs ______ ######################-->
 <!--##############################################################################-->
@@ -98,4 +131,77 @@
             </xpath>
         </field>
     </record>
+
+<!--##############################################################################-->
+<!--#################### ______ étiquettes d'articles ______ #####################-->
+<!--##############################################################################-->
+
+    <record id="of_product_tag_form_view" model="ir.ui.view">
+        <field name="name">of.product.template.tag.form</field>
+        <field name="model">of.product.template.tag</field>
+        <field name="arch" type="xml">
+            <form string="Étiquettes d'articles">
+            <sheet>
+                <div class="oe_button_box" name="button_box">
+                    <button name="toggle_active" type="object"
+                            class="oe_stat_button" icon="fa-archive">
+                        <field name="active" widget="boolean_button"
+                            options='{"terminology": "active"}'/>
+                    </button>
+                </div>
+                <div class="oe_title">
+                    <label class="oe_edit_only" for="name" string="Nom affiché"/>
+                    <h1><field name="name" placeholder="Nom de l'étiquette"/></h1>
+                </div>
+                <separator name="description" string="Description"/>
+                <field name="description" nolabel="1"/>
+            </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_product_tag_tree_view" model="ir.ui.view">
+        <field name="name">of.product.template.tag.tree</field>
+        <field name="model">of.product.template.tag</field>
+        <field name="arch" type="xml">
+            <tree string="Étiquettes d'article" colors="#A0A0A0:active==False;">
+                <field name="name"/>
+                <field name="description"/>
+                <field name="active" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_product_tag_search_view" model="ir.ui.view">
+        <field name="name">of.product.template.tag.search</field>
+        <field name="model">of.product.template.tag</field>
+        <field name="mode">primary</field>
+        <!--<field name="inherit_id" ref="product.product_template_search_view"/>-->
+        <field name="arch" type="xml">
+            <search string="Étiquettes d'article">
+                <field string="Nom affiché" name="name"/>
+                <field string="Description" name="description"/>
+                <separator/>
+                <filter string="Active" name="active" domain="[('active','=',True)]"/>
+                <filter string="Archivée" name="inactive" domain="[('active','=',False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_product_tag_action" model="ir.actions.act_window">
+        <field name="name">Étiquettes d'article</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.product.template.tag</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_type">form</field>
+        <field name="search_view_id" ref="of_product_tag_search_view"/>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Cliquez pour créer une nouvelle étiquette d'article.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_of_product_tag" name="Étiquettes" action="of_product_tag_action" parent="sale.prod_config_main" sequence="3"/>
+
 </odoo>
