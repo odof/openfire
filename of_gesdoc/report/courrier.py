@@ -25,12 +25,11 @@ class Courrier(report_sxw.rml_parse):
 
     # get client's company address
     def adr_get(self, partner):
-        pad_obj = self.pool.get('res.partner.address')
-        c_ids = pad_obj.search(self.cr, self.uid, [('partner_id', '=', partner.id)])
-        result = pad_obj.read(self.cr, self.uid, c_ids[0])
+        partner_obj = self.env['res.partner']
+        partner = partner_obj.browse(partner.id)
+        result = partner.read()[0]
         if result['title']:
-            pad = pad_obj.browse(self.cr, self.uid, c_ids[0])
-            result['title'] = pad.title and pad.title.shortcut or False
+            result['title'] = partner.title and partner.title.shortcut or False
         else:
             result['title'] = False
         return [result]

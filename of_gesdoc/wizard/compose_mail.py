@@ -113,7 +113,7 @@ class OfComposeMail(models.TransientModel):
             ('objet', o, ''),
         )
 
-        res = {key: getattr(obj, key, default) for key, obj, default in values}
+        res = {key: getattr(obj, key, default) or default for key, obj, default in values}
 
         res['date_confirm_order'] = res['confirmation_date']
         del res['confirmation_date']
