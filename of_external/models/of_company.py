@@ -53,4 +53,4 @@ class View(models.Model):
     @api.multi
     def render(self, values=None, engine='ir.qweb'):
         # Ajout de la possibilité d'appeler hasattr depuis une vue qweb
-        return super(View, self).render(dict(values, hasattr=hasattr), engine)
+        return super(View, self).render(dict(values or {}, hasattr=hasattr), engine)
