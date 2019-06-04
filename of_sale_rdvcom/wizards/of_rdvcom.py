@@ -69,6 +69,8 @@ class OFRDVCommercial(models.TransientModel):
             lead_id = self._context['active_ids'][0]
             lead = self.env["crm.lead"].browse(lead_id)
             commercial = lead.user_id
+            if self.env.user.company_id.id not in commercial.sudo().company_ids._ids:
+                return False
             return commercial
         elif active_model == "res.partner":
             partner_id = self._context['active_ids'][0]
@@ -76,6 +78,8 @@ class OFRDVCommercial(models.TransientModel):
             while partner.parent_id and not partner.user_id:
                 partner = partner.parent_id
             commercial = partner.user_id
+            if self.env.user.company_id.id not in commercial.sudo().company_ids._ids:
+                return False
             return commercial
         else:
             return False
@@ -121,13 +125,16 @@ class OFRDVCommercial(models.TransientModel):
     name = fields.Char(string=u'Libellé', size=64, required=False, default="Planifier RDVcom")
     description = fields.Html(string='Description')
     user_id = fields.Many2one('res.users', string=u"Compte Commercial", required=True, default=_default_user)
-    employee_id = fields.Many2one('hr.employee', string=u"Commercial", required=True, default=_default_employee)
+    employee_id = fields.Many2one(
+        'hr.employee', string=u"Commercial", required=True, default=_default_employee,
+        domain=lambda self:[('user_id.company_ids', 'child_of', self.env.user.company_id.id)],
+        help=u"La liste des employés proposés est constituée des employés qui ont accès à la société courante")
     duree = fields.Float(string=u'Durée du RDV', required=True, digits=(12, 2),default=1)
     creneau_ids = fields.One2many('of.rdv.commercial.line', 'wizard_id', string='Proposition de RDVs')
     date_propos = fields.Datetime(string=u'RDV Début')
     date_propos_hour = fields.Float(string=u'Heude de début', digits=(12, 5))
-    date_recherche_debut = fields.Date(string='À partir du', required=True, default=lambda *a: (d_date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
-    date_recherche_fin = fields.Date(string="Jusqu'au", required=True, default=lambda *a: (d_date.today() + timedelta(days=7)).strftime('%Y-%m-%d'))
+    date_recherche_debut = fields.Date(string=u'À partir du', required=True, default=lambda *a: (d_date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
+    date_recherche_fin = fields.Date(string=u"Jusqu'au", required=True, default=lambda *a: (d_date.today() + timedelta(days=7)).strftime('%Y-%m-%d'))
     partner_id = fields.Many2one('res.partner', string='Client', required=True, readonly=True, default=_default_partner)
     partner_name = fields.Char(related='partner_id.name')
     partner_child_ids = fields.One2many(related="partner_id.child_ids",readonly=True) # pour domain dans XML
