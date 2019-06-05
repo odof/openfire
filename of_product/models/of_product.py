@@ -33,6 +33,8 @@ class ProductTemplate(models.Model):
     of_seller_product_category_name = fields.Char(related="seller_ids.of_product_category_name")
     of_seller_delay = fields.Integer(related="seller_ids.delay")
 
+    of_tag_ids = fields.Many2many('of.product.template.tag', column1='product_id', column2='tag_id', string=u'Étiquettes')
+
     @api.multi
     @api.depends('lst_price', 'standard_price')
     def _compute_marge(self):
@@ -122,3 +124,13 @@ class ProductSupplierInfo(models.Model):
                 supinfo.remise = (pp_ht - supinfo.price) * 100.00 / pp_ht
             else:  # division par 0!
                 supinfo.remise = -100
+
+class ProductTemplateTag(models.Model):
+    _name = "of.product.template.tag"
+
+    name = fields.Char(string=u'Nom affiché', required=True, translate=True)
+    description = fields.Text(string="Description")
+    color = fields.Integer(string='Index Couleur')
+    active = fields.Boolean(default=True)
+    product_ids = fields.Many2many('product.template', column1='tag_id', column2='product_id', string='Produits')
+
