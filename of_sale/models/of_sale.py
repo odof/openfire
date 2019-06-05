@@ -223,7 +223,7 @@ class SaleOrder(models.Model):
                 values = compose_mail_obj._get_dict_values(self)
                 datas = {}
                 for chp in mail_template.chp_ids:
-                    datas[chp.name or ''] = chp.to_export and chp.value_openfire and chp.value_openfire % values
+                    datas[chp.name or ''] = chp.to_export and chp.value_openfire and chp.value_openfire % values or ''
                 attachment = attachment_obj.search([('res_model', '=', mail_template._name),
                                                     ('res_field', '=', 'file'),
                                                     ('res_id', '=', mail_template.id)])
@@ -521,6 +521,7 @@ class SaleOrderLine(models.Model):
 
     price_unit = fields.Float(digits=False)
     of_client_view = fields.Boolean(string="Vue client/vendeur", related="order_id.of_client_view")
+    of_article_principal = fields.Boolean(string="Article principal", help="Cet article est l'article principal de la commande")
 
     @api.multi
     @api.onchange('product_id')

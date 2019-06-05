@@ -60,6 +60,7 @@ class SaleQuoteLine(models.Model):
     product_uom_qty = fields.Float(u'Quantitée', required=True, digits=dp.get_precision('Product UoS'), default=1)
     product_uom_id = fields.Many2one('product.uom', u'Unité de mesure', required=True)
     of_active = fields.Boolean('Article actif', compute="_compute_active")
+    of_article_principal = fields.Boolean(string="Article principal", help="Cet article est l'article principal de la commande")
 
     @api.depends('product_id')
     def _compute_active(self):
@@ -129,6 +130,7 @@ class SaleOrder(models.Model):
             'product_id': line.product_id.id,
             'layout_category_id': line.layout_category_id,
             'product_uom': line.product_uom_id.id,
+            'of_article_principal': line.of_article_principal,
         }
         return data
 
