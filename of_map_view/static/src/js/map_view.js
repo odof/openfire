@@ -103,6 +103,7 @@ var MapView = View.extend({
                        80);
         // the index of the first displayed record (starting from 1)
         this.current_min = 1;
+        this.current_max = this._limit + this.current_min;
 
         this.data = undefined;
 
@@ -316,7 +317,7 @@ var MapView = View.extend({
                         }
                         self.map.nocontent_displayer.update_content();
                     });
-        }else if (this.records[offset] == undefined){  // get records from database
+        }else if (this.need_get_records()) {  // get records from database, origin == pager
             dfd_1 = this.get_records(offset, origin)
                     .then(function(){
                         var all_ids = self.records.map(x => x.id || undefined);
@@ -328,7 +329,7 @@ var MapView = View.extend({
                         layer_group.update_records(self.records);
                         layer_group.do_show_range(offset,false,true,true);
                     });
-        }else{  // records already loaded
+        }else{  // records already loaded, origin == pager
             var all_ids = self.records.map(x => x.id || undefined);
             var actual_ids = all_ids.filter(function(el){return !!el;})
 
@@ -348,6 +349,16 @@ var MapView = View.extend({
             .then(function(){
                 self.update_pager(offset + 1);
             });
+    },
+    /**
+     *  Checks if there is at least one record that we need to get from database
+     */
+    need_get_records: function() {
+        for (var i=this.current_min-1; i<this.current_max; i++) {
+            if (this.records[i] == undefined) {
+                return true;
+            }
+        }
     },
     /**
      *  get records from database and update self.records
@@ -372,7 +383,10 @@ var MapView = View.extend({
                     }
                     for (var i = 0; i < records.length; ++i) {
                         var le_index = i + offset;
-                        self.records[le_index] = records[i];
+                        if (self.records[le_index] == undefined && records[i] != undefined) {
+                            self.records[le_index] = records[i];
+                            // console.log("new record in list");  // tu peux décommenter ça pour tes tests ;)
+                        }
                     }
                     return $.when();
                 });
@@ -498,19 +512,12 @@ var MapView = View.extend({
             var self = this;
 
             this.pager.on('pager_changed', this, function (new_state) {
-                //console.log("pager_changed: ",this.pager);
-                
-                var limit_changed = (self._limit !== new_state.limit);
                 var layer_group = self.map.layer_groups[self.map.current_layer_group_index];
                 self.current_min = new_state.current_min;
-                if (limit_changed) {
-                    layer_group._limit = new_state.limit;
-                    self._limit = new_state.limit;
-                    var current_max = this.pager.state.current_max;
-                    self.load_records(self.current_min - 1, origin="pager");
-                }else{
-                    self.load_records(self.current_min - 1, origin="pager");
-                }
+                self.current_max = self.pager.state.current_max;
+                self._limit = new_state.limit;
+                layer_group._limit = new_state.limit;
+                self.load_records(self.current_min - 1, origin="pager");
             });
         }
     },
@@ -914,6 +921,7 @@ MapView.LayerGroup = Widget.extend({
         this._limit = map.view._limit;
         // the index of the first displayed record (starting from 1)
         this.current_min = 1;
+        this.current_max = this.current_min + this._limit;
         //this.pages = {};
 
         this.visible = this.options.visible;
@@ -924,12 +932,13 @@ MapView.LayerGroup = Widget.extend({
         //console.log("MapView.LayerGroup this: ",this);
     },
     /**
-     *
+     *  looks like this one is never used? les arcanes du javascript sont souvent impénétrables!
      */
     update_records: function(new_records) {
         for (var i=0; i<this.records.length; i++) {
             if (this.records[i] == undefined && new_records[i] != undefined) {
                 this.records[i] = new_records[i];
+                console.log("new record in list (layergroup): IT IS USED");
             }
         }
     },
