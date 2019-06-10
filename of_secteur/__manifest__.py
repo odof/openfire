@@ -14,14 +14,14 @@
 
 {
     'name' : "OpenFire / Secteur",
-    'version' : "0.1.0.0",
+    'version' : "10.0.1.0.0",
     'author' : "OpenFire",
     'website' : "www.openfire.fr",
     'category': "",
-    'summary': u"Ajout des secteur",
+    'summary': u"Ajout des secteurs",
     'description': u"""
 Module OpenFire / Secteur
-===============================
+=========================
 Ce module ajoute la notion de secteur
 
 """,

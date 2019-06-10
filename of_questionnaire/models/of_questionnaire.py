@@ -142,7 +142,7 @@ class OfParcInstalle(models.Model):
             self.question_ids.new(vals)
         self.questionnaire_id = False
 
-class OfPlanningInterventionQuestion(models.Model):
+class OfParcInstalleQuestion(models.Model):
     _name = "of.parc.installe.question"
     _order = "type, sequence"
 
