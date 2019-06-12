@@ -18,7 +18,6 @@ class OfPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
     tournee_id = fields.Many2one('of.planning.tournee', compute='_compute_tournee_id', store=True, string='Planification')
-    partner_city = fields.Char(related='address_id.city', store=True)
 
     @api.multi
     @api.depends('equipe_id', 'date', 'tournee_id.date', 'tournee_id.equipe_id')
