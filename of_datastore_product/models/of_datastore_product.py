@@ -5,6 +5,7 @@ from odoo.exceptions import UserError, ValidationError
 from odoo.osv.expression import NEGATIVE_TERM_OPERATORS, TERM_OPERATORS_NEGATION, TRUE_LEAF, FALSE_LEAF
 from odoo.tools.safe_eval import safe_eval
 
+import copy
 from contextlib import contextmanager
 from threading import Lock
 DATASTORE_IND = 100000000  # 100.000.000 ids devraient suffire pour les produits. Les chiffres suivants serviront pour le fournisseur
@@ -945,7 +946,7 @@ class OfDatastoreCentralized(models.AbstractModel):
         if 'of_datastore_product_search' not in domain:
             return False, domain
 
-        domain = [arg for arg in domain if arg != 'of_datastore_product_search']
+        domain = [copy.copy(arg) for arg in domain if arg != 'of_datastore_product_search']
 
         # Recherche des marques
         brand_domain = []
@@ -1027,9 +1028,7 @@ class OfDatastoreCentralized(models.AbstractModel):
 
         result = False
         if obj._name == 'of.product.brand':
-            # La correspondance des marques se fait sur le nom
-            result = (left, new_operator, obj.mapped('name'))
-
+            result = (left, new_operator, obj.mapped('datastore_brand_id'))
         return result
 
     @api.model
