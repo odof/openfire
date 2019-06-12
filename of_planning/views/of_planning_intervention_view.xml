@@ -239,7 +239,7 @@
                     <field name="equipe_id"/>
                     <field name="tache_id"/>
                     <field name="address_id"/>
-                    <field name="partner_city"/>
+                    <field name="address_city"/>
                     <field name="company_id"/>
                     <field name="state"/>
                     <field name="tag_ids" widget="many2many_tags"/>

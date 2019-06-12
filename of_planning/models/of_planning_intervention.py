@@ -124,9 +124,11 @@ class OfPlanningIntervention(models.Model):
     user_id = fields.Many2one('res.users', string='Utilisateur', default=lambda self: self.env.uid)
     partner_id = fields.Many2one('res.partner', string='Client', compute='_compute_partner_id', store=True)
     address_id = fields.Many2one('res.partner', string='Adresse')
-    partner_city = fields.Char(related='address_id.city', string="Ville")
+    address_city = fields.Char(related='address_id.city', string="Ville",oldname="partner_city")
+    address_zip = fields.Char(related='address_id.zip')
     raison_id = fields.Many2one('of.planning.intervention.raison', string='Raison')
     tache_id = fields.Many2one('of.planning.tache', string='Tâche', required=True)
+    tache_name = fields.Char(related='tache_id.name')
     equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe', required=True, oldname='poseur_id')
     employee_ids = fields.Many2many(related='equipe_id.employee_ids', string='Intervenants', readonly=True)
     state = fields.Selection([

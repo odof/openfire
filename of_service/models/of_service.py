@@ -128,8 +128,8 @@ class OfService(models.Model):
     date_fin = fields.Date(u"Date d'échéance")
 
     # Partner-related fields
-    partner_zip = fields.Char('Code Postal', size=24, related='address_id.zip')
-    partner_city = fields.Char('Ville', related='address_id.city')
+    address_zip = fields.Char('Code Postal', size=24, related='address_id.zip', oldname="partner_zip")
+    address_city = fields.Char('Ville', related='address_id.city', oldname="partner_city")
 
     state = fields.Selection([
         ('progress', 'En cours'),
