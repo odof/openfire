@@ -4,6 +4,7 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
 import odoo.addons.decimal_precision as dp
+from datetime import date
 import time
 
 class OfWizardSituation(models.TransientModel):
@@ -261,7 +262,8 @@ class OfWizardSituation(models.TransientModel):
 
     @api.multi
     def of_get_report_date(self, docs):
-        return fields.Date.today()
+        lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
+        return date.today().strftime(lang.date_format)
 
 class OfWizardSituationLine(models.TransientModel):
     _name = "of.wizard.situation.line"
