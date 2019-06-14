@@ -34,7 +34,7 @@
                     <field name="geo_lat" invisible="1"/>
                     <field name="geo_lng" invisible="1"/>
                     <field name="precision" invisible="1"/>
-                    <group name="informations de recherche" col="4">
+                    <group colspan="4" col="4">
                         <separator string="Informations" colspan="4"/>
 
                         <group colspan="2" col="2">
@@ -77,79 +77,49 @@
                                     La durée prise en compte est la durée totale (aller-retour).
                                 </i>
                             </div>
-
                         </group>
                     </group>
-                    <group name="propositions" col="4" attrs="{'invisible':[('display_res','!=',True)]}">
-                        <separator string="Résultat" colspan="4" attrs="{'invisible':['|',('zero_dispo','!=',False),('zero_result','!=',False)]}"/>
-                        <separator string="Aucun résultat suffisament proche" colspan="4" attrs="{'invisible':[('zero_dispo','!=',True)]}"/>
-                        <separator string="Aucun résultat" colspan="4" attrs="{'invisible':[('zero_result','!=',True)]}"/>
-                        <field name="planning_ids" mode="calendar" colspan="4" nolabel="1">
-                            <calendar string="Calendrier" date_start="debut_dt" color="equipe_id" date_stop="fin_dt" all_day="allday"
-                                attendee_model="of.planning.equipe" color_ft_field="color_ft" color_bg_field="color_bg" custom_colors="1"
-                                working_hours="1" filters_radio="1" dispo_field="disponible" show_first_evt="1" display_states="1"
-                                force_color_field="force_color" selected_field="selected">
-                                <field name="name"/>
-                                <field name="distance" suffix=" km"/>
-                                <field name="duree" suffix=" min"/>
-                                <field name="state_int" invisible="1"/>
-                                <field name="disponible" invisible="1"/>
-                                <field name="force_color" invisible="1"/>
-                                <field name="selected" invisible="1"/>
-                                <field name="color_ft" invisible="1"/>
-                                <field name="color_bg" invisible="1"/>
-                            </calendar>
-                            <form string="Créneau">
-                                <script>
-                                    $(document).ready(function(){
-                                        // Cacher les boutons "Sauvegarder" et "Annuler" quand on clique sur un créneau du calendrier
-                                        var len = $(".modal-footer").length;
-                                        $(".modal-footer").eq(len-1).hide();
-                                    });
-                                </script>
-                                <field name="allday" invisible="1"/>
-                                <group attrs="{'invisible':[('allday','!=',False)]}">
-                                    <group>
-                                        <field name="date" readonly="1"/>
-                                        <field name="description" readonly="1"/>
-                                        <field name="equipe_id" readonly="1"/>
-                                        <field name="intervention_id" readonly="1" attrs="{'invisible':[('intervention_id','=',False)]}"/>
-                                        <field name="disponible" readonly="1"/>
-                                    </group>
-                                    <group>
-                                        <field name="dist_prec" readonly="1"/>
-                                        <field name="dist_suiv" readonly="1"/>
-                                        <field name="distance" readonly="1"/>
-                                    </group>
-                                    <group>
-                                        <field name="geo_lat" readonly="1"/>
-                                        <field name="geo_lng" readonly="1"/>
-                                        <field name="precision" readonly="1"/>
-                                    </group>
-                                    <group>
-                                        <field name="duree_prec" readonly="1"/>
-                                        <field name="duree_suiv" readonly="1"/>
-                                        <field name="duree" readonly="1"/>
-                                    </group>
-                                    <group attrs="{'invisible':['|',('intervention_id','!=',False),('selected','!=',True)]}" colspan="2" col="4">
-                                        <field name="selected" invisible="1" readonly="1"/>
-                                        <field name="selected_hour" widget="float_time"/>
-                                    </group>
-                                    <label for="selected_description" colspan="2" attrs="{'invisible':['|',('intervention_id','!=',False),('selected','!=',True)]}"/>
-                                    <field name="selected_description" nolabel="1" colspan="2" widget="html" attrs="{'invisible':['|',('intervention_id','!=',False),('selected','!=',True)]}"/>
-                                </group>
-                                <div attrs="{'invisible':[('allday','!=',True)]}">
-                                    Ce créneau est virtuel. Il existe seulement pour montrer les limites de la recherche.
-                                </div>
-                                <footer>
-                                    <button name="button_select" string="Sélectionner ce créneau" type="object" colspan="4" class="btn-primary"
-                                        attrs="{'invisible': ['|','|',('allday','!=',False),('intervention_id','!=',False),('selected','!=',False)]}"/>
-                                    <button name="button_confirm" string="Confirmer le RDV" type="object" colspan="4" class="btn-primary"
-                                        attrs="{'invisible': [('selected','!=',True)]}"/>
-                                </footer>
-                            </form>
-                        </field>
-                    </group>
+                    <notebook colspan="4">
+                        <page string="Calendrier" name="propositions" col="4" attrs="{'invisible':[('display_res','!=',True)]}">
+                            <separator string="Résultat" colspan="4" attrs="{'invisible':['|',('zero_dispo','!=',False),('zero_result','!=',False)]}"/>
+                            <separator string="Aucun résultat suffisament proche" colspan="4" attrs="{'invisible':[('zero_dispo','!=',True)]}"/>
+                            <separator string="Aucun résultat" colspan="4" attrs="{'invisible':[('zero_result','!=',True)]}"/>
+                            <field name="planning_ids" mode="calendar" colspan="4" nolabel="1">
+                                <calendar string="Calendrier" date_start="debut_dt" color="equipe_id" date_stop="fin_dt" all_day="allday"
+                                    attendee_model="of.planning.equipe" color_ft_field="color_ft" color_bg_field="color_bg" custom_colors="1"
+                                    working_hours="1" filters_radio="1" dispo_field="disponible" jump_to="selected" display_states="1"
+                                    force_color_field="force_color" selected_field="selected">
+                                    <field name="name"/>
+                                    <field name="distance" suffix=" km"/>
+                                    <field name="duree" suffix=" min"/>
+                                    <field name="state_int" invisible="1"/>
+                                    <field name="disponible" invisible="1"/>
+                                    <field name="force_color" invisible="1"/>
+                                    <field name="selected" invisible="1"/>
+                                    <field name="color_ft" invisible="1"/>
+                                    <field name="color_bg" invisible="1"/>
+                                </calendar>
+                            </field>
+                        </page>
+                        <page string="Liste" name="propositions_tree" col="4" attrs="{'invisible':[('display_res','!=',True)]}">
+                            <separator string="Résultat" colspan="4" attrs="{'invisible':['|',('zero_dispo','!=',False),('zero_result','!=',False)]}"/>
+                            <separator string="Aucun résultat suffisament proche" colspan="4" attrs="{'invisible':[('zero_dispo','!=',True)]}"/>
+                            <separator string="Aucun résultat" colspan="4" attrs="{'invisible':[('zero_result','!=',True)]}"/>
+                            <field name="planning_tree_ids" mode="tree" colspan="4" nolabel="1">
+                                <tree create="false" delete="false" colors="blue: selected==True;">
+                                    <field name="allday" invisible="1"/>
+                                    <field name="disponible" invisible="1"/>
+                                    <field name="selected" invisible="1"/>
+                                    <field name="date"/>
+                                    <field name="equipe_id"/>
+                                    <field name="description" string="Créneau"/>
+                                    <field name="distance" string="Distance"/>
+                                    <field name="duree" string="Durée"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+
                     <footer>
                         <button name="button_calcul" string="Rechercher" type="object" colspan="4" class="btn-primary"
                                 attrs="{'invisible': [('date_propos','!=',False)]}"/>
@@ -169,24 +139,53 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Créneau">
-                    <group>
+                    <script>
+                        $(document).ready(function(){
+                            // Cacher les boutons "Sauvegarder" et "Annuler" quand on clique sur un créneau du calendrier
+                            var len = $(".modal-footer").length;
+                            $(".modal-footer").eq(len-1).hide();
+                        });
+                    </script>
+                    <field name="allday" invisible="1"/>
+                    <group attrs="{'invisible':[('allday','!=',False)]}">
                         <group>
-                            <field name="date"/>
+                            <field name="date" readonly="1"/>
                             <field name="description" readonly="1"/>
                             <field name="equipe_id" readonly="1"/>
-                            <field name="intervention_id" readonly="1"/>
+                            <field name="intervention_id" readonly="1" attrs="{'invisible':[('intervention_id','=',False)]}"/>
+                            <field name="disponible" readonly="1"/>
                         </group>
                         <group>
-                            <field name="dist_prec"/>
-                            <field name="dist_suiv"/>
-                            <field name="distance"/>
+                            <field name="dist_prec" readonly="1"/>
+                            <field name="dist_suiv" readonly="1"/>
+                            <field name="distance" readonly="1"/>
                         </group>
                         <group>
-                            <field name="geo_lat"/>
-                            <field name="geo_lng"/>
-                            <field name="precision"/>
+                            <field name="geo_lat" readonly="1"/>
+                            <field name="geo_lng" readonly="1"/>
+                            <field name="precision" readonly="1"/>
                         </group>
+                        <group>
+                            <field name="duree_prec" readonly="1"/>
+                            <field name="duree_suiv" readonly="1"/>
+                            <field name="duree" readonly="1"/>
+                        </group>
+                        <group attrs="{'invisible':['|',('intervention_id','!=',False),('selected','!=',True)]}" colspan="2" col="4">
+                            <field name="selected" invisible="1" readonly="1"/>
+                            <field name="selected_hour" widget="float_time"/>
+                        </group>
+                        <label for="selected_description" colspan="2" attrs="{'invisible':['|',('intervention_id','!=',False),('selected','!=',True)]}"/>
+                        <field name="selected_description" nolabel="1" colspan="2" widget="html" attrs="{'invisible':['|',('intervention_id','!=',False),('selected','!=',True)]}"/>
                     </group>
+                    <div attrs="{'invisible':[('allday','!=',True)]}">
+                        Ce créneau est virtuel. Il existe seulement pour montrer les limites de la recherche.
+                    </div>
+                    <footer>
+                        <button name="button_select" string="Sélectionner ce créneau" type="object" colspan="4" class="btn-primary"
+                            attrs="{'invisible': ['|','|',('allday','!=',False),('intervention_id','!=',False),('selected','!=',False)]}"/>
+                        <button name="button_confirm" string="Confirmer le RDV" type="object" colspan="4" class="btn-primary"
+                            attrs="{'invisible': [('selected','!=',True)]}"/>
+                    </footer>
                 </form>
             </field>
         </record>
