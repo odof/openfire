@@ -337,6 +337,8 @@ class OFRDVCommercial(models.TransientModel):
         self.ensure_one()
         if self.hor_md and self.hor_mf and self.hor_md > self.hor_mf:
             raise UserError(u"L'Heure de début de matinée doit être antérieure à l'heure de fin de matinée")
+        if self.hor_md and self.hor_md < 0:
+            raise UserError(u"L'Heure de début de matinée doit être supérieure à 0")
 
     @api.onchange('hor_mf')
     def _onchange_hor_mf(self):
@@ -359,11 +361,13 @@ class OFRDVCommercial(models.TransientModel):
         self.ensure_one()
         if self.hor_ad and self.hor_af and self.hor_ad > self.hor_af:
             raise UserError(u"L'Heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi")
+        if self.hor_af and self.hor_af > 24:
+            raise UserError(u"L'Heure de fin d'après-midi doit être inférieure ou égale à 24")
 
     @api.multi
     def _check_horaires(self):
         self.ensure_one()
-        return self.hor_md <= self.hor_mf and self.hor_mf <= self.hor_ad and self.hor_af
+        return self.hor_md >= 0 and self.hor_md <= self.hor_mf and self.hor_mf <= self.hor_ad and self.hor_ad <= self.hor_af and self.hor_af <= 24
 
     @api.model
     def get_working_hours_fields(self):
