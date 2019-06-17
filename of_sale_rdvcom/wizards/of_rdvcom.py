@@ -16,11 +16,6 @@ ROUTING_BASE_URL = u"http://s-hotel.openfire.fr:5000/"
 ROUTING_VERSION = u"v1"
 ROUTING_PROFILE = u"driving"
 
-"""PICK_MODES = [
-    ('date', u'Au plus tôt'),
-    ('distance', u'Au plus proche'),
-]"""
-
 @api.model
 def _tz_get(self):
     # put POSIX 'Etc/*' entries at the end to avoid confusing users - see bug 1086728
@@ -36,7 +31,7 @@ class OFRDVCommercial(models.TransientModel):
     _description = u'Prise de RDV commercial'
 
     @api.model
-    def _default_partner(self): ###a verif
+    def _default_partner(self):
         active_model = self._context.get('active_model', '')
         partner_id = False
         if active_model == "res.partner":
@@ -54,7 +49,7 @@ class OFRDVCommercial(models.TransientModel):
         return False
 
     @api.model
-    def _default_lead(self): ###a verif
+    def _default_lead(self):
         active_model = self._context.get('active_model', '')
         lead = False
         if active_model == "crm.lead":
@@ -143,7 +138,6 @@ class OFRDVCommercial(models.TransientModel):
     date_display = fields.Char(string='Jour du RDV', size=64, readonly=True)
     lead_id = fields.Many2one('crm.lead', string='Opportunité', default=_default_lead, domain="[('partner_id', '=', partner_id)]")
     mode_recherche = fields.Selection(SEARCH_MODES, string="Mode de recherche", required=True, default="distance")
-    #mode_result = fields.Selection(PICK_MODES, string="Choix de la proposition", required=True, default="distance")
     max_recherche = fields.Float(string="Maximum", digits=(12, 0))
     allday = fields.Boolean('All Day', default=False)
     hor_md = fields.Float(string=u'Matin début', required=True, digits=(12, 1),default=9)
@@ -492,7 +486,8 @@ class OFRDVCommercial(models.TransientModel):
             'date_flo_deadline': 23.9,
             'date': d_avant_recherche,
             'wizard_id': self.id,
-            #'user_id': self.user_id.id,
+            'user_id': self.user_id.id,
+            'employee_id': self.employee_id.id,
             'user_partner_id': self.user_id.partner_id.id,
             'calendar_id': False,
             'disponible': False,
@@ -508,7 +503,8 @@ class OFRDVCommercial(models.TransientModel):
             'date_flo_deadline': 23.9,
             'date': d_apres_recherche,
             'wizard_id': self.id,
-            #'user_id': self.user_id.id,
+            'user_id': self.user_id.id,
+            'employee_id': self.employee_id.id,
             'user_partner_id': self.user_id.partner_id.id,
             'calendar_id': False,
             'disponible': False,
@@ -616,7 +612,8 @@ class OFRDVCommercial(models.TransientModel):
                     'date': str_d_recherche,
                     'description': description,
                     'wizard_id': self.id,
-                    #'user_id': self.user_id.id,
+                    'user_id': self.user_id.id,
+                    'employee_id': self.employee_id.id,
                     'user_partner_id': self.user_id.partner_id.id,
                     'calendar_id': False,
                     'ignorer_geo': self.ignorer_geo,
@@ -640,7 +637,8 @@ class OFRDVCommercial(models.TransientModel):
                         'date': str_d_recherche,
                         'description': description,
                         'wizard_id': self.id,
-                        #'user_id': event.user_id.id,
+                        'user_id': self.user_id.id,
+                        'employee_id': self.employee_id.id,
                         'user_partner_id': self.user_id.partner_id.id,
                         'calendar_id': event.id,
                         'categ_ids': [(4,le_id,False) for le_id in event.categ_ids._ids],
@@ -711,6 +709,8 @@ class OFRDVCommercial(models.TransientModel):
     @api.multi
     def button_confirm(self):
         self.ensure_one()
+        if self.creneau_ids[0].employee_id.id != self.employee_id:
+            raise UserError(u"Il semblerait que vous ayez changé le commercial depuis votre dernière recherche. Veuillez relancer la recherche ou rétablir le commercial précédent (%s)" % self.creneau_ids[0].employee_id.name)
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')
         tz = pytz.timezone(self._context['tz'])
@@ -916,8 +916,8 @@ class OfRDVCommercialLine(models.TransientModel):
     date_flo_deadline = fields.Float(string='Date', required=True, digits=(12, 5))
     description = fields.Char(string='Plage horaire', size=128)
     wizard_id = fields.Many2one('of.rdv.commercial', string="RDV", required=True, ondelete='cascade')
-    user_id = fields.Many2one(related="wizard_id.user_id")
-    employee_id = fields.Many2one(related="wizard_id.employee_id")
+    user_id = fields.Many2one('res.users', string="Compte utilisateur")
+    employee_id = fields.Many2one('hr.employee', string="Commercial")
     user_partner_id = fields.Many2one('res.partner',string="user partner")
     partner_ids = fields.Many2many('res.partner', 'calendar_event_res_rdvcom_rel', string='Attendees')
     calendar_id = fields.Many2one('calendar.event', string="Planning")
