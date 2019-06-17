@@ -21,8 +21,63 @@ except ImportError:
 
 NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
 
+class OfDocumentsJoints(models.AbstractModel):
+    """ Classe abstraite qui permet d'ajouter les documents joints.
+    Elle doit être surchargée pour ajouter d'autres rapports dans la fonction _allowed_reports
+    et être en héritage pour la classe sur laquelle on veut ajouter la fonctionnalité.
+    """
+    _name = 'of.documents.joints'
+
+    of_mail_template_ids = fields.Many2many("of.mail.template", string="Documents joints", help=u"Intégrer des documents pdf au devis/bon de commande (exemple : CGV)")
+
+    @api.model
+    def _allowed_reports(self):
+        """
+        Fonction qui affecte un nom de rapport à un modèle.
+        Si le nom de rapport imprimé n'est pas dans la liste de clés du dictionnaire,
+        alors les documents joints ne seront pas imprimés.
+        :return: {'nom_du_rapport' : modèle.concerné'}
+        """
+        return {'sale.report_saleorder': 'sale.order', 'account.report_invoice': 'account.invoice'}
+
+    @api.multi
+    def _detect_doc_joint(self):
+        """
+        Cette fonction retourne les données des documents à joindre au fichier pdf du devis/commande au format binaire.
+        Le document retourné correspond au fichier pdf joint au modéle de courrier.
+        @todo: Permettre l'utilisation de courriers classiques et le remplissage des champs.
+        :return: liste des documents à ajouter à la suite du rapport
+        """
+        self.ensure_one()
+        compose_mail_obj = self.env['of.compose.mail']
+        attachment_obj = self.env['ir.attachment']
+        data = []
+        for mail_template in self.of_mail_template_ids:
+            if mail_template.file:
+                # Utilisation des documents pdf fournis
+                if not mail_template.chp_ids:
+                    data.append(mail_template.file)
+                    continue
+                # Calcul des champs remplis sur le modèle de courrier
+                values = compose_mail_obj._get_dict_values(self)
+                datas = {}
+                for chp in mail_template.chp_ids:
+                    datas[chp.name or ''] = chp.to_export and chp.value_openfire and chp.value_openfire % values
+                attachment = attachment_obj.search([('res_model', '=', mail_template._name),
+                                                    ('res_field', '=', 'file'),
+                                                    ('res_id', '=', mail_template.id)])
+                file_path = attachment_obj._full_path(attachment.store_fname)
+                generated_pdf = pypdftk.fill_form(file_path, datas, flatten=not mail_template.fillable)
+                os.rename(generated_pdf, generated_pdf + '.pdf')
+                with open(generated_pdf + '.pdf', "rb") as encode:
+                    encoded_file = base64.b64encode(encode.read())
+                data.append(encoded_file)
+        return data
+
+
 class SaleOrder(models.Model):
-    _inherit = 'sale.order'
+    _name = 'sale.order'
+    _inherit = ['sale.order', 'of.documents.joints']
 
     def pdf_afficher_multi_echeances(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_afficher_multi_echeances')
@@ -69,7 +124,6 @@ class SaleOrder(models.Model):
     of_notes_facture = fields.Html(string="Notes facture", oldname="of_notes_factures")
     of_notes_intervention = fields.Html(string="Notes intervention")
     of_notes_client = fields.Text(related='partner_id.comment', string="Notes client", readonly=True)
-    of_mail_template_ids = fields.Many2many("of.mail.template", string=u"Insérer documents", help=u"Intégrer des documents pdf au devis/bon de commande (exemple : CGV)")
 
     of_total_cout = fields.Monetary(compute='_compute_of_marge', string='Prix de revient')
     of_marge_pc = fields.Float(compute='_compute_of_marge', string='Marge %')
@@ -201,39 +255,6 @@ class SaleOrder(models.Model):
             cout = order.amount_untaxed - order.margin
             order.of_total_cout = cout
             order.of_marge_pc = 100 * (1 - cout / order.amount_untaxed) if order.amount_untaxed else -100
-
-    @api.multi
-    def _detect_doc_joint(self):
-        """
-        Cette fonction retourne les données des documents à joindre au fichier pdf du devis/commande au format binaire.
-        Le document retourné correspond au fichier pdf joint au modéle de courrier.
-        @todo: Permettre l'utilisation de courriers classiques et le remplissage des champs.
-        """
-        self.ensure_one()
-        compose_mail_obj = self.env['of.compose.mail']
-        attachment_obj = self.env['ir.attachment']
-        data = []
-        for mail_template in self.of_mail_template_ids:
-            if mail_template.file:
-                # Utilisation des documents pdf fournis
-                if not mail_template.chp_ids:
-                    data.append(mail_template.file)
-                    continue
-                # calcul des champs remplis sur le modèle de courrier
-                values = compose_mail_obj._get_dict_values(self)
-                datas = {}
-                for chp in mail_template.chp_ids:
-                    datas[chp.name or ''] = chp.to_export and chp.value_openfire and chp.value_openfire % values or ''
-                attachment = attachment_obj.search([('res_model', '=', mail_template._name),
-                                                    ('res_field', '=', 'file'),
-                                                    ('res_id', '=', mail_template.id)])
-                file_path = attachment_obj._full_path(attachment.store_fname)
-                generated_pdf = pypdftk.fill_form(file_path, datas, flatten=not mail_template.fillable)
-                os.rename(generated_pdf, generated_pdf + '.pdf')
-                with open(generated_pdf + '.pdf', "rb") as encode:
-                    encoded_file = base64.b64encode(encode.read())
-                data.append(encoded_file)
-        return data
 
     def toggle_view(self):
         """ Permet de basculer entre la vue vendeur/client
@@ -455,16 +476,18 @@ class SaleOrder(models.Model):
         invoice_vals["of_date_vt"] = self.of_date_vt
         return invoice_vals
 
+
 class Report(models.Model):
     _inherit = "report"
 
     @api.model
     def get_pdf(self, docids, report_name, html=None, data=None):
         result = super(Report, self).get_pdf(docids, report_name, html=html, data=data)
-        if report_name in ('sale.report_saleorder',):
+        allowed_reports = self.env['of.documents.joints']._allowed_reports()
+        if report_name in allowed_reports:
             # On ajoute au besoin les documents joint
-            order = self.env['sale.order'].browse(docids)[0]
-            for mail_data in order._detect_doc_joint():
+            model = self.env[allowed_reports[report_name]].browse(docids)[0]
+            for mail_data in model._detect_doc_joint():
                 if mail_data:
                     # Create temp files
                     fd1, order_pdf = tempfile.mkstemp()
@@ -522,8 +545,6 @@ class OFInvoiceReportTotalGroup(models.Model):
                                             l.product_id.categ_id in self.categ_ids)
 
 
-
-
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
@@ -564,6 +585,7 @@ class SaleOrderLine(models.Model):
                     name = ']'.join(splitted).strip()
         return name.split("\n")  # utilisation t-foreach dans template qweb
 
+
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
@@ -582,6 +604,7 @@ class AccountInvoiceLine(models.Model):
             self.name += '\n' + product.description_fabricant
         return res
 
+
 class Company(models.Model):
     _inherit = 'res.company'
 
@@ -594,6 +617,7 @@ class Company(models.Model):
         ], string="afficher descr. fabricant", default='devis_factures',
         help="La description du fabricant d'un article sera ajoutée à la description de l'article dans les documents."
     )
+
 
 class OFSaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'
@@ -692,8 +716,10 @@ class OFSaleConfiguration(models.TransientModel):
     def set_pdf_afficher_multi_echeances_defaults(self):
         return self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_afficher_multi_echeances', self.pdf_afficher_multi_echeances)
 
+
 class AccountInvoice(models.Model):
-    _inherit = "account.invoice"
+    _name = 'account.invoice'
+    _inherit = ["account.invoice", "of.documents.joints"]
 
     of_date_vt = fields.Date(string="Date visite technique")
     of_sale_order_ids = fields.Many2many('sale.order', compute="_compute_of_sale_order_ids", string="Bons de commande")
@@ -817,6 +843,7 @@ class AccountConfigSettings(models.TransientModel):
     def set_of_color_bg_section_defaults(self):
         return self.env['ir.values'].sudo().set_default('account.config.settings', 'of_color_bg_section', self.of_color_bg_section)
 
+
 class OFSaleEcheance(models.Model):
     _name = "of.sale.echeance"
     _order = "order_id, sequence, id"
@@ -855,6 +882,7 @@ class OFSaleEcheance(models.Model):
         if float_compare(self.percent, test_percent, precision_rounding=.01):
             self.amount = order_amount * self.percent / 100
 
+
 class AccountPaymentTermLine(models.Model):
     _inherit = "account.payment.term.line"
 
@@ -866,6 +894,7 @@ class AccountPaymentTermLine(models.Model):
                 i += 1
                 break
         return result[:i] + [('order', 'Date de commande')] + result[i:]
+
 
 class SaleLayoutCategory(models.Model):
     _inherit = 'sale.layout_category'
