@@ -170,7 +170,7 @@ class AccountPaymentTerm(models.Model):
             if float_is_zero(amt, precision_rounding=prec):
                 dates['previous'] = line.of_compute_line_date(dates)
             else:
-                if force_dates and force_dates[i]:
+                if force_dates and len(force_dates) > i and force_dates[i]:
                     dates['previous'] = fields.Date.from_string(force_dates[i])
                 else:
                     dates['previous'] = line.of_compute_line_date(dates)
