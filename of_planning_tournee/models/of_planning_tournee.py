@@ -320,7 +320,7 @@ class OfPlanningTournee(models.Model):
 
         if vals.get('is_bloque'):
             if intervention_obj.search([('date', '>=', vals['date']), ('date', '<=', vals['date']),
-                                        ('state', 'in', ('draft', 'confirm', 'done')),
+                                        ('state', 'in', ('draft', 'confirm', 'done', 'unfinished')),
                                         ('equipe_id', '=', vals['equipe_id'])]):
                 raise ValidationError(u'Il existe déjà les interventions dans la journée de cette équipe')
         return super(OfPlanningTournee, self).create(vals)
@@ -334,7 +334,7 @@ class OfPlanningTournee(models.Model):
                 date_intervention = vals.get('date', tournee.date)
                 equipe_id = vals.get('equipe_id', tournee.equipe_id.id)
                 if intervention_obj.search([('date', '>=', date_intervention), ('date', '<=', date_intervention),
-                                            ('state', 'in', ('draft', 'confirm', 'done')),
+                                            ('state', 'in', ('draft', 'confirm', 'done', 'unfinished')),
                                             ('equipe_id', '=', equipe_id)]):
                     raise ValidationError(u'Il existe déjà les interventions dans la journée de cette équipe')
         return super(OfPlanningTournee, self).write(vals)

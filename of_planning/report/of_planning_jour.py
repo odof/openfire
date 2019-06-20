@@ -36,8 +36,10 @@ class OfPlanningJour(report_sxw.rml_parse):
 
         date_start = self.objects.date_start
 
-        # Recherche des taches de cette journee, sauf brouillons, reportees ou annulees
-        domain = [('date_deadline', '>=', date_start), ('date', '<=', date_start), ('equipe_id', '=', equipe.id), ('state', 'in', ('draft', 'confirm', 'done'))]
+        # Recherche des tâches de cette journée, sauf reportées ou annulées
+        domain = [('date_deadline', '>=', date_start), ('date', '<=', date_start),
+                  ('equipe_id', '=', equipe.id),
+                  ('state', 'in', ('draft', 'confirm', 'done', 'unfinished'))]
         interventions = intervention_obj.search(domain, order='date')
         return interventions
 

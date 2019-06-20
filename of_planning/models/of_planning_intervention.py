@@ -132,6 +132,7 @@ class OfPlanningIntervention(models.Model):
         ('draft', 'Brouillon'),
         ('confirm', u'Confirmé'),
         ('done', u'Réalisé'),
+        ('unfinished', u'Inachevé'),
         ('cancel', u'Annulé'),
         ('postponed', u'Reporté'),
         ], string=u'État', index=True, readonly=True, default='draft')
@@ -315,13 +316,13 @@ class OfPlanningIntervention(models.Model):
     @api.depends('state')
     def _compute_state_int(self):
         for interv in self:
-            if interv.state and interv.state == "draft":
+            if interv.state and interv.state == 'draft':
                 interv.state_int = 0
-            elif interv.state and interv.state == "confirm":
+            elif interv.state and interv.state == 'confirm':
                 interv.state_int = 1
-            elif interv.state and interv.state == "done":
+            elif interv.state and interv.state in ('done', 'unfinished'):
                 interv.state_int = 2
-            elif interv.state and interv.state in ("cancel", "postponed"):
+            elif interv.state and interv.state in ('cancel', 'postponed'):
                 interv.state_int = 3
 
     @api.depends('name', 'number')
@@ -352,7 +353,7 @@ class OfPlanningIntervention(models.Model):
     def get_state_int_map(self):
         v0 = {'label': 'Brouillon', 'value': 0}
         v1 = {'label': u'Confirmé', 'value': 1}
-        v2 = {'label': u'Réalisé', 'value': 2}
+        v2 = {'label': u'Réalisé / Inachevé', 'value': 2}
         v3 = {'label': u'Annulé / Reporté', 'value': 3}
         return (v0, v1, v2, v3)
 
@@ -390,6 +391,10 @@ class OfPlanningIntervention(models.Model):
         return self.write({'state': 'done'})
 
     @api.multi
+    def button_unfinished(self):
+        return self.write({'state': 'unfinished'})
+
+    @api.multi
     def button_postponed(self):
         return self.write({'state': 'postponed'})
 
@@ -400,32 +405,6 @@ class OfPlanningIntervention(models.Model):
     @api.multi
     def button_draft(self):
         return self.write({'state': 'draft'})
-
-    @api.multi
-    def change_state_after(self):
-        next_state = {
-            'draft'    : 'confirm',
-            'confirm'  : 'done',
-            'done'     : 'cancel',
-            'cancel'   : 'postponed',
-            'postponed': 'draft',
-        }
-        for intervention in self:
-            intervention.state = next_state[intervention.state]
-        return True
-
-    @api.multi
-    def change_state_before(self):
-        previous_state = {
-            'draft'    : 'postponed',
-            'confirm'  : 'draft',
-            'done'     : 'confirm',
-            'cancel'   : 'done',
-            'postponed': 'cancel',
-        }
-        for intervention in self:
-            intervention.state = previous_state[intervention.state]
-        return True
 
     @api.multi
     def do_verif_dispo(self):
@@ -445,7 +424,7 @@ class OfPlanningIntervention(models.Model):
     @api.multi
     def _affect_number(self):
         for interv in self:
-            if interv.template_id and interv.state in ('confirm', 'done', 'postponed') and not interv.number:
+            if interv.template_id and interv.state in ('confirm', 'done', 'unfinished', 'postponed') and not interv.number:
                 interv.write({'number': self.template_id.sequence_id.next_by_id()})
 
     @api.model

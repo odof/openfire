@@ -57,6 +57,7 @@
                         <filter string="Brouillon" name="state_draft" icon="terp-folder-violet" domain="[('state','=','draft')]"/>
                         <filter string="Confirmé" name="state_confirm" icon="gtk-no" domain="[('state','=','confirm')]"/>
                         <filter string="Réalisé" name="state_done" icon="terp-folder-blue" domain="[('state','=','done')]"/>
+                        <filter string="Inachevé" name="state_unfinished" icon="terp-folder-blue" domain="[('state','=','unfinished')]"/>
                         <filter string="Annulé" name="state_cancel" icon="terp-dialog-close-red" domain="[('state','=','cancel')]"/>
                         <filter string="Reporté" name="state_postponed" icon="terp-folder-green" domain="[('state','=','postponed')]"/>
                         <separator/>
@@ -118,9 +119,10 @@
                         Passer à
                         <button name="button_confirm" string="Confirmé" states="draft" type="object"/>
                         <button name="button_done" string="Réalisé" states="confirm" type="object"/>
+                        <button name="button_unfinished" string="Inachevé" states="confirm" type="object"/>
                         <button name="button_postponed" string="Reporté" states="confirm" type="object"/>
                         <button name="button_cancel" string="Annulé" states="draft,confirm" type="object"/>
-                        <button name="button_draft" string="Brouillon" states="done,confirm,cancel,postponed" type="object"/>
+                        <button name="button_draft" string="Brouillon" states="confirm,done,unfinished,cancel,postponed" type="object"/>
                         <field name="state" widget="statusbar" nolabel="1" statusbar_visible="draft,confirm,done" statusbar_colors='{"proforma":"blue","proforma2":"blue"}'/>
                         <div align="right" style="align:right;padding: 0px 18px 0px 0px;width:100%">
                             <field name="raison_id" widget="selection" context="{'tz': 'Europe/Paris'}" attrs="{'invisible':[('state', '!=', 'postponed')]}"/>
@@ -226,7 +228,7 @@
             <field name="name">of.planning.intervention.tree</field>
             <field name="model">of.planning.intervention</field>
             <field name="arch" type="xml" >
-                <tree string="Liste des interventions" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done'">
+                <tree string="Liste des interventions" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done';purple:state=='unfinished'">
                     <field name="name" string="Libellé"/>
                     <field name="user_id" invisible="1"/>
                     <field name="date"/>
@@ -238,14 +240,6 @@
                     <field name="partner_city"/>
                     <field name="company_id"/>
                     <field name="state"/>
-
-                    <!-- Afficher les flèches pour passer à d'autres statuts -->
-                    <button name="change_state_before" type="object" icon="gtk-go-back"/>
-                    <button name="change_state_after" type="object" icon="gtk-go-forward"/>
-
-                    <!-- Afficher l'icône quand le statut est confirmé et réalisé -->
-                    <button name="button_confirm" type="object" icon="gtk-no" attrs="{'invisible':[('state', '!=', 'confirm')]}"/>
-                    <button name="button_done" type="object" icon="gtk-apply" attrs="{'invisible':[('state', '!=', 'done')]}"/>
                     <field name="cleantext_description" string="Description"/>
                 </tree>
             </field>
@@ -566,7 +560,7 @@
             <field name="res_model">of.planning.intervention</field>
             <field name="view_type">form</field>
             <field name="view_mode">calendar,form,tree</field>
-            <field name="context">{'search_default_state_confirm':1,'search_default_state_done':1,'search_default_state_draft':1}</field>
+            <field name="context">{'search_default_state_confirm':1,'search_default_state_done':1,'search_default_state_draft':1,'search_default_state_unfinished':1}</field>
             <field name="view_id" ref="of_planning_intervention_view_calendar"/>
             <field name="search_view_id" ref="of_planning_intervention_filter"/>
         </record>

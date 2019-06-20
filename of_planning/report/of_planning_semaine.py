@@ -59,8 +59,10 @@ class OfPlanningSemaine(report_sxw.rml_parse):
         date_start = fields.Date.to_string(self.localcontext['date_start'])
         date_stop = fields.Date.to_string(self.localcontext['date_stop'])
 
-        # Toutes les poses de la semaine, sauf brouillons, annulees ou reportees
-        domain = [('date_deadline', '>=', date_start), ('date', '<=', date_stop), ('equipe_id', '=', equipe.id), ('state', 'in', ('draft', 'confirm', 'done'))]
+        # Toutes les poses de la semaine, sauf annulées ou reportées
+        domain = [('date_deadline', '>=', date_start), ('date', '<=', date_stop),
+                  ('equipe_id', '=', equipe.id),
+                  ('state', 'in', ('draft', 'confirm', 'done', 'unfinished'))]
         interventions = intervention_obj.search(domain, order='date')
         return interventions
 
