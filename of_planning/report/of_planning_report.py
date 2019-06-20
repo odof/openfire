@@ -55,7 +55,9 @@ class ReportPlanningGeneralSemaine(models.AbstractModel):
         date_start = fields.Date.to_string(self.localcontext['date_start'])
         date_stop = fields.Date.to_string(self.localcontext['date_stop'])
 
-        domain = [('date_deadline', '>=', date_start), ('date', '<=', date_stop), ('equipe_id', 'in', equipe_ids), ('state', 'in', ('draft', 'confirm', 'done'))]
+        domain = [('date_deadline', '>=', date_start), ('date', '<=', date_stop),
+                  ('equipe_id', 'in', equipe_ids),
+                  ('state', 'in', ('draft', 'confirm', 'done', 'unfinished'))]
         interventions = intervention_obj.search(domain, order='equipe_id, date')
 
         res = []

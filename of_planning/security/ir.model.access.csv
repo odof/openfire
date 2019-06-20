@@ -7,3 +7,5 @@
 "access_of_planning_equipe_manager","of.planning.equipe","model_of_planning_equipe","hr.group_hr_manager",1,1,1,1
 "access_pla_intervention_raison_user","of.planning.intervention.raison","of_planning.model_of_planning_intervention_raison","of_group_planning_intervention_user",1,0,0,0
 "access_pla_intervention_raison_manager","of.planning.intervention.raison","of_planning.model_of_planning_intervention_raison","of_group_planning_intervention_manager",1,1,1,1
+"access_of_planning_intervention_template_user","of.planning.intervention.template","model_of_planning_intervention_template","base.group_user",1,0,0,0
+"access_of_planning_intervention_template_manager","of.planning.intervention.template","model_of_planning_intervention_template","of_planning.of_group_planning_intervention_manager",1,1,1,1

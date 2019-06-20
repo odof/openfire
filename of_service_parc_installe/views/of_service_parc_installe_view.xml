@@ -61,7 +61,7 @@
                 <page string="Historique des interventions">
                     <group name="intervention">
                         <field name="intervention_ids" nolabel="1" context="{'default_address_id':site_adresse_id, 'default_parc_installe_id':id}">
-                            <tree string="intervention" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done'">
+                            <tree string="intervention" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done';purple:state=='unfinished'">
                                 <field name="date"/>
                                 <field name="equipe_id"/>
                                 <field name="tache_id"/>

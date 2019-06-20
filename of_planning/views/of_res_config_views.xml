@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Intervention config wizard -->
+    <record id="view_of_intervention_settings" model="ir.ui.view">
+        <field name="name">view.of.intervention.settings</field>
+        <field name="model">of.intervention.settings</field>
+        <field name="arch" type="xml">
+            <form string="Configure Interventions" class="oe_form_configuration" name="intervention_config_form">
+                <header>
+                    <button string="Appliquer" type="object" name="execute" class="oe_highlight"/>
+                    <button string="Annuler" type="object" name="cancel" class="oe_link" special="cancel"/>
+                </header>
+                <group string="Société" groups="base.group_multi_company">
+                    <label for="id" string="Société"/>
+                    <div>
+                        <field name="company_id" options="{'no_create': True}" class="oe_inline"/>
+                    </div>
+                </group>
+                <group name="intervention" string="Intervention">
+                    <label for="id" string="Configuration des interventions" style="width: 250px"/>
+                    <div name="general_config">
+                    </div>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_intervention_settings" model="ir.actions.act_window">
+        <field name="name">Configure Interventions</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.intervention.settings</field>
+        <field name="view_id" ref="view_of_intervention_settings"/>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+    </record>
+
+    <menuitem id="menu_intervention_general_settings" name="Configuration" parent="of_planning.menu_of_planning_configuration"
+                sequence="0" action="of_planning.action_intervention_settings" groups="of_base.of_group_root_only"/>
+
+</odoo>

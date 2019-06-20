@@ -2,12 +2,12 @@
 <odoo>
 
         <!-- Attestation ramonage -->
-        <report 
-            auto="False" 
-            id="report_of_planning_attestation_ramonage" 
+        <report
+            auto="False"
+            id="report_of_planning_attestation_ramonage"
             model="of.planning.intervention"
             name="of_planning.attestation_ramonage"
-            rml="of_planning/report/attestation_ramonage.rml" 
+            rml="of_planning/report/attestation_ramonage.rml"
             string="Attestation ramonage"/>
 
 

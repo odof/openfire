@@ -102,7 +102,7 @@ class OfTourneePlanification(models.TransientModel):
                 ('date_deadline', '>=', date_intervention),
                 ('date', '<=', date_intervention),
                 ('equipe_id', '=', equipe.id),
-                ('state', 'in', ('draft', 'confirm', 'done'))], order='date, date_deadline DESC')
+                ('state', 'in', ('draft', 'confirm', 'done', 'unfinished'))], order='date, date_deadline DESC')
             hor_list = []   # date_flo, date_deadline_flo, libelle, tache_id, duree, partner_id
 
             prev_date_deadline = False

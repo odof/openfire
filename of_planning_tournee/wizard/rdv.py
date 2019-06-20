@@ -348,7 +348,7 @@ class OfTourneeRdv(models.TransientModel):
             interventions = intervention_obj.search([('equipe_id', 'in', equipes_dispo),
                                                      ('date', '<=', str_d_recherche),
                                                      ('date_deadline', '>=', str_d_recherche),
-                                                     ('state', 'in', ('draft', 'confirm', 'done')),
+                                                     ('state', 'in', ('draft', 'confirm', 'done', 'unfinished')),
                                                      ], order='date')
 
             equipe_intervention_dates = {equipe_id: [] for equipe_id in equipes_dispo}
@@ -800,11 +800,11 @@ class OfTourneeRdvLine(models.TransientModel):
         for line in self:
             interv = line.intervention_id
             if interv:
-                if interv.state and interv.state == "draft":
+                if interv.state and interv.state == 'draft':
                     line.state_int = 0
-                elif interv.state and interv.state == "confirm":
+                elif interv.state and interv.state == 'confirm':
                     line.state_int = 1
-                elif interv.state and interv.state == "done":
+                elif interv.state and interv.state in ('done', 'unfinished'):
                     line.state_int = 2
             else:
                 line.state_int = 3
@@ -820,7 +820,7 @@ class OfTourneeRdvLine(models.TransientModel):
 
     @api.multi
     def button_confirm(self):
-        """Sélectionne ce créneau en temps que résultat. Appelé depuis la vue form du créneau"""
+        """Sélectionne ce créneau en tant que résultat. Appelé depuis la vue form du créneau"""
         self.ensure_one()
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')
@@ -833,7 +833,7 @@ class OfTourneeRdvLine(models.TransientModel):
 
     @api.multi
     def button_select(self):
-        """Sélectionne ce créneau en temps que résultat. Appelé depuis la vue form du créneau"""
+        """Sélectionne ce créneau en tant que résultat. Appelé depuis la vue form du créneau"""
         self.ensure_one()
         rdv_line_obj = self.env["of.tournee.rdv.line"]
         selected_line = rdv_line_obj.search([('wizard_id', '=', self.wizard_id.id), ('selected', '=', True)])

@@ -40,21 +40,13 @@
                         <notebook>
                             <page string="Interventions">
                                 <field name="planning_ids" nolabel="1" colspan="2">
-                                    <tree string="Liste des interventions" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done'">
+                                    <tree string="Liste des interventions" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done';purple:state=='unfinished'">
                                         <field name="name" string="Libellé"/>
                                         <field name="date"/>
                                         <field name="duree" string="Durée" widget="float_time"/>
                                         <field name="equipe_id"/>
                                         <field name="company_id"/>
                                         <field name="state"/>
-
-                                        <!-- Afficher les flèches pour passer à d'autres statuts -->
-                                        <button name="change_state_before" type="object" icon="gtk-go-back"/>
-                                        <button name="change_state_after" type="object" icon="gtk-go-forward"/>
-
-                                        <!-- Afficher l'icône quand le status est confirmé et réalisé -->
-                                        <button name="state_conf" type="object" icon="gtk-no" attrs="{'invisible':[('state', '!=', 'Confirme')]}"/>
-                                        <button name="state_pose" type="object" icon="gtk-apply" attrs="{'invisible':[('state', '!=', 'Pose')]}"/>
                                         <field name="description"/>
                                     </tree>
                                 </field>
@@ -90,21 +82,13 @@
                         <field name="note"/>
                         <separator string="Interventions"/>
                         <field name="planning_ids" nolabel="1" colspan="2">
-                            <tree string="Liste des interventions" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done'">
+                            <tree string="Liste des interventions" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done';purple:state=='unfinished'">
                                 <field name="name" string="Libellé"/>
                                 <field name="date"/>
                                 <field name="duree" string="Durée" widget="float_time"/>
                                 <field name="equipe_id"/>
                                 <field name="company_id"/>
                                 <field name="state"/>
-
-                                <!-- Afficher les fleches pour passer a d'autres statuts -->
-                                <button name="change_state_before" type="object" icon="gtk-go-back"/>
-                                <button name="change_state_after" type="object" icon="gtk-go-forward"/>
-
-                                <!-- Afficher l'icône quand le status est Confirmé et Réalisé -->
-                                <button name="state_conf" type="object" icon="gtk-no" attrs="{'invisible':[('state', '!=', 'Confirme')]}"/>
-                                <button name="state_pose" type="object" icon="gtk-apply" attrs="{'invisible':[('state', '!=', 'Pose')]}"/>
                                 <field name="description"/>
                             </tree>
                         </field>
