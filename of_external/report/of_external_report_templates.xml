@@ -132,15 +132,17 @@
                             </t>
                             <t t-elif="o._name == 'sale.order'">
                                 <!-- Si le document est de type devis-->
-                                <t t-if="o.date_order and not o.confirmation_date">
+                                <t t-if="o.date_order and o.state in ['draft','sent']">
                                     <t t-set="date_order" t-value="o.date_order[8:10] + '/' + o.date_order[5:7] + '/' + o.date_order[0:4]"/>
                                     <span t-esc="date_order"/>
                                 </t>
-                                <t t-if="o.confirmation_date">
+                                <t t-elif="o.confirmation_date and o.state not in ['draft','sent']">
                                     <t t-set="confirmation_date" t-value="o.confirmation_date[8:10] + '/' + o.confirmation_date[5:7] + '/' + o.confirmation_date[0:4]"/>
                                     <span t-esc="confirmation_date"/>
                                 </t>
-                                <span t-if="not o.date_order and not o.confirmation_date">-</span>
+                                <t t-else="">
+                                    <span>-</span>
+                                </t>
                             </t>
                             <t t-elif="o._name == 'purchase.order'">
                                 <!-- Si le document est de type achat -->
