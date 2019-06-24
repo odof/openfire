@@ -34,8 +34,8 @@ class of_parc_installe(models.Model):
     active = fields.Boolean(string=u'Actif', default=True)
 
     # Champs ajoutés pour la vue map
-    geo_lat = fields.Float('geo_lat', compute='_compute_geo')
-    geo_lng = fields.Float('geo_lng', compute='_compute_geo')
+    geo_lat = fields.Float('geo_lat', compute='_compute_geo', store=True)
+    geo_lng = fields.Float('geo_lng', compute='_compute_geo', store=True)
     precision = fields.Selection([
         ('manual', "Manuel"),
         ('high', "Haut"),
@@ -44,12 +44,13 @@ class of_parc_installe(models.Model):
         ('no_address', u"--"),
         ('unknown', u"Indéterminé"),
         ('not_tried', u"Pas tenté"),
-        ], default='not_tried', string='precision', compute='_compute_geo')
+        ], default='not_tried', string='precision', compute='_compute_geo', store=True)
 
     _sql_constraints = [('no_serie_uniq', 'unique(name)', u"Ce numéro de série est déjà utilisé et doit être unique.")]
 
     @api.multi
-    @api.depends('client_id', 'site_adresse_id')
+    @api.depends('client_id', 'client_id.geo_lat', 'client_id.geo_lng', 'client_id.precision',
+                 'site_adresse_id', 'site_adresse_id.geo_lat', 'site_adresse_id.geo_lng', 'site_adresse_id.precision')
     def _compute_geo(self):
         for produit_installe in self:
             if produit_installe.site_adresse_id:

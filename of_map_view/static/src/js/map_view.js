@@ -31,6 +31,10 @@ var _t = core._t;
 var _lt = core._lt;
 var qweb = core.qweb;
 
+function isNullOrUndef(value) {
+    return _.isUndefined(value) || _.isNull(value);
+}
+
 var iconUrls = {
         "black": '/of_map_view/static/src/img/marker-icon-black.png',
         "blue": '/of_map_view/static/src/img/marker-icon-blue.png',
@@ -756,8 +760,10 @@ MapView.Map = Widget.extend({
             default:
                 console.log("given string doesn't match any of the available modes. modes are 'visible', 'current', current_visible' and 'all'");
         };
-        //console.log("the_map: ",this.the_map);
-        this.the_map.fitBounds(bounds, {padding: [30, 30]});
+        //console.log("the_map: ",this.the_map,bounds);
+        if (!isNullOrUndef(bounds._northEast)) {
+            this.the_map.fitBounds(bounds, {padding: [30, 30]});
+        }
         if (this.the_map.getZoom() > 15) {
             this.the_map.setZoom(15);
         }
