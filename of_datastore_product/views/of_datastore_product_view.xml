@@ -189,7 +189,7 @@
         </field>
     </record>
 
-    <!-- Vue formulaire devis/commande : champ filtre sur la marque -->
+    <!-- Vue formulaire devis/commande : champ sur la marque -->
     <record id="of_datastore_sale_view_order_form" model="ir.ui.view">
         <field name="name">of.datastore.sale.order.form</field>
         <field name="model">sale.order</field>

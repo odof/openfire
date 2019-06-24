@@ -2,3 +2,4 @@
 
 from . import of_sale_order_gestion_prix
 from . import sale_make_invoice_advance
+from . import compose_mail
