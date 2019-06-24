@@ -445,9 +445,11 @@ class OfTourneePlanificationPartner(models.TransientModel):
 
     wizard_id = fields.Many2one('of.tournee.planification', string="Planification", required=True, ondelete='cascade')
     service_id = fields.Many2one('of.service', string="Service", required=True, ondelete='cascade')
+    date_next = fields.Date(related='service_id.date_next')
 
     partner_id = fields.Many2one(related='service_id.partner_id')
     partner_address_id = fields.Many2one(related='service_id.address_id')
+    address_city = fields.Char('Ville', related='partner_address_id.city')
     tache_id = fields.Many2one(related='service_id.tache_id')
     phone = fields.Char(compute='_get_phone')
 

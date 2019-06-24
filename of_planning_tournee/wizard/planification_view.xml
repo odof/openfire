@@ -71,8 +71,10 @@
             <field name="arch" type="xml">
                 <tree string="Clients" create="false">
                     <field name="partner_address_id"/>
+                    <field name="address_city"/>
                     <field name="phone"/>
                     <field name="tache_id"/>
+                    <field name="date_next"/>
                     <field name="date_flo" widget="float_time"/>
                     <field name="duree" widget="float_time"/>
                     <field name="distance"/>
