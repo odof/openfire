@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="of_planning_intervention_view_planning" model="ir.ui.view">
+        <field name="name">of.planning.intervention.timeline</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="arch" type="xml">
+            <planning date_start="date" date_stop="date_deadline"
+                      string="Interventions" color_ft="color_ft" color_bg="color_bg"
+                      resource="equipe_id" event_open_popup="true">
+                <field name="date" class="of_planning_info_heures of_planning_subinfo_heure_debut"/>
+                <field name="date_deadline" class="of_planning_info_heures of_planning_subinfo_heure_fin"/>
+                <field name="duree" class="of_planning_info_heures of_planning_subinfo_duree"/>
+                <field name="tache_name" class="of_planning_info_tache_name"/>
+                <field name="partner_name" class="of_planning_info_partner_name"/>
+                <field name="address_zip" class="of_planning_info_lieu of_planning_subinfo_zip"/>
+                <field name="address_city" class="of_planning_info_lieu of_planning_subinfo_city"/>
+            </planning>
+        </field>
+    </record>
+
+    <record id="action_of_planning_intervention_planning" model="ir.actions.act_window.view">
+        <field eval="4" name="sequence"/>
+        <field name="view_mode">planning</field>
+        <field name="view_id" ref="of_planning_intervention_view_planning"/>
+        <field name="act_window_id" ref="of_planning.action_of_planning_intervention_calendar"/>
+    </record>
+
+    <record id="of_planning.action_of_planning_intervention_calendar" model="ir.actions.act_window">
+        <field name="view_mode">calendar,planning,tree,form</field>
+    </record>
+
+</odoo>
