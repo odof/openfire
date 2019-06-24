@@ -1,0 +1,192 @@
+<template>
+    <div t-name="PlanningView" class="of_planning_container">
+        
+        <div class="of_planning_view"><!-- <svg id="of_planning_view_svg"></svg> -->
+            
+            <div class="of_planning_buttons" />
+            <div class="of_planning_table_container" style="width: 100%;"/>
+        </div>
+        <div class="of_planning_sidebar_container hidden-xs"/>
+    </div>
+
+    <t t-name="PlanningView.sidebar">
+        <div class="of_planning_sidebar">
+            <div class="of_planning_calendar_mini"/>
+        </div>
+    </t>
+
+    <t t-name="PlanningView.sidebar.reso_filters">
+        <div class="of_planning_reso_filter">
+            <div class="of_planning_contacts"/>
+        </div>
+    </t>
+
+    <t t-name="PlanningView.sidebar.contacts">
+        <div t-foreach="filters" class="of_planning_contact">
+            <t t-if="filters_value.value"><!-- don't display if no value given (or undefined) -->
+                <div class="o_checkbox">
+                    <input type="checkbox" name="selection"
+                        t-att-value="filters_value.value" t-att-id="filters_value.input_id"
+                        t-att-checked="(filters_value.is_checked ? true : undefined)"/><span/>
+                </div>
+                <t t-if="filters_value.value == -1">
+                    <span><i class="fa fa-users fa-fw o_cal_avatar"/></span>
+                </t>
+                <t t-if="(filters_value.value != -1) &amp;&amp; filters_value.avatar_model">
+                    <img t-attf-src="/web/image/#{filters_value.avatar_model}/#{filters_value.value}/image_small" class="o_cal_avatar"/>
+                </t>
+                <span t-attf-style="
+                    color: #{filters_value.color_ft}; 
+                    background: #{filters_value.color_bg}; 
+                    padding: 2px 8px 4px; 
+                    border-radius: 4px;
+                    margin: 1px 0;
+                    border: 1px solid #0D0D0D;">
+                    <t t-esc="filters_value.label"/>
+                </span>
+            </t>
+        </div>
+    </t>
+
+    <t t-name="PlanningView.sidebar.info_filters">
+        <div class="of_planning_info_filter">
+            <div class="of_planning_info_filter_title">
+                <span>AFFICHAGE</span>
+                <i class='fa fa-lg fa-angle-double-down of_planning_info_filter_show'/>
+                <i class='fa fa-lg fa-angle-double-up of_planning_info_filter_hide o_hidden'/>
+            </div>
+            <div class="of_planning_ev_infos o_hidden"/>
+        </div>
+    </t>
+
+    <t t-name="PlanningView.sidebar.event_info">
+        <div t-foreach="filters" class="of_planning_ev_info">
+            <t t-if="filters_value.value"><!-- don't display if no value given (or undefined) -->
+                <div class="o_checkbox">
+                    <input type="checkbox" name="selection"
+                        t-att-id="filters_value.input_id"
+                        t-att-value="filters_value.value" class="of_planning_ev_info_input"
+                        t-att-checked="(filters_value.is_checked ? true : undefined)"/><span/>
+                </div>
+                <span t-attf-style="
+                    padding: 2px 8px 4px; 
+                    margin: 1px 0;">
+                    <t t-esc="filters_value.label"/>
+                </span>
+                <!-- child filters -->
+                <t t-if="filters_value.child_filters != undefined">
+                    <i t-attf-class='fa fa-angle-double-down of_planning_ev_info_show of_planning_ev_info_toggle_#{filters_value.value}'
+                        t-attf-id="#{filters_value.value}_show"/>
+                    <i t-attf-class='fa fa-angle-double-up of_planning_ev_info_hide o_hidden of_planning_ev_info_toggle_#{filters_value.value}'
+                        t-attf-id="#{filters_value.value}_hide"/>
+                    <t t-set="les_children" t-value="filters_value.child_filters"/>
+                    <div t-foreach="les_children" t-attf-class="of_planning_ev_subinfo of_planning_ev_subinfo_#{filters_value.value} o_hidden">
+                        <div class="o_checkbox" style="margin-left: 8px;">
+                            <input type="checkbox" name="selection" t-att-id="les_children_value.input_id"
+                                t-att-value="les_children_value.value" class="of_planning_ev_subinfo_input"
+                                t-att-checked="(les_children_value.is_checked ? true : undefined)"/><span/>
+                        </div>
+                        <span t-attf-style="
+                            padding: 2px 8px 4px; 
+                            margin: 1px 0;">
+                            <t t-esc="les_children_value.label"/>
+                        </span>
+                    </div>
+                </t><!--  -->
+            </t>
+            <t t-else="">HO!</t>
+        </div>
+    </t>
+<!-- dump: border: 1px solid #0D0D0D; border-radius: 4px; -->
+    <t t-name="PlanningView.buttons">
+        <div class="of_planning_buttons">
+            <!--
+            <button t-if="widget.options.action_buttons !== false &amp;&amp; widget.is_action_enabled('create') &amp;&amp; ((widget.field_widget &amp;&amp; (widget.field_widget.open_popup_add)) || (!widget.field_widget))" type="button" class="btn btn-primary planning_button_new o_highlight"><t t-esc="widget.options.create_text || _t('Create')"/></button>
+            -->
+            <button class="btn btn-primary of_planning_button_prev"><span class="fa fa-chevron-left"/></button>
+            <button class="btn btn-primary of_planning_button_today">Today</button>
+            <button class="btn btn-primary of_planning_button_next"><span class="fa fa-chevron-right"/></button>
+
+            <div class="btn-group btn-group-sm">
+                <button class="btn btn-sm btn-default of_planning_button_day">Day</button>
+                <button class="btn btn-sm btn-default of_planning_button_week">Week</button>
+                <button class="btn btn-sm btn-default of_planning_button_month">Month</button>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="PlanningView.table">
+        <table class="of_planning_table table">
+            <thead>
+                <tr>
+                    <th>
+                        <span t-esc="table.head_column.text"/>
+                    </th>
+                    <t t-foreach="table.columns" t-as="column">
+                        <th>
+                            <span t-esc="column.text"/>
+                        </th>
+                    </t>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody class="of_planning_table_tbody">
+                <tr t-if="table.rows.length == 0"><!-- ne fonctionne pas? -->
+                    <td colspan="8">Il n'y a aucun enregistrement pour cette semaine</td>
+                </tr>
+                <!--t t-foreach="rows" t-as="k_rows">
+                    <tr t-attf-id="#{rows[k_rows].res_id}"/>
+                    <!- - t t-call="PlanningView.row">
+                        <t t-set="row" t-value="rows[k_rows]"/>
+                    </t- ->
+                </t-->
+            </tbody>
+        </table>
+    </t>
+
+    <t t-name="PlanningView.row">
+        <td t-attf-style="
+                    color: #{row.color_ft}; 
+                    background: #{row.color_bg}; 
+                    padding: 2px 8px 4px; 
+                    border-radius: 5px;
+                    min-height: 95%;
+                    opacity: 1 !important;
+                    vertical-align: middle;">
+            <t t-esc="row.head_column"/>
+        </td>
+        <t t-foreach="row.columns.length" t-as="col_index">
+            <t t-set="records" t-value="row.columns[col_index]"/>
+            <td t-attf-style="background: #{row.color_bg_rgba}">
+                <t t-foreach="records.length" t-as="rec_index">
+                    <t t-call="PlanningView.record">
+                        <t t-set="record" t-value="records[rec_index]"/>
+                    </t>
+                </t>
+            </td>
+        </t>
+        <td t-attf-style="
+                    color: #{row.color_ft}; 
+                    background: #{row.color_bg}; 
+                    padding: 2px 8px 4px; 
+                    border-radius: 5px;
+                    width: 4px;
+                    opacity: 1 !important;
+                    vertical-align: middle;">
+        </td>
+    </t>
+
+    <div t-name="PlanningView.fillerbar">
+        <table class="of_planning_fillerbar">
+            <tr>
+                <td>Occ.</td>
+                <td>Dis.</td>
+            </tr>
+        </table>
+        <t t-raw="fillerbar.content"/>
+    </div>
+
+    <div t-name="PlanningView.record">
+        <t t-raw="record.content"/>
+    </div>
+</template>
