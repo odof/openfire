@@ -35,7 +35,8 @@
             view_mode="form"
             view_type="form"
             view_id="of_repondre_questionnaire_view_form"
-            target="new"/>
+            target="new"
+            context="{'question_ids': question_ids}"/>
 
     <record id="of_repondre_questionnaire_planning_intervention_view_form" model="ir.ui.view">
         <field name="name">of.repondre.questionnaire.planning.intervention.view.form</field>

@@ -34,12 +34,11 @@
                         <page name="Questions" string="Questions">
                             <group>
                                 <field name="line_ids" mode="tree" widget="many2many" colspan="4" nolabel="1" context="{'default_type': type, 'hide_type': True}" domain="[('type', '=', type)]">
-                                    <tree editable="bottom">
+                                    <tree editable="bottom" edit="false">
                                         <field name="sequence" widget="handle"/>
                                         <field name="name"/>
                                         <field name="answer_type"/>
-                                        <field name="answer" attrs="{'invisible': [('answer_type', 'in', ('bool', 'text'))],
-                                                                     'required': [('answer_type', 'in', ('one', 'list'))]}"/>
+                                        <field name="answer" attrs="{'invisible': [('answer_type', 'in', ('bool', 'text'))]}"/>
                                     </tree>
                                 </field>
                             </group>
@@ -171,6 +170,18 @@
         <field name="view_id" ref="of_questionnaire.of_questionnaire_line_category_view_tree"/>
     </record>
 
+<!-- *************************** Questions ***************************-->
+
+    <record id="of_questionnaire_line_reponse_view_form" model="ir.ui.view">
+        <field name="name">of.questionnaire.line.reponse.view.form</field>
+        <field name="model">of.questionnaire.line.reponse</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="name"/>
+            </form>
+        </field>
+    </record>
+
 <!-- *************************** Questions d'intervention ***************************-->
 
     <record id="of_planning_intervention_question_view_form" model="ir.ui.view">
@@ -207,7 +218,7 @@
 
 <!-- *************************** Menus ***************************-->
 
-    <menuitem name="Config. Questionnaires" id="menu_of_questionnaire_config" parent="of_planning.menu_of_planning_configuration" sequence="20"/>
+    <menuitem name="Questionnaires" id="menu_of_questionnaire_config" parent="of_planning.menu_of_planning_configuration" sequence="20"/>
     <menuitem name="Questionnaires" id="menu_of_questionnaire" parent="of_questionnaire.menu_of_questionnaire_config" sequence="0" action="action_of_questionnaire"/>
     <menuitem name="Questions" id="menu_of_questionnaire_line" parent="of_questionnaire.menu_of_questionnaire_config" sequence="1" action="action_of_questionnaire_line"/>
     <menuitem name="Catégorie de question" id="menu_of_questionnaire_line_category" parent="of_questionnaire.menu_of_questionnaire_config" sequence="2" action="action_of_questionnaire_line_category"/>

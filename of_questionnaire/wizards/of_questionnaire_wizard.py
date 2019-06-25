@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
 
@@ -23,22 +23,47 @@ class RepondreQuestionnaireWizard(models.TransientModel):
             reponse.answer_type = reponse.question_id.answer_type
 
     @api.model
+    def _convert_question_answer(self, question):
+        reponse_obj = self.env['of.questionnaire.line.reponse']
+        result = {}
+        if question.answer_type == 'bool':
+            result['answer_bool'] = question.definitive_answer
+        elif question.answer_type == 'text':
+            result['answer_text'] = question.definitive_answer
+        elif question.answer_type == 'one':
+            reponse = reponse_obj.search([('planning_question_ids', 'in', [question.id]),
+                                          ('name', '=', question.definitive_answer)], limit=1)
+            result['answer_id'] = reponse.id
+        elif question.answer_type == 'list':
+            reponses = reponse_obj.browse([])
+            if question.definitive_answer:
+                for r in question.definitive_answer.split(', '):
+                    reponse = reponse_obj.search([('planning_question_ids', 'in', [question.id]),
+                                                  ('name', '=', r)], limit=1)
+                    reponses |= reponse
+            result['answer_ids'] = [(6, 0, reponses._ids)]
+        return result
+
+    @api.model
     def default_get(self, fields_list):
         rec = super(RepondreQuestionnaireWizard, self).default_get(fields_list)
         question_ids = self._context.get('question_ids', [])
         if question_ids:
-            rec['question_id'] = question_ids and question_ids[0][1] or False
-            rec['question_ids'] =  question_ids[1:] or []
+            rec['question_id'] = question_ids[0][1]
+            rec['question_ids'] = question_ids[1:]
+            question = self.env['of.planning.intervention.question'].browse(question_ids[0][1])
+            if question.definitive_answer:
+                rec.update(self._convert_question_answer(question))
         return rec
 
     def validate_answer(self):
         if self.question_id.answer_type == 'bool':
             self.question_id.write({'definitive_answer': self.answer_bool})
-        if self.question_id.answer_type == 'text':
+        elif self.question_id.answer_type == 'text':
             self.question_id.write({'definitive_answer': self.answer_text})
-        if self.question_id.answer_type == 'one':
+        elif self.question_id.answer_type == 'one':
             self.question_id.write({'definitive_answer': self.answer_id.name})
-        if self.question_id.answer_type == 'list':
+        elif self.question_id.answer_type == 'list':
             self.question_id.write({'definitive_answer': ', '.join([answer.name for answer in self.answer_ids])})
         return self.next_question()
 
@@ -46,7 +71,7 @@ class RepondreQuestionnaireWizard(models.TransientModel):
         self.question_id = self.question_ids and self.question_ids[0] or False
         self.question_ids -= self.question_id
         if self.question_id:
+            self.write(self._convert_question_answer(self.question_id))
             return {"type": "ir.actions.do_nothing"}
         else:
             return True
-
