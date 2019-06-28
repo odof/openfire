@@ -6,6 +6,9 @@
         <field name="model">stock.inventory</field>
         <field name="inherit_id" ref="stock.view_inventory_form"/>
         <field name="arch" type="xml">
+            <button name="reset_real_qty" position="attributes">
+                <attribute name="confirm">Voulez-vous réellement mettre les quantités à zéro ?</attribute>
+            </button>
             <xpath expr="//notebook//field[@name='line_ids']/tree" position="attributes">
                 <attribute name="editable">top</attribute>
             </xpath>
