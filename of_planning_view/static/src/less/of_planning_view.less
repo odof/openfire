@@ -31,6 +31,9 @@
 
         .of_planning_table {
             background-color: @odoo-view-background-color;
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 20px;
             * {
                 z-index: 0; // FIXME
             }
@@ -43,6 +46,52 @@
             .fc-view {
                 overflow-x: auto;
             }
+        }
+
+        .of_planning_column_head {
+            width: 4%;
+        }
+
+        .of_planning_column_day {
+            width: 13.6%;
+        }
+
+        .of_planning_column_foot {
+            width: 0.8%;
+        }
+
+        .of_planning_table > thead > tr > th,
+        .of_planning_table > tbody > tr > th,
+        .of_planning_table > tfoot > tr > th,
+        .of_planning_table > thead > tr > td,
+        .of_planning_table > tbody > tr > td,
+        .of_planning_table > tfoot > tr > td {
+          padding: 4px;
+          line-height: 1.42857143;
+          vertical-align: top;
+          border-top: 1px solid #ddd;
+        }
+        .of_planning_table > thead > tr > th {
+          vertical-align: bottom;
+          border-bottom: 2px solid #ddd;
+        }
+
+        .of_planning_fillerbar {
+            display: table;
+            width: 100%;
+            height: 10px;
+            border: 1px solid #0C0C0C;
+            border-radius: 3px;
+            margin: 2px;
+        }
+        .of_planning_fillerbar_disponible {
+            display: table-cell;
+            background-color: #7FFF00;
+        }
+        .of_planning_fillerbar_occupe {
+            display: table-cell;
+            background-color: #FF0000;
+            border-right: 1px solid #0C0C0C;
         }
     }
 
