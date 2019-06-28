@@ -116,23 +116,23 @@
     </t>
 
     <t t-name="PlanningView.table">
-        <table class="of_planning_table table">
+        <table class="of_planning_table">
             <thead>
                 <tr>
-                    <th>
+                    <th class="of_planning_column_head">
                         <span t-esc="table.head_column.text"/>
                     </th>
                     <t t-foreach="table.columns" t-as="column">
-                        <th>
+                        <th class="of_planning_column_day">
                             <span t-esc="column.text"/>
                         </th>
                     </t>
-                    <th></th>
+                    <th class="of_planning_column_foot"></th>
                 </tr>
             </thead>
             <tbody class="of_planning_table_tbody">
                 <tr t-if="table.rows.length == 0"><!-- ne fonctionne pas? -->
-                    <td colspan="8">Il n'y a aucun enregistrement pour cette semaine</td>
+                    <td colspan="9">Il n'y a aucun enregistrement pour cette semaine</td>
                 </tr>
                 <!--t t-foreach="rows" t-as="k_rows">
                     <tr t-attf-id="#{rows[k_rows].res_id}"/>
@@ -143,7 +143,7 @@
             </tbody>
         </table>
     </t>
-
+<!-- <span class="of_planning_fillerbar_occupe" t-attf-style="min-width: #{la_fillerbar.pct_occupe}%;"/> -->
     <t t-name="PlanningView.row">
         <td t-attf-style="
                     color: #{row.color_ft}; 
@@ -157,7 +157,19 @@
         </td>
         <t t-foreach="row.columns.length" t-as="col_index">
             <t t-set="records" t-value="row.columns[col_index]"/>
+            <t t-set="la_fillerbar" t-value="row.fillerbars[col_index]"/>
             <td t-attf-style="background: #{row.color_bg_rgba}">
+                <!--div t-attf-id="of_planning_fillerbar_#{row.res_id}_#{col_index}" class="of_planning_fillerbar">
+                    <t t-call="PlanningView.fillerbar">
+                        <t t-set="fillerbar" t-value="la_fillerbar"/>
+                    </t>
+                </div-->
+                <div t-attf-id="of_planning_fillerbar_#{row.res_id}_#{col_index}" class="of_planning_fillerbar">
+                    <div t-if="la_fillerbar.pct_occupe > 0" class="of_planning_fillerbar_occupe" t-attf-style="width: #{la_fillerbar.pct_occupe}% !important;">
+                    </div>
+                    <div class="of_planning_fillerbar_disponible">
+                    </div>
+                </div>
                 <t t-foreach="records.length" t-as="rec_index">
                     <t t-call="PlanningView.record">
                         <t t-set="record" t-value="records[rec_index]"/>
@@ -175,16 +187,6 @@
                     vertical-align: middle;">
         </td>
     </t>
-
-    <div t-name="PlanningView.fillerbar">
-        <table class="of_planning_fillerbar">
-            <tr>
-                <td>Occ.</td>
-                <td>Dis.</td>
-            </tr>
-        </table>
-        <t t-raw="fillerbar.content"/>
-    </div>
 
     <div t-name="PlanningView.record">
         <t t-raw="record.content"/>
