@@ -86,41 +86,6 @@
             </field>
         </record>
 
-        <record id="of_planning_tournee_view_interventions_form_map" model="ir.ui.view" >
-            <field name="name">of.planning.tournee.form.map</field>
-            <field name="model">of.planning.tournee</field>
-            <field name="type">form</field>
-            <field name="arch" type="xml">
-                <form string="Tournée">
-                    <group>
-                        <field name="date_jour" invisible="1"/>
-                        <field name="date" invisible="1"/>
-                        <field name="equipe_id" invisible="1"/>
-                        <field name="zip_id" invisible="1"/>
-                        <field name="epi_lat" invisible="1"/>
-                        <field name="epi_lon" invisible="1"/>
-                        <field name="distance" invisible="1"/>
-                        <field name="address_depart_id" invisible="1"/>
-                        <field name="address_retour_id" invisible="1"/>
-                        <field name="is_complet" invisible="1"/>
-                        <field name="is_bloque" invisible="1"/>
-                        <!--field name="docs_name"/-->
-                        <field name="is_confirme" invisible="1"/>
-                        <field name="intervention_ids"/>
-                    </group>
-                </form>
-            </field>
-        </record>
-
-        <record id="action_of_planning_tournee_interventions_map" model="ir.actions.act_window">
-            <field name="name">Interventions de la tournée</field>
-            <field name="res_model">of.planning.tournee</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">form</field>
-            <field name="target">new</field>
-            <field name="view_id" ref="of_planning_tournee_view_interventions_form_map"/>
-        </record>
-
         <record id="of_planning_tournee_view_tree" model="ir.ui.view">
             <field name="name">of.planning.tournee.tree</field>
             <field name="model">of.planning.tournee</field>
@@ -139,10 +104,6 @@
                     <field name="address_retour_id"/>
                     <field name="is_complet"/>
                     <field name="is_bloque"/>
-                    <!--field name="docs_name"/
-                    <button name="%(action_of_planning_tournee_interventions_map)d" type="action" string="Voir la Carte" />
-                    <field name="intervention_ids"/>
-                    -->
                     <field name="is_confirme"/>
                     <button name="open_planification" type="object" string="Planifier" attrs="{'invisible': [('is_complet', '=', True)]}"/>
                 </tree>
