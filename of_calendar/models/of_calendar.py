@@ -10,6 +10,119 @@ def _tz_get(self):
     # put POSIX 'Etc/*' entries at the end to avoid confusing users - see bug 1086728
     return [(tz, tz) for tz in sorted(pytz.all_timezones, key=lambda tz: tz if not tz.startswith('Etc/') else '_')]
 
+def hours_to_strs(*hours):
+    """ Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'
+    """
+    return tuple("%dh%02d" % (hour, round((hour % 1) * 60)) if hour % 1 else "%dh" % (hour) for hour in hours)
+    #return tuple("%dh" % (hour) + (hour % 1 and "%02d" % (round((hour % 1) * 60)) or "") for hour in hours)
+
+def check_hours_overlapping(debut_1, fin_1, debut_2, fin_2):
+    """renvoi True si les horaires se chevauchent, False sinon"""
+    """return debut_1 >= debut_2 and debut_1 < fin_2 or \
+    fin_1 > debut_2 and fin_1 <= fin_2 or \
+    debut_1 <= debut_2 and fin_1 >= fin_2"""
+    return debut_1 < fin_2 and debut_2 < fin_1
+
+class HREmployee(models.Model):
+    _inherit = "hr.employee"
+
+    @api.multi
+    def check_no_overlapping(self):
+        for employee in self:
+            for i in range(1,8):
+                creneaux_du_jour = employee.creneau_ids.filtered(lambda x: x.jour_number == i)
+                la_len = len(creneaux_du_jour)
+                for j in range(la_len):
+                    for k in range(j+1, la_len):
+                        d1 = creneaux_du_jour[j].heure_debut
+                        f1 = creneaux_du_jour[j].heure_fin
+                        d2 = creneaux_du_jour[k].heure_debut
+                        f2 = creneaux_du_jour[k].heure_fin
+                        if check_hours_overlapping(d1, f1, d2, f2):
+                            #raise UserError(u"Oups! Des créneaux se chevauchent")
+                            return False
+                creneaux_temp_du_jour = employee.creneau_temp_ids.filtered(lambda jour: jour.jour_number == i)
+                la_len = len(creneaux_temp_du_jour)
+                for j in range(la_len):
+                    for k in range(j+1, la_len):
+                        d1 = creneaux_temp_du_jour[j].heure_debut
+                        f1 = creneaux_temp_du_jour[j].heure_fin
+                        d2 = creneaux_temp_du_jour[k].heure_debut
+                        f2 = creneaux_temp_du_jour[k].heure_fin
+                        if check_hours_overlapping(d1, f1, d2, f2):
+                            #raise UserError(u"Oups! Des créneaux se chevauchent")
+                            return False
+        return True
+
+    u"""Création horaires avancés"""
+    mode_horaires = fields.Selection([
+        ("easy","Facile"),
+        ("advanced",u"Avancé")], string="Mode de Sélection des horaires", required=True, default="easy")
+    profil_id = fields.Many2one("of.horaires.profil", "Profil")
+    creneau_ids = fields.Many2many("of.horaires.creneau", "employee_creneaux", "employee_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
+    creneau_temp_ids = fields.Many2many("of.horaires.creneau", "employee_creneaux_temp", "employee_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
+    creneau_temp_start = fields.Date(string=u"Début des horaires temporaires")
+    creneau_temp_stop = fields.Date(string="Fin des horaires temporaires")
+
+    _sql_constraints = [
+        ('creneau_temp_start_stop_constraint', 'CHECK ( creneau_temp_start <= creneau_temp_stop )', _(u"La date de début de validité doit être antérieure ou égale à celle de fin")),
+    ]
+
+    _constraints = [
+        (check_no_overlapping, u'Vous ne pourrez pas sauvegarder tant que des créneaux se chevauchent!', []),
+    ]
+
+    @api.onchange("creneau_ids","creneau_temp_ids")
+    def _onchange_creneaux(self):
+        if not self.check_no_overlapping():
+            raise UserError(u"Oups! Des créneaux se chevauchent. Veuillez vous assurer que ce ne soit plus le cas avant de sauvegarder.")
+
+    @api.multi
+    def possede_creneau(self,creneau_id):
+        u"""vérifie que tous les employés présents dans self possèdent tel ou tel créneau.
+            Ne prend pas en compte les créneaux temporaires."""
+        if len(self._ids) == 0:
+            return None
+        for employee in self:
+            if len(employee.creneau_ids.filtered(lambda x: x.id == creneau_id)) > 0:
+                continue
+            else:
+                return False
+        return True
+
+class OFHorairesCreneau(models.Model):
+    _name = "of.horaires.creneau"
+    _order = "jour_number, heure_debut"
+
+    name = fields.Char("Créneau", compute="_compute_name", store=True)
+    jour_id = fields.Many2one("of.jours", string="Jour", required=True)
+    jour_number = fields.Integer(related="jour_id.numero", store=True)
+    heure_debut = fields.Float(string=u"Heure de début", required=True)
+    heure_fin = fields.Float(string=u"Heure de fin", required=True)
+
+    _sql_constraints = [
+        ('name_uniq', 'unique(name)', 'Oups! on dirait que ce créneau existe déjà...'),
+        ('heure_debut_fin_constraint', 'CHECK ( heure_debut <= heure_fin )', _(u"L'Heure de début doit être antérieure à l'heure de fin")),
+        ('heures_sont_des_heures_constraint', 'CHECK ( heure_debut <= 24 AND heure_debut >= 0 AND heure_fin <= 24 AND heure_fin >= 0)', _(u"Les horaires doivent se trouver entre 0 et 24"))
+    ]
+
+    @api.multi
+    @api.depends("jour_id","heure_debut","heure_fin")
+    def _compute_name(self):
+        for creneau in self:
+            creneau.name = (creneau.jour_id and creneau.jour_id.abr + ' ' or '') + ' - '.join(hours_to_strs(creneau.heure_debut, creneau.heure_fin))
+
+class OFHorairesProfil(models.Model):
+    _name = "of.horaires.profil"
+
+    name = fields.Char("Nom du profil")
+    creneau_ids = fields.Many2many("of.horaires.creneau", "profil_creneaux", "profil_id", "creneau_id", string=u"Créneaux")
+    active = fields.Boolean(string="Actif", default=True)
+
+    _sql_constraints = [
+        ('name_uniq', 'unique(name)', 'Oups! on dirait qu\'un autre profil porte déjà ce nom...'),
+    ]
+
 class OFUsers(models.Model):
     _inherit = 'res.users'
 

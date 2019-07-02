@@ -40,6 +40,7 @@ Leur balise calendar devra contenir l'attribut display_states="1".
 """,
     "website": "www.openfire.fr",
     "depends": [
+        "hr",
         "web_widget_color",
         "calendar",
         "web_calendar",
