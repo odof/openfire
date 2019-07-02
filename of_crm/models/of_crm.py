@@ -66,7 +66,7 @@ class CrmLead(models.Model):
 
     # surcharges
     tag_ids = fields.Many2many('res.partner.category', 'crm_lead_res_partner_category_rel', 'lead_id', 'category_id', string='Tags', help="Classify and analyze your lead/opportunity categories like: Training, Service", oldname="of_tag_ids")
-    referred = fields.Many2one('res.partner', string="Apporteur", help="Nom contact")
+    of_referred_id = fields.Many2one('res.partner', string=u"Apporté par", help="Nom de l'apporteur d'affaire")
     street = fields.Char(related='partner_id.street')
     street2 = fields.Char(related='partner_id.street2')
     zip = fields.Char(related='partner_id.zip')
@@ -422,6 +422,8 @@ class ResCompany(models.Model):
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    of_referred_id = fields.Many2one('res.partner', string=u"Apporté par", help="Nom de l'apporteur d'affaire")
+
     @api.multi
     def action_confirm(self):
         """
@@ -434,6 +436,15 @@ class SaleOrder(models.Model):
                 partners += order.partner_id
         partners.write({'of_customer_state': 'customer'})
         return res
+
+    @api.onchange('opportunity_id')
+    def onchange_opportunity(self):
+        if self.opportunity_id:
+            self.of_referred_id = self.opportunity_id.of_referred_id
+            self.campaign_id = self.opportunity_id.campaign_id
+            self.medium_id = self.opportunity_id.medium_id
+            self.source_id = self.opportunity_id.source_id
+            self.team_id = self.opportunity_id.team_id
 
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
