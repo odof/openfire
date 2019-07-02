@@ -447,6 +447,14 @@ class SaleOrder(models.Model):
                 result.append((name, payment['amount']))
         return result
 
+    @api.multi
+    def _prepare_invoice(self):
+        """ Rajout date visite technique. Attention en cas de facturation de plusieurs bons de commande à la fois"""
+        self.ensure_one()
+        invoice_vals = super(SaleOrder, self)._prepare_invoice()
+        invoice_vals["of_date_vt"] = self.of_date_vt
+        return invoice_vals
+
 class Report(models.Model):
     _inherit = "report"
 
