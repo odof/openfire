@@ -268,7 +268,15 @@
 <!--#################################################________Actions_________#################################################-->
 <!--##########################################################################################################################-->
 
-        <record id="action_of_service_form" model="ir.actions.act_window">
+        <record id="action_of_service_form_sale" model="ir.actions.act_window">
+            <field name="name">Services</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">of.service</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,map,form</field>
+        </record>
+
+        <record id="action_of_service_form_planning" model="ir.actions.act_window">
             <field name="name">Services</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">of.service</field>
@@ -280,29 +288,29 @@
             <field eval="0" name="sequence"/>
             <field name="view_mode">tree</field>
             <field name="view_id" ref="view_of_service_tree"/>
-            <field name="act_window_id" ref="action_of_service_form"/>
+            <field name="act_window_id" ref="action_of_service_form_sale"/>
         </record>
 
         <record id="action_service_map_view" model="ir.actions.act_window.view">
             <field eval="1" name="sequence"/>
             <field name="view_mode">map</field>
             <field name="view_id" ref="of_service_map_view"/>
-            <field name="act_window_id" ref="action_of_service_form"/>
+            <field name="act_window_id" ref="action_of_service_form_sale"/>
         </record>
 
         <record id="action_service_form_view" model="ir.actions.act_window.view">
             <field name="sequence" eval="2"/>
             <field name="view_mode">form</field>
             <field name="view_id" ref="view_of_service_form"/>
-            <field name="act_window_id" ref="action_of_service_form"/>
+            <field name="act_window_id" ref="action_of_service_form_sale"/>
         </record>
 
 <!--##########################################################################################################################-->
 <!--#################################################_________Menus__________#################################################-->
 <!--##########################################################################################################################-->
 
-        <menuitem id="menu_of_service" name="Services" parent="sales_team.menu_sales" sequence="105" action="action_of_service_form"/>
-        <menuitem id="menu_of_planning_service" name="Services" parent="of_planning.menu_of_planning_intervention" sequence="25" action="action_of_service_form"/>
+        <menuitem id="menu_of_service" name="Services" parent="sales_team.menu_sales" sequence="105" action="action_of_service_form_sale"/>
+        <menuitem id="menu_of_planning_service" name="Services" parent="of_planning.menu_of_planning_intervention" sequence="25" action="action_of_service_form_planning"/>
 
     </data>
 </openerp>

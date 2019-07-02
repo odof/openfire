@@ -668,6 +668,57 @@
     </record>
 
 <!--##########################################################################################################################-->
+<!--#######################################________Actions Dupliquées_________################################################-->
+<!--##########################################################################################################################-->
+
+    <record id="of_product_template_action_planning" model="ir.actions.act_window">
+        <field name="name">Produits</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_type">form</field>
+        <field name="view_id" ref="product.product_template_kanban_view"/>
+        <field name="context">{"search_default_filter_to_sell":1}</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to define a new product.
+            </p><p>
+                You must define a product for everything you sell, whether it's a physical product, a consumable or a service you offer to customers.
+            </p><p>
+                The product form contains information to simplify the sale process: price, notes in the quotation, accounting data, procurement methods, etc.
+            </p>
+        </field>
+    </record>
+
+    <record id="of_template_open_kit_planning" model="ir.actions.act_window">
+        <field name="name">Kits</field>
+        <field name="res_model">product.template</field>
+        <field name="domain">[('of_is_kit', '=', True)]</field>
+        <field name="view_mode">tree, kanban, form</field>
+        <field name="view_type">form</field>
+        <field name="context">{"default_of_is_kit":1}</field>
+    </record>
+
+    <record id="action_of_partner_form_planning" model="ir.actions.act_window">
+        <field name="name">Clients</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">kanban,tree,map,form</field>
+        <field name="context">{"search_default_customer":1}</field>
+        <field name="search_view_id" ref="base.view_res_partner_filter"/>
+        <field name="help" type="html">
+          <p class="oe_view_nocontent_create">
+            Click to add a contact in your address book.
+          </p><p>
+            Odoo helps you easily track all activities related to
+            a customer: discussions, history of business opportunities,
+            documents, etc.
+          </p>
+        </field>
+    </record>
+
+<!--##########################################################################################################################-->
 <!--#############################################_________Menus__________#####################################################-->
 <!--##########################################################################################################################-->
 
@@ -677,11 +728,11 @@
             <menuitem id="menu_of_planning_intervention_calendar" name="Planning" parent="of_planning.menu_of_planning_intervention" sequence="1" action="action_of_planning_intervention_calendar"/>
 
         <menuitem id="menu_of_planning_clients" name="Clients" parent="of_planning.menu_of_planning" sequence="20"/>
-            <menuitem id="menu_of_planning_clients_clients" name="Clients" parent="of_planning.menu_of_planning_clients" action="base.action_partner_form" sequence="10"/>
+            <menuitem id="menu_of_planning_clients_clients" name="Clients" parent="of_planning.menu_of_planning_clients" action="action_of_partner_form_planning" sequence="10"/>
 
         <menuitem id="menu_of_planning_vente" name="Articles" parent="of_planning.menu_of_planning" sequence="30"/>
-            <menuitem id="menu_of_planning_vente_articles" name="Articles" parent="of_planning.menu_of_planning_vente" action="product.product_template_action" sequence="10"/>
-            <menuitem id="menu_of_planning_vente_kits" name="Kits" parent="of_planning.menu_of_planning_vente" action="of_kit.of_template_open_kit" sequence="20"/>
+            <menuitem id="menu_of_planning_vente_articles" name="Articles" parent="of_planning.menu_of_planning_vente" action="of_product_template_action_planning" sequence="10"/>
+            <menuitem id="menu_of_planning_vente_kits" name="Kits" parent="of_planning.menu_of_planning_vente" action="of_template_open_kit_planning" sequence="20"/>
 
         <menuitem id="menu_of_planning_configuration" name="Configuration" parent="of_planning.menu_of_planning" groups="hr.group_hr_manager" sequence="100"/>
             <menuitem name="Modèles d'intervention" id="menu_of_planning_intervention_template" parent="of_planning.menu_of_planning_configuration" sequence="10" action="action_of_planning_intervention_template"/>
