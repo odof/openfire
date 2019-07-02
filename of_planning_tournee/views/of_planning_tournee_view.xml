@@ -26,7 +26,7 @@
             <field name="inherit_id" ref="of_planning.view_of_planning_equipe_form"/>
             <field name="type">form</field>
             <field name="arch" type="xml">
-                <group name="horaires" position="before">
+                <group name="gr_1" position="inside">
                     <group name="adresse" colspan="2">
                         <separator string="Adresses" colspan="2"/>
                         <field name="address_id"/>
