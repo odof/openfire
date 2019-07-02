@@ -713,7 +713,7 @@ class OFRDVCommercial(models.TransientModel):
     @api.multi
     def button_confirm(self):
         self.ensure_one()
-        if self.creneau_ids[0].employee_id.id != self.employee_id:
+        if self.creneau_ids[0].employee_id.id != self.employee_id.id:
             raise UserError(u"Il semblerait que vous ayez changé le commercial depuis votre dernière recherche. Veuillez relancer la recherche ou rétablir le commercial précédent (%s)" % self.creneau_ids[0].employee_id.name)
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')

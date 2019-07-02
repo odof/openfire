@@ -186,7 +186,7 @@
                         <button name="button_calcul" string="Rechercher" type="object" colspan="2" class="btn-default"
                                 attrs="{'invisible': [('date_propos','=',False)]}"/>
                         <button string="Confirmer RDV" name="button_confirm" type="object" class="btn-primary"
-                                attrs="{'invisible': ['|','|','|',('name','=',False),('date_propos','=',False),('date_propos_hour','=',False)]}"/>
+                                attrs="{'invisible': ['|','|','|','|',('name','=',False),('date_propos','=',False),('date_propos_hour','=',False),('zero_result','=',True)]}"/>
                         <button string="Annuler" class="btn-default" special="cancel"/>
                     </footer>
                 </form>
