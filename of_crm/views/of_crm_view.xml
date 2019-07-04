@@ -9,7 +9,7 @@
         -->
 
         <!-- Ajout dans le contexte "hide_sale: True" qui a été oublié par Odoo pour ne pas afficher les champs "Livré" et "Facturé" dans ligne de commande d'un devis affiché depuis le smart bottom "Devis" du pipeline
-             ainsi que les philtres par défaut "devis ou devis envoyés" -->
+             ainsi que les filtres par défaut "devis ou devis envoyés" -->
         <record id="sale_crm.sale_action_quotations_new"  model="ir.actions.act_window">
             <field name="context">{'search_default_opportunity_id': active_id, 'default_opportunity_id': active_id, 'hide_sale': True, 'search_default_draft': 1, 'search_default_sent': 1}</field>
         </record>
@@ -238,8 +238,8 @@
                                         <field name="source_id" />
                                     </group>
 
-                                    <group string="Misc" name="Misc">
-                                        <field name="referred" />
+                                    <group string="Divers" name="Misc">
+                                        <field name="of_referred_id" />
                                     </group>
                                 </group>
                             </page>
@@ -473,8 +473,8 @@
                                         <field name="source_id" />
                                     </group>
 
-                                    <group string="Misc" name="Misc">
-                                        <field name="referred" />
+                                    <group string="Divers" name="Misc">
+                                        <field name="of_referred_id" />
                                     </group>
                                 </group>
                             </page>
@@ -484,7 +484,7 @@
                                 <group>
                                     <field name="of_modele_id" string="Projet" widget="selection"/>
                                 </group>
- 
+
                                 <!--label for="of_projet_line_ids"/-->
                                 <field name="of_projet_line_ids" nolabel="1" mode="kanban">
                                     <form>
@@ -718,13 +718,31 @@
                     <!-- donner le nom 'other_info' à la page concernée-->
                     <attribute name="name">other_info</attribute>
                 </xpath>
-                <xpath expr="//form//sheet//notebook//group[@name='technical']" position="attributes">
-                    <!-- ouvrir visibilité en dehors de mode développeur-->
+
+                <!-- Afficher champs document d'origine, campagne, moyen, source et opportunité en dehors du mode développeur -->
+                <xpath expr="//group[@name='technical']" position="attributes">
                     <attribute name="groups">sales_team.group_sale_salesman</attribute>
                 </xpath>
-                <xpath expr="//form//sheet//notebook//group[@name='technical']//field[@name='opportunity_id']" position="attributes">
-                    <!-- ouvrir visibilité en dehors de mode développeur-->
+                <xpath expr="//group[@name='technical']/field[@name='origin']" position="attributes">
                     <attribute name="groups">sales_team.group_sale_salesman</attribute>
+                </xpath>
+                <xpath expr="//group[@name='technical']/field[@name='campaign_id']" position="attributes">
+                    <attribute name="groups">sales_team.group_sale_salesman</attribute>
+                </xpath>
+                <xpath expr="//group[@name='technical']/field[@name='medium_id']" position="attributes">
+                    <attribute name="groups">sales_team.group_sale_salesman</attribute>
+                </xpath>
+                <xpath expr="//group[@name='technical']/field[@name='source_id']" position="attributes">
+                    <attribute name="groups">sales_team.group_sale_salesman</attribute>
+                </xpath>
+                <xpath expr="//group[@name='technical']/field[@name='opportunity_id']" position="attributes">
+                    <attribute name="groups">sales_team.group_sale_salesman</attribute>
+                </xpath>
+                <!-- Ajout champ "Apporté par" dans devis/commande -->
+                <xpath expr="//group[@name='technical']" position="after">
+                    <group string="Divers" name="Misc">
+                        <field name="of_referred_id" />
+                    </group>
                 </xpath>
             </field>
         </record>
