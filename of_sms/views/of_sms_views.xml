@@ -1,26 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
-
-        <!-- After installation of the module, open the related menu -->
-        <record id="of_sms_account_action_ovh" model="ir.actions.act_window">
-            <field name="name">Compte SMS OVH</field>
-            <field name="res_model">of.sms.account</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-            <field name="view_id" ref="of_sms.of_sms_account_view_form"/>
-            <field name="context" eval="{'default_name':'OVH Account','default_account_gateway_id':ref('of_sms_gateway_ovh')}"/>
-            <field name="help" type="html">
-                <p class="oe_view_nocontent_create">Ajouter un compte d'une passerelle SMS</p>
-            </field>
-        </record>
-
-        <record id="base.open_menu" model="ir.actions.todo">
-            <field name="action_id" ref="of_sms_account_action_ovh"/>
-            <field name="state">open</field>
-        </record>
-
-    </data>
 
     <!-- Action "Envoyer SMS" dans vue formaulaire partenaires et prospects (res.partner) -->
     <record id="of_sms_partner_more_menu_server_action" model="ir.actions.server">
@@ -445,5 +424,27 @@
 
     <menuitem id="of_sms_template_menu" name="Modèles" parent="of_sms_parent_menu" action="of_sms_template_action" sequence="40"/>
     <menuitem id="of_sms_message_menu" name="SMS émis/reçus" parent="of_sms_parent_menu" action="of_sms_message_action" sequence="30"/>
+
+    <data noupdate="1">
+
+        <!-- After installation of the module, open the related menu -->
+        <record id="of_sms_account_action_ovh" model="ir.actions.act_window">
+            <field name="name">Compte SMS OVH</field>
+            <field name="res_model">of.sms.account</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="of_sms.of_sms_account_view_form"/>
+            <field name="context" eval="{'default_name':'OVH Account','default_account_gateway_id':ref('of_sms_gateway_ovh')}"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Ajouter un compte d'une passerelle SMS</p>
+            </field>
+        </record>
+
+        <record id="base.open_menu" model="ir.actions.todo">
+            <field name="action_id" ref="of_sms_account_action_ovh"/>
+            <field name="state">open</field>
+        </record>
+
+    </data>
 
 </odoo>
