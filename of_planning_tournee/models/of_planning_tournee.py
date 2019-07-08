@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, models, fields
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 
 import math
 from math import asin, sin, cos, sqrt
@@ -212,7 +212,7 @@ class OfPlanningTournee(models.Model):
             tournee.date_jour = jour
 
     @api.multi
-    @api.depends('equipe_id', 'date', 'is_bloque',
+    @api.depends('equipe_id', 'date', 'is_bloque', 'equipe_id.tz', 'equipe_id.tz_offset',
                  'equipe_id.hor_md', 'equipe_id.hor_mf', 'equipe_id.hor_ad', 'equipe_id.hor_af')
     def _compute_is_complet(self):
         if not self._context.get('tz'):
@@ -224,6 +224,8 @@ class OfPlanningTournee(models.Model):
                 continue
 
             equipe = tournee.equipe_id
+            if equipe.tz and equipe.tz != 'Europe/Paris':
+                self = self.with_context(tz=equipe.tz)
 
             interventions = intervention_obj.search([
                 ('equipe_id', '=', equipe.id),
@@ -236,16 +238,35 @@ class OfPlanningTournee(models.Model):
                 continue
 
             date_local = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(tournee.date))
-            start_end_list = [
-                (0, equipe.hor_md),
-                (equipe.hor_mf, equipe.hor_ad),
-                (equipe.hor_af, 24)
-            ]
+            if equipe.mode_horaires == 'easy':  # mode facile
+                start_end_list = [
+                    (0, equipe.hor_md),
+                    (equipe.hor_mf, equipe.hor_ad),
+                    (equipe.hor_af, 24)
+                ]
+                debut_journee = equipe.hor_md
+                fin_journee = equipe.hor_af
+            else:  # mode avancé
+                le_num_jour = date_local.isoweekday()
+                les_creneaux = equipe.creneau_ids.filtered(lambda x: x.jour_number == le_num_jour)
+                if equipe.creneau_temp_start:  # des horaires temporaires: à prendre en compte?
+                    la_date_str = fields.Date.to_string(date_local)
+                    if equipe.creneau_temp_start <= la_date_str and la_date_str <= equipe.creneau_temp_stop:  # oui
+                        les_creneaux = equipe.creneau_temp_ids.filtered(lambda x: x.jour_number == le_num_jour)
+                len_creneaux = len(les_creneaux)
+                if len_creneaux == 0:
+                    raise UserError(u"Oups! On dirait que l'équipe %s ne travail pas ce jour-ci!" % equipe.name)
+                start_end_list = [(0, les_creneaux[0].heure_debut)]
+                for i in range(1,len_creneaux):
+                    start_end_list.append((les_creneaux[i-1].heure_fin, les_creneaux[i].heure_debut))
+                start_end_list.append((les_creneaux[len_creneaux - 1].heure_fin, 24))
+                debut_journee = les_creneaux[0].heure_debut
+                fin_journee = les_creneaux[len_creneaux - 1].heure_fin
 
             for intervention in interventions:
                 start_local = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(intervention.date))
                 if start_local.day != date_local.day:
-                    start_flo = equipe.hor_md
+                    start_flo = debut_journee
                 else:
                     start_flo = (start_local.hour +
                                  start_local.minute / 60 +
@@ -253,7 +274,7 @@ class OfPlanningTournee(models.Model):
 
                 end_local = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(intervention.date_deadline))
                 if end_local.day != date_local.day:
-                    end_flo = equipe.hor_af
+                    end_flo = fin_journee
                 else:
                     end_flo = (start_local.hour +
                                start_local.minute / 60 +

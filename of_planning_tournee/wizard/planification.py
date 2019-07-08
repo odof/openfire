@@ -83,6 +83,7 @@ class OfTourneePlanification(models.TransientModel):
 
         equipe = tournee.equipe_id
         date_intervention = tournee.date
+        d_date_intervention = fields.Date.from_string(date_intervention)
 
         # Comme on n'affiche que les heures, il faut s'assurer de rester dans le bon jour
         #   (pour les interventions étalées sur plusieurs jours)
@@ -91,11 +92,31 @@ class OfTourneePlanification(models.TransientModel):
         date_max = tz.localize(datetime.strptime(date_intervention+" 23:59:00", "%Y-%m-%d %H:%M:%S"))
 
         plannings = []
-        if equipe.hor_md and equipe.hor_mf and equipe.hor_ad and equipe.hor_af:
-            equipe_hor_md = equipe.hor_md
-            equipe_hor_mf = equipe.hor_mf
-            equipe_hor_ad = equipe.hor_ad
-            equipe_hor_af = equipe.hor_af
+        if equipe.hor_md and equipe.hor_mf and equipe.hor_ad and equipe.hor_af or equipe.creneau_ids:
+            equipe_hor_list = []   # liste des creneaux travaillés
+
+            if equipe.mode_horaires == 'easy':  # mode facile
+                if equipe_hor_mf == equipe_hor_ad:
+                    equipe_hor_list.append([equipe.hor_md, equipe.hor_af])
+                else:
+                    equipe_hor_list.append([equipe.hor_md, equipe.hor_mf])
+                    equipe_hor_list.append([equipe.hor_ad, equipe.hor_af])
+            else:  # mode avancé
+                le_num_jour = d_date_intervention.isoweekday()
+                les_creneaux = equipe.creneau_ids.filtered(lambda x: x.jour_number == le_num_jour)
+                if equipe.creneau_temp_start:  # des horaires temporaires: à prendre en compte?
+                    if equipe.creneau_temp_start <= date_intervention and date_intervention <= equipe.creneau_temp_stop:  # oui
+                        les_creneaux = equipe.creneau_temp_ids.filtered(lambda x: x.jour_number == le_num_jour)
+                len_creneaux = len(les_creneaux)
+                if len_creneaux == 0:
+                    raise UserError(u"Oups! On dirait que l'équipe %s ne travail pas ce jour-ci!" % equipe.name)
+                for i in range(len_creneaux):
+                    if i > 0 and les_creneaux[i-1].heure_fin == les_creneaux[i].heure_debut:  # fusion créneaux
+                        equipe_hor_list.pop()
+                        equipe_hor_list.append((les_creneaux[i-1].heure_debut, les_creneaux[i].heure_fin))
+                    equipe_hor_list.append((les_creneaux[i].heure_debut, les_creneaux[i].heure_fin))
+                debut_journee = les_creneaux[0].heure_debut
+                fin_journee = les_creneaux[len_creneaux - 1].heure_fin
 
             # Récupération des RDVs déjà créés
             interventions = intervention_obj.search([
@@ -124,13 +145,6 @@ class OfTourneePlanification(models.TransientModel):
                                            date_local.second / 3600.0, 5)
                     data.append(date_local_flo)
                 hor_list.append(data)
-
-            equipe_hor_list = []   # date_debut, date_fin
-            if equipe_hor_mf == equipe_hor_ad:
-                equipe_hor_list.append([equipe_hor_md, equipe_hor_af])
-            else:
-                equipe_hor_list.append([equipe_hor_md, equipe_hor_mf])
-                equipe_hor_list.append([equipe_hor_ad, equipe_hor_af])
 
             debut_add = 0.0
             for eh in equipe_hor_list:
@@ -611,11 +625,16 @@ class OfTourneePlanificationPlanning(models.TransientModel):
             )
             description = "\n".join([s for s in description if s])
 
+            les_jours_ids = equipe.jour_ids._ids
+            if les_jours_ids == []:
+                les_jours_ids = self.env['of.jours'].search([('numero', 'in', [1, 2, 3, 4, 5])])._ids
+
             values = {
                 'hor_md'     : equipe.hor_md,
                 'hor_mf'     : equipe.hor_mf,
                 'hor_ad'     : equipe.hor_ad,
                 'hor_af'     : equipe.hor_af,
+                'jour_ids'   : [(4, le_id, 0) for le_id in les_jours_ids],
                 'partner_id' : service.partner_id.id,
                 'address_id' : address.id,
                 'service_id' : service.id,

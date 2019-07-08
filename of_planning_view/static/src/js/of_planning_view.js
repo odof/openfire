@@ -346,6 +346,7 @@ var PlanningView = View.extend({
                                 "color_ft": event[self.color_ft] || "#0C0C0C",
                                 "auto_render": false,
                             }
+                            console.log("PLANNING_ROECORD",planning_record);
                             self.rows[la_key] = new PlanningView.Row(self.table,self,[planning_record],row_options);
                         }else{
                             self.rows[la_key].add_record(planning_record);
@@ -854,8 +855,8 @@ PlanningView.Row = Widget.extend({
      *
      */
     add_record: function (planning_record) {
-        if (!planning_record.col_offset_start) {
-            console.log("ERREUR: col_offset_start manquant",record);
+        if (isNullOrUndef(planning_record.col_offset_start)) {
+            console.log("ERREUR: col_offset_start manquant",planning_record);
         }else if(isNullOrUndef(planning_record.col_offset_stop)) {  // 1 day event
             this.columns[planning_record.col_offset_start].push(planning_record);
         }else{  // several days event

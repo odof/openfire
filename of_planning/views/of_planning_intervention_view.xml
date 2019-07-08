@@ -155,52 +155,99 @@
                                 <separator string="Documents liés" colspan="2"/>
                                 <field name="order_id"/>
                             </group>
-                            <group name="horaires" col="4">
-                                <separator string="Horaires de travail" colspan="4"/>
-                                <group colspan="4">
-                                    <label for="hor_md" string="Matin"/>
-                                    <field name="hor_md" nolabel="1" widget="float_time" string="Matin :"/>
-                                    <label for="hor_mf" string="&#160;"/>
-                                    <field name="hor_mf" nolabel="1" widget="float_time"/>
-                                </group>
-                                <group colspan="4">
-                                    <label for="hor_ad" string="Après-midi"/>
-                                    <field name="hor_ad" nolabel="1" widget="float_time"/>
-                                    <label for="hor_af" string="&#160;"/>
-                                    <field name="hor_af" nolabel="1" widget="float_time"/>
-                                   </group>
-                                <group colspan="4" col="2">
-                                    <!--field name="hor_sam"/>
-                                    <field name="hor_dim"/-->
-                                    <field name="jour_ids" widget="many2many_tags"/>
-                                    <field name="tz" invisible="1" widget="timezone_mismatch" options="{'tz_offset_field': 'tz_offset'}" />
-                                    <field name="tz_offset" invisible="1"/>
-                                </group>
-                            </group>
                         </group>
-
-                            <!-- Description -->
                         <notebook>
-                            <page string="Description">
-                                <separator string="Description" colspan="4"/>
-                                <field colspan="4" name="description" nolabel="1" context="{'tz': 'Europe/Paris'}" witget="html"
+                            <!-- Description -->
+                            <page name="description" string="Descripton">
+                                <field name="description" nolabel="1" witget="html"
                                     help="Ce champ sera imprimé dans la fiche d'intervention."/>
-                                <div class="oe_edit_only" colspan="4" style="margin-top: -20px; padding-top: 0px">
+                                <div class="oe_edit_only" style="margin-top: -20px; padding-top: 0px">
                                     * Les données saisies dans ce champ seront imprimées dans la fiche d'intervention.
                                 </div>
-
-                                <!-- Notes client -->
-                                <group attrs="{'invisible':[('of_notes_client','=',False)]}" colspan="4">
-                                    <separator string="Notes client" colspan="4"/>
-                                    <field name="of_notes_client" colspan="4" nolabel="1" readonly="1"
-                                        help="Ces notes proviennent de la fiche client sous la rubrique 'Notes internes'. Elles sont uniquement modifiables dans la fiche client."/>
+                            </page>
+                            <page name="notes" string="Notes" attrs="{'invisible':[('of_notes_client','=',False),('of_notes_intervention','=',False)]}">
+                                <group>
+                                    <!-- Notes client -->
+                                    <group attrs="{'invisible':[('of_notes_client','=',False)]}" col="2">
+                                        <separator string="Notes client" colspan="2"/>
+                                        <field name="of_notes_client" colspan="2" nolabel="1" readonly="1"
+                                            help="Ces notes proviennent de la fiche client sous la rubrique 'Notes internes'. Ils sont uniquement modifiables dans la fiche client."/>
+                                    </group>
+                                    <!-- Notes intervention -->
+                                    <group attrs="{'invisible':[('of_notes_intervention','=',False)]}" col="2">
+                                        <separator string="Notes intervention" colspan="2"/>
+                                        <field name="of_notes_intervention" nolabel="1"
+                                            help="Ces notes proviennent du devis / commande sous la rubrique 'Notes intervention'. Ils sont uniquement modifiables dans le  devis / commande (voir la commande associée)."/>
+                                    </group>
                                 </group>
-                                <!-- Notes intervention -->
-                                <group attrs="{'invisible':[('of_notes_intervention','=',False)]}" colspan="4">
-                                    <separator string="Notes intervention" colspan="4"/>
-                                    <field name="of_notes_intervention" nolabel="1"
-                                        help="Ces notes proviennent du devis / commande sous la rubrique 'Notes intervention'. Elles sont uniquement modifiables dans le devis / commande (voir la commande associée)."/>
+                            </page>
+                            <page name="horaires" string="Horaires de travail">
+                                <group colspan="4">
+                                    <group>
+                                        <field name="forcer_horaires"/>
+                                        <field name="mode_horaires_readonly" attrs="{'invisible':[('forcer_horaires', '=', True)]}"/>
+                                    </group>
+                                    <group></group>
                                 </group>
+                                <group name="horaires_easy" attrs="{'invisible':[('forcer_horaires', '=', False), ('mode_horaires', '=', 'advanced')]}" colspan="4" col="4" >
+                                    <separator string="Horaires" colspan="4"/>
+                                    <group col="2" colspan="2">
+                                        <label for="hor_md" string="Matin"/>
+                                        <span class="oe_inline">
+                                            <field class="oe_inline" name="hor_md" nolabel="1" widget="float_time" attrs="{'invisible':[('forcer_horaires', '=', False)], 'required': ['|', ('forcer_horaires', '=', True), ('mode_horaires', '=', 'easy')]}"/>
+                                            <field class="oe_inline" name="hor_md_readonly" nolabel="1" widget="float_time" attrs="{'invisible':[('forcer_horaires', '=', True)]}"/> -
+                                            <field class="oe_inline" name="hor_mf" nolabel="1" widget="float_time" attrs="{'invisible':[('forcer_horaires', '=', False)], 'required': ['|', ('forcer_horaires', '=', True), ('mode_horaires', '=', 'easy')]}"/>
+                                            <field class="oe_inline" name="hor_mf_readonly" nolabel="1" widget="float_time" attrs="{'invisible':[('forcer_horaires', '=', True)]}"/>
+                                        </span>
+                                        <label for="hor_ad" string="Après-midi"/>
+                                        <span class="oe_inline">
+                                            <field class="oe_inline" name="hor_ad" nolabel="1" widget="float_time" attrs="{'invisible':[('forcer_horaires', '=', False)], 'required': ['|', ('forcer_horaires', '=', True), ('mode_horaires', '=', 'easy')]}"/>
+                                            <field class="oe_inline" name="hor_ad_readonly" nolabel="1" widget="float_time" attrs="{'invisible':[('forcer_horaires', '=', True)]}"/> -
+                                            <field class="oe_inline" name="hor_af" nolabel="1" widget="float_time" attrs="{'invisible':[('forcer_horaires', '=', False)], 'required': ['|', ('forcer_horaires', '=', True), ('mode_horaires', '=', 'easy')]}"/>
+                                            <field class="oe_inline" name="hor_af_readonly" nolabel="1" widget="float_time" attrs="{'invisible':[('forcer_horaires', '=', True)]}"/>
+                                        </span>
+                                    </group>
+                                    <group col="2" colspan="2">
+                                        <field name="jour_ids" attrs="{'invisible':[('forcer_horaires', '=', False)], 'required': ['|', ('forcer_horaires', '=', True), ('mode_horaires', '=', 'easy')]}" widget="many2many_tags" colspan="2"/>
+                                        <field name="jour_readonly_ids" attrs="{'invisible':[('forcer_horaires', '=', True)]}" widget="many2many_tags" colspan="2"/>
+                                    </group>
+                                </group>
+                                <group col="4" name="horaires_advanced" attrs="{'invisible': ['|',('mode_horaires', '!=', 'advanced'), ('forcer_horaires', '=', True)]}">
+                                    <group name="horaires_defaut" col="4" colspan="2">
+                                        <separator string="Horaires par défaut" attrs="{'invisible':[('creneau_temp_start', '=', False)]}" colspan="4"/>
+                                        <separator string="Horaires" attrs="{'invisible':[('creneau_temp_start', '!=', False)]}" colspan="4"/>
+                                        <field name="creneau_readonly_ids" nolabel="1" colspan="4" style="padding: 8px;">
+                                            <tree string="Créneaux" editable="0">
+                                                <field name="jour_number" invisible="1"/>
+                                                <field name="name"/>
+                                                <field name="jour_id" invisible="1"/>
+                                                <field name="heure_debut" invisible="1" widget="float_time"/>
+                                                <field name="heure_fin" invisible="1" widget="float_time"/>
+                                            </tree>
+                                        </field>
+                                    </group>
+                                    <group name="horaires_temp" attrs="{'invisible':[('creneau_temp_start','=',False)]}" col="4" colspan="2">
+                                        <group col="4" colspan="4">
+                                            <separator string="Horaires temporaires" colspan="4"/>
+                                            <field name="creneau_temp_start_readonly" string="Début de validité" attrs="{'required': [('creneau_temp_stop', '!=', False)]}"/>
+                                            <field name="creneau_temp_stop_readonly" string="Fin de validité" attrs="{'required': [('creneau_temp_start', '!=', False)]}"/>
+                                        </group>
+                                        <field name="creneau_temp_readonly_ids" nolabel="1" colspan="4" style="padding: 8px;">
+                                            <tree string="Créneaux" editable="0">
+                                                <field name="jour_number" invisible="1"/>
+                                                <field name="name"/>
+                                                <field name="jour_id" invisible="1"/>
+                                                <field name="heure_debut" invisible="1" widget="float_time"/>
+                                                <field name="heure_fin" invisible="1" widget="float_time"/>
+                                            </tree>
+                                        </field>
+                                    </group>
+                                </group>
+                                <field name="creneau_ids" invisible="1" widget="many2many_tags"/>
+                                <field name="creneau_temp_start" invisible="1"/>
+                                <field name="creneau_temp_stop" invisible="1"/>
+                                <field name="creneau_temp_ids" invisible="1" widget="many2many_tags"/>
+                                <field name="mode_horaires" invisible="1"/>
                             </page>
                         </notebook>
                     </sheet>
@@ -479,7 +526,7 @@
                                         <field name="tz_offset" invisible="1"/>
                                     </group>
                                 </group>
-                                <group name="horaires_simple" colspan="2" col="4" attrs="{'invisible': [('mode_horaires', '!=', 'easy')]}">
+                                <group name="horaires_easy" colspan="2" col="4" attrs="{'invisible': [('mode_horaires', '!=', 'easy')]}">
                                     <separator string="Horaires de travail" colspan="4"/>
                                     <group col="2" colspan="2">
                                         <label for="hor_md" string="Matin"/>
@@ -494,13 +541,13 @@
                                         </span>
                                     </group>
                                     <group col="2" colspan="2">
-                                        <field name="jour_ids" widget="many2many_tags" colspan="2"/>
+                                        <field name="jour_ids" attrs="{'required': [('mode_horaires', '=', 'easy')]}" widget="many2many_tags" colspan="2"/>
                                     </group>
                                 </group>
                                 <group col="4" name="horaires_advanced" attrs="{'invisible': [('mode_horaires', '!=', 'advanced')]}">
                                     <group col="4" colspan="2">
                                         <separator string="Horaires par défaut" colspan="4"/>
-                                        <field name="creneau_ids" nolabel="1" colspan="4" style="padding: 8px;">
+                                        <field name="creneau_ids" nolabel="1" colspan="4" style="padding: 8px;" options='{"no_open": True, "no_create": True}'>
                                             <tree string="Créneaux" editable="0">
                                                 <field name="jour_number" invisible="1"/>
                                                 <field name="name"/>
@@ -522,8 +569,8 @@
                                                 Dans ce cas là il suffit de sélectionner 01/07/2019 comme date de début de validité et 07/07/2019 comme date de fin de validité.
                                                 Même pas besoin d'ajouter des créneaux temporaires, vu que tous les créneaux par défaut de cette semaine seront remplacés!</i>
                                             </span>
-                                            <field name="creneau_temp_start" string="Début de validité"/>
-                                            <field name="creneau_temp_stop" string="Fin de validité"/>
+                                            <field name="creneau_temp_start" string="Début de validité" attrs="{'required': [('creneau_temp_stop', '!=', False)]}"/>
+                                            <field name="creneau_temp_stop" string="Fin de validité" attrs="{'required': [('creneau_temp_start', '!=', False)]}"/>
                                         </group>
                                         <field name="creneau_temp_ids" nolabel="1" colspan="4" style="padding: 8px;">
                                             <tree string="Créneaux" editable="0">

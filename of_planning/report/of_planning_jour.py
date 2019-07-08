@@ -2,6 +2,7 @@
 from odoo.report import report_sxw
 from odoo import fields
 from datetime import datetime
+from odoo.exceptions import UserError
 
 class OfPlanningJour(report_sxw.rml_parse):
     def __init__(self, cr, uid, name, context):
@@ -47,9 +48,23 @@ class OfPlanningJour(report_sxw.rml_parse):
         date_datetime_local = fields.Datetime.context_timestamp(line, fields.Datetime.from_string(line.date))
         planning_datetime_local = fields.Datetime.context_timestamp(line, fields.Datetime.from_string(self.datas['form']['date_start']))
 
-        if date_datetime_local.day != planning_datetime_local.day:
-            int_date_hour = int(line.hor_md)
-            int_date_min = int(round((line.hor_md - int_date_hour) * 60, 0))
+        if date_datetime_local.day != planning_datetime_local.day:  # en cas d'intervention sur plusieurs jours
+            if line.mode_horaires == 'easy' or line.forcer_horaires:  # mode facile
+                int_date_hour = int(line.hor_md)
+                int_date_min = int(round((line.hor_md - int_date_hour) * 60, 0))
+            else:  # mode avancé
+                le_num_jour = planning_datetime_local.weekday() + 1
+                les_creneaux = line.creneau_ids.filtered(lambda x: x.jour_number == le_num_jour)
+                if line.creneau_temp_start:  # des horaires temporaires: a prendre en compte?
+                    la_date_str = fields.Date.to_string(planning_datetime_local)
+                    if line.creneau_temp_start <= la_date_str and la_date_str <= line.creneau_temp_stop:  # oui
+                        les_creneaux = line.creneau_temp_ids.filtered(lambda x: x.jour_number == le_num_jour)
+                if len(les_creneaux) > 0:
+                    le_debut = les_creneaux[0].heure_debut
+                else:
+                    raise UserError(u"Oups! On dirait que l'équipe %s ne travaille pas ce jour-ci" % line.equipe_id.name)
+                int_date_hour = int(le_debut)
+                int_date_min = int(round((le_debut - int_date_hour) * 60, 0))
         else:
             int_date_hour = datetime.time(date_datetime_local).hour
             int_date_min = datetime.time(date_datetime_local).minute
