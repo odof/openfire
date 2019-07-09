@@ -699,6 +699,7 @@ class AccountInvoice(models.Model):
     of_sale_order_ids = fields.Many2many('sale.order', compute="_compute_of_sale_order_ids", string="Bons de commande")
     of_residual = fields.Float(string=u"Somme du montant non payé des factures d'acompte et de la facture finale", compute="_compute_of_residual")
     of_residual_equal = fields.Boolean(compute="_compute_of_residual")
+    of_suivi_interne = fields.Char(string="Suivi interne")
 
     def _compute_of_sale_order_ids(self):
         for invoice in self:
@@ -864,3 +865,8 @@ class AccountPaymentTermLine(models.Model):
                 i += 1
                 break
         return result[:i] + [('order', 'Date de commande')] + result[i:]
+
+class SaleLayoutCategory(models.Model):
+    _inherit = 'sale.layout_category'
+
+    active = fields.Boolean(string="Active", default=True)
