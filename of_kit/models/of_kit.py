@@ -9,7 +9,7 @@ class ProductTemplate(models.Model):
 
     of_is_kit = fields.Boolean(string="Is a kit")
     is_kit_comp = fields.Boolean(string="Is a comp", compute="_compute_is_kit_comp", store=True, help="is a component of a kit")  # store=True for domain searches and _sq_constraint
-    kit_line_ids = fields.One2many('of.product.kit.line', 'kit_id', string='Components')
+    kit_line_ids = fields.One2many('of.product.kit.line', 'kit_id', string='Components', copy=True)
 
     price_comps = fields.Monetary(
         string='Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_compo_price_n_cost',
