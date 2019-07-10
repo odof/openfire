@@ -4,7 +4,11 @@ from odoo import api, models, fields
 from datetime import datetime, timedelta, date as d_date
 import pytz
 from odoo.exceptions import UserError
+
 import urllib, json, requests
+
+from odoo.tools.float_utils import float_compare
+
 
 SEARCH_MODES = [
     ('distance', u'Distance (km)'),
@@ -14,7 +18,9 @@ SEARCH_MODES = [
 ROUTING_BASE_URL = "http://s-hotel.openfire.fr:5000/"
 ROUTING_VERSION = "v1"
 ROUTING_PROFILE = "driving"
-
+"""
+bug description quand changement de tache ou service lié puis changé?
+"""
 def hours_to_strs(*hours):
     """ Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'
     """
@@ -234,6 +240,7 @@ class OfTourneeRdv(models.TransientModel):
         """
         #TODO: finir de commenter
         self.ensure_one()
+        compare_precision = 5
 
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')
@@ -268,7 +275,7 @@ class OfTourneeRdv(models.TransientModel):
         dict_horaires = {}  # dictionnaire contenant les horaires par jour par équipe {equipe_id: {1: [(9, 12), (14, 18)], 2:[], ...}, ...}
         jours_temp_equipes = {}  # dictionnaire contenant les jours travaillés temporaires par équipe {equipe_id: [jours travaillés], ...}
         dict_horaires_temp = {}  # dictionnaire contenant les horaires temporaires par jour par équipe {equipe_id: {1: [(9, 12), (14, 18)], 2:[], ...}, ...}
-        horaires_temp = {equipe_id: False for equipe_id in equipes}  # dictionnaire qui nous dit pour chaque équipe si il faut prendre en compte des horaires temporaires
+        horaires_temp = {equipe.id: False for equipe in equipes}  # dictionnaire qui nous dit pour chaque équipe si il faut prendre en compte des horaires temporaires
         for equipe in equipes:
             equipe_id = equipe.id
             if equipe.mode_horaires == "easy":
@@ -293,6 +300,7 @@ class OfTourneeRdv(models.TransientModel):
                     str_temp_stop = equipe.creneau_temp_stop
                     d_temp_stop = fields.Date.from_string(str_temp_stop)
                     creneaux_temp_travailles = equipe.creneau_temp_ids
+                    dict_horaires_temp[equipe_id] = {}
                     for i in range(1,8):
                         dict_horaires_temp[equipe_id][i] = []
                         creneaux_temp_du_jour = creneaux_temp_travailles.filtered(lambda x: x.jour_number == i)
@@ -301,6 +309,7 @@ class OfTourneeRdv(models.TransientModel):
                     jours_temp_equipes[equipe_id] = [j for j in dict_horaires_temp[equipe_id] if dict_horaires_temp[equipe_id][j] != []]
 
                 creneaux_travailles = equipe.creneau_ids
+                dict_horaires[equipe_id] = {}
                 for i in range(1,8):
                     dict_horaires[equipe_id][i] = []
                     creneaux_du_jour = creneaux_travailles.filtered(lambda x: x.jour_number == i)
@@ -363,7 +372,7 @@ class OfTourneeRdv(models.TransientModel):
             # Restriction aux jours spécifiés dans le service
             while num_jour not in jours_service:
                 d_recherche += un_jour
-                num_jour = num_jour + 1 if ((num_jour + 1) % 7) != 0 else 7 # num jour de la semaine entre 1 et 7
+                num_jour = ((num_jour + 1) % 7) or 7 # num jour de la semaine entre 1 et 7
             # Arreter la recherche si on dépasse la date de fin
             if d_recherche >= d_apres_recherche:
                 continue
@@ -420,6 +429,7 @@ class OfTourneeRdv(models.TransientModel):
                 equipe_intervention_dates[intervention.equipe_id.id].append(intervention_dates)  # (intervention_id, flo_debut, flo_fin)
 
             # Calcul des créneaux
+            # @todo: float_compare
             # @todo: Gestion des employés dans plusieurs équipes
             for equipe in equipe_obj.browse(equipes_dispo):
                 intervention_dates = equipe_intervention_dates[equipe.id]
@@ -459,50 +469,44 @@ class OfTourneeRdv(models.TransientModel):
                     horaires_equipe = dict_horaires[equipe.id][num_jour]
                     index_courant = 0
                     deb = horaires_equipe[index_courant][0]  # début courant
-                    fin = horaires_equipe[index_courant][1]
-                    ##ad = equipe.hor_ad
-                    deb_next = len(horaires_equipe) > index_courant + 1 and horaires_equipe[index_courant + 1][0] or False
-                    fin_next = len(horaires_equipe) > index_courant + 1 and horaires_equipe[index_courant + 1][1] or False
+                    fin = horaires_equipe[index_courant][1]  # fin courante
                     creneaux = []
                     # @todo: Possibilité intervention chevauchant la nuit
                     for intervention, intervention_deb, intervention_fin in intervention_dates + [(False, 24, 24)]:
-                        if deb < intervention_deb:# and deb < fin:
+                        if not intervention:  # plus d'interventions, reste-t-il de la place avant la fin de la journée?
+                            if deb and deb < fin:  # de la place sur ce créneau horaire
+                                creneaux.append((deb, fin, equipe))
+                            while len(horaires_equipe) > index_courant + 1:
+                                index_courant += 1
+                                creneaux.append((horaires_equipe[index_courant][0], horaires_equipe[index_courant][1], equipe))
+                        elif deb and deb < intervention_deb:# and deb < fin:
                             # Un trou dans le planning, suffisant pour un créneau?
                             if intervention_deb - deb >= self.duree:
-                                creneaux.append(deb, intervention_deb)
-                                if intervention_fin <= fin:
+                                creneaux.append((deb, intervention_deb, equipe))
+                                if intervention_fin <= fin:  # l'intervention se fini avant la fin du créneau horaire
                                     deb = intervention_fin  # le nouveau début potentiel sur ce même créneau est la fin de l'intervention
-                                else:
-                                    print "ICIIIIIIIIIIIII"
-
-
-
-
-                            if deb_next and deb < deb_next and intervention_deb >= deb_next:
-                                # On passe d'un créneau horaires au prochain
-                                # On vérifie la durée cumulée de la matinée et de l'après-midi car une intervention peut
-                                # commencer avant la pause repas
-                                intervention_deb = min(intervention_deb, equipe.hor_af)
-                                duree = equipe.hor_mf - deb + intervention_deb - ad
-                                if duree >= self.duree:
-                                    # deb < fin donc il y a du temps disponible le matin
-                                    creneaux.append((deb, fin, equipe))
-                                    if ad < intervention_deb:
-                                        # Il y a du temps disponible entre le début d'après-midi et le début de l'intervention
-                                        creneaux.append((ad, intervention_deb, equipe))
-                                fin = equipe.hor_af
+                                else:  # l'intervention termine après la fin du créneau horaire
+                                    index_courant += 1
+                                    if len(horaires_equipe) > index_courant:  # Nouveau créneau à parcourir
+                                        deb = horaires_equipe[index_courant][0]  # début courant
+                                        deb = max(deb, intervention_fin)
+                                        fin = horaires_equipe[index_courant][1]  # fin courante
+                                        while deb and deb >= fin:  # repositionner le début sur un créneau si besoin
+                                            index_courant += 1
+                                            if len(horaires_equipe) > index_courant:
+                                                fin = horaires_equipe[index_courant][1]
+                                            else:
+                                                deb = False
+                                    else:
+                                        deb = False
                             else:
-                                duree = min(intervention_deb, fin) - deb
-                                if duree >= self.duree:
-                                    creneaux.append((deb, deb+duree, equipe))
-
-                        if intervention_fin >= fin and fin <= ad:
-                            deb = max(intervention_fin, ad)
-                            fin = equipe.hor_af
-                        elif intervention_fin > deb:
-                            deb = intervention_fin
-
-
+                                deb = intervention_fin
+                                while deb and deb >= fin:  # repositionner le début sur un créneau si besoin
+                                    index_courant += 1
+                                    if len(horaires_equipe) > index_courant:
+                                        fin = horaires_equipe[index_courant][1]
+                                    else:
+                                        deb = False
 
 
 
