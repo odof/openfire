@@ -40,6 +40,15 @@ class OfPlanningIntervention(models.Model):
 
         d_date_current = fields.Date.from_string(fields.Datetime.to_string(dt_date_current_local)[:10])
         d_date_stop = fields.Date.from_string(fields.Datetime.to_string(dt_date_stop_local)[:10])
+
+
+        # @todo: horaires avancés
+
+
+
+
+
+
         delta = (d_date_stop - d_date_current).days
         res = {
             "horaires": [hor_md, hor_mf, hor_ad, hor_af],

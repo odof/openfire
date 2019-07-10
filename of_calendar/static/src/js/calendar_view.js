@@ -92,12 +92,10 @@ CalendarView.include({
             dfd.resolve();
         });
 
-        this.init_working_hours_fields()
+        this.set_min_max_time()
         .then(function () {
-            self.set_min_max_time()
-            .then(function() {
-                dfd2.resolve();
-            });
+            dfd2.resolve();
+            return;
         });
 
         return $.when(dfd,dfd2,this._super());
@@ -335,88 +333,32 @@ CalendarView.include({
     set_min_max_time: function() {
         var self = this;
         var dfd = $.Deferred();
-        if (isNullOrUndef(this.working_hours_fields)) {
-            dfd.resolve();
-        }else if (this.attendee_model && this.working_hours == "attendees") { // working hours are stored in attendees model
-            var model = new Model(this.attendee_model);
-            var ms = this.working_hours_fields.mor_start_field;
-            var me = this.working_hours_fields.mor_end_field;
-            var as = this.working_hours_fields.aft_start_field;
-            var ae = this.working_hours_fields.aft_end_field;
-            var fields = [ms, me, as, ae, "tz", "tz_offset"];
-            self.working_hours = {};
-            model.query(fields)
-            .all()
-            .then(function (res) {
-                /*
-                prendre toutes les horaires, les mettres en UTC, les comparer pour avoir le min et max
-                mettre le min et max en localetime pour set minTime et maxTime (plage horaire affichée du calendrier)
-                */
-                //console.log("res: ",res);
-                var date_today = new Date(); // today by default
-                var str_UTC = date_today.toUTCString(); // str UTC
-                var str_prefix = str_UTC.substring(0,17); // str UTC without time
-                var str_suffix = str_UTC.substring(25); // str UTC without time (eg GMT+0100)
-                var descript = {type: "float_time"}; // to format float into hh:mm
-                var minTime, minUTC, maxTime, maxUTC, min_time, max_time;
+        console.log("range", this.date_start, this.date_stop);
 
-                _.each(res, function(record){
-                    min_time = formats.format_value(record[ms],descript) + ":00"; // time formatted hh:mm:ss
-                    max_time = formats.format_value(record[ae],descript) + ":00"; // time formatted hh:mm:ss
-                    record.min_UTC = str_prefix + min_time + str_suffix + record.tz_offset;
-                    record.max_UTC = str_prefix + max_time + str_suffix + record.tz_offset;
-                    record.min_date_UTC = new Date(record.min_UTC);
-                    record.max_date_UTC = new Date(record.max_UTC);
-
-                    if (isNullOrUndef(minUTC)) minUTC = record.min_date_UTC; // set min
-                    if (record.min_date_UTC.getTime() < minUTC.getTime()) minUTC = record.min_date_UTC; // update min
-                    if (isNullOrUndef(maxUTC)) maxUTC = record.max_date_UTC; // set max
-                    if (record.max_date_UTC.getTime() > maxUTC.getTime()) maxUTC = record.max_date_UTC; // update max
-
-                    self.working_hours[record.id] = { // keep a trace
-                        mor_start: min_time,
-                        mor_end: formats.format_value(record[me],descript) + ":00",
-                        aft_start: formats.format_value(record[as],descript) + ":00",
-                        aft_end: max_time,
-                        tz: record["tz"],
-                        tz_offset: record["tz_offset"],
-                        str_suffix: " GMT" + record["tz_offset"],
-                    }
-                });
-                if (isNullOrUndef(minUTC)) minUTC = new Date(str_prefix + "00:00:00" + str_suffix ); // if no records
-                if (isNullOrUndef(maxUTC)) maxUTC = new Date(str_prefix + "00:00:00" + str_suffix ); // if no records
-                minTime = minUTC.toLocaleTimeString(); // local time format hh:mm:ss
-                maxTime = maxUTC.toLocaleTimeString(); // local time format hh:mm:ss
-
-                self.minTime = minTime;
-                self.maxTime = maxTime;
-                //console.log("self.minTime: ",self.minTime);
+        var model = new Model(this.attendee_model);
+        model.call('get_min_max_time')
+        .then(function (res) {
+            // res is a tuple (min, max) in UTC
+            if (!res) {
                 dfd.resolve();
-            });
-        }else if (this.working_hours == "parent" && this.parent_model) { // only in O2M case
-            var date_today = new Date(); // today by default
-            var str_UTC = date_today.toUTCString(); // str UTC
-            var str_prefix = str_UTC.substring(0,17); // str UTC without time
-            var str_suffix = "";
-            if (this.parent_values["tz_offset"]) str_suffix = str_UTC.substring(25) + this.parent_values["tz_offset"]; // str UTC without time (eg GMT+0100)
-            var descript = {type: "float_time"}; // to format float into hh:mm
-            var ms = this.working_hours_fields.mor_start_field;
-            var ae = this.working_hours_fields.aft_end_field;
-            var min_time = formats.format_value(this.parent_values[ms] - 0.5,descript) + ":00"; // mintime UTC minus 1h format hh:mm:ss
-            var max_time = formats.format_value(this.parent_values[ae] + 0.5,descript) + ":00"; // maxtime UTC plus 1h format hh:mm:ss
-            var min_UTC = str_prefix + min_time + str_suffix; // str UTC
-            var max_UTC = str_prefix + max_time + str_suffix; // str UTC
-            var min_date_UTC = new Date(min_UTC); // date UTC
-            var max_date_UTC = new Date(max_UTC); // date UTC
-            var minTime = min_date_UTC.toLocaleTimeString(); // local time format hh:mm:ss
-            var maxTime = max_date_UTC.toLocaleTimeString(); // local time format hh:mm:ss
-
-            self.minTime = minTime;
-            self.maxTime = maxTime;
+                return;
+            }
+            console.log("(min, max) utc",res[0],res[1]);
+            var descript = {type: "float_time"};
+            var min_time_utc = formats.format_value(res[0],descript) + ":00";
+            var max_time_utc = formats.format_value(res[1],descript) + ":00";;
+            var date_today = new Date();
+            var str_UTC = date_today.toUTCString();
+            var str_prefix = str_UTC.substring(0,17);
+            var str_suffix = str_UTC.substring(25);
+            var minUTC = new Date(str_prefix + min_time_utc + str_suffix );
+            var maxUTC = new Date(str_prefix + max_time_utc + str_suffix );
+            self.minTime = minUTC.toLocaleTimeString();
+            self.maxTime = maxUTC.toLocaleTimeString();
+            console.log("(min, max)",self.minTime,self.maxTime);
             dfd.resolve();
-        }else{
-            dfd.resolve();
-        }
+            return;
+        });
         return $.when(dfd);
     },
     /**
