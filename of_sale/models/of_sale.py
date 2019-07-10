@@ -750,6 +750,7 @@ class AccountInvoice(models.Model):
         Toute facture liée à une facture liée est également retournée.
         @param lines : Lignes de la facture courante sur lesquelles le lien est déterminé
         """
+        self.ensure_one()
         invoices = self
         to_check = lines.mapped('sale_line_ids').mapped('invoice_lines').mapped('invoice_id')
         while to_check:
@@ -759,7 +760,7 @@ class AccountInvoice(models.Model):
                         .mapped('sale_line_ids')
                         .mapped('invoice_lines')
                         .mapped('invoice_id')) - invoices
-        return invoices
+        return invoices.filtered(lambda i: i.type == self.type)
 
     @api.multi
     def _of_get_printable_payments(self, lines):

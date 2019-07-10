@@ -305,6 +305,27 @@
             <field name="act_window_id" ref="action_of_service_form_sale"/>
         </record>
 
+        <record id="action_service_tree_view_planning" model="ir.actions.act_window.view">
+            <field eval="0" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_of_service_tree"/>
+            <field name="act_window_id" ref="action_of_service_form_planning"/>
+        </record>
+
+        <record id="action_service_map_view_planning" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">map</field>
+            <field name="view_id" ref="of_service_map_view"/>
+            <field name="act_window_id" ref="action_of_service_form_planning"/>
+        </record>
+
+        <record id="action_service_form_view_planning" model="ir.actions.act_window.view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_of_service_form"/>
+            <field name="act_window_id" ref="action_of_service_form_planning"/>
+        </record>
+
 <!--##########################################################################################################################-->
 <!--#################################################_________Menus__________#################################################-->
 <!--##########################################################################################################################-->
