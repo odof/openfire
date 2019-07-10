@@ -188,6 +188,73 @@ class OfPlanningEquipe(models.Model):
                 raise ValidationError(u"L'heure de l'après-midi ne peut pas être inférieure à l'heure du matin")
 
     @api.model
+    def get_min_max_time(self):
+        """
+        parcours toutes équipes pour trouver les heures minimales et maximales de travail. 
+        Appelée depuis la CalendarView si l'attribut 'working_hours' est à "1". Sert à restreindre la vue Calendar pour ne pas voir les heures entre 0 et min, ni celles entre max et 24
+        renvois les valeurs en UTC
+        /!| Cette fonction est appelée avant de savoir les dates de début et de fin. on prend donc
+        """
+        equipes = self.env['of.planning.equipe'].search([])
+        min_time = False
+        max_time = False
+        min_equipe = False
+        max_equipe = False
+        d_today = fields.Date.from_string(fields.Date.today())
+        for equipe in equipes:
+            equipe_id = equipe.id
+            tz = pytz.timezone(equipe.tz or "Europe/Paris")
+            if equipe.mode_horaires == "easy":
+                # On utilise le mode facile pour les horaires de cette équipe
+                min_equipe = equipe.hor_md
+                max_equipe = equipe.hor_af
+            else: # On utilise le mode avancé pour les horaires de cette équipe
+                # l'équipe a-t-elle des horaires temporaires sur cette recherche??
+                if equipe.creneau_temp_stop:
+                    creneaux_temp_travailles = equipe.creneau_temp_ids
+                    for i in range(1,8):
+                        creneaux_temp_du_jour = creneaux_temp_travailles.filtered(lambda x: x.jour_number == i)
+                        if len(creneaux_temp_du_jour) == 0:
+                            continue
+                        if min_equipe == False:  # ==False pour éviter un éventuel 0.0 oublié
+                            min_equipe = creneaux_temp_du_jour[0].heure_debut  # heure de début du premier créneau
+                            max_equipe = creneaux_temp_du_jour[-1].heure_fin  # heure de fin du dernier créneau
+                        else:
+                            if min_equipe > creneaux_temp_du_jour[0].heure_debut:  # nouveau min
+                                min_equipe = creneaux_temp_du_jour[0].heure_debut
+                            if max_equipe < creneaux_temp_du_jour[-1].heure_fin:  # nouveau max
+                                max_equipe = creneaux_temp_du_jour[-1].heure_fin
+
+                creneaux_travailles = equipe.creneau_ids
+                for i in range(1,8):
+                    creneaux_du_jour = creneaux_travailles.filtered(lambda x: x.jour_number == i)
+                    if len(creneaux_du_jour) == 0:
+                        continue
+                    if min_equipe == False:  # ==False pour éviter un éventuel 0.0 oublié
+                        min_equipe = creneaux_du_jour[0].heure_debut  # heure de début du premier créneau
+                        max_equipe = creneaux_du_jour[-1].heure_fin  # heure de fin du dernier créneau
+                    else:
+                        if min_equipe > creneaux_du_jour[0].heure_debut:  # nouveau min
+                            min_equipe = creneaux_du_jour[0].heure_debut
+                        if max_equipe < creneaux_du_jour[-1].heure_fin:  # nouveau max
+                            max_equipe = creneaux_du_jour[-1].heure_fin
+            dt_min = datetime.combine(d_today, datetime.min.time()) + timedelta(hours=min_equipe)  # datetime naive
+            dt_min = tz.localize(dt_min, is_dst=None).astimezone(pytz.utc)  # datetime utc
+            flo_min = round(dt_min.hour + dt_min.minute / 60.0 + dt_min.second / 3600.0, 5)  # mintime utc as float
+            if min_time == False:
+                min_time = flo_min
+            elif flo_min < min_time:
+                min_time = flo_min
+            dt_max = datetime.combine(d_today, datetime.min.time()) + timedelta(hours=max_equipe)  # datetime naive
+            dt_max = tz.localize(dt_max, is_dst=None).astimezone(pytz.utc)  # datetime utc
+            flo_max = round(dt_max.hour + dt_max.minute / 60.0 + dt_max.second / 3600.0, 5)  # maxtime utc as float
+            if max_time == False:
+                max_time = flo_max
+            elif flo_max > max_time:
+                max_time = flo_max
+        return (min_time, max_time)
+
+    @api.model
     def get_working_hours_fields(self):
         # @TODO: horaires avancés
         return {
@@ -479,7 +546,7 @@ class OfPlanningIntervention(models.Model):
                 # il n'y a pas de créneau suivant la même journée: terminer la journée puis passer au jour suivant
                 la_duree_restante -= (le_dict_courant[le_jour][index_creneau][1] - heure_courante)
 
-                le_jour = le_jour + 1 if ((le_jour + 1) % 7) != 0 else 7 # num jour de la semaine entre 1 et 7
+                le_jour = ((le_jour + 1) % 7) or 7 # num jour de la semaine entre 1 et 7
                 d_courante += un_jour
                 # La nouvelle date courante est-elle dans les horaires temporaires?
                 if horaires_temp and d_temp_start <= d_courante and d_courante <= d_temp_stop:
@@ -492,7 +559,7 @@ class OfPlanningIntervention(models.Model):
                     le_dict_courant = dict_horaires
 
                 while le_jour not in jours_travailles_courants: # on saute les jours non travaillés
-                    le_jour = le_jour + 1 if ((le_jour + 1) % 7) != 0 else 7 # num jour de la semaine entre 1 et 7
+                    le_jour = ((le_jour + 1) % 7) or 7 # num jour de la semaine entre 1 et 7
                     #dt_courante_deb += un_jour
                     d_courante += un_jour
                     if horaires_temp and d_temp_start <= d_courante and d_courante <= d_temp_stop:

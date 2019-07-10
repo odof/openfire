@@ -53,7 +53,7 @@ class OfPlanningJour(report_sxw.rml_parse):
                 int_date_hour = int(line.hor_md)
                 int_date_min = int(round((line.hor_md - int_date_hour) * 60, 0))
             else:  # mode avancé
-                le_num_jour = planning_datetime_local.weekday() + 1
+                le_num_jour = planning_datetime_local.isoweekday()
                 les_creneaux = line.creneau_ids.filtered(lambda x: x.jour_number == le_num_jour)
                 if line.creneau_temp_start:  # des horaires temporaires: a prendre en compte?
                     la_date_str = fields.Date.to_string(planning_datetime_local)

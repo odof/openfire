@@ -45,7 +45,7 @@ var MODE_COLUMN_NBS = {
     "month": 7,
 };
 /*
-NEXT: APPLY FILTERS ASYNC! fillerbars, event disponibles
+NEXT: fillerbars, event disponibles
 TODO: events sur plusieurs jours: heures, ligne connectante: grouper connecrted divs
 */
 var PlanningView = View.extend({

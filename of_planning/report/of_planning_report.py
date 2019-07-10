@@ -61,7 +61,7 @@ class ReportPlanningGeneralSemaine(models.AbstractModel):
         interventions = intervention_obj.search(domain, order='equipe_id, date')
 
         res = []
-        days = range(5)
+        days = range(5) # @todo: jours travaillés
 
         for interv in interventions:
             # Datetime UTC
