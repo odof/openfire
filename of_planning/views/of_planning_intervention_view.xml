@@ -722,9 +722,9 @@
 <!--#############################################_________Menus__________#####################################################-->
 <!--##########################################################################################################################-->
 
-    <menuitem id="menu_of_planning" name="Interventions" groups="of_group_planning_intervention_user" sequence="2" web_icon="of_planning,static/description/icon.png"/>
+    <menuitem id="menu_of_planning" name="Interventions" groups="of_group_planning_intervention_user_restrict" sequence="2" web_icon="of_planning,static/description/icon.png"/>
 
-        <menuitem id="menu_of_planning_intervention" name="Interventions" parent="of_planning.menu_of_planning" groups="of_group_planning_intervention_user" sequence="10"/>
+        <menuitem id="menu_of_planning_intervention" name="Interventions" parent="of_planning.menu_of_planning" groups="of_group_planning_intervention_user_restrict" sequence="10"/>
             <menuitem id="menu_of_planning_intervention_calendar" name="Planning" parent="of_planning.menu_of_planning_intervention" sequence="1" action="action_of_planning_intervention_calendar"/>
 
         <menuitem id="menu_of_planning_clients" name="Clients" parent="of_planning.menu_of_planning" sequence="20"/>

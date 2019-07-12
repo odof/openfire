@@ -3,9 +3,9 @@
 "access_of_planning_intervention_manager","of.planning.intervention","model_of_planning_intervention","of_group_planning_intervention_manager",1,1,1,1
 "access_of_planning_tache_user_intervention","of.planning.tache","model_of_planning_tache","base.group_user",1,0,0,0
 "access_of_planning_tache_manager_intervention","of.planning.tache","model_of_planning_tache","of_group_planning_intervention_manager",1,1,1,1
-"access_of_planning_equipe_user","of.planning.equipe","model_of_planning_equipe","of_group_planning_intervention_user",1,0,0,0
+"access_of_planning_equipe_user","of.planning.equipe","model_of_planning_equipe","of_group_planning_intervention_user_restrict",1,0,0,0
 "access_of_planning_equipe_manager","of.planning.equipe","model_of_planning_equipe","hr.group_hr_manager",1,1,1,1
-"access_pla_intervention_raison_user","of.planning.intervention.raison","of_planning.model_of_planning_intervention_raison","of_group_planning_intervention_user",1,0,0,0
+"access_pla_intervention_raison_user_restrict","of.planning.intervention.raison","of_planning.model_of_planning_intervention_raison","of_group_planning_intervention_user_restrict",1,0,0,0
 "access_pla_intervention_raison_manager","of.planning.intervention.raison","of_planning.model_of_planning_intervention_raison","of_group_planning_intervention_manager",1,1,1,1
 "access_of_planning_intervention_template_user","of.planning.intervention.template","model_of_planning_intervention_template","base.group_user",1,0,0,0
 "access_of_planning_intervention_template_manager","of.planning.intervention.template","model_of_planning_intervention_template","of_planning.of_group_planning_intervention_manager",1,1,1,1

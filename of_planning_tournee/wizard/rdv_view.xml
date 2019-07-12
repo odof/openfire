@@ -199,7 +199,7 @@
             id="action_view_rdv_intervention_wizard_client"
             key2="client_action_multi"
             target="new"
-            groups="of_planning.of_group_planning_intervention_user"
+            groups="of_planning.of_group_planning_intervention_user_restrict"
         />
 
         <act_window
@@ -211,7 +211,7 @@
             id="action_view_rdv_intervention_wizard_service"
             key2="client_action_multi"
             target="new"
-            groups="of_planning.of_group_planning_intervention_user"
+            groups="of_planning.of_group_planning_intervention_user_restrict"
         />
 
         <act_window
@@ -223,7 +223,7 @@
             id="action_view_rdv_intervention_wizard_sale_order"
             key2="client_action_multi"
             target="new"
-            groups="of_planning.of_group_planning_intervention_user"
+            groups="of_planning.of_group_planning_intervention_user_restrict"
         />
 
         <!-- Ajout bouton planifier une intervention dans vue form partenaire-->
