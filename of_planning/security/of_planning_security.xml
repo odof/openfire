@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
+<odoo>
     <data noupdate="0">
 
-    <!--###########################################______Création de la categorie______###################################################-->
+        <!--###########################################______Création de la categorie______###################################################-->
 
         <record model="ir.module.category" id="of_planning_intervention_module_category">
             <field name="name">OF Planning Intervention</field>
@@ -10,11 +10,17 @@
             <field name="sequence">91</field>
         </record>
 
-    <!--#############################################______Création des groupes______#####################################################-->
+        <!--#############################################______Création des groupes______#####################################################-->
+
+        <record id="of_group_planning_intervention_user_restrict" model="res.groups">
+            <field name="name">Utilisateur : mes interventions seulement</field>
+            <field name="category_id" ref="of_planning_intervention_module_category"/>
+        </record>
 
         <record id="of_group_planning_intervention_user" model="res.groups">
-            <field name="name">Utilisateur</field>
+            <field name="name">Utilisateur : toutes les interventions</field>
             <field name="category_id" ref="of_planning_intervention_module_category"/>
+            <field name="implied_ids" eval="[(4, ref('of_group_planning_intervention_user_restrict'))]"/>
         </record>
 
         <record id="of_group_planning_intervention_manager" model="res.groups">
@@ -22,5 +28,20 @@
             <field name="category_id" ref="of_planning_intervention_module_category"/>
             <field name="implied_ids" eval="[(4, ref('of_group_planning_intervention_user'))]"/>
         </record>
+
+		<!-- Règles sur les enregistrements -->
+		<record id="of_planning_intervention_personal_rule" model="ir.rule">
+			<field name="name">Propres rendez-vous</field>
+			<field ref="model_of_planning_intervention" name="model_id"/>
+			<field name="domain_force">[('equipe_id.employee_ids.user_id','=',user.id)]</field>
+			<field name="groups" eval="[(4, ref('of_planning.of_group_planning_intervention_user_restrict'))]"/>
+		</record>
+		<record id="of_planning_intervention_see_all" model="ir.rule">
+			<field name="name">Tous les rendez-vous</field>
+			<field ref="model_of_planning_intervention" name="model_id"/>
+			<field name="domain_force">[(1,'=',1)]</field>
+			<field name="groups" eval="[(4, ref('of_planning.of_group_planning_intervention_user'))]"/>
+		</record>
+
     </data>
-</openerp>
+</odoo>
