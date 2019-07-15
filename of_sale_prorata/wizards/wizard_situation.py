@@ -76,7 +76,7 @@ class OfWizardSituation(models.TransientModel):
     def get_situation_amounts(self, situation_only=True):
         """
         @param situation_only: Si vrai, ne traite que les lignes de factures avec l'article de situation.
-                               Si faux, traite toutes les lignes de facture hors lignes de prorata et retenue de garantie
+                               Si faux, traite toutes les lignes de facture hors lignes de prorata, retenue de garantie et acomptes
         @return: Dictionnaire {taxes : [montant_total , montant_déjà_facturé]}
         """
         order = self.order_id
@@ -89,7 +89,8 @@ class OfWizardSituation(models.TransientModel):
         else:
             product_prorata_id = self.env['ir.values'].get_default('sale.config.settings', 'of_product_prorata_id_setting')
             product_retenue_id = self.env['ir.values'].get_default('sale.config.settings', 'of_product_retenue_id_setting')
-            is_valid_line = lambda line: line.product_id.id not in (product_prorata_id, product_retenue_id)
+            acompte_categ_id = self.env['ir.values'].get_default('sale.config.settings', 'of_deposit_product_categ_id_setting')
+            is_valid_line = lambda line: line.product_id.id not in (product_prorata_id, product_retenue_id) and line.product_id.categ_id.id != acompte_categ_id
 
         # Récupération des montants voulus, par taxe
         for line in self.line_ids:
