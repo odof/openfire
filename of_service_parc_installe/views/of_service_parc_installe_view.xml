@@ -26,6 +26,9 @@
         <field name="res_model">of.service</field>
         <field name="domain">[]</field>
         <field name="view_mode">tree,form</field>
+        <field name="view_ids" eval="[(5,0,0),
+                          (0,0,{'view_mode':'tree'}),
+                          (0,0,{'view_mode':'form', 'view_id': ref('view_of_service_parc_installe_service_form')})]"/>
     </record>
 
    <!-- Planning intervention : ajout champ parc installé lié -->
@@ -46,8 +49,11 @@
         <field name="model">of.parc.installe</field>
         <field name="inherit_id" ref="of_parc_installe.of_parc_installe_form_view"/>
         <field name="arch" type="xml">
+            <xpath expr="//group[@name='produit_installe']" position="inside">
+                <field name="id" invisible="1"/>
+            </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button class="oe_stat_button" name="action_view_service" type="object" icon="fa-archive">
+                <button class="oe_stat_button" name="action_view_service" type="object" icon="fa-archive" context="{'default_partner_id': client_id, 'default_address_id': site_adresse_id, 'default_parc_installe_id': id}">
                     <div class="o_form_field o_stat_info">
                         <span class="o_stat_value"><field name="service_count"/></span>
                         <span class="o_stat_text">Services</span>
