@@ -57,9 +57,9 @@
                         <group colspan="2" col="2">
                             <field name="duree" widget="float_time"/>
                             <field name="employee_id" options="{'no_create': True}"/>
-                            <button name="button_horaires_show" string="Voir les horaires" type="object" colspan="2" class="btn-default"
+                            <button name="toggle_horaires" string="Voir les horaires" type="object" colspan="2" class="btn-default"
                               attrs="{'invisible': [('display_horaires','!=',False)]}"/>
-                            <button name="button_horaires_hide" string="Cacher les horaires" type="object" colspan="2" class="btn-default"
+                            <button name="toggle_horaires" string="Cacher les horaires" type="object" colspan="2" class="btn-default"
                               attrs="{'invisible': [('display_horaires','!=',True)]}"/>
                             <field name="hor_md" widget="float_time" attrs="{'invisible': [('display_horaires','!=',True)]}"/>
                             <field name="hor_mf" widget="float_time" attrs="{'invisible': [('display_horaires','!=',True)]}"/>
@@ -266,4 +266,4 @@
         </record>
 
     </data>
-</odoo>  
+</odoo>

@@ -80,8 +80,6 @@ Droits utilisateurs:
         "sale",
         "sale_margin",
         "sale_crm",
-        "of_utils",
-        "of_calendar",
     ],
     'external_dependancies': {
         'python': ['pdfminer', 'pypdftk', 'pyPdf'],
