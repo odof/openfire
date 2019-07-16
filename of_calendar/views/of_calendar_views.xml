@@ -40,17 +40,17 @@
             <xpath expr="//page[@name='public']/group" position="after">
                 <group name="page1_group2" col="4" colspan="4">
                     <group name="horaires" string="Horaires" col="3" colspan="2">
-                        <field name="hor_md" string="Matin" widget="float_time" colspan="2"/>
-                        <field name="hor_mf" widget="float_time" colspan="1" nolabel="1"/>
-                        <field name="hor_ad" string="Après-midi" widget="float_time" colspan="2"/>
-                        <field name="hor_af" widget="float_time" colspan="1" nolabel="1"/>
-                        <field name="jour_ids" widget="many2many_tags" colspan="3"/>
-                        <field name="tz" widget="timezone_mismatch" options="{'tz_offset_field': 'tz_offset'}" colspan="3"/>
-                        <field name="tz_offset" invisible="1" colspan="3"/>
+                        <field name="of_hor_md" string="Matin" widget="float_time" colspan="2"/>
+                        <field name="of_hor_mf" widget="float_time" colspan="1" nolabel="1"/>
+                        <field name="of_hor_ad" string="Après-midi" widget="float_time" colspan="2"/>
+                        <field name="of_hor_af" widget="float_time" colspan="1" nolabel="1"/>
+                        <field name="of_jour_ids" widget="many2many_tags" colspan="3"/>
+                        <field name="of_tz" widget="timezone_mismatch" options="{'tz_offset_field': 'of_tz_offset'}" colspan="3"/>
+                        <field name="of_tz_offset" invisible="1" colspan="3"/>
                     </group>
                     <group name="deplacements" string="Déplacements" colspan="2">
-                        <field name="address_depart_id"/>
-                        <field name="address_retour_id"/>
+                        <field name="of_address_depart_id"/>
+                        <field name="of_address_retour_id"/>
                     </group>
                 </group>
             </xpath>
@@ -69,8 +69,8 @@
             <xpath expr="//h1" position="attributes">
                 <attribute name="class">oe_edit_only</attribute>
             </xpath>
-            <xpath expr="//field[@name='categ_ids']" position="replace"></xpath>
-            <xpath expr="//field[@name='alarm_ids']" position="replace"></xpath>
+            <xpath expr="//field[@name='categ_ids']" position="replace"/>
+            <xpath expr="//field[@name='alarm_ids']" position="replace"/>
             <xpath expr="//field[@name='location']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
@@ -80,23 +80,23 @@
             </xpath>
             <xpath expr="//field[@name='location']" position="before">
                 <!--field name="user_company_ids" invisible="1"/
-                <field name="lieu_address_state_id" class="o_address_state" options='{"no_open": True}' context="{'country_id': country_id, 'zip': zip}"/>
+                <field name="of_lieu_address_state_id" class="o_address_state" options='{"no_open": True}' context="{'country_id': country_id, 'zip': zip}"/>
                 -->
-                <field name="lieu" widget="selection"/>
-                <field name="lieu_company_id" widget="selection" attrs="{'invisible': [('lieu', '!=', 'onsite')],'required': [('lieu', '=', 'onsite')]}"/>
-                <field name="lieu_rdv_id" options="{'no_open': True, 'no_create': True}" attrs="{'invisible': [('lieu', '!=', 'offsite')],'required': [('lieu', '=', 'offsite')]}"/>
-                <label for="lieu_address_street" string="Adresse: " colspan="2" style="margin-bottom: 4px" attrs="{'invisible': [('lieu', '=', 'phone')]}"/>
-                <div class="o_address_format oe_grey" colspan="2" attrs="{'invisible': [('lieu', '=', 'phone')],'readonly': [('lieu', 'in', ['offsite','onsite','phone'])]}"><i>
-                    <field name="lieu_address_street" placeholder="Street..." class="o_address_street" attrs="{'readonly': [('lieu', 'in', ['offsite','onsite','phone'])]}"/>
-                    <field name="lieu_address_street2" placeholder="Street 2..." class="o_address_street" attrs="{'readonly': [('lieu', 'in', ['offsite','onsite','phone'])]}"/>
-                    <field name="lieu_address_city" placeholder="City" class="o_address_city" attrs="{'readonly': [('lieu', 'in', ['offsite','onsite','phone'])]}"/>
-                    <field name="lieu_address_zip" placeholder="ZIP" class="o_address_zip" attrs="{'readonly': [('lieu', 'in', ['offsite','onsite','phone'])]}"/>
-                    <field name="lieu_address_country_id" placeholder="Country" class="o_address_country" options='{"no_open": True, "no_create": True}' attrs="{'readonly': [('lieu', 'in', ['offsite','onsite','phone'])]}"/></i>
+                <field name="of_lieu" widget="selection"/>
+                <field name="of_lieu_company_id" widget="selection" attrs="{'invisible': [('of_lieu', '!=', 'onsite')],'required': [('of_lieu', '=', 'onsite')]}"/>
+                <field name="of_lieu_rdv_id" options="{'no_open': True, 'no_create': True}" attrs="{'invisible': [('of_lieu', '!=', 'offsite')],'required': [('of_lieu', '=', 'offsite')]}"/>
+                <label for="of_lieu_address_street" string="Adresse: " colspan="2" style="margin-bottom: 4px" attrs="{'invisible': [('of_lieu', '=', 'phone')]}"/>
+                <div class="o_address_format oe_grey" colspan="2" attrs="{'invisible': [('of_lieu', '=', 'phone')],'readonly': [('of_lieu', 'in', ['offsite','onsite','phone'])]}"><i>
+                    <field name="of_lieu_address_street" placeholder="Street..." class="o_address_street" attrs="{'readonly': [('of_lieu', 'in', ['offsite','onsite','phone'])]}"/>
+                    <field name="of_lieu_address_street2" placeholder="Street 2..." class="o_address_street" attrs="{'readonly': [('of_lieu', 'in', ['offsite','onsite','phone'])]}"/>
+                    <field name="of_lieu_address_city" placeholder="City" class="o_address_city" attrs="{'readonly': [('of_lieu', 'in', ['offsite','onsite','phone'])]}"/>
+                    <field name="of_lieu_address_zip" placeholder="ZIP" class="o_address_zip" attrs="{'readonly': [('of_lieu', 'in', ['offsite','onsite','phone'])]}"/>
+                    <field name="of_lieu_address_country_id" placeholder="Country" class="o_address_country" options='{"no_open": True, "no_create": True}' attrs="{'readonly': [('of_lieu', 'in', ['offsite','onsite','phone'])]}"/></i>
                 </div>
             </xpath>
             <!-- rendre l'onglet 'divers' visible tout le temps -->
             <xpath expr="//page[4]" position="attributes">
-                <attribute name="groups"></attribute>
+                <attribute name="groups"/>
                 <attribute name="name">misc</attribute>
             </xpath>
         </field>
@@ -118,7 +118,7 @@
                 <attribute name="attendee_model">res.partner</attribute-->
             </xpath>
             <xpath expr="//calendar" position="inside">
-                <field name="on_phone" icon="phone" position="right" invisible="1"/>
+                <field name="of_on_phone" icon="phone" position="right" invisible="1"/>
             </xpath>
             <!--xpath expr="//calendar" position="inside">
                 <!- - These fields would be necessary if use_contacts="0". See function event_data_transform in .js file - ->

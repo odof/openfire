@@ -15,6 +15,7 @@ Prise de RDV commercial OpenFire
 """,
     "website": "www.openfire.fr",
     "depends": [
+        "of_utils",
         "of_calendar",
         "of_sale",
         "of_crm",

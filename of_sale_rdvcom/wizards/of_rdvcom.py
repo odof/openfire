@@ -88,7 +88,7 @@ class OFRDVCommercial(models.TransientModel):
             return False
 
     @api.model
-    def _default_address(self):  ###a verif
+    def _default_address(self):  # a verif
         partner_obj = self.env['res.partner']
         active_model = self._context.get('active_model', '')
         if active_model == "crm.lead":
@@ -122,7 +122,7 @@ class OFRDVCommercial(models.TransientModel):
     user_id = fields.Many2one('res.users', string=u"Compte Commercial", required=True, default=_default_user)
     employee_id = fields.Many2one(
         'hr.employee', string=u"Commercial", required=True, default=_default_employee,
-        domain=lambda self:[('user_id.company_ids', 'child_of', self.env.user.company_id.id)],
+        domain=lambda self: [('user_id.company_ids', 'child_of', self.env.user.company_id.id)],
         help=u"La liste des employés proposés est constituée des employés qui ont accès à la société courante")
     duree = fields.Float(string=u'Durée du RDV', required=True, digits=(12, 2), default=1)
     creneau_ids = fields.One2many('of.rdv.commercial.line', 'wizard_id', string='Proposition de RDVs')
@@ -209,13 +209,12 @@ class OFRDVCommercial(models.TransientModel):
         partners_customer = partners_customer.search([('id', 'in', partners_customer._ids), ('geo_lat', operator, operand)])
         partners_other = partners_other.search([('id', 'in', partners_other._ids), ('geo_lat', operator, operand)])
         companies = companies.search([('id', 'in', companies._ids), ('partner_id.geo_lat', operator, operand)])
-        return [('id', 'in', self.env['of.rdv.commercial'].search(['|',
-                                                                '&', ('lieu_company_id', 'in', companies._ids),
-                                                                     ('lieu', '=', 'company'),
-                                                                '|', '&', ('partner_address_id', 'in', partners_customer._ids),
-                                                                     ('lieu', '=', 'customer'),
-                                                                '&', ('lieu_rdv_id', 'in', partners_other._ids),
-                                                                     ('lieu', '=', 'other')])._ids)]
+        return [('id', 'in', self.env['of.rdv.commercial'].search(['|', '&', ('lieu_company_id', 'in', companies._ids),
+                                                                             ('lieu', '=', 'company'),
+                                                                        '|', '&', ('partner_address_id', 'in', partners_customer._ids),
+                                                                                  ('lieu', '=', 'customer'),
+                                                                             '&', ('lieu_rdv_id', 'in', partners_other._ids),
+                                                                                  ('lieu', '=', 'other')])._ids)]
 
     def _search_lng(self, operator, operand):
         partners_customer = self.env['res.partner']
@@ -233,13 +232,12 @@ class OFRDVCommercial(models.TransientModel):
         partners_customer = partners_customer.search([('id', 'in', partners_customer._ids), ('geo_lng', operator, operand)])
         partners_other = partners_other.search([('id', 'in', partners_other._ids), ('geo_lng', operator, operand)])
         companies = companies.search([('id', 'in', companies._ids), ('partner_id.geo_lng', operator, operand)])
-        return [('id', 'in', self.env['of.rdv.commercial'].search(['|',
-                                                                '&', ('lieu_company_id', 'in', companies._ids),
-                                                                     ('lieu', '=', 'company'),
-                                                                '|', '&', ('partner_address_id', 'in', partners_customer._ids),
-                                                                     ('lieu', '=', 'customer'),
-                                                                '&', ('lieu_rdv_id', 'in', partners_other._ids),
-                                                                     ('lieu', '=', 'other')])._ids)]
+        return [('id', 'in', self.env['of.rdv.commercial'].search(['|', '&', ('lieu_company_id', 'in', companies._ids),
+                                                                             ('lieu', '=', 'company'),
+                                                                        '|', '&', ('partner_address_id', 'in', partners_customer._ids),
+                                                                                  ('lieu', '=', 'customer'),
+                                                                             '&', ('lieu_rdv_id', 'in', partners_other._ids),
+                                                                                  ('lieu', '=', 'other')])._ids)]
 
     def _search_precision(self, operator, operand):
         partners_customer = self.env['res.partner']
@@ -257,13 +255,12 @@ class OFRDVCommercial(models.TransientModel):
         partners_customer = partners_customer.search([('id', 'in', partners_customer._ids), ('precision', operator, operand)])
         partners_other = partners_other.search([('id', 'in', partners_other._ids), ('precision', operator, operand)])
         companies = companies.search([('id', 'in', companies._ids), ('partner_id.precision', operator, operand)])
-        return [('id', 'in', self.env['of.rdv.commercial'].search(['|',
-                                                                '&', ('lieu_company_id', 'in', companies._ids),
-                                                                     ('lieu', '=', 'company'),
-                                                                '|', '&', ('partner_address_id', 'in', partners_customer._ids),
-                                                                     ('lieu', '=', 'customer'),
-                                                                '&', ('lieu_rdv_id', 'in', partners_other._ids),
-                                                                     ('lieu', '=', 'other')])._ids)]
+        return [('id', 'in', self.env['of.rdv.commercial'].search(['|', '&', ('lieu_company_id', 'in', companies._ids),
+                                                                             ('lieu', '=', 'company'),
+                                                                        '|', '&', ('partner_address_id', 'in', partners_customer._ids),
+                                                                                  ('lieu', '=', 'customer'),
+                                                                             '&', ('lieu_rdv_id', 'in', partners_other._ids),
+                                                                                  ('lieu', '=', 'other')])._ids)]
 
     @api.multi
     @api.depends("lieu", "partner_address_id", "lieu_company_id", "lieu_rdv_id")
@@ -368,17 +365,17 @@ class OFRDVCommercial(models.TransientModel):
         if self.employee_id:
             if self.employee_id.user_id:
                 vals = {
-                    "hor_md": self.employee_id.hor_md,
-                    "hor_mf": self.employee_id.hor_mf,
-                    "hor_ad": self.employee_id.hor_ad,
-                    "hor_af": self.employee_id.hor_af,
-                    "tz": self.employee_id.tz or "Europe/Paris",
-                    "jour_ids": [(5, 0, 0)] + [(4, le_id, False) for le_id in self.employee_id.jour_ids._ids],
+                    "hor_md": self.employee_id.of_hor_md,
+                    "hor_mf": self.employee_id.of_hor_mf,
+                    "hor_ad": self.employee_id.of_hor_ad,
+                    "hor_af": self.employee_id.of_hor_af,
+                    "tz": self.employee_id.of_tz or "Europe/Paris",
+                    "jour_ids": [(5, 0, 0)] + [(4, le_id, False) for le_id in self.employee_id.of_jour_ids._ids],
                     "user_id": self.employee_id.user_id,
                     }
                 self.update(vals)
                 if not self.jour_ids:
-                    raise UserWarning(u"Cet employé n'a aucun jour dans sa liste des jours travaillés. \nVous pouvez configurer ses jours travaillés dans sa fiche employé.")
+                    raise UserError(u"Cet employé n'a aucun jour dans sa liste des jours travaillés. \nVous pouvez configurer ses jours travaillés dans sa fiche employé.")
             else:
                 raise UserError(u"Cet employé n'est pas rattaché à un compte utilisateur. \nPour le rattacher à un compte utilisateur rendez-vous sur sa fiche employé, onglet 'paramètre RH', champ 'utilisateur lié'.")
 
@@ -439,7 +436,7 @@ class OFRDVCommercial(models.TransientModel):
     @api.multi
     def _check_horaires(self):
         self.ensure_one()
-        return self.hor_md >= 0 and self.hor_md <= self.hor_mf and self.hor_mf <= self.hor_ad and self.hor_ad <= self.hor_af and self.hor_af <= 24
+        return 0 <= self.hor_md <= self.hor_mf <= self.hor_ad <= self.hor_af <= 24
 
     @api.model
     def get_working_hours_fields(self):
@@ -470,18 +467,10 @@ class OFRDVCommercial(models.TransientModel):
         }"""
 
     @api.multi
-    def button_horaires_show(self):
-        """Montre les horaires pour pouvoir les modifier"""
+    def toggle_horaires(self):
+        """Affiche / cache les horaires pour pouvoir les modifier"""
         self.ensure_one()
-        self.display_horaires = True
-
-        return {'type': 'ir.actions.do_nothing'}
-
-    @api.multi
-    def button_horaires_hide(self):
-        """Cache les horaires"""
-        self.ensure_one()
-        self.display_horaires = False
+        self.display_horaires = not self.display_horaires
 
         return {'type': 'ir.actions.do_nothing'}
 
@@ -518,13 +507,51 @@ class OFRDVCommercial(models.TransientModel):
             'context': context,
         }
 
+    def create_creneau(self, event_deb, event_fin, tz, d_recherche, str_d_recherche, event=False):
+        """
+        Permet la création de créneau dans le wizard
+        :param event_deb: Heure de début
+        :param event_fin: Heure de fin
+        :param tz: Timezone
+        :param d_recherche: Date de recherche (datetime)
+        :param str_d_recherche: Date de recherche (str)
+        :param event: RDV déjà existant
+        """
+        wizard_line_obj = self.env['of.rdv.commercial.line']
+        description = "%s-%s" % tuple(hours_to_strs(event_deb, event_fin))
+
+        dt_debut = datetime.combine(d_recherche, datetime.min.time()) + timedelta(hours=event_deb)
+        dt_debut = tz.localize(dt_debut, is_dst=None).astimezone(pytz.utc)
+        dt_fin = datetime.combine(d_recherche, datetime.min.time()) + timedelta(hours=event_fin)
+        dt_fin = tz.localize(dt_fin, is_dst=None).astimezone(pytz.utc)
+
+        wizard_line_obj.create({
+            'debut_dt': dt_debut,
+            'fin_dt': dt_fin,
+            'date_flo': event_deb,
+            'date_flo_deadline': event_fin,
+            'date': str_d_recherche,
+            'description': description,
+            'wizard_id': self.id,
+            'user_id': self.user_id.id,
+            'employee_id': self.employee_id.id,
+            'user_partner_id': self.user_id.partner_id.id,
+            'calendar_id': event and event.id,
+            'categ_ids': event and [(4, le_id, False) for le_id in event.categ_ids._ids],
+            'partner_ids': event and [(4, le_id, False) for le_id in event.partner_ids._ids],
+            'name': event and event.name,
+            'disponible': False if event else True,
+            'ignorer_geo': self.ignorer_geo,
+            'on_phone': event.of_lieu and event.of_lieu == 'phone' if event else self.lieu and self.lieu == 'phone',
+            })
+
     @api.multi
     def compute(self):
         u"""Calcul des prochains créneaux disponibles
         NOTE : Si un service est sélectionné incluant le samedi et/ou le dimanche,
                ceux-cis seront traités comme des jours normaux du point de vue des équipes
         """
-        #TODO: finir de commenter
+        # TODO: finir de commenter
         self.ensure_one()
 
         if not self._check_horaires():
@@ -605,7 +632,7 @@ class OFRDVCommercial(models.TransientModel):
                 num_jour = (num_jour + 1) % 7
             # Arreter la recherche si on dépasse la date de fin
             if d_recherche >= d_apres_recherche:
-                continue
+                break
             str_d_recherche = fields.Date.to_string(d_recherche)
 
             # Recherche de creneaux pour la date voulue et les équipes sélectionnées
@@ -615,12 +642,9 @@ class OFRDVCommercial(models.TransientModel):
             events = calendar_obj.search([
                                         ('start_datetime', '<=', str_d_recherche),
                                         ('stop_datetime', '>=', str_d_recherche),
-                                        #('start_date', '=', str_d_recherche)
+                                        # ('start_date', '=', str_d_recherche)
                                         ], order='start_date')
-            for event in events:
-                if self.user_id.partner_id.id not in event.partner_ids._ids and self.partner_id.id not in event.partner_ids._ids:
-                    # ni le commercial ni le client ne font partie de cet event
-                    events -= event
+            events = events.filtered(lambda e: self.user_id.partner_id in e.partner_ids or self.partner_id in e.partner_ids)
 
             event_dates_all = []
             for event in events:
@@ -634,97 +658,41 @@ class OFRDVCommercial(models.TransientModel):
                     dt_event_local = max(dt_event_local, dt_jour_deb)
                     dt_event_local = min(dt_event_local, dt_jour_fin)
                     flo_dt_event_local = round(dt_event_local.hour +
-                                           dt_event_local.minute / 60.0 +
-                                           dt_event_local.second / 3600.0, 5)
+                                               dt_event_local.minute / 60.0 +
+                                               dt_event_local.second / 3600.0, 5)
                     event_dates.append(flo_dt_event_local)
+                self.create_creneau(event_dates[1], event_dates[2], tz, d_recherche, str_d_recherche, event=event_dates[0])
                 event_dates_all.append(event_dates)
 
             deb = self.hor_md
             fin = self.hor_mf
             ad = self.hor_ad
-            creneaux = []
-            #TODO: possibilité intervention chevauchant la nuit
+            # TODO: possibilité intervention chevauchant la nuit
             for event, event_deb, event_fin in event_dates_all + [(False, 24, 24)]:
                 if deb < event_deb and deb < fin:
                     # Un trou dans le planning, suffisant pour un créneau?
-                    if deb < ad and event_deb >= ad:
+                    if deb < ad <= event_deb:
                         # On passe du matin à l'après-midi
                         # On vérifie la durée cumulée de la matinée et de l'après-midi car une intervention peut
                         # commencer avant la pause repas
                         event_deb = min(event_deb, self.hor_af)
                         duree = self.hor_mf - deb + event_deb - ad
                         if duree >= self.duree:
-                            creneaux.append((deb, fin))
+                            self.create_creneau(deb, fin, tz, d_recherche, str_d_recherche)
                             if ad < event_deb:
-                                creneaux.append((ad, event_deb))
+                                self.create_creneau(ad, event_deb, tz, d_recherche, str_d_recherche)
                         fin = self.hor_af
                     else:
                         duree = min(event_deb, fin) - deb
                         if duree >= self.duree:
-                            creneaux.append((deb, deb+duree))
+                            self.create_creneau(deb, deb + duree, tz, d_recherche, str_d_recherche)
 
                 if event_fin >= fin and fin <= ad:
                     deb = max(event_fin, ad)
                     fin = self.hor_af
                 elif event_fin > deb:
                     deb = event_fin
-            if not creneaux:
-                # Aucun creneau libre pour cette équipe
-                continue
-            # création des créneaux dispos
-            for event_deb, event_fin, in creneaux:
-                description = "%s-%s" % tuple(hours_to_strs(event_deb, event_fin))
 
-                dt_debut = datetime.combine(d_recherche, datetime.min.time()) + timedelta(hours=event_deb)
-                dt_debut = tz.localize(dt_debut, is_dst=None).astimezone(pytz.utc)
-                dt_fin = datetime.combine(d_recherche, datetime.min.time()) + timedelta(hours=event_fin)
-                dt_fin = tz.localize(dt_fin, is_dst=None).astimezone(pytz.utc)
-
-                wizard_line_obj.create({
-                    'debut_dt': dt_debut,
-                    'fin_dt': dt_fin,
-                    'date_flo': event_deb,
-                    'date_flo_deadline': event_fin,
-                    'date': str_d_recherche,
-                    'description': description,
-                    'wizard_id': self.id,
-                    'user_id': self.user_id.id,
-                    'employee_id': self.employee_id.id,
-                    'user_partner_id': self.user_id.partner_id.id,
-                    'calendar_id': False,
-                    'ignorer_geo': self.ignorer_geo,
-                    'on_phone': self.lieu and self.lieu == 'phone',
-                })
-            # création des créneaux de rdvs
-            for event, event_deb, event_fin in event_dates_all:
-                if self.user_id.partner_id.id in event.partner_ids._ids:  # le commercial fait partie des participants
-                    description = "%s-%s" % tuple(hours_to_strs(event_deb, event_fin))
-
-                    dt_debut = datetime.combine(d_recherche, datetime.min.time()) + timedelta(hours=event_deb)
-                    dt_debut = tz.localize(dt_debut, is_dst=None).astimezone(pytz.utc)
-                    dt_fin = datetime.combine(d_recherche, datetime.min.time()) + timedelta(hours=event_fin)
-                    dt_fin = tz.localize(dt_fin, is_dst=None).astimezone(pytz.utc)
-
-                    wizard_line_obj.create({
-                        'debut_dt': dt_debut,  # datetime utc
-                        'fin_dt': dt_fin,  # datetime utc
-                        'date_flo': event_deb,
-                        'date_flo_deadline': event_fin,
-                        'date': str_d_recherche,
-                        'description': description,
-                        'wizard_id': self.id,
-                        'user_id': self.user_id.id,
-                        'employee_id': self.employee_id.id,
-                        'user_partner_id': self.user_id.partner_id.id,
-                        'calendar_id': event.id,
-                        'categ_ids': [(4, le_id, False) for le_id in event.categ_ids._ids],
-                        'partner_ids': [(4, le_id, False) for le_id in event.partner_ids._ids],
-                        #'lieu_rdv_id': event.lieu_rdv_id.id or False,
-                        'name': event.name,
-                        'disponible': False,
-                        'ignorer_geo': self.ignorer_geo,
-                        'on_phone': event.lieu and event.lieu == 'phone',
-                    })
         # Calcul des durées et distances
         d_debut = d_avant_recherche + un_jour
         d_fin = d_apres_recherche - un_jour
@@ -733,7 +701,7 @@ class OFRDVCommercial(models.TransientModel):
 
         nb, nb_dispo, first_res = wizard_line_obj.get_nb_dispo(self)
 
-        vals ={}
+        vals = {}
         # Sélection du résultat
         if nb > 0:
             if self.lieu == 'company':
@@ -789,7 +757,7 @@ class OFRDVCommercial(models.TransientModel):
             raise UserError(u"Il semblerait que vous ayez changé le commercial depuis votre dernière recherche. Veuillez relancer la recherche ou rétablir le commercial précédent (%s)" % self.creneau_ids[0].employee_id.name)
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')
-        tz = pytz.timezone(self._context['tz'])
+        # tz = pytz.timezone(self._context['tz'])
 
         calendar_obj = self.env['calendar.event']
 
@@ -806,9 +774,9 @@ class OFRDVCommercial(models.TransientModel):
             fin_dt = fields.Datetime.from_string(planning.fin_dt)
             if err:
                 continue
-            elif debut_dt <= dt_propos and fin_dt >= dt_propos and not planning.calendar_id:  # le debut du rdv est dans un créneau dispo
+            elif debut_dt <= dt_propos <= fin_dt and not planning.calendar_id:  # le debut du rdv est dans un créneau dispo
                 found = True
-                if debut_dt <= dt_propos_deadline and fin_dt >= dt_propos_deadline:  # le rdv se termine dans ce même créneau
+                if debut_dt <= dt_propos_deadline <= fin_dt:  # le rdv se termine dans ce même créneau
                     break
                 elif self.date_propos_hour <= self.hor_mf and dt_propos_deadline > fin_dt:  # chevauchement pause midi
                     dt_propos_deadline += td_pause_midi
@@ -818,7 +786,7 @@ class OFRDVCommercial(models.TransientModel):
                     propos_deadline_flo = (propos_deadline_flo + 24 - self.hor_af + self.hor_md) % 24
             elif found and planning.calendar_id:  # une intervention entre le début et la fin du rdv
                 err = True
-            elif found and debut_dt <= dt_propos_deadline and fin_dt >= dt_propos_deadline and not planning.calendar_id:  # la fin du rdv est dans un créneau dispo
+            elif found and debut_dt <= dt_propos_deadline <= fin_dt and not planning.calendar_id:  # la fin du rdv est dans un créneau dispo
                 break
         else:
             raise UserError(u"Vérifier la date de RDV et l'équipe technique")
@@ -850,9 +818,9 @@ class OFRDVCommercial(models.TransientModel):
             'allday': self.allday,
             'description': self.description or '',
             'partner_ids': [(4, self.user_id.partner_id.id, False), (4, self.partner_id.id, False)],
-            'lieu': le_lieu,
-            'lieu_rdv_id': l_adresse and l_adresse.id,
-            'lieu_company_id': la_company and la_company.id,
+            'of_lieu': le_lieu,
+            'of_lieu_rdv_id': l_adresse and l_adresse.id,
+            'of_lieu_company_id': la_company and la_company.id,
             'opportunity_id': self.lead_id.id,
         }
 
@@ -888,17 +856,17 @@ class OfRDVCommercialLine(models.TransientModel):
         while date_courante <= date_fin:
             creneaux_pre = self.search([('date', '=', date_courante), ('wizard_id', '=', wizard_id)], order="debut_dt")
             creneaux_pre._compute_geo()
-            creneaux = creneaux_pre.search([('date', '=', date_courante), ('wizard_id', '=', wizard_id), '|', ('geo_lat', '!=', 0.0), ('geo_lng', '!=', 0.0)], order="debut_dt")
+            creneaux = creneaux_pre.filtered(lambda c: c.geo_lat != 0.0 and c.geo_lng != 0.0)
             if len(creneaux) == 0:
                 date_courante += un_jour
                 continue
 
-            origine = (creneaux[0].employee_id.address_depart_id or
+            origine = (creneaux[0].employee_id.of_address_depart_id or
                        creneaux[0].employee_id.address_id or
                        False)
-            retour = (creneaux[0].employee_id.address_retour_id or
-                       creneaux[0].employee_id.address_id or
-                       False)
+            retour = (creneaux[0].employee_id.of_address_retour_id or
+                      creneaux[0].employee_id.address_id or
+                      False)
             if not origine:
                 raise UserError(u"L'adressse de départ du commercial est manquante. Pour la configurer rendez-vous dans le menu Employés")
             if not retour:
@@ -912,18 +880,18 @@ class OfRDVCommercialLine(models.TransientModel):
             coords = []
             query = ROUTING_BASE_URL + u"route/" + ROUTING_VERSION + u"/" + ROUTING_PROFILE + u"/"
 
-            ## coordonnées du point de départ
+            # coordonnées du point de départ
             str_coords += str(origine.geo_lng) + u"," + str(origine.geo_lat)
             coords.append((origine.geo_lng, origine.geo_lat))
 
-            ### listess de coordonnées: ATTENTION OSRM prend ses coordonnées sous forme (lng, lat)
+            # listess de coordonnées: ATTENTION OSRM prend ses coordonnées sous forme (lng, lat)
             # créneaux et rdvs
             for line in creneaux:
-                #if line.geo_lat != 0 or line.geo_lng != 0: <- plus besoin: seulement créneaux géolocalisés dans la recherche
+                # if line.geo_lat != 0 or line.geo_lng != 0: <- plus besoin: seulement créneaux géolocalisés dans la recherche
                 str_coords += u";" + str(line.geo_lng) + u"," + str(line.geo_lat)
                 coords.append((line.geo_lng, line.geo_lat))
 
-            ## coordonnées du point de retour
+            # coordonnées du point de retour
             str_coords += u";" + str(retour.geo_lng) + u"," + str(retour.geo_lat)
             coords.append((retour.geo_lng, retour.geo_lat))
 
@@ -936,7 +904,7 @@ class OfRDVCommercialLine(models.TransientModel):
                 req = requests.get(full_query)
                 res = req.json()
             except Exception as e:
-                raise UserError((u"Impossible de contacter le serveur de routing. Assurez-vous que votre connexion Internet est opérationnelle et que l'URL est définie (%s)") % e)
+                raise UserError(u"Impossible de contacter le serveur de routing. Assurez-vous que votre connexion Internet est opérationnelle et que l'URL est définie (%s)" % e)
 
             if res and res.get(u"routes", False):
                 legs = res[u"routes"][0][u"legs"]
@@ -963,7 +931,7 @@ class OfRDVCommercialLine(models.TransientModel):
                             vals[i-1][u"distance"] = vals[i][u"dist_suiv"] + vals[i-1][u"dist_prec"]
                             vals[i-1][u"duree"] = vals[i][u"duree_suiv"] + vals[i-1][u"duree_prec"]
 
-                    for j in  range(len(creneaux)):
+                    for j in range(len(creneaux)):
                         # créneau plus loins que la recherche accepte
                         if creneaux[j].disponible and vals[j][mode_recherche] > maxi:
                             vals[j][u"force_color"] = "#FF0000"
@@ -971,11 +939,11 @@ class OfRDVCommercialLine(models.TransientModel):
                             vals[j][u"disponible"] = False
                         creneaux[j].update(vals[j])
                 else:
-                    raise UserWarning("Erreur de res: %s - %s" % (len(creneaux), len(res[u"routes"][0][u"legs"])))
+                    raise UserError("Erreur de res: %s - %s" % (len(creneaux), len(res[u"routes"][0][u"legs"])))
             elif res and res["message"]:
-                raise UserWarning("Erreur de routing: %s" % res["message"])
+                raise UserError("Erreur de routing: %s" % res["message"])
             else:
-                raise UserWarning("Erreur inattendue de routing")
+                raise UserError("Erreur inattendue de routing")
             date_courante += un_jour
 
     @api.model
@@ -1046,7 +1014,7 @@ class OfRDVCommercialLine(models.TransientModel):
                 calendars |= line.calendar_id
             else:
                 wizards |= line.wizard_id
-        calendars = calendars.search([('id', 'in', calendars._ids), ('geo_lat', operator, operand)])
+        calendars = calendars.search([('id', 'in', calendars._ids), ('of_geo_lat', operator, operand)])
         wizards = wizards.search([('id', 'in', wizards._ids), ('geo_lat', operator, operand)])
         return [('id', 'in', self.env['of.rdv.commercial.line'].search(['|', ('calendar_id', 'in', calendars._ids),
                                                                              ('wizard_id', 'in', wizards._ids)])._ids)]
@@ -1059,7 +1027,7 @@ class OfRDVCommercialLine(models.TransientModel):
                 calendars |= line.calendar_id
             else:
                 wizards |= line.wizard_id
-        calendars = calendars.search([('id', 'in', calendars._ids), ('geo_lng', operator, operand)])
+        calendars = calendars.search([('id', 'in', calendars._ids), ('of_geo_lng', operator, operand)])
         wizards = wizards.search([('id', 'in', wizards._ids), ('geo_lng', operator, operand)])
         return [('id', 'in', self.env['of.rdv.commercial.line'].search(['|', ('calendar_id', 'in', calendars._ids),
                                                                              ('wizard_id', 'in', wizards._ids)])._ids)]
@@ -1072,7 +1040,7 @@ class OfRDVCommercialLine(models.TransientModel):
                 calendars |= line.calendar_id
             else:
                 wizards |= line.wizard_id
-        calendars = calendars.search([('id', 'in', calendars._ids), ('precision', operator, operand)])
+        calendars = calendars.search([('id', 'in', calendars._ids), ('of_precision', operator, operand)])
         wizards = wizards.search([('id', 'in', wizards._ids), ('precision', operator, operand)])
         return [('id', 'in', self.env['of.rdv.commercial.line'].search(['|', ('calendar_id', 'in', calendars._ids),
                                                                              ('wizard_id', 'in', wizards._ids)])._ids)]
@@ -1083,9 +1051,9 @@ class OfRDVCommercialLine(models.TransientModel):
         for line in self:
             if line.calendar_id:  # correspond a un creneau d'intervention
                 vals = {
-                    'geo_lat': line.calendar_id.geo_lat,
-                    'geo_lng': line.calendar_id.geo_lng,
-                    'precision': line.calendar_id.precision,
+                    'geo_lat': line.calendar_id.of_geo_lat,
+                    'geo_lng': line.calendar_id.of_geo_lng,
+                    'precision': line.calendar_id.of_precision,
                 }
             else:  # correspond a un creneau libre
                 vals = {
@@ -1155,7 +1123,7 @@ class OfRDVCommercialLine(models.TransientModel):
             name += address.zip and (" " + address.zip) or ""
             name += address.city and (" " + address.city) or ""
         wizard_vals = {
-            'date_display'    : self.date,  #.strftime('%A %d %B %Y'),
+            'date_display'    : self.date,  # .strftime('%A %d %B %Y'),
             'name'            : name,
             'date_propos'     : self.debut_dt,
             'date_propos_hour': self.date_flo,
