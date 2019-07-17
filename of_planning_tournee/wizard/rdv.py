@@ -295,10 +295,10 @@ class OfTourneeRdv(models.TransientModel):
                 # l'équipe a-t-elle des horaires temporaires qui peuvent interférer avec ses horaires par défaut sur cette recherche??
                 if equipe.creneau_temp_stop and equipe.creneau_temp_stop >= self.date_recherche_debut and equipe.creneau_temp_start <= self.date_recherche_fin:
                     horaires_temp[equipe_id] = True
-                    str_temp_start = equipe.creneau_temp_start
-                    d_temp_start = fields.Date.from_string(str_temp_start)
-                    str_temp_stop = equipe.creneau_temp_stop
-                    d_temp_stop = fields.Date.from_string(str_temp_stop)
+                    #str_temp_start = equipe.creneau_temp_start
+                    #d_temp_start = fields.Date.from_string(str_temp_start)
+                    #str_temp_stop = equipe.creneau_temp_stop
+                    #d_temp_stop = fields.Date.from_string(str_temp_stop)
                     creneaux_temp_travailles = equipe.creneau_temp_ids
                     dict_horaires_temp[equipe_id] = {}
                     for i in range(1,8):
@@ -387,6 +387,7 @@ class OfTourneeRdv(models.TransientModel):
                              (equipe._ids, str_d_recherche))
             equipes_bloquees = [row[0] for row in self._cr.fetchall()]
             equipes_dispo = []
+            horaires_temp_today = {equipe.id: False for equipe in equipes}
             for equipe in equipes:
                 equipe_id = equipe.id
                 if equipe_id not in equipes_bloquees:
@@ -394,6 +395,7 @@ class OfTourneeRdv(models.TransientModel):
                     equipe.creneau_temp_start <= str_d_recherche and str_d_recherche <= equipe.creneau_temp_stop:
                         # l'équipe a des horaires temporaires sur cette date
                         equipes_dispo.append(equipe_id)
+                        horaires_temp_today[equipe_id] = True
                     elif dict_horaires[equipe_id][num_jour] != []:
                         # l'équipe travaille normalement à cette date
                         equipes_dispo.append(equipe_id)
@@ -428,7 +430,7 @@ class OfTourneeRdv(models.TransientModel):
 
                 equipe_intervention_dates[intervention.equipe_id.id].append(intervention_dates)  # (intervention_id, flo_debut, flo_fin)
 
-            # Calcul des créneaux
+            # Calcul des créneaux dispos
             # @todo: float_compare
             # @todo: Gestion des employés dans plusieurs équipes
             for equipe in equipe_obj.browse(equipes_dispo):
@@ -466,7 +468,10 @@ class OfTourneeRdv(models.TransientModel):
                         elif intervention_fin > deb:
                             deb = intervention_fin
                 else:
-                    horaires_equipe = dict_horaires[equipe.id][num_jour]
+                    if horaires_temp_today[equipe_id]:
+                        horaires_equipe = dict_horaires_temp[equipe.id][num_jour]
+                    else:
+                        horaires_equipe = dict_horaires[equipe.id][num_jour]
                     index_courant = 0
                     deb = horaires_equipe[index_courant][0]  # début courant
                     fin = horaires_equipe[index_courant][1]  # fin courante
@@ -479,9 +484,14 @@ class OfTourneeRdv(models.TransientModel):
                             while len(horaires_equipe) > index_courant + 1:
                                 index_courant += 1
                                 creneaux.append((horaires_equipe[index_courant][0], horaires_equipe[index_courant][1], equipe))
-                        elif deb and deb < intervention_deb:# and deb < fin:
+                        elif deb and deb < intervention_deb:## and deb < fin:
+                            while fin < intervention_deb:  # l'intervention commence sur un autre creneau
+                                creneaux.append((deb, fin, equipe))
+                                index_courant += 1
+                                deb = horaires_equipe[index_courant][0]  # début courant
+                                fin = horaires_equipe[index_courant][1]  # fin courante
                             # Un trou dans le planning, suffisant pour un créneau?
-                            if intervention_deb - deb >= self.duree:
+                            if intervention_deb - deb >= self.duree:  # ouiiii suffisant!
                                 creneaux.append((deb, intervention_deb, equipe))
                                 if intervention_fin <= fin:  # l'intervention se fini avant la fin du créneau horaire
                                     deb = intervention_fin  # le nouveau début potentiel sur ce même créneau est la fin de l'intervention
@@ -499,7 +509,7 @@ class OfTourneeRdv(models.TransientModel):
                                                 deb = False
                                     else:
                                         deb = False
-                            else:
+                            else:  # non pas suffisant...
                                 deb = intervention_fin
                                 while deb and deb >= fin:  # repositionner le début sur un créneau si besoin
                                     index_courant += 1
@@ -507,10 +517,14 @@ class OfTourneeRdv(models.TransientModel):
                                         fin = horaires_equipe[index_courant][1]
                                     else:
                                         deb = False
-
-
-
-
+                        elif deb and deb < intervention_fin:  # en cas d'intervention sur plusieurs jour qui se termine sur le jour courant
+                            deb = intervention_fin
+                            while deb and deb >= fin:  # repositionner le début sur un créneau si besoin
+                                index_courant += 1
+                                if len(horaires_equipe) > index_courant:
+                                    fin = horaires_equipe[index_courant][1]
+                                else:
+                                    deb = False
 
                 if not creneaux:
                     # Aucun creneau libre pour cette équipe

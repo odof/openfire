@@ -178,6 +178,10 @@ class OfPlanningEquipe(models.Model):
     @api.onchange('hor_md', 'hor_mf', 'hor_ad', 'hor_af')
     def onchange_horaires(self):
         hors = (self.hor_md, self.hor_mf, self.hor_ad, self.hor_af)
+        self.hor_md = round(self.hor_md, 5)
+        self.hor_mf = round(self.hor_mf, 5)
+        self.hor_ad = round(self.hor_ad, 5)
+        self.hor_af = round(self.hor_af, 5)
         if all(hors):
             for hor in hors:
                 if hor > 24:
@@ -188,12 +192,79 @@ class OfPlanningEquipe(models.Model):
                 raise ValidationError(u"L'heure de l'après-midi ne peut pas être inférieure à l'heure du matin")
 
     @api.model
+    def get_dict_horaires(self, equipe_ids, date_start, date_stop):
+        # transformer date_start et date_stop en date locale
+        dt_date_start_naive = datetime.strptime(date_start, "%Y-%m-%d %H:%M:%S")  # datetime naif
+        dt_date_start_utc = pytz.utc.localize(dt_date_start_naive, is_dst=None)  # datetime utc
+        dt_date_stop_naive = datetime.strptime(date_stop, "%Y-%m-%d %H:%M:%S")  # datetime naif
+        dt_date_stop_utc = pytz.utc.localize(dt_date_stop_naive, is_dst=None)  # datetime utc
+
+        res = {}
+        compare_precision = 5
+        for equipe in self.browse(equipe_ids):
+            # en cas d'équipes sur différentes timezones
+            tz = pytz.timezone(equipe.tz or "Europe/Paris")
+            dt_date_start_local = dt_date_start_utc.astimezone(tz)  # datetime local
+            dt_date_stop_local = dt_date_stop_utc.astimezone(tz)  # datetime local
+            str_d_date_start = fields.Date.to_string(dt_date_start_local)
+            str_d_date_stop = fields.Date.to_string(dt_date_stop_local)
+            #jours_travailles = []  # liste contenant les jours travaillés [jours travaillés]
+            dict_horaires = {}  # dictionnaire contenant les horaires par jour {1: [(9, 12), (14, 18)], 2:[], ...}
+            jours_temp_travailles = []  # liste contenant les jours travaillés temporaires [jours_temp travaillés]
+            dict_horaires_temp = {}  # dictionnaire contenant les horaires temporaires par jour {1: [(9, 12), (14, 18)], 2:[], ...}
+            horaires_temp = False  # booléen qui nous dit si il faut prendre en compte des horaires temporaires
+            equipe_id = equipe.id
+            if equipe.mode_horaires == "easy":
+                # On utilise le mode facile pour les horaires de cette équipe
+                jours_travailles = [jour.numero for jour in equipe.jour_ids] if equipe.jour_ids else range(1, 6)
+                for i in range(1,8):
+                    dict_horaires[i] = []
+                    if i in jours_travailles:
+                        # hor_mf - hor_md > 0 ?
+                        if float_compare(equipe.hor_mf, equipe.hor_md, compare_precision)  > 0.0:
+                            dict_horaires[i].append((equipe.hor_md, equipe.hor_mf))
+                        # hor_af - hor_ad > 0 ?
+                        if float_compare(equipe.hor_af, equipe.hor_ad, compare_precision)  > 0.0:
+                            dict_horaires[i].append((equipe.hor_ad, equipe.hor_af))
+            else: # On utilise le mode avancé pour les horaires de cette équipe
+                # l'équipe a-t-elle des horaires temporaires qui peuvent interférer avec ses horaires par défaut sur cette recherche??
+                if equipe.creneau_temp_stop and equipe.creneau_temp_stop >= str_d_date_start and equipe.creneau_temp_start <= str_d_date_stop:
+                    horaires_temp = True
+                    str_temp_start = max(equipe.creneau_temp_start, str_d_date_start)
+                    str_temp_stop = min(equipe.creneau_temp_stop, str_d_date_stop)
+                    creneaux_temp_travailles = equipe.creneau_temp_ids
+                    for i in range(1,8):
+                        dict_horaires_temp[i] = []
+                        creneaux_temp_du_jour = creneaux_temp_travailles.filtered(lambda x: x.jour_number == i)
+                        for c in creneaux_temp_du_jour:
+                            dict_horaires_temp[i].append((c.heure_debut, c.heure_fin))
+                    jours_temp_travailles = [j for j in dict_horaires_temp if dict_horaires_temp[j] != []]
+
+                creneaux_travailles = equipe.creneau_ids
+                for i in range(1,8):
+                    dict_horaires[i] = []
+                    creneaux_du_jour = creneaux_travailles.filtered(lambda x: x.jour_number == i)
+                    for c in creneaux_du_jour:
+                        dict_horaires[i].append((c.heure_debut, c.heure_fin))
+                jours_travailles = [j for j in dict_horaires if dict_horaires[j] != []]
+            res[equipe_id] = {
+                'dict_horaires': dict_horaires,
+                'jours_travailles': jours_travailles,
+                }
+            if horaires_temp:
+                res[equipe_id]['dict_horaires_temp'] = dict_horaires_temp
+                res[equipe_id]['jours_temp_travailles'] = jours_temp_travailles
+                res[equipe_id]['horaires_temp_start'] = str_temp_start
+                res[equipe_id]['horaires_temp_stop'] = str_temp_stop
+        return res
+
+    @api.model
     def get_min_max_time(self):
         """
         parcours toutes équipes pour trouver les heures minimales et maximales de travail. 
         Appelée depuis la CalendarView si l'attribut 'working_hours' est à "1". Sert à restreindre la vue Calendar pour ne pas voir les heures entre 0 et min, ni celles entre max et 24
         renvois les valeurs en UTC
-        /!| Cette fonction est appelée avant de savoir les dates de début et de fin. on prend donc
+        /!| Cette fonction est appelée avant de savoir les dates de début et de fin. on prend donc tous les horaires possibles
         """
         equipes = self.env['of.planning.equipe'].search([])
         min_time = False
@@ -507,7 +578,7 @@ class OfPlanningIntervention(models.Model):
             if not bool_d_courante_temp:  # la date courante est dans les horaires par défaut
                 for i in range(len(dict_horaires[le_jour])):  # parcours des créneaux
                     c = dict_horaires[le_jour][i]
-                    if c[0] <= heure_debut and heure_debut < c[1]:
+                    if float_compare(heure_debut, c[0], compare_precision)  >= 0.0 and float_compare(heure_debut, c[1], compare_precision) < 0.0:  # c[0] <= heure_debut and heure_debut < c[1]
                         # l'intervention commence sur le creneau dict_horaires[le_jour][i]
                         debut_sur_creneau = True
                         index_creneau = i
@@ -515,7 +586,7 @@ class OfPlanningIntervention(models.Model):
             else:  # la date courante est dans les horaires temporaires
                 for i in range(len(dict_horaires_temp[le_jour])):  # parcours des créneaux temporaires
                     c = dict_horaires_temp[le_jour][i]
-                    if c[0] <= heure_debut and heure_debut < c[1]:
+                    if float_compare(heure_debut, c[0], compare_precision)  >= 0.0 and float_compare(heure_debut, c[1], compare_precision) < 0.0:  # c[0] <= heure_debut and heure_debut < c[1]
                         # l'intervention commence sur le creneau dict_horaires_temp[le_jour][i]
                         debut_sur_creneau = True
                         index_creneau = i
