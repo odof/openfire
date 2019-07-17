@@ -80,7 +80,7 @@ CalendarView.include({
         this.on_event_after_all_render = _.debounce(this.on_event_after_all_render, 300, true);
     },
     /**
-     *  go to system parameters to see if we should allow drag and drop. Inits working hours field if needed
+     *  go to system parameters to see if we should allow drag and drop. Sets minTime and maxTime if needed
      */
     willStart: function() {
         var self = this;
@@ -91,12 +91,15 @@ CalendarView.include({
             self.draggable = _.str.toBool(val) || self.draggable; // if false in system parameters but true in view definition, make it true
             dfd.resolve();
         });
-
-        this.set_min_max_time()
-        .then(function () {
+        if (this.attendee_model && this.working_hours) {
+            this.set_min_max_time()
+            .then(function () {
+                dfd2.resolve();
+                return;
+            });
+        }else{
             dfd2.resolve();
-            return;
-        });
+        }
 
         return $.when(dfd,dfd2,this._super());
     },
@@ -333,7 +336,6 @@ CalendarView.include({
     set_min_max_time: function() {
         var self = this;
         var dfd = $.Deferred();
-        console.log("range", this.date_start, this.date_stop);
 
         var model = new Model(this.attendee_model);
         model.call('get_min_max_time')
@@ -343,7 +345,6 @@ CalendarView.include({
                 dfd.resolve();
                 return;
             }
-            console.log("(min, max) utc",res[0],res[1]);
             var descript = {type: "float_time"};
             var min_time_utc = formats.format_value(res[0],descript) + ":00";
             var max_time_utc = formats.format_value(res[1],descript) + ":00";;
@@ -355,7 +356,6 @@ CalendarView.include({
             var maxUTC = new Date(str_prefix + max_time_utc + str_suffix );
             self.minTime = minUTC.toLocaleTimeString();
             self.maxTime = maxUTC.toLocaleTimeString();
-            console.log("(min, max)",self.minTime,self.maxTime);
             dfd.resolve();
             return;
         });

@@ -167,12 +167,13 @@
                 <div t-attf-id="of_planning_fillerbar_#{row.res_id}_#{col_index}" class="of_planning_fillerbar">
                     <div t-if="la_fillerbar.pct_occupe > 0" class="of_planning_fillerbar_occupe" t-attf-style="width: #{la_fillerbar.pct_occupe}% !important;">
                     </div>
-                    <div class="of_planning_fillerbar_disponible">
+                    <div t-if="la_fillerbar.pct_disponible > 0" class="of_planning_fillerbar_disponible">
                     </div>
                 </div>
                 <t t-foreach="records.length" t-as="rec_index">
                     <t t-call="PlanningView.record">
                         <t t-set="record" t-value="records[rec_index]"/>
+                        <t t-set="le_i" t-value="col_index"/>
                     </t>
                 </t>
             </td>
@@ -189,6 +190,54 @@
     </t>
 
     <div t-name="PlanningView.record">
-        <t t-raw="record.content"/>
+        <t t-if="record.type == 'occupe'">
+            <div t-att-class="record.class" t-att-style="color: record.color_ft; bacground-color: record.color_bg; border: 1px solid record.color_ft">
+                <div class="of_planning_info of_planning_info_heures">
+                    <i class="fa fa-clock-o"/><span class="of_ws"/>
+                    <t t-if="record.col_offset_stop == undefined">
+                        <span class="of_planning_subinfo of_planning_subinfo_heure_debut"><t t-raw="record.heure_debut_str"/></span>
+                        <span class="of_planning_subinfo of_planning_subinfo_heure_fin"> -&gt; </span>
+                        <span class="of_planning_subinfo of_planning_subinfo_heure_fin"><t t-raw="record.heure_fin_str"/></span>
+                        <span class="of_planning_subinfo of_planning_subinfo_duree"> - </span>
+                        <span class="of_planning_subinfo of_planning_subinfo_duree"><t t-raw="record.duree_str"/></span>
+                    </t>
+                    <t t-else="">
+                        <span class="of_planning_subinfo of_planning_subinfo_heure_debut"><t t-raw="record['hours_cols'][le_i].heure_debut_str"/></span>
+                        <span class="of_planning_subinfo of_planning_subinfo_heure_fin"> -&gt; </span>
+                        <span class="of_planning_subinfo of_planning_subinfo_heure_fin"><t t-raw="record['hours_cols'][le_i].heure_fin_str"/></span>
+                        <span class="of_planning_subinfo of_planning_subinfo_duree"> - </span>
+                        <span class="of_planning_subinfo of_planning_subinfo_duree"><t t-raw="record['hours_cols'][le_i].duree_str"/></span>
+                    </t>
+                </div>
+
+                <div t-if="record.tache_name" class="of_planning_info of_planning_info_tache_name">
+                    <i class="fa fa-cogs"/><span class="of_ws"/><t t-raw="record.tache_name"/>
+                </div>
+
+                <div t-if="record.partner_name" class="of_planning_info of_planning_info_partner_name">
+                    <i class="fa fa-user"/><span class="of_ws"/><t t-raw="record.partner_name"/>
+                </div>
+
+                <div class="of_planning_info of_planning_info_lieu">
+
+                    <i t-if="record.address_zip || record.address_city" class="fa fa-map-marker"/>
+                    <span t-if="record.address_zip || record.address_city" class="of_ws"/>
+
+                    <span t-if="record.address_zip" class="of_planning_subinfo of_planning_subinfo_zip">
+                        <t t-raw="record.address_zip"/>
+                    </span>
+
+                    <span t-if="record.address_zip &amp;&amp; record.address_city" class="of_ws"/>
+                    <span t-if="record.address_city" class="of_planning_subinfo of_planning_subinfo_city">
+                        <t t-raw="record.address_city"/>
+                    </span>
+
+                </div>
+            </div>
+
+        </t>
+        <t t-if="record.type == 'disponible'">
+            <t t-raw="record.content"/>
+        </t>
     </div>
 </template>
