@@ -13,6 +13,7 @@
     "website": "www.openfire.fr",
     "depends": [
         "of_planning_tournee",
+        "of_utils",
     ],
     "data": [
         "views/of_planning_view_views.xml",
