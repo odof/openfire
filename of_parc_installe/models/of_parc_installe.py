@@ -87,7 +87,7 @@ class of_parc_installe(models.Model):
         client_id = self._context.get('partner_id_no_serie_puce')
         result = []
         for record in self:
-            result.append((record.id, "-> " if record.client_id == client_id else "" + record.name + " - " + record.client_id.display_name))
+            result.append((record.id, "-> " if record.client_id == client_id else "" + (record.name or u'(N° non renseigné)') + " - " + record.client_id.display_name))
         return result
 
     @api.model
