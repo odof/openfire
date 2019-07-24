@@ -75,24 +75,24 @@
                     <span>Remplacer le nom du contact par celui du parent dans les rapports PDF</span>
                 </div>
                 <label for="pdf_adresse_telephone"/>
-                <div name="pdf_afficher_telephone">
-                    <field name="pdf_adresse_telephone" class="oe_inline"/>
-                    <span>Afficher le numéro de téléphone dans les rapports PDF</span>
+                <div name="pdf_afficher_telephone" colspan="1" col="3">
+                    <field name="pdf_adresse_telephone" class="oe_inline" colspan="2" no_label="1"/>
+                    <span colspan="1"></span>
                 </div>
                 <label for="pdf_adresse_mobile"/>
-                <div name="pdf_afficher_mobile">
-                    <field name="pdf_adresse_mobile" class="oe_inline"/>
-                    <span>Afficher le numéro de mobile dans les rapports PDF</span>
+                <div name="pdf_afficher_mobile" colspan="1" col="3">
+                    <field name="pdf_adresse_mobile" class="oe_inline" colspan="2" no_label="1"/>
+                    <span colspan="1"></span>
                 </div>
                 <label for="pdf_adresse_fax"/>
-                <div name="pdf_afficher_fax">
-                    <field name="pdf_adresse_fax" class="oe_inline"/>
-                    <span>Afficher le fax dans les rapports PDF</span>
+                <div name="pdf_afficher_fax" colspan="1" col="3">
+                    <field name="pdf_adresse_fax" class="oe_inline" colspan="2" no_label="1"/>
+                    <span colspan="1"></span>
                 </div>
                 <label for="pdf_adresse_email"/>
-                <div name="pdf_afficher_email">
-                    <field name="pdf_adresse_email" class="oe_inline"/>
-                    <span>Afficher l'adresse email dans les rapports PDF</span>
+                <div name="pdf_afficher_email" colspan="1" col="3">
+                    <field name="pdf_adresse_email" class="oe_inline" colspan="2" no_label="1"/>
+                    <span colspan="1"></span>
                 </div>
                 <label for="pdf_display_product_ref"/>
                 <div name="pdf_display_product_ref">

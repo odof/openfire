@@ -93,16 +93,16 @@ class SaleOrder(models.Model):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_civilite')
 
     def pdf_afficher_telephone(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_telephone')
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_telephone') or 0
 
     def pdf_afficher_mobile(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_mobile')
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_mobile') or 0
 
     def pdf_afficher_fax(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_fax')
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_fax') or 0
 
     def pdf_afficher_email(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_email')
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_email') or 0
 
     def pdf_afficher_date_validite(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_date_validite_devis')
@@ -669,6 +669,35 @@ class Company(models.Model):
 class OFSaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'
 
+    @api.model
+    def _auto_init(self):
+        """
+        Certain paramètres d'affichage sont passés de Booléen à Sélection.
+        Cette fonction est appelée à chaque mise à jour mais ne fait quelque chose que la première fois qu'elle est appelée.
+        """
+        set_value = False
+        if not self.env['ir.values'].get_default('sale.config.settings', 'bool_vers_selection_fait'):  # Cette fonction n'a encore jamais été appelée
+            set_value = True
+        super(OFSaleConfiguration, self)._auto_init()
+        if set_value:
+            if self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_telephone'):
+                self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_telephone', 1)
+            else:
+                self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_telephone', 0)
+            if self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_mobile'):
+                self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_mobile', 1)
+            else:
+                self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_mobile', 0)
+            if self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_fax'):
+                self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_fax', 1)
+            else:
+                self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_fax', 0)
+            if self.env['ir.values'].get_default('sale.config.settings', 'pdf_adresse_email'):
+                self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_email', 1)
+            else:
+                self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_email', 0)
+            self.env['ir.values'].sudo().set_default('sale.config.settings', 'bool_vers_selection_fait', True)
+
     of_deposit_product_categ_id_setting = fields.Many2one(
         'product.category',
         string=u"(OF) Catégorie des acomptes",
@@ -692,18 +721,30 @@ class OFSaleConfiguration(models.TransientModel):
     pdf_adresse_civilite = fields.Boolean(
         string=u"(OF) Civilités", required=True, default=False,
         help=u"Afficher la civilité dans les rapport PDF ?")
-    pdf_adresse_telephone = fields.Boolean(
-        string=u"(OF) Téléphone", required=True, default=False,
-        help=u"Afficher le numéro de téléphone dans les rapport PDF ?")
-    pdf_adresse_mobile = fields.Boolean(
-        string=u"(OF) Mobile", required=True, default=False,
-        help=u"Afficher le numéro de téléphone mobile dans les rapport PDF ?")
-    pdf_adresse_fax = fields.Boolean(
-        string="(OF) Fax", required=True, default=False,
-        help=u"Afficher le fax dans les rapport PDF ?")
-    pdf_adresse_email = fields.Boolean(
-        string="(OF) E-mail", required=True, default=False,
-        help=u"Afficher l'adresse email dans les rapport PDF ?")
+    pdf_adresse_telephone = fields.Selection([
+            (1, "Afficher dans l'encart d'adresse principal"),
+            (2, "Afficher dans une pastille d'informations complémentaires"),
+            (3, "Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
+        ], string=u"(OF) Téléphone",
+        help=u"Où afficher le numéro de téléphone dans les rapport PDF ? Ne rien mettre pour ne pas afficher.")
+    pdf_adresse_mobile = fields.Selection([
+            (1, "Afficher dans l'encart d'adresse principal"),
+            (2, "Afficher dans une pastille d'informations complémentaires"),
+            (3, "Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
+        ], string=u"(OF) Mobile",
+        help=u"Où afficher le numéro de téléphone mobile dans les rapport PDF ? Ne rien mettre pour ne pas afficher.")
+    pdf_adresse_fax = fields.Selection([
+            (1, "Afficher dans l'encart d'adresse principal"),
+            (2, "Afficher dans une pastille d'informations complémentaires"),
+            (3, "Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
+        ], string="(OF) Fax",
+        help=u"Où afficher le fax dans les rapport PDF ? Ne rien mettre pour ne pas afficher.")
+    pdf_adresse_email = fields.Selection([
+            (1, "Afficher dans l'encart d'adresse principal"),
+            (2, "Afficher dans une pastille d'informations complémentaires"),
+            (3, "Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
+        ], string="(OF) E-mail",
+        help=u"Où afficher l'adresse email dans les rapport PDF ? Ne rien mettre pour ne pas afficher.")
     pdf_afficher_multi_echeances = fields.Boolean(
         string="(OF) Multi-échéances", required=True, default=False,
         help="Afficher les échéances multiples dans les rapports PDF ?")
