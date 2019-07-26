@@ -311,7 +311,7 @@ class OFMeeting(models.Model):
                     le_texte += le_tab[0]
                 for i in range(1, len(le_tab)):
                     le_texte += ", " + le_tab[i]
-                meeting.of_location = le_texte
+                meeting.location = le_texte
 
     """tentative de domain ratée
     @api.multi
