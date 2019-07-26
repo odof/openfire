@@ -17,6 +17,7 @@ class OfAccountPaymentMode(models.Model):
     partner_id = fields.Many2one(related='company_id.partner_id', string='Partner', store=True)
     journal_type = fields.Selection(related='journal_id.type', string='Type', readonly=True)
 
+    active = fields.Boolean(string="Actif", default=True)
     config_affichage = fields.Text(string='Configuration', help=u'Attention niveau avancé!\n Décrivez par texte et balises mako (${variable}) ce qui sera affiché sur la facture.')
 
     _sql_constraints = [('name_uniq', 'unique (name)', u"Ce mode de paiement existe déjà !")]

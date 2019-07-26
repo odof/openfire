@@ -10,6 +10,13 @@
             <field name="arch" type="xml">
                 <form string="Payment mode" version="7">
                     <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="toggle_active" type="object"
+                                    class="oe_stat_button" icon="fa-archive">
+                                <field name="active" widget="boolean_button"
+                                    options='{"terminology": "archive"}'/>
+                            </button>
+                        </div>
                         <div class="oe_title">
                             <h1><field name="name"/></h1>
                         </div>
@@ -108,6 +115,37 @@
                         </div>
                     </sheet>
                 </form>
+            </field>
+        </record>
+
+        <record id="of_view_payment_mode_tree" model="ir.ui.view">
+            <field name="name">Modes de paiement</field>
+            <field name="model">of.account.payment.mode</field>
+            <field name="arch" type="xml">
+                <tree string="Modes de paiement" colors="#A0A0A0:active==False;">
+                    <field name="name"/>
+                    <field name="journal_id"/>
+                    <field name="journal_type"/>
+                    <field name="company_id"/>
+                    <field name="active" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="of_payment_mode_search_view" model="ir.ui.view">
+            <field name="name">of.account.payment.mode.search</field>
+            <field name="model">of.account.payment.mode</field>
+            <field name="mode">primary</field>
+            <field name="arch" type="xml">
+                <search string="Mode de paiment">
+                    <field string="Nom" name="name"/>
+                    <field string="Journal" name="journal_id"/>
+                    <field string="Type de journal" name="journal_type"/>
+                    <field string="Société" name="company_id"/>
+                    <separator/>
+                    <filter string="Actif" name="active" domain="[('active','=',True)]"/>
+                    <filter string="Archivé" name="inactive" domain="[('active','=',False)]"/>
+                </search>
             </field>
         </record>
 
