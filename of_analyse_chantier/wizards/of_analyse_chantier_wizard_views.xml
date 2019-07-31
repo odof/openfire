@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_analyse_chantier_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.analyse.chantier.wizard.view.form</field>
+        <field name="model">of.analyse.chantier.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group col="4">
+                    <p class="text-warning">Cette opération va créer une analyse de chantier avec les éléments sélectionnés.</p>
+                </group>
+                <footer>
+                    <button string="Accepter" name="button_validate" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window id="action_of_analyse_chantier_wizard_view_form_invoice"
+        name="Générer analyse de chantier"
+        res_model="of.analyse.chantier.wizard"
+        src_model="account.invoice"
+        view_mode="form"
+        view_type="form"
+        view_id="of_analyse_chantier_wizard_view_form"
+        target="new"
+        key2="client_action_multi"
+        context="{'origin_model':'account.invoice'}"/>
+
+    <act_window id="action_of_analyse_chantier_wizard_view_form_saleorder"
+        name="Générer analyse de chantier"
+        res_model="of.analyse.chantier.wizard"
+        src_model="sale.order"
+        view_mode="form"
+        view_type="form"
+        view_id="of_analyse_chantier_wizard_view_form"
+        target="new"
+        key2="client_action_multi"
+        context="{'origin_model':'sale.order'}"/>
+
+</odoo>

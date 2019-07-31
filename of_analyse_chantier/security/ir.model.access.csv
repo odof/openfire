@@ -1,0 +1,5 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_of_analyse_chantier_user","of.analyse.chantier","model_of_analyse_chantier","base.group_user",1,0,0,0
+"access_of_analyse_chantier_manager","of.analyse.chantier","model_of_analyse_chantier","of_group_analyse_chantier_manager",1,1,1,1
+"access_of_analyse_chantier_line_user","of.analyse.chantier.line","model_of_analyse_chantier_line","of_group_analyse_chantier_user",1,1,1,1
+"access_of_analyse_chantier_remise_user","of.analyse.chantier.remise","model_of_analyse_chantier_remise","base.group_user",1,1,1,1
