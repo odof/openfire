@@ -1,0 +1,37 @@
+<odoo>
+
+        <!-- wizard paiement EDI (paiements par fichier informatique -->
+        <record id="view_export_winfic_wizard" model="ir.ui.view">
+            <field name="name">Paiement EDI</field>
+            <field name="model">of.wizard.winfic</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Paiement EDI (par échange de données informatisées)">
+                    <field name="nom_fichier" invisible="1"/>
+                    <group colspan="4" col="8">
+                        <button special="cancel" string="Annuler" icon="fa-times"/>
+                        <button name="genere_fichier_winfic" string="Générer fichier" type="object" icon="fa-file-text"/>
+                    </group>
+                    <field name="fichier" filename="nom_fichier" readonly="1" attrs="{'invisible':[('fichier','=','')]}"/>
+                    <group colspan="4" col="1">
+                        <field name="sortie" readonly="1"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+    <!-- Ajout action Export Winfic/Winsis dans vue écritures comptables -->
+    <act_window
+        id="action_of_export_winfic_form"
+        key2="client_action_multi"
+        name="Export Winfic/Winsis"
+        res_model="of.wizard.winfic"
+        src_model="account.move.line"
+        multi="True"
+        view_mode="form"
+        view_type="form"
+        view_id="view_export_winfic_wizard"
+        target="new"
+        groups="account.group_account_manager,account.group_account_user" />
+
+</odoo>
