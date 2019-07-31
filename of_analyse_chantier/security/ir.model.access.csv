@@ -1,0 +1,8 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_of_analyse_chantier_user","of.analyse.chantier","model_of_analyse_chantier","base.group_user",1,0,0,0
+"access_of_analyse_chantier_manager","of.analyse.chantier","model_of_analyse_chantier","of_group_analyse_chantier_user",1,1,1,1
+"access_of_analyse_chantier_line_user","of.analyse.chantier.line","model_of_analyse_chantier_line","of_group_analyse_chantier_user",1,1,1,1
+"access_of_analyse_chantier_product_user","of.analyse.chantier.product","model_of_analyse_chantier_product","of_group_analyse_chantier_user",1,1,1,1
+"access_of_analyse_chantier_remise_user","of.analyse.chantier.remise","model_of_analyse_chantier_remise","of_group_analyse_chantier_user",1,1,1,1
+"access_of_analyse_chantier_service_user","of.analyse.chantier.service","model_of_analyse_chantier_service","of_group_analyse_chantier_user",1,1,1,1
+"access_of_analyse_chantier_remise_user","of.analyse.chantier.remise","model_of_analyse_chantier_remise","base.group_user",1,1,1,1

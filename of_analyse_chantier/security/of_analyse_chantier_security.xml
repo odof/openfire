@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!--###########################################______Création de la categorie______###################################################-->
+
+        <record model="ir.module.category" id="of_analyse_chantier_module_category">
+            <field name="name">OF Analyse de chantier</field>
+            <field name="description">Définit les droits d'accès aux analyses de chantiers OpenFire.</field>
+            <field name="sequence">92</field>
+        </record>
+
+        <!--#############################################______Création des groupes______#####################################################-->
+
+        <record id="of_group_analyse_chantier_user" model="res.groups">
+            <field name="name">Utilisateur</field>
+            <field name="category_id" ref="of_analyse_chantier_module_category"/>
+        </record>
+
+        <record id="of_group_analyse_chantier_manager" model="res.groups">
+            <field name="name">Responsable</field>
+            <field name="category_id" ref="of_analyse_chantier_module_category"/>
+            <field name="implied_ids" eval="[(4, ref('of_group_analyse_chantier_user'))]"/>
+        </record>
+
+        <!-- Règles sur les enregistrements -->
+        <record id="of_analyse_chantier_personal_rule" model="ir.rule">
+            <field name="name">Propres analyses</field>
+            <field ref="model_of_analyse_chantier" name="model_id"/>
+            <field name="domain_force">['|', ('order_ids.user_id','=',user.id), ('invoice_ids.user_id','=',user.id)]</field>
+            <field name="groups" eval="[(4, ref('of_analyse_chantier.of_group_analyse_chantier_user'))]"/>
+        </record>
+        <record id="of_analyse_chantier_see_all" model="ir.rule">
+            <field name="name">Toutes les analyse</field>
+            <field ref="model_of_analyse_chantier" name="model_id"/>
+            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="groups" eval="[(4, ref('of_analyse_chantier.of_group_analyse_chantier_manager'))]"/>
+        </record>
+
+    </data>
+</odoo>
