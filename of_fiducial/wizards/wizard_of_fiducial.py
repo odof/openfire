@@ -46,8 +46,8 @@ class OfWizardExportWinfic(models.TransientModel):
             chaine += '     1|' # No du folio
             chaine += str(no_ligne).rjust(8) + '|' # N° de l'écriture dans le folio
             chaine += ecriture.date[8:10] + ecriture.date[5:7] + ecriture.date[2:4] + '|' # Date de l'écriture
-            if len(ecriture.journal_id.code) != 6:
-                sortie += u"Erreur écriture ligne " + str(no_ligne) + u" : le code du compte " + str(ecriture.account_id.code) + u" ne fait pas 6 caractères.<br>\n"
+            if len(ecriture.account_id.code) != 6: # N° compte compable
+                sortie += u"Erreur écriture ligne " + str(no_ligne) + u" : le n° du compte " + str(ecriture.account_id.code) + u" ne fait pas 6 caractères.<br>\n"
                 erreur = True
             chaine += ecriture.account_id.code  + '|' # No du compte
             if not ecriture.account_id.code in liste_comptes:
@@ -56,7 +56,10 @@ class OfWizardExportWinfic(models.TransientModel):
             chaine += str('%.2f' % ecriture.credit).replace('.', ',').rjust(13) + '|'  # Crédit
             chaine += self.chaine2ascii_taille_fixe_maj(ecriture.name, 30) + '|' # Libellé
             chaine += '  |' # Lettrage
-            chaine += ecriture.move_id.name + '|' # N° de la pièce
+            if len(ecriture.move_id.name) > 5:
+                sortie += u"Erreur écriture ligne " + str(no_ligne) + u" : le numéro de la pièce comptable " + str(ecriture.move_id.name) + u" fait plus de 5 caractères.<br>\n"
+                erreur = True
+            chaine += str(ecriture.move_id.name).rjust(5) + '|' # N° de la pièce
             chaine += " " * 4 + '|' # Code statistique
             if ecriture.date_maturity: # Date d'échéance
                 chaine += ecriture.date_maturity[8:10] + ecriture.date_maturity[5:7] + ecriture.date_maturity[0:4] + '|'
@@ -78,15 +81,19 @@ class OfWizardExportWinfic(models.TransientModel):
             chaine += "\r\n"
             no_ligne = no_ligne + 1
 
-        if chaine:  # On génère le fichier.
-            sortie = u"<p>Le fichier d'export a été généré. Vous pouvez l'enregistrer.</p>\n" + sortie
-            chaine = base64.encodestring(chaine)
-            self.write({
-                'fichier': chaine,
-                'nom_fichier': "ECRITURE.WIN",
-            })
+        if erreur:
+            sortie = u"<p>Il y a eu des erreurs. Le fichier d'export ne peut être généré.</p>\n" + sortie
+            self.write({'fichier': ''})
         else:
-            sortie = u"<p>Le fichier est vide.</p>\n" + sortie
+            if chaine:  # On génère le fichier.
+                sortie = u"<p>Le fichier d'export a été généré. Vous pouvez l'enregistrer.</p>\n" + sortie
+                chaine = base64.encodestring(chaine)
+                self.write({
+                    'fichier': chaine,
+                    'nom_fichier': "ECRITURE.WIN",
+                })
+            else:
+                sortie = u"<p>Le fichier est vide.</p>\n" + sortie
 
         self.write({
             'sortie': sortie

@@ -2,11 +2,11 @@
 
         <!-- wizard paiement EDI (paiements par fichier informatique -->
         <record id="view_export_winfic_wizard" model="ir.ui.view">
-            <field name="name">Paiement EDI</field>
+            <field name="name">Export Winfic/Winsis</field>
             <field name="model">of.wizard.winfic</field>
             <field name="type">form</field>
             <field name="arch" type="xml">
-                <form string="Paiement EDI (par échange de données informatisées)">
+                <form string="Export Winfic/Winsis">
                     <field name="nom_fichier" invisible="1"/>
                     <group colspan="4" col="8">
                         <button special="cancel" string="Annuler" icon="fa-times"/>
