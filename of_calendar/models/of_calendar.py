@@ -168,7 +168,7 @@ class OFMeeting(models.Model):
         ('no_address', u"--"),
         ('unknown', u"Indéterminé"),
         ('not_tried', u"Pas tenté"),
-        ], default='not_tried', help=u"Niveau de précision de la géolocalisation", compute="_compute_geo", store=False, search='_search_precision')
+        ], default='no_address', help=u"Niveau de précision de la géolocalisation", compute="_compute_geo", store=False, search='_search_precision')
 
     def _search_lat(self, operator, operand):
         partners = self.env['res.partner']
