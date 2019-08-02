@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="note.note_note_rule_global" model="ir.rule">
+        <field name="active">False</field>
+    </record>
+</odoo>
