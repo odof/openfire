@@ -294,7 +294,7 @@ var PlanningView = View.extend({
                 self.rows = {};
                 self.set_columns();
                 if (events.length >0) {
-                    console.log("events: ",events);
+                    console.log("events: ",events,self.fields_keys);
                     //console.log("self.resource: ",self.resource);
                     //console.log("events[0][self.resource]: ",events[0][self.resource]);
                     
@@ -805,7 +805,7 @@ PlanningView.Row = Widget.extend({
                     for (var j=0; j<self.creneaux_dispo[i].length; j++) {
                         le_creneau = self.creneaux_dispo[i][j];
                         le_creneau.type = "disponible";
-                        le_creneau.content = "<div>" + le_creneau['duree'] + "h</div>"
+                        le_creneau.content = "<div class='of_planning_dispo'>" + le_creneau['duree'] + "h</div>"
                         self.columns[i].push(self.creneaux_dispo[i][j]);
                         /*la_len = self.columns[i].length;
                         var k = 0;
@@ -834,7 +834,19 @@ PlanningView.Row = Widget.extend({
                             }
                             k++;
                         }*/
-                        _.sortBy(self.columns[i], 'heure_debut');  // @TODO: gerer asynchronicité
+                        function compareFunction(recA, recB) {
+                            var heure_debut_a = recA.heure_debut,
+                                heure_debut_b = recB.heure_debut;
+                            if (!isNullOrUndef(recA.hours_cols)) {
+                                heure_debut_a = recA.hours_cols[i].heure_debut;
+                            }
+                            if (!isNullOrUndef(recB.hours_cols)) {
+                                heure_debut_b = recB.hours_cols[i].heure_debut;
+                            }
+                            return heure_debut_a - heure_debut_b;
+                        }
+                        self.columns[i].sort(compareFunction);
+                        //_.sortBy(self.columns[i], 'heure_debut');  // @TODO: gerer asynchronicité
                     }
                 }
                 console.log("self.COLUMNS!",self.columns);
@@ -1049,13 +1061,27 @@ var PlanningRecord = Widget.extend({
         this.type = "occupe";
 
         var self= this;
-        this.init_content(record);
+        this.record = record;
+        var descript_dt = {type: "datetime"};
+        var descript_ft = {type: "float_time"};
+        this.heure_debut_str = formats.format_value(record.date,descript_dt).substring(11, 16);
+        this.heure_fin_str = formats.format_value(record.date_deadline,descript_dt).substring(11, 16);
+        this.heure_debut = hh_mm_to_float(this.heure_debut_str)
+        this.heure_fin = hh_mm_to_float(this.heure_fin_str)
+        this.duree_str = formats.format_value(record.duree,descript_ft).replace(":", "h");
+        this.address_city = record.address_city;
+        this.address_zip = record.address_zip;
+        this.partner_name = record.partner_name;
+        this.tache_name = record.tache_name;
+
+        //this.init_content(record);
         //console.log('MapRecord this: ',this);
     },
     /**
      *  inits this.values ({fieldName: value, ...}),
-     */
+     * /
     init_content: function (record) {
+        //console.log("INIT CONTENT RECORD:",record);
         var self = this;
         this.values = {};
         _.each(record, function(v, k) {
