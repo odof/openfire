@@ -191,7 +191,7 @@
 
     <div t-name="PlanningView.record">
         <t t-if="record.type == 'occupe'">
-            <div t-att-class="record.class" t-att-style="color: record.color_ft; bacground-color: record.color_bg; border: 1px solid record.color_ft">
+            <div t-att-class="record.class" t-attf-style="color: #{record.color_ft}; background-color: #{record.color_bg}; border: 1px solid #{record.color_ft};">
                 <div class="of_planning_info of_planning_info_heures">
                     <i class="fa fa-clock-o"/><span class="of_ws"/>
                     <t t-if="record.col_offset_stop == undefined">
