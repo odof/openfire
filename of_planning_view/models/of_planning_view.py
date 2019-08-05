@@ -48,6 +48,7 @@ class OfPlanningIntervention(models.Model):
             """Similaire au calcul de créneaux dispo de rdv.py.
             L'idée ici est de fusionner les créneaux dispos consécutifs.
             exple: une journée sans intervention programmée ne doit avoir qu'un créneau dispo"""
+            #@todo: debug lieu_deb
             index_courant = 0
             equipe = self.env['of.planning.equipe'].browse(int(equipe_id))
             deb = creneaux_travailles[index_courant][0]  # début courant
@@ -75,32 +76,32 @@ class OfPlanningIntervention(models.Model):
                     if vals != {} and vals['duree'] >= duree_min:
                         creneaux.append(vals)
                 elif deb and deb < intervention_deb:  # du temps avant le début de l'intervention
-                    # @todo: gestion duree_min quand intervention sur autre créneau
                     if fin < intervention_deb:  # l'intervention commence sur un autre creneau: préparation du créneau dispo
                         vals['heure_debut'] = deb
                         vals['heure_fin'] = fin
-                        vals['lieu_debut'] = lieu_deb
-                        vals['lieu_fin'] = intervention.address_id and intervention.address_id.get_infos_lieu() or False
                         vals['duree'] = fin - deb
                         index_courant += 1
                         deb = creneaux_travailles[index_courant][0]  # début courant
                         fin = creneaux_travailles[index_courant][1]  # fin courante
-                    while fin < intervention_deb:
-                        vals['heure_fin'] = fin
-                        vals['duree'] += fin - deb
-                        index_courant += 1
-                        deb = creneaux_travailles[index_courant][0]  # début courant
-                        fin = creneaux_travailles[index_courant][1]  # fin courante
-                    # Un trou dans le planning, suffisant pour un créneau?
-                    #if intervention_deb - deb >= duree_min: # oui: maj du créneau dispo en cours de création s'il y en a
-                    if vals == {}:  # aucun créneau à fusionner
+                        while fin < intervention_deb:  # parcourir les créneaux jusqu'à arriver au créneau de l'intervention
+                            vals['heure_fin'] = fin
+                            vals['duree'] += fin - deb
+                            index_courant += 1
+                            deb = creneaux_travailles[index_courant][0]  # début courant
+                            fin = creneaux_travailles[index_courant][1]  # fin courante
+                        # si l'intervention commence sur le début d'un créneau: la fin du créneau dispo est la fin du créneau précédent
+                        # => l'heure de fin du créneau dispo est déjà bonne
+                        # si l'intervention NE commence PAS sur le début d'un créneau: la fin du créneau dispo est le début de l'intervention
+                        if deb < intervention_deb:
+                            vals['heure_fin'] = intervention_deb
+                    else:  # l'intervention commence sur ce même créneau
                         vals['heure_debut'] = deb
                         vals['duree'] = 0
-                    vals['heure_fin'] = vals.get('heure_fin', False) and min(vals['heure_fin'],intervention_deb) or intervention_deb  # au cas où l'intervention commence en même temps qu'un créneau
+                        vals['heure_fin'] = intervention_deb
                     vals['lieu_debut'] = lieu_deb
                     vals['lieu_fin'] = intervention.address_id and intervention.address_id.get_infos_lieu() or False
                     vals['duree'] += intervention_deb - deb
-                    if vals != {} and vals['duree'] > duree_min:  # un créneau à ajouter
+                    if vals != {} and vals['duree'] >= duree_min:  # un créneau à ajouter
                         creneaux.append(vals)
                     vals = {}
                     if intervention_fin < fin:  # l'intervention se fini avant la fin du créneau horaire
@@ -314,9 +315,9 @@ class OfPlanningIntervention(models.Model):
 
             fillerbarzz.append(fillerbar)
             if is_jour_temp:
-                creneaux_dispo = get_creneaux_dispo(intervention_liste, dict_horaires_temp[num_jour], 1.0)
+                creneaux_dispo = get_creneaux_dispo(intervention_liste, dict_horaires_temp[num_jour], 0.5)
             else:
-                creneaux_dispo = get_creneaux_dispo(intervention_liste, dict_horaires[num_jour], 1.0)
+                creneaux_dispo = get_creneaux_dispo(intervention_liste, dict_horaires[num_jour], 0.5)
             creneaux_dispozz.append(creneaux_dispo)
 
             d_date_current += un_jour
