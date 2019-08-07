@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<odoo>
+
+
+    <record id="view_of_note_note_kanban" model="ir.ui.view">
+        <field name="name">of.note.note.kanban</field>
+        <field name="model">note.note</field>
+        <field name="inherit_id" ref="note.view_note_note_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban//templates//field[@name='name']" position="after">
+                <t t-if="record.of_partner_id.raw_value">
+                    <br/>
+                    <i class="fa fa-user"/><span class="of_ws"/><field name="of_partner_id"/>
+                </t>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_of_note_note_form" model="ir.ui.view">
+        <field name="name">of.note.note.form</field>
+        <field name="model">note.note</field>
+        <field name="inherit_id" ref="note.view_note_note_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="replace">
+                <sheet>
+                    <group colspan="4" col="4">
+                        <group col="2" colspan="2">
+                            <field name="of_partner_id" options="{'no_create': True, 'no_edit': True}"/>
+                        </group>
+                        <group col="2" colspan="2">
+                            <field name="tag_ids" widget="many2many_tags" placeholder="Étiquettes" options="{'no_create_edit': True}"/>
+                            <field name="of_user_ids" widget="many2many_tags" placeholder="Utilisateurs Concernés" options="{'no_create_edit': True}"/>
+                        </group>
+                        <separator name="memo" string="Contenu" colspan="4"/>
+                        <field name="memo" class="oe_memo" nolabel="1" colspan="4"/>
+                    </group>
+                </sheet>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_of_note_note_filter" model="ir.ui.view">
+        <field name="name">of.note.note.search</field>
+        <field name="model">note.note</field>
+        <field name="inherit_id" ref="note.view_note_note_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tag_ids']" position="after">
+                <field name="of_partner_id"/>
+                <field name="of_user_ids"/>
+                <field name="user_id"/>
+                <filter name="my_notes" string="Mes notes" domain="['|', ('user_id', '=', uid), ('of_user_ids', 'child_of', uid)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_of_note_stage_form" model="ir.ui.view">
+        <field name="name">of.note.stage.form</field>
+        <field name="model">note.stage</field>
+        <field name="inherit_id" ref="note.view_note_stage_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                        <field name="active" widget="boolean_button" options="{&quot;terminology&quot;: &quot;archive&quot;}"/>
+                    </button>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_of_note_stage_tree" model="ir.ui.view">
+        <field name="name">of.note.stage.tree</field>
+        <field name="model">note.stage</field>
+        <field name="inherit_id" ref="note.view_note_stage_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="active"/>
+            </xpath>
+        </field>
+    </record>
+
+        <record id="view_of_note_tag_form" model="ir.ui.view">
+        <field name="name">of.note.tag.form</field>
+        <field name="model">note.tag</field>
+        <field name="inherit_id" ref="note.note_tag_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                        <field name="active" widget="boolean_button" options="{&quot;terminology&quot;: &quot;archive&quot;}"/>
+                    </button>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
