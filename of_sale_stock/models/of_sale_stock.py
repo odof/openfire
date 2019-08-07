@@ -152,6 +152,38 @@ class StockPicking(models.Model):
     client_order_ref = fields.Char(related="sale_id.client_order_ref")
     of_note_operations = fields.Text('Notes Operations')
 
+    of_purchase_ids = fields.Many2many('purchase.order', compute='_compute_of_purchase_ids', string=u'Achats associés à cette livraison')
+    of_purchase_count = fields.Integer('Achats', compute='_compute_of_purchase_ids')
+
+    @api.multi
+    def _compute_of_purchase_ids(self):
+        purchase_order_obj = self.env['purchase.order']
+        for picking in self:
+            if picking.sale_id:
+                picking.of_purchase_ids = purchase_order_obj.search([('sale_order_id', '=', picking.sale_id.id)])
+            elif picking.backorder_id:
+                picking.of_purchase_ids = picking.backorder_id.of_purchase_ids
+            else:
+                picking.of_purchase_ids = []
+            picking.of_purchase_count = len(picking.of_purchase_ids)
+
+    @api.multi
+    def action_of_view_purchase(self):
+        '''
+        This function returns an action that display existing purchase orders
+        of given delivery ids. It can either be a in a list or in a form
+        view, if there is only one purchase order to show.
+        '''
+        action = self.env.ref('purchase.purchase_form_action').read()[0]
+
+        purchases = self.mapped('of_purchase_ids')
+        if len(purchases) > 1:
+            action['domain'] = [('id', 'in', purchases._ids)]
+        elif purchases:
+            action['views'] = [(self.env.ref('purchase.purchase_order_form').id, 'form')]
+            action['res_id'] = purchases.id
+        return action
+
 class PackOperation(models.Model):
     _inherit = "stock.pack.operation"
 
