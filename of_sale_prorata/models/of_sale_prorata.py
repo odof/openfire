@@ -33,8 +33,10 @@ class SaleOrder(models.Model):
                 for invoice in order.invoice_ids:
                     if invoice.state == 'cancel':
                         continue
-                    if invoice.invoice_line_ids and invoice.invoice_line_ids[0].product_id.id == product_situation_id:
-                        n += invoice.type == 'out_invoice' and 1 or -1
+                    for line in invoice.invoice_line_ids:
+                        if line.product_id.id == product_situation_id:
+                            n += invoice.type == 'out_invoice' and 1 or -1
+                            break
             order.of_prochaine_situation = n
 
     @api.multi
