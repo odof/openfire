@@ -357,6 +357,9 @@
             <xpath expr="//page[@name='other_info']//field[@name='name']" position="after">
                 <field name="of_suivi_interne"/>
             </xpath>
+            <xpath expr="//page[@name='other_info']/group/group[last()]" position="inside">
+                <field name="of_mail_template_ids" widget="many2many_tags"/>
+            </xpath>
         </field>
     </record>
 
