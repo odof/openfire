@@ -6,10 +6,8 @@ class OfComposeMail(models.TransientModel):
     _inherit = 'of.compose.mail'
 
     @api.model
-    def _get_dict_values(self, o, objects=None):
-        if not objects:
-            objects = self._get_objects(o)
-        result = super(OfComposeMail,self)._get_dict_values(o, objects=objects)
+    def _get_dict_values(self, o, objects):
+        result = super(OfComposeMail,self)._get_dict_values(o, objects)
 
         order = objects.get('order')
         lines = order and order.order_line.filtered('of_article_principal') or False

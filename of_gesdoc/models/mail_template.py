@@ -23,11 +23,12 @@ class OfMailTemplate(models.Model):
     @api.model
     def _get_note_fields(self):
         comp_obj = self.env['of.compose.mail']
-        values = comp_obj._get_dict_values(self.env.user)
-        return "\n".join(["%%(%s)s" % key for key in sorted(values.keys())])
+        obj = self.env.user
+        values = comp_obj._get_dict_values(obj, comp_obj._get_objects(obj))
+        return "\n".join(["${%s}" % key for key in sorted(values.keys())])
 
     @api.multi
-    def get_note_fields(self):
+    def _compute_note_fields(self):
         note_fields = self._get_note_fields()
         for template in self:
             template.note_fields = note_fields
@@ -41,7 +42,7 @@ class OfMailTemplate(models.Model):
     file = fields.Binary("Formulaire PDF", attachment=True)
     chp_ids = fields.One2many('of.gesdoc.chp', 'template_id', string='Liste des champs')
     fillable = fields.Boolean(u"Laisser éditable", help="Autorise la modification du fichier pdf après téléchargement")
-    note_fields = fields.Text(compute='get_note_fields', string='Liste des valeurs', default=_get_note_fields)
+    note_fields = fields.Text(compute='_compute_note_fields', string='Liste des valeurs', default=_get_note_fields)
     type = fields.Selection([], string="Type de document")
     sequence = fields.Integer(string=u"Séquence", default=10)
 
@@ -88,5 +89,3 @@ class OfGesdocChp(models.Model):
     template_id = fields.Many2one('of.mail.template', string=u'Modèle Courrier')
     to_export = fields.Boolean(string='Export', default=True)
     to_import = fields.Boolean(string='Import')
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
