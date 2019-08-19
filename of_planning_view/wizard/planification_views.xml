@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_of_planification_wizard" model="ir.ui.view">
+        <field name="name">Planifier une intervention</field>
+        <field name="model">of.planification.creneau</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Planifier une intervention">
+                <script>
+                    $(document).ready(function(){
+                        // élargir le pop-up
+                        $(".modal-dialog").width('80%');
+                    });
+                </script>
+                <group>
+                    <group>
+                        <field name="heure_debut"/>
+                        <field name="heure_fin"/>
+                    </group>
+                    <group>
+                    
+                    </group>
+                </group>
+                <footer>HAHA</footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window
+        name="Planifier une intervention"
+        res_model="of.planification.creneau"
+        src_model="of.planning.intervention"
+        view_mode="form"
+        view_id="view_of_planification_wizard"
+        id="action_view_of_planification_wizard"
+        target="new"
+        groups="of_planning.of_group_planning_intervention_user"
+    />
+
+</odoo>
