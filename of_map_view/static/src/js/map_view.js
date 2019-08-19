@@ -479,6 +479,7 @@ var MapView = View.extend({
                     active_model: this.model,
                 });
         }
+        //console.log("event data:",event.data);
         this.do_execute_action(event.data, this.dataset, event.target.id, _.bind(self.reload_record, this, event.target));
     },
     reload_record: function (record) {

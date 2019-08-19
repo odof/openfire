@@ -18,6 +18,7 @@
     "data": [
         "views/of_planning_view_views.xml",
         "views/of_planning_view_templates.xml",
+        "wizard/planification_views.xml",
     ],
     'qweb': [
         'static/src/xml/*.xml',
