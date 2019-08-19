@@ -78,6 +78,8 @@ class OfTourneeRdv(models.TransientModel):
                 return False
             partner = order.partner_id
             address = order.partner_shipping_id or order.partner_id
+        else:
+            address = False
 
         if address and not (address.geo_lat or address.geo_lng):
             address = partner_obj.search(['|', ('id', '=', partner.id), ('parent_id', '=', partner.id),
