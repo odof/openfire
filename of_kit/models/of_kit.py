@@ -106,6 +106,8 @@ class ProductTemplate(models.Model):
                     product_tmpl.of_price_used = product_tmpl.list_price
                 else:
                     product_tmpl.of_price_used = product_tmpl.price_comps
+            else:
+                product_tmpl.of_price_used = product_tmpl.list_price
 
     @api.multi
     @api.depends('list_price', 'standard_price', 'price_comps', 'cost_comps', 'of_pricing', 'of_is_kit')

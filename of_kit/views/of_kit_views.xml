@@ -43,6 +43,9 @@
                     </group>
                 </page>
             </xpath>
+            <xpath expr="//field[@name='list_price']" position="attributes">
+                <attribute name="attrs">{'invisible': [('of_is_kit', '=', True), ('of_pricing', '=', 'computed')]}</attribute>
+            </xpath>
             <xpath expr="//form//notebook//page[@name='general_information']//field[@name='type']" position="attributes">
                 <!-- all kits are services -->
                 <attribute name="attrs">{'readonly': [('of_is_kit', '=', True)]}</attribute>
@@ -52,6 +55,21 @@
                 <attribute name="attrs">{'invisible': [('of_is_kit', '!=', False)]}</attribute>
             </xpath>
             <xpath expr="//form//notebook//page[@name='general_information']//field[@name='standard_price']" position="attributes">
+                <attribute name="attrs">{'invisible': [('of_is_kit', '!=', False)]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_kit_product_template_tree_view" model="ir.ui.view">
+        <field name="name">of.kit.product.template.product.tree</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree//field[@name='list_price']" position="replace">
+                <field name="of_price_used" string="Prix de vente"/>
+                <field name="of_is_kit" invisible="1"/>
+            </xpath>
+            <xpath expr="//tree//field[@name='standard_price']" position="attributes">
                 <attribute name="attrs">{'invisible': [('of_is_kit', '!=', False)]}</attribute>
             </xpath>
         </field>

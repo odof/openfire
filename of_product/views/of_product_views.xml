@@ -21,14 +21,12 @@
                         <label for="of_seller_price"/>
                         <div col="3">
                             <field name="of_seller_price" class="oe_inline" attrs="{'readonly':[('seller_ids','=',[])]}"/>
-                            /
-                            <field name="of_uom_po_id_display" class="oe_inline" groups="product.group_uom"/>
+                            <span groups="product.group_uom"> / <field name="of_uom_po_id_display" class="oe_inline"/></span>
                         </div>
                         <label for="of_seller_pp_ht"/>
                         <div col="5">
                             <field name="of_seller_pp_ht" class="oe_inline" attrs="{'readonly':[('seller_ids','=',[])]}"/>
-                            /
-                            <field name="of_uom_po_id_display2" class="oe_inline" groups="product.group_uom"/>
+                            <span groups="product.group_uom"> / <field name="of_uom_po_id_display2" class="oe_inline"/></span>
                         </div>
                         <field name="of_seller_remise"/>
                         <separator string="Informations avancées" colspan="2"/>
