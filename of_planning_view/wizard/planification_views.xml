@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="view_of_planification_wizard" model="ir.ui.view">
+    <record id="view_of_planif_wizard" model="ir.ui.view">
         <field name="name">Planifier une intervention</field>
-        <field name="model">of.planification.creneau</field>
+        <field name="model">of.planif.creneau</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
             <form string="Planifier une intervention">
@@ -15,25 +15,39 @@
                 </script>
                 <group>
                     <group>
-                        <field name="heure_debut"/>
-                        <field name="heure_fin"/>
+                        <field name="date_creneau"/>
+                        <field name="heure_debut_creneau" widget="float_time"/>
+                        <field name="heure_fin_creneau" widget="float_time"/>
                     </group>
                     <group>
-                    
+                        <field name="lieu_prec_id"/>
+                        <field name="lieu_suiv_id"/>
+                        <field name="distance_max"/>
                     </group>
+                    <field name="proposition_ids" mode="tree" nolabel="1">
+                        <tree limit="3">
+                            <field name="service_id" invisible="1"/>
+                            <field name="tache_name"/>
+                            <field name="tache_name"/>
+                            <field name="address_city"/>
+                            <field name="address_zip"/>
+                        </tree>
+                    </field>
                 </group>
-                <footer>HAHA</footer>
+                <footer>
+                    <button name="button_dummy" string="Rechercher" type="object" colspan="4" class="btn-primary"/>
+                </footer>
             </form>
         </field>
     </record>
 
     <act_window
         name="Planifier une intervention"
-        res_model="of.planification.creneau"
+        res_model="of.planif.creneau"
         src_model="of.planning.intervention"
         view_mode="form"
-        view_id="view_of_planification_wizard"
-        id="action_view_of_planification_wizard"
+        view_id="view_of_planif_wizard"
+        id="action_view_of_planif_wizard"
         target="new"
         groups="of_planning.of_group_planning_intervention_user"
     />
