@@ -28,6 +28,8 @@ class ResPartner(models.Model):
             'precision': self.precision,
             'city': self.city,
             'zip': self.zip,
+            'id': self.id,
+            'name': self.name,
             }
         return res
 
