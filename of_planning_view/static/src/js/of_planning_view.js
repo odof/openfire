@@ -52,7 +52,7 @@ var MODE_COLUMN_NBS = {
 };
 /*
 NEXT: action click creneau dispo on_close, nettoyage et commentaire du code
-TODO: wizard de planification; events sur plusieurs jours: heures, ligne connectante: grouper connecrted divs
+TODO: wizard de planification; ligne connectante: grouper connected divs
 */
 var PlanningView = View.extend({
     template: 'PlanningView',
@@ -1068,7 +1068,8 @@ var PlanningCreneauDispo = Widget.extend({
                 this.duree_str = this.duree_str.substring(1);  // exple: 2h45
             }
         }
-        
+
+        this.date = moment(this.view.range_start).add(self.col_offset, 'days').format('YYYY-MM-DD'),
         this.lieu_debut = record.lieu_debut;
         this.lieu_fin = record.lieu_fin;
     },
@@ -1092,12 +1093,24 @@ var PlanningCreneauDispo = Widget.extend({
     on_planning_creneau_action_clicked: function(ev){
         ev.preventDefault();
         var self = this;
-        var action_id = "of_planning_view.action_view_of_planification_wizard"
-        var additional_context = {};  // à voir quoi mettre
+        var action_id = "of_planning_view.action_view_of_planif_wizard"
+        var additional_context = {
+            "default_heure_debut_creneau": self.heure_debut,
+            "default_heure_fin_creneau": self.heure_fin,
+            "default_lieu_prec_id": self.lieu_debut.id,
+            "default_lieu_suiv_id": self.lieu_fin.id,
+            "default_date_creneau": self.date,
+        };  // à voir quoi mettre
+        console.log("ADDITIONNAL CONTEXT",pyeval.eval('context', additional_context));
 
-        return data_manager.load_action(action_id, additional_context).then(function(result) {
-                var options = {};
-                return self.view.ViewManager.action_manager.ir_actions_act_window(result,options);
+        return data_manager.load_action(action_id, pyeval.eval('context', additional_context)).then(function(result) {
+                console.log("LE RESUUUULT",result);
+                var options = {
+                    'additional_context': pyeval.eval('context', additional_context),  // pour une raison inconnue le additional_context n'est pas pris en compte avant
+                    'on_close': function () {return},
+                };  // @todo: appel reload_events
+                //return self.view.ViewManager.action_manager.ir_actions_act_window(result,options);
+                return self.view.ViewManager.action_manager.do_action(result,options);
             }).then(function(){
                 $(".o_form_buttons_edit").eq(0).hide();  // cacher les boutons "Sauvergarder" et "Annuler"
             });
