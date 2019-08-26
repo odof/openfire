@@ -83,6 +83,7 @@
                         <field name="date_date" string="Mois intervention"
                                context="{'of_date_search_mode':'month'}"/>
                         <field name="duree"/>
+                        <field name="tag_ids" widget="many2one"/>
                         <field name="user_id" widget="selection"/>
                         <field name="tache_id" widget="selection"/>
                         <field name="category_id" widget="selection"/>
@@ -139,6 +140,7 @@
                                 <field name="user_id"/>
                                 <field name="company_id" widget="selection"/>
                                 <field name="name" string="Libellé"/>
+                                <field name="tag_ids" widget="many2many_tags"/>
                             </group>
                             <group col="2">
                                 <field name="template_id" attrs="{'readonly': [('number', '!=', False), ('state', 'not in', ('draft', 'cancel'))]}"/>
@@ -240,6 +242,7 @@
                     <field name="partner_city"/>
                     <field name="company_id"/>
                     <field name="state"/>
+                    <field name="tag_ids" widget="many2many_tags"/>
                     <field name="cleantext_description" string="Description"/>
                 </tree>
             </field>
@@ -261,6 +264,60 @@
                     <!--field name="color" invisible="1"/>
                     <field name="sidebar_color" invisible="1"/-->
                 </calendar>
+            </field>
+        </record>
+<!--##########################################################################################################################-->
+<!--###########################################_________Étiquettes_________###################################################-->
+<!--##########################################################################################################################-->
+
+<!--#############################################_______Recherche_________#####################################################-->
+        <record id="of_planning_tag_filter" model="ir.ui.view">
+            <field name="name">of.planning.tag.filter</field>
+            <field name="model">of.planning.tag</field>
+            <field name="arch" type="xml">
+                <search string="Recherche">
+                    <field name="name"/>
+                    <separator/>
+                    <filter string="Active" name="active" domain="[('active','=',True)]"/>
+                    <filter string="Archivée" name="inactive" domain="[('active','=',False)]"/>
+                </search>
+            </field>
+        </record>
+
+<!--#############################################_______Vue form_________#####################################################-->
+
+        <record id="of_planning_tag_view_form" model="ir.ui.view" >
+            <field name="name">of.planning.tag.form</field>
+            <field name="model">of.planning.tag</field>
+            <field name="arch" type="xml" >
+                <form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="toggle_active" type="object"
+                                    class="oe_stat_button" icon="fa-archive">
+                                <field name="active" widget="boolean_button"
+                                    options='{"terminology": "archive"}'/>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <label class="oe_edit_only" for="name" string="Nom"/>
+                            <h1><field name="name" placeholder="nom de l'étiquette"/></h1>
+                        </div>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+<!--#############################################_______Vue tree_________#####################################################-->
+
+        <record id="of_planning_tag_view_tree" model="ir.ui.view" >
+            <field name="name">of.planning.tag.tree</field>
+            <field name="model">of.planning.tag</field>
+            <field name="arch" type="xml" >
+                <tree string="Liste des Étiquettes" colors="grey: active == False">
+                    <field name="name" string="Libellé"/>
+                    <field name="active" invisible="1"/>
+                </tree>
             </field>
         </record>
 
@@ -475,6 +532,15 @@
             <field name="search_view_id" ref="of_planning_intervention_filter"/>
         </record>
 
+        <record id="action_of_planning_tag_tree" model="ir.actions.act_window">
+            <field name="name">Étiquettes d'intervention</field>
+            <field name="res_model">of.planning.tag</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="of_planning_tag_view_tree"/>
+            <field name="search_view_id" ref="of_planning_tag_filter"/>
+        </record>
+
 <!--#############################################_________Tâches_________#####################################################-->
 
         <record id="action_hr_employee_tree" model="ir.actions.act_window">
@@ -642,6 +708,7 @@
             <menuitem name="Équipes" id="menu_of_planning_equipe_tree" parent="of_planning.menu_of_planning_configuration" sequence="90" action="action_of_planning_equipe_tree"/>
             <menuitem name="Erreurs" id="menu_of_planning_intervention_raison_tree" parent="of_planning.menu_of_planning_configuration" sequence="100" action="action_of_planning_intervention_raison_tree"/>
             <menuitem name="Tâches" id="menu_of_planning_tache_tree" parent="of_planning.menu_of_planning_configuration" sequence="110" action="action_of_planning_tache_tree"/>
+            <menuitem name="Étiquettes d'intervention" id="menu_of_planning_tag_tree" parent="of_planning.menu_of_planning_configuration" sequence="115" action="action_of_planning_tag_tree"/>
 
         <!-- Creation la facture depuis planning intervention -->
 
