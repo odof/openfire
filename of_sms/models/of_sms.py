@@ -9,6 +9,9 @@ from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMA
 from odoo import api, fields, models
 import re
 import requests
+from HTMLParser import HTMLParser
+import urllib
+
 
 # Fonction qui convertit un no de tél au format international e.164 (+33...)
 def format_tel_e164(mobile="", country_id=False):
@@ -73,21 +76,22 @@ class OFSmsTemplate(models.Model):
         """Send the sms using all the details in this sms template, using the specified record ID"""
 
         sms_template = self.env['of.sms.template'].browse( int(template_id) )
-        rendered_sms_template_body = self.env['of.sms.template'].render_template(sms_template.template_body, sms_template.model_id.model, record_id)
-        rendered_sms_to = self.env['of.sms.template'].render_template(sms_template.sms_to, sms_template.model_id.model, record_id)
+        h = HTMLParser()
+        rendered_sms_template_body = h.unescape(self.env['of.sms.template'].render_template(sms_template.template_body, sms_template.model_id.model, record_id))
+        rendered_sms_to = h.unescape(self.env['of.sms.template'].render_template(sms_template.sms_to, sms_template.model_id.model, record_id))
         #gateway_model = sms_template.from_mobile_verified_id.account_id.account_gateway_id.gateway_model_name
         # Queue the SMS message since we can't directly send MMS
         self.env['of.sms.message'].create({
-                                            'record_id': record_id,
-                                            'model_id': sms_template.model_id.id,
-                                            'account_id':sms_template.from_mobile_verified_id.account_id.id,
-                                            'from_mobile':sms_template.from_mobile,
-                                            'to_mobile':rendered_sms_to,
-                                            'sms_content':rendered_sms_template_body,
-                                            'direction':'O',
-                                            'message_date':datetime.utcnow(),
-                                            'status_code': 'queued',
-                                            })
+            'record_id': record_id,
+            'model_id': sms_template.model_id.id,
+            'account_id':sms_template.from_mobile_verified_id.account_id.id,
+            'from_mobile':sms_template.from_mobile,
+            'to_mobile':rendered_sms_to,
+            'sms_content':rendered_sms_template_body,
+            'direction':'O',
+            'message_date':datetime.utcnow(),
+            'status_code': 'queued',
+            })
         # Turn the queue manager on
         self.env['ir.model.data'].get_object('of_sms', 'sms_queue_check').active = True
 
@@ -184,7 +188,7 @@ class OFSmsCompose(models.Model):
         """Prefills from mobile, sms_account and sms_content but allow them to manually change the content after"""
         if self.sms_template_id:
             # On passe le contenu du texto par l'interpréteur Mako.
-            sms_rendered_content = self.env['mail.template'].render_template(self.sms_template_id.template_body, self.sms_template_id.model_id.model, self.record_id, post_process=False)
+            sms_rendered_content = HTMLParser().unescape(self.env['mail.template'].render_template(self.sms_template_id.template_body, self.sms_template_id.model_id.model, self.record_id, post_process=False))
             self.from_mobile_id = self.sms_template_id.from_mobile_verified_id.id
             self.media_id = self.sms_template_id.media_id
             self.media_filename = self.sms_template_id.media_filename
@@ -192,7 +196,7 @@ class OFSmsCompose(models.Model):
 
     @api.multi
     def send_entity(self):
-        """Attempt to send the sms, if any error comes back show it to the user and only log the smses that successfully sent"""
+        """Attempt to send the sms, if any error comes back show it self.sms_template_id.model_id.modelto the user and only log the smses that successfully sent"""
         self.ensure_one()
 
         if self.delivery_time:
@@ -348,7 +352,7 @@ class OFSMSGatewayOVH(models.Model):
         login = sms_account.account_login
         psswrd = sms_account.account_password
 
-        req = api_url + u"&account=" + acc_name + u"&login=" + login + u"&password=" + psswrd + u"&from=" + format_from + u"&to=" + format_to + u"&message=" + sms_content + u"&contentType=text/json"
+        req = api_url + u"&account=" + acc_name + u"&login=" + login + u"&password=" + psswrd + u"&from=" + format_from + u"&to=" + format_to + u"&message=" + urllib.quote(sms_content.encode('utf8')) + u"&contentType=text/json"
         if not is_commercial:
             req = req + u"&noStop=1"
         query_send = req.encode("utf-8")
@@ -552,7 +556,7 @@ class OFPlanningIntervention(models.Model):
                     continue
 
                 # On passe le contenu du texto par l'interpréteur Mako.
-                message_body = self.env['mail.template'].render_template(sms_template[0].template_body, sms_template[0].model_id.model, intervention.id, post_process=False)
+                message_body = HTMLParser().unescape(self.env['mail.template'].render_template(sms_template[0].template_body, sms_template[0].model_id.model, intervention.id, post_process=False))
 
                 # On envoie le texto.
                 queued_sms = self.env['of.sms.message'].create({
