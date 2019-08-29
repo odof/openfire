@@ -120,6 +120,27 @@ class SaleOrder(models.Model):
             domain = ['&'] + domain + [('id', 'not in', zip(*order_ids)[0])]
         return domain
 
+    @api.depends('order_line.price_total')
+    def _amount_all(self):
+        """Compute the total amounts of the SO."""
+
+        # Le calcul standard diffère du calcul utilisé dans les factures, ce qui peut mener à des écarts dans certains cas
+        # (quand l'option d'arrondi global de la tva est utilisée et que la commande contient plusieurs lignes avec des taxes différentes).
+        # On uniformise le calcul du montant des devis/commandes avec celui des factures.
+
+        for order in self:
+            amount_untaxed = amount_tax = 0.0
+
+            for tax in order.of_get_taxes_values().itervalues():
+                amount_untaxed += tax['base']
+                amount_tax += tax['amount']
+
+            order.update({
+                'amount_untaxed': order.pricelist_id.currency_id.round(amount_untaxed),
+                'amount_tax': order.pricelist_id.currency_id.round(amount_tax),
+                'amount_total': amount_untaxed + amount_tax,
+            })
+
     of_to_invoice = fields.Boolean(u"Entièrement facturable", compute='_compute_of_to_invoice', search='_search_of_to_invoice')
     of_notes_facture = fields.Html(string="Notes facture", oldname="of_notes_factures")
     of_notes_intervention = fields.Html(string="Notes intervention")
@@ -144,6 +165,33 @@ class SaleOrder(models.Model):
                                                float_compare(order.amount_total,
                                                              sum(order.of_echeance_line_ids.mapped('amount')),
                                                              precision_rounding=.01))
+
+    @api.multi
+    def of_get_taxes_values(self):
+        tax_grouped = {}
+        round_curr = self.currency_id.round
+        for line in self.order_line:
+            price_unit = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
+
+            taxes = line.tax_id.compute_all(price_unit, self.currency_id, line.product_uom_qty,
+                                            product=line.product_id, partner=self.partner_shipping_id)['taxes']
+            for val in taxes:
+                key = val['account_id']
+
+                if key not in tax_grouped:
+                    tax_grouped[key] = {
+                        'tax_id': val['id'],
+                        'amount': val['amount'],
+                        'base': round_curr(val['base'])
+                    }
+                else:
+                    tax_grouped[key]['amount'] += val['amount']
+                    tax_grouped[key]['base'] += round_curr(val['base'])
+
+        for values in tax_grouped.itervalues():
+            values['base'] = round_curr(values['base'])
+            values['amount'] = round_curr(values['amount'])
+        return tax_grouped
 
     @api.multi
     def _of_compute_echeances(self):
