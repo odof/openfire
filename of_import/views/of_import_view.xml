@@ -32,7 +32,6 @@
                                     <field name="of_import_remise"/>
                                     <field name="of_import_price"/>
                                     <field name="of_import_cout"/>
-                                    <field name="product_ids"/>
                                     <button name="action_update_products" type="object" string="Mettre à jour" icon="fa-cogs" confirm="Attention !
 Cette action irréversible recalculera la catégorie, le prix d'achat et le prix de vente de tous les articles de cette catégorie."/>
                                 </tree>
