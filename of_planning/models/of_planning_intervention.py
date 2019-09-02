@@ -13,6 +13,7 @@ from odoo.tools.safe_eval import safe_eval
 
 from odoo.tools.float_utils import float_compare
 
+
 @api.model
 def _tz_get(self):
     # put POSIX 'Etc/*' entries at the end to avoid confusing users - see bug 1086728
@@ -172,6 +173,69 @@ class OfPlanningIntervention(models.Model):
     template_id = fields.Many2one('of.planning.intervention.template', string=u"Modèle d'intervention")
     number = fields.Char(String=u"Numéro", copy=False)
     calendar_name = fields.Char(string="Calendar Name", compute="_compute_calendar_name")
+
+    @api.model
+    def _modifier_droits_existants_utilisateurs(self):
+        u"""Initialise les droits planning des utilisateurs existants à la 1ère mise à jour du module"""
+        # Un changement des droit a été fait durant la vie du module.
+        # Cette fonction effectue un transfert de l'ancien droit vers les nouveaux.
+        # Elle est appelée à chaque mise à jour du module mais un test sur l'existance de l'ancien droit permet qu'elle ne s'exécute que lors de la 1ère mise à jour.
+        # Règles de conversion :
+        # Ancien droit "Utilisateur : mes interventions seulement" -> Nouveau droit lecture "Voir mes interventions seulement" et nouveau droit modification vide
+        # Ancien droit "Utilisateur : toutes les interventions" -> Nouveau droit lecture "Voir toutes les interventions" et nouveau droit modification vide
+        # Ancien droit "Responsable" -> Nouveau droit lecture "Voir toutes les interventions" et nouveau droit modification "Modifier toutes les interventions"
+
+        cr = self._cr
+        # On teste si l'ancien groupe de droit existe (si oui, c'est la 1ère mise à jour du module)
+        cr.execute("SELECT res_id FROM ir_model_data WHERE name = 'of_group_planning_intervention_user_restrict'")
+        if bool(cr.fetchall()):
+            # On récupère la liste des utilisateurs qui ont l'ancien droit "Utilisateur : mes interventions seulement".
+            cr.execute("SELECT ru.id "
+            "FROM res_groups_users_rel AS rel, res_users AS ru, res_groups AS rg "
+            "WHERE rel.gid = (SELECT res_id FROM ir_model_data WHERE name = 'of_group_planning_intervention_user_restrict' LIMIT 1)"
+            "AND ru.id = rel.uid "
+            "AND rg.id = rel.gid")
+            user_restrict_ids = [x[0] for x in cr.fetchall()]
+
+            # On récupère la liste des utilisateurs qui ont l'ancien droit "Utilisateur : toutes les interventions".
+            cr.execute("SELECT ru.id "
+            "FROM res_groups_users_rel AS rel, res_users AS ru, res_groups AS rg "
+            "WHERE rel.gid = (SELECT res_id FROM ir_model_data WHERE name = 'of_group_planning_intervention_user' LIMIT 1) "
+            "AND ru.id = rel.uid "
+            "AND rg.id = rel.gid")
+            user_ids = [x[0] for x in cr.fetchall()]
+
+            # On récupère la liste des utilisateurs qui ont l'ancien droit "Responsable".
+            cr.execute("SELECT ru.id "
+            "FROM res_groups_users_rel AS rel, res_users AS ru, res_groups AS rg "
+            "WHERE rel.gid = (SELECT res_id FROM ir_model_data WHERE name = 'of_group_planning_intervention_manager' LIMIT 1) "
+            "AND ru.id = rel.uid "
+            "AND rg.id = rel.gid")
+            manager_ids = [x[0] for x in cr.fetchall()]
+
+            # On ajoute les utilisateurs de l'ancien droit "mes interventions seulement" au nouveau droit "Voir mes interventions seulement".
+            # On récupère l'id du nouveau droit.
+            cr.execute("SELECT res_id FROM ir_model_data WHERE name = 'of_group_planning_intervention_lecture_siens' LIMIT 1")
+            group_id = cr.fetchone()[0]
+            # On les ajoute.
+            cr.execute("INSERT INTO res_groups_users_rel (gid, uid) " + "SELECT " + str(group_id) + ", uid FROM unnest(array[" + ', '.join(str(x) for x in user_restrict_ids) + "]) g(uid)")
+
+            # On ajoute les utilisateurs de l'ancien droit "toutes les interventions" au nouveau droit "Voir toutes les interventions".
+            cr.execute("SELECT res_id FROM ir_model_data WHERE name = 'of_group_planning_intervention_lecture_tout' LIMIT 1")
+            group_id = cr.fetchone()[0]
+            cr.execute("INSERT INTO res_groups_users_rel (gid, uid) " + "SELECT " + str(group_id) + ", uid FROM unnest(array[" + ', '.join(str(x) for x in user_ids) + "]) g(uid)")
+
+            # On ajoute les utilisateurs de l'ancien droit "Responsable" au nouveau droit "Modifier mes interventions seulement".
+            cr.execute("SELECT res_id FROM ir_model_data WHERE name = 'of_group_planning_intervention_modification_siens' LIMIT 1")
+            group_id = cr.fetchone()[0]
+            cr.execute("INSERT INTO res_groups_users_rel (gid, uid) " + "SELECT " + str(group_id) + ", uid FROM unnest(array[" + ', '.join(str(x) for x in manager_ids) + "]) g(uid)")
+
+            # On ajoute les utilisateurs de l'ancien droit "Responsable" au nouveau droit "Modifier toutes les interventions".
+            cr.execute("SELECT res_id FROM ir_model_data WHERE name = 'of_group_planning_intervention_modification_tout' LIMIT 1")
+            group_id = cr.fetchone()[0]
+            cr.execute("INSERT INTO res_groups_users_rel (gid, uid) " + "SELECT " + str(group_id) + ", uid FROM unnest(array[" + ', '.join(str(x) for x in manager_ids) + "]) g(uid)")
+
+        return True
 
     @api.depends('date', 'duree', 'hor_md', 'hor_mf', 'hor_ad', 'hor_af', 'hor_sam', 'hor_dim')
     def _compute_date_deadline(self):
@@ -639,7 +703,7 @@ class OfPlanningInterventionTemplate(models.Model):
                 # Si la séquence n'est pas utilisée par un autre modèle, on la modifie directement,
                 # sinon il faudra en re-créer une.
                 if not self.search([('sequence_id', '=', template.sequence_id.id), ('id', '!=', template.id)]):
-                    template.sequence_id.write({'prefix': template.code, 'name': sequence_name})
+                    template.sequence_id.sudo().write({'prefix': template.code, 'name': sequence_name})
                     continue
 
             # Création d'une séquence pour le modèle
@@ -650,4 +714,4 @@ class OfPlanningInterventionTemplate(models.Model):
                 'prefix': template.code,
                 'padding': 4,
             }
-            template.sequence_id = self.env['ir.sequence'].create(sequence_data)
+            template.sequence_id = self.env['ir.sequence'].sudo().create(sequence_data)

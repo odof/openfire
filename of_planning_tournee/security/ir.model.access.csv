@@ -1,3 +1,3 @@
 "id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
-"access_of_planning_tournee_user","of.planning.tournee","model_of_planning_tournee","of_planning.of_group_planning_intervention_user_restrict",1,0,0,0
-"access_of_planning_tournee_manager","of.planning.tournee","model_of_planning_tournee","of_planning.of_group_planning_intervention_manager",1,1,1,1
+"access_of_planning_tournee_user","of.planning.tournee","model_of_planning_tournee","of_planning.of_group_planning_intervention_lecture_siens",1,0,0,0
+"access_of_planning_tournee_manager","of.planning.tournee","model_of_planning_tournee","of_planning.of_group_planning_intervention_modification_siens",1,1,1,1

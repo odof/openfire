@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
     <!-- Intervention config wizard -->
     <record id="view_of_intervention_settings" model="ir.ui.view">
         <field name="name">view.of.intervention.settings</field>
@@ -36,5 +37,8 @@
 
     <menuitem id="menu_intervention_general_settings" name="Configuration" parent="of_planning.menu_of_planning_configuration"
                 sequence="0" action="of_planning.action_intervention_settings" groups="of_base.of_group_root_only"/>
+
+    <!-- Lors de la 1ère mise à jour, affecter les nouveaux droits planning aux utilisateurs. -->
+    <function model="of.planning.intervention" name="_modifier_droits_existants_utilisateurs"/>
 
 </odoo>

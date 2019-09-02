@@ -10,7 +10,7 @@
         id="action_view_rdv_intervention_wizard_parc_installe"
         key2="client_action_multi"
         target="new"
-        groups="of_planning.of_group_planning_intervention_user_restrict"
+        groups="of_planning.of_group_planning_intervention_lecture_siens"
     />
 
     <act_window
@@ -22,7 +22,7 @@
         id="action_view_rdv_intervention_wizard_sav"
         key2="client_action_multi"
         target="new"
-        groups="of_planning.of_group_planning_intervention_user_restrict"
+        groups="of_planning.of_group_planning_intervention_lecture_siens"
     />
 
     <!-- Ajout bouton planifier une intervention dans vue form parc installé-->

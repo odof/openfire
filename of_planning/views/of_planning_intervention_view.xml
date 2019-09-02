@@ -436,46 +436,6 @@
             </field>
         </record>
 
-<!--#############################################_______Employee________#####################################################-->
-
-        <!--record id="of_planning_view_employee_form" model="ir.ui.view">
-            <field name="name">hr.employee.form.inherit</field>
-            <field name="model">hr.employee</field>
-            <field name="inherit_id" ref="hr.view_employee_form"/>
-            <field name="arch" type="xml">
-                <page string="Personal Information" position="after">
-                    <page string="Coût" groups="hr.group_hr_manager">
-                        <field name="jours" string="Jours travaillés par an" on_change="onchange_cout(heures, jours, couts_ids)"/>
-                        <field name="heures" string="Heures travaillées par jour" widget="float_time" on_change="onchange_cout(heures, jours, couts_ids)"/>
-                        <field name="cout_horaire" string="Coût horaire"/>
-                        <field name="cout_annuel" string="Coût annuel"/>
-                        <field name="couts_ids" string="Coûts" colspan="4" nolabel="1" mode="tree" on_change="onchange_cout(heures, jours, couts_ids)" >
-                            <form string="-" >
-                            </form>
-                            <tree string="Liste des coûts" editable="bottom" >
-                                <field name="typ_id" on_change="change_name(typ_id, name)" widget="selection"/>
-                                <field name="name" string="Libellé"/>
-                                <field name="montant"/>
-                                <field name="period" string="Périodicité"/>
-                            </tree>
-                        </field>
-                    </page>
-                </page>
-            </field>
-        </record>
-
-        <record id="of_planning_view_employee_tree" model="ir.ui.view">
-            <field name="name">hr.employee.tree.inherit</field>
-            <field name="model">hr.employee</field>
-            <field name="inherit_id" ref="hr.view_employee_tree"/>
-            <field name="arch" type="xml">
-                <field name="name" position="after">
-                    <field name="cout_horaire" string="Coût horaire" groups="hr.group_hr_manager"/>
-                    <field name="cout_annuel" string="Coût annuel" groups="hr.group_hr_manager"/>
-                </field>
-            </field>
-        </record-->
-
 <!--#############################################_______Raisons inacheve reporte________#####################################################-->
 
         <record id="of_planning_intervention_raison_form" model="ir.ui.view">
@@ -500,56 +460,6 @@
             </field>
         </record>
 
-<!--#############################################_______Employee type cout________#####################################################-->
-
-        <!--record id="of_planning_employee_typcout_form" model="ir.ui.view">
-            <field name="name">hr.employee.typcout.form</field>
-            <field name="model">hr.employee.typcout</field>
-            <field name="type">form</field>
-            <field name="arch" type="xml">
-                <form string="Types de coûts">
-                    <field name="name" string="Libellé"/>
-                </form>
-            </field>
-        </record>
-
-        <record id="of_planning_employee_typcout_tree" model="ir.ui.view">
-            <field name="name">hr.employee.typcout.tree</field>
-            <field name="model">hr.employee.typcout</field>
-            <field name="type">tree</field>
-            <field name="arch" type="xml">
-                <tree string="Types de coûts">
-                    <field name="name" string="Libellé"/>
-                </tree>
-            </field>
-        </record-->
-
-    <!--#############################################_______Res Users________#####################################################-->
-
-        <!--record id="of_planning_view_res_users_form" model="ir.ui.view">
-            <field name="name">of.res.users.planning.form</field>
-            <field name="model">res.users</field>
-            <field name="type">form</field>
-            <field name="priority">2</field>
-            <field name="inherit_id" ref="base.view_users_form"/>
-            <field name="arch" type="xml">
-                <field name="active" position="before">
-                     <field name="color_id"/>
-                </field>
-            </field>
-        </record>
-
-        <record id="view_of_sale_profcommi_user" model="ir.ui.view">
-            <field name="name">of.res.users.planning.tree</field>
-            <field name="model">res.users</field>
-            <field name="type">tree</field>
-            <field name="inherit_id" ref="base.view_users_tree"/>
-            <field name="arch" type="xml">
-                <field name="context_lang" position="after">
-                    <field name="color_id"/>
-                </field>
-            </field>
-        </record-->
 
 <!--##########################################################################################################################-->
 <!--#############################################________Actions_________#####################################################-->
@@ -601,15 +511,6 @@
             <field name="view_id" ref="of_planning.of_planning_intervention_raison_tree"/>
         </record>
 
-    <!--################################################_Type cout employee_######################################################-->
-
-        <!--record id="action_of_planning_employee_typcout_tree" model="ir.actions.act_window">
-            <field name="name">Types de coûts</field>
-            <field name="res_model">hr.employee.typcout</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-            <field name="view_id" ref="of_planning.of_planning_employee_typcout_tree"/>
-        </record-->
 
 <!--##########################################################################################################################-->
 <!--############################################_________Modèle__________#####################################################-->
@@ -722,9 +623,9 @@
 <!--#############################################_________Menus__________#####################################################-->
 <!--##########################################################################################################################-->
 
-    <menuitem id="menu_of_planning" name="Interventions" groups="of_group_planning_intervention_user_restrict" sequence="2" web_icon="of_planning,static/description/icon.png"/>
+    <menuitem id="menu_of_planning" name="Interventions" groups="of_group_planning_intervention_lecture_siens" sequence="2" web_icon="of_planning,static/description/icon.png"/>
 
-        <menuitem id="menu_of_planning_intervention" name="Interventions" parent="of_planning.menu_of_planning" groups="of_group_planning_intervention_user_restrict" sequence="10"/>
+        <menuitem id="menu_of_planning_intervention" name="Interventions" parent="of_planning.menu_of_planning" groups="of_group_planning_intervention_lecture_siens" sequence="10"/>
             <menuitem id="menu_of_planning_intervention_calendar" name="Planning" parent="of_planning.menu_of_planning_intervention" sequence="1" action="action_of_planning_intervention_calendar"/>
 
         <menuitem id="menu_of_planning_clients" name="Clients" parent="of_planning.menu_of_planning" sequence="20"/>
@@ -741,30 +642,6 @@
             <menuitem name="Équipes" id="menu_of_planning_equipe_tree" parent="of_planning.menu_of_planning_configuration" sequence="90" action="action_of_planning_equipe_tree"/>
             <menuitem name="Erreurs" id="menu_of_planning_intervention_raison_tree" parent="of_planning.menu_of_planning_configuration" sequence="100" action="action_of_planning_intervention_raison_tree"/>
             <menuitem name="Tâches" id="menu_of_planning_tache_tree" parent="of_planning.menu_of_planning_configuration" sequence="110" action="action_of_planning_tache_tree"/>
-
-    <!-- Ajouter menu Envoyer un courrier dans Planning Intervention -->
-        <!--act_window
-            name="Envoyer un courrier"
-            res_model="of.compose.mail"
-            src_model="of.planning.intervention"
-            view_mode="form"
-            key2="client_print_multi"
-            view_id="of_gesdoc.view_courrier_wizard"
-            id="action_view_planning_courrier_wizard_account"
-            context="{'model':'of.planning.intervention'}"
-            target="new"
-        /-->
-
-    <!-- Ajouter menu Envoyer un courriel dans Planning Intervention -->
-        <!-- <act_window
-          name="Envoyer un courriel"
-          res_model="mail.compose.message"
-          src_model="of.planning.intervention"
-          view_mode="form"
-          key2="client_print_multi"
-          id="of_planning_email"
-          target="new"/> -->
-        <!--delete model="ir.actions.act_window" id="of_planning_email"/-->
 
         <!-- Creation la facture depuis planning intervention -->
 

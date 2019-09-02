@@ -230,7 +230,7 @@
             key2="client_action_multi"
             target="new"
         />
-<!-- groups="of_planning.of_group_planning_intervention_user" -->
+
         <act_window
             name="Planifier un RDV commercial"
             res_model="of.rdv.commercial"
