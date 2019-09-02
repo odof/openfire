@@ -56,6 +56,7 @@
             <field name="model">of.mail.template</field>
             <field name="arch" type="xml">
                 <tree string="Templates">
+                    <field name="sequence" invisible="1"/>
                     <field name="name"/>
                     <field name="file_name"/>
                     <field name="sans_add"/>

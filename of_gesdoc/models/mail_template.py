@@ -18,6 +18,7 @@ class OfMailTemplate(models.Model):
     "Templates for printing mail"
     _name = "of.mail.template"
     _description = 'Mail Templates'
+    _order = "sequence"
 
     @api.model
     def _get_note_fields(self):
@@ -42,6 +43,7 @@ class OfMailTemplate(models.Model):
     fillable = fields.Boolean(u"Laisser éditable", help="Autorise la modification du fichier pdf après téléchargement")
     note_fields = fields.Text(compute='get_note_fields', string='Liste des valeurs', default=_get_note_fields)
     type = fields.Selection([], string="Type de document")
+    sequence = fields.Integer(string=u"Séquence", default=10)
 
     @api.one
     def copy(self, default=None):
