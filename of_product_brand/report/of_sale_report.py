@@ -36,7 +36,7 @@ class SaleReport(models.Model):
     def _read_group_raw(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
         res = super(SaleReport, self)._read_group_raw(domain, fields, groupby, offset, limit, orderby, lazy)
         if res:
-            time_groupbys = ('date:month', 'date:year', 'date', 'confirmation_date', 'confirmation_date:month', 'confirmation_date:year')
+            time_groupbys = ('date:month', 'date:year', 'date', 'of_confirmation_date', 'of_confirmation_date:month', 'of_confirmation_date:year')
             # Les deltas dépendent d'un champ qui doit être calculé
             diff_percent = [vals for vals in (('of_diff_price', 'price_subtotal'),
                                               ('of_diff_margin', 'margin'),
