@@ -218,22 +218,26 @@ class OfPlanningIntervention(models.Model):
             cr.execute("SELECT res_id FROM ir_model_data WHERE name = 'of_group_planning_intervention_lecture_siens' LIMIT 1")
             group_id = cr.fetchone()[0]
             # On les ajoute.
-            cr.execute("INSERT INTO res_groups_users_rel (gid, uid) " + "SELECT " + str(group_id) + ", uid FROM unnest(array[" + ', '.join(str(x) for x in user_restrict_ids) + "]) g(uid)")
+            if group_id and user_restrict_ids:
+                cr.execute("INSERT INTO res_groups_users_rel (gid, uid) " + "SELECT " + str(group_id) + ", uid FROM unnest(array[" + ', '.join(str(x) for x in user_restrict_ids) + "]) g(uid)")
 
             # On ajoute les utilisateurs de l'ancien droit "toutes les interventions" au nouveau droit "Voir toutes les interventions".
             cr.execute("SELECT res_id FROM ir_model_data WHERE name = 'of_group_planning_intervention_lecture_tout' LIMIT 1")
             group_id = cr.fetchone()[0]
-            cr.execute("INSERT INTO res_groups_users_rel (gid, uid) " + "SELECT " + str(group_id) + ", uid FROM unnest(array[" + ', '.join(str(x) for x in user_ids) + "]) g(uid)")
+            if group_id and user_ids:
+                cr.execute("INSERT INTO res_groups_users_rel (gid, uid) " + "SELECT " + str(group_id) + ", uid FROM unnest(array[" + ', '.join(str(x) for x in user_ids) + "]) g(uid)")
 
             # On ajoute les utilisateurs de l'ancien droit "Responsable" au nouveau droit "Modifier mes interventions seulement".
             cr.execute("SELECT res_id FROM ir_model_data WHERE name = 'of_group_planning_intervention_modification_siens' LIMIT 1")
             group_id = cr.fetchone()[0]
-            cr.execute("INSERT INTO res_groups_users_rel (gid, uid) " + "SELECT " + str(group_id) + ", uid FROM unnest(array[" + ', '.join(str(x) for x in manager_ids) + "]) g(uid)")
+            if group_id and manager_ids:
+                cr.execute("INSERT INTO res_groups_users_rel (gid, uid) " + "SELECT " + str(group_id) + ", uid FROM unnest(array[" + ', '.join(str(x) for x in manager_ids) + "]) g(uid)")
 
             # On ajoute les utilisateurs de l'ancien droit "Responsable" au nouveau droit "Modifier toutes les interventions".
             cr.execute("SELECT res_id FROM ir_model_data WHERE name = 'of_group_planning_intervention_modification_tout' LIMIT 1")
             group_id = cr.fetchone()[0]
-            cr.execute("INSERT INTO res_groups_users_rel (gid, uid) " + "SELECT " + str(group_id) + ", uid FROM unnest(array[" + ', '.join(str(x) for x in manager_ids) + "]) g(uid)")
+            if group_id and manager_ids:
+                cr.execute("INSERT INTO res_groups_users_rel (gid, uid) " + "SELECT " + str(group_id) + ", uid FROM unnest(array[" + ', '.join(str(x) for x in manager_ids) + "]) g(uid)")
 
         return True
 
