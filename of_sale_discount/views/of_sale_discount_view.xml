@@ -14,7 +14,7 @@
                     <attribute name="invisible">1</attribute>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/form//field[@name='discount']" position="after">
-                    <field name="of_discount_formula"/>
+                    <field name="of_discount_formula" class="oe_inline"/>
                 </xpath>
 
                 <!-- Affichage de la formule dans la vue liste des lignes de commande -->
@@ -85,5 +85,18 @@
             </field>
         </record>
 
+        <record id="of_sale_discount_product_pricelist_item_form_view" model="ir.ui.view">
+            <field name="name">of.sale.discount.product.pricelist.item.form</field>
+            <field name="model">product.pricelist.item</field>
+            <field name="inherit_id" ref="product.product_pricelist_item_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='percent_price']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='percent_price']" position="after">
+                    <field name="of_percent_price_formula" nolabel="1" class="oe_inline"/>
+                </xpath>
+            </field>
+        </record>
     </data>
 </odoo>
