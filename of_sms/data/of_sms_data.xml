@@ -75,12 +75,14 @@
     ####        O F . S M S . T E M P L A T E
     #############################################################################################################-->
 
-    <record id="of_sms_planning_rappel_rdv_client" model="of.sms.template">
-        <field name="name">Rappel automatique SMS rendez-vous client</field>
-        <field name="model_id" ref="of_planning.model_of_planning_intervention"/>
-        <field name="sms_to"></field>
-        <field name="template_body">${object.company_id.name}
+    <data noupdate="1">
+        <record id="of_sms_planning_rappel_rdv_client" model="of.sms.template">
+            <field name="name">Rappel automatique SMS rendez-vous client</field>
+            <field name="model_id" ref="of_planning.model_of_planning_intervention"/>
+            <field name="sms_to"></field>
+            <field name="template_body">${object.company_id.name}
 Rappel : vous avez rendez-vous le ${format_tz(object.date, 'Europe/Paris', '%d/%m/%Y') or ""} à ${format_tz(object.date, 'Europe/Paris', '%Hh%M') or ""}.</field>
-    </record>
+        </record>
+    </data>
 
 </odoo>
