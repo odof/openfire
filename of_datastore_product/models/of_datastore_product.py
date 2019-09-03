@@ -1153,6 +1153,7 @@ class ProductTemplate(models.Model):
             new_args = [('brand_id', 'in', brands._ids)] + list(args or [])
         res = super(ProductTemplate, self).name_search(name, new_args, operator, limit)
         res = self._of_datastore_name_search(res, brands, name, args, operator, limit)
+        return res
 
     @api.model
     def _of_datastore_is_computed_field(self, field_name):
