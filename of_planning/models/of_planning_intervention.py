@@ -57,7 +57,7 @@ class OfPlanningEquipe(models.Model):
     def check_no_overlapping(self):
         for equipe in self:
             for i in range(1,8):
-                creneaux_du_jour = equipe.creneau_ids.filtered(lambda jour: jour.jour_number == i)
+                creneaux_du_jour = equipe.of_creneau_ids.filtered(lambda jour: jour.jour_number == i)
                 la_len = len(creneaux_du_jour)
                 for j in range(la_len):
                     for k in range(j+1, la_len):
@@ -68,7 +68,7 @@ class OfPlanningEquipe(models.Model):
                         if check_hours_overlapping(d1, f1, d2, f2):
                             #raise UserError(u"Oups! Des créneaux se chevauchent")
                             return False
-                creneaux_temp_du_jour = equipe.creneau_temp_ids.filtered(lambda jour: jour.jour_number == i)
+                creneaux_temp_du_jour = equipe.of_creneau_temp_ids.filtered(lambda jour: jour.jour_number == i)
                 la_len = len(creneaux_temp_du_jour)
                 for j in range(la_len):
                     for k in range(j+1, la_len):
@@ -115,20 +115,20 @@ class OfPlanningEquipe(models.Model):
         ("easy","Facile"),
         ("advanced",u"Avancé")], string="Mode de Sélection des horaires", required=True, default="easy")
     profil_id = fields.Many2one("of.horaires.profil", "Profil")
-    creneau_ids = fields.Many2many("of.horaires.creneau", "equipe_creneaux", "equipe_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
-    creneau_temp_ids = fields.Many2many("of.horaires.creneau", "equipe_creneaux_temp", "equipe_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
-    creneau_temp_start = fields.Date(string=u"Début des horaires temporaires")
-    creneau_temp_stop = fields.Date(string="Fin des horaires temporaires")
+    of_creneau_ids = fields.Many2many("of.horaires.creneau", "equipe_creneaux", "equipe_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
+    of_creneau_temp_ids = fields.Many2many("of.horaires.creneau", "equipe_creneaux_temp", "equipe_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
+    of_creneau_temp_start = fields.Date(string=u"Début des horaires temporaires")
+    of_creneau_temp_stop = fields.Date(string="Fin des horaires temporaires")
 
     _sql_constraints = [
-        ('creneau_temp_start_stop_constraint', 'CHECK ( creneau_temp_start <= creneau_temp_stop )', _(u"La date de début de validité doit être antérieure ou égale à celle de fin")),
+        ('of_creneau_temp_start_stop_constraint', 'CHECK ( of_creneau_temp_start <= of_creneau_temp_stop )', _(u"La date de début de validité doit être antérieure ou égale à celle de fin")),
     ]
 
     _constraints = [
         (check_no_overlapping, u'Vous ne pourrez pas sauvegarder tant que des créneaux se chevauchent!', []),
     ]
 
-    @api.onchange("creneau_ids","creneau_temp_ids")
+    @api.onchange("of_creneau_ids","of_creneau_temp_ids")
     def _onchange_creneaux(self):
         if not self.check_no_overlapping():
             raise UserError(u"Oups! Des créneaux se chevauchent. Veuillez vous assurer que ce ne soit plus le cas avant de sauvegarder.")
@@ -155,17 +155,17 @@ class OfPlanningEquipe(models.Model):
         else:"""
         if self.employee_ids[0].mode_horaires == 'advanced':
             if len(self.employee_ids) == 1:  # un employé
-                self.creneau_ids = [(4,le_id,False) for le_id in self.employee_ids[0].creneau_ids._ids]
-                self.creneau_temp_ids = [(4,le_id,False) for le_id in self.employee_ids[0].creneau_temp_ids._ids]
-                self.creneau_temp_start = self.employee_ids[0].creneau_temp_start
-                self.creneau_temp_stop = self.employee_ids[0].creneau_temp_stop
+                self.of_creneau_ids = [(4,le_id,False) for le_id in self.employee_ids[0].of_creneau_ids._ids]
+                self.of_creneau_temp_ids = [(4,le_id,False) for le_id in self.employee_ids[0].of_creneau_temp_ids._ids]
+                self.of_creneau_temp_start = self.employee_ids[0].of_creneau_temp_start
+                self.of_creneau_temp_stop = self.employee_ids[0].of_creneau_temp_stop
             else:  # plusieurs employés /!\ ne gère pas les créneaux temporaires
                 les_employees = self.employee_ids[1:]
                 les_creneaux = self.env['of.horaires.creneau']
-                for ce_creneau in self.employee_ids[0].creneau_ids:  # on teste tous les créneaux du premier employé et on ne garde que ceux qui sont aussi dans tous les autres employés
+                for ce_creneau in self.employee_ids[0].of_creneau_ids:  # on teste tous les créneaux du premier employé et on ne garde que ceux qui sont aussi dans tous les autres employés
                     if les_employees.possede_creneau(ce_creneau.id):
                         les_creneaux |= ce_creneau
-                self.creneau_ids = [(4,le_id,False) for le_id in les_creneaux._ids]
+                self.of_creneau_ids = [(4,le_id,False) for le_id in les_creneaux._ids]
         if not self.category_ids:
             category_ids = []
             for employee in self.employee_ids:
@@ -228,11 +228,11 @@ class OfPlanningEquipe(models.Model):
                             dict_horaires[i].append((equipe.hor_ad, equipe.hor_af))
             else: # On utilise le mode avancé pour les horaires de cette équipe
                 # l'équipe a-t-elle des horaires temporaires qui peuvent interférer avec ses horaires par défaut sur cette recherche??
-                if equipe.creneau_temp_stop and equipe.creneau_temp_stop >= str_d_date_start and equipe.creneau_temp_start <= str_d_date_stop:
+                if equipe.of_creneau_temp_stop and equipe.of_creneau_temp_stop >= str_d_date_start and equipe.of_creneau_temp_start <= str_d_date_stop:
                     horaires_temp = True
-                    str_temp_start = max(equipe.creneau_temp_start, str_d_date_start)
-                    str_temp_stop = min(equipe.creneau_temp_stop, str_d_date_stop)
-                    creneaux_temp_travailles = equipe.creneau_temp_ids
+                    str_temp_start = max(equipe.of_creneau_temp_start, str_d_date_start)
+                    str_temp_stop = min(equipe.of_creneau_temp_stop, str_d_date_stop)
+                    creneaux_temp_travailles = equipe.of_creneau_temp_ids
                     for i in range(1,8):
                         dict_horaires_temp[i] = []
                         creneaux_temp_du_jour = creneaux_temp_travailles.filtered(lambda x: x.jour_number == i)
@@ -240,7 +240,7 @@ class OfPlanningEquipe(models.Model):
                             dict_horaires_temp[i].append((c.heure_debut, c.heure_fin))
                     jours_temp_travailles = [j for j in dict_horaires_temp if dict_horaires_temp[j] != []]
 
-                creneaux_travailles = equipe.creneau_ids
+                creneaux_travailles = equipe.of_creneau_ids
                 for i in range(1,8):
                     dict_horaires[i] = []
                     creneaux_du_jour = creneaux_travailles.filtered(lambda x: x.jour_number == i)
@@ -281,8 +281,8 @@ class OfPlanningEquipe(models.Model):
                 max_equipe = equipe.hor_af
             else: # On utilise le mode avancé pour les horaires de cette équipe
                 # l'équipe a-t-elle des horaires temporaires sur cette recherche??
-                if equipe.creneau_temp_stop:
-                    creneaux_temp_travailles = equipe.creneau_temp_ids
+                if equipe.of_creneau_temp_stop:
+                    creneaux_temp_travailles = equipe.of_creneau_temp_ids
                     for i in range(1,8):
                         creneaux_temp_du_jour = creneaux_temp_travailles.filtered(lambda x: x.jour_number == i)
                         if len(creneaux_temp_du_jour) == 0:
@@ -296,7 +296,7 @@ class OfPlanningEquipe(models.Model):
                             if max_equipe < creneaux_temp_du_jour[-1].heure_fin:  # nouveau max
                                 max_equipe = creneaux_temp_du_jour[-1].heure_fin
 
-                creneaux_travailles = equipe.creneau_ids
+                creneaux_travailles = equipe.of_creneau_ids
                 for i in range(1,8):
                     creneaux_du_jour = creneaux_travailles.filtered(lambda x: x.jour_number == i)
                     if len(creneaux_du_jour) == 0:
@@ -382,10 +382,10 @@ class OfPlanningIntervention(models.Model):
     mode_horaires = fields.Selection([
         ("easy","Facile"),
         ("advanced",u"Avancé")], string="Mode de Sélection des horaires", required=True, default="easy")
-    creneau_ids = fields.Many2many("of.horaires.creneau", "intervention_creneaux", "intervention_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
-    creneau_temp_ids = fields.Many2many("of.horaires.creneau", "intervention_creneaux_temp", "intervention_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
-    creneau_temp_start = fields.Date(string=u"Début des horaires temporaires")
-    creneau_temp_stop = fields.Date(string="Fin des horaires temporaires")
+    of_creneau_ids = fields.Many2many("of.horaires.creneau", "intervention_creneaux", "intervention_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
+    of_creneau_temp_ids = fields.Many2many("of.horaires.creneau", "intervention_creneaux_temp", "intervention_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
+    of_creneau_temp_start = fields.Date(string=u"Début des horaires temporaires")
+    of_creneau_temp_stop = fields.Date(string="Fin des horaires temporaires")
     hor_md = fields.Float(string=u'Matin début', digits=(12, 5))
     hor_mf = fields.Float(string='Matin fin', digits=(12, 5))
     hor_ad = fields.Float(string=u'Après-midi début', digits=(12, 5))
@@ -396,10 +396,10 @@ class OfPlanningIntervention(models.Model):
 
     # champs copiés pour le readonly, le xml, les onchange Many2many
     mode_horaires_readonly = fields.Selection(related="mode_horaires", readonly=True, string="Mode de Sélection des horaires")
-    creneau_readonly_ids = fields.Many2many(related="creneau_ids", readonly=True)
-    creneau_temp_readonly_ids = fields.Many2many(related="creneau_temp_ids", readonly=True)
-    creneau_temp_start_readonly = fields.Date(related="creneau_temp_start", readonly=True)
-    creneau_temp_stop_readonly = fields.Date(related="creneau_temp_stop", readonly=True)
+    of_creneau_readonly_ids = fields.Many2many(related="of_creneau_ids", readonly=True)
+    of_creneau_temp_readonly_ids = fields.Many2many(related="of_creneau_temp_ids", readonly=True)
+    of_creneau_temp_start_readonly = fields.Date(related="of_creneau_temp_start", readonly=True)
+    of_creneau_temp_stop_readonly = fields.Date(related="of_creneau_temp_stop", readonly=True)
     hor_md_readonly = fields.Float(related="hor_md", readonly=True)
     hor_mf_readonly = fields.Float(related="hor_mf", readonly=True)
     hor_ad_readonly = fields.Float(related="hor_ad", readonly=True)
@@ -529,13 +529,13 @@ class OfPlanningIntervention(models.Model):
                             dict_horaires[i].append((intervention.hor_ad, intervention.hor_af))
             else: # On utilise le mode avancé pour les horaires
                 # l'équipe a-t-elle des horaires temporaires qui peuvent interférer avec ses horaires par défaut sur cette intervention?
-                if equipe.creneau_temp_stop and equipe.creneau_temp_stop >= intervention.date:
+                if equipe.of_creneau_temp_stop and equipe.of_creneau_temp_stop >= intervention.date:
                     horaires_temp = True
-                    str_temp_start = equipe.creneau_temp_start
+                    str_temp_start = equipe.of_creneau_temp_start
                     d_temp_start = fields.Date.from_string(str_temp_start)
-                    str_temp_stop = equipe.creneau_temp_stop
+                    str_temp_stop = equipe.of_creneau_temp_stop
                     d_temp_stop = fields.Date.from_string(str_temp_stop)
-                    creneaux_temp_travailles = equipe.creneau_temp_ids
+                    creneaux_temp_travailles = equipe.of_creneau_temp_ids
                     dict_horaires_temp = {} # dictionnaire qui à num_jour associe les horaires
                     for i in range(1,8):
                         dict_horaires_temp[i] = []
@@ -544,7 +544,7 @@ class OfPlanningIntervention(models.Model):
                             dict_horaires_temp[i].append((c.heure_debut, c.heure_fin))
                     jours_temp_travailles = [j for j in dict_horaires_temp if dict_horaires_temp[j] != []]
 
-                creneaux_travailles = equipe.creneau_ids
+                creneaux_travailles = equipe.of_creneau_ids
                 dict_horaires = {} # dictionnaire qui à num_jour associe les horaires
                 for i in range(1,8):
                     dict_horaires[i] = []
@@ -793,10 +793,10 @@ class OfPlanningIntervention(models.Model):
             if les_jours_ids == []:
                 les_jours_ids = self.env['of.jours'].search([('numero', 'in', [1, 2, 3, 4, 5])])._ids
             self.jour_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in les_jours_ids]
-            self.creneau_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in equipe.creneau_ids._ids]
-            self.creneau_temp_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in equipe.creneau_temp_ids._ids]
-            self.creneau_temp_start = equipe.creneau_temp_start
-            self.creneau_temp_stop = equipe.creneau_temp_stop
+            self.of_creneau_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in equipe.of_creneau_ids._ids]
+            self.of_creneau_temp_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in equipe.of_creneau_temp_ids._ids]
+            self.of_creneau_temp_start = equipe.of_creneau_temp_start
+            self.of_creneau_temp_stop = equipe.of_creneau_temp_stop
             self.mode_horaires = equipe.mode_horaires
 
     @api.multi

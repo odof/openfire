@@ -214,9 +214,9 @@
                                 </group>
                                 <group col="4" name="horaires_advanced" attrs="{'invisible': ['|',('mode_horaires', '!=', 'advanced'), ('forcer_horaires', '=', True)]}">
                                     <group name="horaires_defaut" col="4" colspan="2">
-                                        <separator string="Horaires par défaut" attrs="{'invisible':[('creneau_temp_start', '=', False)]}" colspan="4"/>
-                                        <separator string="Horaires" attrs="{'invisible':[('creneau_temp_start', '!=', False)]}" colspan="4"/>
-                                        <field name="creneau_readonly_ids" nolabel="1" colspan="4" style="padding: 8px;">
+                                        <separator string="Horaires par défaut" attrs="{'invisible':[('of_creneau_temp_start', '=', False)]}" colspan="4"/>
+                                        <separator string="Horaires" attrs="{'invisible':[('of_creneau_temp_start', '!=', False)]}" colspan="4"/>
+                                        <field name="of_creneau_readonly_ids" nolabel="1" colspan="4" style="padding: 8px;">
                                             <tree string="Créneaux" editable="0">
                                                 <field name="jour_number" invisible="1"/>
                                                 <field name="name"/>
@@ -226,13 +226,13 @@
                                             </tree>
                                         </field>
                                     </group>
-                                    <group name="horaires_temp" attrs="{'invisible':[('creneau_temp_start','=',False)]}" col="4" colspan="2">
+                                    <group name="horaires_temp" attrs="{'invisible':[('of_creneau_temp_start','=',False)]}" col="4" colspan="2">
                                         <group col="4" colspan="4">
                                             <separator string="Horaires temporaires" colspan="4"/>
-                                            <field name="creneau_temp_start_readonly" string="Début de validité" attrs="{'required': [('creneau_temp_stop', '!=', False)]}"/>
-                                            <field name="creneau_temp_stop_readonly" string="Fin de validité" attrs="{'required': [('creneau_temp_start', '!=', False)]}"/>
+                                            <field name="of_creneau_temp_start_readonly" string="Début de validité" attrs="{'required': [('of_creneau_temp_stop', '!=', False)]}"/>
+                                            <field name="of_creneau_temp_stop_readonly" string="Fin de validité" attrs="{'required': [('of_creneau_temp_start', '!=', False)]}"/>
                                         </group>
-                                        <field name="creneau_temp_readonly_ids" nolabel="1" colspan="4" style="padding: 8px;">
+                                        <field name="of_creneau_temp_readonly_ids" nolabel="1" colspan="4" style="padding: 8px;">
                                             <tree string="Créneaux" editable="0">
                                                 <field name="jour_number" invisible="1"/>
                                                 <field name="name"/>
@@ -243,10 +243,10 @@
                                         </field>
                                     </group>
                                 </group>
-                                <field name="creneau_ids" invisible="1" widget="many2many_tags"/>
-                                <field name="creneau_temp_start" invisible="1"/>
-                                <field name="creneau_temp_stop" invisible="1"/>
-                                <field name="creneau_temp_ids" invisible="1" widget="many2many_tags"/>
+                                <field name="of_creneau_ids" invisible="1" widget="many2many_tags"/>
+                                <field name="of_creneau_temp_start" invisible="1"/>
+                                <field name="of_creneau_temp_stop" invisible="1"/>
+                                <field name="of_creneau_temp_ids" invisible="1" widget="many2many_tags"/>
                                 <field name="mode_horaires" invisible="1"/>
                             </page>
                         </notebook>
@@ -547,7 +547,7 @@
                                 <group col="4" name="horaires_advanced" attrs="{'invisible': [('mode_horaires', '!=', 'advanced')]}">
                                     <group col="4" colspan="2">
                                         <separator string="Horaires par défaut" colspan="4"/>
-                                        <field name="creneau_ids" nolabel="1" colspan="4" style="padding: 8px;" options='{"no_open": True, "no_create": True}'>
+                                        <field name="of_creneau_ids" nolabel="1" colspan="4" style="padding: 8px;" options='{"no_open": True, "no_create": True}'>
                                             <tree string="Créneaux" editable="0">
                                                 <field name="jour_number" invisible="1"/>
                                                 <field name="name"/>
@@ -569,10 +569,10 @@
                                                 Dans ce cas là il suffit de sélectionner 01/07/2019 comme date de début de validité et 07/07/2019 comme date de fin de validité.
                                                 Même pas besoin d'ajouter des créneaux temporaires, vu que tous les créneaux par défaut de cette semaine seront remplacés!</i>
                                             </span>
-                                            <field name="creneau_temp_start" string="Début de validité" attrs="{'required': [('creneau_temp_stop', '!=', False)]}"/>
-                                            <field name="creneau_temp_stop" string="Fin de validité" attrs="{'required': [('creneau_temp_start', '!=', False)]}"/>
+                                            <field name="of_creneau_temp_start" string="Début de validité" attrs="{'required': [('of_creneau_temp_stop', '!=', False)]}"/>
+                                            <field name="of_creneau_temp_stop" string="Fin de validité" attrs="{'required': [('of_creneau_temp_start', '!=', False)]}"/>
                                         </group>
-                                        <field name="creneau_temp_ids" nolabel="1" colspan="4" style="padding: 8px;">
+                                        <field name="of_creneau_temp_ids" nolabel="1" colspan="4" style="padding: 8px;">
                                             <tree string="Créneaux" editable="0">
                                                 <field name="jour_number" invisible="1"/>
                                                 <field name="name"/>
