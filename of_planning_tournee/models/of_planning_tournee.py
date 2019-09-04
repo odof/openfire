@@ -248,11 +248,11 @@ class OfPlanningTournee(models.Model):
                 fin_journee = equipe.hor_af
             else:  # mode avancé
                 le_num_jour = date_local.isoweekday()
-                les_creneaux = equipe.creneau_ids.filtered(lambda x: x.jour_number == le_num_jour)
-                if equipe.creneau_temp_start:  # des horaires temporaires: à prendre en compte?
+                les_creneaux = equipe.of_creneau_ids.filtered(lambda x: x.jour_number == le_num_jour)
+                if equipe.of_creneau_temp_start:  # des horaires temporaires: à prendre en compte?
                     la_date_str = fields.Date.to_string(date_local)
-                    if equipe.creneau_temp_start <= la_date_str and la_date_str <= equipe.creneau_temp_stop:  # oui
-                        les_creneaux = equipe.creneau_temp_ids.filtered(lambda x: x.jour_number == le_num_jour)
+                    if equipe.of_creneau_temp_start <= la_date_str and la_date_str <= equipe.of_creneau_temp_stop:  # oui
+                        les_creneaux = equipe.of_creneau_temp_ids.filtered(lambda x: x.jour_number == le_num_jour)
                 len_creneaux = len(les_creneaux)
                 if len_creneaux == 0:
                     raise UserError(u"Oups! On dirait que l'équipe %s ne travail pas ce jour-ci!" % equipe.name)

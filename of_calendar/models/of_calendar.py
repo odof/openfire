@@ -49,7 +49,7 @@ class HREmployee(models.Model):
     def check_no_overlapping(self):
         for employee in self:
             for i in range(1,8):
-                creneaux_du_jour = employee.creneau_ids.filtered(lambda x: x.jour_number == i)
+                creneaux_du_jour = employee.of_creneau_ids.filtered(lambda x: x.jour_number == i)
                 la_len = len(creneaux_du_jour)
                 for j in range(la_len):
                     for k in range(j+1, la_len):
@@ -60,7 +60,7 @@ class HREmployee(models.Model):
                         if se_chevauchent(d1, f1, d2, f2):
                             #raise UserError(u"Oups! Des créneaux se chevauchent")
                             return False
-                creneaux_temp_du_jour = employee.creneau_temp_ids.filtered(lambda jour: jour.jour_number == i)
+                creneaux_temp_du_jour = employee.of_creneau_temp_ids.filtered(lambda jour: jour.jour_number == i)
                 la_len = len(creneaux_temp_du_jour)
                 for j in range(la_len):
                     for k in range(j+1, la_len):
@@ -75,40 +75,125 @@ class HREmployee(models.Model):
 
     tz = fields.Selection(
         _tz_get, string='Fuseau horaire', required=True, default=lambda self: self._default_tz(),
-        help="Le fuseau horaire de l'équipe d'intervention")
+        help=u"Le fuseau horaire de l'employé", oldname="of_tz")  # les champs tz et tz_offset sont utilisés par odoo et doivent conserver ce nom
     tz_offset = fields.Char(compute='_compute_tz_offset', string='Timezone offset', invisible=True)
     u"""Création horaires avancés"""
-    mode_horaires = fields.Selection([
+    of_mode_horaires = fields.Selection([
         ("easy","Facile"),
         ("advanced",u"Avancé")], string="Mode de Sélection des horaires", required=True, default="easy")
-    profil_id = fields.Many2one("of.horaires.profil", "Profil")
-    creneau_ids = fields.Many2many("of.horaires.creneau", "employee_creneaux", "employee_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
-    creneau_temp_ids = fields.Many2many("of.horaires.creneau", "employee_creneaux_temp", "employee_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
-    creneau_temp_start = fields.Date(string=u"Début des horaires temporaires")
-    creneau_temp_stop = fields.Date(string="Fin des horaires temporaires")
-    archive_horaires = fields.Text(string="Archive des horaires")
-    archive_horaires_temp = fields.Text(string="Archive des horaires temporaires")
+    of_profil_id = fields.Many2one("of.horaires.profil", "Profil")
+    of_creneau_ids = fields.Many2many("of.horaires.creneau", "employee_creneaux", "employee_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
+    of_creneau_temp_ids = fields.Many2many("of.horaires.creneau", "employee_creneaux_temp", "employee_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
+    of_creneau_temp_start = fields.Date(string=u"Début des horaires temporaires")
+    of_creneau_temp_stop = fields.Date(string="Fin des horaires temporaires")
+    of_archive_horaires = fields.Text(string="Archive des horaires")
+    of_archive_horaires_temp = fields.Text(string="Archive des horaires temporaires")
+
+    of_hor_md = fields.Float(string=u'Matin début', required=True, digits=(12, 1), default=9)
+    of_hor_mf = fields.Float(string='Matin fin', required=True, digits=(12, 1), default=12)
+    of_hor_ad = fields.Float(string=u'Après-midi début', required=True, digits=(12, 1), default=14)
+    of_hor_af = fields.Float(string=u'Après-midi fin', required=True, digits=(12, 1), default=18)
+    of_jour_ids = fields.Many2many('of.jours', 'employee_jours_rel', 'employee_id', 'jour_id', string='Jours travaillés', required=True, default=lambda self: self._get_default_jours())
+    """of_tz = fields.Selection(_tz_get, string='Fuseau horaire', default=lambda self: self.env.user.tz or 'Europe/Paris', required=True,
+                             help="The Team's timezone, used to output proper date and time values "
+                               "inside printed reports. It is important to set a value for this field. "
+                               "You should use the same timezone that is otherwise used to pick and "
+                               "render date and time values: your computer's timezone.")
+    of_tz_offset = fields.Char(compute='_compute_tz_offset', string='Timezone offset')"""
+    of_address_depart_id = fields.Many2one('res.partner', string=u'Adresse de départ')
+    of_address_retour_id = fields.Many2one('res.partner', string='Adresse de retour')
+
+    of_color_ft = fields.Char(string="Couleur de texte", compute="_compute_colors")
+    of_color_bg = fields.Char(string="Couleur de fond", compute="_compute_colors")
 
     _sql_constraints = [
-        ('creneau_temp_start_stop_constraint', 'CHECK ( creneau_temp_start <= creneau_temp_stop )', _(u"La date de début de validité doit être antérieure ou égale à celle de fin")),
+        ('hor_md_mf_constraint', 'CHECK ( of_hor_md <= of_hor_mf )', _(u"L'Heure de début de matinée doit être antérieure à l'heure de fin de matinée")),
+        ('hor_mf_ad_constraint', 'CHECK ( of_hor_mf <= of_hor_ad )', _(u"L'Heure de fin de matinée doit être antérieure à l'heure de début d'après-midi")),
+        ('hor_ad_af_constraint', 'CHECK ( of_hor_ad <= of_hor_af )', _(u"L'Heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi")),
+        ('of_creneau_temp_start_stop_constraint', 'CHECK ( of_creneau_temp_start <= of_creneau_temp_stop )', _(u"La date de début de validité doit être antérieure ou égale à celle de fin")),
     ]
 
     _constraints = [
         (check_no_overlapping, u'Vous ne pourrez pas sauvegarder tant que des créneaux se chevauchent!', []),
     ]
 
-    @api.onchange("creneau_ids","creneau_temp_ids")
+    def _get_default_jours(self):
+        # Lundi à vendredi comme valeurs par défaut
+        jours = self.env['of.jours'].search([('numero', 'in', (1, 2, 3, 4, 5))], order="numero")
+        res = [jour.id for jour in jours]
+        return res
+
+    @api.depends("user_id")
+    def _compute_colors(self):
+        for employee in self:
+            if employee.user_id:
+                employee.of_color_ft = employee.user_id.of_color_ft
+                employee.of_color_bg = employee.user_id.of_color_bg
+            else:
+                employee.of_color_ft = "#0D0D0D"
+                employee.of_color_bg = "#F0F0F0"
+
+    @api.onchange('of_address_depart_id')
+    def _onchange_address_depart_id(self):
+        self.ensure_one()
+        if self.of_address_depart_id:
+            self.of_address_retour_id = self.of_address_depart_id
+
+    @api.onchange('user_id')
+    def _onchange_user_id(self):
+        self.ensure_one()
+        if self.user_id:
+            self.of_tz = self.user_id.tz
+
+    @api.onchange('of_hor_md')
+    def _onchange_hor_md(self):
+        self.ensure_one()
+        if self.of_hor_md and self.of_hor_mf and self.of_hor_md > self.of_hor_mf:
+            raise UserError(u"L'Heure de début de matinée doit être antérieure à l'heure de fin de matinée")
+
+    @api.onchange('of_hor_mf')
+    def _onchange_hor_mf(self):
+        self.ensure_one()
+        if self.of_hor_md and self.of_hor_mf and self.of_hor_md > self.of_hor_mf:
+            raise UserError(u"L'Heure de début de matinée doit être antérieure à l'heure de fin de matinée")
+        elif self.of_hor_mf and self.of_hor_ad and self.of_hor_mf > self.of_hor_ad:
+            raise UserError(u"L'Heure de fin de matinée doit être antérieure à l'heure de début d'après-midi")
+
+    @api.onchange('of_hor_ad')
+    def _onchange_hor_ad(self):
+        self.ensure_one()
+        if self.of_hor_ad and self.of_hor_af and self.of_hor_ad > self.of_hor_af:
+            raise UserError(u"L'Heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi")
+        elif self.of_hor_mf and self.of_hor_ad and self.of_hor_mf > self.of_hor_ad:
+            raise UserError(u"L'Heure de fin de matinée doit être antérieure à l'heure de début d'après-midi")
+
+    @api.onchange('of_hor_af')
+    def _onchange_hor_af(self):
+        self.ensure_one()
+        if self.of_hor_ad and self.of_hor_af and self.of_hor_ad > self.of_hor_af:
+            raise UserError(u"L'Heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi")
+
+    @api.model
+    def get_working_hours_fields(self):
+        return {
+            "morning_start_field": "of_hor_md",
+            "morning_end_field": "of_hor_mf",
+            "afternoon_start_field": "of_hor_ad",
+            "afternoon_end_field": "of_hor_af"
+        }
+
+    @api.onchange("of_creneau_ids","of_creneau_temp_ids")
     def _onchange_creneaux(self):
         if not self.check_no_overlapping():
             raise UserError(u"Oups! Des créneaux se chevauchent. Veuillez vous assurer que ce ne soit plus le cas avant de sauvegarder.")
 
-    @api.onchange("creneau_temp_start")
-    def _onchange_creneau_temp_start(self):
+    @api.onchange("of_creneau_temp_start")
+    def _onchange_of_creneau_temp_start(self):
         self.ensure_one()
-        if self.creneau_temp_start:
-            date_deb = fields.Date.from_string(self.creneau_temp_start)
+        if self.of_creneau_temp_start:
+            date_deb = fields.Date.from_string(self.of_creneau_temp_start)
             date_fin = date_deb + timedelta(days=6)
-            self.creneau_temp_stop = fields.Date.to_string(date_fin)
+            self.of_creneau_temp_stop = fields.Date.to_string(date_fin)
 
     @api.multi
     def possede_creneau(self,creneau_id):
@@ -117,7 +202,7 @@ class HREmployee(models.Model):
         if len(self._ids) == 0:
             return None
         for employee in self:
-            if len(employee.creneau_ids.filtered(lambda x: x.id == creneau_id)) > 0:
+            if len(employee.of_creneau_ids.filtered(lambda x: x.id == creneau_id)) > 0:
                 continue
             else:
                 return False
@@ -130,7 +215,7 @@ class HREmployee(models.Model):
         un_jour = timedelta(days=1)
         for employee in self:
             """Récupérer l'archive actuelle, si la date d'aujourd'hui existe déjà dans l'archive, on la remplace"""
-            archive = employee.archive_horaires
+            archive = employee.of_archive_horaires
             if archive:
                 les_morceaux = archive.split(u"\n")
                 for le_morceau in les_morceaux:
@@ -149,8 +234,8 @@ class HREmployee(models.Model):
                     les_morceaux[-1] = le_morceau[:15] + u'"' + str_date_hier + u'"' + le_morceau[20:]
             """création de l'archive"""
             dict_nouveau_morceau = {}  # dict contenant les horaires de travail
-            if employee.mode_horaires == u"advanced":  # mode avancé
-                for creneau in employee.creneau_ids:
+            if employee.of_mode_horaires == u"advanced":  # mode avancé
+                for creneau in employee.of_creneau_ids:
                     if creneau.jour_id.abr not in dict_nouveau_morceau:
                         dict_nouveau_morceau[creneau.jour_id.abr] = []
                     dict_nouveau_morceau[creneau.jour_id.abr].append((creneau.heure_debut, creneau.heure_fin))
@@ -161,19 +246,18 @@ class HREmployee(models.Model):
                 str_nouveau_morceau = u'["%s", false, %s]' % (employee.create_date[:10], json.dumps(dict_nouveau_morceau))
             les_morceaux.append(str_nouveau_morceau)
             nouvelle_archive = u"\n".join(les_morceaux)
-            employee.archive_horaires = nouvelle_archive
-
+            employee.of_archive_horaires = nouvelle_archive
 
     @api.multi
     def archiver_horaires_temp(self):
         for employee in self:
-            archive = employee.archive_horaires_temp
+            archive = employee.of_archive_horaires_temp
             if archive:
                 les_morceaux = archive.split("\n")
                 """Vérification qu'il n'y a pas de chevauchement avec des dates d'horaires temporaires existants"""
                 for le_morceau in les_morceaux:
                     la_liste = json.loads(le_morceau)
-                    if se_chevauchent(la_liste[0], la_liste[1], employee.creneau_temp_start, employee.creneau_temp_stop, True):
+                    if se_chevauchent(la_liste[0], la_liste[1], employee.of_creneau_temp_start, employee.of_creneau_temp_stop, True):
                         raise UserError(u"OH oh! le système nous dit qu'il y a du chevauchement au niveau de l'archive des horaires temporaires.\n"
                                         u"Pour que tout se passe bien, veuillez sélectionner des dates de début et de fin qui ne chevauchent pas des dates de début et de fin existantes dans l'archive.\n"
                                         u"dates source du conflit: entre le %s et le %s" % (la_liste[0], la_liste[1]))
@@ -181,15 +265,15 @@ class HREmployee(models.Model):
                 les_morceaux = []
             """Création du nouveau morceau et de l'archive"""
             dict_nouveau_morceau = {}  # dict contenant les horaires de travail temporaire
-            for creneau in employee.creneau_temp_ids:
+            for creneau in employee.of_creneau_temp_ids:
                 if creneau.jour_id.abr not in dict_nouveau_morceau:
                     dict_nouveau_morceau[creneau.jour_id.abr] = []
                 dict_nouveau_morceau[creneau.jour_id.abr].append((creneau.heure_debut, creneau.heure_fin))
-            str_nouveau_morceau = u'["%s", "%s", %s]' % (employee.creneau_temp_start, employee.creneau_temp_stop, json.dumps(dict_nouveau_morceau))
+            str_nouveau_morceau = u'["%s", "%s", %s]' % (employee.of_creneau_temp_start, employee.of_creneau_temp_stop, json.dumps(dict_nouveau_morceau))
             les_morceaux.append(str_nouveau_morceau)
             les_morceaux.sort(key=lambda x: x[2:12])  # si quelqu'un ajoute des horaires temporaires antérieurs à ceux déjà ajouté, BIM FOOLPROOF
             nouvelle_archive = u"\n".join(les_morceaux)
-            employee.archive_horaires_temp = nouvelle_archive
+            employee.of_archive_horaires_temp = nouvelle_archive
 
     @api.multi
     def get_archive_list_horaires(self, jour_keys="number"):
@@ -199,9 +283,9 @@ class HREmployee(models.Model):
         un_jour = timedelta(days=1)
         for employee in self:
             res[employee.id] = {}
-            if not employee.archive_horaires:
+            if not employee.of_archive_horaires:
                 continue
-            str_archive = u'[%s]' % employee.archive_horaires.replace(u"\n", u",")
+            str_archive = u'[%s]' % employee.of_archive_horaires.replace(u"\n", u",")
             if jour_keys == "number":
                 str_archive = jour_abr_2_nb(str_archive)
             list_archive = json.loads(str_archive)
@@ -216,9 +300,9 @@ class HREmployee(models.Model):
         un_jour = timedelta(days=1)
         for employee in self:
             res[employee.id] = {}
-            if not employee.archive_horaires_temp:
+            if not employee.of_archive_horaires_temp:
                 continue
-            str_archive = u'[%s]' % employee.archive_horaires_temp.replace(u"\n", u",")
+            str_archive = u'[%s]' % employee.of_archive_horaires_temp.replace(u"\n", u",")
             if jour_keys == "number":
                 str_archive = jour_abr_2_nb(str_archive)
             list_archive = json.loads(str_archive)
@@ -340,9 +424,9 @@ class HREmployee(models.Model):
     def write(self, vals):
         res = super(HREmployee, self).write(vals)
         #self.get_archive_list_horaires_temp()
-        if vals.get("creneau_ids", False):
+        if vals.get("of_creneau_ids", False):
             self.archiver_horaires()
-        if vals.get("creneau_temp_start", False) or vals.get("creneau_temp_stop", False):
+        if vals.get("of_creneau_temp_start", False) or vals.get("of_creneau_temp_stop", False):
             self.archiver_horaires_temp()
         a_ver = self.env['hr.employee'].get_list_horaires([7], "2019-08-01 00:00:00", "2019-08-31 23:59:59")
         return res
@@ -350,13 +434,89 @@ class HREmployee(models.Model):
     @api.model
     def create(self, vals):
         employee = super(HREmployee, self).create(vals)
-        if vals.get("creneau_ids", False):
+        if vals.get("of_creneau_ids", False):
             employee.archiver_horaires()
         return employee
 
 class OFHorairesCreneau(models.Model):
     _name = "of.horaires.creneau"
     _order = "jour_number, heure_debut"
+
+    """@api.model
+    def _auto_init(self):
+        déjà perdu du temp la-dessus... à voir si initialisation par import?
+        "" "
+        Initialisation des créneaux horaires en fonction des équipe et des employés
+        "" "
+        res = super(OFHorairesCreneau, self)._auto_init()
+        set_value = False
+        cr = self._cr
+        cr.execute("SELECT id FROM of_horaires_creneau LIMIT 1")
+        creneau_existe = bool(cr.fetchall())  # Il y a déjà au moins un créneau dans la base, pas besoin d'initialiser les créneaux
+        if not creneau_existe:
+            set_value = True
+        
+        if set_value:
+            cr.execute("SELECT * FROM information_schema.tables WHERE table_name = '%s'" % ("of_planning_equipe",))
+            equipe_existe = bool(cr.fetchall())  # les équipes existent! on peut aller y chercher les horaires
+
+            
+            employees = self.env['hr.employee'].search([])
+            jours = self.env['of.jours'].search([('numero', '<', 7)])
+            creneau_obj = self.env['of.horaires.creneau']
+            if equipe_existe:
+                auto_init_equipe = self.env['of.planning.equipe']._auto_init()
+                equipes = self.env['of.planning.equipe'].search([])
+                for equipe in equipes:
+                    # des horaires du matin
+                    hor_md = equipe.hor_md
+                    hor_mf = equipe.hor_mf
+                    hor_ad = equipe.hor_ad
+                    hor_af = equipe.hor_af
+                    if hor_md and hor_mf and hor_md < horaire_mf:
+                        if len(creneau_obj.search([('heure_debut', '=', hor_md), ('heure_fin', '=', hor_mf)], limit=1)) == 0:  # ce créneau n'existe pas encore
+                            for jour in jours:
+                                vals = {
+                                    'jour_id': jour.id,
+                                    'heure_debut': hor_md,
+                                    'heure_fin': hor_mf,
+                                }
+                                creneau_obj.create(vals)
+                    if hor_ad and hor_af and hor_ad < horaire_af:
+                        if len(creneau_obj.search([('heure_debut', '=', hor_ad), ('heure_fin', '=', hor_af)], limit=1)) == 0:  # ce créneau n'existe pas encore
+                            for jour in jours:
+                                vals = {
+                                    'jour_id': jour.id,
+                                    'heure_debut': hor_md,
+                                    'heure_fin': hor_mf,
+                                }
+                                creneau_obj.create(vals)
+            for employee in employees:
+                # des horaires du matin
+                hor_md = employee.of_hor_md
+                hor_mf = employee.of_hor_mf
+                hor_ad = employee.of_hor_ad
+                hor_af = employee.of_hor_af
+                if hor_md and hor_mf and hor_md < horaire_mf:
+                    if len(creneau_obj.search([('heure_debut', '=', hor_md), ('heure_fin', '=', hor_mf)], limit=1)) == 0:  # ce créneau n'existe pas encore
+                        for jour in jours:
+                            vals = {
+                                'jour_id': jour.id,
+                                'heure_debut': hor_md,
+                                'heure_fin': hor_mf,
+                            }
+                            creneau_obj.create(vals)
+                if hor_ad and hor_af and hor_ad < horaire_af:
+                    if len(creneau_obj.search([('heure_debut', '=', hor_ad), ('heure_fin', '=', hor_af)], limit=1)) == 0:  # ce créneau n'existe pas encore
+                        for jour in jours:
+                            vals = {
+                                'jour_id': jour.id,
+                                'heure_debut': hor_md,
+                                'heure_fin': hor_mf,
+                            }
+                            creneau_obj.create(vals)
+
+        return res"""
 
     name = fields.Char("Créneau", compute="_compute_name", store=True)
     jour_id = fields.Many2one("of.jours", string="Jour", required=True)
@@ -380,7 +540,7 @@ class OFHorairesProfil(models.Model):
     _name = "of.horaires.profil"
 
     name = fields.Char("Nom du profil")
-    creneau_ids = fields.Many2many("of.horaires.creneau", "profil_creneaux", "profil_id", "creneau_id", string=u"Créneaux")
+    of_creneau_ids = fields.Many2many("of.horaires.creneau", "profil_creneaux", "of_profil_id", "creneau_id", string=u"Créneaux")
     active = fields.Boolean(string="Actif", default=True)
 
     _sql_constraints = [
@@ -408,102 +568,6 @@ class OFPartners(models.Model):
             else:
                 partner.of_color_ft = "#0D0D0D"
                 partner.of_color_bg = "#F0F0F0"
-
-class HREmployee(models.Model):
-    _inherit = 'hr.employee'
-
-    def _get_default_jours(self):
-        # Lundi à vendredi comme valeurs par défaut
-        jours = self.env['of.jours'].search([('numero', 'in', (1, 2, 3, 4, 5))], order="numero")
-        res = [jour.id for jour in jours]
-        return res
-
-    of_hor_md = fields.Float(string=u'Matin début', required=True, digits=(12, 1), default=9)
-    of_hor_mf = fields.Float(string='Matin fin', required=True, digits=(12, 1), default=12)
-    of_hor_ad = fields.Float(string=u'Après-midi début', required=True, digits=(12, 1), default=14)
-    of_hor_af = fields.Float(string=u'Après-midi fin', required=True, digits=(12, 1), default=18)
-    of_jour_ids = fields.Many2many('of.jours', 'employee_jours_rel', 'employee_id', 'jour_id', string='Jours travaillés', required=True, default=_get_default_jours)
-    of_tz = fields.Selection(_tz_get, string='Fuseau horaire', default=lambda self: self.env.user.tz or 'Europe/Paris', required=True,
-                             help="The Team's timezone, used to output proper date and time values "
-                               "inside printed reports. It is important to set a value for this field. "
-                               "You should use the same timezone that is otherwise used to pick and "
-                               "render date and time values: your computer's timezone.")
-    of_tz_offset = fields.Char(compute='_compute_tz_offset', string='Timezone offset')
-    of_address_depart_id = fields.Many2one('res.partner', string=u'Adresse de départ')
-    of_address_retour_id = fields.Many2one('res.partner', string='Adresse de retour')
-
-    of_color_ft = fields.Char(string="Couleur de texte", compute="_compute_colors")
-    of_color_bg = fields.Char(string="Couleur de fond", compute="_compute_colors")
-
-    @api.depends('of_tz')
-    def _compute_tz_offset(self):
-        for employee in self:
-            employee.of_tz_offset = datetime.now(pytz.timezone(employee.of_tz or 'GMT')).strftime('%z')
-
-    @api.depends("user_id")
-    def _compute_colors(self):
-        for employee in self:
-            if employee.user_id:
-                employee.of_color_ft = employee.user_id.of_color_ft
-                employee.of_color_bg = employee.user_id.of_color_bg
-            else:
-                employee.of_color_ft = "#0D0D0D"
-                employee.of_color_bg = "#F0F0F0"
-
-    _sql_constraints = [
-        ('hor_md_mf_constraint', 'CHECK ( of_hor_md <= of_hor_mf )', _(u"L'Heure de début de matinée doit être antérieure à l'heure de fin de matinée")),
-        ('hor_mf_ad_constraint', 'CHECK ( of_hor_mf <= of_hor_ad )', _(u"L'Heure de fin de matinée doit être antérieure à l'heure de début d'après-midi")),
-        ('hor_ad_af_constraint', 'CHECK ( of_hor_ad <= of_hor_af )', _(u"L'Heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi")),
-    ]
-
-    @api.onchange('of_address_depart_id')
-    def _onchange_address_depart_id(self):
-        self.ensure_one()
-        if self.of_address_depart_id:
-            self.of_address_retour_id = self.of_address_depart_id
-
-    @api.onchange('user_id')
-    def _onchange_user_id(self):
-        self.ensure_one()
-        if self.user_id:
-            self.of_tz = self.user_id.tz
-
-    @api.onchange('of_hor_md')
-    def _onchange_hor_md(self):
-        self.ensure_one()
-        if self.of_hor_md and self.of_hor_mf and self.of_hor_md > self.of_hor_mf:
-            raise UserError(u"L'Heure de début de matinée doit être antérieure à l'heure de fin de matinée")
-
-    @api.onchange('of_hor_mf')
-    def _onchange_hor_mf(self):
-        self.ensure_one()
-        if self.of_hor_md and self.of_hor_mf and self.of_hor_md > self.of_hor_mf:
-            raise UserError(u"L'Heure de début de matinée doit être antérieure à l'heure de fin de matinée")
-        elif self.of_hor_mf and self.of_hor_ad and self.of_hor_mf > self.of_hor_ad:
-            raise UserError(u"L'Heure de fin de matinée doit être antérieure à l'heure de début d'après-midi")
-
-    @api.onchange('of_hor_ad')
-    def _onchange_hor_ad(self):
-        self.ensure_one()
-        if self.of_hor_ad and self.of_hor_af and self.of_hor_ad > self.of_hor_af:
-            raise UserError(u"L'Heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi")
-        elif self.of_hor_mf and self.of_hor_ad and self.of_hor_mf > self.of_hor_ad:
-            raise UserError(u"L'Heure de fin de matinée doit être antérieure à l'heure de début d'après-midi")
-
-    @api.onchange('of_hor_af')
-    def _onchange_hor_af(self):
-        self.ensure_one()
-        if self.of_hor_ad and self.of_hor_af and self.of_hor_ad > self.of_hor_af:
-            raise UserError(u"L'Heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi")
-
-    @api.model
-    def get_working_hours_fields(self):
-        return {
-            "morning_start_field": "of_hor_md",
-            "morning_end_field": "of_hor_mf",
-            "afternoon_start_field": "of_hor_ad",
-            "afternoon_end_field": "of_hor_af"
-        }
 
 class OFMeetingType(models.Model):
     _inherit = 'calendar.event.type'

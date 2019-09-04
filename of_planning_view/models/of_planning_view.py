@@ -192,13 +192,13 @@ class OfPlanningIntervention(models.Model):
                         dict_horaires[i].append((equipe.hor_ad, equipe.hor_af))
         else: # On utilise le mode avancé pour les horaires de cette équipe
             # l'équipe a-t-elle des horaires temporaires qui peuvent interférer avec ses horaires par défaut sur cette recherche??
-            if equipe.creneau_temp_stop and equipe.creneau_temp_stop >= date_start and equipe.creneau_temp_start <= date_stop:
+            if equipe.of_creneau_temp_stop and equipe.of_creneau_temp_stop >= date_start and equipe.of_creneau_temp_start <= date_stop:
                 horaires_temp = True
-                str_temp_start = equipe.creneau_temp_start
+                str_temp_start = equipe.of_creneau_temp_start
                 d_temp_start = fields.Date.from_string(str_temp_start)
-                str_temp_stop = equipe.creneau_temp_stop
+                str_temp_stop = equipe.of_creneau_temp_stop
                 d_temp_stop = fields.Date.from_string(str_temp_stop)
-                creneaux_temp_travailles = equipe.creneau_temp_ids
+                creneaux_temp_travailles = equipe.of_creneau_temp_ids
                 for i in range(1,8):
                     dict_horaires_temp[i] = []
                     creneaux_temp_du_jour = creneaux_temp_travailles.filtered(lambda x: x.jour_number == i)
@@ -207,7 +207,7 @@ class OfPlanningIntervention(models.Model):
                         dict_horaires_temp[i].append((c.heure_debut, c.heure_fin))
                 jours_temp_travailles = [j for j in dict_horaires_temp if dict_horaires_temp[j] != []]
 
-            creneaux_travailles = equipe.creneau_ids
+            creneaux_travailles = equipe.of_creneau_ids
             for i in range(1,8):
                 dict_horaires[i] = []
                 creneaux_du_jour = creneaux_travailles.filtered(lambda x: x.jour_number == i)

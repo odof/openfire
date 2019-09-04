@@ -92,7 +92,7 @@ class OfTourneePlanification(models.TransientModel):
         date_max = tz.localize(datetime.strptime(date_intervention+" 23:59:00", "%Y-%m-%d %H:%M:%S"))
 
         plannings = []
-        if equipe.hor_md and equipe.hor_mf and equipe.hor_ad and equipe.hor_af or equipe.creneau_ids:
+        if equipe.hor_md and equipe.hor_mf and equipe.hor_ad and equipe.hor_af or equipe.of_creneau_ids:
             equipe_hor_list = []   # liste des creneaux travaillés
 
             if equipe.mode_horaires == 'easy':  # mode facile
@@ -103,10 +103,10 @@ class OfTourneePlanification(models.TransientModel):
                     equipe_hor_list.append([equipe.hor_ad, equipe.hor_af])
             else:  # mode avancé
                 le_num_jour = d_date_intervention.isoweekday()
-                les_creneaux = equipe.creneau_ids.filtered(lambda x: x.jour_number == le_num_jour)
-                if equipe.creneau_temp_start:  # des horaires temporaires: à prendre en compte?
-                    if equipe.creneau_temp_start <= date_intervention and date_intervention <= equipe.creneau_temp_stop:  # oui
-                        les_creneaux = equipe.creneau_temp_ids.filtered(lambda x: x.jour_number == le_num_jour)
+                les_creneaux = equipe.of_creneau_ids.filtered(lambda x: x.jour_number == le_num_jour)
+                if equipe.of_creneau_temp_start:  # des horaires temporaires: à prendre en compte?
+                    if equipe.of_creneau_temp_start <= date_intervention and date_intervention <= equipe.of_creneau_temp_stop:  # oui
+                        les_creneaux = equipe.of_creneau_temp_ids.filtered(lambda x: x.jour_number == le_num_jour)
                 len_creneaux = len(les_creneaux)
                 if len_creneaux == 0:
                     raise UserError(u"Oups! On dirait que l'équipe %s ne travail pas ce jour-ci!" % equipe.name)
