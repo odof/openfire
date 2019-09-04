@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 <data>
+
 <!--##############################################################################-->
 <!--########################### ______ Employés ______ ###########################-->
 <!--##############################################################################-->
@@ -10,17 +11,25 @@
         <field name="model">hr.employee</field>
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//page[@name='public']/group" position="after">
+                <group name="page1_group2" col="4" colspan="4">
+                    <group name="deplacements" string="Déplacements" colspan="2">
+                        <field name="of_address_depart_id"/>
+                        <field name="of_address_retour_id"/>
+                    </group>
+                </group>
+            </xpath>
             <xpath expr="//notebook" position="inside">
                 <page name="horaires" string="Horaires">
                     <group col="4">
                         <group>
-                            <field name="mode_horaires"/>
+                            <field name="of_mode_horaires"/>
                         </group>
                     </group>
-                    <group col="4" name="horaires_advanced" attrs="{'invisible': [('mode_horaires', '!=', 'advanced')]}">
+                    <group col="4" name="horaires_advanced" attrs="{'invisible': [('of_mode_horaires', '!=', 'advanced')]}">
                         <group name="horaires" col="4" colspan="2">
                             <separator string="Horaires par défaut" colspan="4"/>
-                            <field name="creneau_ids" nolabel="1" colspan="4" style="padding: 8px;">
+                            <field name="of_creneau_ids" nolabel="1" colspan="4" style="padding: 8px;">
                                 <tree string="Créneaux" editable="0">
                                     <field name="jour_number" invisible="1"/>
                                     <field name="name"/>
@@ -42,10 +51,10 @@
                                     Dans ce cas là il suffit de sélectionner 01/07/2019 comme date de début de validité et 07/07/2019 comme date de fin de validité.
                                     Même pas besoin d'ajouter des créneaux temporaires, vu que tous les créneaux par défaut de cette semaine seront remplacés!</i>
                                 </span>
-                                <field name="creneau_temp_start" string="Début de validité" attrs="{'required': ['|',('creneau_temp_stop', '!=', False),('creneau_temp_ids', '!=', [])]}"/>
-                                <field name="creneau_temp_stop" string="Fin de validité" attrs="{'required': ['|',('creneau_temp_start', '!=', False),('creneau_temp_ids', '!=', [])]}"/>
+                                <field name="of_creneau_temp_start" string="Début de validité" attrs="{'required': ['|',('of_creneau_temp_stop', '!=', False),('of_creneau_temp_ids', '!=', [])]}"/>
+                                <field name="of_creneau_temp_stop" string="Fin de validité" attrs="{'required': ['|',('of_creneau_temp_start', '!=', False),('of_creneau_temp_ids', '!=', [])]}"/>
                             </group>
-                            <field name="creneau_temp_ids" nolabel="1" colspan="4" style="padding: 8px;">
+                            <field name="of_creneau_temp_ids" nolabel="1" colspan="4" style="padding: 8px;">
                                 <tree string="Créneaux" editable="0">
                                     <field name="jour_number" invisible="1"/>
                                     <field name="name"/>
@@ -55,13 +64,24 @@
                                 </tree>
                             </field>
                         </group>
-                        <group name="archive_horaires" col="2" colspan="2" groups="base.group_no_one">
+                        <group name="of_archive_horaires" col="2" colspan="2" groups="base.group_no_one">
                             <separator string="Archive horaires" colspan="2"/>
-                            <field name="archive_horaires" nolabel="1" colspan="2"/>
+                            <field name="of_archive_horaires" nolabel="1" colspan="2"/>
                         </group>
-                        <group name="archive_horaires_temp" col="2" colspan="2" groups="base.group_no_one">
+                        <group name="of_archive_horaires_temp" col="2" colspan="2" groups="base.group_no_one">
                             <separator string="Archive horaires temporaires" colspan="2"/>
-                            <field name="archive_horaires_temp" nolabel="1" colspan="2"/>
+                            <field name="of_archive_horaires_temp" nolabel="1" colspan="2"/>
+                        </group>
+                    </group>
+                    <group name="horaires_easy" attrs="{'invisible': [('of_mode_horaires', '!=', 'easy')]}" col="4" colspan="4">
+                        <group name="horaires" string="Horaires" col="3" colspan="2">
+                            <field name="of_hor_md" string="Matin" widget="float_time" colspan="2"/>
+                            <field name="of_hor_mf" widget="float_time" colspan="1" nolabel="1"/>
+                            <field name="of_hor_ad" string="Après-midi" widget="float_time" colspan="2"/>
+                            <field name="of_hor_af" widget="float_time" colspan="1" nolabel="1"/>
+                            <field name="of_jour_ids" widget="many2many_tags" colspan="3"/>
+                            <field name="tz" widget="timezone_mismatch" options="{'tz_offset_field': 'tz_offset'}" colspan="3"/>
+                            <field name="tz_offset" invisible="1" colspan="3"/>
                         </group>
                     </group>
                 </page>
@@ -170,34 +190,6 @@
         <field name="arch" type="xml">
             <xpath expr="//tree//field[@name='login']" position="after">
                 <field name="of_color_bg" string="couleur" widget="color"/>
-            </xpath>
-        </field>
-    </record>
-
-<!--##############################################################################-->
-<!--######################### ______ Employés ______ #############################-->
-<!--##############################################################################-->
-    <record id="of_view_employee_form" model="ir.ui.view">
-        <field name="name">of.hr.employee.form</field>
-        <field name="model">hr.employee</field>
-        <field name="inherit_id" ref="hr.view_employee_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//page[@name='public']/group" position="after">
-                <group name="page1_group2" col="4" colspan="4">
-                    <group name="horaires" string="Horaires" col="3" colspan="2">
-                        <field name="of_hor_md" string="Matin" widget="float_time" colspan="2"/>
-                        <field name="of_hor_mf" widget="float_time" colspan="1" nolabel="1"/>
-                        <field name="of_hor_ad" string="Après-midi" widget="float_time" colspan="2"/>
-                        <field name="of_hor_af" widget="float_time" colspan="1" nolabel="1"/>
-                        <field name="of_jour_ids" widget="many2many_tags" colspan="3"/>
-                        <field name="of_tz" widget="timezone_mismatch" options="{'tz_offset_field': 'of_tz_offset'}" colspan="3"/>
-                        <field name="of_tz_offset" invisible="1" colspan="3"/>
-                    </group>
-                    <group name="deplacements" string="Déplacements" colspan="2">
-                        <field name="of_address_depart_id"/>
-                        <field name="of_address_retour_id"/>
-                    </group>
-                </group>
             </xpath>
         </field>
     </record>

@@ -295,13 +295,13 @@ class OfTourneeRdv(models.TransientModel):
                             dict_horaires[equipe_id][i].append((equipe.hor_ad, equipe.hor_af))
             else: # On utilise le mode avancé pour les horaires de cette équipe
                 # l'équipe a-t-elle des horaires temporaires qui peuvent interférer avec ses horaires par défaut sur cette recherche??
-                if equipe.creneau_temp_stop and equipe.creneau_temp_stop >= self.date_recherche_debut and equipe.creneau_temp_start <= self.date_recherche_fin:
+                if equipe.of_creneau_temp_stop and equipe.of_creneau_temp_stop >= self.date_recherche_debut and equipe.of_creneau_temp_start <= self.date_recherche_fin:
                     horaires_temp[equipe_id] = True
-                    #str_temp_start = equipe.creneau_temp_start
+                    #str_temp_start = equipe.of_creneau_temp_start
                     #d_temp_start = fields.Date.from_string(str_temp_start)
-                    #str_temp_stop = equipe.creneau_temp_stop
+                    #str_temp_stop = equipe.of_creneau_temp_stop
                     #d_temp_stop = fields.Date.from_string(str_temp_stop)
-                    creneaux_temp_travailles = equipe.creneau_temp_ids
+                    creneaux_temp_travailles = equipe.of_creneau_temp_ids
                     dict_horaires_temp[equipe_id] = {}
                     for i in range(1,8):
                         dict_horaires_temp[equipe_id][i] = []
@@ -310,7 +310,7 @@ class OfTourneeRdv(models.TransientModel):
                             dict_horaires_temp[equipe_id][i].append((c.heure_debut, c.heure_fin))
                     jours_temp_equipes[equipe_id] = [j for j in dict_horaires_temp[equipe_id] if dict_horaires_temp[equipe_id][j] != []]
 
-                creneaux_travailles = equipe.creneau_ids
+                creneaux_travailles = equipe.of_creneau_ids
                 dict_horaires[equipe_id] = {}
                 for i in range(1,8):
                     dict_horaires[equipe_id][i] = []
@@ -394,7 +394,7 @@ class OfTourneeRdv(models.TransientModel):
                 equipe_id = equipe.id
                 if equipe_id not in equipes_bloquees:
                     if horaires_temp[equipe_id] and dict_horaires_temp[equipe_id][num_jour] != [] and \
-                    equipe.creneau_temp_start <= str_d_recherche and str_d_recherche <= equipe.creneau_temp_stop:
+                    equipe.of_creneau_temp_start <= str_d_recherche and str_d_recherche <= equipe.of_creneau_temp_stop:
                         # l'équipe a des horaires temporaires sur cette date
                         equipes_dispo.append(equipe_id)
                         horaires_temp_today[equipe_id] = True
