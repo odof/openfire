@@ -36,7 +36,8 @@ Fiche de projet dynamique
         'of_gesdoc',
         'of_web_widgets',
         'of_calendar',
-        'of_base',
+        #'of_base',  # <- par of_base_location
+        'of_base_location',
     ],
     'data' : [
         'views/of_crm_view.xml',
