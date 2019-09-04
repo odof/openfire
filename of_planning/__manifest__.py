@@ -30,11 +30,13 @@ Inclut la gestion des équipes d'intervention.
         'hr',
         'product',
         'sale',
-        'of_base',
+        #'of_base',
         'of_gesdoc',
         'of_calendar',
         'of_kit',
         'mail',
+        'of_utils',
+        'of_base_location',  # secteurs
     ],
     'data' : [
         'security/of_planning_security.xml',
