@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_horaires_creneau_user,of.horaires.creneau.user,model_of_horaires_creneau,base.group_user,1,0,0,0
+access_of_horaires_creneau_manager,of.horaires.creneau.manager,model_of_horaires_creneau,hr.group_hr_manager,1,1,1,1

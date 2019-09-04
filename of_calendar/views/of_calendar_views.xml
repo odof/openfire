@@ -18,7 +18,7 @@
                         </group>
                     </group>
                     <group col="4" name="horaires_advanced" attrs="{'invisible': [('mode_horaires', '!=', 'advanced')]}">
-                        <group col="4" colspan="2">
+                        <group name="horaires" col="4" colspan="2">
                             <separator string="Horaires par défaut" colspan="4"/>
                             <field name="creneau_ids" nolabel="1" colspan="4" style="padding: 8px;">
                                 <tree string="Créneaux" editable="0">
@@ -31,7 +31,7 @@
                             </field>
                             <!--div colspan="1"/-->
                         </group>
-                        <group col="4" colspan="2">
+                        <group name="horaires_temp" col="4" colspan="2">
                             <group col="4" colspan="4">
                                 <separator string="Horaires temporaires" colspan="4"/>
                                 <span class="oe_grey" colspan="4">
@@ -42,8 +42,8 @@
                                     Dans ce cas là il suffit de sélectionner 01/07/2019 comme date de début de validité et 07/07/2019 comme date de fin de validité.
                                     Même pas besoin d'ajouter des créneaux temporaires, vu que tous les créneaux par défaut de cette semaine seront remplacés!</i>
                                 </span>
-                                <field name="creneau_temp_start" string="Début de validité" attrs="{'required': [('creneau_temp_stop', '!=', False)]}"/>
-                                <field name="creneau_temp_stop" string="Fin de validité" attrs="{'required': [('creneau_temp_start', '!=', False)]}"/>
+                                <field name="creneau_temp_start" string="Début de validité" attrs="{'required': ['|',('creneau_temp_stop', '!=', False),('creneau_temp_ids', '!=', [])]}"/>
+                                <field name="creneau_temp_stop" string="Fin de validité" attrs="{'required': ['|',('creneau_temp_start', '!=', False),('creneau_temp_ids', '!=', [])]}"/>
                             </group>
                             <field name="creneau_temp_ids" nolabel="1" colspan="4" style="padding: 8px;">
                                 <tree string="Créneaux" editable="0">
@@ -54,6 +54,14 @@
                                     <field name="heure_fin" invisible="1" widget="float_time" readonly="1"/>
                                 </tree>
                             </field>
+                        </group>
+                        <group name="archive_horaires" col="2" colspan="2" groups="base.group_no_one">
+                            <separator string="Archive horaires" colspan="2"/>
+                            <field name="archive_horaires" nolabel="1" colspan="2"/>
+                        </group>
+                        <group name="archive_horaires_temp" col="2" colspan="2" groups="base.group_no_one">
+                            <separator string="Archive horaires temporaires" colspan="2"/>
+                            <field name="archive_horaires_temp" nolabel="1" colspan="2"/>
                         </group>
                     </group>
                 </page>
@@ -66,7 +74,7 @@
         <field name="name">of.horaires.creneau.tree</field>
         <field name="model">of.horaires.creneau</field>
         <field name="arch" type="xml">
-            <tree string="Créneaux" editable="bottom">
+            <tree string="Créneaux horaires" editable="bottom">
                 <field name="jour_number" invisible="1"/>
                 <field name="name"/>
                 <field name="jour_id" options='{"no_open": True, "no_create": True}'/>
