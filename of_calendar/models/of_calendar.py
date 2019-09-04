@@ -2,13 +2,10 @@
 
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError
+from datetime import datetime, timedelta
+import json
 import pytz
-from datetime import datetime
-
-@api.model
-def _tz_get(self):
-    # put POSIX 'Etc/*' entries at the end to avoid confusing users - see bug 1086728
-    return [(tz, tz) for tz in sorted(pytz.all_timezones, key=lambda tz: tz if not tz.startswith('Etc/') else '_')]
+from copy import deepcopy
 
 def hours_to_strs(*hours):
     """ Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'
@@ -16,15 +13,37 @@ def hours_to_strs(*hours):
     return tuple("%dh%02d" % (hour, round((hour % 1) * 60)) if hour % 1 else "%dh" % (hour) for hour in hours)
     #return tuple("%dh" % (hour) + (hour % 1 and "%02d" % (round((hour % 1) * 60)) or "") for hour in hours)
 
-def check_hours_overlapping(debut_1, fin_1, debut_2, fin_2):
-    """renvoi True si les horaires se chevauchent, False sinon"""
-    """return debut_1 >= debut_2 and debut_1 < fin_2 or \
-    fin_1 > debut_2 and fin_1 <= fin_2 or \
-    debut_1 <= debut_2 and fin_1 >= fin_2"""
-    return debut_1 < fin_2 and debut_2 < fin_1
+def se_chevauchent(debut_1, fin_1, debut_2, fin_2, strict=False):
+    """renvoi True si les horaires se chevauchent, False sinon."""
+    if not strict:
+        debut_1 < fin_2 and debut_2 < fin_1
+    return debut_1 <= fin_2 and debut_2 <= fin_1
+
+@api.model
+def _tz_get(self):
+    # put POSIX 'Etc/*' entries at the end to avoid confusing users - see bug 1086728
+    return [(tz, tz) for tz in sorted(pytz.all_timezones, key=lambda tz: tz if not tz.startswith('Etc/') else '_')]
+
+def jour_abr_2_nb(str):
+    res = str.replace(u'"lun."', u"1")
+    res = res.replace(u'"mar."', u"2")
+    res = res.replace(u'"mer."', u"3")
+    res = res.replace(u'"jeu."', u"4")
+    res = res.replace(u'"ven."', u"5")
+    res = res.replace(u'"sam."', u"6")
+    res = res.replace(u'"dim."', u"7")
+    return res
 
 class HREmployee(models.Model):
     _inherit = "hr.employee"
+
+    def _default_tz(self):
+        return self.env.user.tz or 'Europe/Paris'
+
+    @api.depends('tz')
+    def _compute_tz_offset(self):
+        for employee in self:
+            employee.tz_offset = datetime.now(pytz.timezone(employee.tz or 'GMT')).strftime('%z')
 
     @api.multi
     def check_no_overlapping(self):
@@ -38,7 +57,7 @@ class HREmployee(models.Model):
                         f1 = creneaux_du_jour[j].heure_fin
                         d2 = creneaux_du_jour[k].heure_debut
                         f2 = creneaux_du_jour[k].heure_fin
-                        if check_hours_overlapping(d1, f1, d2, f2):
+                        if se_chevauchent(d1, f1, d2, f2):
                             #raise UserError(u"Oups! Des créneaux se chevauchent")
                             return False
                 creneaux_temp_du_jour = employee.creneau_temp_ids.filtered(lambda jour: jour.jour_number == i)
@@ -49,11 +68,15 @@ class HREmployee(models.Model):
                         f1 = creneaux_temp_du_jour[j].heure_fin
                         d2 = creneaux_temp_du_jour[k].heure_debut
                         f2 = creneaux_temp_du_jour[k].heure_fin
-                        if check_hours_overlapping(d1, f1, d2, f2):
+                        if se_chevauchent(d1, f1, d2, f2):
                             #raise UserError(u"Oups! Des créneaux se chevauchent")
                             return False
         return True
 
+    tz = fields.Selection(
+        _tz_get, string='Fuseau horaire', required=True, default=lambda self: self._default_tz(),
+        help="Le fuseau horaire de l'équipe d'intervention")
+    tz_offset = fields.Char(compute='_compute_tz_offset', string='Timezone offset', invisible=True)
     u"""Création horaires avancés"""
     mode_horaires = fields.Selection([
         ("easy","Facile"),
@@ -63,6 +86,8 @@ class HREmployee(models.Model):
     creneau_temp_ids = fields.Many2many("of.horaires.creneau", "employee_creneaux_temp", "employee_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
     creneau_temp_start = fields.Date(string=u"Début des horaires temporaires")
     creneau_temp_stop = fields.Date(string="Fin des horaires temporaires")
+    archive_horaires = fields.Text(string="Archive des horaires")
+    archive_horaires_temp = fields.Text(string="Archive des horaires temporaires")
 
     _sql_constraints = [
         ('creneau_temp_start_stop_constraint', 'CHECK ( creneau_temp_start <= creneau_temp_stop )', _(u"La date de début de validité doit être antérieure ou égale à celle de fin")),
@@ -77,6 +102,14 @@ class HREmployee(models.Model):
         if not self.check_no_overlapping():
             raise UserError(u"Oups! Des créneaux se chevauchent. Veuillez vous assurer que ce ne soit plus le cas avant de sauvegarder.")
 
+    @api.onchange("creneau_temp_start")
+    def _onchange_creneau_temp_start(self):
+        self.ensure_one()
+        if self.creneau_temp_start:
+            date_deb = fields.Date.from_string(self.creneau_temp_start)
+            date_fin = date_deb + timedelta(days=6)
+            self.creneau_temp_stop = fields.Date.to_string(date_fin)
+
     @api.multi
     def possede_creneau(self,creneau_id):
         u"""vérifie que tous les employés présents dans self possèdent tel ou tel créneau.
@@ -89,6 +122,237 @@ class HREmployee(models.Model):
             else:
                 return False
         return True
+
+    @api.multi
+    def archiver_horaires(self):
+        str_date_today = fields.Date.today()
+        d_date_today = fields.Date.from_string(str_date_today)
+        un_jour = timedelta(days=1)
+        for employee in self:
+            """Récupérer l'archive actuelle, si la date d'aujourd'hui existe déjà dans l'archive, on la remplace"""
+            archive = employee.archive_horaires
+            if archive:
+                les_morceaux = archive.split(u"\n")
+                for le_morceau in les_morceaux:
+                    str_la_date = le_morceau[2:12]  # la date commence au 3eme caractère
+                    if str_date_today == str_la_date:
+                        les_morceaux.remove(le_morceau)
+                        break
+            else:
+                les_morceaux = []
+            """Ajout date d'hier si besoin"""
+            if len(les_morceaux) > 0:
+                le_morceau = les_morceaux[-1]
+                if le_morceau[15] == u'f':  # le dernier morceau de la liste n'a pas de date de fin.
+                    d_date_hier = d_date_today - un_jour
+                    str_date_hier = fields.Date.to_string(d_date_hier)
+                    les_morceaux[-1] = le_morceau[:15] + u'"' + str_date_hier + u'"' + le_morceau[20:]
+            """création de l'archive"""
+            dict_nouveau_morceau = {}  # dict contenant les horaires de travail
+            if employee.mode_horaires == u"advanced":  # mode avancé
+                for creneau in employee.creneau_ids:
+                    if creneau.jour_id.abr not in dict_nouveau_morceau:
+                        dict_nouveau_morceau[creneau.jour_id.abr] = []
+                    dict_nouveau_morceau[creneau.jour_id.abr].append((creneau.heure_debut, creneau.heure_fin))
+            #else:  # mode facile -> a faire quand rebase avec code rdvcom
+            if archive:
+                str_nouveau_morceau = u'["%s", false, %s]' % (str_date_today, json.dumps(dict_nouveau_morceau))
+            else:  # lors de la permière création d'horaires, on considère que l'employé avait ces horaires depuis sa création
+                str_nouveau_morceau = u'["%s", false, %s]' % (employee.create_date[:10], json.dumps(dict_nouveau_morceau))
+            les_morceaux.append(str_nouveau_morceau)
+            nouvelle_archive = u"\n".join(les_morceaux)
+            employee.archive_horaires = nouvelle_archive
+
+
+    @api.multi
+    def archiver_horaires_temp(self):
+        for employee in self:
+            archive = employee.archive_horaires_temp
+            if archive:
+                les_morceaux = archive.split("\n")
+                """Vérification qu'il n'y a pas de chevauchement avec des dates d'horaires temporaires existants"""
+                for le_morceau in les_morceaux:
+                    la_liste = json.loads(le_morceau)
+                    if se_chevauchent(la_liste[0], la_liste[1], employee.creneau_temp_start, employee.creneau_temp_stop, True):
+                        raise UserError(u"OH oh! le système nous dit qu'il y a du chevauchement au niveau de l'archive des horaires temporaires.\n"
+                                        u"Pour que tout se passe bien, veuillez sélectionner des dates de début et de fin qui ne chevauchent pas des dates de début et de fin existantes dans l'archive.\n"
+                                        u"dates source du conflit: entre le %s et le %s" % (la_liste[0], la_liste[1]))
+            else:
+                les_morceaux = []
+            """Création du nouveau morceau et de l'archive"""
+            dict_nouveau_morceau = {}  # dict contenant les horaires de travail temporaire
+            for creneau in employee.creneau_temp_ids:
+                if creneau.jour_id.abr not in dict_nouveau_morceau:
+                    dict_nouveau_morceau[creneau.jour_id.abr] = []
+                dict_nouveau_morceau[creneau.jour_id.abr].append((creneau.heure_debut, creneau.heure_fin))
+            str_nouveau_morceau = u'["%s", "%s", %s]' % (employee.creneau_temp_start, employee.creneau_temp_stop, json.dumps(dict_nouveau_morceau))
+            les_morceaux.append(str_nouveau_morceau)
+            les_morceaux.sort(key=lambda x: x[2:12])  # si quelqu'un ajoute des horaires temporaires antérieurs à ceux déjà ajouté, BIM FOOLPROOF
+            nouvelle_archive = u"\n".join(les_morceaux)
+            employee.archive_horaires_temp = nouvelle_archive
+
+    @api.multi
+    def get_archive_list_horaires(self, jour_keys="number"):
+        """Renvois l'archive des horaires des employés présents dans self sous forme de liste
+        résultat sous forme [ [date_debut, date_fin, dict_horaires], ...]"""
+        res = {}
+        un_jour = timedelta(days=1)
+        for employee in self:
+            res[employee.id] = {}
+            if not employee.archive_horaires:
+                continue
+            str_archive = u'[%s]' % employee.archive_horaires.replace(u"\n", u",")
+            if jour_keys == "number":
+                str_archive = jour_abr_2_nb(str_archive)
+            list_archive = json.loads(str_archive)
+            res[employee.id] = list_archive
+        return res
+
+    @api.multi
+    def get_archive_list_horaires_temp(self, jour_keys="number"):
+        """Renvois l'archive des horaires temporaires des employés présents dans self sous forme de liste
+        résultat sous forme [ [date_debut, date_fin, dict_horaires], ...]"""
+        res = {}
+        un_jour = timedelta(days=1)
+        for employee in self:
+            res[employee.id] = {}
+            if not employee.archive_horaires_temp:
+                continue
+            str_archive = u'[%s]' % employee.archive_horaires_temp.replace(u"\n", u",")
+            if jour_keys == "number":
+                str_archive = jour_abr_2_nb(str_archive)
+            list_archive = json.loads(str_archive)
+            res[employee.id] = list_archive
+        return res
+
+    @api.model
+    def get_list_horaires(self, employee_ids, date_start, date_stop):
+        # transformer date_start et date_stop en date locale
+        dt_date_start_naive = datetime.strptime(date_start, "%Y-%m-%d %H:%M:%S")  # datetime naif
+        dt_date_start_utc = pytz.utc.localize(dt_date_start_naive, is_dst=None)  # datetime utc
+        dt_date_stop_naive = datetime.strptime(date_stop, "%Y-%m-%d %H:%M:%S")  # datetime naif
+        dt_date_stop_utc = pytz.utc.localize(dt_date_stop_naive, is_dst=None)  # datetime utc
+        un_jour = timedelta(days=1)
+
+        res = {}
+        compare_precision = 5
+        archive_list_horaires = self.browse(employee_ids).get_archive_list_horaires()
+        archive_list_horaires_temp = self.browse(employee_ids).get_archive_list_horaires_temp()
+        for employee in self.browse(employee_ids):
+            res[employee.id] = []
+            # en cas d'employés sur différentes timezones
+            tz = pytz.timezone(employee.tz or "Europe/Paris")
+            dt_date_start_local = dt_date_start_utc.astimezone(tz)  # datetime local
+            dt_date_stop_local = dt_date_stop_utc.astimezone(tz)  # datetime local
+            str_d_date_start = fields.Date.to_string(dt_date_start_local).decode('utf-8')
+            str_d_date_stop = fields.Date.to_string(dt_date_stop_local).decode('utf-8')
+
+            # on récupère les horaires standards
+            horaires_employee = archive_list_horaires[employee.id]
+            horaires_utiles = []
+            if len(horaires_employee) == 1:  # les seuls horaires standard connu, on considère qu'ils sont valable sur la periode demandée
+                horaires_utiles.append([str_d_date_start, str_d_date_stop, horaires_employee[0][2]])
+            elif len(horaires_employee) > 1:
+                # on cherche les index de début et de fin
+                index_start = -1
+                index_stop = -1
+                for i in range(len(horaires_employee)):
+
+                    if index_start == -1:  # n'a pas été affecté
+                        if not horaires_employee[i][1]:
+                            index_start = index_stop = i
+                        elif se_chevauchent(str_d_date_start, str_d_date_start, horaires_employee[i][0], horaires_employee[i][1], True):
+                            index_start = i
+                    if index_stop == -1:  # n'a pas été affecté
+                        if not horaires_employee[i][1]:
+                            index_stop = i
+                        elif se_chevauchent(str_d_date_stop, str_d_date_stop, horaires_employee[i][0], horaires_employee[i][1], True):
+                            index_stop = i
+                    if index_start != -1 and index_stop != -1:  # on a trouvé les 2 indexes
+                        break
+
+                if index_start == index_stop:  # on a de la chance! l'employé n'a pas changé d'horaires entre les 2 dates demandées
+                    horaires_utiles.append([str_d_date_start, str_d_date_stop, horaires_employee[index_start][2]])
+                else:  # mince alors! l'employé a changé d'horaires entre les 2 dates demandées
+                    horaires_utiles.append([str_d_date_start, horaires_employee[index_start][1], horaires_employee[index_start][2]])
+                    for i in range(index_start + 1, index_stop):
+                        horaires_utiles.append([horaires_employee[i][0], horaires_employee[i][1], horaires_employee[i][2]])
+                    horaires_utiles.append([horaires_employee[index_stop][0], str_d_date_stop, horaires_employee[index_stop][2]])
+            # On a la liste des horaires standards! \o/ maintenant on récupère si besoin la liste des horaires temporaires
+            horaires_employee_temp = archive_list_horaires_temp[employee.id]
+            horaires_temp_utiles = []
+            if len(horaires_employee_temp) == 0:  # oups! pas d'horaires temporaires
+                continue
+            # Sélection des horaires temporaires concernés
+            for i in range(len(horaires_employee_temp)):
+                if se_chevauchent(str_d_date_start, str_d_date_stop, horaires_employee_temp[i][0], horaires_employee_temp[i][1], True):
+                    # chevauchement! ce créneau est à prendre en compte
+                    if (horaires_employee_temp[i][0] < str_d_date_start):  # on coupe ce qui dépasse
+                        horaires_employee_temp[i][0] = str_d_date_start
+                    if (horaires_employee_temp[i][1] > str_d_date_stop):  # à gauche et à droite
+                        horaires_employee_temp[i][1] = str_d_date_stop
+                    horaires_temp_utiles.append(horaires_employee_temp[i])
+            # OK! on a 2 listes de segments d'horaires sur un même intervalle, fiou!
+            # FUUUUUUU-ZION!
+            index_courant = 0
+            while len(horaires_temp_utiles) > 0:
+                segment_std = horaires_utiles[index_courant]
+                segment_temp = horaires_temp_utiles.pop(0)
+                while not se_chevauchent(segment_temp[0], segment_temp[1], segment_std[0], segment_std[1], True):
+                    res[employee.id].append(horaires_utiles[index_courant])
+                    index_courant += 1
+                    segment_std = horaires_utiles[index_courant]
+
+                d_debut_temp = fields.Date.from_string(segment_temp[0])
+                d_debut_temp -= un_jour
+                str_debut_temp = fields.Date.to_string(d_debut_temp).decode('utf-8')
+                d_fin_temp = fields.Date.from_string(segment_temp[1])
+                d_fin_temp += un_jour
+                str_fin_temp = fields.Date.to_string(d_fin_temp).decode('utf-8')
+                sous_seg_1 = deepcopy(segment_std)
+                sous_seg_1[1] = str_debut_temp
+                if segment_temp[1] <= segment_std[1]:
+                    # le segment d'horaires temporaires est inclus dans le segment d'horaires standards
+                    # un sous-segment a été créé, on modifie le segment courant
+                    horaires_utiles[index_courant][0] = str_fin_temp
+                    if horaires_utiles[index_courant][0] > horaires_utiles[index_courant][1]:
+                        index_courant += 1
+                else:  # le segment d'horaires temporaires chevauche 2 segments d'horaires standards
+                    # on met à jour le prochain segment d'horaires standards
+                    index_courant += 1
+                    horaires_utiles[index_courant][0] = str_fin_temp
+
+                if sous_seg_1[0] <= sous_seg_1[1]:  # est un vrai segment, on l'ajoute!
+                    res[employee.id].append(sous_seg_1)
+                res[employee.id].append(segment_temp)
+            if index_courant < index_stop:
+                for j in range(index_courant, index_stop + 1):
+                    segment_std = horaires_utiles[j]
+                    res[employee.id].append(segment_std)
+
+        # WHOO HOO on y est! \o/
+        # le résultat est un dictionnaire avec les identifiants des employés en clés
+        # les valeurs sont de la forme [ [debut, fin, horaires] ,  [debut, fin, horaires] ,  ... ]
+        # avec un seul choix d'horaires possibles pour une date donnée
+        return res
+
+    @api.multi
+    def write(self, vals):
+        res = super(HREmployee, self).write(vals)
+        #self.get_archive_list_horaires_temp()
+        if vals.get("creneau_ids", False):
+            self.archiver_horaires()
+        if vals.get("creneau_temp_start", False) or vals.get("creneau_temp_stop", False):
+            self.archiver_horaires_temp()
+        a_ver = self.env['hr.employee'].get_list_horaires([7], "2019-08-01 00:00:00", "2019-08-31 23:59:59")
+        return res
+
+    @api.model
+    def create(self, vals):
+        employee = super(HREmployee, self).create(vals)
+        if vals.get("creneau_ids", False):
+            employee.archiver_horaires()
+        return employee
 
 class OFHorairesCreneau(models.Model):
     _name = "of.horaires.creneau"
