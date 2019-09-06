@@ -26,12 +26,12 @@
                 </group>
                 <group attrs="{'invisible': [('report_model', 'not in', ('stats', ))]}" col="4">
                     <group colspan="2">
-                        <field name="period_n" domain="[('type_id.fiscal_month', '=', True)]" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'period')], 'invisible': [('type_filtre_date', 'not in', 'period')]}"/>
+                        <field name="period_n" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'period')], 'invisible': [('type_filtre_date', 'not in', 'period')]}"/>
                         <field name="debut_n" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'date')], 'invisible': [('type_filtre_date', 'not in', 'date')]}"/>
                         <field name="fin_n" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'date')], 'invisible': [('type_filtre_date', 'not in', 'date')]}"/>
                     </group>
                     <group colspan="2">
-                        <field name="period_n1" domain="[('type_id.fiscal_month', '=', True)]" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'period')], 'invisible': [('type_filtre_date', 'not in', 'period')]}"/>
+                        <field name="period_n1" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'period')], 'invisible': [('type_filtre_date', 'not in', 'period')]}"/>
                         <field name="debut_n1" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'date')], 'invisible': [('type_filtre_date', 'not in', 'date')]}"/>
                         <field name="fin_n1" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'date')], 'invisible': [('type_filtre_date', 'not in', 'date')]}"/>
                     </group>

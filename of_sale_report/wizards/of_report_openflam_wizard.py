@@ -159,6 +159,13 @@ class OFRapportOpenflamWizard(models.TransientModel):
             'border': True,
         })
 
+        style_number_border_percent = workbook.add_format({
+            'valign': 'vcenter',
+            'num_format': '#,##0.00 %',
+            'font_size': 8,
+            'border': True,
+            })
+
         style_number_bold_border = workbook.add_format({
             'valign': 'vcenter',
             'num_format': '#,##0.00',
@@ -186,6 +193,16 @@ class OFRapportOpenflamWizard(models.TransientModel):
             'bg_color' : color_light_blue,
             'num_format': '#,##0.00',
         })
+
+        style_number_title_border_blue_percent = workbook.add_format({
+            'valign': 'vcenter',
+            'align': 'right',
+            'border': 1,
+            'bold': True,
+            'font_size': 10,
+            'bg_color': color_light_blue,
+            'num_format': '#,##0.00 %',
+            })
 
         style_number_title_border_red = workbook.add_format({
             'valign': 'vcenter',
@@ -219,9 +236,11 @@ class OFRapportOpenflamWizard(models.TransientModel):
             'text_title_border_wrap': style_text_title_border_wrap,
             'text_total_border': style_text_total_border,
             'number_border': style_number_border,
+            'number_border_percent': style_number_border_percent,
             'number_bold_border': style_number_bold_border,
             'number_title_border': style_number_title_border,
             'number_title_border_blue': style_number_title_border_blue,
+            'number_title_border_blue_percent': style_number_title_border_blue_percent,
             'number_title_border_red': style_number_title_border_red,
             'number_total_border': style_number_total_border,
         }
@@ -475,7 +494,7 @@ class OFRapportOpenflamWizard(models.TransientModel):
             '&', ('confirmation_date', '>=', n1_start), ('confirmation_date', '<=', n1_end)]
 
         account_invoice_domain = [
-            ('state', 'in', ['open', 'paid']),
+            ('state', 'in', ['open', 'paid']), ('type', 'in', ['out_invoice', 'out_refund']),
             '|',
             '&', ('date_invoice', '>=', n_start), ('date_invoice', '<=', n_end),
             '&', ('date_invoice', '>=', n1_start), ('date_invoice', '<=', n1_end)]
@@ -495,16 +514,12 @@ class OFRapportOpenflamWizard(models.TransientModel):
         line_domain = []
         if self.product_ids and self.filtre_article:
             line_domain += [('product_id', 'in', self.product_ids._ids)]
-            
 
         if self.category_ids and self.filtre_article:
             line_domain += [('product_id.categ_id', 'child_of', self.category_ids._ids)]
-            
 
         if self.brand_ids and self.filtre_article:
             line_domain += [('product_id.brand_id', 'in', self.brand_ids._ids)]
-            
-
 
         orders = self.env['sale.order'].search(sale_order_domain)
         invoices = self.env['account.invoice'].search(account_invoice_domain)
@@ -512,7 +527,6 @@ class OFRapportOpenflamWizard(models.TransientModel):
         invoice_line_domain = line_domain + [('invoice_id', 'in', invoices._ids)]
         order_lines = self.env['sale.order.line'].search(order_line_domain).sorted('order_partner_id')
         invoice_lines = self.env['account.invoice.line'].search(invoice_line_domain).sorted('partner_id')
-
 
         stats_partner = {}  # must be stats_partner = {client: {produit: {period_n:{qty: x, prix:y}, period_n1:{qty: x, prix:y}}, qté: 'x'}}
         stats_categ = {}  # must be stats_categ = {categ: {client: {period_n:{qty: x, prix:y}, period_n1:{qty: x, prix:y}}, qté: 'x'}}
@@ -615,29 +629,31 @@ class OFRapportOpenflamWizard(models.TransientModel):
                     brands_and_partners = brands_and_partners[partner]
 
                     if line.invoice_id.date_invoice >= n_start and line.invoice_id.date_invoice <= n_end:
-                        stats_partner[partner]['iqté'] += line.quantity
-                        stats_categ[categ]['iqté'] += line.quantity
-                        stats_brand[brand]['iqté'] += line.quantity
-                        stats_brand[brand]['ica'] += line.price_unit * line.quantity * (1 - line.discount / 100)
-                        partners_and_products[n_start]['iqté'] += line.quantity
-                        partners_and_products[n_start]['iprix'] += line.price_unit * line.quantity * (1 - line.discount / 100)
-                        categs_and_partners[n_start]['iqté'] += line.quantity
-                        categs_and_partners[n_start]['iprix'] += line.price_unit * line.quantity * (1 - line.discount / 100)
-                        brands_and_partners[n_start]['iqté'] += line.quantity
-                        brands_and_partners[n_start]['iprix'] += line.price_unit * line.quantity * (1 - line.discount / 100)
-                        rec_pr[n_start]['iqté'] += line.quantity
-                        rec_pr[n_start]['iprix'] += line.price_unit * line.quantity * (1 - line.discount / 100)
+                        sign = 1 if line.invoice_id.type == 'out_invoice' else -1
+                        stats_partner[partner]['iqté'] += line.quantity * sign
+                        stats_categ[categ]['iqté'] += line.quantity * sign
+                        stats_brand[brand]['iqté'] += line.quantity * sign
+                        stats_brand[brand]['ica'] += line.price_subtotal_signed
+                        partners_and_products[n_start]['iqté'] += line.quantity * sign
+                        partners_and_products[n_start]['iprix'] += line.price_subtotal_signed
+                        categs_and_partners[n_start]['iqté'] += line.quantity * sign
+                        categs_and_partners[n_start]['iprix'] += line.price_subtotal_signed
+                        brands_and_partners[n_start]['iqté'] += line.quantity * sign
+                        brands_and_partners[n_start]['iprix'] += line.price_subtotal_signed
+                        rec_pr[n_start]['iqté'] += line.quantity * sign
+                        rec_pr[n_start]['iprix'] += line.price_subtotal_signed
                     else:
-                        stats_brand[brand]['iqté1'] += line.quantity
-                        stats_brand[brand]['ica1'] += line.price_unit * line.quantity * (1 - line.discount / 100)
-                        partners_and_products[n1_start]['iqté'] += line.quantity
-                        partners_and_products[n1_start]['iprix'] += line.price_unit * line.quantity * (1 - line.discount / 100)
-                        categs_and_partners[n1_start]['iqté'] += line.quantity
-                        categs_and_partners[n1_start]['iprix'] += line.price_unit * line.quantity * (1 - line.discount / 100)
-                        brands_and_partners[n1_start]['iqté'] += line.quantity
-                        brands_and_partners[n1_start]['iprix'] += line.price_unit * line.quantity * (1 - line.discount / 100)
-                        rec_pr[n1_start]['iqté'] += line.quantity
-                        rec_pr[n1_start]['iprix'] += line.price_unit * line.quantity * (1 - line.discount / 100)
+                        sign = 1 if line.invoice_id.type == 'out_invoice' else -1
+                        stats_brand[brand]['iqté1'] += line.quantity * sign
+                        stats_brand[brand]['ica1'] += line.price_subtotal_signed
+                        partners_and_products[n1_start]['iqté'] += line.quantity * sign
+                        partners_and_products[n1_start]['iprix'] += line.price_subtotal_signed
+                        categs_and_partners[n1_start]['iqté'] += line.quantity * sign
+                        categs_and_partners[n1_start]['iprix'] += line.price_subtotal_signed
+                        brands_and_partners[n1_start]['iqté'] += line.quantity * sign
+                        brands_and_partners[n1_start]['iprix'] += line.price_subtotal_signed
+                        rec_pr[n1_start]['iqté'] += line.quantity * sign
+                        rec_pr[n1_start]['iprix'] += line.price_subtotal_signed
 
         # un premier tri qui permet d'avoir les tableaux dans l'ordre décroissant
         sorted_partner = sorted(stats_partner.items(), key=lambda data: data[1]['oqté'], reverse=True)
@@ -720,24 +736,24 @@ class OFRapportOpenflamWizard(models.TransientModel):
                     worksheet.write(line_number, 0, obj.name, styles['text_border_left'])
                     worksheet.write(line_number, 1, qty_n, styles['number_border'])
                     worksheet.write(line_number, 2, qty_n1, styles['number_border'])
-                    worksheet.write(line_number, 3, '=(%s / %s - 1) * 100' % (xl_rowcol_to_cell(line_number, 1),
-                                                                              xl_rowcol_to_cell(line_number, 2)) if qty_n1 else 100, styles['number_border'])
+                    worksheet.write(line_number, 3, '=(%s / %s - 1)' % (xl_rowcol_to_cell(line_number, 1),
+                                                                        xl_rowcol_to_cell(line_number, 2)) if qty_n1 else 1, styles['number_border_percent'])
                     worksheet.write(line_number, 4, price_n, styles['number_border'])
                     worksheet.write(line_number, 5, price_n1, styles['number_border'])
-                    worksheet.write(line_number, 6, '=(%s / %s - 1) * 100' % (xl_rowcol_to_cell(line_number, 4),
-                                                                              xl_rowcol_to_cell(line_number, 5)) if price_n1 else 100, styles['number_border'])
+                    worksheet.write(line_number, 6, '=(%s / %s - 1)' % (xl_rowcol_to_cell(line_number, 4),
+                                                                        xl_rowcol_to_cell(line_number, 5)) if price_n1 else 1, styles['number_border_percent'])
                     worksheet.write(line_number, 7, fprice_n, styles['number_border'])
                     worksheet.write(line_number, 8, fprice_n1, styles['number_border'])
-                    worksheet.write(line_number, 9, '=(%s / %s - 1) * 100' % (xl_rowcol_to_cell(line_number, 7),
-                                                                              xl_rowcol_to_cell(line_number, 8)) if fprice_n1 else 100, styles['number_border'])
+                    worksheet.write(line_number, 9, '=(%s / %s - 1)' % (xl_rowcol_to_cell(line_number, 7),
+                                                                        xl_rowcol_to_cell(line_number, 8)) if fprice_n1 else 1, styles['number_border_percent'])
                     line_number += 1
 
                 worksheet.write(line_number, 0, 'TOTAL', styles['text_title_border_blue_left'])
                 for column in range(1, 10):
                     if column in (3, 6, 9):
-                        worksheet.write(line_number, column, '=IF(%s>0,(%s / %s - 1) * 100,100)' % (xl_rowcol_to_cell(line_number, column-1),
-                                                                                                    xl_rowcol_to_cell(line_number, column-2),
-                                                                                                    xl_rowcol_to_cell(line_number, column-1)), styles['number_title_border_blue'])
+                        worksheet.write(line_number, column, '=IF(%s>0,(%s / %s - 1),1)' % (xl_rowcol_to_cell(line_number, column-1),
+                                                                                            xl_rowcol_to_cell(line_number, column-2),
+                                                                                            xl_rowcol_to_cell(line_number, column-1)), styles['number_title_border_blue_percent'])
                     else:
                         worksheet.write(line_number, column, '=SUM(%s:%s)' % (xl_rowcol_to_cell(line_keep, column),
                                                                               xl_rowcol_to_cell(line_number - 1, column)), styles['number_title_border_blue'])
@@ -784,23 +800,23 @@ class OFRapportOpenflamWizard(models.TransientModel):
                     worksheet.write(line_number, 0, entry.name, styles['text_border_left'])
                     worksheet.write(line_number, 1, qty_n, styles['number_border'])
                     worksheet.write(line_number, 2, qty_n1, styles['number_border'])
-                    worksheet.write(line_number, 3, '=(%s / %s - 1) * 100' % (xl_rowcol_to_cell(line_number, 1),
-                                                                              xl_rowcol_to_cell(line_number, 2)) if qty_n1 else 100, styles['number_border'])
+                    worksheet.write(line_number, 3, '=(%s / %s - 1)' % (xl_rowcol_to_cell(line_number, 1),
+                                                                        xl_rowcol_to_cell(line_number, 2)) if qty_n1 else 1, styles['number_border_percent'])
                     worksheet.write(line_number, 4, price_n, styles['number_border'])
                     worksheet.write(line_number, 5, price_n1, styles['number_border'])
-                    worksheet.write(line_number, 6, '=(%s / %s - 1) * 100' % (xl_rowcol_to_cell(line_number, 4),
-                                                                              xl_rowcol_to_cell(line_number, 5)) if price_n1 else 100, styles['number_border'])
+                    worksheet.write(line_number, 6, '=(%s / %s - 1)' % (xl_rowcol_to_cell(line_number, 4),
+                                                                        xl_rowcol_to_cell(line_number, 5)) if price_n1 else 1, styles['number_border_percent'])
                     worksheet.write(line_number, 7, fprice_n, styles['number_border'])
                     worksheet.write(line_number, 8, fprice_n1, styles['number_border'])
-                    worksheet.write(line_number, 9, '=(%s / %s - 1) * 100' % (xl_rowcol_to_cell(line_number, 7),
-                                                                              xl_rowcol_to_cell(line_number, 8)) if fprice_n1 else 100, styles['number_border'])
+                    worksheet.write(line_number, 9, '=(%s / %s - 1)' % (xl_rowcol_to_cell(line_number, 7),
+                                                                        xl_rowcol_to_cell(line_number, 8)) if fprice_n1 else 1, styles['number_border_percent'])
                     line_number += 1
                 worksheet.write(line_number, 0, 'TOTAL', styles['text_title_border_blue_left'])
                 for column in range(1, 10):
                     if column in (3, 6, 9):
-                        worksheet.write(line_number, column, '=IF(%s>0,(%s / %s - 1) * 100,100)' % (xl_rowcol_to_cell(line_number, column-1),
-                                                                                                    xl_rowcol_to_cell(line_number, column-2),
-                                                                                                    xl_rowcol_to_cell(line_number, column-1)), styles['number_title_border_blue'])
+                        worksheet.write(line_number, column, '=IF(%s>0,(%s / %s - 1),1)' % (xl_rowcol_to_cell(line_number, column-1),
+                                                                                            xl_rowcol_to_cell(line_number, column-2),
+                                                                                            xl_rowcol_to_cell(line_number, column-1)), styles['number_title_border_blue_percent'])
                     else:
                         worksheet.write(line_number, column, '=SUM(%s:%s)' % (xl_rowcol_to_cell(line_keep, column),
                                                                               xl_rowcol_to_cell(line_number - 1, column)), styles['number_title_border_blue'])
