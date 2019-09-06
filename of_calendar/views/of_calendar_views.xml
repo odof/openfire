@@ -20,16 +20,20 @@
                 </group>
             </xpath>
             <xpath expr="//notebook" position="inside">
-                <page name="horaires" string="Horaires">
-                    <group col="4">
-                        <group>
+                <page name="horaires" string="Horaires" col="4">
+                    <group col="4" colspan="4">
+                        <group col="2" colspan="2">
                             <field name="of_mode_horaires"/>
                         </group>
+                        <group col="2" colspan="2">
+                            <field name="tz" widget="timezone_mismatch" options="{'tz_offset_field': 'tz_offset'}"/>
+                            <field name="tz_offset" invisible="1"/>
+                        </group>
                     </group>
-                    <group col="4" name="horaires_advanced" attrs="{'invisible': [('of_mode_horaires', '!=', 'advanced')]}">
+                    <group col="4" colspan="4" name="horaires_advanced" attrs="{'invisible': [('of_mode_horaires', '!=', 'advanced')]}">
                         <group name="horaires" col="4" colspan="2">
                             <separator string="Horaires par défaut" colspan="4"/>
-                            <field name="of_creneau_ids" nolabel="1" colspan="4" style="padding: 8px;">
+                            <field name="of_creneau_ids" nolabel="1" colspan="4" style="padding: 8px;" attrs="{'required': [('of_mode_horaires', '=', 'advanced')]}">
                                 <tree string="Créneaux" editable="0">
                                     <field name="jour_number" invisible="1"/>
                                     <field name="name"/>
@@ -75,13 +79,11 @@
                     </group>
                     <group name="horaires_easy" attrs="{'invisible': [('of_mode_horaires', '!=', 'easy')]}" col="4" colspan="4">
                         <group name="horaires" string="Horaires" col="3" colspan="2">
-                            <field name="of_hor_md" string="Matin" widget="float_time" colspan="2"/>
-                            <field name="of_hor_mf" widget="float_time" colspan="1" nolabel="1"/>
-                            <field name="of_hor_ad" string="Après-midi" widget="float_time" colspan="2"/>
-                            <field name="of_hor_af" widget="float_time" colspan="1" nolabel="1"/>
-                            <field name="of_jour_ids" widget="many2many_tags" colspan="3"/>
-                            <field name="tz" widget="timezone_mismatch" options="{'tz_offset_field': 'tz_offset'}" colspan="3"/>
-                            <field name="tz_offset" invisible="1" colspan="3"/>
+                            <field name="of_hor_md" string="Matin" widget="float_time" colspan="2" attrs="{'required': [('of_mode_horaires', '=', 'easy')]}"/>
+                            <field name="of_hor_mf" widget="float_time" colspan="1" nolabel="1" attrs="{'required': [('of_mode_horaires', '=', 'easy')]}"/>
+                            <field name="of_hor_ad" string="Après-midi" widget="float_time" colspan="2" attrs="{'required': [('of_mode_horaires', '=', 'easy')]}"/>
+                            <field name="of_hor_af" widget="float_time" colspan="1" nolabel="1" attrs="{'required': [('of_mode_horaires', '=', 'easy')]}"/>
+                            <field name="of_jour_ids" widget="many2many_tags" colspan="3" attrs="{'required': [('of_mode_horaires', '=', 'easy')]}"/>
                         </group>
                     </group>
                 </page>

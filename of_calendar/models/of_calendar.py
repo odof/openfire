@@ -88,12 +88,13 @@ class HREmployee(models.Model):
     of_creneau_temp_stop = fields.Date(string="Fin des horaires temporaires")
     of_archive_horaires = fields.Text(string="Archive des horaires")
     of_archive_horaires_temp = fields.Text(string="Archive des horaires temporaires")
+    of_horaires_du_jour = fields.Text(string=u"Horaires d'aujourd'hui", compute="_compute_horaires_du_jour")
 
-    of_hor_md = fields.Float(string=u'Matin début', required=True, digits=(12, 1), default=9)
-    of_hor_mf = fields.Float(string='Matin fin', required=True, digits=(12, 1), default=12)
-    of_hor_ad = fields.Float(string=u'Après-midi début', required=True, digits=(12, 1), default=14)
-    of_hor_af = fields.Float(string=u'Après-midi fin', required=True, digits=(12, 1), default=18)
-    of_jour_ids = fields.Many2many('of.jours', 'employee_jours_rel', 'employee_id', 'jour_id', string='Jours travaillés', required=True, default=lambda self: self._get_default_jours())
+    of_hor_md = fields.Float(string=u'Matin début', digits=(12, 1), default=9)
+    of_hor_mf = fields.Float(string='Matin fin', digits=(12, 1), default=12)
+    of_hor_ad = fields.Float(string=u'Après-midi début', digits=(12, 1), default=14)
+    of_hor_af = fields.Float(string=u'Après-midi fin', digits=(12, 1), default=18)
+    of_jour_ids = fields.Many2many('of.jours', 'employee_jours_rel', 'employee_id', 'jour_id', string='Jours travaillés', default=lambda self: self._get_default_jours())
     """of_tz = fields.Selection(_tz_get, string='Fuseau horaire', default=lambda self: self.env.user.tz or 'Europe/Paris', required=True,
                              help="The Team's timezone, used to output proper date and time values "
                                "inside printed reports. It is important to set a value for this field. "
@@ -132,6 +133,15 @@ class HREmployee(models.Model):
             else:
                 employee.of_color_ft = "#0D0D0D"
                 employee.of_color_bg = "#F0F0F0"
+
+    @api.multi
+    @api.depends('of_archive_horaires', 'of_archive_horaires_temp')
+    def _compute_horaires_du_jour(self):
+        str_date_today = fields.Date.today()
+        horaires_today = self.get_horaires_date(str_date_today)
+        for employee in self:
+            tuple_str_creneaux = hours_to_strs(horaires_today[employee.id])
+            employee.of_horaires_du_jour = "\n".join(tuple_str_creneaux)
 
     @api.onchange('of_address_depart_id')
     def _onchange_address_depart_id(self):
@@ -278,7 +288,7 @@ class HREmployee(models.Model):
     @api.multi
     def get_archive_list_horaires(self, jour_keys="number"):
         """Renvois l'archive des horaires des employés présents dans self sous forme de liste
-        résultat sous forme [ [date_debut, date_fin, dict_horaires], ...]"""
+        résultat sous forme {  employee_id :  [ [date_debut, date_fin, dict_horaires], ...],  ...  }"""
         res = {}
         un_jour = timedelta(days=1)
         for employee in self:
@@ -295,7 +305,7 @@ class HREmployee(models.Model):
     @api.multi
     def get_archive_list_horaires_temp(self, jour_keys="number"):
         """Renvois l'archive des horaires temporaires des employés présents dans self sous forme de liste
-        résultat sous forme [ [date_debut, date_fin, dict_horaires], ...]"""
+        résultat sous forme {  employee_id :  [ [date_debut, date_fin, dict_horaires], ...],  ...  }"""
         res = {}
         un_jour = timedelta(days=1)
         for employee in self:
@@ -307,6 +317,30 @@ class HREmployee(models.Model):
                 str_archive = jour_abr_2_nb(str_archive)
             list_archive = json.loads(str_archive)
             res[employee.id] = list_archive
+        return res
+
+    @api.multi
+    def get_horaires_date(self,str_date):
+        """renvois les horaires des employés présent dans self à la date donnée en paramètre.
+        résultat sous forme { employee_id :  [(h_deb, h_fin), (h_deb, h_fin), ..] ,  .. }"""
+        archive_horaires = self.get_archive_list_horaires()
+        archive_horaires_temp = self.get_archive_list_horaires_temp()
+        d_date = fields.Date.from_string(str_date)
+        num_jour = d_date.isoweekday()  # entre 1 et 7
+        res = []
+        for employee in self:
+            res[employee.id] = []
+            horaires_temp = archive_horaires_temp[employee.id]
+            for segment in horaires_temp:  # la date demandée correspond-elle à des horaires temporaires pour cet employé?
+                if se_chevauchent(str_date, str_date, segment[0], segment[1], True):  # la date demandée est sur un segment d'horaires temporaires
+                    res[employee.id] = segment[2][num_jour]
+                    break
+            horaires = archive_horaires[employee.id]
+            if res[employee.id] == []:  # la date demandée n'est pas sur un segment d'horaires temporaires
+                for segment in horaires:
+                    if se_chevauchent(str_date, str_date, segment[0], segment[1], True):  # trouvé!
+                        res[employee.id] = segment[2][num_jour]
+                        break
         return res
 
     @api.model
@@ -419,6 +453,80 @@ class HREmployee(models.Model):
         # les valeurs sont de la forme [ [debut, fin, horaires] ,  [debut, fin, horaires] ,  ... ]
         # avec un seul choix d'horaires possibles pour une date donnée
         return res
+
+
+    """
+    À refaire quand passage à l'étape de la vue planning
+    @api.model
+    def get_min_max_time(self):
+        "" "
+        parcours toutes équipes pour trouver les heures minimales et maximales de travail. 
+        Appelée depuis la CalendarView si l'attribut 'working_hours' est à "1". Sert à restreindre la vue Calendar pour ne pas voir les heures entre 0 et min, ni celles entre max et 24
+        renvois les valeurs en UTC
+        /!| Cette fonction est appelée avant de savoir les dates de début et de fin. on prend donc tous les horaires possibles
+        "" "
+        employees = self.env['hr.employee'].search([])
+        min_time = False
+        max_time = False
+        min_equipe = False
+        max_equipe = False
+        d_today = fields.Date.from_string(fields.Date.today())
+
+        list_horaires = employees.get_archive_list_horaires()
+        list_horaires_temp = employees.get_archive_list_horaires_temp()
+
+        for equipe in equipes:
+            equipe_id = equipe.id
+            tz = pytz.timezone(equipe.tz or "Europe/Paris")
+            if equipe.mode_horaires == "easy":
+                # On utilise le mode facile pour les horaires de cette équipe
+                min_equipe = equipe.hor_md
+                max_equipe = equipe.hor_af
+            else: # On utilise le mode avancé pour les horaires de cette équipe
+                # l'équipe a-t-elle des horaires temporaires sur cette recherche??
+                if equipe.of_creneau_temp_stop:
+                    creneaux_temp_travailles = equipe.of_creneau_temp_ids
+                    for i in range(1,8):
+                        creneaux_temp_du_jour = creneaux_temp_travailles.filtered(lambda x: x.jour_number == i)
+                        if len(creneaux_temp_du_jour) == 0:
+                            continue
+                        if min_equipe == False:  # ==False pour éviter un éventuel 0.0 oublié
+                            min_equipe = creneaux_temp_du_jour[0].heure_debut  # heure de début du premier créneau
+                            max_equipe = creneaux_temp_du_jour[-1].heure_fin  # heure de fin du dernier créneau
+                        else:
+                            if min_equipe > creneaux_temp_du_jour[0].heure_debut:  # nouveau min
+                                min_equipe = creneaux_temp_du_jour[0].heure_debut
+                            if max_equipe < creneaux_temp_du_jour[-1].heure_fin:  # nouveau max
+                                max_equipe = creneaux_temp_du_jour[-1].heure_fin
+
+                creneaux_travailles = equipe.of_creneau_ids
+                for i in range(1,8):
+                    creneaux_du_jour = creneaux_travailles.filtered(lambda x: x.jour_number == i)
+                    if len(creneaux_du_jour) == 0:
+                        continue
+                    if min_equipe == False:  # ==False pour éviter un éventuel 0.0 oublié
+                        min_equipe = creneaux_du_jour[0].heure_debut  # heure de début du premier créneau
+                        max_equipe = creneaux_du_jour[-1].heure_fin  # heure de fin du dernier créneau
+                    else:
+                        if min_equipe > creneaux_du_jour[0].heure_debut:  # nouveau min
+                            min_equipe = creneaux_du_jour[0].heure_debut
+                        if max_equipe < creneaux_du_jour[-1].heure_fin:  # nouveau max
+                            max_equipe = creneaux_du_jour[-1].heure_fin
+            dt_min = datetime.combine(d_today, datetime.min.time()) + timedelta(hours=min_equipe)  # datetime naive
+            dt_min = tz.localize(dt_min, is_dst=None).astimezone(pytz.utc)  # datetime utc
+            flo_min = round(dt_min.hour + dt_min.minute / 60.0 + dt_min.second / 3600.0, 5)  # mintime utc as float
+            if min_time == False:
+                min_time = flo_min
+            elif flo_min < min_time:
+                min_time = flo_min
+            dt_max = datetime.combine(d_today, datetime.min.time()) + timedelta(hours=max_equipe)  # datetime naive
+            dt_max = tz.localize(dt_max, is_dst=None).astimezone(pytz.utc)  # datetime utc
+            flo_max = round(dt_max.hour + dt_max.minute / 60.0 + dt_max.second / 3600.0, 5)  # maxtime utc as float
+            if max_time == False:
+                max_time = flo_max
+            elif flo_max > max_time:
+                max_time = flo_max
+        return (min_time, max_time)"""
 
     @api.multi
     def write(self, vals):
@@ -552,6 +660,24 @@ class OFUsers(models.Model):
 
     of_color_ft = fields.Char(string="Couleur de texte", help="Choisissez votre couleur", default="#0D0D0D", oldname="color_ft")
     of_color_bg = fields.Char(string="Couleur de fond", help="Choisissez votre couleur", default="#F0F0F0", oldname="color_bg")
+
+
+    @api.multi
+    def write(self, vals):
+        res = super(OFUsers, self).write(vals)
+        employees = self.mapped('employee_ids')
+        if vals.get('of_color_ft', False):
+            employees.write({'of_color_ft': vals.get('of_color_ft', False)})
+        if vals.get('of_color_bg', False):
+            employees.write({'of_color_bg': vals.get('of_color_bg', False)})
+        if vals.get('tz', False):
+            employees.write({'tz': vals.get('tz', False)})
+        return res
+
+    @api.model
+    def create(self, vals):
+        user = super(OFUsers, self).create(vals)
+        #création automatique employee sur création utilisateur?
 
 class OFPartners(models.Model):
     _inherit = 'res.partner'
