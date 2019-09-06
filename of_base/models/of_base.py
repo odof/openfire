@@ -171,9 +171,26 @@ class ResPartner(models.Model):
     # Pour afficher dans le menu déroulant du choix de partenaire l'adresse du contact et pas que le nom.
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
-        if self._context.get('show_address'):
-            self = self.with_context(of_show_address_line=True)
-        return super(ResPartner, self).name_search(name=name, args=args, operator=operator, limit=limit)
+        return super(ResPartner, self.with_context(of_show_address_line=True)).name_search(name=name, args=args, operator=operator, limit=limit)
+
+    @api.multi
+    def name_get(self):
+        """ Permet de renvoyer le nom + la ville du client quand valeur du contexte 'of_show_address_line' présent """
+        result = []
+        name = self._rec_name
+        affichage_ville = self.env['ir.values'].get_default('base.config.settings', 'of_affichage_ville')
+        if name in self._fields:
+            convert = self._fields[name].convert_to_display_name
+            for record in self:
+                if self._context.get('of_show_address_line') and affichage_ville:
+                    result.append((record.id, '%s%s' % (convert(record[name], record), ''.join([' (', record.city, ')']) if record.city else '')))
+                else:
+                    result.append((record.id, convert(record[name], record)))
+        else:
+            for record in self:
+                result.append((record.id, "%s,%s" % (record._name, record.id)))
+
+        return result
 
     @api.model
     def _get_default_image(self, partner_type, is_company, parent_id):
@@ -432,3 +449,21 @@ class ResCompany(models.Model):
     of_juridique = fields.Char(string="Forme juridique")
     of_capital = fields.Char(string="Capital social")
     of_assu_dec = fields.Char(string=u"Assurance décennale")
+
+class BaseConfigSettings(models.TransientModel):
+
+    _inherit = 'base.config.settings'
+
+    @api.model_cr_context
+    def _auto_init(self):
+        super(BaseConfigSettings, self)._auto_init()
+        if not self.env['ir.values'].search([('name', '=', 'of_affichage_ville'), ('model', '=', 'base.config.settings')]):
+            self.env['ir.values'].sudo().set_default('base.config.settings', 'of_affichage_ville', True)
+
+    of_affichage_ville = fields.Boolean(
+        string="(OF) Afficher ville",
+        help=u"Affiche la ville entre parenthèses après le nom du partenaire lors de la recherche de partenaire")
+
+    @api.multi
+    def set_of_affichage_ville_defaults(self):
+        return self.env['ir.values'].sudo().set_default('base.config.settings', 'of_affichage_ville', self.of_affichage_ville)
