@@ -11,6 +11,7 @@
             </xpath>
             <xpath expr="//field[@name='date']" position="after">
                 <field name="of_confirmation_date"/>
+                <field name="of_date_livraison"/>
             </xpath>
         </field>
     </record>
@@ -24,6 +25,7 @@
                 <field name="of_diff_price" type="measure" color="green"/>
                 <field name="of_diff_margin" type="measure"/>
                 <field name="of_diff_qty_delivered" type="measure"/>
+                <field name="of_montant_livre" type="measure"/>
             </xpath>
         </field>
     </record>
