@@ -10,6 +10,8 @@ class SaleReport(models.Model):
     of_diff_margin = fields.Float(u"Δ% Marge", compute="_compute_dummy")
     of_diff_qty_delivered = fields.Float(u"Δ% qté liv.", compute="_compute_dummy")
     of_confirmation_date = fields.Datetime('Date de confirmation', readonly=True)
+    of_date_livraison = fields.Datetime('Date de livraison', readonly=True)
+    of_montant_livre = fields.Float(string=u"Montant livré", readonly=True)
 
     @api.depends()
     def _compute_dummy(self):
@@ -18,25 +20,49 @@ class SaleReport(models.Model):
         return
 
     def _select(self):
+        """
+        Si le bon de commande est à l'état 'fait', on récupère la date de livraison
+        :todo: Afficher le montant correspondant à la marchandise livrée.
+        """
         res = super(SaleReport, self)._select()
-        res += ", t.brand_id as of_brand_id, s.confirmation_date as of_confirmation_date"
+        res += (", t.brand_id as of_brand_id"
+                ", s.confirmation_date as of_confirmation_date"
+                ", CASE WHEN sm.qty = sum(l.product_uom_qty / u.factor * u2.factor) THEN sm.date ELSE NULL END AS of_date_livraison"
+                ", sum(l.price_subtotal / COALESCE(cr.rate, 1.0)) * sm.qty / sum(l.product_uom_qty / u.factor * u2.factor) AS of_montant_livre")
         return res
 
     def _from(self):
+        """
+        Si la totalité de la quantité commandée est livrée, on renseigne la date de livraison.
+        """
         res = super(SaleReport, self)._from()
-        res += "left join of_product_brand b on (t.brand_id=b.id)\n"
+        res += """
+        LEFT JOIN of_product_brand b on (t.brand_id=b.id)
+        LEFT JOIN (
+          SELECT
+            po.sale_line_id AS sol_id,
+            SUM(sm.product_uom_qty) AS qty,
+            max(sm.date) AS date
+          FROM procurement_order po
+            INNER JOIN stock_move sm ON (sm.procurement_id=po.id)
+            INNER JOIN sale_order_line sol ON (sol.id=po.sale_line_id)
+          WHERE sm.state = 'done'
+          GROUP BY po.sale_line_id, sol.product_uom_qty
+        ) AS sm ON sm.sol_id = l.id
+        """
         return res
 
     def _group_by(self):
         res = super(SaleReport, self)._group_by()
-        res += ", t.brand_id, s.confirmation_date"
+        res += ", t.brand_id, s.confirmation_date, sm.date, sm.qty"
         return res
 
     @api.model
     def _read_group_raw(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
         res = super(SaleReport, self)._read_group_raw(domain, fields, groupby, offset, limit, orderby, lazy)
         if res:
-            time_groupbys = ('date:month', 'date:year', 'date', 'of_confirmation_date', 'of_confirmation_date:month', 'of_confirmation_date:year')
+            time_groupbys = ('date:month', 'date:year', 'date', 'of_confirmation_date', 'of_confirmation_date:month', 'of_confirmation_date:year',
+                             'of_date_livraison', 'of_date_livraison:month', 'of_date_livraison:year')
             # Les deltas dépendent d'un champ qui doit être calculé
             diff_percent = [vals for vals in (('of_diff_price', 'price_subtotal'),
                                               ('of_diff_margin', 'margin'),
