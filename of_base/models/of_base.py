@@ -176,20 +176,15 @@ class ResPartner(models.Model):
     @api.multi
     def name_get(self):
         """ Permet de renvoyer le nom + la ville du client quand valeur du contexte 'of_show_address_line' présent """
-        result = []
         name = self._rec_name
         affichage_ville = self.env['ir.values'].get_default('base.config.settings', 'of_affichage_ville')
-        if name in self._fields:
+        if affichage_ville and self._context.get('of_show_address_line') and name in self._fields:
+            result = []
             convert = self._fields[name].convert_to_display_name
             for record in self:
-                if self._context.get('of_show_address_line') and affichage_ville:
-                    result.append((record.id, '%s%s' % (convert(record[name], record), ''.join([' (', record.city, ')']) if record.city else '')))
-                else:
-                    result.append((record.id, convert(record[name], record)))
+                result.append((record.id, '%s%s' % (convert(record[name], record), ''.join([' (', record.city, ')']) if record.city else '')))
         else:
-            for record in self:
-                result.append((record.id, "%s,%s" % (record._name, record.id)))
-
+            result = super(ResPartner, self).name_get()
         return result
 
     @api.model
