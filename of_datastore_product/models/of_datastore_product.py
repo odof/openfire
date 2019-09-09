@@ -150,7 +150,7 @@ class OfDatastoreSupplier(models.Model):
                 func = "lambda code: code"
             if brand_from['use_prefix']:
                 func += '[%i:]' % (len(brand_from['code']) + 1)
-            default_code_func[brand] = eval(func)
+            default_code_func[brand] = safe_eval(func)
         return default_code_func
 
     @api.multi
@@ -482,11 +482,39 @@ class OfProductBrand(models.Model):
             ]
         self.env['of.datastore.cache'].search(domain).unlink()
 
+    def _datastore_update_product_vals(self, product_vals):
+        """
+        Importe les articles centralisés utilisés dans product_vals.
+        :param product_vals: Liste de règles x2many.
+        :return: product_vals mis à jour avec les ids des articles après import.
+        """
+        vals = []
+        new_products = self.env['product.template']
+        for val in product_vals:
+            if val[0] == 6:
+                pass
+            elif val[1] < 0:
+                product = self.env['product.template'].browse(val[1]).of_datastore_import()
+                val = [v for v in val]
+                val[1] = product.id
+                new_products |= product
+            vals.append(val)
+        return vals, new_products
+
     @api.multi
     def write(self, vals):
+        # Autorise l'ajout de règles pour des articles centralisés
+        new_products = False
+        if vals.get('product_config_ids', False):
+            vals['product_config_ids'], new_products = self._datastore_update_product_vals(vals['product_config_ids'])
+
         res = super(OfProductBrand, self).write(vals)
+
+        # Lors de la modification de la marque, les données en cache sont invalidées
         if vals and self and not self._context.get('no_clear_datastore_cache'):
             self.clear_datastore_cache()
+        if new_products:
+            new_products.of_action_update_from_brand()
         return res
 
 class OfDatastoreCache(models.TransientModel):
@@ -1249,9 +1277,9 @@ class ProductProduct(models.Model):
         unused_fields = self._get_datastore_unused_fields()
         computed_fields = self._of_get_datastore_computed_fields()
         fields = [f for f in self._fields
-                  if f not in computed_fields and
-                  f not in unused_fields and
-                  f != 'product_tmpl_id']
+                  if f not in computed_fields
+                  and f not in unused_fields
+                  and f != 'product_tmpl_id']
 
         fields += [
             # Champs relatifs au modèle d'article
