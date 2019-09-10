@@ -28,7 +28,7 @@ class SaleReport(models.Model):
         res += (", t.brand_id as of_brand_id"
                 ", s.confirmation_date as of_confirmation_date"
                 ", CASE WHEN sm.qty = sum(l.product_uom_qty / u.factor * u2.factor) THEN sm.date ELSE NULL END AS of_date_livraison"
-                ", sum(l.price_subtotal / COALESCE(cr.rate, 1.0)) * sm.qty / sum(l.product_uom_qty / u.factor * u2.factor) AS of_montant_livre")
+                ", CASE WHEN sum(l.product_uom_qty / u.factor * u2.factor) != 0 THEN sum(l.price_subtotal / COALESCE(cr.rate, 1.0)) * sm.qty / sum(l.product_uom_qty / u.factor * u2.factor) ELSE 0 END AS of_montant_livre")
         return res
 
     def _from(self):
