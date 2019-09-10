@@ -26,6 +26,14 @@ def check_hours_overlapping(debut_1, fin_1, debut_2, fin_2):
     debut_1 <= debut_2 and fin_1 >= fin_2"""
     return debut_1 < fin_2 and debut_2 < fin_1
 
+class HREmployee(models.Model):
+    _inherit = "hr.employee"
+
+    tache_ids = fields.Many2many('of.planning.tache', 'employee_tache_rel', 'employee_id', 'tache_id', u'Tâches')
+    equipe_ids = fields.Many2many('of.planning.equipe', 'of_planning_employee_rel', 'employee_id', 'equipe_id', u'Équipes')
+    changed_intervention_id = fields.Many2one('of.planning.intervention', string=u"Dernière intervention modifiée") # api.depends dans of.planning.intervention
+    est_intervenant = fields.Boolean(string=u"Est intervenant?", default=False)
+
 class OfPlanningTache(models.Model):
     _name = "of.planning.tache"
     _description = u"Planning OpenFire : Tâches"
@@ -40,7 +48,9 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
     duree = fields.Float(u'Durée par défaut', digits=(12, 5), default=1.0)
     category_id = fields.Many2one('hr.employee.category', string=u"Catégorie d'employés")
     is_crm = fields.Boolean(u'Tâche CRM')
-    equipe_ids = fields.Many2many('of.planning.equipe', 'equipe_tache_rel', 'tache_id', 'equipe_id', 'Équipes')
+    equipe_ids = fields.Many2many('of.planning.equipe', 'equipe_tache_rel', 'tache_id', 'equipe_id', u'Équipes qualifiées')
+    employee_ids = fields.Many2many('hr.employee', 'employee_tache_rel', 'tache_id', 'employee_id', u'Employés qualifiés')
+    employee_nb = fields.Integer(string=u'Nombre d\'intervenants', default=1)
 
     @api.multi
     def unlink(self):
@@ -191,6 +201,8 @@ class OfPlanningEquipe(models.Model):
             if(hors[1] > hors[2]):
                 raise ValidationError(u"L'heure de l'après-midi ne peut pas être inférieure à l'heure du matin")
 
+    """
+    à voir si adapter cette fonction à partir de la nouvelle version présente dans les employés ou si la supprimer totalement
     @api.model
     def get_dict_horaires(self, equipe_ids, date_start, date_stop):
         # transformer date_start et date_stop en date locale
@@ -256,16 +268,18 @@ class OfPlanningEquipe(models.Model):
                 res[equipe_id]['jours_temp_travailles'] = jours_temp_travailles
                 res[equipe_id]['horaires_temp_start'] = str_temp_start
                 res[equipe_id]['horaires_temp_stop'] = str_temp_stop
-        return res
+        return res"""
 
+    """
+    À refaire ou supprimer quand passage à l'étape vue planning
     @api.model
     def get_min_max_time(self):
-        """
+        "" "
         parcours toutes équipes pour trouver les heures minimales et maximales de travail. 
         Appelée depuis la CalendarView si l'attribut 'working_hours' est à "1". Sert à restreindre la vue Calendar pour ne pas voir les heures entre 0 et min, ni celles entre max et 24
         renvois les valeurs en UTC
         /!| Cette fonction est appelée avant de savoir les dates de début et de fin. on prend donc tous les horaires possibles
-        """
+        "" "
         equipes = self.env['of.planning.equipe'].search([])
         min_time = False
         max_time = False
@@ -323,7 +337,7 @@ class OfPlanningEquipe(models.Model):
                 max_time = flo_max
             elif flo_max > max_time:
                 max_time = flo_max
-        return (min_time, max_time)
+        return (min_time, max_time)"""
 
     @api.model
     def get_working_hours_fields(self):
@@ -347,6 +361,11 @@ class OfPlanningIntervention(models.Model):
     _inherit = ["of.readgroup", "of.calendar.mixin", 'mail.thread']
     _order = 'date'
 
+    @api.depends('tz')
+    def _compute_tz_offset(self):
+        for intervention in self:
+            intervention.tz_offset = datetime.now(pytz.timezone(intervention.employee_ids and intervention.employee_ids[0].tz or 'GMT')).strftime('%z')
+
     def _get_default_jours(self):
         # Lundi à vendredi comme valeurs par défaut
         jours = self.env['of.jours'].search([('numero', 'in', (1, 2, 3, 4, 5))], order="numero")
@@ -365,8 +384,9 @@ class OfPlanningIntervention(models.Model):
     raison_id = fields.Many2one('of.planning.intervention.raison', string='Raison')
     tache_id = fields.Many2one('of.planning.tache', string='Tâche', required=True)
     tache_name = fields.Char(related='tache_id.name')
-    equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe', required=True, oldname='poseur_id')
-    employee_ids = fields.Many2many(related='equipe_id.employee_ids', string='Intervenants', readonly=True)
+    equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe', oldname='poseur_id')
+    employee_ids = fields.Many2many('hr.employee', 'employee_intervention_rel', 'intervention_id', 'employee_id', string='Intervenants', required=True, domain="[('est_intervenant', '=', True)]")
+    employee_main_id = fields.Many2one('hr.employee', string=u"Employé principal", compute="_compute_employee_main_id", store=True)
     state = fields.Selection([
         ('draft', 'Brouillon'),
         ('confirm', u'Confirmé'),
@@ -391,8 +411,8 @@ class OfPlanningIntervention(models.Model):
     hor_ad = fields.Float(string=u'Après-midi début', digits=(12, 5))
     hor_af = fields.Float(string=u'Après-midi fin', digits=(12, 5))
     jour_ids = fields.Many2many('of.jours', 'intervention_jours', 'intervention_id', 'jour_id', string='Jours', default=_get_default_jours)
-    tz = fields.Selection(related="equipe_id.tz")
-    tz_offset = fields.Char(related="equipe_id.tz_offset")
+    tz = fields.Selection(_tz_get, compute='_compute_tz', string="fuseau horaires")
+    tz_offset = fields.Char(compute='_compute_tz_offset', string='Timezone offset', invisible=True)
 
     # champs copiés pour le readonly, le xml, les onchange Many2many
     mode_horaires_readonly = fields.Selection(related="mode_horaires", readonly=True, string="Mode de Sélection des horaires")
@@ -418,8 +438,8 @@ class OfPlanningIntervention(models.Model):
     gb_employee_id = fields.Many2one('hr.employee', compute=lambda *a, **k: {}, search='_search_gb_employee_id',
                                      string="Intervenant", of_custom_groupby=True)
 
-    color_ft = fields.Char(related="equipe_id.color_ft", readonly=True)
-    color_bg = fields.Char(related="equipe_id.color_bg", readonly=True)
+    color_ft = fields.Char(related="employee_main_id.of_color_ft", readonly=True)
+    color_bg = fields.Char(related="employee_main_id.of_color_bg", readonly=True)
 
     order_id = fields.Many2one("sale.order", string="Commande associée")
     of_notes_intervention = fields.Html(related='order_id.of_notes_intervention', readonly=True)
@@ -432,7 +452,67 @@ class OfPlanningIntervention(models.Model):
     template_id = fields.Many2one('of.planning.intervention.template', string=u"Modèle d'intervention")
     number = fields.Char(String=u"Numéro", copy=False)
     calendar_name = fields.Char(string="Calendar Name", compute="_compute_calendar_name")
+######################## debut de verifier / refaire
+    interv_before_id = fields.Many2one('of.planning.intervention', compute="_compute_interventions_before_after", store=True)
+    interv_after_id = fields.Many2one('of.planning.intervention', compute="_compute_interventions_before_after", store=True)
+    before_to_this = fields.Float(compute="_compute_interval", store=True, digits=(12, 5))
 
+    def compare_date(self, date1, date2, compare="==", isdatetime=False):
+        if not date1 or not date2:
+            return False
+        date1 = fields.Datetime.from_string(date1)
+        date2 = fields.Datetime.from_string(date2)
+        return safe_eval("date1 " + compare + " date2", {'date1': date1.strftime("%d/%m/%Y %H:%M:%S") if isdatetime else date1.strftime("%d/%m/%Y"),
+                                                         'date2': date2.strftime("%d/%m/%Y %H:%M:%S") if isdatetime else date2.strftime("%d/%m/%Y")})
+
+    @api.depends('employee_main_id', 'employee_main_id.changed_intervention_id')
+    def _compute_interventions_before_after(self):
+        intervention_obj = self.env['of.planning.intervention']
+        for interv in self:
+            if interv.compare_date(interv.date, fields.Datetime.now(), compare=">") or not interv.compare_date(interv.date, interv.employee_main_id.changed_intervention_id.date):
+                continue
+            if interv.interv_before_id and interv.interv_before_id == interv.employee_main_id.changed_intervention_id:
+                limit_date = fields.Datetime.to_string(fields.Datetime.from_string(interv.date) + relativedelta(days=-1, hour=0, minute=0, second=0))
+                interv.interv_before_id = intervention_obj.search([('date_deadline', '<=', interv.date), ('date', '>=', limit_date)], order='date DESC', limit=1)
+            if interv.interv_after_id and interv.interv_after_id == interv.employee_main_id.changed_intervention_id:
+                limit_date = fields.Datetime.to_string(fields.Datetime.from_string(interv.date) + relativedelta(days=1, hour=0, minute=0, second=0))
+                interv.interv_after_id = intervention_obj.search([('date', '>=', interv.date_deadline), ('date', '<=', limit_date)], order='date ASC', limit=1)
+            if not interv.interv_before_id:
+                limit_date = fields.Datetime.to_string(fields.Datetime.from_string(interv.date) + relativedelta(days=-1, hour=0, minute=0, second=0))
+                res = intervention_obj.search([('date_deadline', '<=', interv.date), ('date', '>=', limit_date)], order='date DESC', limit=1)
+                if res:
+                    interv.interv_before_id = res
+            if not interv.interv_after_id:
+                limit_date = fields.Datetime.to_string(fields.Datetime.from_string(interv.date) + relativedelta(days=1, hour=0, minute=0, second=0))
+                res = intervention_obj.search([('date', '>=', interv.date_deadline), ('date', '<=', limit_date)], order='date ASC', limit=1)
+                if res:
+                    interv.interv_after_id = res
+
+    @api.depends('interv_before_id')
+    def _compute_interval(self):
+        for interv in self:
+            if not interv.interv_before_id or not interv.interv_before_id.address_id or not interv.address_id:
+                continue
+            origine = interv.interv_before_id.address_id
+            arrivee = interv.address_id
+            query = ROUTING_BASE_URL + "route/" + ROUTING_VERSION + "/" + ROUTING_PROFILE + "/"
+
+            # Listes de coordonnées : ATTENTION OSRM prend ses coordonnées sous form (lng, lat)
+            str_coords = str(origine.geo_lng) + "," + str(origine.geo_lat)
+            str_coords += ";" + str(arrivee.geo_lng) + "," + str(arrivee.geo_lat)
+
+            query_send = urllib.quote(query.strip().encode('utf8')).replace('%3A', ':')
+            full_query = query_send + str_coords + "?"
+            try:
+                req = requests.get(full_query)
+                res = req.json()
+            except Exception as e:
+                raise UserError(
+                    u"Impossible de contacter le serveur de routage. Assurez-vous que votre connexion internet est opérationnelle et que l'URL est définie (%s)." % e)
+
+            if res and res.get('routes'):
+                interv.before_to_this = (float(res['routes'].pop(0)['duration']) / 60.0) / 60.0
+######################### fin de vérifier / refaire
     @api.model
     def _modifier_droits_existants_utilisateurs(self):
         u"""Initialise les droits planning des utilisateurs existants à la 1ère mise à jour du module"""
@@ -500,152 +580,98 @@ class OfPlanningIntervention(models.Model):
 
         return True
 
-    @api.depends('date', 'duree', 'hor_md', 'hor_mf', 'hor_ad', 'hor_af', 'jour_ids', 'equipe_id')
+    @api.depends('employee_ids')
+    def _compute_tz(self):
+        for intervention in self:
+            if intervention.employee_ids:
+                intervention.tz = intervention.employee_ids[0].tz
+
+
+    @api.depends('date', 'duree', 'hor_md', 'hor_mf', 'hor_ad', 'hor_af', 'jour_ids', 'employee_ids',
+                 'forcer_horaires')
     def _compute_date_deadline(self):
         compare_precision = 5
+        employee_obj = self.env['hr.employee']
         for intervention in self:
-            if not (intervention.equipe_id and intervention.date and intervention.duree):
+            if not (intervention.employee_ids  and intervention.date and intervention.duree):
                 continue
 
-            equipe = intervention.equipe_id
+            employees = intervention.employee_ids
             tz = pytz.timezone(intervention.tz)
             if not tz:
                 tz = "Europe/Paris"
-            horaires_temp = False  # passera a True si on risque de devoir utiliser des horaires temporaires
-            bool_d_courante_temp = False  # passera a True si la date courante est entre les dates de début et fin d'horaires temporaires 
-            # remplissage de dict_horaires et jours_travaillés (et eventuellement dict_horaires_temp et jours_temp_travailles)
-            if intervention.forcer_horaires or intervention.equipe_id.mode_horaires == "easy":
-                # On utilise le mode facile pour les horaires
-                jours_travailles = [jour.numero for jour in self.jour_ids] if self.jour_ids else range(1, 6)
-                dict_horaires = {} # dictionnaire qui à num_jour associe les horaires
-                for i in range(1,8):
-                    dict_horaires[i] = []
-                    if i in jours_travailles:
-                        # hor_mf - hor_md > 0 ?
-                        if float_compare(intervention.hor_mf, intervention.hor_md, compare_precision)  > 0.0:
-                            dict_horaires[i].append((intervention.hor_md, intervention.hor_mf))
-                        # hor_af - hor_ad > 0 ?
-                        if float_compare(intervention.hor_af, intervention.hor_ad, compare_precision)  > 0.0:
-                            dict_horaires[i].append((intervention.hor_ad, intervention.hor_af))
-            else: # On utilise le mode avancé pour les horaires
-                # l'équipe a-t-elle des horaires temporaires qui peuvent interférer avec ses horaires par défaut sur cette intervention?
-                if equipe.of_creneau_temp_stop and equipe.of_creneau_temp_stop >= intervention.date:
-                    horaires_temp = True
-                    str_temp_start = equipe.of_creneau_temp_start
-                    d_temp_start = fields.Date.from_string(str_temp_start)
-                    str_temp_stop = equipe.of_creneau_temp_stop
-                    d_temp_stop = fields.Date.from_string(str_temp_stop)
-                    creneaux_temp_travailles = equipe.of_creneau_temp_ids
-                    dict_horaires_temp = {} # dictionnaire qui à num_jour associe les horaires
-                    for i in range(1,8):
-                        dict_horaires_temp[i] = []
-                        creneaux_temp_du_jour = creneaux_temp_travailles.filtered(lambda x: x.jour_number == i)
-                        for c in creneaux_temp_du_jour:
-                            dict_horaires_temp[i].append((c.heure_debut, c.heure_fin))
-                    jours_temp_travailles = [j for j in dict_horaires_temp if dict_horaires_temp[j] != []]
-
-                creneaux_travailles = equipe.of_creneau_ids
-                dict_horaires = {} # dictionnaire qui à num_jour associe les horaires
-                for i in range(1,8):
-                    dict_horaires[i] = []
-                    creneaux_du_jour = creneaux_travailles.filtered(lambda x: x.jour_number == i)
-                    for c in creneaux_du_jour:
-                        dict_horaires[i].append((c.heure_debut, c.heure_fin))
-                jours_travailles = [j for j in dict_horaires if dict_horaires[j] != []]
 
             # génération d_courante 
             dt_utc = datetime.strptime(intervention.date, "%Y-%m-%d %H:%M:%S")  # Datetime UTC
             dt_local = fields.Datetime.context_timestamp(intervention, dt_utc)  # Datetime local
-            str_dt_local = fields.Datetime.to_string(dt_local)  # String Datetime local
+            str_dt_local = fields.Datetime.to_string(dt_local).decode('utf-8')  # String Datetime local
             d_courante = fields.Date.from_string(str_dt_local)  # Date local
+            str_d_courante = fields.Date.to_string(d_courante).decode('utf-8')
             un_jour = timedelta(days=1)
 
-            le_jour = dt_local.isoweekday()
-            if horaires_temp:  # la date d'intervention est-elle dans les horaires temporaires de l'équipe?
-                if d_temp_start <= d_courante and d_courante <= d_temp_stop:
-                    bool_d_courante_temp = True
-                    if le_jour not in jours_temp_travailles:
-                        raise UserError(u"L'équipe ne travaille pas ce jour-ci")
-            elif le_jour not in jours_travailles:
-                raise UserError(u"L'équipe ne travaille pas ce jour-ci")
+            une_semaine = timedelta(days=7)
+            dt_date_stop = dt_local + une_semaine  # pour des raisons pratiques on limite la recherche des horaires à une semaine après la date d'intervention
+            str_dt_stop = fields.Datetime.to_string(dt_date_stop).decode('utf-8')
+            # récupérer le dictionnaire des segments horaires des employés
+            dict_list_horaires = employee_obj.get_dict_list_horaires(employees._ids, str_dt_local, str_dt_stop)
+            # récupérer la liste des segments de l'équipe (ie l'intersection des horaires des employés)
+            segments_equipe = employee_obj.get_list_horaires_intersection(employee_ids=employees._ids, dict_list_horaires=dict_list_horaires)
 
-            la_duree_restante = intervention.duree
+            if intervention.forcer_horaires:
+                jours_travailles = [jour.numero for jour in self.jour_ids] if self.jour_ids else range(1, 6)
+
+            jour_courant = dt_local.isoweekday()
+
+            duree_restante = intervention.duree
             heure_debut = dt_local.hour + (dt_local.minute + dt_local.second / 60.0) / 60.0 # heure en float
 
             # Vérifier que l'intervention commence sur un créneau travaillé
-            debut_sur_creneau = False
-            index_creneau = 0
-            if not bool_d_courante_temp:  # la date courante est dans les horaires par défaut
-                for i in range(len(dict_horaires[le_jour])):  # parcours des créneaux
-                    c = dict_horaires[le_jour][i]
-                    if float_compare(heure_debut, c[0], compare_precision)  >= 0.0 and float_compare(heure_debut, c[1], compare_precision) < 0.0:  # c[0] <= heure_debut and heure_debut < c[1]
-                        # l'intervention commence sur le creneau dict_horaires[le_jour][i]
-                        debut_sur_creneau = True
-                        index_creneau = i
-                        break
-            else:  # la date courante est dans les horaires temporaires
-                for i in range(len(dict_horaires_temp[le_jour])):  # parcours des créneaux temporaires
-                    c = dict_horaires_temp[le_jour][i]
-                    if float_compare(heure_debut, c[0], compare_precision)  >= 0.0 and float_compare(heure_debut, c[1], compare_precision) < 0.0:  # c[0] <= heure_debut and heure_debut < c[1]
-                        # l'intervention commence sur le creneau dict_horaires_temp[le_jour][i]
-                        debut_sur_creneau = True
-                        index_creneau = i
-                        break
-            if not debut_sur_creneau:
+            index_creneau = employee_obj.debut_sur_creneau(str_d_courante, heure_debut, segments_equipe)
+            if index_creneau == -1:
                 raise UserError(u"L'horaire de début des travaux est en dehors des heures de travail")
 
             heure_courante = heure_debut
-            if not bool_d_courante_temp:  # la date courante est dans les horaires par défaut
-                le_dict_courant = dict_horaires
-            else:  # la date courante est dans les horaires temporaires
-                le_dict_courant = dict_horaires_temp
+            segment_courant = segments_equipe.pop(0)
+            dict_horaires = segment_courant[2]
+            while float_compare(duree_restante, 0.0, compare_precision)  > 0.0:
 
-            while float_compare(la_duree_restante, 0.0, compare_precision)  > 0.0:
-
-                fin_creneau_courant = le_dict_courant[le_jour][index_creneau][1]
-                if float_compare(fin_creneau_courant, heure_courante + la_duree_restante, compare_precision)  >= 0.0:
+                fin_creneau_courant = dict_horaires[jour_courant][index_creneau][1]
+                if float_compare(fin_creneau_courant, heure_courante + duree_restante, compare_precision)  >= 0.0:
                     # l'intervention se termine sur ce créneau
-                    heure_courante += la_duree_restante
+                    heure_courante += duree_restante
                     break
                 # l'intervention continue
                 # y-a-t-il un créneau suivant la même journée?
-                if index_creneau + 1 < len(le_dict_courant[le_jour]):  # oui
-                    la_duree_restante -= (le_dict_courant[le_jour][index_creneau][1] - heure_courante)
+                if index_creneau + 1 < len(dict_horaires[jour_courant]):  # oui
+                    duree_restante -= (dict_horaires[jour_courant][index_creneau][1] - heure_courante)
                     index_creneau += 1
-                    heure_courante = le_dict_courant[le_jour][index_creneau][0]
+                    heure_courante = dict_horaires[jour_courant][index_creneau][0]
                     continue
                 # il n'y a pas de créneau suivant la même journée: terminer la journée puis passer au jour suivant
-                la_duree_restante -= (le_dict_courant[le_jour][index_creneau][1] - heure_courante)
+                duree_restante -= (dict_horaires[jour_courant][index_creneau][1] - heure_courante)
 
-                le_jour = ((le_jour + 1) % 7) or 7 # num jour de la semaine entre 1 et 7
+                jour_courant = ((jour_courant + 1) % 7) or 7 # num jour de la semaine entre 1 et 7
                 d_courante += un_jour
-                # La nouvelle date courante est-elle dans les horaires temporaires?
-                if horaires_temp and d_temp_start <= d_courante and d_courante <= d_temp_stop:
-                    bool_d_courante_temp = True
-                    jours_travailles_courants = jours_temp_travailles
-                    le_dict_courant = dict_horaires_temp
-                else:
-                    bool_d_courante_temp = False
-                    jours_travailles_courants = jours_travailles
-                    le_dict_courant = dict_horaires
+                str_d_courante = fields.Date.to_string(d_courante).decode('utf-8')
 
-                while le_jour not in jours_travailles_courants: # on saute les jours non travaillés
-                    le_jour = ((le_jour + 1) % 7) or 7 # num jour de la semaine entre 1 et 7
+                if str_d_courante > segment_courant[1]:  # changer de segment courant
+                    segment_courant = segments_equipe.pop(0)
+                    dict_horaires = segment_courant[2]
+                
+                while jour_courant not in dict_horaires: # on saute les jours non travaillés
+                    jour_courant = ((le_jour + 1) % 7) or 7 # num jour de la semaine entre 1 et 7
                     #dt_courante_deb += un_jour
                     d_courante += un_jour
-                    if horaires_temp and d_temp_start <= d_courante and d_courante <= d_temp_stop:
-                        bool_d_courante_temp = True
-                        jours_travailles_courants = jours_temp_travailles
-                        le_dict_courant = dict_horaires_temp
-                    else:
-                        bool_d_courante_temp = False
-                        jours_travailles_courants = jours_travailles
-                        le_dict_courant = dict_horaires
+                    if str_d_courante > segment_courant[1]:  # changer de segment courant
+                        segment_courant = segments_equipe.pop(0)
+                        dict_horaires = segment_courant[2]
+
                 index_creneau = 0
                 # heure_courante passée a l'heure de début du premier créneau du jour travaillé suivant
-                heure_courante = le_dict_courant[le_jour][index_creneau][0]
+                heure_courante = dict_horaires[jour_courant][index_creneau][0]
 
-            str_d_courante = fields.Date.to_string(d_courante)  # String Date courante locale
+            # la durée restante est égale à 0! on y est!
+            str_d_courante = fields.Date.to_string(d_courante).decode('utf-8')  # String Date courante locale
             dt_courante_deb = tz.localize(datetime.strptime(str_d_courante+" 00:00:00", "%Y-%m-%d %H:%M:%S"))  # Datetime local début du jour
             # Calcul de la nouvelle date
             dt_deadline_local = dt_courante_deb + timedelta(hours=heure_courante)
@@ -663,9 +689,6 @@ class OfPlanningIntervention(models.Model):
                 while partner.parent_id:
                     partner = partner.parent_id
             intervention.partner_id = partner and partner.id
-
-    def _search_gb_employee_id(self, operator, value):
-        return [('equipe_id.employee_ids', operator, value)]
 
     @api.depends('description')
     def _compute_cleantext_description(self):
@@ -695,6 +718,16 @@ class OfPlanningIntervention(models.Model):
     def _compute_date_date(self):
         for inter in self:
             inter.date_date = inter.date
+
+    @api.multi
+    @api.depends('employee_ids')
+    def _compute_employee_main_id(self):
+        for inter in self:
+            if inter.employee_ids:
+                inter.employee_main_id = inter.employee_ids[0]
+
+    def _search_gb_employee_id(self, operator, value):
+        return [('employee_ids', operator, value)]
 
     @api.model
     def _search_date_date(self, operator, value):
@@ -781,23 +814,30 @@ class OfPlanningIntervention(models.Model):
         if self.tache_id and self.tache_id.duree:
             self.duree = self.tache_id.duree
 
-    @api.onchange('equipe_id')
-    def _onchange_equipe_id(self):
-        equipe = self.equipe_id
-        if equipe:
-            self.hor_md = equipe.hor_md
-            self.hor_mf = equipe.hor_mf
-            self.hor_ad = equipe.hor_ad
-            self.hor_af = equipe.hor_af
-            les_jours_ids = equipe.jour_ids._ids
+    @api.onchange('employee_ids')
+    def _onchange_employee_ids(self):
+        self.ensure_one()
+        employee = self.employee_main_id
+        if employee:
+            self.hor_md = employee.of_hor_md
+            self.hor_mf = employee.of_hor_mf
+            self.hor_ad = employee.of_hor_ad
+            self.hor_af = employee.of_hor_af
+            les_jours_ids = employee.of_jour_ids._ids
             if les_jours_ids == []:
                 les_jours_ids = self.env['of.jours'].search([('numero', 'in', [1, 2, 3, 4, 5])])._ids
             self.jour_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in les_jours_ids]
-            self.of_creneau_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in equipe.of_creneau_ids._ids]
-            self.of_creneau_temp_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in equipe.of_creneau_temp_ids._ids]
-            self.of_creneau_temp_start = equipe.of_creneau_temp_start
-            self.of_creneau_temp_stop = equipe.of_creneau_temp_stop
-            self.mode_horaires = equipe.mode_horaires
+            self.of_creneau_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in employee.of_creneau_ids._ids]
+            self.of_creneau_temp_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in employee.of_creneau_temp_ids._ids]
+            self.of_creneau_temp_start = employee.of_creneau_temp_start
+            self.of_creneau_temp_stop = employee.of_creneau_temp_stop
+            self.mode_horaires = employee.of_mode_horaires
+
+    @api.onchange('equipe_id')
+    def _onchange_equipe_id(self):
+        self.ensure_one()
+        if self.equipe_id:
+            self.employee_ids = [(5, 0, 0)] + [(4, id_emp, 0) for id_emp in self.equipe_id.employee_ids._ids]
 
     @api.multi
     def button_confirm(self):
@@ -826,17 +866,18 @@ class OfPlanningIntervention(models.Model):
     @api.multi
     def do_verif_dispo(self):
         # Vérification de la validité du créneau
+        intervention_obj = self.env['of.planning.intervention']
         for intervention in self:
             if intervention.verif_dispo:
-                rdv = self.search([
-                    ('equipe_id', '=', intervention.equipe_id.id),
+                rdv = intervention_obj.search([
+                    ('employee_ids', 'in', intervention.employee_ids.ids),  # /!\ conserver .ids : ._ids est un tuple et génère une erreur à l'évaluation
                     ('date', '<', intervention.date_deadline),
                     ('date_deadline', '>', intervention.date),
                     ('id', '!=', intervention.id),
                     ('state', 'not in', ('cancel', 'postponed')),
-                ])
+                ], limit=1)
                 if rdv:
-                    raise ValidationError(u'Cette équipe a déjà %s rendez-vous sur ce créneau' % (len(rdv),))
+                    raise ValidationError(u'L\'Employé %s a déjà au moins 1 rendez-vous sur ce créneau' % ((rdv.employee_ids & intervention.employee_ids))[0].name)
 
     @api.multi
     def _affect_number(self):

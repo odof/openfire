@@ -14,7 +14,7 @@
                     <group col="4">
                         <separator string="Informations" colspan="4"/>
                         <field name="date_display" readonly="1"/>
-                        <field name="equipe_id" readonly="1"/>
+                        <field name="employee_id" readonly="1"/>
                         <field name="zip_id" readonly="1"/>
                         <field name="address_depart_id" readonly="1"/>
                         <field name="distance" readonly="1"/>

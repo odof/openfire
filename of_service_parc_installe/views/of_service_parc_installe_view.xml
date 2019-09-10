@@ -69,7 +69,7 @@
                         <field name="intervention_ids" nolabel="1" context="{'default_address_id':site_adresse_id, 'default_parc_installe_id':id}">
                             <tree string="intervention" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done';purple:state=='unfinished'">
                                 <field name="date"/>
-                                <field name="equipe_id"/>
+                                <field name="employee_ids"/>
                                 <field name="tache_id"/>
                                 <field name="duree" context="{'tz': 'Europe/Paris'}" string="Durée" widget="float_time"/>
                                 <button name="button_open_of_planning_intervention" class="oe_link" type="object" string="Ouvrir"/>

@@ -26,7 +26,7 @@ class OfTourneePlanification(models.TransientModel):
         partner_obj = self.env['res.partner']
         service_obj = self.env['of.service']
 
-        taches = tournee.equipe_id.tache_ids
+        taches = tournee.employee_id.tache_ids
 
         date_tournee = tournee.date
         date_tournee_datetime = fields.Date.from_string(date_tournee)
@@ -207,15 +207,15 @@ class OfTourneePlanification(models.TransientModel):
 
     zip_id = fields.Many2one(related='tournee_id.zip_id')
     distance = fields.Float(related='tournee_id.distance')
-    equipe_id = fields.Many2one(related='tournee_id.equipe_id')
+    employee_id = fields.Many2one(related='tournee_id.employee_id')
     address_depart_id = fields.Many2one(related='tournee_id.address_depart_id')
     address_retour_id = fields.Many2one(related='tournee_id.address_retour_id')
 
-    @api.onchange('equipe_id')
-    def _onchange_equipe_id(self):
-        if self.equipe_id:
-            self.address_depart_id = self.equipe_id.address_id
-            self.address_retour_id = self.equipe_id.address_retour_id
+    @api.onchange('employee_id')
+    def _onchange_employee_id(self):
+        if self.employee_id:
+            self.address_depart_id = self.employee_id.address_id
+            self.address_retour_id = self.employee_id.address_retour_id
 
     @api.onchange('address_depart_id')
     def _onchange_address_depart_id(self):
@@ -467,7 +467,7 @@ class OfTourneePlanificationPartner(models.TransientModel):
     tache_id = fields.Many2one(related='service_id.tache_id')
     phone = fields.Char(compute='_get_phone')
 
-    tache_possible = fields.Many2many('of.planning.tache', related="wizard_id.tournee_id.equipe_id.tache_ids", string="Intervention Possible")
+    tache_possible = fields.Many2many('of.planning.tache', related="wizard_id.tournee_id.employee_id.tache_ids", string="Intervention Possible")
 
     duree = fields.Float(string=u'Durée', required=True, digits=(12, 5))
     distance = fields.Float(string='Dist.tot.', digits=(12, 3))

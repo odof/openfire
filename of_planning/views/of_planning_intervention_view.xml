@@ -1,6 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+<!--##############################################################################-->
+<!--########################### ______ Employés ______ ###########################-->
+<!--##############################################################################-->
+    <!-- Employee -->
+    <record id="view_of_employee_form_intervention" model="ir.ui.view">
+        <field name="name">of.hr.employee.form.intervention</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='job_id']" position="after">
+                <field name="est_intervenant"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page name="interventions" string="Interventions" attrs="{'invisible': [('est_intervenant','=', False)]}">
+                    <group>
+                        <field name="tache_ids" widget="many2many_tags"/>
+                        <field name="equipe_ids" widget="many2many_tags"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
 <!--##########################################################################################################################-->
 <!--#############################################______Historique du client______#############################################-->
 <!--##########################################################################################################################-->
@@ -17,7 +40,7 @@
                                context="{'form_view_ref':'of_planning.of_planning_intervention_view_form2'}">
                             <tree string="Plannings">
                                 <field name="tache_id"/>
-                                <field name="equipe_id"/>
+                                <field name="employee_ids" widget="many2many_tags"/>
                                 <field name="date" string="Date"/>
                                 <field name="duree" string="Durée" widget="float_time"/>
                                 <field name="state"/>
@@ -28,7 +51,7 @@
                         <field name="intervention_address_ids" colspan="4" nolabel="1" attrs="{'invisible': [('parent_id','=', False)]}"
                                 context="{'form_view_ref':'of_planning.of_planning_intervention_view_form2', 'default_address_id':id}">
                             <tree string="Plannings">
-                                <field name="equipe_id"/>
+                                <field name="employee_ids" widget="many2many_tags"/>
                                 <field name="tache_id"/>
                                 <field name="date" string="Date"/>
                                 <field name="duree" string="Durée" widget="float_time"/>
@@ -88,6 +111,7 @@
                         <field name="tache_id" widget="selection"/>
                         <field name="category_id" widget="selection"/>
                         <field name="equipe_id" widget="selection"/>
+                        <field name="employee_ids"/>
                         <field name="address_id"/>
                         <field name="company_id" widget="selection"/>
                     </group>
@@ -136,6 +160,7 @@
                         <group>
                             <group col="2">
                                 <field name="equipe_id" autofocus="autofocus"/>
+                                <field name="employee_ids" string="Intervenants" widget="many2many_tags" options='{"no_open": True, "no_create": True}'/>
                                 <field name="address_id" domain="[('customer','=',True)]" colspan="2"/>
                                 <field name="user_id"/>
                                 <field name="company_id" widget="selection"/>
@@ -283,7 +308,7 @@
                     <field name="date"/>
                     <field name="date_deadline" string="Deadline" invisible="1"/>
                     <field name="duree" string="Durée" widget="float_time"/>
-                    <field name="equipe_id"/>
+                    <field name="employee_ids" widget="many2many_tags"/>
                     <field name="tache_id"/>
                     <field name="address_id"/>
                     <field name="address_city"/>
@@ -301,8 +326,9 @@
             <field name="name">of.planning.intervention.calendar</field>
             <field name="model">of.planning.intervention</field>
             <field name="arch" type="xml">
-                <calendar string="Calendrier" date_start="date" color="equipe_id" date_stop="date_deadline" display_states="1" quick_add="0"
-                    attendee_model="of.planning.equipe" color_ft_field="color_ft" color_bg_field="color_bg" custom_colors="1">
+                <!-- À vérifier  -->
+                <calendar string="Calendrier" date_start="date" color="employee_main_id" date_stop="date_deadline" display_states="1" quick_add="0"
+                    attendee_model="hr.employee" color_ft_field="color_ft" color_bg_field="color_bg" custom_colors="1">
                     <field name="calendar_name"/>
                     <field name="state" invisible="1"/>
                     <field name="state_int" invisible="1"/>
@@ -407,6 +433,7 @@
                         </div>
                         <group>
                             <group>
+                                <field name="employee_nb"/>
                                 <field name="product_id" string="Produit lié" attrs="{'readonly':[('verr', '=', True)]}"/>
                                 <field name="category_id"/>
                                 <field name="duree" widget="float_time"/>
@@ -455,6 +482,7 @@
                 <search string="Recherche">
                     <group>
                         <filter name="filter_active" string="Désactivée" icon="terp-accessories-archiver" domain="[('active', '=', 0)]"/>
+                        <field name="employee_ids"/>
                         <field name="name"/>
                         <field name="note"/>
                         <field name="category_ids"/>
@@ -490,6 +518,12 @@
             <field name="arch" type="xml">
                 <form class="oe_form_configuration">
                     <sheet>
+                        <div class="oe_button_box" name="button_box" >
+                            <!-- Bouton Actif -->
+                            <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive" display="inline-block">
+                                <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                            </button>
+                        </div>
                         <div class="oe_title">
                             <label for="name" string="Equipe" class="oe_edit_only"/>
                             <h1>

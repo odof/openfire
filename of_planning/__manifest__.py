@@ -27,7 +27,7 @@ Inclut la gestion des équipes d'intervention.
 
 """,
     'depends' : [
-        'hr',
+        #'hr',  # par of_calendar
         'product',
         'sale',
         #'of_base',

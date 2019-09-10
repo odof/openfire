@@ -43,11 +43,23 @@
             <field name="type">form</field>
             <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
             <field name="arch" type="xml">
+                <xpath expr="//field[@name='tache_id']" position="after">
+                    <field name="service_id"/>
+                </xpath>
                 <group name="liens" position="attributes">
                     <attribute name="invisible">0</attribute>
                 </group>
                 <group name="liens" position="inside">
-                    <field name="tournee_id"/>
+                    <field name="tournee_ids">
+                        <tree>
+                            <field name="employee_id"/>
+                            <field name="secteur_id"/>
+                            <field name="zip_id"/>
+                            <field name="is_complet"/>
+                            <field name="is_bloque"/>
+                            <field name="is_confirme"/>
+                        </tree>
+                    </field>
                 </group>
             </field>
         </record>
@@ -62,7 +74,8 @@
                         <separator string="Info" colspan="4"/>
                         <field name="date_jour"/>
                         <field name="date"/>
-                        <field name="equipe_id"/>
+                        <field name="employee_id"/>
+                        <field name="secteur_id"/>
                         <field name="address_depart_id"/>
                         <field name="address_retour_id"/>
                         <field name="distance" attrs="{'required': [('is_bloque', '=', False)]}"/>
@@ -95,7 +108,8 @@
                     <!--field name="docs" invisible="1"/-->
                     <field name="date_jour"/>
                     <field name="date"/>
-                    <field name="equipe_id"/>
+                    <field name="employee_id"/>
+                    <field name="secteur_id"/>
                     <field name="zip_id"/>
                     <field name="epi_lat" attrs="{'required': [('is_bloque', '=', False)]}"/>
                     <field name="epi_lon" attrs="{'required': [('is_bloque', '=', False)]}"/>
@@ -105,7 +119,7 @@
                     <field name="is_complet"/>
                     <field name="is_bloque"/>
                     <field name="is_confirme"/>
-                    <button name="open_planification" type="object" string="Planifier" attrs="{'invisible': [('is_complet', '=', True)]}"/>
+                    <!--button name="open_planification" type="object" string="Planifier" attrs="{'invisible': [('is_complet', '=', True)]}"/-->
                 </tree>
             </field>
         </record>
@@ -121,7 +135,8 @@
                         <filter name="filter_nonbloque" string="Non Bloqué" icon="terp-accessories-archiver" domain="[('is_bloque', '=', False)]"/>
                         <field name="date_min" filter_domain="[('date','&gt;=',self)]"/>
                         <field name="date_max" filter_domain="[('date','&lt;=',self)]"/>
-                        <field name="equipe_id"/>
+                        <field name="employee_id"/>
+                        <field name="secteur_id"/>
                         <field name="zip_id"/>
                     </group>
                  </search>
