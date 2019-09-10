@@ -195,7 +195,7 @@
                         <field colspan="4" mode="tree" name="interventions_liees" nolabel="1" widget="one2many_list"
                                groups="project.group_project_user" context="{'default_partner_id':partner_id, 'view_readonly_sav':True}">
                             <tree string="Interventions">
-                                <field name="equipe_id"/>
+                                <field name="employee_ids" widget="many2many_tags"/>
                                 <field name="tache_id"/>
                                 <field name="date" string="Date"/>
                                 <field name="duree" string="Durée"/>

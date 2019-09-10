@@ -17,6 +17,10 @@
                         <field name="of_address_depart_id"/>
                         <field name="of_address_retour_id"/>
                     </group>
+                    <group name="couleurs" string="Couleurs" colspan="2">
+                        <field name="of_color_ft" widget="color"/>
+                        <field name="of_color_bg" widget="color"/>
+                    </group>
                 </group>
             </xpath>
             <xpath expr="//notebook" position="inside">
@@ -68,14 +72,6 @@
                                 </tree>
                             </field>
                         </group>
-                        <group name="of_archive_horaires" col="2" colspan="2" groups="base.group_no_one">
-                            <separator string="Archive horaires" colspan="2"/>
-                            <field name="of_archive_horaires" nolabel="1" colspan="2"/>
-                        </group>
-                        <group name="of_archive_horaires_temp" col="2" colspan="2" groups="base.group_no_one">
-                            <separator string="Archive horaires temporaires" colspan="2"/>
-                            <field name="of_archive_horaires_temp" nolabel="1" colspan="2"/>
-                        </group>
                     </group>
                     <group name="horaires_easy" attrs="{'invisible': [('of_mode_horaires', '!=', 'easy')]}" col="4" colspan="4">
                         <group name="horaires" string="Horaires" col="3" colspan="2">
@@ -84,6 +80,16 @@
                             <field name="of_hor_ad" string="Après-midi" widget="float_time" colspan="2" attrs="{'required': [('of_mode_horaires', '=', 'easy')]}"/>
                             <field name="of_hor_af" widget="float_time" colspan="1" nolabel="1" attrs="{'required': [('of_mode_horaires', '=', 'easy')]}"/>
                             <field name="of_jour_ids" widget="many2many_tags" colspan="3" attrs="{'required': [('of_mode_horaires', '=', 'easy')]}"/>
+                        </group>
+                    </group>
+                    <group name="archive_horaires" groups="base.group_no_one" col="4" colspan="4">
+                        <group name="of_archive_horaires" col="2" colspan="2" groups="base.group_no_one">
+                            <separator string="Archive horaires" colspan="2"/>
+                            <field name="of_archive_horaires" nolabel="1" colspan="2"/>
+                        </group>
+                        <group name="of_archive_horaires_temp" col="2" colspan="2" groups="base.group_no_one">
+                            <separator string="Archive horaires temporaires" colspan="2"/>
+                            <field name="of_archive_horaires_temp" nolabel="1" colspan="2"/>
                         </group>
                     </group>
                 </page>

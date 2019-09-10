@@ -45,7 +45,7 @@
                                         <field name="name" string="Libellé"/>
                                         <field name="date"/>
                                         <field name="duree" string="Durée" widget="float_time"/>
-                                        <field name="equipe_id"/>
+                                        <field name="employee_ids"/>
                                         <field name="company_id"/>
                                         <field name="state"/>
                                         <field name="description"/>
@@ -90,7 +90,7 @@
                                 <field name="name" string="Libellé"/>
                                 <field name="date"/>
                                 <field name="duree" string="Durée" widget="float_time"/>
-                                <field name="equipe_id"/>
+                                <field name="employee_ids"/>
                                 <field name="company_id"/>
                                 <field name="state"/>
                                 <field name="description"/>

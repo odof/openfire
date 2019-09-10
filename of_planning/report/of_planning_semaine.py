@@ -37,7 +37,7 @@ class OfPlanningSemaine(report_sxw.rml_parse):
         date_str = fields.Datetime.to_string(date)
         return self.formatLang(date_str, date_time=True)
 
-    def get_titre(self, equipe):
+    def get_titre(self, employee):
         date_start_date = self.localcontext['date_start']
         date_stop_date = self.localcontext['date_stop']
 
@@ -49,10 +49,10 @@ class OfPlanningSemaine(report_sxw.rml_parse):
         elif date_start_date.month != date_stop_date.month:
             date_start_extend = date_start_date.strftime(" %B").decode("utf-8")
 
-        title = "Planning des Interventions - %s - Semaine %s du %s%s au %s%s" % (equipe.name, week_number, date_start_date.day, date_start_extend, date_stop_date.day, date_stop_date.strftime(" %B %Y").decode("utf-8"))
+        title = "Planning des Interventions - %s - Semaine %s du %s%s au %s%s" % (employee.name, week_number, date_start_date.day, date_start_extend, date_stop_date.day, date_stop_date.strftime(" %B %Y").decode("utf-8"))
         return title
 
-    def get_interventions(self, equipe):
+    def get_interventions(self, employee):
         intervention_obj = self.env['of.planning.intervention']
 
         # changer le type a string pour search
@@ -61,7 +61,7 @@ class OfPlanningSemaine(report_sxw.rml_parse):
 
         # Toutes les poses de la semaine, sauf annulées ou reportées
         domain = [('date_deadline', '>=', date_start), ('date', '<=', date_stop),
-                  ('equipe_id', '=', equipe.id),
+                  ('employee_ids', 'in', employee.id),
                   ('state', 'in', ('draft', 'confirm', 'done', 'unfinished'))]
         interventions = intervention_obj.search(domain, order='date')
         return interventions
