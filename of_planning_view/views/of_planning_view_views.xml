@@ -6,7 +6,7 @@
         <field name="arch" type="xml">
             <planning date_start="date" date_stop="date_deadline"
                       string="Interventions" color_ft="color_ft" color_bg="color_bg"
-                      resource="equipe_id" event_open_popup="true">
+                      resource="employee_ids" event_open_popup="true">
                 <field name="date" class="of_planning_info_heures of_planning_subinfo_heure_debut"/>
                 <field name="date_deadline" class="of_planning_info_heures of_planning_subinfo_heure_fin"/>
                 <field name="duree" class="of_planning_info_heures of_planning_subinfo_duree"/>

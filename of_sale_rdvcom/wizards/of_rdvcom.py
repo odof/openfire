@@ -447,25 +447,6 @@ class OFRDVCommercial(models.TransientModel):
             "afternoon_end_field": "hor_af"
         }
 
-    """
-    a voir si réimplémenter cette fonctionnalité
-    # Note: Séparation en 3 fonctions car, avec une seule fonction button_calcul(self, creneau_suivant=False),
-    #       Odoo place le contexte dans cette variable si elle n'est pas fournie en paramètre ...
-    @api.multi
-    def button_calcul_suivant(self):
-        # Calcule a prochaine intervention à partir de la dernière intervention proposée
-        self.compute(creneau_suivant=True)
-        context = dict(self._context, equipe_domain=self._get_equipe_possible())
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'of.tournee.rdv',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_id': self.id,
-            'target': 'new',
-            'context': context,
-        }"""
-
     @api.multi
     def toggle_horaires(self):
         """Affiche / cache les horaires pour pouvoir les modifier"""

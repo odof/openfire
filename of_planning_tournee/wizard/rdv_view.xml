@@ -25,7 +25,7 @@
                     <field name="partner_id" invisible="1"/>
                     <field name="res_line_id" invisible="1"/>
                     <field name="name" invisible="1"/>
-                    <field name="equipe_id" domain="[('id', 'in', context.get('equipe_domain',[]))]" invisible="1"/>
+                    <field name="employee_id" domain="[('id', 'in', context.get('employee_domain',[]))]" invisible="1"/>
                     <field name="date_propos" invisible="1"/>
                     <field name="date_propos_hour" widget="float_time" invisible="1"/>
                     <field name="date_next" invisible="1"/>
@@ -62,7 +62,7 @@
                             <field name="tache_id"/>
                             <field name="creer_recurrence" attrs="{'invisible': [('service_id', '!=', False)]}"/>
                             <field name="duree" widget="float_time"/>
-                            <field name="pre_equipe_ids" widget="many2many_tags"/>
+                            <field name="pre_employee_ids" widget="many2many_tags"/>
                         </group>
                         <group col="2" colspan="2">
                             <field name="date_recherche_debut"/>
@@ -85,8 +85,8 @@
                             <separator string="Aucun résultat suffisament proche" colspan="4" attrs="{'invisible':[('zero_dispo','!=',True)]}"/>
                             <separator string="Aucun résultat" colspan="4" attrs="{'invisible':[('zero_result','!=',True)]}"/>
                             <field name="planning_ids" mode="calendar" colspan="4" nolabel="1">
-                                <calendar string="Calendrier" date_start="debut_dt" color="equipe_id" date_stop="fin_dt" all_day="allday"
-                                    attendee_model="of.planning.equipe" color_ft_field="color_ft" color_bg_field="color_bg" custom_colors="1"
+                                <calendar string="Calendrier" date_start="debut_dt" color="employee_id" date_stop="fin_dt" all_day="allday"
+                                    attendee_model="hr.employee" color_ft_field="color_ft" color_bg_field="color_bg" custom_colors="1"
                                     working_hours="1" filters_radio="1" dispo_field="disponible" jump_to="selected" display_states="1"
                                     force_color_field="force_color" selected_field="selected">
                                     <field name="name"/>
@@ -111,7 +111,7 @@
                                     <field name="disponible" invisible="1"/>
                                     <field name="selected" invisible="1"/>
                                     <field name="date"/>
-                                    <field name="equipe_id"/>
+                                    <field name="employee_id"/>
                                     <field name="description" string="Créneau"/>
                                     <field name="distance" string="Distance"/>
                                     <field name="duree" string="Durée"/>
@@ -126,7 +126,7 @@
                         <button name="button_calcul" string="Rechercher" type="object" colspan="2" class="btn-default"
                                 attrs="{'invisible': [('date_propos','=',False)]}"/>
                         <button string="Confirmer RDV" name="button_confirm" type="object" class="btn-primary"
-                                attrs="{'invisible': ['|','|','|',('name','=',False),('equipe_id','=',False),('date_propos','=',False),('date_propos_hour','=',False)]}"/>
+                                attrs="{'invisible': ['|','|','|',('name','=',False),('employee_id','=',False),('date_propos','=',False),('date_propos_hour','=',False)]}"/>
                         <button string="Annuler" class="btn-default" special="cancel"/>
                     </footer>
                 </form>
@@ -151,7 +151,7 @@
                         <group>
                             <field name="date" readonly="1"/>
                             <field name="description" readonly="1"/>
-                            <field name="equipe_id" readonly="1"/>
+                            <field name="employee_id" readonly="1"/>
                             <field name="intervention_id" readonly="1" attrs="{'invisible':[('intervention_id','=',False)]}"/>
                             <field name="disponible" readonly="1"/>
                         </group>
