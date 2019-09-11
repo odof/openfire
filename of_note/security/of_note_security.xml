@@ -3,4 +3,10 @@
     <record id="note.note_note_rule_global" model="ir.rule">
         <field name="active">False</field>
     </record>
+    <record id="note.note_stage_rule_global" model="ir.rule">
+        <field name="active">False</field>
+    </record>
+    <record id="note.note_note_create_unlink_global" model="ir.rule">
+        <field name="active">False</field>
+    </record>
 </odoo>
