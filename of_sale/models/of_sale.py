@@ -123,23 +123,13 @@ class SaleOrder(models.Model):
     @api.depends('order_line.price_total')
     def _amount_all(self):
         """Compute the total amounts of the SO."""
-
         # Le calcul standard diffère du calcul utilisé dans les factures, ce qui peut mener à des écarts dans certains cas
         # (quand l'option d'arrondi global de la tva est utilisée et que la commande contient plusieurs lignes avec des taxes différentes).
         # On uniformise le calcul du montant des devis/commandes avec celui des factures.
-
         for order in self:
-            amount_untaxed = amount_tax = 0.0
-
-            for tax in order.of_get_taxes_values().itervalues():
-                amount_untaxed += tax['base']
-                amount_tax += tax['amount']
-
-            order.update({
-                'amount_untaxed': order.pricelist_id.currency_id.round(amount_untaxed),
-                'amount_tax': order.pricelist_id.currency_id.round(amount_tax),
-                'amount_total': amount_untaxed + amount_tax,
-            })
+            order.amount_untaxed = sum(line.price_subtotal for line in self.order_line)
+            order.amount_tax = sum(tax['amount'] for tax in order.of_get_taxes_values().itervalues())
+            order.amount_total = self.amount_untaxed + self.amount_tax
 
     of_to_invoice = fields.Boolean(u"Entièrement facturable", compute='_compute_of_to_invoice', search='_search_of_to_invoice')
     of_notes_facture = fields.Html(string="Notes facture", oldname="of_notes_factures")
@@ -512,7 +502,7 @@ class SaleOrder(models.Model):
             for payment in widget.get('content', []):
                 # Les paiements sont classés dans l'ordre chronologique
                 move_line = account_move_line_obj.browse(payment['payment_id'])
-                name =  invoice_obj._of_get_payment_display(move_line)
+                name = invoice_obj._of_get_payment_display(move_line)
                 result.append((name, payment['amount']))
         return result
 
