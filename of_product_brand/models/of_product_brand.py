@@ -105,6 +105,7 @@ class ProductTemplate(models.Model):
     brand_id = fields.Many2one('of.product.brand', string='Brand', required=True, index=True)
     of_seller_name = fields.Many2one(related="seller_ids.name")
     of_previous_brand_id = fields.Many2one('of.product.brand', compute='_compute_of_previous_brand_id')
+    seller_ids = fields.One2many('product.supplierinfo', 'product_tmpl_id', 'Vendors', copy=True)
 
     # dependancy on default_code to prevent recomputing it before _onchange_brand_id call
     @api.depends('default_code')
@@ -167,6 +168,14 @@ class ProductTemplate(models.Model):
             args = [('brand_id', 'in', brands._ids)] + args
         return super(ProductTemplate, self).name_search(name, args, operator, limit)
 
+    @api.multi
+    def copy(self, default=None):
+        self.ensure_one()
+        if default is None:
+            default = {}
+        if 'default_code' not in default:
+            default['default_code'] = _("%s (copy)") % self.default_code
+        return super(ProductTemplate, self).copy(default=default)
 
 class ProductProduct(models.Model):
     _inherit = 'product.product'
