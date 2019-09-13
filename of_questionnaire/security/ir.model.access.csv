@@ -7,7 +7,7 @@
 "access_of_questionnaire_line_category_manager","of.questionnaire.line.category","model_of_questionnaire_line_category","of_planning.of_group_planning_intervention_modification_tout",1,1,1,1
 "access_of_questionnaire_line_reponse_user","of.questionnaire.line.reponse","model_of_questionnaire_line_reponse","base.group_user",1,0,0,0
 "access_of_questionnaire_line_reponse_manager","of.questionnaire.line.reponse","model_of_questionnaire_line_reponse","of_planning.of_group_planning_intervention_modification_tout",1,1,1,1
-"access_of_planning_intervention_question_user","of.planning.intervention.question","model_of_planning_intervention_question","base.group_user",1,0,0,0
+"access_of_planning_intervention_question_user","of.planning.intervention.question","model_of_planning_intervention_question","base.group_user",1,1,0,0
 "access_of_planning_intervention_question_manager","of.planning.intervention.question","model_of_planning_intervention_question","of_planning.of_group_planning_intervention_modification_tout",1,1,1,1
-"access_of_parc_installe_question_user","of.parc.installe.question","model_of_parc_installe_question","base.group_user",1,0,0,0
+"access_of_parc_installe_question_user","of.parc.installe.question","model_of_parc_installe_question","base.group_user",1,1,0,0
 "access_of_parc_installe_question_manager","of.parc.installe.question","model_of_parc_installe_question","of_planning.of_group_planning_intervention_modification_tout",1,1,1,1
