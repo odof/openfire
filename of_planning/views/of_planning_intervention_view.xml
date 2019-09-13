@@ -161,6 +161,7 @@
                             <group col="2">
                                 <field name="equipe_id" autofocus="autofocus"/>
                                 <field name="employee_ids" string="Intervenants" widget="many2many_tags" options='{"no_open": True, "no_create": True}'/>
+                                <field name="partner_id" invisible="1"/>
                                 <field name="address_id" domain="[('customer','=',True)]" colspan="2"/>
                                 <field name="user_id"/>
                                 <field name="company_id" widget="selection"/>
@@ -424,7 +425,16 @@
             <field name="model">of.planning.tache</field>
             <field name="arch" type="xml" >
                 <form class="oe_form_configuration">
+                    <header></header>
                     <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="toggle_active" type="object"
+                                    class="oe_stat_button" icon="fa-archive"
+                                    confirm="Êtes-vous sûr de vouloir archiver/activer cette tâche ?">
+                                <field name="active" widget="boolean_button"
+                                    options='{"terminology": "archive"}'/>
+                            </button>
+                        </div>
                         <div class="oe_title">
                             <label for="name" string="Libellé" class="oe_edit_only" attrs="{'readonly':[('verr', '=', True)]}"/>
                             <h1>
@@ -439,7 +449,6 @@
                                 <field name="duree" widget="float_time"/>
                             </group>
                             <group>
-                                <field name="active"/>
                                 <field name="is_crm"/>
                                 <field name="imp_detail"/>
                             </group>

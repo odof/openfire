@@ -30,7 +30,7 @@ Inclut la gestion des équipes d'intervention.
         #'hr',  # par of_calendar
         'product',
         'sale',
-        #'of_base',
+        #'of_base', par of_base_location
         'of_gesdoc',
         'of_calendar',
         'of_kit',

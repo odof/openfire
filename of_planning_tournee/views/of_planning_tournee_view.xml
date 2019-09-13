@@ -43,9 +43,6 @@
             <field name="type">form</field>
             <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='tache_id']" position="after">
-                    <field name="service_id"/>
-                </xpath>
                 <group name="liens" position="attributes">
                     <attribute name="invisible">0</attribute>
                 </group>
