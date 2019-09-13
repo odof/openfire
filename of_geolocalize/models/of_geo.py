@@ -199,6 +199,8 @@ class ResPartner(models.Model):
                 vals['precision'] = "not_tried"
                 vals['date_last_localization'] = fields.Datetime.context_timestamp(self, fields.datetime.now())
 
+        result = super(ResPartner, self).write(vals)
+
         # DO GEOCODING AUTOMATIC (through wizard)
         if do_geocoding_auto:
             # Get geocoder by default
@@ -229,7 +231,7 @@ class ResPartner(models.Model):
                 'overwrite_geoloc_except_manual': False,
             })
             wizard.action_geocode()
-        return super(ResPartner, self).write(vals)
+        return result
 
 
 # Configuration
