@@ -3,6 +3,7 @@
 from odoo import api, models, fields
 from datetime import date
 from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 
 class OfService(models.Model):
     _name = "of.service"
@@ -107,6 +108,7 @@ class OfService(models.Model):
     # template_id = fields.Many2one('of.mail.template', string='Contrat')
     partner_id = fields.Many2one('res.partner', string='Partenaire', ondelete='restrict')
     address_id = fields.Many2one('res.partner', string="Adresse", ondelete='restrict')
+    secteur_tech_id = fields.Many2one(related='address_id.secteur_tech_id', readonly=True)
     company_id = fields.Many2one('res.company', string=u"Société")
 
     # Champs ajoutés pour la vue map
@@ -115,13 +117,15 @@ class OfService(models.Model):
     precision = fields.Selection(related='address_id.precision')
     partner_name = fields.Char(related='partner_id.name')
     partner_mobile = fields.Char(related='partner_id.mobile')
+    partner_phone = fields.Char(related='partner_id.phone')
 
     tache_id = fields.Many2one('of.planning.tache', string=u'Tâche', required=True)
     name = fields.Char(u"Libellé", related='tache_id.name', store=True)
     tag_ids = fields.Many2many('of.service.tag', string=u"Étiquettes")
+    name = fields.Char(u"Libellé", compute="_compute_name", store=True)
 
-    mois_ids = fields.Many2many('of.mois', 'service_mois', 'service_id', 'mois_id', string='Mois', required=True)
-    jour_ids = fields.Many2many('of.jours', 'service_jours', 'service_id', 'jour_id', string='Jours', required=True, default=_default_jours)
+    mois_ids = fields.Many2many('of.mois', 'service_mois', 'service_id', 'mois_id', string='Mois')
+    jour_ids = fields.Many2many('of.jours', 'service_jours', 'service_id', 'jour_id', string='Jours', default=_get_default_jours)
 
     note = fields.Text('Notes')
     date_next = fields.Date('Prochaine intervention', help=u"Date à partir de laquelle programmer la prochaine intervention", required=True)
@@ -131,9 +135,20 @@ class OfService(models.Model):
     address_zip = fields.Char('Code Postal', size=24, related='address_id.zip', oldname="partner_zip")
     address_city = fields.Char('Ville', related='address_id.city', oldname="partner_city")
 
+    recurrence = fields.Boolean(string=u"Récurrent?", default=True)
+    recurring_rule_type = fields.Selection([
+        #('daily', 'Jour(s)'),
+        ('weekly', 'Semaine(s)'),
+        ('monthly', 'Mois'),
+        ('yearly', u'Année(s)'),
+        ], string=u'Récurrence', default='yearly', help=u"Spécifier l'intervalle pour le calcul automatique de date de prochaine intervention dans les services.")
+    recurring_interval = fields.Integer(string=u'Répéter chaque', default=1, help=u"Répéter (Jours/Semaines/Mois/Années)")
+
     state = fields.Selection([
-        ('progress', 'En cours'),
-        ('cancel', u'Annulé'),
+        ('progress', 'En cours'),  #services récurrents
+        ('todo', u'À faire'),  # services ponctuels
+        ('done', u'fait'),  # services ponctuels
+        ('cancel', u'Annulé'),  # services ponctuels et recurrents
         ], u'État')
     active = fields.Boolean(string="Active", default=True)
 
@@ -150,10 +165,29 @@ class OfService(models.Model):
     # Couleur de contrôle
     color = fields.Char(compute='_compute_color', string='Couleur', store=False)
 
+    @api.multi
+    @api.depends('address_id', 'partner_id', 'tache_id')
+    def _compute_name(self):
+        for service in self:
+            partner_name = service.partner_id and service.partner_id.name or u''
+            address_zip = service.address_id and service.address_id.zip or u''
+            tache_name = service.tache_id and service.tache_id.name or u''
+            service.name = tache_name + partner_name + address_zip
+
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
+        self.ensure_one()
         if self.partner_id:
+            self.address_id = self.partner_id
             self.company_id = self.partner_id.company_id
+
+    @api.onchange('tache_id')
+    def _onchange_tache_id(self):
+        self.ensure_one()
+        if self.tache_id:
+            self.recurrence = self.tache_id.recurrence
+            self.recurring_rule_type = self.tache_id.recurring_rule_type
+            self.recurring_interval = self.tache_id.recurring_interval
 
     @api.onchange('date_next')
     def _onchange_date_next(self):
@@ -171,19 +205,40 @@ class OfService(models.Model):
     @api.multi
     def get_next_date(self, date_str):
         self.ensure_one()
-        mois_nums = self.mois_ids.mapped('numero')
+        if self.recurrence:
+            mois_nums = self.mois_ids.mapped('numero')
 
-        date_date = fields.Date.from_string(max(date_str, self.date_last))
-        date_mois = date_date.month
-        date_annee = date_date.year
+            d_date_from = fields.Date.from_string(max(date_str, self.date_last))
+            d_date_next = d_date_from + self.get_relative_delta(self.recurring_rule_type, self.recurring_interval)
 
-        if (date_mois not in mois_nums) and (date_mois+1 in mois_nums):
-            # Le rdv a été pris en avance pour le mois suivant
-            date_mois += 1
+            date_mois = d_date_next.month
+            date_annee = d_date_next.year
 
-        mois = min(mois_nums, key=lambda m: (m <= date_mois, m))
-        annee = date_annee + (mois <= date_mois)
-        return fields.Date.to_string(date(annee, mois, 1))
+            if (date_mois not in mois_nums) and (date_mois+1 in mois_nums):
+                # Le rdv a été pris en avance pour le mois suivant
+                date_mois += 1
+
+            mois = min(mois_nums, key=lambda m: (m <= date_mois, m))
+            annee = date_annee + (mois <= date_mois)
+            return fields.Date.to_string(date(annee, mois, 1))
+        else:
+            return False
+
+    @api.model
+    def get_relative_delta(self, recurring_rule_type, interval):
+        if recurring_rule_type == 'weekly':
+            return relativedelta(weeks=interval)
+        #elif recurring_rule_type == 'daily':
+        #    return relativedelta(days=interval)
+        elif recurring_rule_type == 'monthly':
+            return relativedelta(months=interval)
+        else:
+            return relativedelta(years=interval)
+
+    @api.multi
+    def toggle_recurrence(self):
+        return self.write({'recurrence': not self.recurrence})
+
 
     @api.model
     def create(self, vals):
@@ -203,28 +258,117 @@ class OfService(models.Model):
         res = super(OfService, self).read(fields, load)
         return res
 
-class OFServicesTag(models.Model):
+class OFServiceTag(models.Model):
     _name = 'of.service.tag'
     _description = u"Étiquettes des services"
 
     name = fields.Char(string=u"Libellé", required=True)
     active = fields.Boolean(string='Actif', default=True)
+    color = fields.Integer(string=u"Color index")
+
+class OFPlanningTache(models.Model):
+    _inherit = "of.planning.tache"
+
+    service_ids = fields.One2many("of.service", "tache_id", string="Services")
+    service_count = fields.Integer(compute='_compute_service_count')
+
+    recurrence = fields.Boolean(u"Tâche récurrente?")
+    recurring_rule_type = fields.Selection([
+        ('weekly', 'Semaine(s)'),
+        ('monthly', 'Mois'),
+        ('yearly', u'Année(s)'),
+        ], string=u'Récurrence', default='monthly', help=u"Spécifier l'intervalle pour le calcul automatique de date de prochaine intervention dans les services.")
+    recurring_interval = fields.Integer(string=u'Répéter chaque', default=1, help=u"Répéter (Jours/Semaines/Mois/Années)")
+    recurrence_display = fields.Char(string=u"Récurrence", compute="_compute_recurrence_display")
+
+    @api.multi
+    @api.depends('service_ids')
+    def _compute_service_count(self):
+        for tache in self:
+            tache.service_count = len(tache.service_ids)
+
+    @api.multi
+    @api.depends('recurrence', 'recurring_interval', 'recurring_rule_type')
+    def _compute_recurrence_display(self):
+        for tache in self:
+            display = False
+            if tache.recurrence:
+                feminin = tache.recurring_rule_type and tache.recurring_rule_type == 'weekly' or False
+                if feminin:
+                    display = u"Toutes les "
+                else:
+                    display = u"Tous les "
+                if tache.recurring_interval and tache.recurring_interval != 1:
+                    display += chr(tache.recurring_interval) + u" "
+                #if tache.recurring_rule_type == 'daily':
+                #    display += u"jours"
+                elif tache.recurring_rule_type == 'weekly':
+                    display += u"semaines"
+                elif tache.recurring_rule_type == 'monthly':
+                    display += u"mois"
+                elif tache.recurring_rule_type == 'yearly':
+                    display += u"ans"
+            tache.recurrence_display = display
+
+    @api.multi
+    def get_next_date(self, date_str):
+        self.ensure_one()
+        if self.recurrence:
+            date_from_da = fields.Date.from_string(date_str)
+            date_next_da = date_from_da + self.get_relative_delta(self.recurring_rule_type, self.recurring_interval)
+
+            return fields.Date.to_string(date_next_da)
+        else:
+            return False
+
+    @api.model
+    def get_relative_delta(self, recurring_rule_type, interval):
+        if recurring_rule_type == 'weekly':
+            return relativedelta(weeks=interval)
+        #elif recurring_rule_type == 'daily':
+        #    return relativedelta(days=interval)
+        elif recurring_rule_type == 'monthly':
+            return relativedelta(months=interval)
+        else:
+            return relativedelta(years=interval)
+
 
 class OFPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
-    service_id = fields.Many2one('of.service', string="Service")
+    service_id = fields.Many2one('of.service', string="Service", domain="[('address_id', '=', address_id)]")
 
-    @api.onchange('address_id')
+    @api.onchange('address_id', 'tache_id')
     def _onchange_address_id(self):
         super(OFPlanningIntervention, self)._onchange_address_id()
         if self.address_id and self.address_id.service_address_ids:
-            self.service_id = self.address_id.service_address_ids[0]
+            if self.tache_id:
+                service = self.address_id.service_address_ids.filtered(lambda x: x.tache_id == self.tache_id.id)
+                self.service_id = service and service[0] or False
+            else:
+                self.service_id = self.address_id.service_address_ids[0]
 
     @api.onchange('service_id')
     def _onchange_service_id(self):
         if self.service_id:
             self.tache_id = self.service_id.tache_id
+
+    @api.multi
+    def write(self, vals):
+        res = super(OFPlanningIntervention, self).write(vals)
+        if vals.get('state', False) == 'done':
+            for intervention in self:
+                if intervention.service_id:
+                    intervention.service_id.date_next = intervention.service_id.get_next_date(intervention.date_date)
+        return res
+
+    @api.model
+    def create(self, vals):
+        intervention = super(OFPlanningIntervention, self).write(vals)
+        if vals.get('state', False) == 'done':
+            if intervention.service_id:
+                intervention.service_id.date_next = intervention.service_id.get_next_date(intervention.date_date)
+        return intervention
 
 class ResPartner(models.Model):
     _inherit = "res.partner"

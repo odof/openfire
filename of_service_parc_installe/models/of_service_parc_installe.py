@@ -45,3 +45,10 @@ class OfParcInstalle(models.Model):
         action = self.env.ref('of_service_parc_installe.of_service_parc_installe_open_service').read()[0]
         action['domain'] = [('parc_installe_id', '=', self.id)]
         return action
+
+
+class ProjectIssue(models.Model):
+    _inherit = 'project.issue'
+
+    #service_id
+

@@ -20,23 +20,47 @@
                                 <field name="active" widget="boolean_button"
                                     options='{"terminology": "archive"}'/>
                             </button>
+                            <button name="toggle_recurrence" type="object"
+                                    class="oe_stat_button" icon="fa-repeat"
+                                    confirm="Êtes-vous sûr de vouloir activer/désactiver la récurrence de ce service ?">
+                                <field name="recurrence" widget="boolean_button"
+                                    options='{"terminology": {
+                                        "string_true": "Récurrent",
+                                        "hover_true": "Ponctuel?",
+                                        "string_false": "Poncutel",
+                                        "hover_false": "Récurrent?",
+                                        }}'/>
+                            </button>
                         </div>
                         <div class="oe_title">
-                            <separator string="Service"/>
+                            <separator string="Service récurrent" attrs="{'invisible': [('recurrence', '=', False)]}"/>
+                            <separator string="Prestation ponctuelle" attrs="{'invisible': [('recurrence', '=', True)]}"/>
                         </div>
                         <group>
-                            <field name="partner_id" invisible="context.get('hide_service_partner_id')"/>
-                            <field name="address_id" invisible="context.get('hide_service_address_id')"/>
-                            <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                            <group>
+                                <field name="partner_id" invisible="context.get('hide_service_partner_id')"/>
+                                <field name="address_id" invisible="context.get('hide_service_address_id')"/>
+                                <field name="secteur_tech_id"/>
+                                <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                                <field name="tache_id"/>
+                                <field name="tag_ids" widget="many2many_tags"/>
+                            </group>
+                            <group>
+                                <field name="date_next"/>
+                                <field name="date_fin"/>
+                                <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                <label for="recurring_interval" attrs="{'invisible': [('recurrence', '=', False)]}"/>
+                                <div attrs="{'invisible': [('recurrence', '=', False)]}" col="2">
+                                    <field name="recurring_interval" nolabel="1" class="oe_inline of_ws"/>
+                                    <field name="recurring_rule_type" nolabel="1" class="oe_inline"/>
+                                </div>
+                            </group>
+                            <group col="4" colspan="4">
+                                <label for="note" colspan="4"/>
+                                <field name="note" colspan="4" nolabel="1"/>
+                            </group>
 
-                            <field name="tache_id"/>
-                            <!-- <field name="template_id"/> -->
-                            <field name="date_next"/>
-                            <field name="date_fin"/>
-                            <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}"/>
-                            <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
-                            <field name="tag_ids" widget="many2many_tags"/>
-                            <field name="note"/>
                         </group>
                         <notebook>
                             <page string="Interventions">
@@ -66,36 +90,67 @@
             <field name="arch" type="xml">
                 <form>
                     <sheet>
-                        <field name="active" invisible="1"/>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="toggle_active" type="object"
+                                    class="oe_stat_button" icon="fa-archive"
+                                    confirm="Êtes-vous sûr de vouloir archiver/activer ce service ?">
+                                <field name="active" widget="boolean_button"
+                                    options='{"terminology": "archive"}'/>
+                            </button>
+                            <button name="toggle_recurrence" type="object"
+                                    class="oe_stat_button" icon="fa-repeat"
+                                    confirm="Êtes-vous sûr de vouloir activer/désactiver la récurrence de ce service ?">
+                                <field name="recurrence" widget="boolean_button"
+                                    options='{"terminology": {
+                                        "string_true": "Récurrent",
+                                        "hover_true": "Ponctuel?",
+                                        "string_false": "Poncutel",
+                                        "hover_false": "Récurrent?",
+                                        }}'/>
+                            </button>
+                        </div>
                         <group>
-                            <field name="partner_id" invisible="1"/>
-                            <field name="address_id" invisible="context.get('hide_service_address_id')"
-                                   domain="['|',('id','=',parent.id),('parent_id','=',parent.id)]"/>
-                            <field name="company_id" invisible="1"
+                            <group>
+                                <field name="partner_id" invisible="1"/>
+                                <field name="address_id" invisible="context.get('hide_service_address_id')"
+                                  domain="['|',('id','=',parent.id),('parent_id','=',parent.id)]"/>
+                                <field name="secteur_tech_id"/>
+                                <field name="company_id" invisible="1"
                                    options="{'no_create': True}" groups="base.group_multi_company"/>
-                            <separator string="Informations générales" colspan="2"/>
-                            <field name="tache_id"/>
-                            <!-- <field name="template_id"/> -->
-                            <field name="date_next"/>
-                            <field name="date_fin"/>
-                            <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}"/>
-                            <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
-                            <field name="tag_ids" widget="many2many_tags"/>
+                                <field name="tache_id"/>
+                                <field name="tag_ids" widget="many2many_tags"/>
+                            </group>
+                            <group>
+                                <field name="date_next"/>
+                                <field name="date_fin"/>
+                                <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                <label for="recurring_interval" attrs="{'invisible': [('recurrence', '=', False)]}"/>
+                                <div attrs="{'invisible': [('recurrence', '=', False)]}" col="2">
+                                    <field name="recurring_interval" nolabel="1" class="oe_inline of_ws"/>
+                                    <field name="recurring_rule_type" nolabel="1" class="oe_inline"/>
+                                </div>
+                            </group>
+                            <group col="4" colspan="4">
+                                <label for="note" colspan="4"/>
+                                <field name="note" colspan="4" nolabel="1"/>
+                            </group>
                         </group>
-                        <separator string="Notes"/>
-                        <field name="note"/>
-                        <separator string="Interventions"/>
-                        <field name="planning_ids" nolabel="1" colspan="2">
-                            <tree string="Liste des interventions" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done';purple:state=='unfinished'">
-                                <field name="name" string="Libellé"/>
-                                <field name="date"/>
-                                <field name="duree" string="Durée" widget="float_time"/>
-                                <field name="employee_ids"/>
-                                <field name="company_id"/>
-                                <field name="state"/>
-                                <field name="description"/>
-                            </tree>
-                        </field>
+                        <notebook>
+                            <page string="Interventions" name="intervention">
+                                <field name="planning_ids" nolabel="1" colspan="2">
+                                    <tree string="Liste des interventions" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done';purple:state=='unfinished'">
+                                        <field name="name" string="Libellé"/>
+                                        <field name="date"/>
+                                        <field name="duree" string="Durée" widget="float_time"/>
+                                        <field name="employee_ids"/>
+                                        <field name="company_id"/>
+                                        <field name="state"/>
+                                        <field name="description"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
                     </sheet>
                 </form>
             </field>
@@ -165,6 +220,7 @@
                     <field name="address_zip"/>
                     <field name="address_city"/>
                     <field name="partner_mobile"/>
+                    <field name="partner_phone"/>
                     <field name="name"/>
                     <field name="date_next"/>
                     <templates>
@@ -181,6 +237,9 @@
                                     </t>
                                     <t t-if="record.address_zip.raw_value">
                                         <i class="of_map_record_main fa fa-map-marker"/><span class="of_ws"/><field name="address_zip"/><span class="of_ws"/><field name="address_city"/><br/>
+                                    </t>
+                                    <t t-if="record.partner_phone.raw_value">
+                                        <i class="of_map_record_main fa fa-phone"/><span class="of_ws"/><field name="partner_phone"/><br/>
                                     </t>
                                     <t t-if="record.partner_mobile.raw_value">
                                         <i class="of_map_record_main fa fa-phone"/><span class="of_ws"/><field name="partner_mobile"/><br/>
@@ -212,6 +271,49 @@
                 </map>
             </field>
         </record>
+
+<!--##########################################################################################################################-->
+<!--##################################################_______Taches_______####################################################-->
+<!--##########################################################################################################################-->
+
+        <record id="of_planning_tache_view_form_service" model="ir.ui.view" >
+            <field name="name">of.planning.tache.form.service</field>
+            <field name="model">of.planning.tache</field>
+            <field name="inherit_id" ref="of_planning.of_planning_tache_view_form"/>
+            <field name="arch" type="xml" >
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button class="oe_stat_button" type="action"
+                        name="%(action_of_service_form_planning)d"
+                        icon="fa-home"
+                        context="{'search_default_tache_id': active_id}">
+                        <field string="Services" name="service_count" widget="statinfo"/>
+                    </button>
+                </xpath>
+                <xpath expr="//field[@name='imp_detail']" position="after">
+                    <field name="recurrence"/>
+                    <label for="recurring_interval" attrs="{'invisible': [('recurrence', '=', False)]}"/>
+                    <div attrs="{'invisible': [('recurrence', '=', False)]}" col="2">
+                        <field name="recurring_interval" nolabel="1" class="oe_inline of_ws"/>
+                        <field name="recurring_rule_type" nolabel="1" class="oe_inline"/>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_planning_tache_view_tree_service" model="ir.ui.view" >
+            <field name="name">of.planning.tache.tree.service</field>
+            <field name="model">of.planning.tache</field>
+            <field name="inherit_id" ref="of_planning.of_planning_tache_view_tree"/>
+            <field name="arch" type="xml" >
+                <xpath expr="//field[@name='category_id']" position="after">
+                    <field name="recurrence_display"/>
+                    <field name="recurrence" invisible="1"/>
+                    <field name="recurring_interval" invisible="1"/>
+                    <field name="recurring_rule_type" invisible="1"/>
+                </xpath>
+            </field>
+        </record>
+
 
 <!--##########################################################################################################################-->
 <!--#################################################______Étiquettes______###################################################-->
@@ -253,6 +355,22 @@
 <!--##########################################################################################################################-->
 <!--##################################################______Planning______####################################################-->
 <!--##########################################################################################################################-->
+
+        <record id="of_planning_intervention_view_form_service" model="ir.ui.view" >
+            <field name="name">of.planning.intervention.form.service</field>
+            <field name="model">of.planning.intervention</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='tache_id']" position="after">
+                    <field name="service_id" context="{
+                    'default_partner_id': partner_id,
+                    'default_address_id': address_id,
+                    'default_tache_id': tache_id,
+                    }"/>
+                </xpath>
+            </field>
+        </record>
 
 <!--##########################################################################################################################-->
 <!--##################################################______Partenaire______##################################################-->

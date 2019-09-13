@@ -48,6 +48,12 @@ class OFParcInstalle(models.Model):
 
     _sql_constraints = [('no_serie_uniq', 'unique(name)', u"Ce numéro de série est déjà utilisé et doit être unique.")]
 
+    @api.onchange('client_id')
+    def _onchange_client_id(self):
+        self.ensure_one()
+        if self.client_id:
+            self.site_adresse_id = self.client_id
+
     @api.multi
     @api.depends('client_id', 'client_id.geo_lat', 'client_id.geo_lng', 'client_id.precision',
                  'site_adresse_id', 'site_adresse_id.geo_lat', 'site_adresse_id.geo_lng', 'site_adresse_id.precision')

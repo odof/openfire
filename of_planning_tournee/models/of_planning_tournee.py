@@ -128,8 +128,8 @@ class OfPlanningIntervention(models.Model):
                 if bloque_ids:
                     raise ValidationError(u'Un des intervenants a déjà une tournée bloquée sur ce créneau')
 
-        intervention_retires_ids = intervention_obj.search([('employee_ids', 'in', retire_ids)])
-        intervention_obj.remove_tournees(intervention.date, intervention_retires_ids)
+                intervention_retires_ids = intervention_obj.search([('employee_ids', 'in', retire_ids)])
+                intervention_obj.remove_tournees(intervention.date, intervention_retires_ids)
 
         super(OfPlanningIntervention, self).write(vals)
 
