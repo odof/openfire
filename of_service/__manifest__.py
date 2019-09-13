@@ -11,6 +11,7 @@
         'of_planning',
         'of_map_view',
         'of_utils',
+        #'of_base_location', < par of_planning
     ],
     'init_xml' : [],
     'demo_xml' : [],

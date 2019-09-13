@@ -53,7 +53,12 @@
                 <field name="id" invisible="1"/>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button class="oe_stat_button" name="action_view_service" type="object" icon="fa-archive" context="{'default_partner_id': client_id, 'default_address_id': site_adresse_id, 'default_parc_installe_id': id}">
+                <button class="oe_stat_button" name="action_view_service" type="object" icon="fa-home"
+                context="{
+                    'default_partner_id': client_id,
+                    'default_address_id': site_adresse_id,
+                    'default_recurrence': True,
+                    'default_parc_installe_id': id}">
                     <div class="o_form_field o_stat_info">
                         <span class="o_stat_value"><field name="service_count"/></span>
                         <span class="o_stat_text">Services</span>
