@@ -4,6 +4,7 @@ from odoo import models, fields, api
 from odoo.exceptions import UserError
 
 import time
+import tempfile
 import os
 import base64
 
@@ -232,10 +233,17 @@ class OfComposeMail(models.TransientModel):
 
             # Generation du fichier rempli. Le parametre flatten (True par defaut) retire la possibilite de modifier le document pdf genere
             file_path = attachment_obj._full_path(attachment.store_fname)
-            generated_pdf = pypdftk.fill_form(file_path, datas, flatten=not self.lettre_id.fillable)
-            os.rename(generated_pdf, generated_pdf + '.pdf')
-            with open(generated_pdf + '.pdf', "rb") as encode:
-                encoded_file = base64.b64encode(encode.read())
+            fd, generated_pdf = tempfile.mkstemp(prefix='gesdoc_', suffix='.pdf')
+            try:
+                pypdftk.fill_form(file_path, datas, out_file=generated_pdf, flatten=not self.lettre_id.fillable)
+                with open(generated_pdf, "rb") as encode:
+                    encoded_file = base64.b64encode(encode.read())
+            finally:
+                os.close(fd)
+                try:
+                    os.remove(generated_pdf)
+                except Exception:
+                    pass
             # Si c'est un rapport généré depuis un SAV, on prend le no du SAV et le nom du client
             if self._context['model'] == 'project.issue' and datas.get('cnom') and datas.get('sno'):
                 res_file_name = datas['sno'] + ' ' + datas['cnom'] + '.pdf'
