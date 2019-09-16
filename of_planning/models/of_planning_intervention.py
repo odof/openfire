@@ -438,8 +438,8 @@ class OfPlanningIntervention(models.Model):
     gb_employee_id = fields.Many2one('hr.employee', compute=lambda *a, **k: {}, search='_search_gb_employee_id',
                                      string="Intervenant", of_custom_groupby=True)
 
-    color_ft = fields.Char(related="employee_main_id.of_color_ft", readonly=True)
-    color_bg = fields.Char(related="employee_main_id.of_color_bg", readonly=True)
+    of_color_ft = fields.Char(related="employee_main_id.of_color_ft", readonly=True, oldname='color_ft')
+    of_color_bg = fields.Char(related="employee_main_id.of_color_bg", readonly=True, oldname='color_bg')
 
     order_id = fields.Many2one("sale.order", string="Commande associée")
     of_notes_intervention = fields.Html(related='order_id.of_notes_intervention', readonly=True)

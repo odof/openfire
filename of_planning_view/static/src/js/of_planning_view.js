@@ -250,7 +250,7 @@ var PlanningView = View.extend({
                 self.rows = {};
                 self.set_columns();
                 if (events.length >0) {
-                    //console.log("events: ",events,self.fields_keys);
+                    console.log("events: ",events,self.fields_keys);
 
                     var filter_item;
                     var event, planning_record, day_span, col_offset_start, col_offset_stop, record_options, row_options;
@@ -281,38 +281,39 @@ var PlanningView = View.extend({
                             "day_span": day_span,
                         }
                         //console.log("col_offset_start: ",col_offset_start);
-                        
+                        // TODO get filter labels
                         //console.log("event: ",event);
-                        la_key = event[self.resource][0];
-                        if (!self.all_filters[la_key]) {
-                            filter_item = {
-                                value: la_key,
-                                input_id: la_key + "_input",
-                                label: event[self.resource][1],
-                                //color: self.get_color(key),
-                                //avatar_model: (utils.toBoolElse(self.avatar_filter, true) ? self.avatar_filter : false ),
-                                is_checked: true,
+                        res_keys = event[self.resource];
+                        for (var la_key in res_keys) {
+                            if (!self.all_filters[la_key]) {
+                                filter_item = {
+                                    value: la_key,
+                                    input_id: la_key + "_input",
+                                    label: event[self.resource],
+                                    //color: self.get_color(key),
+                                    //avatar_model: (utils.toBoolElse(self.avatar_filter, true) ? self.avatar_filter : false ),
+                                    is_checked: true,
+                                };
+                                self.all_filters[la_key] = filter_item;
                             };
-                            self.all_filters[la_key] = filter_item;
-                        };
-                        if (! _.contains(self.now_filter_ids, la_key)) {
-                            self.now_filter_ids.push(la_key);
-                        };
-                        if (!self.rows[la_key]) {
-                            row_options = {
-                                "res_id": event[self.resource][0],
-                                "head_column": event[self.resource][1],
-                                "color_bg": event[self.color_bg] || "#7FFF00",
-                                "color_ft": event[self.color_ft] || "#0C0C0C",
-                                "auto_render": false,
+                            if (! _.contains(self.now_filter_ids, la_key)) {
+                                self.now_filter_ids.push(la_key);
+                            };
+                            if (!self.rows[la_key]) {
+                                row_options = {
+                                    "res_id": event[self.resource][0],
+                                    "head_column": event[self.resource][1],
+                                    "color_bg": event[self.color_bg] || "#7FFF00",
+                                    "color_ft": event[self.color_ft] || "#0C0C0C",
+                                    "auto_render": false,
+                                }
+                                //console.log("PLANNING_ROECORD",planning_record);
+                                self.rows[la_key] = new PlanningView.Row(self.table,self,[],row_options);
                             }
-                            //console.log("PLANNING_ROECORD",planning_record);
-                            self.rows[la_key] = new PlanningView.Row(self.table,self,[],row_options);
-                        }
 
-                        planning_record = new PlanningRecord(self.rows[la_key],self,event,record_options);
-                        self.rows[la_key].add_record(planning_record);
-                        
+                            planning_record = new PlanningRecord(self.rows[la_key],self,event,record_options);
+                            self.rows[la_key].add_record(planning_record);
+                        }
                     }
                 }
 

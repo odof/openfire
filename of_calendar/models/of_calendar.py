@@ -600,20 +600,23 @@ class HREmployee(models.Model):
 
 
     @api.model
-    def get_horaires_effectif_date(self, str_date, liste_horaires):
-        """fonction qui utilise le résultat de get_list_horaires pour trouver les horaires à une date donnée
+    def get_horaires_effectif_date(self, str_date, dict_list_horaires):
+        """fonction qui utilise le résultat de get_dict_list_horaires pour trouver les horaires à une date donnée
         résultat équivalent à celui de get_horaires_date
         résultat sous forme { employee_id :  [(h_deb, h_fin), (h_deb, h_fin), ..] ,  .. }"""
-        res = []
+        res = {}
         d_date = fields.Date.from_string(str_date)
         num_jour = d_date.isoweekday()
-        for employee_id in liste_horaires:
-            res[employee_id] = []
-            segments = liste_horaires[employee_id]
+        for employee_id in dict_list_horaires:
+            segments = dict_list_horaires[employee_id]
             for segment in segments:
-                if se_chevauchent(str_date, str_date, segment[0], segment[1], True):  # la date demandée est sur ce segment d'horaires
-                    res[employee_id] = segment[2][num_jour]
+                if not segment[1]:  # segment sans date de fin
+                    res[employee_id] = num_jour in segment[2] and segment[2][num_jour] or []
                     break
+                if se_chevauchent(str_date, str_date, segment[0], segment[1], True):  # la date demandée est sur ce segment d'horaires
+                    res[employee_id] = num_jour in segment[2] and segment[2][num_jour] or []
+                    break
+        return res
 
     @api.model
     def debut_sur_creneau(self, str_date, h_debut, list_segments):
@@ -631,17 +634,20 @@ class HREmployee(models.Model):
                     return -1
         return -1
 
-    """
-    À refaire quand passage à l'étape de la vue planning
     @api.model
-    def get_min_max_time(self):
-        "" "
+    def get_min_max_time(self, date_debut=False, date_fin=False):
+        """
         parcours toutes équipes pour trouver les heures minimales et maximales de travail. 
         Appelée depuis la CalendarView si l'attribut 'working_hours' est à "1". Sert à restreindre la vue Calendar pour ne pas voir les heures entre 0 et min, ni celles entre max et 24
         renvois les valeurs en UTC
         /!| Cette fonction est appelée avant de savoir les dates de début et de fin. on prend donc tous les horaires possibles
-        "" "
-        employees = self.env['hr.employee'].search([])
+        """
+        min_time = self.env['ir.values'].get_default('res.config.settings', 'calendar_min_time')
+        max_time = self.env['ir.values'].get_default('res.config.settings', 'calendar_max_time')
+        
+        
+        
+        """employees = self.env['hr.employee'].search([])
         min_time = False
         max_time = False
         min_equipe = False
@@ -701,8 +707,8 @@ class HREmployee(models.Model):
             if max_time == False:
                 max_time = flo_max
             elif flo_max > max_time:
-                max_time = flo_max
-        return (min_time, max_time)"""
+                max_time = flo_max"""
+        return (min_time or 3.0, max_time or 21.0)
 
     @api.multi
     def write(self, vals):

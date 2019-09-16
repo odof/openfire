@@ -21,6 +21,7 @@ Ajout du bouton "planifier une intervention" dans les SAV et parc installé.
     ],
     'data' : [
         'views/of_tournee_parc_installe_views.xml',
+        'wizard/rdv_views.xml',
     ],
     'installable': True,
     'auto_install': True,
