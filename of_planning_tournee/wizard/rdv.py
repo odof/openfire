@@ -65,7 +65,7 @@ class OfTourneeRdv(models.TransientModel):
         elif active_model in ["res.partner", "sale.order"]:
             partner = self._default_partner()
             if partner:
-                service = self.env['of.service'].search([('partner_id', '=', partner.id)], limit=1)
+                service = self.env['of.service'].search([('partner_id', '=', partner.id),('recurrence', '=', True)], limit=1)
         return service
 
     @api.model
@@ -280,7 +280,7 @@ class OfTourneeRdv(models.TransientModel):
 
         # Jours du service, jours travaillés des équipes et horaires de travail
         jours_service = [jour.numero for jour in service.jour_ids] if service else range(1, 8)
-        liste_horaires = employee_obj.get_list_horaires(employees._ids, self.date_recherche_debut, self.date_recherche_fin)
+        dict_list_horaires = employee_obj.get_dict_list_horaires(employees._ids, self.date_recherche_debut, self.date_recherche_fin)
 
         un_jour = timedelta(days=1)
         # --- Création des créneaux de début et fin de recherche ---
@@ -341,7 +341,7 @@ class OfTourneeRdv(models.TransientModel):
             if d_recherche >= d_apres_recherche:
                 continue
             str_d_recherche = fields.Date.to_string(d_recherche)
-            horaires_du_jour = employee_obj.get_horaires_effectif_date(str_d_recherche, liste_horaires)
+            horaires_du_jour = employee_obj.get_horaires_effectif_date(str_d_recherche, dict_list_horaires)
 
             # Interdiction de chercher dans les tournées bloquées ou complètes
             self._cr.execute("SELECT employee_id "
@@ -569,24 +569,8 @@ class OfTourneeRdv(models.TransientModel):
         }
 
     @api.multi
-    def button_confirm(self):
+    def get_values_intervention_create(self):
         self.ensure_one()
-        if not self._context.get('tz'):
-            self = self.with_context(tz='Europe/Paris')
-
-        intervention_obj = self.env['of.planning.intervention']
-        service_obj = self.env['of.service']
-
-        # Vérifier que la date de début et la date de fin sont dans les créneaux
-        employee = self.employee_id
-        if not employee.of_archive_horaires:
-            raise UserError("Il faut configurer l'horaire de travail de tous les intervenants.")
-
-        #td_pause_midi = timedelta(hours=equipe.hor_ad - equipe.hor_mf)
-        dt_propos = fields.Datetime.from_string(self.date_propos)  # datetime utc proposition de rdv
-        dt_propos_deadline = dt_propos + timedelta(hours=self.duree)  # datetime utc proposition fin de rdv
-        str_d_propos = self.date_propos[:10]
-
         values = {
             'hor_md': employee.of_mode_horaires == 'easy' and employee.hor_md or 0.0,
             'hor_mf': employee.of_mode_horaires == 'easy' and employee.hor_mf or 0.0,
@@ -610,9 +594,28 @@ class OfTourneeRdv(models.TransientModel):
             'verif_dispo': True,
         }
 
-        # Si rdv RES pris depuis un SAV, on le lie au SAV
-        if self._context.get('active_model') == 'crm.helpdesk':
-            values['sav_id'] = self._context.get('active_id', False)
+        return values
+
+    @api.multi
+    def button_confirm(self):
+        self.ensure_one()
+        if not self._context.get('tz'):
+            self = self.with_context(tz='Europe/Paris')
+
+        intervention_obj = self.env['of.planning.intervention']
+        service_obj = self.env['of.service']
+
+        # Vérifier que la date de début et la date de fin sont dans les créneaux
+        employee = self.employee_id
+        if not employee.of_archive_horaires:
+            raise UserError("Il faut configurer l'horaire de travail de tous les intervenants.")
+
+        #td_pause_midi = timedelta(hours=equipe.hor_ad - equipe.hor_mf)
+        dt_propos = fields.Datetime.from_string(self.date_propos)  # datetime utc proposition de rdv
+        dt_propos_deadline = dt_propos + timedelta(hours=self.duree)  # datetime utc proposition fin de rdv
+        str_d_propos = self.date_propos[:10]
+
+        values = self.get_values_intervention_create()
 
         res = intervention_obj.create(values)
 
@@ -640,6 +643,7 @@ class OfTourneeRdv(models.TransientModel):
         """
         self.ensure_one()
         wizard_line_obj = self.env['of.tournee.rdv.line']
+        tournee_obj = self.env['of.planning.tournee']
         lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
         un_jour = timedelta(days=1)
         date_courante = date_debut
@@ -652,7 +656,9 @@ class OfTourneeRdv(models.TransientModel):
                                                    ('employee_id', '=', employee.id)], order="debut_dt")
                 if len(creneaux) == 0:
                     continue
-                tournee = creneaux.mapped("intervention_id").mapped("tournee_id")
+                tournee = tournee_obj.search([('date', '=', date_courante),
+                                              ('employee_id', '=', employee.id)], limit=1)
+                #tournee = creneaux.mapped("intervention_id").mapped("tournee_ids").filtered(lambda t: t.employee_id == employee.id)
                 # S'il y a une tournée, on favorise son point de départ plutôt que celui de l'employé.
                 # Note : une tournée est unique par employé et par date (contrainte SQL) donc len(tournee) <= 1
                 origine = (tournee.address_depart_id or
@@ -788,8 +794,8 @@ class OfTourneeRdvLine(models.TransientModel):
     duree = fields.Float(string=u'Durée.tot. (min)', digits=(12, 0), help=u"durée prec + durée suiv")
     duree_prec = fields.Float(string=u'Durée.Prec. (min)', digits=(12, 0))
     duree_suiv = fields.Float(string=u'Durée.Suiv. (min)', digits=(12, 0))
-    color_ft = fields.Char(related="employee_id.of_color_ft", readonly=True)
-    color_bg = fields.Char(related="employee_id.of_color_bg", readonly=True)
+    of_color_ft = fields.Char(related="employee_id.of_color_ft", readonly=True)
+    of_color_bg = fields.Char(related="employee_id.of_color_bg", readonly=True)
     disponible = fields.Boolean(string="Est dispo", default=True)
     force_color = fields.Char("Couleur")
     allday = fields.Boolean('All Day', default=False)
