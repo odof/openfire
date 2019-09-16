@@ -91,7 +91,7 @@ CalendarView.include({
             self.draggable = _.str.toBool(val) || self.draggable; // if false in system parameters but true in view definition, make it true
             dfd.resolve();
         });
-        if (this.attendee_model && this.working_hours) {
+        if (this.attendee_model && this.working_hours == 'attendees' || this.parent_model && this.working_hours == 'parent') {
             this.set_min_max_time()
             .then(function () {
                 dfd2.resolve();
@@ -336,12 +336,19 @@ CalendarView.include({
     set_min_max_time: function() {
         var self = this;
         var dfd = $.Deferred();
+        var model;
+        console.log("SET MIN MAX TIME")
 
-        var model = new Model(this.attendee_model);
+        if (self.working_hours == 'parent') {
+            model = new Model(this.parent_model);
+        }else{
+            model = new Model(this.attendee_model);
+        }
         model.call('get_min_max_time')
         .then(function (res) {
             // res is a tuple (min, max) in UTC
             if (!res) {
+                console.log("OUCH!",res)
                 dfd.resolve();
                 return;
             }
@@ -356,6 +363,7 @@ CalendarView.include({
             var maxUTC = new Date(str_prefix + max_time_utc + str_suffix );
             self.minTime = minUTC.toLocaleTimeString();
             self.maxTime = maxUTC.toLocaleTimeString();
+            console.log("MIN MAX",self.minTime,self.maxTime);
             dfd.resolve();
             return;
         });

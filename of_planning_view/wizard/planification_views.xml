@@ -49,7 +49,7 @@
         view_id="view_of_planif_wizard"
         id="action_view_of_planif_wizard"
         target="new"
-        groups="of_planning.of_group_planning_intervention_user"
+        groups="of_planning.of_group_planning_intervention_modification_siens"
     />
 
 </odoo>
