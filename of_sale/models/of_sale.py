@@ -67,10 +67,17 @@ class OfDocumentsJoints(models.AbstractModel):
                                                     ('res_field', '=', 'file'),
                                                     ('res_id', '=', mail_template.id)])
                 file_path = attachment_obj._full_path(attachment.store_fname)
-                generated_pdf = pypdftk.fill_form(file_path, datas, flatten=not mail_template.fillable)
-                os.rename(generated_pdf, generated_pdf + '.pdf')
-                with open(generated_pdf + '.pdf', "rb") as encode:
-                    encoded_file = base64.b64encode(encode.read())
+                fd, generated_pdf = tempfile.mkstemp(prefix='doc_joint_', suffix='.pdf')
+                try:
+                    pypdftk.fill_form(file_path, datas, out_file=generated_pdf, flatten=not mail_template.fillable)
+                    with open(generated_pdf, "rb") as encode:
+                        encoded_file = base64.b64encode(encode.read())
+                finally:
+                    os.close(fd)
+                    try:
+                        os.remove(generated_pdf)
+                    except Exception:
+                        pass
                 data.append(encoded_file)
         return data
 
@@ -525,31 +532,29 @@ class Report(models.Model):
         if report_name in allowed_reports:
             # On ajoute au besoin les documents joint
             model = self.env[allowed_reports[report_name]].browse(docids)[0]
-            for mail_data in model._detect_doc_joint():
-                if mail_data:
-                    # Create temp files
-                    fd1, order_pdf = tempfile.mkstemp()
-                    fd2, mail_pdf = tempfile.mkstemp()
-                    fd3, merge_pdf = tempfile.mkstemp()
+            mails_data = model._detect_doc_joint()
+            if mails_data:
+                fd, order_pdf = tempfile.mkstemp()
+                os.write(fd, result)
+                os.close(fd)
+                file_paths = [order_pdf]
 
-                    os.write(fd1, result)
-                    os.write(fd2, base64.b64decode(mail_data))
+                for mail_data in mails_data:
+                    fd, mail_pdf = tempfile.mkstemp()
+                    os.write(fd, base64.b64decode(mail_data))
+                    os.close(fd)
+                    file_paths.append(mail_pdf)
 
-                    output = pyPdf.PdfFileWriter()
-                    pdfOne = pyPdf.PdfFileReader(file(order_pdf, "rb"))
-                    pdfTwo = pyPdf.PdfFileReader(file(mail_pdf, "rb"))
-
-                    for page in range(pdfOne.getNumPages()):
-                        output.addPage(pdfOne.getPage(page))
-
-                    for page in range(pdfTwo.getNumPages()):
-                        output.addPage(pdfTwo.getPage(page))
-
-                    outputStream = file(merge_pdf, "wb")
-                    output.write(outputStream)
-                    outputStream.close()
-
-                    result = file(merge_pdf, "rb").read()
+                result_file_path = self.env['report']._merge_pdf(file_paths)
+                try:
+                    result_file = file(result_file_path, "rb")
+                    result = result_file.read()
+                    result_file.close()
+                    for file_path in file_paths:
+                        os.remove(file_path)
+                    os.remove(result_file_path)
+                except Exception:
+                    pass
         return result
 
 
