@@ -124,7 +124,7 @@ class OfPlanningIntervention(models.Model):
     user_id = fields.Many2one('res.users', string='Utilisateur', default=lambda self: self.env.uid)
     partner_id = fields.Many2one('res.partner', string='Client', compute='_compute_partner_id', store=True)
     address_id = fields.Many2one('res.partner', string='Adresse')
-    partner_city = fields.Char(related='address_id.city')
+    partner_city = fields.Char(related='address_id.city', string="Ville")
     raison_id = fields.Many2one('of.planning.intervention.raison', string='Raison')
     tache_id = fields.Many2one('of.planning.tache', string='Tâche', required=True)
     equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe', required=True, oldname='poseur_id')
@@ -138,6 +138,7 @@ class OfPlanningIntervention(models.Model):
         ('postponed', u'Reporté'),
         ], string=u'État', index=True, readonly=True, default='draft')
     company_id = fields.Many2one('res.company', string='Magasin', default=lambda self: self.env.user.company_id.id)
+    tag_ids = fields.Many2many('of.planning.tag', column1='intervention_id', column2='tag_id', string=u'Étiquettes')
     description = fields.Html(string='Description')  # Non utilisé, changé pour notes intervention
     hor_md = fields.Float(string=u'Matin début', required=True, digits=(12, 5))
     hor_mf = fields.Float(string='Matin fin', required=True, digits=(12, 5))
@@ -719,3 +720,12 @@ class OfPlanningInterventionTemplate(models.Model):
                 'padding': 4,
             }
             template.sequence_id = self.env['ir.sequence'].sudo().create(sequence_data)
+
+class OfPlanningTag(models.Model):
+    _description = "Étiquettes d'intervention"
+    _name = 'of.planning.tag'
+
+    name = fields.Char(string='Nom', required=True, translate=True)
+    color = fields.Integer(string='Index couleur')
+    active = fields.Boolean(default=True, help="Le champ 'Active' vous permet de cacher l'étiquette sans la supprimer.")
+    intervention_ids = fields.Many2many('of.planning.intervention', column1='tag_id', column2='intervention_id', string='Interventions')
