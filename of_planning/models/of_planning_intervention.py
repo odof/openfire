@@ -654,15 +654,15 @@ class OfPlanningIntervention(models.Model):
                 d_courante += un_jour
                 str_d_courante = fields.Date.to_string(d_courante).decode('utf-8')
 
-                if str_d_courante > segment_courant[1]:  # changer de segment courant
+                if str_d_courante > segment_courant[1] and len(segments_equipe) > 0:  # changer de segment courant
                     segment_courant = segments_equipe.pop(0)
                     dict_horaires = segment_courant[2]
                 
-                while jour_courant not in dict_horaires: # on saute les jours non travaillés
-                    jour_courant = ((le_jour + 1) % 7) or 7 # num jour de la semaine entre 1 et 7
+                while jour_courant not in dict_horaires or dict_horaires[jour_courant] == []: # on saute les jours non travaillés
+                    jour_courant = ((jour_courant + 1) % 7) or 7 # num jour de la semaine entre 1 et 7
                     #dt_courante_deb += un_jour
                     d_courante += un_jour
-                    if str_d_courante > segment_courant[1]:  # changer de segment courant
+                    if str_d_courante > segment_courant[1] and len(segments_equipe) > 0:  # changer de segment courant
                         segment_courant = segments_equipe.pop(0)
                         dict_horaires = segment_courant[2]
 

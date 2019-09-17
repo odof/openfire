@@ -13,7 +13,7 @@ class OfService(models.Model):
 class OfPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
-    parc_installe_id = fields.Many2one('of.parc.installe', string=u"Parc installé")
+    parc_installe_id = fields.Many2one('of.parc.installe', string=u"Parc installé", domain="['|', '|', ('client_id', '=', partner_id), ('client_id', '=', address_id), ('site_adresse_id', '=', address_id)]")
 
     @api.multi
     def button_open_of_planning_intervention(self):

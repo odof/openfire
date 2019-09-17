@@ -241,6 +241,7 @@ var PlanningView = View.extend({
             self.all_filters = {};
         }
         var event_domain = self.get_range_domain(this.domain || [],this.range_start,this.range_stop);
+        self.view_res_ids = [];
         self.dataset.read_slice(self.fields_keys, {
                     offset: 0,
                     domain: event_domain,
@@ -253,15 +254,18 @@ var PlanningView = View.extend({
                     console.log("events: ",events,self.fields_keys);
 
                     var filter_item;
-                    var event, planning_record, day_span, col_offset_start, col_offset_stop, record_options, row_options;
+                    var event, planning_record, day_span, col_offset_start, col_offset_stop, record_options, row_options, event_res_ids, res_id, rgb;
                     for (var i=0; i<events.length; i++) {
+                        //console.log(i,events.length);
                         event = events[i];
+                        event_res_ids = event[self.resource];
                         // how many days?
                         day_span = moment(event[self.date_stop]).startOf('day').diff(moment(event[self.date_start]).startOf('day'), 'days')+1;
                         //console.log("EVENT:",event);
                         //console.log("DAY SPAN:",day_span);
                         if (day_span > 1) {
                             col_offset_stop = moment(event[self.date_stop]).startOf('day').diff(moment(self.range_start), 'days');
+                            //col_offset_stop = Math.min(col_offset_stop,6);
                         }else{
                             col_offset_stop = undefined;
                         }
@@ -276,71 +280,104 @@ var PlanningView = View.extend({
                         record_options = {
                             "col_offset_start": col_offset_start,
                             "col_offset_stop": col_offset_stop,
-                            "color_bg": event[self.color_bg] || "#7FFF00",
-                            "color_ft": event[self.color_ft] || "#0C0C0C",
+                            //"color_bg": event[self.color_bg] || "#7FFF00",
+                            //"color_ft": event[self.color_ft] || "#0C0C0C",
                             "day_span": day_span,
                         }
                         //console.log("col_offset_start: ",col_offset_start);
                         // TODO get filter labels
                         //console.log("event: ",event);
-                        res_keys = event[self.resource];
-                        for (var la_key in res_keys) {
-                            if (!self.all_filters[la_key]) {
+                        self.view_res_ids = _.union(self.view_res_ids, event_res_ids);
+                        //console.log("self.res_ids",self.res_ids);
+                        for (var j in event_res_ids) {
+                            res_id = event_res_ids[j];
+                            if (!self.all_filters[res_id]) {
                                 filter_item = {
-                                    value: la_key,
-                                    input_id: la_key + "_input",
+                                    value: res_id,
+                                    input_id: res_id + "_input",
                                     label: event[self.resource],
                                     //color: self.get_color(key),
                                     //avatar_model: (utils.toBoolElse(self.avatar_filter, true) ? self.avatar_filter : false ),
                                     is_checked: true,
                                 };
-                                self.all_filters[la_key] = filter_item;
+                                self.all_filters[res_id] = filter_item;
                             };
-                            if (! _.contains(self.now_filter_ids, la_key)) {
-                                self.now_filter_ids.push(la_key);
+                            if (! _.contains(self.now_filter_ids, res_id)) {
+                                self.now_filter_ids.push(res_id);
                             };
-                            if (!self.rows[la_key]) {
+                            if (!self.rows[res_id]) {
                                 row_options = {
-                                    "res_id": event[self.resource][0],
-                                    "head_column": event[self.resource][1],
-                                    "color_bg": event[self.color_bg] || "#7FFF00",
-                                    "color_ft": event[self.color_ft] || "#0C0C0C",
+                                    "res_id": res_id,
+                                    //"head_column": "",
+                                    //"color_bg": event[self.color_bg] || "#7FFF00",
+                                    //"color_ft": event[self.color_ft] || "#0C0C0C",
                                     "auto_render": false,
                                 }
                                 //console.log("PLANNING_ROECORD",planning_record);
-                                self.rows[la_key] = new PlanningView.Row(self.table,self,[],row_options);
+                                self.rows[res_id] = new PlanningView.Row(self.table,self,[],row_options);
                             }
+                            //console.log("WEUT");
 
-                            planning_record = new PlanningRecord(self.rows[la_key],self,event,record_options);
-                            self.rows[la_key].add_record(planning_record);
+                            planning_record = new PlanningRecord(self.rows[res_id],self,event,record_options);
+                            self.rows[res_id]["records_to_add"].push(planning_record);
                         }
                     }
                 }
 
-                if (self.sidebar) {
-                    self.sidebar.reso_filter.render();
-                    /*if (self.sidebar.info_filter.rendered) {
-                        console.log("ALREADY RENDERED!");
-                        self.sidebar.info_filter.apply_filters();
-                    }else{
-                        self.sidebar.info_filter.render(); //@TODO: trouver un meilleur endroit pour faire ça!//
-                    }*/
-                    
-                    //console.log("self.now_filter_ids:",self.now_filter_ids);
-                    for (var key in self.rows) {
-                        var key_num = Number(key);
-                        if (_.include(self.now_filter_ids, key_num) &&  self.all_filters[key_num].is_checked) {
-                            self.rows[key].hidden = false;
+                // initialiser les segments horaires des employés
+                var prom = self.set_res_horaires_info();
+                $.when(prom).then(function () {
+                    if (self.sidebar) {
+                        self.sidebar.reso_filter.render();
+                        /*if (self.sidebar.info_filter.rendered) {
+                            console.log("ALREADY RENDERED!");
+                            self.sidebar.info_filter.apply_filters();
                         }else{
-                            self.rows[key].hidden = true;
+                            self.sidebar.info_filter.render(); //@TODO: trouver un meilleur endroit pour faire ça!//
+                        }*/
+                        
+                        //console.log("self.now_filter_ids:",self.now_filter_ids);
+                        for (var key in self.rows) {
+                            var key_num = Number(key);
+                            if (_.include(self.now_filter_ids, key_num) &&  self.all_filters[key_num].is_checked) {
+                                self.rows[key].hidden = false;
+                            }else{
+                                self.rows[key].hidden = true;
+                            }
                         }
                     }
-                }
-                console.log("self.rows: ",self.rows);
-                
-                self.table.rows = self.rows;
-                self.render_table();
+                    for (var key in self.rows) {
+                        //console.log("HORAIRES INFO",self.res_horaires_info,key);
+                        self.rows[key].segments_horaires = self.res_horaires_info[key]['segments'];
+                        self.rows[key].col_offset_to_segment = self.res_horaires_info[key]['col_offset_to_segment'];
+                        self.rows[key].fillerbars = self.res_horaires_info[key]['fillerbars'];
+                        self.rows[key].creneaux_dispo = self.res_horaires_info[key]['creneaux_dispo'];
+                        self.rows[key].color_bg = self.res_horaires_info[key]['color_bg'];
+                        self.rows[key].color_ft = self.res_horaires_info[key]['color_ft'];
+                        rgb = hexToRgb(self.res_horaires_info[key]['color_bg']);
+                        self.rows[key].color_bg_rgba = "rgba(" + rgb.r + "," + rgb.g + "," + rgb.b + ",0.3);";
+                    }
+                    console.log("self.rows: ",self.rows);
+                    
+                    self.table.rows = self.rows;
+                    self.render_table();
+
+                })
             });
+    },
+    set_res_horaires_info: function() {
+        var self = this;
+        var dfd = $.Deferred();
+        var p = dfd.promise()
+        //var model_name = self.fields[self.resource].relation;
+        var Planning = new Model(self.model);
+        Planning.call('get_emp_horaires_info', [self.view_res_ids, self.range_start, self.range_stop])
+        .then(function (result) {
+            console.log("self.res_horaires_info",result);
+            self.res_horaires_info = result;
+            dfd.resolve();
+        });
+        return $.when(p);
     },
     /**
      *  called by PlanningView.get_all_filters_ordered
@@ -354,10 +391,10 @@ var PlanningView = View.extend({
         var p = dfd.promise({target: kays});
         var kays = [];
         var model_name = self.fields[self.resource].relation;
-        console.log("MODEL NAME:",model_name);
+        //console.log("MODEL NAME:",model_name);
 
         var Attendees = new Model(model_name);
-        Attendees.query(['id', self.color_ft, self.color_bg]) // retrieve colors from db
+        Attendees.query(['id', self.color_ft, self.color_bg, 'name']) // retrieve colors from db
             .filter([['id','in',ids]]) // id
             .all()
             .then(function (attendees){
@@ -365,6 +402,7 @@ var PlanningView = View.extend({
                     var a = attendees[i];
                     var key = a.id;
                     kays.push(key);
+                    self.all_filters[key]['label'] = a['name'];
                     self.all_filters[key]['color_bg'] = a[self.color_bg];
                     self.all_filters[key]['color_ft'] = a[self.color_ft];
                 };
@@ -675,15 +713,20 @@ PlanningView.Table = Widget.extend({
 PlanningView.Row = Widget.extend({
     template: "PlanningView.row",
     tagName: 'tr',
+    custom_events: {
+        'record_added': 'on_record_added',
+        'all_records_added': 'on_all_records_added',
+    },
     init: function(parent, view, records, options) {
         var self = this;
         console.log("PlanningView.Row init args: ",arguments);
         this._super.apply(this, arguments);
         this.options = options;
-        this.color_bg = options.color_bg;
-        var le_rgb = hexToRgb(this.color_bg);
-        this.color_bg_rgba = "rgba(" + le_rgb.r + "," + le_rgb.g + "," + le_rgb.b + ",0.3);"
-        this.color_ft = options.color_ft;
+        // couleurs affectées dans le _do_search de la vue
+        //this.color_bg = options.color_bg;
+        //var le_rgb = hexToRgb(this.color_bg);
+        //this.color_bg_rgba = "rgba(" + le_rgb.r + "," + le_rgb.g + "," + le_rgb.b + ",0.3);"
+        //this.color_ft = options.color_ft;
         this.res_id = options.res_id;
         this.id = "of_planning_row_" + this.res_id;
         this.hidden = options.hidden || false;
@@ -695,13 +738,16 @@ PlanningView.Row = Widget.extend({
         this.columns = new Array(this.column_nb);
         this.fillerbars = [];//new Array(this.column_nb);
         this.records_multiples = {};
+        this.records_to_add = [];
+        this.records_added = [];
         for (var i=0; i<this.columns.length; i++) {
             this.columns[i] = [];
         }
         self.dfd_horaires = $.Deferred();
+        self.ready_to_render = $.Deferred();
         //this.assing_records_to_columns(records);
         this.willStart()
-        .then(function(){self.assing_records_to_columns(records)});
+        //.then(function(){self.assing_records_to_columns(records)});
     },
     /**
      *
@@ -725,7 +771,8 @@ PlanningView.Row = Widget.extend({
         var self = this;
         var dfd_1 = $.Deferred();
         var p1 = dfd_1.promise();
-        //var p2 = dfd_2.promise();
+        return $.when();
+        /*/var p2 = dfd_2.promise();
         //var str_d_range_start = this.view.range_start.toLacol
 
         this.model.call('get_dict_horaires', [[this.res_id], this.view.range_start, this.view.range_stop])
@@ -746,7 +793,7 @@ PlanningView.Row = Widget.extend({
             dfd_1.resolve();
         });
 
-        return $.when(p1);
+        return $.when(p1);*/
     },
     /**
      *
@@ -767,156 +814,69 @@ PlanningView.Row = Widget.extend({
         var le_model = new Model("of.planning.intervention");
         var fillerbarzz = [];
         //console.log("self.res_id",self.res_id);
-        fillerbarzz = le_model.call("get_fillerbar_data",[self.res_id, self.view.range_start, self.view.range_stop]).promise();
+        //fillerbarzz = le_model.call("get_fillerbar_data",[self.res_id, self.view.range_start, self.view.range_stop]).promise();
         //$.when(fillerbars).then(function(res){fillerbars = res;console.log("FILLERBARS!",fillerbars);});
+        self.assing_records_to_columns();
+        $.when(self.ready_2_render).then(function(){
+
+            var $la_row = self.table.$('#'+self.id);
+            if ($la_row.length >0) {
+                console.log("FOUND",self.$el);
+                return self.replace($la_row);
+            }
 
 
-        var $la_row = self.table.$('#'+self.id);
-        if ($la_row.length >0) {
-            console.log("FOUND",self.$el);
-            return self.replace($la_row);
-        }
-        //console.log("NOT FOUND, TBODY",self.table.$tbody);
-        return $.when(fillerbarzz)
-            .then(function(res){
-                var le_creneau, found, la_len;
-                var descript_dt = {type: "datetime"};
-                var descript_ft = {type: "float_time"};
-                var formatted_heure_record, formatted_heure_creneau;
-                var options = {};
-                self.fillerbars = res['fillerbars'];
-                self.creneaux_dispo = res['creneaux_dispo'];
-                for (var i=0; i<7; i++) {
-                    options = {col_offset: i};
-                    for (var j=0; j<self.creneaux_dispo[i].length; j++) {
+            var le_creneau, found, la_len;
+            var descript_dt = {type: "datetime"};
+            var descript_ft = {type: "float_time"};
+            var formatted_heure_record, formatted_heure_creneau;
+            var options = {};
+            for (var i=0; i<7; i++) {
+                options = {col_offset: i};
+                for (var j=0; j<self.creneaux_dispo[i].length; j++) {
 
-                        le_creneau = new PlanningCreneauDispo(self, self.view, self.creneaux_dispo[i][j], options);
-                        //console.log("DIIIIIISSSSSSSPPPOOO VAAAALS", self.creneaux_dispo[i][j]);
-                        //le_creneau.type = "disponible";
-                        //le_creneau.content = "<div class='of_planning_dispo'>" + le_creneau['duree'] + "h</div>"
-                        self.columns[i].push(le_creneau);
-                        /*la_len = self.columns[i].length;
-                        var k = 0;
-                        sitted = false;
-                        formatted_heure_creneau = formats.format_value(le_creneau.heure_debut,descript_ft);
-
-
-
-                        while (!sitted) {
-                            //console.log("HEURES ",le_creneau.heure_debut,self.columns[i][k].record.date);
-                            if (isNullOrUndef(self.columns[i][k])) {
-                                self.columns[i].splice(k, 0, le_creneau);
-                                break;
-                            }
-                            if (isNullOrUndef(self.columns[i][k].record)) {  // creneaux dispos deja ajoutés
-                                formatted_heure_record = formats.format_value(self.columns[i][k].heure_debut,descript_ft);
-                            }else{
-                                formatted_heure_record = formats.format_value(self.columns[i][k].record.date,descript_dt).substring(11, 16);
-                            }
-
-
-                            console.log("HEURES FORMATTED ",formatted_heure_creneau,formatted_heure_record);
-                            if (formatted_heure_record > formatted_heure_creneau) {
-                                self.columns[i].splice(k, 0, le_creneau);
-                                sitted = true;
-                            }
-                            k++;
-                        }*/
-                        function compareFunction(recA, recB) {
-                            var heure_debut_a = recA.heure_debut,
-                                heure_debut_b = recB.heure_debut;
-                            if (!isNullOrUndef(recA.hours_cols)) {
-                                heure_debut_a = recA.hours_cols[i].heure_debut;
-                            }
-                            if (!isNullOrUndef(recB.hours_cols)) {
-                                heure_debut_b = recB.hours_cols[i].heure_debut;
-                            }
-                            return heure_debut_a - heure_debut_b;
+                    le_creneau = new PlanningCreneauDispo(self, self.view, self.creneaux_dispo[i][j], options);
+                    self.columns[i].push(le_creneau);
+                    function compareFunction(recA, recB) {
+                        var heure_debut_a = recA.heure_debut,
+                            heure_debut_b = recB.heure_debut;
+                        if (!isNullOrUndef(recA.hours_cols)) {
+                            heure_debut_a = recA.hours_cols[i].heure_debut;
                         }
-                        self.columns[i].sort(compareFunction);
-                        //_.sortBy(self.columns[i], 'heure_debut');  // @TODO: gerer asynchronicité
+                        if (!isNullOrUndef(recB.hours_cols)) {
+                            heure_debut_b = recB.hours_cols[i].heure_debut;
+                        }
+                        return heure_debut_a - heure_debut_b;
                     }
+                    self.columns[i].sort(compareFunction);
+                    //_.sortBy(self.columns[i], 'heure_debut');  // @TODO: gerer asynchronicité
                 }
-                console.log("self.COLUMNS!",self.columns);
-                console.log("self.FILLERBARS!",self.fillerbars);
-                console.log("self.DISPOOO!",self.creneaux_dispo);
-                return $.when();
-            })
-            .then(function() {
-                return self.$el.html(qweb.render(self.template, {"row": self})).promise()
-            })
-            .then(function (){
-                
-                //console.log("self.$el:",self.$el);
-                //for (var i=0; i<self.fillerbars.length; i++) {
-                    //self.fillerbars[i].render();
-                //}
-                self.$el.attr("id", self.id);
-                self.rendered = true;
-                //self.$el.css("background-color", self.color_bg);
-                //self.$el.css("opacity", 0.3);
-                //self.$("td").css("opacity", 1);
-                //self.$el.appendTo("tbody.of_planning_table_tbody");
-                if (self.hidden) {
-                    self.do_hide();
+            }
+            console.log("self.COLUMNS!",self.columns);
+            console.log("self.FILLERBARS!",self.fillerbars);
+            console.log("self.DISPOOO!",self.creneaux_dispo);
+            return $.when()
+        })
+        .then(function() {
+            return self.$el.html(qweb.render(self.template, {"row": self})).promise()
+        })
+        .then(function (){
+            self.$el.attr("id", self.id);
+            self.rendered = true;
+            if (self.hidden) {
+                self.do_hide();
+            }
+            return self.$el.appendTo("tbody.of_planning_table_tbody")
+        })
+        .then(function(){
+            for (var i=0; i<7; i++) {
+                for (var j=0; j<self.columns[i].length; j++) {
+                    // res_id, col_index
+                    self.columns[i][j].render(i);
                 }
-                
-
-                return self.$el.appendTo("tbody.of_planning_table_tbody")
-            })
-            .then(function(){
-                for (var i=0; i<7; i++) {
-                    for (var j=0; j<self.columns[i].length; j++) {
-                        // res_id, col_index
-                        self.columns[i][j].render();
-                    }
-                }
-                //var td_id = "of_planning_td_" + self.res_id + "_" + col_index;
-                //console.log("TD ID ",td_id,$("#" + td_id).length);
-                self.trigger_up("row_rendered")
-            });
-                /* record multiples
-                var $le_svg = $("svg");
-                console.log("LE SVG",$le_svg);
-                function connect_divs (div1, div2) {
-                    var $div1 = $(div1);
-                    var $div2 = $(div2);
-                    var pos1 = $div1.position();
-                    var pos2 = $div2.position();
-                    console.log("pos1:",pos1);
-                    console.log("pos2:",pos2);
-                    var a_add = "<svg><line x1='"+pos1.left+"' y1='"+pos1.top+"' x2='"+pos2.left+"' y2='"+pos2.top+"'></svg>"
-                    $(".of_planning_container").append(a_add);
-                }
-                for (var le_id in self.records_multiples) {
-                    var $records_multiples = self.$(".of_planning_record_"+le_id);
-                    console.log("$records_multiples",$records_multiples);
-                    if (!$records_multiples.length) {
-                        console.log("CEST UN ECHEC");
-                        continue;
-                    }
-                    var record_prec;// = $records_multiples[0];
-                    var record_curr;
-                    for (var i=1; i<$records_multiples.length; i++) {
-                        record_prec = $records_multiples[i-1];
-                        record_curr = $records_multiples[i];
-                        connect_divs(record_prec, record_curr);
-                    }
-                }
-
-
-                /*var $records_multiples = self.$(".of_planning_record_multiple");
-                if ($records_multiples.length > 0) {
-                    console.log("$records_multiples",$records_multiples);
-                    var le_res;
-                    for (var i=0; i<$records_multiples.length; i++) {
-                        console.log("elem?:", $records_multiples[i]);
-                    }
-                    var $records_multiples_grouped;
-                }*/
-                
-            //});
-
+            }
+            self.trigger_up("row_rendered")
+        });
     },
     renderElement: function() {
         var $el;
@@ -932,51 +892,60 @@ PlanningView.Row = Widget.extend({
      */
     add_record: function (planning_record) {
         var self = this;
-        $.when(self.dfd_horaires).then(function() {
+        //$.when(self.dfd_horaires).then(function() {
             if (isNullOrUndef(planning_record.col_offset_start)) {
                 console.log("ERREUR: col_offset_start manquant",planning_record);
             }else if(isNullOrUndef(planning_record.col_offset_stop)) {  // 1 day event
+                //console.log("ONE DAY EV COL",planning_record.col_offset_start,planning_record);
                 self.columns[planning_record.col_offset_start].push(planning_record);
             }else{  // several days event: get the actual hours to display (exple: 17:00 -> 18:00 and 9:00 -> 11:30 in place of twice 17:00 -> 11:30) smoother to display and to sort
                 //console.log("PLANNING RECORD SEVDAYS:",planning_record);
                 self.records_multiples[planning_record.id] = [];
-                planning_record["hours_cols"] = {}
-                var a_push;
+                planning_record["hours_cols"] = {};
+                planning_record.$of_el = {};
+                var a_push, dict_horaires;
                 var descript_ft = {type: "float_time"};
                 for (var i=planning_record.col_offset_start; i<=planning_record.col_offset_stop; i++) {
                     a_push = true;
+                    
                     if (i>=0 && i<self.column_nb) {
-                        console.log("pushed to column ",i);
-                        console.log(self.dict_horaires);
+                        planning_record.$of_el[i] = planning_record.$el.clone(true);
+                        dict_horaires = self.segments_horaires[self.col_offset_to_segment[i]][2];  // récupérer le bon dict_horaires
+                        //console.log("pushed to column ",i);
+                        //console.log("dict_horaires",dict_horaires);
                         planning_record["hours_cols"][i] = {};
                         if (i == planning_record.col_offset_start) {  // first day
-                            planning_record["hours_cols"][i].heure_debut = planning_record.heure_debut;
-                            if (!isNullOrUndef(self.col_offset_temp_start) && self.col_offset_temp_start <= i && i <= self.col_offset_temp_stop ) {  // horaires temporaires à prendre en compte
-                                planning_record["hours_cols"][i].heure_fin = self.dict_horaires_temp[i+1][self.dict_horaires_temp[i+1].length-1][1]  // heure de fin du dernier créneau du jour
-                            }else{
-                                planning_record["hours_cols"][i].heure_fin = self.dict_horaires[i+1][self.dict_horaires[i+1].length-1][1]  // heure de fin du dernier créneau du jour
-                            }
-                        }else if (i >= planning_record.col_offset_start && i < planning_record.col_offset_stop) {
-                            if (!isNullOrUndef(self.col_offset_temp_start) && self.col_offset_temp_start <= i && i <= self.col_offset_temp_stop && i+1 in self.jours_temp_travailles) {  // horaires temporaires à prendre en compte
-                                planning_record["hours_cols"][i].heure_debut = self.dict_horaires_temp[i+1][0][0]  // heure de début du premier créneau du jour
-                                planning_record["hours_cols"][i].heure_fin = self.dict_horaires_temp[i+1][self.dict_horaires_temp[i+1].length-1][1]  // heure de fin du dernier créneau du jour
-                            }else if (_.find(self.jours_travailles, function(num){return num == i+1})) {
-                                planning_record["hours_cols"][i].heure_debut = self.dict_horaires[i+1][0][0]  // heure de début du premier créneau du jour
-                                planning_record["hours_cols"][i].heure_fin = self.dict_horaires[i+1][self.dict_horaires[i+1].length-1][1]  // heure de fin du dernier créneau du jour
-                            }else{
+                            if ( isNullOrUndef(dict_horaires[i + 1]) || dict_horaires[i + 1] == [] ) {  // jour non travaillé. peut arriver pour une intervention de plusieurs jours qui commence le dimanche
                                 planning_record["hours_cols"][i].heure_debut = false;
                                 planning_record["hours_cols"][i].heure_fin = false;
                                 a_push = false;
+                            }else{
+                                planning_record["hours_cols"][i].heure_debut = planning_record.heure_debut;
+                                planning_record["hours_cols"][i].heure_fin = dict_horaires[i+1][dict_horaires[i+1].length-1][1]  // heure de fin du dernier créneau du jour
+                            
+                            }
+                        }else if (i >= planning_record.col_offset_start && i < planning_record.col_offset_stop) {
+                            if ( isNullOrUndef(dict_horaires[i + 1]) || dict_horaires[i + 1] == [] ) {  // jour non travaillé
+                                console.log("jour non travaillé pour ",self.res_id);
+                                console.log("i",i);
+                                planning_record["hours_cols"][i].heure_debut = false;
+                                planning_record["hours_cols"][i].heure_fin = false;
+                                a_push = false;
+                            }else{
+                                planning_record["hours_cols"][i].heure_debut = dict_horaires[i+1][0][0]  // heure de début du premier créneau du jour
+                                planning_record["hours_cols"][i].heure_fin = dict_horaires[i+1][dict_horaires[i+1].length-1][1]  // heure de fin du dernier créneau du jour
                             }
                         }else if (i == planning_record.col_offset_stop) {  // last day
-                            if (!isNullOrUndef(self.col_offset_temp_start) && self.col_offset_temp_start <= i && i <= self.col_offset_temp_stop ) {  // horaires temporaires à prendre en compte
-                                planning_record["hours_cols"][i].heure_debut = self.dict_horaires_temp[i+1][0][0]  // heure de début du premier créneau du jour
+                            if ( isNullOrUndef(dict_horaires[i + 1]) || dict_horaires[i + 1] == [] ) {  // jour non travaillé. peut arriver pour une intervention de plusieurs jours qui termine la semaine suivante
+                                planning_record["hours_cols"][i].heure_debut = false;
+                                planning_record["hours_cols"][i].heure_fin = false;
+                                a_push = false;
                             }else{
-                                planning_record["hours_cols"][i].heure_debut = self.dict_horaires[i+1][0][0]  // heure de fin du dernier créneau du jour
+                                planning_record["hours_cols"][i].heure_debut = dict_horaires[i+1][0][0]  // heure de début du premier créneau du jour
+                                planning_record["hours_cols"][i].heure_fin = planning_record.heure_fin;
                             }
-                            planning_record["hours_cols"][i].heure_fin = planning_record.heure_fin;
                         }
-                        console.log("HOURS COLS",planning_record["record"],planning_record["hours_cols"]);
+                        //console.log("HOURS COLS",planning_record["record"],planning_record["hours_cols"]);
                         planning_record["hours_cols"][i].heure_debut_str = formats.format_value(planning_record["hours_cols"][i].heure_debut,descript_ft);
                         planning_record["hours_cols"][i].heure_fin_str = formats.format_value(planning_record["hours_cols"][i].heure_fin,descript_ft);
                         planning_record["hours_cols"][i].duree = planning_record["hours_cols"][i].heure_fin - planning_record["hours_cols"][i].heure_debut
@@ -988,25 +957,40 @@ PlanningView.Row = Widget.extend({
                         
                         self.records_multiples[planning_record.id].push(i);
                     }
+                    if (i == planning_record.col_offset_stop) {
+                        self.records_added.push(planning_record)
+                        self.trigger_up("record_added");
+                    }
                 }
+                
 
             }
-        })
+        //})
         
+    },
+    /**
+     *  appelée dans render()
+     */
+    assing_records_to_columns: function () {
+        var record_to_add;
+        for (var i in this.records_to_add) {
+            record_to_add = this.records_to_add[i];
+            this.add_record(record_to_add);
+        }
     },
     /**
      *
      */
-    assing_records_to_columns: function (planning_records) {
-        if (isNullOrUndef(planning_records)) {
-            console.log("planning_records is ",planning_record);
-            return false;
-        }
-        var planning_record;
-        for (var i=0; i<planning_records.length; i++) {
-            planning_record = planning_records[i];
-            this.add_record(planning_record);
-        }
+    on_record_added: function (ev) {
+        if (this.records_to_add.length == this.records_added.length) {
+            this.on_all_records_added()
+        };
+    },
+    /**
+     *
+     */
+    on_all_records_added: function () {
+        this.ready_to_render.resolve();
     },
 });
 
@@ -1098,8 +1082,8 @@ var PlanningCreneauDispo = Widget.extend({
         var additional_context = {
             "default_heure_debut_creneau": self.heure_debut,
             "default_heure_fin_creneau": self.heure_fin,
-            "default_lieu_prec_id": self.lieu_debut.id,
-            "default_lieu_suiv_id": self.lieu_fin.id,
+            "default_lieu_prec_id": self.lieu_debut.id || false,
+            "default_lieu_suiv_id": self.lieu_fin.id|| false,
             "default_date_creneau": self.date,
         };  // à voir quoi mettre
         console.log("ADDITIONNAL CONTEXT",pyeval.eval('context', additional_context));
@@ -1130,8 +1114,8 @@ var PlanningRecord = Widget.extend({
         this.row = row;
         this.view = view;
         this.options = options;
-        this.color_bg = options.color_bg;
-        this.color_ft = options.color_ft;
+        //this.color_bg = options.color_bg;
+        //this.color_ft = options.color_ft;
         this.day_span = options.day_span;
         if (this.day_span > 1) this.$els = [];
         this.class ="of_planning_record of_planning_record_" + this.id;
@@ -1166,16 +1150,32 @@ var PlanningRecord = Widget.extend({
     },
     render: function(col_index) {
         var self = this;
-        console.log("PLANNING_RECORD RENDER");
+        
         if (isNullOrUndef(col_index)) {
-            col_index = self.col_offset_start;
+            col_index = Math.max(self.col_offset_start, 0);
         }
-        return self.$el.html(qweb.render('PlanningView.record', {"record": self, "col_index": col_index})).promise()
+        console.log("PLANNING_RECORD RENDER",col_index);
+        self.color_bg = self.row.color_bg;
+        self.color_ft = self.row.color_ft;
+        if (isNullOrUndef(self.col_offset_stop)) {  // 1 day event
+            return self.$el.html(qweb.render('PlanningView.record', {"record": self, "col_index": col_index})).promise()
+                .then(function (){
+                    var td_id = "of_planning_td_" + self.row.res_id + "_" + col_index;
+                    //console.log("POSTRENDER ",self);
+                    self.$el.appendTo("#" + td_id);
+                    self.$el.on('click', self.proxy('on_global_click'));
+                    self.$el.mouseover(self.on_planning_record_mouseover);
+                    self.$el.mouseout(self.on_planning_record_mouseout);
+                })
+        }
+        return self.$of_el[col_index].html(qweb.render('PlanningView.record', {"record": self, "col_index": col_index})).promise()
             .then(function (){
                 var td_id = "of_planning_td_" + self.row.res_id + "_" + col_index;
                 //console.log("POSTRENDER ",self);
-                self.$el.appendTo("#" + td_id);
-                self.$el.on('click', self.proxy('on_global_click'));
+                self.$of_el[col_index].appendTo("#" + td_id);
+                self.$of_el[col_index].on('click', self.proxy('on_global_click'));
+                self.$of_el[col_index].mouseover(self.on_planning_record_mouseover);
+                self.$of_el[col_index].mouseout(self.on_planning_record_mouseout);
             })
     },
     on_global_click: function (ev) {
@@ -1220,6 +1220,24 @@ var PlanningRecord = Widget.extend({
                 this.on_card_clicked(ev);
             }
         }
+    },
+    on_planning_record_mouseover: function(ev) {
+        var record_class = "of_planning_record_" + this.id;
+        var records = $("." + record_class)
+        if (records.length > 1) {
+            records.addClass("of_pulse");
+        }
+        //console.log("records:",records);
+    },
+    on_planning_record_mouseout: function(ev) {
+        var record_class = "of_planning_record_" + this.id;
+        var records = $("." + record_class)
+        if (records.length > 1) {
+            records.removeClass("of_pulse");
+        }
+        //console.log("records:",records);
+        //console.log("class:",record_class);
+        //console.log("$('.' + record_class):",$("." + record_class));
     },
     /* actions when user click on the block with a specific class
      *  open on normal view : oe_kanban_global_click
@@ -1313,7 +1331,7 @@ var PlanningRecord = Widget.extend({
      *
      */
     start: function () {
-        console.log("START PlanningRecord");;
+        //console.log("START PlanningRecord");;
         return this._super();
     },
 });
@@ -1346,7 +1364,7 @@ PlanningView.SidebarResoFilter = Widget.extend({
             var filters = _.filter(fil.target, function(filter) {
                 return _.contains(self.view.now_filter_ids, filter.value);
             });
-            console.log("filters",filters);
+            //console.log("filters",filters);
             self.$('.of_planning_contacts').html(qweb.render('PlanningView.sidebar.contacts', { filters: filters }));
         });
     },
@@ -1416,9 +1434,9 @@ PlanningView.SidebarInfoFilter = Widget.extend({
         $.when.apply($, check_tab_defs)
         //$.when(check_tab_defs[0],check_tab_defs[1],check_tab_defs[2],check_tab_defs[3],check_tab_defs[4],check_tab_defs[5],check_tab_defs[6])
         .then(function () {
-            console.log("defs",defs);
-            console.log("check_tab_defs",check_tab_defs);
-            console.log("check_tab_vals",check_tab_vals);
+            //console.log("defs",defs);
+            //console.log("check_tab_defs",check_tab_defs);
+            //console.log("check_tab_vals",check_tab_vals);
             self.info_filters = {
                 "client": {
                     "value": "client",
@@ -1505,7 +1523,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
     },
     render: function() {
         var self = this;
-        console.log("info filters:",this.view.info_filters);
+        //console.log("info filters:",this.view.info_filters);
 
         $.when(self.$('.of_planning_ev_infos').html(qweb.render('PlanningView.sidebar.event_info', { filters: self.info_filters })))
         .then(function() {
@@ -1569,7 +1587,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                 var le_tab = [];
                 for (var k in le_filter.child_filters) {
                     le_tab = [filter_value, k];
-                    console.log("LE_TAB",le_tab);
+                    //console.log("LE_TAB",le_tab);
                     this.do_toggle_checked(checked, le_tab, false);
                 }
             }

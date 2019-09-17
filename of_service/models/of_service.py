@@ -364,7 +364,7 @@ class OFPlanningIntervention(models.Model):
 
     @api.model
     def create(self, vals):
-        intervention = super(OFPlanningIntervention, self).write(vals)
+        intervention = super(OFPlanningIntervention, self).create(vals)
         if vals.get('state', False) == 'done':
             if intervention.service_id:
                 intervention.service_id.date_next = intervention.service_id.get_next_date(intervention.date_date)
