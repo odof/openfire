@@ -20,7 +20,7 @@ class of_product_nomenclature_bloc(models.Model):
         'nb_selection_max': 9999
     }
     _order = 'sequence, name'
-    _sql_constraints = [('number_uniq', 'unique(name)', 'Il existe déjà un enregistrement avec le même nom.')]
+    _sql_constraints = [('number_uniq', 'unique(name)', 'Il existe déjà un enregistrement avec le même nom. (#200)')]
     
     @api.one
     def copy(self, default=None):

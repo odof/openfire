@@ -14,7 +14,7 @@ class of_product_nomenclature(models.Model):
     sequence = fields.Integer('Séquence', help="Définit l'ordre d'affichage des nomenclatures dans les listes (plus petit au début)")
 
     _order = 'name'
-    _sql_constraints = [('number_uniq', 'unique(name)', 'Il existe déjà un enregistrement avec le même nom.')]
+    _sql_constraints = [('number_uniq', 'unique(name)', 'Il existe déjà un enregistrement avec le même nom. (#100)')]
 
     @api.one
     def copy(self, default=None):
@@ -22,7 +22,9 @@ class of_product_nomenclature(models.Model):
         if default is None:
             default = {}
         default = default.copy()
-        self = self.with_context(of_prefixe_traduction_copie="(copie)")
+        # On se place en utilisateur anglais pour simplifier les calculs de traduction
+        self = self.with_context(lang='en_US', of_prefixe_traduction_copie="(copie)")
+        default['name'] = '(copie)' + self.name
         return super(of_product_nomenclature, self).copy(default)
 
 
@@ -36,9 +38,8 @@ class IrTranslation(models.Model):
         if prefixe:
             if vals.get('source'):
                 # Définir la valeur du champ source écrase aussi la valeur du champ src
-                vals['source'] = prefixe + vals['source']
                 if 'src' in vals:
-                    vals['src'] = vals['source']
+                    vals['src'] = prefixe + vals['src']
             if vals.get('value'):
                 vals['value'] = prefixe + vals['value']
         return super(IrTranslation, self).create(vals)
