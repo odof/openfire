@@ -17,8 +17,8 @@
                         <field name="company_id" options="{'no_create': True}" class="oe_inline"/>
                     </div>
                 </group>
-                <group name="intervention" string="Intervention">
-                    <label for="id" string="Configuration des interventions" style="width: 250px"/>
+                <group name="intervention" string="Interventions">
+                    <!--label for="id" string="Configuration des interventions" style="width: 250px"/-->
                     <div name="general_config">
                     </div>
                 </group>
