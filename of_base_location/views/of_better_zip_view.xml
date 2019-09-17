@@ -50,19 +50,13 @@
                         </group>
                         <group>
                             <separator string="Codes postaux du secteur" colspan="2"/>
-                            <field name="zip_com_ids" attrs="{'invisible': [('type', '=', 'tech')]}" widget="many2many" nolabel="1" colspan="2">
-                                <tree>
+                            <field name="regle_ids" nolabel="1" colspan="2">
+                                <tree editable="top">
                                     <field name="cp_min"/>
                                     <field name="cp_max"/>
                                 </tree>
                             </field>
-                            <field name="zip_tech_ids" attrs="{'invisible': ['|',('type', '=', 'com'),('type', '=', 'tech_com')]}" widget="many2many" nolabel="1" colspan="2">
-                                <tree>
-                                    <field name="cp_min"/>
-                                    <field name="cp_max"/>
-                                </tree>
-                            </field>
-                        </group><!--  -->
+                        </group>
                     </group>
                 </sheet>
             </form>
@@ -91,11 +85,9 @@
                                     </span>
                                 </strong>
                                 <field name="code"/>
-                <field name="type"/>
-                                <field name="zip_utile_ids" widget="many2many_tags"/>
-                                <field name="zip_com_ids" attrs="{'invisible': [('type', '=', 'tech')]}" widget="many2many_tags"/>
-                <field name="zip_tech_ids" attrs="{'invisible': [('type', '=', 'com')]}" widget="many2many_list"/>
-                <field name="active" invisible="1"/>
+                                <field name="type"/>
+                                <field name="regle_ids" widget="many2many_tags"/>
+                                <field name="active" invisible="1"/>
                             </div>
                         </div>
                     </t>
@@ -112,9 +104,7 @@
                 <field name="name"/>
                 <field name="code"/>
                 <field name="type"/>
-                <field name="zip_utile_ids"/>
-                <field name="zip_com_ids" invisible="1"/>
-                <field name="zip_tech_ids" invisible="1"/>
+                <field name="regle_ids"/>
                 <field name="active" invisible="1"/>
             </tree>
         </field>
@@ -157,7 +147,7 @@
 <!-- #################################################################################### -->
 <!-- ################## CODES POSTAUX DES SECTEURS ###################################### -->
 <!-- #################################################################################### -->
-
+    <!--
     <record id="of_view_secteur_zip_form" model="ir.ui.view">
         <field name="name">of.secteur.zip.form</field>
         <field name="model">of.secteur.zip</field>
@@ -170,8 +160,7 @@
                         <field name="cp_max"/>
                     </group>
                     <group>
-                        <field name="secteur_com_id"/>
-                        <field name="secteur_tech_id"/>
+                        <field name="secteur_id"/>
                     </group>
                 </group>
             </form>
@@ -186,8 +175,7 @@
                 <field name="name"/>
                 <field name="cp_min"/>
                 <field name="cp_max"/>
-                <field name="secteur_com_id"/>
-                <field name="secteur_tech_id"/>
+                <field name="secteur_id"/>
             </tree>
         </field>
     </record>
@@ -222,7 +210,7 @@
         parent="base_location.locations_root_menu"
         action="action_of_secteur_zip_tree"
         sequence="21"
-        />
+        /> -->
 
 <!-- #################################################################################### -->
 <!-- ########################## PARTENAIRES ############################################# -->
