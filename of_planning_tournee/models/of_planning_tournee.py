@@ -146,7 +146,7 @@ class OfPlanningIntervention(models.Model):
             interventions.append((date_jour, intervention.employee_ids))
         super(OfPlanningIntervention, self).unlink()
         for date, employee_ids in interventions:
-            self.remove_tournee(date, employee_ids)
+            self.remove_tournees(date, employee_ids)
         return True
 
     @api.multi

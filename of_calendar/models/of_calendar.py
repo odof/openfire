@@ -625,7 +625,7 @@ class HREmployee(models.Model):
             if segment[0] <= str_date and str_date <= segment[1]:  # la date est sur ce segment
                 d_date = fields.Date.from_string(str_date)
                 num_jour = d_date.isoweekday()
-                creneaux = segment[2][num_jour]
+                creneaux = num_jour in segment[2] and segment[2][num_jour]
                 for i in range(len(creneaux)):  # creneau sous form (h_debut, h_fin)
                     creneau = creneaux[i]
                     if creneau[0] <= h_debut and h_debut < creneau[1]:

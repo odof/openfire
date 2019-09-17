@@ -38,7 +38,7 @@
         <field name="inherit_id" ref="of_project_issue.of_planning_intervention_sav_liee"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='sav_id']" position="after">
-                <field name="parc_installe_id" domain="[('site_adresse_id', '=', address_id)]"/>
+                <field name="parc_installe_id"/>
             </xpath>
         </field>
     </record>
