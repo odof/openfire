@@ -56,17 +56,16 @@ class OfSecteur(models.Model):
 
     name = fields.Char(string="Libellé", required=True)
     code = fields.Char(string="Code")
-    type = fields.Selection([
-        ('tech', 'Technique'),
-        ('com', 'Commercial'),
-        ('tech_com', 'Technique et commercial')], string="type de secteur", required=True, default='tech_com')
-    zip_com_ids = fields.One2many('of.secteur.zip', 'secteur_com_id', u'Codes postaux (Com)')
-    zip_tech_ids = fields.One2many('of.secteur.zip', 'secteur_tech_id', u'Codes postaux (Tech)')
-    zip_utile_ids = fields.One2many('of.secteur.zip', 'secteur_utile_id', string=u'Codes postaux', compute="_compute_zip_utile_ids", store=True)
+    type = fields.Selection(
+        [('tech', 'Technique'),
+         ('com', 'Commercial'),
+         ('tech_com', 'Technique et commercial'),
+        ], string="type de secteur", required=True, default='tech_com')
+    regle_ids = fields.One2many('of.secteur.regle', 'secteur_com_id', string=u'Codes postaux')
     active = fields.Boolean(string='Actif', default=True)
 
     _sql_constraints = [
-        ('name_uniq', 'unique(name)', 'Oups! on dirait que ce secteur existe déjà...'),
+        ('name_uniq', 'unique(name)', 'Oups ! On dirait que ce secteur existe déjà...'),
     ]
 
     @api.multi
@@ -74,80 +73,62 @@ class OfSecteur(models.Model):
     def _compute_zip_utile_ids(self):
         for secteur in self:
             if secteur.type == 'tech':
-                secteur.zip_utile_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in self.zip_tech_ids._ids]
+                secteur.zip_utile_ids = [(5, )] + [(4, zip_id, 0) for zip_id in self.zip_tech_ids._ids]
             else:
-                secteur.zip_utile_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in self.zip_com_ids._ids]
+                secteur.zip_utile_ids = [(5, )] + [(4, zip_id, 0) for zip_id in self.zip_com_ids._ids]
 
     @api.multi
     def write(self, vals):
-        if vals.get('type', False) == 'tech_com':  # est transformé en secteur technique et commercial
-            vals['zip_tech_ids'] = [(5, 0, 0)] + vals['zip_com_ids']
+        if vals.get('type') == 'tech_com':  # Est transformé en secteur technique et commercial
+            vals['zip_tech_ids'] = [(5, )] + vals['zip_com_ids']
         return super(OfSecteur, self).write(vals)
 
     @api.model
     def create(self, vals):
-        if vals.get('type', False) == 'tech_com':
-            vals['zip_tech_ids'] = [(5, 0, 0)] + vals['zip_com_ids']
+        if vals.get('type') == 'tech_com':
+            vals['zip_tech_ids'] = [(5, )] + vals['zip_com_ids']
         return super(OfSecteur, self).create(vals)
 
-class OfSecteurZip(models.Model):
-    _name = "of.secteur.zip"
+    @api.model
+    def get_secteur_from_cp(self, cp):
+        return self.env['of.secteur.regle'].search(
+            [('cp_min', '<=', cp), ('cp_max', '>=', cp)],
+            order="cp_min DESC, cp_max", limit=1
+        ).secteur_id
+
+    @api.multi
+    def get_partners(self):
+        partner_obj = self.env['res.partner']
+        regle_obj = self.env['of.secteur.regle']
+
+        domain = ['|'] * (len(self) - 1)
+
+        for regle in self.mapped(regle_ids):
+            cp_min = regle.cp_min
+            cp_max = regle.cp_max
+            regles_intra = regle_obj.search(
+                [('cp_min', '>=', cp_min), ('cp_min', '<=', cp_max), ('id', '!=', regle.id)],
+                order='cp_min, cp_max DESC')
+
+            domain_secteur = ['&'] * (len(regles_intra) + 1)
+            domain_secteur += [('zip', '>=', cp_min), ('zip', '<=', cp_max)]
+            for regle_intra in regles_intra:
+                if regle_intra.cp_max >= cp_min:
+                    domain_secteur += ['|', ('zip', '<', regle_intra.cp_min), ('zip', '>', regle_intra.cp_max)]
+                    cp_min = regle_intra.cp_max
+            domain += domain_secteur
+
+        return partner_obj.search(domain)
+
+class OfSecteurRegle(models.Model):
+    _name = "of.secteur.regle"
     _order = 'cp_min, cp_max'
 
-    name = fields.Char('Nom affiché', compute="_compute_name", store=True)
-    cp_min = fields.Char(u'Code postal début', required=True, size=5)
-    cp_max = fields.Char(u'Code postal fin', required=True, size=5)
-    secteur_com_id = fields.Many2one('of.secteur', string='Secteur Com')
-    secteur_tech_id = fields.Many2one('of.secteur', string='Secteur Tech')
-    secteur_utile_id = fields.Many2one('of.secteur', string='Secteur')
-
-    _sql_constraints = [
-        ('name_uniq', 'unique(name)', 'Oups! on dirait que ce secteur existe déjà...'),
-    ]
-
-    @api.onchange('secteur_com_id')
-    def _onchange_secteur_com_id(self):
-        self.ensure_one()
-        if self.secteur_com_id and self.secteur_com_id.type == 'tech_com':
-            self.secteur_tech_id = self.secteur_com_id.id
+    cp_min = fields.Char(u'Code postal début', required=True)
+    cp_max = fields.Char(u'Code postal fin', required=True)
+    secteur_id = fields.Many2one('of.secteur', string='Secteur', required=True, ondelete='cascade')
 
     @api.onchange('cp_min')
     def _onchange_cp_min(self):
         self.ensure_one()
         self.cp_max = self.cp_min
-
-    @api.multi
-    @api.depends('cp_min', 'cp_max')
-    def _compute_name(self):
-        for secteur_zip in self:
-            if secteur_zip.cp_min == secteur_zip.cp_max:
-                secteur_zip.name = secteur_zip.cp_min
-            else:
-                secteur_zip.name = secteur_zip.cp_min + "-" + secteur_zip.cp_max
-
-    @api.model
-    def get_cp_secteur(self, cp):
-        secteurs = self.search([('cp_min','<=',cp),('cp_max','>=',cp)], order="cp_min DESC, cp_max", limit=1)
-        return secteurs and secteurs[0] or False
-
-    @api.multi
-    def get_partners(self):
-        partner_obj = self.env['res.partner']
-
-        domain = ['|'] * (len(self) - 1)
-
-        for secteur in self:
-            cp_min = secteur.cp_min
-            cp_max = secteur.cp_max
-            secteurs_intra = self.search([('cp_min', '>=', cp_min), ('cp_min', '<=', cp_max), ('id', '!=', secteur.id)], order='cp_min, cp_max DESC')
-
-            domain_secteur = ['&'] * (len(secteur_intra) + 1)
-            domain_secteur += [('zip', '>=', cp_min), ('zip', '<=', cp_max)]
-            for secteur_intra in secteurs_intra:
-                if secteur_intra.cp_min >= cp_min:
-                    domain_secteur += ['|', ('zip', '<', secteur_intra.cp_min), ('zip', '>', secteur_intra.cp_max)]
-                    cp_min = secteur_intra.cp_max
-
-            domain += domain_secteur
-
-        return partner_obj.search(domain)
