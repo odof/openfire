@@ -375,7 +375,7 @@ class SaleOrderLine(models.Model):
 class OfSaleOrderKit(models.Model):
     _name = 'of.saleorder.kit'
 
-    order_line_id = fields.Many2one("sale.order.line", string="Order line", ondelete="cascade")
+    order_line_id = fields.Many2one("sale.order.line", string="Order line", ondelete="cascade", copy=False)
 
     name = fields.Char(string='Name', required=True, default="draft saleorder kit")
     kit_line_ids = fields.One2many('of.saleorder.kit.line', 'kit_id', string="Components", copy=True)

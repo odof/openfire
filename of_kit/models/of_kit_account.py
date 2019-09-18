@@ -266,7 +266,7 @@ class AccountInvoiceLine(models.Model):
 class OfAccountInvoiceKit(models.Model):
     _name = 'of.invoice.kit'
 
-    invoice_line_id = fields.Many2one("account.invoice.line", string="Invoice line", ondelete="cascade")
+    invoice_line_id = fields.Many2one("account.invoice.line", string="Invoice line", ondelete="cascade", copy=False)
 
     name = fields.Char(string='Name', required=True, default="draft invoice kit")
     kit_line_ids = fields.One2many('of.invoice.kit.line', 'kit_id', string="Components", copy=True)
