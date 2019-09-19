@@ -36,13 +36,11 @@ class OfComposeMail(models.TransientModel):
         return result
 
     @api.model
-    def _get_dict_values(self, o, objects=None):
+    def _get_dict_values(self, o, objects):
         fisc_position_obj = self.env['account.fiscal.position']
-        if not objects:
-            objects = self._get_objects(o)
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')
-        result = super(OfComposeMail, self)._get_dict_values(o, objects=objects)
+        result = super(OfComposeMail, self)._get_dict_values(o, objects)
 
         equipes = []
         dates = []

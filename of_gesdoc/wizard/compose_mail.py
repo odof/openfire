@@ -1,17 +1,76 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, tools
 from odoo.exceptions import UserError
+from odoo.addons.mail.models.mail_template import format_date, format_tz, format_amount
+from odoo.tools.safe_eval import safe_eval
 
+import dateutil.relativedelta as relativedelta
+import datetime
+from urllib import urlencode, quote as quote
 import time
 import tempfile
 import os
 import base64
+import logging
+import re
+import copy
+
+_logger = logging.getLogger(__name__)
 
 try:
     import pypdftk
 except ImportError:
     pypdftk = None
+
+# Code copié depuis odoo/addons/mail/models/mail_template.py avec modification pour désactiver les échappements xml/html
+try:
+    # We use a jinja2 sandboxed environment to render mako templates.
+    # Note that the rendering does not cover all the mako syntax, in particular
+    # arbitrary Python statements are not accepted, and not all expressions are
+    # allowed: only "public" attributes (not starting with '_') of objects may
+    # be accessed.
+    # This is done on purpose: it prevents incidental or malicious execution of
+    # Python code that may break the security of the server.
+    from jinja2.sandbox import SandboxedEnvironment
+    mako_template_env = SandboxedEnvironment(
+        block_start_string="<%",
+        block_end_string="%>",
+        variable_start_string="${",
+        variable_end_string="}",
+        comment_start_string="<%doc>",
+        comment_end_string="</%doc>",
+        line_statement_prefix="%",
+        line_comment_prefix="##",
+        trim_blocks=True,               # do not output newline after blocks
+        autoescape=False,                # XML/HTML automatic escaping
+    )
+    mako_template_env.globals.update({
+        'str': str,
+        'quote': quote,
+        'urlencode': urlencode,
+        'datetime': datetime,
+        'len': len,
+        'abs': abs,
+        'min': min,
+        'max': max,
+        'sum': sum,
+        'filter': filter,
+        'reduce': reduce,
+        'map': map,
+        'round': round,
+        'cmp': cmp,
+
+        # dateutil.relativedelta is an old-style class and cannot be directly
+        # instanciated wihtin a jinja2 expression, so a lambda "proxy" is
+        # is needed, apparently.
+        'relativedelta': lambda *a, **kw : relativedelta.relativedelta(*a, **kw),
+    })
+    mako_safe_template_env = copy.copy(mako_template_env)
+    mako_safe_template_env.autoescape = False
+except ImportError:
+    _logger.warning("jinja2 not available, templating features will not work!")
+
 
 class OfComposeMail(models.TransientModel):
     _name = 'of.compose.mail'
@@ -27,6 +86,53 @@ class OfComposeMail(models.TransientModel):
     def format_body(self, body):
         return (body or u'').encode('utf8', 'ignore')
 
+    @api.model
+    def _eval_text(self, value, values):
+        if not value:
+            return False
+        #   Rétro-compatibilité
+        # Transformation de l'ancien système %( )s en ${ }
+        value = re.sub(r'%\((.*?)\)s', r'${\1}', value)
+        # Transformation des échappements %% en simple %
+        value = re.sub(r'%%', r'%', value)
+
+        # Interprétation du code avec l'aide de jinja2 (récupéré de odoo mail_template.py)
+        template = mako_template_env.from_string(tools.ustr(value))
+
+        try:
+            result = template.render(values)
+        except Exception:
+            _logger.info(u"Échec de l'interprétation du code %r en utilisant les valeurs %r" % (template, values),
+                         exc_info=True)
+            raise UserError(u"Échec de l'interprétation du code %r en utilisant les valeurs %r" % (template, values))
+
+        if result == u"False":
+            result = u""
+        return result
+
+    @api.model
+    def eval_champs(self, obj, champs):
+        u"""
+        :param obj: Objet (instance avec id unique) pour lequel est généré le courrier
+        :param champs: Instances de of.gesdoc.chp ou de of.gesdoc.chp.tmp
+        :return: Liste de tuples [('nom du champ', 'valeur à afficher dans le courrier')]
+        """
+        objects = self._get_objects(obj)
+        values = self._get_dict_values(obj, objects)
+        result = []
+        for chp in champs:
+            result.append((
+                chp.name or '',
+                chp.to_export and self.format_body(self._eval_text(chp.value_openfire, values)) or '',
+            ))
+        return result
+
+    @api.model
+    def eval_text(self, obj, text):
+        objects = self._get_objects(obj)
+        values = self._get_dict_values(obj, objects)
+        return self.format_body(self._eval_text(text, values)) or ''
+
     @api.onchange('lettre_id')
     def _onchange_lettre_id(self):
         lettre = self.lettre_id
@@ -34,19 +140,18 @@ class OfComposeMail(models.TransientModel):
             return
 
         obj = self.env[self._context.get('active_model')].browse(self._context.get('active_ids'))
-        values = self._get_dict_values(obj)
 
         if lettre.file:
             self.chp_tmp_ids = [
                 (0, 0, {
-                    'name': chp.name or '',
-                    'value_openfire': chp.to_export and chp.value_openfire and self.format_body(chp.value_openfire % values) or '',
+                    'name': chp[0],
+                    'value_openfire': chp[1]
                 })
-                for chp in lettre.chp_ids
+                for chp in self.eval_champs(obj, lettre.chp_ids)
             ]
         else:
             self.chp_tmp_ids = []
-            self.content = self.format_body((lettre.body_text or '') % values)
+            self.content = self.eval_text(obj, lettre.body_text)
 
     @api.model
     def _get_objects(self, o):
@@ -85,13 +190,11 @@ class OfComposeMail(models.TransientModel):
         return result
 
     @api.model
-    def _get_dict_values(self, o, objects=None):
+    def _get_dict_values(self, o, objects):
         if not o:
             return {}
         lang_obj = self.env['res.lang']
 
-        if not objects:
-            objects = self._get_objects(o)
         order = objects.get('order', False)
         invoice = objects.get('invoice', False)
         partner = objects.get('partner', False)
@@ -164,6 +267,16 @@ class OfComposeMail(models.TransientModel):
             'c_adr_pose_street2': res['c_adr_intervention_street2'],
             'c_adr_pose_city'   : res['c_adr_intervention_city'],
             'c_adr_pose_zip'    : res['c_adr_intervention_zip'],
+        })
+
+        res.update(objects)
+        res.update({
+            'o': o,
+            'format_date': lambda date, format=False, context=self._context: format_date(self.env, date, format),
+            'format_tz': lambda dt, tz=False, format=False, context=self._context: format_tz(self.env, dt, tz, format),
+            'format_amount': lambda amount, currency, context=self._context: format_amount(self.env, amount, currency),
+            'user': self.env.user,
+            'ctx': self._context,  # context kw would clash with mako internals
         })
         return res
 
@@ -266,6 +379,7 @@ class OfComposeMail(models.TransientModel):
             'res_id': self.id,
             'context': self._context,
         }
+
 
 class OfGesdocChpTmp(models.TransientModel):
     _name = 'of.gesdoc.chp.tmp'

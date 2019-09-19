@@ -17,10 +17,8 @@ class OfComposeMail(models.TransientModel):
         return result
 
     @api.model
-    def _get_dict_values(self, o, objects=None):
-        if not objects:
-            objects = self._get_objects(o)
-        result = super(OfComposeMail, self)._get_dict_values(o, objects=objects)
+    def _get_dict_values(self, o, objects):
+        result = super(OfComposeMail, self)._get_dict_values(o, objects)
 
         sav = objects.get('sav')
         sav_categ = sav and sav.of_categorie_id

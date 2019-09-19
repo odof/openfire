@@ -59,13 +59,10 @@ class OfDocumentsJoints(models.AbstractModel):
                     data.append(mail_template.file)
                     continue
                 # Calcul des champs remplis sur le modèle de courrier
-                values = compose_mail_obj._get_dict_values(self)
-                datas = {}
-                for chp in mail_template.chp_ids:
-                    datas[chp.name or ''] = chp.to_export and chp.value_openfire and chp.value_openfire % values
                 attachment = attachment_obj.search([('res_model', '=', mail_template._name),
                                                     ('res_field', '=', 'file'),
                                                     ('res_id', '=', mail_template.id)])
+                datas = dict(compose_mail_obj.eval_champs(self, mail_template.chp_ids))
                 file_path = attachment_obj._full_path(attachment.store_fname)
                 fd, generated_pdf = tempfile.mkstemp(prefix='doc_joint_', suffix='.pdf')
                 try:
