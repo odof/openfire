@@ -62,7 +62,7 @@ class OfDocumentsJoints(models.AbstractModel):
                 attachment = attachment_obj.search([('res_model', '=', mail_template._name),
                                                     ('res_field', '=', 'file'),
                                                     ('res_id', '=', mail_template.id)])
-                datas = dict(compose_mail_obj.eval_champs(self, mail_template.chp_ids, False))
+                datas = dict(compose_mail_obj.eval_champs(self, mail_template.chp_ids))
                 file_path = attachment_obj._full_path(attachment.store_fname)
                 fd, generated_pdf = tempfile.mkstemp(prefix='doc_joint_', suffix='.pdf')
                 try:

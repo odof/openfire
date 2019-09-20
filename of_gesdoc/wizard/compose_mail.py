@@ -111,7 +111,7 @@ class OfComposeMail(models.TransientModel):
         return result
 
     @api.model
-    def eval_champs(self, obj, champs, format=True):
+    def eval_champs(self, obj, champs):
         u"""
         :param obj: Objet (instance avec id unique) pour lequel est généré le courrier
         :param champs: Instances de of.gesdoc.chp ou de of.gesdoc.chp.tmp
@@ -121,16 +121,10 @@ class OfComposeMail(models.TransientModel):
         values = self._get_dict_values(obj, objects)
         result = []
         for chp in champs:
-            if format:
-                result.append((
-                    chp.name or '',
-                    chp.to_export and self.format_body(self._eval_text(chp.value_openfire, values)) or '',
+            result.append((
+                chp.name or '',
+                chp.to_export and self._eval_text(chp.value_openfire, values) or '',
                 ))
-            else:
-                result.append((
-                    chp.name or '',
-                    chp.to_export and self._eval_text(chp.value_openfire, values) or '',
-                    ))
         return result
 
     @api.model
@@ -151,8 +145,8 @@ class OfComposeMail(models.TransientModel):
             self.chp_tmp_ids = [
                 (0, 0, {
                     'name': chp[0],
-                    'value_openfire': chp[1]
-                })
+                    'value_openfire': chp[1] and self.format_body(str(chp[1]))
+                    })
                 for chp in self.eval_champs(obj, lettre.chp_ids)
             ]
         else:
