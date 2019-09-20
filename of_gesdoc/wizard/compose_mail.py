@@ -123,7 +123,7 @@ class OfComposeMail(models.TransientModel):
         for chp in champs:
             result.append((
                 chp.name or '',
-                chp.to_export and self.format_body(self._eval_text(chp.value_openfire, values)) or '',
+                chp.to_export and self._eval_text(chp.value_openfire, values) or '',
             ))
         return result
 
@@ -145,7 +145,7 @@ class OfComposeMail(models.TransientModel):
             self.chp_tmp_ids = [
                 (0, 0, {
                     'name': chp[0],
-                    'value_openfire': chp[1]
+                    'value_openfire': self.format_body(chp[1]) if isinstance(chp[1], basestring) else chp[1]
                 })
                 for chp in self.eval_champs(obj, lettre.chp_ids)
             ]
