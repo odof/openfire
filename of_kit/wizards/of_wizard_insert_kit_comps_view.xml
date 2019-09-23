@@ -8,9 +8,11 @@
             <form>
                 <separator string="Sélectionnez le kit dont vous voulez ajouter les composants"/>
                 <group col="2">
-                    <field name="product_id" domain="[('of_is_kit', '!=', False)]"/>
+                    <field name="product_id" domain="[('of_is_kit', '!=', False)]" required="1"/>
                     <field name="comp_ids" attrs=" {'invisible': [('product_id', '=', False)]}">
-                        <tree editable="bottom">
+                        <tree editable="bottom" colors="#aaaaaa:is_selected==False" create="false">
+                            <button name="button_inverse_selected" type="object" icon="fa-refresh" invisible="1"/>
+                            <field name="is_selected"/>
                             <field name="product_id"/>
                             <field name="product_uom_qty"/>
                             <field name="product_uom_id"/>
@@ -19,6 +21,8 @@
                     </field>
                 </group>
                 <footer>
+                    <button name="button_select_all" type="object" string="Tout sélectionner"/>
+                    <button name="button_unselect_all" type="object" string="Tout déselectionner"/>
                     <button name="button_confirm_lines" string="Confirmer" type="object" class="btn-primary"/>
                     <button string="Annuler" special="cancel" class="btn-default"/>
                 </footer>
@@ -41,7 +45,7 @@
         <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='state']" position="before">
-                <button name="%(action_wizard_insert_kit_comps)d" string="Ajout composants kit" type="action" class="btn-default" states="draft,sent"/>
+                <button name="of_action_wizard_insert_kit_comps" string="Ajout composants kit" type="object" class="btn-default" states="draft,sent"/>
             </xpath>
         </field>
     </record>

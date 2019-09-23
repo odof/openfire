@@ -71,6 +71,17 @@ class SaleOrder(models.Model):
         self.mapped('comp_ids').mapped('procurement_ids').cancel()
         return super(SaleOrder, self).action_cancel()
 
+    @api.multi
+    def of_action_wizard_insert_kit_comps(self):
+        wizard = self.env['of.wizard.insert.kit.comps'].create({})
+        return {
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'of.wizard.insert.kit.comps',
+            'res_id': wizard.id,
+            'target': 'new',
+        }
+
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
