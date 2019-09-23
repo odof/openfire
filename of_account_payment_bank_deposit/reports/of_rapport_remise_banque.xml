@@ -21,6 +21,9 @@
                                         <t t-if="o.name">
                                             <div style="margin-bottom: 4px"><strong>Numéro&amp;nbsp;:</strong> <span t-field="o.name"/></div>
                                         </t>
+                                        <t t-if="o.journal_id.bank_id">
+                                            <div style="margin-bottom: 4px"><strong>Banque&amp;nbsp;:</strong> <span t-field="o.journal_id.bank_id.name"/></div>
+                                        </t>
                                         <t t-if="o.date">
                                             <div><strong>Date remise&amp;nbsp;:</strong> <span t-field="o.date"/></div>
                                         </t>
@@ -30,7 +33,11 @@
                                     <div>
                                         <div class="h5" style="padding: 0px 16px;">
                                             <t t-if="o.journal_id">
-                                                <div style="margin-bottom: 4px"><strong>Journal&amp;nbsp;:</strong> <span t-field="o.journal_id"/></div>
+                                                <div style="margin-bottom: 4px">
+                                                    <strong>Journal&amp;nbsp;:</strong> <span t-field="o.journal_id"/>
+                                                    <br/>
+                                                    <strong>Compte&amp;nbsp;:</strong> <span t-field="o.journal_id.default_debit_account_id.code"/>
+                                                </div>
                                             </t>
                                             <t t-if="o.move_id">
                                                 <div><strong>Pièce comptable&amp;nbsp;:</strong> <span t-field="o.move_id"/></div>
@@ -41,12 +48,15 @@
                             </div>
                             <div class="col-xs-12" style="display: table">
                                 <t t-if="o.payment_ids">
+                                    <t t-set="print_categ"
+                                       t-value="hasattr(o.payment_ids[0], 'of_tag_ids') and o.payment_ids.mapped('of_tag_ids')"/>
                                     <table class="table table-condensed" style="margin-top: 8px; margin-bottom: 0px">
                                         <thead>
                                             <tr>
                                                 <th>Date</th>
                                                 <th>Mode de paiement</th>
                                                 <th>Numéro</th>
+                                                <th t-if="print_categ">Catégorie</th>
                                                 <th>Client</th>
                                                 <th class="text-right">Montant</th>
                                             </tr>
@@ -57,6 +67,9 @@
                                                     <td><span t-field="p.payment_date"/></td>
                                                     <td><span t-field="p.of_payment_mode_id"/></td>
                                                     <td><span t-field="p.name"/></td>
+                                                    <td t-if="print_categ">
+                                                        <span t-esc="'-'.join(p.of_tag_ids.mapped('name'))"/>
+                                                    </td>
                                                     <td><span t-field="p.partner_id"/></td>
                                                     <td class="text-right"><span t-field="p.amount"/></td>
                                                 </tr>

@@ -35,10 +35,12 @@
                         <div class="oe_title">
                             <h1><field name="name" attrs="{'readonly': [('state', '!=', 'draft')]}"/></h1>
                         </div>
-                        <group>
+                        <group name="valeurs">
                             <field name="journal_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                             <field name="date" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                             <field name="move_id" attrs="{'invisible': [('move_id', '=', False)]}"/>
+                        </group>
+                        <group name="paiements">
                             <separator name="payments" string="Payments"/>
                             <field name="payment_ids" colspan="4" nolabel="1" widget="many2many"
                                    options="{'not_delete':True}"
