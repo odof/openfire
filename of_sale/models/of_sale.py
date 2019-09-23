@@ -514,6 +514,8 @@ class SaleOrder(models.Model):
     def _prepare_invoice(self):
         """ Rajout date visite technique. Attention en cas de facturation de plusieurs bons de commande à la fois"""
         self.ensure_one()
+        if self.company_id:
+            self = self.with_context(company_id=self.company_id.id)
         invoice_vals = super(SaleOrder, self)._prepare_invoice()
         invoice_vals["of_date_vt"] = self.of_date_vt
         return invoice_vals
