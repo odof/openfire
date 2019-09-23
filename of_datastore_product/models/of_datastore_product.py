@@ -808,7 +808,7 @@ class OfDatastoreCentralized(models.AbstractModel):
                         # Preparation des lignes
                         obj = self._fields[field].comodel_name
                         obj_obj = self.env[obj]
-                        vals[field] = [(0, 0, line.copy_data()[0]) for line in obj_obj.browse(line_ids)]
+                        vals[field] = [(5, )] + [(0, 0, line.copy_data()[0]) for line in obj_obj.browse(line_ids)]
                     else:
                         # Conversion en id datastore
                         # Parcours avec indice pour ne pas recreer la liste
