@@ -39,6 +39,8 @@ class SaleAdvancePaymentInv(models.TransientModel):
 
     @api.multi
     def _create_invoice(self, order, so_line, amount):
+        if order.company_id:
+            self = self.with_context(company_id=order.company_id.id, default_company_id=order.company_id.id)
         invoice = super(SaleAdvancePaymentInv, self)._create_invoice(order, so_line, amount)
         # La méthode _onchange_tax est définie dans le module of_account_tax et recalcule le compte comptable de
         # la ligne de facture en fonction de ses taxes.
