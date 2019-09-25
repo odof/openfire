@@ -219,7 +219,7 @@
                             <group>
                                 <field name="date_next"/>
                                 <field name="date_fin"/>
-                                <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'invisible': [('recurrence', '=', False)]}"/>
                                 <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
                                 <label for="recurring_interval" attrs="{'invisible': [('recurrence', '=', False)]}"/>
                                 <div attrs="{'invisible': [('recurrence', '=', False)]}" col="2">
@@ -384,7 +384,7 @@
                             <group>
                                 <field name="date_next" string="À partir du"/>
                                 <field name="date_fin" string="Au plus tard le"/>
-                                <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'invisible': [('recurrence', '=', True)]}"/>
+                                <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'invisible': [('recurrence', '=', False)]}"/>
                                 <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
                                 <label for="recurring_interval" attrs="{'invisible': [('recurrence', '=', False)]}"/>
                                 <div attrs="{'invisible': [('recurrence', '=', False)]}" col="2">

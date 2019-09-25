@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from datetime import timedelta
 
 class OfService(models.Model):
     _inherit = "of.service"
@@ -104,16 +105,23 @@ class ProjectIssue(models.Model):
     @api.multi
     def action_view_a_programmer(self):
         self.ensure_one()
+        str_today = fields.Date.today()
+        d_today = fields.Date.from_string(str_today)
+        d_2_semaines = d_today + timedelta(days=14)
+        str_2_semaines = fields.Date.to_string(d_2_semaines)
         action = self.env.ref('of_service_parc_installe.of_service_parc_installe_open_a_programmer').read()[0]
         action['domain'] = [('sav_id', '=', self.id), ('recurrence', '=', False)]
         action['context'] = {
         'default_partner_id': self.of_parc_installe_client_id.id,
         'default_address_id': self.of_parc_installe_lieu_id.id,
         'default_recurrence': False,
+        'default_date_next': str_today,
+        'default_date_fin': str_2_semaines,
         'default_sav_id': self.id,
         'default_parc_installe_id': self.of_produit_installe_id.id,
         'default_origin': u"[SAV] " + self.name,
         'bloquer_recurrence': True,
+        'hide_bouton_planif': True,
         }
         return action
 
@@ -121,18 +129,29 @@ class ProjectIssue(models.Model):
     def action_view_prevoir_intervention(self):
         self.ensure_one()
         action = self.env.ref('of_service_parc_installe.of_service_parc_installe_open_a_programmer').read()[0]
-        action['active_id'] = False,
-        action['active_ids'] = [],
+#         action['active_id'] = False,
+#         action['active_ids'] = [],
+        str_today = fields.Date.today()
+        d_today = fields.Date.from_string(str_today)
+        d_2_semaines = d_today + timedelta(days=14)
+        str_2_semaines = fields.Date.to_string(d_2_semaines)
+        action['name'] = u"Prévoir une intervention"
         action['view_mode'] = "form"
-        action['view_ids'] = [(5,0,0), (0,0,{'view_mode':'form', 'view_id': ref('view_of_service_parc_installe_service_ponc_form')})]
+        action['view_ids'] = False
+        action['view_id'] = self.env['ir.model.data'].xmlid_to_res_id("of_service.view_of_service_ponc_form")
+        action['views'] = False
+        action['target'] = "new"
         action['context'] = {
         'default_partner_id': self.of_parc_installe_client_id.id,
         'default_address_id': self.of_parc_installe_lieu_id.id,
         'default_recurrence': False,
+        'default_date_next': str_today,
+        'default_date_fin': str_2_semaines,
         'default_sav_id': self.id,
         'default_parc_installe_id': self.of_produit_installe_id.id,
         'default_origin': u"[SAV] " + self.name,
         'bloquer_recurrence': True,
+        'hide_bouton_planif': True,
         }
         return action
 

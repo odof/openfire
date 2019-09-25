@@ -124,16 +124,6 @@ class HREmployee(models.Model):
         res = [jour.id for jour in jours]
         return res
 
-    """@api.depends("user_id")
-    def _compute_colors(self):
-        for employee in self:
-            if employee.user_id:
-                employee.of_color_ft = employee.user_id.of_color_ft
-                employee.of_color_bg = employee.user_id.of_color_bg
-            else:
-                employee.of_color_ft = "#0D0D0D"
-                employee.of_color_bg = "#F0F0F0" """
-
     @api.multi
     @api.depends('of_archive_horaires', 'of_archive_horaires_temp')
     def _compute_horaires_du_jour(self):
