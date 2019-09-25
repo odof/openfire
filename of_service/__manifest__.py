@@ -11,6 +11,7 @@
         'of_planning',
         'of_map_view',
         'of_utils',
+        'sales_team',  # <- menu service dans les ventes
         #'of_base_location', < par of_planning
     ],
     'init_xml' : [],

@@ -155,7 +155,7 @@ class OfPlanifCreneau(models.TransientModel):
     heure_debut_creneau = fields.Float(string=u'Heude de début', digits=(5, 5))
     heure_fin_creneau = fields.Float(string=u'Heude de fin', digits=(5, 5))
     distance_max = fields.Integer("Distance max.",default=75)
-    duree_creneau = fields.Float(string=u"Durée", compute="_compute_duree_creneau")
+    duree_creneau = fields.Float(string=u"Durée")#, compute="_compute_duree_creneau")
     # lieu précédent
     lieu_prec_id = fields.Many2one("res.partner", string="lieu précédent")
     geo_lat_prec = fields.Float(related='lieu_prec_id.geo_lat', readonly=True)
@@ -217,8 +217,8 @@ class OfPlanifCreneau(models.TransientModel):
         self.peupler_candidats()
         return {'type': 'ir.actions.do_nothing'}
 
-    @api.multi
+    """@api.multi
     @api.depends('heure_debut_creneau', 'heure_fin_creneau')
     def _compute_duree_creneau(self):
         for wizard in self:
-            wizard.duree_creneau = wizard.heure_fin_creneau - wizard.heure_debut_creneau
+            wizard.duree_creneau = wizard.heure_fin_creneau - wizard.heure_debut_creneau"""

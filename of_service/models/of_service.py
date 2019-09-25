@@ -106,7 +106,7 @@ class OfService(models.Model):
         return {"title": title, "values": (v0, v1, v2)}
 
     # template_id = fields.Many2one('of.mail.template', string='Contrat')
-    partner_id = fields.Many2one('res.partner', string='Partenaire', ondelete='restrict')
+    partner_id = fields.Many2one('res.partner', string='Partenaire', required=True, ondelete='restrict')
     address_id = fields.Many2one('res.partner', string="Adresse", ondelete='restrict')
     secteur_tech_id = fields.Many2one(related='address_id.secteur_tech_id', readonly=True)
     company_id = fields.Many2one('res.company', string=u"Société")
@@ -120,9 +120,12 @@ class OfService(models.Model):
     partner_phone = fields.Char(related='partner_id.phone')
 
     tache_id = fields.Many2one('of.planning.tache', string=u'Tâche', required=True)
-    name = fields.Char(u"Libellé", related='tache_id.name', store=True)
-    tag_ids = fields.Many2many('of.service.tag', string=u"Étiquettes")
     name = fields.Char(u"Libellé", compute="_compute_name", store=True)
+    tag_ids = fields.Many2many('of.service.tag', string=u"Étiquettes")
+    tache_name = fields.Char(related="tache_id.name", readonly=True)
+    duree = fields.Float(string=u"Durée estimée")
+
+    origin = fields.Char(string="Origine")
 
     mois_ids = fields.Many2many('of.mois', 'service_mois', 'service_id', 'mois_id', string='Mois')
     jour_ids = fields.Many2many('of.jours', 'service_jours', 'service_id', 'jour_id', string='Jours', default=_get_default_jours)
@@ -188,6 +191,7 @@ class OfService(models.Model):
             self.recurrence = self.tache_id.recurrence
             self.recurring_rule_type = self.tache_id.recurring_rule_type
             self.recurring_interval = self.tache_id.recurring_interval
+            self.duree = self.tache_id.duree
 
     @api.onchange('date_next')
     def _onchange_date_next(self):
@@ -284,8 +288,9 @@ class OFPlanningTache(models.Model):
     @api.multi
     @api.depends('service_ids')
     def _compute_service_count(self):
+        service_obj = self.env['of.service']
         for tache in self:
-            tache.service_count = len(tache.service_ids)
+            tache.service_count = len(service_obj.search([('tache_id', '=', tache.id), ('recurrence', '=', True)]))
 
     @api.multi
     @api.depends('recurrence', 'recurring_interval', 'recurring_rule_type')
@@ -332,6 +337,17 @@ class OFPlanningTache(models.Model):
         else:
             return relativedelta(years=interval)
 
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        """permet de montrer les tache recurrentes en premier ou les taches ponctuelles en premier"""
+        rec_first = self._context.get('show_rec_icon_first', -1)
+        if rec_first != -1:
+            res = super(OFPlanningTache, self).name_search(name, args + [['recurrence', '=', rec_first]], operator, limit) or []
+            limit = limit - len(res)
+            res += super(OFPlanningTache, self).name_search(name, [['recurrence', '!=', rec_first]], operator, limit) or []
+            return res
+        return super(OFPlanningTache, self).name_search(name, args, operator, limit)
+
 
 class OFPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
@@ -359,7 +375,10 @@ class OFPlanningIntervention(models.Model):
         if vals.get('state', False) == 'done':
             for intervention in self:
                 if intervention.service_id:
-                    intervention.service_id.date_next = intervention.service_id.get_next_date(intervention.date_date)
+                    if intervention.service_id.recurrence:
+                        intervention.service_id.date_next = intervention.service_id.get_next_date(intervention.date_date)
+                    else:
+                        intervention.service_id.state = 'done'
         return res
 
     @api.model
@@ -367,7 +386,10 @@ class OFPlanningIntervention(models.Model):
         intervention = super(OFPlanningIntervention, self).create(vals)
         if vals.get('state', False) == 'done':
             if intervention.service_id:
-                intervention.service_id.date_next = intervention.service_id.get_next_date(intervention.date_date)
+                if intervention.service_id.recurrence:
+                    intervention.service_id.date_next = intervention.service_id.get_next_date(intervention.date_date)
+                else:
+                    intervention.service_id.state = 'done'
         return intervention
 
 class ResPartner(models.Model):

@@ -68,10 +68,10 @@ class OfTourneeRdv(models.TransientModel):
         sav = False
         if active_model == 'project.issue':
             sav = self.env['project.issue'].browse(self._context['active_ids'][0])
-        elif active_model == "of.parc.installe":
-            parc_installe = self.env['of.parc.installe'].browse(self._context['active_ids'][0])
-            sav = parc_installe.project_issue_ids.filtered(lambda p: not p.interventions_liees)
-            sav = sav and sav[0] or False
+        #elif active_model == "of.parc.installe":
+        #    parc_installe = self.env['of.parc.installe'].browse(self._context['active_ids'][0])
+        #    sav = parc_installe.project_issue_ids.filtered(lambda p: not p.interventions_liees)
+        #    sav = sav and sav[0] or False
         return sav
 
     sav_id = fields.Many2one('project.issue', string='SAV', default=lambda x: x._default_sav(), domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', partner_address_id)]")
