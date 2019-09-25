@@ -96,7 +96,7 @@ class OfTourneeRdv(models.TransientModel):
 
     name = fields.Char(string=u'Libellé', size=64, required=False)
     description = fields.Html(string='Description')
-    tache_id = fields.Many2one('of.planning.tache', string='Prestation', required=True)
+    tache_id = fields.Many2one('of.planning.tache', string='Tâche', required=True)
     employee_id = fields.Many2one('hr.employee', string=u"Intervenant")
     pre_employee_ids = fields.Many2many('hr.employee', string=u'Pré-sélection d\'intervenants', domain="[('tache_ids', 'in', tache_id)]", help=u"pré-sélection des intervenants")
     duree = fields.Float(string=u'Durée', required=True, digits=(12, 5))
@@ -491,19 +491,20 @@ class OfTourneeRdv(models.TransientModel):
                     dt_fin = datetime.combine(d_recherche, datetime.min.time()) + timedelta(hours=intervention_fin)
                     dt_fin = tz.localize(dt_fin, is_dst=None).astimezone(pytz.utc)
 
-                    wizard_line_obj.create({
-                        'debut_dt': dt_debut,  # datetime utc
-                        'fin_dt': dt_fin,  # datetime utc
-                        'date_flo': intervention_deb,
-                        'date_flo_deadline': intervention_fin,
-                        'date': str_d_recherche,
-                        'description': description,
-                        'wizard_id': self.id,
-                        'employee_id': intervention.employee_id.id,
-                        'intervention_id': intervention.id,
-                        'name': intervention.name,
-                        'disponible': False,
-                    })
+                    for employee in intervention.employee_ids:
+                        wizard_line_obj.create({
+                            'debut_dt': dt_debut,  # datetime utc
+                            'fin_dt': dt_fin,  # datetime utc
+                            'date_flo': intervention_deb,
+                            'date_flo_deadline': intervention_fin,
+                            'date': str_d_recherche,
+                            'description': description,
+                            'wizard_id': self.id,
+                            'employee_id': employee.id,
+                            'intervention_id': intervention.id,
+                            'name': intervention.name,
+                            'disponible': False,
+                        })
         # Calcul des durées et distances
         d_debut = d_avant_recherche + un_jour
         d_fin = d_apres_recherche - un_jour
@@ -791,7 +792,7 @@ class OfTourneeRdvLine(models.TransientModel):
     distance = fields.Float(string='Dist.tot. (km)', digits=(12, 0), help="distance prec + distance suiv")
     dist_prec = fields.Float(string='Dist.Prec. (km)', digits=(12, 0))
     dist_suiv = fields.Float(string='Dist.Suiv. (km)', digits=(12, 0))
-    duree = fields.Float(string=u'Durée.tot. (min)', digits=(12, 0), help=u"durée prec + durée suiv")
+    duree = fields.Float(string=u'Durée.tot. (min)', default=-1, digits=(12, 0), help=u"durée prec + durée suiv")
     duree_prec = fields.Float(string=u'Durée.Prec. (min)', digits=(12, 0))
     duree_suiv = fields.Float(string=u'Durée.Suiv. (min)', digits=(12, 0))
     of_color_ft = fields.Char(related="employee_id.of_color_ft", readonly=True)
