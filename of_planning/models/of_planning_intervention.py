@@ -513,6 +513,49 @@ class OfPlanningIntervention(models.Model):
             if res and res.get('routes'):
                 interv.before_to_this = (float(res['routes'].pop(0)['duration']) / 60.0) / 60.0
 ######################### fin de vérifier / refaire
+
+    @api.model_cr_context
+    def _auto_init(self):
+        # Lors de la 1ère mise à jour après la refonte des équipes (sept. 2019), on migre les données existantes.
+        cr = self._cr
+        cr.execute("SELECT 1 FROM information_schema.tables WHERE table_name = 'employee_intervention_rel'")
+        existe_avant = bool(cr.fetchall())
+        res = super(OfPlanningIntervention, self)._auto_init()
+        cr.execute("SELECT 1 FROM information_schema.tables WHERE table_name = 'employee_intervention_rel'")
+        existe_apres = bool(cr.fetchall())
+        # Si le champ employee_ids n'est pas un many2many avant et l'est après la mise à jour,
+        # c'est qu'on est à la 1ère mise à jour après la refonte du planning, on doit faire la migration des données.
+        if not existe_avant and existe_apres:
+            # On peuple le champ employee_ids de chaque rdv avec les employés de l'équipe du rdv.
+            cr.execute("INSERT INTO employee_intervention_rel (of_planning_intervention_id, hr_employee_id) "
+            "SELECT opi.id, oper.employee_id "
+            "FROM of_planning_intervention AS opi, of_planning_equipe AS ope, of_planning_employee_rel AS oper "
+            "WHERE opi.equipe_id = ope.id "
+            "AND oper.equipe_id = opi.equipe_id")
+
+            # Bascule des couleurs du planning des employés.
+            # Règle retenue : prend en priorité la couleur de l'utilisateur lié si il existe, sinon celle de l'équipe.
+
+            # On recopie le choix des couleurs du planning de l'équipe dans les employés.
+            # Si un employé est membre de plusieurs équipe, ce sont les couleurs de la dernière équipe renvoyée en SQL qui l'emportent.
+            cr.execute("UPDATE hr_employee "
+            "SET of_color_ft = pe.color_ft, of_color_bg = pe.color_bg "
+            "FROM of_planning_equipe as pe "
+            "JOIN of_planning_employee_rel per ON pe.id = per.equipe_id "
+            "JOIN hr_employee he ON per.employee_id = he.id "
+            "WHERE hr_employee.id = he.id")
+
+            # On recopie le choix des couleurs de l'utilisateur dans les employés
+            cr.execute("UPDATE hr_employee "
+           "SET of_color_ft = ru.of_color_ft, of_color_bg = ru.of_color_bg "
+           "FROM res_users as ru "
+           "JOIN resource_resource rr ON ru.id = rr.user_id "
+           "JOIN hr_employee he ON rr.id = he.id "
+           "WHERE hr_employee.id = he.id")
+
+        return res
+
+
     @api.model
     def _modifier_droits_existants_utilisateurs(self):
         u"""Initialise les droits planning des utilisateurs existants à la 1ère mise à jour du module"""
