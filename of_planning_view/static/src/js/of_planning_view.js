@@ -1085,6 +1085,7 @@ var PlanningCreneauDispo = Widget.extend({
             "default_lieu_prec_id": self.lieu_debut.id || false,
             "default_lieu_suiv_id": self.lieu_fin.id|| false,
             "default_date_creneau": self.date,
+            "default_duree_creneau": self.duree,
         };  // à voir quoi mettre
         console.log("ADDITIONNAL CONTEXT",pyeval.eval('context', additional_context));
 
