@@ -6,10 +6,15 @@
         <field name="model">of.wizard.insert.kit.comps</field>
         <field name="arch" type="xml">
             <form>
-                <separator string="Sélectionnez le kit dont vous voulez ajouter les composants"/>
-                <group col="2">
-                    <field name="product_id" domain="[('of_is_kit', '!=', False)]" required="1"/>
-                    <field name="comp_ids" attrs=" {'invisible': [('product_id', '=', False)]}">
+                <!-- Utilisation d'un group pour que product_id prenne la largeur du formulaire -->
+                <group col="1">
+                    <separator string="Sélectionnez le kit dont vous voulez ajouter les composants"/>
+                    <field name="product_id" domain="[('of_is_kit', '!=', False)]" required="1" nolabel="1"
+                           options="{'no_create': True, 'no_open': True}"/>
+                </group>
+                <div attrs=" {'invisible': [('product_id', '=', False)]}">
+                    <separator string="Sélectionnez les composants à ajouter"/>
+                    <field name="comp_ids">
                         <tree editable="bottom" colors="#aaaaaa:is_selected==False" create="false">
                             <button name="button_inverse_selected" type="object" icon="fa-refresh" invisible="1"/>
                             <field name="is_selected"/>
@@ -19,10 +24,12 @@
                             <field name="product_uom_categ_id" invisible="1"/>
                         </tree>
                     </field>
-                </group>
+                </div>
                 <footer>
-                    <button name="button_select_all" type="object" string="Tout sélectionner"/>
-                    <button name="button_unselect_all" type="object" string="Tout déselectionner"/>
+                    <button name="button_select_all" type="object" string="Tout sélectionner"
+                            attrs=" {'invisible': [('product_id', '=', False)]}"/>
+                    <button name="button_unselect_all" type="object" string="Tout déselectionner"
+                            attrs=" {'invisible': [('product_id', '=', False)]}"/>
                     <button name="button_confirm_lines" string="Confirmer" type="object" class="btn-primary"/>
                     <button string="Annuler" special="cancel" class="btn-default"/>
                 </footer>
