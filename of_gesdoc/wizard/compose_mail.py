@@ -65,6 +65,10 @@ try:
         # instanciated wihtin a jinja2 expression, so a lambda "proxy" is
         # is needed, apparently.
         'relativedelta': lambda *a, **kw : relativedelta.relativedelta(*a, **kw),
+
+        # Ajout d'éléments OpenFire
+        'hasattr': hasattr,
+        'getattr': getattr,
     })
     mako_safe_template_env = copy.copy(mako_template_env)
     mako_safe_template_env.autoescape = False
@@ -221,7 +225,7 @@ class OfComposeMail(models.TransientModel):
 
         res['date_confirm_order'] = res['confirmation_date']
         del res['confirmation_date']
-        res['user'] = res['user_id'] and res['user_id'].name
+        res['user_name'] = res['user_id'] and res['user_id'].name
         del res['user_id']
 
         if cal_event:
