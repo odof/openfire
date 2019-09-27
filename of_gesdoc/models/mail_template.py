@@ -14,6 +14,8 @@ try:
 except ImportError:
     PDFParser = PSLiteral = PDFDocument = resolve1 = decode_text = None
 
+ALLOWED_MODELS = ['sale.order', 'res.partner', 'account.invoice']
+
 class OfMailTemplate(models.Model):
     "Templates for printing mail"
     _name = "of.mail.template"
@@ -33,6 +35,14 @@ class OfMailTemplate(models.Model):
         for template in self:
             template.note_fields = note_fields
 
+    @api.model
+    def _get_allowed_models(self):
+        return ALLOWED_MODELS
+
+    @api.model
+    def _get_models_domain(self):
+        return [('model', 'in', self._get_allowed_models())]
+
     name = fields.Char(string='Nom', size=250, required=True)
     active = fields.Boolean(string=u'Actif', default=True)
     sans_add = fields.Boolean(string='Sans adresse')
@@ -40,17 +50,18 @@ class OfMailTemplate(models.Model):
     body_text = fields.Text(string='Text contents', help="Plaintext version of the message (placeholders may be used here)")
     file_name = fields.Char(string='Nom du fichier', size=64)
     file = fields.Binary("Formulaire PDF", attachment=True)
-    chp_ids = fields.One2many('of.gesdoc.chp', 'template_id', string='Liste des champs')
+    chp_ids = fields.One2many('of.gesdoc.chp', 'template_id', string='Liste des champs', copy=True)
     fillable = fields.Boolean(u"Laisser éditable", help="Autorise la modification du fichier pdf après téléchargement")
     note_fields = fields.Text(compute='_compute_note_fields', string='Liste des valeurs', default=_get_note_fields)
     type = fields.Selection([], string="Type de document")
     sequence = fields.Integer(string=u"Séquence", default=10)
+    model_ids = fields.Many2many('ir.model', string=u"Impression rapide", domain=_get_models_domain, copy=False, help=u"Ajoute un raccourci dans le menu \"Imprimer\"")
 
-    @api.one
     def copy(self, default=None):
         default = dict(default or {})
         default['name'] = _('%s (copy)') % self.name
-        return super(OfMailTemplate, self).copy(default)
+        res = super(OfMailTemplate, self).copy(default)
+        return res
 
     @api.onchange('file')
     def onchange_file(self):
@@ -79,6 +90,83 @@ class OfMailTemplate(models.Model):
                     'to_export': True,
                 }))
         self.chp_ids = chps
+
+    @api.model
+    def create_shortcuts(self, model_ids):
+        """
+        Fonction permettant la création des raccourcis d'impression
+        :param model_ids:
+        :return:
+        """
+        model_obj = self.env['ir.model']
+        action_report_obj = self.env['ir.actions.report.xml']
+        for model_id in model_ids:
+            model = model_obj.browse(model_id)
+            action_report = action_report_obj.create({
+                'name' : self.name,
+                'report_type' : 'controller',
+                'model' : model.model,
+                'print_report_name' : self.name,
+                'report_name' : self.name,
+                'report_rml': '/courrier/%s/%s' % (self.id, model.model),
+                })
+            action_report.create_action()
+
+    @api.model
+    def delete_shortcuts(self, model_ids):
+        model_obj = self.env['ir.model']
+        action_report_obj = self.env['ir.actions.report.xml']
+        for model_id in model_ids:
+            model = model_obj.browse(model_id)
+            report = action_report_obj.search([('model', '=', model.model), ('report_type', '=', 'controller'),
+                                               ('report_rml', '=', '/courrier/%s/%s' % (self.id, model.model))])
+            report.unlink()
+
+    @api.multi
+    def change_shortcuts(self, name):
+        # Change le nom du raccourci
+        action_report_obj = self.env['ir.actions.report.xml']
+        for mail_template in self:
+            reports = action_report_obj.search(
+                [('report_type', '=', 'controller'),
+                 ('report_rml', 'like', '/courrier/%s/' % self.id)])
+            reports.write({'name': name})
+
+    @api.model
+    def create(self, vals):
+        res = super(OfMailTemplate, self).create(vals)
+        res.create_shortcuts(res.model_ids.ids)
+        return res
+
+    @api.multi
+    def write(self, vals):
+        # Pour ajouter le raccourci dans le menu "Imprimer"
+        for courrier in self:
+            current_models = courrier.model_ids.ids
+            active_current = vals.get('active', courrier.active)
+            if 'model_ids' in vals and active_current:  # En many2many_tags le code 6 est toujours envoyé.
+                old_ids = set(courrier.model_ids.ids)
+                new_ids = set(vals['model_ids'][0][2])
+                current_models = False
+                courrier.create_shortcuts(list(new_ids - old_ids))
+                courrier.delete_shortcuts(list(old_ids - new_ids))
+            # Si la case "Actif" du modèle de courrier a été cochée/décochée, il faut ajouter/enlever le raccourci.
+            elif 'active' in vals:
+                active = vals['active']
+                if active and current_models:
+                    courrier.create_shortcuts(current_models)
+                elif not active:
+                    courrier.delete_shortcuts(courrier.model_ids.ids)
+            # Si le nom du modèle de courrier change, on doit changer le nom du raccourci.
+            if 'name' in vals and active_current:
+                courrier.change_shortcuts(vals['name'])
+        return super(OfMailTemplate, self).write(vals)
+
+    @api.multi
+    def unlink(self):
+        for template in self:
+            template.delete_shortcuts(template.model_ids.ids)
+        return super(OfMailTemplate, self).unlink()
 
 class OfGesdocChp(models.Model):
     _name = 'of.gesdoc.chp'

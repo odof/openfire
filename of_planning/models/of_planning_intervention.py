@@ -729,3 +729,10 @@ class OfPlanningTag(models.Model):
     color = fields.Integer(string='Index couleur')
     active = fields.Boolean(default=True, help="Le champ 'Active' vous permet de cacher l'étiquette sans la supprimer.")
     intervention_ids = fields.Many2many('of.planning.intervention', column1='tag_id', column2='intervention_id', string='Interventions')
+
+class OfMailTemplate(models.Model):
+    _inherit = "of.mail.template"
+
+    @api.model
+    def _get_allowed_models(self):
+        return super(OfMailTemplate, self)._get_allowed_models() + ['of.planning.intervention']
