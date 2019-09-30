@@ -89,6 +89,35 @@ class OfParcInstalle(models.Model):
         }
         return action
 
+    @api.multi
+    def action_prevoir_intervention(self):
+        self.ensure_one()
+        action = self.env.ref('of_service_parc_installe.of_service_parc_installe_open_a_programmer').read()[0]
+#         action['active_id'] = False,
+#         action['active_ids'] = [],
+        str_today = fields.Date.today()
+        d_today = fields.Date.from_string(str_today)
+        d_2_semaines = d_today + timedelta(days=14)
+        str_2_semaines = fields.Date.to_string(d_2_semaines)
+        action['name'] = u"Prévoir une intervention"
+        action['view_mode'] = "form"
+        action['view_ids'] = False
+        action['view_id'] = self.env['ir.model.data'].xmlid_to_res_id("of_service.view_of_service_ponc_form")
+        action['views'] = False
+        action['target'] = "new"
+        action['context'] = {
+        'default_partner_id': self.client_id.id,
+        'default_address_id': self.site_adresse_id.id,
+        'default_recurrence': False,
+        'default_date_next': str_today,
+        'default_date_fin': str_2_semaines,
+        'default_parc_installe_id': self.id,
+        'default_origin': u"[Parc installé] " + self.name,
+        'bloquer_recurrence': True,
+        'hide_bouton_planif': True,
+        }
+        return action
+
 
 class ProjectIssue(models.Model):
     _inherit = 'project.issue'
@@ -126,7 +155,7 @@ class ProjectIssue(models.Model):
         return action
 
     @api.multi
-    def action_view_prevoir_intervention(self):
+    def action_prevoir_intervention(self):
         self.ensure_one()
         action = self.env.ref('of_service_parc_installe.of_service_parc_installe_open_a_programmer').read()[0]
 #         action['active_id'] = False,
