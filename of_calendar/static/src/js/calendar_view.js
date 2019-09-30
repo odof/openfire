@@ -24,6 +24,12 @@ function isNullOrUndef(value) {
 }
 
 CalendarView.include({
+    custom_events: {
+        reload_events: function () {
+            this.$calendar.fullCalendar('refetchEvents');
+        },
+        'filters_rendered': 'on_filters_rendered',
+    },
 
     init: function () {
         var self = this;
@@ -41,10 +47,16 @@ CalendarView.include({
 
         this.color_ft_field = attrs.color_ft_field;
         this.color_bg_field = attrs.color_bg_field;
+        if (this.fields[this.color_field].type == "many2many") {
+            this.attendee_multiple = true;
+        }
         if (this.custom_colors && !(attrs.color_ft_field && attrs.color_bg_field)) {
             throw new Error(_t("Calendar views with 'custom_colors' attribute set to true need to define both 'color_ft_field' and 'color_bg_field' attributes."));
         }
         this.attendee_model = attrs.attendee_model;
+        if (isNullOrUndef(this.avatar_title) && !isNullOrUndef(this.attendee_model)) {
+            this.avatar_title = this.attendee_model;
+        }
         if (this.custom_colors && !this.useContacts && isNullOrUndef(this.attendee_model)) {
             throw new Error(_t("Calendar views with 'custom_colors' attribute set to true need to define either 'use_contacts' or 'attendee_model' attribute. \n\
                 (use_contacts takes precedence)."));
@@ -76,6 +88,7 @@ CalendarView.include({
         if (isNullOrUndef(this.options.sidebar)) {
             this.display_states = false;
         }
+        //this.dfd_filters_rendered = $.Deferred();
 
         this.on_event_after_all_render = _.debounce(this.on_event_after_all_render, 300, true);
     },
@@ -108,6 +121,7 @@ CalendarView.include({
      */
     _do_search: function (domain, context, _group_by) {
         var self = this;
+        self.dfd_filters_rendered = $.Deferred(); // asynchronicity event colors
         if (! self.all_filters) {
             self.all_filters = {};
         }
@@ -125,12 +139,12 @@ CalendarView.include({
 
                 var current_event_source = self.event_source;
                     var event_domain = self.get_range_domain(domain, start, end);
-                    if (self.useContacts && (!self.all_filters[-1] || !self.all_filters[-1].is_checked)) {
-                        var partner_ids = $.map(self.all_filters, function(o) { if (o.is_checked) { return o.value; }});
-                        if (!_.isEmpty(partner_ids)) {
+                    if (self.useContacts && (!self.all_filters[-1] || !self.all_filters[-1].is_checked) || self.attendee_multiple) {
+                        var attendee_ids = $.map(self.all_filters, function(o) { if (o.is_checked) { return o.value; }});
+                        if (!_.isEmpty(attendee_ids)) {
                             event_domain = new data.CompoundDomain(
                                 event_domain,
-                                [[self.attendee_people, 'in', partner_ids]]
+                                [[self.attendee_people, 'in', attendee_ids]]
                             );
                         }
                     }
@@ -152,6 +166,7 @@ CalendarView.include({
                         Comportement: dans tous les cas on cherche notre premier event (même si jump_to est a selected)
                         comme ça si jump_to est a selected mais qu'il n'y a aucun event selected on sautera au premier
                     */
+                    //console.log("EVENTS",events);
                     self.first_evt = events.length > 0 && events[0] || undefined;
                     if (!isNullOrUndef(self.jump_to) && !isNullOrUndef(self.first_evt)) {
                         var tmp, strdate1, strdate2, strtime1, strtime2;
@@ -217,26 +232,47 @@ CalendarView.include({
                         var new_filter_added = false;
                         _.each(events, function (e) {
                             var key,val = null;
-                            if (color_field.type == "selection") {
-                                key = e[self.color_field];
-                                val = _.find(color_field.selection, function(name){ return name[0] === key;});
-                            } else {
-                                key = e[self.color_field][0];
-                                val = e[self.color_field];
-                            }
-                            if (!all_filters_temp[key]) {
-                                filter_item = {
-                                    value: key,
-                                    label: val[1],
-                                    color: self.get_color(key),
-                                    avatar_model: (utils.toBoolElse(self.avatar_filter, true) ? self.avatar_filter : false ),
-                                    is_checked: true
-                                };
-                                all_filters_temp[key] = filter_item;
-                                new_filter_added = true
-                            }
-                            if (! _.contains(self.now_filter_ids, key)) {
-                                self.now_filter_ids.push(key);
+
+                            if (self.attendee_multiple) {
+                                _.each(e[self.color_field], function (a) {
+                                    key = a;
+                                    if (!all_filters_temp[key]) {
+                                        filter_item = {
+                                            value: key,
+                                            label: 'oupsy',
+                                            color: self.get_color(key),
+                                            avatar_model: (utils.toBoolElse(self.avatar_filter, true) ? self.avatar_filter : false ),
+                                            is_checked: true
+                                        };
+                                        all_filters_temp[key] = filter_item;
+                                        new_filter_added = true
+                                    }
+                                    if (! _.contains(self.now_filter_ids, key)) {
+                                        self.now_filter_ids.push(key);
+                                    }
+                                });
+                            }else{
+                                if (color_field.type == "selection") {
+                                    key = e[self.color_field];
+                                    val = _.find(color_field.selection, function(name){ return name[0] === key;});
+                                } else {
+                                    key = e[self.color_field][0];
+                                    val = e[self.color_field];
+                                }
+                                if (!all_filters_temp[key]) {
+                                    filter_item = {
+                                        value: key,
+                                        label: val[1],
+                                        color: self.get_color(key),
+                                        avatar_model: (utils.toBoolElse(self.avatar_filter, true) ? self.avatar_filter : false ),
+                                        is_checked: true
+                                    };
+                                    all_filters_temp[key] = filter_item;
+                                    new_filter_added = true
+                                }
+                                if (! _.contains(self.now_filter_ids, key)) {
+                                    self.now_filter_ids.push(key);
+                                }
                             }
                         });
                         if (self.filters_radio && new_filter_added) {  // uncheck all but one filter if a new filter has been added
@@ -256,18 +292,35 @@ CalendarView.include({
                             };
                         }
                         self.all_filters = all_filters_temp;
-                        //////////////////////////////////////////////////////////////////////////////////
 
+                        //var dfd_filters_rendered = $.Deferred();
                         if (self.sidebar) {
                             self.sidebar.filter.render();
+                            //$.when(self.sidebar.filter.render()).then(function(){return dfd_filters_rendered.resolve()});
+                            //setTimeout(function(){return dfd_filters_rendered.resolve()}, 100);
 
                             events = $.map(events, function (e) {
-                                var key = color_field.type == "selection" ? e[self.color_field] : e[self.color_field][0];
-                                if (_.contains(self.now_filter_ids, key) &&  self.all_filters[key].is_checked) {
-                                    return e;
+                                if (self.attendee_multiple) {
+                                    var keys = e[self.color_field];
+                                    var key;
+                                    for (var i in keys) {
+                                        key = keys[i];
+                                        if (_.contains(self.now_filter_ids, key) &&  self.all_filters[key].is_checked) {
+                                            // at least one of the attendees of this events is checked in the filters
+                                            return e;
+                                        }
+                                    }
+                                }else{
+                                    var key = color_field.type == "selection" ? e[self.color_field] : e[self.color_field][0];
+                                    if (_.contains(self.now_filter_ids, key) &&  self.all_filters[key].is_checked) {
+                                        return e;
+                                    }
                                 }
                                 return null;
                             });
+                        }else{
+                            self.dfd_filters_rendered.resolve()
+                            console.log("OUPSY NO SIDEBAR")
                         }
                     }
 
@@ -281,15 +334,18 @@ CalendarView.include({
                                 self.all_attendees[item.id] = item.name;
                             });
                         }).done(function() {
-                            return self.perform_necessary_name_gets(events).then(callback);
+                            return $.when(self.dfd_filters_rendered).then(function() {return self.perform_necessary_name_gets(events).then(callback)});
+                            //return self.perform_necessary_name_gets(events).then(callback);
                         });
                     }
                     else {
                         _.each(all_attendees,function(item){
                                 self.all_attendees[item] = '';
                         });
-                        return self.perform_necessary_name_gets(events).then(callback);
+                        //return self.perform_necessary_name_gets(events).then(callback)
+                        return $.when(self.dfd_filters_rendered).then(function() {return self.perform_necessary_name_gets(events).then(callback)});//, 100);  // ici
                     }
+                    //////////////////////////////////////////////////////////////////////////////////
                 });
             },
             eventDataTransform: function (event) {
@@ -337,7 +393,7 @@ CalendarView.include({
         var self = this;
         var dfd = $.Deferred();
         var model;
-        console.log("SET MIN MAX TIME")
+        //console.log("SET MIN MAX TIME")
 
         if (self.working_hours == 'parent') {
             model = new Model(this.parent_model);
@@ -348,7 +404,7 @@ CalendarView.include({
         .then(function (res) {
             // res is a tuple (min, max) in UTC
             if (!res) {
-                console.log("OUCH!",res)
+                //console.log("OUCH!",res)
                 dfd.resolve();
                 return;
             }
@@ -363,7 +419,7 @@ CalendarView.include({
             var maxUTC = new Date(str_prefix + max_time_utc + str_suffix );
             self.minTime = minUTC.toLocaleTimeString();
             self.maxTime = maxUTC.toLocaleTimeString();
-            console.log("MIN MAX",self.minTime,self.maxTime);
+            //console.log("MIN MAX",self.minTime,self.maxTime);
             dfd.resolve();
             return;
         });
@@ -407,6 +463,9 @@ CalendarView.include({
             self.$calendar.fullCalendar('gotoDate', date_tmp);
         }
     },
+    on_filters_rendered: function() {
+        this.dfd_filters_rendered.resolve();
+    },
     /**
      *  called by CalendarView.get_all_filters_ordered if custom_colors set to true
      *  sets custom colors for all_filter.
@@ -428,7 +487,7 @@ CalendarView.include({
         }
         var Attendees = new Model(model_name);
         //console.log("ATTENDEES: ",Attendees, self.color_ft_field, self.color_bg_field);
-        Attendees.query(['id', self.color_ft_field, self.color_bg_field]) // retrieve colors from db
+        Attendees.query(['id', 'name', self.color_ft_field, self.color_bg_field]) // retrieve colors from db
             .filter([['id','in',ids]]) // id
             .all()
             .then(function (attendees){
@@ -440,11 +499,13 @@ CalendarView.include({
                     self.all_filters[key]['color_bg'] = a[self.color_bg_field];
                     self.all_filters[key]['color_ft'] = a[self.color_ft_field];
                     self.all_filters[key]['custom_colors'] = true;
+                    self.all_filters[key]['label'] = a['name'];
                 };
                 if (self.useContacts) {
                     self.all_filters[-1]['color_bg'] = '#C0FFE8';
                     self.all_filters[-1]['color_ft'] = '#0D0D0D';
                     self.all_filters[-1]['custom_colors'] = true;
+                    self.all_filters[-1]['label'] = 'Tout le monde';
                 };
                 dfd.resolve();
             });
@@ -582,21 +643,41 @@ CalendarView.include({
                 var attendee_showed = 0;
                 var attendee_other = '';
 
-                _.each(temp_ret[this.attendee_people],
+                _.each(evt[this.attendee_people],
                     function (the_attendee_people) {
                         attendees.push(the_attendee_people);
                         attendee_showed += 1;
                         if (attendee_showed<= MAX_ATTENDEES) {
                             if (self.avatar_model !== null) {
-                                       the_title_avatar += '<img title="' + _.escape(self.all_attendees[the_attendee_people]) + '" class="o_attendee_head"  \
-                                                        src="/web/image/' + self.avatar_model + '/' + the_attendee_people + '/image_small"></img>';
+                               the_title_avatar += '<img title="' + _.escape(self.all_attendees[the_attendee_people]) + '" class="o_attendee_head"  \
+                                                src="/web/image/' + self.avatar_model + '/' + the_attendee_people + '/image_small"></img>';
                             }
                             else {
-                                if (!self.colorIsAttendee || the_attendee_people != temp_ret[self.color_field]) {
-                                        var tempColor = (self.all_filters[the_attendee_people] !== undefined) 
-                                                    ? self.all_filters[the_attendee_people].color
-                                                    : (self.all_filters[-1] ? self.all_filters[-1].color : 1);
-                                        the_title_avatar += '<i class="fa fa-user o_attendee_head o_underline_color_'+tempColor+'" title="' + _.escape(self.all_attendees[the_attendee_people]) + '" ></i>';
+                                if (!self.attendee_multiple && (!self.colorIsAttendee || the_attendee_people != evt[self.color_field])) {
+                                    var tempColor = (self.all_filters[the_attendee_people] !== undefined) 
+                                                ? self.all_filters[the_attendee_people].color
+                                                : (self.all_filters[-1] ? self.all_filters[-1].color : 1);
+                                    the_title_avatar += '<i class="fa fa-user o_attendee_head o_underline_color_'+tempColor+'" title="' + _.escape(self.all_attendees[the_attendee_people]) + '" ></i>';
+                                }else if (self.attendee_multiple) {
+                                    var tempColorFT, tempColorBG;
+                                    var now_id;
+                                    var found = false;
+                                    for (var i in evt[self.attendee_people]) {
+                                        now_id = evt[self.attendee_people][i];
+                                        tempColorFT = self.all_filters[now_id].color_ft;
+                                        tempColorBG = self.all_filters[now_id].color_bg;
+                                        if (self.all_filters[now_id].is_checked && !found) {  // this will be the main color of the event
+                                            evt["color_filter_id"] = now_id;
+                                            found = true;
+                                            if (!self.colorIsAttendee) {
+                                                the_title_avatar += '<i class="of_calendar_evt_top of_calendar_evt_right of_calendar_attendee_box" title="' + _.escape(self.all_attendees[the_attendee_people]) + '"' +
+                                                    'style="background: ' + tempColorBG + '; border: 1px solid #0D0D0D" ></i>';
+                                            }
+                                        }else{
+                                            the_title_avatar += '<i class="of_calendar_evt_top of_calendar_evt_right of_calendar_attendee_box" title="' + _.escape(self.all_attendees[the_attendee_people]) + '"' +
+                                                'style="background: ' + tempColorBG + '; border: 1px solid #0D0D0D" ></i>';
+                                        }
+                                    }
                                 }//else don't add myself
                             }
                         }
@@ -622,7 +703,7 @@ CalendarView.include({
             'attendee_avatars': the_title_avatar,
             'allDay': (this.fields[this.date_start].type == 'date' || (this.all_day && evt[this.all_day]) || false),
             'id': evt.id,
-            'attendees':attendees
+            'attendees':attendees,
         };
         ////////////////////////////////////////////////////////////////////////////////// This part is modified
         for (var key in self["icons"]) {
@@ -641,6 +722,27 @@ CalendarView.include({
                 var index = self.get_custom_color_index(r.attendees);
                 r.backgroundColor = self.all_filters[index]['color_bg'];
                 r.textColor = self.all_filters[index]['color_ft'];
+            }else if (self.attendee_multiple) {  // multiple attendees
+                if (!isNullOrUndef(evt["color_filter_id"])) {
+                    r.backgroundColor = self.all_filters[ evt["color_filter_id"] ]['color_bg'];
+                    r.textColor = self.all_filters[ evt["color_filter_id"] ]['color_ft'];
+                }else{
+                    console.log("oups! something went wrong with multiple attendees colors");
+                }
+                /*var now_id;
+                var found = false;
+                for (var i in self.now_filter_ids) {
+                    now_id = self.now_filter_ids[i];
+                    if (self.all_filters[now_id].is_checked && !found) {  // this will be the main color of the event
+                        console.log("FOUND",now_id,self.all_filters[now_id]['color_bg'],self.all_filters[now_id]['color_ft']);
+                        r.backgroundColor = self.all_filters[now_id]['color_bg'];
+                        r.textColor = self.all_filters[now_id]['color_ft'];
+                        found = true
+                        //break;
+                    }else if (self.all_filters[now_id].is_checked) {
+
+                    }
+                }*/
             }else if (evt[self.color_ft_field] && evt[self.color_bg_field]) {
                 r.textColor = evt[self.color_ft_field];
                 r.backgroundColor = evt[self.color_bg_field];
@@ -648,6 +750,11 @@ CalendarView.include({
                 throw new Error(_t("Missing fields in calendar view definition: '" + self.color_ft_field + "' and/or '" + self.color_bg_field + "'."));
             }
             r.className = ["of_custom_color"];
+            if (self.attendee_multiple) {
+                for (var i=0; i<evt[self.color_field].length; i++) {
+                    r.className.push("of_calendar_attendee_" + evt[self.color_field][i]);
+                }
+            }
             if (evt[self.selected_field]) {
                 //console.log("HAHAHA event selected: ",evt);
                 r.className.push("of_pulse");
@@ -687,9 +794,15 @@ Sidebar.include({
 });
 
 SidebarFilter.include({
+    events: {
+        'click .o_calendar_contact': 'on_click',
+        'mouseover .of_calendar_filter': 'on_mouseover',
+        'mouseout .of_calendar_filter': 'on_mouseout',
+    },
     init: function(parent, view) {
         this._super(parent,view);
         this.filters_radio = view.filters_radio;
+        //this.dfd_filters_rendered = $.Deferred();
     },
     /**
      *  Override of parent function. handles asynchronicity.
@@ -703,8 +816,10 @@ SidebarFilter.include({
             var filters = _.filter(fil.target, function(filter) {
                 return _.contains(self.view.now_filter_ids, filter.value);
             });
+            //console.log("filters!",filters);
             var filters_radio = self.filters_radio || false;
-            self.$('.o_calendar_contacts').html(QWeb.render('CalendarView.sidebar.contacts', { filters: filters, filters_radio: filters_radio }));
+            return $.when(self.$('.o_calendar_contacts').html(QWeb.render('CalendarView.sidebar.contacts', { filters: filters, filters_radio: filters_radio })))
+                .then(function(){return self.trigger_up('filters_rendered')});
         });
     },
     /**
@@ -729,6 +844,18 @@ SidebarFilter.include({
             all_filters[e.target.value].is_checked = e.target.checked;
         }
         this.trigger_up('reload_events');
+    },
+    on_mouseout: function (ev) {
+        if (!this.filters_radio) {
+            var class_a_pulse = ev.target.id;
+            $("." + class_a_pulse).removeClass("of_pulse");
+        }
+    },
+    on_mouseover: function (ev) {
+        if (!this.filters_radio) {
+            var class_a_pulse = ev.target.id;
+            $("." + class_a_pulse).addClass("of_pulse");
+        }
     },
 });
 
