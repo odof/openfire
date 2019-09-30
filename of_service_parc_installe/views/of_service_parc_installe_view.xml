@@ -85,6 +85,10 @@
         <field name="model">of.parc.installe</field>
         <field name="inherit_id" ref="of_parc_installe.of_parc_installe_form_view"/>
         <field name="arch" type="xml">
+            <!-- Ajout bouton prévoir une intervention-->
+            <xpath expr="//header" position="inside">
+                <button name="action_prevoir_intervention" string="Prévoir Intervention" type="object"/>
+            </xpath>
             <xpath expr="//group[@name='produit_installe']" position="inside">
                 <field name="id" invisible="1"/>
             </xpath>
@@ -145,7 +149,7 @@
         src_model="project.issue"
         view_mode="form"
         view_id="of_service.view_of_service_ponc_form"
-        id="action_view_prevoir_intervention_sav"
+        id="action_prevoir_intervention_sav"
         key2="client_action_multi"
         target="new"
         groups="of_planning.of_group_planning_intervention_lecture_siens"
@@ -165,7 +169,7 @@
         <field name="arch" type="xml">
             <!-- Ajout bouton prévoir une intervention dans vue form SAV-->
             <xpath expr="//header" position="inside">
-                <button name="action_view_prevoir_intervention" string="Prévoir Intervention" type="object"/>
+                <button name="action_prevoir_intervention" string="Prévoir Intervention" type="object"/>
             </xpath>
             <!-- smart button 'à programmer' -->
             <xpath expr="//div[@class='oe_button_box']" position="inside">

@@ -188,9 +188,10 @@ class OfService(models.Model):
     def _onchange_tache_id(self):
         self.ensure_one()
         if self.tache_id:
-            self.recurrence = self.tache_id.recurrence
-            self.recurring_rule_type = self.tache_id.recurring_rule_type
-            self.recurring_interval = self.tache_id.recurring_interval
+            if not self._context[u"bloquer_recurrence"]:
+                self.recurrence = self.tache_id.recurrence
+                self.recurring_rule_type = self.tache_id.recurring_rule_type
+                self.recurring_interval = self.tache_id.recurring_interval
             self.duree = self.tache_id.duree
 
     @api.onchange('date_next')
