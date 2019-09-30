@@ -25,4 +25,20 @@
         </field>
     </record>
 
+    <!-- Ajout de la vue pivot sur les contrats -->
+    <record id="contract.action_account_analytic_overdue_all" model="ir.actions.act_window">
+        <field name="view_mode">tree,form,pivot</field>
+    </record>
+
+    <record model="ir.ui.view" id="of_view_contract_pivot">
+        <field name="name">of.view.contract.pivot</field>
+        <field name="model">account.analytic.account</field>
+        <field name="arch" type="xml">
+            <pivot string="Contracts">
+                <field name="recurring_next_date" type="row"/>
+                <field name="of_amount_total" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
 </odoo>
