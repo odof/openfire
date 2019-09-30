@@ -110,7 +110,9 @@ class GestionPrix(models.TransientModel):
         """
         if to_distribute == 0.0:
             line_vals = {'price_unit': 0.0}
-            taxes = {'total_excluded': 0.0, 'total_included': 0.0}
+            taxes = order_line.tax_id.with_context(base_values=(0.0, 0.0, 0.0))
+            taxes = taxes.compute_all(0.0, currency, order_line.product_uom_qty,
+                                      product=order_line.product_id, partner=order_line.order_id.partner_id)
         else:
             # Prix HT unitaire final de la ligne
             price_unit = (order_line.price_unit or 1.0) * to_distribute / total
