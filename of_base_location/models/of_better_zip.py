@@ -82,7 +82,7 @@ class OfSecteur(models.Model):
 
         domain = ['|'] * (len(self) - 1)
 
-        for zip_range in self.mapped(zip_range_ids):
+        for zip_range in self.mapped("zip_range_ids"):
             cp_min = zip_range.cp_min
             cp_max = zip_range.cp_max
             zip_ranges_intra = zip_range_obj.search(
