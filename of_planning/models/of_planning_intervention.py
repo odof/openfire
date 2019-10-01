@@ -527,7 +527,7 @@ class OfPlanningIntervention(models.Model):
         # c'est qu'on est à la 1ère mise à jour après la refonte du planning, on doit faire la migration des données.
         if not existe_avant and existe_apres:
             # On peuple le champ employee_ids de chaque rdv avec les employés de l'équipe du rdv.
-            cr.execute("INSERT INTO employee_intervention_rel (of_planning_intervention_id, hr_employee_id) "
+            cr.execute("INSERT INTO employee_intervention_rel (intervention_id, employee_id) "
             "SELECT opi.id, oper.employee_id "
             "FROM of_planning_intervention AS opi, of_planning_equipe AS ope, of_planning_employee_rel AS oper "
             "WHERE opi.equipe_id = ope.id "

@@ -50,7 +50,7 @@
                         </group>
                         <group>
                             <separator string="Codes postaux du secteur" colspan="2"/>
-                            <field name="regle_ids" nolabel="1" colspan="2">
+                            <field name="zip_range_ids" nolabel="1" colspan="2">
                                 <tree editable="top">
                                     <field name="cp_min"/>
                                     <field name="cp_max"/>
@@ -71,9 +71,7 @@
                 <field name="name"/>
                 <field name="code"/>
                 <field name="type"/>
-                <field name="zip_utile_ids"/>
-                <field name="zip_com_ids"/>
-                <field name="zip_tech_ids"/>
+                <field name="zip_range_ids"/>
                 <field name="active"/>
                 <templates>
                     <t t-name="kanban-box">
@@ -86,7 +84,7 @@
                                 </strong>
                                 <field name="code"/>
                                 <field name="type"/>
-                                <field name="regle_ids" widget="many2many_tags"/>
+                                <field name="zip_range_ids" widget="many2many_tags"/>
                                 <field name="active" invisible="1"/>
                             </div>
                         </div>
@@ -104,7 +102,7 @@
                 <field name="name"/>
                 <field name="code"/>
                 <field name="type"/>
-                <field name="regle_ids"/>
+                <field name="zip_range_ids"/>
                 <field name="active" invisible="1"/>
             </tree>
         </field>
@@ -148,9 +146,9 @@
 <!-- ################## CODES POSTAUX DES SECTEURS ###################################### -->
 <!-- #################################################################################### -->
     <!--
-    <record id="of_view_secteur_zip_form" model="ir.ui.view">
-        <field name="name">of.secteur.zip.form</field>
-        <field name="model">of.secteur.zip</field>
+    <record id="of_view_secteur_zip_range_form" model="ir.ui.view">
+        <field name="name">of.secteur.zip.range.form</field>
+        <field name="model">of.secteur.zip.range</field>
         <field name="arch" type="xml">
             <form string="Codes Postaux des Secteurs">
                 <group>
@@ -167,9 +165,9 @@
         </field>
     </record>
 
-    <record id="of_view_secteur_zip_tree" model="ir.ui.view">
-        <field name="name">of.secteur.zip.tree</field>
-        <field name="model">of.secteur.zip</field>
+    <record id="of_view_secteur_zip_range_tree" model="ir.ui.view">
+        <field name="name">of.secteur.zip.range.tree</field>
+        <field name="model">of.secteur.zip.range</field>
         <field name="arch" type="xml">
             <tree string="Codes Postaux des Secteurs" editable="top">
                 <field name="name"/>
@@ -180,9 +178,9 @@
         </field>
     </record>
 
-    <record id="of_view_secteur_zip_filter" model="ir.ui.view">
-        <field name="name">of.secteur.zip.filter</field>
-        <field name="model">of.secteur.zip</field>
+    <record id="of_view_secteur_zip_range_filter" model="ir.ui.view">
+        <field name="name">of.secteur.zip.range.filter</field>
+        <field name="model">of.secteur.zip.range</field>
         <field name="arch" type="xml">
             <search string="Recherche Codes Postaux des Secteurs">
                 <field name="name"/>
@@ -197,7 +195,7 @@
 
     <record id="action_of_secteur_zip_tree" model="ir.actions.act_window">
         <field name="name">CP des secteurs</field>
-        <field name="res_model">of.secteur.zip</field>
+        <field name="res_model">of.secteur.zip.range</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="of_view_secteur_zip_tree"/>
@@ -208,7 +206,7 @@
         name="CP des Secteurs"
         id="of_secteur_zip_menu"
         parent="base_location.locations_root_menu"
-        action="action_of_secteur_zip_tree"
+        action="action_of_secteur_zip.range_tree"
         sequence="21"
         /> -->
 
