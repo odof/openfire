@@ -547,11 +547,13 @@ class OfPlanningIntervention(models.Model):
 
             # On recopie le choix des couleurs de l'utilisateur dans les employés
             cr.execute("UPDATE hr_employee "
-           "SET of_color_ft = ru.of_color_ft, of_color_bg = ru.of_color_bg "
-           "FROM res_users as ru "
-           "JOIN resource_resource rr ON ru.id = rr.user_id "
-           "JOIN hr_employee he ON rr.id = he.id "
-           "WHERE hr_employee.id = he.id")
+            "SET of_color_ft = ru.of_color_ft, of_color_bg = ru.of_color_bg "
+            "FROM res_users as ru "
+            "JOIN resource_resource rr ON ru.id = rr.user_id "
+            "JOIN hr_employee he ON rr.id = he.id "
+            "WHERE hr_employee.id = he.id"
+            "    AND ru.of_color_ft != '#0D0D0D'"
+            "    AND ru.of_color_bg != '#F0F0F0'")
 
         return res
 
