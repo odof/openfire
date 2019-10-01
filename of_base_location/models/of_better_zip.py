@@ -61,37 +61,16 @@ class OfSecteur(models.Model):
          ('com', 'Commercial'),
          ('tech_com', 'Technique et commercial'),
         ], string="type de secteur", required=True, default='tech_com')
-    regle_ids = fields.One2many('of.secteur.regle', 'secteur_com_id', string=u'Codes postaux')
+    zip_range_ids = fields.One2many('of.secteur.zip.range', 'secteur_id', string=u'Codes postaux')
     active = fields.Boolean(string='Actif', default=True)
 
     _sql_constraints = [
         ('name_uniq', 'unique(name)', 'Oups ! On dirait que ce secteur existe déjà...'),
     ]
 
-    @api.multi
-    @api.depends('type', 'zip_com_ids', 'zip_tech_ids')
-    def _compute_zip_utile_ids(self):
-        for secteur in self:
-            if secteur.type == 'tech':
-                secteur.zip_utile_ids = [(5, )] + [(4, zip_id, 0) for zip_id in self.zip_tech_ids._ids]
-            else:
-                secteur.zip_utile_ids = [(5, )] + [(4, zip_id, 0) for zip_id in self.zip_com_ids._ids]
-
-    @api.multi
-    def write(self, vals):
-        if vals.get('type') == 'tech_com':  # Est transformé en secteur technique et commercial
-            vals['zip_tech_ids'] = [(5, )] + vals['zip_com_ids']
-        return super(OfSecteur, self).write(vals)
-
-    @api.model
-    def create(self, vals):
-        if vals.get('type') == 'tech_com':
-            vals['zip_tech_ids'] = [(5, )] + vals['zip_com_ids']
-        return super(OfSecteur, self).create(vals)
-
     @api.model
     def get_secteur_from_cp(self, cp):
-        return self.env['of.secteur.regle'].search(
+        return self.env['of.secteur.zip.range'].search(
             [('cp_min', '<=', cp), ('cp_max', '>=', cp)],
             order="cp_min DESC, cp_max", limit=1
         ).secteur_id
@@ -99,7 +78,7 @@ class OfSecteur(models.Model):
     @api.multi
     def get_partners(self):
         partner_obj = self.env['res.partner']
-        regle_obj = self.env['of.secteur.regle']
+        zip_range_obj = self.env['of.secteur.zip.range']
 
         domain = ['|'] * (len(self) - 1)
 
@@ -121,7 +100,7 @@ class OfSecteur(models.Model):
         return partner_obj.search(domain)
 
 class OfSecteurRegle(models.Model):
-    _name = "of.secteur.regle"
+    _name = "of.secteur.zip.range"
     _order = 'cp_min, cp_max'
 
     cp_min = fields.Char(u'Code postal début', required=True)
