@@ -82,24 +82,24 @@ class OfSecteur(models.Model):
 
         domain = ['|'] * (len(self) - 1)
 
-        for regle in self.mapped(regle_ids):
-            cp_min = regle.cp_min
-            cp_max = regle.cp_max
-            regles_intra = regle_obj.search(
-                [('cp_min', '>=', cp_min), ('cp_min', '<=', cp_max), ('id', '!=', regle.id)],
+        for zip_range in self.mapped(zip_range_ids):
+            cp_min = zip_range.cp_min
+            cp_max = zip_range.cp_max
+            zip_ranges_intra = zip_range_obj.search(
+                [('cp_min', '>=', cp_min), ('cp_min', '<=', cp_max), ('id', '!=', zip_range.id)],
                 order='cp_min, cp_max DESC')
 
-            domain_secteur = ['&'] * (len(regles_intra) + 1)
+            domain_secteur = ['&'] * (len(zip_ranges_intra) + 1)
             domain_secteur += [('zip', '>=', cp_min), ('zip', '<=', cp_max)]
-            for regle_intra in regles_intra:
-                if regle_intra.cp_max >= cp_min:
-                    domain_secteur += ['|', ('zip', '<', regle_intra.cp_min), ('zip', '>', regle_intra.cp_max)]
-                    cp_min = regle_intra.cp_max
+            for zip_range_intra in zip_ranges_intra:
+                if zip_range_intra.cp_max >= cp_min:
+                    domain_secteur += ['|', ('zip', '<', zip_range_intra.cp_min), ('zip', '>', zip_range_intra.cp_max)]
+                    cp_min = zip_range_intra.cp_max
             domain += domain_secteur
 
         return partner_obj.search(domain)
 
-class OfSecteurRegle(models.Model):
+class OfSecteurZipRange(models.Model):
     _name = "of.secteur.zip.range"
     _order = 'cp_min, cp_max'
 
