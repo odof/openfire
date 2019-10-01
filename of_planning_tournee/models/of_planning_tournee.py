@@ -249,7 +249,7 @@ class OfPlanningTournee(models.Model):
             tournee.date_jour = jour
 
     @api.multi
-    @api.depends('employee_id', 'date', 'is_bloque', 'employee_id.tz', 'employee_id.tz_offset',
+    @api.depends('employee_id', 'date', 'is_bloque', 'employee_id.of_tz', 'employee_id.of_tz_offset',
                  'employee_id.of_hor_md', 'employee_id.of_hor_mf', 'employee_id.of_hor_ad', 'employee_id.of_hor_af',
                  'employee_id.of_mode_horaires', 'employee_id.of_archive_horaires', 'employee_id.of_archive_horaires_temp')
     def _compute_is_complet(self):
@@ -262,8 +262,8 @@ class OfPlanningTournee(models.Model):
                 continue
 
             employee = tournee.employee_id
-            if employee.tz and employee.tz != 'Europe/Paris':
-                self = self.with_context(tz=employee.tz)
+            if employee.of_tz and employee.of_tz != 'Europe/Paris':
+                self = self.with_context(tz=employee.of_tz)
 
             interventions = intervention_obj.search([
                 ('employee_ids', 'in', employee.id),

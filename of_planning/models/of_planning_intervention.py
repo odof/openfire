@@ -627,7 +627,7 @@ class OfPlanningIntervention(models.Model):
     def _compute_tz(self):
         for intervention in self:
             if intervention.employee_ids:
-                intervention.tz = intervention.employee_ids[0].tz
+                intervention.tz = intervention.employee_ids[0].of_tz
 
 
     @api.depends('date', 'duree', 'hor_md', 'hor_mf', 'hor_ad', 'hor_af', 'jour_ids', 'employee_ids',

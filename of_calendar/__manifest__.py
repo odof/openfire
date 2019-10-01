@@ -46,7 +46,6 @@ Leur balise calendar devra contenir l'attribut display_states="1".
         "web_calendar",
         "of_web_widgets",
         "of_geolocalize",
-        "hr",
         "of_utils",
     ],
     "data": [
