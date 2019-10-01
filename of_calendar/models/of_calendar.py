@@ -37,13 +37,13 @@ def jour_abr_2_nb(str):
 class HREmployee(models.Model):
     _inherit = "hr.employee"
 
-    def _default_tz(self):
+    def _default_of_tz(self):
         return self.env.user.tz or 'Europe/Paris'
 
-    @api.depends('tz')
-    def _compute_tz_offset(self):
+    @api.depends('of_tz')
+    def _compute_of_tz_offset(self):
         for employee in self:
-            employee.tz_offset = datetime.now(pytz.timezone(employee.tz or 'GMT')).strftime('%z')
+            employee.of_tz_offset = datetime.now(pytz.timezone(employee.of_tz or 'GMT')).strftime('%z')
 
     @api.multi
     def check_no_overlapping(self):
@@ -73,10 +73,10 @@ class HREmployee(models.Model):
                             return False
         return True
 
-    tz = fields.Selection(
-        _tz_get, string='Fuseau horaire', required=True, default=lambda self: self._default_tz(),
-        help=u"Le fuseau horaire de l'employé", oldname="of_tz")  # les champs tz et tz_offset sont utilisés par odoo et doivent conserver ce nom
-    tz_offset = fields.Char(compute='_compute_tz_offset', string='Timezone offset', invisible=True)
+    of_tz = fields.Selection(
+        _tz_get, string='Fuseau horaire', required=True, default=lambda self: self._default_of_tz(),
+        help=u"Le fuseau horaire de l'employé")
+    of_tz_offset = fields.Char(compute='_compute_of_tz_offset', string='Timezone offset', invisible=True)
     u"""Création horaires avancés"""
     of_mode_horaires = fields.Selection([
         ("easy","Facile"),
@@ -95,12 +95,7 @@ class HREmployee(models.Model):
     of_hor_ad = fields.Float(string=u'Après-midi début', digits=(12, 1), default=14)
     of_hor_af = fields.Float(string=u'Après-midi fin', digits=(12, 1), default=18)
     of_jour_ids = fields.Many2many('of.jours', 'employee_jours_rel', 'employee_id', 'jour_id', string='Jours travaillés', default=lambda self: self._get_default_jours())
-    """of_tz = fields.Selection(_tz_get, string='Fuseau horaire', default=lambda self: self.env.user.tz or 'Europe/Paris', required=True,
-                             help="The Team's timezone, used to output proper date and time values "
-                               "inside printed reports. It is important to set a value for this field. "
-                               "You should use the same timezone that is otherwise used to pick and "
-                               "render date and time values: your computer's timezone.")
-    of_tz_offset = fields.Char(compute='_compute_tz_offset', string='Timezone offset')"""
+
     of_address_depart_id = fields.Many2one('res.partner', string=u'Adresse de départ')
     of_address_retour_id = fields.Many2one('res.partner', string='Adresse de retour')
 
@@ -143,7 +138,7 @@ class HREmployee(models.Model):
     def _onchange_user_id(self):
         self.ensure_one()
         if self.user_id:
-            self.tz = self.user_id.tz
+            self.of_tz = self.user_id.tz
             self.of_color_ft = self.user_id.of_color_ft
             self.of_color_bg = self.user_id.of_color_bg
 
@@ -391,7 +386,7 @@ class HREmployee(models.Model):
         for employee in self.browse(employee_ids):
             res[employee.id] = []
             # en cas d'employés sur différentes timezones
-            tz = pytz.timezone(employee.tz or "Europe/Paris")
+            tz = pytz.timezone(employee.of_tz or "Europe/Paris")
             if mode_params == "datetime":
                 dt_date_start_local = dt_date_start_utc.astimezone(tz)  # datetime local
                 dt_date_stop_local = dt_date_stop_utc.astimezone(tz)  # datetime local
@@ -649,7 +644,7 @@ class HREmployee(models.Model):
 
         for equipe in equipes:
             equipe_id = equipe.id
-            tz = pytz.timezone(equipe.tz or "Europe/Paris")
+            tz = pytz.timezone(equipe.of_tz or "Europe/Paris")
             if equipe.mode_horaires == "easy":
                 # On utilise le mode facile pour les horaires de cette équipe
                 min_equipe = equipe.hor_md
@@ -857,7 +852,7 @@ class OFUsers(models.Model):
         if vals.get('of_color_bg', False) and not vals.get("no_rebounce", False):
             employees.write({'of_color_bg': vals.get('of_color_bg', False), 'no_rebounce': True})
         if vals.get('tz', False) and not vals.get("no_rebounce", False):
-            employees.write({'tz': vals.get('tz', False)})
+            employees.write({'of_tz': vals.get('tz', False)})
         return res
 
     @api.model

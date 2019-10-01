@@ -30,8 +30,8 @@
                             <field name="of_mode_horaires"/>
                         </group>
                         <group col="2" colspan="2">
-                            <field name="tz" widget="timezone_mismatch" options="{'tz_offset_field': 'tz_offset'}"/>
-                            <field name="tz_offset" invisible="1"/>
+                            <field name="of_tz" widget="timezone_mismatch" options="{'tz_offset_field': 'of_tz_offset'}"/>
+                            <field name="of_tz_offset" invisible="1"/>
                         </group>
                     </group>
                     <group col="4" colspan="4" name="horaires_advanced" attrs="{'invisible': [('of_mode_horaires', '!=', 'advanced')]}">
