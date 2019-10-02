@@ -85,7 +85,7 @@ class OfPlanningIntervention(models.Model):
 
         if not vals.get('employee_ids', False):
             raise UserError(u"Cette intervnetion n'a pas d'intervenant")
-        employee_ids = vals.get('employee_ids', False)[0][2]  # vals['employee_ids'] est un code 6 sur création
+        employee_ids = vals.get('employee_ids', False)[0][2]  # vals['employee_ids'] est un code 6 sur création et est toujours renseigné car champ obligatoire
 
         planning_tournee_ids = planning_tournee_obj.search([('date', '=', date_jour),
                                                             ('employee_id', 'in', employee_ids),
@@ -104,7 +104,6 @@ class OfPlanningIntervention(models.Model):
     def write(self, vals):
         planning_tournee_obj = self.env['of.planning.tournee']
         intervention_obj = self.env['of.planning.intervention']
-        interventions = []
         if 'date' in vals or 'employee_ids' in vals:
             for intervention in self:
                 date = vals.get('date', intervention.date)
@@ -118,17 +117,17 @@ class OfPlanningIntervention(models.Model):
                     elif row[0] == 4:
                         employee_ids.add(row[1])
                     elif row[0] == 6:
-                        employee_ids = set(row[1])
-                ajoute_ids = employee_ids - set(intervention.employee_ids)
-                retire_ids = set(intervention.employee_ids) - employee_ids
-                concernes_ids = vals.get('employee_ids', False) and ajoute_ids + retire_ids or employee_ids  # si pas de modif employee_ids mais modif date
+                        employee_ids = set(row[2])
+                ajoute_ids = employee_ids - set(intervention.employee_ids.ids)
+                retire_ids = set(intervention.employee_ids.ids) - employee_ids
+                concernes_ids = (vals.get('employee_ids', False) and ajoute_ids | retire_ids) or employee_ids  # si pas de modif employee_ids mais modif date
                 bloque_ids = planning_tournee_obj.search([('date', '=', date_jour),
-                                                        ('employee_id', 'in', concernes_ids),
-                                                        ('is_bloque', '=', True)])
+                                                          ('employee_id', 'in', list(concernes_ids)),
+                                                          ('is_bloque', '=', True)])
                 if bloque_ids:
                     raise ValidationError(u'Un des intervenants a déjà une tournée bloquée sur ce créneau')
 
-                intervention_retires_ids = intervention_obj.search([('employee_ids', 'in', retire_ids)])
+                intervention_retires_ids = intervention_obj.search([('employee_ids', 'in', list(retire_ids))])
                 intervention_obj.remove_tournees(intervention.date, intervention_retires_ids)
 
         super(OfPlanningIntervention, self).write(vals)

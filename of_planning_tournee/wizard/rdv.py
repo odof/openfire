@@ -9,7 +9,6 @@ import urllib, json, requests
 
 from odoo.tools.float_utils import float_compare
 
-
 SEARCH_MODES = [
     ('distance', u'Distance (km)'),
     ('duree', u'Durée (min)'),
@@ -26,12 +25,6 @@ def hours_to_strs(*hours):
     """ Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'
     """
     return tuple("%02dh%02d" % (hour, round((hour % 1) * 60)) for hour in hours)
-
-def se_chevauchent(debut_1, fin_1, debut_2, fin_2, strict=False):
-    """renvoi True si les horaires se chevauchent, False sinon."""
-    if not strict:
-        debut_1 < fin_2 and debut_2 < fin_1
-    return debut_1 <= fin_2 and debut_2 <= fin_1
 
 class OfTourneeRdv(models.TransientModel):
     _name = 'of.tournee.rdv'
