@@ -642,6 +642,8 @@ CalendarView.include({
                 var MAX_ATTENDEES = 3;
                 var attendee_showed = 0;
                 var attendee_other = '';
+                var found = false;
+                var icon_offset_px = 2;  // 2 + 15 * nb_icon_places
 
                 _.each(evt[this.attendee_people],
                     function (the_attendee_people) {
@@ -661,22 +663,22 @@ CalendarView.include({
                                 }else if (self.attendee_multiple) {
                                     var tempColorFT, tempColorBG;
                                     var now_id;
-                                    var found = false;
-                                    for (var i in evt[self.attendee_people]) {
-                                        now_id = evt[self.attendee_people][i];
-                                        tempColorFT = self.all_filters[now_id].color_ft;
-                                        tempColorBG = self.all_filters[now_id].color_bg;
-                                        if (self.all_filters[now_id].is_checked && !found) {  // this will be the main color of the event
-                                            evt["color_filter_id"] = now_id;
-                                            found = true;
-                                            if (!self.colorIsAttendee) {
-                                                the_title_avatar += '<i class="of_calendar_evt_top of_calendar_evt_right of_calendar_attendee_box" title="' + _.escape(self.all_attendees[the_attendee_people]) + '"' +
-                                                    'style="background: ' + tempColorBG + '; border: 1px solid #0D0D0D" ></i>';
-                                            }
-                                        }else{
-                                            the_title_avatar += '<i class="of_calendar_evt_top of_calendar_evt_right of_calendar_attendee_box" title="' + _.escape(self.all_attendees[the_attendee_people]) + '"' +
-                                                'style="background: ' + tempColorBG + '; border: 1px solid #0D0D0D" ></i>';
+
+                                    now_id = the_attendee_people;
+                                    tempColorFT = self.all_filters[now_id].color_ft;
+                                    tempColorBG = self.all_filters[now_id].color_bg;
+                                    if (self.all_filters[now_id].is_checked && !found) {  // this will be the main color of the event
+                                        evt["color_filter_id"] = now_id;
+                                        found = true;
+                                        if (!self.colorIsAttendee) {
+                                            the_title_avatar += '<i class="of_calendar_evt_top of_calendar_attendee_box" title="' + _.escape(self.all_attendees[the_attendee_people]) + '"' +
+                                                'style="background: ' + tempColorBG + '; border: 1px solid #0D0D0D; position: absolute; right: ' + icon_offset_px + 'px;" ></i>';
+                                                icon_offset_px += 15;
                                         }
+                                    }else{
+                                        the_title_avatar += '<i class="of_calendar_evt_top of_calendar_attendee_box" title="' + _.escape(self.all_attendees[the_attendee_people]) + '"' +
+                                            'style="background: ' + tempColorBG + '; border: 1px solid #0D0D0D; position: absolute; right: ' + icon_offset_px + 'px;" ></i>';
+                                        icon_offset_px += 15;
                                     }
                                 }//else don't add myself
                             }

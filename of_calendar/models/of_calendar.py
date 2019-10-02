@@ -277,7 +277,7 @@ class HREmployee(models.Model):
             employee.of_archive_horaires_temp = nouvelle_archive
 
     @api.multi
-    def get_archive_list_horaires(self, jour_keys="number"):
+    def get_archive_list_segments(self, jour_keys="number"):
         """Renvois l'archive des horaires des employés présents dans self sous forme de liste
         résultat sous forme {  employee_id :  [ [date_debut, date_fin, dict_horaires], ...],  ...  }"""
         res = {}
@@ -298,7 +298,7 @@ class HREmployee(models.Model):
         return res
 
     @api.multi
-    def get_archive_list_horaires_temp(self, jour_keys="number"):
+    def get_archive_list_segments_temp(self, jour_keys="number"):
         """Renvois l'archive des horaires temporaires des employés présents dans self sous forme de liste
         résultat sous forme {  employee_id :  [ [date_debut, date_fin, dict_horaires], ...],  ...  }"""
         res = {}
@@ -322,8 +322,8 @@ class HREmployee(models.Model):
     def get_horaires_date(self, str_date):
         """renvois les horaires des employés présent dans self à la date donnée en paramètre.
         résultat sous forme { employee_id :  [(h_deb, h_fin), (h_deb, h_fin), ..] ,  .. }"""
-        archive_horaires = self.get_archive_list_horaires()
-        archive_horaires_temp = self.get_archive_list_horaires_temp()
+        archive_horaires = self.get_archive_list_segments()
+        archive_horaires_temp = self.get_archive_list_segments_temp()
         d_date = fields.Date.from_string(str_date)
         num_jour = d_date.isoweekday()  # entre 1 et 7
         res = {}
@@ -348,7 +348,7 @@ class HREmployee(models.Model):
     @api.model
     def get_horaires_date_model(self, str_date, archive_list_horaires, archive_list_horaires_temp):
         """renvois les horaires de l'employés dont les archives horaires sont données en paramètres à la date donnée.
-        fonction pour éviter de faire des appels à get_archive_list_horaires non nécessaires
+        fonction pour éviter de faire des appels à get_archive_list_segments non nécessaires
         résultat sous forme [(h_deb, h_fin), (h_deb, h_fin), ..]"""
         d_date = fields.Date.from_string(str_date)
         num_jour = d_date.isoweekday()  # entre 1 et 7
@@ -380,8 +380,8 @@ class HREmployee(models.Model):
         un_jour = timedelta(days=1)
 
         res = {}
-        archive_list_horaires = self.browse(employee_ids).get_archive_list_horaires()
-        archive_list_horaires_temp = self.browse(employee_ids).get_archive_list_horaires_temp()
+        archive_list_horaires = self.browse(employee_ids).get_archive_list_segments()
+        archive_list_horaires_temp = self.browse(employee_ids).get_archive_list_segments_temp()
         for employee in self.browse(employee_ids):
             res[employee.id] = []
             # en cas d'employés sur différentes timezones
@@ -569,14 +569,19 @@ class HREmployee(models.Model):
                 if se_chevauchent(list1[0][0], list1[0][1], list2[0][0], list2[0][1]):  # les 2 créneaux se chevauchent!
                     res[i].append( (max(list1[0][0], list2[0][0]) ,  min(list1[0][1], list2[0][1])) )  # intersection des 2 créneaux
                     # la nouvelle heure de début est l'heure de fin du créneau qui termine en premier
-                    if list1[0][1] < list2[0][1]:
+                    if list1[0][1] < list2[0][1]:  # le 1er créneau de list1 termine avant le premier créneau de list2
                         list1.pop(0)
                         list2[0][0] = len(list1) > 0 and list1[0][1] or list2[0][1]
-                    elif list1[0][1] > list2[0][1]:
+                    elif list1[0][1] > list2[0][1]:  # le 1er créneau de list2 termine avant le premier créneau de list1
                         list2.pop(0)
                         list1[0][0] = len(list2) > 0 and list2[0][1] or list1[0][1]
                     else:
                         list1.pop(0)
+                        list2.pop(0)
+                else:  # les 2 créneaux ne se chevauchent pas: on retire celui qui termine en premier
+                    if list1[0][1] < list2[0][1]:  # le 1er créneau de list1 termine avant le premier créneau de list2
+                        list1.pop(0)
+                    else:  # le 1er créneau de list2 termine avant le premier créneau de list1
                         list2.pop(0)
         return res
 
@@ -633,8 +638,8 @@ class HREmployee(models.Model):
         max_equipe = False
         d_today = fields.Date.from_string(fields.Date.today())
 
-        list_horaires = employees.get_archive_list_horaires()
-        list_horaires_temp = employees.get_archive_list_horaires_temp()
+        list_horaires = employees.get_archive_list_segments()
+        list_horaires_temp = employees.get_archive_list_segments_temp()
 
         for equipe in equipes:
             equipe_id = equipe.id
@@ -692,7 +697,7 @@ class HREmployee(models.Model):
     @api.multi
     def write(self, vals):
         res = super(HREmployee, self).write(vals)
-        #self.get_archive_list_horaires_temp()
+        #self.get_archive_list_segments_temp()
         if vals.get("of_creneau_ids", False) or vals.get("of_hor_md", False) or vals.get("of_hor_mf", False) or \
            vals.get("of_hor_ad", False) or vals.get("of_hor_af", False) or vals.get("of_mode_horaires", False) or \
            vals.get("of_jour_ids", False):
