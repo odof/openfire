@@ -16,8 +16,8 @@
             <xpath expr="//notebook" position="inside">
                 <page name="interventions" string="Interventions" attrs="{'invisible': [('est_intervenant','=', False)]}">
                     <group>
-                        <field name="tache_ids" widget="many2many_tags"/>
                         <field name="equipe_ids" widget="many2many_tags"/>
+                        <field name="tache_ids" widget="many2many"/>
                     </group>
                 </page>
             </xpath>
@@ -163,6 +163,7 @@
                                 <field name="employee_ids" string="Intervenants" widget="many2many_tags" options='{"no_open": True, "no_create": True}'/>
                                 <field name="partner_id" invisible="1"/>
                                 <field name="address_id" domain="[('customer','=',True)]" colspan="2"/>
+                                <field name="secteur_id"/>
                                 <field name="user_id"/>
                                 <field name="company_id" widget="selection"/>
                                 <field name="name" string="Libellé"/>
