@@ -4,7 +4,7 @@
     <!-- Ajout de la machine installée dans la fiche intervention -->
     <template id="of_questionnaire_extension_fiche_intervention_report" inherit_id="of_service_parc_installe.of_parc_installe_extension_fiche_intervention_report">
         <xpath expr="//t[@t-if='o.parc_installe_id']" position="after">
-            <t t-set="lines" t-value="o._filter_answers_category(o.question_ids.filtered(lambda q: q.type == 'intervention'))"/>
+            <t t-set="lines" t-value="o.question_ids and o._filter_answers_category(o.question_ids.filtered(lambda q: q.type == 'intervention'))"/>
             <table class="row" style="width: 100%; margin-bottom: 12px;" t-if="lines">
                 <thead style="padding: 0px 16px 16px 16px;">
                     <tr>
