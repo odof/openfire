@@ -33,16 +33,32 @@ class ResPartner(models.Model):
             }
         return res
 
+class OfPlanifTag(models.Model):
+    _name = 'of.planif.tag'
+    _description = u"Étiquettes de propositions d'interventions"
+
+    name = fields.Char(string='Nom', required=True, translate=True)
+    color = fields.Integer(string='Index couleur')
+    active = fields.Boolean(default=True, help="Le champ 'Active' vous permet de cacher l'étiquette sans la supprimer.")
+
+
 class OfPlanningIntervention(models.Model):
     _name = "of.planning.intervention"
     _inherit = ["of.planning.intervention", "of.readgroup", "of.calendar.mixin"]
 
     @api.model
-    def get_creneaux_dispo(self, employee_id, intervention_heures, creneaux_travailles, duree_min=1.0):  # interventions et creneaux sont des listes de tuples (heure_debut, heure_fin)
+    def get_creneaux_dispo(self, employee_id, date, intervention_heures, creneaux_travailles, duree_min=1.0):  # interventions et creneaux sont des listes de tuples (heure_debut, heure_fin)
         """Similaire au calcul de créneaux dispo de rdv.py.
         L'idée ici est de fusionner les créneaux dispos consécutifs.
         exple: une journée sans intervention programmée ne doit avoir qu'un créneau dispo"""
-        #@todo: debug lieu_deb
+        tournee = self.env['of.planning.tournee'].search([
+                                                        ('date', '=', date),
+                                                        ('employee_id', '=', employee_id)
+                                                        ], limit=1)
+        if tournee:
+            secteur_id = tournee.secteur_id.id
+        else:
+            secteur_id = False
         index_courant = 0
         employee = self.env['hr.employee'].browse(int(employee_id))
         deb = creneaux_travailles[index_courant][0]  # début courant
@@ -68,6 +84,7 @@ class OfPlanningIntervention(models.Model):
                     vals['heure_fin'] = fin
                     vals['duree'] += fin - deb
                 if vals != {} and vals['duree'] >= duree_min:
+                    vals['secteur_id'] = secteur_id
                     creneaux.append(vals)
             elif deb and deb < intervention_deb:  # du temps avant le début de l'intervention
                 if fin < intervention_deb:  # l'intervention commence sur un autre creneau: préparation du créneau dispo
@@ -96,6 +113,7 @@ class OfPlanningIntervention(models.Model):
                 vals['lieu_fin'] = intervention.address_id and intervention.address_id.get_infos_lieu() or False
                 vals['duree'] += intervention_deb - deb
                 if vals != {} and vals['duree'] >= duree_min:  # un créneau à ajouter
+                    vals['secteur_id'] = secteur_id
                     creneaux.append(vals)
                 vals = {}
                 if intervention_fin < fin:  # l'intervention se fini avant la fin du créneau horaire
@@ -126,7 +144,7 @@ class OfPlanningIntervention(models.Model):
                         fin = creneaux_travailles[index_courant][1]
                     else:
                         deb = False
-        
+
         return creneaux
 
     @api.model
@@ -156,6 +174,7 @@ class OfPlanningIntervention(models.Model):
     def get_emp_horaires_info(self, employee_ids, date_start, date_stop, dict_list_horaires=False):
         intervention_obj = self.env['of.planning.intervention']
         employee_obj = self.env['hr.employee']
+        tournee_obj = self.env['of.planning.tournee']
         employees = employee_obj.browse(employee_ids)
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')
@@ -180,7 +199,6 @@ class OfPlanningIntervention(models.Model):
 
         un_jour = timedelta(days=1)
 
-        
         is_jour_temp = False
 #float_compare(la_duree_restante, 0.0, compare_precision)  > 0.0
         for employee in employees:
@@ -197,7 +215,7 @@ class OfPlanningIntervention(models.Model):
             fillerbarzz = []
             creneaux_dispozz = []
             d_date_current = d_date_start
-            
+
             while d_date_current <= d_date_stop:
                 res[employee_id]['col_offset_to_segment'].append(i_col_offset_to_segment)
                 num_jour = d_date_current.isoweekday()
@@ -222,7 +240,7 @@ class OfPlanningIntervention(models.Model):
                             segment_courant = segments_horaires[index_courant]
                             i_col_offset_to_segment = index_courant
                     continue
-                
+
                 fillerbar['nb_heures_travaillees'] = sum([round(c[1] - c[0], 5) for c in horaires_du_jour])
                 journee_debut = horaires_du_jour[0][0]
                 journee_fin = horaires_du_jour[-1][1]
@@ -245,7 +263,7 @@ class OfPlanningIntervention(models.Model):
                             index_courant += 1
                             segment_courant = segments_horaires[index_courant]
                             i_col_offset_to_segment = index_courant
-                    creneaux_dispo = intervention_obj.get_creneaux_dispo(employee_id, intervention_liste, horaires_du_jour, 1.0)
+                    creneaux_dispo = intervention_obj.get_creneaux_dispo(employee_id, str_date_current, intervention_liste, horaires_du_jour, 1.0)
                     creneaux_dispozz.append(creneaux_dispo)
                     continue
 
@@ -284,7 +302,7 @@ class OfPlanningIntervention(models.Model):
                     fillerbar['pct_disponible'] = fillerbar['nb_heures_disponibles'] * 100 / fillerbar['nb_heures_travaillees']
 
                 fillerbarzz.append(fillerbar)
-                creneaux_dispo = intervention_obj.get_creneaux_dispo(employee_id, intervention_liste, horaires_du_jour, 0.5)
+                creneaux_dispo = intervention_obj.get_creneaux_dispo(employee_id, str_date_current, intervention_liste, horaires_du_jour, 0.5)
                 creneaux_dispozz.append(creneaux_dispo)
 
                 d_date_current += un_jour

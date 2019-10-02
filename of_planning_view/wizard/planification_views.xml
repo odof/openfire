@@ -19,19 +19,23 @@
                         <field name="heure_debut_creneau" widget="float_time"/>
                         <field name="heure_fin_creneau" widget="float_time"/>
                         <field name="duree_creneau" widget="float_time"/>
+                        <field name="distance_max"/>
                     </group>
                     <group>
+                        <field name="employee_id"/>
                         <field name="lieu_prec_id"/>
                         <field name="lieu_suiv_id"/>
-                        <field name="distance_max"/>
+                        <field name="secteur_id" widget="selection"/>
                     </group>
                     <field name="proposition_ids" mode="tree" nolabel="1">
                         <tree limit="3">
                             <field name="service_id" invisible="1"/>
-                            <field name="tache_name"/>
+                            <field name="priorite"/>
                             <field name="tache_name"/>
                             <field name="address_city"/>
                             <field name="address_zip"/>
+                            <field name="distance_dwazo_prec"/>
+                            <field name="distance_dwazo_suiv"/>
                         </tree>
                     </field>
                 </group>
