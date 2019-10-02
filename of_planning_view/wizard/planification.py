@@ -29,6 +29,7 @@ def voldwazo(lat1, lng1, lat2, lng2):
 class OfPlanifCreneauProp(models.TransientModel):
     _name = 'of.planif.intervention'
     _description = u"Proposition d'intervention à programmer"
+    _order = "priorite DESC"
 
     service_id = fields.Many2one("of.service", string="Service")
     creneau_id = fields.Many2one('of.planif.creneau', string=u"Créneau")
@@ -42,10 +43,11 @@ class OfPlanifCreneauProp(models.TransientModel):
     geo_lng = fields.Float(related='service_id.geo_lng', readonly=True)
     precision = fields.Selection(related='service_id.precision', readonly=True)
 
-    distance_dwazo_prec = fields.Float(string=u'Distance à vol d\'oiseau', digits=(5, 5), compute="_compute_distance_dwazo")
-    distance_dwazo_suiv = fields.Float(string=u'Distance à vol d\'oiseau', digits=(5, 5), compute="_compute_distance_dwazo")
+    distance_dwazo_prec = fields.Float(string=u'Distance du précédent', digits=(5, 5), compute="_compute_distance_dwazo", help="À vol d'oiseau")
+    distance_dwazo_suiv = fields.Float(string=u'Distance du suivant', digits=(5, 5), compute="_compute_distance_dwazo", help="À vol d'oiseau")
 
     dummy_field = fields.Boolean(string=u"A VER?", compute="_compute_dummy_field")
+    priorite = fields.Integer(string=u"Priorité")
 
     @api.multi
     @api.depends('geo_lat', 'geo_lng', 'creneau_id.geo_lat_prec', 'creneau_id.geo_lng_prec', 
@@ -72,33 +74,81 @@ class OfPlanifCreneauProp(models.TransientModel):
             else:
                 a_planifier.distance_dwazo_suiv = voldwazo(a_planifier.geo_lat, a_planifier.geo_lng, a_planifier.creneau_id.geo_lat_suiv, a_planifier.creneau_id.geo_lng_suiv)
 
-    @api.model
-    def peupler_candidats(self, date_creneau, duree_creneau, distance_max, address_prec_id, address_suiv_id):
+    """@api.model
+    def get_candidats(self, date_creneau, duree_creneau, distance_max, address_prec_id, address_suiv_id):
         un_mois = timedelta(days=30)
+        une_semaine = timedelta(days=7)
         d_date_creneau = fields.Date.from_string(self.date_creneau)
         d_date_un_mois = d_date_creneau + un_mois
+        d_date_1_semaine = d_date_creneau + une_semaine  # pour les services recurrents
+        d_date_2_semaines = d_date_creneau + 2 * une_semaine  # pour les services recurrents
+        d_date_moins_un_mois = d_date_creneau - un_mois  # pour les services recurrents
+        d_date_moins_3_semaines = d_date_creneau - 3 * une_semaine  # pour les services recurrents
+        d_date_moins_2_semaines = d_date_creneau - 2 * une_semaine  # pour les services recurrents
         str_date_un_mois = fields.Date.to_string(d_date_un_mois)
+        str_date_1_semaine = fields.Date.to_string(d_date_1_semaine)
+        str_date_2_semaines = fields.Date.to_string(d_date_2_semaines)
+        str_date_moins_un_mois = fields.Date.to_string(d_date_moins_un_mois)
+        str_date_moins_3_semaines = fields.Date.to_string(d_date_moins_3_semaines)
+        str_date_moins_2_semaines = fields.Date.to_string(d_date_moins_2_semaines)
         taches_possibles = self.env['of.planning.tache'].search([('duree', '<=', duree_creneau)])  # seulement les taches suffisamment courtes a prendre en compte
         vals_list = []
         # services
         services = self.env['of.service'].search([
             ('tache_id', 'in', taches_possibles._ids),
-            #('date_next', '>=', self.date_creneau),
-            ('date_next', '<=', str_date_un_mois),])
+            ('date_next', '<=', str_date_un_mois),  # ne pas proposer d'interventions à programmer dans plus d'un mois
+            '|',
+            '&', ('recurrence', '=', True), '|', ('date_fin', '=', False), ('date_fin', '>', self.date_creneau)  # pour les service récurrents, la date de fin est la date de fin du contrat
+            ('recurrence', '=', False),
+            ])
+        distance_max = self.distance_max * 1.3  # approximation
 
         for service in services:
-            if voldwazo(service.geo_lat, service.geo_lng, address_prec_id.geo_lat, address_prec_id.geo_lng) > self.distance_max:
+            voldwazo_prec = voldwazo(service.geo_lat, service.geo_lng, address_prec_id.geo_lat, address_prec_id.geo_lng)
+            voldwazo_suiv = voldwazo(service.geo_lat, service.geo_lng, address_suiv_id.geo_lat, address_suiv_id.geo_lng)
+            priorite = 0
+            if voldwazo_prec > distance_max:  # trop loins
                 continue
-            if voldwazo(service.geo_lat, service.geo_lng, address_suiv_id.geo_lat, address_suiv_id.geo_lng) > self.distance_max:
+            if voldwazo_suiv > distance_max:
                 continue
+            if voldwazo_prec + voldwazo_suiv <= 5:
+                priorite += 3
+            elif voldwazo_prec + voldwazo_suiv <= 10:
+                priorite += 2
+            elif voldwazo_prec + voldwazo_suiv <= 15:
+                priorite += 1
+            if service.recurrence and (not service.date_fin or service.date_fin > str_date_un_mois):  # service recurrent sans date de fin ou qui termine dans + d'un mois
+                # on prend en compte la date de prochaine intervention
+                if service.date_next <= str_date_moins_un_mois:  # date de prochaine intervention il y a plus d'un mois: en retard!
+                    priorite += 3
+                elif service.date_next <= str_date_moins_3_semaines:  # date de prochaine intervention il y a plus de 3 semaines: à faire cette semaine
+                    priorite += 2
+                elif service.date_next <= str_date_moins_2_semaines:  # date de prochaine intervention il y a plus de 2 semaines: à faire cette quinzaine
+                    priorite += 1
+            # pas besoin de gérer le cas service récurrent déjà terminé grace au search plus haut
+            else:
+                # on prend en compte la date de fin
+                if service.date_fin < self.date_creneau:  # en retard!
+                    priorite += 3
+                elif service.date_fin <= str_date_1_semaine: # à faire cette semaine
+                    priorite += 2
+                elif service.date_fin <= str_date_2_semaines: # à faire cette quinzaine
+                    priorite += 1
+
             vals = {
+                'priorite': priorite,
                 'service_id': service.id,
             }
             vals_list.append(vals)
 
+        return vals_list
+
+    @api.model
+    def peupler_candidats(self, date_creneau, duree_creneau, distance_max, address_prec_id, address_suiv_id):
+        vals_list = self.get_candidats(date_creneau, duree_creneau, distance_max, address_prec_id, address_suiv_id)
         la_list = [(5, 0, 0)] + [(0, 0, values) for values in vals_list]
 
-        self.proposition_ids = la_list
+        self.proposition_ids = la_list"""
 
 
 class OfPlanifCreneau(models.TransientModel):
@@ -154,8 +204,9 @@ class OfPlanifCreneau(models.TransientModel):
     date_creneau = fields.Date(string="Date du créneau")
     heure_debut_creneau = fields.Float(string=u'Heude de début', digits=(5, 5))
     heure_fin_creneau = fields.Float(string=u'Heude de fin', digits=(5, 5))
-    distance_max = fields.Integer("Distance max.",default=75)
+    distance_max = fields.Integer("Distance max.",default=30)
     duree_creneau = fields.Float(string=u"Durée")#, compute="_compute_duree_creneau")
+    employee_id = fields.Many2one('hr.employee', string="Intervenant")
     # lieu précédent
     lieu_prec_id = fields.Many2one("res.partner", string="lieu précédent")
     geo_lat_prec = fields.Float(related='lieu_prec_id.geo_lat', readonly=True)
@@ -166,6 +217,7 @@ class OfPlanifCreneau(models.TransientModel):
     geo_lat_suiv = fields.Float(related='lieu_suiv_id.geo_lat', readonly=True)
     geo_lng_suiv = fields.Float(related='lieu_suiv_id.geo_lng', readonly=True)
     precision_suiv = fields.Selection(related='lieu_suiv_id.precision', readonly=True)
+    secteur_id = fields.Many2one('of.secteur', string="Secteur", help="laisser vide pour ne pas restreindre à un secteur en particulier")
 
     proposition_ids = fields.One2many('of.planif.intervention', 'creneau_id', string="propositions")#, compute="peupler_candidats")
 
@@ -178,36 +230,85 @@ class OfPlanifCreneau(models.TransientModel):
     @api.multi
     def compute(self):
         self.ensure_one()
-        print "ET OUIIII"
-        #if self.lieu_prec:
-        #    continue
 
     @api.multi
-    def peupler_candidats(self):
+    def get_candidats(self):
         self.ensure_one()
-
         un_mois = timedelta(days=30)
+        une_semaine = timedelta(days=7)
         d_date_creneau = fields.Date.from_string(self.date_creneau)
         d_date_un_mois = d_date_creneau + un_mois
+        d_date_1_semaine = d_date_creneau + une_semaine  # pour les services recurrents
+        d_date_2_semaines = d_date_creneau + 2 * une_semaine  # pour les services recurrents
+        d_date_moins_un_mois = d_date_creneau - un_mois  # pour les services recurrents
+        d_date_moins_3_semaines = d_date_creneau - 3 * une_semaine  # pour les services recurrents
+        d_date_moins_2_semaines = d_date_creneau - 2 * une_semaine  # pour les services recurrents
         str_date_un_mois = fields.Date.to_string(d_date_un_mois)
-        taches_possibles = self.env['of.planning.tache'].search([('duree', '<=', self.duree_creneau)])  # seulement les taches suffisamment courtes a prendre en compte
+        str_date_1_semaine = fields.Date.to_string(d_date_1_semaine)
+        str_date_2_semaines = fields.Date.to_string(d_date_2_semaines)
+        str_date_moins_un_mois = fields.Date.to_string(d_date_moins_un_mois)
+        str_date_moins_3_semaines = fields.Date.to_string(d_date_moins_3_semaines)
+        str_date_moins_2_semaines = fields.Date.to_string(d_date_moins_2_semaines)
+        taches_emp = self.employee_id.tache_ids
+        taches_possibles = taches_emp.filtered(lambda t: t.duree <= self.duree_creneau)  # seulement les taches suffisamment courtes a prendre en compte
         vals_list = []
+        service_domain = [
+            ('tache_id', 'in', taches_possibles.ids),
+            ('date_next', '<=', str_date_un_mois),  # ne pas proposer d'interventions à programmer dans plus d'un mois
+            '|',
+            '&', ('recurrence', '=', True), '|', ('date_fin', '=', False), ('date_fin', '>', self.date_creneau),  # pour les service récurrents, la date de fin est la date de fin du contrat
+            ('recurrence', '=', False),
+        ]
+        if self.secteur_id:
+            service_domain.append(('secteur_tech_id', '=', self.secteur_id.id))
         # services
-        services = self.env['of.service'].search([
-            ('tache_id', 'in', taches_possibles._ids),
-            #('date_next', '>=', self.date_creneau),
-            ('date_next', '<=', str_date_un_mois),])
+        services = self.env['of.service'].search()
+        distance_max = self.distance_max * 1.3  # approximation
 
         for service in services:
-            if voldwazo(service.geo_lat, service.geo_lng, self.geo_lat_prec, self.geo_lng_prec) > self.distance_max:
+            voldwazo_prec = voldwazo(service.geo_lat, service.geo_lng, self.lieu_prec_id.geo_lat, self.lieu_prec_id.geo_lng)
+            voldwazo_suiv = voldwazo(service.geo_lat, service.geo_lng, self.lieu_suiv_id.geo_lat, self.lieu_suiv_id.geo_lng)
+            priorite = 0
+            if voldwazo_prec > distance_max:  # trop loins
                 continue
-            if voldwazo(service.geo_lat, service.geo_lng, self.geo_lat_suiv, self.geo_lng_suiv) > self.distance_max:
+            if voldwazo_suiv > distance_max:
                 continue
+            if voldwazo_prec + voldwazo_suiv <= 5:
+                priorite += 3
+            elif voldwazo_prec + voldwazo_suiv <= 10:
+                priorite += 2
+            elif voldwazo_prec + voldwazo_suiv <= 15:
+                priorite += 1
+            if service.recurrence and (not service.date_fin or service.date_fin > str_date_un_mois):  # service recurrent sans date de fin ou qui termine dans + d'un mois
+                # on prend en compte la date de prochaine intervention
+                if service.date_next <= str_date_moins_un_mois:  # date de prochaine intervention il y a plus d'un mois: en retard!
+                    priorite += 3
+                elif service.date_next <= str_date_moins_3_semaines:  # date de prochaine intervention il y a plus de 3 semaines: à faire cette semaine
+                    priorite += 2
+                elif service.date_next <= str_date_moins_2_semaines:  # date de prochaine intervention il y a plus de 2 semaines: à faire cette quinzaine
+                    priorite += 1
+            # pas besoin de gérer le cas service récurrent déjà terminé grace au search plus haut
+            else:
+                # on prend en compte la date de fin
+                if service.date_fin < self.date_creneau:  # en retard!
+                    priorite += 3
+                elif service.date_fin <= str_date_1_semaine: # à faire cette semaine
+                    priorite += 2
+                elif service.date_fin <= str_date_2_semaines: # à faire cette quinzaine
+                    priorite += 1
+
             vals = {
+                'priorite': priorite,
                 'service_id': service.id,
             }
             vals_list.append(vals)
 
+        return vals_list
+
+    @api.model
+    def peupler_candidats(self):
+        self.ensure_one()
+        vals_list = self.get_candidats()
         la_list = [(5, 0, 0)] + [(0, 0, values) for values in vals_list]
 
         self.proposition_ids = la_list

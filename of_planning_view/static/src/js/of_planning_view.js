@@ -488,12 +488,12 @@ var PlanningView = View.extend({
             this.proxy(self.on_today_clicked));
         this.$buttons.find(".of_planning_button_next").click(
             this.proxy(self.on_next_clicked));
-        this.$buttons.find(".of_planning_button_day").click(
-            this.proxy(self.on_scale_day_clicked));
+        /*this.$buttons.find(".of_planning_button_day").click(
+            this.proxy(self.on_scale_day_clicked));*/
         this.$buttons.find(".of_planning_button_week").click(
             this.proxy(self.on_scale_week_clicked));
-        this.$buttons.find(".of_planning_button_month").click(
-            this.proxy(self.on_scale_month_clicked));
+        /*this.$buttons.find(".of_planning_button_month").click(
+            this.proxy(self.on_scale_month_clicked));*/
 
         this.$buttons.find('.of_planning_button_scale_' + this.mode).toggleClass("btn-primary btn-default");
         
@@ -1041,6 +1041,7 @@ var PlanningCreneauDispo = Widget.extend({
         this.heure_debut_str = formats.format_value(record.heure_debut,descript_ft);
         this.heure_fin_str = formats.format_value(record.heure_fin,descript_ft);
         this.duree = record.duree;
+        this.secteur_id = record.secteur_id;
         var heures = Math.trunc(this.duree);
         var minutes = (this.duree - heures) * 60;
         if (!heures) {
@@ -1086,6 +1087,8 @@ var PlanningCreneauDispo = Widget.extend({
             "default_lieu_suiv_id": self.lieu_fin.id|| false,
             "default_date_creneau": self.date,
             "default_duree_creneau": self.duree,
+            "default_employee_id": self.row.res_id,
+            "default_secteur_id": self.secteur_id,
         };  // à voir quoi mettre
         console.log("ADDITIONNAL CONTEXT",pyeval.eval('context', additional_context));
 

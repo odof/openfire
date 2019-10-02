@@ -108,9 +108,10 @@
             <button class="btn btn-primary of_planning_button_next"><span class="fa fa-chevron-right"/></button>
 
             <div class="btn-group btn-group-sm">
-                <button class="btn btn-sm btn-default of_planning_button_day">Day</button>
+                <!-- vue 'jour' et 'mois' peut-être dans une implémentation future -->
+                <!--button class="btn btn-sm btn-default of_planning_button_day">Day</button-->
                 <button class="btn btn-sm btn-default of_planning_button_week">Week</button>
-                <button class="btn btn-sm btn-default of_planning_button_month">Month</button>
+                <!--button class="btn btn-sm btn-default of_planning_button_month">Month</button-->
             </div>
         </div>
     </t>
