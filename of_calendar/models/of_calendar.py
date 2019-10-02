@@ -13,9 +13,9 @@ def hours_to_strs(*hours):
     return tuple("%dh%02d" % (hour, round((hour % 1) * 60)) if hour % 1 else "%dh" % (hour) for hour in hours)
     #return tuple("%dh" % (hour) + (hour % 1 and "%02d" % (round((hour % 1) * 60)) or "") for hour in hours)
 
-def se_chevauchent(debut_1, fin_1, debut_2, fin_2, strict=False):
+def se_chevauchent(debut_1, fin_1, debut_2, fin_2, strict=True):
     """renvoi True si les horaires se chevauchent, False sinon."""
-    if not strict:
+    if strict:
         return debut_1 < fin_2 and debut_2 < fin_1
     return debut_1 <= fin_2 and debut_2 <= fin_1
 
@@ -258,7 +258,7 @@ class HREmployee(models.Model):
                 """Vérification qu'il n'y a pas de chevauchement avec des dates d'horaires temporaires existants"""
                 for le_morceau in les_morceaux:
                     la_liste = json.loads(le_morceau)
-                    if se_chevauchent(la_liste[0], la_liste[1], employee.of_creneau_temp_start, employee.of_creneau_temp_stop, True):
+                    if se_chevauchent(la_liste[0], la_liste[1], employee.of_creneau_temp_start, employee.of_creneau_temp_stop, False):
                         raise UserError(u"OH oh! le système nous dit qu'il y a du chevauchement au niveau de l'archive des horaires temporaires.\n"
                                         u"Pour que tout se passe bien, veuillez sélectionner des dates de début et de fin qui ne chevauchent pas des dates de début et de fin existantes dans l'archive.\n"
                                         u"dates source du conflit: entre le %s et le %s" % (la_liste[0], la_liste[1]))
@@ -331,7 +331,7 @@ class HREmployee(models.Model):
             res[employee.id] = []
             horaires_temp = archive_horaires_temp[employee.id]
             for segment in horaires_temp:  # la date demandée correspond-elle à des horaires temporaires pour cet employé?
-                if se_chevauchent(str_date, str_date, segment[0], segment[1], True):  # la date demandée est sur un segment d'horaires temporaires
+                if se_chevauchent(str_date, str_date, segment[0], segment[1], False):  # la date demandée est sur un segment d'horaires temporaires
                     res[employee.id] = segment[2][num_jour]
                     break
             horaires = archive_horaires[employee.id]
@@ -340,7 +340,7 @@ class HREmployee(models.Model):
                     if not segment[1]:  # le dernier segment horaires n'a pas de date de fin
                         res[employee.id] = num_jour in segment[2] and segment[2][num_jour] or []
                         break
-                    if se_chevauchent(str_date, str_date, segment[0], segment[1], True):  # trouvé!
+                    if se_chevauchent(str_date, str_date, segment[0], segment[1], False):  # trouvé!
                         res[employee.id] = segment[2][num_jour]
                         break
         return res
@@ -354,12 +354,12 @@ class HREmployee(models.Model):
         num_jour = d_date.isoweekday()  # entre 1 et 7
         res = []
         for segment in archive_list_horaires_temp:  # la date demandée correspond-elle à des horaires temporaires pour cet employé?
-            if se_chevauchent(str_date, str_date, segment[0], segment[1], True):  # la date demandée est sur un segment d'horaires temporaires
+            if se_chevauchent(str_date, str_date, segment[0], segment[1], False):  # la date demandée est sur un segment d'horaires temporaires
                 res = segment[2][num_jour]
                 break
         if not res:  # la date demandée n'est pas sur un segment d'horaires temporaires
             for segment in archive_list_horaires:
-                if se_chevauchent(str_date, str_date, segment[0], segment[1], True):  # trouvé!
+                if se_chevauchent(str_date, str_date, segment[0], segment[1], False):  # trouvé!
                     res = segment[2][num_jour]
                     break
         return res
@@ -409,12 +409,12 @@ class HREmployee(models.Model):
                     if index_start == -1:  # n'a pas été affecté
                         if not horaires_employee[i][1]:
                             index_start = index_stop = i
-                        elif se_chevauchent(str_d_date_start, str_d_date_start, horaires_employee[i][0], horaires_employee[i][1], True):
+                        elif se_chevauchent(str_d_date_start, str_d_date_start, horaires_employee[i][0], horaires_employee[i][1], False):
                             index_start = i
                     if index_stop == -1:  # n'a pas été affecté
                         if not horaires_employee[i][1]:
                             index_stop = i
-                        elif se_chevauchent(str_d_date_stop, str_d_date_stop, horaires_employee[i][0], horaires_employee[i][1], True):
+                        elif se_chevauchent(str_d_date_stop, str_d_date_stop, horaires_employee[i][0], horaires_employee[i][1], False):
                             index_stop = i
                     if index_start != -1 and index_stop != -1:  # on a trouvé les 2 indexes
                         break
@@ -435,7 +435,7 @@ class HREmployee(models.Model):
                 continue
             # Sélection des horaires temporaires concernés
             for i in range(len(horaires_employee_temp)):
-                if se_chevauchent(str_d_date_start, str_d_date_stop, horaires_employee_temp[i][0], horaires_employee_temp[i][1], True):
+                if se_chevauchent(str_d_date_start, str_d_date_stop, horaires_employee_temp[i][0], horaires_employee_temp[i][1], False):
                     # chevauchement! ce créneau est à prendre en compte
                     if horaires_employee_temp[i][0] < str_d_date_start:  # on coupe ce qui dépasse
                         horaires_employee_temp[i][0] = str_d_date_start
@@ -448,7 +448,7 @@ class HREmployee(models.Model):
             while len(horaires_temp_utiles) > 0:
                 segment_std = horaires_utiles[index_courant]
                 segment_temp = horaires_temp_utiles.pop(0)
-                while not se_chevauchent(segment_temp[0], segment_temp[1], segment_std[0], segment_std[1], True):
+                while not se_chevauchent(segment_temp[0], segment_temp[1], segment_std[0], segment_std[1], False):
                     res[employee.id].append(horaires_utiles[index_courant])
                     index_courant += 1
                     segment_std = horaires_utiles[index_courant]
@@ -477,7 +477,7 @@ class HREmployee(models.Model):
                 res[employee.id].append(segment_temp)
             if index_courant < index_stop:
                 for j in range(index_courant, index_stop + 1):
-                    segment_std = horaires_utiles[j]
+                    segment_std = horaires_employee[j]
                     res[employee.id].append(segment_std)
 
         # WHOO HOO on y est! \o/
@@ -594,7 +594,7 @@ class HREmployee(models.Model):
                 if not segment[1]:  # segment sans date de fin
                     res[employee_id] = num_jour in segment[2] and segment[2][num_jour] or []
                     break
-                if se_chevauchent(str_date, str_date, segment[0], segment[1], True):  # la date demandée est sur ce segment d'horaires
+                if se_chevauchent(str_date, str_date, segment[0], segment[1], False):  # la date demandée est sur ce segment d'horaires
                     res[employee_id] = num_jour in segment[2] and segment[2][num_jour] or []
                     break
         return res

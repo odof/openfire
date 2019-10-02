@@ -121,7 +121,7 @@ CalendarView.include({
      */
     _do_search: function (domain, context, _group_by) {
         var self = this;
-        self.dfd_filters_rendered = $.Deferred(); // asynchronicity event colors
+        self.dfd_filters_rendered = $.Deferred(); // asynchronicity event colors. we need filteres to be rendered to know what color to put on events
         if (! self.all_filters) {
             self.all_filters = {};
         }
@@ -139,7 +139,7 @@ CalendarView.include({
 
                 var current_event_source = self.event_source;
                     var event_domain = self.get_range_domain(domain, start, end);
-                    if (self.useContacts && (!self.all_filters[-1] || !self.all_filters[-1].is_checked) || self.attendee_multiple) {
+                    if (self.useContacts && (!self.all_filters[-1] || !self.all_filters[-1].is_checked)){// || self.attendee_multiple) {
                         var attendee_ids = $.map(self.all_filters, function(o) { if (o.is_checked) { return o.value; }});
                         if (!_.isEmpty(attendee_ids)) {
                             event_domain = new data.CompoundDomain(
@@ -813,9 +813,10 @@ SidebarFilter.include({
         var fil = self.view.get_all_filters_ordered()
         //async
         $.when(fil).then(function(){ // fil is a promise
-            var filters = _.filter(fil.target, function(filter) {
+            var filters = fil.target;
+            /*var filters = _.filter(fil.target, function(filter) {  disparition du filtre quand desélection??
                 return _.contains(self.view.now_filter_ids, filter.value);
-            });
+            });*/
             //console.log("filters!",filters);
             var filters_radio = self.filters_radio || false;
             return $.when(self.$('.o_calendar_contacts').html(QWeb.render('CalendarView.sidebar.contacts', { filters: filters, filters_radio: filters_radio })))
