@@ -103,9 +103,19 @@ class OfSecteurZipRange(models.Model):
     _name = "of.secteur.zip.range"
     _order = 'cp_min, cp_max'
 
+    name = fields.Char(string=u"Nom affiché", compute="_compute_name", store=True)
     cp_min = fields.Char(u'Code postal début', required=True)
     cp_max = fields.Char(u'Code postal fin', required=True)
     secteur_id = fields.Many2one('of.secteur', string='Secteur', required=True, ondelete='cascade')
+
+    @api.depends('cp_min', 'cp_max')
+    @api.multi
+    def _compute_name(self):
+        for zip_range in self:
+            if zip_range.cp_min == zip_range.cp_max:
+                zip_range.name = zip_range.cp_min
+            else:
+                zip_range.name = zip_range.cp_min + u' - ' + zip_range.cp_max
 
     @api.onchange('cp_min')
     def _onchange_cp_min(self):
