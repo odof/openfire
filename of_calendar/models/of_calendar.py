@@ -901,9 +901,9 @@ class OFMeeting(models.Model):
         ("offsite", "À l'exterieur"),
         ("custom", "Adresse manuelle"),
         ], string="Lieu du RDV", required=True, default="onsite")
-    # user_company_ids = fields.Many2many('res.company', 'calendar_user_company_rel', 'calendar_id', 'company_id', u"sociétés du propriétaire",compute="_compute_user_company_ids")#,store=True)#related="user_id.company_ids", readonly=True)
+    #user_company_ids = fields.Many2many('res.company', 'calendar_user_company_rel', 'calendar_id', 'company_id', u"sociétés du propriétaire",compute="_compute_user_company_ids")#,store=True)#related="user_id.company_ids", readonly=True)
     # tentative de domain ratée
-    of_lieu_company_id = fields.Many2one("res.company", string="(Précisez)")  # ,domain="[('id', 'in', user_company_ids and user_company_ids._ids)]")
+    of_lieu_company_id = fields.Many2one("res.company", string="(Précisez)")  #,domain="[('id', 'in', user_company_ids and user_company_ids._ids)]")
     of_lieu_rdv_id = fields.Many2one("res.partner", string="(Précisez)")
     of_lieu_address_street = fields.Char(string="Rue")  # , compute="_compute_geo")
     of_lieu_address_street2 = fields.Char(string="Rue (2)")  # , compute="_compute_geo")
@@ -939,10 +939,10 @@ class OFMeeting(models.Model):
                 continue
         partners = partners.search([('id', 'in', partners._ids), ('geo_lat', operator, operand)])
         companies = companies.search([('id', 'in', companies._ids), ('partner_id.geo_lat', operator, operand)])
-        return [('id', 'in', self.env['calendar.event'].search(['|', '&', ('of_lieu_company_id', 'in', companies._ids),
+        return [('id', 'in', self.env['calendar.event'].search(['|', '&', ('of_lieu_company_id', 'in', companies.ids),
                                                                           ('of_lieu', '=', 'onsite'),
-                                                                     '&', ('of_lieu_rdv_id', 'in', partners._ids),
-                                                                          ('of_lieu', '=', 'offsite')])._ids)]
+                                                                     '&', ('of_lieu_rdv_id', 'in', partners.ids),
+                                                                          ('of_lieu', '=', 'offsite')]).ids)]
 
     def _search_lng(self, operator, operand):
         partners = self.env['res.partner']
@@ -958,10 +958,10 @@ class OFMeeting(models.Model):
                 continue
         partners = partners.search([('id', 'in', partners._ids), ('geo_lng', operator, operand)])
         companies = companies.search([('id', 'in', companies._ids), ('partner_id.geo_lng', operator, operand)])
-        return [('id', 'in', self.env['calendar.event'].search(['|', '&', ('of_lieu_company_id', 'in', companies._ids),
+        return [('id', 'in', self.env['calendar.event'].search(['|', '&', ('of_lieu_company_id', 'in', companies.ids),
                                                                           ('of_lieu', '=', 'onsite'),
-                                                                     '&', ('of_lieu_rdv_id', 'in', partners._ids),
-                                                                          ('of_lieu', '=', 'offsite')])._ids)]
+                                                                     '&', ('of_lieu_rdv_id', 'in', partners.ids),
+                                                                          ('of_lieu', '=', 'offsite')]).ids)]
 
     def _search_precision(self, operator, operand):
         partners = self.env['res.partner']
@@ -977,10 +977,10 @@ class OFMeeting(models.Model):
                 continue
         partners = partners.search([('id', 'in', partners._ids), ('precision', operator, operand)])
         companies = companies.search([('id', 'in', companies._ids), ('partner_id.precision', operator, operand)])
-        return [('id', 'in', self.env['calendar.event'].search(['|', '&', ('of_lieu_company_id', 'in', companies._ids),
+        return [('id', 'in', self.env['calendar.event'].search(['|', '&', ('of_lieu_company_id', 'in', companies.ids),
                                                                           ('of_lieu', '=', 'onsite'),
-                                                                     '&', ('of_lieu_rdv_id', 'in', partners._ids),
-                                                                          ('of_lieu', '=', 'offsite')])._ids)]
+                                                                     '&', ('of_lieu_rdv_id', 'in', partners.ids),
+                                                                          ('of_lieu', '=', 'offsite')]).ids)]
 
     @api.multi
     @api.depends("of_lieu")
@@ -1102,7 +1102,7 @@ class OFMeeting(models.Model):
         self.of_lieu_rdv_id = self.of_lieu_company_id.partner_id.id
 
     """
-    These fields would be necessary if use_contacts="0" in <calendar>. See event_data_transform function in .js file
+    These fields would be necessary if use_contacts="0" in <calendar>. See event_data_transforgit statuism function in .js file
 
     of_color_ft = fields.Char(string="Couleur de texte", help="Couleur de texte de l'utilisateur", compute="_compute_of_color")
     of_color_bg = fields.Char(string="Couleur de fond", help="Couleur de fond de l'utilisateur", compute="_compute_of_color")
@@ -1157,7 +1157,6 @@ class OFMeeting(models.Model):
                 vals["of_geo_lng"] = False
                 vals["of_precision"] = "no_address"
         return super(OFMeeting, self).write(vals)
-
 
     @api.model
     def create(self, vals):
