@@ -9,23 +9,33 @@ class OfService(models.Model):
     _inherit = "of.map.view.mixin"
     _description = "Service"
 
-    def _get_default_jours(self):
+    @api.model_cr_context
+    def _auto_init(self):
+        # A SUPRIMER
+        # Mise à jour du champ company_id des services existants
+        cr = self._cr
+        fill_company_id = False
+        if self._auto:
+            cr.execute("SELECT * FROM information_schema.columns WHERE table_name = 'of_service' AND column_name = 'company_id'")
+            fill_company_id = not bool(cr.fetchall())
+
+        res = super(OfService, self)._auto_init()
+        if fill_company_id:
+            cr.execute("UPDATE of_service AS s "
+                       "SET company_id = p.company_id\n"
+                       "FROM res_partner AS p\n"
+                       "WHERE p.id = s.partner_id")
+        return res
+
+    def _default_jours(self):
         # Lundi à vendredi comme valeurs par défaut
         jours = self.env['of.jours'].search([('numero', 'in', (1, 2, 3, 4, 5))], order="numero")
         res = [jour.id for jour in jours]
         return res
 
-    def _search_mois(self, operator, value):
-        mois = self.env['of.mois'].search(['|', ('name', operator, value), ('abr', operator, value)])
-        return [('mois_ids', 'in', mois.ids)]
-
-    def _search_jour(self, operator, value):
-        jours = self.env['of.jours'].search(['|', ('name', operator, value), ('abr', operator, value)])
-        return [('jour_ids', 'in', jours.ids)]
-
     @api.one
     @api.depends('tache_id', 'address_id')
-    def _get_planning_ids(self):
+    def _compute_planning_ids(self):
         planning_obj = self.env['of.planning.intervention']
         for service in self:
             plannings = planning_obj.search([('tache_id', '=', service.tache_id.id),
@@ -97,6 +107,7 @@ class OfService(models.Model):
     # template_id = fields.Many2one('of.mail.template', string='Contrat')
     partner_id = fields.Many2one('res.partner', string='Partenaire', ondelete='restrict')
     address_id = fields.Many2one('res.partner', string="Adresse", ondelete='restrict')
+    company_id = fields.Many2one('res.company', string=u"Société")
 
     # Champs ajoutés pour la vue map
     geo_lat = fields.Float(related='address_id.geo_lat')
@@ -107,9 +118,10 @@ class OfService(models.Model):
 
     tache_id = fields.Many2one('of.planning.tache', string=u'Tâche', required=True)
     name = fields.Char(u"Libellé", related='tache_id.name', store=True)
+    tag_ids = fields.Many2many('of.service.tag', string=u"Étiquettes")
 
     mois_ids = fields.Many2many('of.mois', 'service_mois', 'service_id', 'mois_id', string='Mois', required=True)
-    jour_ids = fields.Many2many('of.jours', 'service_jours', 'service_id', 'jour_id', string='Jours', required=True, default=_get_default_jours)
+    jour_ids = fields.Many2many('of.jours', 'service_jours', 'service_id', 'jour_id', string='Jours', required=True, default=_default_jours)
 
     note = fields.Text('Notes')
     date_next = fields.Date('Prochaine intervention', help=u"Date à partir de laquelle programmer la prochaine intervention", required=True)
@@ -125,8 +137,10 @@ class OfService(models.Model):
         ], u'État')
     active = fields.Boolean(string="Active", default=True)
 
-    planning_ids = fields.One2many('of.planning.intervention', compute='_get_planning_ids', string="Interventions")
-    date_last = fields.Date(u'Dernière intervention', compute='_get_planning_ids', search='_search_last_date', help=u"Date de la dernière intervention")
+    planning_ids = fields.One2many('of.planning.intervention', compute='_compute_planning_ids', string="Interventions")
+    date_last = fields.Date(
+        string=u'Dernière intervention', compute='_compute_planning_ids', search='_search_last_date',
+        help=u"Date de la dernière intervention")
 
     # Champs de recherche
     date_fin_min = fields.Date(string=u"Date échéance min", compute='lambda *a, **k:{}')
@@ -135,6 +149,11 @@ class OfService(models.Model):
 
     # Couleur de contrôle
     color = fields.Char(compute='_compute_color', string='Couleur', store=False)
+
+    @api.onchange('partner_id')
+    def _onchange_partner_id(self):
+        if self.partner_id:
+            self.company_id = self.partner_id.company_id
 
     @api.onchange('date_next')
     def _onchange_date_next(self):
@@ -183,6 +202,13 @@ class OfService(models.Model):
     def read(self, fields=None, load='_classic_read'):
         res = super(OfService, self).read(fields, load)
         return res
+
+class OFServicesTag(models.Model):
+    _name = 'of.service.tag'
+    _description = u"Étiquettes des services"
+
+    name = fields.Char(string=u"Libellé", required=True)
+    active = fields.Boolean(string='Actif', default=True)
 
 class OFPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"

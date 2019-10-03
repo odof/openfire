@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-    <data>
+<odoo>
 
 
 <!--##########################################################################################################################-->
@@ -28,6 +27,7 @@
                         <group>
                             <field name="partner_id" invisible="context.get('hide_service_partner_id')"/>
                             <field name="address_id" invisible="context.get('hide_service_address_id')"/>
+                            <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
 
                             <field name="tache_id"/>
                             <!-- <field name="template_id"/> -->
@@ -35,6 +35,7 @@
                             <field name="date_fin"/>
                             <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}"/>
                             <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                            <field name="tag_ids" widget="many2many_tags"/>
                             <field name="note"/>
                         </group>
                         <notebook>
@@ -70,6 +71,8 @@
                             <field name="partner_id" invisible="1"/>
                             <field name="address_id" invisible="context.get('hide_service_address_id')"
                                    domain="['|',('id','=',parent.id),('parent_id','=',parent.id)]"/>
+                            <field name="company_id" invisible="1"
+                                   options="{'no_create': True}" groups="base.group_multi_company"/>
                             <separator string="Informations générales" colspan="2"/>
                             <field name="tache_id"/>
                             <!-- <field name="template_id"/> -->
@@ -77,6 +80,7 @@
                             <field name="date_fin"/>
                             <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}"/>
                             <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                            <field name="tag_ids" widget="many2many_tags"/>
                         </group>
                         <separator string="Notes"/>
                         <field name="note"/>
@@ -115,6 +119,7 @@
                     <field name="date_next"/>
                     <field name="date_fin"/>
                     <field name="active" invisible="1"/>
+                    <field name="tag_ids" widget="many2many_tags"/>
                     <!--field name="state" invisible="1"/-->
                 </tree>
             </field>
@@ -134,8 +139,9 @@
                    <field name="address_id"/>
                    <field name="partner_zip" string="CP"/>
                    <field name="tache_id"/>
-                   <field name="mois_ids"/>
-                   <field name="jour_ids"/>
+                   <field name="tag_ids" widget="many2one"/>
+                   <field name="mois_ids" widget="many2one"/>
+                   <field name="jour_ids" widget="many2one"/>
                    <field name="date_fin" invisible="1"/>
                    <field name="date_fin_min" filter_domain="[('date_fin','&gt;=',self)]"/>
                    <field name="date_fin_max" filter_domain="[('date_fin','&lt;=',self)]"/>
@@ -206,6 +212,43 @@
                 </map>
             </field>
         </record>
+
+<!--##########################################################################################################################-->
+<!--#################################################______Étiquettes______###################################################-->
+<!--##########################################################################################################################-->
+
+    <record id="of_service_tag_view_form" model="ir.ui.view" >
+        <field name="name">of.service.tag.form</field>
+        <field name="model">of.service.tag</field>
+        <field name="arch" type="xml" >
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object"
+                                class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button"
+                                options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label class="oe_edit_only" for="name" string="Nom"/>
+                        <h1><field name="name" placeholder="nom de l'étiquette"/></h1>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_service_tag_view_tree" model="ir.ui.view" >
+        <field name="name">of.service.tag.tree</field>
+        <field name="model">of.service.tag</field>
+        <field name="arch" type="xml">
+            <tree string="Liste des Étiquettes" colors="grey: active == False">
+                <field name="name"/>
+                <field name="active" invisible="1"/>
+            </tree>
+        </field>
+    </record>
 
 <!--##########################################################################################################################-->
 <!--##################################################______Planning______####################################################-->
@@ -326,12 +369,20 @@
             <field name="act_window_id" ref="action_of_service_form_planning"/>
         </record>
 
+        <record id="action_of_service_tag_tree" model="ir.actions.act_window">
+            <field name="name">Étiquettes de service</field>
+            <field name="res_model">of.service.tag</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="of_service_tag_view_tree"/>
+        </record>
+
 <!--##########################################################################################################################-->
 <!--#################################################_________Menus__________#################################################-->
 <!--##########################################################################################################################-->
 
         <menuitem id="menu_of_service" name="Services" parent="sales_team.menu_sales" sequence="105" action="action_of_service_form_sale"/>
         <menuitem id="menu_of_planning_service" name="Services" parent="of_planning.menu_of_planning_intervention" sequence="25" action="action_of_service_form_planning"/>
+        <menuitem id="menu_of_service_tag" name="Étiquettes de service" parent="of_planning.menu_of_planning_configuration" sequence="120" action="action_of_service_tag_tree"/>
 
-    </data>
-</openerp>
+</odoo>
