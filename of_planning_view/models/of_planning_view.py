@@ -171,7 +171,7 @@ class OfPlanningIntervention(models.Model):
         return temps_chevauche
 
     @api.model
-    def get_emp_horaires_info(self, employee_ids, date_start, date_stop, dict_list_horaires=False):
+    def get_emp_horaires_info(self, employee_ids, date_start, date_stop, horaires_list_dict=False):
         intervention_obj = self.env['of.planning.intervention']
         employee_obj = self.env['hr.employee']
         tournee_obj = self.env['of.planning.tournee']
@@ -181,21 +181,21 @@ class OfPlanningIntervention(models.Model):
         tz = pytz.timezone(self._context['tz'])
         compare_precision = 5
 
-        if not dict_list_horaires:
-            dict_list_horaires = employee_obj.get_dict_list_horaires(employee_ids, date_start, date_stop)
+        if not horaires_list_dict:
+            horaires_list_dict = employee_obj.get_horaires_list_dict(employee_ids, date_start, date_stop)
 
-        dt_date_current_naive = datetime.strptime(date_start, "%Y-%m-%d %H:%M:%S")  # datetime naif
-        dt_date_current_utc = pytz.utc.localize(dt_date_current_naive, is_dst=None)  # datetime utc
-        dt_date_current_local = dt_date_current_utc.astimezone(tz)  # datetime local
-        dt_date_stop_naive = datetime.strptime(date_stop, "%Y-%m-%d %H:%M:%S")  # datetime naif
-        dt_date_stop_utc = pytz.utc.localize(dt_date_stop_naive, is_dst=None)  # datetime utc
-        dt_date_stop_local = dt_date_stop_utc.astimezone(tz)  # datetime local
+        date_current_naive_dt = datetime.strptime(date_start, "%Y-%m-%d %H:%M:%S")  # datetime naif
+        date_current_utc_dt = pytz.utc.localize(date_current_naive_dt, is_dst=None)  # datetime utc
+        date_current_locale_dt = date_current_utc_dt.astimezone(tz)  # datetime local
+        date_stop_naive_dt = datetime.strptime(date_stop, "%Y-%m-%d %H:%M:%S")  # datetime naif
+        date_stop_utc_dt = pytz.utc.localize(date_stop_naive_dt, is_dst=None)  # datetime utc
+        date_stop_locale_dt = date_stop_utc_dt.astimezone(tz)  # datetime local
 
-        d_date_start = fields.Date.from_string(fields.Datetime.to_string(dt_date_current_local)[:10])
-        d_date_current = fields.Date.from_string(fields.Datetime.to_string(dt_date_current_local)[:10])
-        d_date_stop = fields.Date.from_string(fields.Datetime.to_string(dt_date_stop_local)[:10])
+        date_start_da = fields.Date.from_string(fields.Datetime.to_string(date_current_locale_dt)[:10])
+        date_current_da = fields.Date.from_string(fields.Datetime.to_string(date_current_locale_dt)[:10])
+        date_stop_da = fields.Date.from_string(fields.Datetime.to_string(date_stop_locale_dt)[:10])
 
-        res = {id_emp: {'segments': dict_list_horaires[id_emp], 'fillerbars': [], 'creneaux_dispo': []} for id_emp in employee_ids}
+        res = {id_emp: {'segments': horaires_list_dict[id_emp], 'fillerbars': [], 'creneaux_dispo': []} for id_emp in employee_ids}
 
         un_jour = timedelta(days=1)
 
@@ -214,11 +214,11 @@ class OfPlanningIntervention(models.Model):
                 continue
             fillerbarzz = []
             creneaux_dispozz = []
-            d_date_current = d_date_start
+            date_current_da = date_start_da
 
-            while d_date_current <= d_date_stop:
+            while date_current_da <= date_stop_da:
                 res[employee_id]['col_offset_to_segment'].append(i_col_offset_to_segment)
-                num_jour = d_date_current.isoweekday()
+                num_jour = date_current_da.isoweekday()
 
                 fillerbar = {
                     'nb_heures_travaillees': 0.0,
@@ -232,9 +232,9 @@ class OfPlanningIntervention(models.Model):
                 if not horaires_du_jour:
                     fillerbarzz.append(fillerbar)
                     creneaux_dispozz.append([])
-                    d_date_current += un_jour
-                    str_date_current = fields.Date.to_string(d_date_current)
-                    if segment_courant[1] and segment_courant[1] < str_date_current:  # segment_courant[1] == False quand segment sans date de fin
+                    date_current_da += un_jour
+                    date_current_str = fields.Date.to_string(date_current_da)
+                    if segment_courant[1] and segment_courant[1] < date_current_str:  # segment_courant[1] == False quand segment sans date de fin
                         if len(segments_horaires) > index_courant + 1:  # changement de segment horaires
                             index_courant += 1
                             segment_courant = segments_horaires[index_courant]
@@ -245,10 +245,10 @@ class OfPlanningIntervention(models.Model):
                 journee_debut = horaires_du_jour[0][0]
                 journee_fin = horaires_du_jour[-1][1]
 
-                str_date_current = fields.Date.to_string(d_date_current)
+                date_current_str = fields.Date.to_string(date_current_da)
                 interventions = intervention_obj.search([('employee_ids', 'in', employee_id),
-                                                         ('date', '<=', str_date_current),
-                                                         ('date_deadline', '>=', str_date_current),
+                                                         ('date', '<=', date_current_str),
+                                                         ('date_deadline', '>=', date_current_str),
                                                          ('state', 'in', ('draft', 'confirm', 'done')),
                                                          ], order='date')
                 intervention_liste = []
@@ -256,34 +256,34 @@ class OfPlanningIntervention(models.Model):
                     fillerbar['nb_heures_disponibles'] = fillerbar['nb_heures_travaillees']
                     fillerbar['pct_disponible'] = 100.0
                     fillerbarzz.append(fillerbar)
-                    d_date_current += un_jour
-                    str_date_current = fields.Date.to_string(d_date_current)
-                    if segment_courant[1] and segment_courant[1] < str_date_current:  # segment_courant[1] == False quand segment sans date de fin
+                    date_current_da += un_jour
+                    date_current_str = fields.Date.to_string(date_current_da)
+                    if segment_courant[1] and segment_courant[1] < date_current_str:  # segment_courant[1] == False quand segment sans date de fin
                         if len(segments_horaires) > index_courant + 1:  # changement de segment horaires
                             index_courant += 1
                             segment_courant = segments_horaires[index_courant]
                             i_col_offset_to_segment = index_courant
-                    creneaux_dispo = intervention_obj.get_creneaux_dispo(employee_id, str_date_current, intervention_liste, horaires_du_jour, 1.0)
+                    creneaux_dispo = intervention_obj.get_creneaux_dispo(employee_id, date_current_str, intervention_liste, horaires_du_jour, 1.0)
                     creneaux_dispozz.append(creneaux_dispo)
                     continue
 
                 nb_heures_occupees = 0.0
-                dt_jour_deb = tz.localize(datetime.strptime(str_date_current+" 00:00:00", "%Y-%m-%d %H:%M:%S"))
-                dt_jour_fin = tz.localize(datetime.strptime(str_date_current+" 23:59:00", "%Y-%m-%d %H:%M:%S"))
+                jour_deb_dt = tz.localize(datetime.strptime(date_current_str+" 00:00:00", "%Y-%m-%d %H:%M:%S"))
+                jour_fin_dt = tz.localize(datetime.strptime(date_current_str+" 23:59:00", "%Y-%m-%d %H:%M:%S"))
                 for intervention in interventions:
                     intervention_heures = [intervention]
                     for intervention_heure in (intervention.date, intervention.date_deadline):
                         # Conversion des dates de début et de fin en nombres flottants et à l'heure locale
-                        dt_intervention_local = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(intervention_heure))
+                        intervention_locale_dt = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(intervention_heure))
 
                         # Comme on n'affiche que les heures, il faut s'assurer de rester dans le bon jour
                         #   (pour les interventions étalées sur plusieurs jours)
-                        dt_intervention_local = max(dt_intervention_local, dt_jour_deb)
-                        dt_intervention_local = min(dt_intervention_local, dt_jour_fin)
-                        flo_dt_intervention_local = round(dt_intervention_local.hour +
-                                                          dt_intervention_local.minute / 60.0 +
-                                                          dt_intervention_local.second / 3600.0, 5)
-                        intervention_heures.append(flo_dt_intervention_local)
+                        intervention_locale_dt = max(intervention_locale_dt, jour_deb_dt)
+                        intervention_locale_dt = min(intervention_locale_dt, jour_fin_dt)
+                        date_intervention_locale_flo = round(intervention_locale_dt.hour +
+                                                          intervention_locale_dt.minute / 60.0 +
+                                                          intervention_locale_dt.second / 3600.0, 5)
+                        intervention_heures.append(date_intervention_locale_flo)
                     if intervention_heures[1] <= 0.25:
                         intervention_heures[1] = journee_debut
                     if intervention_heures[2] >= 23.75:
@@ -302,12 +302,12 @@ class OfPlanningIntervention(models.Model):
                     fillerbar['pct_disponible'] = fillerbar['nb_heures_disponibles'] * 100 / fillerbar['nb_heures_travaillees']
 
                 fillerbarzz.append(fillerbar)
-                creneaux_dispo = intervention_obj.get_creneaux_dispo(employee_id, str_date_current, intervention_liste, horaires_du_jour, 0.5)
+                creneaux_dispo = intervention_obj.get_creneaux_dispo(employee_id, date_current_str, intervention_liste, horaires_du_jour, 0.5)
                 creneaux_dispozz.append(creneaux_dispo)
 
-                d_date_current += un_jour
-                str_date_current = fields.Date.to_string(d_date_current)
-                if segment_courant[1] and segment_courant[1] < str_date_current:  # segment_courant[1] == False quand segment sans date de fin
+                date_current_da += un_jour
+                date_current_str = fields.Date.to_string(date_current_da)
+                if segment_courant[1] and segment_courant[1] < date_current_str:  # segment_courant[1] == False quand segment sans date de fin
                     if len(segments_horaires) > index_courant + 1:  # changement de segment horaires
                         index_courant += 1
                         segment_courant = segments_horaires[index_courant]

@@ -506,7 +506,7 @@ class OFPlanningIntervention(models.Model):
                 # Si aucun no de portable renseigné, on passe à l'équipe suivante.
                 if not mobile_partners_to:
                     continue
-                str_mobile_partners_to = ','.join(mobile_partners_to)
+                mobile_partners_to_str = ','.join(mobile_partners_to)
 
                 # On parcourt la liste des interventions.
                 for intervention in interventions:
@@ -519,7 +519,7 @@ class OFPlanningIntervention(models.Model):
                     'model_id': my_model[0].id,
                     'account_id': from_number.account_id.id,
                     'from_mobile': from_number.mobile_number,
-                    'to_mobile': str_mobile_partners_to,
+                    'to_mobile': mobile_partners_to_str,
                     'sms_content': message_body,
                     'direction': 'O',
                     'message_date': datetime.utcnow(),

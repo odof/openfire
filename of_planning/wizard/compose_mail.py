@@ -49,11 +49,11 @@ class OfComposeMail(models.TransientModel):
             for employee in intervention.employee_ids:
                 if not employee.name in employees:
                     employees.append(employee.name)
-            d_interv = fields.Datetime.from_string(intervention.date)
-            d_interv = fields.Datetime.context_timestamp(self, d_interv)
+            date_interv_da = fields.Datetime.from_string(intervention.date)
+            date_interv_da = fields.Datetime.context_timestamp(self, date_interv_da)
 
             # La fonction date.strftime ne gère pas correctement les chaînes unicode, on ne peut donc pas faire strftime(u"%d/%m/%Y à %H:%M")
-            dates.append(d_interv.strftime("%d/%m/%Y à %H:%M").decode('utf-8'))
+            dates.append(date_interv_da.strftime("%d/%m/%Y à %H:%M").decode('utf-8'))
 
         tache_product_ttc = ''
         duree = ''
