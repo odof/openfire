@@ -213,11 +213,11 @@ class OfService(models.Model):
         if self.recurrence:
             mois_nums = self.mois_ids.mapped('numero')
 
-            d_date_from = fields.Date.from_string(max(date_str, self.date_last))
-            d_date_next = d_date_from + self.get_relative_delta(self.recurring_rule_type, self.recurring_interval)
+            date_from_da = fields.Date.from_string(max(date_str, self.date_last))
+            date_next_da = date_from_da + self.get_relative_delta(self.recurring_rule_type, self.recurring_interval)
 
-            date_mois = d_date_next.month
-            date_annee = d_date_next.year
+            date_mois = date_next_da.month
+            date_annee = date_next_da.year
 
             if (date_mois not in mois_nums) and (date_mois+1 in mois_nums):
                 # Le rdv a été pris en avance pour le mois suivant

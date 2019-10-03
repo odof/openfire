@@ -124,11 +124,9 @@ class HREmployee(models.Model):
     @api.multi
     @api.depends('of_archive_horaires', 'of_archive_horaires_temp')
     def _compute_horaires_du_jour(self):
-        str_date_today = fields.Date.today()
-        horaires_today = self.get_horaires_date(str_date_today)
+        horaires_today = self.get_horaires_date(fields.Date.today())
         for employee in self:
-            tuple_str_creneaux = hours_to_strs(horaires_today[employee.id])
-            employee.of_horaires_du_jour = "\n".join(tuple_str_creneaux)
+            employee.of_horaires_du_jour = "\n".join(hours_to_strs(horaires_today[employee.id]))
 
     @api.onchange('of_address_depart_id')
     def _onchange_address_depart_id(self):
@@ -209,8 +207,8 @@ class HREmployee(models.Model):
 
     @api.multi
     def archiver_horaires(self):
-        str_date_today = fields.Date.today()
-        d_date_today = fields.Date.from_string(str_date_today)
+        date_today_str = fields.Date.today()
+        date_today_da = fields.Date.from_string(date_today_str)
         un_jour = timedelta(days=1)
         for employee in self:
             """Récupérer l'archive actuelle, si la date d'aujourd'hui existe déjà dans l'archive, on la remplace"""
@@ -218,8 +216,8 @@ class HREmployee(models.Model):
             if archive:
                 les_morceaux = archive.split(u"\n")
                 for le_morceau in les_morceaux:
-                    str_la_date = le_morceau[2:12]  # la date commence au 3eme caractère
-                    if str_date_today == str_la_date:
+                    la_date_str = le_morceau[2:12]  # la date commence au 3eme caractère
+                    if date_today_str == la_date_str:
                         les_morceaux.remove(le_morceau)
                         break
             else:
@@ -228,24 +226,24 @@ class HREmployee(models.Model):
             if len(les_morceaux) > 0:
                 le_morceau = les_morceaux[-1]
                 if le_morceau[15] == u'f':  # le dernier morceau de la liste n'a pas de date de fin.
-                    d_date_hier = d_date_today - un_jour
-                    str_date_hier = fields.Date.to_string(d_date_hier)
-                    les_morceaux[-1] = le_morceau[:15] + u'"' + str_date_hier + u'"' + le_morceau[20:]
+                    date_hier_da = date_today_da - un_jour
+                    date_hier_str = fields.Date.to_string(date_hier_da)
+                    les_morceaux[-1] = le_morceau[:15] + u'"' + date_hier_str + u'"' + le_morceau[20:]
             """création de l'archive"""
-            dict_nouveau_morceau = {}  # dict contenant les horaires de travail
+            nouveau_morceau_dict = {}  # dict contenant les horaires de travail
             if employee.of_mode_horaires == u"advanced":  # mode avancé
                 for creneau in employee.of_creneau_ids:
-                    if creneau.jour_id.abr not in dict_nouveau_morceau:
-                        dict_nouveau_morceau[creneau.jour_id.abr] = []
-                    dict_nouveau_morceau[creneau.jour_id.abr].append((creneau.heure_debut, creneau.heure_fin))
+                    if creneau.jour_id.abr not in nouveau_morceau_dict:
+                        nouveau_morceau_dict[creneau.jour_id.abr] = []
+                    nouveau_morceau_dict[creneau.jour_id.abr].append((creneau.heure_debut, creneau.heure_fin))
             else:  # mode facile
                 for jour in employee.of_jour_ids:
-                    dict_nouveau_morceau[jour.abr] = [(employee.of_hor_md, employee.of_hor_mf), (employee.of_hor_ad, employee.of_hor_af)]
+                    nouveau_morceau_dict[jour.abr] = [(employee.of_hor_md, employee.of_hor_mf), (employee.of_hor_ad, employee.of_hor_af)]
             if archive:
-                str_nouveau_morceau = u'["%s", false, %s]' % (str_date_today, json.dumps(dict_nouveau_morceau))
+                nouveau_morceau_str = u'["%s", false, %s]' % (date_today_str, json.dumps(nouveau_morceau_dict))
             else:  # lors de la permière création d'horaires, on considère que l'employé avait ces horaires depuis sa création
-                str_nouveau_morceau = u'["%s", false, %s]' % (employee.create_date[:10], json.dumps(dict_nouveau_morceau))
-            les_morceaux.append(str_nouveau_morceau)
+                nouveau_morceau_str = u'["%s", false, %s]' % (employee.create_date[:10], json.dumps(nouveau_morceau_dict))
+            les_morceaux.append(nouveau_morceau_str)
             nouvelle_archive = u"\n".join(les_morceaux)
             employee.of_archive_horaires = nouvelle_archive
 
@@ -265,13 +263,13 @@ class HREmployee(models.Model):
             else:
                 les_morceaux = []
             """Création du nouveau morceau et de l'archive"""
-            dict_nouveau_morceau = {}  # dict contenant les horaires de travail temporaire
+            nouveau_morceau_dict = {}  # dict contenant les horaires de travail temporaire
             for creneau in employee.of_creneau_temp_ids:
-                if creneau.jour_id.abr not in dict_nouveau_morceau:
-                    dict_nouveau_morceau[creneau.jour_id.abr] = []
-                dict_nouveau_morceau[creneau.jour_id.abr].append((creneau.heure_debut, creneau.heure_fin))
-            str_nouveau_morceau = u'["%s", "%s", %s]' % (employee.of_creneau_temp_start, employee.of_creneau_temp_stop, json.dumps(dict_nouveau_morceau))
-            les_morceaux.append(str_nouveau_morceau)
+                if creneau.jour_id.abr not in nouveau_morceau_dict:
+                    nouveau_morceau_dict[creneau.jour_id.abr] = []
+                nouveau_morceau_dict[creneau.jour_id.abr].append((creneau.heure_debut, creneau.heure_fin))
+            nouveau_morceau_str = u'["%s", "%s", %s]' % (employee.of_creneau_temp_start, employee.of_creneau_temp_stop, json.dumps(nouveau_morceau_dict))
+            les_morceaux.append(nouveau_morceau_str)
             les_morceaux.sort(key=lambda x: x[2:12])  # si quelqu'un ajoute des horaires temporaires antérieurs à ceux déjà ajouté, BIM FOOLPROOF
             nouvelle_archive = u"\n".join(les_morceaux)
             employee.of_archive_horaires_temp = nouvelle_archive
@@ -279,59 +277,59 @@ class HREmployee(models.Model):
     @api.multi
     def get_archive_list_segments(self, jour_keys="number"):
         """Renvois l'archive des horaires des employés présents dans self sous forme de liste
-        résultat sous forme {  employee_id :  [ [date_debut, date_fin, dict_horaires], ...],  ...  }"""
+        résultat sous forme {  employee_id :  [ [date_debut, date_fin, horaires_dict], ...],  ...  }"""
         res = {}
         for employee in self:
             res[employee.id] = {}
             if not employee.of_archive_horaires:
                 continue
-            str_archive = u'[%s]' % employee.of_archive_horaires.replace(u"\n", u",")
+            archive_str = u'[%s]' % employee.of_archive_horaires.replace(u"\n", u",")
             if jour_keys == "number":
-                str_archive = jour_abr_2_nb(str_archive)
-            list_archive = json.loads(str_archive)
+                archive_str = jour_abr_2_nb(archive_str)
+            list_archive = json.loads(archive_str)
             if jour_keys == "number":
                 for segment in list_archive:
-                    dict_horaires = segment[2]
-                    for k in dict_horaires:
-                        dict_horaires[int(k)] = dict_horaires.pop(k)
+                    horaires_dict = segment[2]
+                    for k in horaires_dict:
+                        horaires_dict[int(k)] = horaires_dict.pop(k)
             res[employee.id] = list_archive
         return res
 
     @api.multi
     def get_archive_list_segments_temp(self, jour_keys="number"):
         """Renvois l'archive des horaires temporaires des employés présents dans self sous forme de liste
-        résultat sous forme {  employee_id :  [ [date_debut, date_fin, dict_horaires], ...],  ...  }"""
+        résultat sous forme {  employee_id :  [ [date_debut, date_fin, horaires_dict], ...],  ...  }"""
         res = {}
         for employee in self:
             res[employee.id] = {}
             if not employee.of_archive_horaires_temp:
                 continue
-            str_archive = u'[%s]' % employee.of_archive_horaires_temp.replace(u"\n", u",")
+            archive_str = u'[%s]' % employee.of_archive_horaires_temp.replace(u"\n", u",")
             if jour_keys == "number":
-                str_archive = jour_abr_2_nb(str_archive)
-            list_archive = json.loads(str_archive)  # json.loads nécessite des noms de propriétés entre double quotes
+                archive_str = jour_abr_2_nb(archive_str)
+            list_archive = json.loads(archive_str)  # json.loads nécessite des noms de propriétés entre double quotes
             if jour_keys == "number":
                 for segment in list_archive:
-                    dict_horaires = segment[2]
-                    for k in dict_horaires:
-                        dict_horaires[int(k)] = dict_horaires.pop(k)
+                    horaires_dict = segment[2]
+                    for k in horaires_dict:
+                        horaires_dict[int(k)] = horaires_dict.pop(k)
             res[employee.id] = list_archive
         return res
 
     @api.multi
-    def get_horaires_date(self, str_date):
+    def get_horaires_date(self, date_str):
         """renvois les horaires des employés présent dans self à la date donnée en paramètre.
         résultat sous forme { employee_id :  [(h_deb, h_fin), (h_deb, h_fin), ..] ,  .. }"""
         archive_horaires = self.get_archive_list_segments()
         archive_horaires_temp = self.get_archive_list_segments_temp()
-        d_date = fields.Date.from_string(str_date)
-        num_jour = d_date.isoweekday()  # entre 1 et 7
+        date_da = fields.Date.from_string(date_str)
+        num_jour = date_da.isoweekday()  # entre 1 et 7
         res = {}
         for employee in self:
             res[employee.id] = []
             horaires_temp = archive_horaires_temp[employee.id]
             for segment in horaires_temp:  # la date demandée correspond-elle à des horaires temporaires pour cet employé?
-                if se_chevauchent(str_date, str_date, segment[0], segment[1], False):  # la date demandée est sur un segment d'horaires temporaires
+                if se_chevauchent(date_str, date_str, segment[0], segment[1], False):  # la date demandée est sur un segment d'horaires temporaires
                     res[employee.id] = segment[2][num_jour]
                     break
             horaires = archive_horaires[employee.id]
@@ -340,42 +338,42 @@ class HREmployee(models.Model):
                     if not segment[1]:  # le dernier segment horaires n'a pas de date de fin
                         res[employee.id] = num_jour in segment[2] and segment[2][num_jour] or []
                         break
-                    if se_chevauchent(str_date, str_date, segment[0], segment[1], False):  # trouvé!
+                    if se_chevauchent(date_str, date_str, segment[0], segment[1], False):  # trouvé!
                         res[employee.id] = segment[2][num_jour]
                         break
         return res
 
     @api.model
-    def get_horaires_date_model(self, str_date, archive_list_horaires, archive_list_horaires_temp):
+    def get_horaires_date_model(self, date_str, archive_list_horaires, archive_list_horaires_temp):
         """renvois les horaires de l'employés dont les archives horaires sont données en paramètres à la date donnée.
         fonction pour éviter de faire des appels à get_archive_list_segments non nécessaires
         résultat sous forme [(h_deb, h_fin), (h_deb, h_fin), ..]"""
-        d_date = fields.Date.from_string(str_date)
-        num_jour = d_date.isoweekday()  # entre 1 et 7
+        date_da = fields.Date.from_string(date_str)
+        num_jour = date_da.isoweekday()  # entre 1 et 7
         res = []
         for segment in archive_list_horaires_temp:  # la date demandée correspond-elle à des horaires temporaires pour cet employé?
-            if se_chevauchent(str_date, str_date, segment[0], segment[1], False):  # la date demandée est sur un segment d'horaires temporaires
+            if se_chevauchent(date_str, date_str, segment[0], segment[1], False):  # la date demandée est sur un segment d'horaires temporaires
                 res = segment[2][num_jour]
                 break
         if not res:  # la date demandée n'est pas sur un segment d'horaires temporaires
             for segment in archive_list_horaires:
-                if se_chevauchent(str_date, str_date, segment[0], segment[1], False):  # trouvé!
+                if se_chevauchent(date_str, date_str, segment[0], segment[1], False):  # trouvé!
                     res = segment[2][num_jour]
                     break
         return res
 
     @api.model
-    def get_dict_list_horaires(self, employee_ids, date_start, date_stop):
+    def get_horaires_list_dict(self, employee_ids, date_start, date_stop):
         """ renvois le résultat de la fusion des archives horaires et archives horaires temporaires des employés
-        résultat sous forme { employee_id :  [(d_debut, d_fin, dict_horaires), (d_debut, d_fin, dict_horaires), ..] ,  .. }"""
+        résultat sous forme { employee_id :  [(date_debut_da, date_fin_da, horaires_dict), (date_debut_da, date_fin_da, horaires_dict), ..] ,  .. }"""
         if len(date_start) == 10:  # les paramètres sont des dates
             mode_params = "date"
         else:
             # transformer date_start et date_stop en date locale
-            dt_date_start_naive = datetime.strptime(date_start, "%Y-%m-%d %H:%M:%S")  # datetime naif
-            dt_date_start_utc = pytz.utc.localize(dt_date_start_naive, is_dst=None)  # datetime utc
-            dt_date_stop_naive = datetime.strptime(date_stop, "%Y-%m-%d %H:%M:%S")  # datetime naif
-            dt_date_stop_utc = pytz.utc.localize(dt_date_stop_naive, is_dst=None)  # datetime utc
+            date_start_naive_dt = datetime.strptime(date_start, "%Y-%m-%d %H:%M:%S")  # datetime naif
+            date_start_utc_dt = pytz.utc.localize(date_start_naive_dt, is_dst=None)  # datetime utc
+            date_stop_naive_dt = datetime.strptime(date_stop, "%Y-%m-%d %H:%M:%S")  # datetime naif
+            date_stop_utc_dt = pytz.utc.localize(date_stop_naive_dt, is_dst=None)  # datetime utc
             mode_params = "datetime"
         un_jour = timedelta(days=1)
 
@@ -387,19 +385,19 @@ class HREmployee(models.Model):
             # en cas d'employés sur différentes timezones
             tz = pytz.timezone(employee.of_tz or "Europe/Paris")
             if mode_params == "datetime":
-                dt_date_start_local = dt_date_start_utc.astimezone(tz)  # datetime local
-                dt_date_stop_local = dt_date_stop_utc.astimezone(tz)  # datetime local
-                str_d_date_start = fields.Date.to_string(dt_date_start_local).decode('utf-8')
-                str_d_date_stop = fields.Date.to_string(dt_date_stop_local).decode('utf-8')
+                date_start_local_dt = date_start_utc_dt.astimezone(tz)  # datetime local
+                date_stop_local_dt = date_stop_utc_dt.astimezone(tz)  # datetime local
+                date_start_str = fields.Date.to_string(date_start_local_dt).decode('utf-8')
+                date_stop_str = fields.Date.to_string(date_stop_local_dt).decode('utf-8')
             else:
-                str_d_date_start = date_start
-                str_d_date_stop = date_stop
+                date_start_str = date_start
+                date_stop_str = date_stop
 
             # on récupère les horaires standards
             horaires_employee = archive_list_horaires[employee.id]
             horaires_utiles = []
             if len(horaires_employee) == 1:  # les seuls horaires standard connu, on considère qu'ils sont valable sur la periode demandée
-                horaires_utiles.append([str_d_date_start, str_d_date_stop, horaires_employee[0][2]])
+                horaires_utiles.append([date_start_str, date_stop_str, horaires_employee[0][2]])
             elif len(horaires_employee) > 1:
                 # on cherche les index de début et de fin
                 index_start = -1
@@ -409,23 +407,23 @@ class HREmployee(models.Model):
                     if index_start == -1:  # n'a pas été affecté
                         if not horaires_employee[i][1]:
                             index_start = index_stop = i
-                        elif se_chevauchent(str_d_date_start, str_d_date_start, horaires_employee[i][0], horaires_employee[i][1], False):
+                        elif se_chevauchent(date_start_str, date_start_str, horaires_employee[i][0], horaires_employee[i][1], False):
                             index_start = i
                     if index_stop == -1:  # n'a pas été affecté
                         if not horaires_employee[i][1]:
                             index_stop = i
-                        elif se_chevauchent(str_d_date_stop, str_d_date_stop, horaires_employee[i][0], horaires_employee[i][1], False):
+                        elif se_chevauchent(date_stop_str, date_stop_str, horaires_employee[i][0], horaires_employee[i][1], False):
                             index_stop = i
                     if index_start != -1 and index_stop != -1:  # on a trouvé les 2 indexes
                         break
 
                 if index_start == index_stop:  # on a de la chance! l'employé n'a pas changé d'horaires entre les 2 dates demandées
-                    horaires_utiles.append([str_d_date_start, str_d_date_stop, horaires_employee[index_start][2]])
+                    horaires_utiles.append([date_start_str, date_stop_str, horaires_employee[index_start][2]])
                 else:  # mince alors! l'employé a changé d'horaires entre les 2 dates demandées
-                    horaires_utiles.append([str_d_date_start, horaires_employee[index_start][1], horaires_employee[index_start][2]])
+                    horaires_utiles.append([date_start_str, horaires_employee[index_start][1], horaires_employee[index_start][2]])
                     for i in range(index_start + 1, index_stop):
                         horaires_utiles.append([horaires_employee[i][0], horaires_employee[i][1], horaires_employee[i][2]])
-                    horaires_utiles.append([horaires_employee[index_stop][0], str_d_date_stop, horaires_employee[index_stop][2]])
+                    horaires_utiles.append([horaires_employee[index_stop][0], date_stop_str, horaires_employee[index_stop][2]])
             # On a la liste des horaires standards! \o/ maintenant on récupère si besoin la liste des horaires temporaires
             horaires_employee_temp = archive_list_horaires_temp[employee.id]
             horaires_temp_utiles = []
@@ -435,12 +433,12 @@ class HREmployee(models.Model):
                 continue
             # Sélection des horaires temporaires concernés
             for i in range(len(horaires_employee_temp)):
-                if se_chevauchent(str_d_date_start, str_d_date_stop, horaires_employee_temp[i][0], horaires_employee_temp[i][1], False):
+                if se_chevauchent(date_start_str, date_stop_str, horaires_employee_temp[i][0], horaires_employee_temp[i][1], False):
                     # chevauchement! ce créneau est à prendre en compte
-                    if horaires_employee_temp[i][0] < str_d_date_start:  # on coupe ce qui dépasse
-                        horaires_employee_temp[i][0] = str_d_date_start
-                    if horaires_employee_temp[i][1] > str_d_date_stop:  # à gauche et à droite
-                        horaires_employee_temp[i][1] = str_d_date_stop
+                    if horaires_employee_temp[i][0] < date_start_str:  # on coupe ce qui dépasse
+                        horaires_employee_temp[i][0] = date_start_str
+                    if horaires_employee_temp[i][1] > date_stop_str:  # à gauche et à droite
+                        horaires_employee_temp[i][1] = date_stop_str
                     horaires_temp_utiles.append(horaires_employee_temp[i])
             # OK! on a 2 listes de segments d'horaires sur un même intervalle, fiou!
             # FUUUUUUU-ZION!
@@ -453,24 +451,24 @@ class HREmployee(models.Model):
                     index_courant += 1
                     segment_std = horaires_utiles[index_courant]
 
-                d_debut_temp = fields.Date.from_string(segment_temp[0])
-                d_debut_temp -= un_jour
-                str_debut_temp = fields.Date.to_string(d_debut_temp).decode('utf-8')
-                d_fin_temp = fields.Date.from_string(segment_temp[1])
-                d_fin_temp += un_jour
-                str_fin_temp = fields.Date.to_string(d_fin_temp).decode('utf-8')
+                date_debut_temp_da = fields.Date.from_string(segment_temp[0])
+                date_debut_temp_da -= un_jour
+                debut_temp_str = fields.Date.to_string(date_debut_temp_da).decode('utf-8')
+                date_fin_temp_da = fields.Date.from_string(segment_temp[1])
+                date_fin_temp_da += un_jour
+                fin_temp_str = fields.Date.to_string(date_fin_temp_da).decode('utf-8')
                 sous_seg_1 = deepcopy(segment_std)
-                sous_seg_1[1] = str_debut_temp
+                sous_seg_1[1] = debut_temp_str
                 if segment_temp[1] <= segment_std[1]:
                     # le segment d'horaires temporaires est inclus dans le segment d'horaires standards
                     # un sous-segment a été créé, on modifie le segment courant
-                    horaires_utiles[index_courant][0] = str_fin_temp
+                    horaires_utiles[index_courant][0] = fin_temp_str
                     if horaires_utiles[index_courant][0] > horaires_utiles[index_courant][1]:
                         index_courant += 1
                 else:  # le segment d'horaires temporaires chevauche 2 segments d'horaires standards
                     # on met à jour le prochain segment d'horaires standards
                     index_courant += 1
-                    horaires_utiles[index_courant][0] = str_fin_temp
+                    horaires_utiles[index_courant][0] = fin_temp_str
 
                 if sous_seg_1[0] <= sous_seg_1[1]:  # est un vrai segment, on l'ajoute!
                     res[employee.id].append(sous_seg_1)
@@ -487,65 +485,65 @@ class HREmployee(models.Model):
         return res
 
     @api.model
-    def get_list_horaires_intersection(self, employee_ids=[], date_start=False, date_stop=False, dict_list_horaires=False):
+    def get_list_horaires_intersection(self, employee_ids=[], date_start=False, date_stop=False, horaires_list_dict=False):
         """renvois l'intersection des horaires des employés donnés en paramètre
-        avec soit les dates connues, soit le dict_list_horaires
-        résultat sous la forme [ (d_debut, d_fin, dict_horaires) ,  (d_debut, d_fin, dict_horaires) ,  ..]"""
+        avec soit les dates connues, soit le horaires_list_dict
+        résultat sous la forme [ (date_debut_da, date_fin_da, horaires_dict) ,  (date_debut_da, date_fin_da, horaires_dict) ,  ..]"""
         res = []
         if len(employee_ids) == 0:
             return res
-        if not dict_list_horaires:
-            dict_list_horaires = self.get_dict_list_horaires(employee_ids, date_start, date_stop)
+        if not horaires_list_dict:
+            horaires_list_dict = self.get_horaires_list_dict(employee_ids, date_start, date_stop)
         if len(employee_ids) == 1:
-            res = dict_list_horaires[employee_ids[0]]
+            res = horaires_list_dict[employee_ids[0]]
             return res
         emp_ids = list(employee_ids)
         while len(emp_ids) > 1:
             emp_1 = emp_ids.pop(0)
             emp_2 = emp_ids.pop(0)
             # on utilise -1 comme fake id pour la fusion des segments de 2 employés
-            dict_list_horaires[-1] = self.get_intersection_horaires_segment(emp_1, emp_2, dict_list_horaires)
+            horaires_list_dict[-1] = self.get_intersection_horaires_segment(emp_1, emp_2, horaires_list_dict)
             emp_ids.insert(0, -1)  # rajout du fake id dans la liste d'ids
-        res = dict_list_horaires[-1]
+        res = horaires_list_dict[-1]
         return res
 
     @api.model
-    def get_intersection_horaires_segment(self, employee1_id, employee2_id, dict_list_segments):
+    def get_intersection_horaires_segment(self, employee1_id, employee2_id, segments_list_dict):
         """renvois l'intersection des horaires des employés donnés en paramètre
-        résultat sous la forme [ (d_debut, d_fin, dict_horaires) ,  (d_debut, d_fin, dict_horaires) ,  ..]"""
+        résultat sous la forme [ (date_debut_da, date_fin_da, horaires_dict) ,  (date_debut_da, date_fin_da, horaires_dict) ,  ..]"""
         res = []
-        if len(dict_list_segments[employee1_id]) == 0 or len(dict_list_segments[employee2_id]) == 0:
+        if len(segments_list_dict[employee1_id]) == 0 or len(segments_list_dict[employee2_id]) == 0:
             return res
         un_jour = timedelta(days=1)
-        segments_emp_1 = deepcopy(dict_list_segments[employee1_id])  # [(d_debut, d_fin, dict_horaires), (d_debut, d_fin, dict_horaires), ..]
-        segments_emp_2 = deepcopy(dict_list_segments[employee2_id])
+        segments_emp_1 = deepcopy(segments_list_dict[employee1_id])  # [(date_debut_da, date_fin_da, horaires_dict), (date_debut_da, date_fin_da, horaires_dict), ..]
+        segments_emp_2 = deepcopy(segments_list_dict[employee2_id])
         pre_res = []
-        """fusionner les listes de segments pour que les dates correspondent, en conservant les 2 dict_horaires à chaque fois"""
+        """fusionner les listes de segments pour que les dates correspondent, en conservant les 2 horaires_dict à chaque fois"""
         while len(segments_emp_1) > 0 and len(segments_emp_2) > 0:
-            d_fin_1 = fields.Date.from_string(segments_emp_1[0][1])  # date de fin du premier segment de la liste
-            d_fin_2 = fields.Date.from_string(segments_emp_2[0][1])  # date de fin du premier segment de la liste
+            date_fin_1_da = fields.Date.from_string(segments_emp_1[0][1])  # date de fin du premier segment de la liste
+            date_fin_2_da = fields.Date.from_string(segments_emp_2[0][1])  # date de fin du premier segment de la liste
 
-            if d_fin_1 < d_fin_2:  # le premier segment de l'employé 1 termine en premier
-                d_debut_2 = d_fin_1 + un_jour
-                str_debut_2 = fields.Date.to_string(d_debut_2)
-                segments_emp_2[0][0] = str_debut_2
+            if date_fin_1_da < date_fin_2_da:  # le premier segment de l'employé 1 termine en premier
+                date_debut_2_da = date_fin_1_da + un_jour
+                debut_2_str = fields.Date.to_string(date_debut_2_da)
+                segments_emp_2[0][0] = debut_2_str
                 segment_fuz = list(segments_emp_1.pop(0))  # conversion de tuple à list pour pouvoir ajouter un élément
-                segment_fuz.append(segments_emp_2[0][2])  # ajout du dict_horaires
+                segment_fuz.append(segments_emp_2[0][2])  # ajout du horaires_dict
                 pre_res.append(segment_fuz)
-            elif d_fin_1 > d_fin_2:  # le premier segment de l'employé 2 termine en premier
-                d_debut_1 = d_fin_2 + un_jour
-                str_debut_1 = fields.Date.to_string(d_debut_1)
-                segments_emp_1[0][0] = str_debut_1
+            elif date_fin_1_da > date_fin_2_da:  # le premier segment de l'employé 2 termine en premier
+                date_debut_1_da = date_fin_2_da + un_jour
+                debut_1_str = fields.Date.to_string(date_debut_1_da)
+                segments_emp_1[0][0] = debut_1_str
                 segment_fuz = list(segments_emp_2.pop(0))  # conversion de tuple à list pour pouvoir ajouter un élément
-                segment_fuz.append(segments_emp_1[0][2])  # ajout du dict_horaires
+                segment_fuz.append(segments_emp_1[0][2])  # ajout du horaires_dict
                 pre_res.append(segment_fuz)
             else:  # les premiers segments des deux employés terminent en même temps
                 segment_fuz = list(segments_emp_1[0])  # conversion de tuple à list pour pouvoir ajouter un élément
-                segment_fuz.append(segments_emp_2[0][2])  # ajout du dict_horaires
+                segment_fuz.append(segments_emp_2[0][2])  # ajout du horaires_dict
                 pre_res.append(segment_fuz)
                 segments_emp_1.pop(0)
                 segments_emp_2.pop(0)
-        # OK! on a une liste de segments avec 2 dict_horaires dans chaque. maintenant on fusionne les dict_horaires pour garder leur intersection
+        # OK! on a une liste de segments avec 2 horaires_dict dans chaque. maintenant on fusionne les horaires_dict pour garder leur intersection
         for segment in pre_res:
             segment_fuz = (segment[0], segment[1], self.get_intersection_heures_dict(segment[2], segment[3]))
             res.append(segment_fuz)
@@ -554,7 +552,7 @@ class HREmployee(models.Model):
 
     @api.model
     def get_intersection_heures_dict(self, dict1, dict2):
-        """fusionne 2 dict_horaires et renvois leur intersection
+        """fusionne 2 horaires_dict et renvois leur intersection
         résultat sous la forme { 1..7 :  [(h_debut, h_fin), (h_debut, h_fin)] }
         exemple: dict1[1] = [(9, 12)], dict2 = [(11, 14)]; res[1] = [(11, 12)]"""
         res = {}
@@ -586,31 +584,31 @@ class HREmployee(models.Model):
         return res
 
     @api.model
-    def get_horaires_effectif_date(self, str_date, dict_list_horaires):
-        """fonction qui utilise le résultat de get_dict_list_horaires pour trouver les horaires à une date donnée
+    def get_horaires_effectif_date(self, date_str, horaires_list_dict):
+        """fonction qui utilise le résultat de get_horaires_list_dict pour trouver les horaires à une date donnée
         résultat équivalent à celui de get_horaires_date
         résultat sous forme { employee_id :  [(h_deb, h_fin), (h_deb, h_fin), ..] ,  .. }"""
         res = {}
-        d_date = fields.Date.from_string(str_date)
-        num_jour = d_date.isoweekday()
-        for employee_id in dict_list_horaires:
-            segments = dict_list_horaires[employee_id]
+        date_da = fields.Date.from_string(date_str)
+        num_jour = date_da.isoweekday()
+        for employee_id in horaires_list_dict:
+            segments = horaires_list_dict[employee_id]
             for segment in segments:
                 if not segment[1]:  # segment sans date de fin
                     res[employee_id] = num_jour in segment[2] and segment[2][num_jour] or []
                     break
-                if se_chevauchent(str_date, str_date, segment[0], segment[1], False):  # la date demandée est sur ce segment d'horaires
+                if se_chevauchent(date_str, date_str, segment[0], segment[1], False):  # la date demandée est sur ce segment d'horaires
                     res[employee_id] = num_jour in segment[2] and segment[2][num_jour] or []
                     break
         return res
 
     @api.model
-    def debut_sur_creneau(self, str_date, h_debut, list_segments):
+    def debut_sur_creneau(self, date_str, h_debut, list_segments):
         """renvois l'indexe du créneau de début si l'heure et la date sont dans les horaires, -1 sinon"""
         for segment in list_segments:
-            if segment[0] <= str_date <= segment[1]:  # la date est sur ce segment
-                d_date = fields.Date.from_string(str_date)
-                num_jour = d_date.isoweekday()
+            if segment[0] <= date_str <= segment[1]:  # la date est sur ce segment
+                date_da = fields.Date.from_string(date_str)
+                num_jour = date_da.isoweekday()
                 creneaux = num_jour in segment[2] and segment[2][num_jour]
                 for i in range(len(creneaux)):  # creneau sous form (h_debut, h_fin)
                     creneau = creneaux[i]
@@ -636,7 +634,7 @@ class HREmployee(models.Model):
         max_time = False
         min_equipe = False
         max_equipe = False
-        d_today = fields.Date.from_string(fields.Date.today())
+        today_da = fields.Date.from_string(fields.Date.today())
 
         list_horaires = employees.get_archive_list_segments()
         list_horaires_temp = employees.get_archive_list_segments_temp()
@@ -678,16 +676,16 @@ class HREmployee(models.Model):
                             min_equipe = creneaux_du_jour[0].heure_debut
                         if max_equipe < creneaux_du_jour[-1].heure_fin:  # nouveau max
                             max_equipe = creneaux_du_jour[-1].heure_fin
-            dt_min = datetime.combine(d_today, datetime.min.time()) + timedelta(hours=min_equipe)  # datetime naive
-            dt_min = tz.localize(dt_min, is_dst=None).astimezone(pytz.utc)  # datetime utc
-            flo_min = round(dt_min.hour + dt_min.minute / 60.0 + dt_min.second / 3600.0, 5)  # mintime utc as float
+            date_min_dt = datetime.combine(today_da, datetime.min.time()) + timedelta(hours=min_equipe)  # datetime naive
+            date_min_dt = tz.localize(date_min_dt, is_dst=None).astimezone(pytz.utc)  # datetime utc
+            flo_min = round(date_min_dt.hour + date_min_dt.minute / 60.0 + date_min_dt.second / 3600.0, 5)  # mintime utc as float
             if min_time == False:
                 min_time = flo_min
             elif flo_min < min_time:
                 min_time = flo_min
-            dt_max = datetime.combine(d_today, datetime.min.time()) + timedelta(hours=max_equipe)  # datetime naive
-            dt_max = tz.localize(dt_max, is_dst=None).astimezone(pytz.utc)  # datetime utc
-            flo_max = round(dt_max.hour + dt_max.minute / 60.0 + dt_max.second / 3600.0, 5)  # maxtime utc as float
+            date_max_dt = datetime.combine(today_da, datetime.min.time()) + timedelta(hours=max_equipe)  # datetime naive
+            date_max_dt = tz.localize(date_max_dt, is_dst=None).astimezone(pytz.utc)  # datetime utc
+            flo_max = round(date_max_dt.hour + date_max_dt.minute / 60.0 + date_max_dt.second / 3600.0, 5)  # maxtime utc as float
             if max_time == False:
                 max_time = flo_max
             elif flo_max > max_time:

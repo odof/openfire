@@ -55,8 +55,8 @@ class OfPlanningJour(report_sxw.rml_parse):
                 int_date_min = int(round((line.hor_md - int_date_hour) * 60, 0))
             else:
                 employees = line.employee_ids
-                str_planning_dat_local = fields.Date.to_string(planning_datetime_local)
-                horaires_du_jour = employees.get_horaires_date(str_planning_dat_local)
+                planning_dat_local_str = fields.Date.to_string(planning_datetime_local)
+                horaires_du_jour = employees.get_horaires_date(planning_dat_local_str)
                 heure_debut_min = 24
                 for employee_id in horaires_du_jour:
                     if len(horaires_du_jour[employee_id]) > 0 and horaires_du_jour[employee_id][0][0] < heure_debut_min:

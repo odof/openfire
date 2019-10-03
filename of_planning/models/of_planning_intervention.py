@@ -204,70 +204,70 @@ class OfPlanningEquipe(models.Model):
     """
     à voir si adapter cette fonction à partir de la nouvelle version présente dans les employés ou si la supprimer totalement
     @api.model
-    def get_dict_horaires(self, equipe_ids, date_start, date_stop):
+    def get_horaires_dict(self, equipe_ids, date_start, date_stop):
         # transformer date_start et date_stop en date locale
-        dt_date_start_naive = datetime.strptime(date_start, "%Y-%m-%d %H:%M:%S")  # datetime naif
-        dt_date_start_utc = pytz.utc.localize(dt_date_start_naive, is_dst=None)  # datetime utc
-        dt_date_stop_naive = datetime.strptime(date_stop, "%Y-%m-%d %H:%M:%S")  # datetime naif
-        dt_date_stop_utc = pytz.utc.localize(dt_date_stop_naive, is_dst=None)  # datetime utc
+        date_start_naive_dt = datetime.strptime(date_start, "%Y-%m-%d %H:%M:%S")  # datetime naif
+        date_start_utc_dt = pytz.utc.localize(date_start_naive_dt, is_dst=None)  # datetime utc
+        date_stop_naive_dt = datetime.strptime(date_stop, "%Y-%m-%d %H:%M:%S")  # datetime naif
+        date_stop_utc_dt = pytz.utc.localize(date_stop_naive_dt, is_dst=None)  # datetime utc
 
         res = {}
         compare_precision = 5
         for equipe in self.browse(equipe_ids):
             # en cas d'équipes sur différentes timezones
             tz = pytz.timezone(equipe.tz or "Europe/Paris")
-            dt_date_start_local = dt_date_start_utc.astimezone(tz)  # datetime local
-            dt_date_stop_local = dt_date_stop_utc.astimezone(tz)  # datetime local
-            str_d_date_start = fields.Date.to_string(dt_date_start_local)
-            str_d_date_stop = fields.Date.to_string(dt_date_stop_local)
+            date_start_local_dt = date_start_utc_dt.astimezone(tz)  # datetime local
+            date_stop_local_dt = date_stop_utc_dt.astimezone(tz)  # datetime local
+            date_start_str = fields.Date.to_string(date_start_local_dt)
+            date_stop_str = fields.Date.to_string(date_stop_local_dt)
             #jours_travailles = []  # liste contenant les jours travaillés [jours travaillés]
-            dict_horaires = {}  # dictionnaire contenant les horaires par jour {1: [(9, 12), (14, 18)], 2:[], ...}
+            horaires_dict = {}  # dictionnaire contenant les horaires par jour {1: [(9, 12), (14, 18)], 2:[], ...}
             jours_temp_travailles = []  # liste contenant les jours travaillés temporaires [jours_temp travaillés]
-            dict_horaires_temp = {}  # dictionnaire contenant les horaires temporaires par jour {1: [(9, 12), (14, 18)], 2:[], ...}
+            horaires_temp_dict = {}  # dictionnaire contenant les horaires temporaires par jour {1: [(9, 12), (14, 18)], 2:[], ...}
             horaires_temp = False  # booléen qui nous dit si il faut prendre en compte des horaires temporaires
             equipe_id = equipe.id
             if equipe.mode_horaires == "easy":
                 # On utilise le mode facile pour les horaires de cette équipe
                 jours_travailles = [jour.numero for jour in equipe.jour_ids] if equipe.jour_ids else range(1, 6)
                 for i in range(1,8):
-                    dict_horaires[i] = []
+                    horaires_dict[i] = []
                     if i in jours_travailles:
                         # hor_mf - hor_md > 0 ?
                         if float_compare(equipe.hor_mf, equipe.hor_md, compare_precision)  > 0.0:
-                            dict_horaires[i].append((equipe.hor_md, equipe.hor_mf))
+                            horaires_dict[i].append((equipe.hor_md, equipe.hor_mf))
                         # hor_af - hor_ad > 0 ?
                         if float_compare(equipe.hor_af, equipe.hor_ad, compare_precision)  > 0.0:
-                            dict_horaires[i].append((equipe.hor_ad, equipe.hor_af))
+                            horaires_dict[i].append((equipe.hor_ad, equipe.hor_af))
             else: # On utilise le mode avancé pour les horaires de cette équipe
                 # l'équipe a-t-elle des horaires temporaires qui peuvent interférer avec ses horaires par défaut sur cette recherche??
-                if equipe.of_creneau_temp_stop and equipe.of_creneau_temp_stop >= str_d_date_start and equipe.of_creneau_temp_start <= str_d_date_stop:
+                if equipe.of_creneau_temp_stop and equipe.of_creneau_temp_stop >= date_start_str and equipe.of_creneau_temp_start <= date_stop_str:
                     horaires_temp = True
-                    str_temp_start = max(equipe.of_creneau_temp_start, str_d_date_start)
-                    str_temp_stop = min(equipe.of_creneau_temp_stop, str_d_date_stop)
+                    temp_start_str = max(equipe.of_creneau_temp_start, date_start_str)
+                    temp_stop_str = min(equipe.of_creneau_temp_stop, date_stop_str)
                     creneaux_temp_travailles = equipe.of_creneau_temp_ids
                     for i in range(1,8):
-                        dict_horaires_temp[i] = []
+                        horaires_temp_dict[i] = []
                         creneaux_temp_du_jour = creneaux_temp_travailles.filtered(lambda x: x.jour_number == i)
                         for c in creneaux_temp_du_jour:
-                            dict_horaires_temp[i].append((c.heure_debut, c.heure_fin))
-                    jours_temp_travailles = [j for j in dict_horaires_temp if dict_horaires_temp[j] != []]
+                            horaires_temp_dict[i].append((c.heure_debut, c.heure_fin))
+                    jours_temp_travailles = [j for j in horaires_temp_dict if horaires_temp_dict[j] != []]
 
                 creneaux_travailles = equipe.of_creneau_ids
                 for i in range(1,8):
-                    dict_horaires[i] = []
+                    horaires_dict[i] = []
                     creneaux_du_jour = creneaux_travailles.filtered(lambda x: x.jour_number == i)
                     for c in creneaux_du_jour:
-                        dict_horaires[i].append((c.heure_debut, c.heure_fin))
-                jours_travailles = [j for j in dict_horaires if dict_horaires[j] != []]
+                        horaires_dict[i].append((c.heure_debut, c.heure_fin))
+                jours_travailles = [j for j in horaires_dict if horaires_dict[j] != []]
             res[equipe_id] = {
-                'dict_horaires': dict_horaires,
+                'horaires_dict': horaires_dict,
                 'jours_travailles': jours_travailles,
                 }
             if horaires_temp:
-                res[equipe_id]['dict_horaires_temp'] = dict_horaires_temp
+                res[equipe_id]['horaires_temp_dict'] = horaires_temp_dict
                 res[equipe_id]['jours_temp_travailles'] = jours_temp_travailles
-                res[equipe_id]['horaires_temp_start'] = str_temp_start
-                res[equipe_id]['horaires_temp_stop'] = str_temp_stop
+                res[equipe_id]['horaires_temp_start'] = temp_start_str
+                res[equipe_id]['horaires_temp_stop'] = temp_stop_str
         return res"""
 
     """
@@ -285,7 +285,7 @@ class OfPlanningEquipe(models.Model):
         max_time = False
         min_equipe = False
         max_equipe = False
-        d_today = fields.Date.from_string(fields.Date.today())
+        today_da = fields.Date.from_string(fields.Date.today())
         for equipe in equipes:
             equipe_id = equipe.id
             tz = pytz.timezone(equipe.tz or "Europe/Paris")
@@ -323,16 +323,16 @@ class OfPlanningEquipe(models.Model):
                             min_equipe = creneaux_du_jour[0].heure_debut
                         if max_equipe < creneaux_du_jour[-1].heure_fin:  # nouveau max
                             max_equipe = creneaux_du_jour[-1].heure_fin
-            dt_min = datetime.combine(d_today, datetime.min.time()) + timedelta(hours=min_equipe)  # datetime naive
-            dt_min = tz.localize(dt_min, is_dst=None).astimezone(pytz.utc)  # datetime utc
-            flo_min = round(dt_min.hour + dt_min.minute / 60.0 + dt_min.second / 3600.0, 5)  # mintime utc as float
+            date_min_dt = datetime.combine(today_da, datetime.min.time()) + timedelta(hours=min_equipe)  # datetime naive
+            date_min_dt = tz.localize(date_min_dt, is_dst=None).astimezone(pytz.utc)  # datetime utc
+            flo_min = round(date_min_dt.hour + date_min_dt.minute / 60.0 + date_min_dt.second / 3600.0, 5)  # mintime utc as float
             if min_time == False:
                 min_time = flo_min
             elif flo_min < min_time:
                 min_time = flo_min
-            dt_max = datetime.combine(d_today, datetime.min.time()) + timedelta(hours=max_equipe)  # datetime naive
-            dt_max = tz.localize(dt_max, is_dst=None).astimezone(pytz.utc)  # datetime utc
-            flo_max = round(dt_max.hour + dt_max.minute / 60.0 + dt_max.second / 3600.0, 5)  # maxtime utc as float
+            date_max_dt = datetime.combine(today_da, datetime.min.time()) + timedelta(hours=max_equipe)  # datetime naive
+            date_max_dt = tz.localize(date_max_dt, is_dst=None).astimezone(pytz.utc)  # datetime utc
+            flo_max = round(date_max_dt.hour + date_max_dt.minute / 60.0 + date_max_dt.second / 3600.0, 5)  # maxtime utc as float
             if max_time == False:
                 max_time = flo_max
             elif flo_max > max_time:
@@ -499,11 +499,11 @@ class OfPlanningIntervention(models.Model):
             query = ROUTING_BASE_URL + "route/" + ROUTING_VERSION + "/" + ROUTING_PROFILE + "/"
 
             # Listes de coordonnées : ATTENTION OSRM prend ses coordonnées sous form (lng, lat)
-            str_coords = str(origine.geo_lng) + "," + str(origine.geo_lat)
-            str_coords += ";" + str(arrivee.geo_lng) + "," + str(arrivee.geo_lat)
+            coords_str = str(origine.geo_lng) + "," + str(origine.geo_lat)
+            coords_str += ";" + str(arrivee.geo_lng) + "," + str(arrivee.geo_lat)
 
             query_send = urllib.quote(query.strip().encode('utf8')).replace('%3A', ':')
-            full_query = query_send + str_coords + "?"
+            full_query = query_send + coords_str + "?"
             try:
                 req = requests.get(full_query)
                 res = req.json()
@@ -647,84 +647,84 @@ class OfPlanningIntervention(models.Model):
             if not tz:
                 tz = "Europe/Paris"
 
-            # génération d_courante 
-            dt_utc = datetime.strptime(intervention.date, "%Y-%m-%d %H:%M:%S")  # Datetime UTC
-            dt_local = fields.Datetime.context_timestamp(intervention, dt_utc)  # Datetime local
-            str_dt_local = fields.Datetime.to_string(dt_local).decode('utf-8')  # String Datetime local
-            d_courante = fields.Date.from_string(str_dt_local)  # Date local
-            str_d_courante = fields.Date.to_string(d_courante).decode('utf-8')
+            # génération courante_da
+            date_utc_dt = datetime.strptime(intervention.date, "%Y-%m-%d %H:%M:%S")  # Datetime UTC
+            date_local_dt = fields.Datetime.context_timestamp(intervention, date_utc_dt)  # Datetime local
+            date_locale_str = fields.Datetime.to_string(date_locale_dt).decode('utf-8')  # String Datetime local
+            date_courante_da = fields.Date.from_string(date_locale_str)  # Date local
+            date_courante_str = fields.Date.to_string(date_courante_da).decode('utf-8')
             un_jour = timedelta(days=1)
 
             une_semaine = timedelta(days=7)
-            dt_date_stop = dt_local + une_semaine  # pour des raisons pratiques on limite la recherche des horaires à une semaine après la date d'intervention
-            str_dt_stop = fields.Datetime.to_string(dt_date_stop).decode('utf-8')
+            date_stop_dt = date_locale_dt + une_semaine  # pour des raisons pratiques on limite la recherche des horaires à une semaine après la date d'intervention
+            date_stop_str = fields.Datetime.to_string(date_stop_dt).decode('utf-8')
             # récupérer le dictionnaire des segments horaires des employés
-            dict_list_horaires = employee_obj.get_dict_list_horaires(employees._ids, str_dt_local, str_dt_stop)
+            horaires_list_dict = employee_obj.get_horaires_list_dic(employees._ids, date_locale_str, date_stop_str)
             # récupérer la liste des segments de l'équipe (ie l'intersection des horaires des employés)
-            segments_equipe = employee_obj.get_list_horaires_intersection(employee_ids=employees._ids, dict_list_horaires=dict_list_horaires)
+            segments_equipe = employee_obj.get_list_horaires_intersection(employee_ids=employees._ids, horaires_list_dict=horaires_list_dict)
 
             if intervention.forcer_horaires:
                 jours_travailles = [jour.numero for jour in self.jour_ids] if self.jour_ids else range(1, 6)
 
-            jour_courant = dt_local.isoweekday()
+            jour_courant = date_locale_dt.isoweekday()
 
             duree_restante = intervention.duree
-            heure_debut = dt_local.hour + (dt_local.minute + dt_local.second / 60.0) / 60.0 # heure en float
+            heure_debut = date_locale_dt.hour + (date_locale_dt.minute + date_locale_dt.second / 60.0) / 60.0 # heure en float
 
             # Vérifier que l'intervention commence sur un créneau travaillé
-            index_creneau = employee_obj.debut_sur_creneau(str_d_courante, heure_debut, segments_equipe)
+            index_creneau = employee_obj.debut_sur_creneau(date_courante_str, heure_debut, segments_equipe)
             if index_creneau == -1:
                 raise UserError(u"L'horaire de début des travaux est en dehors des heures de travail")
 
             heure_courante = heure_debut
             segment_courant = segments_equipe.pop(0)
-            dict_horaires = segment_courant[2]
+            horaires_dict = segment_courant[2]
             while float_compare(duree_restante, 0.0, compare_precision)  > 0.0:
 
-                fin_creneau_courant = dict_horaires[jour_courant][index_creneau][1]
+                fin_creneau_courant = horaires_dict[jour_courant][index_creneau][1]
                 if float_compare(fin_creneau_courant, heure_courante + duree_restante, compare_precision)  >= 0.0:
                     # l'intervention se termine sur ce créneau
                     heure_courante += duree_restante
                     break
                 # l'intervention continue
                 # y-a-t-il un créneau suivant la même journée?
-                if index_creneau + 1 < len(dict_horaires[jour_courant]):  # oui
-                    duree_restante -= (dict_horaires[jour_courant][index_creneau][1] - heure_courante)
+                if index_creneau + 1 < len(horaires_dict[jour_courant]):  # oui
+                    duree_restante -= (horaires_dict[jour_courant][index_creneau][1] - heure_courante)
                     index_creneau += 1
-                    heure_courante = dict_horaires[jour_courant][index_creneau][0]
+                    heure_courante = horaires_dict[jour_courant][index_creneau][0]
                     continue
                 # il n'y a pas de créneau suivant la même journée: terminer la journée puis passer au jour suivant
-                duree_restante -= (dict_horaires[jour_courant][index_creneau][1] - heure_courante)
+                duree_restante -= (horaires_dict[jour_courant][index_creneau][1] - heure_courante)
 
                 jour_courant = ((jour_courant + 1) % 7) or 7 # num jour de la semaine entre 1 et 7
-                d_courante += un_jour
-                str_d_courante = fields.Date.to_string(d_courante).decode('utf-8')
+                date_courante_da += un_jour
+                date_courante_str = fields.Date.to_string(date_courante_da).decode('utf-8')
 
-                if str_d_courante > segment_courant[1] and len(segments_equipe) > 0:  # changer de segment courant
+                if date_courante_str > segment_courant[1] and len(segments_equipe) > 0:  # changer de segment courant
                     segment_courant = segments_equipe.pop(0)
-                    dict_horaires = segment_courant[2]
+                    horaires_dict = segment_courant[2]
                 
-                while jour_courant not in dict_horaires or dict_horaires[jour_courant] == []: # on saute les jours non travaillés
+                while jour_courant not in horaires_dict or horaires_dict[jour_courant] == []: # on saute les jours non travaillés
                     jour_courant = ((jour_courant + 1) % 7) or 7 # num jour de la semaine entre 1 et 7
-                    #dt_courante_deb += un_jour
-                    d_courante += un_jour
-                    if str_d_courante > segment_courant[1] and len(segments_equipe) > 0:  # changer de segment courant
+                    #date_courante_deb_dt += un_jour
+                    date_courante_da += un_jour
+                    if date_courante_str > segment_courant[1] and len(segments_equipe) > 0:  # changer de segment courant
                         segment_courant = segments_equipe.pop(0)
-                        dict_horaires = segment_courant[2]
+                        horaires_dict = segment_courant[2]
 
                 index_creneau = 0
                 # heure_courante passée a l'heure de début du premier créneau du jour travaillé suivant
-                heure_courante = dict_horaires[jour_courant][index_creneau][0]
+                heure_courante = horaires_dict[jour_courant][index_creneau][0]
 
             # la durée restante est égale à 0! on y est!
-            str_d_courante = fields.Date.to_string(d_courante).decode('utf-8')  # String Date courante locale
-            dt_courante_deb = tz.localize(datetime.strptime(str_d_courante+" 00:00:00", "%Y-%m-%d %H:%M:%S"))  # Datetime local début du jour
+            date_courante_str = fields.Date.to_string(date_courante_da).decode('utf-8')  # String Date courante locale
+            date_courante_deb_dt = tz.localize(datetime.strptime(date_courante_str+" 00:00:00", "%Y-%m-%d %H:%M:%S"))  # Datetime local début du jour
             # Calcul de la nouvelle date
-            dt_deadline_local = dt_courante_deb + timedelta(hours=heure_courante)
+            date_deadline_locale_dt = date_courante_deb_dt + timedelta(hours=heure_courante)
             # Conversion en UTC
-            dt_deadline_utc = dt_deadline_local - dt_deadline_local.tzinfo._utcoffset
-            date_deadline = dt_deadline_utc.strftime("%Y-%m-%d %H:%M:%S")
-            intervention.date_deadline = date_deadline
+            date_deadline_utc_dt = date_deadline_locale_dt - date_deadline_locale_dt.tzinfo._utcoffset
+            date_deadline_str = date_deadline_utc_dt.strftime("%Y-%m-%d %H:%M:%S")
+            intervention.date_deadline = date_deadline_str
 
 
     @api.depends('address_id', 'address_id.parent_id')
