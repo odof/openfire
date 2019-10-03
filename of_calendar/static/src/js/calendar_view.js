@@ -412,11 +412,11 @@ CalendarView.include({
             var min_time_utc = formats.format_value(res[0],descript) + ":00";
             var max_time_utc = formats.format_value(res[1],descript) + ":00";;
             var date_today = new Date();
-            var str_UTC = date_today.toUTCString();
-            var str_prefix = str_UTC.substring(0,17);
-            var str_suffix = str_UTC.substring(25);
-            var minUTC = new Date(str_prefix + min_time_utc + str_suffix );
-            var maxUTC = new Date(str_prefix + max_time_utc + str_suffix );
+            var UTC_str = date_today.toUTCString();
+            var prefix_str = UTC_str.substring(0,17);
+            var suffix_str = UTC_str.substring(25);
+            var minUTC = new Date(prefix_str + min_time_utc + suffix_str );
+            var maxUTC = new Date(prefix_str + max_time_utc + suffix_str );
             self.minTime = minUTC.toLocaleTimeString();
             self.maxTime = maxUTC.toLocaleTimeString();
             //console.log("MIN MAX",self.minTime,self.maxTime);

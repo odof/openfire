@@ -65,11 +65,11 @@ class ReportPlanningGeneralSemaine(models.AbstractModel):
 
         for interv in interventions:
             # Datetime UTC
-            dt_utc = datetime.strptime(interv.date, "%Y-%m-%d %H:%M:%S")
+            date_utc_str = datetime.strptime(interv.date, "%Y-%m-%d %H:%M:%S")
             # Datetime local
-            dt_local = fields.Datetime.context_timestamp(interv, dt_utc)
+            date_locale_dt = fields.Datetime.context_timestamp(interv, date_utc_str)
 
-            day = dt_local.weekday()
+            day = date_locale_dt.weekday()
             if day not in days:
                 days.append(day)
 
@@ -77,7 +77,7 @@ class ReportPlanningGeneralSemaine(models.AbstractModel):
                 if not res or res[-1][0] != employee.name:
                     res.append([employee.name, {}])
 
-            heure = dt_local.strftime("%H:%M")
+            heure = date_locale_dt.strftime("%H:%M")
 
             employee_jours_dict = res[-1][1]
             employee_jours_dict.setdefault(day, [False, []])[1].append((heure, interv))

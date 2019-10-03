@@ -755,7 +755,7 @@ PlanningView.Row = Widget.extend({
      willStart: function () {
         console.log("WILLSTART PlanningView.Row");
         var self = this;
-        var horaires_prom = this.get_dict_horaires().promise();
+        var horaires_prom = this.get_horaires_dict().promise();
         
 
         return $.when(horaires_prom,this._super())
@@ -767,19 +767,19 @@ PlanningView.Row = Widget.extend({
     /**
      *
      */
-    get_dict_horaires: function () {
+    get_horaires_dict: function () {
         var self = this;
         var dfd_1 = $.Deferred();
         var p1 = dfd_1.promise();
         return $.when();
         /*/var p2 = dfd_2.promise();
-        //var str_d_range_start = this.view.range_start.toLacol
+        //var d_range_start_str = this.view.range_start.toLacol
 
-        this.model.call('get_dict_horaires', [[this.res_id], this.view.range_start, this.view.range_stop])
+        this.model.call('get_horaires_dict', [[this.res_id], this.view.range_start, this.view.range_stop])
         .then(function (res) {
-            self.dict_horaires = res[self.res_id]["dict_horaires"];
+            self.horaires_dict = res[self.res_id]["horaires_dict"];
             self.jours_travailles = res[self.res_id]["jours_travailles"];
-            self.dict_horaires_temp = res[self.res_id]["dict_horaires_temp"];
+            self.horaires_dict_temp = res[self.res_id]["horaires_dict_temp"];
             self.jours_temp_travailles = res[self.res_id]["jours_temp_travailles"];
             self.horaires_temp_start = res[self.res_id]["horaires_temp_start"];
             self.horaires_temp_stop = res[self.res_id]["horaires_temp_stop"];
@@ -903,45 +903,45 @@ PlanningView.Row = Widget.extend({
                 self.records_multiples[planning_record.id] = [];
                 planning_record["hours_cols"] = {};
                 planning_record.$of_el = {};
-                var a_push, dict_horaires;
+                var a_push, horaires_dict;
                 var descript_ft = {type: "float_time"};
                 for (var i=planning_record.col_offset_start; i<=planning_record.col_offset_stop; i++) {
                     a_push = true;
                     
                     if (i>=0 && i<self.column_nb) {
                         planning_record.$of_el[i] = planning_record.$el.clone(true);
-                        dict_horaires = self.segments_horaires[self.col_offset_to_segment[i]][2];  // récupérer le bon dict_horaires
+                        horaires_dict = self.segments_horaires[self.col_offset_to_segment[i]][2];  // récupérer le bon horaires_dict
                         //console.log("pushed to column ",i);
-                        //console.log("dict_horaires",dict_horaires);
+                        //console.log("horaires_dict",horaires_dict);
                         planning_record["hours_cols"][i] = {};
                         if (i == planning_record.col_offset_start) {  // first day
-                            if ( isNullOrUndef(dict_horaires[i + 1]) || dict_horaires[i + 1] == [] ) {  // jour non travaillé. peut arriver pour une intervention de plusieurs jours qui commence le dimanche
+                            if ( isNullOrUndef(horaires_dict[i + 1]) || horaires_dict[i + 1] == [] ) {  // jour non travaillé. peut arriver pour une intervention de plusieurs jours qui commence le dimanche
                                 planning_record["hours_cols"][i].heure_debut = false;
                                 planning_record["hours_cols"][i].heure_fin = false;
                                 a_push = false;
                             }else{
                                 planning_record["hours_cols"][i].heure_debut = planning_record.heure_debut;
-                                planning_record["hours_cols"][i].heure_fin = dict_horaires[i+1][dict_horaires[i+1].length-1][1]  // heure de fin du dernier créneau du jour
+                                planning_record["hours_cols"][i].heure_fin = horaires_dict[i+1][horaires_dict[i+1].length-1][1]  // heure de fin du dernier créneau du jour
                             
                             }
                         }else if (i >= planning_record.col_offset_start && i < planning_record.col_offset_stop) {
-                            if ( isNullOrUndef(dict_horaires[i + 1]) || dict_horaires[i + 1] == [] ) {  // jour non travaillé
+                            if ( isNullOrUndef(horaires_dict[i + 1]) || horaires_dict[i + 1] == [] ) {  // jour non travaillé
                                 console.log("jour non travaillé pour ",self.res_id);
                                 console.log("i",i);
                                 planning_record["hours_cols"][i].heure_debut = false;
                                 planning_record["hours_cols"][i].heure_fin = false;
                                 a_push = false;
                             }else{
-                                planning_record["hours_cols"][i].heure_debut = dict_horaires[i+1][0][0]  // heure de début du premier créneau du jour
-                                planning_record["hours_cols"][i].heure_fin = dict_horaires[i+1][dict_horaires[i+1].length-1][1]  // heure de fin du dernier créneau du jour
+                                planning_record["hours_cols"][i].heure_debut = horaires_dict[i+1][0][0]  // heure de début du premier créneau du jour
+                                planning_record["hours_cols"][i].heure_fin = horaires_dict[i+1][horaires_dict[i+1].length-1][1]  // heure de fin du dernier créneau du jour
                             }
                         }else if (i == planning_record.col_offset_stop) {  // last day
-                            if ( isNullOrUndef(dict_horaires[i + 1]) || dict_horaires[i + 1] == [] ) {  // jour non travaillé. peut arriver pour une intervention de plusieurs jours qui termine la semaine suivante
+                            if ( isNullOrUndef(horaires_dict[i + 1]) || horaires_dict[i + 1] == [] ) {  // jour non travaillé. peut arriver pour une intervention de plusieurs jours qui termine la semaine suivante
                                 planning_record["hours_cols"][i].heure_debut = false;
                                 planning_record["hours_cols"][i].heure_fin = false;
                                 a_push = false;
                             }else{
-                                planning_record["hours_cols"][i].heure_debut = dict_horaires[i+1][0][0]  // heure de début du premier créneau du jour
+                                planning_record["hours_cols"][i].heure_debut = horaires_dict[i+1][0][0]  // heure de début du premier créneau du jour
                                 planning_record["hours_cols"][i].heure_fin = planning_record.heure_fin;
                             }
                         }

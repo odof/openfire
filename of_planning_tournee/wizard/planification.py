@@ -83,7 +83,7 @@ class OfTourneePlanification(models.TransientModel):
 
         equipe = tournee.equipe_id
         date_intervention = tournee.date
-        d_date_intervention = fields.Date.from_string(date_intervention)
+        date_intervention_da = fields.Date.from_string(date_intervention)
 
         # Comme on n'affiche que les heures, il faut s'assurer de rester dans le bon jour
         #   (pour les interventions étalées sur plusieurs jours)
@@ -102,7 +102,7 @@ class OfTourneePlanification(models.TransientModel):
                     equipe_hor_list.append([equipe.hor_md, equipe.hor_mf])
                     equipe_hor_list.append([equipe.hor_ad, equipe.hor_af])
             else:  # mode avancé
-                le_num_jour = d_date_intervention.isoweekday()
+                le_num_jour = date_intervention_da.isoweekday()
                 les_creneaux = equipe.of_creneau_ids.filtered(lambda x: x.jour_number == le_num_jour)
                 if equipe.of_creneau_temp_start:  # des horaires temporaires: à prendre en compte?
                     if equipe.of_creneau_temp_start <= date_intervention and date_intervention <= equipe.of_creneau_temp_stop:  # oui
