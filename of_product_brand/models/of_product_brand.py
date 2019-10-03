@@ -176,7 +176,11 @@ class ProductProduct(models.Model):
         for product in self:
             if not product.default_code:
                 continue
-            if self.search([('default_code', '=', product.default_code), ('brand_id', '=', product.brand_id.id), ('product_tmpl_id', '!=', product.product_tmpl_id.id)]):
+            if self.with_context(active_test=False).search([
+                ('default_code', '=', product.default_code),
+                ('brand_id', '=', product.brand_id.id),
+                ('product_tmpl_id', '!=', product.product_tmpl_id.id)
+            ], limit=1):
                 raise ValidationError(_('Product reference must be unique per brand !\nReference : %s') % product.default_code)
 
     @api.onchange('brand_id')
