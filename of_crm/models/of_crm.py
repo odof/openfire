@@ -312,6 +312,10 @@ Ce champ se met à jour automatiquement sur confirmation de commande et sur vali
 
     meeting_ids = fields.Many2many('calendar.event', 'calendar_event_res_partner_rel', string='Meetings')
     of_prospecteur_id = fields.Many2one("res.users", string="Prospecteur", oldname='of_prospecteur')
+    # Les champs suivants ne sont pas utilisés, mais permettent un affichage en vue liste des contacts
+    #   grâce au list editor.
+    of_quotations_count = fields.Integer(compute='_compute_of_quotations_count', string='Nb devis')
+    of_sale_order_quot_count = fields.Integer(compute='_compute_of_sale_order_quot_count', string='Nb dev+cmd')
 
     @api.model
     def _init_prospects(self):
@@ -356,24 +360,30 @@ Ce champ se met à jour automatiquement sur confirmation de commande et sur vali
         else:
             _logger.info(u"fonction '_init_prospects': %d clients ont été traités" % (len_done))
 
+    def of_compute_sale_orders_count(self, field, state_domain=[]):
+        # retrieve all children partners and prefetch 'parent_id' on them
+        all_partners = self.search([('id', 'child_of', self.ids)])
+        all_partners.read(['parent_id'])
+
+        sale_order_groups = self.env['sale.order'].read_group(
+            domain=[('partner_id', 'in', all_partners.ids)] + state_domain,
+            fields=['partner_id'], groupby=['partner_id']
+        )
+        for group in sale_order_groups:
+            partner = self.browse(group['partner_id'][0])
+            while partner:
+                if partner in self:
+                    partner[field] += group['partner_id_count']
+                partner = partner.parent_id
+
+    def _compute_of_sale_order_quot_count(self):
+        self.of_compute_sale_orders_count('of_sale_order_quot_count', [('state', '!=', ['cancel'])])
+
+    def _compute_of_quotations_count(self):
+        self.of_compute_sale_orders_count('of_quotations_count', [('state', 'in', ['draft', 'sent'])])
+
     def _compute_sale_order_count(self):
-        """
-        Surcharge méthode du même nom pour ne pas compter les devis dans les ventes
-        """
-        # added domain value for states
-        sale_data = self.env['sale.order'].read_group(domain=[('partner_id', 'child_of', self.ids), ('state', 'in', ['sale', 'done'])],
-                                                      fields=['partner_id'], groupby=['partner_id'])
-        # read to keep the child/parent relation while aggregating the read_group result in the loop
-        partner_child_ids = self.read(['child_ids'])
-        mapped_data = dict([(m['partner_id'][0], m['partner_id_count']) for m in sale_data])
-        for partner in self:
-            # let's obtain the partner id and all its child ids from the read up there
-            partner_ids = filter(lambda r: r['id'] == partner.id, partner_child_ids)[0]
-            partner_ids = [partner_ids.get('id')] + partner_ids.get('child_ids')
-            # then we can sum for all the partner's child
-            # added of_customer_state
-            sale_order_count = sum(mapped_data.get(child, 0) for child in partner_ids)
-            partner.sale_order_count = sale_order_count
+        self.of_compute_sale_orders_count('sale_order_count', [('state', 'in', ['sale', 'done'])])
 
     @api.onchange('customer')
     def _onchange_customer(self):
