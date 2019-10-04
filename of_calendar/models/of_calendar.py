@@ -214,21 +214,21 @@ class HREmployee(models.Model):
             """Récupérer l'archive actuelle, si la date d'aujourd'hui existe déjà dans l'archive, on la remplace"""
             archive = employee.of_archive_horaires
             if archive:
-                les_morceaux = archive.split(u"\n")
-                for le_morceau in les_morceaux:
-                    la_date_str = le_morceau[2:12]  # la date commence au 3eme caractère
+                morceaux_list = archive.split(u"\n")
+                for morceau in morceaux_list:
+                    la_date_str = morceau[2:12]  # la date commence au 3eme caractère du morceau
                     if date_today_str == la_date_str:
-                        les_morceaux.remove(le_morceau)
+                        morceaux_list.remove(morceau)
                         break
             else:
-                les_morceaux = []
+                morceaux_list = []
             """Ajout date d'hier si besoin"""
-            if len(les_morceaux) > 0:
-                le_morceau = les_morceaux[-1]
-                if le_morceau[15] == u'f':  # le dernier morceau de la liste n'a pas de date de fin.
+            if len(morceaux_list) > 0:
+                morceau = morceaux_list[-1]
+                if morceau[15] == u'f':  # le dernier morceau de la liste n'a pas de date de fin.
                     date_hier_da = date_today_da - un_jour
                     date_hier_str = fields.Date.to_string(date_hier_da)
-                    les_morceaux[-1] = le_morceau[:15] + u'"' + date_hier_str + u'"' + le_morceau[20:]
+                    morceaux_list[-1] = morceau[:15] + u'"' + date_hier_str + u'"' + morceau[20:]
             """création de l'archive"""
             nouveau_morceau_dict = {}  # dict contenant les horaires de travail
             if employee.of_mode_horaires == u"advanced":  # mode avancé
@@ -243,8 +243,8 @@ class HREmployee(models.Model):
                 nouveau_morceau_str = u'["%s", false, %s]' % (date_today_str, json.dumps(nouveau_morceau_dict))
             else:  # lors de la permière création d'horaires, on considère que l'employé avait ces horaires depuis sa création
                 nouveau_morceau_str = u'["%s", false, %s]' % (employee.create_date[:10], json.dumps(nouveau_morceau_dict))
-            les_morceaux.append(nouveau_morceau_str)
-            nouvelle_archive = u"\n".join(les_morceaux)
+            morceaux_list.append(nouveau_morceau_str)
+            nouvelle_archive = u"\n".join(morceaux_list)
             employee.of_archive_horaires = nouvelle_archive
 
     @api.multi
@@ -252,16 +252,16 @@ class HREmployee(models.Model):
         for employee in self:
             archive = employee.of_archive_horaires_temp
             if archive:
-                les_morceaux = archive.split("\n")
+                morceaux_list = archive.split("\n")
                 """Vérification qu'il n'y a pas de chevauchement avec des dates d'horaires temporaires existants"""
-                for le_morceau in les_morceaux:
-                    la_liste = json.loads(le_morceau)
+                for morceau in morceaux_list:
+                    la_liste = json.loads(morceau)
                     if se_chevauchent(la_liste[0], la_liste[1], employee.of_creneau_temp_start, employee.of_creneau_temp_stop, False):
                         raise UserError(u"OH oh! le système nous dit qu'il y a du chevauchement au niveau de l'archive des horaires temporaires.\n"
                                         u"Pour que tout se passe bien, veuillez sélectionner des dates de début et de fin qui ne chevauchent pas des dates de début et de fin existantes dans l'archive.\n"
                                         u"dates source du conflit: entre le %s et le %s" % (la_liste[0], la_liste[1]))
             else:
-                les_morceaux = []
+                morceaux_list = []
             """Création du nouveau morceau et de l'archive"""
             nouveau_morceau_dict = {}  # dict contenant les horaires de travail temporaire
             for creneau in employee.of_creneau_temp_ids:
@@ -269,9 +269,9 @@ class HREmployee(models.Model):
                     nouveau_morceau_dict[creneau.jour_id.abr] = []
                 nouveau_morceau_dict[creneau.jour_id.abr].append((creneau.heure_debut, creneau.heure_fin))
             nouveau_morceau_str = u'["%s", "%s", %s]' % (employee.of_creneau_temp_start, employee.of_creneau_temp_stop, json.dumps(nouveau_morceau_dict))
-            les_morceaux.append(nouveau_morceau_str)
-            les_morceaux.sort(key=lambda x: x[2:12])  # si quelqu'un ajoute des horaires temporaires antérieurs à ceux déjà ajouté, BIM FOOLPROOF
-            nouvelle_archive = u"\n".join(les_morceaux)
+            morceaux_list.append(nouveau_morceau_str)
+            morceaux_list.sort(key=lambda x: x[2:12])  # si quelqu'un ajoute des horaires temporaires antérieurs à ceux déjà ajouté, BIM FOOLPROOF
+            nouvelle_archive = u"\n".join(morceaux_list)
             employee.of_archive_horaires_temp = nouvelle_archive
 
     @api.multi
