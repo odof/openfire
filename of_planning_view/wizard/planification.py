@@ -215,7 +215,7 @@ class OfPlanifCreneau(models.TransientModel):
         date_moins_un_mois_str = fields.Date.to_string(date_moins_un_mois_da)
         date_moins_3_semaines_str = fields.Date.to_string(date_moins_3_semaines_da)
         date_moins_2_semaines_str = fields.Date.to_string(date_moins_2_semaines_da)
-        taches_emp = self.employee_id.tache_ids
+        taches_emp = self.employee_id.of_tache_ids
         taches_possibles = taches_emp.filtered(lambda t: t.duree <= self.duree_creneau)  # seulement les taches suffisamment courtes a prendre en compte
         vals_list = []
         service_domain = [
