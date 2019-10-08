@@ -48,8 +48,8 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         product_obj = self.env['product.product']
         ds_product_obj = supplier.of_datastore_get_model(client, 'product.product')
         # --- Matching des références avec la base centrale ---
-        # Conversion des références article
-        convert_func = supplier.get_product_code_convert_func()
+        # Conversion des références article (référence locale -> référence cherchée sur base centrale)
+        convert_func = supplier.get_product_code_convert_func(from_datastore=False)
         code_to_match_dict = {convert_func[product.brand_id](product.default_code): product
                               for product in product_obj.browse(product_ids)}
         # Récupération des correspondances de la base centrale
@@ -218,7 +218,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
                 # On appelle product_obj.browse pour conserver le context d'origine et éviter des recalculs de cache.
                 supplier: product_obj.browse((supplier.brand_ids & brands)
                                              .with_context(active_test=False)
-                                             .mapped('product_variant_ids')._ids)
+                                             .mapped('product_variant_ids').ids)
                 for supplier in suppliers}
             _logger.info(u"OF TC : Début de mise à jour de marque : %s", ', '.join(brands.mapped('name')))
 

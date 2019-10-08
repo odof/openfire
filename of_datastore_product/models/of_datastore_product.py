@@ -121,7 +121,13 @@ class OfDatastoreSupplier(models.Model):
         }
 
     @api.multi
-    def get_product_code_convert_func(self, client=False):
+    def get_product_code_convert_func(self, client=False, from_datastore=True):
+        u"""
+        :param client: Connecteur ouvert vers la base centralisée.
+        :param from_datastore: Si True, la conversion se fait depuis la base centralisée vers la base locale.
+                               Si False, la conversion se fait depuis la base locale vers la base centralisée.
+        :return: fonction de conversion entre la référence de l'article centralisé et la référence locale
+        """
         self.ensure_one()
         if not client:
             client = self.of_datastore_connect()
@@ -131,16 +137,18 @@ class OfDatastoreSupplier(models.Model):
         default_code_func = {}
         for ds_brand in ds_brands_data:
             brand = brand_match[ds_brand['id']]
-            if brand.use_prefix and ds_brand['use_prefix'] and brand.code == ds_brand['code']:
+            brand_from = ds_brand if from_datastore else brand
+            brand_to = brand if from_datastore else ds_brand
+            if brand_from['use_prefix'] and brand_to['use_prefix'] and brand_from['code'] == brand_to['code']:
                 # Le préfixe est le même : on ne va pas le retirer pour le remettre!
                 default_code_func[brand] = lambda code: code
                 continue
-            if brand.use_prefix:
-                func = "lambda code: '%s_' + code" % brand.code
+            if brand_to['use_prefix']:
+                func = "lambda code: '%s_' + code" % brand_to['code']
             else:
                 func = "lambda code: code"
-            if ds_brand['use_prefix']:
-                func += '[%i:]' % (len(ds_brand['code']) + 1)
+            if brand_from['use_prefix']:
+                func += '[%i:]' % (len(brand_from['code']) + 1)
             default_code_func[brand] = eval(func)
         return default_code_func
 
