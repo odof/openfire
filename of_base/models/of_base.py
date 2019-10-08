@@ -10,6 +10,14 @@ from odoo.tools import OrderedSet
 from odoo.osv import expression
 
 class OfReadGroup(models.AbstractModel):
+    """
+    Cette classe permet d'effectuer un read_group sur un champ qui ne serait normalement pas accepté par Odoo.
+    Normalement, un read_group ne peut être effectué que sur un champ ayant le paramètre store=True.
+    Une classe héritant de of.readgroup peut en plus autoriser cette fonction sur les champs ayant le paramètre
+    of_custom_groupby.
+    Il faut ensuite surcharger _read_group_process_groupby afin de modifier la query et de retourner les
+    éléments nécessaire à son interprétation.
+    """
     _name = 'of.readgroup'
 
     @api.model

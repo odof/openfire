@@ -1,5 +1,4 @@
 <odoo>
-    <data>
 
         <!-- Page de connexion : remplacer email par indentifiant (login) -->
         <template id="of_base_login" name="Connexion indentifiant" inherit_id="web.login">
@@ -70,7 +69,7 @@
             </field>
         </record>
 
-   <record id="of_res_partner_tree" model="ir.ui.view">
+    <record id="of_res_partner_tree" model="ir.ui.view">
         <field name="name">of.res.partner.tree</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_tree" />
@@ -92,7 +91,7 @@
         </field>
     </record>
 
-   <record id="of_res_partner_filter" model="ir.ui.view">
+    <record id="of_res_partner_filter" model="ir.ui.view">
         <field name="name">of.res.partner.select</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_res_partner_filter" />
@@ -207,5 +206,9 @@
         </field>
     </record>
 
-    </data>
+    <!-- Vue tree par défaut pour les contacts -->
+    <record id="contacts.action_contacts_view_kanban" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+    </record>
+
 </odoo>

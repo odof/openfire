@@ -24,7 +24,7 @@ Personnalisation des fonctions de base Odoo :
 - Permet à l'auteur d'un mail de le recevoir en copie (par défaut odoo retire l'expéditeur de la liste des destinataires)
 """,
     'website' : "www.openfire.fr",
-    'depends' : ["product", "mail"],
+    'depends' : ['product', 'mail', 'contacts'],
     'category' : "OpenFire",
     'data' : [
         'data/report_paperformat.xml',
