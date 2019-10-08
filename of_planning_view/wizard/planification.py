@@ -2,21 +2,22 @@
 
 from odoo import api, models, fields
 from datetime import datetime, timedelta, date
-#import pytz
+import pytz
+import json
 from odoo.exceptions import UserError
 from odoo.tools.float_utils import float_compare
-#import urllib
+import urllib
 from math import asin, sin, cos, sqrt, radians
-#import requests
+import requests
 
-"""ROUTING_BASE_URL = "http://s-hotel.openfire.fr:5000/"
+ROUTING_BASE_URL = "http://s-hotel.openfire.fr:5000/"
 ROUTING_VERSION = "v1"
-ROUTING_PROFILE = "driving" """
+ROUTING_PROFILE = "driving"
 
 def hours_to_strs(*hours):
-    """ Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'
+    """ Convertit une liste d'heures sous forme de floats en liste de str de type '13h37'
     """
-    return tuple("%02dh%02d" % (hour, round((hour % 1) * 60)) for hour in hours)
+    return tuple("%dh%02d" % (hour, round((hour % 1) * 60)) if hour % 1 else "%dh" % (hour) for hour in hours)
 
 def voldwazo(lat1, lng1, lat2, lng2):
     u"""
@@ -29,13 +30,14 @@ def voldwazo(lat1, lng1, lat2, lng2):
 class OfPlanifCreneauProp(models.TransientModel):
     _name = 'of.planif.intervention'
     _description = u"Proposition d'intervention à programmer"
-    _order = "priorite DESC"
+    _order = "priorite DESC, distance_order"
 
     service_id = fields.Many2one("of.service", string="Service")
     creneau_id = fields.Many2one('of.planif.creneau', string=u"Créneau")
 
     partner_name = fields.Char(related='service_id.partner_id.name', readonly=True)
     partner_mobile = fields.Char(related='service_id.partner_id.mobile', readonly=True)
+    duree = fields.Float(related='service_id.duree')
     tache_name = fields.Char(related='service_id.tache_id.name', readonly=True)
     address_zip = fields.Char('Code Postal', size=24, related='service_id.address_id.zip', readonly=True)
     address_city = fields.Char('Ville', related='service_id.address_id.city', readonly=True)
@@ -43,23 +45,69 @@ class OfPlanifCreneauProp(models.TransientModel):
     geo_lng = fields.Float(related='service_id.geo_lng', readonly=True)
     precision = fields.Selection(related='service_id.precision', readonly=True)
 
-    distance_dwazo_prec = fields.Float(string=u'Distance du précédent', digits=(5, 5), compute="_compute_distance_dwazo", help="À vol d'oiseau")
-    distance_dwazo_suiv = fields.Float(string=u'Distance du suivant', digits=(5, 5), compute="_compute_distance_dwazo", help="À vol d'oiseau")
-
-    dummy_field = fields.Boolean(string=u"A VER?", compute="_compute_dummy_field")
+    distance_dwazo_prec = fields.Float(string=u'Distance du précédent', digits=(5, 5), compute="_compute_distance_dwazo", help=u"À vol d'oiseau")
+    distance_dwazo_suiv = fields.Float(string=u'Distance du suivant', digits=(5, 5), compute="_compute_distance_dwazo", help=u"À vol d'oiseau")
+    distance_reelle_prec = fields.Float(string=u'Distance du précédent', digits=(5, 5),
+                                       compute="_compute_distance_reelle", help=u"Réelle")
+    distance_reelle_suiv = fields.Float(string=u'Distance du suivant', digits=(5, 5), compute="_compute_distance_reelle",
+                                       help=u"Réelle")
+    distance_reelle_tota = fields.Float(string=u'Distance totale', digits=(5, 5),
+                                        compute="_compute_distance_reelle",
+                                        help=u"Réelle")
+    osrm_response = fields.Text(string=u"Réponse OSRM")
+    distance_order = fields.Float(string=u'Distance totale', digits=(5, 5), help=u"pour ordonner", default=99999.99999)
+    dummy_field = fields.Boolean(string=u"A VER?", compute="_compute_distance_reelle")
     priorite = fields.Integer(string=u"Priorité")
+    selected = fields.Boolean(string=u"Sélectionné")
 
     @api.multi
     @api.depends('geo_lat', 'geo_lng', 'creneau_id.geo_lat_prec', 'creneau_id.geo_lng_prec', 
                  'creneau_id.geo_lat_suiv', 'creneau_id.geo_lng_suiv')
-    def _compute_dummy_field(self):
+    def _compute_distance_reelle(self):
+        print "\nA VER?"
+        print len(self)
+        print "\n"
         for a_planifier in self:
             a_planifier.dummy_field = True
+            query = ROUTING_BASE_URL + "route/" + ROUTING_VERSION + "/" + ROUTING_PROFILE + "/"
+            # Listes de coordonnées : ATTENTION OSRM prend ses coordonnées sous form (lng, lat)
+            # lieu précédent
+            coords_str = str(a_planifier.creneau_id.geo_lng_prec) + "," + str(a_planifier.creneau_id.geo_lat_prec)
+            # lieu de l'intervention à programmer
+            coords_str += ";" + str(a_planifier.geo_lng) + "," + str(a_planifier.geo_lat)
+            # lieu suivant
+            coords_str += ";" + str(a_planifier.creneau_id.geo_lng_suiv) + "," + str(a_planifier.creneau_id.geo_lat_suiv)
+            query_send = urllib.quote(query.strip().encode('utf8')).replace('%3A', ':')
+            full_query = query_send + coords_str + "?"
+            try:
+                req = requests.get(full_query)
+                res = req.json()
+            except Exception as e:
+                raise UserError(
+                    u"Impossible de contacter le serveur de routage. Assurez-vous que votre connexion internet est opérationnelle et que l'URL est définie (%s)" % e)
+
+            if res and res.get('routes'):
+                legs = res['routes'][0]['legs']
+                a_planifier.distance_reelle_prec = round(legs[0][u'distance'] / 1000.0, 2)
+                a_planifier.distance_reelle_suiv = round(legs[1][u'distance'] / 1000.0, 2)
+                a_planifier.distance_reelle_tota = a_planifier.distance_reelle_prec + a_planifier.distance_reelle_suiv
+                a_planifier.distance_order = a_planifier.distance_reelle_tota
+                a_planifier.osrm_response = legs
+            else:
+                a_planifier.distance_reelle_prec = -1
+                a_planifier.distance_reelle_suiv = -1
+                a_planifier.distance_reelle_tota = -1
+                a_planifier.distance_order = 99999.99999
+                a_planifier.osrm_response = res
+
 
     @api.multi
-    @api.depends('geo_lat', 'geo_lng', 'creneau_id.geo_lat_prec', 'creneau_id.geo_lng_prec', 
+    @api.depends('geo_lat', 'geo_lng', 'creneau_id.geo_lat_prec', 'creneau_id.geo_lng_prec',
                  'creneau_id.geo_lat_suiv', 'creneau_id.geo_lng_suiv')
     def _compute_distance_dwazo(self):
+        print "\nDISTANCE DWAZO?"
+        print len(self)
+        print "\n"
         for a_planifier in self:
             if a_planifier.geo_lat == 0.0 or a_planifier.geo_lng == 0.0:
                 a_planifier.distance_dwazo_prec = -1
@@ -74,138 +122,31 @@ class OfPlanifCreneauProp(models.TransientModel):
             else:
                 a_planifier.distance_dwazo_suiv = voldwazo(a_planifier.geo_lat, a_planifier.geo_lng, a_planifier.creneau_id.geo_lat_suiv, a_planifier.creneau_id.geo_lng_suiv)
 
-    """@api.model
-    def get_candidats(self, date_creneau, duree_creneau, distance_max, address_prec_id, address_suiv_id):
-        un_mois = timedelta(days=30)
-        une_semaine = timedelta(days=7)
-        date_creneau_da = fields.Date.from_string(self.date_creneau)
-        date_un_mois_da = date_creneau_da + un_mois
-        date_1_semaine_da = date_creneau_da + une_semaine  # pour les services recurrents
-        date_2_semaines_da = date_creneau_da + 2 * une_semaine  # pour les services recurrents
-        date_moins_un_mois_da = date_creneau_da - un_mois  # pour les services recurrents
-        date_moins_3_semaines_da = date_creneau_da - 3 * une_semaine  # pour les services recurrents
-        date_moins_2_semaines_da = date_creneau_da - 2 * une_semaine  # pour les services recurrents
-        date_un_mois_str = fields.Date.to_string(date_un_mois_da)
-        date_1_semaine_str = fields.Date.to_string(date_1_semaine_da)
-        date_2_semaines_str = fields.Date.to_string(date_2_semaines_da)
-        date_moins_un_mois_str = fields.Date.to_string(date_moins_un_mois_da)
-        date_moins_3_semaines_str = fields.Date.to_string(date_moins_3_semaines_da)
-        date_moins_2_semaines_str = fields.Date.to_string(date_moins_2_semaines_da)
-        taches_possibles = self.env['of.planning.tache'].search([('duree', '<=', duree_creneau)])  # seulement les taches suffisamment courtes a prendre en compte
-        vals_list = []
-        # services
-        services = self.env['of.service'].search([
-            ('tache_id', 'in', taches_possibles._ids),
-            ('date_next', '<=', date_un_mois_str),  # ne pas proposer d'interventions à programmer dans plus d'un mois
-            '|',
-            '&', ('recurrence', '=', True), '|', ('date_fin', '=', False), ('date_fin', '>', self.date_creneau)  # pour les service récurrents, la date de fin est la date de fin du contrat
-            ('recurrence', '=', False),
-            ])
-        distance_max = self.distance_max * 1.3  # approximation
-
-        for service in services:
-            voldwazo_prec = voldwazo(service.geo_lat, service.geo_lng, address_prec_id.geo_lat, address_prec_id.geo_lng)
-            voldwazo_suiv = voldwazo(service.geo_lat, service.geo_lng, address_suiv_id.geo_lat, address_suiv_id.geo_lng)
-            priorite = 0
-            if voldwazo_prec > distance_max:  # trop loins
-                continue
-            if voldwazo_suiv > distance_max:
-                continue
-            if voldwazo_prec + voldwazo_suiv <= 5:
-                priorite += 3
-            elif voldwazo_prec + voldwazo_suiv <= 10:
-                priorite += 2
-            elif voldwazo_prec + voldwazo_suiv <= 15:
-                priorite += 1
-            if service.recurrence and (not service.date_fin or service.date_fin > date_un_mois_str):  # service recurrent sans date de fin ou qui termine dans + d'un mois
-                # on prend en compte la date de prochaine intervention
-                if service.date_next <= date_moins_un_mois_str:  # date de prochaine intervention il y a plus d'un mois: en retard!
-                    priorite += 3
-                elif service.date_next <= date_moins_3_semaines_str:  # date de prochaine intervention il y a plus de 3 semaines: à faire cette semaine
-                    priorite += 2
-                elif service.date_next <= date_moins_2_semaines_str:  # date de prochaine intervention il y a plus de 2 semaines: à faire cette quinzaine
-                    priorite += 1
-            # pas besoin de gérer le cas service récurrent déjà terminé grace au search plus haut
-            else:
-                # on prend en compte la date de fin
-                if service.date_fin < self.date_creneau:  # en retard!
-                    priorite += 3
-                elif service.date_fin <= date_1_semaine_str: # à faire cette semaine
-                    priorite += 2
-                elif service.date_fin <= date_2_semaines_str: # à faire cette quinzaine
-                    priorite += 1
-
-            vals = {
-                'priorite': priorite,
-                'service_id': service.id,
-            }
-            vals_list.append(vals)
-
-        return vals_list
-
-    @api.model
-    def peupler_candidats(self, date_creneau, duree_creneau, distance_max, address_prec_id, address_suiv_id):
-        vals_list = self.get_candidats(date_creneau, duree_creneau, distance_max, address_prec_id, address_suiv_id)
-        la_list = [(5, 0, 0)] + [(0, 0, values) for values in vals_list]
-
-        self.proposition_ids = la_list"""
+    @api.multi
+    def get_closer_one(self):
+        """Renvois la proposition dont la distance réelle est la plus petite parmis les éléments de self"""
+        min_prop = False
+        for prop in self:
+            if not min_prop:  # initialisation min_prop
+                min_prop = prop
+            elif prop.distance_reelle_tota < min_prop.distance_reelle_tota:  # nouveau min!
+                min_prop = prop
+        return min_prop
 
 
 class OfPlanifCreneau(models.TransientModel):
     _name = 'of.planif.creneau'
     _description = u'Prise de RDV depuis un créneau disponible'
-    """
-    @api.model
-    def _default_partner(self):
-        # Suivant que la prise de rdv se fait depuis la fiche client ou un service
-        if self._context.get('active_model', '') == 'res.partner':
-            partner_id = self._context['active_ids'][0]
-        elif self._context.get('active_model', '') == 'of.service':
-            partner_id = self.env['of.service'].browse(self._context['active_ids'][0]).partner_id.id
-        else:
-            return False
 
-        partner = self.env['res.partner'].browse(partner_id)
-        while partner.parent_id:
-            partner = partner.parent_id
-        return partner
-
-    @api.model
-    def _default_service(self):
-        active_model = self._context.get('active_model', '')
-        service = False
-        if active_model == "of.service":
-            service_id = self._context['active_ids'][0]
-            service = self.env["of.service"].browse(service_id)
-        elif active_model == "res.partner":
-            partner = self._default_partner()
-            if partner:
-                service = self.env['of.service'].search([('partner_id', '=', partner.id)], limit=1)
-        return service
-
-    @api.model
-    def _default_address(self):
-        partner_obj = self.env['res.partner']
-        active_model = self._context.get('active_model', '')
-        if active_model == "of.service":
-            service = self.env["of.service"].browse(self._context['active_ids'][0])
-            partner = service.partner_id
-            address = service.address_id
-        elif active_model == "res.partner":
-            partner = partner_obj.browse(self._context['active_ids'][0])
-            address = partner_obj.browse(partner.address_get(['delivery'])['delivery'])
-
-        if address and not (address.geo_lat or address.geo_lng):
-            address = partner_obj.search(['|', ('id', '=', partner.id), ('parent_id', '=', partner.id),
-                                          '|', ('geo_lat', '!=', 0), ('geo_lng', '!=', 0)],
-                                         limit=1) or address
-        return address or False
-    """
     date_creneau = fields.Date(string="Date du créneau")
+    num_jour = fields.Integer(string=u"numéro du jour", compute="_compute_num_jour")
     heure_debut_creneau = fields.Float(string=u'Heude de début', digits=(5, 5))
     heure_fin_creneau = fields.Float(string=u'Heude de fin', digits=(5, 5))
+    creneaux_reels = fields.Char(string=u"Créneaux réels")
+    creneaux_reels_formatted = fields.Char(string=u"Créneaux réels", compute="_compute_creneaux_reels_formatted")
     distance_max = fields.Integer("Distance max.",default=30)
     duree_creneau = fields.Float(string=u"Durée")#, compute="_compute_duree_creneau")
+    journee_finie = fields.Boolean(string=u"Journée entièrement planifiée")
     employee_id = fields.Many2one('hr.employee', string="Intervenant")
     # lieu précédent
     lieu_prec_id = fields.Many2one("res.partner", string="lieu précédent")
@@ -218,14 +159,39 @@ class OfPlanifCreneau(models.TransientModel):
     geo_lng_suiv = fields.Float(related='lieu_suiv_id.geo_lng', readonly=True)
     precision_suiv = fields.Selection(related='lieu_suiv_id.precision', readonly=True)
     secteur_id = fields.Many2one('of.secteur', string="Secteur", help="laisser vide pour ne pas restreindre à un secteur en particulier")
+    priorite_max = fields.Integer(string=u"Priorité max", help=u"Priorité la plus heute parmis les propositions")
 
     proposition_ids = fields.One2many('of.planif.intervention', 'creneau_id', string="propositions")#, compute="peupler_candidats")
+    selected_id = fields.Many2one('of.planif.intervention', string="Proposition")
+    heure_debut_rdv = fields.Float(string=u'Heude de début', digits=(5, 5))
+    duree_rdv = fields.Float(string=u"Durée")
+    description_rdv = fields.Html(string='Description')
+    employee_other_ids = fields.Many2many('hr.employee', string="Autres intervenants",
+                                          domain="[('est_intervenant', '=', True), ('id', '!=', employee_id)]")
 
-    @api.onchange("distance_max")
-    def onchange_distance_max(self):
-        # lancer l'auto-search
-        self.compute()
-        #self.peupler_candidats()
+    @api.depends('date_creneau')
+    def _compute_num_jour(self):
+        for creneau in self:
+            if creneau.date_creneau:
+                date_creneau_da = fields.Date.from_string(creneau.date_creneau)
+                creneau.num_jour = date_creneau_da.isoweekday()
+
+    @api.depends("creneaux_reels")
+    def _compute_creneaux_reels_formatted(self):
+        if self.creneaux_reels:
+            res_list = []
+            creneaux_reels_list = json.loads(self.creneaux_reels)
+            for creneau in creneaux_reels_list:
+                hours_str_list = hours_to_strs(creneau[0], creneau[1])
+                res_list.append("-".join(hours_str_list))
+            self.creneaux_reels_formatted = ", ".join(res_list)
+
+
+    @api.onchange('employee_other_ids')
+    def onchange_employee_other_ids(self):
+        self.ensure_one()
+        # verifier debut_sur_creneau
+
 
     @api.multi
     def compute(self):
@@ -253,6 +219,7 @@ class OfPlanifCreneau(models.TransientModel):
         taches_possibles = taches_emp.filtered(lambda t: t.duree <= self.duree_creneau)  # seulement les taches suffisamment courtes a prendre en compte
         vals_list = []
         service_domain = [
+            '|', ('jour_ids', 'in', self.num_jour), ('jour_ids', '=', False),  # les jours peuvent ne pas être renseignés
             ('tache_id', 'in', taches_possibles.ids),
             ('date_next', '<=', date_un_mois_str),  # ne pas proposer d'interventions à programmer dans plus d'un mois
             '|',
@@ -260,10 +227,21 @@ class OfPlanifCreneau(models.TransientModel):
             ('recurrence', '=', False),
         ]
         if self.secteur_id:
+            # dans le cas ou le secteur n'est pas renseigné, on regarde les codes postaux
+            for zip_range in self.secteur_id.zip_range_ids:
+                if zip_range.cp_min == zip_range.cp_max:
+                    service_domain.append('|')
+                    service_domain.append(('address_zip', '=', zip_range.cp_min))
+                else:
+                    service_domain.append('|')
+                    service_domain.append('&')
+                    service_domain.append(('address_zip', '>=', zip_range.cp_min))
+                    service_domain.append(('address_zip', '<=', zip_range.cp_max))
             service_domain.append(('secteur_tech_id', '=', self.secteur_id.id))
         # services
-        services = self.env['of.service'].search()
+        services = self.env['of.service'].search(service_domain)
         distance_max = self.distance_max * 1.3  # approximation
+        priorite_max = 0
 
         for service in services:
             voldwazo_prec = voldwazo(service.geo_lat, service.geo_lng, self.lieu_prec_id.geo_lat, self.lieu_prec_id.geo_lng)
@@ -296,17 +274,20 @@ class OfPlanifCreneau(models.TransientModel):
                     priorite += 2
                 elif service.date_fin <= date_2_semaines_str: # à faire cette quinzaine
                     priorite += 1
+            if priorite > priorite_max:
+                priorite_max = priorite
 
             vals = {
                 'priorite': priorite,
                 'service_id': service.id,
             }
             vals_list.append(vals)
+        self.priorite_max = priorite_max
 
         return vals_list
 
-    @api.model
-    def peupler_candidats(self):
+    @api.multi
+    def set_proposition_ids(self):
         self.ensure_one()
         vals_list = self.get_candidats()
         la_list = [(5, 0, 0)] + [(0, 0, values) for values in vals_list]
@@ -314,12 +295,171 @@ class OfPlanifCreneau(models.TransientModel):
         self.proposition_ids = la_list
 
     @api.multi
+    def set_selected_id(self):
+        self.ensure_one()
+        if not self.proposition_ids:
+            self.selected_id = False
+            return
+        prop_selected = self.proposition_ids.filtered(lambda p: p.selected == True)
+        if prop_selected:
+            prop_selected.selected = False
+        prop_prioritaires = self.proposition_ids.filtered(lambda p: p.priorite == self.priorite_max)
+        prop_prioritaires._compute_distance_reelle()
+        self.selected_id = prop_prioritaires.get_closer_one()
+        self.selected_id.selected = True
+        self.duree_rdv = self.selected_id.service_id.duree
+        #self.proposition_id.priorite += 1
+
+    @api.multi
     def button_dummy(self):
-        self.peupler_candidats()
+        self.set_proposition_ids()
+        self.set_selected_id()
         return {'type': 'ir.actions.do_nothing'}
+
+    @api.multi
+    def get_values_intervention_create(self):
+        self.ensure_one()
+
+        if not self._context.get('tz'):
+            self = self.with_context(tz='Europe/Paris')
+        tz = pytz.timezone(self._context['tz'])
+
+        employee = self.employee_id
+        service = self.selected_id.service_id
+        date_da = fields.Date.from_string(self.date_creneau)
+        date_propos_dt = datetime.combine(date_da, datetime.min.time()) + timedelta(
+            hours=self.heure_debut_rdv)  # datetime naive
+        date_propos_dt = tz.localize(date_propos_dt, is_dst=None).astimezone(pytz.utc)  # datetime utc
+        employee_ids = [self.employee_id.id] + self.employee_other_ids.ids
+
+        values = {
+            'hor_md': employee.of_mode_horaires == 'easy' and employee.of_hor_md or 0.0,
+            'hor_mf': employee.of_mode_horaires == 'easy' and employee.of_hor_mf or 0.0,
+            'hor_ad': employee.of_mode_horaires == 'easy' and employee.of_hor_ad or 0.0,
+            'hor_af': employee.of_mode_horaires == 'easy' and employee.of_hor_af or 0.0,
+            'jour_ids': employee.of_mode_horaires == 'easy' and [(4, id_j, 0) for id_j in employee.of_jour_ids._ids] or False,
+            'mode_horaires': employee.of_mode_horaires,
+            'of_creneau_ids': employee.of_mode_horaires == 'advanced' and [(4, id_j, 0) for id_j in employee.of_creneau_ids._ids] or False,
+            'partner_id': service.partner_id.id,
+            'address_id': service.address_id.id,
+            'tache_id': service.tache_id.id,
+            'service_id': service.id,
+            'employee_ids': [(6, 0, employee_ids)],  #[(4, self.employee_id.id, 0)] + [(4, id_emp, 0) for id_emp in self.employee_other_ids.ids],
+            'date': fields.Datetime.to_string(date_propos_dt),
+            'duree': self.duree_rdv,
+            'user_id': self._uid,
+            'company_id': service.address_id.company_id and service.address_id.company_id.id,
+            'name': service.name,
+            'description': self.description_rdv or '',
+            'state': 'confirm',
+            'verif_dispo': True,
+        }
+
+        return values
+
+    @api.multi
+    def create_intervention(self):
+        self.ensure_one()
+        intervention_vals = self.get_values_intervention_create()
+        return self.env['of.planning.intervention'].create(intervention_vals)
+
+    @api.multi
+    def button_confirm(self):
+        self.ensure_one()
+        intervention = self.create_intervention()
+        #if self.selected_id.service_id.recurrence:  # conception: calculer date next à la création de l'intervention ou à sa validation?
+        #    intervention.service_id.date_next = intervention.service_id.get_next_date(self.date_creneau)
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'of.planning.intervention',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_id': intervention.id,
+            'target': 'current',
+            'context': self._context,
+        }
+
+    @api.multi
+    def button_confirm_next(self):
+        self.ensure_one()
+        if not self._context.get('tz'):
+            self = self.with_context(tz='Europe/Paris')
+        intervention = self.create_intervention()
+        same_day = (intervention.date_deadline - intervention.date).days == 0
+        journee_finie = False
+        if same_day:  # réinitialiser les champs du wizard pour lancer une nouvelle recherche
+            date_fin_interv_locale_dt = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(intervention.date_deadline))
+            interv_heure_fin = round(date_fin_interv_locale_dt.hour +
+                                     date_fin_interv_locale_dt.minute / 60.0 +
+                                     date_fin_interv_locale_dt.second / 3600.0, 5)
+            creneaux = json.loads(self.creneaux_reels)
+            for i in range(len(creneaux)):
+                creneau = creneaux[i]
+                if creneau[0] <= interv_heure_fin <= creneau[1]:  # trouvé!
+                    if interv_heure_fin == creneau[1]:  # le créneau a été entièrement rempli: on le supprime
+                        if i < len(creneaux) - 1:  # il reste d'autres créneaux à planifier ce jour
+                            creneaux = creneaux[i+1:]
+                        else:  # la journée est totalement planifiée
+                            journee_finie = True
+                        break
+                    else:  # la nouvelle heure de début du créneau est l'heure de fin de l'intervention
+                        creneaux = creneaux[i:]
+                        creneaux[0][0] = interv_heure_fin
+                        break
+            else:
+                raise UserError(u"On dirait que cette journée est entièrement planifiée pour %s" % self.employee_id.name)
+        else:
+            journee_finie = True
+        if journee_finie:  # la journée est entièrement planifiée!
+            self.journee_finie = journee_finie
+            return {'type': 'ir.actions.do_nothing'}
+        self.creneaux_reels = json.dumps(creneaux)
+        self.duree_creneau -= intervention.duree
+        self.priorite_max = 0
+        self.proposition_ids.unlink()
+        self.heure_debut_creneau = interv_heure_fin
+        self.heure_debut_rdv = interv_heure_fin
+        return {'type': 'ir.actions.do_nothing'}
+
+
+
+
+
 
     """@api.multi
     @api.depends('heure_debut_creneau', 'heure_fin_creneau')
     def _compute_duree_creneau(self):
         for wizard in self:
             wizard.duree_creneau = wizard.heure_fin_creneau - wizard.heure_debut_creneau"""
+
+
+class OfPlanifCreneauSecteur(models.TransientModel):
+    _name = 'of.planif.creneau.secteur'
+    _description = u'Assigner un secteur à créneau disponible'
+
+    secteur_id = fields.Many2one('of.secteur', string="Secteur", help="Laisser vide pour retirer l'assignation de secteur")
+    employee_id = fields.Many2one('hr.employee', string="Intervenant", required=True)
+    date_creneau = fields.Date(string=u"Date du créneau", required=True)
+
+    @api.multi
+    def button_confirm(self):
+        self.ensure_one()
+        tournee_obj = self.env['of.planning.tournee']
+        tournee = tournee_obj.search([
+            ('employee_id', '=', self.employee_id.id),
+            ('date', '=', self.date_creneau)], limit=1)
+        if tournee:
+            tournee.secteur_id = self.secteur_id
+        elif self.secteur_id:
+            vals = {
+                'employee_id': self.employee_id.id,
+                'date': self.date_creneau,
+                'secteur_id': self.secteur_id.id,
+            }
+            tournee_obj.create(vals)
+        return
+
+    @api.multi
+    def button_cancel(self):
+        self.ensure_one()
+        return {'type': 'ir.actions.act_window_close'}
