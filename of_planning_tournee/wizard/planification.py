@@ -26,7 +26,7 @@ class OfTourneePlanification(models.TransientModel):
         partner_obj = self.env['res.partner']
         service_obj = self.env['of.service']
 
-        taches = tournee.employee_id.tache_ids
+        taches = tournee.employee_id.of_tache_ids
 
         date_tournee = tournee.date
         date_tournee_datetime = fields.Date.from_string(date_tournee)
@@ -467,7 +467,7 @@ class OfTourneePlanificationPartner(models.TransientModel):
     tache_id = fields.Many2one(related='service_id.tache_id')
     phone = fields.Char(compute='_get_phone')
 
-    tache_possible = fields.Many2many('of.planning.tache', related="wizard_id.tournee_id.employee_id.tache_ids", string="Intervention Possible")
+    tache_possible = fields.Many2many('of.planning.tache', related="wizard_id.tournee_id.employee_id.of_tache_ids", string="Intervention Possible")
 
     duree = fields.Float(string=u'Durée', required=True, digits=(12, 5))
     distance = fields.Float(string='Dist.tot.', digits=(12, 3))
