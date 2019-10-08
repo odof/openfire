@@ -56,20 +56,22 @@ class OfPlanningIntervention(models.Model):
                                                         ('employee_id', '=', employee_id)
                                                         ], limit=1)
         if tournee:
-            secteur_id = tournee.secteur_id.id
+            secteur = tournee.secteur_id
         else:
-            secteur_id = False
+            secteur = False
         index_courant = 0
         employee = self.env['hr.employee'].browse(int(employee_id))
         deb = creneaux_travailles[index_courant][0]  # début courant
         fin = creneaux_travailles[index_courant][1]  # fin courante
         creneaux = []
-        to_append = []
         vals={}
         lieu_depart = employee.of_address_depart_id and employee.of_address_depart_id.get_infos_lieu() or False
         lieu_retour = employee.of_address_retour_id and employee.of_address_retour_id.get_infos_lieu() or False
         lieu_deb = lieu_depart
+        vals['display_secteur'] = not intervention_heures
         for intervention, intervention_deb, intervention_fin in intervention_heures + [(False, 24, 24)]:
+            secteur = intervention and intervention.secteur_id or secteur
+            secteur_str = secteur and secteur.name or ""
             if not intervention:  # plus d'interventions, reste-t-il de la place avant la fin de la journée?
                 if deb and deb < fin:  # de la place sur ce créneau horaire
                     vals['heure_debut'] = deb
@@ -77,26 +79,31 @@ class OfPlanningIntervention(models.Model):
                     vals['lieu_debut'] = lieu_deb
                     vals['lieu_fin'] = lieu_retour
                     vals['duree'] = fin - deb
+                    vals['creneaux_reels'] = [(deb, fin)]
                 while len(creneaux_travailles) > index_courant + 1:  # rajouter le reste des créneaux s'il y en a
                     index_courant += 1
                     deb = creneaux_travailles[index_courant][0]  # début courant
                     fin = creneaux_travailles[index_courant][1]  # fin courante
                     vals['heure_fin'] = fin
                     vals['duree'] += fin - deb
+                    vals['creneaux_reels'].append((deb, fin))
                 if vals != {} and vals['duree'] >= duree_min:
-                    vals['secteur_id'] = secteur_id
+                    vals['secteur_id'] = secteur and secteur.id or False
+                    vals['secteur_str'] = secteur_str
                     creneaux.append(vals)
             elif deb and deb < intervention_deb:  # du temps avant le début de l'intervention
                 if fin < intervention_deb:  # l'intervention commence sur un autre creneau: préparation du créneau dispo
                     vals['heure_debut'] = deb
                     vals['heure_fin'] = fin
                     vals['duree'] = fin - deb
+                    vals['creneaux_reels'] = [(deb, fin)]
                     index_courant += 1
                     deb = creneaux_travailles[index_courant][0]  # début courant
                     fin = creneaux_travailles[index_courant][1]  # fin courante
                     while fin < intervention_deb:  # parcourir les créneaux jusqu'à arriver au créneau de l'intervention
                         vals['heure_fin'] = fin
                         vals['duree'] += fin - deb
+                        vals['creneaux_reels'].append((deb, fin))
                         index_courant += 1
                         deb = creneaux_travailles[index_courant][0]  # début courant
                         fin = creneaux_travailles[index_courant][1]  # fin courante
@@ -108,12 +115,15 @@ class OfPlanningIntervention(models.Model):
                 else:  # l'intervention commence sur ce même créneau
                     vals['heure_debut'] = deb
                     vals['duree'] = 0
+                    vals['creneaux_reels'] = []
                     vals['heure_fin'] = intervention_deb
                 vals['lieu_debut'] = lieu_deb
                 vals['lieu_fin'] = intervention.address_id and intervention.address_id.get_infos_lieu() or False
                 vals['duree'] += intervention_deb - deb
+                vals['creneaux_reels'].append((deb, intervention_deb))
                 if vals != {} and vals['duree'] >= duree_min:  # un créneau à ajouter
-                    vals['secteur_id'] = secteur_id
+                    vals['secteur_id'] = secteur and secteur.id or False
+                    vals['secteur_str'] = secteur_str
                     creneaux.append(vals)
                 vals = {}
                 if intervention_fin < fin:  # l'intervention se fini avant la fin du créneau horaire
@@ -256,6 +266,9 @@ class OfPlanningIntervention(models.Model):
                     fillerbar['nb_heures_disponibles'] = fillerbar['nb_heures_travaillees']
                     fillerbar['pct_disponible'] = 100.0
                     fillerbarzz.append(fillerbar)
+                    creneaux_dispo = intervention_obj.get_creneaux_dispo(employee_id, date_current_str,
+                                                                         intervention_liste, horaires_du_jour, 1.0)
+                    creneaux_dispozz.append(creneaux_dispo)
                     date_current_da += un_jour
                     date_current_str = fields.Date.to_string(date_current_da)
                     if segment_courant[1] and segment_courant[1] < date_current_str:  # segment_courant[1] == False quand segment sans date de fin
@@ -263,8 +276,6 @@ class OfPlanningIntervention(models.Model):
                             index_courant += 1
                             segment_courant = segments_horaires[index_courant]
                             i_col_offset_to_segment = index_courant
-                    creneaux_dispo = intervention_obj.get_creneaux_dispo(employee_id, date_current_str, intervention_liste, horaires_du_jour, 1.0)
-                    creneaux_dispozz.append(creneaux_dispo)
                     continue
 
                 nb_heures_occupees = 0.0

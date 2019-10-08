@@ -6,7 +6,7 @@
         <field name="model">of.planif.creneau</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
-            <form string="Planifier une intervention">
+            <form string="Planifier une intervention depuis un créneau">
                 <script>
                     $(document).ready(function(){
                         // élargir le pop-up
@@ -19,6 +19,8 @@
                         <field name="heure_debut_creneau" widget="float_time"/>
                         <field name="heure_fin_creneau" widget="float_time"/>
                         <field name="duree_creneau" widget="float_time"/>
+                        <field name="creneaux_reels"/>
+                        <field name="creneaux_reels_formatted"/>
                         <field name="distance_max"/>
                     </group>
                     <group>
@@ -26,21 +28,35 @@
                         <field name="lieu_prec_id"/>
                         <field name="lieu_suiv_id"/>
                         <field name="secteur_id" widget="selection"/>
+                        <field name="priorite_max"/>
                     </group>
                     <field name="proposition_ids" mode="tree" nolabel="1">
-                        <tree limit="3">
+                        <tree limit="5" colors="blue: selected==True;">
                             <field name="service_id" invisible="1"/>
+                            <field name="dummy_field" invisible="1"/>
                             <field name="priorite"/>
                             <field name="tache_name"/>
                             <field name="address_city"/>
                             <field name="address_zip"/>
                             <field name="distance_dwazo_prec"/>
                             <field name="distance_dwazo_suiv"/>
+                            <field name="distance_reelle_prec"/>
+                            <field name="distance_reelle_suiv"/>
+                            <field name="distance_reelle_tota"/>
+                            <field name="selected" invisible="1"/>
+                            <field name="distance_order" invisible="1"/>
                         </tree>
                     </field>
+                    <group>
+                        <field name="heure_debut_rdv" widget="float_time"/>
+                        <field name="duree_rdv" widget="float_time"/>
+                        <field name="employee_other_ids" widget="many2many_tags"/>
+                    </group>
                 </group>
                 <footer>
                     <button name="button_dummy" string="Rechercher" type="object" colspan="4" class="btn-primary"/>
+                    <button name="button_confirm" string="Confirmer &amp; Fermer" type="object" colspan="4" class="btn-primary"/>
+                    <button name="button_confirm_next" string="Confirmer &amp; Suivant" type="object" colspan="4" class="btn-primary"/>
                 </footer>
             </form>
         </field>
@@ -53,6 +69,38 @@
         view_mode="form"
         view_id="view_of_planif_wizard"
         id="action_view_of_planif_wizard"
+        target="new"
+        groups="of_planning.of_group_planning_intervention_modification_siens"
+    />
+
+    <record id="view_of_planif_creneau_secteur_wizard" model="ir.ui.view">
+        <field name="name">Assigner un secteur</field>
+        <field name="model">of.planif.creneau.secteur</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Planifier une intervention">
+                <group>
+                    <group>
+                        <field name="date_creneau"/>
+                        <field name="employee_id"/>
+                        <field name="secteur_id"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="button_confirm" string="Confirmer" type="object" colspan="4" class="btn-primary"/>
+                    <button string="Annuler" class="oe_link" colspan="4" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window
+        name="Assigner un secteur"
+        res_model="of.planif.creneau.secteur"
+        src_model="of.planning.intervention"
+        view_mode="form"
+        view_id="view_of_planif_creneau_secteur_wizard"
+        id="action_view_of_planif_creneau_secteur_wizard"
         target="new"
         groups="of_planning.of_group_planning_intervention_modification_siens"
     />

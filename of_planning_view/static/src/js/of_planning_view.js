@@ -1020,6 +1020,7 @@ var PlanningCreneauDispo = Widget.extend({
      */
     events: {
         'click .of_planning_creneau_action': 'on_planning_creneau_action_clicked',
+        'click .of_planning_creneau_secteur_action': 'on_planning_creneau_secteur_action_clicked',
     },
     init: function(row, view, record, options) {
         this._super(row);
@@ -1041,7 +1042,11 @@ var PlanningCreneauDispo = Widget.extend({
         this.heure_debut_str = formats.format_value(record.heure_debut,descript_ft);
         this.heure_fin_str = formats.format_value(record.heure_fin,descript_ft);
         this.duree = record.duree;
+        this.creneaux_reels = record.creneaux_reels;
+        //console.log("LES CRENEAUX REELS", this.creneaux_reels)
         this.secteur_id = record.secteur_id;
+        this.secteur_str = record.secteur_str;
+        this.display_secteur = record.display_secteur;
         var heures = Math.trunc(this.duree);
         var minutes = (this.duree - heures) * 60;
         if (!heures) {
@@ -1074,14 +1079,67 @@ var PlanningCreneauDispo = Widget.extend({
             })
     },
     /**
+     *  reloads, rerenders. after selecting a secteur
+     */
+    reload_secteur: function() {
+        var self = this;
+        var tournee_mod = new Model("of.planning.tournee")
+        return tournee_mod.query(['id', 'employee_id', 'date', 'secteur_id']) // retrieve secteur from db
+            .filter([['employee_id','=', self.row.res_id], ['date','=', self.date]]) // id
+            .limit(1)
+            .all()
+            .then(function (result){
+                //console.log("result tournee", result);
+                if (result.length == 1) {
+                    if (!result[0].secteur_id) {
+                        self.secteur_id = false;
+                        self.secteur_str = "";
+                    }else{
+                        self.secteur_id = result[0].secteur_id[0];
+                        self.secteur_str = result[0].secteur_id[1];
+                    }
+                }
+                return self.render();
+            });
+    },
+    /**
      *  Ouvre le pop-up de planification @todo fonction on_close
+     */
+    on_planning_creneau_secteur_action_clicked: function(ev){
+        ev.preventDefault();
+        //console.log(ev);
+        var self = this;
+        var action_id = "of_planning_view.action_view_of_planif_creneau_secteur_wizard"
+        var additional_context = {
+            "default_date_creneau": self.date,
+            "default_employee_id": self.row.res_id,
+            "default_secteur_id": self.secteur_id,
+        };  // à voir quoi mettre
+        //console.log("ADDITIONNAL CONTEXT",pyeval.eval('context', additional_context));
+
+        return data_manager.load_action(action_id, pyeval.eval('context', additional_context)).then(function(result) {
+                //console.log("LE RESUUUULT",result);
+                var options = {
+                    'additional_context': pyeval.eval('context', additional_context),  // pour une raison inconnue le additional_context n'est pas pris en compte avant
+                    'on_close': function () {self.reload_secteur();},
+                };  // @todo: appel reload_events
+                //return self.view.ViewManager.action_manager.ir_actions_act_window(result,options);
+                return self.view.ViewManager.action_manager.do_action(result,options);
+            }).then(function(){
+                //$(".o_form_buttons_edit").eq(0).hide();  // cacher les boutons "Sauvergarder" et "Annuler"
+            });
+    },
+    /**
+     *  Ouvre le pop-up de sélection de secteur @todo fonction on_close
      */
     on_planning_creneau_action_clicked: function(ev){
         ev.preventDefault();
+        console.log(ev);
         var self = this;
         var action_id = "of_planning_view.action_view_of_planif_wizard"
         var additional_context = {
             "default_heure_debut_creneau": self.heure_debut,
+            "default_heure_debut_rdv": self.heure_debut,
             "default_heure_fin_creneau": self.heure_fin,
             "default_lieu_prec_id": self.lieu_debut.id || false,
             "default_lieu_suiv_id": self.lieu_fin.id|| false,
@@ -1089,6 +1147,7 @@ var PlanningCreneauDispo = Widget.extend({
             "default_duree_creneau": self.duree,
             "default_employee_id": self.row.res_id,
             "default_secteur_id": self.secteur_id,
+            "default_creneaux_reels": self.creneaux_reels.length > 1 ? self.creneaux_reels : false,
         };  // à voir quoi mettre
         console.log("ADDITIONNAL CONTEXT",pyeval.eval('context', additional_context));
 
@@ -1096,7 +1155,7 @@ var PlanningCreneauDispo = Widget.extend({
                 console.log("LE RESUUUULT",result);
                 var options = {
                     'additional_context': pyeval.eval('context', additional_context),  // pour une raison inconnue le additional_context n'est pas pris en compte avant
-                    'on_close': function () {return},
+                    'on_close': function () {return },
                 };  // @todo: appel reload_events
                 //return self.view.ViewManager.action_manager.ir_actions_act_window(result,options);
                 return self.view.ViewManager.action_manager.do_action(result,options);
@@ -1116,6 +1175,11 @@ var PlanningRecord = Widget.extend({
         this.id = record.id;
         this._super(row);
         this.row = row;
+        if (!this.row.record_consoled) {
+            console.log("PlanningRecord",record);
+            console.log("row color",this.row.color_bg);
+            this.row.record_consoled = true;
+        }
         this.view = view;
         this.options = options;
         //this.color_bg = options.color_bg;
@@ -1148,6 +1212,12 @@ var PlanningRecord = Widget.extend({
         this.address_zip = record.address_zip;
         this.partner_name = record.partner_name;
         this.tache_name = record.tache_name;
+        if (record[this.view.resource].length > 1) {  // several attendees
+            this.attendee_other_ids = _.reject(record[this.view.resource], function (attendee_id) { return attendee_id == self.row.res_id})
+            console.log("this.attendee_other_ids",this.attendee_other_ids);
+        }else{
+            this.attendee_other_ids = []
+        }
 
         //this.init_content(record);
         //console.log('MapRecord this: ',this);
@@ -1158,7 +1228,7 @@ var PlanningRecord = Widget.extend({
         if (isNullOrUndef(col_index)) {
             col_index = Math.max(self.col_offset_start, 0);
         }
-        console.log("PLANNING_RECORD RENDER",col_index);
+        //console.log("PLANNING_RECORD RENDER",col_index);
         self.color_bg = self.row.color_bg;
         self.color_ft = self.row.color_ft;
         if (isNullOrUndef(self.col_offset_stop)) {  // 1 day event
