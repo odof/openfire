@@ -11,13 +11,13 @@
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='job_id']" position="after">
-                <field name="est_intervenant"/>
+                <field name="of_est_intervenant"/>
             </xpath>
             <xpath expr="//notebook" position="inside">
-                <page name="interventions" string="Interventions" attrs="{'invisible': [('est_intervenant','=', False)]}">
+                <page name="interventions" string="Interventions" attrs="{'invisible': [('of_est_intervenant','=', False)]}">
                     <group>
-                        <field name="equipe_ids" widget="many2many_tags"/>
-                        <field name="tache_ids" widget="many2many"/>
+                        <field name="of_equipe_ids" widget="many2many_tags"/>
+                        <field name="of_tache_ids" widget="many2many"/>
                     </group>
                 </page>
             </xpath>
