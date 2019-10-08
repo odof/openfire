@@ -444,6 +444,7 @@ CalendarView.include({
         fc.editable = this.draggable;
         fc.minTime = this.minTime;
         fc.maxTime = this.maxTime;
+        fc.timeFormat = fc.timeFormat.replace(':ss', '');
         // callback
         fc.eventAfterAllRender = function(view) {
             if (!isNullOrUndef(self.first_evt)) {
