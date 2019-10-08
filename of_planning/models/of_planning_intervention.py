@@ -4,6 +4,9 @@ from __builtin__ import False
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.addons.of_planning_tournee.wizard.rdv import ROUTING_BASE_URL, ROUTING_VERSION, ROUTING_PROFILE
+import urllib
+import requests
 import re
 import pytz
 
@@ -13,9 +16,6 @@ from odoo.tools.safe_eval import safe_eval
 
 from odoo.tools.float_utils import float_compare
 
-ROUTING_BASE_URL = "http://s-hotel.openfire.fr:5000/"
-ROUTING_VERSION = "v1"
-ROUTING_PROFILE = "driving"
 
 @api.model
 def _tz_get(self):
@@ -41,6 +41,10 @@ class OfPlanningTache(models.Model):
     _name = "of.planning.tache"
     _description = u"Planning OpenFire : Tâches"
 
+    @api.model
+    def _get_employee_ids_domaim(self):
+        return [('of_est_intervenant', '=', True)]
+
     name = fields.Char(u'Libellé', size=64, required=True)
     description = fields.Text('Description')
     verr = fields.Boolean(u'Verrouillé')
@@ -53,7 +57,7 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
     is_crm = fields.Boolean(u'Tâche CRM')
     equipe_ids = fields.Many2many('of.planning.equipe', 'equipe_tache_rel', 'tache_id', 'equipe_id', u'Équipes qualifiées')
     employee_ids = fields.Many2many('hr.employee', 'employee_tache_rel', 'tache_id', 'employee_id', u'Employés qualifiés',
-                                    domain="[('of_est_intervenant', '=', True)]")
+                                    domain=_get_employee_ids_domaim)
     employee_nb = fields.Integer(string=u'Nombre d\'intervenants', default=1)
 
     @api.multi
@@ -67,10 +71,14 @@ class OfPlanningEquipe(models.Model):
     _description = u"Équipe d'intervention"
     _order = "sequence, name"
 
+    @api.model
+    def _get_employee_ids_domaim(self):
+        return [('of_est_intervenant', '=', True)]
+
     @api.multi
     def check_no_overlapping(self):
         for equipe in self:
-            for i in range(1,8):
+            for i in range(1, 8):
                 creneaux_du_jour = equipe.of_creneau_ids.filtered(lambda jour: jour.jour_number == i)
                 la_len = len(creneaux_du_jour)
                 for j in range(la_len):
@@ -107,7 +115,7 @@ class OfPlanningEquipe(models.Model):
     name = fields.Char(u'Équipe', size=128, required=True)
     note = fields.Text('Description')
     employee_ids = fields.Many2many('hr.employee', 'of_planning_employee_rel', 'equipe_id', 'employee_id', u'Employés',
-                                    domain="[('of_est_intervenant', '=', True)]")
+                                    domain=_get_employee_ids_domaim)
     active = fields.Boolean('Actif', default=True)
     category_ids = fields.Many2many('hr.employee.category', 'equipe_category_rel', 'equipe_id', 'category_id', u'Catégories')
     intervention_ids = fields.One2many('of.planning.intervention', 'equipe_id', u'Interventions liées', copy=False)
@@ -127,8 +135,8 @@ class OfPlanningEquipe(models.Model):
 
     # Ajout des horaires avancés
     mode_horaires = fields.Selection([
-        ("easy","Facile"),
-        ("advanced",u"Avancé")], string="Mode de Sélection des horaires", required=True, default="easy")
+        ("easy", "Facile"),
+        ("advanced", u"Avancé")], string="Mode de Sélection des horaires", required=True, default="easy")
     profil_id = fields.Many2one("of.horaires.profil", "Profil")
     of_creneau_ids = fields.Many2many("of.horaires.creneau", "equipe_creneaux", "equipe_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
     of_creneau_temp_ids = fields.Many2many("of.horaires.creneau", "equipe_creneaux_temp", "equipe_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
@@ -170,8 +178,8 @@ class OfPlanningEquipe(models.Model):
         else:"""
         if self.employee_ids[0].mode_horaires == 'advanced':
             if len(self.employee_ids) == 1:  # un employé
-                self.of_creneau_ids = [(4,le_id,False) for le_id in self.employee_ids[0].of_creneau_ids._ids]
-                self.of_creneau_temp_ids = [(4,le_id,False) for le_id in self.employee_ids[0].of_creneau_temp_ids._ids]
+                self.of_creneau_ids = [(4, le_id, False) for le_id in self.employee_ids[0].of_creneau_ids._ids]
+                self.of_creneau_temp_ids = [(4, le_id, False) for le_id in self.employee_ids[0].of_creneau_temp_ids._ids]
                 self.of_creneau_temp_start = self.employee_ids[0].of_creneau_temp_start
                 self.of_creneau_temp_stop = self.employee_ids[0].of_creneau_temp_stop
             else:  # plusieurs employés /!\ ne gère pas les créneaux temporaires
@@ -180,7 +188,7 @@ class OfPlanningEquipe(models.Model):
                 for ce_creneau in self.employee_ids[0].of_creneau_ids:  # on teste tous les créneaux du premier employé et on ne garde que ceux qui sont aussi dans tous les autres employés
                     if les_employees.possede_creneau(ce_creneau.id):
                         les_creneaux |= ce_creneau
-                self.of_creneau_ids = [(4,le_id,False) for le_id in les_creneaux._ids]
+                self.of_creneau_ids = [(4, le_id, False) for le_id in les_creneaux._ids]
         if not self.category_ids:
             category_ids = []
             for employee in self.employee_ids:
@@ -203,146 +211,8 @@ class OfPlanningEquipe(models.Model):
                     raise ValidationError(u"L'heure doit être inférieure ou égale à 24")
             if hors[0] > hors[1] or hors[2] > hors[3]:
                 raise ValidationError(u"L'heure de début ne peut pas être supérieure à l'heure de fin")
-            if(hors[1] > hors[2]):
+            if hors[1] > hors[2]:
                 raise ValidationError(u"L'heure de l'après-midi ne peut pas être inférieure à l'heure du matin")
-
-    """
-    à voir si adapter cette fonction à partir de la nouvelle version présente dans les employés ou si la supprimer totalement
-    @api.model
-    def get_horaires_dict(self, equipe_ids, date_start, date_stop):
-        # transformer date_start et date_stop en date locale
-        date_start_naive_dt = datetime.strptime(date_start, "%Y-%m-%d %H:%M:%S")  # datetime naif
-        date_start_utc_dt = pytz.utc.localize(date_start_naive_dt, is_dst=None)  # datetime utc
-        date_stop_naive_dt = datetime.strptime(date_stop, "%Y-%m-%d %H:%M:%S")  # datetime naif
-        date_stop_utc_dt = pytz.utc.localize(date_stop_naive_dt, is_dst=None)  # datetime utc
-
-        res = {}
-        compare_precision = 5
-        for equipe in self.browse(equipe_ids):
-            # en cas d'équipes sur différentes timezones
-            tz = pytz.timezone(equipe.tz or "Europe/Paris")
-            date_start_local_dt = date_start_utc_dt.astimezone(tz)  # datetime local
-            date_stop_local_dt = date_stop_utc_dt.astimezone(tz)  # datetime local
-            date_start_str = fields.Date.to_string(date_start_local_dt)
-            date_stop_str = fields.Date.to_string(date_stop_local_dt)
-            #jours_travailles = []  # liste contenant les jours travaillés [jours travaillés]
-            horaires_dict = {}  # dictionnaire contenant les horaires par jour {1: [(9, 12), (14, 18)], 2:[], ...}
-            jours_temp_travailles = []  # liste contenant les jours travaillés temporaires [jours_temp travaillés]
-            horaires_temp_dict = {}  # dictionnaire contenant les horaires temporaires par jour {1: [(9, 12), (14, 18)], 2:[], ...}
-            horaires_temp = False  # booléen qui nous dit si il faut prendre en compte des horaires temporaires
-            equipe_id = equipe.id
-            if equipe.mode_horaires == "easy":
-                # On utilise le mode facile pour les horaires de cette équipe
-                jours_travailles = [jour.numero for jour in equipe.jour_ids] if equipe.jour_ids else range(1, 6)
-                for i in range(1,8):
-                    horaires_dict[i] = []
-                    if i in jours_travailles:
-                        # hor_mf - hor_md > 0 ?
-                        if float_compare(equipe.hor_mf, equipe.hor_md, compare_precision)  > 0.0:
-                            horaires_dict[i].append((equipe.hor_md, equipe.hor_mf))
-                        # hor_af - hor_ad > 0 ?
-                        if float_compare(equipe.hor_af, equipe.hor_ad, compare_precision)  > 0.0:
-                            horaires_dict[i].append((equipe.hor_ad, equipe.hor_af))
-            else: # On utilise le mode avancé pour les horaires de cette équipe
-                # l'équipe a-t-elle des horaires temporaires qui peuvent interférer avec ses horaires par défaut sur cette recherche??
-                if equipe.of_creneau_temp_stop and equipe.of_creneau_temp_stop >= date_start_str and equipe.of_creneau_temp_start <= date_stop_str:
-                    horaires_temp = True
-                    temp_start_str = max(equipe.of_creneau_temp_start, date_start_str)
-                    temp_stop_str = min(equipe.of_creneau_temp_stop, date_stop_str)
-                    creneaux_temp_travailles = equipe.of_creneau_temp_ids
-                    for i in range(1,8):
-                        horaires_temp_dict[i] = []
-                        creneaux_temp_du_jour = creneaux_temp_travailles.filtered(lambda x: x.jour_number == i)
-                        for c in creneaux_temp_du_jour:
-                            horaires_temp_dict[i].append((c.heure_debut, c.heure_fin))
-                    jours_temp_travailles = [j for j in horaires_temp_dict if horaires_temp_dict[j] != []]
-
-                creneaux_travailles = equipe.of_creneau_ids
-                for i in range(1,8):
-                    horaires_dict[i] = []
-                    creneaux_du_jour = creneaux_travailles.filtered(lambda x: x.jour_number == i)
-                    for c in creneaux_du_jour:
-                        horaires_dict[i].append((c.heure_debut, c.heure_fin))
-                jours_travailles = [j for j in horaires_dict if horaires_dict[j] != []]
-            res[equipe_id] = {
-                'horaires_dict': horaires_dict,
-                'jours_travailles': jours_travailles,
-                }
-            if horaires_temp:
-                res[equipe_id]['horaires_temp_dict'] = horaires_temp_dict
-                res[equipe_id]['jours_temp_travailles'] = jours_temp_travailles
-                res[equipe_id]['horaires_temp_start'] = temp_start_str
-                res[equipe_id]['horaires_temp_stop'] = temp_stop_str
-        return res"""
-
-    """
-    À refaire ou supprimer quand passage à l'étape vue planning
-    @api.model
-    def get_min_max_time(self):
-        "" "
-        parcours toutes équipes pour trouver les heures minimales et maximales de travail. 
-        Appelée depuis la CalendarView si l'attribut 'working_hours' est à "1". Sert à restreindre la vue Calendar pour ne pas voir les heures entre 0 et min, ni celles entre max et 24
-        renvois les valeurs en UTC
-        /!| Cette fonction est appelée avant de savoir les dates de début et de fin. on prend donc tous les horaires possibles
-        "" "
-        equipes = self.env['of.planning.equipe'].search([])
-        min_time = False
-        max_time = False
-        min_equipe = False
-        max_equipe = False
-        today_da = fields.Date.from_string(fields.Date.today())
-        for equipe in equipes:
-            equipe_id = equipe.id
-            tz = pytz.timezone(equipe.tz or "Europe/Paris")
-            if equipe.mode_horaires == "easy":
-                # On utilise le mode facile pour les horaires de cette équipe
-                min_equipe = equipe.hor_md
-                max_equipe = equipe.hor_af
-            else: # On utilise le mode avancé pour les horaires de cette équipe
-                # l'équipe a-t-elle des horaires temporaires sur cette recherche??
-                if equipe.of_creneau_temp_stop:
-                    creneaux_temp_travailles = equipe.of_creneau_temp_ids
-                    for i in range(1,8):
-                        creneaux_temp_du_jour = creneaux_temp_travailles.filtered(lambda x: x.jour_number == i)
-                        if len(creneaux_temp_du_jour) == 0:
-                            continue
-                        if min_equipe == False:  # ==False pour éviter un éventuel 0.0 oublié
-                            min_equipe = creneaux_temp_du_jour[0].heure_debut  # heure de début du premier créneau
-                            max_equipe = creneaux_temp_du_jour[-1].heure_fin  # heure de fin du dernier créneau
-                        else:
-                            if min_equipe > creneaux_temp_du_jour[0].heure_debut:  # nouveau min
-                                min_equipe = creneaux_temp_du_jour[0].heure_debut
-                            if max_equipe < creneaux_temp_du_jour[-1].heure_fin:  # nouveau max
-                                max_equipe = creneaux_temp_du_jour[-1].heure_fin
-
-                creneaux_travailles = equipe.of_creneau_ids
-                for i in range(1,8):
-                    creneaux_du_jour = creneaux_travailles.filtered(lambda x: x.jour_number == i)
-                    if len(creneaux_du_jour) == 0:
-                        continue
-                    if min_equipe == False:  # ==False pour éviter un éventuel 0.0 oublié
-                        min_equipe = creneaux_du_jour[0].heure_debut  # heure de début du premier créneau
-                        max_equipe = creneaux_du_jour[-1].heure_fin  # heure de fin du dernier créneau
-                    else:
-                        if min_equipe > creneaux_du_jour[0].heure_debut:  # nouveau min
-                            min_equipe = creneaux_du_jour[0].heure_debut
-                        if max_equipe < creneaux_du_jour[-1].heure_fin:  # nouveau max
-                            max_equipe = creneaux_du_jour[-1].heure_fin
-            date_min_dt = datetime.combine(today_da, datetime.min.time()) + timedelta(hours=min_equipe)  # datetime naive
-            date_min_dt = tz.localize(date_min_dt, is_dst=None).astimezone(pytz.utc)  # datetime utc
-            flo_min = round(date_min_dt.hour + date_min_dt.minute / 60.0 + date_min_dt.second / 3600.0, 5)  # mintime utc as float
-            if min_time == False:
-                min_time = flo_min
-            elif flo_min < min_time:
-                min_time = flo_min
-            date_max_dt = datetime.combine(today_da, datetime.min.time()) + timedelta(hours=max_equipe)  # datetime naive
-            date_max_dt = tz.localize(date_max_dt, is_dst=None).astimezone(pytz.utc)  # datetime utc
-            flo_max = round(date_max_dt.hour + date_max_dt.minute / 60.0 + date_max_dt.second / 3600.0, 5)  # maxtime utc as float
-            if max_time == False:
-                max_time = flo_max
-            elif flo_max > max_time:
-                max_time = flo_max
-        return (min_time, max_time)"""
 
     @api.model
     def get_working_hours_fields(self):
@@ -366,6 +236,10 @@ class OfPlanningIntervention(models.Model):
     _inherit = ["of.readgroup", "of.calendar.mixin", 'mail.thread']
     _order = 'date'
 
+    @api.model
+    def _get_employee_ids_domaim(self):
+        return [('of_est_intervenant', '=', True)]
+
     @api.depends('tz')
     def _compute_tz_offset(self):
         for intervention in self:
@@ -384,7 +258,7 @@ class OfPlanningIntervention(models.Model):
     user_id = fields.Many2one('res.users', string='Utilisateur', default=lambda self: self.env.uid)
     partner_id = fields.Many2one('res.partner', string='Client', compute='_compute_partner_id', store=True)
     address_id = fields.Many2one('res.partner', string='Adresse')
-    address_city = fields.Char(related='address_id.city', string="Ville",oldname="partner_city")
+    address_city = fields.Char(related='address_id.city', string="Ville", oldname="partner_city")
     address_zip = fields.Char(related='address_id.zip')
     secteur_id = fields.Many2one(related='address_id.secteur_tech_id', readonly=True)
     raison_id = fields.Many2one('of.planning.intervention.raison', string='Raison')
@@ -392,7 +266,7 @@ class OfPlanningIntervention(models.Model):
     tache_name = fields.Char(related='tache_id.name')
     equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe', oldname='poseur_id')
     employee_ids = fields.Many2many('hr.employee', 'employee_intervention_rel', 'intervention_id', 'employee_id',
-                                    string='Intervenants', required=True, domain="[('of_est_intervenant', '=', True)]")
+                                    string='Intervenants', required=True, domain=_get_employee_ids_domaim)
     employee_main_id = fields.Many2one('hr.employee', string=u"Employé principal", compute="_compute_employee_main_id", store=True)
     state = fields.Selection([
         ('draft', 'Brouillon'),
@@ -407,8 +281,8 @@ class OfPlanningIntervention(models.Model):
     description = fields.Html(string='Description')  # Non utilisé, changé pour notes intervention
     forcer_horaires = fields.Boolean("Forcer les horaires", default=False)
     mode_horaires = fields.Selection([
-        ("easy","Facile"),
-        ("advanced",u"Avancé")], string="Mode de Sélection des horaires", default="easy")
+        ("easy", "Facile"),
+        ("advanced", u"Avancé")], string="Mode de Sélection des horaires", default="easy")
     of_creneau_ids = fields.Many2many("of.horaires.creneau", "intervention_creneaux", "intervention_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
     of_creneau_temp_ids = fields.Many2many("of.horaires.creneau", "intervention_creneaux_temp", "intervention_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
     of_creneau_temp_start = fields.Date(string=u"Début des horaires temporaires")
@@ -432,7 +306,6 @@ class OfPlanningIntervention(models.Model):
     hor_ad_readonly = fields.Float(related="hor_ad", readonly=True)
     hor_af_readonly = fields.Float(related="hor_af", readonly=True)
     jour_readonly_ids = fields.Many2many(related="jour_ids", readonly=True)
-
 
     # 3 champs ajoutés pour la vue map
     geo_lat = fields.Float(related='address_id.geo_lat')
@@ -535,10 +408,10 @@ class OfPlanningIntervention(models.Model):
         if not existe_avant and existe_apres:
             # On peuple le champ employee_ids de chaque rdv avec les employés de l'équipe du rdv.
             cr.execute("INSERT INTO employee_intervention_rel (intervention_id, employee_id) "
-            "SELECT opi.id, oper.employee_id "
-            "FROM of_planning_intervention AS opi, of_planning_equipe AS ope, of_planning_employee_rel AS oper "
-            "WHERE opi.equipe_id = ope.id "
-            "AND oper.equipe_id = opi.equipe_id")
+                       "SELECT opi.id, oper.employee_id "
+                       "FROM of_planning_intervention AS opi, of_planning_equipe AS ope, of_planning_employee_rel AS oper "
+                       "WHERE opi.equipe_id = ope.id "
+                       "AND oper.equipe_id = opi.equipe_id")
 
             # Bascule des couleurs du planning des employés.
             # Règle retenue : prend en priorité la couleur de l'utilisateur lié si il existe, sinon celle de l'équipe.
@@ -548,21 +421,21 @@ class OfPlanningIntervention(models.Model):
             # Et le champ of_est_intervenant dans hr_employee doit être initialisé à vrai pour les employés qui sont dans une équipe.
             # On en profite de le faire avec l'initialisation des couleurs comme ce sont les mêmes critères.
             cr.execute("UPDATE hr_employee "
-            "SET of_color_ft = pe.color_ft, of_color_bg = pe.color_bg, of_est_intervenant = True "
-            "FROM of_planning_equipe as pe "
-            "JOIN of_planning_employee_rel per ON pe.id = per.equipe_id "
-            "JOIN hr_employee he ON per.employee_id = he.id "
-            "WHERE hr_employee.id = he.id")
+                       "SET of_color_ft = pe.color_ft, of_color_bg = pe.color_bg, of_est_intervenant = True "
+                       "FROM of_planning_equipe as pe "
+                       "JOIN of_planning_employee_rel per ON pe.id = per.equipe_id "
+                       "JOIN hr_employee he ON per.employee_id = he.id "
+                       "WHERE hr_employee.id = he.id")
 
             # On recopie le choix des couleurs de l'utilisateur dans les employés
             cr.execute("UPDATE hr_employee "
-            "SET of_color_ft = ru.of_color_ft, of_color_bg = ru.of_color_bg "
-            "FROM res_users as ru "
-            "JOIN resource_resource rr ON ru.id = rr.user_id "
-            "JOIN hr_employee he ON rr.id = he.id "
-            "WHERE hr_employee.id = he.id "
-            "AND ru.of_color_ft != '#0D0D0D' "
-            "AND ru.of_color_bg != '#F0F0F0'")
+                       "SET of_color_ft = ru.of_color_ft, of_color_bg = ru.of_color_bg "
+                       "FROM res_users as ru "
+                       "JOIN resource_resource rr ON ru.id = rr.user_id "
+                       "JOIN hr_employee he ON rr.id = he.id "
+                       "WHERE hr_employee.id = he.id "
+                       "AND ru.of_color_ft != '#0D0D0D' "
+                       "AND ru.of_color_bg != '#F0F0F0'")
 
             # On recopie les horaires des équipes dans les employés
             # dans le cas où ce n'est pas les horaires par défaut dans l'équipe et c'est les horaires par défaut dans l'employé.
@@ -585,7 +458,6 @@ class OfPlanningIntervention(models.Model):
 
         return res
 
-
     @api.model
     def _modifier_droits_existants_utilisateurs(self):
         u"""Initialise les droits planning des utilisateurs existants à la 1ère mise à jour du module"""
@@ -603,26 +475,26 @@ class OfPlanningIntervention(models.Model):
         if bool(cr.fetchall()):
             # On récupère la liste des utilisateurs qui ont l'ancien droit "Utilisateur : mes interventions seulement".
             cr.execute("SELECT ru.id "
-            "FROM res_groups_users_rel AS rel, res_users AS ru, res_groups AS rg "
-            "WHERE rel.gid = (SELECT res_id FROM ir_model_data WHERE name = 'of_group_planning_intervention_user_restrict' LIMIT 1)"
-            "AND ru.id = rel.uid "
-            "AND rg.id = rel.gid")
+                       "FROM res_groups_users_rel AS rel, res_users AS ru, res_groups AS rg "
+                       "WHERE rel.gid = (SELECT res_id FROM ir_model_data WHERE name = 'of_group_planning_intervention_user_restrict' LIMIT 1)"
+                       "AND ru.id = rel.uid "
+                       "AND rg.id = rel.gid")
             user_restrict_ids = [x[0] for x in cr.fetchall()]
 
             # On récupère la liste des utilisateurs qui ont l'ancien droit "Utilisateur : toutes les interventions".
             cr.execute("SELECT ru.id "
-            "FROM res_groups_users_rel AS rel, res_users AS ru, res_groups AS rg "
-            "WHERE rel.gid = (SELECT res_id FROM ir_model_data WHERE name = 'of_group_planning_intervention_user' LIMIT 1) "
-            "AND ru.id = rel.uid "
-            "AND rg.id = rel.gid")
+                       "FROM res_groups_users_rel AS rel, res_users AS ru, res_groups AS rg "
+                       "WHERE rel.gid = (SELECT res_id FROM ir_model_data WHERE name = 'of_group_planning_intervention_user' LIMIT 1) "
+                       "AND ru.id = rel.uid "
+                       "AND rg.id = rel.gid")
             user_ids = [x[0] for x in cr.fetchall()]
 
             # On récupère la liste des utilisateurs qui ont l'ancien droit "Responsable".
             cr.execute("SELECT ru.id "
-            "FROM res_groups_users_rel AS rel, res_users AS ru, res_groups AS rg "
-            "WHERE rel.gid = (SELECT res_id FROM ir_model_data WHERE name = 'of_group_planning_intervention_manager' LIMIT 1) "
-            "AND ru.id = rel.uid "
-            "AND rg.id = rel.gid")
+                       "FROM res_groups_users_rel AS rel, res_users AS ru, res_groups AS rg "
+                       "WHERE rel.gid = (SELECT res_id FROM ir_model_data WHERE name = 'of_group_planning_intervention_manager' LIMIT 1) "
+                       "AND ru.id = rel.uid "
+                       "AND rg.id = rel.gid")
             manager_ids = [x[0] for x in cr.fetchall()]
 
             # On ajoute les utilisateurs de l'ancien droit "mes interventions seulement" au nouveau droit "Voir mes interventions seulement".
@@ -659,7 +531,6 @@ class OfPlanningIntervention(models.Model):
             if intervention.employee_ids:
                 intervention.tz = intervention.employee_ids[0].of_tz
 
-
     @api.depends('date', 'duree', 'hor_md', 'hor_mf', 'hor_ad', 'hor_af', 'jour_ids', 'employee_ids',
                  'forcer_horaires')
     def _compute_date_deadline(self):
@@ -690,13 +561,10 @@ class OfPlanningIntervention(models.Model):
             # récupérer la liste des segments de l'équipe (ie l'intersection des horaires des employés)
             segments_equipe = employee_obj.get_list_horaires_intersection(employee_ids=employees._ids, horaires_list_dict=horaires_list_dict)
 
-            if intervention.forcer_horaires:
-                jours_travailles = [jour.numero for jour in self.jour_ids] if self.jour_ids else range(1, 6)
-
             jour_courant = date_locale_dt.isoweekday()
 
             duree_restante = intervention.duree
-            heure_debut = date_locale_dt.hour + (date_locale_dt.minute + date_locale_dt.second / 60.0) / 60.0 # heure en float
+            heure_debut = date_locale_dt.hour + (date_locale_dt.minute + date_locale_dt.second / 60.0) / 60.0  # heure en float
 
             # Vérifier que l'intervention commence sur un créneau travaillé
             index_creneau = employee_obj.debut_sur_creneau(date_courante_str, heure_debut, segments_equipe)
@@ -706,10 +574,10 @@ class OfPlanningIntervention(models.Model):
             heure_courante = heure_debut
             segment_courant = segments_equipe.pop(0)
             horaires_dict = segment_courant[2]
-            while float_compare(duree_restante, 0.0, compare_precision)  > 0.0:
+            while float_compare(duree_restante, 0.0, compare_precision) > 0.0:
 
                 fin_creneau_courant = horaires_dict[jour_courant][index_creneau][1]
-                if float_compare(fin_creneau_courant, heure_courante + duree_restante, compare_precision)  >= 0.0:
+                if float_compare(fin_creneau_courant, heure_courante + duree_restante, compare_precision) >= 0.0:
                     # l'intervention se termine sur ce créneau
                     heure_courante += duree_restante
                     break
@@ -723,16 +591,16 @@ class OfPlanningIntervention(models.Model):
                 # il n'y a pas de créneau suivant la même journée: terminer la journée puis passer au jour suivant
                 duree_restante -= (horaires_dict[jour_courant][index_creneau][1] - heure_courante)
 
-                jour_courant = ((jour_courant + 1) % 7) or 7 # num jour de la semaine entre 1 et 7
+                jour_courant = ((jour_courant + 1) % 7) or 7  # num jour de la semaine entre 1 et 7
                 date_courante_da += un_jour
                 date_courante_str = fields.Date.to_string(date_courante_da).decode('utf-8')
 
                 if date_courante_str > segment_courant[1] and len(segments_equipe) > 0:  # changer de segment courant
                     segment_courant = segments_equipe.pop(0)
                     horaires_dict = segment_courant[2]
-                
-                while jour_courant not in horaires_dict or horaires_dict[jour_courant] == []: # on saute les jours non travaillés
-                    jour_courant = ((jour_courant + 1) % 7) or 7 # num jour de la semaine entre 1 et 7
+
+                while jour_courant not in horaires_dict or horaires_dict[jour_courant] == []:  # on saute les jours non travaillés
+                    jour_courant = ((jour_courant + 1) % 7) or 7  # num jour de la semaine entre 1 et 7
                     #date_courante_deb_dt += un_jour
                     date_courante_da += un_jour
                     if date_courante_str > segment_courant[1] and len(segments_equipe) > 0:  # changer de segment courant
@@ -896,10 +764,10 @@ class OfPlanningIntervention(models.Model):
             self.hor_mf = employee.of_hor_mf
             self.hor_ad = employee.of_hor_ad
             self.hor_af = employee.of_hor_af
-            les_jours_ids = employee.of_jour_ids._ids
-            if les_jours_ids == []:
-                les_jours_ids = self.env['of.jours'].search([('numero', 'in', [1, 2, 3, 4, 5])])._ids
-            self.jour_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in les_jours_ids]
+            emp_jours_ids = employee.of_jour_ids._ids
+            if not emp_jours_ids:
+                emp_jours_ids = self.env['of.jours'].search([('numero', 'in', [1, 2, 3, 4, 5])])._ids
+            self.jour_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in emp_jours_ids]
             self.of_creneau_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in employee.of_creneau_ids._ids]
             self.of_creneau_temp_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in employee.of_creneau_temp_ids._ids]
             self.of_creneau_temp_start = employee.of_creneau_temp_start
@@ -1038,7 +906,6 @@ class OfPlanningIntervention(models.Model):
 
         pricelist = partner.property_product_pricelist
         company = self._get_invoicing_company(partner)
-        from_currency = company.currency_id
 
         if pricelist.discount_policy == 'without_discount':
             from_currency = company.currency_id

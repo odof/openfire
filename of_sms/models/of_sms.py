@@ -482,11 +482,11 @@ class OFPlanningIntervention(models.Model):
             country_id_defaut  = False
 
         # RAPPEL ÉQUIPE : on envoie un texto aux équipes si option activée.
-        # Contrairement aux clients, pour les rendez-vous sur plusieurs jours, on envoie un texto de rappel tous les jours. 
+        # Contrairement aux clients, pour les rendez-vous sur plusieurs jours, on envoie un texto de rappel tous les jours.
         if self.env['ir.values'].get_default('of.sms.config.settings', 'alerte_interventions_equipes_veille'):
             for employee in self.env["hr.employee"].search([]):
                 message_body = u"Vos prochaines interventions :\n"
-                interventions = intervention_obj.search([('employee_ids', 'in', employee.id),
+                interventions = intervention_obj.search([('employee_ids', 'in', [employee.id]),
                                                         ('date', '<=', date_fin_relance_str),
                                                         ('date_deadline', '>=', date_demain_str),
                                                         ('state', '=', 'confirm')
