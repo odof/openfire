@@ -162,7 +162,7 @@ class ProjectIssue(models.Model):
 #         action['active_ids'] = [],
         today_str = fields.Date.today()
         today_da = fields.Date.from_string(today_str)
-        deux_semaines = today_da + timedelta(days=14)
+        deux_semaines_da = today_da + timedelta(days=14)
         deux_semaines_str = fields.Date.to_string(deux_semaines_da)
         action['name'] = u"Prévoir une intervention"
         action['view_mode'] = "form"

@@ -70,7 +70,7 @@ class OfPlanningIntervention(models.Model):
             planning_intervention_ids = self.search([('date', '>=', date), ('date', '<=', date), ('employee_ids', 'in', employee.id)], limit=1)
             if not planning_intervention_ids:
                 # Il n'existe plus de plannings pour la tournee, on la supprime
-                employees_tournees_unlink_ids.append(employee.id) 
+                employees_tournees_unlink_ids.append(employee.id)
 
         tournees_unlink = planning_tournee_obj.search([('date', '=', date), ('employee_id', 'in', employees_tournees_unlink_ids),
                                                        ('is_bloque', '=', False), ('is_confirme', '=', False)])
@@ -177,7 +177,6 @@ class OfPlanningIntervention(models.Model):
             self._calc_new_description()
         #auto-détection du service
         service_obj = self.env['of.service']
-        service = False
         vals = {'service_id': False}
         if self.tache_id:
             if self.service_id and self.service_id.tache_id.id == self.tache_id.id:
@@ -278,7 +277,6 @@ class OfPlanningTournee(models.Model):
                 continue
 
             date_local = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(tournee.date))
-            le_num_jour = date_local.isoweekday()
             horaires_emp = employee.get_horaires_date(tournee.date)[employee.id]
             nb_creneaux = len(horaires_emp)
             if nb_creneaux == 0:
