@@ -188,7 +188,7 @@ class OfService(models.Model):
     def _onchange_tache_id(self):
         self.ensure_one()
         if self.tache_id:
-            if not self._context[u"bloquer_recurrence"]:
+            if not self._context.get(u"bloquer_recurrence"):
                 self.recurrence = self.tache_id.recurrence
                 self.recurring_rule_type = self.tache_id.recurring_rule_type
                 self.recurring_interval = self.tache_id.recurring_interval
@@ -299,8 +299,7 @@ class OFPlanningTache(models.Model):
         for tache in self:
             display = False
             if tache.recurrence:
-                feminin = tache.recurring_rule_type and tache.recurring_rule_type == 'weekly' or False
-                if feminin:
+                if tache.recurring_rule_type and tache.recurring_rule_type == 'weekly' :  # Féminin
                     display = u"Toutes les "
                 else:
                     display = u"Tous les "
@@ -317,7 +316,7 @@ class OFPlanningTache(models.Model):
             tache.recurrence_display = display
 
     @api.multi
-    def get_next_date(self, date_str):
+    def get_next_date(self, date_str):  # Jamais appelée en python, est-ce le cas en JS ?
         self.ensure_one()
         if self.recurrence:
             date_from_da = fields.Date.from_string(date_str)
@@ -340,7 +339,7 @@ class OFPlanningTache(models.Model):
 
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
-        """permet de montrer les tache recurrentes en premier ou les taches ponctuelles en premier"""
+        """permet d'afficher les tache recurrentes en premier en fonction du contexte"""
         rec_first = self._context.get('show_rec_icon_first', -1)
         if rec_first != -1:
             res = super(OFPlanningTache, self).name_search(name, args + [['recurrence', '=', rec_first]], operator, limit) or []
@@ -362,7 +361,7 @@ class OFPlanningIntervention(models.Model):
         super(OFPlanningIntervention, self)._onchange_address_id()
         if self.address_id and self.address_id.service_address_ids:
             if self.tache_id:
-                service = self.address_id.service_address_ids.filtered(lambda x: x.tache_id == self.tache_id.id)
+                service = self.address_id.service_address_ids.filtered(lambda x: x.tache_id.id == self.tache_id.id)
                 self.service_id = service and service[0] or False
             else:
                 self.service_id = self.address_id.service_address_ids[0]
