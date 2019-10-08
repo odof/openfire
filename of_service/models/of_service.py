@@ -211,7 +211,7 @@ class OfService(models.Model):
     def get_next_date(self, date_str):
         self.ensure_one()
         if self.recurrence:
-            mois_nums = self.mois_ids.mapped('numero')
+            mois_nums = self.mois_ids.mapped('numero') or (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
 
             date_from_da = fields.Date.from_string(max(date_str, self.date_last))
             date_next_da = date_from_da + self.get_relative_delta(self.recurring_rule_type, self.recurring_interval)
@@ -353,7 +353,9 @@ class OFPlanningTache(models.Model):
 class OFPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
-    service_id = fields.Many2one('of.service', string="Service", domain="[('address_id', '=', address_id)]")
+    service_id = fields.Many2one('of.service', string="Service",
+                                 domain="partner_id and [('partner_id', '=', partner_id), '|', ('address_id', '=', False), ('address_id', '=', address_id)] or "
+                                        "address_id and [('partner_id', '=', address_id), '|', ('address_id', '=', False), ('address_id', '=', address_id)] or []")
 
     @api.onchange('address_id', 'tache_id')
     def _onchange_address_id(self):
@@ -373,25 +375,65 @@ class OFPlanningIntervention(models.Model):
     @api.multi
     def write(self, vals):
         res = super(OFPlanningIntervention, self).write(vals)
-        if vals.get('state', False) == 'done':
+        state_interv = vals.get('state', False)
+        if state_interv:
             for intervention in self:
                 if intervention.service_id:
-                    if intervention.service_id.recurrence:
-                        intervention.service_id.date_next = intervention.service_id.get_next_date(intervention.date_date)
-                    else:
-                        intervention.service_id.state = 'done'
+                    if state_interv == 'done':
+                        if intervention.service_id.recurrence and intervention.service_id.date_next <= intervention.date_date:
+                            intervention.service_id.date_next = intervention.service_id.get_next_date(intervention.date_date)
+                        else:
+                            intervention.service_id.state = 'done'
+                    elif state_interv == 'cancel':
+                        if intervention.service_id.recurrence:
+                            if intervention.service_id.date_last:
+                                date_next_old_str = fields.Date.to_string(fields.Date.from_string(intervention.service_id.date_last) + timedelta(days=1))
+                            else:
+                                date_next_old_str = fields.Date.today()
+                            intervention.service_id.date_next = date_next_old_str
+                        else:
+                            intervention.service_id.state = 'todo'
         return res
 
     @api.model
     def create(self, vals):
         intervention = super(OFPlanningIntervention, self).create(vals)
-        if vals.get('state', False) == 'done':
+        state_interv = vals.get('state', False)
+        if state_interv:
             if intervention.service_id:
-                if intervention.service_id.recurrence:
-                    intervention.service_id.date_next = intervention.service_id.get_next_date(intervention.date_date)
-                else:
-                    intervention.service_id.state = 'done'
+                if state_interv == 'done':
+                    if intervention.service_id.recurrence and intervention.service_id.date_next <= intervention.date_date:
+                        intervention.service_id.date_next = intervention.service_id.get_next_date(
+                            intervention.date_date)
+                    else:
+                        intervention.service_id.state = 'done'
+                elif state_interv == 'cancel':
+                    if intervention.service_id.recurrence:
+                        if intervention.service_id.date_last:
+                            date_next_old_str = fields.Date.to_string(
+                                fields.Date.from_string(intervention.service_id.date_last) + timedelta(days=1))
+                        else:
+                            date_next_old_str = fields.Date.today()
+                        intervention.service_id.date_next = date_next_old_str
+                    else:
+                        intervention.service_id.state = 'todo'
         return intervention
+
+    @api.multi
+    def unlink(self):
+        res = super(OFPlanningIntervention, self).unlink()
+        for intervention in self:
+            if intervention.service_id:
+                if intervention.service_id.state == 'done':
+                    intervention.service_id.state = 'todo'
+                if intervention.service_id.recurrence:
+                    if intervention.service_id.date_last:
+                        date_next_old_str = fields.Date.to_string(
+                            fields.Date.from_string(intervention.service_id.date_last) + timedelta(days=1))
+                    else:
+                        date_next_old_str = fields.Date.today()
+                    intervention.service_id.date_next = date_next_old_str
+
 
 class ResPartner(models.Model):
     _inherit = "res.partner"
