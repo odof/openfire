@@ -222,14 +222,17 @@ class OfPlanningTournee(models.Model):
     date = fields.Date(string='Date', required=True)
     date_jour = fields.Char(compute="_compute_date_jour", string="Jour")
     employee_id = fields.Many2one('hr.employee', string=u'Intervenant', required=True)
-    secteur_id = fields.Many2one('of.secteur', string='Secteur', domain="[('type', 'in', ['tech', 'tech_com']]")
-    epi_lat = fields.Float(string=u'Épicentre Lat', digits=(12, 12), required=True)
-    epi_lon = fields.Float(string=u'Épicentre Lon', digits=(12, 12), required=True)
+    employee_other_ids = fields.Many2many('hr.employee', 'tournee_employee_other_rel', 'tournee_id', 'employee_id',
+                                    string='Équipiers', required=True, domain="[('est_intervenant', '=', True)]")
+    secteur_id = fields.Many2one('of.secteur', string='Secteur', domain="[('type', 'in', ['tech', 'tech_com'])]")
+    #secteur_name = fields.Char(related="secteur_id.name")
+    epi_lat = fields.Float(string=u'Épicentre Lat', digits=(12, 12))
+    epi_lon = fields.Float(string=u'Épicentre Lon', digits=(12, 12))
     address_depart_id = fields.Many2one('res.partner', string='Adresse départ')
     address_retour_id = fields.Many2one('res.partner', string='Adresse retour')
 
     zip_id = fields.Many2one('res.better.zip', 'Ville')
-    distance = fields.Float(string='Eloignement (km)', digits=(12, 4), required=True, default=20.0)
+    distance = fields.Float(string='Eloignement (km)', digits=(12, 4), default=20.0)
     is_complet = fields.Boolean(compute="_compute_is_complet", string='Complet', store=True)
     is_bloque = fields.Boolean(string=u'Bloqué', help=u'Journée bloquée : ne sera pas proposée à la planification')
     is_confirme = fields.Boolean(string=u'Confirmé', default=True, help=u'Une tournée non confirmée sera supprimée si on lui retire ses rendez-vous')
@@ -335,8 +338,8 @@ class OfPlanningTournee(models.Model):
     @api.onchange('employee_id')
     def _onchange_employee_id(self):
         if self.employee_id:
-            self.address_depart_id = self.employee_id.address_id
-            self.address_retour_id = self.employee_id.address_retour_id
+            self.address_depart_id = self.employee_id.of_address_depart_id
+            self.address_retour_id = self.employee_id.of_address_retour_id
 
     @api.onchange('address_depart_id')
     def _onchange_address_depart_id(self):
