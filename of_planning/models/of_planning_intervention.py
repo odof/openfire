@@ -13,6 +13,9 @@ from odoo.tools.safe_eval import safe_eval
 
 from odoo.tools.float_utils import float_compare
 
+ROUTING_BASE_URL = "http://s-hotel.openfire.fr:5000/"
+ROUTING_VERSION = "v1"
+ROUTING_PROFILE = "driving"
 
 @api.model
 def _tz_get(self):
