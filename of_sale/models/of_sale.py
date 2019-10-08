@@ -1006,6 +1006,18 @@ class AccountInvoice(models.Model):
                 report_pages.append(page)
         return report_pages
 
+    @api.model
+    def _refund_cleanup_lines(self, lines):
+        """ Surcharge pour que tout avoir soit pris en compte dans la commande
+        """
+        result = super(AccountInvoice, self)._refund_cleanup_lines(lines)
+        if self.env.context.get('of_mode') == 'cancel':
+            for i in xrange(0, len(lines)):
+                for name, field in lines[i]._fields.iteritems():
+                    if name == 'sale_line_ids':
+                        result[i][2][name] = [(6, 0, lines[i][name].ids)]
+        return result
+
 
 class AccountConfigSettings(models.TransientModel):
     _inherit = 'account.config.settings'
