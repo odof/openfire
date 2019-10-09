@@ -1201,19 +1201,34 @@ class ProductProduct(models.Model):
 
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
-        name, brands = self.env['product.template'].of_name_search_extract_brands(name)
-        if args and len(args) == 1 and args[0][0] == 'brand_id' and args[0][1] == '=':
-            if args[0][2] and not brands:
-                if isinstance(args[0][2], basestring):
-                    brands = self.env['of.product.brand'].search(['|', ('name', '=', args[0][2]), ('code', '=', args[0][2])])
-                else:
-                    brands = self.env['of.product.brand'].browse(args[0][2])
-            args = []
+        name, name_brands = self.env['product.template'].of_name_search_extract_brands(name)
+        args_brands = self.env['of.product.brand']
+        for arg in args:
+            if arg[0] == 'brand_id' and arg[1] == '=':
+                if arg[2]:
+                    if isinstance(arg[2], basestring):
+                        brand = self.env['of.product.brand'].search(['|', ('name', '=', arg[2]), ('code', '=', arg[2])])
+                    else:
+                        brand = self.env['of.product.brand'].browse(arg[2])
+                    args_brands += brand
+
         new_args = args
-        if brands:
-            new_args = [('brand_id', 'in', brands._ids)] + list(args or [])
+        if name_brands:
+            new_args = [('brand_id', 'in', name_brands._ids)] + list(args or [])
         res = super(ProductProduct, self).name_search(name, new_args, operator, limit)
-        return self._of_datastore_name_search(res, brands, name, args, operator, limit)
+
+        parse_domain = self._of_datastore_update_domain_item
+        for arg in args:
+            if not isinstance(arg, (list, tuple)):
+                continue
+            if arg[0].startswith('ds_'):
+                arg[0] = arg[0][3:]
+            elif arg[0] in ('categ_id', 'brand_id'):
+                obj_name = self._fields[arg[0]].comodel_name
+                new_arg = parse_domain(arg, self.env[obj_name])
+                if new_arg:
+                    arg[0], arg[1], arg[2] = new_arg
+        return self._of_datastore_name_search(res, args_brands or name_brands, name, args, operator, limit)
 
     @api.model
     def of_datastore_get_import_fields(self):
