@@ -39,6 +39,13 @@ def jour_abr_2_nb(str):
 class HREmployee(models.Model):
     _inherit = "hr.employee"
 
+    @api.model_cr_context
+    def _auto_init(self):
+        res = super(HREmployee, self)._auto_init()
+        employees_to_archive = self.search([('of_archive_horaires', '=', False)])
+        employees_to_archive.archiver_horaires()
+        return res
+
     def _default_of_tz(self):
         return self.env.user.tz or 'Europe/Paris'
 
