@@ -112,10 +112,10 @@ class OfPlanningEquipe(models.Model):
     category_ids = fields.Many2many('hr.employee.category', 'equipe_category_rel', 'equipe_id', 'category_id', u'Catégories')
     intervention_ids = fields.One2many('of.planning.intervention', 'equipe_id', u'Interventions liées', copy=False)
     tache_ids = fields.Many2many('of.planning.tache', 'equipe_tache_rel', 'equipe_id', 'tache_id', u'Compétences')
-    hor_md = fields.Float(u'Matin début', required=True, digits=(12, 5))
-    hor_mf = fields.Float('Matin fin', required=True, digits=(12, 5))
-    hor_ad = fields.Float(u'Après-midi début', required=True, digits=(12, 5))
-    hor_af = fields.Float(u'Après-midi fin', required=True, digits=(12, 5))
+    hor_md = fields.Float(u'Matin début', digits=(12, 5))
+    hor_mf = fields.Float('Matin fin', digits=(12, 5))
+    hor_ad = fields.Float(u'Après-midi début', digits=(12, 5))
+    hor_af = fields.Float(u'Après-midi fin', digits=(12, 5))
     jour_ids = fields.Many2many('of.jours', 'equipe_jours', 'equipe_id', 'jour_id', string='Jours', default=_get_default_jours)
     sequence = fields.Integer(u'Séquence', help=u"Ordre d'affichage (plus petit en premier)")
     color_ft = fields.Char(string="Couleur de texte", help="Choisissez votre couleur", default="#0D0D0D")
@@ -408,7 +408,7 @@ class OfPlanningIntervention(models.Model):
     forcer_horaires = fields.Boolean("Forcer les horaires", default=False)
     mode_horaires = fields.Selection([
         ("easy","Facile"),
-        ("advanced",u"Avancé")], string="Mode de Sélection des horaires", required=True, default="easy")
+        ("advanced",u"Avancé")], string="Mode de Sélection des horaires", default="easy")
     of_creneau_ids = fields.Many2many("of.horaires.creneau", "intervention_creneaux", "intervention_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
     of_creneau_temp_ids = fields.Many2many("of.horaires.creneau", "intervention_creneaux_temp", "intervention_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
     of_creneau_temp_start = fields.Date(string=u"Début des horaires temporaires")
