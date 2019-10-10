@@ -58,7 +58,7 @@
                 </xpath>
                 <!-- Ajout onglet Notes : client, facture, intervention -->
                 <xpath expr="//notebook" position="inside">
-                     <page string="Notes">
+                     <page string="Notes" name="notes">
                         <!-- Notes client -->
                         <group attrs="{'invisible':[('of_notes_client','=',False)]}">
                             <separator string="Notes client" colspan="4"/>
