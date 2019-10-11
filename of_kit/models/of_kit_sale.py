@@ -347,6 +347,8 @@ class SaleOrderLine(models.Model):
         line = super(SaleOrderLine, self).create(vals)
         sale_kit_vals = {'order_line_id': line.id, 'name': line.name, 'of_pricing': line.of_pricing}
         line.kit_id.write(sale_kit_vals)
+        if line.kit_id and line.order_id.state == 'sale':  # Doit être rappeler pour les kits sinon les liens pour la création d'approvisionnements n'existent pas
+            line._action_procurement_create()
         return line
 
     @api.multi
@@ -609,7 +611,8 @@ class OfSaleOrderKitLine(models.Model):
         precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
         new_procs = self.env['procurement.order']  # Empty recordset
         for comp in self:
-            if comp.state != 'sale' or not comp.product_id._need_procurement():
+            # Dans certains cas le champ comp.state n'est pas bien recalculé donc vérification via comp.order_id.state
+            if (comp.state or comp.order_id.state) != 'sale' or not comp.product_id._need_procurement():
                 continue
             qty = 0.0
             for proc in comp.procurement_ids:

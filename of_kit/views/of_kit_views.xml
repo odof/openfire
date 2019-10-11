@@ -303,6 +303,11 @@
             <xpath expr="//field[@name='order_line']" position="attributes">
                 <attribute name="context">{'default_of_client_view': of_client_view, 'hide_sale': context.get('hide_sale')}</attribute>
             </xpath>
+            <!-- Modification du readonly pour empêcher de changer l'article sélectionné sur une ligne de commande en état bon de commande ou verrouillé -->
+            <!--    dans le cas où l'article est un kit, sinon interaction étrange avec le BL.                                                           -->
+            <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="attributes">
+                <attribute name="attrs">{'readonly': ['|', '|', ('qty_invoiced', '&gt;', 0), ('procurement_ids', '!=', []), '&amp;', ('of_is_kit', '=', True), ('state', 'in', ['sale', 'done'])]}</attribute>
+            </xpath>
             <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="after">
                 <field name="sale_kits_to_unlink" invisible="1"/>
                 <field name="of_is_kit"/>
