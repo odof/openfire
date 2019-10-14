@@ -131,9 +131,9 @@ class SaleOrder(models.Model):
         # (quand l'option d'arrondi global de la tva est utilisée et que la commande contient plusieurs lignes avec des taxes différentes).
         # On uniformise le calcul du montant des devis/commandes avec celui des factures.
         for order in self:
-            order.amount_untaxed = sum(line.price_subtotal for line in self.order_line)
+            order.amount_untaxed = sum(line.price_subtotal for line in order.order_line)
             order.amount_tax = sum(tax['amount'] for tax in order.of_get_taxes_values().itervalues())
-            order.amount_total = self.amount_untaxed + self.amount_tax
+            order.amount_total = order.amount_untaxed + order.amount_tax
 
     of_to_invoice = fields.Boolean(u"Entièrement facturable", compute='_compute_of_to_invoice', search='_search_of_to_invoice')
     of_notes_facture = fields.Html(string="Notes facture", oldname="of_notes_factures")
