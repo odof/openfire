@@ -30,7 +30,7 @@ FieldMany2One.include({
 
         if (this.field.relation == 'res.partner') {
             this.geo_lat_field = (this.options && this.options.geo_lat_field) || this.geo_lat_field || 'geo_lat';
-            if (!isNullOrUndef(this.field_manager.fields[this.geo_lat_field])) {
+            if (!isNullOrUndef(this.field_manager.fields) && !isNullOrUndef(this.field_manager.fields[this.geo_lat_field])) {
                 this.set({"geo_lat": this.field_manager.get_field_value(this.geo_lat_field)});
             }else{
                 this.set_geo_lat();
@@ -74,13 +74,14 @@ FieldMany2One.include({
             // on attend d'avoir set la valeur de geo_lat avant de la verifier :D
             $.when(this.dfd_geo_lat).then(function(){
                 self.$label.next('.o_tz_warning').remove();
-                if(!self.check_localized()){
+                if(!self.check_localized() && $('.of_warning_' + self.field_manager.datarecord[self.name][1]).length == 0 && !self.get("invisible")) {
+                    //console.log(self.$label.length, self);
                     // n'est pas géolocalisé
                     var options = _.extend({
                         delay: { show: 501, hide: 0 },
                         title: _t((self.current_display || self.field_manager.datarecord[self.name][1] || "Ce partenaire ") + " n'est pas géolocalisé"),
                     });
-                    $('<span/>').addClass('fa fa-exclamation-triangle o_tz_warning').insertAfter(self.$label).tooltip(options);
+                    $('<span/>').addClass('fa fa-exclamation-triangle o_tz_warning of_warning_' + self.field_manager.datarecord[self.name][1]).insertAfter(self.$label).tooltip(options);
                 }
             });
         }
