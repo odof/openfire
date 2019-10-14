@@ -151,6 +151,13 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='tax_ids']" position="after">
                 <field name="debit" string="Montant" filter_domain="['|',('debit','=',self),('credit','=',self)]"/>
+                <separator/>
+                <filter string="Mois en cours" name="this_month"
+                        domain="[('date', u'&gt;=', context_today().strftime('%Y-%m-01')),
+                                 ('date', u'&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Mois précédent" name="previous_month"
+                        domain="[('date', u'&gt;=', (context_today() - relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
+                                 ('date', u'&lt;', context_today().strftime('%Y-%m-01'))]"/>
             </xpath>
         </field>
     </record>
