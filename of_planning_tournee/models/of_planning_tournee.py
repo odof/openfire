@@ -85,7 +85,8 @@ class OfPlanningIntervention(models.Model):
 
         if not vals.get('employee_ids', False):
             raise UserError(u"Cette intervnetion n'a pas d'intervenant")
-        employee_ids = vals.get('employee_ids', False)[0][2]  # vals['employee_ids'] est un code 6 sur création et est toujours renseigné car champ obligatoire
+        employee_ids_val = vals.get('employee_ids', False)#[0][2]  # vals['employee_ids'] est un code 6 sur création et est toujours renseigné car champ obligatoire
+        employee_ids = employee_ids_val[0][0] == 6 and employee_ids_val[0][2] or [le_tup[1] for le_tup in employee_ids_val if le_tup[0] == 4]
 
         planning_tournee_ids = planning_tournee_obj.search([('date', '=', date_jour),
                                                             ('employee_id', 'in', employee_ids),
@@ -222,7 +223,7 @@ class OfPlanningTournee(models.Model):
     date_jour = fields.Char(compute="_compute_date_jour", string="Jour")
     employee_id = fields.Many2one('hr.employee', string=u'Intervenant', required=True)
     employee_other_ids = fields.Many2many('hr.employee', 'tournee_employee_other_rel', 'tournee_id', 'employee_id',
-                                    string='Équipiers', required=True, domain="[('est_intervenant', '=', True)]")
+                                    string='Équipiers', required=True, domain="[('of_est_intervenant', '=', True)]")
     secteur_id = fields.Many2one('of.secteur', string='Secteur', domain="[('type', 'in', ['tech', 'tech_com'])]")
     #secteur_name = fields.Char(related="secteur_id.name")
     epi_lat = fields.Float(string=u'Épicentre Lat', digits=(12, 12))
