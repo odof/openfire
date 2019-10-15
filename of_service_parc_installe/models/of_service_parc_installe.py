@@ -102,7 +102,7 @@ class OfParcInstalle(models.Model):
         action['name'] = u"Prévoir une intervention"
         action['view_mode'] = "form"
         action['view_ids'] = False
-        action['view_id'] = self.env['ir.model.data'].xmlid_to_res_id("of_service.view_of_service_ponc_form")
+        action['view_id'] = self.env['ir.model.data'].xmlid_to_res_id("of_service.view_of_service_form")
         action['views'] = False
         action['target'] = "new"
         action['context'] = {
@@ -167,7 +167,7 @@ class ProjectIssue(models.Model):
         action['name'] = u"Prévoir une intervention"
         action['view_mode'] = "form"
         action['view_ids'] = False
-        action['view_id'] = self.env['ir.model.data'].xmlid_to_res_id("of_service.view_of_service_ponc_form")
+        action['view_id'] = self.env['ir.model.data'].xmlid_to_res_id("of_service.view_of_service_form")
         action['views'] = False
         action['target'] = "new"
         action['context'] = {
