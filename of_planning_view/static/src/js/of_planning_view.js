@@ -86,6 +86,7 @@ var PlanningView = View.extend({
         'all_rows_rendered': 'on_all_rows_rendered',
         'planning_record_open': 'open_record',
         'planning_do_action': 'open_action',
+        'reload_events': 'on_reload_events'
     },
     /**
      *
@@ -570,6 +571,9 @@ var PlanningView = View.extend({
                 this.sidebar.info_filter.render();
             }
         }
+    },
+    on_reload_events: function () {
+        this._do_search(this.domain, this.context, this.group_by);
     },
     open_record: function (event, options) {
         console.log("OPTIONS:",options)
@@ -1103,6 +1107,12 @@ var PlanningCreneauDispo = Widget.extend({
             });
     },
     /**
+     *  reloads all events
+     */
+    reload_events: function () {
+        this.trigger_up('reload_events');
+    },
+    /**
      *  Ouvre le pop-up de planification @todo fonction on_close
      */
     on_planning_creneau_secteur_action_clicked: function(ev){
@@ -1147,7 +1157,7 @@ var PlanningCreneauDispo = Widget.extend({
             "default_duree_creneau": self.duree,
             "default_employee_id": self.row.res_id,
             "default_secteur_id": self.secteur_id,
-            "default_creneaux_reels": self.creneaux_reels.length > 1 ? self.creneaux_reels : false,
+            "default_creneaux_reels": self.creneaux_reels.length > 0 ? self.creneaux_reels : false,
         };  // à voir quoi mettre
         console.log("ADDITIONNAL CONTEXT",pyeval.eval('context', additional_context));
 
@@ -1155,7 +1165,7 @@ var PlanningCreneauDispo = Widget.extend({
                 console.log("LE RESUUUULT",result);
                 var options = {
                     'additional_context': pyeval.eval('context', additional_context),  // pour une raison inconnue le additional_context n'est pas pris en compte avant
-                    'on_close': function () {return },
+                    'on_close': function () {self.reload_events();},
                 };  // @todo: appel reload_events
                 //return self.view.ViewManager.action_manager.ir_actions_act_window(result,options);
                 return self.view.ViewManager.action_manager.do_action(result,options);
