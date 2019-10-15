@@ -39,13 +39,6 @@ def jour_abr_2_nb(str):
 class HREmployee(models.Model):
     _inherit = "hr.employee"
 
-    @api.model_cr_context
-    def _auto_init(self):
-        res = super(HREmployee, self)._auto_init()
-        employees_to_archive = self.search([('of_archive_horaires', '=', False)])
-        employees_to_archive.archiver_horaires()
-        return res
-
     def _default_of_tz(self):
         return self.env.user.tz or 'Europe/Paris'
 
@@ -289,7 +282,7 @@ class HREmployee(models.Model):
         for employee in self:
             res[employee.id] = {}
             if not employee.of_archive_horaires:
-                continue
+                employee.archiver_horaires()
             archive_str = u'[%s]' % employee.of_archive_horaires.replace(u"\n", u",")
             if jour_keys == "number":
                 archive_str = jour_abr_2_nb(archive_str)
@@ -309,7 +302,9 @@ class HREmployee(models.Model):
         res = {}
         for employee in self:
             res[employee.id] = {}
-            if not employee.of_archive_horaires_temp:
+            if not employee.of_archive_horaires_temp and employee.of_mode_horaires == 'advanced' and employee.of_creneau_temp_start:
+                employee.archiver_horaires_temp()
+            elif not employee.of_archive_horaires_temp:
                 continue
             archive_str = u'[%s]' % employee.of_archive_horaires_temp.replace(u"\n", u",")
             if jour_keys == "number":
