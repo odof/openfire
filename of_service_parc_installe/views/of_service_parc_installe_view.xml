@@ -5,7 +5,7 @@
     <record id="view_of_service_parc_installe_service_rec_form" model="ir.ui.view">
         <field name="name">of.parc.installe.service.form</field>
         <field name="model">of.service</field>
-        <field name="inherit_id" ref="of_service.view_of_service_rec_form"/>
+        <field name="inherit_id" ref="of_service.view_of_service_form"/>
         <field name="arch" type="xml">
             <xpath expr="//notebook/page[1]" position="before">
                 <page string="Produit installé">
@@ -27,7 +27,7 @@
     <record id="view_of_service_parc_installe_service_ponc_form" model="ir.ui.view">
         <field name="name">of.parc.installe.service.form</field>
         <field name="model">of.service</field>
-        <field name="inherit_id" ref="of_service.view_of_service_ponc_form"/>
+        <field name="inherit_id" ref="of_service.view_of_service_form"/>
         <field name="arch" type="xml">
             <xpath expr="//notebook/page[1]" position="before">
                 <page string="Produit installé">
@@ -148,7 +148,7 @@
         res_model="of.service"
         src_model="project.issue"
         view_mode="form"
-        view_id="of_service.view_of_service_ponc_form"
+        view_id="of_service.view_of_service_form"
         id="action_prevoir_intervention_sav"
         key2="client_action_multi"
         target="new"

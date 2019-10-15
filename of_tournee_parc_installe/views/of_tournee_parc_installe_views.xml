@@ -32,7 +32,7 @@
         <field name="inherit_id" ref="of_parc_installe.of_parc_installe_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="%(action_view_rdv_intervention_wizard_parc_installe)d" string="Planifier Intervention" type="action"/>
+                <button name="%(action_view_rdv_intervention_wizard_parc_installe)d" states="calculated" string="Planifier Intervention" type="action"/>
             </xpath>
         </field>
     </record>
