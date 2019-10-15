@@ -108,9 +108,9 @@
                     <field name="employee_id"/>
                     <field name="secteur_id"/>
                     <field name="zip_id"/>
-                    <field name="epi_lat" attrs="{'required': [('is_bloque', '=', False)]}"/>
-                    <field name="epi_lon" attrs="{'required': [('is_bloque', '=', False)]}"/>
-                    <field name="distance" attrs="{'required': [('is_bloque', '=', False)]}"/>
+                    <!--field name="epi_lat" attrs="{'required': [('is_bloque', '=', False)]}"/-->
+                    <!--field name="epi_lon" attrs="{'required': [('is_bloque', '=', False)]}"/-->
+                    <!--field name="distance" attrs="{'required': [('is_bloque', '=', False)]}"/-->
                     <field name="address_depart_id"/>
                     <field name="address_retour_id"/>
                     <field name="is_complet"/>

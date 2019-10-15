@@ -239,10 +239,10 @@
         </record>
 
         <!-- Ajout bouton planifier une intervention dans vue form service recurrent-->
-        <record id="view_of_service_rec_form_rdv_intervention" model="ir.ui.view">
+        <record id="view_of_service_form_rdv_intervention" model="ir.ui.view">
             <field name="name">of.service.form.rdv.intervention</field>
             <field name="model">of.service</field>
-            <field name="inherit_id" ref="of_service.view_of_service_rec_form"/>
+            <field name="inherit_id" ref="of_service.view_of_service_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//header" position="inside">
                     <button name="%(action_view_rdv_intervention_wizard_service)d" string="Planifier Intervention" type="action" invisible="context.get('hide_bouton_planif')"/>
@@ -251,10 +251,10 @@
         </record>
 
         <!-- Ajout bouton planifier une intervention dans vue form service ponctuel-->
-        <record id="view_of_service_rec_form_rdv_intervention" model="ir.ui.view">
+        <record id="view_of_service_form_rdv_intervention" model="ir.ui.view">
             <field name="name">of.service.form.rdv.intervention</field>
             <field name="model">of.service</field>
-            <field name="inherit_id" ref="of_service.view_of_service_ponc_form"/>
+            <field name="inherit_id" ref="of_service.view_of_service_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//header" position="inside">
                     <button name="%(action_view_rdv_intervention_wizard_service)d" string="Planifier Intervention" type="action" invisible="context.get('hide_bouton_planif')"/>
