@@ -51,14 +51,6 @@ class OfPlanningIntervention(models.Model):
         """Similaire au calcul de créneaux dispo de rdv.py.
         L'idée ici est de fusionner les créneaux dispos consécutifs.
         exple: une journée sans intervention programmée ne doit avoir qu'un créneau dispo"""
-        tournee = self.env['of.planning.tournee'].search([
-                                                        ('date', '=', date),
-                                                        ('employee_id', '=', employee_id)
-                                                        ], limit=1)
-        if tournee:
-            secteur = tournee.secteur_id
-        else:
-            secteur = False
         index_courant = 0
         employee = self.env['hr.employee'].browse(int(employee_id))
         deb = creneaux_travailles[index_courant][0]  # début courant
@@ -67,8 +59,15 @@ class OfPlanningIntervention(models.Model):
         vals={}
         lieu_depart = employee.of_address_depart_id and employee.of_address_depart_id.get_infos_lieu() or False
         lieu_retour = employee.of_address_retour_id and employee.of_address_retour_id.get_infos_lieu() or False
+        tournee = self.env['of.planning.tournee'].search([('date', '=', date), ('employee_id', '=', employee_id)], limit=1)
+        if tournee:
+            secteur = tournee.secteur_id
+            # les lieux de départ et de retour d'une tournée priment sur ceux de l'employé
+            lieu_depart = tournee.address_depart_id and tournee.address_depart_id.get_infos_lieu() or lieu_depart
+            lieu_retour = tournee.address_retour_id and tournee.address_retour_id.get_infos_lieu() or lieu_retour
+        else:
+            secteur = False
         lieu_deb = lieu_depart
-        vals['display_secteur'] = not intervention_heures
         for intervention, intervention_deb, intervention_fin in intervention_heures + [(False, 24, 24)]:
             secteur = intervention and intervention.secteur_id or secteur
             secteur_str = secteur and secteur.name or ""
@@ -90,7 +89,9 @@ class OfPlanningIntervention(models.Model):
                 if vals != {} and vals['duree'] >= duree_min:
                     vals['secteur_id'] = secteur and secteur.id or False
                     vals['secteur_str'] = secteur_str
+                    vals['display_secteur'] = not intervention_heures  # on affiche le secteur seulement si il n'y a pas d'interventions dans la journée
                     creneaux.append(vals)
+                vals = {}
             elif deb and deb < intervention_deb:  # du temps avant le début de l'intervention
                 if fin < intervention_deb:  # l'intervention commence sur un autre creneau: préparation du créneau dispo
                     vals['heure_debut'] = deb
