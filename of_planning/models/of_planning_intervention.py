@@ -427,7 +427,7 @@ class OfPlanningIntervention(models.Model):
                        "JOIN hr_employee he ON per.employee_id = he.id "
                        "WHERE hr_employee.id = he.id")
 
-            # On recopie le choix des couleurs de l'utilisateur dans les employés
+            # On recopie le choix des couleurs de l'utilisateur dans les employés.
             cr.execute("UPDATE hr_employee "
                        "SET of_color_ft = ru.of_color_ft, of_color_bg = ru.of_color_bg "
                        "FROM res_users as ru "
@@ -436,6 +436,26 @@ class OfPlanningIntervention(models.Model):
                        "WHERE hr_employee.id = he.id "
                        "AND ru.of_color_ft != '#0D0D0D' "
                        "AND ru.of_color_bg != '#F0F0F0'")
+
+            # On recopie les adresses de départ et de retour de l'équipe dans les employés.
+            # Si un employé est membre de plusieurs équipes, ce sont les adresses de la dernière équipe renvoyée en SQL qui l'emportent.
+
+            # Adresse de départ
+            cr.execute("UPDATE hr_employee "
+                       "SET of_address_depart_id = pe.address_id "
+                       "FROM of_planning_equipe as pe "
+                       "JOIN of_planning_employee_rel per ON pe.id = per.equipe_id "
+                       "JOIN hr_employee he ON per.employee_id = he.id "
+                       "WHERE hr_employee.id = he.id "
+                       "AND pe.address_id IS NOT Null AND he.of_address_depart_id IS Null")
+            # Adresse de retour
+            cr.execute("UPDATE hr_employee "
+                       "SET of_address_retour_id = pe.address_retour_id "
+                       "FROM of_planning_equipe as pe "
+                       "JOIN of_planning_employee_rel per ON pe.id = per.equipe_id "
+                       "JOIN hr_employee he ON per.employee_id = he.id "
+                       "WHERE hr_employee.id = he.id "
+                       "AND pe.address_retour_id IS NOT Null AND he.of_address_retour_id IS Null")
 
             # On recopie les horaires des équipes dans les employés
             # dans le cas où ce n'est pas les horaires par défaut dans l'équipe et c'est les horaires par défaut dans l'employé.
@@ -455,6 +475,12 @@ class OfPlanningIntervention(models.Model):
                        "FROM hr_employee HE, of_jours OJ "
                        "WHERE OJ.numero >= 1 AND OJ.numero <= 5 "
                        "AND HE.id NOT IN (SELECT employee_id FROM employee_jours_rel)")
+
+            # On recopie les tâches des équipes vers les employés.
+            cr.execute("INSERT INTO employee_tache_rel(employee_id, tache_id) "
+                       "SELECT DISTINCT oper.employee_id, etr.tache_id "
+                       "FROM equipe_tache_rel etr "
+                       "JOIN of_planning_employee_rel oper ON etr.equipe_id = oper.equipe_id")
 
         return res
 
