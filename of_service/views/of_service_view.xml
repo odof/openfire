@@ -168,9 +168,9 @@
             </field>
         </record>
 
-<!-- ### Services récurrents -->
+<!-- ### Services récurrents - ->
 
-        <record id="view_of_service_rec_form" model="ir.ui.view">
+        <record id="view_of_service_rec_form" model="ir.ui.view"> <!- - n'est plus utilisé, à supprimer bientôt - ->
             <field name="name">of.service.form</field>
             <field name="model">of.service</field>
             <field name="priority" eval="10"/>
@@ -213,6 +213,8 @@
                                    options="{'no_create': True}" groups="base.group_multi_company"/>
                                 <field name="tache_id" context="{'show_rec_icon_first': recurrence}"/>
                                 <field name="duree" widget="float_time"/>
+                                <field name="duree_planif" widget="float_time"/>
+                                <field name="duree_restante" widget="float_time"/>
                                 <field name="tag_ids" widget="many2many_tags"/>
                                 <field name="origin" readonly="1" attrs="{'invisible': [('recurrence', '=', True)]}"/>
                             </group>
@@ -242,6 +244,7 @@
                                         <field name="employee_ids"/>
                                         <field name="company_id"/>
                                         <field name="state"/>
+                                        <button name="button_done" string="Marquer comme fait" type="object"/>
                                         <field name="description"/>
                                     </tree>
                                 </field>
@@ -250,7 +253,7 @@
                     </sheet>
                 </form>
             </field>
-        </record>
+        </record-->
 
         <record id="view_of_service_rec_tree" model="ir.ui.view">
             <field name="name">of.service.tree</field>
@@ -338,15 +341,20 @@
             </field>
         </record>
 
-<!-- ### Services ponctuels -->
+<!-- ### Services ponctuels  invisible="1"-->
 
-        <record id="view_of_service_ponc_form" model="ir.ui.view">
+        <record id="view_of_service_form" model="ir.ui.view">
             <field name="name">of.service.form</field>
             <field name="model">of.service</field>
             <field name="arch" type="xml">
                 <form>
                     <header>
-                        <field name="state" widget="statusbar" statusbar_visible="todo,done,cancel"/>
+                        <button name="button_valider" string="Valider" states="draft" type="object"/>
+                        <button name="button_annuler" string="Annuler" states="calculated" type="object"/>
+                        <button name="button_brouillon" string="Remettre en brouillon" states="cancel" type="object"/>
+
+                        <field name="state_rec" widget="statusbar" attrs="{'invisible': [('recurrence', '=', False)]}"/>
+                        <field name="state_ponc" widget="statusbar" attrs="{'invisible': [('recurrence', '=', True)]}"/>
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
@@ -374,12 +382,16 @@
                         </div>
                         <group>
                             <group>
+                                <field name="state" invisible="1"/>
                                 <field name="partner_id" invisible="context.get('hide_service_partner_id')"/>
                                 <field name="address_id" invisible="context.get('hide_service_address_id')"/>
                                 <field name="secteur_tech_id"/>
                                 <field name="tache_id" context="{'show_rec_icon_first': recurrence}"/>
                                 <field name="duree" widget="float_time"/>
+                                <field name="duree_planif" widget="float_time"/>
+                                <field name="duree_restante" widget="float_time"/>
                                 <field name="origin" readonly="1" attrs="{'invisible': [('recurrence', '=', True)]}"/>
+                                <field name="tag_ids" widget="many2many_tags"/>
                             </group>
                             <group>
                                 <field name="date_next" string="À partir du"/>
@@ -408,6 +420,7 @@
                                         <field name="employee_ids"/>
                                         <field name="company_id"/>
                                         <field name="state"/>
+                                        <button name="button_done" string="Marquer comme fait" type="object"/>
                                         <field name="description"/>
                                     </tree>
                                 </field>
@@ -536,7 +549,7 @@
         <record id="action_service_rec_form_view_sale" model="ir.actions.act_window.view">
             <field name="sequence" eval="2"/>
             <field name="view_mode">form</field>
-            <field name="view_id" ref="view_of_service_rec_form"/>
+            <field name="view_id" ref="view_of_service_form"/>
             <field name="act_window_id" ref="action_of_service_rec_form_sale"/>
         </record>
 
@@ -571,7 +584,7 @@
         <record id="action_service_rec_form_view_planning" model="ir.actions.act_window.view">
             <field name="sequence" eval="2"/>
             <field name="view_mode">form</field>
-            <field name="view_id" ref="view_of_service_rec_form"/>
+            <field name="view_id" ref="view_of_service_form"/>
             <field name="act_window_id" ref="action_of_service_rec_form_planning"/>
         </record>
 
@@ -607,7 +620,7 @@
         <record id="action_service_ponc_form_view_sale" model="ir.actions.act_window.view">
             <field name="sequence" eval="2"/>
             <field name="view_mode">form</field>
-            <field name="view_id" ref="view_of_service_ponc_form"/>
+            <field name="view_id" ref="view_of_service_form"/>
             <field name="act_window_id" ref="action_of_service_ponc_form_sale"/>
         </record>
 
@@ -643,7 +656,7 @@
         <record id="action_service_ponc_form_view_planning" model="ir.actions.act_window.view">
             <field name="sequence" eval="2"/>
             <field name="view_mode">form</field>
-            <field name="view_id" ref="view_of_service_ponc_form"/>
+            <field name="view_id" ref="view_of_service_form"/>
             <field name="act_window_id" ref="action_of_service_ponc_form_planning"/>
         </record>
 
