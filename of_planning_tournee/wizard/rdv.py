@@ -94,7 +94,8 @@ class OfTourneeRdv(models.TransientModel):
     pre_employee_ids = fields.Many2many('hr.employee', string=u'Pré-sélection d\'intervenants', domain="[('of_tache_ids', 'in', tache_id)]", help=u"pré-sélection des intervenants")
     duree = fields.Float(string=u'Durée', required=True, digits=(12, 5))
     planning_ids = fields.One2many('of.tournee.rdv.line', 'wizard_id', string='Proposition de RDVs')
-    planning_tree_ids = fields.One2many('of.tournee.rdv.line', 'wizard_id', string='Proposition de RDVs', domain=[('allday', '=', False)])
+    planning_tree_ids = fields.One2many('of.tournee.rdv.line', 'wizard_id', string='Proposition de RDVs',
+                                        domain=[('intervention_id', '=', False), ('allday', '=', False)])
     date_propos = fields.Datetime(string=u'RDV Début')
     date_propos_hour = fields.Float(string=u'Heude de début', digits=(12, 5))
     date_recherche_debut = fields.Date(string='À partir du', required=True, default=lambda *a: (date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
@@ -315,14 +316,14 @@ class OfTourneeRdv(models.TransientModel):
             })
 
         # --- Recherche des créneaux ---
-        date_recherche_da = d_avant_recherche
+        date_recherche_da = avant_recherche_da
         u"""
         Parcourt tous les jours inclus entre la date de début de recherche et la date de fin de recherche.
         Prend en compte les équipes qui peuvent effectuer la tache, et qui sont disponibles
         Ne prend pas en compte les jours non travaillés
         @TODO: passer les jours travaillés en many2many vers of.jour (module of_utils)
         """
-        while date_recherche_da < d_apres_recherche:
+        while date_recherche_da < apres_recherche_da:
             date_recherche_da += un_jour
             num_jour = date_recherche_da.isoweekday()
 
@@ -331,9 +332,9 @@ class OfTourneeRdv(models.TransientModel):
                 date_recherche_da += un_jour
                 num_jour = ((num_jour + 1) % 7) or 7 # num jour de la semaine entre 1 et 7
             # Arreter la recherche si on dépasse la date de fin
-            if date_recherche_da >= d_apres_recherche:
+            if date_recherche_da >= apres_recherche_da:
                 continue
-            date_recherche_da_str = fields.Date.to_string(date_recherche_da)
+            date_recherche_str = fields.Date.to_string(date_recherche_da)
             horaires_du_jour = employee_obj.get_horaires_effectif_date(date_recherche_str, horaires_list_dict)
 
             # Interdiction de chercher dans les tournées bloquées ou complètes
@@ -342,7 +343,7 @@ class OfTourneeRdv(models.TransientModel):
                              "WHERE employee_id IN %s "
                              "  AND date = %s"
                              "  AND (is_bloque OR is_complet)",
-                             (employee._ids, date_recherche_str))
+                             (employees._ids, date_recherche_str))
             employees_bloquees = [row[0] for row in self._cr.fetchall()]
             employees_dispo = []
 
@@ -372,8 +373,8 @@ class OfTourneeRdv(models.TransientModel):
 
                     # Comme on n'affiche que les heures, il faut s'assurer de rester dans le bon jour
                     #   (pour les interventions étalées sur plusieurs jours)
-                    date_intervention_locale_dt = max(date_intervention_locale_dt, dt_jour_deb)
-                    date_intervention_locale_dt = min(date_intervention_locale_dt, dt_jour_fin)
+                    date_intervention_locale_dt = max(date_intervention_locale_dt, jour_deb_dt)
+                    date_intervention_locale_dt = min(date_intervention_locale_dt, jour_fin_dt)
                     date_intervention_locale_flo = round(date_intervention_locale_dt.hour +
                                                       date_intervention_locale_dt.minute / 60.0 +
                                                       date_intervention_locale_dt.second / 3600.0, 5)
@@ -499,7 +500,7 @@ class OfTourneeRdv(models.TransientModel):
                             'disponible': False,
                         })
         # Calcul des durées et distances
-        date_debut_da = d_avant_recherche + un_jour
+        date_debut_da = avant_recherche_da + un_jour
         date_fin_da = apres_recherche_da - un_jour
         if not self.ignorer_geo:
             self.calc_distances_dates_employees(date_debut_da, date_fin_da, employees)
@@ -565,6 +566,7 @@ class OfTourneeRdv(models.TransientModel):
     @api.multi
     def get_values_intervention_create(self):
         self.ensure_one()
+        employee = self.employee_id
         values = {
             'hor_md': employee.of_mode_horaires == 'easy' and employee.of_hor_md or 0.0,
             'hor_mf': employee.of_mode_horaires == 'easy' and employee.of_hor_mf or 0.0,
