@@ -20,7 +20,24 @@ class OfService(models.Model):
             cr.execute("SELECT * FROM information_schema.columns WHERE table_name = 'of_service' AND column_name = 'company_id'")
             fill_company_id = not bool(cr.fetchall())
 
+        # Lors de la 1ère mise à jour après la refonte des planning (sept. 2019), on migre les données existantes.
+        cr.execute("SELECT 1 FROM information_schema.columns WHERE table_name = 'of_service' AND column_name = 'recurrence'")
+        existe_avant = bool(cr.fetchall())
+
         res = super(OfService, self)._auto_init()
+
+        cr.execute("SELECT 1 FROM information_schema.columns WHERE table_name = 'of_service' AND column_name = 'recurrence'")
+        existe_apres = bool(cr.fetchall())
+        # Si le champ recurrence n'existe pas avant et l'est après la mise à jour,
+        # c'est qu'on est à la 1ère mise à jour après la refonte du planning, on doit faire la migration des données.
+        if not existe_avant and existe_apres:
+            # On peuple le champ durée des services avec la durée de la tâche associé au service.
+            cr.execute("UPDATE of_service "
+                       "SET duree = of_planning_tache.duree "
+                       "FROM of_planning_tache "
+                       "WHERE of_service.tache_id = of_planning_tache.id")
+
+        # company_id
         if fill_company_id:
             cr.execute("UPDATE of_service AS s "
                        "SET company_id = p.company_id\n"
@@ -325,7 +342,8 @@ class OfService(models.Model):
                 date_mois += 1
 
             mois = min(mois_nums, key=lambda m: (m <= date_mois, m))
-            annee = date_annee + (mois <= date_mois)
+            annee = date_annee + (mois < date_mois)
+
             return fields.Date.to_string(date(annee, mois, 1))
         else:
             return False
