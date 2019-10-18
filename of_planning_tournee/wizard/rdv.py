@@ -24,7 +24,7 @@ bug description quand changement de tache ou service lié puis changé?
 def hours_to_strs(*hours):
     """ Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'
     """
-    return tuple("%02dh%02d" % (hour, round((hour % 1) * 60)) for hour in hours)
+    return tuple("%dh%02d" % (hour, round((hour % 1) * 60)) if hour % 1 else "%dh" % (hour) for hour in hours)
 
 class OfTourneeRdv(models.TransientModel):
     _name = 'of.tournee.rdv'
@@ -167,6 +167,8 @@ class OfTourneeRdv(models.TransientModel):
                                               ('tache_id', '=', self.tache_id.id)], limit=1)
                 if service:
                     vals['service_id'] = service
+            if not vals.get('service_id', False):
+                vals['creer_recurrence'] = self.tache_id.recurrence
 
             if self.tache_id.duree:
                 vals['duree'] = self.tache_id.duree
@@ -531,10 +533,12 @@ class OfTourneeRdv(models.TransientModel):
                 'zero_dispo'      : False,
             }
 
-            if self.service_id:
+            if self.service_id and self.service_id.recurrence:
                 vals['date_next'] = self.service_id.get_next_date(first_res_da.strftime('%Y-%m-%d'))
-            else:
+            elif self.creer_recurrence:
                 vals['date_next'] = "%s-%02i-01" % (first_res_da.year + 1, first_res_da.month)
+            else:
+                vals['date_next'] = False
 
             if nb_dispo == 0:
                 vals['display_res'] = True

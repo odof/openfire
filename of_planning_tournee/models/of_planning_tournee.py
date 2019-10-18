@@ -222,6 +222,7 @@ class OfPlanningTournee(models.Model):
     date = fields.Date(string='Date', required=True)
     date_jour = fields.Char(compute="_compute_date_jour", string="Jour")
     employee_id = fields.Many2one('hr.employee', string=u'Intervenant', required=True)
+    equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe')
     employee_other_ids = fields.Many2many('hr.employee', 'tournee_employee_other_rel', 'tournee_id', 'employee_id',
                                     string='Équipiers', required=True, domain="[('of_est_intervenant', '=', True)]")
     secteur_id = fields.Many2one('of.secteur', string='Secteur', domain="[('type', 'in', ['tech', 'tech_com'])]")
@@ -281,7 +282,8 @@ class OfPlanningTournee(models.Model):
             horaires_emp = employee.get_horaires_date(tournee.date)[employee.id]
             nb_creneaux = len(horaires_emp)
             if nb_creneaux == 0:
-                raise UserError(u"Oups! On dirait que l'intervenant %s ne travail pas ce jour-ci!" % employee.name)
+                tournee.is_complet = True
+                continue
             start_end_list = [(0, horaires_emp[0][0])]  # liste des créneaux non-travaillés de l'employé
             for i in range(1, nb_creneaux):
                 start_end_list.append((horaires_emp[i-1][1], horaires_emp[i][0]))
