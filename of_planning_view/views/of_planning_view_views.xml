@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <record id="view_of_intervention_settings_planning_view" model="ir.ui.view">
+        <field name="name">paramètres interventions vue planning</field>
+        <field name="model">of.intervention.settings</field>
+        <field name="inherit_id" ref="of_planning.view_of_intervention_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='main']" position="inside">
+                <group name="planning_view_config" string="Vue Planning">
+                    <label for="planningview_employee_exclu_ids"/>
+                    <div name="planningview_employee_exclu_ids">
+                        <field name="planningview_employee_exclu_ids" class="oe_inline" widget="many2many_tags"/>
+                        <span>Intervenants à NE PAS montrer en vue planning</span>
+                    </div>
+                </group>
+
+            </xpath>
+        </field>
+    </record>
+
     <record id="of_planning_intervention_view_planning" model="ir.ui.view">
         <field name="name">of.planning.intervention.timeline</field>
         <field name="model">of.planning.intervention</field>
@@ -14,6 +32,8 @@
                 <field name="partner_name" class="of_planning_info_partner_name"/>
                 <field name="address_zip" class="of_planning_info_lieu of_planning_subinfo_zip"/>
                 <field name="address_city" class="of_planning_info_lieu of_planning_subinfo_city"/>
+                <field name="secteur_id"/>
+                <field name="state_int"/>
             </planning>
         </field>
     </record>

@@ -106,7 +106,7 @@ class OfPlanningIntervention(models.Model):
                 date = vals.get('date', intervention.date)
                 date_jour = isinstance(date, basestring) and date[:10] or date.strftime('%Y-%m-%d')
                 employee_ids = set(intervention.employee_ids._ids)
-                for row in vals.get('employee_ids', False):
+                for row in vals.get('employee_ids', []):
                     if row[0] == 5:
                         employee_ids = set()
                     elif row[0] == 2:

@@ -74,9 +74,9 @@ class OfPlanifCreneauProp(models.TransientModel):
     #@api.depends('geo_lat', 'geo_lng', 'creneau_id.geo_lat_prec', 'creneau_id.geo_lng_prec',
     #             'creneau_id.geo_lat_suiv', 'creneau_id.geo_lng_suiv')
     def compute_distance_reelle(self):
-        print "\nA VER?"
-        print len(self)
-        print "\n"
+        #print "\nA VER?"
+        #print len(self)
+        #print "\n"
         for a_planifier in self:
             a_planifier.dummy_field = True
             query = ROUTING_BASE_URL + "route/" + ROUTING_VERSION + "/" + ROUTING_PROFILE + "/"
@@ -120,9 +120,9 @@ class OfPlanifCreneauProp(models.TransientModel):
     @api.depends('geo_lat', 'geo_lng', 'creneau_id.geo_lat_prec', 'creneau_id.geo_lng_prec',
                  'creneau_id.geo_lat_suiv', 'creneau_id.geo_lng_suiv')
     def _compute_distance_dwazo(self):
-        print "\nDISTANCE DWAZO?"
-        print len(self)
-        print "\n"
+        #print "\nDISTANCE DWAZO?"
+        #print len(self)
+        #print "\n"
         for a_planifier in self:
             if a_planifier.geo_lat == 0.0 or a_planifier.geo_lng == 0.0:
                 a_planifier.distance_dwazo_prec = -1
@@ -412,6 +412,8 @@ class OfPlanifCreneau(models.TransientModel):
     @api.multi
     def button_confirm(self):
         self.ensure_one()
+        if not self.duree_rdv:
+            raise UserError(u"Avez-vous pensé à vérifier la durée de votre intervention?")
         intervention = self.create_intervention()
         #if self.selected_id.service_id.recurrence:  # conception: calculer date next à la création de l'intervention ou à sa validation?
         #    intervention.service_id.date_next = intervention.service_id.get_next_date(self.date_creneau)
@@ -430,6 +432,8 @@ class OfPlanifCreneau(models.TransientModel):
         self.ensure_one()
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')
+        if not self.duree_rdv:
+            raise UserError(u"Avez-vous pensé à vérifier la durée de votre intervention?")
         intervention = self.create_intervention()
         intervention._compute_date_deadline()
         date_dt = fields.Datetime.from_string(intervention.date)

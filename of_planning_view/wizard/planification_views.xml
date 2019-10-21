@@ -15,6 +15,7 @@
                 </script>
                 <field name="creneau_fini" invisible="1"/>
                 <field name="aucun_res" invisible="1"/>
+                <header></header>
                 <group col="1" colspan="2" attrs="{'invisible': [('creneau_fini', '=', False)]}">
                     <div>Félicitation! Ce créneau est entièrement planifiée! \o/</div>
                 </group>
