@@ -374,12 +374,27 @@
             <field name="type">search</field>
             <field name="arch" type="xml">
                 <search>
-                    <filter string="En cours" name="filter_progress" domain="[('active', '=', True)]"/>
-                    <filter string="Annulé" name="filter_cancel" domain="[('active', '=', False)]"/>
-                    <separator/>
                     <filter string="Récurrent" name="filter_rec" domain="[('recurrence', '=', True)]"/>
                     <filter string="Ponctuel" name="filter_ponc" domain="[('recurrence', '=', False)]"/>
                     <separator/>
+                    <filter string="(rec) Brouillon" name="filter_rec_draft" domain="[('state_rec', '=', 'draft')]"/>
+                    <filter string="(rec) À planifier prochainement" name="filter_rec_to_plan" domain="[('state_rec', '=', 'to_plan')]"/>
+                    <filter string="(rec) Planifié prochainement" name="filter_rec_planned_soon" domain="[('state_rec', '=', 'planned_soon')]"/>
+                    <filter string="(rec) Planifié récemment" name="filter_rec_planned" domain="[('state_rec', '=', 'planned')]"/>
+                    <filter string="(rec) En cours" name="filter_rec_progress" domain="[('state_rec', '=', 'progress')]"/>
+                    <filter string="(rec) En retard de planification" name="filter_rec_late" domain="[('state_rec', '=', 'late')]"/>
+                    <filter string="(rec) Terminé" name="filter_rec_done" domain="[('state_rec', '=', 'done')]"/>
+                    <filter string="(rec) Annulé" name="filter_rec_cancel" domain="[('state_rec', '=', 'cancel')]"/>
+
+                    <filter string="(ponc) Brouillon" name="filter_ponc_draft" domain="[('state_ponc', '=', 'draft')]"/>
+                    <filter string="(ponc) À planifier" name="filter_ponc_to_plan" domain="[('state_ponc', '=', 'to_plan')]"/>
+                    <filter string="(ponc) Partiellement planifié" name="filter_ponc_part_planned" domain="[('state_ponc', '=', 'part_planned')]"/>
+                    <filter string="(ponc) Entièrement planifié" name="filter_ponc_all_planned" domain="[('state_ponc', '=', 'all_planned')]"/>
+                    <filter string="(ponc) En retard de planification" name="filter_ponc_late" domain="[('state_ponc', '=', 'late')]"/>
+                    <filter string="(ponc) Fait" name="filter_ponc_done" domain="[('state_ponc', '=', 'done')]"/>
+                    <filter string="(ponc) Annulé" name="filter_ponc_cancel" domain="[('state_ponc', '=', 'cancel')]"/>
+                    <separator/>
+
                     <filter string="Semaine en cours" name="this_week"
                             domain="['|',
                                      '&amp;', '&amp;', ('recurrence', '=', True),
@@ -452,7 +467,7 @@
             </field>
         </record>
 
-        <record id="view_of_service_ponc_filter" model="ir.ui.view">
+        <!--record id="view_of_service_ponc_filter" model="ir.ui.view">
             <field name="name">of.service.select</field>
             <field name="model">of.service</field>
             <field name="type">search</field>
@@ -512,7 +527,7 @@
                     <field name="date_fin_max" filter_domain="[('date_fin','&lt;=',self)]"/>
                 </search>
             </field>
-        </record>
+        </record-->
 
 <!--##########################################################################################################################-->
 <!--#################################################________Actions_________#################################################-->
@@ -595,7 +610,7 @@
             <field name="res_model">of.service</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,map,form</field>
-            <field name="search_view_id" ref="view_of_service_ponc_filter"/>
+            <field name="search_view_id" ref="view_of_service_rec_filter"/>
             <field name="context">{
                 'search_default_this_week': 1,
                 'search_default_next_week': 1,
@@ -631,7 +646,7 @@
             <field name="res_model">of.service</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,map,form</field>
-            <field name="search_view_id" ref="view_of_service_ponc_filter"/>
+            <field name="search_view_id" ref="view_of_service_rec_filter"/>
             <field name="context">{
                 'search_default_this_week': 1,
                 'search_default_next_week': 1,
