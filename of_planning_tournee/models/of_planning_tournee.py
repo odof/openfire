@@ -30,31 +30,27 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def create_tournees(self):
-        """Crée les tournées des employés de cette intervention si besoin"""
+        """Créer les tournées des employés de cette intervention si besoin"""
         self.ensure_one()
         tournee_obj = self.env['of.planning.tournee']
-        # if self.tache_id.category_id.type_planning_intervention != 'tournee':
-        #     return False
         date_intervention = self.date
         date_jour = isinstance(date_intervention, basestring) and date_intervention[:10] or date_intervention.strftime('%Y-%m-%d')
         address = self.address_id
-        # ville = address.ville or address
         ville = address
         country = address.country_id
         res = []
         for employee in self.employee_ids:
-            tournee_id = tournee_obj.search([('date', '=', date_jour), ('employee_id', '=', employee.id)], limit=1)
+            tournee_id = tournee_obj.search([('date','=',date_jour), ('employee_id','=',employee.id)], limit=1)
             if not tournee_id:
                 tournee_data = {
                     'date'       : date_jour,
                     'employee_id': employee.id,
                     'epi_lat'    : ville.geo_lat,
                     'epi_lon'    : ville.geo_lng,
-                    'adr_id'     : address.id,
-                    # 'ville'      : address.ville and address.ville.id,
-                    'zip'        : ville.zip,
-                    'city'       : ville.city,
-                    'country_id' : country and country.id,
+                    # 'adr_id'     : address.id,
+                    # 'zip'        : ville.zip,
+                    # 'city'       : ville.city,
+                    # 'country_id' : country and country.id,
                     'is_bloque'  : False,
                     'is_confirme': False
                 }
@@ -80,7 +76,7 @@ class OfPlanningIntervention(models.Model):
     def create(self, vals):
         planning_tournee_obj = self.env['of.planning.tournee']
 
-        # On verifie que la tournee n'est pas deja complete ou bloquee
+        # On verifie que la tournée n'est pas déjà complète ou bloquée.
         date_jour = isinstance(vals['date'], basestring) and vals['date'][:10] or vals['date'].strftime('%Y-%m-%d')
 
         if not vals.get('employee_ids', False):
@@ -92,12 +88,12 @@ class OfPlanningIntervention(models.Model):
                                                             ('employee_id', 'in', employee_ids),
                                                             ('is_bloque', '=', True)])
         if planning_tournee_ids:
-            raise ValidationError(u'Un des intervenants a déjà une tournée bloquée à cette date')
+            raise ValidationError(u'Un des intervenants a déjà une tournée bloquée à cette date.')
 
         intervention = super(OfPlanningIntervention, self).create(vals)
         planning_tournee_ids = planning_tournee_obj.search([('date', '=', date_jour),
                                                             ('employee_id', 'in', employee_ids)])
-        if len(planning_tournee_ids) != len(employee_ids):  # une ou plusieurs tournées n'ont pas encore été créées
+        if len(planning_tournee_ids) != len(employee_ids):  # Une ou plusieurs tournées n'ont pas encore été créées.
             intervention.create_tournees()
         return intervention
 
@@ -221,8 +217,11 @@ class OfPlanningTournee(models.Model):
 
     date = fields.Date(string='Date', required=True)
     date_jour = fields.Char(compute="_compute_date_jour", string="Jour")
-    employee_id = fields.Many2one('hr.employee', string=u'Intervenant', required=True)
+    # Champ equipe_id avant la refonte du planning nov. 2019.
+    # Conservé quelques jours pour la transtion des données.
+    # À supprimer par la suite.
     equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe')
+    employee_id = fields.Many2one('hr.employee', string=u'Intervenant', required=True)
     employee_other_ids = fields.Many2many('hr.employee', 'tournee_employee_other_rel', 'tournee_id', 'employee_id',
                                     string='Équipiers', required=True, domain="[('of_est_intervenant', '=', True)]")
     secteur_id = fields.Many2one('of.secteur', string='Secteur', domain="[('type', 'in', ['tech', 'tech_com'])]")
@@ -239,6 +238,27 @@ class OfPlanningTournee(models.Model):
     is_confirme = fields.Boolean(string=u'Confirmé', default=True, help=u'Une tournée non confirmée sera supprimée si on lui retire ses rendez-vous')
     date_min = fields.Date(related="date", string="Date min")
     date_max = fields.Date(related="date", string="Date max")
+
+    @api.model_cr_context
+    def _auto_init(self):
+        # Lors de la 1ère mise à jour après la refonte des planning (nov. 2019), on migre les données existantes.
+        cr = self._cr
+        cr.execute("SELECT 1 FROM information_schema.columns WHERE table_name = 'of_planning_tournee' AND column_name = 'employee_id'")
+        existe_avant = bool(cr.fetchall())
+        res = super(OfPlanningTournee, self)._auto_init()
+        cr.execute("SELECT 1 FROM information_schema.columns WHERE table_name = 'of_planning_tournee' AND column_name = 'employee_id'")
+        existe_apres = bool(cr.fetchall())
+        # Si le champ employee_id n'existe pas avant et l'est après la mise à jour,
+        # c'est qu'on est à la 1ère mise à jour après la refonte du planning, on doit faire la migration des données.
+        if not existe_avant and existe_apres:
+            # On supprime la colonne et les tables de l'ancienne planification.
+            cr.execute("ALTER TABLE of_planning_intervention DROP COLUMN tournee_id")
+            cr.execute("DROP TABLE of_tournee_planification, of_tournee_planification_partner, of_tournee_planification_planning")
+            # On vide les tournées existantes et on les re-créer.
+            cr.execute("TRUNCATE of_planning_intervention_of_planning_tournee_rel, tournee_employee_other_rel, of_planning_tournee")
+            for intervention in self.env['of.planning.intervention'].search([('state','not in',('cancel','postponed'))], order="date"):
+                intervention.create_tournees()
+        return res
 
     @api.depends('date')
     def _compute_date_jour(self):
@@ -355,7 +375,7 @@ class OfPlanningTournee(models.Model):
             if intervention_obj.search([('date', '>=', vals['date']), ('date', '<=', vals['date']),
                                         ('state', 'in', ('draft', 'confirm', 'done', 'unfinished')),
                                         ('employee_ids', 'in', vals['employee_id'])]):
-                raise ValidationError(u'Il existe déjà les interventions dans la journée de cet Intervenant')
+                raise ValidationError(u'Il existe déjà des interventions dans la journée pour cet intervenant.')
         return super(OfPlanningTournee, self).create(vals)
 
     @api.multi
@@ -369,21 +389,8 @@ class OfPlanningTournee(models.Model):
                 if intervention_obj.search([('date', '>=', date_intervention), ('date', '<=', date_intervention),
                                             ('state', 'in', ('draft', 'confirm', 'done', 'unfinished')),
                                             ('employee_ids', 'in', employee_id)]):
-                    raise ValidationError(u'Il existe déjà les interventions dans la journée de cette équipe')
+                    raise ValidationError(u'Il existe déjà des interventions dans la journée pour cet intervenant.')
         return super(OfPlanningTournee, self).write(vals)
-
-    @api.multi
-    def open_planification(self):
-        self.ensure_one()
-        plan_obj = self.env['of.tournee.planification']
-
-        planif = plan_obj.create({
-            'tournee_id'       : self.id,
-            'distance_add'     : self.distance + 10.0,
-            'plan_partner_ids' : plan_obj._get_partner_ids(self),
-            'plan_planning_ids': plan_obj._get_planning_ids(self),
-        })
-        return planif._get_show_action()
 
 class OfService(models.Model):
     _inherit = 'of.service'

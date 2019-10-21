@@ -102,21 +102,16 @@
             <field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree editable="top" colors="red:(is_complet==True) or (is_bloque==True);grey:(is_confirme==False)">
-                    <!--field name="docs" invisible="1"/-->
                     <field name="date_jour"/>
                     <field name="date"/>
                     <field name="employee_id"/>
                     <field name="secteur_id"/>
                     <field name="zip_id"/>
-                    <!--field name="epi_lat" attrs="{'required': [('is_bloque', '=', False)]}"/-->
-                    <!--field name="epi_lon" attrs="{'required': [('is_bloque', '=', False)]}"/-->
-                    <!--field name="distance" attrs="{'required': [('is_bloque', '=', False)]}"/-->
                     <field name="address_depart_id"/>
                     <field name="address_retour_id"/>
                     <field name="is_complet"/>
                     <field name="is_bloque"/>
                     <field name="is_confirme"/>
-                    <!--button name="open_planification" type="object" string="Planifier" attrs="{'invisible': [('is_complet', '=', True)]}"/-->
                 </tree>
             </field>
         </record>
