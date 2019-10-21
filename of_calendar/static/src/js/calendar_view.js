@@ -97,13 +97,17 @@ CalendarView.include({
      */
     willStart: function() {
         var self = this;
-        var dfd = $.Deferred();
-        var dfd2 = $.Deferred();
-        var ir_config = new Model('ir.config_parameter');
-        ir_config.call('get_param',['Calendar_Drag_And_Drop']).then(function(val) {
-            self.draggable = _.str.toBool(val) || self.draggable; // if false in system parameters but true in view definition, make it true
-            dfd.resolve();
-        });
+        //var dfd = $.Deferred();
+        //var dfd2 = $.Deferred();
+        //var dfd3 = $.Deferred();
+        var ir_config_model = new Model('ir.config_parameter');
+        var ir_values_model = new Model('ir.values');
+        var dnd_dfd = ir_config_model.call('get_param',['Calendar_Drag_And_Drop']);
+        var mintime_dfd = ir_values_model.call("get_default", ["of.intervention.settings", "calendar_min_time"]);
+        var maxtime_dfd = ir_values_model.call("get_default", ["of.intervention.settings", "calendar_max_time"]);
+
+
+/*
         if (this.attendee_model && this.working_hours == 'attendees' || this.parent_model && this.working_hours == 'parent') {
             this.set_min_max_time()
             .then(function () {
@@ -112,9 +116,25 @@ CalendarView.include({
             });
         }else{
             dfd2.resolve();
-        }
+        }*/
 
-        return $.when(dfd,dfd2,this._super());
+        return $.when(dnd_dfd, mintime_dfd, maxtime_dfd, this._super())
+        .then(function () {
+            self.draggable = _.str.toBool(arguments[0]) || self.draggable; // if false in system parameters but true in view definition, make it true
+            var min_time = arguments[1];
+            var max_time = arguments[2]
+            if (min_time && min_time < 10) {  // minTime
+                self.minTime = "0" + min_time + ":00:00"
+            }else if (min_time) {
+                self.minTime = min_time + ":00:00"
+            }
+            if (max_time && max_time < 10) {  // minTime
+                self.maxTime = "0" + max_time + ":00:00"
+            }else if (max_time) {
+                self.maxTime = max_time + ":00:00"
+            }
+            return $.when();
+        });
     },
     /**
      * override copy of parent function. Sets up first event to be displayed. Handles radio filters
@@ -388,7 +408,7 @@ CalendarView.include({
     },
     /**
      *  Sets up this.minTime and this.maxTime
-     */
+     * /
     set_min_max_time: function() {
         var self = this;
         var dfd = $.Deferred();
@@ -436,7 +456,7 @@ CalendarView.include({
         }
     },
     /**
-     *  update drag n drop
+     *  update drag n drop, minTime, maxTime
      */
     get_fc_init_options: function () {
         var fc = this._super();
