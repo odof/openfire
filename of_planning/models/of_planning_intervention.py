@@ -1017,7 +1017,7 @@ class OfPlanningIntervention(models.Model):
 
 class OFInterventionConfiguration(models.TransientModel):
     u"""modèle défini ici, utilisé par of_planning_view"""
-    _name = 'of.intervention.config.settings'
+    _name = 'of.intervention.settings'
     _inherit = 'res.config.settings'
 
 class ResPartner(models.Model):
