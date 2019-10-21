@@ -74,7 +74,7 @@ FieldMany2One.include({
             // on attend d'avoir set la valeur de geo_lat avant de la verifier :D
             $.when(this.dfd_geo_lat).then(function(){
                 self.$label.next('.o_tz_warning').remove();
-                if(!self.check_localized() && $('.of_warning_' + self.field_manager.datarecord[self.name][1]).length == 0 && !self.get("invisible")) {
+                if(!self.check_localized() && !self.get("invisible")) {  //&& $('.of_warning_' + self.field_manager.datarecord[self.name][1]).length == 0
                     //console.log(self.$label.length, self);
                     // n'est pas géolocalisé
                     var options = _.extend({
