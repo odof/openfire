@@ -711,7 +711,7 @@ class HREmployee(models.Model):
             user_ids.write({'of_color_ft': vals.get("of_color_ft", False), 'no_rebounce': True})
         if vals.get("of_color_bg", False) and not vals.get("no_rebounce", False):
             user_ids.write({'of_color_bg': vals.get("of_color_bg", False), 'no_rebounce': True})
-        self = self.filtered(lambda i: not i.of_archive_horaire)
+        self = self.filtered(lambda i: not i.of_archive_horaires)
         if self:
             self.archiver_horaires()
         return res
