@@ -84,8 +84,8 @@ class HREmployee(models.Model):
         ("easy", "Facile"),
         ("advanced", u"Avancé")], string="Mode de Sélection des horaires", required=True, default="easy")
     of_profil_id = fields.Many2one("of.horaires.profil", "Profil")
-    of_creneau_ids = fields.Many2many("of.horaires.creneau", "employee_creneaux", "employee_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
-    of_creneau_temp_ids = fields.Many2many("of.horaires.creneau", "employee_creneaux_temp", "employee_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
+    of_creneau_ids = fields.Many2many("of.horaires.creneau", "of_employee_creneaux_rel", "employee_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
+    of_creneau_temp_ids = fields.Many2many("of.horaires.creneau", "of_employee_creneaux_temp_rel", "employee_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
     of_creneau_temp_start = fields.Date(string=u"Début des horaires temporaires")
     of_creneau_temp_stop = fields.Date(string="Fin des horaires temporaires")
     of_archive_horaires = fields.Text(string="Archive des horaires")
@@ -612,6 +612,8 @@ class HREmployee(models.Model):
                 date_da = fields.Date.from_string(date_str)
                 num_jour = date_da.isoweekday()
                 creneaux = num_jour in segment[2] and segment[2][num_jour]
+                if not creneaux:
+                    return -1
                 for i in range(len(creneaux)):  # creneau sous form (h_debut, h_fin)
                     creneau = creneaux[i]
                     if creneau[0] <= h_debut < creneau[1]:
