@@ -159,25 +159,15 @@
         <t t-foreach="row.columns.length" t-as="col_index">
             <t t-set="records" t-value="row.columns[col_index]"/>
             <t t-set="la_fillerbar" t-value="row.fillerbars[col_index]"/>
-            <td t-attf-id="of_planning_td_#{row.res_id}_#{col_index}" t-attf-style="background: #{row.color_bg_rgba}">
-                <!--div t-attf-id="of_planning_fillerbar_#{row.res_id}_#{col_index}" class="of_planning_fillerbar">
-                    <t t-call="PlanningView.fillerbar">
-                        <t t-set="fillerbar" t-value="la_fillerbar"/>
-                    </t>
-                </div-->
-                <div t-attf-id="of_planning_fillerbar_#{row.res_id}_#{col_index}" class="of_planning_fillerbar"> <!-- @todo: t-attf-title -->
+            <td t-attf-id="of_planning_td_#{row.res_id}_#{col_index}" t-attf-style="background: #{col_index == row.col_offset_today and row.color_bg_rgba_today or row.color_bg_rgba}">
+                <div t-attf-id="of_planning_fillerbar_#{row.res_id}_#{col_index}" class="of_planning_fillerbar">
                     <div t-if="la_fillerbar.pct_occupe > 0" class="of_planning_fillerbar_occupe"
                       t-attf-style="width: #{la_fillerbar.pct_occupe}% !important; background: #{row.color_bg}; ">
                     </div>
-                    <div t-if="la_fillerbar.pct_disponible > 0" class="of_planning_fillerbar_disponible">
+                    <div t-if="la_fillerbar.pct_disponible > 0" class="of_planning_fillerbar_disponible"
+                        t-attf-style="background-color: #{row.fillerbar_color_dispo}">
                     </div>
                 </div>
-                <!--t t-foreach="records.length" t-as="rec_index">
-                    <t t-call="PlanningView.record">
-                        <t t-set="record" t-value="records[rec_index]"/>
-                        <t t-set="le_i" t-value="col_index"/>
-                    </t>
-                </t-->
             </td>
         </t>
         <td t-attf-style="
@@ -191,8 +181,25 @@
         </td>
     </t>
 
+    <t t-name="PlanningView.row.column">  <!-- donné par le js: col_index-->
+        <t t-set="records" t-value="row.columns[col_index]"/>
+        <t t-set="la_fillerbar" t-value="row.fillerbars[col_index]"/>
+        <td t-attf-id="of_planning_td_#{row.res_id}_#{col_index}" t-attf-style="background: #{col_index == row.col_offset_today and row.color_bg_rgba_today or row.color_bg_rgba}">
+            <div t-attf-id="of_planning_fillerbar_#{row.res_id}_#{col_index}" class="of_planning_fillerbar">
+                <div t-if="la_fillerbar.pct_occupe > 0" class="of_planning_fillerbar_occupe"
+                  t-attf-style="width: #{la_fillerbar.pct_occupe}% !important; background: #{row.color_bg}; ">
+                </div>
+                <div t-if="la_fillerbar.pct_disponible > 0" class="of_planning_fillerbar_disponible"
+                    t-attf-style="background-color: #{row.fillerbar_color_dispo}">
+                </div>
+            </div>
+        </td>
+    </t>
+
     <div t-name="PlanningView.record" class="of_planning_record_global_click">  <!-- variables données par le javascript: record et col_index -->
-        <div t-att-class="record.class" t-attf-style="color: #{record.color_ft}; background-color: #{record.color_bg}; border: 1px solid #{record.color_ft};">
+        <div t-att-class="record.class"
+             t-attf-style="color: #{record.color_ft}; background-color: #{record.color_bg}; border-top: 1px solid #{record.color_ft};
+                border-bottom: 1px solid #{record.color_ft};">
             <t t-set="attendees" t-value="record.attendee_other_ids"/>
             <t t-foreach="attendees">
                 <i class="of_calendar_attendee_box_flat"
@@ -226,23 +233,90 @@
 
             <div class="of_planning_info of_planning_info_lieu">
 
-                <i t-if="record.address_zip || record.address_city" class="fa fa-map-marker"/>
+                <i t-if="record.address_zip || record.address_city || record.secteur_name" class="fa fa-map-marker"/>
                 <span t-if="record.address_zip || record.address_city" class="of_ws"/>
 
                 <span t-if="record.address_zip" class="of_planning_subinfo of_planning_subinfo_zip">
                     <t t-raw="record.address_zip"/>
                 </span>
 
-                <span t-if="record.address_zip &amp;&amp; record.address_city" class="of_ws"/>
+                <span t-if="record.address_zip &amp;&amp; record.address_city" class="of_ws of_planning_subinfo of_planning_subinfo_city"/>
                 <span t-if="record.address_city" class="of_planning_subinfo of_planning_subinfo_city">
                     <t t-raw="record.address_city"/>
                 </span>
 
+                <span t-if="record.address_zip || record.address_city" class="of_ws of_planning_subinfo of_planning_subinfo_secteur"/>
+                <span t-if="record.secteur_name" class="of_planning_subinfo of_planning_subinfo_secteur">
+                    <t t-raw="record.secteur_name"/>
+                </span>
             </div>
         </div>
     </div>
+
+    <div t-name="PlanningView.record.tooltip" class="of_planning_record_tooltip">  <!-- variables données par le javascript: record et col_index -->
+        <div>
+            <t t-set="attendees" t-value="record.attendee_other_ids"/>
+            <t t-foreach="attendees">
+                <i class="of_calendar_attendee_box_flat"
+                   t-attf-style="background: #{record.view.rows[attendees_value].color_bg}; border: 1px solid #0D0D0D; float: right; margin-left: 2px; margin-top: -3px;"/>
+            </t>
+            <div>
+                <i class="fa fa-clock-o"/><span class="of_ws"/>
+                <t t-if="record.col_offset_stop == undefined">
+                    <span><t t-raw="record.heure_debut_str"/></span>
+                    <span> -&gt; </span>
+                    <span><t t-raw="record.heure_fin_str"/></span>
+                    <span> - </span>
+                    <span><t t-raw="record.duree_str"/></span>
+                </t>
+                <t t-else="">
+                    <span>[
+                        <t t-foreach="record['hours_cols']" t-as="record_heures">(
+                            <span><t t-raw="record_heures_value.heure_debut_str"/></span>
+                            <span> -&gt; </span>
+                            <span><t t-raw="record_heures_value.heure_fin_str"/></span>
+                            <span> - </span>
+                            <span><t t-raw="record_heures_value.duree_str"/></span>
+                            ),
+                        </t>
+                        ]
+                    </span>
+                </t>
+            </div>
+
+            <div t-if="record.tache_name">
+                <i class="fa fa-cogs"/><span class="of_ws"/><t t-raw="record.tache_name"/>
+            </div>
+
+            <div t-if="record.partner_name">
+                <i class="fa fa-user"/><span class="of_ws"/><t t-raw="record.partner_name"/>
+            </div>
+
+            <div>
+
+                <i t-if="record.address_zip || record.address_city || record.secteur_name" class="fa fa-map-marker"/>
+                <span t-if="record.address_zip || record.address_city" class="of_ws"/>
+
+                <span t-if="record.address_zip">
+                    <t t-raw="record.address_zip"/>
+                </span>
+
+                <span t-if="record.address_zip &amp;&amp; record.address_city" class="of_ws"/>
+                <span t-if="record.address_city">
+                    <t t-raw="record.address_city"/>
+                </span>
+
+                <span t-if="record.address_zip || record.address_city" class="of_ws"/>
+                <span t-if="record.secteur_name">
+                    <t t-raw="record.secteur_name"/>
+                </span>
+            </div>
+        </div>
+    </div>
+
 <!-- t-attf-data-context="{'default_partner_id': {{partner_id}}, 'default_service_id': {{service_id}}, 'default_address_id': {{address_id}},}" -->
-    <div t-name="PlanningView.creneau_dispo" class="of_planning_creneau_dispo">  <!-- variable donnée par le javascript: creneau -->
+    <div t-name="PlanningView.creneau_dispo" class="of_planning_creneau_dispo"
+        t-attf-style="color: #{creneau.color_ft}; background-color: #{creneau.color_bg}; border: 1px solid #{creneau.color_ft};">  <!-- variable donnée par le javascript: creneau et col_index -->
         <div>
             <a name="%(of_planning_view.action_view_of_planif_wizard)d" type="action" class="of_planning_creneau_action"
               >
