@@ -32,7 +32,7 @@ def check_hours_overlapping(debut_1, fin_1, debut_2, fin_2):
 class HREmployee(models.Model):
     _inherit = "hr.employee"
 
-    of_tache_ids = fields.Many2many('of.planning.tache', 'employee_tache_rel', 'employee_id', 'tache_id', u'Tâches')
+    of_tache_ids = fields.Many2many('of.planning.tache', 'of_employee_tache_rel', 'employee_id', 'tache_id', u'Tâches')
     of_equipe_ids = fields.Many2many('of.planning.equipe', 'of_planning_employee_rel', 'employee_id', 'equipe_id', u'Équipes')
     of_changed_intervention_id = fields.Many2one('of.planning.intervention', string=u"Dernière intervention modifiée") # api.depends dans of.planning.intervention
     of_est_intervenant = fields.Boolean(string=u"Est intervenant?", default=False)
@@ -56,7 +56,7 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
     category_id = fields.Many2one('hr.employee.category', string=u"Catégorie d'employés")
     is_crm = fields.Boolean(u'Tâche CRM')
     equipe_ids = fields.Many2many('of.planning.equipe', 'equipe_tache_rel', 'tache_id', 'equipe_id', u'Équipes qualifiées')
-    employee_ids = fields.Many2many('hr.employee', 'employee_tache_rel', 'tache_id', 'employee_id', u'Employés qualifiés',
+    employee_ids = fields.Many2many('hr.employee', 'of_employee_tache_rel', 'tache_id', 'employee_id', u'Employés qualifiés',
                                     domain=_get_employee_ids_domaim)
     employee_nb = fields.Integer(string=u'Nombre d\'intervenants', default=1)
 
@@ -124,7 +124,7 @@ class OfPlanningEquipe(models.Model):
     hor_mf = fields.Float('Matin fin', digits=(12, 5))
     hor_ad = fields.Float(u'Après-midi début', digits=(12, 5))
     hor_af = fields.Float(u'Après-midi fin', digits=(12, 5))
-    jour_ids = fields.Many2many('of.jours', 'equipe_jours', 'equipe_id', 'jour_id', string='Jours', default=_get_default_jours)
+    jour_ids = fields.Many2many('of.jours', 'of_equipe_jours_rel', 'equipe_id', 'jour_id', string='Jours', default=_get_default_jours)
     sequence = fields.Integer(u'Séquence', help=u"Ordre d'affichage (plus petit en premier)")
     color_ft = fields.Char(string="Couleur de texte", help="Choisissez votre couleur", default="#0D0D0D")
     color_bg = fields.Char(string="Couleur de fond", help="Choisissez votre couleur", default="#F0F0F0")
@@ -138,8 +138,8 @@ class OfPlanningEquipe(models.Model):
         ("easy", "Facile"),
         ("advanced", u"Avancé")], string="Mode de Sélection des horaires", required=True, default="easy")
     profil_id = fields.Many2one("of.horaires.profil", "Profil")
-    of_creneau_ids = fields.Many2many("of.horaires.creneau", "equipe_creneaux", "equipe_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
-    of_creneau_temp_ids = fields.Many2many("of.horaires.creneau", "equipe_creneaux_temp", "equipe_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
+    of_creneau_ids = fields.Many2many("of.horaires.creneau", "of_equipe_creneaux_rel", "equipe_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
+    of_creneau_temp_ids = fields.Many2many("of.horaires.creneau", "of_equipe_creneaux_temp_rel", "equipe_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
     of_creneau_temp_start = fields.Date(string=u"Début des horaires temporaires")
     of_creneau_temp_stop = fields.Date(string="Fin des horaires temporaires")
 
@@ -265,7 +265,7 @@ class OfPlanningIntervention(models.Model):
     tache_id = fields.Many2one('of.planning.tache', string='Tâche', required=True)
     tache_name = fields.Char(related='tache_id.name')
     equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe', oldname='poseur_id')
-    employee_ids = fields.Many2many('hr.employee', 'employee_intervention_rel', 'intervention_id', 'employee_id',
+    employee_ids = fields.Many2many('hr.employee', 'of_employee_intervention_rel', 'intervention_id', 'employee_id',
                                     string='Intervenants', required=True, domain=_get_employee_ids_domaim)
     employee_main_id = fields.Many2one('hr.employee', string=u"Employé principal", compute="_compute_employee_main_id", store=True)
     state = fields.Selection([
@@ -283,15 +283,15 @@ class OfPlanningIntervention(models.Model):
     mode_horaires = fields.Selection([
         ("easy", "Facile"),
         ("advanced", u"Avancé")], string="Mode de Sélection des horaires", default="easy")
-    of_creneau_ids = fields.Many2many("of.horaires.creneau", "intervention_creneaux", "intervention_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
-    of_creneau_temp_ids = fields.Many2many("of.horaires.creneau", "intervention_creneaux_temp", "intervention_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
+    of_creneau_ids = fields.Many2many("of.horaires.creneau", "of_intervention_creneaux_rel", "intervention_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
+    of_creneau_temp_ids = fields.Many2many("of.horaires.creneau", "of_intervention_creneaux_temp_rel", "intervention_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
     of_creneau_temp_start = fields.Date(string=u"Début des horaires temporaires")
     of_creneau_temp_stop = fields.Date(string="Fin des horaires temporaires")
     hor_md = fields.Float(string=u'Matin début', digits=(12, 5))
     hor_mf = fields.Float(string='Matin fin', digits=(12, 5))
     hor_ad = fields.Float(string=u'Après-midi début', digits=(12, 5))
     hor_af = fields.Float(string=u'Après-midi fin', digits=(12, 5))
-    jour_ids = fields.Many2many('of.jours', 'intervention_jours', 'intervention_id', 'jour_id', string='Jours', default=_get_default_jours)
+    jour_ids = fields.Many2many('of.jours', 'of_intervention_jours_rel', 'intervention_id', 'jour_id', string='Jours', default=_get_default_jours)
     tz = fields.Selection(_tz_get, compute='_compute_tz', string="fuseau horaires")
     tz_offset = fields.Char(compute='_compute_tz_offset', string='Timezone offset', invisible=True)
 
@@ -398,18 +398,18 @@ class OfPlanningIntervention(models.Model):
     def _auto_init(self):
         # Lors de la 1ère mise à jour après la refonte des équipes (sept. 2019), on migre les données existantes.
         cr = self._cr
-        cr.execute("SELECT 1 FROM information_schema.tables WHERE table_name = 'employee_intervention_rel'")
+        cr.execute("SELECT 1 FROM information_schema.tables WHERE table_name = 'of_employee_intervention_rel'")
         existe_avant = bool(cr.fetchall())
         res = super(OfPlanningIntervention, self)._auto_init()
-        cr.execute("SELECT 1 FROM information_schema.tables WHERE table_name = 'employee_intervention_rel'")
+        cr.execute("SELECT 1 FROM information_schema.tables WHERE table_name = 'of_employee_intervention_rel'")
         existe_apres = bool(cr.fetchall())
         # Si le champ employee_ids n'est pas un many2many avant et l'est après la mise à jour,
         # c'est qu'on est à la 1ère mise à jour après la refonte du planning, on doit faire la migration des données.
         if not existe_avant and existe_apres:
             # On peuple le champ employee_ids de chaque rdv avec les employés de l'équipe du rdv.
-            cr.execute("INSERT INTO employee_intervention_rel (intervention_id, employee_id) "
+            cr.execute("INSERT INTO of_employee_intervention_rel(intervention_id, employee_id) "
                        "SELECT opi.id, oper.employee_id "
-                       "FROM of_planning_intervention AS opi, of_planning_equipe AS ope, of_planning_employee_rel AS oper "
+                       "FROM of_planning_intervention opi, of_planning_equipe ope, of_planning_employee_rel oper "
                        "WHERE opi.equipe_id = ope.id "
                        "AND oper.equipe_id = opi.equipe_id")
 
@@ -421,16 +421,16 @@ class OfPlanningIntervention(models.Model):
             # Et le champ of_est_intervenant dans hr_employee doit être initialisé à vrai pour les employés qui sont dans une équipe.
             # On en profite de le faire avec l'initialisation des couleurs comme ce sont les mêmes critères.
             cr.execute("UPDATE hr_employee "
-                       "SET of_color_ft = pe.color_ft, of_color_bg = pe.color_bg, of_est_intervenant = True "
-                       "FROM of_planning_equipe as pe "
-                       "JOIN of_planning_employee_rel per ON pe.id = per.equipe_id "
-                       "JOIN hr_employee he ON per.employee_id = he.id "
+                       "SET of_color_ft = ope.color_ft, of_color_bg = ope.color_bg, of_est_intervenant = True "
+                       "FROM of_planning_equipe ope "
+                       "JOIN of_planning_employee_rel oper ON ope.id = oper.equipe_id "
+                       "JOIN hr_employee he ON oper.employee_id = he.id "
                        "WHERE hr_employee.id = he.id")
 
             # On recopie le choix des couleurs de l'utilisateur dans les employés.
             cr.execute("UPDATE hr_employee "
                        "SET of_color_ft = ru.of_color_ft, of_color_bg = ru.of_color_bg "
-                       "FROM res_users as ru "
+                       "FROM res_users ru "
                        "JOIN resource_resource rr ON ru.id = rr.user_id "
                        "JOIN hr_employee he ON rr.id = he.id "
                        "WHERE hr_employee.id = he.id "
@@ -442,46 +442,63 @@ class OfPlanningIntervention(models.Model):
 
             # Adresse de départ
             cr.execute("UPDATE hr_employee "
-                       "SET of_address_depart_id = pe.address_id "
-                       "FROM of_planning_equipe as pe "
-                       "JOIN of_planning_employee_rel per ON pe.id = per.equipe_id "
-                       "JOIN hr_employee he ON per.employee_id = he.id "
+                       "SET of_address_depart_id = ope.address_id "
+                       "FROM of_planning_equipe ope "
+                       "JOIN of_planning_employee_rel oper ON ope.id = oper.equipe_id "
+                       "JOIN hr_employee he ON oper.employee_id = he.id "
                        "WHERE hr_employee.id = he.id "
-                       "AND pe.address_id IS NOT Null AND he.of_address_depart_id IS Null")
+                       "AND ope.address_id IS NOT Null AND he.of_address_depart_id IS Null")
             # Adresse de retour
             cr.execute("UPDATE hr_employee "
-                       "SET of_address_retour_id = pe.address_retour_id "
-                       "FROM of_planning_equipe as pe "
-                       "JOIN of_planning_employee_rel per ON pe.id = per.equipe_id "
-                       "JOIN hr_employee he ON per.employee_id = he.id "
+                       "SET of_address_retour_id = ope.address_retour_id "
+                       "FROM of_planning_equipe ope "
+                       "JOIN of_planning_employee_rel oper ON ope.id = oper.equipe_id "
+                       "JOIN hr_employee he ON oper.employee_id = he.id "
                        "WHERE hr_employee.id = he.id "
-                       "AND pe.address_retour_id IS NOT Null AND he.of_address_retour_id IS Null")
+                       "AND ope.address_retour_id IS NOT Null AND he.of_address_retour_id IS Null")
 
             # On recopie les horaires des équipes dans les employés
             # dans le cas où ce n'est pas les horaires par défaut dans l'équipe et c'est les horaires par défaut dans l'employé.
             # Si un employé est membre de plusieurs équipes, ce sont les horaires de la dernière équipe renvoyée en SQL qui l'emportent.
             cr.execute("UPDATE hr_employee "
-                       "SET of_hor_md = pe.hor_md, of_hor_mf = pe.hor_mf, of_hor_ad = pe.hor_ad, of_hor_af = pe.hor_af "
-                       "FROM of_planning_equipe as pe "
-                       "JOIN of_planning_employee_rel per ON pe.id = per.equipe_id "
-                       "JOIN hr_employee he ON per.employee_id = he.id "
+                       "SET of_hor_md = ope.hor_md, of_hor_mf = ope.hor_mf, of_hor_ad = ope.hor_ad, of_hor_af = ope.hor_af "
+                       "FROM of_planning_equipe ope "
+                       "JOIN of_planning_employee_rel oper ON ope.id = oper.equipe_id "
+                       "JOIN hr_employee he ON oper.employee_id = he.id "
                        "WHERE hr_employee.id = he.id "
-                       "AND NOT (pe.hor_md = 0 AND pe.hor_mf = 0 AND pe.hor_ad = 0 AND pe.hor_af = 0) "
+                       "AND NOT (ope.hor_md = 0 AND ope.hor_mf = 0 AND ope.hor_ad = 0 AND ope.hor_af = 0) "
                        "AND hr_employee.of_hor_md = 9 AND hr_employee.of_hor_mf = 12 AND hr_employee.of_hor_ad = 14 AND hr_employee.of_hor_af = 18")
 
             # On remplit le champ jours travaillés des employés par les valeurs lundi à vendredi pour les employés dont les jours ne sont pas déjà renseignés.
             cr.execute("INSERT INTO employee_jours_rel(employee_id, jour_id) "
-                       "SELECT HE.id, OJ.numero "
-                       "FROM hr_employee HE, of_jours OJ "
-                       "WHERE OJ.numero >= 1 AND OJ.numero <= 5 "
-                       "AND HE.id NOT IN (SELECT employee_id FROM employee_jours_rel)")
+                       "SELECT he.id, oj.numero "
+                       "FROM hr_employee he, of_jours oj "
+                       "WHERE oj.numero >= 1 AND oj.numero <= 5 "
+                       "AND he.id NOT IN (SELECT employee_id FROM employee_jours_rel)")
+
+            # On remplit le champ jour_ids dans les interventions par les valeurs lundi à vendredi.
+            cr.execute("INSERT INTO of_intervention_jours_rel(intervention_id, jour_id) "
+                       "SELECT opi.id, oj.numero "
+                       "FROM of_planning_intervention opi, of_jours oj "
+                       "WHERE oj.numero >= 1 AND oj.numero <= 5")
+
+            # Pour les interventions effectuées un samedi, on ajoute le samedi dans jour_ids.
+            cr.execute("INSERT INTO of_intervention_jours_rel(intervention_id, jour_id) "
+                       "SELECT opi.id, 6 "
+                       "FROM of_planning_intervention opi "
+                       "WHERE EXTRACT(DOW FROM opi.date) = 6")
+
+            # Même chose pour le dimanche.
+            cr.execute("INSERT INTO of_intervention_jours_rel(intervention_id, jour_id) "
+                       "SELECT opi.id, 7 "
+                       "FROM of_planning_intervention opi "
+                       "WHERE EXTRACT(DOW FROM opi.date) = 0")
 
             # On recopie les tâches des équipes vers les employés.
-            cr.execute("INSERT INTO employee_tache_rel(employee_id, tache_id) "
+            cr.execute("INSERT INTO of_employee_tache_rel(employee_id, tache_id) "
                        "SELECT DISTINCT oper.employee_id, etr.tache_id "
                        "FROM equipe_tache_rel etr "
                        "JOIN of_planning_employee_rel oper ON etr.equipe_id = oper.equipe_id")
-
         return res
 
     @api.model

@@ -31,11 +31,13 @@ class OfService(models.Model):
         # Si le champ recurrence n'existe pas avant et l'est après la mise à jour,
         # c'est qu'on est à la 1ère mise à jour après la refonte du planning, on doit faire la migration des données.
         if not existe_avant and existe_apres:
-            # On peuple le champ durée des services avec la durée de la tâche associé au service.
+            # On peuple le champ durée des services avec la durée de la tâche associée au service.
             cr.execute("UPDATE of_service "
                        "SET duree = of_planning_tache.duree "
                        "FROM of_planning_tache "
                        "WHERE of_service.tache_id = of_planning_tache.id")
+            # On met le champ state à "calculated" quand state est différent de "cancel".
+            cr.execute("UPDATE of_service SET state = 'calculated' WHERE state IS Null OR state <> 'cancel'")
 
         # company_id
         if fill_company_id:
