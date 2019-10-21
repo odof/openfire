@@ -44,7 +44,7 @@ class OfWizardExportWinfic(models.TransientModel):
             date_piece = ecriture.move_id.date
             chaine += date_piece[8:10] + date_piece[5:7] + date_piece[0:4] + '|' # Date de la pièce
             chaine += '     1|' # No du folio
-            chaine += str(no_ligne).rjust(8) + '|' # N° de l'écriture dans le folio
+            chaine += str(no_ligne).rjust(6) + '|' # N° de l'écriture dans le folio
             chaine += ecriture.date[8:10] + ecriture.date[5:7] + ecriture.date[2:4] + '|' # Date de l'écriture
             if len(ecriture.account_id.code) != 6: # N° compte comptable
                 sortie += u"Erreur écriture ligne " + str(no_ligne) + u" : le n° du compte " + str(ecriture.account_id.code) + u" ne fait pas 6 caractères.<br>\n"
