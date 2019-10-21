@@ -85,11 +85,19 @@ class OfService(models.Model):
             service.duree_planif = sum(plannings.filtered(lambda p: p.state in ('draft', 'confirm', 'done')).mapped('duree'))
             service.duree_restante = service.duree > service.duree_planif and service.duree - service.duree_planif or 0
 
+    @api.model
+    def compute_state_poncrec_daily(self):
+        services = self.search([('state', '=', False)])
+        for service in services:
+            service.state = 'calculated'
+        services = self.search([('state', '=', 'calculated')])
+        services._compute_state_poncrec()
+
     @api.multi
     @api.depends('date_next', 'duree', 'state', 'recurrence')
     def _compute_state_poncrec(self):
         un_mois = timedelta(days=30)
-        today_da = fields.Date.from_string(fields.Date.today())
+        today_da = fields.Date.from_string(fields.Date.context_today(self))
         dans_un_mois_da = today_da + un_mois
         il_y_a_un_mois_da = today_da - un_mois
         self._compute_planning_ids()
@@ -243,13 +251,13 @@ class OfService(models.Model):
     state_rec = fields.Selection([
         ('draft', u'Brouillon'),  # état par défaut
         ('to_plan', u'À planifier prochainement'),  # prochaine planif à faire dans moins d'un mois
-        ('planned_soon', u'planifié prochainement'),  # planifié pour dans moins d'un mois
+        ('planned_soon', u'Planifié prochainement'),  # planifié pour dans moins d'un mois
         ('planned', u'Planifié récemment'),  # dernière intervention il y a moins d'un mois
         ('progress', u'En cours'),  # par défaut
         ('late', u'En retard de planification'),  # date de prochaine planification il y a plus d'un mois
         ('done', u'Terminé'),  # date de fin <= date du jour
         ('cancel', u'Annulé'),  # manuellement décidé
-    ], u'État', compute="_compute_state_poncrec")
+    ], u'État', compute="_compute_state_poncrec", store=True)
 
     state_ponc = fields.Selection([
         ('draft', u'Brouillon'),  # état par défaut
@@ -259,7 +267,7 @@ class OfService(models.Model):
         ('late', u'En retard de planification'),  # date de prochaine planification il y a plus d'un mois
         ('done', u'Fait'),  # intervention(s) et durée restante == 0 et date de fin dépassée
         ('cancel', u'Annulé'),  # manuellement décidé
-    ], u'État', compute="_compute_state_poncrec")
+    ], u'État', compute="_compute_state_poncrec", store=True)
 
     state = fields.Selection([
         ('draft', u'Brouillon'),  # état par défaut
