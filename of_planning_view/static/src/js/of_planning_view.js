@@ -36,13 +36,19 @@ function isNullOrUndef(value) {
     return _.isUndefined(value) || _.isNull(value);
 };
 
-function hexToRgb(hex) {
-  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result ? {
-    r: parseInt(result[1], 16),
-    g: parseInt(result[2], 16),
-    b: parseInt(result[3], 16)
+function hexToRgb(hex, mod) {
+  var parsed = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  var result = parsed ? {
+    r: parseInt(parsed[1], 16),
+    g: parseInt(parsed[2], 16),
+    b: parseInt(parsed[3], 16)
   } : null;
+  if (!isNullOrUndef(mod) && !isNullOrUndef(parsed)) {
+    result["r"] = mod < 0 ? Math.max(0, result["r"] + mod) : Math.min(255, result["r"] + mod);
+    result["g"] = mod < 0 ? Math.max(0, result["g"] + mod) : Math.min(255, result["g"] + mod);
+    result["b"] = mod < 0 ? Math.max(0, result["b"] + mod) : Math.min(255, result["b"] + mod);
+  }
+  return result;
 }
 
 var MODE_COLUMN_NBS = {
@@ -86,7 +92,7 @@ var PlanningView = View.extend({
         'all_rows_rendered': 'on_all_rows_rendered',
         'planning_record_open': 'open_record',
         'planning_do_action': 'open_action',
-        'reload_events': 'on_reload_events'
+        'reload_events': 'on_reload_events',
     },
     /**
      *
@@ -130,6 +136,7 @@ var PlanningView = View.extend({
             }
         }
         console.log("PLANNING VIEW THIS: ",this);
+        this.first_search_done = false;
     },
     /**
      *
@@ -140,16 +147,124 @@ var PlanningView = View.extend({
         var write_def = this.dataset.call("check_access_rights", ["write", false]);
         var create_def = this.dataset.call("check_access_rights", ["create", false]);
         var rendered_prom = this.$el.html(qweb.render(this.template, this)).promise();
-        return $.when(write_def, create_def, rendered_prom, this._super()).then(function (write, create) {
-            self.write_right = write;
-            self.create_right = create;
+        var excluded_ids_def = new Model("ir.values").call("get_default", ["of.intervention.settings", "planningview_employee_exclu_ids"]);
+        var intervenants_ids_def = new Model("hr.employee").query(['id']) // retrieve ids from db
+            .filter([['of_est_intervenant', '=', true]]) // seulement les intervenants
+            .all();
+        var ir_values_model = new Model("ir.values");
+        var range_start_def = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_range_start", false]);
+        var creneaux_dispo_data_def = self.set_creneaux_dispo_data();
+
+        return $.when(write_def, create_def, excluded_ids_def, intervenants_ids_def, range_start_def, rendered_prom, creneaux_dispo_data_def, this._super()).then(
+            function (write, create, excluded, emp_ids, range_start) {
+                self.write_right = write;
+                self.create_right = create;
+                //console.log("arguments!", arguments);
+                var excluded_ids = [], to_show_ids = [];
+                if (!!excluded) {
+                    excluded_ids = excluded[0][2]  // [(6, 0, [ids_list])]
+                }
+                for (var i=0; i<emp_ids.length; i++) {
+                    if (!excluded_ids.includes(emp_ids[i].id)) {
+                        to_show_ids.push(emp_ids[i].id)
+                    }
+                }
+                if (!isNullOrUndef(range_start)) {
+                    self.range_start = moment.utc(range_start).local().startOf(self.mode)._d;
+                    self.range_stop = moment.utc(range_start).local().endOf(self.mode)._d;
+                    //console.log("RANGE_START",self.range_start);
+                    //console.log("RANGE_STOP",self.range_stop)
+                }
+                self.view_res_ids = to_show_ids;
+
+                var all_filters_def = self._set_all_custom_colors();
+
+                return $.when(all_filters_def);
+        }).then(function (all_filters) {
+            //console.log("ALL_FILTERS", all_filters);
+        });
+    },
+    set_creneaux_dispo_data: function () {
+        var self = this;
+        var ir_values_model = new Model("ir.values")
+        var bg_def = ir_values_model.call("get_default", ["of.intervention.settings", "color_bg_creneaux_dispo"]);
+        var ft_def = ir_values_model.call("get_default", ["of.intervention.settings", "color_ft_creneaux_dispo"]);
+        var dureemin_def = ir_values_model.call("get_default", ["of.intervention.settings", "duree_min_creneaux_dispo"]);
+        return $.when(bg_def, ft_def, dureemin_def)
+        .then(function (bg, ft, duree) {
+            self.creneaux_dispo = {
+                'color_bg': bg,
+                'color_ft': ft,
+                'duree_min': duree,
+            }
+            return $.when();
+        });
+    },
+
+    /**
+     *  called by PlanningView.willStart
+     *  sets custom colors for all_filter.
+     */
+    _set_all_custom_colors: function() {
+        var self = this;
+        var ids = _.reject(_.keys(self.all_filters),function(num){ return num == 'undefined'; });
+
+        var dfd = $.Deferred();
+        var p = dfd.promise({target: kays});
+        var kays = [];
+        var model_name = self.fields[self.resource].relation;
+        //console.log("MODEL NAME:",model_name);
+
+        var Attendees = new Model(model_name);
+        //console.log(self.view_res_ids);
+        Attendees.query(['id', self.color_ft, self.color_bg, 'name']) // retrieve colors from db
+            .filter([['id', 'in', self.view_res_ids || []]]) // id
+            .all()
+            .then(function (attendees){
+                self.all_filters = {};
+                for (var i=0; i<attendees.length; i++) {
+                    var a = attendees[i];
+                    var key = a.id;
+                    kays.push(key);
+                    var filter_item = {
+                        label: a['name'],
+                        color_bg: a[self.color_bg],
+                        color_ft: a[self.color_ft],
+                        value: a['id'],
+                        input_id: a['id'] + "_input",
+                        is_checked: true,
+                    }
+                    //self.all_filters[key]['label'] = a['name'];
+                    //self.all_filters[key]['color_bg'] = a[self.color_bg];
+                    //self.all_filters[key]['color_ft'] = a[self.color_ft];
+                    self.all_filters[key] = filter_item;
+                    //self.rows[key] = new PlanningView.Row(self.table,self,[],row_options);
+                    //self.rows[key].head_column = a['name'];
+                };
+                dfd.resolve();
+            });
+
+        return $.when(p).then(function(){
+            return kays;
         });
     },
     /**
      *
      */
     start: function () {
-        //console.log("START");
+        //console.log("START", this.to_show_ids);
+        /*this.all_filters = {};
+        var filter_item, emp_id;
+        for (var i in this.to_show_ids) {
+            emp_id = this.to_show_ids[i];
+           //console.log(emp_id);
+            filter_item = {
+                value: emp_id,
+                input_id: emp_id + "_input",
+                is_checked: true,
+            };
+            this.all_filters[emp_id] = filter_item;
+        }*/
         this.$sidebar_container = this.$(".of_planning_sidebar_container");
         this.$table_container = this.$(".of_planning_table_container");
         this.$el.addClass(this.fields_view.arch.attrs.class);
@@ -225,15 +340,43 @@ var PlanningView = View.extend({
     },
     do_search: function (domain, context, group_by) {
         var self = this;
+        //console.log("group_by",group_by);
+        var context_dfd, domain_dfd, range_start_dfd = $.Deferred();
+        var ir_values_model = new Model('ir.values');
+        // 1ère recherche: on charge la config, autres recherches, on affecte la config
+        if (!this.first_search_done) {
+            //context_dfd = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_context", false]);
+            //domain_dfd = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_domain", false]);
+            range_start_dfd = $.when();
+        }else{
+            //this.domain = domain;
+            //this.context = context;
+            //context_dfd = ir_values_model.call("set_default", ["of.intervention.settings", "planningview_context", JSON.stringify(this.context), false]);
+            //domain_dfd = ir_values_model.call("set_default", ["of.intervention.settings", "planningview_domain", JSON.stringify(this.domain), false]);
+            var format = time.datetime_to_str;
+            var range_start_str = format(this.range_start);
+            range_start_dfd = ir_values_model.call("set_default", ["of.intervention.settings", "planningview_range_start", range_start_str, false]);
+        }
         this.domain = domain;
         this.context = context;
         this.group_by = group_by;
+
+        $.when(range_start_dfd).then(function(){
+            //console.log("ARGUS",arguments)
+            if (self.table_inited && self.first_search_done) {
+                self._do_search(self.domain, self.context, self.group_by);
+            }else{
+                self.first_search_done = true;
+                /*if (!isNullOrUndef(domain)) {
+                    self.domain = JSON.parse(domain);
+                }
+                if (!isNullOrUndef(context)) {
+                    self.context = JSON.parse(context);
+                }*/
+                console.log('do_search not done, planning view not inited');
+            }
+        })
         
-        if (this.table_inited) {
-            this._do_search(domain, context, group_by);
-        }else{
-            console.log('do_search not done, planning view not inited');
-        }
     },
     _do_search: function(domain, context, group_by) {
         var self = this;
@@ -241,21 +384,40 @@ var PlanningView = View.extend({
         if (! self.all_filters) {
             self.all_filters = {};
         }
+        self.rows = {};
+        var row_options, emp_id;
+        for (var i in self.view_res_ids) {
+            emp_id = self.view_res_ids[i];
+            row_options = {
+                "res_id": emp_id,
+                //"head_column": "",
+                //"color_bg": event[self.color_bg] || "#7FFF00",
+                //"color_ft": event[self.color_ft] || "#0C0C0C",
+                "auto_render": false,
+            }
+            //console.log("PLANNING_ROECORD",planning_record);
+            self.rows[emp_id] = new PlanningView.Row(self.table,self,[],row_options);
+            self.rows[emp_id].head_column = self.all_filters[emp_id].label;
+        }
+        var col_offset_today = null;
+        if (moment(self.range_start) <= moment() && moment() <= moment(self.range_stop)) {
+            col_offset_today = moment().startOf('day').diff(moment(self.range_start), 'days');
+        }
         var event_domain = self.get_range_domain(this.domain || [],this.range_start,this.range_stop);
-        self.view_res_ids = [];
+        //self.view_res_ids = self.to_show_ids;
         self.dataset.read_slice(self.fields_keys, {
                     offset: 0,
                     domain: event_domain,
                     context: context,
             }).done(function(events) {
-                self.now_filter_ids = [];
-                self.rows = {};
+                self.now_filter_ids = self.view_res_ids;  //hack for testing not to rewrite all the code
+                //self.rows = {};
                 self.set_columns();
                 if (events.length >0) {
-                    console.log("events: ",events,self.fields_keys);
+                   //console.log("events: ",events,self.fields_keys);
 
                     var filter_item;
-                    var event, planning_record, day_span, col_offset_start, col_offset_stop, record_options, row_options, event_res_ids, res_id, rgb;
+                    var event, planning_record, day_span, col_offset_start, col_offset_stop, record_options, row_options, event_res_ids, res_id;
                     for (var i=0; i<events.length; i++) {
                         //console.log(i,events.length);
                         event = events[i];
@@ -274,9 +436,9 @@ var PlanningView = View.extend({
                         // the column index to insert the record
                         col_offset_start = moment(event[self.date_start]).startOf('day').diff(moment(self.range_start), 'days');
                         if (col_offset_start < 0) {
-                            console.log("TROP TOT")
+                           //console.log("TROP TOT")
                         }else if (col_offset_start >= self.column_nb) {
-                            console.log("TROP TARD");
+                           //console.log("TROP TARD");
                         }
                         record_options = {
                             "col_offset_start": col_offset_start,
@@ -286,13 +448,13 @@ var PlanningView = View.extend({
                             "day_span": day_span,
                         }
                         //console.log("col_offset_start: ",col_offset_start);
-                        // TODO get filter labels
+
                         //console.log("event: ",event);
-                        self.view_res_ids = _.union(self.view_res_ids, event_res_ids);
+                        //self.view_res_ids = _.union(self.view_res_ids, event_res_ids);
                         //console.log("self.res_ids",self.res_ids);
                         for (var j in event_res_ids) {
                             res_id = event_res_ids[j];
-                            if (!self.all_filters[res_id]) {
+                            /*if (!self.all_filters[res_id]) {
                                 filter_item = {
                                     value: res_id,
                                     input_id: res_id + "_input",
@@ -316,7 +478,7 @@ var PlanningView = View.extend({
                                 }
                                 //console.log("PLANNING_ROECORD",planning_record);
                                 self.rows[res_id] = new PlanningView.Row(self.table,self,[],row_options);
-                            }
+                            }*/
                             //console.log("WEUT");
 
                             planning_record = new PlanningRecord(self.rows[res_id],self,event,record_options);
@@ -326,12 +488,12 @@ var PlanningView = View.extend({
                 }
 
                 // initialiser les segments horaires des employés
-                var prom = self.set_res_horaires_info();
+                var prom = self.set_res_horaires_data();
                 $.when(prom).then(function () {
                     if (self.sidebar) {
                         self.sidebar.reso_filter.render();
                         /*if (self.sidebar.info_filter.rendered) {
-                            console.log("ALREADY RENDERED!");
+                           //console.log("ALREADY RENDERED!");
                             self.sidebar.info_filter.apply_filters();
                         }else{
                             self.sidebar.info_filter.render(); //@TODO: trouver un meilleur endroit pour faire ça!//
@@ -340,13 +502,15 @@ var PlanningView = View.extend({
                         //console.log("self.now_filter_ids:",self.now_filter_ids);
                         for (var key in self.rows) {
                             var key_num = Number(key);
-                            if (_.include(self.now_filter_ids, key_num) &&  self.all_filters[key_num].is_checked) {
+                            //if (_.include(self.now_filter_ids, key_num) &&  self.all_filters[key_num].is_checked) {
+                            if (self.all_filters[key_num].is_checked) {
                                 self.rows[key].hidden = false;
                             }else{
                                 self.rows[key].hidden = true;
                             }
                         }
                     }
+                    var rgb, rgb_today;
                     for (var key in self.rows) {
                         //console.log("HORAIRES INFO",self.res_horaires_info,key);
                         self.rows[key].segments_horaires = self.res_horaires_info[key]['segments'];
@@ -357,62 +521,46 @@ var PlanningView = View.extend({
                         self.rows[key].color_ft = self.res_horaires_info[key]['color_ft'];
                         rgb = hexToRgb(self.res_horaires_info[key]['color_bg']);
                         self.rows[key].color_bg_rgba = "rgba(" + rgb.r + "," + rgb.g + "," + rgb.b + ",0.3);";
+                        self.rows[key].col_offset_today = isNullOrUndef(col_offset_today) ? -1 : col_offset_today;
+                        if (self.rows[key].col_offset_today != -1) {
+                            rgb_today = hexToRgb(self.res_horaires_info[key]['color_bg'], -30);
+                            self.rows[key].color_bg_rgba_today = "rgba(" + rgb_today.r + "," + rgb_today.g + "," + rgb_today.b + ",0.4);";
+                        }
                     }
-                    console.log("self.rows: ",self.rows);
-                    
+                   //console.log("self.rows: ",self.rows);
+
                     self.table.rows = self.rows;
                     self.render_table();
-
+                    console.log("self.res_horaires_info search",self.res_horaires_info);
+                    console.log("keys", _.keys(self.res_horaires_info), typeof(_.keys(self.res_horaires_info)));
                 })
             });
     },
-    set_res_horaires_info: function() {
+    set_res_horaires_data: function(res_ids=false, start=false, end=false, get_segments=false) {
         var self = this;
         var dfd = $.Deferred();
         var p = dfd.promise()
+        res_ids = res_ids || self.view_res_ids;
+        start = start || self.range_start;
+        end = end || self.range_stop;
+
         //var model_name = self.fields[self.resource].relation;
         var Planning = new Model(self.model);
-        Planning.call('get_emp_horaires_info', [self.view_res_ids, self.range_start, self.range_stop])
+       //console.log("START/STOP", self.range_start, self.range_stop)
+        Planning.call('get_emp_horaires_info', [res_ids, start, end, get_segments])
         .then(function (result) {
-            console.log("self.res_horaires_info",result);
-            self.res_horaires_info = result;
+            console.log("result",result);
+            if (isNullOrUndef(self.res_horaires_info)) {
+                self.res_horaires_info = result;
+            }else{
+                for (var i=0; i<res_ids.length; i++) {
+                    self.res_horaires_info[res_ids[i]] = result[res_ids[i]];
+                }
+            }
+            
             dfd.resolve();
         });
         return $.when(p);
-    },
-    /**
-     *  called by PlanningView.get_all_filters_ordered
-     *  sets custom colors for all_filter.
-     */
-    _set_all_custom_colors: function() {
-        var self = this;
-        var ids = _.reject(_.keys(self.all_filters),function(num){ return num == 'undefined'; });
-
-        var dfd = $.Deferred();
-        var p = dfd.promise({target: kays});
-        var kays = [];
-        var model_name = self.fields[self.resource].relation;
-        //console.log("MODEL NAME:",model_name);
-
-        var Attendees = new Model(model_name);
-        Attendees.query(['id', self.color_ft, self.color_bg, 'name']) // retrieve colors from db
-            .filter([['id','in',ids]]) // id
-            .all()
-            .then(function (attendees){
-                for (var i=0; i<attendees.length; i++) {
-                    var a = attendees[i];
-                    var key = a.id;
-                    kays.push(key);
-                    self.all_filters[key]['label'] = a['name'];
-                    self.all_filters[key]['color_bg'] = a[self.color_bg];
-                    self.all_filters[key]['color_ft'] = a[self.color_ft];
-                };
-                dfd.resolve();
-            });
-
-        return $.when(p).then(function(){
-            return kays;
-        });
     },
     /**
      *  Adds custom colors to filters.
@@ -420,9 +568,9 @@ var PlanningView = View.extend({
      */
     get_all_filters_ordered: function() {
         var self = this
-        var filters = _.values(this.all_filters).sort(function(f1,f2) {
+        var filters = _.values(this.all_filters)/*.sort(function(f1,f2) {
             return _.string.naturalCmp(f1.label, f2.label);
-        });
+        });/*
         var dfd = $.Deferred();
         var p = dfd.promise({target: filters});
         $.when(self._set_all_custom_colors()).then(function(kays) {
@@ -433,15 +581,16 @@ var PlanningView = View.extend({
                         filters[i]['color_ft'] = self.all_filters[index].color_ft;
                         filters[i]['custom_colors'] = true;
                     }
-                }*/
+                }* /
                 dfd.resolve();
             });
 
-        return p;
+        return p;*/
+        return filters;
     },
     render_table: function() {
         var self = this;
-        console.log("render_table");
+       //console.log("render_table");
         var rendered_prom = this.$(".of_planning_table").html(qweb.render("PlanningView.table", {"table": this.table})).appendTo(self.$table_container).promise();
 
         return $.when(rendered_prom)
@@ -458,7 +607,7 @@ var PlanningView = View.extend({
             /*.then(function() {
                 if (self.sidebar) {
                     if (self.sidebar.info_filter.rendered) {
-                        console.log("ALREADY RENDERED!");
+                       //console.log("ALREADY RENDERED!");
                         self.sidebar.info_filter.apply_filters();
                     }else{
                         self.sidebar.info_filter.render();
@@ -475,7 +624,7 @@ var PlanningView = View.extend({
      * or into a div of its template
      */
     render_buttons: function($node) {
-        console.log("RENDER BUTTONS");
+       //console.log("RENDER BUTTONS");
         var self = this;
         this.$buttons = $(qweb.render("PlanningView.buttons", {'widget': this}));
         this.$buttons.on('click', 'button.of_planning_button_new', function () {
@@ -508,29 +657,29 @@ var PlanningView = View.extend({
      *  mode switching
      */
     on_prev_clicked: function (ev) {
-        console.log("on_prev_clicked!",ev);
+       //console.log("on_prev_clicked!",ev);
         this.range_stop = moment(this.range_start).subtract(1, 'hours').endOf(this.mode)._d;
         this.range_start = moment(this.range_start).subtract(1, 'hours').startOf(this.mode)._d;
-        console.log("le moment: ",)
+       //console.log("le moment: ",)
         this.$small_calendar.datepicker("setDate",moment(this.range_start).format("MM/DD/YYYY"));
         this.do_search(this.domain,this.context,this.group_by);
     },
     on_today_clicked: function(ev) {
-        console.log("on_today_clicked!",ev);
+       //console.log("on_today_clicked!",ev);
         this.range_start = moment().startOf(this.mode)._d;
         this.range_stop = moment().endOf(this.mode)._d;
         this.$small_calendar.datepicker("setDate",moment().format("MM/DD/YYYY"));
         this.do_search(this.domain,this.context,this.group_by);
     },
     on_next_clicked: function (ev) {
-        console.log("on_next_clicked!",ev);
+       //console.log("on_next_clicked!",ev);
         this.range_start = moment(this.range_stop).add(1, 'hours').startOf(this.mode)._d;
         this.range_stop = moment(this.range_stop).add(1, 'hours').endOf(this.mode)._d;
         this.$small_calendar.datepicker("setDate",moment(this.range_start).format("MM/DD/YYYY"));
         this.do_search(this.domain,this.context,this.group_by);
     },
     on_scale_day_clicked: function(ev) {
-        console.log("on_scale_day_clicked!",ev);
+       //console.log("on_scale_day_clicked!",ev);
         if (this.mode != "day") {
             this.$buttons.find('.of_planning_button_' + this.mode).toggleClass("btn-primary btn-default");
             this.$buttons.find('.of_planning_button_day').toggleClass("btn-primary btn-default");
@@ -538,7 +687,7 @@ var PlanningView = View.extend({
         }
     },
     on_scale_week_clicked: function(ev) {
-        console.log("on_scale_week_clicked!",ev);
+       //console.log("on_scale_week_clicked!",ev);
         if (this.mode != "week") {
             this.$buttons.find('.of_planning_button_' + this.mode).toggleClass("btn-primary btn-default");
             this.$buttons.find('.of_planning_button_week').toggleClass("btn-primary btn-default");
@@ -546,7 +695,7 @@ var PlanningView = View.extend({
         }
     },
     on_scale_month_clicked: function(ev) {
-        console.log("on_scale_month_clicked!",ev);
+       //console.log("on_scale_month_clicked!",ev);
         if (this.mode != "month") {
             this.$buttons.find('.of_planning_button_' + this.mode).toggleClass("btn-primary btn-default");
             this.$buttons.find('.of_planning_button_month').toggleClass("btn-primary btn-default");
@@ -554,7 +703,7 @@ var PlanningView = View.extend({
         }
     },
     do_switch_mode: function(new_mode) {
-        console.log("do_switch_mode: ",this.mode,new_mode);
+       //console.log("do_switch_mode: ",this.mode,new_mode);
         this.mode = new_mode;
         this.column_nb = MODE_COLUMN_NBS[this.mode];
         this.range_start = moment().startOf(this.mode)._d;
@@ -562,10 +711,10 @@ var PlanningView = View.extend({
         //this.do_search(this.domain,this.context,this.group_by);
     },
     on_all_rows_rendered: function() {
-        console.log("all rows rendered!")
+       //console.log("all rows rendered!")
         if (this.sidebar) {
             if (this.sidebar.info_filter.rendered) {
-                console.log("ALREADY RENDERED!");
+               //console.log("ALREADY RENDERED!");
                 this.sidebar.info_filter.apply_filters();
             }else{
                 this.sidebar.info_filter.render();
@@ -575,8 +724,102 @@ var PlanningView = View.extend({
     on_reload_events: function () {
         this._do_search(this.domain, this.context, this.group_by);
     },
+    on_reload_partiel: function (res_id, column) {
+        console.log("on_reload_partiel", res_id, column);
+        var self = this;
+        var date_column = moment(this.range_start).add(column, 'days')
+        var date_fin = date_column.endOf('day')._d;
+        date_column = date_column._d;
+        var event_domain = this.get_range_domain(this.domain || [], date_column, date_fin, [res_id]);
+        //event_domain = new CompoundDomain(event_domain, ['id', '=', res_id]);
+        console.log("event_domain",event_domain);
+        this.rows[res_id].clear_column(column);
+        this.dataset.read_slice(this.fields_keys, {offset: 0, domain: event_domain, context: self.context,
+        }).done(function(events) {
+            if (events.length >0) {
+               //console.log("events: ",events,self.fields_keys);
+
+                var event, planning_record, day_span, col_offset_start, col_offset_stop, record_options, row_options, event_res_ids;
+                for (var i=0; i<events.length; i++) {
+                    //console.log(i,events.length);
+                    event = events[i];
+                    event_res_ids = event[self.resource];
+                    // how many days?
+                    day_span = moment(event[self.date_stop]).startOf('day').diff(moment(event[self.date_start]).startOf('day'), 'days')+1;
+                    //console.log("EVENT:",event);
+                    //console.log("DAY SPAN:",day_span);
+                    if (day_span > 1) {
+                        col_offset_stop = moment(event[self.date_stop]).startOf('day').diff(moment(self.range_start), 'days');
+                        //col_offset_stop = Math.min(col_offset_stop,6);
+                    }else{
+                        col_offset_stop = undefined;
+                    }
+                    //console.log("duration: ",day_span);
+                    // the column index to insert the record
+                    col_offset_start = moment(event[self.date_start]).startOf('day').diff(moment(self.range_start), 'days');
+                    if (col_offset_start < 0) {
+                       //console.log("TROP TOT")
+                    }else if (col_offset_start >= self.column_nb) {
+                       //console.log("TROP TARD");
+                    }
+                    record_options = {
+                        "col_offset_start": col_offset_start,
+                        "col_offset_stop": col_offset_stop,
+                        //"color_bg": event[self.color_bg] || "#7FFF00",
+                        //"color_ft": event[self.color_ft] || "#0C0C0C",
+                        "day_span": day_span,
+                    }
+                    //console.log("col_offset_start: ",col_offset_start);
+
+                    //console.log("event: ",event);
+                    //self.view_res_ids = _.union(self.view_res_ids, event_res_ids);
+                    //console.log("self.res_ids",self.res_ids);
+                    //for (var j in event_res_ids) {
+                        //res_id = event_res_ids[j];
+                        /*if (!self.all_filters[res_id]) {
+                            filter_item = {
+                                value: res_id,
+                                input_id: res_id + "_input",
+                                label: event[self.resource],
+                                //color: self.get_color(key),
+                                //avatar_model: (utils.toBoolElse(self.avatar_filter, true) ? self.avatar_filter : false ),
+                                is_checked: true,
+                            };
+                            self.all_filters[res_id] = filter_item;
+                        };
+                        if (! _.contains(self.now_filter_ids, res_id)) {
+                            self.now_filter_ids.push(res_id);
+                        };
+                        if (!self.rows[res_id]) {
+                            row_options = {
+                                "res_id": res_id,
+                                //"head_column": "",
+                                //"color_bg": event[self.color_bg] || "#7FFF00",
+                                //"color_ft": event[self.color_ft] || "#0C0C0C",
+                                "auto_render": false,
+                            }
+                            //console.log("PLANNING_ROECORD",planning_record);
+                            self.rows[res_id] = new PlanningView.Row(self.table,self,[],row_options);
+                        }*/
+                        //console.log("WEUT");
+
+                        planning_record = new PlanningRecord(self.rows[res_id],self,event,record_options);
+                        self.rows[res_id]["records_to_add"].push(planning_record);
+                    //}
+                }
+            }
+            console.log("res_id", res_id, typeof(res_id));
+            console.log("self.res_horaires_info",self.res_horaires_info);
+            var prom = self.set_res_horaires_data([res_id], date_column, date_fin, self.res_horaires_info[res_id].segments_horaires);
+            $.when(prom).then(function () {
+                self.rows[res_id].fillerbars[column] = self.res_horaires_info[res_id]['fillerbars'][0];
+                self.rows[res_id].creneaux_dispo[column] = self.res_horaires_info[res_id]['creneaux_dispo'][0];
+                self.rows[res_id].render(column);
+            });
+        });
+    },
     open_record: function (event, options) {
-        console.log("OPTIONS:",options)
+       //console.log("OPTIONS:",options)
         if (!options) {
             options = {target: 'new'};
         }
@@ -599,7 +842,7 @@ var PlanningView = View.extend({
                     active_model: this.model,
                 });
         //}
-        console.log("EXECUTE ACTION!",event.data, this.dataset, event.target.id, function(){return});
+       //console.log("EXECUTE ACTION!",event.data, this.dataset, event.target.id, function(){return});
         //console.log("event data:",event.data);   event.target.id
         this.do_execute_action(event.data, this.dataset, undefined, function(){return})//_.bind(self.reload_record, this, event.target));
     },
@@ -639,14 +882,16 @@ var PlanningView = View.extend({
      * Build OpenERP Domain to filter object by this.date_start field
      * between given start, end dates.
      */
-    get_range_domain: function(domain, start, end) {
+    get_range_domain: function(domain, start, end, res_ids) {
         var format = time.datetime_to_str;
+        res_ids = res_ids || this.view_res_ids;
         var extend_domain = [[this.date_start, '<=', format(end)]];
         if (this.date_stop) {
             extend_domain.push([this.date_stop, '>=', format(start)]);
         } else if (!this.date_delay) {
             extend_domain.push([this.date_start, '>=', format(start)]);
         }
+        extend_domain.push(['employee_ids', 'in', res_ids]);
         return new CompoundDomain(domain, extend_domain);
     },
 });
@@ -657,7 +902,7 @@ PlanningView.Table = Widget.extend({
         'row_rendered': 'on_row_rendered',
     },
     init: function(parent, options) {
-        console.log("PlanningView.Table init args: ",arguments);
+       //console.log("PlanningView.Table init args: ",arguments);
         this._super.apply(this, arguments);
         this.view = parent;
         this.columns = this.view.columns;
@@ -670,7 +915,7 @@ PlanningView.Table = Widget.extend({
      *
      */
      willStart: function () {
-        console.log("WILLSTART PlanningView.Table");
+       //console.log("WILLSTART PlanningView.Table");
         return $.when();
         /*var self = this;
         var rendered_prom = this.$el.html(qweb.render(this.template, this)).promise();
@@ -684,9 +929,9 @@ PlanningView.Table = Widget.extend({
      *
      */
     start: function () {
-        console.log("START PlanningView.Table");
+       //console.log("START PlanningView.Table");
         this.$tbody = this.$("tbody");
-        console.log("TBODY LEN:",this.$tbody.length);
+       //console.log("TBODY LEN:",this.$tbody.length);
         return this._super();
     },
     renderElement: function() {
@@ -699,7 +944,7 @@ PlanningView.Table = Widget.extend({
         this.replaceElement($el);
     },
     on_row_rendered: function() {
-        console.log("on row rendered");
+       //console.log("on row rendered");
         if (this.check_all_rows_rendered()) {
             this.trigger_up("all_rows_rendered");
         }
@@ -723,7 +968,7 @@ PlanningView.Row = Widget.extend({
     },
     init: function(parent, view, records, options) {
         var self = this;
-        console.log("PlanningView.Row init args: ",arguments);
+       //console.log("PlanningView.Row init args: ",arguments);
         this._super.apply(this, arguments);
         this.options = options;
         // couleurs affectées dans le _do_search de la vue
@@ -736,6 +981,7 @@ PlanningView.Row = Widget.extend({
         this.hidden = options.hidden || false;
         this.table = view.table;
         this.view = view;
+        this.fillerbar_color_dispo = view.creneaux_dispo.color_bg;
         this.model = new Model(this.view.fields[this.view.resource].relation);
         this.head_column = this.options.head_column;
         this.column_nb = this.view.column_nb;
@@ -757,7 +1003,7 @@ PlanningView.Row = Widget.extend({
      *
      */
      willStart: function () {
-        console.log("WILLSTART PlanningView.Row");
+       //console.log("WILLSTART PlanningView.Row");
         var self = this;
         var horaires_prom = this.get_horaires_dict().promise();
         
@@ -790,7 +1036,7 @@ PlanningView.Row = Widget.extend({
             if (!isNullOrUndef(self.horaires_temp_start)) {
                 self.col_offset_temp_start = moment(self.horaires_temp_start).startOf('day').diff(moment(self.view.range_start), 'days');
                 self.col_offset_temp_stop = moment(self.horaires_temp_stop).startOf('day').diff(moment(self.view.range_start), 'days');
-                console.log("HORAIRES TEMP", self.col_offset_temp_start, self.col_offset_temp_stop);
+               //console.log("HORAIRES TEMP", self.col_offset_temp_start, self.col_offset_temp_stop);
             }
 
             self.dfd_horaires.resolve();
@@ -803,16 +1049,16 @@ PlanningView.Row = Widget.extend({
      *
      */
     start: function () {
-        console.log("START PlanningView.Row", this);
+       //console.log("START PlanningView.Row", this);
         this.$el.attr("id", this.id);
         //this.$el.css("background-color", this.color_bg);
         //this.$el.css("opacity", 0.3);
         return this._super();
     },
     /**
-     *
+     *  col_index optionnal, keep undefined for rendering all columns
      */
-    render: function () {
+    render: function (col_index) {
         var self = this;
 
         var le_model = new Model("of.planning.intervention");
@@ -825,7 +1071,7 @@ PlanningView.Row = Widget.extend({
 
             var $la_row = self.table.$('#'+self.id);
             if ($la_row.length >0) {
-                console.log("FOUND",self.$el);
+               //console.log("FOUND",self.$el);
                 return self.replace($la_row);
             }
 
@@ -837,46 +1083,79 @@ PlanningView.Row = Widget.extend({
             var options = {};
             for (var i=0; i<7; i++) {
                 options = {col_offset: i};
-                for (var j=0; j<self.creneaux_dispo[i].length; j++) {
+                if (isNullOrUndef(col_index) || i==col_index) {
+                    for (var j=0; j<self.creneaux_dispo[i].length; j++) {
 
-                    le_creneau = new PlanningCreneauDispo(self, self.view, self.creneaux_dispo[i][j], options);
-                    self.columns[i].push(le_creneau);
-                    function compareFunction(recA, recB) {
-                        var heure_debut_a = recA.heure_debut,
-                            heure_debut_b = recB.heure_debut;
-                        if (!isNullOrUndef(recA.hours_cols)) {
-                            heure_debut_a = recA.hours_cols[i].heure_debut;
+                        le_creneau = new PlanningCreneauDispo(self, self.view, self.creneaux_dispo[i][j], options);
+                        self.columns[i].push(le_creneau);
+                        function compareFunction(recA, recB) {
+                            var heure_debut_a = recA.heure_debut,
+                                heure_debut_b = recB.heure_debut;
+                            if (!isNullOrUndef(recA.hours_cols)) {
+                                heure_debut_a = recA.hours_cols[i].heure_debut;
+                            }
+                            if (!isNullOrUndef(recB.hours_cols)) {
+                                heure_debut_b = recB.hours_cols[i].heure_debut;
+                            }
+                            return heure_debut_a - heure_debut_b;
                         }
-                        if (!isNullOrUndef(recB.hours_cols)) {
-                            heure_debut_b = recB.hours_cols[i].heure_debut;
-                        }
-                        return heure_debut_a - heure_debut_b;
+                        self.columns[i].sort(compareFunction);
+                        //_.sortBy(self.columns[i], 'heure_debut');  // @TODO: gerer asynchronicité
                     }
-                    self.columns[i].sort(compareFunction);
-                    //_.sortBy(self.columns[i], 'heure_debut');  // @TODO: gerer asynchronicité
                 }
             }
-            console.log("self.COLUMNS!",self.columns);
-            console.log("self.FILLERBARS!",self.fillerbars);
-            console.log("self.DISPOOO!",self.creneaux_dispo);
+           //console.log("self.COLUMNS!",self.columns);
+           //console.log("self.FILLERBARS!",self.fillerbars);
+           //console.log("self.DISPOOO!",self.creneaux_dispo);
             return $.when()
         })
-        .then(function() {
-            return self.$el.html(qweb.render(self.template, {"row": self})).promise()
+        .then(function () {  // rendering
+            if (isNullOrUndef(col_index)) {
+                return self.$el.html(qweb.render(self.template, {"row": self})).promise()
+            }else{
+                var $column = $(".of_planning_td_" + self.res_id + "_" + col_index);
+                if (!$column.length) console.log("WEUT?");
+                return $column.html(qweb.render('PlanningView.row.column', { "col_index": col_index , "row": self,})).promise();
+            }
         })
-        .then(function (){
+        .then(function (a_ver) {
+            console.log("a ver",a_ver);
             self.$el.attr("id", self.id);
             self.rendered = true;
             if (self.hidden) {
                 self.do_hide();
             }
-            return self.$el.appendTo("tbody.of_planning_table_tbody")
-        })
-        .then(function(){
+            var $fillerbar, fillerbar, tooltip_options, fil_title;
             for (var i=0; i<7; i++) {
-                for (var j=0; j<self.columns[i].length; j++) {
-                    // res_id, col_index
-                    self.columns[i][j].render(i);
+                if (isNullOrUndef(col_index) || col_index==i) {
+                    $fillerbar = self.$("#of_planning_fillerbar_" + self.res_id + "_" + i);
+                    fillerbar = self.fillerbars[i];
+                    //console.log("LA FILLERBAR!", fillerbar);
+
+                    if (!fillerbar.nb_heures_travaillees) {
+                        fil_title = "Journée non travaillée"
+                    }else{
+                        fil_title = "Horaires du jour: " + fillerbar["creneaux_du_jour"] + "<br/>"
+                        + fillerbar["heures_occupees_str"] + " occupées sur " 
+                        + fillerbar["heures_travaillees_str"] + " travaillées (" + fillerbar["pct_occupe"].toFixed(2) + "%)"
+                    }
+                    tooltip_options = {
+                        delay: { show: 501, hide: 0 },
+                        title: fil_title,
+                    }
+                    $fillerbar.tooltip(tooltip_options);
+                }
+            }
+            if (isNullOrUndef(col_index)) return self.$el.appendTo("tbody.of_planning_table_tbody");
+            return $.when();
+        })
+        .then(function () {
+            for (var i=0; i<7; i++) {
+                if (isNullOrUndef(col_index) || col_index==i) {
+                    for (var j=0; j<self.columns[i].length; j++) {
+                        // res_id, col_index
+                        self.columns[i][j].render(i);
+                    }
                 }
             }
             self.trigger_up("row_rendered")
@@ -891,6 +1170,13 @@ PlanningView.Row = Widget.extend({
         }
         this.replaceElement($el);
     },
+    clear_column: function (column) {
+        var record;
+        while (this.columns[column].length) {
+            record = this.columns[column].pop();
+            record.destroy();
+        }
+    },
     /**
      *
      */
@@ -898,7 +1184,7 @@ PlanningView.Row = Widget.extend({
         var self = this;
         //$.when(self.dfd_horaires).then(function() {
             if (isNullOrUndef(planning_record.col_offset_start)) {
-                console.log("ERREUR: col_offset_start manquant",planning_record);
+               //console.log("ERREUR: col_offset_start manquant",planning_record);
             }else if(isNullOrUndef(planning_record.col_offset_stop)) {  // 1 day event
                 //console.log("ONE DAY EV COL",planning_record.col_offset_start,planning_record);
                 self.columns[planning_record.col_offset_start].push(planning_record);
@@ -930,8 +1216,8 @@ PlanningView.Row = Widget.extend({
                             }
                         }else if (i >= planning_record.col_offset_start && i < planning_record.col_offset_stop) {
                             if ( isNullOrUndef(horaires_dict[i + 1]) || horaires_dict[i + 1] == [] ) {  // jour non travaillé
-                                console.log("jour non travaillé pour ",self.res_id);
-                                console.log("i",i);
+                               //console.log("jour non travaillé pour ",self.res_id);
+                               //console.log("i",i);
                                 planning_record["hours_cols"][i].heure_debut = false;
                                 planning_record["hours_cols"][i].heure_fin = false;
                                 a_push = false;
@@ -1011,9 +1297,9 @@ PlanningView.Row = Widget.extend({
     render: function() {
         var $la_div = $("#of_planning_fillerbar_" + this.res_id + "_" + this.column);
         if ($la_div.length > 0) {
-            console.log("TROUVÉ",$la_div);
+           //console.log("TROUVÉ",$la_div);
         }else{
-            console.log("pas trouvé...")
+           //console.log("pas trouvé...")
         }
     },
 });*/
@@ -1031,8 +1317,8 @@ var PlanningCreneauDispo = Widget.extend({
         this.row = row;
         this.view = view;
         this.options = options;
-        this.color_bg = options.color_bg;
-        this.color_ft = options.color_ft;
+        this.color_bg = this.view.creneaux_dispo.color_bg;
+        this.color_ft = this.view.creneaux_dispo.color_ft;
         this.col_offset = options.col_offset;
 
         this.minimized = false;  // à voir si supprimer
@@ -1112,6 +1398,9 @@ var PlanningCreneauDispo = Widget.extend({
     reload_events: function () {
         this.trigger_up('reload_events');
     },
+    reload_column: function () {
+        this.view.on_reload_partiel(this.row.res_id, this.col_offset);
+    },
     /**
      *  Ouvre le pop-up de planification @todo fonction on_close
      */
@@ -1144,7 +1433,7 @@ var PlanningCreneauDispo = Widget.extend({
      */
     on_planning_creneau_action_clicked: function(ev){
         ev.preventDefault();
-        console.log(ev);
+       //console.log(ev);
         var self = this;
         var action_id = "of_planning_view.action_view_of_planif_wizard"
         var additional_context = {
@@ -1159,10 +1448,10 @@ var PlanningCreneauDispo = Widget.extend({
             "default_secteur_id": self.secteur_id,
             "default_creneaux_reels": self.creneaux_reels.length > 0 ? self.creneaux_reels : false,
         };  // à voir quoi mettre
-        console.log("ADDITIONNAL CONTEXT",pyeval.eval('context', additional_context));
+       //console.log("ADDITIONNAL CONTEXT",pyeval.eval('context', additional_context));
 
         return data_manager.load_action(action_id, pyeval.eval('context', additional_context)).then(function(result) {
-                console.log("LE RESUUUULT",result);
+               //console.log("LE RESUUUULT",result);
                 var options = {
                     'additional_context': pyeval.eval('context', additional_context),  // pour une raison inconnue le additional_context n'est pas pris en compte avant
                     'on_close': function () {self.reload_events();},
@@ -1186,8 +1475,8 @@ var PlanningRecord = Widget.extend({
         this._super(row);
         this.row = row;
         if (!this.row.record_consoled) {
-            console.log("PlanningRecord",record);
-            console.log("row color",this.row.color_bg);
+           //console.log("PlanningRecord",record);
+           //console.log("row color",this.row.color_bg);
             this.row.record_consoled = true;
         }
         this.view = view;
@@ -1197,6 +1486,7 @@ var PlanningRecord = Widget.extend({
         this.day_span = options.day_span;
         if (this.day_span > 1) this.$els = [];
         this.class ="of_planning_record of_planning_record_" + this.id;
+        if (!isNullOrUndef(record.state_int)) this.class += " of_calendar_state_" + record["state_int"];
         if (this.day_span > 1) this.class += " of_planning_record_multiple";
         this.col_offset_start = options.col_offset_start;
         this.col_offset_stop = options.col_offset_stop;
@@ -1220,11 +1510,13 @@ var PlanningRecord = Widget.extend({
         this.duree_str = formats.format_value(record.duree,descript_ft).replace(":", "h");
         this.address_city = record.address_city;
         this.address_zip = record.address_zip;
+        this.secteur_name = record.secteur_id && record.secteur_id[1] || false;
         this.partner_name = record.partner_name;
         this.tache_name = record.tache_name;
+        this.state_int = record.state_int;
         if (record[this.view.resource].length > 1) {  // several attendees
             this.attendee_other_ids = _.reject(record[this.view.resource], function (attendee_id) { return attendee_id == self.row.res_id})
-            console.log("this.attendee_other_ids",this.attendee_other_ids);
+           //console.log("this.attendee_other_ids",this.attendee_other_ids);
         }else{
             this.attendee_other_ids = []
         }
@@ -1250,7 +1542,19 @@ var PlanningRecord = Widget.extend({
                     self.$el.on('click', self.proxy('on_global_click'));
                     self.$el.mouseover(self.on_planning_record_mouseover);
                     self.$el.mouseout(self.on_planning_record_mouseout);
-                })
+                    var tooltip_opts = {
+                        delay: { show: 501, hide: 0 },
+                        //title: qweb.render('PlanningView.record.tooltip', {"record": self, "col_index": col_index}),
+                    }
+                    return qweb.render('PlanningView.record.tooltip', {"record": self, "col_index": self.col_offset_start})
+                    //return self.$el.tooltip(tooltip_opts).promise()
+                }).then(function (html) {
+                    self.tooltip_opts = {
+                        delay: { show: 501, hide: 0 },
+                        title: html,
+                    }
+                    return self.$el.tooltip(self.tooltip_opts);
+                });
         }
         return self.$of_el[col_index].html(qweb.render('PlanningView.record', {"record": self, "col_index": col_index})).promise()
             .then(function (){
@@ -1260,10 +1564,25 @@ var PlanningRecord = Widget.extend({
                 self.$of_el[col_index].on('click', self.proxy('on_global_click'));
                 self.$of_el[col_index].mouseover(self.on_planning_record_mouseover);
                 self.$of_el[col_index].mouseout(self.on_planning_record_mouseout);
-            })
+                if (isNullOrUndef(self.tooltip_opts)) {
+                    return qweb.render('PlanningView.record.tooltip', {"record": self, "col_index": self.col_offset_start});
+                }
+                return $.when();
+            }).then(function (html) {
+                if (isNullOrUndef(self.tooltip_opts)) {
+                    self.tooltip_opts = {
+                        delay: { show: 501, hide: 0 },
+                        title: html,
+                    }
+                    for (var k in self.$of_el){
+                        self.$of_el[k].tooltip(self.tooltip_opts)
+                    }
+                }
+                
+            });
     },
     on_global_click: function (ev) {
-        console.log("CLICLICLICLICLIC",ev);
+       //console.log("CLICLICLICLICLIC",ev);
         if ($(ev.target).parents('.o_dropdown_kanban').length) {
             return;
         }
@@ -1311,6 +1630,7 @@ var PlanningRecord = Widget.extend({
         if (records.length > 1) {
             records.addClass("of_pulse");
         }
+        var self = this;
         //console.log("records:",records);
     },
     on_planning_record_mouseout: function(ev) {
@@ -1319,97 +1639,16 @@ var PlanningRecord = Widget.extend({
         if (records.length > 1) {
             records.removeClass("of_pulse");
         }
-        //console.log("records:",records);
-        //console.log("class:",record_class);
-        //console.log("$('.' + record_class):",$("." + record_class));
     },
     /* actions when user click on the block with a specific class
      *  open on normal view : oe_kanban_global_click
      *  open on form/edit view : oe_kanban_global_click_edit
      */
     on_card_clicked: function() {
-        console.log("CARD CLICK")
-        //if (this.$el.hasClass('oe_kanban_global_click_edit')) {
-        //    this.trigger_up('kanban_record_edit', {id: this.id});
-        //} else {
-            this.trigger_up('planning_record_open', {id: this.id});
-        //}
+        this.trigger_up('planning_record_open', {id: this.id});
     },
     on_planning_creneau_action_clicked: function (ev) {
-        console.log("HAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHA");
-    },
-    /**
-     *  inits this.values ({fieldName: value, ...}),
-     * /
-    init_content: function (record) {
-        //console.log("INIT CONTENT RECORD:",record);
-        var self = this;
-        this.values = {};
-        _.each(record, function(v, k) {
-            self.values[k] = {
-                value: v.value
-            };
-        });
-        this.record = record;
-        var descript_dt = {type: "datetime"};
-        var descript_ft = {type: "float_time"};
-        self.heure_debut_str = formats.format_value(record.date,descript_dt).substring(11, 16);
-        self.heure_fin_str = formats.format_value(record.date_deadline,descript_dt).substring(11, 16);
-        self.heure_debut = hh_mm_to_float(self.heure_debut_str)
-        self.heure_fin = hh_mm_to_float(self.heure_fin_str)
-
-        var formatted_duree = formats.format_value(record.duree,descript_ft).replace(":", "h");
-        self.duree_str = formatted_duree;
-        this.content_header = "" +
-        "<div class='" + this.class + "' " +
-            "style='color: " + this.color_ft + "; background-color: " + this.color_bg +
-            "; padding: 2px 8px 4px; border-radius: 4px; border: 1px solid " + this.color_ft + ";'>" +
-            "<div class='of_planning_info of_planning_info_heures'>" +
-                "<i class='fa fa-clock-o'/>&nbsp;" +
-                "<span class='of_planning_subinfo of_planning_subinfo_heure_debut'>" + self.heure_debut_str + "</span>" +
-                "<span class='of_planning_subinfo of_planning_subinfo_heure_fin'> -> </span>" +
-                "<span class='of_planning_subinfo of_planning_subinfo_heure_fin'>" + self.heure_fin_str + "</span>" +
-                "<span class='of_planning_subinfo of_planning_subinfo_duree'> - </span>" +
-                "<span class='of_planning_subinfo of_planning_subinfo_duree'>" + formatted_duree + "</span>" +
-            "</div>";
-        this.content = "" +
-            "<div class='of_planning_info of_planning_info_tache_name'><i class='fa fa-cogs'/>&nbsp;" + record.tache_name + "</div>" 
-        if (record.partner_name) {
-            this.content += "<div class='of_planning_info of_planning_info_partner_name'><i class='fa fa-user'/>&nbsp;" + record.partner_name + "</div>"
-        }
-        this.content += "<div class='of_planning_info of_planning_info_lieu'>"
-        if (record.address_zip || record.address_city) {
-            this.content += "<i class='fa fa-map-marker'/>&nbsp;"
-        }
-        if (record.address_zip) {
-            this.content += "<span class='of_planning_subinfo of_planning_subinfo_zip'>" + record.address_zip + "</span>"
-        }
-        if (record.address_city) {
-            this.content += "&nbsp;<span class='of_planning_subinfo of_planning_subinfo_city'>" + record.address_city + "</span>"
-        }
-        this.content += "" +
-            "</div>" +
-        "</div>"
-        //console.log("planning_record this: ",this);
-    },
-    init_content_header: function () {
-        if (isNullOrUndef(this.hours_cols)) {
-            this.content_header = "" +
-            "<div class='" + this.class + "' " +
-                "style='color: " + this.color_ft + "; background-color: " + this.color_bg +
-                "; padding: 2px 8px 4px; border-radius: 4px; border: 1px solid " + this.color_ft + ";'>" +
-                "<div class='of_planning_info of_planning_info_heures'>" +
-                    "<i class='fa fa-clock-o'/>&nbsp;" +
-                    "<span class='of_planning_subinfo of_planning_subinfo_heure_debut'>" + self.heure_debut_str + "</span>" +
-                    "<span class='of_planning_subinfo of_planning_subinfo_heure_fin'> -> </span>" +
-                    "<span class='of_planning_subinfo of_planning_subinfo_heure_fin'>" + self.heure_fin_str + "</span>" +
-                    "<span class='of_planning_subinfo of_planning_subinfo_duree'> - </span>" +
-                    "<span class='of_planning_subinfo of_planning_subinfo_duree'>" + formatted_duree + "</span>" +
-                "</div>";
-        }else{
-
-        }
-        
+       //console.log("HAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHA");
     },
     /**
      *
@@ -1424,9 +1663,14 @@ PlanningView.Sidebar = Widget.extend({
     template: 'PlanningView.sidebar',
     
     start: function() {
+        var self = this;
+        this.caption = new SidebarCaption(this, this.getParent());
         this.reso_filter = new PlanningView.SidebarResoFilter(this, this.getParent());
         this.info_filter = new PlanningView.SidebarInfoFilter(this, this.getParent());
-        return $.when(this._super(), this.reso_filter.appendTo(this.$el), this.info_filter.appendTo(this.$el));
+        return $.when(this._super(), this.reso_filter.appendTo(this.$el), this.info_filter.appendTo(this.$el), this.caption.appendTo(this.$el))
+        .then(function() {
+            self.caption.render();
+        });
     }
 });
 PlanningView.SidebarResoFilter = Widget.extend({
@@ -1441,19 +1685,21 @@ PlanningView.SidebarResoFilter = Widget.extend({
     },
     render: function() {
         var self = this;
-
+        self.$('.of_planning_contacts').html(qweb.render('PlanningView.sidebar.contacts', { filters: self.view.all_filters }));
+        /*
         var fil = self.view.get_all_filters_ordered()
         //async
         $.when(fil).then(function(){ // fil is a promise
+            console.log("filters")
             var filters = _.filter(fil.target, function(filter) {
                 return _.contains(self.view.now_filter_ids, filter.value);
             });
             //console.log("filters",filters);
-            self.$('.of_planning_contacts').html(qweb.render('PlanningView.sidebar.contacts', { filters: filters }));
-        });
+            self.$('.of_planning_contacts').html(qweb.render('PlanningView.sidebar.contacts', { filters: self.view.all_filters }));
+        });*/
     },
     on_click: function(e) {
-        console.log("CLICK");
+       //console.log("CLICK");
         if (e.target.tagName == 'SPAN') {  // click sur span -> la checkboxe est a coté
             var la_input = e.target.previousElementSibling.firstElementChild;
             $("#"+la_input.id).click();
@@ -1493,27 +1739,29 @@ PlanningView.SidebarInfoFilter = Widget.extend({
     init_filters: function() {
         var self = this;
 
-        var check_tab_names = ["client","tache","zip","city","heure_debut","heure_fin","duree"];
-        var check_tab_vals = new Array(7);
-        var check_tab_defs = new Array(7);
+        var check_tab_names = ["client","tache","zip","city","secteur","heure_debut","heure_fin","duree"];
+        var check_tab_vals = new Array(8);
+        var check_tab_defs = new Array(8);
         var dfd = $.Deferred();
         var p = dfd.promise(self.info_filters);
         var defs = [], proms = [], les_args, le_def;
         var ir_values_model = new Model("ir.values");
-        check_tab_defs[0] = ir_values_model.call("get_default", ["of.intervention.config.settings", "planningview_filter_" + check_tab_names[0], false]);
+        check_tab_defs[0] = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_filter_" + check_tab_names[0], false]);
         $.when(check_tab_defs[0]).then(function(res){check_tab_vals[0] = isNullOrUndef(res) || res});
-        check_tab_defs[1] = ir_values_model.call("get_default", ["of.intervention.config.settings", "planningview_filter_" + check_tab_names[1], false]);
+        check_tab_defs[1] = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_filter_" + check_tab_names[1], false]);
         $.when(check_tab_defs[1]).then(function(res){check_tab_vals[1] = isNullOrUndef(res) || res});
-        check_tab_defs[2] = ir_values_model.call("get_default", ["of.intervention.config.settings", "planningview_filter_" + check_tab_names[2], false]);
+        check_tab_defs[2] = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_filter_" + check_tab_names[2], false]);
         $.when(check_tab_defs[2]).then(function(res){check_tab_vals[2] = isNullOrUndef(res) || res});
-        check_tab_defs[3] = ir_values_model.call("get_default", ["of.intervention.config.settings", "planningview_filter_" + check_tab_names[3], false]);
+        check_tab_defs[3] = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_filter_" + check_tab_names[3], false]);
         $.when(check_tab_defs[3]).then(function(res){check_tab_vals[3] = isNullOrUndef(res) || res});
-        check_tab_defs[4] = ir_values_model.call("get_default", ["of.intervention.config.settings", "planningview_filter_" + check_tab_names[4], false]);
+        check_tab_defs[4] = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_filter_" + check_tab_names[4], false]);
         $.when(check_tab_defs[4]).then(function(res){check_tab_vals[4] = isNullOrUndef(res) || res});
-        check_tab_defs[5] = ir_values_model.call("get_default", ["of.intervention.config.settings", "planningview_filter_" + check_tab_names[5], false]);
+        check_tab_defs[5] = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_filter_" + check_tab_names[5], false]);
         $.when(check_tab_defs[5]).then(function(res){check_tab_vals[5] = isNullOrUndef(res) || res});
-        check_tab_defs[6] = ir_values_model.call("get_default", ["of.intervention.config.settings", "planningview_filter_" + check_tab_names[6], false]);
+        check_tab_defs[6] = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_filter_" + check_tab_names[6], false]);
         $.when(check_tab_defs[6]).then(function(res){check_tab_vals[6] = isNullOrUndef(res) || res});
+        check_tab_defs[7] = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_filter_" + check_tab_names[7], false]);
+        $.when(check_tab_defs[7]).then(function(res){check_tab_vals[7] = isNullOrUndef(res) || res});
 
         $.when.apply($, check_tab_defs)
         //$.when(check_tab_defs[0],check_tab_defs[1],check_tab_defs[2],check_tab_defs[3],check_tab_defs[4],check_tab_defs[5],check_tab_defs[6])
@@ -1543,7 +1791,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                     "input_id": "lieu_input",
                     "class": "of_planning_info_lieu",
                     "label": "Lieu",
-                    "is_checked": check_tab_vals[2] || check_tab_vals[3],
+                    "is_checked": check_tab_vals[2] || check_tab_vals[3] || check_tab_vals[4],
                     "child_filters_visible": (local_storage.getItem('planningview_info_filters_visible_lieu') == 'true'),
                     "child_filters": {
                         "zip": {
@@ -1562,6 +1810,14 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                             "is_checked": check_tab_vals[3],
                             "field_name_ir": "planningview_filter_city",
                         },
+                        "secteur": {
+                            "value": "lieu-secteur",
+                            "input_id": "lieu-secteur_input",
+                            "class": "of_planning_subinfo_secteur",
+                            "label": "Secteur",
+                            "is_checked": check_tab_vals[4],
+                            "field_name_ir": "planningview_filter_secteur",
+                        },
                     },
                 },
                 "heures": {
@@ -1569,7 +1825,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                     "input_id": "heures_input",
                     "class": "of_planning_info_heures",
                     "label": "Heures / Durées",
-                    "is_checked": check_tab_vals[4] || check_tab_vals[5] || check_tab_vals[6],
+                    "is_checked": check_tab_vals[7] || check_tab_vals[5] || check_tab_vals[6],
                     "child_filters_visible": (local_storage.getItem('planningview_info_filters_visible_heures') == 'true'),
                     "child_filters": {
                         "heure_debut": {
@@ -1577,7 +1833,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                             "input_id": "heures-heure_debut_input",
                             "class": "of_planning_subinfo_heure_debut",
                             "label": "Heure de début",
-                            "is_checked": check_tab_vals[4],
+                            "is_checked": check_tab_vals[5],
                             "field_name_ir": "planningview_filter_heure_debut",
                         },
                         "heure_fin": {
@@ -1585,7 +1841,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                             "input_id": "heures-heure_fin_input",
                             "class": "of_planning_subinfo_heure_fin",
                             "label": "Heure de fin",
-                            "is_checked": check_tab_vals[5],
+                            "is_checked": check_tab_vals[6],
                             "field_name_ir": "planningview_filter_heure_fin",
                         },
                         "duree": {
@@ -1593,7 +1849,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                             "input_id": "heures-duree_input",
                             "class": "of_planning_subinfo_duree",
                             "label": "Durée",
-                            "is_checked": check_tab_vals[6],
+                            "is_checked": check_tab_vals[7],
                             "field_name_ir": "planningview_filter_duree",
                         },
                     },
@@ -1656,6 +1912,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
         if ( filter_value instanceof Array) {
             le_parent = this.info_filters[filter_value[0]];
             le_filter = le_parent["child_filters"][filter_value[1]];
+            le_filter.is_checked = checked;  // update data
             
             if (rebounce) {
                 if (checked && !le_parent.is_checked) {  // check parent filter if at least one of the subfilters is checked
@@ -1666,6 +1923,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
             }
         }else{
             le_filter = this.info_filters[filter_value];
+            le_filter.is_checked = checked;  // update data
 
             if (rebounce && !isNullOrUndef(this.info_filters[filter_value].child_filters)) {  // filter has child filters: apply toggle to subfilters if rebounce=true
                 var le_tab = [];
@@ -1677,11 +1935,11 @@ PlanningView.SidebarInfoFilter = Widget.extend({
             }
             
         }
-        le_filter.is_checked = checked;  // update data
+
         la_class = le_filter.class;
         la_input_sel = "#"+le_filter.input_id;
         if (!isNullOrUndef(le_filter["field_name_ir"])) { // update config settings
-            ir_values_model.call("set_default", ["of.intervention.config.settings", le_filter["field_name_ir"], checked, false]);
+            ir_values_model.call("set_default", ["of.intervention.settings", le_filter["field_name_ir"], checked, false]);
         }
         if (checked != $(la_input_sel).prop("checked")) { // update filter display
             $(la_input_sel).prop("checked", checked);
@@ -1704,7 +1962,7 @@ PlanningView.SidebarInfoFilter = Widget.extend({
         return true;
     },
     on_click: function(e) {
-        console.log("CLICK",e.target.tagName);
+       //console.log("CLICK",e.target.tagName);
         //console.log("event target:",e.target);
         var la_value = e.target.value;
         var la_class;
@@ -1716,10 +1974,10 @@ PlanningView.SidebarInfoFilter = Widget.extend({
         if (e.target.tagName == 'DIV') {  // click sur div
             if (e.target.className == "of_planning_ev_info" || e.target.className.indexOf("of_planning_ev_subinfo") != -1) {  // click sur div du filtre TODO className.indexOf
                 $(e.target).find('input.' + e.target.className + '_input').click();
-                console.log("CASE AA");
+               //console.log("CASE AA");
                 return;
             }else{  // click sur div du widget
-                console.log("CASE BB");
+               //console.log("CASE BB");
                 return;
             }
         }
@@ -1772,6 +2030,39 @@ PlanningView.SidebarInfoFilter = Widget.extend({
             this.info_filters_visible = false;
             local_storage.setItem('planningview_info_filters_visible', this.info_filters_visible);
         }
+    },
+});
+
+var SidebarCaption = Widget.extend({
+    /**
+     *  called by Sidebar.start
+     */
+    init: function(parent, view) {
+        this._super(parent);
+        this.view = view;
+        this.start();
+    },
+
+    start: function() {
+        if (this.view.display_states) {
+            this.$el.addClass("of_calendar_captions");
+        };
+        return $.when(this._super());
+    },
+    /**
+     *  called by CalendarView._do_show_init
+     */
+    render: function () {
+        var self = this;
+        //if (this.view.display_states) {
+            $.when(new Model(this.view.dataset.model).call('get_state_int_map'))
+            .then(function (states){
+                self.$el.html(qweb.render('CalendarView.sidebar.captions', { widget: self, captions: states }));
+                self.do_show();
+            });
+        //}else{
+        //    this.do_hide();
+        //}
     },
 });
 

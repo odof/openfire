@@ -4,6 +4,9 @@ from odoo.osv import orm
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools.float_utils import float_compare
 from odoo import models, fields, api
+import json
+from odoo.addons.of_planning_tournee.wizard.rdv import hours_to_strs
+
 
 import pytz
 from datetime import datetime, timedelta
@@ -14,6 +17,11 @@ PLANNING_VIEW = ('planning', 'Planning')
 def _tz_get(self):
     # put POSIX 'Etc/*' entries at the end to avoid confusing users - see bug 1086728
     return [(tz, tz) for tz in sorted(pytz.all_timezones, key=lambda tz: tz if not tz.startswith('Etc/') else '_')]
+
+class HREmployee(models.Model):
+    _inherit = "hr.employee"
+
+    planning_seq = fields.Integer(string=u"Séquence affichage vue Planning", default=20)
 
 class ResPartner(models.Model):
     _inherit = "res.partner"
@@ -192,6 +200,8 @@ class OfPlanningIntervention(models.Model):
         tz = pytz.timezone(self._context['tz'])
         compare_precision = 5
 
+        duree_min = self.env['ir.values'].get_default("of.intervention.settings", "duree_min_creneaux_dispo")
+
         if not horaires_list_dict:
             horaires_list_dict = employee_obj.get_horaires_list_dict(employee_ids, date_start, date_stop)
 
@@ -233,10 +243,13 @@ class OfPlanningIntervention(models.Model):
 
                 fillerbar = {
                     'nb_heures_travaillees': 0.0,
+                    'heures_travaillees_str': u"0h00",
                     'nb_heures_disponibles': 0.0,
                     'nb_heures_occupees': 0.0,
+                    'heures_occupees_str': u"0h00",
                     'pct_disponible': 0.0,
                     'pct_occupe': 0.0,
+                    'creneaux_du_jour': "",
                 }
 
                 horaires_du_jour = segment_courant[2].get(num_jour, False)  # [ (h_debut, h_fin) ,  .. ]
@@ -252,7 +265,10 @@ class OfPlanningIntervention(models.Model):
                             i_col_offset_to_segment = index_courant
                     continue
 
+                fillerbar['creneaux_du_jour'] = ["-".join(hours_to_strs(creneau[0], creneau[1])) for creneau in horaires_du_jour]
+                fillerbar['creneaux_du_jour'] = ", ".join(fillerbar['creneaux_du_jour'])
                 fillerbar['nb_heures_travaillees'] = sum([round(c[1] - c[0], 5) for c in horaires_du_jour])
+                fillerbar['heures_travaillees_str'] = hours_to_strs(fillerbar['nb_heures_travaillees'])
                 journee_debut = horaires_du_jour[0][0]
                 journee_fin = horaires_du_jour[-1][1]
 
@@ -268,7 +284,7 @@ class OfPlanningIntervention(models.Model):
                     fillerbar['pct_disponible'] = 100.0
                     fillerbarzz.append(fillerbar)
                     creneaux_dispo = intervention_obj.get_creneaux_dispo(employee_id, date_current_str,
-                                                                         intervention_liste, horaires_du_jour, 1.0)
+                                                                         intervention_liste, horaires_du_jour, duree_min)
                     creneaux_dispozz.append(creneaux_dispo)
                     date_current_da += un_jour
                     date_current_str = fields.Date.to_string(date_current_da)
@@ -305,6 +321,7 @@ class OfPlanningIntervention(models.Model):
                     intervention_liste.append(intervention_heures)
 
                 fillerbar['nb_heures_occupees'] = nb_heures_occupees
+                fillerbar['heures_occupees_str'] = hours_to_strs(fillerbar['nb_heures_occupees'])
                 fillerbar['pct_occupe'] = fillerbar['nb_heures_occupees'] * 100 / fillerbar['nb_heures_travaillees']
                 fillerbar['nb_heures_disponibles'] = fillerbar['nb_heures_travaillees'] - nb_heures_occupees
                 if fillerbar['nb_heures_disponibles'] <= 0.0:
@@ -314,7 +331,7 @@ class OfPlanningIntervention(models.Model):
                     fillerbar['pct_disponible'] = fillerbar['nb_heures_disponibles'] * 100 / fillerbar['nb_heures_travaillees']
 
                 fillerbarzz.append(fillerbar)
-                creneaux_dispo = intervention_obj.get_creneaux_dispo(employee_id, date_current_str, intervention_liste, horaires_du_jour, 0.5)
+                creneaux_dispo = intervention_obj.get_creneaux_dispo(employee_id, date_current_str, intervention_liste, horaires_du_jour, duree_min)
                 creneaux_dispozz.append(creneaux_dispo)
 
                 date_current_da += un_jour
@@ -328,8 +345,26 @@ class OfPlanningIntervention(models.Model):
             res[employee_id]['creneaux_dispo'] = creneaux_dispozz
         return res
 
+
 class OFInterventionConfiguration(models.TransientModel):
-    _inherit = 'of.intervention.config.settings'
+    _inherit = 'of.intervention.settings'
+
+    planningview_employee_exclu_ids = fields.Many2many('hr.employee', string=u"(OF) Exculsion d'intervenants",
+                                                       help=u"Intervenants à NE PAS montrer en vue planning",
+                                                       domain=[('of_est_intervenant', '=', True)])
+
+    #planningview_employee_ids = fields.Many2many()
+
+    """planningview_range_start = fields.Date(string=u"Date début vue planning",
+                                           help=u"pris en compte en sous-marin pour conserver l'état de la vue planning"
+                                                u"à niveau utilisateur")
+
+    planningview_domain = fields.Char(string=u"Domaine vue planning",
+                                      help=u"pris en compte en sous-marin pour conserver l'état de la vue planning"
+                                           u"à niveau utilisateur")
+    planningview_context = fields.Char(string=u"Contexte vue planning",
+                                       help=u"pris en compte en sous-marin pour conserver l'état de la vue planning"
+                                            u"à niveau utilisateur")"""
 
     planningview_filter_client = fields.Boolean(
         string=u"(OF) Nom du client", required=True, default=True,
@@ -359,33 +394,82 @@ class OFInterventionConfiguration(models.TransientModel):
         string=u"(OF) Durée", required=True, default=True,
         help=u"Afficher la durée des interventions en vue planning ?")
 
+    """@api.model
+    def get_default_planningview_domain(self, fields):
+        value = self.env['ir.values'].sudo().get_default('of.intervention.settings', 'planningview_domain', False)
+        return {
+            'planningview_domain': json.loads(value)
+        }
+
+    @api.model
+    def get_default_planningview_context(self, fields):
+        value = self.env['ir.values'].sudo().get_default('of.intervention.settings', 'planningview_context', False)
+        return {
+            'planningview_context': json.loads(value)
+        }
+
+    @api.model
+    def get_default_planningview_context(self, fields):
+        value = self.env['ir.values'].sudo().get_default('of.intervention.settings', 'planningview_context', False)
+        return {
+            'planningview_context': json.loads(value)
+        }"""
+
+    @api.multi
+    def set_planningview_employee_exclu_ids_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings',
+            'planningview_employee_exclu_ids',
+            [(6, 0, self.planningview_employee_exclu_ids.ids)],
+        )
+
+    """@api.multi
+    def set_planningview_context_defaults(self):
+        if not isinstance(self.planningview_context, basestring):
+            self.planningview_context = json.dumps(self.planningview_context)
+        return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'planningview_context', self.planningview_context)
+
+    @api.multi
+    def set_planningview_domain_defaults(self):
+        if not isinstance(self.planningview_domain, basestring):
+            self.planningview_domain = json.dumps(self.planningview_domain)
+        return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'planningview_domain', self.planningview_domain)
+
+    @api.multi
+    def set_planningview_range_start_defaults(self):
+        planningview_range_start_da = fields.Date.from_string(self.planningview_range_start)
+        if planningview_range_start_da.weekday() != 0:  # n'est pas un lundi
+            planningview_range_start_da -= timedelta(days=planningview_range_start_da.weekday() % 7)  # replacé un lundi
+            self.planningview_range_start = fields.Date.to_string(planningview_range_start_da)
+        return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'planningview_range_start', self.planningview_range_start)"""
+
     @api.multi
     def set_planningview_filter_client_defaults(self):
-        return self.env['ir.values'].sudo().set_default('of.intervention.config.settings', 'planningview_filter_client', self.planningview_filter_client)
+        return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'planningview_filter_client', self.planningview_filter_client)
 
     @api.multi
     def set_planningview_filter_tache_defaults(self):
-        return self.env['ir.values'].sudo().set_default('of.intervention.config.settings', 'planningview_filter_tache', self.planningview_filter_tache)
+        return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'planningview_filter_tache', self.planningview_filter_tache)
 
     @api.multi
     def set_planningview_filter_zip_defaults(self):
-        return self.env['ir.values'].sudo().set_default('of.intervention.config.settings', 'planningview_filter_zip', self.planningview_filter_zip)
+        return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'planningview_filter_zip', self.planningview_filter_zip)
 
     @api.multi
     def set_planningview_filter_city_defaults(self):
-        return self.env['ir.values'].sudo().set_default('of.intervention.config.settings', 'planningview_filter_city', self.planningview_filter_city)
+        return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'planningview_filter_city', self.planningview_filter_city)
 
     @api.multi
     def set_planningview_filter_heure_debut_defaults(self):
-        return self.env['ir.values'].sudo().set_default('of.intervention.config.settings', 'planningview_filter_heure_debut', self.planningview_filter_heure_debut)
+        return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'planningview_filter_heure_debut', self.planningview_filter_heure_debut)
 
     @api.multi
     def set_planningview_filter_heure_fin_defaults(self):
-        return self.env['ir.values'].sudo().set_default('of.intervention.config.settings', 'planningview_filter_heure_fin', self.planningview_filter_heure_fin)
+        return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'planningview_filter_heure_fin', self.planningview_filter_heure_fin)
 
     @api.multi
     def set_planningview_filter_duree_defaults(self):
-        return self.env['ir.values'].sudo().set_default('of.intervention.config.settings', 'planningview_filter_duree', self.planningview_filter_duree)
+        return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'planningview_filter_duree', self.planningview_filter_duree)
 
 class IrUIView(models.Model):
     _inherit = 'ir.ui.view'
