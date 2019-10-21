@@ -611,7 +611,7 @@ class HREmployee(models.Model):
             if segment[0] <= date_str <= segment[1]:  # la date est sur ce segment
                 date_da = fields.Date.from_string(date_str)
                 num_jour = date_da.isoweekday()
-                creneaux = num_jour in segment[2] and segment[2][num_jour]
+                creneaux = num_jour in segment[2] and segment[2][num_jour] or False
                 if not creneaux:
                     return -1
                 for i in range(len(creneaux)):  # creneau sous form (h_debut, h_fin)
@@ -711,6 +711,9 @@ class HREmployee(models.Model):
             user_ids.write({'of_color_ft': vals.get("of_color_ft", False), 'no_rebounce': True})
         if vals.get("of_color_bg", False) and not vals.get("no_rebounce", False):
             user_ids.write({'of_color_bg': vals.get("of_color_bg", False), 'no_rebounce': True})
+        self = self.filtered(lambda i: not i.of_archive_horaire)
+        if self:
+            self.archiver_horaires()
         return res
 
     @api.model
