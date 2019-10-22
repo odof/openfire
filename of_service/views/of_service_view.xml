@@ -535,7 +535,7 @@
 
 <!-- ### Services récurrents depuis ventes -->
         <record id="action_of_service_rec_form_sale" model="ir.actions.act_window">
-            <field name="name">Services Récurrents</field>
+            <field name="name">Services récurrents</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">of.service</field>
             <field name="view_type">form</field>
@@ -570,7 +570,7 @@
 
 <!-- ### Services récurrents depuis planning -->
         <record id="action_of_service_rec_form_planning" model="ir.actions.act_window">
-            <field name="name">Services Récurrents</field>
+            <field name="name">Services récurrents</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">of.service</field>
             <field name="view_type">form</field>
