@@ -115,15 +115,23 @@ class GestionPrix(models.TransientModel):
                                       product=order_line.product_id, partner=order_line.order_id.partner_id)
         else:
             # Prix HT unitaire final de la ligne
-            price_unit = (order_line.price_unit or 1.0) * to_distribute / total
+            taxes = order_line.tax_id
+            if total == 0.0:  # Permet de gérer les lignes de remises avec montant HT initial de 0
+                if self._context.get('pc_marge'):  # Dans le cas d'un calcul de % de marge on part du montant HT
+                    taxes_percentage = 0.0
+                else:  # Dans tout les autres cas, on part du montant TTC
+                    taxes_percentage = sum(taxes.mapped('amount')) / 100
+                price_unit = (order_line.price_unit or 1.0) * to_distribute / (1 + taxes_percentage)
+            else:
+                price_unit = (order_line.price_unit or 1.0) * to_distribute / total
             if rounding:
                 price_unit = currency.round(price_unit)
 
             # Ces deux lignes sont copiées depuis la fonction sale_order_line._compute_amount() d module sale
             price = price_unit * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
-            taxes = order_line.tax_id.with_context(base_values=(price, price, price))
-            taxes = taxes.compute_all(price, currency, order_line.product_uom_qty,
-                                      product=order_line.product_id, partner=order_line.order_id.partner_id)
+            taxes = taxes.with_context(base_values=(price, price, price)).compute_all(price, currency, order_line.product_uom_qty,
+                                                                                      product=order_line.product_id,
+                                                                                      partner=order_line.order_id.partner_id)
 
             if line_rounding:
                 # On arrondit les montants par ligne
@@ -209,7 +217,7 @@ class GestionPrix(models.TransientModel):
         for line in lines_select.with_context(round=False):
             # Calcul manuel des taxes avec context['round']==False pour conserver la précision des calculs
             order_line = line.order_line_id
-            price = (order_line.price_unit or 1.0) * (1 - (order_line.discount or 0.0) / 100.0)
+            price = order_line.price_unit * (1 - (order_line.discount or 0.0) / 100.0)
             taxes = order_line.tax_id.compute_all(price, order_line.currency_id, order_line.product_uom_qty,
                                                   product=order_line.product_id, partner=order_line.order_id.partner_id)
             if line.is_selected:
@@ -252,6 +260,7 @@ class GestionPrix(models.TransientModel):
             total = (100 * order.of_total_cout) / (100.0 - self.valeur) - total_ht_nonselect
             total_select = total_ht_select
             tax_field = 'total_excluded'
+            self = self.with_context(pc_marge=True)
         else:
             total = False
 
@@ -275,7 +284,7 @@ class GestionPrix(models.TransientModel):
             else:
                 vals, taxes = self._calcule_vals_ligne(order_line,
                                                        to_distribute,
-                                                       total_select or nb_select,
+                                                       total_select,
                                                        currency=cur,
                                                        rounding=line != lines_select[-1],  # On arrondit toutes les lignes sauf la dernière
                                                        line_rounding=line_rounding)
