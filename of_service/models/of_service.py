@@ -12,20 +12,11 @@ class OfService(models.Model):
 
     @api.model_cr_context
     def _auto_init(self):
-        # A SUPRIMER
-        # Mise à jour du champ company_id des services existants
         cr = self._cr
-        fill_company_id = False
-        if self._auto:
-            cr.execute("SELECT * FROM information_schema.columns WHERE table_name = 'of_service' AND column_name = 'company_id'")
-            fill_company_id = not bool(cr.fetchall())
-
         # Lors de la 1ère mise à jour après la refonte des planning (sept. 2019), on migre les données existantes.
         cr.execute("SELECT 1 FROM information_schema.columns WHERE table_name = 'of_service' AND column_name = 'recurrence'")
         existe_avant = bool(cr.fetchall())
-
         res = super(OfService, self)._auto_init()
-
         cr.execute("SELECT 1 FROM information_schema.columns WHERE table_name = 'of_service' AND column_name = 'recurrence'")
         existe_apres = bool(cr.fetchall())
         # Si le champ recurrence n'existe pas avant et l'est après la mise à jour,
@@ -38,13 +29,6 @@ class OfService(models.Model):
                        "WHERE of_service.tache_id = of_planning_tache.id")
             # On met le champ state à "calculated" quand state est différent de "cancel".
             cr.execute("UPDATE of_service SET state = 'calculated' WHERE state IS Null OR state <> 'cancel'")
-
-        # company_id
-        if fill_company_id:
-            cr.execute("UPDATE of_service AS s "
-                       "SET company_id = p.company_id\n"
-                       "FROM res_partner AS p\n"
-                       "WHERE p.id = s.partner_id")
         return res
 
     def _default_jours(self):
@@ -283,6 +267,7 @@ class OfService(models.Model):
         ], u'État', help=u"Ce champ permet de choisir manuellement l'état du service", default="draft")
     active = fields.Boolean(string="Active", default=True)
 
+    #planning_ids = fields.One2many('of.planning.intervention', compute='_compute_planning_ids', string="Interventions", order="date DESC")
     planning_ids = fields.One2many('of.planning.intervention', compute='_compute_planning_ids', string="Interventions", order="date DESC")
     date_last = fields.Date(
         string=u'Dernière intervention', compute='_compute_planning_ids', search='_search_last_date',
