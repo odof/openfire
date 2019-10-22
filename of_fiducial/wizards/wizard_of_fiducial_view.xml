@@ -7,15 +7,15 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Export Winfic/Winsis">
-                    <field name="nom_fichier" invisible="1"/>
-                    <group colspan="4" col="8">
-                        <button special="cancel" string="Annuler" icon="fa-times"/>
-                        <button name="genere_fichier_winfic" string="Générer fichier" type="object" icon="fa-file-text"/>
-                    </group>
-                    <field name="fichier" filename="nom_fichier" readonly="1" attrs="{'invisible':[('fichier','=','')]}"/>
                     <group colspan="4" col="1">
                         <field name="sortie" readonly="1"/>
                     </group>
+                    <footer>
+                        <button special="cancel" string="Annuler" icon="fa-times"/>
+                        <button name="genere_fichier_winfic" string="Générer fichier" type="object" icon="fa-file-text"/>
+                        <field name="nom_fichier" invisible="1"/>
+                        <field name="fichier" filename="nom_fichier" readonly="1" attrs="{'invisible':[('fichier','=','')]}"/>
+                    </footer>
                 </form>
             </field>
         </record>

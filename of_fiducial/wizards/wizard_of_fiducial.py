@@ -24,8 +24,7 @@ class OfWizardExportWinfic(models.TransientModel):
         self.ensure_one()
         # On récupère les factures selectionnées
         sortie = ""
-        move_line_obj = self.env['account.move.line']
-        liste_ecritures = move_line_obj.browse(self._context.get('active_ids', []))
+        liste_ecritures = self.env['account.move.line'].search([('id', 'in', self._context.get('active_ids', []))], order='journal_id, move_id, account_id')
 
         # Teste si au moins une facturé sélectionnée
         if not liste_ecritures:
@@ -74,7 +73,7 @@ class OfWizardExportWinfic(models.TransientModel):
         no_ligne = 1
         date = time.strftime('%d%m%Y')
         for compte in liste_comptes:
-            chaine += '1e|' + date + '|     1|' + str(no_ligne).rjust(8) + '|     1|'
+            chaine += '1e|' + date + '|     1|' + str(no_ligne).rjust(6) + '|     1|'
             chaine += compte
             chaine += '|         0,00|         0,00|' + self.chaine2ascii_taille_fixe_maj(liste_comptes[compte], 30)
             chaine += '|  |     |    |        |1| | |          0|  |'
