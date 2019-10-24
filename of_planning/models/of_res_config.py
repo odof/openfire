@@ -19,29 +19,29 @@ class OfInterventionSettings(models.TransientModel):
     color_indispo_ft = fields.Char(string="(OF) créneaux indispo", help=u"Couleur de texte des créneaux indisponibles.", default="#0C0C0C")
     color_indispo_bg = fields.Char(string="(OF) créneaux indispo", help=u"Couleur de fond des créneaux indisponibles", default="#FF2222")"""
 
-    color_bg_creneaux_dispo = fields.Char(string="(OF) Créneaux dispo couleur fond",
+    color_bg_creneaux_dispo = fields.Char(string=u"(OF) Créneaux dispo couleur fond",
         help=u"Choisissez un couleur de fond pour les créneaux dispos", default="#7FFF00")
-    color_ft_creneaux_dispo = fields.Char(string="(OF) Creneaux dispo couleur texte",
+    color_ft_creneaux_dispo = fields.Char(string=u"(OF) Créneaux dispo couleur texte",
                                           help=u"Choisissez un couleur de texte pour les créneaux dispos",
                                           default="#0C0C0C")
-    duree_min_creneaux_dispo = fields.Float(string="(OF) Créneaux dispo durée min", default="1",
+    duree_min_creneaux_dispo = fields.Float(string=u"(OF) Créneaux dispo durée min", default="1",
                                             help=u"durée minimale pour qu'un trou dans le planning soit considéré commme un créneau dispo")
 
-    color_bg_creneaux_indispo = fields.Char(string="(OF) Créneaux indispo couleur fond",
+    color_bg_creneaux_indispo = fields.Char(string=u"(OF) Créneaux indispo couleur fond",
         help=u"Choisissez un couleur de fond pour les créneaux dispos", default="#FF2222")
-    color_ft_creneaux_indispo = fields.Char(string="(OF) Creneaux indispo couleur texte", default="#0C0C0C",
+    color_ft_creneaux_indispo = fields.Char(string=u"(OF) Crenéaux indispo couleur texte", default="#0C0C0C",
                                           help=u"Choisissez un couleur de texte pour les créneaux dispos",)
 
     @api.multi
     def set_calendar_min_time_defaults(self):
         if not 0 <= self.calendar_min_time < 24:
-            raise ValidationError("l'heure minimale doit être entre 0 et 24! (et idéalement pas 24...)")
+            raise ValidationError(u"l'heure minimale doit être entre 0 et 24! (et idéalement pas 24...)")
         return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'calendar_min_time', self.calendar_min_time)
 
     @api.multi
     def set_calendar_max_time_defaults(self):
         if not 0 <= self.calendar_max_time <= 24:
-            raise ValidationError("l'heure maximale doit être entre 0 et 24! (et idéalement pas 0...)")
+            raise ValidationError(u"l'heure maximale doit être entre 0 et 24! (et idéalement pas 0...)")
         return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'calendar_max_time', self.calendar_max_time)
 
     @api.multi

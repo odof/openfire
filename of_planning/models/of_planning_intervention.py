@@ -34,7 +34,7 @@ class HREmployee(models.Model):
 
     of_tache_ids = fields.Many2many('of.planning.tache', 'of_employee_tache_rel', 'employee_id', 'tache_id', u'Tâches')
     of_equipe_ids = fields.Many2many('of.planning.equipe', 'of_planning_employee_rel', 'employee_id', 'equipe_id', u'Équipes')
-    of_changed_intervention_id = fields.Many2one('of.planning.intervention', string=u"Dernière intervention modifiée") # api.depends dans of.planning.intervention
+    of_changed_intervention_id = fields.Many2one('of.planning.intervention', string=u"Dernière intervention modifiée")  # api.depends dans of.planning.intervention
     of_est_intervenant = fields.Boolean(string=u"Est intervenant?", default=False)
 
 class OfPlanningTache(models.Model):
@@ -42,7 +42,7 @@ class OfPlanningTache(models.Model):
     _description = u"Planning OpenFire : Tâches"
 
     @api.model
-    def _get_employee_ids_domaim(self):
+    def _get_employee_ids_domain(self):
         return [('of_est_intervenant', '=', True)]
 
     name = fields.Char(u'Libellé', size=64, required=True)
@@ -57,7 +57,7 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
     is_crm = fields.Boolean(u'Tâche CRM')
     equipe_ids = fields.Many2many('of.planning.equipe', 'equipe_tache_rel', 'tache_id', 'equipe_id', u'Équipes qualifiées')
     employee_ids = fields.Many2many('hr.employee', 'of_employee_tache_rel', 'tache_id', 'employee_id', u'Employés qualifiés',
-                                    domain=_get_employee_ids_domaim)
+                                    domain=_get_employee_ids_domain)
     #employee_nb = fields.Integer(string=u'Nombre d\'intervenants', default=1)
 
     @api.multi
@@ -72,7 +72,7 @@ class OfPlanningEquipe(models.Model):
     _order = "sequence, name"
 
     @api.model
-    def _get_employee_ids_domaim(self):
+    def _get_employee_ids_domain(self):
         return [('of_est_intervenant', '=', True)]
 
     @api.multi
@@ -115,7 +115,7 @@ class OfPlanningEquipe(models.Model):
     name = fields.Char(u'Équipe', size=128, required=True)
     note = fields.Text('Description')
     employee_ids = fields.Many2many('hr.employee', 'of_planning_employee_rel', 'equipe_id', 'employee_id', u'Employés',
-                                    domain=_get_employee_ids_domaim)
+                                    domain=_get_employee_ids_domain)
     active = fields.Boolean('Actif', default=True)
     category_ids = fields.Many2many('hr.employee.category', 'equipe_category_rel', 'equipe_id', 'category_id', u'Catégories')
     intervention_ids = fields.One2many('of.planning.intervention', 'equipe_id', u'Interventions liées', copy=False)
@@ -136,7 +136,7 @@ class OfPlanningEquipe(models.Model):
     # Ajout des horaires avancés
     mode_horaires = fields.Selection([
         ("easy", "Facile"),
-        ("advanced", u"Avancé")], string="Mode de Sélection des horaires", required=True, default="easy")
+        ("advanced", u"Avancé")], string=u"Mode de Sélection des horaires", required=True, default="easy")
     profil_id = fields.Many2one("of.horaires.profil", "Profil")
     of_creneau_ids = fields.Many2many("of.horaires.creneau", "of_equipe_creneaux_rel", "equipe_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
     of_creneau_temp_ids = fields.Many2many("of.horaires.creneau", "of_equipe_creneaux_temp_rel", "equipe_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
@@ -237,7 +237,7 @@ class OfPlanningIntervention(models.Model):
     _order = 'date'
 
     @api.model
-    def _get_employee_ids_domaim(self):
+    def _get_employee_ids_domain(self):
         return [('of_est_intervenant', '=', True)]
 
     @api.depends('tz')
@@ -268,7 +268,7 @@ class OfPlanningIntervention(models.Model):
     tache_name = fields.Char(related='tache_id.name')
     equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe', oldname='poseur_id')
     employee_ids = fields.Many2many('hr.employee', 'of_employee_intervention_rel', 'intervention_id', 'employee_id',
-                                    string='Intervenants', required=True, domain=_get_employee_ids_domaim)
+                                    string='Intervenants', required=True, domain=_get_employee_ids_domain)
     employee_main_id = fields.Many2one('hr.employee', string=u"Employé principal", compute="_compute_employee_main_id", store=True)
     state = fields.Selection([
         ('draft', 'Brouillon'),
@@ -354,19 +354,19 @@ class OfPlanningIntervention(models.Model):
             if interv.compare_date(interv.date, fields.Datetime.now(), compare=">") or not interv.compare_date(interv.date, interv.employee_main_id.of_changed_intervention_id.date):
                 continue
             if interv.interv_before_id and interv.interv_before_id == interv.employee_main_id.of_changed_intervention_id:
-                limit_date = fields.Datetime.to_string(fields.Datetime.from_string(interv.date) + relativedelta(days=-1, hour=0, minute=0, second=0))
-                interv.interv_before_id = intervention_obj.search([('date_deadline', '<=', interv.date), ('date', '>=', limit_date)], order='date DESC', limit=1)
+                limit_date = fields.Datetime.to_string(fields.Datetime.from_string(interv.date) + relativedelta(hour=0, minute=0, second=0))
+                interv.interv_before_id = intervention_obj.search([('date_deadline', '<=', interv.date), ('date', '>=', limit_date), ('employee_main_id', '=', interv.employee_main_id.id)], order='date DESC', limit=1)
             if interv.interv_after_id and interv.interv_after_id == interv.employee_main_id.of_changed_intervention_id:
                 limit_date = fields.Datetime.to_string(fields.Datetime.from_string(interv.date) + relativedelta(days=1, hour=0, minute=0, second=0))
-                interv.interv_after_id = intervention_obj.search([('date', '>=', interv.date_deadline), ('date', '<=', limit_date)], order='date ASC', limit=1)
-            if not interv.interv_before_id:
-                limit_date = fields.Datetime.to_string(fields.Datetime.from_string(interv.date) + relativedelta(days=-1, hour=0, minute=0, second=0))
-                res = intervention_obj.search([('date_deadline', '<=', interv.date), ('date', '>=', limit_date)], order='date DESC', limit=1)
+                interv.interv_after_id = intervention_obj.search([('date', '>=', interv.date_deadline), ('date', '<=', limit_date), ('employee_main_id', '=', interv.employee_main_id.id)], order='date ASC', limit=1)
+            if not interv.interv_before_id or interv == interv.employee_main_id.of_changed_intervention_id:
+                limit_date = fields.Datetime.to_string(fields.Datetime.from_string(interv.date) + relativedelta(hour=0, minute=0, second=0))
+                res = intervention_obj.search([('date_deadline', '<=', interv.date), ('date', '>=', limit_date), ('employee_main_id', '=', interv.employee_main_id.id)], order='date DESC', limit=1)
                 if res:
                     interv.interv_before_id = res
-            if not interv.interv_after_id:
+            if not interv.interv_after_id or interv == interv.employee_main_id.of_changed_intervention_id:
                 limit_date = fields.Datetime.to_string(fields.Datetime.from_string(interv.date) + relativedelta(days=1, hour=0, minute=0, second=0))
-                res = intervention_obj.search([('date', '>=', interv.date_deadline), ('date', '<=', limit_date)], order='date ASC', limit=1)
+                res = intervention_obj.search([('date', '>=', interv.date_deadline), ('date', '<=', limit_date), ('employee_main_id', '=', interv.employee_main_id.id)], order='date ASC', limit=1)
                 if res:
                     interv.interv_after_id = res
 

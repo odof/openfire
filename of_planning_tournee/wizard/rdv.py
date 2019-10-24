@@ -255,7 +255,6 @@ class OfTourneeRdv(models.TransientModel):
         wizard_line_obj = self.env['of.tournee.rdv.line']
         intervention_obj = self.env['of.planning.intervention']
 
-        address = self.partner_address_id
         service = self.service_id
 
         # Suppression des anciens créneaux
@@ -332,7 +331,7 @@ class OfTourneeRdv(models.TransientModel):
             # Restriction aux jours spécifiés dans le service
             while num_jour not in jours_service:
                 date_recherche_da += un_jour
-                num_jour = ((num_jour + 1) % 7) or 7 # num jour de la semaine entre 1 et 7
+                num_jour = ((num_jour + 1) % 7) or 7  # num jour de la semaine entre 1 et 7
             # Arreter la recherche si on dépasse la date de fin
             if date_recherche_da >= apres_recherche_da:
                 continue
@@ -405,7 +404,7 @@ class OfTourneeRdv(models.TransientModel):
                             index_courant += 1
                             creneaux.append((horaires_employee[index_courant][0], horaires_employee[index_courant][1], employee))
                     # deb < intervention_deb << mémo float_compare
-                    elif deb and float_compare(intervention_deb, deb, compare_precision) > 0.0:## and deb < fin:
+                    elif deb and float_compare(intervention_deb, deb, compare_precision) > 0.0:  ## and deb < fin:
                         # fin < intervention_deb << mémo float_compare
                         while float_compare(intervention_deb, fin, compare_precision) > 0.0:  # l'intervention commence sur un autre creneau
                             creneaux.append((deb, fin, employee))

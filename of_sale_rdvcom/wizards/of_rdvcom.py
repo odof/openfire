@@ -773,7 +773,7 @@ class OFRDVCommercial(models.TransientModel):
             raise UserError(u"Vérifier la date de RDV et l'équipe technique")
 
         if (not self.hor_md) or (not self.hor_mf) or (not self.hor_ad) or (not self.hor_af):
-            raise UserError("Il faut configurer l'horaire de travail de toutes les équipes.")
+            raise UserError(u"Il faut configurer l'horaire de travail de toutes les équipes.")
 
         la_company = False
         l_adresse = False
@@ -944,7 +944,7 @@ class OfRDVCommercialLine(models.TransientModel):
         return (nb, nb_dispo, first_res)
 
     date = fields.Date(string="Date")
-    debut_dt = fields.Datetime(string="Début")
+    debut_dt = fields.Datetime(string=u"Début")
     fin_dt = fields.Datetime(string="Fin")
     date_flo = fields.Float(string='Date', required=True, digits=(12, 5))
     date_flo_deadline = fields.Float(string='Date', required=True, digits=(12, 5))

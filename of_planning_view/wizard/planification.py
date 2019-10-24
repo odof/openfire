@@ -41,7 +41,7 @@ class OfPlanifCreneauProp(models.TransientModel):
 
     duree_restante = fields.Float(related='service_id.duree_restante')
     recurrence = fields.Boolean(related="service_id.recurrence", readonly=True)
-    date_next = fields.Date(string="À planifier à partir du", related="service_id.date_next", readonly=True)
+    date_next = fields.Date(string=u"À planifier à partir du", related="service_id.date_next", readonly=True)
     date_fin = fields.Date(string="Au plus tard le", related="service_id.date_fin", readonly=True)
     partner_name = fields.Char(string="Client", related='service_id.partner_id.name', readonly=True)
     partner_of_telephones = fields.Text(related='service_id.partner_id.of_telephones', readonly=True)
@@ -178,7 +178,7 @@ class OfPlanifCreneau(models.TransientModel):
     _name = 'of.planif.creneau'
     _description = u'Prise de RDV depuis un créneau disponible'
 
-    date_creneau = fields.Date(string="Date du créneau", readonly=True)
+    date_creneau = fields.Date(string=u"Date du créneau", readonly=True)
     num_jour = fields.Integer(string=u"numéro du jour", compute="_compute_num_jour")
     heure_debut_creneau = fields.Float(string=u'Heude de début', digits=(5, 5))
     heure_fin_creneau = fields.Float(string=u'Heude de fin', digits=(5, 5))
@@ -203,7 +203,7 @@ class OfPlanifCreneau(models.TransientModel):
     aucun_res = fields.Boolean(string=u"Aucun résultat!")
     employee_id = fields.Many2one('hr.employee', string="Intervenant", readonly=True)
     # lieu précédent
-    lieu_prec_id = fields.Many2one("res.partner", string="lieu précédent")
+    lieu_prec_id = fields.Many2one("res.partner", string=u"lieu précédent")
     geo_lat_prec = fields.Float(related='lieu_prec_id.geo_lat', readonly=True)
     geo_lng_prec = fields.Float(related='lieu_prec_id.geo_lng', readonly=True)
     precision_prec = fields.Selection(related='lieu_prec_id.precision', readonly=True)
