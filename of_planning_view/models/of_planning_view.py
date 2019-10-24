@@ -47,7 +47,7 @@ class OfPlanifTag(models.Model):
 
     name = fields.Char(string='Nom', required=True, translate=True)
     color = fields.Integer(string='Index couleur')
-    active = fields.Boolean(default=True, help="Le champ 'Active' vous permet de cacher l'étiquette sans la supprimer.")
+    active = fields.Boolean(default=True, help=u"Le champ 'Active' vous permet de cacher l'étiquette sans la supprimer.")
 
 
 class OfPlanningIntervention(models.Model):
@@ -490,15 +490,15 @@ class IrUIView(models.Model):
             if not self._apply_group(model, node, modifiers, fields):
                 # node must be removed, no need to proceed further with its children
                 return fields
-    
+
             # The view architeture overrides the python model.
             # Get the attrs before they are (possibly) deleted by check_group below
             orm.transfer_node_to_modifiers(node, modifiers, self._context, in_tree_view)
-    
+
             for f in node:
                 # useless here? if children or (node.tag == 'field' and f.tag in ('filter', 'separator')):
                 fields.update(self.postprocess(model, f, view_id, in_tree_view, model_fields))
-    
+
             orm.transfer_modifiers_to_node(modifiers, node)
         return fields
 
