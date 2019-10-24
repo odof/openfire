@@ -34,7 +34,7 @@
       <blockValign value="TOP"/>
       <!-- <lineStyle kind="LINEABOVE" colorName="#000000" start="0,0" stop="-1,0"/> -->
     </blockTableStyle>
-     
+
     <initialize>
       <paraStyle name="all" alignment="justify"/>
     </initialize>
@@ -146,7 +146,7 @@ l'intervention</td>
 	  <para style="terp_default_8">[[ setLang(i.user_id.lang) ]]</para>
   	  <blockTable colWidths="105.0, 45.0, 60.0, 120.0, 201.0" style="Table4">
 	      <tr>
-	          <td>[[ i.date or '' ]]</td>
+	          <td>[[ formatLang(i.date, date_time=True) ]]</td>
 	          <td>[[ i.duree and 'h'.join(str(datetime.timedelta(hours=i.duree)).split(':')[:-1]) or '' ]]</td>
 	          <td>[[ i.state or '' ]]</td>
 	          <td>[[ i.equipe_id.name or '' ]]</td>
@@ -158,4 +158,3 @@ l'intervention</td>
   </pto>
   </story>
 </document>
-  
