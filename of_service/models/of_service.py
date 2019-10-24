@@ -4,6 +4,7 @@ from odoo import api, models, fields
 from datetime import date
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
+from odoo.tools.safe_eval import safe_eval
 
 import math
 
@@ -40,19 +41,13 @@ class OfService(models.Model):
         return res
 
     @api.multi
-    @api.depends('tache_id', 'address_id', 'duree')
-    def _compute_planning_ids(self):
-        planning_obj = self.env['of.planning.intervention']
+    @api.depends('tache_id', 'address_id', 'duree', 'planning_ids', 'recurrence', 'recurring_interval', 'recurring_rule_type')
+    def _compute_durees(self):
         for service in self:
-            plannings = planning_obj.search([('tache_id', '=', service.tache_id.id),
-                                             ('address_id', '=', service.address_id.id)], order='date desc')
-            service.planning_ids = plannings
-            for planning in plannings:  # ne pas prendre les interventions annulées / reportées / non terminées
-                if planning.state in ('draft', 'confirm', 'done'):
-                    service.date_last = planning.date
-                    break
-            else:
-                service.date_last = False
+            plannings = service.planning_ids
+            # ne pas prendre les interventions annulées / reportées / non terminées
+            planning_filtered = plannings.filtered(lambda p: p.state in ('draft', 'confirm', 'done'))
+            service.date_last = planning_filtered and planning_filtered[0].date or False
 
             if service.recurrence:
                 # les interventions faites il y a plus d'une periode ne sont pas a prendre en compte dans le calcul de la durée planifiée
@@ -86,7 +81,7 @@ class OfService(models.Model):
         today_da = fields.Date.from_string(fields.Date.context_today(self))
         dans_un_mois_da = today_da + un_mois
         il_y_a_un_mois_da = today_da - un_mois
-        self._compute_planning_ids()
+        self._compute_durees()
         for service in self:
             if service.state and service.state != 'calculated':
                 service.state_ponc = not service.recurrence and service.state or False
@@ -104,9 +99,9 @@ class OfService(models.Model):
                         service.state_rec = 'to_plan'
                     elif date_last_da and (il_y_a_un_mois_da <= date_last_da <= today_da):  # dernière intervention il y a moins d'un mois
                         service.state_rec = 'planned'
-                    elif date_last_da and (today_da < date_last_da <= dans_un_mois_da):  # dernière intervention il y a moins d'un mois
+                    elif date_last_da and (today_da < date_last_da <= dans_un_mois_da):  # dernière intervention dans moins d'un mois
                         service.state_rec = 'planned_soon'
-                    elif date_next_da < il_y_a_un_mois_da:  # prochaine planification il y a plus d'un mois
+                    elif date_next_da < il_y_a_un_mois_da:  # prochaine planification en retard de plus d'un mois
                         service.state_rec = 'late'
                     elif date_fin_da and (date_fin_da < date_next_da or date_fin_da < today_da):  # le service a expiré ou expire avant la date de prochaine planif
                         service.state_rec = 'done'
@@ -208,8 +203,8 @@ class OfService(models.Model):
     tag_ids = fields.Many2many('of.service.tag', string=u"Étiquettes")
     tache_name = fields.Char(related="tache_id.name", readonly=True)
     duree = fields.Float(string=u"Durée estimée")
-    duree_planif = fields.Float(string=u"Durée planifiée", compute="_compute_planning_ids")
-    duree_restante = fields.Float(string=u"Durée restante", compute="_compute_planning_ids")
+    duree_planif = fields.Float(string=u"Durée planifiée", compute="_compute_durees")
+    duree_restante = fields.Float(string=u"Durée restante", compute="_compute_durees", search='_search_duree_restante')
 
     origin = fields.Char(string="Origine")
 
@@ -269,10 +264,10 @@ class OfService(models.Model):
         ], u'État', help=u"Ce champ permet de choisir manuellement l'état du service", default="draft")
     active = fields.Boolean(string="Active", default=True)
 
-    #planning_ids = fields.One2many('of.planning.intervention', compute='_compute_planning_ids', string="Interventions", order="date DESC")
+    #planning_ids = fields.One2many('of.planning.intervention', 'service_id', string="Interventions", order="date DESC")
     planning_ids = fields.One2many('of.planning.intervention', 'service_id', string="Interventions", order="date DESC")
     date_last = fields.Date(
-        string=u'Dernière intervention', compute='_compute_planning_ids', search='_search_last_date',
+        string=u'Dernière intervention', compute='_compute_durees', search='_search_last_date',
         help=u"Date de la dernière intervention")
 
     # Champs de recherche
@@ -283,13 +278,18 @@ class OfService(models.Model):
     # Couleur de contrôle
     color = fields.Char(compute='_compute_color', string='Couleur', store=False)
 
+    def _search_duree_restante(self, operator, operand):
+        services = self.search([])
+        res = safe_eval("services.filtered(lambda s: s.duree_restante %s %.2f)" % (operator, operand), {'services': services})
+        return [('id', 'in', res.ids)]
+
     @api.multi
     @api.depends('address_id', 'partner_id', 'tache_id')
     def _compute_name(self):
         for service in self:
-            partner_name = service.partner_id and service.partner_id.name or u''
-            address_zip = service.address_id and service.address_id.zip or u''
-            tache_name = service.tache_id and service.tache_id.name or u''
+            partner_name = service.partner_id.name or u''
+            address_zip = service.address_id.zip or u''
+            tache_name = service.tache_id.name or u''
             service.name = tache_name + " " + partner_name + " " + address_zip
 
     @api.onchange('partner_id')
@@ -452,9 +452,8 @@ class OFPlanningTache(models.Model):
     @api.multi
     @api.depends('service_ids')
     def _compute_service_count(self):
-        service_obj = self.env['of.service']
         for tache in self:
-            tache.service_count = len(service_obj.search([('tache_id', '=', tache.id), ('recurrence', '=', True)]))
+            tache.service_count = len(tache.service_ids)
 
     @api.multi
     @api.depends('recurrence', 'recurring_interval', 'recurring_rule_type')
@@ -555,7 +554,7 @@ class OFPlanningIntervention(models.Model):
                     # calculer et affecter la nouvelle date de prochaine planification
                     service.date_next = service.get_next_date(intervention.date_date)
                 # l'intervention est marquée comme faite
-                elif fait:  # mettre à jour l'ancienne date de prochaine planification
+                elif fait and service.date_next_last <= intervention.date_date:  # mettre à jour l'ancienne date de prochaine planification
                     service.date_next_last = service.date_next
                     service.date_next = service.get_next_date(service.date_next)
         return res
@@ -596,4 +595,4 @@ class ResPartner(models.Model):
 
     service_address_ids = fields.One2many('of.service', 'address_id', string='Services', context={'active_test': False})
     service_partner_ids = fields.One2many('of.service', 'partner_id', string='Services du partenaire', context={'active_test': False},
-                                          help="Services liés au partenaire, incluant les services des contacts associés")
+                                          help=u"Services liés au partenaire, incluant les services des contacts associés")

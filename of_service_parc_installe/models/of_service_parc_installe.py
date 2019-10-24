@@ -8,7 +8,7 @@ class OfService(models.Model):
 
     parc_installe_id = fields.Many2one('of.parc.installe', string=u"No de série",
         domain="partner_id and [('client_id', '=', partner_id), '|', ('site_adresse_id', '=', False), ('site_adresse_id', '=', address_id)] or "
-               "address_id and [('client_id', '=', address_id), '|', ('site_adresse_id', '=', False), ('site_adresse_id', '=', address_id)] or []")
+               "address_id and [('client_id', 'parent_of', address_id), '|', ('site_adresse_id', '=', False), ('site_adresse_id', '=', address_id)] or []")
 
     parc_installe_product_id = fields.Many2one('product.product', string=u"Désignation", related="parc_installe_id.product_id", readonly=True)
     parc_installe_site_adresse_id = fields.Many2one('res.partner', string=u"Adresse de pose", related="parc_installe_id.site_adresse_id", readonly=True)
@@ -57,8 +57,9 @@ class OfParcInstalle(models.Model):
         """Smart button vue parc installé : renvoi le nombre de service lié à la machine installée"""
         service_obj = self.env['of.service']
         for parc in self:
-            parc.service_count = len(service_obj.search([('parc_installe_id', '=', parc.id), ('recurrence', '=', True)]))
-            parc.a_programmer_count = len(service_obj.search([('parc_installe_id', '=', parc.id), ('recurrence', '=', False)]))
+            services = service_obj.search([('parc_installe_id', '=', parc.id)])  # permet de ne faire d'un seul search
+            parc.service_count = len(services.filtered('recurrence'))
+            parc.a_programmer_count = len(services.filtered(lambda s: not s.recurrence))
 
     @api.multi
     def action_view_service(self):
@@ -183,4 +184,3 @@ class ProjectIssue(models.Model):
         'hide_bouton_planif': True,
         }
         return action
-
