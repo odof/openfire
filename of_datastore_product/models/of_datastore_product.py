@@ -1203,7 +1203,7 @@ class ProductProduct(models.Model):
     def name_search(self, name='', args=None, operator='ilike', limit=100):
         name, name_brands = self.env['product.template'].of_name_search_extract_brands(name)
         args_brands = self.env['of.product.brand']
-        for arg in args:
+        for arg in args or []:
             if arg[0] == 'brand_id' and arg[1] == '=':
                 if arg[2]:
                     if isinstance(arg[2], basestring):
@@ -1218,7 +1218,7 @@ class ProductProduct(models.Model):
         res = super(ProductProduct, self).name_search(name, new_args, operator, limit)
 
         parse_domain = self._of_datastore_update_domain_item
-        for arg in args:
+        for arg in args or []:
             if not isinstance(arg, (list, tuple)):
                 continue
             if arg[0].startswith('ds_'):
