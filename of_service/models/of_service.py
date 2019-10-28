@@ -5,6 +5,8 @@ from datetime import date
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 
+import math
+
 class OfService(models.Model):
     _name = "of.service"
     _inherit = "of.map.view.mixin"
@@ -207,7 +209,7 @@ class OfService(models.Model):
     tache_name = fields.Char(related="tache_id.name", readonly=True)
     duree = fields.Float(string=u"Durée estimée")
     duree_planif = fields.Float(string=u"Durée planifiée", compute="_compute_planning_ids")
-    duree_restante = fields.Float(string=u"Durée restante", compute="_compute_planning_ids", store=True)
+    duree_restante = fields.Float(string=u"Durée restante", compute="_compute_planning_ids")
 
     origin = fields.Char(string="Origine")
 
@@ -322,24 +324,57 @@ class OfService(models.Model):
 
     @api.multi
     def get_next_date(self, date_str):
+        """
+        :param date_str: Date de dernière intervention à utuliser pour le calcul, sous format string
+        :return: Date à partir de laquelle planifier la prochaine intervention
+        :rtype string
+        """
         self.ensure_one()
         if self.recurrence:
-            mois_nums = self.mois_ids.mapped('numero') or (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+            mois_ints = self.mois_ids.mapped('numero') or range(1, 13)
 
             date_from_da = fields.Date.from_string(max(date_str, self.date_last))
+
+            date_from_mois_int = date_from_da.month
+
+            if date_from_mois_int not in mois_ints:
+                # l'intervention n'a pas été planifiée le bon mois
+                # on veut replacer la date sur un mois valide AVANT d'ajouter la periode, il nous faut savoir si l'intervention à été planifié en retard ou en avance
+                mois_courant_int = date_from_mois_int
+
+                # Détection du mois précédent et du mois suivant dans le service (valeur 1-12)
+                mois_passe_int = mois_ints[-1]
+                mois_futur_int = mois_ints[0]
+                for mois_int in mois_ints:
+                    if mois_int < mois_courant_int:
+                        mois_passe_int = mois_int
+                    else:
+                        mois_futur_int = mois_int
+                        break
+
+                # Modification des mois : valeur de -11 à + 24 selon l'année
+                if mois_passe_int > date_from_mois_int:
+                    mois_passe_int -= 12
+                if mois_futur_int < date_from_mois_int:
+                    mois_futur_int += 12
+                # Mois le plus proche de la date fournie
+                mois_int = mois_passe_int if mois_passe_int + mois_futur_int > 2 * date_from_mois_int else mois_futur_int
+                mois_int -= 1
+
+                # A ce stade, mois_int est un numéro de mois de 0 à 11
+                #   auquel a été ajouté/retiré 12 en fonction de l'année
+                # Il ne reste donc plus qu'à calculer l'année et le mois réels
+                annee_int = date_from_da.year + int(math.floor(mois_int / 12.0))
+                mois_int = mois_int % 12 + 1
+                date_from_da = date(annee_int, mois_int, 1)
+
             date_next_da = date_from_da + self.get_relative_delta(self.recurring_rule_type, self.recurring_interval)
+            date_next_mois_int = date_next_da.month
 
-            date_mois = date_next_da.month
-            date_annee = date_next_da.year
+            res_mois_int = min(mois_ints, key=lambda m: (m < date_next_mois_int, m))
+            res_year_int = date_next_da.year + (res_mois_int < date_next_mois_int)
 
-            if (date_mois not in mois_nums) and (date_mois+1 in mois_nums):
-                # Le rdv a été pris en avance pour le mois suivant
-                date_mois += 1
-
-            mois = min(mois_nums, key=lambda m: (m <= date_mois, m))
-            annee = date_annee + (mois < date_mois)
-
-            return fields.Date.to_string(date(annee, mois, 1))
+            return fields.Date.to_string(date(res_year_int, res_mois_int, 1))
         else:
             return False
 
@@ -350,9 +385,9 @@ class OfService(models.Model):
         #elif recurring_rule_type == 'daily':
         #    return relativedelta(days=interval)
         elif recurring_rule_type == 'monthly':
-            return relativedelta(months=interval)
+            return relativedelta(months=interval, day=1)
         else:
-            return relativedelta(years=interval)
+            return relativedelta(years=interval, day=1)
 
     @api.multi
     def toggle_recurrence(self):

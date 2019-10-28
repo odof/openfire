@@ -44,8 +44,8 @@ class OfPlanifCreneauProp(models.TransientModel):
     date_next = fields.Date(string="À planifier à partir du", related="service_id.date_next", readonly=True)
     date_fin = fields.Date(string="Au plus tard le", related="service_id.date_fin", readonly=True)
     partner_name = fields.Char(string="Client", related='service_id.partner_id.name', readonly=True)
-    partner_mobile = fields.Char(related='service_id.partner_id.mobile', readonly=True)
-    partner_phone = fields.Char(related='service_id.partner_id.phone', readonly=True)
+    partner_of_telephones = fields.Text(related='service_id.partner_id.of_telephones', readonly=True)
+    #partner_phone = fields.Char(related='service_id.partner_id.phone', readonly=True)
 
     tache_name = fields.Char(related='service_id.tache_id.name', readonly=True)
     address_name = fields.Char(string="Adresse", related="service_id.address_id.name", readonly=True)
@@ -63,7 +63,7 @@ class OfPlanifCreneauProp(models.TransientModel):
     distance_dwazo_suiv = fields.Float(string=u'Distance du suivant', digits=(5, 5), compute="_compute_distance_dwazo", help=u"À vol d'oiseau")
     distance_reelle_prec = fields.Float(string=u'Distance du précédent', digits=(5, 2), help=u"Réelle")
     distance_reelle_suiv = fields.Float(string=u'Distance du suivant', digits=(5, 2), help=u"Réelle")
-    distance_reelle_tota = fields.Float(string=u'Distance totale', digits=(5, 2), help=u"Réelle")
+    distance_reelle_tota = fields.Float(string=u'Distance totale (km)', digits=(5, 2), help=u"Réelle")
     osrm_response = fields.Text(string=u"Réponse OSRM")
     distance_order = fields.Float(string=u'Distance totale', digits=(5, 5), help=u"pour ordonner", default=99999.99999)
     dummy_field = fields.Boolean(string=u"A VER?")
@@ -178,17 +178,30 @@ class OfPlanifCreneau(models.TransientModel):
     _name = 'of.planif.creneau'
     _description = u'Prise de RDV depuis un créneau disponible'
 
-    date_creneau = fields.Date(string="Date du créneau")
+    date_creneau = fields.Date(string="Date du créneau", readonly=True)
     num_jour = fields.Integer(string=u"numéro du jour", compute="_compute_num_jour")
     heure_debut_creneau = fields.Float(string=u'Heude de début', digits=(5, 5))
     heure_fin_creneau = fields.Float(string=u'Heude de fin', digits=(5, 5))
     creneaux_reels = fields.Char(string=u"Créneaux réels")
     creneaux_reels_formatted = fields.Char(string=u"Créneaux réels", compute="_compute_creneaux_reels_formatted")
     distance_max = fields.Integer("Distance max.",default=30)
-    duree_creneau = fields.Float(string=u"Durée")#, compute="_compute_duree_creneau")
-    creneau_fini = fields.Boolean(string=u"Journée entièrement planifiée")
+    duree_creneau = fields.Float(string=u"Durée à planifier")#, compute="_compute_duree_creneau")
+    ignorer_duree = fields.Boolean(string=u"Ignorer durée", help=u"Cochez pour proposer aussi les interventions plus longues que le créneau")
+    pre_tache_ids = fields.Many2many('of.planning.tache', string="Tâches", help=u"Remplir pour restreindre la recherche à certaines tâches")
+    pre_a_programmer_id = fields.Many2one('of.service', string="Choisir directement le service", help=u"San passer par la recherche")
+    pre_a_programmer_address_id = fields.Many2one('res.partner', string="Adresse", compute="_compute_pre_a_programer_fields")
+    pre_a_programmer_zip = fields.Char(string="Code Postal", compute="_compute_pre_a_programer_fields")
+    pre_a_programmer_city = fields.Char(string="Ville", compute="_compute_pre_a_programer_fields")
+    pre_a_programmer_telephones = fields.Text(string="Téléphones", compute="_compute_pre_a_programer_fields")
+    #pre_a_programmer_distance = fields.Float(string="Distance totale (km)", compute="_compute_pre_a_programer_fields")
+
+    creneau_fini = fields.Boolean(string=u"Créneau entièrement planifiée")
+    #message_fini = fields.Selection([
+    #    ('pile_poil', u"Félicitation! vous avez enitèrement planifié ce créneau!"),
+    #    ('restant_trop_court', u"Félicitation! vous avez ")
+    #])
     aucun_res = fields.Boolean(string=u"Aucun résultat!")
-    employee_id = fields.Many2one('hr.employee', string="Intervenant")
+    employee_id = fields.Many2one('hr.employee', string="Intervenant", readonly=True)
     # lieu précédent
     lieu_prec_id = fields.Many2one("res.partner", string="lieu précédent")
     geo_lat_prec = fields.Float(related='lieu_prec_id.geo_lat', readonly=True)
@@ -210,6 +223,12 @@ class OfPlanifCreneau(models.TransientModel):
     employee_other_ids = fields.Many2many('hr.employee', string="Autres intervenants",
                                           domain="[('of_est_intervenant', '=', True), ('id', '!=', employee_id)]")
 
+    proposition_readonly_ids = fields.One2many('of.planif.intervention', compute="_compute_proposition_readonly_ids", readonly=True)
+    duree_creneau_readonly = fields.Float(related="duree_creneau", readonly=True)
+    lieu_prec_readonly_id = fields.Many2one(related="lieu_prec_id", readonly=True)
+    lieu_suiv_readonly_id = fields.Many2one(related="lieu_suiv_id", readonly=True)
+
+
     @api.depends('date_creneau')
     def _compute_num_jour(self):
         for creneau in self:
@@ -227,12 +246,37 @@ class OfPlanifCreneau(models.TransientModel):
                 res_list.append("-".join(hours_str_list))
             self.creneaux_reels_formatted = ", ".join(res_list)
 
+    @api.depends("proposition_ids")
+    def _compute_proposition_readonly_ids(self):
+        self.proposition_readonly_ids = self.proposition_ids
+
+    @api.depends('pre_a_programmer_id')
+    def _compute_pre_a_programer_fields(self):
+        self.ensure_one()
+        if self.pre_a_programmer_id:
+            if self.pre_a_programmer_id.address_id:
+                address = self.pre_a_programmer_id.address_id
+            else:
+                address = self.pre_a_programmer_id.partner_id
+        else:
+            address = False
+        self.pre_a_programmer_address_id = address and address.id or False
+        self.pre_a_programmer_zip = address and address.zip or False
+        self.pre_a_programmer_city = address and address.city or False
+        self.pre_a_programmer_telephones = address and address.of_telephones or False
+
 
     @api.onchange('employee_other_ids')
     def onchange_employee_other_ids(self):
         self.ensure_one()
         # verifier debut_sur_creneau
 
+    @api.onchange('pre_a_programmer_id')
+    def onchange_pre_a_programmer_id(self):
+        self.ensure_one()
+        if self.pre_a_programmer_id:
+            #self.button_dummy()
+            self.duree_rdv = self.pre_a_programmer_id.duree
 
     @api.multi
     def compute(self):
@@ -241,6 +285,14 @@ class OfPlanifCreneau(models.TransientModel):
     @api.multi
     def get_candidats(self):
         self.ensure_one()
+        if self.pre_a_programmer_id:
+            vals = {
+                'priorite': 7,
+                'service_id': self.pre_a_programmer_id.id,
+            }
+            self.priorite_max = 7
+            return [vals]
+
         un_mois = timedelta(days=30)
         une_semaine = timedelta(days=7)
         date_creneau_da = fields.Date.from_string(self.date_creneau)
@@ -256,8 +308,12 @@ class OfPlanifCreneau(models.TransientModel):
         date_moins_un_mois_str = fields.Date.to_string(date_moins_un_mois_da)
         date_moins_3_semaines_str = fields.Date.to_string(date_moins_3_semaines_da)
         date_moins_2_semaines_str = fields.Date.to_string(date_moins_2_semaines_da)
-        taches_emp = self.employee_id.of_tache_ids
-        taches_possibles = taches_emp.filtered(lambda t: t.duree <= self.duree_creneau)  # seulement les taches suffisamment courtes a prendre en compte
+        taches_possibles = self.employee_id.of_tache_ids
+        if not self.ignorer_duree:
+            taches_possibles = taches_possibles.filtered(lambda t: t.duree <= self.duree_creneau)  # seulement les taches suffisamment courtes a prendre en compte
+        if self.pre_tache_ids:
+            taches_possibles = taches_possibles.filtered(lambda t: t.id in self.pre_tache_ids.ids)
+
         vals_list = []
         service_domain = [
             '|', ('state_rec', 'in', ['to_plan', 'late']), ('state_ponc', 'in', ['to_plan', 'part_planned', 'late']),
@@ -379,13 +435,6 @@ class OfPlanifCreneau(models.TransientModel):
         employee_ids = [self.employee_id.id] + self.employee_other_ids.ids
 
         values = {
-            'hor_md': employee.of_mode_horaires == 'easy' and employee.of_hor_md or 0.0,
-            'hor_mf': employee.of_mode_horaires == 'easy' and employee.of_hor_mf or 0.0,
-            'hor_ad': employee.of_mode_horaires == 'easy' and employee.of_hor_ad or 0.0,
-            'hor_af': employee.of_mode_horaires == 'easy' and employee.of_hor_af or 0.0,
-            'jour_ids': employee.of_mode_horaires == 'easy' and [(4, id_j, 0) for id_j in employee.of_jour_ids._ids] or False,
-            'mode_horaires': employee.of_mode_horaires,
-            'of_creneau_ids': employee.of_mode_horaires == 'advanced' and [(4, id_j, 0) for id_j in employee.of_creneau_ids._ids] or False,
             'partner_id': service.partner_id.id,
             'address_id': service.address_id.id,
             'tache_id': service.tache_id.id,
@@ -439,7 +488,14 @@ class OfPlanifCreneau(models.TransientModel):
         date_dt = fields.Datetime.from_string(intervention.date)
         date_deadline_dt = fields.Datetime.from_string(intervention.date_deadline)
         same_day = (date_deadline_dt - date_dt).days == 0
-        creneau_fini = False
+        duree_min = self.env['ir.values'].get_default('of.intervention.settings', 'duree_min_creneaux_dispo')
+        self.duree_creneau -= intervention.duree
+        if self.duree_creneau < duree_min:
+            #creneau_fini = True
+            same_day = False  # pour passer le recalcul des créneaux
+        else:
+            creneau_fini = False
+
         if same_day:  # réinitialiser les champs du wizard pour lancer une nouvelle recherche
             date_fin_interv_locale_dt = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(intervention.date_deadline))
             interv_heure_fin = round(date_fin_interv_locale_dt.hour +
@@ -468,7 +524,7 @@ class OfPlanifCreneau(models.TransientModel):
             return {'type': 'ir.actions.do_nothing'}
         # mise à jour des données du créneau
         self.creneaux_reels = json.dumps(creneaux)
-        self.duree_creneau -= intervention.duree
+
         self.priorite_max = 0
         self.lieu_prec_id = intervention.address_id
         self.proposition_ids.unlink()
