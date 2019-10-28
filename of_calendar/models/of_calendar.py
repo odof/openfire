@@ -880,6 +880,7 @@ class OFPartners(models.Model):
 
     of_color_ft = fields.Char(string="Couleur de texte", compute="_compute_colors", oldname="color_ft")
     of_color_bg = fields.Char(string="Couleur de fond", compute="_compute_colors", oldname="color_bg")
+    of_telephones = fields.Text(string="Téléphones", compute="_compute_of_telephones")
 
     @api.depends("user_ids")
     def _compute_colors(self):
@@ -890,6 +891,19 @@ class OFPartners(models.Model):
             else:
                 partner.of_color_ft = "#0D0D0D"
                 partner.of_color_bg = "#F0F0F0"
+
+    @api.multi
+    @api.depends('phone', 'mobile')
+    def _compute_of_telephones(self):
+        for partner in self:
+            if partner.mobile and partner.phone:
+                partner.of_telephones = "%s\n%s" % (partner.mobile, partner.phone)
+            elif partner.mobile:
+                partner.of_telephones = partner.mobile
+            elif partner.phone:
+                partner.of_telephones = partner.phone
+            else:
+                partner.of_telephones = ""
 
 
 class OFMeetingType(models.Model):

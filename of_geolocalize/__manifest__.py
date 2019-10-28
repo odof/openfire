@@ -45,6 +45,7 @@ Fonctionnalités
     'depends' : [
         'base',
         'web',
+        'of_utils',
     ],
     'external_dependancies': {
         'python': ['requests', 'googlemaps'],
