@@ -249,7 +249,7 @@ class OfPlanningTournee(models.Model):
         cr.execute("SELECT 1 FROM information_schema.columns WHERE table_name = 'of_planning_tournee' AND column_name = 'employee_id'")
         existe_apres = bool(cr.fetchall())
         # Si le champ employee_id n'existe pas avant et l'est après la mise à jour,
-        # c'est qu'on est à la 1ère mise à jour après la refonte du planning, on doit faire la migration des données.
+        # c'est que l'on est à la 1ère mise à jour après la refonte du planning, on doit faire la migration des données.
         if not existe_avant and existe_apres:
             # On supprime la colonne et les tables de l'ancienne planification.
             cr.execute("ALTER TABLE of_planning_intervention DROP COLUMN tournee_id")

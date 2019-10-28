@@ -268,7 +268,7 @@ class OfService(models.Model):
     active = fields.Boolean(string="Active", default=True)
 
     #planning_ids = fields.One2many('of.planning.intervention', compute='_compute_planning_ids', string="Interventions", order="date DESC")
-    planning_ids = fields.One2many('of.planning.intervention', compute='_compute_planning_ids', string="Interventions", order="date DESC")
+    planning_ids = fields.One2many('of.planning.intervention', 'service_id', string="Interventions", order="date DESC")
     date_last = fields.Date(
         string=u'Dernière intervention', compute='_compute_planning_ids', search='_search_last_date',
         help=u"Date de la dernière intervention")
@@ -480,9 +480,7 @@ class OFPlanningTache(models.Model):
 class OFPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
-    service_id = fields.Many2one('of.service', string="Service",
-                                 domain="partner_id and [('partner_id', '=', partner_id), '|', ('address_id', '=', False), ('address_id', '=', address_id)] or "
-                                        "address_id and [('partner_id', '=', address_id), '|', ('address_id', '=', False), ('address_id', '=', address_id)] or []")
+    service_id = fields.Many2one('of.service', string="Service", domain="address_id and [('address_id', '=', address_id),('tache_id','=','tache_id')]")
 
     @api.onchange('address_id', 'tache_id')
     def _onchange_address_id(self):

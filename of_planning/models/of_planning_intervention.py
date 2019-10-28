@@ -404,8 +404,8 @@ class OfPlanningIntervention(models.Model):
         cr.execute("SELECT 1 FROM information_schema.tables WHERE table_name = 'of_employee_intervention_rel'")
         existe_apres = bool(cr.fetchall())
         # Si le champ employee_ids n'est pas un many2many avant et l'est après la mise à jour,
-        # c'est qu'on est à la 1ère mise à jour après la refonte du planning, on doit faire la migration des données.
-        if not existe_avant and existe_apres:
+        # c'est que l'on est à la 1ère mise à jour après la refonte du planning, on doit faire la migration des données.
+        if existe_avant and existe_apres:
             # On peuple le champ employee_ids de chaque rdv avec les employés de l'équipe du rdv.
             cr.execute("INSERT INTO of_employee_intervention_rel(intervention_id, employee_id) "
                        "SELECT opi.id, oper.employee_id "
@@ -417,7 +417,7 @@ class OfPlanningIntervention(models.Model):
             # Règle retenue : prend en priorité la couleur de l'utilisateur lié si il existe, sinon celle de l'équipe.
 
             # On recopie le choix des couleurs du planning de l'équipe dans les employés.
-            # Si un employé est membre de plusieurs équipe, ce sont les couleurs de la dernière équipe renvoyée en SQL qui l'emportent.
+            # Si un employé est membre de plusieurs équipes, ce sont les couleurs de la dernière équipe renvoyée en SQL qui l'emportent.
             # Et le champ of_est_intervenant dans hr_employee doit être initialisé à vrai pour les employés qui sont dans une équipe.
             # On en profite de le faire avec l'initialisation des couleurs comme ce sont les mêmes critères.
             cr.execute("UPDATE hr_employee "
@@ -437,25 +437,27 @@ class OfPlanningIntervention(models.Model):
                        "AND ru.of_color_ft != '#0D0D0D' "
                        "AND ru.of_color_bg != '#F0F0F0'")
 
-            # On recopie les adresses de départ et de retour de l'équipe dans les employés.
+            # Si le module of_planning_tournee est installé, on doit recopier les adresses de départ et de retour de l'équipe dans les employés.
             # Si un employé est membre de plusieurs équipes, ce sont les adresses de la dernière équipe renvoyée en SQL qui l'emportent.
-
-            # Adresse de départ
-            cr.execute("UPDATE hr_employee "
-                       "SET of_address_depart_id = ope.address_id "
-                       "FROM of_planning_equipe ope "
-                       "JOIN of_planning_employee_rel oper ON ope.id = oper.equipe_id "
-                       "JOIN hr_employee he ON oper.employee_id = he.id "
-                       "WHERE hr_employee.id = he.id "
-                       "AND ope.address_id IS NOT Null AND he.of_address_depart_id IS Null")
-            # Adresse de retour
-            cr.execute("UPDATE hr_employee "
-                       "SET of_address_retour_id = ope.address_retour_id "
-                       "FROM of_planning_equipe ope "
-                       "JOIN of_planning_employee_rel oper ON ope.id = oper.equipe_id "
-                       "JOIN hr_employee he ON oper.employee_id = he.id "
-                       "WHERE hr_employee.id = he.id "
-                       "AND ope.address_retour_id IS NOT Null AND he.of_address_retour_id IS Null")
+            # Teste si le module of_planning_tournee est installé par l'existence du champ address_id.
+            cr.execute("SELECT 1 FROM information_schema.columns WHERE table_name = 'of_planning_equipe' AND column_name = 'address_id'")
+            if bool(cr.fetchall()):
+                # Adresse de départ
+                cr.execute("UPDATE hr_employee "
+                           "SET of_address_depart_id = ope.address_id "
+                           "FROM of_planning_equipe ope "
+                           "JOIN of_planning_employee_rel oper ON ope.id = oper.equipe_id "
+                           "JOIN hr_employee he ON oper.employee_id = he.id "
+                           "WHERE hr_employee.id = he.id "
+                           "AND ope.address_id IS NOT Null AND he.of_address_depart_id IS Null")
+                # Adresse de retour
+                cr.execute("UPDATE hr_employee "
+                           "SET of_address_retour_id = ope.address_retour_id "
+                           "FROM of_planning_equipe ope "
+                           "JOIN of_planning_employee_rel oper ON ope.id = oper.equipe_id "
+                           "JOIN hr_employee he ON oper.employee_id = he.id "
+                           "WHERE hr_employee.id = he.id "
+                           "AND ope.address_retour_id IS NOT Null AND he.of_address_retour_id IS Null")
 
             # On recopie les horaires des équipes dans les employés
             # dans le cas où ce n'est pas les horaires par défaut dans l'équipe et c'est les horaires par défaut dans l'employé.
@@ -499,6 +501,18 @@ class OfPlanningIntervention(models.Model):
                        "SELECT DISTINCT oper.employee_id, etr.tache_id "
                        "FROM equipe_tache_rel etr "
                        "JOIN of_planning_employee_rel oper ON etr.equipe_id = oper.equipe_id")
+
+            # Si le module_of_service est installé, on doit peupler le champ service_id dans les interventions.
+            # Règle retenue : on relie une intervention à un service quand les tâches du planning sont les mêmes
+            # et que l'adresse de l'intervention est soit égale à l'adresse du service soit égale au client du service.
+            # Teste si le module of_service est installé par l'existence du champ service_id.
+            cr.execute("SELECT 1 FROM information_schema.columns WHERE table_name = 'of_planning_equipe' AND column_name = ''")
+            if bool(cr.fetchall()):
+                self._cr.execute("UPDATE of_planning_intervention "
+                                 "SET service_id = of_service.id "
+                                 "FROM of_service "
+                                 "WHERE of_service.tache_id = of_planning_intervention.tache_id "
+                                 "AND (of_planning_intervention.address_id = of_service.address_id OR of_planning_intervention.address_id = of_service.partner_id)")
         return res
 
     @api.model
