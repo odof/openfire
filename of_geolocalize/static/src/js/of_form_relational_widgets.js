@@ -46,11 +46,21 @@ FieldMany2One.include({
             self.dfd_geo_lat.resolve();
         }else{
             var ResPartner = new Model("res.partner");
-            ResPartner.query(['id', 'geo_lat', 'name']) // retrieve geo_lat from db
+            ResPartner.query(['id', 'geo_lat', 'precision', 'name']) // retrieve geo_lat from db
                 .filter([['id','=',partner_id]]) // id
                 .all()
                 .then(function (partners){
-                    self.set({"geo_lat": partners[0]["geo_lat"]});
+                    self.set({
+                        "geo_lat": partners[0]["geo_lat"],
+                        "precision": partners[0]["precision"],
+                        "tooltip_title": partners[0]["name"],
+                    });
+                    if (!self.get("id") || !self.get("class_id")) {
+                        self.set({
+                            "id": partner_id,
+                            "class_id": "of_geo_partner_m2o_" + partner_id
+                        });
+                    }
                     // on peut vérifier la géo_loc maintenant
                     self.dfd_geo_lat.resolve();
                     return partners[0]["geo_lat"]
@@ -59,6 +69,7 @@ FieldMany2One.include({
 
     },
     check_localized: function() {
+        // on Considère que s'il n'y a pas de partenaire c'est géolocalisé, par convention
         var partner_lat = this.get('geo_lat');
         if (partner_lat === 0) {
             return false;
@@ -72,20 +83,43 @@ FieldMany2One.include({
             this.dfd_geo_lat = $.Deferred()
             this.set_geo_lat();
             // on attend d'avoir set la valeur de geo_lat avant de la verifier :D
+
             $.when(this.dfd_geo_lat).then(function(){
-                self.$label.next('.o_tz_warning').remove();
-                if(!self.check_localized() && !self.get("invisible")) {  //&& $('.of_warning_' + self.field_manager.datarecord[self.name][1]).length == 0
+                //console.log(self.get("id"),self.get("tooltip_title"),self.get("geo_lat"),self.get("precision"))
+                var localized = self.check_localized();
+                if(!localized && !self.get("invisible")) {  //&& $('.of_warning_' + self.field_manager.datarecord[self.name][1]).length == 0
                     //console.log(self.$label.length, self);
                     // n'est pas géolocalisé
                     var options = _.extend({
                         delay: { show: 501, hide: 0 },
-                        title: _t((self.current_display || self.field_manager.datarecord[self.name][1] || "Ce partenaire ") + " n'est pas géolocalisé"),
+                        title: _t("Cliquez ici pour tenter de géolocaliser ce partneaire avec votre géocodeur par défaut"),
                     });
-                    $('<span/>').addClass('fa fa-exclamation-triangle o_tz_warning of_warning_' + self.field_manager.datarecord[self.name][1]).insertAfter(self.$label).tooltip(options);
+                    if (self.get("precision") == "not_tried" && isNullOrUndef(self.$geo_button)) {
+                        self.$geo_button = $('<span/>').addClass('fa fa-map-marker fa-lg of_ws_lr of_icon_button ' + self.get("class_id"))
+                        .insertAfter(self.$label).tooltip(options)
+                        .click(self.geocode_fast.bind(self));
+                    }else if (self.get("precision") != "not_tried" && !isNullOrUndef(self.$geo_button)) {
+                        self.$geo_button.remove()
+                    }
+                    options["title"] = _t(self.get('tooltip_title') + " n'est pas géolocalisé")
+                    if (isNullOrUndef(self.$geo_warning)) {
+                        self.$geo_warning = $('<span/>').addClass('fa fa-exclamation-triangle o_tz_warning of_ws_l ' + self.get("class_id"))
+                        .insertAfter(self.$label).tooltip(options);
+                    }
+                }else if (localized) {
+                    $("." + self.get("class_id")).remove();
                 }
             });
         }
-    }
+    },
+    geocode_fast: function() {
+        var self = this;
+        var ResPartner = new Model("res.partner");
+        ResPartner.call("geo_code", [[this.get("id")]])
+        .then(function () {
+            self.render_value();
+        })
+    },
 });
 
 
