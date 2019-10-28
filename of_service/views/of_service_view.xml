@@ -130,6 +130,7 @@
                                 <field name="partner_id" invisible="context.get('hide_service_partner_id')"/>
                                 <field name="address_id" invisible="context.get('hide_service_address_id')"/>
                                 <field name="secteur_tech_id"/>
+                                <field name="company_id"/>
                                 <field name="tache_id" context="{'show_rec_icon_first': recurrence}"/>
                                 <field name="duree" widget="float_time"/>
                                 <field name="duree_planif" widget="float_time"/>

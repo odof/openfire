@@ -2,29 +2,7 @@
 <odoo>
 
     <!-- Vue services recurrents formulaire : ajout onglet parc installé -->
-    <record id="view_of_service_parc_installe_service_rec_form" model="ir.ui.view">
-        <field name="name">of.parc.installe.service.form</field>
-        <field name="model">of.service</field>
-        <field name="inherit_id" ref="of_service.view_of_service_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//notebook/page[1]" position="before">
-                <page string="Produit installé">
-                    <group>
-                        <field name="parc_installe_id"/>
-                        <field name="parc_installe_product_id"/>
-                        <field name="parc_installe_site_adresse_id"/>
-                        <field name="parc_installe_note"/>
-                    </group>
-                </page>
-            </xpath>
-            <xpath expr="//field[@name='origin']" position="after">
-                <field name="sav_id" attrs="{'invisible': [('recurrence', '=', True)]}"/>
-            </xpath>
-        </field>
-    </record>
-
-    <!-- Vue services formulaire : ajout onglet parc installé -->
-    <record id="view_of_service_parc_installe_service_ponc_form" model="ir.ui.view">
+    <record id="view_of_service_parc_installe_service_form" model="ir.ui.view">
         <field name="name">of.parc.installe.service.form</field>
         <field name="model">of.service</field>
         <field name="inherit_id" ref="of_service.view_of_service_form"/>
@@ -53,7 +31,7 @@
         <field name="view_mode">tree,form</field>
         <field name="view_ids" eval="[(5,0,0),
                           (0,0,{'view_mode':'tree'}),
-                          (0,0,{'view_mode':'form', 'view_id': ref('view_of_service_parc_installe_service_rec_form')})]"/>
+                          (0,0,{'view_mode':'form', 'view_id': ref('view_of_service_parc_installe_service_form')})]"/>
     </record>
 
     <!-- Action pour ouvrir les interventions à programmer depuis parc installé -->
@@ -64,7 +42,7 @@
         <field name="view_mode">tree,form</field>
         <field name="view_ids" eval="[(5,0,0),
                           (0,0,{'view_mode':'tree'}),
-                          (0,0,{'view_mode':'form', 'view_id': ref('view_of_service_parc_installe_service_ponc_form')})]"/>
+                          (0,0,{'view_mode':'form', 'view_id': ref('view_of_service_parc_installe_service_form')})]"/>
     </record>
 
    <!-- Planning intervention : ajout champ parc installé lié -->

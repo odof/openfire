@@ -399,9 +399,9 @@ var PlanningView = View.extend({
             self.rows[emp_id] = new PlanningView.Row(self.table,self,[],row_options);
             self.rows[emp_id].head_column = self.all_filters[emp_id].label;
         }
-        var col_offset_today = null;
+        self.col_offset_today = null;
         if (moment(self.range_start) <= moment() && moment() <= moment(self.range_stop)) {
-            col_offset_today = moment().startOf('day').diff(moment(self.range_start), 'days');
+            self.col_offset_today = moment().startOf('day').diff(moment(self.range_start), 'days');
         }
         var event_domain = self.get_range_domain(this.domain || [],this.range_start,this.range_stop);
         //self.view_res_ids = self.to_show_ids;
@@ -521,7 +521,7 @@ var PlanningView = View.extend({
                         self.rows[key].color_ft = self.res_horaires_info[key]['color_ft'];
                         rgb = hexToRgb(self.res_horaires_info[key]['color_bg']);
                         self.rows[key].color_bg_rgba = "rgba(" + rgb.r + "," + rgb.g + "," + rgb.b + ",0.3);";
-                        self.rows[key].col_offset_today = isNullOrUndef(col_offset_today) ? -1 : col_offset_today;
+                        self.rows[key].col_offset_today = isNullOrUndef(self.col_offset_today) ? -1 : self.col_offset_today;
                         if (self.rows[key].col_offset_today != -1) {
                             rgb_today = hexToRgb(self.res_horaires_info[key]['color_bg'], -30);
                             self.rows[key].color_bg_rgba_today = "rgba(" + rgb_today.r + "," + rgb_today.g + "," + rgb_today.b + ",0.4);";
@@ -531,8 +531,8 @@ var PlanningView = View.extend({
 
                     self.table.rows = self.rows;
                     self.render_table();
-                    console.log("self.res_horaires_info search",self.res_horaires_info);
-                    console.log("keys", _.keys(self.res_horaires_info), typeof(_.keys(self.res_horaires_info)));
+                    //console.log("self.res_horaires_info search",self.res_horaires_info);
+                    //console.log("keys", _.keys(self.res_horaires_info), typeof(_.keys(self.res_horaires_info)));
                 })
             });
     },
@@ -549,7 +549,7 @@ var PlanningView = View.extend({
        //console.log("START/STOP", self.range_start, self.range_stop)
         Planning.call('get_emp_horaires_info', [res_ids, start, end, get_segments])
         .then(function (result) {
-            console.log("result",result);
+            //console.log("result",result);
             if (isNullOrUndef(self.res_horaires_info)) {
                 self.res_horaires_info = result;
             }else{
@@ -725,14 +725,14 @@ var PlanningView = View.extend({
         this._do_search(this.domain, this.context, this.group_by);
     },
     on_reload_partiel: function (res_id, column) {
-        console.log("on_reload_partiel", res_id, column);
+        //console.log("on_reload_partiel", res_id, column);
         var self = this;
         var date_column = moment(this.range_start).add(column, 'days')
         var date_fin = date_column.endOf('day')._d;
         date_column = date_column._d;
         var event_domain = this.get_range_domain(this.domain || [], date_column, date_fin, [res_id]);
         //event_domain = new CompoundDomain(event_domain, ['id', '=', res_id]);
-        console.log("event_domain",event_domain);
+        //console.log("event_domain",event_domain);
         this.rows[res_id].clear_column(column);
         this.dataset.read_slice(this.fields_keys, {offset: 0, domain: event_domain, context: self.context,
         }).done(function(events) {
@@ -808,8 +808,8 @@ var PlanningView = View.extend({
                     //}
                 }
             }
-            console.log("res_id", res_id, typeof(res_id));
-            console.log("self.res_horaires_info",self.res_horaires_info);
+            //console.log("res_id", res_id, typeof(res_id));
+            //console.log("self.res_horaires_info",self.res_horaires_info);
             var prom = self.set_res_horaires_data([res_id], date_column, date_fin, self.res_horaires_info[res_id].segments_horaires);
             $.when(prom).then(function () {
                 self.rows[res_id].fillerbars[column] = self.res_horaires_info[res_id]['fillerbars'][0];
@@ -859,14 +859,17 @@ var PlanningView = View.extend({
         };
         var res = [];
         var jours = ["Lun.", "Mar.", "Mer.", "Jeu.", "Ven.", "Sam.", "Dim."];
-        var le_text, la_date, le_dict = {};
+        var le_text, la_date, le_dict = {}, la_class;
         for (var i=0; i<this.column_nb; i++) {
+            la_class = "of_planning_column_day"
             le_text = jours[i] + " " + moment(this.range_start).add(i, 'days').format('L');
             la_date = moment(this.range_start).add(i, 'days')._d;
+            if (this.col_offset_today == i) la_class += " of_planning_column_today"
             le_dict = {
                 "text": le_text,
                 "date": la_date,
                 "type": "date",
+                "class": la_class,
             }
             res.push(le_dict);
         }
@@ -1114,12 +1117,12 @@ PlanningView.Row = Widget.extend({
                 return self.$el.html(qweb.render(self.template, {"row": self})).promise()
             }else{
                 var $column = $(".of_planning_td_" + self.res_id + "_" + col_index);
-                if (!$column.length) console.log("WEUT?");
+                //if (!$column.length) console.log("WEUT?");
                 return $column.html(qweb.render('PlanningView.row.column', { "col_index": col_index , "row": self,})).promise();
             }
         })
         .then(function (a_ver) {
-            console.log("a ver",a_ver);
+            //console.log("a ver",a_ver);
             self.$el.attr("id", self.id);
             self.rendered = true;
             if (self.hidden) {
