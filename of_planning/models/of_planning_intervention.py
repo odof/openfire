@@ -405,7 +405,7 @@ class OfPlanningIntervention(models.Model):
         existe_apres = bool(cr.fetchall())
         # Si le champ employee_ids n'est pas un many2many avant et l'est après la mise à jour,
         # c'est que l'on est à la 1ère mise à jour après la refonte du planning, on doit faire la migration des données.
-        if existe_avant and existe_apres:
+        if not existe_avant and existe_apres:
             # On peuple le champ employee_ids de chaque rdv avec les employés de l'équipe du rdv.
             cr.execute("INSERT INTO of_employee_intervention_rel(intervention_id, employee_id) "
                        "SELECT opi.id, oper.employee_id "
