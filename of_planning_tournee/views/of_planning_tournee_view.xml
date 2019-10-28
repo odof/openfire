@@ -19,48 +19,6 @@
         </record>
         -->
 
-        <!-- Ajouter point d'depart pour l'equipe -->
-        <record id="view_of_planning_equipe_form" model="ir.ui.view">
-            <field name="name">of.planning.equipe.form</field>
-            <field name="model">of.planning.equipe</field>
-            <field name="inherit_id" ref="of_planning.view_of_planning_equipe_form"/>
-            <field name="type">form</field>
-            <field name="arch" type="xml">
-                <group name="gr_1" position="inside">
-                    <group name="adresse" colspan="2">
-                        <separator string="Adresses" colspan="2"/>
-                        <field name="address_id"/>
-                        <field name="address_retour_id"/>
-                    </group>
-                </group>
-            </field>
-        </record>
-
-        <!-- Ajouter le champ 'Planification' dans le Planning d'intervention -->
-        <record id="of_tournee_planning_intervention_view_form" model="ir.ui.view" >
-            <field name="name">of.planning.intervention.form</field>
-            <field name="model">of.planning.intervention</field>
-            <field name="type">form</field>
-            <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
-            <field name="arch" type="xml">
-                <group name="liens" position="attributes">
-                    <attribute name="invisible">0</attribute>
-                </group>
-                <group name="liens" position="inside">
-                    <field name="tournee_ids">
-                        <tree>
-                            <field name="employee_id"/>
-                            <field name="secteur_id"/>
-                            <field name="zip_id"/>
-                            <field name="is_complet"/>
-                            <field name="is_bloque"/>
-                            <field name="is_confirme"/>
-                        </tree>
-                    </field>
-                </group>
-            </field>
-        </record>
-
         <record id="of_planning_tournee_view_form" model="ir.ui.view" >
             <field name="name">of.planning.tournee.form</field>
             <field name="model">of.planning.tournee</field>
@@ -144,7 +102,7 @@
             <field name="context">{'search_default_filter_incomplet':1}</field>
         </record>
 
-        <menuitem name="Tournées" id="menu_of_planning_tournee_tree" parent="of_planning.menu_of_planning_intervention" sequence="7"
+        <menuitem name="Tournées" id="menu_of_planning_tournee_tree" parent="of_planning.menu_of_planning_intervention" sequence="75"
                   action="action_of_planning_tournee_tree"/>
 
         <!-- vue map des services -->
