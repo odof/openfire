@@ -175,7 +175,9 @@
                                 <field name="date"/>
                                 <field name="jour"/>
                                 <field name="duree" string="Durée" widget="float_time"/>
-                                <field name="date_deadline"/>
+                                <field name="date_deadline" attrs="{'invisible': [('forcer_date_deadline', '=', True)]}"/>
+                                <field name="forcer_date_deadline"/>
+                                <field name="date_deadline_forcee" attrs="{'invisible': [('forcer_date_deadline', '=', False)]}"/>
                                 <field name="verif_dispo"/>
                             </group>
                             <group name="liens" invisible="1">
@@ -208,7 +210,7 @@
                                     </group>
                                 </group>
                             </page>
-                            <page name="horaires" string="Horaires de travail">
+                            <!--page name="horaires" string="Horaires de travail">
                                 <group colspan="4">
                                     <group>
                                         <field name="forcer_horaires"/>
@@ -275,7 +277,7 @@
                                 <field name="of_creneau_temp_stop" invisible="1"/>
                                 <field name="of_creneau_temp_ids" invisible="1" widget="many2many_tags"/>
                                 <field name="mode_horaires" invisible="1"/>
-                            </page>
+                            </page-->
                         </notebook>
                     </sheet>
                     <div class="oe_chatter">
@@ -444,7 +446,7 @@
                         </div>
                         <group>
                             <group>
-                                <field name="employee_nb"/>
+                                <!--field name="employee_nb"/-->
                                 <field name="product_id" string="Produit lié" attrs="{'readonly':[('verr', '=', True)]}"/>
                                 <field name="category_id"/>
                                 <field name="duree" widget="float_time"/>

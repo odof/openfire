@@ -572,13 +572,6 @@ class OfTourneeRdv(models.TransientModel):
         self.ensure_one()
         employee = self.employee_id
         values = {
-            'hor_md': employee.of_mode_horaires == 'easy' and employee.of_hor_md or 0.0,
-            'hor_mf': employee.of_mode_horaires == 'easy' and employee.of_hor_mf or 0.0,
-            'hor_ad': employee.of_mode_horaires == 'easy' and employee.of_hor_ad or 0.0,
-            'hor_af': employee.of_mode_horaires == 'easy' and employee.of_hor_af or 0.0,
-            'jour_ids': employee.of_mode_horaires == 'easy' and [(4, id_j, 0) for id_j in employee.of_jour_ids._ids] or False,
-            'mode_horaires': employee.of_mode_horaires,
-            'of_creneau_ids': employee.of_mode_horaires == 'advanced' and [(4, id_j, 0) for id_j in employee.of_creneau_ids._ids] or False,
             'partner_id': self.partner_id.id,
             'address_id': self.partner_address_id.id,
             'tache_id': self.tache_id.id,

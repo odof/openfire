@@ -124,7 +124,7 @@
                         <span t-esc="table.head_column.text"/>
                     </th>
                     <t t-foreach="table.columns" t-as="column">
-                        <th class="of_planning_column_day">
+                        <th t-att-class="column.class">
                             <span t-esc="column.text"/>
                         </th>
                     </t>
