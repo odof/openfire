@@ -480,23 +480,23 @@ class OfPlanningIntervention(models.Model):
                        "WHERE oj.numero >= 1 AND oj.numero <= 5 "
                        "AND he.id NOT IN (SELECT employee_id FROM employee_jours_rel)")
 
-            # On remplit le champ jour_ids dans les interventions par les valeurs lundi à vendredi.
-            cr.execute("INSERT INTO of_intervention_jours_rel(intervention_id, jour_id) "
-                       "SELECT opi.id, oj.numero "
-                       "FROM of_planning_intervention opi, of_jours oj "
-                       "WHERE oj.numero >= 1 AND oj.numero <= 5")
-
-            # Pour les interventions effectuées un samedi, on ajoute le samedi dans jour_ids.
-            cr.execute("INSERT INTO of_intervention_jours_rel(intervention_id, jour_id) "
-                       "SELECT opi.id, 6 "
-                       "FROM of_planning_intervention opi "
-                       "WHERE EXTRACT(DOW FROM opi.date) = 6")
-
-            # Même chose pour le dimanche.
-            cr.execute("INSERT INTO of_intervention_jours_rel(intervention_id, jour_id) "
-                       "SELECT opi.id, 7 "
-                       "FROM of_planning_intervention opi "
-                       "WHERE EXTRACT(DOW FROM opi.date) = 0")
+            # # On remplit le champ jour_ids dans les interventions par les valeurs lundi à vendredi.
+            # cr.execute("INSERT INTO of_intervention_jours_rel(intervention_id, jour_id) "
+            #            "SELECT opi.id, oj.numero "
+            #            "FROM of_planning_intervention opi, of_jours oj "
+            #            "WHERE oj.numero >= 1 AND oj.numero <= 5")
+            #
+            # # Pour les interventions effectuées un samedi, on ajoute le samedi dans jour_ids.
+            # cr.execute("INSERT INTO of_intervention_jours_rel(intervention_id, jour_id) "
+            #            "SELECT opi.id, 6 "
+            #            "FROM of_planning_intervention opi "
+            #            "WHERE EXTRACT(DOW FROM opi.date) = 6")
+            #
+            # # Même chose pour le dimanche.
+            # cr.execute("INSERT INTO of_intervention_jours_rel(intervention_id, jour_id) "
+            #            "SELECT opi.id, 7 "
+            #            "FROM of_planning_intervention opi "
+            #            "WHERE EXTRACT(DOW FROM opi.date) = 0")
 
             # On recopie les tâches des équipes vers les employés.
             cr.execute("INSERT INTO of_employee_tache_rel(employee_id, tache_id) "
