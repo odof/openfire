@@ -506,7 +506,7 @@ class OfPlanningIntervention(models.Model):
             # Règle retenue : on relie une intervention à un service quand les tâches du planning sont les mêmes
             # et que l'adresse de l'intervention est soit égale à l'adresse du service soit égale au client du service.
             # Teste si le module of_service est installé par l'existence du champ service_id.
-            cr.execute("SELECT 1 FROM information_schema.columns WHERE table_name = 'of_planning_equipe' AND column_name = ''")
+            cr.execute("SELECT 1 FROM information_schema.columns WHERE table_name = 'of_planning_intervention' AND column_name = 'service_id'")
             if bool(cr.fetchall()):
                 self._cr.execute("UPDATE of_planning_intervention "
                                  "SET service_id = of_service.id "
