@@ -41,10 +41,10 @@ class OfService(models.Model):
         return res
 
     @api.multi
-    @api.depends('tache_id', 'address_id', 'duree', 'planning_ids', 'recurrence', 'recurring_interval', 'recurring_rule_type')
+    @api.depends('tache_id', 'address_id', 'duree', 'intervention_ids', 'recurrence', 'recurring_interval', 'recurring_rule_type')
     def _compute_durees(self):
         for service in self:
-            plannings = service.planning_ids
+            plannings = service.intervention_ids
             # ne pas prendre les interventions annulées / reportées / non terminées
             planning_filtered = plannings.filtered(lambda p: p.state in ('draft', 'confirm', 'done'))
             service.date_last = planning_filtered and planning_filtered[0].date or False
@@ -264,8 +264,8 @@ class OfService(models.Model):
         ], u'État', help=u"Ce champ permet de choisir manuellement l'état du service", default="draft")
     active = fields.Boolean(string="Active", default=True)
 
-    #planning_ids = fields.One2many('of.planning.intervention', 'service_id', string="Interventions", order="date DESC")
-    planning_ids = fields.One2many('of.planning.intervention', 'service_id', string="Interventions", order="date DESC")
+    #intervention_ids = fields.One2many('of.planning.intervention', 'service_id', string="Interventions", order="date DESC")
+    intervention_ids = fields.One2many('of.planning.intervention', 'service_id', string="Interventions", order="date DESC")
     date_last = fields.Date(
         string=u'Dernière intervention', compute='_compute_durees', search='_search_last_date',
         help=u"Date de la dernière intervention")
@@ -582,9 +582,9 @@ class OFPlanningIntervention(models.Model):
     def unlink(self):
         for intervention in self:
             service = intervention.service_id
-            if not service or not service.recurrence or not service.planning_ids:
+            if not service or not service.recurrence or not service.intervention_ids:
                 continue
-            if intervention == service.planning_ids[0]:  # était la dernière intervention planifiée pour ce service -> rollback!
+            if intervention == service.intervention_ids[0]:  # était la dernière intervention planifiée pour ce service -> rollback!
                 service.date_next = service.date_next_last or intervention.date_date
 
         return super(OFPlanningIntervention, self).unlink()

@@ -69,7 +69,7 @@
                         </group>
                         <notebook>
                             <page string="Interventions" name="intervention">
-                                <field name="planning_ids" nolabel="1" colspan="2">
+                                <field name="intervention_ids" nolabel="1" colspan="2">
                                     <tree string="Liste des interventions" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done';purple:state=='unfinished'">
                                         <field name="name" string="Libellé"/>
                                         <field name="date"/>
@@ -157,7 +157,7 @@
                         </group>
                         <notebook>
                             <page string="Interventions">
-                                <field name="planning_ids" nolabel="1" colspan="2">
+                                <field name="intervention_ids" nolabel="1" colspan="2">
                                     <tree string="Liste des interventions" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done';purple:state=='unfinished'">
                                         <field name="name" string="Libellé"/>
                                         <field name="date"/>
@@ -326,7 +326,7 @@
                         </group>
                         <notebook>
                             <page string="Interventions" name="intervention">
-                                <field name="planning_ids" nolabel="1" colspan="2">
+                                <field name="intervention_ids" nolabel="1" colspan="2">
                                     <tree string="Liste des interventions" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done';purple:state=='unfinished'">
                                         <field name="name" string="Libellé"/>
                                         <field name="date"/>
@@ -534,7 +534,7 @@
 <!--#################################################________Actions_________#################################################-->
 <!--##########################################################################################################################-->
 
-<!-- ### Services récurrents depuis ventes -->
+<!-- ### Services récurrents depuis ventes - ->
         <record id="action_of_service_rec_form_sale" model="ir.actions.act_window">
             <field name="name">Services récurrents</field>
             <field name="type">ir.actions.act_window</field>
@@ -567,11 +567,11 @@
             <field name="view_mode">form</field>
             <field name="view_id" ref="view_of_service_form"/>
             <field name="act_window_id" ref="action_of_service_rec_form_sale"/>
-        </record>
+        </record-->
 
 <!-- ### Services récurrents depuis planning -->
         <record id="action_of_service_rec_form_planning" model="ir.actions.act_window">
-            <field name="name">Services récurrents</field>
+            <field name="name">Interventions récurrentes</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">of.service</field>
             <field name="view_type">form</field>
@@ -604,7 +604,7 @@
             <field name="act_window_id" ref="action_of_service_rec_form_planning"/>
         </record>
 
-<!-- ### Services ponctuels depuis ventes -->
+<!-- ### Services ponctuels depuis ventes - ->
         <record id="action_of_service_ponc_form_sale" model="ir.actions.act_window">
             <field name="name">Services à programmer</field>
             <field name="type">ir.actions.act_window</field>
@@ -638,19 +638,18 @@
             <field name="view_mode">form</field>
             <field name="view_id" ref="view_of_service_form"/>
             <field name="act_window_id" ref="action_of_service_ponc_form_sale"/>
-        </record>
+        </record-->
 
 <!-- ### Services ponctuels depuis planning -->
         <record id="action_of_service_ponc_form_planning" model="ir.actions.act_window">
-            <field name="name">Services à programmer</field>
+            <field name="name">Interventions ponctuelles</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">of.service</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,map,form</field>
             <field name="search_view_id" ref="view_of_service_rec_filter"/>
             <field name="context">{
-                'search_default_this_week': 1,
-                'search_default_next_week': 1,
+                'search_default_filter_ponc': 1,
                 'default_recurrence': False,
             }</field>
         </record>
@@ -676,15 +675,52 @@
             <field name="act_window_id" ref="action_of_service_ponc_form_planning"/>
         </record>
 
+    <!-- ### Services à programmer depuis planning -->
+        <record id="action_of_service_prog_form_planning" model="ir.actions.act_window">
+            <field name="name">Interventions à programmer</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">of.service</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,map,form</field>
+            <field name="search_view_id" ref="view_of_service_rec_filter"/>
+            <field name="context">{
+                'search_default_this_week': 1,
+                'search_default_next_week': 1,
+                'default_recurrence': False,
+            }</field>
+        </record>
+
+        <record id="action_service_prog_tree_view_planning" model="ir.actions.act_window.view">
+            <field eval="0" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_of_service_ponc_tree"/>
+            <field name="act_window_id" ref="action_of_service_prog_form_planning"/>
+        </record>
+
+        <record id="action_service_prog_map_view_planning" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">map</field>
+            <field name="view_id" ref="of_service_map_view"/>
+            <field name="act_window_id" ref="action_of_service_prog_form_planning"/>
+        </record>
+
+        <record id="action_service_prog_form_view_planning" model="ir.actions.act_window.view">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_of_service_form"/>
+            <field name="act_window_id" ref="action_of_service_prog_form_planning"/>
+        </record>
+
 <!--##########################################################################################################################-->
 <!--#################################################_________Menus__________#################################################-->
 <!--##########################################################################################################################-->
 
-        <menuitem id="menu_of_service_rec" name="Services récurrents" parent="sales_team.menu_sales" sequence="105" action="action_of_service_rec_form_sale"/>
-        <menuitem id="menu_of_planning_service_rec" name="Services récurrents" parent="of_planning.menu_of_planning_intervention" sequence="25" action="action_of_service_rec_form_planning"/>
+        <!--menuitem id="menu_of_service_rec" name="Interventions récurrentes" parent="sales_team.menu_sales" sequence="105" action="action_of_service_rec_form_sale"/-->
 
-        <menuitem id="menu_of_service_ponc" name="Services à programmer" parent="sales_team.menu_sales" sequence="105" action="action_of_service_ponc_form_sale"/>
-        <menuitem id="menu_of_planning_service_ponc" name="Services à programmer" parent="of_planning.menu_of_planning_intervention" sequence="25" action="action_of_service_ponc_form_planning"/>
+        <!--menuitem id="menu_of_service_ponc" name="Services à programmer" parent="sales_team.menu_sales" sequence="105" action="action_of_service_ponc_form_sale"/-->
+        <menuitem id="menu_of_planning_service_prog" name="Interventions à programmer" parent="of_planning.menu_of_planning_intervention" sequence="5" action="action_of_service_prog_form_planning"/>
+        <menuitem id="menu_of_planning_service_rec" name="Interventions récurrentes" parent="of_planning.menu_of_planning_intervention" sequence="6" action="action_of_service_rec_form_planning"/>
+        <menuitem id="menu_of_planning_service_ponc" name="Interventions ponctuelle" parent="of_planning.menu_of_planning_intervention" sequence="7" action="action_of_service_ponc_form_planning"/>
 
 <!--##########################################################################################################################-->
 <!--##################################################_______Taches_______####################################################-->
