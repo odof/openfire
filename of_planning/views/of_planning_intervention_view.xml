@@ -514,7 +514,7 @@
                     <!--field name="cout_horaire" string="Coût horaire"/>
                     <field name="cout_annuel" string="Coût annuel"/-->
                     <field name="employee_ids"/>
-                    <field name="color_bg" widget="color"/>
+                    <!--field name="color_bg" widget="color"/-->
                     <field name="note"/>
                     <field name="sequence"/>
                     <!--field name="color_id"/-->
@@ -544,95 +544,11 @@
                         </div>
                         <group name="gr_1">
                             <group>
+                                <field name="employee_ids" widget="many2many_tags"/>
                                 <field name="sequence"/>
                             </group>
-                            <group>
-                                <field name="color_ft" widget="color"/>
-                                <field name="color_bg" widget="color"/>
-                            </group>
+                            <field name="note" nolabel="1"/>
                         </group>
-                        <notebook>
-                            <page name="employees" string="Employés">
-                                <field name="employee_ids" nolabel="1"/>
-                            </page>
-                            <page name="categs" string="Catégories">
-                                <field name="category_ids" nolabel="1"/>
-                            </page>
-                            <page name="competences" string="Compétences">
-                                <field name="tache_ids" nolabel="1"/>
-                            </page>
-                            <page name="horaires" string="Horaires">
-                                <group col="4" name="horaires_general">
-                                    <group>
-                                        <field name="mode_horaires"/>
-                                    </group>
-                                    <group>
-                                        <field name="tz" widget="timezone_mismatch" options="{'tz_offset_field': 'tz_offset'}" />
-                                        <field name="tz_offset" invisible="1"/>
-                                    </group>
-                                </group>
-                                <group name="horaires_easy" colspan="2" col="4" attrs="{'invisible': [('mode_horaires', '!=', 'easy')]}">
-                                    <separator string="Horaires de travail" colspan="4"/>
-                                    <group col="2" colspan="2">
-                                        <label for="hor_md" string="Matin"/>
-                                        <span class="oe_inline">
-                                            <field class="oe_inline" name="hor_md" nolabel="1" widget="float_time"/> -
-                                            <field class="oe_inline" name="hor_mf" nolabel="1" widget="float_time"/>
-                                        </span>
-                                        <label for="hor_ad" string="Après-midi"/>
-                                        <span class="oe_inline">
-                                            <field class="oe_inline" name="hor_ad" nolabel="1" widget="float_time"/> -
-                                            <field class="oe_inline" name="hor_af" nolabel="1" widget="float_time"/>
-                                        </span>
-                                    </group>
-                                    <group col="2" colspan="2">
-                                        <field name="jour_ids" attrs="{'required': [('mode_horaires', '=', 'easy')]}" widget="many2many_tags" colspan="2"/>
-                                    </group>
-                                </group>
-                                <group col="4" name="horaires_advanced" attrs="{'invisible': [('mode_horaires', '!=', 'advanced')]}">
-                                    <group col="4" colspan="2">
-                                        <separator string="Horaires par défaut" colspan="4"/>
-                                        <field name="of_creneau_ids" nolabel="1" colspan="4" style="padding: 8px;" options='{"no_open": True, "no_create": True}'>
-                                            <tree string="Créneaux" editable="0">
-                                                <field name="jour_number" invisible="1"/>
-                                                <field name="name"/>
-                                                <field name="jour_id" invisible="1" readonly="1"/>
-                                                <field name="heure_debut" invisible="1" widget="float_time" readonly="1"/>
-                                                <field name="heure_fin" invisible="1" widget="float_time" readonly="1"/>
-                                            </tree>
-                                        </field>
-                                        <!--div colspan="1"/-->
-                                    </group>
-                                    <group col="4" colspan="2">
-                                        <group col="4" colspan="4">
-                                            <separator string="Horaires temporaires" colspan="4"/>
-                                            <span class="oe_grey" colspan="4">
-                                                <i>Ces horaires remplacent les horaires par défaut pendant la période de validité<br/>
-                                                Exemple: Un employé travaille en général de 9h à 12h puis de 14h à 18h le lundi. Exceptionnellement le lundi 1er juillet 2019 il ne travaille pas l'après-mid.
-                                                Il nous faut donc sélectionner 01/07/2019 comme date de début et de fin de validité, puis ajouter le créneau lun. 9h - 12h dans les horaires temporaires.<br/>
-                                                Autre exemple: Un employé prend une semaine de vacances la première semaine de juillet 2019.
-                                                Dans ce cas là il suffit de sélectionner 01/07/2019 comme date de début de validité et 07/07/2019 comme date de fin de validité.
-                                                Même pas besoin d'ajouter des créneaux temporaires, vu que tous les créneaux par défaut de cette semaine seront remplacés!</i>
-                                            </span>
-                                            <field name="of_creneau_temp_start" string="Début de validité" attrs="{'required': [('of_creneau_temp_stop', '!=', False)]}"/>
-                                            <field name="of_creneau_temp_stop" string="Fin de validité" attrs="{'required': [('of_creneau_temp_start', '!=', False)]}"/>
-                                        </group>
-                                        <field name="of_creneau_temp_ids" nolabel="1" colspan="4" style="padding: 8px;">
-                                            <tree string="Créneaux" editable="0">
-                                                <field name="jour_number" invisible="1"/>
-                                                <field name="name"/>
-                                                <field name="jour_id" invisible="1" readonly="1"/>
-                                                <field name="heure_debut" invisible="1" widget="float_time" readonly="1"/>
-                                                <field name="heure_fin" invisible="1" widget="float_time" readonly="1"/>
-                                            </tree>
-                                        </field>
-                                    </group>
-                                </group>
-                            </page>
-                            <page string="Description">
-                                <field name="note"/>
-                            </page>
-                        </notebook>
                     </sheet>
                 </form>
             </field>
