@@ -80,7 +80,7 @@ class OfSecteur(models.Model):
                 for under_zip_range_id in under_zip_range_ids:
                     if under_zip_range_id.secteur_id.type in types:
                         zip_range_ids |= under_zip_range_id
-            return zip_range_ids.mapped('secteur_id')
+            return zip_range_ids.mapped('secteur_id').filtered(lambda s: s.id != self.id)
         elif len(self) > 1:
             res = {}
             for secteur in self:
@@ -90,7 +90,7 @@ class OfSecteur(models.Model):
                     for under_zip_range_id in under_zip_range_ids:
                         if under_zip_range_id.secteur_id.type in types:
                             zip_range_ids |= under_zip_range_id
-                res[secteur.id] = zip_range_ids.mapped('secteur_id')
+                res[secteur.id] = zip_range_ids.mapped('secteur_id').filtered(lambda s: s.id != secteur.id)
             return res
 
     @api.model

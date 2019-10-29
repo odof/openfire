@@ -4,6 +4,19 @@
 <!--##############################################################################-->
 <!--########################### ______ Employés ______ ###########################-->
 <!--##############################################################################-->
+
+    <!--Hr Employee inherit search view-->
+    <record id="hr_employee_view_search_in_planning" model="ir.ui.view">
+        <field name="name">hr.employee.search.view.inherit.planning</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='inactive']" position="after">
+                <filter name="intervenants" string="Intervenants" domain="[('of_est_intervenant', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+
     <!-- Employee -->
     <record id="view_of_employee_form_intervention" model="ir.ui.view">
         <field name="name">of.hr.employee.form.intervention</field>
@@ -158,7 +171,7 @@
                             <h1><field name="number" placeholder="N° d'intervention" readonly="1"/></h1>
                         </div>
                         <group>
-                            <group col="2">
+                            <group col="2" name="refs" string="Références">
                                 <field name="equipe_id" autofocus="autofocus"/>
                                 <field name="employee_ids" string="Intervenants" widget="many2many_tags" options='{"no_open": True, "no_create": True}'/>
                                 <field name="partner_id" invisible="1"/>
@@ -169,7 +182,7 @@
                                 <field name="name" string="Libellé"/>
                                 <field name="tag_ids" widget="many2many_tags"/>
                             </group>
-                            <group col="2">
+                            <group col="2" name="planif" string="Planification">
                                 <field name="template_id" attrs="{'readonly': [('number', '!=', False), ('state', 'not in', ('draft', 'cancel'))]}"/>
                                 <field name="tache_id"/>
                                 <field name="date"/>
@@ -657,6 +670,9 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="hr.view_employee_tree"/>
+            <field name="context">{
+                'search_default_intervenants': 1,
+            }</field>
         </record>
 
         <!-- équipes -->
@@ -896,7 +912,7 @@
             </field>
         </record>
 
-        <!-- Action pour afficher leste d'interventions -->
+        <!-- Action pour afficher liste d'interventions -->
         <record id="of_sale_order_open_interventions" model="ir.actions.act_window">
             <field name="name">Interventions</field>
             <field name="res_model">of.planning.intervention</field>

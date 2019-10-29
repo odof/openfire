@@ -91,7 +91,9 @@ class OfTourneeRdv(models.TransientModel):
     description = fields.Html(string='Description')
     tache_id = fields.Many2one('of.planning.tache', string='Tâche', required=True)
     employee_id = fields.Many2one('hr.employee', string=u"Intervenant")
-    pre_employee_ids = fields.Many2many('hr.employee', string=u'Pré-sélection d\'intervenants', domain="[('of_tache_ids', 'in', tache_id)]", help=u"pré-sélection des intervenants")
+    pre_employee_ids = fields.Many2many('hr.employee', string=u'Pré-sélection d\'intervenants',
+                                        domain="['|', ('of_tache_ids', 'in', tache_id), ('of_toutes_taches', '=', True)]",
+                                        help=u"pré-sélection des intervenants")
     duree = fields.Float(string=u'Durée', required=True, digits=(12, 5))
     planning_ids = fields.One2many('of.tournee.rdv.line', 'wizard_id', string='Proposition de RDVs')
     planning_tree_ids = fields.One2many('of.tournee.rdv.line', 'wizard_id', string='Proposition de RDVs',
