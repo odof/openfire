@@ -1,7 +1,17 @@
 # -*- encoding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields
 
+def se_chevauchent(min_1, max_1, min_2, max_2, strict=True):
+    """
+    Teste si les intervalles passés en paramètre se chevauchent.
+    Fonctionne pour tous types de variables acceptant les opérateurs d'inégalité ( '<' '<=' '>=' '>' )
+    :param strict: Si vrai, les intervalles doivent se chevaucher strictement (pas seulement se toucher)
+    :return: True si les intervalles se chevauchent, False sinon.
+    """
+    if strict:
+        return min_1 < max_2 and min_2 < max_1
+    return min_1 <= max_2 and min_2 <= max_1
 
 class OFMois(models.Model):
     _name = 'of.mois'
