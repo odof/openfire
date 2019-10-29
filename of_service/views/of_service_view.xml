@@ -44,7 +44,7 @@
                                 <field name="partner_id" invisible="1"/>
                                 <field name="address_id" invisible="context.get('hide_service_address_id')"
                                   domain="['|',('id','=',parent.id),('parent_id','=',parent.id)]"/>
-                                <field name="secteur_tech_id"/>
+                                <field name="of_secteur_tech_id"/>
 
                                 <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
                                 <field name="tache_id"/>
@@ -97,8 +97,10 @@
                         <button name="button_annuler" string="Annuler" states="calculated" type="object"/>
                         <button name="button_brouillon" string="Remettre en brouillon" states="cancel" type="object"/>
 
-                        <field name="state_rec" widget="statusbar" attrs="{'invisible': [('recurrence', '=', False)]}"/>
                         <field name="state_ponc" widget="statusbar" attrs="{'invisible': [('recurrence', '=', True)]}"/>
+                        <field name="state" widget="statusbar" attrs="{'invisible': [('recurrence', '=', False)]}"
+                               statusbar_visible="draft,to_plan,planned_soon,planned,progress,late,done,cancel"/>
+<!--                        <field name="state" widget="statusbar" attrs="{'invisible': [('recurrence', '=', True)]}" statusbar_visible="draft,to_plan,planned_soon,planned,progress,late,done,cancel"/>-->
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
@@ -129,7 +131,7 @@
                         </div>
                         <group>
                             <group name="refs" string="Références">
-                                <field name="state" invisible="1"/>
+                                <field name="base_state" invisible="1"/>
                                 <field name="partner_id" invisible="context.get('hide_service_partner_id')"/>
                                 <field name="address_id" invisible="context.get('hide_service_address_id')"/>
                                 <field name="secteur_tech_id"/>
@@ -302,7 +304,7 @@
                                 <field name="partner_id" invisible="1"/>
                                 <field name="address_id" invisible="context.get('hide_service_address_id')"
                                   domain="['|',('id','=',parent.id),('parent_id','=',parent.id)]"/>
-                                <field name="secteur_tech_id"/>
+                                <field name="of_secteur_tech_id"/>
                                 <field name="company_id" invisible="1"
                                    options="{'no_create': True}" groups="base.group_multi_company"/>
                                 <field name="tache_id" context="{'show_rec_icon_first': recurrence}"/>
@@ -382,22 +384,17 @@
                     <filter string="Récurrent" name="filter_rec" domain="[('recurrence', '=', True)]"/>
                     <filter string="Ponctuel" name="filter_ponc" domain="[('recurrence', '=', False)]"/>
                     <separator/>
-                    <filter string="(rec) Brouillon" name="filter_rec_draft" domain="[('state_rec', '=', 'draft')]"/>
-                    <filter string="(rec) À planifier prochainement" name="filter_rec_to_plan" domain="[('state_rec', '=', 'to_plan')]"/>
-                    <filter string="(rec) Planifié prochainement" name="filter_rec_planned_soon" domain="[('state_rec', '=', 'planned_soon')]"/>
-                    <filter string="(rec) Planifié récemment" name="filter_rec_planned" domain="[('state_rec', '=', 'planned')]"/>
-                    <filter string="(rec) En cours" name="filter_rec_progress" domain="[('state_rec', '=', 'progress')]"/>
-                    <filter string="(rec) En retard de planification" name="filter_rec_late" domain="[('state_rec', '=', 'late')]"/>
-                    <filter string="(rec) Terminé" name="filter_rec_done" domain="[('state_rec', '=', 'done')]"/>
-                    <filter string="(rec) Annulé" name="filter_rec_cancel" domain="[('state_rec', '=', 'cancel')]"/>
+                    <filter string="Brouillon" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                    <filter string="À planifier prochainement" name="filter_to_plan" domain="[('state', '=', 'to_plan')]"/>
+                    <filter string="(ponc) Partiellement planifié" name="filter_ponc_part_planned" domain="[('state', '=', 'part_planned'), ('recurrence', '=', False)]"/>
+                    <filter string="(rec) Planifié prochainement" name="filter_rec_planned_soon" domain="[('state', '=', 'planned_soon'), ('recurrence', '=', True)]"/>
+                    <filter string="(rec) Planifié récemment" name="filter_rec_planned" domain="[('state', '=', 'planned'), ('recurrence', '=', True)]"/>
+                    <filter string="(ponc) Entièrement planifié" name="filter_ponc_all_planned" domain="[('state', '=', 'all_planned'), ('recurrence', '=', False)]"/>
+                    <filter string="(rec) En cours" name="filter_rec_progress" domain="[('state', '=', 'progress'), ('recurrence', '=', True)]"/>
+                    <filter string="En retard de planification" name="filter_late" domain="[('state', '=', 'late')]"/>
+                    <filter string="Terminé" name="filter_done" domain="[('state', '=', 'done')]"/>
+                    <filter string="Annulé" name="filter_cancel" domain="[('state', '=', 'cancel')]"/>
 
-                    <filter string="(ponc) Brouillon" name="filter_ponc_draft" domain="[('state_ponc', '=', 'draft')]"/>
-                    <filter string="(ponc) À planifier" name="filter_ponc_to_plan" domain="[('state_ponc', '=', 'to_plan')]"/>
-                    <filter string="(ponc) Partiellement planifié" name="filter_ponc_part_planned" domain="[('state_ponc', '=', 'part_planned')]"/>
-                    <filter string="(ponc) Entièrement planifié" name="filter_ponc_all_planned" domain="[('state_ponc', '=', 'all_planned')]"/>
-                    <filter string="(ponc) En retard de planification" name="filter_ponc_late" domain="[('state_ponc', '=', 'late')]"/>
-                    <filter string="(ponc) Fait" name="filter_ponc_done" domain="[('state_ponc', '=', 'done')]"/>
-                    <filter string="(ponc) Annulé" name="filter_ponc_cancel" domain="[('state_ponc', '=', 'cancel')]"/>
                     <separator/>
 
                     <filter string="Semaine en cours" name="this_week"

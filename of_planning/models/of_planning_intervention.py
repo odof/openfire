@@ -97,7 +97,7 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
     def _compute_employee_ids(self):
         intervenants = self.env['hr.employee'].search([('of_est_intervenant', '=', True)])
         for tache in self:
-            tache.employee_ids = (6, 0, intervenants.filtered(lambda i: i.of_toutes_taches or tache.id in i.of_tache_ids.ids).ids)
+            tache.employee_ids = intervenants.filtered(lambda i: i.of_toutes_taches or tache.id in i.of_tache_ids.ids)
 
     @api.multi
     def unlink(self):
@@ -291,17 +291,17 @@ class OfPlanningIntervention(models.Model):
         return res
 
     name = fields.Char(string=u'Libellé', required=True)
-    date = fields.Datetime(string='Date intervention', required=True)
-    date_deadline = fields.Datetime(compute="_compute_date_deadline", string='Date Fin', store=True)
+    date = fields.Datetime(string='Date intervention', required=True, track_visibility='always')
+    date_deadline = fields.Datetime(compute="_compute_date_deadline", string='Date Fin', store=True, track_visibility='always')
     forcer_date_deadline = fields.Boolean("Forcer la date de fin", default=False, help=u"/!\\")
     date_deadline_forcee = fields.Datetime(string='Date Fin (forcée)')
-    duree = fields.Float(string=u'Durée intervention', required=True, digits=(12, 5))
+    duree = fields.Float(string=u'Durée intervention', required=True, digits=(12, 5), track_visibility='always')
     user_id = fields.Many2one('res.users', string='Utilisateur', default=lambda self: self.env.uid)
     partner_id = fields.Many2one('res.partner', string='Client', compute='_compute_partner_id', store=True)
-    address_id = fields.Many2one('res.partner', string='Adresse')
+    address_id = fields.Many2one('res.partner', string='Adresse', track_visibility='onchange')
     address_city = fields.Char(related='address_id.city', string="Ville", oldname="partner_city")
     address_zip = fields.Char(related='address_id.zip')
-    secteur_id = fields.Many2one(related='address_id.secteur_tech_id', readonly=True)
+    secteur_id = fields.Many2one(related='address_id.of_secteur_tech_id', readonly=True)
     raison_id = fields.Many2one('of.planning.intervention.raison', string='Raison')
     tache_id = fields.Many2one('of.planning.tache', string='Tâche', required=True)
     tache_categ_id = fields.Many2one(related="tache_id.tache_categ_id", readonly=True)
