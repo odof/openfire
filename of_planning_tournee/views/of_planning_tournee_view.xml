@@ -1,28 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
 
-        <!-- Ajouter bouton 'Imprimer et sauvegarder' dans l'impression de model courrier -->
-        <!--
-        <record id="of_tournee_view_courrier_wizard2" model="ir.ui.view">
-            <field name="name">Envoyer un mailing</field>
-            <field name="model">compose.mail</field>
-            <field name="type">form</field>
-            <field name="inherit_id" ref="of_gesdoc.view_courrier_wizard2"/>
-            <field name="arch" type="xml">
-                <button name="print_report" position="after">
-                    <field name="service_id" invisible="1"/>
-                    <button name="print_report_save" string="Imprimer et sauvegarder" colspan="1" type="object" icon="gtk-save"
-                            attrs="{'invisible': [('service_id', '=', False)]}"/>
-                </button>
-            </field>
-        </record>
-        -->
+    <!-- Vue vide, à supprimer après l'application en production -->
+    <record id="of_tournee_planning_intervention_view_form" model="ir.ui.view">
+        <field name="name">of.planning.intervention.form</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
+        <field name="active" eval="False"/>
+    </record>
 
-        <record id="of_planning_tournee_view_form" model="ir.ui.view" >
+        <record id="of_planning_tournee_view_form" model="ir.ui.view">
             <field name="name">of.planning.tournee.form</field>
             <field name="model">of.planning.tournee</field>
-            <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Tournées">
                     <group colspan="2" col="4">
@@ -45,10 +34,6 @@
                         <field name="epi_lat" attrs="{'required': [('is_bloque', '=', False)]}"/>
                         <field name="epi_lon" attrs="{'required': [('is_bloque', '=', False)]}"/>
                         <separator colspan="4" string="Documents"/>
-                        <!--
-                        <field name="docs" colspan="4" nolabel="1"/>
-                        <field name="docs_name" invisible="1"/>
-                        -->
                     </group>
                 </form>
             </field>
@@ -57,7 +42,6 @@
         <record id="of_planning_tournee_view_tree" model="ir.ui.view">
             <field name="name">of.planning.tournee.tree</field>
             <field name="model">of.planning.tournee</field>
-            <field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree editable="top" colors="red:(is_complet==True) or (is_bloque==True);grey:(is_confirme==False)">
                     <field name="date_jour"/>
@@ -77,7 +61,6 @@
         <record id="of_planning_tournee_view_filter" model="ir.ui.view">
             <field name="name">of.planning.tournee.filter</field>
             <field name="model">of.planning.tournee</field>
-            <field name="type">search</field>
             <field name="arch" type="xml">
                 <search string="Recherche">
                     <group>
@@ -130,56 +113,4 @@
             </field>
         </record>
 
-        <!-- Impression des documents des tournées -->
-
-        <!--
-        <record model="ir.ui.view" id="of_param_docs_tree">
-            <field name="name">of.param.docs.tree</field>
-            <field name="model">of.param.docs</field>
-            <field name="type">tree</field>
-            <field name="arch" type="xml">
-                <tree string="Paramétrage des documents">
-                    <field name="short_name"/>
-                    <field name="name"/>
-                    <field name="doc_type"/>
-                    <field name="model"/>
-                    <field name="default_doc"/>
-                </tree>
-            </field>
-        </record>
-
-        <record model="ir.ui.view" id="of_param_docs_form">
-            <field name="name">of.param.docs.form</field>
-            <field name="model">of.param.docs</field>
-            <field name="type">form</field>
-            <field name="arch" type="xml">
-                <form string="Paramétrage des documents">
-                    <group colspan="4" col="6">
-                        <field name="model" select="1"/>
-                        <field name="default_doc" select="2"/>
-                        <newline></newline>
-                        <field name="report_template" domain="[('model','=',model)]" attrs="{'required': [('mail_template','=',False)]}"
-                               on_change="onchange_report(report_template)"/>
-                        <field name="mail_template" domain="[('file','=',False)]" attrs="{'required': [('report_template','=',False)]}"
-                               on_change="onchange_mail(mail_template)"/>
-                        <newline></newline>
-                        <field name="name" select="1"/>
-                        <field name="short_name" select="1"/>
-                        <field name="doc_type" select="1"/>
-                    </group>
-                </form>
-            </field>
-        </record>
-
-        <record model="ir.actions.act_window" id="action_param_docs">
-            <field name="name">Paramétrage des documents</field>
-            <field name="res_model">of.param.docs</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">form,tree</field>
-            <field name="view_id" ref="of_param_docs_tree" />
-        </record>
-
-        <menuitem id="of_menu_param_docs" parent="sale.menu_sales_configuration_misc" action="action_param_docs" sequence="30"/>
-        -->
-    </data>
 </odoo>
