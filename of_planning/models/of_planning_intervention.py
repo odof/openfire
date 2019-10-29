@@ -38,6 +38,18 @@ class HREmployee(models.Model):
     of_changed_intervention_id = fields.Many2one('of.planning.intervention', string=u"Dernière intervention modifiée")  # api.depends dans of.planning.intervention
     of_est_intervenant = fields.Boolean(string=u"Est intervenant?", default=False)
 
+
+class OfPlanningTacheCateg(models.Model):
+    _name = "of.planning.tache.categ"
+    _description = u"Planning OpenFire : Catégories de tâches"
+
+    name = fields.Char(u'Libellé', size=64, required=True)
+    description = fields.Text('Description')
+    tache_ids = fields.One2many('of.planning.tache', 'tache_categ_id', string=u"Tâches")
+    active = fields.Boolean('Actif', default=True)
+    sequence = fields.Integer(u'Séquence', help=u"Ordre d'affichage (plus petit en premier)")
+
+
 class OfPlanningTache(models.Model):
     _name = "of.planning.tache"
     _description = u"Planning OpenFire : Tâches"
@@ -54,11 +66,12 @@ class OfPlanningTache(models.Model):
     imp_detail = fields.Boolean(u'Imprimer Détail', help=u"""Impression du détail des tâches dans le planning semaine
 Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée dans la journée apparaîtra""", default=True)
     duree = fields.Float(u'Durée par défaut', digits=(12, 5), default=1.0)
-    category_id = fields.Many2one('hr.employee.category', string=u"Catégorie d'employés")
+    tache_categ_id = fields.Many2one('of.planning.tache.categ', string=u"Catégorie de tâche")
     is_crm = fields.Boolean(u'Tâche CRM')
     equipe_ids = fields.Many2many('of.planning.equipe', 'equipe_tache_rel', 'tache_id', 'equipe_id', u'Équipes qualifiées')
     employee_ids = fields.Many2many('hr.employee', 'of_employee_tache_rel', 'tache_id', 'employee_id', u'Employés qualifiés',
                                     domain=_get_employee_ids_domain)
+    category_id = fields.Many2one('hr.employee.category', string=u"Catégorie d'employés")
     #employee_nb = fields.Integer(string=u'Nombre d\'intervenants', default=1)
 
     @api.multi
@@ -266,6 +279,7 @@ class OfPlanningIntervention(models.Model):
     secteur_id = fields.Many2one(related='address_id.secteur_tech_id', readonly=True)
     raison_id = fields.Many2one('of.planning.intervention.raison', string='Raison')
     tache_id = fields.Many2one('of.planning.tache', string='Tâche', required=True)
+    tache_categ_id = fields.Many2one(related="tache_id.tache_categ_id", readonly=True)
     tache_name = fields.Char(related='tache_id.name')
     equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe', oldname='poseur_id')
     employee_ids = fields.Many2many('hr.employee', 'of_employee_intervention_rel', 'intervention_id', 'employee_id',
@@ -476,7 +490,7 @@ class OfPlanningIntervention(models.Model):
 
             # On remplit le champ jours travaillés des employés par les valeurs lundi à vendredi pour les employés dont les jours ne sont pas déjà renseignés.
             cr.execute("INSERT INTO employee_jours_rel(employee_id, jour_id) "
-                       "SELECT he.id, oj.numero "
+                       "SELECT he.id, oj.id "
                        "FROM hr_employee he, of_jours oj "
                        "WHERE oj.numero >= 1 AND oj.numero <= 5 "
                        "AND he.id NOT IN (SELECT employee_id FROM employee_jours_rel)")
