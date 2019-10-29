@@ -5,6 +5,7 @@ from datetime import date
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 from odoo.tools.safe_eval import safe_eval
+from odoo.exceptions import UserError
 
 import math
 
@@ -208,6 +209,7 @@ class OfService(models.Model):
     duree_restante = fields.Float(string=u"Durée restante", compute="_compute_durees", search='_search_duree_restante')
 
     origin = fields.Char(string="Origine")
+    order_id = fields.Many2one('sale.order', string="Commande client")
 
     mois_ids = fields.Many2many('of.mois', 'service_mois', 'service_id', 'mois_id', string='Mois')
     jour_ids = fields.Many2many('of.jours', 'service_jours', 'service_id', 'jour_id', string='Jours', default=_default_jours)
@@ -267,6 +269,7 @@ class OfService(models.Model):
 
     #intervention_ids = fields.One2many('of.planning.intervention', 'service_id', string="Interventions", order="date DESC")
     intervention_ids = fields.One2many('of.planning.intervention', 'service_id', string="Interventions", order="date DESC")
+    intervention_count = fields.Integer(string='Interventions', compute='_compute_intervention_count')
     date_last = fields.Date(
         string=u'Dernière intervention', compute='_compute_durees', search='_search_last_date',
         help=u"Date de la dernière intervention")
@@ -292,6 +295,12 @@ class OfService(models.Model):
             address_zip = service.address_id.zip or u''
             tache_name = service.tache_id.name or u''
             service.name = tache_name + " " + partner_name + " " + address_zip
+
+    @api.depends('intervention_ids')
+    @api.multi
+    def _compute_intervention_count(self):
+        for service in self:
+            service.intervention_count = len(service.intervention_ids)
 
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
@@ -322,6 +331,14 @@ class OfService(models.Model):
             mois_id = mois[0] and mois[0].id or False
             if mois_id:
                 self.mois_ids = [(4, mois_id, 0)]
+
+    @api.onchange('date_next', 'date_fin')
+    def _onchange_dates(self):
+        self.ensure_one()
+        if self.date_next and self.date_fin and self.date_next > self.date_fin:
+            raise UserError("La date de prochaine planification est postérieure à la date de fin.\n"
+                            "Cela signifie que cette intervention ne sera plus jamais sélectionnée par les outils de planification.\n"
+                            "Veuillez changer les dates si ce n'est pas ce que vous vouliez faire")
 
     @api.multi
     def get_next_date(self, date_str):
@@ -394,6 +411,23 @@ class OfService(models.Model):
     def toggle_recurrence(self):
         return self.write({'recurrence': not self.recurrence})
 
+    @api.multi
+    def action_view_interventions(self):
+        action = self.env.ref('of_planning.of_sale_order_open_interventions').read()[0]
+
+        action['domain'] = [('service_id', 'in', self.ids)]
+        if len(self._ids) == 1:
+            context = safe_eval(action['context'])
+            context.update({
+                'default_partner_id': self.partner_id.id,
+                'default_address_id': self.address_id and self.address_id.id or self.partner_id.id,
+                'default_tache_id': self.tache_id and self.tache_id.id or False,
+                'default_duree': self.duree,
+                'default_description': self.note,
+                'default_service_id': self.id,
+            })
+            action['context'] = str(context)
+        return action
 
     @api.model
     def create(self, vals):
@@ -591,9 +625,92 @@ class OFPlanningIntervention(models.Model):
         return super(OFPlanningIntervention, self).unlink()
 
 
+class SaleOrder(models.Model):
+    _inherit = "sale.order"
+
+    # Utilisé pour ajouter bouton Interventions à Devis (see order_id many2one field above)
+    a_programmer_ids = fields.One2many("of.service", "order_id", string="À programmer") #TODO: domain sur state quand code de stan
+
+    a_programmer_count = fields.Integer(string='À programmer', compute='_compute_a_programmer_count')
+
+    @api.depends('a_programmer_ids')
+    @api.multi
+    def _compute_a_programmer_count(self):
+        for sale_order in self:
+            sale_order.a_programmer_count = len(sale_order.a_programmer_ids)
+
+    @api.multi
+    def action_view_a_programmer(self):
+        action = self.env.ref('of_service.of_sale_order_open_a_programmer').read()[0]
+
+        action['domain'] = [('order_id', 'in', self.ids)]
+        if len(self._ids) == 1:
+            context = safe_eval(action['context'])
+            context.update({
+                'default_partner_id': self.partner_id.id,
+                'default_address_id': self.partner_shipping_id.id or self.partner_id.id,
+                'default_order_id': self.id,
+            })
+            action['context'] = str(context)
+        return action
+
+    @api.multi
+    def action_prevoir_intervention(self):
+        self.ensure_one()
+        action = self.env.ref('of_service.action_of_service_prog_form_planning').read()[0]
+        today_str = fields.Date.today()
+        today_da = fields.Date.from_string(today_str)
+        deux_semaines_da = today_da + timedelta(days=14)
+        deux_semaines_str = fields.Date.to_string(deux_semaines_da)
+        action['name'] = u"Prévoir une intervention"
+        action['view_mode'] = "form"
+        action['view_ids'] = False
+        action['view_id'] = self.env['ir.model.data'].xmlid_to_res_id("of_service.view_of_service_form")
+        action['views'] = False
+        action['target'] = "new"
+        action['context'] = {
+            'default_partner_id': self.partner_id.id,
+            'default_address_id': self.partner_shipping_id and self.partner_shipping_id.id or self.partner_id.id,
+            'default_recurrence': False,
+            'default_date_next': today_str,
+            'default_date_fin': deux_semaines_str,
+            'default_origin': u"[Commande] " + self.name,
+            'default_order_id': self.id,
+            'bloquer_recurrence': True,
+            'hide_bouton_planif': True,
+        }
+        return action
+
+
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
     service_address_ids = fields.One2many('of.service', 'address_id', string='Services', context={'active_test': False})
     service_partner_ids = fields.One2many('of.service', 'partner_id', string='Services du partenaire', context={'active_test': False},
                                           help=u"Services liés au partenaire, incluant les services des contacts associés")
+
+    @api.multi
+    def action_prevoir_intervention(self):
+        self.ensure_one()
+        action = self.env.ref('of_service.action_of_service_prog_form_planning').read()[0]
+        today_str = fields.Date.today()
+        today_da = fields.Date.from_string(today_str)
+        deux_semaines_da = today_da + timedelta(days=14)
+        deux_semaines_str = fields.Date.to_string(deux_semaines_da)
+        action['name'] = u"Prévoir une intervention"
+        action['view_mode'] = "form"
+        action['view_ids'] = False
+        action['view_id'] = self.env['ir.model.data'].xmlid_to_res_id("of_service.view_of_service_form")
+        action['views'] = False
+        action['target'] = "new"
+        action['context'] = {
+            'default_partner_id': self.id,
+            'default_address_id': self.address_get(adr_pref=['delivery']) or self.id,
+            'default_recurrence': False,
+            'default_date_next': today_str,
+            'default_date_fin': deux_semaines_str,
+            'default_origin': u"[Partenaire] " + self.name,
+            'bloquer_recurrence': True,
+            'hide_bouton_planif': True,
+        }
+        return action

@@ -315,7 +315,7 @@ class OfPlanifCreneau(models.TransientModel):
         date_moins_un_mois_str = fields.Date.to_string(date_moins_un_mois_da)
         date_moins_3_semaines_str = fields.Date.to_string(date_moins_3_semaines_da)
         date_moins_2_semaines_str = fields.Date.to_string(date_moins_2_semaines_da)
-        taches_possibles = self.employee_id.of_tache_ids
+        taches_possibles = self.employee_id.get_taches_possibles()
         if not self.ignorer_duree:
             taches_possibles = taches_possibles.filtered(lambda t: t.duree <= self.duree_creneau)  # seulement les taches suffisamment courtes a prendre en compte
         if self.pre_tache_ids:
