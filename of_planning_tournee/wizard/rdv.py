@@ -275,7 +275,7 @@ class OfTourneeRdv(models.TransientModel):
 
         # Jours du service, jours travaillés des équipes et horaires de travail
         jours_service = [jour.numero for jour in service.jour_ids] if service else range(1, 8)
-        horaires_list_dict = employee_obj.get_horaires_list_dict(employees._ids, self.date_recherche_debut, self.date_recherche_fin)
+        horaires_list_dict = employees.get_horaires_list_dict(self.date_recherche_debut, self.date_recherche_fin)
 
         un_jour = timedelta(days=1)
         # --- Création des créneaux de début et fin de recherche ---

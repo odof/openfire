@@ -193,7 +193,6 @@ class OfPlanningIntervention(models.Model):
     def get_emp_horaires_info(self, employee_ids, date_start, date_stop, horaires_list_dict=False):
         intervention_obj = self.env['of.planning.intervention']
         employee_obj = self.env['hr.employee']
-        tournee_obj = self.env['of.planning.tournee']
         employees = employee_obj.browse(employee_ids)
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')
@@ -203,7 +202,7 @@ class OfPlanningIntervention(models.Model):
         duree_min = self.env['ir.values'].get_default("of.intervention.settings", "duree_min_creneaux_dispo")
 
         if not horaires_list_dict:
-            horaires_list_dict = employee_obj.get_horaires_list_dict(employee_ids, date_start, date_stop)
+            horaires_list_dict = employees.get_horaires_list_dict(date_start, date_stop)
 
         date_current_naive_dt = datetime.strptime(date_start, "%Y-%m-%d %H:%M:%S")  # datetime naif
         date_current_utc_dt = pytz.utc.localize(date_current_naive_dt, is_dst=None)  # datetime utc
