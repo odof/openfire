@@ -17,10 +17,10 @@ def distance_points(lat1, lon1, lat2, lon2):
 class OfPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
-    tournee_ids = fields.Many2many('of.planning.tournee', compute='_compute_tournee_ids', store=True, string='Planification')
+    tournee_ids = fields.Many2many('of.planning.tournee', 'tournee_intervention_rel', 'intervention_id', 'tournee_id', compute='_compute_tournee_ids', store=True, string='Planification')
 
     @api.multi
-    @api.depends('employee_ids', 'date', 'tournee_ids.date', 'tournee_ids.employee_id')
+    @api.depends('employee_ids', 'date', 'tournee_ids.date', 'tournee_ids.employee_id', 'employee_ids.of_tournee_ids')
     def _compute_tournee_ids(self):
         tournee_obj = self.env['of.planning.tournee']
         for intervention in self:
@@ -238,6 +238,17 @@ class OfPlanningTournee(models.Model):
     is_confirme = fields.Boolean(string=u'Confirmé', default=True, help=u'Une tournée non confirmée sera supprimée si on lui retire ses rendez-vous')
     date_min = fields.Date(related="date", string="Date min")
     date_max = fields.Date(related="date", string="Date max")
+    intervention_ids = fields.Many2many('of.planning.intervention', 'tournee_intervention_rel', 'tournee_id', 'intervention_id', string='Interventions')
+
+    # @api.multi
+    # @api.depends('employee_id', 'date')
+    # def _compute_tournee_ids(self):
+    #     intervention_obj = self.env['of.planning.intervention']
+    #     for tournee in self:
+    #         if tournee.employee_id and tournee.date:
+    #             interventions = intervention_obj.search(
+    #                     [('employee_ids', 'in', tournee.employee_id.id), ('date', '>=', tournee.date), ('date', '<=', tournee.date)])
+    #             tournee.intervention_ids = [(6, 0, interventions.ids)]
 
     @api.model_cr_context
     def _auto_init(self):
@@ -391,3 +402,9 @@ class OfPlanningTournee(models.Model):
                                             ('employee_ids', 'in', employee_id)]):
                     raise ValidationError(u'Il existe déjà des interventions dans la journée pour cet intervenant.')
         return super(OfPlanningTournee, self).write(vals)
+
+
+class HrEmployee(models.Model):
+    _inherit = 'hr.employee'
+
+    of_tournee_ids = fields.One2many('of.planning.tournee', 'employee_id', string=u"Tournées")

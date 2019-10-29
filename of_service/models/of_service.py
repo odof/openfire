@@ -37,7 +37,7 @@ class OfService(models.Model):
                        "FROM of_planning_tache "
                        "WHERE of_service.tache_id = of_planning_tache.id")
             # On met le champ state à "calculated" quand state est différent de "cancel".
-            cr.execute("UPDATE of_service SET state = 'calculated' WHERE state IS Null OR state <> 'cancel'")
+            cr.execute("UPDATE of_service SET base_state = 'calculated'")
         return res
 
     def _default_jours(self):
@@ -74,14 +74,14 @@ class OfService(models.Model):
 
     @api.model
     def compute_state_poncrec_daily(self):
-        services = self.search([('state', '=', False)])
+        services = self.search([('base_state', '=', False)])
         for service in services:
-            service.state = 'calculated'
-        services = self.search([('state', '=', 'calculated')])
+            service.base_state = 'calculated'
+        services = self.search([('base_state', '=', 'calculated')])
         services._compute_state_poncrec()
 
     @api.multi
-    @api.depends('date_next', 'duree', 'state', 'recurrence')
+    @api.depends('date_next', 'duree', 'base_state', 'recurrence')
     def _compute_state_poncrec(self):
         un_mois = timedelta(days=30)
         today_da = fields.Date.from_string(fields.Date.context_today(self))
@@ -89,45 +89,46 @@ class OfService(models.Model):
         il_y_a_un_mois_da = today_da - un_mois
         self._compute_durees()
         for service in self:
-            if service.state and service.state != 'calculated':
-                service.state_ponc = not service.recurrence and service.state or False
-                service.state_rec = service.recurrence and service.state or False
-            else:
+            if service.base_state and service.base_state == 'calculated':
                 date_next_da = fields.Date.from_string(service.date_next)
                 date_last_da = service.date_last and fields.Date.from_string(service.date_last) or False
-                date_fin_da = service.date_fin and fields.Date.from_string(service.date_fin) or False
+                date_fin_da = service.date_fin and fields.Date.from_string(service.date_fin) or date_next_da + relativedelta(days=14)
                 if service.recurrence:
-                    service.state_ponc = False
+                    # service.state_ponc = False
                     if il_y_a_un_mois_da <= date_next_da <= today_da and \
                             (not date_last_da or date_last_da < il_y_a_un_mois_da):
                         # prochaine planification à faire dans moins d'un mois
                         # et pas de dernière intervention ou dernière intervention il y a plus d'un mois
-                        service.state_rec = 'to_plan'
+                        service.state = 'to_plan'
                     elif date_last_da and (il_y_a_un_mois_da <= date_last_da <= today_da):  # dernière intervention il y a moins d'un mois
-                        service.state_rec = 'planned'
+                        service.state = 'planned'
                     elif date_last_da and (today_da < date_last_da <= dans_un_mois_da):  # dernière intervention dans moins d'un mois
-                        service.state_rec = 'planned_soon'
+                        service.state = 'planned_soon'
                     elif date_next_da < il_y_a_un_mois_da:  # prochaine planification en retard de plus d'un mois
-                        service.state_rec = 'late'
+                        service.state = 'late'
                     elif date_fin_da and (date_fin_da < date_next_da or date_fin_da < today_da):  # le service a expiré ou expire avant la date de prochaine planif
-                        service.state_rec = 'done'
+                        service.state = 'done'
                     else:  # par défaut
-                        service.state_rec = 'progress'
+                        service.state = 'progress'
                 else:
                     # l'état 'annulé' est provoqué manuellement
                     # dans le cas d'un service ponctuel, le champ 'date_next' correspond à la date de début de la fourchette de planification
                     # et le champ 'date_fin' à la date de fin de la fourchette de planification
-                    service.state_rec = False
+                    # service.state_rec = False
                     if date_fin_da < today_da and service.duree_restante != 0:  # la durée restante n'est pas nulle et la date de fin est dépassée
-                        service.state_ponc = 'late'
+                        service.state = 'late'
                     elif not date_last_da:  # aucune intervention planifiée
-                        service.state_ponc = 'to_plan'
+                        service.state = 'to_plan'
                     elif service.duree_restante == 0 and date_last_da < today_da:  # durée restant == 0 et la dernière intervention planifiée est passée
-                        service.state_ponc = 'done'
-                    elif service.duree_restante == 0:  # durée restante == 0 et la dernière intervention planifiée est future
-                        service.state_ponc = 'all_planned'
+                        service.state = 'done'
+                    elif service.duree_restante == 0 and service.duree:  # durée restante == 0 et la dernière intervention planifiée est future
+                        service.state = 'all_planned'
                     else:  # la durée restant n'est pas nulle et la date de fin est future
-                        service.state_ponc = 'part_planned'
+                        service.state = 'part_planned'
+                    service.state_ponc = service.state
+            else:
+                service.state = service.base_state
+
 
     @api.model
     def _search_last_date(self, operator, operand):
@@ -193,7 +194,7 @@ class OfService(models.Model):
     # template_id = fields.Many2one('of.mail.template', string='Contrat')
     partner_id = fields.Many2one('res.partner', string='Partenaire', required=True, ondelete='restrict')
     address_id = fields.Many2one('res.partner', string="Adresse", ondelete='restrict')
-    secteur_tech_id = fields.Many2one(related='address_id.secteur_tech_id', readonly=True)
+    secteur_tech_id = fields.Many2one(related='address_id.of_secteur_tech_id', readonly=True)
     company_id = fields.Many2one('res.company', string=u"Société")
 
     # Champs ajoutés pour la vue map
@@ -237,17 +238,17 @@ class OfService(models.Model):
         ], string=u'Récurrence', default='yearly', help=u"Spécifier l'intervalle pour le calcul automatique de date de prochaine intervention dans les services.")
     recurring_interval = fields.Integer(string=u'Répéter chaque', default=1, help=u"Répéter (Jours/Semaines/Mois/Années)")
 
-    state_rec = fields.Selection([
-        ('draft', u'Brouillon'),  # état par défaut
-        ('to_plan', u'À planifier prochainement'),  # prochaine planif à faire dans moins d'un mois
-        ('planned_soon', u'Planifié prochainement'),  # planifié pour dans moins d'un mois
-        ('planned', u'Planifié récemment'),  # dernière intervention il y a moins d'un mois
-        ('progress', u'En cours'),  # par défaut
-        ('late', u'En retard de planification'),  # date de prochaine planification il y a plus d'un mois
-        ('done', u'Terminé'),  # date de fin <= date du jour
-        ('cancel', u'Annulé'),  # manuellement décidé
-    ], u'État', compute="_compute_state_poncrec", store=True)
-
+    # state_rec = fields.Selection([
+    #     ('draft', u'Brouillon'),  # état par défaut
+    #     ('to_plan', u'À planifier prochainement'),  # prochaine planif à faire dans moins d'un mois
+    #     ('planned_soon', u'Planifié prochainement'),  # planifié pour dans moins d'un mois
+    #     ('planned', u'Planifié récemment'),  # dernière intervention il y a moins d'un mois
+    #     ('progress', u'En cours'),  # par défaut
+    #     ('late', u'En retard de planification'),  # date de prochaine planification il y a plus d'un mois
+    #     ('done', u'Terminé'),  # date de fin <= date du jour
+    #     ('cancel', u'Annulé'),  # manuellement décidé
+    # ], u'État', compute="_compute_state_poncrec", store=True)
+    #
     state_ponc = fields.Selection([
         ('draft', u'Brouillon'),  # état par défaut
         ('to_plan', u'À planifier'),  # pas d'intervention
@@ -256,7 +257,7 @@ class OfService(models.Model):
         ('late', u'En retard de planification'),  # date de prochaine planification il y a plus d'un mois
         ('done', u'Fait'),  # intervention(s) et durée restante == 0 et date de fin dépassée
         ('cancel', u'Annulé'),  # manuellement décidé
-    ], u'État', compute="_compute_state_poncrec", store=True)
+    ], u'État', compute="_compute_state_poncrec")
 
     state = fields.Selection([
         ('draft', u'Brouillon'),  # état par défaut
@@ -269,7 +270,14 @@ class OfService(models.Model):
         ('all_planned', u'Entièrement planifié'),  # intervention(s) et durée restante == 0
         ('cancel', u'Annulé'),  # manuellement décidé
         ('calculated', u'Calculé'),  # équivalent a state=False mais utile en XML
-        ], u'État', help=u"Ce champ permet de choisir manuellement l'état du service", default="draft")
+        ], u'État', help=u"Ce champ permet de choisir manuellement l'état du service", compute="_compute_state_poncrec", store=True)
+
+    base_state = fields.Selection([
+        ('draft', u'Brouillon'),  # état par défaut
+        ('calculated', u'Calculé'),  # équivalent a state=False mais utile en XML
+        ('cancel', u'Annulé'),  # manuellement décidé
+        ], u'État', help=u"Ce champ permet de choisir manuellement l'état du service", default="draft", required=True)
+
     active = fields.Boolean(string="Active", default=True)
 
     #intervention_ids = fields.One2many('of.planning.intervention', 'service_id', string="Interventions", order="date DESC")
@@ -455,15 +463,15 @@ class OfService(models.Model):
     @api.multi
     def button_valider(self):
         # laisser le système calculer l'état
-        return self.write({'state': 'calculated'})
+        return self.write({'base_state': 'calculated'})
 
     @api.multi
     def button_annuler(self):
-        return self.write({'state': 'cancel'})
+        return self.write({'base_state': 'cancel'})
 
     @api.multi
     def button_brouillon(self):
-        return self.write({'state': 'draft'})
+        return self.write({'base_state': 'draft'})
 
 
 class OFServiceTag(models.Model):

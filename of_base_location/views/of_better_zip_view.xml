@@ -184,11 +184,11 @@
         <field name="arch" type="xml">
             <search string="Recherche Codes Postaux des Secteurs">
                 <field name="name"/>
-                <field name="secteur_com_id"/>
-                <field name="secteur_tech_id"/>
+                <field name="of_secteur_com_id"/>
+                <field name="of_secteur_tech_id"/>
                 <separator/>
-                <filter string="Commercial" name="com" domain="[('secteur_com_id', '!=', False)]"/>
-                <filter string="Technique" name="tech" domain="[('secteur_tech_id', '!=', False)]"/>
+                <filter string="Commercial" name="com" domain="[('of_secteur_com_id', '!=', False)]"/>
+                <filter string="Technique" name="tech" domain="[('of_secteur_tech_id', '!=', False)]"/>
             </search>
         </field>
     </record>
@@ -220,8 +220,8 @@
         <field name="inherit_id" ref="of_base.of_base_partner_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='website']" position="before">
-                <field name="secteur_com_id"/>
-                <field name="secteur_tech_id"/>
+                <field name="of_secteur_com_id"/>
+                <field name="of_secteur_tech_id"/>
             </xpath>
         </field>
     </record>
@@ -232,8 +232,8 @@
         <field name="inherit_id" ref="of_base.of_res_partner_filter" />
         <field name="arch" type="xml">
             <xpath expr="//field[@name='city']" position="after">
-                <field name="secteur_com_id"/>
-                <field name="secteur_tech_id"/>
+                <field name="of_secteur_com_id"/>
+                <field name="of_secteur_tech_id"/>
             </xpath>
         </field>
     </record>
