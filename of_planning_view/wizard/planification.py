@@ -325,7 +325,7 @@ class OfPlanifCreneau(models.TransientModel):
 
         vals_list = []
         service_domain = [
-            '|', ('state_rec', 'in', ['to_plan', 'late']), ('state_ponc', 'in', ['to_plan', 'part_planned', 'late']),
+            ('state', 'in', ['to_plan', 'part_planned', 'late']),
             '|', ('jour_ids', 'in', self.num_jour), ('jour_ids', '=', False),  # les jours peuvent ne pas être renseignés
             ('tache_id', 'in', taches_possibles.ids),
             ('date_next', '<=', date_un_mois_str),  # ne pas proposer d'interventions à programmer dans plus d'un mois
@@ -344,7 +344,7 @@ class OfPlanifCreneau(models.TransientModel):
                     service_domain.append('&')
                     service_domain.append(('address_zip', '>=', zip_range.cp_min))
                     service_domain.append(('address_zip', '<=', zip_range.cp_max))
-            service_domain.append(('secteur_tech_id', '=', self.secteur_id.id))
+            service_domain.append(('of_secteur_tech_id', '=', self.secteur_id.id))
             # exclusion des secteurs intérieurs
             secteurs_interieurs = self.secteur_id.get_secteurs_interieurs('tech')
             if secteurs_interieurs:
