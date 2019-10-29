@@ -465,7 +465,54 @@
             </field>
         </record>
 
+        <record id="of_planning_tache_categ_view_form" model="ir.ui.view" >
+            <field name="name">of.planning.tache.categ.form</field>
+            <field name="model">of.planning.tache.categ</field>
+            <field name="arch" type="xml" >
+                <form class="oe_form_configuration">
+                    <header></header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="toggle_active" type="object"
+                                    class="oe_stat_button" icon="fa-archive"
+                                    confirm="Êtes-vous sûr de vouloir archiver/activer cette tâche ?">
+                                <field name="active" widget="boolean_button"
+                                    options='{"terminology": "archive"}'/>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <label for="name" string="Libellé" class="oe_edit_only" attrs="{'readonly':[('verr', '=', True)]}"/>
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="tache_ids" widget="many2many"/>
+                            </group>
+                            <group>
+                                <field name="sequence"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
 <!--#############################################_______Vue tree_________#####################################################-->
+
+        <record id="of_planning_tache_categ_view_tree" model="ir.ui.view" >
+            <field name="name">of.planning.tache.categ.tree</field>
+            <field name="model">of.planning.tache.categ</field>
+            <field name="arch" type="xml" >
+                <tree string="Liste des catégories de tâches" >
+                    <field name="name" string="Libellé"/>
+                    <field name="tache_ids"/>
+                    <field name="description"/>
+                    <field name="sequence" invisible="1"/>
+                </tree>
+            </field>
+        </record>
 
         <record id="of_planning_tache_view_tree" model="ir.ui.view" >
             <field name="name">of.planning.tache.tree</field>
@@ -619,6 +666,15 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="view_of_planning_equipe_tree"/>
+        </record>
+
+        <!-- catégories de tâches -->
+        <record id="action_of_planning_tache_categ_tree" model="ir.actions.act_window">
+            <field name="name">Catégories de tâches</field>
+            <field name="res_model">of.planning.tache.categ</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="of_planning_tache_categ_view_tree"/>
         </record>
 
         <!-- tâches -->
@@ -801,6 +857,7 @@
             <menuitem name="Équipes" id="menu_of_planning_equipe_tree" parent="of_planning.menu_of_planning_configuration" sequence="90" action="action_of_planning_equipe_tree"/>
             <menuitem id="menu_hr_config_of_creneaux_intervention" name="Créneaux horaires" parent="menu_of_planning_configuration" groups="hr.group_hr_manager" action="action_view_of_horaire_creneau_tree_intervention" sequence="95"/>
             <menuitem name="Erreurs" id="menu_of_planning_intervention_raison_tree" parent="of_planning.menu_of_planning_configuration" sequence="100" action="action_of_planning_intervention_raison_tree"/>
+            <menuitem name="Catégories de tâches" id="menu_of_planning_tache_categ_tree" parent="of_planning.menu_of_planning_configuration" sequence="109" action="action_of_planning_tache_categ_tree"/>
             <menuitem name="Tâches" id="menu_of_planning_tache_tree" parent="of_planning.menu_of_planning_configuration" sequence="110" action="action_of_planning_tache_tree"/>
             <menuitem name="Étiquettes d'intervention" id="menu_of_planning_tag_tree" parent="of_planning.menu_of_planning_configuration" sequence="115" action="action_of_planning_tag_tree"/>
             <menuitem name="Secteurs" id="of_secteur_intervention_menu" parent="of_planning.menu_of_planning_configuration" action="action_of_secteur_tree_intervention" sequence="120"/>

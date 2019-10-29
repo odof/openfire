@@ -184,9 +184,10 @@ class OfPlanifCreneau(models.TransientModel):
     heure_fin_creneau = fields.Float(string=u'Heude de fin', digits=(5, 5))
     creneaux_reels = fields.Char(string=u"Créneaux réels")
     creneaux_reels_formatted = fields.Char(string=u"Créneaux réels", compute="_compute_creneaux_reels_formatted")
-    distance_max = fields.Integer("Distance max.",default=30)
+    distance_max = fields.Integer("Distance max. (km)", default=30)
     duree_creneau = fields.Float(string=u"Durée à planifier")#, compute="_compute_duree_creneau")
     ignorer_duree = fields.Boolean(string=u"Ignorer durée", help=u"Cochez pour proposer aussi les interventions plus longues que le créneau")
+    pre_tache_categ_ids = fields.Many2many('of.planning.tache.categ', string=u"Catégories de tâches", help=u"Remplir pour restreindre la recherche à certaines catégories de tâches")
     pre_tache_ids = fields.Many2many('of.planning.tache', string="Tâches", help=u"Remplir pour restreindre la recherche à certaines tâches")
     pre_a_programmer_id = fields.Many2one('of.service', string="Choisir directement le service", help=u"San passer par la recherche")
     pre_a_programmer_address_id = fields.Many2one('res.partner', string="Adresse", compute="_compute_pre_a_programer_fields")
@@ -265,17 +266,23 @@ class OfPlanifCreneau(models.TransientModel):
         self.pre_a_programmer_city = address and address.city or False
         self.pre_a_programmer_telephones = address and address.of_telephones or False
 
+    @api.onchange('pre_tache_categ_ids')
+    def onchange_pre_tache_categ_ids(self):
+        # remplir les taches en fonction des catégories
+        self.ensure_one()
+        if self.pre_tache_categ_ids:
+            tache_ids = self.pre_tache_categ_ids.mapped('tache_ids')
+            self.pre_tache_ids = [(5,)] + [(4, tache_id, 0) for tache_id in tache_ids.ids]
 
     @api.onchange('employee_other_ids')
     def onchange_employee_other_ids(self):
         self.ensure_one()
-        # verifier debut_sur_creneau
+        # verifier debut_sur_creneau -> quand code de cédric à disposition
 
     @api.onchange('pre_a_programmer_id')
     def onchange_pre_a_programmer_id(self):
         self.ensure_one()
         if self.pre_a_programmer_id:
-            #self.button_dummy()
             self.duree_rdv = self.pre_a_programmer_id.duree
 
     @api.multi
@@ -313,6 +320,8 @@ class OfPlanifCreneau(models.TransientModel):
             taches_possibles = taches_possibles.filtered(lambda t: t.duree <= self.duree_creneau)  # seulement les taches suffisamment courtes a prendre en compte
         if self.pre_tache_ids:
             taches_possibles = taches_possibles.filtered(lambda t: t.id in self.pre_tache_ids.ids)
+        #if self.pre_tache_categ_ids: <- inutile?
+        #    taches_possibles = taches_possibles.filtered(lambda t: t.tache_categ_id in self.pre_tache_categ_ids.ids)
 
         vals_list = []
         service_domain = [
@@ -336,6 +345,17 @@ class OfPlanifCreneau(models.TransientModel):
                     service_domain.append(('address_zip', '>=', zip_range.cp_min))
                     service_domain.append(('address_zip', '<=', zip_range.cp_max))
             service_domain.append(('secteur_tech_id', '=', self.secteur_id.id))
+            # exclusion des secteurs intérieurs
+            secteurs_interieurs = self.secteur_id.get_secteurs_interieurs('tech')
+            if secteurs_interieurs:
+                zip_range_excluded = secteurs_interieurs.mapped('zip_range_ids')
+                for zip_range in zip_range_excluded:
+                    if zip_range.cp_min == zip_range.cp_max:
+                        service_domain.append(('address_zip', '!=', zip_range.cp_min))
+                    else:
+                        service_domain.append(('address_zip', '<', zip_range.cp_min))
+                        service_domain.append(('address_zip', '>', zip_range.cp_max))
+                service_domain.append(('address_zip', 'not in', zip_range_excluded.ids))
         # services
         services = self.env['of.service'].search(service_domain)
         distance_max = self.distance_max * 1.3  # approximation

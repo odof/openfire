@@ -199,6 +199,7 @@ class OfService(models.Model):
     partner_phone = fields.Char(related='partner_id.phone')
 
     tache_id = fields.Many2one('of.planning.tache', string=u'Tâche', required=True)
+    tache_categ_id = fields.Many2one(related="tache_id.tache_categ_id", readonly=True)
     name = fields.Char(u"Libellé", compute="_compute_name", store=True)
     tag_ids = fields.Many2many('of.service.tag', string=u"Étiquettes")
     tache_name = fields.Char(related="tache_id.name", readonly=True)
