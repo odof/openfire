@@ -40,8 +40,8 @@ class OfPlanningIntervention(models.Model):
         country = address.country_id
         res = []
         for employee in self.employee_ids:
-            tournee_id = tournee_obj.search([('date','=',date_jour), ('employee_id','=',employee.id)], limit=1)
-            if not tournee_id:
+            tournee = tournee_obj.search([('date', '=', date_jour), ('employee_id', '=', employee.id)], limit=1)
+            if not tournee:
                 tournee_data = {
                     'date'       : date_jour,
                     'employee_id': employee.id,
@@ -391,25 +391,3 @@ class OfPlanningTournee(models.Model):
                                             ('employee_ids', 'in', employee_id)]):
                     raise ValidationError(u'Il existe déjà des interventions dans la journée pour cet intervenant.')
         return super(OfPlanningTournee, self).write(vals)
-
-class OfService(models.Model):
-    _inherit = 'of.service'
-
-    def _get_color(self):
-        u""" COULEURS :
-        gris : Service dont l'adresse n'a pas de coordonnées GPS
-        rouge : Service dont la date de dernière intervention est inférieure à la date courante (ou à self._context.get('date_next_max'))
-        bleu : Service dont le dernier rendez-vous est planifié hors tournée
-        noir : Autres services
-        """
-        date_next_max = self._context.get('date_next_max') or fields.Date.today()
-
-        for service in self:
-            if not (service.address_id.geo_lat or service.address_id.geo_lng):
-                service.color = 'gray'
-            elif service.date_next <= date_next_max:
-                service.color = 'red'
-            elif service.planning_ids and not service.planning_ids[0].tournee_id:
-                service.color = 'blue'
-            else:
-                service.color = 'black'
