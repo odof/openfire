@@ -51,6 +51,7 @@ class ResPartner(models.Model):
         if self.secteur_com_id and self.secteur_com_id.type == 'tech_com':
             self.secteur_tech_id = self.secteur_com_id.id
 
+
 class OfSecteur(models.Model):
     _name = "of.secteur"
 
@@ -67,6 +68,30 @@ class OfSecteur(models.Model):
     _sql_constraints = [
         ('name_uniq', 'unique(name)', 'Oups ! On dirait que ce secteur existe déjà...'),
     ]
+
+    @api.multi
+    def get_secteurs_interieurs(self, type='tech'):
+        zip_range_obj = self.env['of.secteur.zip.range']
+        types = ('tech', 'tech_com') if type == 'tech' else ('com', 'tech_com')
+        if len(self) == 1:
+            zip_range_ids = self.env['of.secteur.zip.range']
+            for zip_range in self.zip_range_ids:
+                under_zip_range_ids = zip_range_obj.search([('cp_min', '<=', zip_range.cp_max), ('cp_max', '>=', zip_range.cp_min)])
+                for under_zip_range_id in under_zip_range_ids:
+                    if under_zip_range_id.secteur_id.type in types:
+                        zip_range_ids |= under_zip_range_id
+            return zip_range_ids.mapped('secteur_id')
+        elif len(self) > 1:
+            res = {}
+            for secteur in self:
+                zip_range_ids = self.env['of.secteur.zip.range']
+                for zip_range in secteur.zip_range_ids:
+                    under_zip_range_ids = zip_range_obj.search([('cp_min', '<=', zip_range.cp_max), ('cp_max', '>=', zip_range.cp_min)])
+                    for under_zip_range_id in under_zip_range_ids:
+                        if under_zip_range_id.secteur_id.type in types:
+                            zip_range_ids |= under_zip_range_id
+                res[secteur.id] = zip_range_ids.mapped('secteur_id')
+            return res
 
     @api.model
     def get_secteur_from_cp(self, cp):

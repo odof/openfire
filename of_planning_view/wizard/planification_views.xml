@@ -44,6 +44,7 @@
                             <field name="distance_max"/>
                             <field name="secteur_id" widget="selection"/>
                             <field name="ignorer_duree"/>
+                            <field name="pre_tache_categ_ids" widget="many2many_tags"/>
                             <field name="pre_tache_ids" widget="many2many_tags"/>
                         </group>
                         <group col="2" colspan="2">
@@ -79,7 +80,7 @@
                             <field name="dummy_field" invisible="1"/>
                             <field name="priorite" invisible="1"/>
                             <field name="selected" invisible="1"/>
-                            <field name="id"/>
+                            <field name="id" invisible="1"/>
                             <field name="tache_name"/>
                             <field name="partner_name"/>
                             <field name="address_city"/>
