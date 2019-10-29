@@ -38,6 +38,24 @@ class HREmployee(models.Model):
     of_changed_intervention_id = fields.Many2one('of.planning.intervention', string=u"Dernière intervention modifiée")  # api.depends dans of.planning.intervention
     of_est_intervenant = fields.Boolean(string=u"Est intervenant?", default=False)
 
+    @api.multi
+    def peut_faire(self, tache_id, all_required=False):
+        if all_required:
+            return len(self.filtered(lambda e: (tache_id not in e.of_tache_ids) and not e.of_toutes_tahces)) == 0
+        return len(self.filtered(lambda e: (tache_id in e.of_tache_ids) or e.of_toutes_tahces))
+
+    @api.multi
+    def get_taches_possibles(self, en_commun=False):
+        self = self.filtered(lambda e: not e.of_toutes_taches)
+        if not self:
+            return self.env['of.planning.tache'].search([()])
+        taches = self.mapped('of_taches_ids')
+        if not en_commun:
+            return taches
+        for employee in self:
+            taches = taches.filtered(lambda t: t.id in employee.of_taches_ids.ids)
+        return taches
+
 
 class OfPlanningTacheCateg(models.Model):
     _name = "of.planning.tache.categ"
@@ -69,10 +87,17 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
     tache_categ_id = fields.Many2one('of.planning.tache.categ', string=u"Catégorie de tâche")
     is_crm = fields.Boolean(u'Tâche CRM')
     equipe_ids = fields.Many2many('of.planning.equipe', 'equipe_tache_rel', 'tache_id', 'equipe_id', u'Équipes qualifiées')
-    employee_ids = fields.Many2many('hr.employee', 'of_employee_tache_rel', 'tache_id', 'employee_id', u'Employés qualifiés',
-                                    domain=_get_employee_ids_domain)
+    #employee_ids = fields.Many2many('hr.employee', 'of_employee_tache_rel', 'tache_id', 'employee_id', u'Employés qualifiés',
+    #                                domain=_get_employee_ids_domain)
+    employee_ids = fields.Many2many('hr.employee', u'Employés qualifiés', compute="_compute_employee_ids")
     category_id = fields.Many2one('hr.employee.category', string=u"Catégorie d'employés")
     #employee_nb = fields.Integer(string=u'Nombre d\'intervenants', default=1)
+
+    @api.multi
+    def _compute_employee_ids(self):
+        intervenants = self.env['hr.employee'].search([('of_est_intervenant', '=', True)])
+        for tache in self:
+            tache.employee_ids = (6, 0, intervenants.filtered(lambda i: i.of_toutes_taches or tache.id in i.of_tache_ids.ids).ids)
 
     @api.multi
     def unlink(self):
@@ -831,6 +856,8 @@ class OfPlanningIntervention(models.Model):
     def _onchange_tache_id(self):
         if self.tache_id and self.tache_id.duree:
             self.duree = self.tache_id.duree
+            if self.employee_ids and not self.employee_ids.peut_faire(self.tache_id):
+                raise UserError("Aucun des intervenants de cette intervention ne peut réaliser cette Tâche")
 
     @api.onchange('forcer_date_deadline')
     def _onchange_forcer_date_deadline(self):

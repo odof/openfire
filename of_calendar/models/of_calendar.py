@@ -95,9 +95,11 @@ class HREmployee(models.Model):
     of_color_bg = fields.Char(string="Couleur de fond", help="Choisissez votre couleur", default="#F0F0F0", oldname="color_bg")
 
     _sql_constraints = [
+        ('hor_md_constraint', 'CHECK ( of_hor_md >= 0 )', _(u"L'Heure de début de matinée doit être supérieure ou égale à 0")),
         ('hor_md_mf_constraint', 'CHECK ( of_hor_md <= of_hor_mf )', _(u"L'Heure de début de matinée doit être antérieure à l'heure de fin de matinée")),
         ('hor_mf_ad_constraint', 'CHECK ( of_hor_mf <= of_hor_ad )', _(u"L'Heure de fin de matinée doit être antérieure à l'heure de début d'après-midi")),
         ('hor_ad_af_constraint', 'CHECK ( of_hor_ad <= of_hor_af )', _(u"L'Heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi")),
+        ('hor_af_constraint', 'CHECK ( of_hor_af <= 24 )', _(u"L'Heure de fin d'après-midi doit être inférieure ou égale à 24")),
         ('of_creneau_temp_start_stop_constraint', 'CHECK ( of_creneau_temp_start <= of_creneau_temp_stop )', _(u"La date de début de validité doit être antérieure ou égale à celle de fin")),
     ]
 

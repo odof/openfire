@@ -11,7 +11,7 @@
         'of_planning',
         'of_map_view',
         'of_utils',
-        'sales_team',  # <- menu service dans les ventes
+        'sales_team',  # <- bouton 'prévoir intervention' dans les commandes client
         #'of_base_location', < par of_planning
     ],
     'init_xml' : [],

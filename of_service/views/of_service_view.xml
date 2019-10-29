@@ -102,6 +102,9 @@
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" name="action_view_interventions" type="object" icon="fa-wrench">
+                                <field string="Interventions" name="intervention_count" widget="statinfo"/>
+                            </button>
                             <button name="toggle_active" type="object"
                                     class="oe_stat_button" icon="fa-archive"
                                     confirm="Êtes-vous sûr de vouloir archiver/activer ce service ?">
@@ -121,33 +124,34 @@
                             </button>
                         </div>
                         <div class="oe_title">
-                            <separator string="Service récurrent" attrs="{'invisible': [('recurrence', '=', False)]}"/>
-                            <separator string="Prestation ponctuelle" attrs="{'invisible': [('recurrence', '=', True)]}"/>
+                            <separator string="Intervention récurrente" attrs="{'invisible': [('recurrence', '=', False)]}"/>
+                            <separator string="Intervention ponctuelle" attrs="{'invisible': [('recurrence', '=', True)]}"/>
                         </div>
                         <group>
-                            <group>
+                            <group name="refs" string="Références">
                                 <field name="state" invisible="1"/>
                                 <field name="partner_id" invisible="context.get('hide_service_partner_id')"/>
                                 <field name="address_id" invisible="context.get('hide_service_address_id')"/>
                                 <field name="secteur_tech_id"/>
                                 <field name="company_id"/>
-                                <field name="tache_id" context="{'show_rec_icon_first': recurrence}"/>
-                                <field name="duree" widget="float_time"/>
-                                <field name="duree_planif" widget="float_time"/>
-                                <field name="duree_restante" widget="float_time"/>
                                 <field name="origin" readonly="1" attrs="{'invisible': [('recurrence', '=', True)]}"/>
+                                <field name="order_id"/>
                                 <field name="tag_ids" widget="many2many_tags"/>
                             </group>
-                            <group>
+                            <group name="planif" string="Planification">
                                 <field name="date_next" string="À partir du"/>
                                 <field name="date_fin" string="Au plus tard le"/>
-                                <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'invisible': [('recurrence', '=', False)]}"/>
                                 <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'invisible': [('recurrence', '=', False)]}"/>
                                 <label for="recurring_interval" attrs="{'invisible': [('recurrence', '=', False)]}"/>
                                 <div attrs="{'invisible': [('recurrence', '=', False)]}" col="2">
                                     <field name="recurring_interval" nolabel="1" class="oe_inline of_ws"/>
                                     <field name="recurring_rule_type" nolabel="1" class="oe_inline"/>
                                 </div>
+                                <field name="tache_id" context="{'show_rec_icon_first': recurrence}"/>
+                                <field name="duree" widget="float_time"/>
+                                <field name="duree_planif" widget="float_time"/>
+                                <field name="duree_restante" widget="float_time"/>
                             </group>
                             <group col="4" colspan="4">
                                 <label for="note" colspan="4"/>
@@ -812,7 +816,7 @@
             <field name="type">form</field>
             <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='tache_id']" position="after">
+                <xpath expr="//field[@name='order_id']" position="after">
                     <field name="service_id" context="{
                     'default_partner_id': partner_id,
                     'default_address_id': address_id,
@@ -821,6 +825,35 @@
                 </xpath>
             </field>
         </record>
+
+<!--##########################################################################################################################-->
+<!--##################################################______sale.order______##################################################-->
+<!--##########################################################################################################################-->
+
+    <!-- Action pour afficher liste d'interventions à programmer -->
+    <record id="of_sale_order_open_a_programmer" model="ir.actions.act_window">
+        <field name="name">Interventions à programmer</field>
+        <field name="res_model">of.service</field>
+        <field name="domain">[]</field> <!-- Force empty -->
+        <field name="view_type">form</field>
+    </record>
+
+    <!-- Vue formulaire devis/commande :  ajout bouton "prévoir intervention"-->
+    <record id="sale_order_form_quote" model="ir.ui.view">
+        <field name="name">sale.order.form.payment</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_prevoir_intervention" string="Prévoir Intervention" type="object"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" name="action_view_a_programmer" type="object" icon="fa-wrench">
+                    <field string="À programmer" name="a_programmer_count" widget="statinfo"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
 
 <!--##########################################################################################################################-->
 <!--##################################################______Partenaire______##################################################-->
@@ -832,6 +865,9 @@
             <field name="type">form</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
+                <xpath expr="//header" position="inside">
+                    <button name="action_prevoir_intervention" string="Prévoir Intervention" type="object"/>
+                </xpath>
                 <page name="sales_purchases" position="after">
                     <page string="Service" name="service">
                         <!-- Affichage des services liés au partenaire -->
