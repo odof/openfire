@@ -927,7 +927,7 @@ class OfPlanningIntervention(models.Model):
                     ('state', 'not in', ('cancel', 'postponed')),
                 ], limit=1)
                 if rdv:
-                    raise ValidationError(u'L\'Employé %s a déjà au moins 1 rendez-vous sur ce créneau' % ((rdv.employee_ids & intervention.employee_ids))[0].name)
+                    raise ValidationError(u'L\'employé %s a déjà au moins 1 rendez-vous sur ce créneau.' % ((rdv.employee_ids & intervention.employee_ids))[0].name)
 
     @api.multi
     def _affect_number(self):
@@ -1007,7 +1007,7 @@ class OfPlanningIntervention(models.Model):
         line_account = product.property_account_income_id or product.categ_id.property_account_income_categ_id
         if not line_account:
             return (False,
-                    msg_erreur % (self.name, u'Il faut configurer les comptes de revenus pour la catégorie du produit\n'))
+                    msg_erreur % (self.name, u'Il faut configurer les comptes de revenus pour la catégorie du produit.\n'))
 
         # Mapping des comptes par taxe induit par le module of_account_tax
         for tax in taxes:

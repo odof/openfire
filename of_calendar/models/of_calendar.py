@@ -72,7 +72,7 @@ class HREmployee(models.Model):
     u"""Création horaires avancés"""
     of_mode_horaires = fields.Selection([
         ("easy", "Facile"),
-        ("advanced", u"Avancé")], string="Mode de Sélection des horaires", required=True, default="easy")
+        ("advanced", u"Avancé")], string="Mode de sélection des horaires", required=True, default="easy")
     of_profil_id = fields.Many2one("of.horaires.profil", "Profil")
     of_creneau_ids = fields.Many2many("of.horaires.creneau", "of_employee_creneaux_rel", "employee_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
     of_creneau_temp_ids = fields.Many2many("of.horaires.creneau", "of_employee_creneaux_temp_rel", "employee_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
@@ -82,10 +82,10 @@ class HREmployee(models.Model):
     of_archive_horaires_temp = fields.Text(string="Archive des horaires temporaires")
     of_horaires_du_jour = fields.Text(string=u"Horaires d'aujourd'hui", compute="_compute_horaires_du_jour")
 
-    of_hor_md = fields.Float(string=u'Matin début', digits=(12, 1), default=9)
-    of_hor_mf = fields.Float(string='Matin fin', digits=(12, 1), default=12)
-    of_hor_ad = fields.Float(string=u'Après-midi début', digits=(12, 1), default=14)
-    of_hor_af = fields.Float(string=u'Après-midi fin', digits=(12, 1), default=18)
+    of_hor_md = fields.Float(string=u'Matin début', digits=(12, 5), default=9)
+    of_hor_mf = fields.Float(string=u'Matin fin', digits=(12, 5), default=12)
+    of_hor_ad = fields.Float(string=u'Après-midi début', digits=(12, 5), default=14)
+    of_hor_af = fields.Float(string=u'Après-midi fin', digits=(12, 5), default=18)
     of_jour_ids = fields.Many2many('of.jours', 'employee_jours_rel', 'employee_id', 'jour_id', string='Jours travaillés', default=lambda self: self._get_default_jours())
 
     of_address_depart_id = fields.Many2one('res.partner', string=u'Adresse de départ')
@@ -95,16 +95,16 @@ class HREmployee(models.Model):
     of_color_bg = fields.Char(string="Couleur de fond", help="Choisissez votre couleur", default="#F0F0F0", oldname="color_bg")
 
     _sql_constraints = [
-        ('hor_md_constraint', 'CHECK ( of_hor_md >= 0 )', _(u"L'Heure de début de matinée doit être supérieure ou égale à 0")),
-        ('hor_md_mf_constraint', 'CHECK ( of_hor_md <= of_hor_mf )', _(u"L'Heure de début de matinée doit être antérieure à l'heure de fin de matinée")),
-        ('hor_mf_ad_constraint', 'CHECK ( of_hor_mf <= of_hor_ad )', _(u"L'Heure de fin de matinée doit être antérieure à l'heure de début d'après-midi")),
-        ('hor_ad_af_constraint', 'CHECK ( of_hor_ad <= of_hor_af )', _(u"L'Heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi")),
-        ('hor_af_constraint', 'CHECK ( of_hor_af <= 24 )', _(u"L'Heure de fin d'après-midi doit être inférieure ou égale à 24")),
-        ('of_creneau_temp_start_stop_constraint', 'CHECK ( of_creneau_temp_start <= of_creneau_temp_stop )', _(u"La date de début de validité doit être antérieure ou égale à celle de fin")),
+        ('hor_md_constraint', 'CHECK ( of_hor_md >= 0 )', _(u"L'heure de début de matinée doit être supérieure ou égale à 0.")),
+        ('hor_md_mf_constraint', 'CHECK ( of_hor_md <= of_hor_mf )', _(u"L'heure de début de matinée doit être antérieure à l'heure de fin de matinée.")),
+        ('hor_mf_ad_constraint', 'CHECK ( of_hor_mf <= of_hor_ad )', _(u"L'heure de fin de matinée doit être antérieure à l'heure de début d'après-midi.")),
+        ('hor_ad_af_constraint', 'CHECK ( of_hor_ad <= of_hor_af )', _(u"L'heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi.")),
+        ('hor_af_constraint', 'CHECK ( of_hor_af <= 24 )', _(u"L'heure de fin d'après-midi doit être inférieure ou égale à 24.")),
+        ('of_creneau_temp_start_stop_constraint', 'CHECK ( of_creneau_temp_start <= of_creneau_temp_stop )', _(u"La date de début de validité doit être antérieure ou égale à celle de fin.")),
     ]
 
     _constraints = [
-        (check_no_overlapping, u'Vous ne pourrez pas sauvegarder tant que des créneaux se chevauchent!', []),
+        (check_no_overlapping, u'Vous ne pouvez pas sauvegarder tant que des créneaux se chevauchent.', []),
     ]
 
     def _get_default_jours(self):
@@ -138,29 +138,29 @@ class HREmployee(models.Model):
     def _onchange_hor_md(self):
         self.ensure_one()
         if self.of_hor_md and self.of_hor_mf and self.of_hor_md > self.of_hor_mf:
-            raise UserError(u"L'Heure de début de matinée doit être antérieure à l'heure de fin de matinée")
+            raise UserError(u"L'heure de début de matinée doit être antérieure à l'heure de fin de matinée.")
 
     @api.onchange('of_hor_mf')
     def _onchange_hor_mf(self):
         self.ensure_one()
         if self.of_hor_md and self.of_hor_mf and self.of_hor_md > self.of_hor_mf:
-            raise UserError(u"L'Heure de début de matinée doit être antérieure à l'heure de fin de matinée")
+            raise UserError(u"L'heure de début de matinée doit être antérieure à l'heure de fin de matinée.")
         elif self.of_hor_mf and self.of_hor_ad and self.of_hor_mf > self.of_hor_ad:
-            raise UserError(u"L'Heure de fin de matinée doit être antérieure à l'heure de début d'après-midi")
+            raise UserError(u"L'heure de fin de matinée doit être antérieure à l'heure de début d'après-midi.")
 
     @api.onchange('of_hor_ad')
     def _onchange_hor_ad(self):
         self.ensure_one()
         if self.of_hor_ad and self.of_hor_af and self.of_hor_ad > self.of_hor_af:
-            raise UserError(u"L'Heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi")
+            raise UserError(u"L'heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi.")
         elif self.of_hor_mf and self.of_hor_ad and self.of_hor_mf > self.of_hor_ad:
-            raise UserError(u"L'Heure de fin de matinée doit être antérieure à l'heure de début d'après-midi")
+            raise UserError(u"L'heure de fin de matinée doit être antérieure à l'heure de début d'après-midi.")
 
     @api.onchange('of_hor_af')
     def _onchange_hor_af(self):
         self.ensure_one()
         if self.of_hor_ad and self.of_hor_af and self.of_hor_ad > self.of_hor_af:
-            raise UserError(u"L'Heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi")
+            raise UserError(u"L'heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi.")
 
     @api.model
     def get_working_hours_fields(self):
@@ -174,7 +174,7 @@ class HREmployee(models.Model):
     @api.onchange("of_creneau_ids", "of_creneau_temp_ids")
     def _onchange_creneaux(self):
         if not self.check_no_overlapping():
-            raise UserError(u"Oups! Des créneaux se chevauchent. Veuillez vous assurer que ce ne soit plus le cas avant de sauvegarder.")
+            raise UserError(u"Oups ! Des créneaux se chevauchent. Veuillez vous assurer que ce ne soit plus le cas avant de sauvegarder.")
 
     @api.onchange("of_creneau_temp_start")
     def _onchange_of_creneau_temp_start(self):
@@ -210,7 +210,7 @@ class HREmployee(models.Model):
         date_today_da = fields.Date.from_string(date_today_str)
         un_jour = timedelta(days=1)
         for employee in self:
-            """On récupère l'archive actuelle. Si la date d'aujourd'hui existe déjà dans l'archive, on la remplace"""
+            """On récupère l'archive actuelle. Si la date d'aujourd'hui existe déjà dans l'archive, on la remplace."""
             archive = employee.of_archive_horaires
             if archive:
                 morceaux_list = archive.split(u"\n")
@@ -218,7 +218,7 @@ class HREmployee(models.Model):
                     morceaux_list.pop()
             else:
                 morceaux_list = []
-            """Si elle existe, remplit la date de fin de la dernière archive enregistrée avec la date de la veille"""
+            """Si elle existe, remplit la date de fin de la dernière archive enregistrée avec la date de la veille."""
             if morceaux_list:
                 morceau = morceaux_list[-1]
                 if morceau[15] == u'f':  # le dernier morceau de la liste n'a pas de date de fin.
@@ -270,8 +270,8 @@ class HREmployee(models.Model):
                                       employee.of_creneau_temp_start, employee.of_creneau_temp_stop,
                                       strict=False):
                         raise UserError(
-                            _("Deux configurations d'horaires temporaires ne peuvent pas se superposer dans le temps !\n"
-                              "Dates source du conflit: entre le %s et le %s") % (creneau_start, creneau_stop)
+                            _("Deux configurations d'horaires temporaires ne peuvent pas se superposer dans le temps.\n"
+                              "Dates source du conflit : entre le %s et le %s") % (creneau_start, creneau_stop)
                         )
             else:
                 morceaux_list = []
@@ -632,7 +632,7 @@ class HREmployee(models.Model):
             return res
         un_jour = timedelta(days=1)
         pre_res = []
-        """fusionner les listes de segments pour que les dates correspondent, en conservant les 2 horaires_dict à chaque fois"""
+        """Fusionner les listes de segments pour que les dates correspondent, en conservant les 2 horaires_dict à chaque fois"""
         while len(segments_emp_1) > 0 and len(segments_emp_2) > 0:
             date_fin_1_da = fields.Date.from_string(segments_emp_1[0][1])  # date de fin du premier segment de la liste
             date_fin_2_da = fields.Date.from_string(segments_emp_2[0][1])  # date de fin du premier segment de la liste

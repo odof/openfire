@@ -8,12 +8,12 @@
     'summary': 'Calendar custom colors',
     'license': 'AGPL-3',
     "description": """
-Module OpenFire des calendrier
-==============================
+Module OpenFire des calendriers
+===============================
 
 - Ajout des champs 'of_color_ft' et 'of_color_bg' dans res.users et res.partner
 - Ajout choix des couleurs dans les calendriers
-- Ajout configuration du drag and drop dans les paramètres systèmes (configuration -> technique -> paramètres)
+- Ajout configuration du drag and drop dans les paramètres système (Configuration -> Technique -> Paramètres)
 - Ajout de la possibilité d'afficher une vue calendar d'un champ One2many
 
 Vue calendar
