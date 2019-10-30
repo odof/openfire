@@ -365,8 +365,8 @@ class SaleOrderLine(models.Model):
             update_ol_id = True
         elif 'of_pricing' in vals:
             update_ol_id = True
-        if len(self) == 1 and ((self.of_pricing == 'computed' and not vals.get('of_pricing')) or vals.get('of_pricing') == 'computed'):
-            vals['price_unit'] = vals.get('price_comps', self.price_comps)  # price_unit is equal to price_comps if pricing is computed
+        if len(self) == 1 and vals.get('of_pricing', self.of_pricing) == 'computed' and vals.get('of_is_kit', self.of_is_kit):
+            vals['price_unit'] = vals.get('kit_id') and self.env['of.saleorder.kit'].browse(vals['kit_id']).price_comps or self.price_comps  # price_unit is equal to price_comps if pricing is computed
         super(SaleOrderLine, self).write(vals)
         if update_ol_id:
             sale_kit_vals = {'order_line_id': self.id}
