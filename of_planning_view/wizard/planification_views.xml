@@ -99,7 +99,7 @@
                     <button name="button_dummy" string="Rechercher" type="object" colspan="4" class="btn-primary"
                             attrs="{'invisible': [('pre_a_programmer_id', '!=', False)]}"/>
                     <button name="button_confirm" string="Confirmer &amp; Fermer" type="object" colspan="4"
-                            class="btn-primary" attrs="{'invisible': [('proposition_ids', '=', [])]}"/>
+                            class="btn-primary" attrs="{'invisible': [('proposition_ids', '=', []), ('pre_a_programmer_id', '=', False)]}"/>
                     <button name="button_confirm_next" string="Confirmer &amp; Suivant" type="object" colspan="4"
                             class="btn-primary" attrs="{'invisible': [('proposition_ids', '=', [])]}"/>
                     <button name="button_close" string="Fermer" type="object" colspan="4" class="btn-primary"/>
@@ -154,7 +154,7 @@
                     <field name="description_rdv" nolabel="1" colspan="2" widget="html" attrs="{'invisible':[('selected','!=',True)]}"/>
                 </group>
                 <footer>
-                    <button name="button_select" string="Sélectionner ce service" type="object" colspan="4" class="btn-primary"
+                    <button name="button_select" string="Sélectionner cette intervention à programmer" type="object" colspan="4" class="btn-primary"
                         attrs="{'invisible': [('selected','!=',False)]}"/>
                     <button name="button_confirm" string="Confirmer le RDV" type="object" colspan="4" class="btn-primary"
                         attrs="{'invisible': [('selected','!=',True)]}"/>
@@ -164,7 +164,7 @@
     </record>
 
     <act_window
-        name="Planifier un créneau dispo"
+        name="Remplir un créneau"
         res_model="of.planif.creneau"
         src_model="of.planning.intervention"
         view_mode="form"

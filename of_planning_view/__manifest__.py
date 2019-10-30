@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 {
-    "name": "OpenFire / Planning View",
+    "name": "OpenFire / Planning view",
     "version": "10.0.1.0.0",
     "author": "OpenFire",
     'category': 'OpenFire modules',
-    'summary': 'Planning View',
+    'summary': 'Planning view',
     'license': 'LGPL-3',
     "description": """
 

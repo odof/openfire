@@ -189,7 +189,7 @@ class OfPlanifCreneau(models.TransientModel):
     ignorer_duree = fields.Boolean(string=u"Ignorer durée", help=u"Cochez pour proposer aussi les interventions plus longues que le créneau")
     pre_tache_categ_ids = fields.Many2many('of.planning.tache.categ', string=u"Catégories de tâches", help=u"Remplir pour restreindre la recherche à certaines catégories de tâches")
     pre_tache_ids = fields.Many2many('of.planning.tache', string="Tâches", help=u"Remplir pour restreindre la recherche à certaines tâches")
-    pre_a_programmer_id = fields.Many2one('of.service', string="Choisir directement le service", help=u"San passer par la recherche")
+    pre_a_programmer_id = fields.Many2one('of.service', string="Choisir directement l'intervention à programmer", help=u"San passer par la recherche")
     pre_a_programmer_address_id = fields.Many2one('res.partner', string="Adresse", compute="_compute_pre_a_programer_fields")
     pre_a_programmer_zip = fields.Char(string="Code Postal", compute="_compute_pre_a_programer_fields")
     pre_a_programmer_city = fields.Char(string="Ville", compute="_compute_pre_a_programer_fields")

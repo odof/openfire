@@ -724,7 +724,7 @@
         <!--menuitem id="menu_of_service_ponc" name="Services à programmer" parent="sales_team.menu_sales" sequence="105" action="action_of_service_ponc_form_sale"/-->
         <menuitem id="menu_of_planning_service_prog" name="Interventions à programmer" parent="of_planning.menu_of_planning_intervention" sequence="5" action="action_of_service_prog_form_planning"/>
         <menuitem id="menu_of_planning_service_rec" name="Interventions récurrentes" parent="of_planning.menu_of_planning_intervention" sequence="6" action="action_of_service_rec_form_planning"/>
-        <menuitem id="menu_of_planning_service_ponc" name="Interventions ponctuelle" parent="of_planning.menu_of_planning_intervention" sequence="7" action="action_of_service_ponc_form_planning"/>
+        <menuitem id="menu_of_planning_service_ponc" name="Interventions ponctuelles" parent="of_planning.menu_of_planning_intervention" sequence="7" action="action_of_service_ponc_form_planning"/>
 
 <!--##########################################################################################################################-->
 <!--##################################################_______Taches_______####################################################-->
