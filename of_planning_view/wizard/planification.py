@@ -447,7 +447,7 @@ class OfPlanifCreneau(models.TransientModel):
         tz = pytz.timezone(self._context['tz'])
 
         employee = self.employee_id
-        service = self.selected_id.service_id
+        service = self.pre_a_programmer_id or self.selected_id.service_id
         date_da = fields.Date.from_string(self.date_creneau)
         date_propos_dt = datetime.combine(date_da, datetime.min.time()) + timedelta(
             hours=self.heure_debut_rdv)  # datetime naive
