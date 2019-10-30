@@ -49,11 +49,11 @@ class HREmployee(models.Model):
         self = self.filtered(lambda e: not e.of_toutes_taches)
         if not self:
             return self.env['of.planning.tache'].search([()])
-        taches = self.mapped('of_taches_ids')
+        taches = self.mapped('of_tache_ids')
         if not en_commun:
             return taches
         for employee in self:
-            taches = taches.filtered(lambda t: t.id in employee.of_taches_ids.ids)
+            taches = taches.filtered(lambda t: t.id in employee.of_tache_ids.ids)
         return taches
 
 
@@ -927,7 +927,7 @@ class OfPlanningIntervention(models.Model):
                     ('state', 'not in', ('cancel', 'postponed')),
                 ], limit=1)
                 if rdv:
-                    raise ValidationError(u'L\'employé %s a déjà au moins 1 rendez-vous sur ce créneau.' % ((rdv.employee_ids & intervention.employee_ids))[0].name)
+                    raise ValidationError(u'L\'employé %s a déjà au moins un rendez-vous sur ce créneau.' % ((rdv.employee_ids & intervention.employee_ids))[0].name)
 
     @api.multi
     def _affect_number(self):
