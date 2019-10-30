@@ -238,7 +238,7 @@ class OfPlanningTournee(models.Model):
     is_confirme = fields.Boolean(string=u'Confirmé', default=True, help=u'Une tournée non confirmée sera supprimée si on lui retire ses rendez-vous')
     date_min = fields.Date(related="date", string="Date min")
     date_max = fields.Date(related="date", string="Date max")
-    intervention_ids = fields.Many2many('of.planning.intervention', 'tournee_intervention_rel', 'tournee_id', 'intervention_id', string='Interventions')
+    intervention_ids = fields.Many2many('of.planning.intervention', 'of_planning_intervention_of_planning_tournee_rel', 'tournee_id', 'intervention_id', string='Interventions')
 
     # @api.multi
     # @api.depends('employee_id', 'date')

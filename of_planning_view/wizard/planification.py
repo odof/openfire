@@ -344,7 +344,7 @@ class OfPlanifCreneau(models.TransientModel):
                     service_domain.append('&')
                     service_domain.append(('address_zip', '>=', zip_range.cp_min))
                     service_domain.append(('address_zip', '<=', zip_range.cp_max))
-            service_domain.append(('of_secteur_tech_id', '=', self.secteur_id.id))
+            service_domain.append(('secteur_tech_id', '=', self.secteur_id.id))
             # exclusion des secteurs intérieurs
             secteurs_interieurs = self.secteur_id.get_secteurs_interieurs('tech')
             if secteurs_interieurs:
