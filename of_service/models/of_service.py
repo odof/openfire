@@ -263,6 +263,7 @@ class OfService(models.Model):
         ('draft', u'Brouillon'),  # état par défaut
         ('to_plan', u'À planifier prochainement'),  # prochaine intervention dans moins d'un mois
         ('planned', u'Planifié récemment'),  # dernière intervention il y a moins d'un mois
+        ('planned_soon', u'Planifié prochainement'),  # planifié pour dans moins d'un mois
         ('progress', u'En cours'),  # par défaut
         ('late', u'En retard de planification'),  # date de prochaine planification il y a plus d'un mois
         ('done', u'Terminé / Annulé'),  # date de fin <= date du jour (rec) / durée restante == 0 et date de fin dépassée (ponc)
