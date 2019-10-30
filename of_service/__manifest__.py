@@ -12,6 +12,7 @@
         'of_map_view',
         'of_utils',
         'sales_team',  # <- bouton 'prévoir intervention' dans les commandes client
+        'date_range',
         #'of_base_location', < par of_planning
     ],
     'init_xml' : [],
