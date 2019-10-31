@@ -22,6 +22,7 @@
         <field name="inherit_id" ref="sale.view_order_product_pivot"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='price_subtotal']" position="after">
+                <field name="of_margin_percentage" type="measure"/>
                 <field name="of_diff_price" type="measure" color="green"/>
                 <field name="of_diff_margin" type="measure"/>
                 <field name="of_diff_qty_delivered" type="measure"/>

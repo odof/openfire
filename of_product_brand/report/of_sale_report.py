@@ -6,6 +6,7 @@ class SaleReport(models.Model):
     _inherit = "sale.report"
 
     of_brand_id = fields.Many2one("of.product.brand", "Marque", readonly=True)
+    of_margin_percentage = fields.Float(u"Marge (%)", compute="_compute_dummy")
     of_diff_price = fields.Float(u"Δ% HT", compute="_compute_dummy")
     of_diff_margin = fields.Float(u"Δ% Marge", compute="_compute_dummy")
     of_diff_qty_delivered = fields.Float(u"Δ% qté liv.", compute="_compute_dummy")
@@ -103,4 +104,8 @@ class SaleReport(models.Model):
                                 r[field1] = ((r[field2] / values[period_prec][other][field2] - 1)) * 100 if values[period_prec][other][field2] else 100
                     period_prec = period
 
+            display_margin_percent = ('of_margin_percentage', 'margin', 'price_subtotal')
+            if all(val in fields for val in display_margin_percent):
+                for entry in res:
+                    entry[display_margin_percent[0]] = entry[display_margin_percent[1]] * 100 / (entry[display_margin_percent[2]] or 1)
         return res
