@@ -20,7 +20,7 @@ class OfPlanningIntervention(models.Model):
     tournee_ids = fields.Many2many('of.planning.tournee', 'tournee_intervention_rel', 'intervention_id', 'tournee_id', compute='_compute_tournee_ids', store=True, string='Planification')
 
     @api.multi
-    @api.depends('employee_ids', 'date', 'tournee_ids.date', 'tournee_ids.employee_id', 'employee_ids.of_tournee_ids')
+    @api.depends('employee_ids', 'date', 'tournee_ids.date', 'tournee_ids.employee_id')
     def _compute_tournee_ids(self):
         tournee_obj = self.env['of.planning.tournee']
         for intervention in self:
@@ -95,6 +95,7 @@ class OfPlanningIntervention(models.Model):
                                                             ('employee_id', 'in', employee_ids)])
         if len(planning_tournee_ids) != len(employee_ids):  # Une ou plusieurs tournées n'ont pas encore été créées.
             intervention.create_tournees()
+            intervention._recompute_todo(self._fields['tournee_ids'])
         return intervention
 
     @api.multi
@@ -131,6 +132,7 @@ class OfPlanningIntervention(models.Model):
 
         for intervention in self:
             intervention.create_tournees()
+            intervention._recompute_todo(self._fields['tournee_ids'])
         return True
 
     @api.multi
@@ -267,8 +269,10 @@ class OfPlanningTournee(models.Model):
             cr.execute("DROP TABLE of_tournee_planification, of_tournee_planification_partner, of_tournee_planification_planning")
             # On vide les tournées existantes et on les re-créer.
             cr.execute("TRUNCATE of_planning_intervention_of_planning_tournee_rel, tournee_employee_other_rel, of_planning_tournee")
-            for intervention in self.env['of.planning.intervention'].search([('state','not in',('cancel','postponed'))], order="date"):
+            interventions = self.env['of.planning.intervention'].search([('state','not in',('cancel','postponed'))], order="date")
+            for intervention in interventions:
                 intervention.create_tournees()
+            interventions._recompute_todo(interventions._fields['tournee_ids'])
         return res
 
     @api.depends('date')
