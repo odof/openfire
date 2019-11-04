@@ -123,14 +123,14 @@ class OfParcInstalle(models.Model):
 class ProjectIssue(models.Model):
     _inherit = 'project.issue'
 
-    a_programmer_count = fields.Integer(compute="_get_a_programmer_count")
+    of_a_programmer_count = fields.Integer(compute="_get_of_a_programmer_count")
 
     @api.multi
-    def _get_a_programmer_count(self):
+    def _get_of_a_programmer_count(self):
         """Smart button vue SAV : renvoi le nombre d'interventions à programmer liées à la machine installée"""
         service_obj = self.env['of.service']
         for sav in self:
-            sav.a_programmer_count = len(service_obj.search([('sav_id', '=', sav.id), ('recurrence', '=', False)]))
+            sav.of_a_programmer_count = len(service_obj.search([('sav_id', '=', sav.id), ('recurrence', '=', False)]))
 
     @api.multi
     def action_view_a_programmer(self):
