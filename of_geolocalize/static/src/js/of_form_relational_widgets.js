@@ -51,10 +51,11 @@ FieldMany2One.include({
                 .filter([['id', '=', partner_id]]) // id
                 .all()
                 .then(function (partners){
+                    var tooltip_title = (partners[0]["name"] || "cette adresse") + " n'est pas géolocalisé."
                     self.set({
                         "geo_lat": partners[0]["geo_lat"],
                         "precision": partners[0]["precision"],
-                        "tooltip_title": partners[0]["name"],
+                        "tooltip_title": tooltip_title,
                     });
                     if (!self.get("id") || !self.get("class_id")) {
                         self.set({
@@ -102,7 +103,7 @@ FieldMany2One.include({
                     }else if (self.get("precision") != "not_tried" && !isNullOrUndef(self.$geo_button)) {
                         self.$geo_button.remove()
                     }
-                    options["title"] = _t(self.get('tooltip_title') + " n'est pas géolocalisé")
+                    options["title"] = _t(self.get('tooltip_title'))
                     if (isNullOrUndef(self.$geo_warning)) {
                         self.$geo_warning = $('<span/>').addClass('fa fa-exclamation-triangle o_tz_warning of_ws_l ' + self.get("class_id"))
                         .insertAfter(self.$label).tooltip(options);
