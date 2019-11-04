@@ -643,15 +643,15 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     # Utilisé pour ajouter bouton Interventions à Devis (see order_id many2one field above)
-    a_programmer_ids = fields.One2many("of.service", "order_id", string="À programmer") #TODO: domain sur state quand code de stan
+    of_a_programmer_ids = fields.One2many("of.service", "order_id", string="À programmer")
 
-    a_programmer_count = fields.Integer(string='À programmer', compute='_compute_a_programmer_count')
+    of_a_programmer_count = fields.Integer(string='À programmer', compute='_compute_of_a_programmer_count')
 
-    @api.depends('a_programmer_ids')
+    @api.depends('of_a_programmer_ids')
     @api.multi
-    def _compute_a_programmer_count(self):
+    def _compute_of_a_programmer_count(self):
         for sale_order in self:
-            sale_order.a_programmer_count = len(sale_order.a_programmer_ids)
+            sale_order.of_a_programmer_count = len(sale_order.of_a_programmer_ids)
 
     @api.multi
     def action_view_a_programmer(self):

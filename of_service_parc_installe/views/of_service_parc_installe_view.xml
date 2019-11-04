@@ -153,7 +153,7 @@
             <xpath expr="//div[@class='oe_button_box']" position="inside">
                 <button class="oe_stat_button" name="action_view_a_programmer" type="object" icon="fa-calendar-o">
                     <div class="o_form_field o_stat_info">
-                        <span class="o_stat_value"><field name="a_programmer_count"/></span>
+                        <span class="o_stat_value"><field name="of_a_programmer_count"/></span>
                         <span class="o_stat_text">À programmer</span>
                     </div>
                 </button>
