@@ -46,8 +46,9 @@ FieldMany2One.include({
             self.dfd_geo_lat.resolve();
         }else{
             var ResPartner = new Model("res.partner");
+            ResPartner._context = ResPartner.context({'active_test': false})
             ResPartner.query(['id', 'geo_lat', 'precision', 'name']) // retrieve geo_lat from db
-                .filter([['id','=',partner_id]]) // id
+                .filter([['id', '=', partner_id]]) // id
                 .all()
                 .then(function (partners){
                     self.set({
