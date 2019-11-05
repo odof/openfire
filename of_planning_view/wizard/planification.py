@@ -180,8 +180,8 @@ class OfPlanifCreneau(models.TransientModel):
 
     date_creneau = fields.Date(string=u"Date du créneau", readonly=True)
     num_jour = fields.Integer(string=u"numéro du jour", compute="_compute_num_jour")
-    heure_debut_creneau = fields.Float(string=u'Heude de début', digits=(5, 5))
-    heure_fin_creneau = fields.Float(string=u'Heude de fin', digits=(5, 5))
+    heure_debut_creneau = fields.Float(string=u'Heure de début', digits=(5, 5))
+    heure_fin_creneau = fields.Float(string=u'Heure de fin', digits=(5, 5))
     creneaux_reels = fields.Char(string=u"Créneaux réels")
     creneaux_reels_formatted = fields.Char(string=u"Créneaux réels", compute="_compute_creneaux_reels_formatted")
     distance_max = fields.Integer("Distance max. (km)", default=30)
@@ -218,7 +218,7 @@ class OfPlanifCreneau(models.TransientModel):
 
     proposition_ids = fields.One2many('of.planif.intervention', 'creneau_id', string="propositions")#, compute="peupler_candidats")
     selected_id = fields.Many2one('of.planif.intervention', string="Proposition")
-    heure_debut_rdv = fields.Float(string=u'Heude de début', digits=(5, 5))
+    heure_debut_rdv = fields.Float(string=u'Heure de début', digits=(5, 5))
     duree_rdv = fields.Float(string=u"Durée")
     description_rdv = fields.Text(string='Description')
     employee_other_ids = fields.Many2many('hr.employee', string="Autres intervenants",

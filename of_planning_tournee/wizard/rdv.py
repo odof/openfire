@@ -99,7 +99,7 @@ class OfTourneeRdv(models.TransientModel):
     planning_tree_ids = fields.One2many('of.tournee.rdv.line', 'wizard_id', string='Proposition de RDVs',
                                         domain=[('intervention_id', '=', False), ('allday', '=', False)])
     date_propos = fields.Datetime(string=u'RDV Début')
-    date_propos_hour = fields.Float(string=u'Heude de début', digits=(12, 5))
+    date_propos_hour = fields.Float(string=u'Heure de début', digits=(12, 5))
     date_recherche_debut = fields.Date(string='À partir du', required=True, default=lambda *a: (date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
     date_recherche_fin = fields.Date(string="Jusqu'au", required=True, default=lambda *a: (date.today() + timedelta(days=7)).strftime('%Y-%m-%d'))
     partner_id = fields.Many2one('res.partner', string='Client', required=True, readonly=True, default=lambda x: x._default_partner())
