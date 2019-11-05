@@ -127,7 +127,7 @@ class OFRDVCommercial(models.TransientModel):
     duree = fields.Float(string=u'Durée du RDV', required=True, digits=(12, 2), default=1)
     creneau_ids = fields.One2many('of.rdv.commercial.line', 'wizard_id', string='Proposition de RDVs')
     date_propos = fields.Datetime(string=u'RDV Début')
-    date_propos_hour = fields.Float(string=u'Heude de début', digits=(12, 5))
+    date_propos_hour = fields.Float(string=u'Heure de début', digits=(12, 5))
     date_recherche_debut = fields.Date(string=u'À partir du', required=True, default=lambda *a: (date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
     date_recherche_fin = fields.Date(string=u"Jusqu'au", required=True, default=lambda *a: (date.today() + timedelta(days=7)).strftime('%Y-%m-%d'))
     partner_id = fields.Many2one('res.partner', string='Client', required=True, readonly=True, default=_default_partner)
