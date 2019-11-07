@@ -125,9 +125,11 @@
                                         }}'/>
                             </button>
                         </div>
-                        <div class="oe_title">
-                            <separator string="Intervention récurrente" attrs="{'invisible': [('recurrence', '=', False)]}"/>
-                            <separator string="Intervention ponctuelle" attrs="{'invisible': [('recurrence', '=', True)]}"/>
+                        <div class="oe_title of_title">
+                            <h1>
+                                <span attrs="{'invisible': [('recurrence', '=', False)]}">Intervention récurrente</span>
+                                <span attrs="{'invisible': [('recurrence', '=', True)]}">Intervention ponctuelle</span>
+                            </h1>
                         </div>
                         <group>
                             <group name="refs" string="Références">

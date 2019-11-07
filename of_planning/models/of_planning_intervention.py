@@ -41,14 +41,14 @@ class HREmployee(models.Model):
     @api.multi
     def peut_faire(self, tache_id, all_required=False):
         if all_required:
-            return len(self.filtered(lambda e: (tache_id not in e.of_tache_ids) and not e.of_toutes_tahces)) == 0
-        return len(self.filtered(lambda e: (tache_id in e.of_tache_ids) or e.of_toutes_tahces))
+            return len(self.filtered(lambda e: (tache_id not in e.of_tache_ids) and not e.of_toutes_taches)) == 0
+        return len(self.filtered(lambda e: (tache_id in e.of_tache_ids) or e.of_toutes_taches))
 
     @api.multi
     def get_taches_possibles(self, en_commun=False):
         self = self.filtered(lambda e: not e.of_toutes_taches)
         if not self:
-            return self.env['of.planning.tache'].search([()])
+            return self.env['of.planning.tache'].search([])
         taches = self.mapped('of_tache_ids')
         if not en_commun:
             return taches
@@ -356,7 +356,7 @@ class OfPlanningIntervention(models.Model):
     partner_name = fields.Char(related='partner_id.name')
 
     category_id = fields.Many2one(related='tache_id.category_id', string=u"Type de tâche")
-    verif_dispo = fields.Boolean(string=u'Vérif', help=u"Vérifier la disponibilité de l'équipe sur ce créneau", default=True)
+    verif_dispo = fields.Boolean(string=u'Vérif chevauchement', help=u"Vérifier que cette intervention n'en chevauche pas une autre", default=True)
     gb_employee_id = fields.Many2one('hr.employee', compute=lambda *a, **k: {}, search='_search_gb_employee_id',
                                      string="Intervenant", of_custom_groupby=True)
 
@@ -435,6 +435,28 @@ class OfPlanningIntervention(models.Model):
             if res and res.get('routes'):
                 interv.before_to_this = (float(res['routes'].pop(0)['duration']) / 60.0) / 60.0
 ######################### fin de vérifier / refaire
+
+    @api.multi
+    def get_interv_prec_suiv(self, employee_id):
+        """renvois l'intervention précédente à celle-ci, pour l'employé donné
+        (différent potentiellement de interv_before_id pour les interventions à plusieurs employés)"""
+        if not self:
+            return (False, False)
+        self.ensure_one()
+        if not employee_id:
+            employee_id = self.employee_ids and self.employee_ids[0].id
+        interv_obj = self.env['of.planning.intervention']
+        interv_prec = interv_obj.search([
+            ('date_date', '=', self.date_date),
+            ('date', '<', self.date),  # strict pour ne pas récupérer l'intervention du self
+            ('employee_ids', 'in', employee_id)
+        ], order="date DESC", limit=1)
+        interv_suiv = interv_obj.search([
+            ('date_date', '=', self.date_date),
+            ('date', '>', self.date),  # strict pour ne pas récupérer l'intervention du self
+            ('employee_ids', 'in', employee_id)
+        ], order="date DESC", limit=1)
+        return (interv_prec or False, interv_suiv or False)
 
     @api.model_cr_context
     def _auto_init(self):
@@ -869,7 +891,7 @@ class OfPlanningIntervention(models.Model):
     @api.onchange('forcer_date_deadline')
     def _onchange_forcer_date_deadline(self):
         if self.forcer_date_deadline:
-            self.date_deadline_forcee = self.date_deadline
+            self.date_deadline_forcee = fields.Datetime.to_string(fields.Datetime.from_string(self.date) + relativedelta(hours=self.duree))
 
     """@api.onchange('employee_ids')
     def _onchange_employee_ids(self):
