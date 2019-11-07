@@ -30,7 +30,8 @@
                 <page name="interventions" string="Interventions" attrs="{'invisible': [('of_est_intervenant','=', False)]}">
                     <group>
                         <field name="of_equipe_ids" widget="many2many_tags"/>
-                        <field name="of_tache_ids" widget="many2many"/>
+                        <field name="of_toutes_taches"/>
+                        <field name="of_tache_ids" widget="many2many" attrs="{'invisible': [('of_toutes_taches', '=', True)]}"/>
                     </group>
                 </page>
             </xpath>
@@ -152,7 +153,7 @@
             <field name="name">of.planning.intervention.form</field>
             <field name="model">of.planning.intervention</field>
             <field name="arch" type="xml" >
-                <form string="Nouvelle Intervention" >
+                <form string="Nouvelle Intervention">
                     <header>
                         Passer à
                         <button name="button_confirm" string="Confirmé" states="draft" type="object"/>
@@ -169,7 +170,7 @@
                     <sheet>
                         <div class="oe_title" name="num">
                             <h1>
-                                <span>Rendez-vous d'intervention</span>
+                                <span class="of_title">Rendez-vous d'intervention</span>
                                 <field name="number" placeholder="N° d'intervention" readonly="1" nolabel="1" class="oe_inline"/>
                             </h1>
                         </div>
@@ -653,6 +654,14 @@
             <field name="context">{'search_default_state_confirm':1,'search_default_state_done':1,'search_default_state_draft':1,'search_default_state_unfinished':1}</field>
             <field name="view_id" ref="of_planning_intervention_view_calendar"/>
             <field name="search_view_id" ref="of_planning_intervention_filter"/>
+        </record>
+
+        <record id="action_of_planning_intervention_form" model="ir.actions.act_window">
+            <field name="name">Planning d'intervention</field>
+            <field name="res_model">of.planning.intervention</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="of_planning_intervention_view_form"/>
         </record>
 
         <record id="action_of_planning_tag_tree" model="ir.actions.act_window">

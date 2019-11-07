@@ -1236,7 +1236,7 @@ class Meeting(models.Model):
         self.of_lieu_rdv_id = self.of_lieu_company_id.partner_id.id
 
     """
-    These fields would be necessary if use_contacts="0" in <calendar>. See event_data_transforgit statuism function in .js file
+    These fields would be necessary if use_contacts="0" in <calendar>. See event_data_transform function in .js file
 
     of_color_ft = fields.Char(string="Couleur de texte", help="Couleur de texte de l'utilisateur", compute="_compute_of_color")
     of_color_bg = fields.Char(string="Couleur de fond", help="Couleur de fond de l'utilisateur", compute="_compute_of_color")
