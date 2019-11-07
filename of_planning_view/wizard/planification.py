@@ -77,7 +77,7 @@ class OfPlanifCreneauProp(models.TransientModel):
         #print "\nA VER?"
         #print len(self)
         #print "\n"
-        for a_planifier in self:
+        for a_planifier in self[:100]:
             a_planifier.dummy_field = True
             query = ROUTING_BASE_URL + "route/" + ROUTING_VERSION + "/" + ROUTING_PROFILE + "/"
             # Listes de coordonnées : ATTENTION OSRM prend ses coordonnées sous form (lng, lat)
@@ -137,6 +137,23 @@ class OfPlanifCreneauProp(models.TransientModel):
             else:
                 a_planifier.distance_dwazo_suiv = voldwazo(a_planifier.geo_lat, a_planifier.geo_lng, a_planifier.creneau_id.geo_lat_suiv, a_planifier.creneau_id.geo_lng_suiv)
 
+    @api.multi
+    @api.onchange('heure_debut_rdv')
+    def onchange_heure_debut_rdv(self):
+        self.ensure_one()
+        # veŕifier que l'heure de début choisie est sur les créneaux proposés
+        for i in range(len(self.creneau_id.creneaux_reels)):
+            # début sur créneau
+            if self.creneau_id.creneaux_reels[i][0] <= self.heure_debut_rdv < self.creneau_id.creneaux_reels[i][1]:
+                break
+        else:
+            raise UserError(u"l'heure de début choisi est en dehors de ce créneau"
+                            u"pour votre information, les horaires de ce créneau sont"
+                            u"%s" % self.creneau_id.creneaux_reels_formatted)
+        # calculer la durée avant et la durée après
+        # définir si montrer boutons confirmer et suivant, et/ou confirmer et précédent
+
+
     """@api.multi
     @api.onchange('selected')
     def onchange_selected(self):
@@ -172,6 +189,7 @@ class OfPlanifCreneauProp(models.TransientModel):
     @api.multi
     def button_confirm(self):
         self.ensure_one()
+        return self.creneau_id.button_confirm()
 
 
 class OfPlanifCreneau(models.TransientModel):
@@ -407,6 +425,10 @@ class OfPlanifCreneau(models.TransientModel):
     @api.multi
     def set_proposition_ids(self):
         self.ensure_one()
+        if not self.lieu_prec_id:
+            raise UserError(u"Veuillez configurer l'adresse de départ de %s" % self.employee_id.name)
+        if not self.lieu_suiv_id:
+            raise UserError(u"Veuillez configurer l'adresse de retour de %s" % self.employee_id.name)
         vals_list = self.get_candidats()
         la_list = [(5, 0, 0)] + [(0, 0, values) for values in vals_list]
         if not vals_list:
@@ -539,7 +561,7 @@ class OfPlanifCreneau(models.TransientModel):
                 raise UserError(u"On dirait que cette journée est entièrement planifiée pour %s" % self.employee_id.name)
         else:
             creneau_fini = True
-        if creneau_fini:  # la journée est entièrement planifiée!
+        if creneau_fini:  # le créneau est entièrement planifiée!
             self.creneau_fini = creneau_fini
             return {'type': 'ir.actions.do_nothing'}
         # mise à jour des données du créneau

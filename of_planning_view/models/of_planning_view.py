@@ -6,7 +6,7 @@ from odoo.tools.float_utils import float_compare
 from odoo import models, fields, api
 import json
 from odoo.addons.of_planning_tournee.wizard.rdv import hours_to_strs
-
+from odoo.addons.of_utils.models.of_utils import se_chevauchent
 
 import pytz
 from datetime import datetime, timedelta
@@ -55,7 +55,132 @@ class OfPlanningIntervention(models.Model):
     _inherit = ["of.planning.intervention", "of.readgroup", "of.calendar.mixin"]
 
     @api.model
-    def get_creneaux_dispo(self, employee_id, date, intervention_heures, creneaux_travailles, duree_min=1.0):  # interventions et creneaux sont des listes de tuples (heure_debut, heure_fin)
+    def get_creneaux_dispo(self, employee_id, date, intervention_heures, creneaux_travailles,
+                               duree_min=1.0):  # interventions et creneaux sont des listes de tuples (heure_debut, heure_fin)
+        """Similaire au calcul de créneaux dispo de rdv.py.
+        L'idée ici est de fusionner les créneaux dispos consécutifs.
+        exple: une journée sans intervention programmée ne doit avoir qu'un créneau dispo"""
+        compare_precision = 5
+        index_courant = intervention_heures and 0 or -1  # index de parcours de intervention_heures
+        employee = self.env['hr.employee'].browse(int(employee_id))
+        #deb = creneaux_travailles[index_courant][0]  # début courant
+        #fin = creneaux_travailles[index_courant][1]  # fin courante
+        creneaux = []
+        vals = {}
+        #warning_forcer_horaires = any([forcee for forcee ])
+        lieu_depart = employee.of_address_depart_id and employee.of_address_depart_id.get_infos_lieu() or False
+        lieu_retour = employee.of_address_retour_id and employee.of_address_retour_id.get_infos_lieu() or False
+        tournee = self.env['of.planning.tournee'].search([('date', '=', date), ('employee_id', '=', employee_id)], limit=1)
+        if tournee:
+            secteur = tournee.secteur_id
+            # les lieux de départ et de retour d'une tournée priment sur ceux de l'employé
+            lieu_depart = tournee.address_depart_id and tournee.address_depart_id.get_infos_lieu() or lieu_depart
+            lieu_retour = tournee.address_retour_id and tournee.address_retour_id.get_infos_lieu() or lieu_retour
+        else:
+            secteur = False
+
+        if not creneaux_travailles:
+            return []
+        if not intervention_heures:
+            secteur_str = secteur and secteur.name or ""
+            vals['heure_debut'] = creneaux_travailles[0][0]
+            vals['heure_fin'] = creneaux_travailles[-1][-1]
+            vals['lieu_debut'] = lieu_depart
+            vals['lieu_fin'] = lieu_retour
+            vals['duree'] = sum([c[1] - c[0] for c in creneaux_travailles])
+            vals['creneaux_reels'] = creneaux_travailles
+            vals['secteur_id'] = secteur and secteur.id or False
+            vals['secteur_str'] = secteur_str
+            vals['display_secteur'] = True
+            return vals['duree'] >= duree_min and [vals] or []
+
+        deb_h = creneaux_travailles[0][0]
+        fin_h = creneaux_travailles[0][1]
+        avant_tupzz = filter(lambda t: t[1] <= deb_h, intervention_heures)  # toutes les intervention qui commencent avant le premier creneau de la journée
+        pendant_tupzz = []  # sera rempli dans le for
+        apres_tupzz = [tup for tup in intervention_heures if tup not in avant_tupzz]
+        lieu_deb = avant_tupzz and avant_tupzz[-1][0].address_id and avant_tupzz[-1][0].address_id.get_infos_lieu() or lieu_depart
+        secteur = avant_tupzz and avant_tupzz[-1][0].secteur_id or secteur
+        secteur_str = secteur and secteur.name or ""
+        fin_libre = False
+
+        for index_creneau in range(len(creneaux_travailles)):
+            creneau = creneaux_travailles[index_creneau]
+            pendant_tupzz = filter(lambda t: t[1] < creneau[1], apres_tupzz)
+            if avant_tupzz and avant_tupzz[-1][2] > creneau[0]:  # chevauchement
+                pendant_tupzz.append(avant_tupzz.pop(-1))
+            apres_tupzz = filter(lambda t: t not in pendant_tupzz, apres_tupzz)
+            already_added = False
+            if fin_libre:  # fusion ou nettoyage
+                fin = pendant_tupzz and pendant_tupzz[0][1] or creneau[1]
+                vals = creneaux[-1]
+                vals['heure_fin'] = fin
+                vals['duree'] += fin - creneau[0]
+                vals['lieu_fin'] = lieu_fin
+                vals['creneaux_reels'] += [(creneau[0], fin)]
+                if creneaux[-1]["duree"] < duree_min:
+                    creneaux.pop(-1)
+                already_added = True
+                vals = {}
+            elif creneaux and creneaux[-1]["duree"] < duree_min:
+                creneaux.pop(-1)
+
+            while pendant_tupzz:
+                interv_tup = pendant_tupzz.pop(0)  # (intervention, heure_debut, heure_fin)
+                lieu_fin = interv_tup[0].address_id and interv_tup[0].address_id.get_infos_lieu() or False
+
+                if not already_added and float_compare(interv_tup[1], creneau[0], compare_precision) > duree_min:
+                    # l'intervention commence après le début du créneau
+                    # on ajoute le créneau dispo à la liste
+                    vals['heure_debut'] = creneau[0]
+                    vals['heure_fin'] = interv_tup[1]
+                    vals['lieu_debut'] = lieu_deb
+                    vals['lieu_fin'] = lieu_fin
+                    vals['duree'] = interv_tup[1] - creneau[0]
+                    vals['creneaux_reels'] = [(creneau[0], interv_tup[1])]
+                    vals['secteur_id'] = secteur and secteur.id or False
+                    vals['secteur_str'] = secteur_str
+                    vals['display_secteur'] = False
+                    creneaux.append(vals)
+                    vals = {}
+                elif already_added:
+                    already_added = False
+                # mettre à jour les données pour la prochaine itération interventions
+                secteur = interv_tup[0].secteur_id or secteur
+                secteur_str = secteur and secteur.name or ""
+                creneau[0] = interv_tup[2]  # min(creneau[1], interv_tup[2])?
+                avant_tupzz.append(interv_tup)
+                lieu_deb = lieu_fin
+            if not already_added and float_compare(creneau[1], creneau[0], compare_precision) > 0:
+                # il reste du temps entre la fin de la dernière intervention de pendant_tupzz et la fin du créneau
+                # on ajoute le créneau dispo à la liste:
+                #   si la durée est suffisante dans le cas du dernier créneau de la journée
+                #   tout le temp sinon: il sera fusionné ou supprimé dans la prochaine itération créneau
+                lieu_fin = apres_tupzz and apres_tupzz[0][0].address_id and apres_tupzz[0][0].address_id.get_infos_lieu() or False
+                vals['heure_debut'] = creneau[0]
+                vals['heure_fin'] = creneau[1]
+                vals['lieu_debut'] = lieu_deb
+                vals['lieu_fin'] = lieu_fin
+                vals['duree'] = creneau[1] - creneau[0]
+                vals['creneaux_reels'] = [(creneau[0], creneau[1])]
+                vals['secteur_id'] = secteur and secteur.id or False
+                vals['secteur_str'] = secteur_str
+                vals['display_secteur'] = False
+                if float_compare(vals['duree'], duree_min, compare_precision) >= 0 or index_creneau != len(creneaux_travailles) -1:
+                    # ne pas ajouter le dernier créneau de la journée si il est trop court car il ne sera pas nettoyé
+                    creneaux.append(vals)
+                    fin_libre = True
+                vals = {}
+
+            elif not already_added:
+                fin_libre = False
+            # mettre à jour les données pour la prochaine itération créneaux
+            lieu_deb = lieu_fin
+
+        return creneaux
+
+    @api.model
+    def get_creneaux_dispo_old(self, employee_id, date, intervention_heures, creneaux_travailles, duree_min=1.0):  # interventions et creneaux sont des listes de tuples (heure_debut, heure_fin)
         """Similaire au calcul de créneaux dispo de rdv.py.
         L'idée ici est de fusionner les créneaux dispos consécutifs.
         exple: une journée sans intervention programmée ne doit avoir qu'un créneau dispo"""
@@ -65,6 +190,7 @@ class OfPlanningIntervention(models.Model):
         fin = creneaux_travailles[index_courant][1]  # fin courante
         creneaux = []
         vals={}
+        to_add = False
         lieu_depart = employee.of_address_depart_id and employee.of_address_depart_id.get_infos_lieu() or False
         lieu_retour = employee.of_address_retour_id and employee.of_address_retour_id.get_infos_lieu() or False
         tournee = self.env['of.planning.tournee'].search([('date', '=', date), ('employee_id', '=', employee_id)], limit=1)
@@ -87,6 +213,7 @@ class OfPlanningIntervention(models.Model):
                     vals['lieu_fin'] = lieu_retour
                     vals['duree'] = fin - deb
                     vals['creneaux_reels'] = [(deb, fin)]
+                    to_add = True
                 while len(creneaux_travailles) > index_courant + 1:  # rajouter le reste des créneaux s'il y en a
                     index_courant += 1
                     deb = creneaux_travailles[index_courant][0]  # début courant
@@ -94,12 +221,13 @@ class OfPlanningIntervention(models.Model):
                     vals['heure_fin'] = fin
                     vals['duree'] += fin - deb
                     vals['creneaux_reels'].append((deb, fin))
-                if vals != {} and vals['duree'] >= duree_min:
+                if to_add and vals['duree'] >= duree_min:
                     vals['secteur_id'] = secteur and secteur.id or False
                     vals['secteur_str'] = secteur_str
+                    vals['interv_suiv_id'] = False
                     vals['display_secteur'] = not intervention_heures  # on affiche le secteur seulement si il n'y a pas d'interventions dans la journée
                     creneaux.append(vals)
-                vals = {}
+                break
             elif deb and deb < intervention_deb:  # du temps avant le début de l'intervention
                 if fin < intervention_deb:  # l'intervention commence sur un autre creneau: préparation du créneau dispo
                     vals['heure_debut'] = deb
@@ -130,9 +258,10 @@ class OfPlanningIntervention(models.Model):
                 vals['lieu_fin'] = intervention.address_id and intervention.address_id.get_infos_lieu() or False
                 vals['duree'] += intervention_deb - deb
                 vals['creneaux_reels'].append((deb, intervention_deb))
-                if vals != {} and vals['duree'] >= duree_min:  # un créneau à ajouter
+                if vals['duree'] >= duree_min:  # un créneau à ajouter
                     vals['secteur_id'] = secteur and secteur.id or False
                     vals['secteur_str'] = secteur_str
+                    vals['interv_suiv_id'] = intervention.id
                     creneaux.append(vals)
                 vals = {}
                 if intervention_fin < fin:  # l'intervention se fini avant la fin du créneau horaire
@@ -163,6 +292,8 @@ class OfPlanningIntervention(models.Model):
                         fin = creneaux_travailles[index_courant][1]
                     else:
                         deb = False
+            # mettre à jour l'intervention précédente
+            vals['interv_prec_id'] = intervention.id
 
         return creneaux
 
@@ -199,7 +330,7 @@ class OfPlanningIntervention(models.Model):
         tz = pytz.timezone(self._context['tz'])
         compare_precision = 5
 
-        duree_min = self.env['ir.values'].get_default("of.intervention.settings", "duree_min_creneaux_dispo")
+        duree_min = self.env['ir.values'].get_default("of.intervention.settings", "duree_min_creneaux_dispo") or 1
 
         if not horaires_list_dict:
             horaires_list_dict = employees.get_horaires_list_dict(date_start, date_stop)
@@ -272,7 +403,7 @@ class OfPlanningIntervention(models.Model):
                 journee_fin = horaires_du_jour[-1][1]
 
                 date_current_str = fields.Date.to_string(date_current_da)
-                interventions = intervention_obj.search([('employee_ids', 'in', employee_id),
+                interventions = intervention_obj.sudo().search([('employee_ids', 'in', employee_id),
                                                          ('date', '<=', date_current_str),
                                                          ('date_deadline', '>=', date_current_str),
                                                          ('state', 'in', ('draft', 'confirm', 'done')),
