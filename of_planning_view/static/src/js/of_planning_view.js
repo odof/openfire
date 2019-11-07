@@ -64,6 +64,7 @@ var PlanningView = View.extend({
     template: 'PlanningView',
     display_name: _lt('Planning'),
     icon: 'fa fa-sliders',
+    searchview_hidden: true,
     view_type: "planning",
     _model: null,
     defaults: _.extend({}, View.prototype.defaults, {
@@ -107,6 +108,12 @@ var PlanningView = View.extend({
         if (!attrs.resource) {
             throw new Error(_t("Planning view has not defined 'resource' attribute."));
         }
+        for (var k in this.dataset.context) {
+            if (k.indexOf("search_default") != -1) {
+                delete this.dataset.context[k];
+            }
+        }
+        this.dataset = new data.DataSetSearch(this.ViewManager.action_manager, 'of.planning.intervention', this.dataset.context, [])
         this.resource = attrs.resource;
         this.color_ft = attrs.color_ft;
         this.color_bg = attrs.color_bg;
@@ -340,6 +347,7 @@ var PlanningView = View.extend({
     },
     do_search: function (domain, context, group_by) {
         var self = this;
+        //console.log("DO_SEARCH doamin:",domain);
         //console.log("group_by",group_by);
         var context_dfd, domain_dfd, range_start_dfd = $.Deferred();
         var ir_values_model = new Model('ir.values');
@@ -357,7 +365,7 @@ var PlanningView = View.extend({
             var range_start_str = format(this.range_start);
             range_start_dfd = ir_values_model.call("set_default", ["of.intervention.settings", "planningview_range_start", range_start_str, false]);
         }
-        this.domain = domain;
+        this.domain = [];
         this.context = context;
         this.group_by = group_by;
 
@@ -403,7 +411,9 @@ var PlanningView = View.extend({
         if (moment(self.range_start) <= moment() && moment() <= moment(self.range_stop)) {
             self.col_offset_today = moment().startOf('day').diff(moment(self.range_start), 'days');
         }
-        var event_domain = self.get_range_domain(this.domain || [],this.range_start,this.range_stop);
+        var event_domain = self.get_range_domain([],this.range_start,this.range_stop);  // retrait du domain de recherche
+        //console.log("DO_SEARCH domain:",event_domain);
+        //console.log("DO_SEARCH dataset context:",this.dataset.context);
         //self.view_res_ids = self.to_show_ids;
         self.dataset.read_slice(self.fields_keys, {
                     offset: 0,
@@ -819,15 +829,27 @@ var PlanningView = View.extend({
         });
     },
     open_record: function (event, options) {
-       //console.log("OPTIONS:",options)
-        if (!options) {
-            options = {target: 'new'};
-        }
-        if (this.dataset.select_id(event.data.id)) {
-            this.do_switch_view('form', options);
-        } else {
-            this.do_warn("Planning: could not find id#" + event.data.id);
-        }
+        //console.log("OPTIONS:",options)
+        //console.log("event",event)
+
+
+        //event.preventDefault();
+        //console.log(ev);
+        var self = this;
+        var additional_context = {};
+        var action_id = "of_planning.action_of_planning_intervention_form"
+
+        return data_manager.load_action(action_id, pyeval.eval('context', additional_context)).then(function(result) {
+                //console.log("LE RESUUUULT",result);
+                result.target = "new";
+                result.res_id = event.data.id;
+                var options = {
+                    'additional_context': pyeval.eval('context', additional_context),  // pour une raison inconnue le additional_context n'est pas pris en compte avant
+                    'on_close': function () {console.log(" TODOOOOOOO AIE AIE AIE ARGS",arguments);},
+                };  // @todo: appel reload_events
+                //return self.view.ViewManager.action_manager.ir_actions_act_window(result,options);
+                return self.ViewManager.action_manager.do_action(result,options);
+            });
     },
     /**
      *  Handles signal to open an action
@@ -1444,7 +1466,7 @@ var PlanningCreneauDispo = Widget.extend({
             "default_heure_debut_rdv": self.heure_debut,
             "default_heure_fin_creneau": self.heure_fin,
             "default_lieu_prec_id": self.lieu_debut.id || false,
-            "default_lieu_suiv_id": self.lieu_fin.id|| false,
+            "default_lieu_suiv_id": self.lieu_fin.id || false,
             "default_date_creneau": self.date,
             "default_duree_creneau": self.duree,
             "default_employee_id": self.row.res_id,
@@ -1475,6 +1497,7 @@ var PlanningRecord = Widget.extend({
     init: function(row, view, record, options) {
         //console.log('MapRecord.init arguments: ',arguments);
         this.id = record.id;
+        console.log(record.id);
         this._super(row);
         this.row = row;
         if (!this.row.record_consoled) {
@@ -1491,6 +1514,7 @@ var PlanningRecord = Widget.extend({
         this.class ="of_planning_record of_planning_record_" + this.id;
         if (!isNullOrUndef(record.state_int)) this.class += " of_calendar_state_" + record["state_int"];
         if (this.day_span > 1) this.class += " of_planning_record_multiple";
+        if (record.state_int == 3) this.class += " of_planning_info_annule_reporte";
         this.col_offset_start = options.col_offset_start;
         this.col_offset_stop = options.col_offset_stop;
         this.read_only_mode = options.read_only_mode || true; // current implementation solo readonly
@@ -1510,13 +1534,26 @@ var PlanningRecord = Widget.extend({
         this.heure_fin_str = formats.format_value(record.date_deadline,descript_dt).substring(11, 16);
         this.heure_debut = hh_mm_to_float(this.heure_debut_str)
         this.heure_fin = hh_mm_to_float(this.heure_fin_str)
-        this.duree_str = formats.format_value(record.duree,descript_ft).replace(":", "h");
+        //this.duree_str = formats.format_value(record.duree,descript_ft).replace(":", "h");
+        var heures = Math.trunc(record.duree);
+        var minutes = (record.duree - heures) * 60;
+        if (!heures) {
+            this.duree_str = minutes + "min";  // exple: 45min
+        }else if (!minutes) {
+            this.duree_str = heures + "h"  // exple: 2h
+        }else{
+            this.duree_str = formats.format_value(record.duree,descript_ft).replace(":", "h");
+            if (this.duree_str[0] == "0") {
+                this.duree_str = this.duree_str.substring(1);  // exple: 2h45
+            }
+        }
         this.address_city = record.address_city;
         this.address_zip = record.address_zip;
         this.secteur_name = record.secteur_id && record.secteur_id[1] || false;
         this.partner_name = record.partner_name;
         this.tache_name = record.tache_name;
         this.state_int = record.state_int;
+
         if (record[this.view.resource].length > 1) {  // several attendees
             this.attendee_other_ids = _.reject(record[this.view.resource], function (attendee_id) { return attendee_id == self.row.res_id})
            //console.log("this.attendee_other_ids",this.attendee_other_ids);
@@ -1742,9 +1779,9 @@ PlanningView.SidebarInfoFilter = Widget.extend({
     init_filters: function() {
         var self = this;
 
-        var check_tab_names = ["client","tache","zip","city","secteur","heure_debut","heure_fin","duree"];
-        var check_tab_vals = new Array(8);
-        var check_tab_defs = new Array(8);
+        var check_tab_names = ["client","tache","zip","city","secteur","heure_debut","heure_fin","duree","annule_reporte"];
+        var check_tab_vals = new Array(9);
+        var check_tab_defs = new Array(9);
         var dfd = $.Deferred();
         var p = dfd.promise(self.info_filters);
         var defs = [], proms = [], les_args, le_def;
@@ -1765,6 +1802,8 @@ PlanningView.SidebarInfoFilter = Widget.extend({
         $.when(check_tab_defs[6]).then(function(res){check_tab_vals[6] = isNullOrUndef(res) || res});
         check_tab_defs[7] = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_filter_" + check_tab_names[7], false]);
         $.when(check_tab_defs[7]).then(function(res){check_tab_vals[7] = isNullOrUndef(res) || res});
+        check_tab_defs[8] = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_filter_" + check_tab_names[8], false]);
+        $.when(check_tab_defs[8]).then(function(res){check_tab_vals[8] = isNullOrUndef(res) || res});
 
         $.when.apply($, check_tab_defs)
         //$.when(check_tab_defs[0],check_tab_defs[1],check_tab_defs[2],check_tab_defs[3],check_tab_defs[4],check_tab_defs[5],check_tab_defs[6])
@@ -1856,6 +1895,15 @@ PlanningView.SidebarInfoFilter = Widget.extend({
                             "field_name_ir": "planningview_filter_duree",
                         },
                     },
+                },
+                "annule_reporte": {
+                    "value": "annule_reporte",
+                    "input_id": "annule_reporte_input",
+                    "class": "of_planning_info_annule_reporte",
+                    "label": "Annulé / Reporté",
+                    "is_checked": check_tab_vals[8],
+                    "field_name_ir": "planningview_filter_annule_reporte",
+                    "separated": true,
                 },
             }
             self.view.info_filters = self.info_filters;

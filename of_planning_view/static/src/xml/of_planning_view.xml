@@ -62,6 +62,7 @@
     <t t-name="PlanningView.sidebar.event_info">
         <div t-foreach="filters" class="of_planning_ev_info">
             <t t-if="filters_value.value"><!-- don't display if no value given (or undefined) -->
+                <div t-if="filters_value.separated" style="border-top: #000000; width: 100%"/>
                 <div class="o_checkbox">
                     <input type="checkbox" name="selection"
                         t-att-id="filters_value.input_id"
@@ -211,8 +212,7 @@
                     <span class="of_planning_subinfo of_planning_subinfo_heure_debut"><t t-raw="record.heure_debut_str"/></span>
                     <span class="of_planning_subinfo of_planning_subinfo_heure_fin"> -&gt; </span>
                     <span class="of_planning_subinfo of_planning_subinfo_heure_fin"><t t-raw="record.heure_fin_str"/></span>
-                    <span class="of_planning_subinfo of_planning_subinfo_duree"> - </span>
-                    <span class="of_planning_subinfo of_planning_subinfo_duree"><t t-raw="record.duree_str"/></span>
+                    <span class="of_planning_subinfo of_planning_subinfo_duree">(<t t-raw="record.duree_str"/>)</span>
                 </t>
                 <t t-else="">
                     <span class="of_planning_subinfo of_planning_subinfo_heure_debut"><t t-raw="record['hours_cols'][col_index].heure_debut_str"/></span>

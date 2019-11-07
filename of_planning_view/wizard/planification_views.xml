@@ -12,7 +12,7 @@
                         // élargir le pop-up
                         $(".modal-dialog").width('80%');
                     });
-                </script>
+                </script><!-- -->
                 <group colspan="2" col="8" name="invisblez" style="display: none">
                     <field name="creneau_fini" invisible="1"/>
                     <field name="aucun_res" invisible="1"/>
@@ -23,6 +23,8 @@
                     <field name="duree_creneau" widget="float_time" invisible="1"/>
                     <field name="lieu_prec_id" invisible="1"/>
                     <field name="lieu_suiv_id" invisible="1"/>
+                    <field name="geo_lat_prec" invisible="1"/>
+                    <field name="geo_lat_suiv" invisible="1"/>
                 </group>
                 <group col="1" colspan="2" attrs="{'invisible': [('creneau_fini', '=', False)]}">
                     <div>Félicitation! Ce créneau est entièrement planifié! \o/</div>
@@ -58,7 +60,7 @@
                         </group>
                     </group>
                     <group col="2" colspan="2">
-                        <group col="2" colspan="2" attrs="{'invisible': [('proposition_ids', '=', []),('pre_a_programmer_id', '=', False)]}">
+                        <group col="2" colspan="2">
                             <separator string="Intervention à créer" colspan="2"/>
                             <field name="heure_debut_rdv" widget="float_time"/>
                             <field name="duree_rdv" widget="float_time"/>
@@ -66,7 +68,7 @@
                         </group>
                         <group col="2" colspan="2" attrs="{'invisible': [('aucun_res', '=', False)]}">
                             <separator string="Aucun résultat" colspan="2"/>
-                            <div colspan="2">
+                            <div colspan="2" style="color: red">
                                 <i>
                                     Aucun service à programmer correspondant à vos critères de recherche n'a été trouvé...
                                 </i>
