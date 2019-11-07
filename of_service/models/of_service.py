@@ -128,6 +128,7 @@ class OfService(models.Model):
                     service.state_ponc = service.state
             else:
                 service.state = service.base_state
+                service.state_ponc = service.base_state
 
 
     @api.model
@@ -563,7 +564,7 @@ class OFPlanningTache(models.Model):
 class OFPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
-    service_id = fields.Many2one('of.service', string="Service", domain="address_id and [('address_id', '=', address_id),('tache_id','=','tache_id')]")
+    service_id = fields.Many2one('of.service', string="À programmer", domain="address_id and [('address_id', '=', address_id),('tache_id','=','tache_id')]")
 
     @api.onchange('address_id', 'tache_id')
     def _onchange_address_id(self):
