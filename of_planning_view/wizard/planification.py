@@ -207,7 +207,7 @@ class OfPlanifCreneau(models.TransientModel):
     ignorer_duree = fields.Boolean(string=u"Ignorer durée", help=u"Cochez pour proposer aussi les interventions plus longues que le créneau")
     pre_tache_categ_ids = fields.Many2many('of.planning.tache.categ', string=u"Catégories de tâches", help=u"Remplir pour restreindre la recherche à certaines catégories de tâches")
     pre_tache_ids = fields.Many2many('of.planning.tache', string="Tâches", help=u"Remplir pour restreindre la recherche à certaines tâches")
-    pre_a_programmer_id = fields.Many2one('of.service', string="Choisir directement l'intervention à programmer", help=u"San passer par la recherche")
+    pre_a_programmer_id = fields.Many2one('of.service', string="Choisir directement l'intervention à programmer", help=u"Sans passer par la recherche")
     pre_a_programmer_address_id = fields.Many2one('res.partner', string="Adresse", compute="_compute_pre_a_programer_fields")
     pre_a_programmer_zip = fields.Char(string="Code Postal", compute="_compute_pre_a_programer_fields")
     pre_a_programmer_city = fields.Char(string="Ville", compute="_compute_pre_a_programer_fields")
@@ -232,7 +232,7 @@ class OfPlanifCreneau(models.TransientModel):
     geo_lng_suiv = fields.Float(related='lieu_suiv_id.geo_lng', readonly=True)
     precision_suiv = fields.Selection(related='lieu_suiv_id.precision', readonly=True)
     secteur_id = fields.Many2one('of.secteur', string="Secteur", help="laisser vide pour ne pas restreindre à un secteur en particulier")
-    priorite_max = fields.Integer(string=u"Priorité max", help=u"Priorité la plus heute parmis les propositions")
+    priorite_max = fields.Integer(string=u"Priorité max", help=u"Priorité la plus haute parmis les propositions")
 
     proposition_ids = fields.One2many('of.planif.intervention', 'creneau_id', string="propositions")#, compute="peupler_candidats")
     selected_id = fields.Many2one('of.planif.intervention', string="Proposition")
@@ -344,12 +344,15 @@ class OfPlanifCreneau(models.TransientModel):
         vals_list = []
         service_domain = [
             ('state', 'in', ['to_plan', 'part_planned', 'late']),
-            '|', ('jour_ids', 'in', self.num_jour), ('jour_ids', '=', False),  # les jours peuvent ne pas être renseignés
+            '|', ('jour_ids', 'in', self.num_jour),
+                 ('jour_ids', '=', False),  # les jours peuvent ne pas être renseignés
             ('tache_id', 'in', taches_possibles.ids),
             ('date_next', '<=', date_un_mois_str),  # ne pas proposer d'interventions à programmer dans plus d'un mois
             '|',
-            '&', ('recurrence', '=', True), '|', ('date_fin', '=', False), ('date_fin', '>', self.date_creneau),  # pour les service récurrents, la date de fin est la date de fin du contrat
-            ('recurrence', '=', False),
+                '&', ('recurrence', '=', True),
+                     '|', ('date_fin', '=', False),
+                          ('date_fin', '>', self.date_creneau),  # pour les service récurrents, la date de fin est la date de fin du contrat
+                ('recurrence', '=', False),
         ]
         if self.secteur_id:
             # dans le cas ou le secteur n'est pas renseigné, on regarde les codes postaux
@@ -406,9 +409,9 @@ class OfPlanifCreneau(models.TransientModel):
                 # on prend en compte la date de fin
                 if service.date_fin < self.date_creneau:  # en retard!
                     priorite += 3
-                elif service.date_fin <= date_1_semaine_str: # à faire cette semaine
+                elif service.date_fin <= date_1_semaine_str:  # à faire cette semaine
                     priorite += 2
-                elif service.date_fin <= date_2_semaines_str: # à faire cette quinzaine
+                elif service.date_fin <= date_2_semaines_str:  # à faire cette quinzaine
                     priorite += 1
             if priorite > priorite_max:
                 priorite_max = priorite
@@ -425,10 +428,6 @@ class OfPlanifCreneau(models.TransientModel):
     @api.multi
     def set_proposition_ids(self):
         self.ensure_one()
-        if not self.lieu_prec_id:
-            raise UserError(u"Veuillez configurer l'adresse de départ de %s" % self.employee_id.name)
-        if not self.lieu_suiv_id:
-            raise UserError(u"Veuillez configurer l'adresse de retour de %s" % self.employee_id.name)
         vals_list = self.get_candidats()
         la_list = [(5, 0, 0)] + [(0, 0, values) for values in vals_list]
         if not vals_list:
@@ -468,7 +467,6 @@ class OfPlanifCreneau(models.TransientModel):
             self = self.with_context(tz='Europe/Paris')
         tz = pytz.timezone(self._context['tz'])
 
-        employee = self.employee_id
         service = self.pre_a_programmer_id or self.selected_id.service_id
         date_da = fields.Date.from_string(self.date_creneau)
         date_propos_dt = datetime.combine(date_da, datetime.min.time()) + timedelta(
@@ -533,8 +531,8 @@ class OfPlanifCreneau(models.TransientModel):
         duree_min = self.env['ir.values'].get_default('of.intervention.settings', 'duree_min_creneaux_dispo')
         self.duree_creneau -= intervention.duree
         if self.duree_creneau < duree_min:
-            #creneau_fini = True
             same_day = False  # pour passer le recalcul des créneaux
+            creneau_fini = True
         else:
             creneau_fini = False
 
@@ -559,9 +557,7 @@ class OfPlanifCreneau(models.TransientModel):
                         break
             else:
                 raise UserError(u"On dirait que cette journée est entièrement planifiée pour %s" % self.employee_id.name)
-        else:
-            creneau_fini = True
-        if creneau_fini:  # le créneau est entièrement planifiée!
+        if creneau_fini:  # le créneau est entièrement planifié!
             self.creneau_fini = creneau_fini
             return {'type': 'ir.actions.do_nothing'}
         # mise à jour des données du créneau
