@@ -465,6 +465,7 @@
                             <group>
                                 <!--field name="employee_nb"/-->
                                 <field name="product_id" string="Produit lié" attrs="{'readonly':[('verr', '=', True)]}"/>
+                                <field name="tache_categ_id" options="{'no_create':True, 'no_open': True}"/>
                                 <field name="category_id"/>
                                 <field name="duree" widget="float_time"/>
                             </group>
