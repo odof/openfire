@@ -573,17 +573,19 @@ class OfPlanningIntervention(models.Model):
                        "FROM equipe_tache_rel etr "
                        "JOIN of_planning_employee_rel oper ON etr.equipe_id = oper.equipe_id")
 
-            # Si le module_of_service est installé, on doit peupler le champ service_id dans les interventions.
+            # Si le module_of_service est installé, on doit peupler le champ service_id dans les interventions
+            # et supprimer la colonne name pour que les valeurs soient recalculées à la mise à jour du module of_service
             # Règle retenue : on relie une intervention à un service quand les tâches du planning sont les mêmes
             # et que l'adresse de l'intervention est soit égale à l'adresse du service soit égale au client du service.
             # Teste si le module of_service est installé par l'existence du champ service_id.
             cr.execute("SELECT 1 FROM information_schema.columns WHERE table_name = 'of_planning_intervention' AND column_name = 'service_id'")
             if bool(cr.fetchall()):
-                self._cr.execute("UPDATE of_planning_intervention "
+                cr.execute("UPDATE of_planning_intervention "
                                  "SET service_id = of_service.id "
                                  "FROM of_service "
                                  "WHERE of_service.tache_id = of_planning_intervention.tache_id "
                                  "AND (of_planning_intervention.address_id = of_service.address_id OR of_planning_intervention.address_id = of_service.partner_id)")
+                cr.execute("ALTER TABLE of_service DROP COLUMN name")
         return res
 
     @api.model
