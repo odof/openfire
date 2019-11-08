@@ -730,6 +730,12 @@ var PlanningView = View.extend({
                 this.sidebar.info_filter.render();
             }
         }
+        var tooltip_options = {
+                        delay: { show: 501, hide: 0 },
+                        title: "Au moins une intervention a ses horaires forcés aujourd'hui.\n" + 
+                               "Par conséquent, les données de ce créneau disponible sont peut-être erronées",
+                    }
+        $(".of_warning_horaires").tooltip(tooltip_options)
     },
     on_reload_events: function () {
         this._do_search(this.domain, this.context, this.group_by);
@@ -845,7 +851,7 @@ var PlanningView = View.extend({
                 result.res_id = event.data.id;
                 var options = {
                     'additional_context': pyeval.eval('context', additional_context),  // pour une raison inconnue le additional_context n'est pas pris en compte avant
-                    'on_close': function () {console.log(" TODOOOOOOO AIE AIE AIE ARGS",arguments);},
+                    'on_close': function () {self.trigger_up('reload_events')},
                 };  // @todo: appel reload_events
                 //return self.view.ViewManager.action_manager.ir_actions_act_window(result,options);
                 return self.ViewManager.action_manager.do_action(result,options);
@@ -1358,6 +1364,7 @@ var PlanningCreneauDispo = Widget.extend({
         this.heure_fin_str = formats.format_value(record.heure_fin,descript_ft);
         this.duree = record.duree;
         this.creneaux_reels = record.creneaux_reels;
+        this.warning_horaires = record.warning_horaires;
         //console.log("LES CRENEAUX REELS", this.creneaux_reels)
         this.secteur_id = record.secteur_id;
         this.secteur_str = record.secteur_str;
@@ -1472,6 +1479,7 @@ var PlanningCreneauDispo = Widget.extend({
             "default_employee_id": self.row.res_id,
             "default_secteur_id": self.secteur_id,
             "default_creneaux_reels": self.creneaux_reels.length > 0 ? self.creneaux_reels : false,
+            "default_warning_horaires": self.warning_horaires,
         };  // à voir quoi mettre
        //console.log("ADDITIONNAL CONTEXT",pyeval.eval('context', additional_context));
 
