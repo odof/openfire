@@ -22,8 +22,9 @@
                             <field name="sans_add" attrs="{'invisible': [('file','!=',False)]}"/>
                             <field name="sans_header" attrs="{'invisible': [('file','!=',False)]}"/>
                             <field name="fillable" attrs="{'invisible': ['|',('file','=',False),('chp_ids','=',[])]}"/>
+                            <field name="model_ids" widget="many2many_tags" options="{'no_create':True}"/>
                         </group>
-                        <separator string="Importer un formulaire Acrobat"/>
+                        <separator string="Importer un formulaire PDF"/>
                         <group colspan="2">
                             <field name="file_name" invisible="1"/>
                             <field name="file" filename="file_name"/>
@@ -88,10 +89,10 @@
         <!-- add menu item 'Modèles de courriers' for mail templates' configurations in Ventes-->
         <menuitem id="menu_of_mail_templates" parent="sales_team.menu_sale_config" action="action_of_mail_template_tree_all"
                   sequence="100"/>
-        
-        <!-- add menu item 'Modèles de courriers' for mail templates' configurations in Comptabilité-->          
+
+        <!-- add menu item 'Modèles de courriers' for mail templates' configurations in Comptabilité-->
         <menuitem id="menu_of_mail_templates_compt" parent="account.menu_finance_configuration" action="action_of_mail_template_tree_all"
-                  sequence="100"/>          
+                  sequence="100"/>
 
     </data>
 </openerp>

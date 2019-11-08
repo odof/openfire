@@ -770,3 +770,11 @@ class OfPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
     sav_id = fields.Many2one('project.issue', string='SAV', readonly=False)
+
+
+class OfMailTemplate(models.Model):
+    _inherit = "of.mail.template"
+
+    @api.model
+    def _get_allowed_models(self):
+        return super(OfMailTemplate, self)._get_allowed_models() + ['project.issue']

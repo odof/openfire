@@ -207,7 +207,7 @@ class OfComposeMail(models.TransientModel):
         cal_event = objects.get('cal_event', False)
 
         lang_code = self._context.get('lang', partner.lang)
-        lang = lang_obj.search([('code', '=', lang_code)])
+        lang = lang_obj.search([('code', '=', lang_code or 'fr_FR')])
 
         values = (
             ('amount_total', o, ''),
