@@ -51,7 +51,12 @@ FieldMany2One.include({
                 .filter([['id', '=', partner_id]]) // id
                 .all()
                 .then(function (partners){
-                    var tooltip_title = (partners[0]["name"] || "cette adresse") + " n'est pas géolocalisé."
+                    var tooltip_title;
+                    if (!!partners[0]["name"]) {
+                        tooltip_title = partners[0]["name"] + " n'est pas géolocalisé."
+                    }else{
+                        tooltip_title = "cette adresse n'est pas géolocalisée."
+                    }
                     self.set({
                         "geo_lat": partners[0]["geo_lat"],
                         "precision": partners[0]["precision"],
@@ -94,7 +99,7 @@ FieldMany2One.include({
                     // n'est pas géolocalisé
                     var options = _.extend({
                         delay: { show: 501, hide: 0 },
-                        title: _t("Cliquez ici pour tenter de géolocaliser ce partneaire avec votre géocodeur par défaut"),
+                        title: _t("Cliquez ici pour tenter de géolocaliser ce partenaire avec votre géocodeur par défaut"),
                     });
                     if (self.get("precision") == "not_tried" && isNullOrUndef(self.$geo_button)) {
                         self.$geo_button = $('<span/>').addClass('fa fa-map-marker fa-lg of_ws_lr of_icon_button ' + self.get("class_id"))
