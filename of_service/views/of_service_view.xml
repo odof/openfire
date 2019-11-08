@@ -104,8 +104,8 @@
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
-                            <button class="oe_stat_button" name="action_view_interventions" type="object" icon="fa-wrench">
-                                <field string="Interventions" name="intervention_count" widget="statinfo"/>
+                            <button class="oe_stat_button" name="action_view_interventions" type="object" icon="fa-calendar">
+                                <field string="RDVs" name="intervention_count" widget="statinfo"/>
                             </button>
                             <button name="toggle_active" type="object"
                                     class="oe_stat_button" icon="fa-archive"
@@ -144,7 +144,7 @@
                             </group>
                             <group name="planif" string="Planification">
                                 <field name="date_next" string="À partir du"/>
-                                <field name="date_fin" string="Au plus tard le"/>
+                                <field name="date_fin" string="Au plus tard"/>
                                 <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
                                 <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'invisible': [('recurrence', '=', False)]}"/>
                                 <label for="recurring_interval" attrs="{'invisible': [('recurrence', '=', False)]}"/>
@@ -157,14 +157,13 @@
                                 <field name="duree_planif" widget="float_time"/>
                                 <field name="duree_restante" widget="float_time"/>
                             </group>
-                            <group col="4" colspan="4">
-                                <label for="note" colspan="4"/>
+                            <group name="notes" string="Notes" col="4" colspan="4">
                                 <field name="note" colspan="4" nolabel="1"/>
                             </group>
 
                         </group>
                         <notebook>
-                            <page string="Interventions">
+                            <!--page string="Interventions">
                                 <field name="intervention_ids" nolabel="1" colspan="2">
                                     <tree string="Liste des interventions" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done';purple:state=='unfinished'">
                                         <field name="name" string="Libellé"/>
@@ -177,7 +176,7 @@
                                         <field name="description"/>
                                     </tree>
                                 </field>
-                            </page>
+                            </page-->
                         </notebook>
 
                     </sheet>
@@ -689,6 +688,9 @@
             <field name="context">{
                 'search_default_this_week': 1,
                 'search_default_next_week': 1,
+                'search_default_filter_to_plan': 1,
+                'search_default_filter_ponc_part_planned': 1,
+                'search_default_filter_late': 1,
                 'default_recurrence': False,
             }</field>
         </record>
