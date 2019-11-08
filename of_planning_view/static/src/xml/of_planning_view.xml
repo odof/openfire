@@ -323,6 +323,7 @@
                 <i class="fa fa-calendar-o"/><span class="of_ws"/>
                 <span>Planifier (<t t-esc="creneau.duree_str"/>)</span>
             </a>
+            <i t-if="creneau.warning_horaires" class="fa fa-warning of_warning_horaires" style="float: right; padding-top: 4px;"/>
         </div>
         <div>
             <t t-if="creneau.display_secteur">
