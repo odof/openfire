@@ -200,21 +200,21 @@ class OfPlanningEquipe(models.Model):
         for equipe in self:
             equipe.tz_offset = datetime.now(pytz.timezone(equipe.tz or 'GMT')).strftime('%z')
 
-    @api.onchange('employee_ids')
+    """@api.onchange('employee_ids')
     def onchange_employees(self):
         # @TODO: horaires simples
         self.ensure_one()
         if len(self.employee_ids) == 0:  # aucun employé
             return
-        self.mode_horaires = self.employee_ids[0].mode_horaires
-        """self.tz = self.employee_ids[0].tz  # la tz et les horaires en mode facile seront ajoutées par of_sale_rdvcom quand validé
+        self.mode_horaires = self.employee_ids[0].ofmode_horaires
+        "" "self.tz = self.employee_ids[0].tz  # la tz et les horaires en mode facile seront ajoutées par of_sale_rdvcom quand validé
         if self.employee_ids[0].mode_horaires == 'easy':  # si le mode horaire est à 'facile' on prend les horaires du premier employé
             self.hor_md = self.employee_ids[0].hor_md
             self.hor_mf = self.employee_ids[0].hor_mf
             self.hor_ad = self.employee_ids[0].hor_ad
             self.hor_af = self.employee_ids[0].hor_af
             self.jour_ids = [(4,le_id,False) for le_id in self.employee_ids[0].jour_ids._ids]
-        else:"""
+        else:"" "
         if self.employee_ids[0].mode_horaires == 'advanced':
             if len(self.employee_ids) == 1:  # un employé
                 self.of_creneau_ids = [(4, le_id, False) for le_id in self.employee_ids[0].of_creneau_ids._ids]
@@ -235,7 +235,7 @@ class OfPlanningEquipe(models.Model):
                     if category.id not in category_ids:
                         category_ids.append(category.id)
             if category_ids:
-                self.category_ids = category_ids
+                self.category_ids = category_ids"""
 
     @api.onchange('hor_md', 'hor_mf', 'hor_ad', 'hor_af')
     def onchange_horaires(self):
@@ -274,6 +274,24 @@ class OfPlanningIntervention(models.Model):
     _description = "Planning d'intervention OpenFire"
     _inherit = ["of.readgroup", "of.calendar.mixin", 'mail.thread']
     _order = 'date'
+
+    @api.multi
+    def check_coherence_dates(self):
+        for intervention in self:
+            if intervention.date_deadline_forcee and intervention.forcer_date_deadline and intervention.date and intervention.duree:
+                diff_heures = relativedelta(fields.Datetime.from_string(intervention.date_deadline_forcee),
+                                            fields.Datetime.from_string(intervention.date))
+                if float_compare(diff_heures.hours, intervention.duree, 5) < 0:
+                    return False
+        return True
+
+    _sql_constraints = [
+        ('dates_forcees_constraint', 'CHECK ( date <= date_deadline_forcee )', _(u"La date de début doit être antérieure ou égale à celle de fin")),
+    ]
+
+    _constraints = [
+        (check_coherence_dates, u"Attention /!\ la date de fin doit être au moins égale à la date de début + la durée", []),
+    ]
 
     @api.model
     def _get_employee_ids_domain(self):
@@ -894,6 +912,13 @@ class OfPlanningIntervention(models.Model):
     def _onchange_forcer_date_deadline(self):
         if self.forcer_date_deadline:
             self.date_deadline_forcee = fields.Datetime.to_string(fields.Datetime.from_string(self.date) + relativedelta(hours=self.duree))
+
+    @api.onchange('date_deadline_forcee', 'date', 'duree')
+    def _onchange_date_deadline_forcee(self):
+        #if self.date_deadline_forcee and self.forcer_date_deadline and self.date and self.duree:
+        #    diff_heures = relativedelta(fields.Datetime.from_string(self.date_deadline_forcee), fields.Datetime.from_string(self.date))
+        if not self.check_coherence_dates():
+            raise UserError(u"Attention /!\ la date de fin doit être au moins égale à la date de début + la durée")
 
     """@api.onchange('employee_ids')
     def _onchange_employee_ids(self):
