@@ -146,8 +146,8 @@ class OfPlanningIntervention(models.Model):
     hor_af = fields.Float(string=u'Après-midi fin', required=True, digits=(12, 5))
     hor_sam = fields.Boolean(string='Samedi')
     hor_dim = fields.Boolean(string='Dimanche')
-    tz = fields.Selection(related="equipe_id.tz")
-    tz_offset = fields.Char(related="equipe_id.tz_offset")
+    tz = fields.Selection(related="equipe_id.tz", readonly=True)
+    tz_offset = fields.Char(related="equipe_id.tz_offset", readonly=True)
 
     # 3 champs ajoutés pour la vue map
     geo_lat = fields.Float(related='address_id.geo_lat')
