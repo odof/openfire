@@ -202,6 +202,7 @@ class OfPlanifCreneau(models.TransientModel):
     heure_fin_creneau = fields.Float(string=u'Heure de fin', digits=(5, 5))
     creneaux_reels = fields.Char(string=u"Créneaux réels")
     creneaux_reels_formatted = fields.Char(string=u"Créneaux réels", compute="_compute_creneaux_reels_formatted")
+    warning_horaires = fields.Boolean(string="Attention")
     distance_max = fields.Integer("Distance max. (km)", default=30)
     duree_creneau = fields.Float(string=u"Durée à planifier")#, compute="_compute_duree_creneau")
     ignorer_duree = fields.Boolean(string=u"Ignorer durée", help=u"Cochez pour proposer aussi les interventions plus longues que le créneau")
@@ -247,6 +248,11 @@ class OfPlanifCreneau(models.TransientModel):
     lieu_prec_readonly_id = fields.Many2one(related="lieu_prec_id", readonly=True)
     lieu_suiv_readonly_id = fields.Many2one(related="lieu_suiv_id", readonly=True)
 
+    lieu_prec_message = fields.Selection([
+        ('lieu_prec_absent', u'Il n\'y a pas de lieu précédent ce créneau.\n'
+         u'Cela peut arriver si l\'intervention précédent n\'a '),
+        ('lieu_prec_non_geoloc', u'')
+    ])
 
     @api.depends('date_creneau')
     def _compute_num_jour(self):
@@ -381,6 +387,7 @@ class OfPlanifCreneau(models.TransientModel):
         services = self.env['of.service'].search(service_domain)
         distance_max = self.distance_max * 1.3  # approximation
         priorite_max = 0
+        #lieu_prec = self.lieu_prec_id
 
         for service in services:
             voldwazo_prec = voldwazo(service.geo_lat, service.geo_lng, self.lieu_prec_id.geo_lat, self.lieu_prec_id.geo_lng)
@@ -450,6 +457,8 @@ class OfPlanifCreneau(models.TransientModel):
         prop_prioritaires.compute_distance_reelle()
         self.selected_id = prop_prioritaires.get_closer_one()
         self.selected_id.selected = True
+        if self.selected_id.priorite == self.priorite_max:
+            self.selected_id.priorite += 1
         self.duree_rdv = self.selected_id.service_id.duree
         self.description_rdv = self.selected_id.service_id.note
 

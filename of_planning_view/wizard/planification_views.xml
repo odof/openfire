@@ -25,6 +25,7 @@
                     <field name="lieu_suiv_id" invisible="1"/>
                     <field name="geo_lat_prec" invisible="1"/>
                     <field name="geo_lat_suiv" invisible="1"/>
+                    <field name="warning_horaires" invisible="1"/>
                 </group>
                 <group col="1" colspan="2" attrs="{'invisible': [('creneau_fini', '=', False)]}">
                     <div>Félicitation! Ce créneau est entièrement planifié! \o/</div>
@@ -39,6 +40,11 @@
                         <field name="duree_creneau_readonly" widget="float_time"/>
                         <field name="lieu_prec_readonly_id"/>
                         <field name="lieu_suiv_readonly_id"/>
+                        <i attrs="{'invisible': [('warning_horaires', '=', False)]}" class="oe_grey" colspan="2">
+                            <i class="fa fa-warning"/>
+                            Au moins une intervention de cette journée a ses horaires forcés.<br/>
+                            <t/>Par conséquent, les données de ce créneau sont peut-être erronées.
+                        </i>
                     </group>
                     <group col="2" colspan="2"><!--  widget="localizable" options="{'geo_lat_field': 'geo_lat_prec'}" widget="localizable" options="{'geo_lat_field': 'geo_lat_suiv'}" -->
                         <separator string="Recherche" colspan="2"/>
@@ -66,7 +72,7 @@
                             <field name="duree_rdv" widget="float_time"/>
                             <field name="employee_other_ids" widget="many2many_tags"/>
                         </group>
-                        <group col="2" colspan="2" attrs="{'invisible': [('aucun_res', '=', False)]}">
+                        <group col="2" colspan="2" attrs="{'invisible': ['|', ('aucun_res', '=', False), ('pre_a_programmer_id', '!=', False)]}">
                             <separator string="Aucun résultat" colspan="2"/>
                             <div colspan="2" style="color: red">
                                 <i>
@@ -104,7 +110,7 @@
                             class="btn-primary" attrs="{'invisible': [('proposition_ids', '=', []), ('pre_a_programmer_id', '=', False)]}"/>
                     <button name="button_confirm_next" string="Confirmer &amp; Suivant" type="object" colspan="4"
                             class="btn-primary" attrs="{'invisible': [('proposition_ids', '=', [])]}"/>
-                    <button name="button_close" string="Fermer" type="object" colspan="4" class="btn-primary"/>
+                    <button name="button_close" string="Fermer" type="object" colspan="4" class="btn-default"/>
                 </footer>
             </form>
         </field>
