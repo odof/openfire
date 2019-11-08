@@ -81,13 +81,12 @@ class OfService(models.Model):
         services._compute_state_poncrec()
 
     @api.multi
-    @api.depends('date_next', 'duree', 'base_state', 'recurrence')
+    @api.depends('date_next', 'duree', 'base_state', 'recurrence', 'intervention_ids')
     def _compute_state_poncrec(self):
         un_mois = timedelta(days=30)
         today_da = fields.Date.from_string(fields.Date.context_today(self))
         dans_un_mois_da = today_da + un_mois
         il_y_a_un_mois_da = today_da - un_mois
-        self._compute_durees()
         for service in self:
             if service.base_state and service.base_state == 'calculated':
                 date_next_da = fields.Date.from_string(service.date_next)

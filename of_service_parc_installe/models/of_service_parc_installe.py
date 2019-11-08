@@ -71,7 +71,7 @@ class OfParcInstalle(models.Model):
         'default_address_id': self.site_adresse_id.id,
         'default_recurrence': True,
         'default_parc_installe_id': self.id,
-        'default_origin': u"[parc installé] " + self.name,
+        'default_origin': u"[parc installé] " + (self.name or ''),
         'bloquer_recurrence': True,
         }
         return action
@@ -85,7 +85,7 @@ class OfParcInstalle(models.Model):
         'default_address_id': self.site_adresse_id.id,
         'default_recurrence': False,
         'default_parc_installe_id': self.id,
-        'default_origin': u"[parc installé] " + self.name,
+        'default_origin': u"[parc installé] " + (self.name or ''),
         'bloquer_recurrence': True,
         }
         return action
@@ -113,9 +113,8 @@ class OfParcInstalle(models.Model):
         'default_date_next': today_str,
         'default_date_fin': deux_semaines_str,
         'default_parc_installe_id': self.id,
-        'default_origin': u"[Parc installé] " + self.name,
+        'default_origin': u"[Parc installé] " + (self.name or ''),
         'bloquer_recurrence': True,
-        'hide_bouton_planif': True,
         }
         return action
 
@@ -151,7 +150,6 @@ class ProjectIssue(models.Model):
         'default_parc_installe_id': self.of_produit_installe_id.id,
         'default_origin': u"[SAV] " + self.name,
         'bloquer_recurrence': True,
-        'hide_bouton_planif': True,
         }
         return action
 
@@ -181,6 +179,5 @@ class ProjectIssue(models.Model):
         'default_parc_installe_id': self.of_produit_installe_id.id,
         'default_origin': u"[SAV] " + self.name,
         'bloquer_recurrence': True,
-        'hide_bouton_planif': True,
         }
         return action
