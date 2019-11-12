@@ -189,12 +189,24 @@
                             <group col="2" name="planif" string="Planification">
                                 <field name="template_id" attrs="{'readonly': [('number', '!=', False), ('state', 'not in', ('draft', 'cancel'))]}"/>
                                 <field name="tache_id"/>
-                                <field name="date"/>
-                                <field name="jour"/>
+                                <field name="forcer_dates"/>
+                                <label for="date"/>
+                                <div>
+                                    <field name="jour" class="oe_inline of_ws"/>
+                                    <field name="date" class="oe_inline"/>
+                                </div>
                                 <field name="duree" string="Durée" widget="float_time"/>
-                                <field name="date_deadline" attrs="{'invisible': [('forcer_date_deadline', '=', True)]}"/>
-                                <field name="forcer_date_deadline"/>
-                                <field name="date_deadline_forcee" attrs="{'invisible': [('forcer_date_deadline', '=', False)]}"/>
+                                <label for="date_deadline" attrs="{'invisible': [('forcer_dates', '=', True)]}"/>
+                                <div attrs="{'invisible': [('forcer_dates', '=', True)]}">
+                                    <field name="jour_fin" class="oe_inline of_ws"/>
+                                    <field name="date_deadline" class="oe_inline"/>
+                                </div>
+                                <label for="date_deadline_forcee" attrs="{'invisible': [('forcer_dates', '=', False)]}"/>
+                                <div attrs="{'invisible': [('forcer_dates', '=', False)]}">
+                                    <field name="jour_fin_force" class="oe_inline of_ws"/>
+                                    <field name="date_deadline_forcee" class="oe_inline"
+                                           attrs="{'required': [('forcer_dates', '=', True)]}"/>
+                                </div>
                                 <field name="verif_dispo"/>
                             </group>
                             <group name="liens" invisible="1">
