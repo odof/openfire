@@ -38,7 +38,7 @@
                     <attribute name="confirm">Êtes-vous sûr de vouloir verrouiller la vente ? Une fois verrouillée, vous ne pourrez plus rien modifier. Cette action est irréversible.</attribute>
                 </button>
                 <xpath expr="//header" position="inside">
-                    <button name="button_gestion_prix" type="object" string="Gestion prix" attrs="{'invisible': [('invoice_status', '=', 'invoiced')]}"/>
+                    <button name="button_gestion_prix" type="object" string="Gestion prix"/>
                 </xpath>
                 <xpath expr="//div[@name='button_box']" position="inside">
                     <!-- Ajout d'un bouton pour switcher entre vue client et vue vendeur' -->

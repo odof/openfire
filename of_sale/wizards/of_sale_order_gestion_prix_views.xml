@@ -8,20 +8,20 @@
 
             <form string="Gestion des prix">
                 <header>
-                    <button name="bouton_simuler" class="oe_highlight" string="Simuler" type="object"/>
-                    <button name="bouton_valider" class="oe_highlight" string="Appliquer au devis/bon de commande (non réversible)" type="object" confirm="Confirmez-vous l'application des nouveaux prix calculés au devis/bon de commande (non réversible) ?"/>
+                    <button name="bouton_simuler" class="oe_highlight" string="Simuler" type="object" invisible="context.get('invoice_status') == 'invoiced'"/>
+                    <button name="bouton_valider" class="oe_highlight" string="Appliquer au devis/bon de commande (non réversible)" type="object" confirm="Confirmez-vous l'application des nouveaux prix calculés au devis/bon de commande (non réversible) ?" invisible="context.get('invoice_status') == 'invoiced'"/>
                     <button name="bouton_annuler" string="Retour à la commande" type="object"/>
                 </header>
-                    <div class="oe_button_box" name="button_box">
-                        <button name="toggle_view" type="object" class="oe_stat_button" icon="fa-pencil-square-o" groups="of_sale.of_group_sale_marge_manager">
-                            <field name="of_client_view" widget="boolean_button"
-                                   options="{'terminology': {'string_true': 'Vue client',
-                                                             'hover_true': 'Vue client',
-                                                             'string_false': 'Vue vendeur',
-                                                             'hover_false': 'Vue vendeur' }}"/>
-                        </button>
-                    </div>
-                    <group>
+                <div class="oe_button_box" name="button_box">
+                    <button name="toggle_view" type="object" class="oe_stat_button" icon="fa-pencil-square-o" groups="of_sale.of_group_sale_marge_manager">
+                        <field name="of_client_view" widget="boolean_button"
+                               options="{'terminology': {'string_true': 'Vue client',
+                                                         'hover_true': 'Vue client',
+                                                         'string_false': 'Vue vendeur',
+                                                         'hover_false': 'Vue vendeur' }}"/>
+                    </button>
+                </div>
+                <group invisible="context.get('invoice_status') == 'invoiced'">
                     <field name="methode_remise" required="1"/>
                     <field name="valeur"
                            attrs="{'invisible':[('methode_remise','not in',('prix_ttc_cible','montant_ttc','pc','pc_marge'))],
@@ -40,8 +40,8 @@
                 <field name="line_ids">
                     <tree string="Lignes de commande" colors="green:is_selected==True;grey:is_selected==False;">
                         <field name="is_selected" invisible="1"/>
-                        <button name="button_inverse" string="Inverser" type="object" icon="fa-refresh"/>
-                        <field name="text_selected"/>
+                        <button name="button_inverse" string="Inverser" type="object" icon="fa-refresh" invisible="context.get('invoice_status') == 'invoiced'"/>
+                        <field name="text_selected" invisible="context.get('invoice_status') == 'invoiced'"/>
                         <field name="order_line_id"/>
                         <field name="cout" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
                         <field name="prix_total_ht"/>
@@ -54,8 +54,8 @@
                     </tree>
                 </field>
 
-                <button name="bouton_inclure_tout" type="object" class="oe_left btn-default" string="Tout inclure"/>
-                <button name="bouton_exclure_tout" type="object" class="oe_left btn-default" string="Tout exclure"/>
+                <button name="bouton_inclure_tout" type="object" class="oe_left btn-default" string="Tout inclure" invisible="context.get('invoice_status') == 'invoiced'"/>
+                <button name="bouton_exclure_tout" type="object" class="oe_left btn-default" string="Tout exclure" invisible="context.get('invoice_status') == 'invoiced'"/>
 
                 <group col="4" string="Total devis/commande">
                     <field name="montant_total_ttc_initial"/>

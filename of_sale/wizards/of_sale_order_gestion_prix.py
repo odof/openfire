@@ -395,9 +395,6 @@ class SaleOrder(models.Model):
     def button_gestion_prix(self):
         self.ensure_one()
 
-        if self.invoice_status == 'invoiced':
-            raise UserError(u"(Erreur #RG105)\nVous ne pouvez faire une remise globale que sur un devis ou une commande non facturée.")
-
         remise_obj = self.env['of.sale.order.gestion.prix']
 
         line_vals = []
@@ -422,5 +419,6 @@ class SaleOrder(models.Model):
             'res_model': 'of.sale.order.gestion.prix',
             'res_id': remise.id,
             'target': 'current',
-            'flags': {'initial_mode': 'edit', 'form': {'action_buttons': True, 'options': {'mode': 'edit'}}}
+            'flags': {'initial_mode': 'edit', 'form': {'action_buttons': True, 'options': {'mode': 'edit'}}},
+            'context': {'invoice_status': self.invoice_status}
         }
