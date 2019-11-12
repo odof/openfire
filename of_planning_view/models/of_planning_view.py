@@ -471,7 +471,7 @@ class OfPlanningIntervention(models.Model):
                     fillerbar['pct_disponible'] = fillerbar['nb_heures_disponibles'] * 100 / fillerbar['nb_heures_travaillees']
 
                 fillerbarzz.append(fillerbar)
-                intervention_forcee = len(interventions.filtered(lambda i: i.forcer_date_deadline)) > 0
+                intervention_forcee = len(interventions.filtered(lambda i: i.forcer_dates)) > 0
                 if date_current_str >= date_today_str:
                     creneaux_dispo = intervention_obj.get_creneaux_dispo(employee_id, date_current_str,
                                                                          intervention_liste,

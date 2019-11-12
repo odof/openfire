@@ -2,6 +2,7 @@
 
 from odoo import api, models, fields
 from datetime import datetime, timedelta, date
+from dateutil.relativedelta import relativedelta
 import pytz
 import json
 from odoo.exceptions import UserError
@@ -41,8 +42,8 @@ class OfPlanifCreneauProp(models.TransientModel):
 
     duree_restante = fields.Float(related='service_id.duree_restante')
     recurrence = fields.Boolean(related="service_id.recurrence", readonly=True)
-    date_next = fields.Date(string=u"À planifier à partir du", related="service_id.date_next", readonly=True)
-    date_fin = fields.Date(string="Au plus tard le", related="service_id.date_fin", readonly=True)
+    date_next = fields.Date(string=u"À planifier entre le", related="service_id.date_next", readonly=True)
+    date_fin = fields.Date(string="et le", compute="_compute_date_fin", readonly=True)
     partner_name = fields.Char(string="Client", related='service_id.partner_id.name', readonly=True)
     partner_of_telephones = fields.Text(related='service_id.partner_id.of_telephones', readonly=True)
     #partner_phone = fields.Char(related='service_id.partner_id.phone', readonly=True)
@@ -61,32 +62,61 @@ class OfPlanifCreneauProp(models.TransientModel):
 
     distance_dwazo_prec = fields.Float(string=u'Distance du précédent', digits=(5, 5), compute="_compute_distance_dwazo", help=u"À vol d'oiseau")
     distance_dwazo_suiv = fields.Float(string=u'Distance du suivant', digits=(5, 5), compute="_compute_distance_dwazo", help=u"À vol d'oiseau")
-    distance_reelle_prec = fields.Float(string=u'Distance du précédent', digits=(5, 2), help=u"Réelle")
-    distance_reelle_suiv = fields.Float(string=u'Distance du suivant', digits=(5, 2), help=u"Réelle")
-    distance_reelle_tota = fields.Float(string=u'Distance totale (km)', digits=(5, 2), help=u"Réelle")
-    osrm_response = fields.Text(string=u"Réponse OSRM")
-    distance_order = fields.Float(string=u'Distance totale', digits=(5, 5), help=u"pour ordonner", default=99999.99999)
-    dummy_field = fields.Boolean(string=u"A VER?")
+    distance_reelle_prec = fields.Float(string=u'Distance du précédent', digits=(5, 2), help=u"Réelle", compute="compute_distance_reelle")
+    distance_reelle_suiv = fields.Float(string=u'Distance du suivant', digits=(5, 2), help=u"Réelle", compute="compute_distance_reelle")
+    distance_reelle_tota = fields.Float(string=u'Distance totale (km)', digits=(5, 2), help=u"Réelle", compute="compute_distance_reelle")
+    osrm_response = fields.Text(string=u"Réponse OSRM", compute="compute_distance_reelle")
+    distance_order = fields.Float(string=u'Distance totale order', digits=(5, 5), help=u"pour ordonner", store=True, default=99999.99999, compute="compute_distance_reelle")
+    dummy_field = fields.Boolean(string=u"A VER?", compute="_compute_dummy_field")
     priorite = fields.Integer(string=u"Priorité")
     selected = fields.Boolean(string=u"Sélectionné")
 
     @api.multi
-    #@api.depends('geo_lat', 'geo_lng', 'creneau_id.geo_lat_prec', 'creneau_id.geo_lng_prec',
-    #             'creneau_id.geo_lat_suiv', 'creneau_id.geo_lng_suiv')
-    def compute_distance_reelle(self):
-        #print "\nA VER?"
-        #print len(self)
-        #print "\n"
-        for a_planifier in self[:100]:
+    @api.depends('geo_lat', 'geo_lng', 'creneau_id.geo_lat_prec', 'creneau_id.geo_lng_prec',
+                 'creneau_id.geo_lat_suiv', 'creneau_id.geo_lng_suiv', 'creneau_id')
+    def _compute_dummy_field(self):
+        a_planifierzz = self.env['of.planif.intervention']
+        """for a_planifier in self:
             a_planifier.dummy_field = True
+            if not a_planifier.distance_reelle_tota and not a_planifier.distance_reelle_tota == -1:
+                a_planifierzz |= a_planifier
+        a_planifierzz.compute_distance_reelle()"""
+
+    @api.multi
+    @api.depends('geo_lat', 'geo_lng', 'creneau_id.geo_lat_prec', 'creneau_id.geo_lng_prec',
+                 'creneau_id.geo_lat_suiv', 'creneau_id.geo_lng_suiv', 'creneau_id')
+    def compute_distance_reelle(self):
+        if not self:
+            return
+        creneau = self[0].creneau_id
+        lieu_prec = creneau.geo_lat_prec and creneau.lieu_prec_id or creneau.lieu_prec_manual_id
+        lieu_suiv = creneau.geo_lat_suiv and creneau.lieu_suiv_id or creneau.lieu_suiv_manual_idl
+        if not lieu_prec and not lieu_suiv:
+            self.distance_reelle_prec = -1
+            self.distance_reelle_suiv = -1
+            self.distance_reelle_tota = -1
+            self.distance_order = 99999.99999
+            self.osrm_response = ""
+            return
+        if not lieu_prec:
+            lieu_prec = lieu_suiv
+        elif not lieu_suiv:
+            lieu_suiv = lieu_prec
+        geo_lat_prec = lieu_prec.geo_lat
+        geo_lng_prec = lieu_prec.geo_lng
+        geo_lat_suiv = lieu_suiv.geo_lat
+        geo_lng_suiv = lieu_suiv.geo_lng
+
+        for a_planifier in self[:100]:
+            #a_planifier.dummy_field = True
             query = ROUTING_BASE_URL + "route/" + ROUTING_VERSION + "/" + ROUTING_PROFILE + "/"
             # Listes de coordonnées : ATTENTION OSRM prend ses coordonnées sous form (lng, lat)
             # lieu précédent
-            coords_str = str(a_planifier.creneau_id.geo_lng_prec) + "," + str(a_planifier.creneau_id.geo_lat_prec)
+            coords_str = str(geo_lng_prec) + "," + str(geo_lat_prec)
             # lieu de l'intervention à programmer
             coords_str += ";" + str(a_planifier.geo_lng) + "," + str(a_planifier.geo_lat)
             # lieu suivant
-            coords_str += ";" + str(a_planifier.creneau_id.geo_lng_suiv) + "," + str(a_planifier.creneau_id.geo_lat_suiv)
+            coords_str += ";" + str(geo_lng_suiv) + "," + str(geo_lat_suiv)
             query_send = urllib.quote(query.strip().encode('utf8')).replace('%3A', ':')
             full_query = query_send + coords_str + "?"
             try:
@@ -114,6 +144,22 @@ class OfPlanifCreneauProp(models.TransientModel):
                 #asupprimer quand osrm refonctionne
                 a_planifier.distance_order = a_planifier.distance_dwazo_prec + a_planifier.distance_dwazo_suiv
                 a_planifier.distance_reelle_tota = a_planifier.distance_order"""
+
+    @api.multi
+    @api.depends('service_id', 'service_id.recurrence', 'service_id.date_next', 'service_id.date_fin')
+    def _compute_date_fin(self):
+        un_mois = relativedelta(months=1)
+        for a_planifier in self:
+            service = a_planifier.service_id
+            if service.recurrence:
+                date_next_da = fields.Date.from_string(service.date_next)
+                date_fin_da = date_next_da + un_mois
+                service_date_fin_da = service.date_fin and fields.Date.from_string(service.date_fin) or False
+                if service_date_fin_da and (date_next_da <= service_date_fin_da < date_fin_da):
+                    date_fin_da = service_date_fin_da
+                a_planifier.date_fin = fields.Date.to_string(date_fin_da)
+            else:
+                a_planifier.date_fin = service.date_fin
 
 
     @api.multi
@@ -172,7 +218,7 @@ class OfPlanifCreneauProp(models.TransientModel):
         for prop in self:
             if not min_prop:  # initialisation min_prop
                 min_prop = prop
-            elif prop.distance_reelle_tota < min_prop.distance_reelle_tota:  # nouveau min!
+            elif prop.distance_reelle_tota < min_prop.distance_reelle_tota and prop.distance_order < 99000:  # nouveau min!
                 min_prop = prop
         return min_prop
 
@@ -248,11 +294,58 @@ class OfPlanifCreneau(models.TransientModel):
     lieu_prec_readonly_id = fields.Many2one(related="lieu_prec_id", readonly=True)
     lieu_suiv_readonly_id = fields.Many2one(related="lieu_suiv_id", readonly=True)
 
+    lieu_prec_manual_id = fields.Many2one("res.partner", string=u"lieu précédent (manuel)")
     lieu_prec_message = fields.Selection([
-        ('lieu_prec_absent', u'Il n\'y a pas de lieu précédent ce créneau.\n'
-         u'Cela peut arriver si l\'intervention précédent n\'a '),
-        ('lieu_prec_non_geoloc', u'')
-    ])
+        ('lieu_prec_absent', u"Ce créneau n'a pas de lieu précédent.\n"
+         u"Cela peut arriver si l'intervention précédente n'a pas d'adresse, ou si l'intervenant n'a pas d'adresse de départ.\n"
+         u"Veuillez choisir un lieu de précédent pour ce créneau afin de faciliter les calculs de distances.\n"
+         u"Si vous ne le faites pas, pas de panique! On considérera que le lieu de précédent est le lieu suivant"),
+        ('lieu_prec_non_geoloc', u"Le lieu précédent de ce créneau n'est pas géolocalisé\n"
+         u"Si vous avez déjà tenté de le géocoder, veuillez choisir un lieu précédent géolocalisé afin de faciliter les calculs de distances\n"
+         u"Si vous ne le faites pas, pas de panique! On considérera que le lieu de précédent est le lieu suivant"),
+    ], compute="_compute_messages")
+
+    lieu_suiv_manual_id = fields.Many2one("res.partner", string=u"lieu suivant (manuel)")
+    lieu_suiv_message = fields.Selection([
+        ('lieu_suiv_absent', u"Ce créneau n'a pas de lieu suivant.\n"
+         u"Cela peut arriver si l'intervention suivante n'a pas d'adresse, ou si l'intervenant n'a pas d'adresse de retour.\n"
+         u"Veuillez choisir un lieu de suivant pour ce créneau Pour faciliter les calculs de distances.\n"
+         u"Si vous ne le faites pas, pas de panique! On considérera que le lieu de suivant est le lieu précédent"),
+        ('lieu_suiv_non_geoloc', u"Le lieu suivant de ce créneau n'est pas géolocalisé\n"
+         u"Si vous avez déjà tenté de le géocoder, veuillez choisir un lieu suivant géolocalisé afin de faciliter les calculs de distances\n"
+         u"Si vous ne le faites pas, pas de panique! On considérera que le lieu suivant est le lieu précédent"),
+        ('lieu_prec_suiv_prob', u"Ce créneau n'a ni lieu précédent ni lieu suivant, ou il y a des problèmes de géolocalisation.\n"
+         u"Veuillez choisir un lieu précédent et/ou suivant géolocalisés pour ce créneau afin de faciliter les calculs de distances.\n"
+         u"Si vous ne le faites pas, les résultat proposés ne tiendront pas compte des distances"),
+    ], compute="_compute_messages")
+
+    @api.multi
+    @api.depends('lieu_prec_id', 'lieu_prec_manual_id', 'lieu_suiv_id', 'lieu_suiv_manual_id')
+    def _compute_messages(self):
+        for creneau in self:
+            message_lieu_prec = (not creneau.lieu_prec_id or not creneau.lieu_prec_id.geo_lat) \
+                and (not creneau.lieu_prec_manual_id or not creneau.lieu_prec_manual_id.geo_lat)
+            message_lieu_suiv = (not creneau.lieu_suiv_id or not creneau.lieu_suiv_id.geo_lat) \
+                                and (not creneau.lieu_suiv_manual_id or not creneau.lieu_suiv_manual_id.geo_lat)
+            if message_lieu_prec and message_lieu_suiv:  # probleme avec les lieux précédent et suivant
+                creneau.lieu_prec_message = False
+                creneau.lieu_suiv_message = 'lieu_prec_suiv_prob'
+            elif message_lieu_prec:
+                creneau.lieu_suiv_message = False
+                if not creneau.lieu_prec_id and not creneau.lieu_prec_manual_id:
+                    creneau.lieu_prec_message = 'lieu_prec_absent'
+                else:
+                    creneau.lieu_prec_message = 'lieu_prec_non_geoloc'
+            elif message_lieu_suiv:
+                creneau.lieu_prec_message = False
+                if not creneau.lieu_suiv_id and not creneau.lieu_suiv_manual_id:
+                    creneau.lieu_suiv_message = 'lieu_suiv_absent'
+                else:
+                    creneau.lieu_suiv_message = 'lieu_suiv_non_geoloc'
+            else:
+                creneau.lieu_prec_message = False
+                creneau.lieu_suiv_message = False
+
 
     @api.depends('date_creneau')
     def _compute_num_jour(self):
@@ -387,22 +480,31 @@ class OfPlanifCreneau(models.TransientModel):
         services = self.env['of.service'].search(service_domain)
         distance_max = self.distance_max * 1.3  # approximation
         priorite_max = 0
-        #lieu_prec = self.lieu_prec_id
+        lieu_prec = self.geo_lat_prec and self.lieu_prec_id or self.lieu_prec_manual_id
+        lieu_suiv = self.geo_lat_suiv and self.lieu_suiv_id or self.lieu_suiv_manual_idl
+        calcul_distance_dwazo = True
+        if not lieu_prec and not lieu_suiv:
+            calcul_distance_dwazo = False
+        elif not lieu_prec:
+            lieu_prec = lieu_suiv
+        elif not lieu_suiv:
+            lieu_suiv = lieu_prec
 
         for service in services:
-            voldwazo_prec = voldwazo(service.geo_lat, service.geo_lng, self.lieu_prec_id.geo_lat, self.lieu_prec_id.geo_lng)
-            voldwazo_suiv = voldwazo(service.geo_lat, service.geo_lng, self.lieu_suiv_id.geo_lat, self.lieu_suiv_id.geo_lng)
-            priorite = 0
-            if voldwazo_prec > distance_max:  # trop loins
-                continue
-            if voldwazo_suiv > distance_max:
-                continue
-            if voldwazo_prec + voldwazo_suiv <= 5:
-                priorite += 3
-            elif voldwazo_prec + voldwazo_suiv <= 10:
-                priorite += 2
-            elif voldwazo_prec + voldwazo_suiv <= 15:
-                priorite += 1
+            if calcul_distance_dwazo:
+                voldwazo_prec = voldwazo(service.geo_lat, service.geo_lng, lieu_prec.geo_lat, lieu_prec.geo_lng)
+                voldwazo_suiv = voldwazo(service.geo_lat, service.geo_lng, lieu_suiv.geo_lat, lieu_suiv.geo_lng)
+                priorite = 0
+                if voldwazo_prec > distance_max:  # trop loins
+                    continue
+                if voldwazo_suiv > distance_max:
+                    continue
+                if voldwazo_prec + voldwazo_suiv <= 5:
+                    priorite += 3
+                elif voldwazo_prec + voldwazo_suiv <= 10:
+                    priorite += 2
+                elif voldwazo_prec + voldwazo_suiv <= 15:
+                    priorite += 1
             if service.recurrence and (not service.date_fin or service.date_fin > date_un_mois_str):  # service recurrent sans date de fin ou qui termine dans + d'un mois
                 # on prend en compte la date de prochaine intervention
                 if service.date_next <= date_moins_un_mois_str:  # date de prochaine intervention il y a plus d'un mois: en retard!

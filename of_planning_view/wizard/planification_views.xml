@@ -36,15 +36,21 @@
                         <field name="employee_id" widget="many2one" options="{'force_link': True}"/>
                         <field name="date_creneau"/>
                         <field name="creneaux_reels_formatted"/>
-
-                        <field name="duree_creneau_readonly" widget="float_time"/>
-                        <field name="lieu_prec_readonly_id"/>
-                        <field name="lieu_suiv_readonly_id"/>
                         <i attrs="{'invisible': [('warning_horaires', '=', False)]}" class="oe_grey" colspan="2">
                             <i class="fa fa-warning"/>
                             Au moins une intervention de cette journée a ses horaires forcés.<br/>
-                            <t/>Par conséquent, les données de ce créneau sont peut-être erronées.
+                            <t/>Par conséquent, le temps disponible de cet intervenant pour ce créneau est peut-être erroné.
                         </i>
+                        <field name="duree_creneau_readonly" widget="float_time"/>
+                        <field name="lieu_prec_readonly_id"/>
+                        <field name="lieu_suiv_readonly_id"/>
+                        <i colspan="2"><field name="lieu_prec_message" attrs="{'invisible': [('lieu_prec_message', '=', False)]}"
+                               class="oe_grey" nolabel="1"/></i>
+                        <field name="lieu_prec_manual_id" attrs="{'invisible': [('lieu_prec_id', '!=', False), ('geo_lat_prec', '!=', False)]}"/>
+                        <i colspan="2"><field name="lieu_suiv_message" attrs="{'invisible': [('lieu_suiv_message', '=', False)]}"
+                               class="oe_grey" nolabel="1"/></i>
+                        <field name="lieu_suiv_manual_id" attrs="{'invisible': [('lieu_suiv_id', '!=', False), ('geo_lat_suiv', '!=', False)]}"/>
+
                     </group>
                     <group col="2" colspan="2"><!--  widget="localizable" options="{'geo_lat_field': 'geo_lat_prec'}" widget="localizable" options="{'geo_lat_field': 'geo_lat_suiv'}" -->
                         <separator string="Recherche" colspan="2"/>
@@ -85,8 +91,8 @@
                            attrs="{'invisible': ['|',('proposition_ids', '=', []),('pre_a_programmer_id', '!=', False)]}">
                         <tree limit="5" colors="blue: selected==True;" create="0">
                             <field name="service_id" invisible="1"/>
-                            <field name="dummy_field" invisible="1"/>
-                            <field name="priorite" invisible="1"/>
+                            <field name="dummy_field"/>
+                            <field name="priorite"/>
                             <field name="selected" invisible="1"/>
                             <field name="id" invisible="1"/>
                             <field name="tache_name"/>
@@ -94,12 +100,15 @@
                             <field name="address_city"/>
                             <field name="address_zip"/>
                             <field name="partner_of_telephones"/>
+                            <field name="date_next"/>
+                            <field name="date_fin"/>
                             <field name="distance_dwazo_prec" invisible="1"/>
                             <field name="distance_dwazo_suiv" invisible="1"/>
                             <field name="distance_reelle_prec" invisible="1"/>
                             <field name="distance_reelle_suiv" invisible="1"/>
                             <field name="distance_reelle_tota"/>
-                            <field name="distance_order" invisible="1"/>
+                            <field name="distance_order"/>
+                            <field name="osrm_response"/>
                         </tree>
                     </field>
                 </group>
