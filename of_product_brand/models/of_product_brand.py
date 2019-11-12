@@ -232,6 +232,11 @@ class Partner(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
+    of_product_brand_id = fields.Many2one(
+        'of.product.brand', related='product_id.brand_id', string='Marque',
+        store=True, index=True
+    )
+
     @api.onchange('product_id')
     def product_id_change(self):
         super(SaleOrderLine, self).product_id_change()
@@ -248,6 +253,11 @@ class SaleOrderLine(models.Model):
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
+
+    of_product_brand_id = fields.Many2one(
+        'of.product.brand', related='product_id.brand_id', string='Marque',
+        store=True, index=True
+    )
 
     @api.onchange('product_id')
     def _onchange_product_id(self):

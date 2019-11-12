@@ -593,6 +593,11 @@ class SaleOrderLine(models.Model):
     price_unit = fields.Float(digits=False)
     of_client_view = fields.Boolean(string="Vue client/vendeur", related="order_id.of_client_view")
     of_article_principal = fields.Boolean(string="Article principal", help="Cet article est l'article principal de la commande")
+    of_product_categ_id = fields.Many2one(
+        'product.category', related='product_id.categ_id', string=u"Catégorie d'article",
+        store=True, index=True
+    )
+    date_order = fields.Datetime(related='order_id.date_order', string="Date de commande", store=True, index=True)
 
     @api.multi
     @api.onchange('product_id')

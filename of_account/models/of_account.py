@@ -61,6 +61,20 @@ class AccountInvoice(models.Model):
                 vals['tax_line_ids'] = [(5, )] + lines_to_keep
         return super(AccountInvoice, self).write(vals)
 
+
+class AccountInvoiceLine(models.Model):
+    _inherit = 'account.invoice.line'
+
+    of_product_categ_id = fields.Many2one(
+        'product.category', related='product_id.categ_id', string=u"Catégorie d'article",
+        store=True, index=True
+    )
+    date_invoice = fields.Date(
+        related='invoice_id.date_invoice', string="Date de facturation",
+        store=True, index=True
+    )
+
+
 class AccountAccount(models.Model):
     _inherit = "account.account"
 
