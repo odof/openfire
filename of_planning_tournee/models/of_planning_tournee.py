@@ -289,7 +289,7 @@ class OfPlanningTournee(models.Model):
     @api.multi
     @api.depends('employee_id', 'date', 'is_bloque', 'employee_id.of_tz', 'employee_id.of_tz_offset',
                  'employee_id.of_hor_md', 'employee_id.of_hor_mf', 'employee_id.of_hor_ad', 'employee_id.of_hor_af',
-                 'employee_id.of_mode_horaires', 'employee_id.of_archive_horaires', 'employee_id.of_archive_horaires_temp')
+                 'employee_id.of_mode_horaires', 'employee_id.of_segment_ids')
     def _compute_is_complet(self):
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<record id="of_horaire_save_profil_form_view" model="ir.ui.view">
+    <field name="name">of.horaire.save.profil.form.view</field>
+    <field name="model">of.horaire.save.profil</field>
+    <field name="arch" type="xml">
+        <form>
+            <h3>Choisir un nom pour le profil :</h3>
+            <field name="name"/>
+            <footer>
+                <button string="Sauvegarder le profil" name="action_confirm" type="object"
+                    class="oe_highlight"/>
+                <button string="Cancel" special="cancel"
+                    class="oe_link"/>
+            </footer>
+        </form>
+    </field>
+</record>
+
+</odoo>
