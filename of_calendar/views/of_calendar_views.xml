@@ -23,20 +23,49 @@
                 </group>
             </xpath>
             <xpath expr="//notebook" position="inside">
-                <page name="horaires" string="Horaires" col="4">
-                    <group col="4" colspan="4">
-                        <group col="2" colspan="2">
+                <page name="horaires" string="Horaires">
+                    <field name="of_horaires_recap"/>
+                    <!--
+                    <separator string="Modifier les horaires de travail"/>
+                    <span>Utilisez les champs ci-dessous pour enregistrer de nouveaux horaires de travail.</span>
+                    <span>Vous pouvez aussi corriger une ancienne saisie :
+                        <field name="of_segment_select"/>
+                    </span>
+                    -->
+                    <group>
+                        <group>
                             <field name="of_mode_horaires"/>
                         </group>
-                        <group col="2" colspan="2">
+                        <group>
                             <field name="of_tz" widget="timezone_mismatch" options="{'tz_offset_field': 'of_tz_offset'}"/>
                             <field name="of_tz_offset" invisible="1"/>
                         </group>
                     </group>
-                    <group col="4" colspan="4" name="horaires_advanced" attrs="{'invisible': [('of_mode_horaires', '!=', 'advanced')]}">
-                        <group name="horaires" col="4" colspan="2">
-                            <separator string="Horaires par défaut" colspan="4"/>
-                            <field name="of_creneau_ids" nolabel="1" colspan="4" style="padding: 8px;" attrs="{'required': [('of_mode_horaires', '=', 'advanced')]}">
+                    <group name="horaires_advanced" attrs="{'invisible': [('of_mode_horaires', '!=', 'advanced')]}">
+                        <group name="horaires">
+                            <separator string="Horaires de travail" colspan="2"/>
+                            <field name="of_segment_ids" nolabel="1" colspan="2">
+                                <tree>
+                                    <field name="date_deb"/>
+                                    <field name="date_fin"/>
+                                    <field name="creneau_ids" widget="many2many_tags"/>
+                                    <field name="permanent"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="date_deb"/>
+                                        <field name="date_fin"/>
+                                        <field name="permanent"/>
+                                        <field name="profil_id" readonly="0"
+                                               context="{'default_creneau_ids':creneau_ids}"/>
+                                    </group>
+                                    <field name="creneau_ids"/>
+                                </form>
+                            </field>
+                        </group>
+                        <!--group name="horaires">
+                            <separator string="Horaires par défaut" colspan="2"/>
+                            <field name="of_creneau_ids" nolabel="1" colspan="2" style="padding: 8px;" attrs="{'required': [('of_mode_horaires', '=', 'advanced')]}">
                                 <tree string="Créneaux" editable="0">
                                     <field name="jour_number" invisible="1"/>
                                     <field name="name"/>
@@ -45,12 +74,11 @@
                                     <field name="heure_fin" invisible="1" widget="float_time" readonly="1"/>
                                 </tree>
                             </field>
-                            <!--div colspan="1"/-->
                         </group>
-                        <group name="horaires_temp" col="4" colspan="2">
-                            <group col="4" colspan="4">
-                                <separator string="Horaires temporaires" colspan="4"/>
-                                <span class="oe_grey" colspan="4">
+                        <group name="horaires_temp">
+                            <group>
+                                <separator string="Horaires temporaires" colspan="2"/>
+                                <span class="oe_grey" colspan="2">
                                     <i>Ces horaires remplacent les horaires par défaut pendant la période de validité<br/>
                                     Exemple: Un employé travaille en général de 9h à 12h puis de 14h à 18h le lundi. Exceptionnellement le lundi 1er juillet 2019 il ne travaille pas l'après-mid.
                                     Il nous faut donc sélectionner 01/07/2019 comme date de début et de fin de validité, puis ajouter le créneau lun. 9h - 12h dans les horaires temporaires.<br/>
@@ -61,7 +89,7 @@
                                 <field name="of_creneau_temp_start" string="Début de validité" attrs="{'required': ['|',('of_creneau_temp_stop', '!=', False),('of_creneau_temp_ids', '!=', [])]}"/>
                                 <field name="of_creneau_temp_stop" string="Fin de validité" attrs="{'required': ['|',('of_creneau_temp_start', '!=', False),('of_creneau_temp_ids', '!=', [])]}"/>
                             </group>
-                            <field name="of_creneau_temp_ids" nolabel="1" colspan="4" style="padding: 8px;">
+                            <field name="of_creneau_temp_ids" nolabel="1" style="padding: 8px;">
                                 <tree string="Créneaux" editable="0">
                                     <field name="jour_number" invisible="1"/>
                                     <field name="name"/>
@@ -70,7 +98,7 @@
                                     <field name="heure_fin" invisible="1" widget="float_time" readonly="1"/>
                                 </tree>
                             </field>
-                        </group>
+                        </group-->
                     </group>
                     <group name="horaires_easy" attrs="{'invisible': [('of_mode_horaires', '!=', 'easy')]}" col="4" colspan="4">
                         <group name="horaires" string="Horaires" col="3" colspan="2">
@@ -81,7 +109,7 @@
                             <field name="of_jour_ids" widget="many2many_tags" colspan="3" attrs="{'required': [('of_mode_horaires', '=', 'easy')]}"/>
                         </group>
                     </group>
-                    <group name="archive_horaires" groups="base.group_no_one" col="4" colspan="4">
+                    <!--group name="archive_horaires" groups="base.group_no_one" col="4" colspan="4">
                         <group name="of_archive_horaires" col="2" colspan="2" groups="base.group_no_one">
                             <separator string="Archive horaires" colspan="2"/>
                             <field name="of_archive_horaires" nolabel="1" colspan="2"/>
@@ -90,7 +118,7 @@
                             <separator string="Archive horaires temporaires" colspan="2"/>
                             <field name="of_archive_horaires_temp" nolabel="1" colspan="2"/>
                         </group>
-                    </group>
+                    </group-->
                 </page>
             </xpath>
         </field>

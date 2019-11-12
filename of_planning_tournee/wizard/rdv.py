@@ -601,7 +601,7 @@ class OfTourneeRdv(models.TransientModel):
 
         # Vérifier que la date de début et la date de fin sont dans les créneaux
         employee = self.employee_id
-        if not employee.of_archive_horaires:
+        if not employee.of_segment_ids:
             raise UserError("Il faut configurer l'horaire de travail de tous les intervenants.")
 
         #td_pause_midi = timedelta(hours=equipe.hor_ad - equipe.hor_mf)

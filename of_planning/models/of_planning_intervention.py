@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.addons.of_planning_tournee.wizard.rdv import ROUTING_BASE_URL, ROUTING_VERSION, ROUTING_PROFILE
+from odoo.addons.of_utils.models.of_utils import se_chevauchent
 import urllib
 import requests
 import re
@@ -21,13 +22,6 @@ from odoo.tools.float_utils import float_compare
 def _tz_get(self):
     # put POSIX 'Etc/*' entries at the end to avoid confusing users - see bug 1086728
     return [(tz, tz) for tz in sorted(pytz.all_timezones, key=lambda tz: tz if not tz.startswith('Etc/') else '_')]
-
-def check_hours_overlapping(debut_1, fin_1, debut_2, fin_2):
-    """renvoi True si les horaires se chevauchent, False sinon"""
-    """return debut_1 >= debut_2 and debut_1 < fin_2 or \
-    fin_1 > debut_2 and fin_1 <= fin_2 or \
-    debut_1 <= debut_2 and fin_1 >= fin_2"""
-    return debut_1 < fin_2 and debut_2 < fin_1
 
 class HREmployee(models.Model):
     _inherit = "hr.employee"
@@ -126,7 +120,7 @@ class OfPlanningEquipe(models.Model):
                         f1 = creneaux_du_jour[j].heure_fin
                         d2 = creneaux_du_jour[k].heure_debut
                         f2 = creneaux_du_jour[k].heure_fin
-                        if check_hours_overlapping(d1, f1, d2, f2):
+                        if se_chevauchent(d1, f1, d2, f2):
                             #raise UserError(u"Oups! Des créneaux se chevauchent")
                             return False
                 creneaux_temp_du_jour = equipe.of_creneau_temp_ids.filtered(lambda jour: jour.jour_number == i)
@@ -137,7 +131,7 @@ class OfPlanningEquipe(models.Model):
                         f1 = creneaux_temp_du_jour[j].heure_fin
                         d2 = creneaux_temp_du_jour[k].heure_debut
                         f2 = creneaux_temp_du_jour[k].heure_fin
-                        if check_hours_overlapping(d1, f1, d2, f2):
+                        if se_chevauchent(d1, f1, d2, f2):
                             #raise UserError(u"Oups! Des créneaux se chevauchent")
                             return False
         return True
@@ -217,10 +211,10 @@ class OfPlanningEquipe(models.Model):
         else:"" "
         if self.employee_ids[0].mode_horaires == 'advanced':
             if len(self.employee_ids) == 1:  # un employé
-                self.of_creneau_ids = [(4, le_id, False) for le_id in self.employee_ids[0].of_creneau_ids._ids]
-                self.of_creneau_temp_ids = [(4, le_id, False) for le_id in self.employee_ids[0].of_creneau_temp_ids._ids]
-                self.of_creneau_temp_start = self.employee_ids[0].of_creneau_temp_start
-                self.of_creneau_temp_stop = self.employee_ids[0].of_creneau_temp_stop
+                self.of_creneau_ids = [(4, le_id, False) for le_id in self.employee_ids.of_creneau_ids._ids]
+                self.of_creneau_temp_ids = [(4, le_id, False) for le_id in self.employee_ids.of_creneau_temp_ids._ids]
+                self.of_creneau_temp_start = self.employee_ids.of_creneau_temp_start
+                self.of_creneau_temp_stop = self.employee_ids.of_creneau_temp_stop
             else:  # plusieurs employés /!\ ne gère pas les créneaux temporaires
                 les_employees = self.employee_ids[1:]
                 les_creneaux = self.env['of.horaires.creneau']
