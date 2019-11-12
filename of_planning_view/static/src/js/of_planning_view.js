@@ -733,7 +733,7 @@ var PlanningView = View.extend({
         var tooltip_options = {
                         delay: { show: 501, hide: 0 },
                         title: "Au moins une intervention a ses horaires forcés aujourd'hui.\n" + 
-                               "Par conséquent, les données de ce créneau disponible sont peut-être erronées",
+                               "Par conséquent, le temps disponible de cet intervenant pour ce créneau est peut-être erroné.",
                     }
         $(".of_warning_horaires").tooltip(tooltip_options)
     },
@@ -1157,6 +1157,11 @@ PlanningView.Row = Widget.extend({
                 self.do_hide();
             }
             var $fillerbar, fillerbar, tooltip_options, fil_title;
+            tooltip_options = {
+                delay: { show: 501, hide: 0 },
+                title: "Cet intervenant travaille plus d'heures que son maximum pour cette journée",
+            }
+            self.$(".of_planning_fillerbar_warning").tooltip(tooltip_options);
             for (var i=0; i<7; i++) {
                 if (isNullOrUndef(col_index) || col_index==i) {
                     $fillerbar = self.$("#of_planning_fillerbar_" + self.res_id + "_" + i);
