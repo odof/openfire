@@ -278,7 +278,7 @@ class OfPlanningIntervention(models.Model):
     @api.multi
     def check_coherence_dates(self):
         for intervention in self:
-            if intervention.date_deadline_forcee and intervention.forcer_date_deadline and intervention.date and intervention.duree:
+            if intervention.date_deadline_forcee and intervention.forcer_dates and intervention.date and intervention.duree:
                 diff_heures = relativedelta(fields.Datetime.from_string(intervention.date_deadline_forcee),
                                             fields.Datetime.from_string(intervention.date))
                 if float_compare(diff_heures.hours, intervention.duree, 5) < 0:
@@ -311,7 +311,7 @@ class OfPlanningIntervention(models.Model):
     name = fields.Char(string=u'Libellé', required=True)
     date = fields.Datetime(string='Date intervention', required=True, track_visibility='always')
     date_deadline = fields.Datetime(compute="_compute_date_deadline", string='Date fin', store=True, track_visibility='always')
-    forcer_date_deadline = fields.Boolean("Forcer la date de fin", default=False, help=u"/!\\")
+    forcer_dates = fields.Boolean("Forcer les dates", default=False, help=u"/!\\")
     date_deadline_forcee = fields.Datetime(string='Date fin (forcée)')
     duree = fields.Float(string=u'Durée intervention', required=True, digits=(12, 5), track_visibility='always')
     user_id = fields.Many2one('res.users', string='Utilisateur', default=lambda self: self.env.uid)
@@ -387,6 +387,8 @@ class OfPlanningIntervention(models.Model):
     cleantext_description = fields.Text(compute='_compute_cleantext_description')
     cleantext_intervention = fields.Text(compute='_compute_cleantext_intervention')
     jour = fields.Char("Jour", compute="_compute_jour")
+    jour_fin = fields.Char("Jour fin", compute="_compute_jour")
+    jour_fin_force = fields.Char(u"Jour fin forcé", compute="_compute_jour")
     date_date = fields.Date(string='Jour intervention', compute='_compute_date_date', search='_search_date_date', readonly=True)
 
     template_id = fields.Many2one('of.planning.intervention.template', string=u"Modèle d'intervention")
@@ -679,7 +681,7 @@ class OfPlanningIntervention(models.Model):
             if intervention.employee_ids:
                 intervention.tz = intervention.employee_ids[0].of_tz
 
-    @api.depends('date', 'duree', 'employee_ids', 'forcer_date_deadline')
+    @api.depends('date', 'duree', 'employee_ids', 'forcer_dates')
     def _compute_date_deadline(self):
         compare_precision = 5
         employee_obj = self.env['hr.employee']
@@ -687,7 +689,7 @@ class OfPlanningIntervention(models.Model):
             if not (intervention.employee_ids and intervention.date and intervention.duree):
                 continue
 
-            if intervention.forcer_date_deadline:
+            if intervention.forcer_dates:
                 intervention.date_deadline = intervention.date_deadline_forcee
             else:
 
@@ -796,7 +798,7 @@ class OfPlanningIntervention(models.Model):
             cleantext = re.sub(cleanr, '', interv.order_id.of_notes_intervention or '')
             interv.cleantext_intervention = cleantext
 
-    @api.depends('date')
+    @api.depends('date', 'date_deadline_forcee')
     def _compute_jour(self):
         for inter in self:
             t = ''
@@ -805,6 +807,18 @@ class OfPlanningIntervention(models.Model):
                 dt = fields.Datetime.context_timestamp(self, dt)  # openerp's ORM method
                 t = dt.strftime("%A").capitalize()  # The day_name is Sunday here.
             inter.jour = t
+            t_fin = ''
+            if inter.date_deadline:
+                dt = datetime.strptime(inter.date_deadline, DEFAULT_SERVER_DATETIME_FORMAT)
+                dt = fields.Datetime.context_timestamp(self, dt)  # openerp's ORM method
+                t_fin = dt.strftime("%A").capitalize()  # The day_name is Sunday here.
+            inter.jour_fin = t_fin
+            t_fin_force = ''
+            if inter.date_deadline_forcee:
+                dt = datetime.strptime(inter.date_deadline_forcee, DEFAULT_SERVER_DATETIME_FORMAT)
+                dt = fields.Datetime.context_timestamp(self, dt)  # openerp's ORM method
+                t_fin_force = dt.strftime("%A").capitalize()  # The day_name is Sunday here.
+            inter.jour_fin_force = t_fin_force
 
     @api.depends('date')
     def _compute_date_date(self):
@@ -908,14 +922,14 @@ class OfPlanningIntervention(models.Model):
             if self.employee_ids and not self.employee_ids.peut_faire(self.tache_id):
                 raise UserError("Aucun des intervenants de cette intervention ne peut réaliser cette Tâche")
 
-    @api.onchange('forcer_date_deadline')
-    def _onchange_forcer_date_deadline(self):
-        if self.forcer_date_deadline:
+    @api.onchange('forcer_dates')
+    def _onchange_forcer_dates(self):
+        if self.forcer_dates:
             self.date_deadline_forcee = fields.Datetime.to_string(fields.Datetime.from_string(self.date) + relativedelta(hours=self.duree))
 
     @api.onchange('date_deadline_forcee', 'date', 'duree')
     def _onchange_date_deadline_forcee(self):
-        #if self.date_deadline_forcee and self.forcer_date_deadline and self.date and self.duree:
+        #if self.date_deadline_forcee and self.forcer_dates and self.date and self.duree:
         #    diff_heures = relativedelta(fields.Datetime.from_string(self.date_deadline_forcee), fields.Datetime.from_string(self.date))
         if not self.check_coherence_dates():
             raise UserError(u"Attention /!\ la date de fin doit être au moins égale à la date de début + la durée")
