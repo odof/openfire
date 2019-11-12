@@ -164,6 +164,7 @@
                 <div t-attf-id="of_planning_fillerbar_#{row.res_id}_#{col_index}" class="of_planning_fillerbar">
                     <div t-if="la_fillerbar.pct_occupe > 0" class="of_planning_fillerbar_occupe"
                       t-attf-style="width: #{la_fillerbar.pct_occupe}% !important; background: #{row.color_bg}; ">
+                        <i t-if="la_fillerbar.pct_occupe > 100" class="of_planning_fillerbar_warning fa fa-warning"/>
                     </div>
                     <div t-if="la_fillerbar.pct_disponible > 0" class="of_planning_fillerbar_disponible"
                         t-attf-style="background-color: #{row.fillerbar_color_dispo}">
@@ -189,6 +190,7 @@
             <div t-attf-id="of_planning_fillerbar_#{row.res_id}_#{col_index}" class="of_planning_fillerbar">
                 <div t-if="la_fillerbar.pct_occupe > 0" class="of_planning_fillerbar_occupe"
                   t-attf-style="width: #{la_fillerbar.pct_occupe}% !important; background: #{row.color_bg}; ">
+                    <i t-if="la_fillerbar.pct_occupe > 100" class="of_planning_fillerbar_warning fa fa-warning"/>
                 </div>
                 <div t-if="la_fillerbar.pct_disponible > 0" class="of_planning_fillerbar_disponible"
                     t-attf-style="background-color: #{row.fillerbar_color_dispo}">
