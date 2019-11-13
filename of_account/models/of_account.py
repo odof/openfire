@@ -95,6 +95,14 @@ class AccountInvoiceLine(models.Model):
         store=True, index=True
     )
 
+    def _write(self, vals):
+        for field in vals:
+            if field != 'of_product_categ_id':
+                break
+        else:
+            self = self.sudo()
+        return super(AccountInvoiceLine, self)._write(vals)
+
 
 class AccountAccount(models.Model):
     _inherit = "account.account"

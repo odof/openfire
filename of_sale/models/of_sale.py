@@ -632,6 +632,14 @@ class SaleOrderLine(models.Model):
                     name = ']'.join(splitted).strip()
         return name.split("\n")  # utilisation t-foreach dans template qweb
 
+    def _write(self, vals):
+        for field in vals:
+            if field != 'of_product_categ_id':
+                break
+        else:
+            self = self.sudo()
+        return super(SaleOrderLine, self)._write(vals)
+
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'

@@ -251,6 +251,15 @@ class SaleOrderLine(models.Model):
             else:
                 self.name = brand_code + self.name
 
+    def _write(self, vals):
+        for field in vals:
+            if field != 'of_product_brand_id':
+                break
+        else:
+            self = self.sudo()
+        return super(SaleOrderLine, self)._write(vals)
+
+
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
@@ -272,3 +281,11 @@ class AccountInvoiceLine(models.Model):
                 self.name = self.name[:i] + brand_code + self.name[i:]
             else:
                 self.name = brand_code + self.name
+
+    def _write(self, vals):
+        for field in vals:
+            if field != 'of_product_brand_id':
+                break
+        else:
+            self = self.sudo()
+        return super(AccountInvoiceLine, self)._write(vals)
