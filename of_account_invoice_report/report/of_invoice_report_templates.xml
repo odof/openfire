@@ -4,6 +4,11 @@
 <template id="account.report_invoice_document">
     <t t-call="report.external_layout">
         <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})" />
+        <t t-set="pdf_telephone" t-value="o.pdf_afficher_telephone()"/>
+        <t t-set="pdf_mobile" t-value="o.pdf_afficher_mobile()"/>
+        <t t-set="pdf_fax" t-value="o.pdf_afficher_fax()"/>
+        <t t-set="pdf_email" t-value="o.pdf_afficher_email()"/>
+        <t t-set="client_info_pastille" t-value="(pdf_telephone &gt; 1 and o.partner_id.phone) or (pdf_mobile &gt; 1 and o.partner_id.mobile) or (pdf_fax &gt; 1 and o.partner_id.fax) or (pdf_email &gt; 1 and o.partner_id.email)"/>
         <!--####################
             La vue d'origine est entièrement réécrite ici.
             ####################-->
@@ -20,10 +25,10 @@
                     <t t-if="not the_address.name and the_address.parent_id"><span t-field="the_address.parent_id.name"/></t>
                     <address t-field="o.partner_id"
                         t-options='{"widget": "contact", "fields": ["address"], "no_marker": True}' />
-                    <t t-if="o.partner_id.phone and o.pdf_afficher_telephone()">Tél. <span t-field="o.partner_id.phone"/><br/></t>
-                    <t t-if="o.partner_id.mobile and o.pdf_afficher_mobile()">Tél. <span t-field="o.partner_id.mobile"/><br/></t>
-                    <t t-if="o.partner_id.fax and o.pdf_afficher_fax()">Fax <span t-field="o.partner_id.fax"/><br/></t>
-                    <t t-if="o.partner_id.email and o.pdf_afficher_email()"><span t-field="o.partner_id.email"/><br/></t>
+                    <t t-if="o.partner_id.phone and pdf_telephone % 2 == 1">Tél. <span t-field="o.partner_id.phone"/><br/></t>
+                    <t t-if="o.partner_id.mobile and pdf_mobile % 2 == 1">Tél. <span t-field="o.partner_id.mobile"/><br/></t>
+                    <t t-if="o.partner_id.fax and pdf_fax % 2 == 1">Fax <span t-field="o.partner_id.fax"/><br/></t>
+                    <t t-if="o.partner_id.email and pdf_email % 2 == 1"><span t-field="o.partner_id.email"/><br/></t>
                     <span t-if="o.partner_id.vat">TIN: <span t-field="o.partner_id.vat"/></span>
                 </div>
             </div>
@@ -68,6 +73,17 @@
                         </p>
                     </div>
                     <div t-if="o.user_id" style="display: table-cell; width: 4px;"/>
+
+                    <div name="client" t-if="client_info_pastille" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                        <strong>Client(e)&amp;nbsp;:</strong>
+                        <p>
+                            <t t-if="pdf_telephone &gt; 1 and o.partner_id.phone"><span t-field="o.partner_id.phone"/><br/></t>
+                            <t t-if="pdf_mobile &gt; 1 and o.partner_id.mobile"><span t-field="o.partner_id.mobile"/><br/></t>
+                            <t t-if="pdf_fax &gt; 1 and o.partner_id.fax"><span t-field="o.partner_id.fax"/><br/></t>
+                            <t t-if="pdf_email &gt; 1 and o.partner_id.email"><span t-field="o.partner_id.email"/></t>
+                        </p>
+                    </div>
+                    <div t-if="client_info_pastille" style="display: table-cell; width: 4px;"/>
 
                     <div name="doc_ref" t-if="o.reference and o.type == 'in_invoice'" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                         <strong>Doc Ref:</strong>
