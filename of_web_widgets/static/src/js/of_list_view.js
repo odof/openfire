@@ -4,6 +4,8 @@ odoo.define('of_web_widgets.ListView', function (require) {
 var ListView = require('web.ListView');
 var data = require('web.data')
 var Model = require('web.DataModel');
+var _t = core._t;
+var _lt = core._lt;
 
 
 ListView.List.include({
