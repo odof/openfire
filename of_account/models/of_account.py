@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError,  ValidationError
 
 NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
 
@@ -18,6 +18,20 @@ class AccountConfigSettings(models.TransientModel):
 
 class AccountInvoice(models.Model):
     _inherit = "account.invoice"
+
+    @api.multi
+    @api.constrains('company_id', 'journal_id')
+    def _check_journal_company(self):
+        """
+        Ajout d'une vérification sur la société du journal.
+        Si le journal n'est pas de la société de la facture ou une société parente alors renvoi une erreur.
+        """
+        company_obj = self.env['res.company']
+        for invoice in self:
+            if invoice.move_name:
+                continue
+            if invoice.journal_id.company_id not in company_obj.search([('id', 'parent_of', invoice.company_id.id)]):
+                raise ValidationError(u'Erreur ! La société du journal est différente de celle de la facture.')
 
     of_etiquette_partenaire_ids = fields.Many2many('res.partner.category', related='partner_id.category_id', string=u"Étiquettes client")
 
@@ -42,6 +56,7 @@ class AccountInvoice(models.Model):
     @api.multi
     def action_invoice_open(self):
         """Mettre le libellé des écritures comptables d'une facture avec nom client (30 1er caractères) + no facture"""
+        self._check_journal_company()  # Ajout de vérification de la société du journal
         res = super(AccountInvoice, self).action_invoice_open()
         ref = (self.partner_id.name or self.partner_id.parent_id.name or '')[:30] + ' ' + self.number
         self.move_id.line_ids.write({'name': ref})
@@ -61,6 +76,12 @@ class AccountInvoice(models.Model):
                 vals['tax_line_ids'] = [(5, )] + lines_to_keep
         return super(AccountInvoice, self).write(vals)
 
+    @api.onchange('company_id')
+    def _onchange_company_id(self):
+        """
+        Recalcul auto du journal par défaut en fonction de la société.
+        """
+        self.journal_id = self.with_context(company_id=self.company_id.id)._default_journal()
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
