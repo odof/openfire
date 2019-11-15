@@ -173,4 +173,16 @@
     <!-- Rendre visible le menu "Écritures comptables" sans le mode débogue. -->
     <menuitem action="account.action_account_moves_all_a" id="account.menu_action_account_moves_all" parent="account.menu_finance_entries" sequence="1" groups="-base.group_no_one" />
 
+    <!-- Ajout du nom de la facture dans la liste des lignes de factures, permet de voir le numéro de la facture dans les lignes de la commande -->
+    <record id="of_account_view_invoice_line_tree" model="ir.ui.view">
+        <field name="name">of.account.view.invoice.line.tree</field>
+        <field name="model">account.invoice.line</field>
+        <field name="inherit_id" ref="account.view_invoice_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="before">
+                <field name="invoice_id"/>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
