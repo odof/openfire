@@ -55,7 +55,7 @@ class HREmployee(models.Model):
     u"""Création horaires avancés"""
     of_mode_horaires = fields.Selection([
         ("easy", "Facile"),
-        ("advanced", u"Avancé")], string="Mode de Sélection des horaires", required=True, default="easy")
+        ("advanced", u"Avancé")], string="Mode de sélection des horaires", required=True, default="easy")
     of_segment_ids = fields.One2many('of.horaires.segment', 'employee_id', string="Horaires de travail")
 
     of_horaires_recap = fields.Html(compute='_compute_of_horaires_recap', string="Horaires de travail")
@@ -879,13 +879,13 @@ class OFHorairesCreneau(models.Model):
     name = fields.Char("Créneau", compute="_compute_name", store=True)
     jour_id = fields.Many2one("of.jours", string="Jour", required=True)
     jour_number = fields.Integer(related="jour_id.numero", store=True)
-    heure_debut = fields.Float(string=u"Heure de début", required=True)
-    heure_fin = fields.Float(string=u"Heure de fin", required=True)
+    heure_debut = fields.Float(string=u"Heure de début", digits=(12, 5), required=True)
+    heure_fin = fields.Float(string=u"Heure de fin", digits=(12, 5), required=True)
 
     _sql_constraints = [
-        ('name_uniq', 'unique(name)', 'Oups! on dirait que ce créneau existe déjà...'),
-        ('heure_debut_fin_constraint', 'CHECK ( heure_debut <= heure_fin )', _(u"L'Heure de début doit être antérieure à l'heure de fin")),
-        ('heures_sont_des_heures_constraint', 'CHECK ( heure_debut <= 24 AND heure_debut >= 0 AND heure_fin <= 24 AND heure_fin >= 0)', _(u"Les horaires doivent se trouver entre 0 et 24"))
+        ('name_uniq', 'unique(name)', 'Oups ! On dirait que ce créneau existe déjà.'),
+        ('heure_debut_fin_constraint', 'CHECK ( heure_debut <= heure_fin )', _(u"L'heure de début doit être antérieure à l'heure de fin.")),
+        ('heures_sont_des_heures_constraint', 'CHECK ( heure_debut <= 24 AND heure_debut >= 0 AND heure_fin <= 24 AND heure_fin >= 0)', _(u"Les horaires doivent se trouver entre 0 et 24."))
     ]
 
     @api.multi
@@ -906,7 +906,7 @@ class OFHorairesProfil(models.Model):
     active = fields.Boolean(string="Actif", default=True)
 
     _sql_constraints = [
-        ('name_uniq', 'unique(name)', u"Le nom d'un profil doit être unique !"),
+        ('name_uniq', 'unique(name)', u"Le nom d'un profil doit être unique."),
     ]
 
 

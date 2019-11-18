@@ -563,6 +563,26 @@ class OfPlanningIntervention(models.Model):
                        "WHERE oj.numero >= 1 AND oj.numero <= 5 "
                        "AND he.id NOT IN (SELECT employee_id FROM employee_jours_rel)")
 
+            # Initialise les créneaux.
+            maintenant = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+            # Horaires du matin
+            cr.execute("INSERT INTO of_horaires_creneau(create_uid, write_uid, create_date, write_date, name, heure_debut, heure_fin, jour_number, jour_id) "
+                       "SELECT DISTINCT ON(of_hor_md, of_hor_mf, oj.numero) 1, 1, '%s', '%s', oj.abr || ' ' || FLOOR(of_hor_md) || 'h' || REPLACE(RPAD(FLOOR(60*(of_hor_md-FLOOR(of_hor_md)))::text, 2, '0'), '00', '') || ' - ' || FLOOR(of_hor_mf) || 'h' || REPLACE(RPAD(FLOOR(60*(of_hor_mf-FLOOR(of_hor_mf)))::text, 2, '0'), '00', ''), of_hor_md, of_hor_mf, oj.numero, oj.id "
+                       "FROM hr_employee he, employee_jours_rel ejr, of_jours oj "
+                       "WHERE ejr.employee_id = he.id "
+                       "AND ejr.jour_id = oj.id" % (maintenant, maintenant))
+            # Horaires de l'après-midi
+            cr.execute("INSERT INTO of_horaires_creneau(create_uid, write_uid, create_date, write_date, name, heure_debut, heure_fin, jour_number, jour_id) "
+                       "SELECT DISTINCT ON(of_hor_ad, of_hor_af, oj.numero) 1, 1, '%s', '%s', oj.abr || ' ' || FLOOR(of_hor_ad) || 'h' || REPLACE(RPAD(FLOOR(60*(of_hor_ad-FLOOR(of_hor_ad)))::text, 2, '0'), '00', '') || ' - ' || FLOOR(of_hor_af) || 'h' || REPLACE(RPAD(FLOOR(60*(of_hor_af-FLOOR(of_hor_af)))::text, 2, '0'), '00', ''), of_hor_ad, of_hor_af, oj.numero, oj.id "
+                       "FROM hr_employee he, employee_jours_rel ejr, of_jours oj "
+                       "WHERE ejr.employee_id = he.id "
+                       "AND ejr.jour_id = oj.id "
+                       "AND (SELECT 1 FROM hr_employee WHERE hr_employee.of_hor_md = he.of_hor_ad AND hr_employee.of_hor_mf = he.of_hor_af) <> 1" % (maintenant, maintenant))
+
+            # FROM hr_employee he, employee_jours_rel ejr, of_jours oj
+            # WHERE ejr.employee_id = he.id
+            # AND ejr.jour_id = oj.id
+
             # # On remplit le champ jour_ids dans les interventions par les valeurs lundi à vendredi.
             # cr.execute("INSERT INTO of_intervention_jours_rel(intervention_id, jour_id) "
             #            "SELECT opi.id, oj.numero "
