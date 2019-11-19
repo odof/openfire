@@ -126,10 +126,10 @@
                             </button>
                         </div>
                         <div class="oe_title of_title">
-                            <h1>
+                            <h1><b>
                                 <span attrs="{'invisible': [('recurrence', '=', False)]}">Intervention récurrente</span>
                                 <span attrs="{'invisible': [('recurrence', '=', True)]}">Intervention ponctuelle</span>
-                            </h1>
+                            </b></h1>
                         </div>
                         <group>
                             <group name="refs" string="Références">

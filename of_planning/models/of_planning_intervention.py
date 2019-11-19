@@ -170,7 +170,7 @@ class OfPlanningEquipe(models.Model):
     mode_horaires = fields.Selection([
         ("easy", "Facile"),
         ("advanced", u"Avancé")], string=u"Mode de Sélection des horaires", required=True, default="easy")
-    profil_id = fields.Many2one("of.horaires.profil", "Profil")
+    modele_id = fields.Many2one("of.horaires.modele", "Modèle")
     of_creneau_ids = fields.Many2many("of.horaires.creneau", "of_equipe_creneaux_rel", "equipe_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
     of_creneau_temp_ids = fields.Many2many("of.horaires.creneau", "of_equipe_creneaux_temp_rel", "equipe_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
     of_creneau_temp_start = fields.Date(string=u"Début des horaires temporaires")
