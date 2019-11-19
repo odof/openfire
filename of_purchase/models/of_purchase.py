@@ -28,6 +28,11 @@ class PurchaseOrder(models.Model):
     sale_order_id = fields.Many2one('sale.order', string="Commande d'origine")
     delivery_expected = fields.Char(string='Livraison attendue', states={'done': [('readonly', True)]})
 
+    @api.model
+    def _prepare_picking(self):
+        values = super(PurchaseOrder, self)._prepare_picking()
+        return isinstance(values, dict) and values.update({'of_customer_id': self.customer_id.id}) or values
+
 class ProcurementOrder(models.Model):
     _inherit = 'procurement.order'
 
@@ -198,3 +203,26 @@ class OFPurchaseConfiguration(models.TransientModel):
     def set_description_as_order_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'purchase.config.settings', 'of_description_as_order_setting', self.of_description_as_order_setting)
+
+class StockPicking(models.Model):
+    _inherit = 'stock.picking'
+
+    of_customer_id = fields.Many2one('res.partner', string="Client")
+    of_location_usage = fields.Selection(related="location_id.usage")  # Permet de cacher le champ of_customer_id si pas sur BR
+
+
+class ResPartner(models.Model):
+    _inherit = 'res.partner'
+
+    of_br_count = fields.Integer(string=u"Réceptions", compute="compute_br_count")
+
+    def compute_br_count(self):
+        picking_obj = self.env['stock.picking']
+        for partner in self:
+            partner.of_br_count = len(picking_obj.search([('of_customer_id', '=', partner.id), ('of_location_usage', '=', 'supplier')]))
+
+    @api.multi
+    def action_view_picking(self):
+        action = self.env.ref('of_purchase.of_purchase_open_picking').read()[0]
+        action['domain'] = [('of_customer_id', 'in', self._ids)]
+        return action
