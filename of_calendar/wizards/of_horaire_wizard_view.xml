@@ -63,13 +63,10 @@
                         ]" context="{'restrict_date': 1,}" options="{'no_create': 1, 'no_open': 1,}"/>
                         <field name="date_deb" attrs="{
                             'required': [
+                                ('mode', 'in', ('create', 'edit')),
                                 '|',
-                                    ('mode', '=', 'edit'),
-                                    '&amp;',
-                                    '&amp;',
-                                        ('mode', '=', 'create'),
-                                        ('permanent', '=', True),
-                                        ('premier_seg', '=', True)],
+                                    ('permanent', '=', False),
+                                    ('premier_seg', '=', False)],
                             'invisible': [
                                 '|',
                                 '|',
@@ -87,23 +84,32 @@
                                     ('permanent', '=', True),
                                     ('mode', '=', 'unlink'),
                                     '&amp;',
-                                        ('mode','=', 'edit'),
+                                        ('mode', '=', 'edit'),
                                         ('segment_id', '=', False)]}"/>
                         <field name="motif" attrs="{
                           'invisible': [
                             '|',
+                            '|',
                                 ('mode', '=', 'unlink'),
+                                '&amp;',
+                                    ('mode', '=', 'unlink'),
+                                    ('segment_id', '=', False),
                                 '&amp;',
                                     ('permanent', '=', True),
                                     ('premier_seg', '=', True)]}"/>
                         <div colspan="2" attrs="{
-                          'invisible': ['|', ('premier_seg', '=', False), ('permanent', '=', False)]}">
+                          'invisible': [
+                            '|',
+                            '|',
+                                ('mode', '!=', 'create'),
+                                ('premier_seg', '=', False),
+                                ('permanent', '=', False)]}">
                             <i>
                                 <p>Ces horaires sont les premiers horaires permanents de cet employé</p>
                                 <p>Il n'y a donc pas besoin de rentrer une date de début</p>
                             </i>
                         </div>
-                        <field name="premier_seg" invisible="1"/>
+                        <field name="premier_seg"/>
                     </group>
                     <group name="horaires" string="Horaires" col="2" colspan="2"
                            attrs="{'invisible': [('mode', '=', 'unlink'), ('segment_id', '=', False)]}">

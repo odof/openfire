@@ -141,10 +141,11 @@ class HREmployee(models.Model):
 
             recap = ""
             if segments_perm:
-                segment_cur = segments_perm[0]
+                segment_cur = segments_perm[-1]
 
                 recap = '<h3>Horaires :</h3>\n<p>\n' + formate_segment(segment_cur) + '</p>\n'
-                for seg in segments_perm[1:]:
+                for i_seg in range(len(segments_perm) - 1, 0, -1):
+                    seg = segments_perm[i_seg]
                     recap += "<h3>Changement d'horaires "
                     if seg.date_fin:
                         recap += "du %s au %s" % (format_date(seg.date_deb),
