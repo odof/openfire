@@ -134,6 +134,10 @@ class OFHorairesSegmentWizard(models.TransientModel):
             self.mode_horaires = 'advanced'
             self.motif = self.segment_id.motif
             self.creneau_ids = self.segment_id.creneau_ids
+            if not self.segment_id.date_deb:
+                self.premier_seg = True
+        if self.mode != 'create' and (self.segment_id and self.segment_id.date_deb or not self.segment_id):
+            self.premier_seg = False
 
     @api.multi
     @api.onchange('date_deb')
@@ -256,7 +260,7 @@ class OFHorairesSegmentWizard(models.TransientModel):
         self.ensure_one()
         if self.mode == "edit" and not self.segment_id:
             raise UserError(u"Veuillez Sélectionner une période à modifier")
-        if self.date_fin < self.date_deb:
+        if self.date_fin and self.date_fin < self.date_deb:
             raise UserError(u"la date de fin doit être postérieure ou égale à la date de début")
         self.onchange_hor_ma_df()
         creneau_obj = self.env['of.horaires.creneau']
@@ -292,6 +296,7 @@ class OFHorairesSegmentWizard(models.TransientModel):
                 ('employee_id', '=', self.employee_id.id),
                 ('date_deb', '=', self.date_deb),
                 ('permanent', '=', True),
+                ('id', '!=', self.segment_id and self.segment_id.id or False),
             ])
             if segment_meme_deb:
                 raise UserError(u"Des horaires permanents qui commencent à cette date existent déjà")
