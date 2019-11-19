@@ -2,6 +2,10 @@
 
 from odoo import models, fields
 
+
+def format_date(date, lang):
+    return fields.Date.from_string(date).strftime(lang.date_format)
+
 def se_chevauchent(min_1, max_1, min_2, max_2, strict=True):
     """
     Teste si les intervalles passés en paramètre se chevauchent.

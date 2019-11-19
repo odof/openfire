@@ -52,8 +52,8 @@ Leur balise calendar devra contenir l'attribut display_states="1".
         "data/ir_config_parameter_data.xml",
         "data/of_calendar_data.xml",
         "views/of_web_calendar_templates.xml",
+        "wizards/of_horaire_wizard_view.xml",
         "views/of_calendar_views.xml",
-        "wizards/of_horaire_save_profil_view.xml",
         "security/ir.model.access.csv",
     ],
     'qweb': [

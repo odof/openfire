@@ -2,8 +2,8 @@
 
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError
-from odoo.addons.of_utils.models.of_utils import se_chevauchent
-
+from odoo.addons.of_utils.models.of_utils import se_chevauchent, format_date
+from odoo.tools.float_utils import float_compare
 from datetime import datetime, timedelta
 import pytz
 from copy import deepcopy
@@ -151,6 +151,8 @@ class HREmployee(models.Model):
                                                   format_date(seg.date_fin))
                     else:
                         recap += "à partir du " + format_date(seg.date_deb)
+                    if seg.motif:
+                        recap += " (%s)" % seg.motif
                     recap += '</h3>\n<p>\n' + formate_segment(seg) + '</p>\n'
             if segments_temp:
                 recap += "<h3>Horaires temporaires</h3>\n"
@@ -160,6 +162,8 @@ class HREmployee(models.Model):
                     else:
                         recap += "<h5>du %s au %s" % (format_date(seg.date_deb),
                                                       format_date(seg.date_fin))
+                    if seg.motif:
+                        recap += " (%s)" % seg.motif
                     recap += '</h5>\n<p>\n' + formate_segment(seg) + '</p>\n'
             employee.of_horaires_recap = recap
 
@@ -668,76 +672,9 @@ class HREmployee(models.Model):
 
     @api.model
     def get_min_max_time(self):
-        """
-        Parcourt toutes équipes pour trouver les heures minimales et maximales de travail.
-        Appelée depuis la CalendarView si l'attribut 'working_hours' est à "1". Sert à restreindre la vue Calendar pour ne pas voir les heures entre 0 et min, ni celles entre max et 24
-        renvois les valeurs en UTC
-        /!| Cette fonction est appelée avant de savoir les dates de début et de fin. on prend donc tous les horaires possibles
-        """
         min_time = self.env['ir.values'].get_default('res.config.settings', 'calendar_min_time')
         max_time = self.env['ir.values'].get_default('res.config.settings', 'calendar_max_time')
 
-        """employees = self.env['hr.employee'].search([])
-        min_time = False
-        max_time = False
-        min_equipe = False
-        max_equipe = False
-        today_da = fields.Date.from_string(fields.Date.today())
-
-        list_horaires = employees.get_archive_list_segments()
-        list_horaires_temp = employees.get_archive_list_segments_temp()
-
-        for equipe in equipes:
-            equipe_id = equipe.id
-            tz = pytz.timezone(equipe.of_tz or "Europe/Paris")
-            if equipe.mode_horaires == "easy":
-                # On utilise le mode facile pour les horaires de cette équipe
-                min_equipe = equipe.hor_md
-                max_equipe = equipe.hor_af
-            else: # On utilise le mode avancé pour les horaires de cette équipe
-                # l'équipe a-t-elle des horaires temporaires sur cette recherche??
-                if equipe.of_creneau_temp_stop:
-                    creneaux_temp_travailles = equipe.of_creneau_temp_ids
-                    for i in range(1,8):
-                        creneaux_temp_du_jour = creneaux_temp_travailles.filtered(lambda x: x.jour_number == i)
-                        if len(creneaux_temp_du_jour) == 0:
-                            continue
-                        if min_equipe == False:  # ==False pour éviter un éventuel 0.0 oublié
-                            min_equipe = creneaux_temp_du_jour[0].heure_debut  # heure de début du premier créneau
-                            max_equipe = creneaux_temp_du_jour[-1].heure_fin  # heure de fin du dernier créneau
-                        else:
-                            if min_equipe > creneaux_temp_du_jour[0].heure_debut:  # nouveau min
-                                min_equipe = creneaux_temp_du_jour[0].heure_debut
-                            if max_equipe < creneaux_temp_du_jour[-1].heure_fin:  # nouveau max
-                                max_equipe = creneaux_temp_du_jour[-1].heure_fin
-
-                creneaux_travailles = equipe.of_creneau_ids
-                for i in range(1,8):
-                    creneaux_du_jour = creneaux_travailles.filtered(lambda x: x.jour_number == i)
-                    if len(creneaux_du_jour) == 0:
-                        continue
-                    if min_equipe == False:  # ==False pour éviter un éventuel 0.0 oublié
-                        min_equipe = creneaux_du_jour[0].heure_debut  # heure de début du premier créneau
-                        max_equipe = creneaux_du_jour[-1].heure_fin  # heure de fin du dernier créneau
-                    else:
-                        if min_equipe > creneaux_du_jour[0].heure_debut:  # nouveau min
-                            min_equipe = creneaux_du_jour[0].heure_debut
-                        if max_equipe < creneaux_du_jour[-1].heure_fin:  # nouveau max
-                            max_equipe = creneaux_du_jour[-1].heure_fin
-            date_min_dt = datetime.combine(today_da, datetime.min.time()) + timedelta(hours=min_equipe)  # datetime naive
-            date_min_dt = tz.localize(date_min_dt, is_dst=None).astimezone(pytz.utc)  # datetime utc
-            flo_min = round(date_min_dt.hour + date_min_dt.minute / 60.0 + date_min_dt.second / 3600.0, 5)  # mintime utc as float
-            if min_time == False:
-                min_time = flo_min
-            elif flo_min < min_time:
-                min_time = flo_min
-            date_max_dt = datetime.combine(today_da, datetime.min.time()) + timedelta(hours=max_equipe)  # datetime naive
-            date_max_dt = tz.localize(date_max_dt, is_dst=None).astimezone(pytz.utc)  # datetime utc
-            flo_max = round(date_max_dt.hour + date_max_dt.minute / 60.0 + date_max_dt.second / 3600.0, 5)  # maxtime utc as float
-            if max_time == False:
-                max_time = flo_max
-            elif flo_max > max_time:
-                max_time = flo_max"""
         return (min_time or 3.0, max_time or 21.0)
 
     @api.multi
@@ -781,6 +718,8 @@ class OFHorairesSegment(models.Model):
     _name = 'of.horaires.segment'
     _order = 'date_deb'
 
+    name = fields.Char(string="Période", compute="_compute_name")
+
     employee_id = fields.Many2one('hr.employee', string=u"Employé", required=True, ondelete='cascade')
     date_deb = fields.Date(string=u"Date de début")
     date_fin = fields.Date(string="Date de fin")
@@ -792,7 +731,39 @@ class OFHorairesSegment(models.Model):
         "of.horaires.creneau", "of_segment_creneaux_rel", "segment_id", "creneau_id",
         string=u"Créneaux"
     )
-    profil_id = fields.Many2one('of.horaires.profil', string="Charger un profil", compute=lambda *args: None)
+    modele_id = fields.Many2one('of.horaires.modele', string="Charger un modèle", compute=lambda *args: None)
+    active = fields.Boolean(string="Active", default=True)
+    motif = fields.Char(string="Motif du changement")
+
+    @api.model
+    def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
+        if self._context.get("restrict_date", False):
+            order = 'date_deb DESC'
+        # On détourne la fonction search pour peupler la liste de documents (onglet infos supplémentaires) à l'amorce de l'affichage de la vue
+        res = super(OFHorairesSegment, self)._search(args, offset, limit, order, count, access_rights_uid)
+        if self._context.get("restrict_date", False):
+            today_str = fields.Date.today()
+            records = self.browse(res)
+            res = records.filtered(lambda s: s.date_fin >= today_str or not s.date_fin).ids
+        return res
+
+    @api.multi
+    @api.depends('date_deb', 'date_fin', 'permanent', 'motif')
+    def _compute_name(self):
+        lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
+        for segment in self:
+            if segment.permanent:
+                if segment.date_deb:
+                    name = _(u"À partir du ") + format_date(segment.date_deb, lang)
+                else:
+                    name = _(u"Depuis l'embauche")
+            elif segment.date_deb != segment.date_fin:
+                name = _(u"Du %s au %s") % (format_date(segment.date_deb, lang), format_date(segment.date_fin, lang))
+            else:
+                name = _(u"Le %s") % format_date(segment.date_deb, lang)
+            if segment.motif:
+                name += u" (%s)" % segment.motif
+            segment.name = name
 
     @api.multi
     def check_no_overlapping(self):
@@ -815,11 +786,11 @@ class OFHorairesSegment(models.Model):
         (check_no_overlapping, u'Vous ne pouvez pas sauvegarder tant que des créneaux se chevauchent.', []),
     ]
 
-    @api.onchange('profil_id')
-    def _onchange_profil_id(self):
-        if self.profil_id:
-            self.creneau_ids = self.profil_id.creneau_ids
-            self.profil_id = False
+    @api.onchange('modele_id')
+    def _onchange_modele_id(self):
+        if self.modele_id:
+            self.creneau_ids = [(6, "ET OUIIIII", self.modele_id.creneau_ids.ids)]
+            self.modele_id = False
 
     @api.multi
     def format_str_list(self):
@@ -895,18 +866,96 @@ class OFHorairesCreneau(models.Model):
             creneau.name = (creneau.jour_id and creneau.jour_id.abr + ' ' or '') + \
                 ' - '.join(hours_to_strs(creneau.heure_debut, creneau.heure_fin))
 
+    @api.model
+    def create_if_necessary(self, hor_md, hor_mf, hor_ad, hor_af, jour_ids):
+        res = {
+            'create_ids': [],
+            'exist_ids': [],
+        }
+        for jour_id in jour_ids:
+            for debut, fin in [(hor_md, hor_mf), (hor_ad, hor_af)]:
+                if float_compare(debut, fin, 5) != 0:
+                    creneau = self.search([
+                        ('jour_id', '=', jour_id),
+                        ('heure_debut', '<=', debut + 0.00005),  # éviter les erreurs d'arrondi
+                        ('heure_debut', '>=', debut - 0.00005),
+                        ('heure_fin', '<=', fin + 0.00005),
+                        ('heure_fin', '>=', fin - 0.00005),
+                    ], limit=1)
+                    if not creneau:
+                        vals = {
+                            'jour_id': jour_id,
+                            'heure_debut': debut,
+                            'heure_fin': fin,
+                        }
+                        creneau = self.create(vals)
+                        res['create_ids'].append(creneau.id)
+                    else:
+                        res['exist_ids'].append(creneau.id)
+        return res
 
-class OFHorairesProfil(models.Model):
-    _name = "of.horaires.profil"
+    @api.multi
+    def format_str_list(self):
+        """
+        :return: Liste d'horaires à afficher
+        :rtype: [ str, ...]
+        """
+        if not self:
+            return [u"Aucun créneau horaire défini"]
+        # Regroupement des créneaux par jour (dictionnaire {jour: [heures]})
+        horaires_dict = {}
+        jour_prec = False
+        jours = []  # Pour conserver les jours dans l'ordre croissant
+        for creneau in self:
+            if creneau.jour_id != jour_prec:
+                jour_prec = creneau.jour_id
+                horaires_dict[jour_prec] = []
+                jours.append(jour_prec)
+            horaires_dict[jour_prec].append(hours_to_strs(creneau.heure_debut, creneau.heure_fin))
 
-    name = fields.Char("Nom du profil")
+        # Regroupement des jours avec des créneaux identiques (liste [[jour1, jour2], [jour3]...])
+        jour_groups = []
+        for jour in jours:
+            horaires = horaires_dict[jour]
+            for jour_group in jour_groups:
+                if horaires_dict[jour_group[0]] == horaires:
+                    jour_group.append(jour)
+                    break
+            else:
+                jour_groups.append([jour])
+
+        # Passage en format texte
+        result = []
+        for jours in jour_groups:
+            jours_str = ""
+            while jours:
+                if jours_str:
+                    jours_str += ", "
+                jour_deb = jours.pop(0)
+                jour_fin = jour_deb
+                while jours and jours[0].numero == jour_fin.numero + 1:
+                    jour_fin = jours.pop(0)
+
+                jours_str += jour_deb.abr
+                if jour_fin != jour_deb:
+                    jours_str += "-" + jour_fin.abr
+            horaires_str = ", ".join(["%s-%s" % h
+                                      for h in horaires_dict[jour_deb]])
+            result.append(jours_str + " : " + horaires_str)
+        return result
+
+
+class OFHorairesModele(models.Model):
+    _name = "of.horaires.modele"
+
+    name = fields.Char("Nom du modèle")
     creneau_ids = fields.Many2many(
-        'of.horaires.creneau', 'profil_creneaux', 'profil_id', 'creneau_id', string=u"Créneaux"
+        'of.horaires.creneau', 'modele_creneaux', 'modele_id', 'creneau_id', string=u"Créneaux"
     )
     active = fields.Boolean(string="Actif", default=True)
 
     _sql_constraints = [
-        ('name_uniq', 'unique(name)', u"Le nom d'un profil doit être unique."),
+        ('name_uniq', 'unique(name)', u"Le nom d'un modèle doit être unique."),
     ]
 
 
