@@ -17,7 +17,7 @@ def distance_points(lat1, lon1, lat2, lon2):
 class OfPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
-    tournee_ids = fields.Many2many('of.planning.tournee', 'tournee_intervention_rel', 'intervention_id', 'tournee_id', compute='_compute_tournee_ids', store=True, string='Planification')
+    tournee_ids = fields.Many2many('of.planning.tournee', 'of_planning_intervention_of_planning_tournee_rel', 'intervention_id', 'tournee_id', compute='_compute_tournee_ids', store=True, string='Planification')
 
     @api.multi
     @api.depends('employee_ids', 'date', 'tournee_ids.date', 'tournee_ids.employee_id')

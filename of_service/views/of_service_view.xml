@@ -164,7 +164,7 @@
                         </group>
                         <notebook>
                             <page string="Interventions" invisible="1">
-                                <field name="intervention_ids" nolabel="1" colspan="2">
+                                <field name="intervention_ids" nolabel="1" colspan="2" options="{'reload_on_button': True}">
                                     <tree string="Liste des interventions" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done';purple:state=='unfinished'">
                                         <field name="name" string="Libellé"/>
                                         <field name="date"/>
