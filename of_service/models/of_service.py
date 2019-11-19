@@ -406,7 +406,7 @@ class OfService(models.Model):
             res_mois_int = min(mois_ints, key=lambda m: (m < date_next_mois_int, m))
             res_year_int = date_next_da.year + (res_mois_int < date_next_mois_int)
 
-            return fields.Date.to_string(date(res_year_int, 1, res_mois_int))
+            return fields.Date.to_string(date(year=res_year_int, month=res_mois_int, day=1))
         else:
             return False
 
@@ -605,7 +605,7 @@ class OFPlanningIntervention(models.Model):
                 # l'intervention est marquée comme faite
                 elif fait and service.date_next_last <= intervention.date_date:  # mettre à jour l'ancienne date de prochaine planification
                     service.date_next_last = service.date_next
-                    service.date_next = service.get_next_date(service.date_next)
+                    service.date_next = service.get_next_date(intervention.date_date)
         return res
 
     @api.model
