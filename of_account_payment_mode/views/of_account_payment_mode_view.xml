@@ -123,6 +123,7 @@
             <field name="model">of.account.payment.mode</field>
             <field name="arch" type="xml">
                 <tree string="Modes de paiement" colors="#A0A0A0:active==False;">
+                    <field name="sequence" widget="handle"/>
                     <field name="name"/>
                     <field name="journal_id"/>
                     <field name="journal_type"/>

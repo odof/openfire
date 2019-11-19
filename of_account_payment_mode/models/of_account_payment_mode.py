@@ -9,6 +9,7 @@ from odoo.addons.mail.models.mail_template import format_date
 class OfAccountPaymentMode(models.Model):
     _name = 'of.account.payment.mode'
     _description = 'Payment mode'
+    _order = "sequence"
 
     name = fields.Char('Name', required=True, help='Mode of Payment')
     journal_id = fields.Many2one('account.journal', 'Journal', domain=[('type', 'in', ('bank', 'cash'))],
@@ -19,6 +20,7 @@ class OfAccountPaymentMode(models.Model):
 
     active = fields.Boolean(string="Actif", default=True)
     config_affichage = fields.Text(string='Configuration', help=u'Attention niveau avancé!\n Décrivez par texte et balises mako (${variable}) ce qui sera affiché sur la facture.')
+    sequence = fields.Integer(default=100, string=u"Séquence")
 
     _sql_constraints = [('name_uniq', 'unique (name)', u"Ce mode de paiement existe déjà !")]
 
