@@ -11,27 +11,30 @@ from copy import deepcopy
 def hours_to_strs(*hours):
     """ Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'
     """
-    return tuple("%dh%02d" % (hour, round((hour % 1) * 60)) if hour % 1 else "%dh" % (hour) for hour in hours)
+    return tuple("%dh%02d" % (hour / 60, hour % 60)
+                 if hour % 60
+                 else "%dh" % hour / 60 for hour in map(lambda hour: round(hour * 60), hours))
+    return tuple("%dh%02d" % (hour / 60, hour % 60) if hour % 60 else "%dh" % hour / 60 for hour in map(lambda hour: round(hour * 60), hours))
 
 @api.model
 def _tz_get(self):
     # put POSIX 'Etc/*' entries at the end to avoid confusing users - see bug 1086728
     return [(tz, tz) for tz in sorted(pytz.all_timezones, key=lambda tz: tz if not tz.startswith('Etc/') else '_')]
 
-def jour_abr_2_nb(str):
-    u"""
-    :param str: Chaîne de caractères correspondant à une abréviation de jour
-    :return: Le numéro correspondant au jour entré, de 1 à 7
-    """
-    return {
-        'lun.': 1,
-        'mar.': 2,
-        'mer.': 3,
-        'jeu.': 4,
-        'ven.': 5,
-        'sam.': 6,
-        'dim.': 7,
-    }.get(str, str)
+# def jour_abr_2_nb(str):
+#     u"""
+#     :param str: Chaîne de caractères correspondant à une abréviation de jour
+#     :return: Le numéro correspondant au jour entré, de 1 à 7
+#     """
+#     return {
+#         'lun.': 1,
+#         'mar.': 2,
+#         'mer.': 3,
+#         'jeu.': 4,
+#         'ven.': 5,
+#         'sam.': 6,
+#         'dim.': 7,
+#     }.get(str, str)
 
 # @TODO: revoir les nom des fonctions pour qu'ils soient plus explicites
 
@@ -432,6 +435,7 @@ class HREmployee(models.Model):
         @TODO: Optimiser cette fonction en ne passant plus par les fonctions get_archive_list_segments() et get_archive_list_segments_temp()
         :rtype: dict { employee_id :  [(date_debut_da, date_fin_da, horaires_dict), ...] ,  ... }
         """
+        segment_obj = self.env['of.horaires.segment']
         if len(date_start) == 10:  # les paramètres sont des dates
             mode_params = "date"
         else:
@@ -442,6 +446,110 @@ class HREmployee(models.Model):
             date_stop_utc_dt = pytz.utc.localize(date_stop_naive_dt, is_dst=None)  # datetime utc
             mode_params = "datetime"
         un_jour = timedelta(days=1)
+
+        res = {}
+        for employee in self:
+            if not employee.of_segment_ids:
+                # L'employé n'a pas d'horaires définis
+                res[employee.id] = []
+                continue
+
+            # En cas d'employés sur différentes timezones
+            tz = pytz.timezone(employee.of_tz or "Europe/Paris")
+            if mode_params == "datetime":
+                date_start_local_dt = date_start_utc_dt.astimezone(tz)  # datetime local
+                date_stop_local_dt = date_stop_utc_dt.astimezone(tz)  # datetime local
+                date_start_str = fields.Date.to_string(date_start_local_dt).decode('utf-8')
+                date_stop_str = fields.Date.to_string(date_stop_local_dt).decode('utf-8')
+            else:
+                date_start_str = date_start
+                date_stop_str = date_stop
+
+            segments = segment_obj.search([('employee_id', '=', employee.id),
+                                           '|', ('date_fin', '=', False), ('date_fin', '>', date_start_str),
+                                           '|', ('date_deb', '=', False), ('date_deb', '<=', date_stop_str)])
+            # segments = self.convert_segments_to_list(segments)
+            segments_temporaires = []
+            segments_permanents = []
+            pile = []
+            horaires = []
+            date_deb = date_start_str
+            for segment in segments + segment_obj.browse(-1):
+                if segment.id != -1:
+                    segment_deb = segment.date_deb
+                    segment_fin = segment.date_fin
+                    date_fin_temp_da = fields.Date.from_string(segment_deb)
+                    date_fin_temp_da -= un_jour
+                    date_fin = fields.Date.to_string(date_fin_temp_da).decode('utf-8')
+                else:
+                    date_fin = date_stop_str
+                    segment_deb = segment_fin = date_stop_str + 'Z'
+
+                while date_deb <= date_fin:
+                    # Ajout des segments pour combler le vide
+                    if pile: # @todo : changer pour horaires permanents
+                        seg_prec, hor_prec = pile[-1]
+                        if seg_prec.date_fin > date_fin:
+                            horaires.append((date_deb, date_fin, hor_prec))
+                        else:
+                            horaires.append((date_deb, pile[-1].date_fin, hor_prec))
+                    else:
+                        # @todo : calculer date de fin, vérifier format horaires
+                        horaires.append((date_deb, '', False))
+
+                    while pile and pile[-1].date_fin <= segment_fin:
+                        pile.pop()
+
+
+
+
+
+
+
+                # Etape 1 : On traite la pile avant l'horaire étudié
+                if segment.id == -1:
+                    # On finit de traiter la pile
+                    segment_data = False
+                else:
+                    segment_data = self.convert_segments_to_list(segment)[0]
+
+
+                if segment.id == -1:
+                    # On finit de traiter la pile
+                    segment_data = False
+                else:
+                    segment_data = self.convert_segments_to_list(segment)[0]
+
+
+
+                if segment.permanent:
+                    # Un segment permanent doit être étudié en dernier
+                    pile = [segment] + pile
+                    continue
+                while pile:
+                    segment_prec = pile[-1]
+                    date_fin = segment_prec.date_fin
+                    if date_fin >= date_deb:
+                        # Ajout d'un segment
+
+                        date_fin_temp_da = fields.Date.from_string(segment.date_deb)
+                        date_fin_temp_da -= un_jour
+                        date_fin = fields.Date.to_string(date_fin_temp_da).decode('utf-8')
+                        horaires.append((date_deb, date_fin, segment_data[2]))
+
+
+                    if not segment_prec.date_fin or segment_prec.date_fin > segment.date_fin:
+                        break
+                    pile = pile[:-1]
+
+                    date_fin = min(segment.date_deb, )
+                    if pile[-1].date_fin and pile
+
+                for segment_prec in pile:
+
+                while pile and pile[-1].horaire_fin <
+
+
 
         res = {}
         archive_list_horaires = self.get_archive_list_segments()
