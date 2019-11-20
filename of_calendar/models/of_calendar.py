@@ -377,7 +377,7 @@ class HREmployee(models.Model):
         for segment in segments or self.of_segment_ids:
             creneaux_dict = {i+1: [] for i in xrange(7)}
             for creneau in segment.creneau_ids:
-                creneaux_dict[creneau.jour_number].append((creneau.heure_debut, creneau.heure_fin))
+                creneaux_dict[creneau.jour_number].append([creneau.heure_debut, creneau.heure_fin])
             result.append([segment.date_deb, segment.date_fin, creneaux_dict])
         return result
 
@@ -419,7 +419,7 @@ class HREmployee(models.Model):
                                          order='permanent, date_deb desc',
                                          limit=1)
             creneaux = segment.creneau_ids.filtered(lambda c: c.jour_number == num_jour)
-            res[employee.id] = [(creneau.heure_debut, creneau.heure_fin) for creneau in creneaux]
+            res[employee.id] = [[creneau.heure_debut, creneau.heure_fin] for creneau in creneaux]
         return res
 
     # @api.model
@@ -687,7 +687,7 @@ class HREmployee(models.Model):
         min_time = self.env['ir.values'].get_default('res.config.settings', 'calendar_min_time')
         max_time = self.env['ir.values'].get_default('res.config.settings', 'calendar_max_time')
 
-        return (min_time or 3.0, max_time or 21.0)
+        return min_time or 3.0, max_time or 21.0
 
     @api.multi
     def write(self, vals):
