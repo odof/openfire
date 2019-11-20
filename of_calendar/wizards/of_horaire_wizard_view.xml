@@ -10,10 +10,10 @@
                 <group>
                     <field name="name" required="1" attrs="{'readonly': [('fait', '=', True)]}"/>
                     <field name="horaires_recap"/>
-                    <field name="creneau_ids" invisible="1"/>
-                    <field name="fait" invisible="1"/>
-                    <field name="mode" invisible="1"/>
-                    <field name="wizard_id" invisible="1"/>
+                    <field name="creneau_ids" widget="many2many_tags"/>
+                    <field name="fait"/>
+                    <field name="mode"/>
+                    <field name="wizard_id"/>
                 </group>
 
                 <footer>
@@ -54,7 +54,7 @@
                 </b></h1>
                 <field name="mode" invisible="1"/>
                 <group col="3">
-                    <group name="periode" string="Période" colspan="1">
+                    <group name="periode" string="Période">
                         <field name="permanent" attrs="{'readonly': [('premier_seg', '=', True)]}"/>
                         <field name="segment_id" attrs="{'invisible': [('mode', '=', 'create')]}"
                           domain="[
@@ -109,11 +109,12 @@
                                 <p>Il n'y a donc pas besoin de rentrer une date de début</p>
                             </i>
                         </div>
-                        <field name="premier_seg"/>
+                        <field name="premier_seg" invisible="1"/>
+                        <field name="remplacement" invisible="1"/>
                     </group>
-                    <group name="horaires" string="Horaires" col="2" colspan="2"
+                    <group name="horaires" string="Horaires" colspan="2"
                            attrs="{'invisible': [('mode', '=', 'unlink'), ('segment_id', '=', False)]}">
-                        <group col="2" colspan="2">
+                        <group colspan="2">
                             <field name="modele_id" readonly="0" attrs="{'invisible': [('mode', '=', 'unlink')]}"
                                    context="{'default_creneau_ids':creneau_ids}"/>
                             <field name="mode_horaires" attrs="{'required': [('mode', '!=', 'unlink')],
@@ -145,8 +146,11 @@
                 </group>
 
                 <footer>
+                    <!--attrs="{'invisible': ['|', ('mode', '!=', 'create'), ('result_recap', '=', False)]}"
+                    attrs="{'invisible': [('result_recap', '!=', False)]}"
+                    -->
                     <button name="button_create_edit" string="Créer horaires" class="btn btn-primary" type="object"
-                      attrs="{'invisible': ['|', ('mode', '!=', 'create'), ('result_recap', '!=', '')]}"/>
+                      attrs="{'invisible': ['|', ('mode', '!=', 'create'), ('remplacement', '=', True)]}"/>
                     <button name="button_create_edit" string="Modifier horaires" class="btn btn-primary" type="object"
                       attrs="{'invisible': ['|', ('mode', '!=', 'edit'), ('segment_id', '=', False)]}"/>
                     <button name="button_unlink" string="Supprimer horaires" class="btn btn-primary" type="object"
@@ -155,7 +159,7 @@
                       attrs="{'invisible': [('mode', '=', 'unlink')]}" type="object"/>
                     <button name="button_remplacer" string="Remplacer" class="btn btn-primary" type="object"
                             confirm="Êtes-vous sûr de vouloir remplacer les périodes existantes?"
-                            attrs="{'invisible': [('result_recap', '=', '')]}"/>
+                            attrs="{'invisible': [('remplacement', '=', False)]}"/>
                     <button name="button_cancel" string="Annuler" special="cancel" class="btn btn-default"/>
                 </footer>
             </form>
