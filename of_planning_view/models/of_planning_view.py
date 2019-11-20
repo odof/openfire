@@ -391,7 +391,7 @@ class OfPlanningIntervention(models.Model):
                     'creneaux_du_jour': "",
                 }
 
-                horaires_du_jour = segment_courant[2].get(num_jour, False)  # [ (h_debut, h_fin) ,  .. ]
+                horaires_du_jour = segment_courant[2].get(num_jour, False)  # [ [h_debut, h_fin] ,  .. ]
                 if not horaires_du_jour:
                     fillerbarzz.append(fillerbar)
                     creneaux_dispozz.append([])

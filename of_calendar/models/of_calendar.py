@@ -156,11 +156,13 @@ class HREmployee(models.Model):
                 for i_seg in range(len(segments_perm) - 1, 0, -1):
                     seg = segments_perm[i_seg]
                     recap += u"<h3>Changement d'horaires "
-                    if seg.date_fin:
+                    """if seg.date_fin:
                         recap += u"du %s au %s" % (format_date(seg.date_deb),
                                                   format_date(seg.date_fin))
-                    else:
-                        recap += u"à partir du " + format_date(seg.date_deb)
+                    
+                    else:"""
+                    # ^- toujours "à partir du" ( date_fin implicite à la lecture )
+                    recap += u"à partir du " + format_date(seg.date_deb)
                     if seg.motif:
                         recap += u" (%s)" % seg.motif
                     recap += u'</h3>\n<p>\n' + formate_segment(seg) + u'</p>\n'
@@ -854,6 +856,24 @@ class OFHorairesSegment(models.Model):
                                       for h in horaires_dict[jour_deb]])
             result.append(jours_str + " : " + horaires_str)
         return result
+
+    @api.model
+    def recompute_permanent_date_fin(self, employee_id):
+        """Cette fonction sera couteuse en temp de calcul au fil des ajout d'horaires permanents
+        Une meilleure façon de faire serait de recalculer directement depuis le wizard d'horaires seulement les segments concernés
+        mais on est dans l'hyper urgence alors on verra plus tard"""
+        seg_perm = self.search([('employee_id', '=', employee_id), ('permanent', '=', True)], order="date_deb DESC")
+        for i_seg in range(len(seg_perm) - 1, 0, -1):
+            seg = seg_perm[i_seg]
+            if seg_perm[i_seg - 1].date_deb:
+                fin_da = fields.Date.from_string(seg_perm[i_seg - 1].date_deb) - timedelta(days=1)
+                seg.date_fin = fields.Date.to_string(fin_da)
+            else:
+                seg.date_fin = False
+        if len(seg_perm) > 1:
+            fin_da = fields.Date.from_string(seg_perm[-1].date_deb) - timedelta(days=1)
+            seg_perm[0].date_fin = fields.Date.to_string(fin_da)
+
 
 class OFHorairesCreneau(models.Model):
     _name = "of.horaires.creneau"
