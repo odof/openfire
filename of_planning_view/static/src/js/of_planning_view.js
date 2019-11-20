@@ -1112,26 +1112,32 @@ PlanningView.Row = Widget.extend({
             var descript_ft = {type: "float_time"};
             var formatted_heure_record, formatted_heure_creneau;
             var options = {};
-            for (var i=0; i<7; i++) {
-                options = {col_offset: i};
-                if (isNullOrUndef(col_index) || i==col_index) {
-                    for (var j=0; j<self.creneaux_dispo[i].length; j++) {
+            console.log(self.res_id, self.creneaux_dispo)
+            if (!self.creneaux_dispo.length) {// == []) {
+                self.zero_horaire = true;
+            }else{
+                self.zero_horaire = false;
+                for (var i=0; i<7; i++) {
+                    options = {col_offset: i};
+                    if (isNullOrUndef(col_index) || i==col_index) {
+                        for (var j=0; j<self.creneaux_dispo[i].length; j++) {
 
-                        le_creneau = new PlanningCreneauDispo(self, self.view, self.creneaux_dispo[i][j], options);
-                        self.columns[i].push(le_creneau);
-                        function compareFunction(recA, recB) {
-                            var heure_debut_a = recA.heure_debut,
-                                heure_debut_b = recB.heure_debut;
-                            if (!isNullOrUndef(recA.hours_cols)) {
-                                heure_debut_a = recA.hours_cols[i].heure_debut;
+                            le_creneau = new PlanningCreneauDispo(self, self.view, self.creneaux_dispo[i][j], options);
+                            self.columns[i].push(le_creneau);
+                            function compareFunction(recA, recB) {
+                                var heure_debut_a = recA.heure_debut,
+                                    heure_debut_b = recB.heure_debut;
+                                if (!isNullOrUndef(recA.hours_cols)) {
+                                    heure_debut_a = recA.hours_cols[i].heure_debut;
+                                }
+                                if (!isNullOrUndef(recB.hours_cols)) {
+                                    heure_debut_b = recB.hours_cols[i].heure_debut;
+                                }
+                                return heure_debut_a - heure_debut_b;
                             }
-                            if (!isNullOrUndef(recB.hours_cols)) {
-                                heure_debut_b = recB.hours_cols[i].heure_debut;
-                            }
-                            return heure_debut_a - heure_debut_b;
+                            self.columns[i].sort(compareFunction);
+                            //_.sortBy(self.columns[i], 'heure_debut');  // @TODO: gerer asynchronicité
                         }
-                        self.columns[i].sort(compareFunction);
-                        //_.sortBy(self.columns[i], 'heure_debut');  // @TODO: gerer asynchronicité
                     }
                 }
             }
@@ -1162,24 +1168,26 @@ PlanningView.Row = Widget.extend({
                 title: "Cet intervenant travaille plus d'heures que son maximum pour cette journée",
             }
             self.$(".of_planning_fillerbar_warning").tooltip(tooltip_options);
-            for (var i=0; i<7; i++) {
-                if (isNullOrUndef(col_index) || col_index==i) {
-                    $fillerbar = self.$("#of_planning_fillerbar_" + self.res_id + "_" + i);
-                    fillerbar = self.fillerbars[i];
-                    //console.log("LA FILLERBAR!", fillerbar);
+            if (!self.zero_horaire) {
+                for (var i=0; i<7; i++) {
+                    if (isNullOrUndef(col_index) || col_index==i) {
+                        $fillerbar = self.$("#of_planning_fillerbar_" + self.res_id + "_" + i);
+                        fillerbar = self.fillerbars[i];
+                        //console.log("LA FILLERBAR!", fillerbar);
 
-                    if (!fillerbar.nb_heures_travaillees) {
-                        fil_title = "Journée non travaillée"
-                    }else{
-                        fil_title = "Horaires du jour: " + fillerbar["creneaux_du_jour"] + "<br/>"
-                        + fillerbar["heures_occupees_str"] + " occupées sur " 
-                        + fillerbar["heures_travaillees_str"] + " travaillées (" + fillerbar["pct_occupe"].toFixed(2) + "%)"
+                        if (!fillerbar.nb_heures_travaillees) {
+                            fil_title = "Journée non travaillée"
+                        }else{
+                            fil_title = "Horaires du jour: " + fillerbar["creneaux_du_jour"] + "<br/>"
+                            + fillerbar["heures_occupees_str"] + " occupées sur " 
+                            + fillerbar["heures_travaillees_str"] + " travaillées (" + fillerbar["pct_occupe"].toFixed(2) + "%)"
+                        }
+                        tooltip_options = {
+                            delay: { show: 501, hide: 0 },
+                            title: fil_title,
+                        }
+                        $fillerbar.tooltip(tooltip_options);
                     }
-                    tooltip_options = {
-                        delay: { show: 501, hide: 0 },
-                        title: fil_title,
-                    }
-                    $fillerbar.tooltip(tooltip_options);
                 }
             }
             if (isNullOrUndef(col_index)) return self.$el.appendTo("tbody.of_planning_table_tbody");

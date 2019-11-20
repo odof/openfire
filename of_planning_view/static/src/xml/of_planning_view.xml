@@ -157,19 +157,26 @@
                     vertical-align: middle;">
             <t t-esc="row.head_column"/>
         </td>
-        <t t-foreach="row.columns.length" t-as="col_index">
-            <t t-set="records" t-value="row.columns[col_index]"/>
-            <t t-set="la_fillerbar" t-value="row.fillerbars[col_index]"/>
-            <td t-attf-id="of_planning_td_#{row.res_id}_#{col_index}" t-attf-style="background: #{col_index == row.col_offset_today and row.color_bg_rgba_today or row.color_bg_rgba}">
-                <div t-attf-id="of_planning_fillerbar_#{row.res_id}_#{col_index}" class="of_planning_fillerbar">
-                    <div t-if="la_fillerbar.pct_occupe > 0" class="of_planning_fillerbar_occupe"
-                      t-attf-style="width: #{la_fillerbar.pct_occupe}% !important; background: #{row.color_bg}; ">
-                        <i t-if="la_fillerbar.pct_occupe > 100" class="of_planning_fillerbar_warning fa fa-warning"/>
+        <t t-if="row.zero_horaire == false">
+            <t t-foreach="row.columns.length" t-as="col_index">
+                <t t-set="records" t-value="row.columns[col_index]"/>
+                <t t-set="la_fillerbar" t-value="row.fillerbars[col_index]"/>
+                <td t-attf-id="of_planning_td_#{row.res_id}_#{col_index}" t-attf-style="background: #{col_index == row.col_offset_today and row.color_bg_rgba_today or row.color_bg_rgba}">
+                    <div t-attf-id="of_planning_fillerbar_#{row.res_id}_#{col_index}" class="of_planning_fillerbar">
+                        <div t-if="la_fillerbar.pct_occupe > 0" class="of_planning_fillerbar_occupe"
+                          t-attf-style="width: #{la_fillerbar.pct_occupe}% !important; background: #{row.color_bg}; ">
+                            <i t-if="la_fillerbar.pct_occupe > 100" class="of_planning_fillerbar_warning fa fa-warning"/>
+                        </div>
+                        <div t-if="la_fillerbar.pct_disponible > 0" class="of_planning_fillerbar_disponible"
+                            t-attf-style="background-color: #{row.fillerbar_color_dispo}">
+                        </div>
                     </div>
-                    <div t-if="la_fillerbar.pct_disponible > 0" class="of_planning_fillerbar_disponible"
-                        t-attf-style="background-color: #{row.fillerbar_color_dispo}">
-                    </div>
-                </div>
+                </td>
+            </t>
+        </t>
+        <t t-else="">
+            <td t-att-colspan="row.columns.length" style="text-align: center">
+                Cet intervenant n'a pas d'horaires définis
             </td>
         </t>
         <td t-attf-style="

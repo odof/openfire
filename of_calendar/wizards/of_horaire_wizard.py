@@ -144,6 +144,7 @@ class OFHorairesSegmentWizard(models.TransientModel):
     @api.onchange('date_deb')
     def onchange_date_deb(self):
         self.ensure_one()
+        self.remplacement = False
         if self.date_deb and not self.permanent:
             self.date_fin = self.date_deb
 
@@ -310,12 +311,25 @@ class OFHorairesSegmentWizard(models.TransientModel):
             if segment_meme_deb:
                 raise UserError(u"Des horaires permanents qui commencent à cette date existent déjà")
             vals['permanent'] = True
+            """# Mettre à jour la date de fin du segment permanent précédent si nécessaire
+            segments_prec = segment_obj.search([
+                ('employee_id', '=', self.employee_id.id),
+                '|',
+                    ('date_deb', '<', self.date_deb),
+                    ('date_deb', '=', False),
+                ('permanent', '=', True),
+                ('id', '!=', self.segment_id and self.segment_id.id or False),
+            ])
+
+            # Définir une date de fin si il existe un segment permanent suivant"""
         else:
             vals['date_fin'] = self.date_fin
         if self.mode == 'create':
             segment_obj.create(vals)
         else:
             self.segment_id.write(vals)
+        if self.permanent:
+            segment_obj.recompute_permanent_date_fin(self.employee_id.id)
         return {'type': 'ir.actions.act_window_close'}
 
     @api.multi
@@ -324,6 +338,8 @@ class OFHorairesSegmentWizard(models.TransientModel):
         if not self.segment_id:
             raise UserError(u"Veuillez Sélectionner une période à supprimer")
         self.segment_id.unlink()
+        if self.permanent:
+            self.env['of.horaires.segment'].recompute_permanent_date_fin(self.employee_id.id)
         return {'type': 'ir.actions.act_window_close'}
 
     @api.multi
