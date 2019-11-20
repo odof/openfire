@@ -131,41 +131,52 @@ class HREmployee(models.Model):
         date_str = self._context.get('of_horaire_recap_start') or fields.Date.today()
 
         for employee in self:
-            segments = segment_obj.search([('employee_id', '=', employee.id),
-                                           '|', ('date_fin', '=', False), ('date_fin', '>=', date_str)])
-            if not segments:
-                employee.of_horaires_recap = "Pas d'horaire renseigné"
-                continue
-            segments_perm = segments.filtered('permanent')
-            segments_temp = segments - segments_perm
+            segments_temp = segment_obj.search([
+                ('employee_id', '=', employee.id),
+                ('permanent', '=', False),
+                ('date_fin', '>=', date_str)])
+            segments_perm = segment_obj.search([
+                ('employee_id', '=', employee.id),
+                ('permanent', '=', True), ], order="date_deb DESC")
 
-            recap = ""
+            recap = u"<p><i class='oe_grey'>Les horaires passés ne sont pas affichés.</i></p>"
             if segments_perm:
-                segment_cur = segments_perm[-1]
+                segments_perm_futur = segments_perm.filtered(lambda s: s.date_deb > date_str)
+                segments_perm_passe = (segments_perm - segments_perm_futur)
+                segment_perm_cur = segments_perm_passe[0]
 
-                recap = '<h3>Horaires :</h3>\n<p>\n' + formate_segment(segment_cur) + '</p>\n'
+                if segment_perm_cur.date_deb:
+                    depuis_cur = u"le " + segment_perm_cur.date_deb
+                else:
+                    depuis_cur = u"l'embauche"
+                if segment_perm_cur.motif:
+                    depuis_cur += u"(%s)" % segment_perm_cur.motif
+
+                recap += u'<h3>Horaires depuis %s</h3>\n<p>\n%s</p>\n' % (depuis_cur, formate_segment(segment_perm_cur))
                 for i_seg in range(len(segments_perm) - 1, 0, -1):
                     seg = segments_perm[i_seg]
-                    recap += "<h3>Changement d'horaires "
+                    recap += u"<h3>Changement d'horaires "
                     if seg.date_fin:
-                        recap += "du %s au %s" % (format_date(seg.date_deb),
+                        recap += u"du %s au %s" % (format_date(seg.date_deb),
                                                   format_date(seg.date_fin))
                     else:
-                        recap += "à partir du " + format_date(seg.date_deb)
+                        recap += u"à partir du " + format_date(seg.date_deb)
                     if seg.motif:
-                        recap += " (%s)" % seg.motif
-                    recap += '</h3>\n<p>\n' + formate_segment(seg) + '</p>\n'
+                        recap += u" (%s)" % seg.motif
+                    recap += u'</h3>\n<p>\n' + formate_segment(seg) + u'</p>\n'
+            else:
+                recap = u"<p><b class='of_red'><i class='fa fa-lg fa-warning'/> Aucun horaire permanent n'est renseigné</b></p>"
             if segments_temp:
-                recap += "<h3>Horaires temporaires</h3>\n"
+                recap += u"<h3>Horaires temporaires à venir</h3>\n"
                 for seg in segments_temp:
                     if seg.date_deb == seg.date_fin:
-                        recap += "<h5>Le " + format_date(seg.date_deb)
+                        recap += u"<h5>Le " + format_date(seg.date_deb)
                     else:
-                        recap += "<h5>du %s au %s" % (format_date(seg.date_deb),
+                        recap += u"<h5>du %s au %s" % (format_date(seg.date_deb),
                                                       format_date(seg.date_fin))
                     if seg.motif:
-                        recap += " (%s)" % seg.motif
-                    recap += '</h5>\n<p>\n' + formate_segment(seg) + '</p>\n'
+                        recap += u" (%s)" % seg.motif
+                    recap += u'</h5>\n<p>\n' + formate_segment(seg) + u'</p>\n'
             employee.of_horaires_recap = recap
 
     # @api.multi

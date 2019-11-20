@@ -37,17 +37,17 @@ class OFHoraireSaveModeleWizard(models.TransientModel):
             raise UserError(_(u"Échec de la sauvegarde : horaires non trouvés."))
         self.env['of.horaires.modele'].create({
             'name': self.name,
-            'creneau_ids': self.creneau_ids,
+            'creneau_ids': [(6, 0, self.creneau_ids.ids)],
         })
         self.fait = True
-        return {'type': 'ir.actions.do_nothing'}
+        return {'type': 'ir.actions.do_nothing'}  #self.env['of.horaires.modele'].search([('name', '=', 'BB')]).creneau_ids
 
     @api.multi
     def action_retour(self):
         if not self.wizard_id:
             return {'type': 'ir.actions.do_nothing'}
         action = self.env.ref('of_calendar.action_of_horaires_segment_' + self.mode + '_form_view').read()[0]
-        action['context'] = {'res_id': self.wizard_id.id}
+        action['res_id'] = self.wizard_id.id
         return action
 
 class OFHorairesSegmentWizard(models.TransientModel):
@@ -88,8 +88,8 @@ class OFHorairesSegmentWizard(models.TransientModel):
     ])
 
     employee_id = fields.Many2one('hr.employee', string=u"Employé", required=True, ondelete='cascade')
-    date_deb = fields.Date(string=u"Date de début")
-    date_fin = fields.Date(string="Date de fin")
+    date_deb = fields.Date(string=u"Date de début", default=lambda self: fields.Date.today())
+    date_fin = fields.Date(string="Date de fin", default=lambda self: fields.Date.today())
     permanent = fields.Boolean(
         string="horaire permanent",
         help="Horaires valables sur une durée indéterminée.",
@@ -109,6 +109,7 @@ class OFHorairesSegmentWizard(models.TransientModel):
     jour_ids = fields.Many2many('of.jours', string=u'Jours travaillés', default=lambda self: self._default_jours_ids())
 
     # Champs en cas de chevauchement
+    remplacement = fields.Boolean(string="besoin confirmation")
     seg_1_horaires_recap = fields.Html(compute='_compute_horaires_recap', string="Horaires de travail")
     seg_exist_ids = fields.Many2many('of.horaires.segment', string="Segment Existants", order="date_deb")
     seg_exist_recap = fields.Html(compute='_compute_horaires_recap', string="Horaires de travail")
@@ -147,6 +148,11 @@ class OFHorairesSegmentWizard(models.TransientModel):
             self.date_fin = self.date_deb
 
     @api.multi
+    @api.onchange('motif')
+    def onchange_motif(self):
+        self.ensure_one()
+
+    @api.multi
     @api.depends('permanent')
     def onchange_permanent(self):
         for wizard in self:
@@ -166,7 +172,7 @@ class OFHorairesSegmentWizard(models.TransientModel):
             #self.profil_id = False
 
     @api.multi
-    @api.depends('creneau_ids', 'seg_exist_ids', 'date_deb', 'date_fin')
+    @api.depends('creneau_ids', 'seg_exist_ids', 'date_deb', 'date_fin', 'permanent')
     def _compute_horaires_recap(self):
         lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
         def format_date(date):
@@ -175,9 +181,9 @@ class OFHorairesSegmentWizard(models.TransientModel):
             return u'<p>\n&nbsp;&nbsp;&nbsp;' + u'<br/>\n&nbsp;&nbsp;&nbsp;'.join(creneaux.format_str_list()) + u'</p>\n'
         for wizard in self:
             if not self.seg_exist_ids or not self.date_deb or not self.date_fin or self.permanent:
-                self.seg_1_horaires_recap = ""
-                self.seg_exist_recap = ""
-                self.result_recap = ""
+                self.seg_1_horaires_recap = False
+                self.seg_exist_recap = False
+                self.result_recap = False
             else:
                 seg_exist_pluriel = len(self.seg_exist_ids) > 1
                 recap_1 = u'<div><i>Vous avez entré la période horaire suivante :</i></div>'
@@ -249,6 +255,7 @@ class OFHorairesSegmentWizard(models.TransientModel):
 
         action = self.env.ref('of_calendar.action_of_horaire_save_modele_form_view').read()[0]
         action['context'] = {
+
             'default_creneau_ids': creneau_ids,
             'default_wizard_id': self.id,
             'default_mode': self.mode,
@@ -282,7 +289,9 @@ class OFHorairesSegmentWizard(models.TransientModel):
         if chevauche_seg_ids and not self.permanent:
             self.creneau_ids = [(6, 0, creneau_ids)]
             self.seg_exist_ids = [(6, 0, chevauche_seg_ids.ids)]
+            self.remplacement = True
             return {'type': 'ir.actions.do_nothing'}
+        self.remplacement = False
         self.employee_id.mode_horaires = self.mode_horaires  # conserver le mode horaires pour les futures utilisation du wizard
         vals = {
             'employee_id': self.employee_id.id,
