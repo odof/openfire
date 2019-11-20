@@ -45,6 +45,7 @@ class ResPartner(models.Model):
         """
         Création / Mise à jour du compte de tiers des clients.
         """
+        partner_obj = self.env['res.partner']
         # Ce verrou est normalement inutile car les appels _update_account() se font après les appels super() dans create et write
         if self._context.get('of_no_update_partner_account'):
             return
@@ -77,11 +78,11 @@ class ResPartner(models.Model):
                 if partner.customer and company.of_code_client:
                     # Création du compte de tiers
                     code, name = safe_eval(company.of_code_client, {'partner': partner, 'company': company})
-                    account_ids = ac_obj.search([('code', '=', code), ('company_id', '=', company.id)])
                     if (partner.property_account_receivable_id or default_account_receivable) == default_account_receivable:
-                        if account_ids:
-                            data['property_account_receivable_id'] = account_ids[0]
-                            account_ids[0].name = code
+                        account = ac_obj.search([('code', '=', code), ('company_id', '=', company.id)], limit=1)
+                        if account:
+                            data['property_account_receivable_id'] = account.id
+                            account.name = code
                         else:
                             type_id = data_obj.get_object_reference('account', 'data_account_type_receivable')[1]
                             account_data = {
@@ -97,20 +98,24 @@ class ResPartner(models.Model):
                             data['property_account_receivable_id'] = ac_obj.create(account_data)
                     elif partner.property_account_receivable_id.name != name:
                         # Mise à jour du libellé du compte de tiers
-                        if account_ids and self.env['res.partner'].search([('property_account_receivable_id', '=', account_ids[0])], count=True) == 1:
-                            partner.property_account_receivable_id.name = name
-                        else:
-                            partner.property_account_receivable_id.name = code
+                        account = partner.property_account_receivable_id
+                        account_partners = partner_obj.search([('property_account_receivable_id', '=', account.id)])
+                        for account_partner in account_partners:
+                            if account_partner.commercial_partner_id != partner.commercial_partner_id:
+                                name = account.code
+                                break
+                        if account.name != name:
+                            account.name = name
 
                 # Si est un fournisseur
                 if partner.supplier and company.of_code_fournisseur:
                     # Création du compte de tiers
                     code, name = safe_eval(company.of_code_fournisseur, {'partner': partner, 'company': company})
-                    account_ids = ac_obj.search([('code', '=', code), ('company_id', '=', company.id)])
                     if (partner.property_account_payable_id or default_account_payable) == default_account_payable:
-                        if account_ids:
-                            data['property_account_payable_id'] = account_ids[0]
-                            account_ids[0].name = code
+                        account = ac_obj.search([('code', '=', code), ('company_id', '=', company.id)], limit=1)
+                        if account:
+                            data['property_account_payable_id'] = account.id
+                            account.name = code
                         else:
                             type_id = data_obj.get_object_reference('account', 'data_account_type_payable')[1]
                             account = {
@@ -126,10 +131,14 @@ class ResPartner(models.Model):
                             data['property_account_payable_id'] = ac_obj.create(account)
                     elif partner.property_account_payable_id.name != name:
                         # Mise à jour du libellé du compte de tiers
-                        if account_ids and self.env['res.partner'].search([('property_account_payable_id', '=', account_ids[0])], count=True) == 1:
-                            partner.property_account_payable_id.name = name
-                        else:
-                            partner.property_account_payable_id.name = code
+                        account = partner.property_account_payable_id
+                        account_partners = partner_obj.search([('property_account_payable_id', '=', account.id)])
+                        for account_partner in account_partners:
+                            if account_partner.commercial_partner_id != partner.commercial_partner_id:
+                                name = account.code
+                                break
+                        if account.name != name:
+                            account.name = name
 
                 if data:
                     partner.write(data)
