@@ -8,10 +8,10 @@ class OFHoraireSaveModeleWizard(models.TransientModel):
     _name = 'of.horaire.save.modele.wizard'
 
     name = fields.Char(string=u"Libellé", required=True)
-    creneau_ids = fields.Many2many("of.horaires.creneau", string=u"Créneaux")
+    creneau_ids = fields.Many2many("of.horaire.creneau", string=u"Créneaux")
     horaires_recap = fields.Html(compute='_compute_horaires_recap', string="Récapitulatif des horaires")
     fait = fields.Boolean(string="fait!")
-    wizard_id = fields.Many2one('of.horaires.segment.wizard', string="wizard")
+    wizard_id = fields.Many2one('of.horaire.segment.wizard', string="wizard")
     mode = fields.Selection([
         ('create', u"Créer"),
         ('edit', u"Éditer"),
@@ -35,7 +35,7 @@ class OFHoraireSaveModeleWizard(models.TransientModel):
             raise UserError(_(u"Échec de la sauvegarde : nom manquant."))
         if not self.creneau_ids:
             raise UserError(_(u"Échec de la sauvegarde : horaires non trouvés."))
-        self.env['of.horaires.modele'].create({
+        self.env['of.horaire.modele'].create({
             'name': self.name,
             'creneau_ids': [(6, 0, self.creneau_ids.ids)],
         })
@@ -46,12 +46,12 @@ class OFHoraireSaveModeleWizard(models.TransientModel):
     def action_retour(self):
         if not self.wizard_id:
             return {'type': 'ir.actions.do_nothing'}
-        action = self.env.ref('of_calendar.action_of_horaires_segment_' + self.mode + '_form_view').read()[0]
+        action = self.env.ref('of_calendar.action_of_horaire_segment_' + self.mode + '_form_view').read()[0]
         action['res_id'] = self.wizard_id.id
         return action
 
 class OFHorairesSegmentWizard(models.TransientModel):
-    _name = 'of.horaires.segment.wizard'
+    _name = 'of.horaire.segment.wizard'
 
     def _default_jours_ids(self):
         # Lundi à vendredi comme valeurs par défaut
@@ -72,7 +72,7 @@ class OFHorairesSegmentWizard(models.TransientModel):
         active_id = self._context.get('active_id')
         if not active_id:
             return []
-        wizard = self.env['of.horaires.segment.wizard'].browse(active_id)
+        wizard = self.env['of.horaire.segment.wizard'].browse(active_id)
         return [
             ('employee_id', '=', wizard.employee_id.id),
             ('permanent', '=', wizard.permanent),
@@ -97,11 +97,11 @@ class OFHorairesSegmentWizard(models.TransientModel):
     )
     premier_seg = fields.Boolean(string=u"premier segment permanent?", default = lambda self: self._default_premier_seg())
     motif = fields.Char(string="Motif du changement")
-    modele_id = fields.Many2one('of.horaires.modele', string="Charger un modèle")
+    modele_id = fields.Many2one('of.horaire.modele', string="Charger un modèle")
     mode_horaires = fields.Selection([
         ("easy", "Facile"),
         ("advanced", u"Avancé")], string="Mode de Sélection des horaires", required=True, default="easy")
-    creneau_ids = fields.Many2many("of.horaires.creneau", string=u"Créneaux")
+    creneau_ids = fields.Many2many("of.horaire.creneau", string=u"Créneaux")
     hor_md = fields.Float(string=u'Matin début', digits=(12, 5), default=9)
     hor_mf = fields.Float(string=u'Matin fin', digits=(12, 5), default=12)
     hor_ad = fields.Float(string=u'Après-midi début', digits=(12, 5), default=14)
@@ -111,12 +111,12 @@ class OFHorairesSegmentWizard(models.TransientModel):
     # Champs en cas de chevauchement
     remplacement = fields.Boolean(string="besoin confirmation")
     seg_1_horaires_recap = fields.Html(compute='_compute_horaires_recap', string="Horaires de travail")
-    seg_exist_ids = fields.Many2many('of.horaires.segment', string="Segment Existants", order="date_deb")
+    seg_exist_ids = fields.Many2many('of.horaire.segment', string="Segment Existants", order="date_deb")
     seg_exist_recap = fields.Html(compute='_compute_horaires_recap', string="Horaires de travail")
     result_recap = fields.Html(compute='_compute_horaires_recap', string="Horaires de travail")
 
     # Pour la modification et la suppression
-    segment_id = fields.Many2one('of.horaires.segment', string="Période concernée")#, domain=_get_segment_id_domain)
+    segment_id = fields.Many2one('of.horaire.segment', string="Période concernée")#, domain=_get_segment_id_domain)
 
     @api.multi
     @api.onchange('hor_md', 'hor_mf', 'hor_ad', 'hor_af', 'mode_horaires')
@@ -245,8 +245,8 @@ class OFHorairesSegmentWizard(models.TransientModel):
     def button_save_modele(self):
         self.ensure_one()
         self.onchange_hor_ma_df()
-        creneau_obj = self.env['of.horaires.creneau']
-        segment_obj = self.env['of.horaires.segment']
+        creneau_obj = self.env['of.horaire.creneau']
+        segment_obj = self.env['of.horaire.segment']
         if self.mode_horaires == 'easy':
             create_exist_ids = creneau_obj.create_if_necessary(
                 self.hor_md, self.hor_mf, self.hor_ad, self.hor_af, self.jour_ids.ids)
@@ -271,8 +271,8 @@ class OFHorairesSegmentWizard(models.TransientModel):
         if not self.permanent and self.date_fin and self.date_fin < self.date_deb:
             raise UserError(u"la date de fin doit être postérieure ou égale à la date de début")
         self.onchange_hor_ma_df()
-        creneau_obj = self.env['of.horaires.creneau']
-        segment_obj = self.env['of.horaires.segment']
+        creneau_obj = self.env['of.horaire.creneau']
+        segment_obj = self.env['of.horaire.segment']
         if self.mode_horaires == 'easy':
             create_exist_ids = creneau_obj.create_if_necessary(
                 self.hor_md, self.hor_mf, self.hor_ad, self.hor_af, self.jour_ids.ids)
@@ -345,7 +345,7 @@ class OFHorairesSegmentWizard(models.TransientModel):
     @api.multi
     def button_remplacer(self):
         self.ensure_one()
-        segment_obj = self.env['of.horaires.segment']
+        segment_obj = self.env['of.horaire.segment']
 
         un_jour = timedelta(days=1)
         premier_fin_da = fields.Date.from_string(self.date_deb) - un_jour

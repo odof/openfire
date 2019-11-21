@@ -24,20 +24,20 @@
             </xpath>
             <xpath expr="//notebook" position="inside">
                 <page name="horaires" string="Horaires">
-                    <field name="of_horaires_recap"/>
-                    <button name="%(action_of_horaires_segment_create_form_view)d" string="Créer un horaire" type="action"
+                    <field name="of_horaire_recap"/>
+                    <button name="%(action_of_horaire_segment_create_form_view)d" string="Créer un horaire" type="action"
                     context="{
                         'default_employee_id': id,
                         'default_mode': 'create',
                         'default_mode_horaires': of_mode_horaires,
                     }"/>
-                    <button name="%(action_of_horaires_segment_edit_form_view)d" string="Modifier un horaire" type="action"
+                    <button name="%(action_of_horaire_segment_edit_form_view)d" string="Modifier un horaire" type="action"
                     context="{
                         'default_employee_id': id,
                         'default_mode': 'edit',
                         'default_mode_horaires': of_mode_horaires,
                     }"/>
-                    <button name="%(action_of_horaires_segment_unlink_form_view)d" string="Supprimer un horaire" type="action"
+                    <button name="%(action_of_horaire_segment_unlink_form_view)d" string="Supprimer un horaire" type="action"
                     context="{
                         'default_employee_id': id,
                         'default_mode': 'unlink',
@@ -92,9 +92,9 @@
     </record>
 
     <!-- Créneaux d'horaires -->
-    <record id="view_of_horaires_creneau_tree" model="ir.ui.view">
-        <field name="name">of.horaires.creneau.tree</field>
-        <field name="model">of.horaires.creneau</field>
+    <record id="view_of_horaire_creneau_tree" model="ir.ui.view">
+        <field name="name">of.horaire.creneau.tree</field>
+        <field name="model">of.horaire.creneau</field>
         <field name="arch" type="xml">
             <tree string="Créneaux horaires" editable="bottom">
                 <field name="jour_number" invisible="1"/>
@@ -106,9 +106,9 @@
         </field>
     </record>
 
-    <record id="view_of_horaires_creneau_form" model="ir.ui.view">
-        <field name="name">of.horaires.creneau.form</field>
-        <field name="model">of.horaires.creneau</field>
+    <record id="view_of_horaire_creneau_form" model="ir.ui.view">
+        <field name="name">of.horaire.creneau.form</field>
+        <field name="model">of.horaire.creneau</field>
         <field name="arch" type="xml">
             <form string="Créneaux">
                 <field name="jour_number" invisible="1"/>
@@ -126,9 +126,9 @@
         </field>
     </record>
 
-    <record id="view_of_horaires_creneau_filter" model="ir.ui.view">
-        <field name="name">of.horaires.creneau.search</field>
-        <field name="model">of.horaires.creneau</field>
+    <record id="view_of_horaire_creneau_filter" model="ir.ui.view">
+        <field name="name">of.horaire.creneau.search</field>
+        <field name="model">of.horaire.creneau</field>
         <field name="arch" type="xml">
             <search string="Créneaux">
                 <field name="name" string="Créneau"/>
@@ -151,16 +151,16 @@
     </record>
 
     <record id="action_view_of_horaire_creneau_tree" model="ir.actions.act_window">
-        <field name="name">Créneaux Horaires</field>
-        <field name="res_model">of.horaires.creneau</field>
+        <field name="name">Créneaux horaires</field>
+        <field name="res_model">of.horaire.creneau</field>
         <field name="view_type">form</field>
         <field name="view_mode">form,tree</field>
-        <field name="view_id" eval="view_of_horaires_creneau_tree"/>
-        <field name="search_view_id" ref="view_of_horaires_creneau_filter"/>
+        <field name="view_id" eval="view_of_horaire_creneau_tree"/>
+        <field name="search_view_id" ref="view_of_horaire_creneau_filter"/>
     </record>
 
     <menuitem
-        id="menu_hr_config_of_creneaux"
+        id="menu_hr_config_of_creneau"
         name="Créneaux horaires"
         parent="hr.menu_human_resources_configuration"
         groups="hr.group_hr_manager"

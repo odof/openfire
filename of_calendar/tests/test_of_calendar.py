@@ -12,7 +12,7 @@ class OfTestEmployees(common.TransactionCase):
         super(OfTestEmployees, self).setUp()
         self.of_jours_model = self.env['of.jours']
         self.hr_employee_model = self.env['hr.employee']
-        self.creneau_model = self.env['of.horaires.creneau']
+        self.creneau_model = self.env['of.horaire.creneau']
 
     def test_employees(self):
         def generate_creneaux_create_data(creneaux):
