@@ -299,18 +299,18 @@ class OfTestEmployees(common.TransactionCase):
 
         self.assertEqual(
             emp_2.get_horaires_date('2019-06-20')[emp_2.id],
-            [(7.0, 9.0), (11.0, 14.0), (15.0, 19.0)],
+            [[7.0, 9.0], [11.0, 14.0], [15.0, 19.0]],
             "Mauvais calcul d'horaire sur date (#1)"
         )
 
         self.assertEqual(
             emp_2.get_horaires_date('2019-07-03')[emp_2.id],
-            [(15.0, 18.0)],
+            [[15.0, 18.0]],
             "Mauvais calcul d'horaire sur date (#2)"
         )
 
         self.assertEqual(
             emp_2.get_horaires_date('2019-07-04')[emp_2.id],
-            [(15.0, 19.0)],
+            [[15.0, 19.0]],
             "Mauvais calcul d'horaire sur date (#3)"
         )
