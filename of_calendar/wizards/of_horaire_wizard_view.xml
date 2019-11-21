@@ -28,9 +28,9 @@
         </field>
     </record>
 
-    <record id="of_horaires_segment_form_view" model="ir.ui.view">
-        <field name="name">of.horaires.segment.form.view</field>
-        <field name="model">of.horaires.segment.wizard</field>
+    <record id="of_horaire_segment_form_view" model="ir.ui.view">
+        <field name="name">of.horaire.segment.form.view</field>
+        <field name="model">of.horaire.segment.wizard</field>
         <field name="arch" type="xml">
             <form>
                 <!--script>
@@ -178,40 +178,40 @@
 
     <act_window
         name="Créer un horaire"
-        res_model="of.horaires.segment.wizard"
+        res_model="of.horaire.segment.wizard"
         view_mode="form"
-        view_id="of_horaires_segment_form_view"
-        id="action_of_horaires_segment_create_form_view"
+        view_id="of_horaire_segment_form_view"
+        id="action_of_horaire_segment_create_form_view"
         target="new"
         groups="hr.group_hr_manager"
     />
 
     <act_window
         name="Modifier un horaire"
-        res_model="of.horaires.segment.wizard"
+        res_model="of.horaire.segment.wizard"
         view_mode="form"
-        view_id="of_horaires_segment_form_view"
-        id="action_of_horaires_segment_edit_form_view"
+        view_id="of_horaire_segment_form_view"
+        id="action_of_horaire_segment_edit_form_view"
         target="new"
         groups="hr.group_hr_manager"
     />
 
     <act_window
         name="Supprimer un horaire"
-        res_model="of.horaires.segment.wizard"
+        res_model="of.horaire.segment.wizard"
         view_mode="form"
-        view_id="of_horaires_segment_form_view"
-        id="action_of_horaires_segment_unlink_form_view"
+        view_id="of_horaire_segment_form_view"
+        id="action_of_horaire_segment_unlink_form_view"
         target="new"
         groups="hr.group_hr_manager"
     />
 
     <!--act_window
         name="Résoudre un chevauchement de fiches horaires"
-        res_model="of.horaires.segment.choose.wizard"
+        res_model="of.horaire.segment.choose.wizard"
         view_mode="form"
-        view_id="of_horaires_segment_choose_form_view"
-        id="action_of_horaires_segment_choose_form_view"
+        view_id="of_horaire_segment_choose_form_view"
+        id="action_of_horaire_segment_choose_form_view"
         target="new"
         groups="hr.group_hr_manager"
     /-->

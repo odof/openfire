@@ -729,12 +729,12 @@
 
         <!-- créneaux horaires -->
         <record id="action_view_of_horaire_creneau_tree_intervention" model="ir.actions.act_window">
-            <field name="name">Créneaux Horaires</field>
-            <field name="res_model">of.horaires.creneau</field>
+            <field name="name">Créneaux horaires</field>
+            <field name="res_model">of.horaire.creneau</field>
             <field name="view_type">form</field>
             <field name="view_mode">form,tree</field>
-            <field name="view_id" ref="of_calendar.view_of_horaires_creneau_tree"/>
-            <field name="search_view_id" ref="of_calendar.view_of_horaires_creneau_filter"/>
+            <field name="view_id" ref="of_calendar.view_of_horaire_creneau_tree"/>
+            <field name="search_view_id" ref="of_calendar.view_of_horaire_creneau_filter"/>
         </record>
 
         <!-- secteurs -->
@@ -896,7 +896,7 @@
             <menuitem name="Modèles de courriers" id="menu_of_planning_mail_templates" parent="of_planning.menu_of_planning_configuration" sequence="70" action="of_gesdoc.action_of_mail_template_tree_all" />
             <menuitem name="Employés" id="menu_hr_employee_tree" parent="of_planning.menu_of_planning_configuration" sequence="80" action="action_hr_employee_tree"/>
             <menuitem name="Équipes" id="menu_of_planning_equipe_tree" parent="of_planning.menu_of_planning_configuration" sequence="90" action="action_of_planning_equipe_tree"/>
-            <menuitem id="menu_hr_config_of_creneaux_intervention" name="Créneaux horaires" parent="menu_of_planning_configuration" groups="hr.group_hr_manager" action="action_view_of_horaire_creneau_tree_intervention" sequence="95"/>
+            <menuitem id="menu_hr_config_of_creneau_intervention" name="Créneaux horaires" parent="menu_of_planning_configuration" groups="hr.group_hr_manager" action="action_view_of_horaire_creneau_tree_intervention" sequence="95"/>
             <menuitem name="Erreurs" id="menu_of_planning_intervention_raison_tree" parent="of_planning.menu_of_planning_configuration" sequence="100" action="action_of_planning_intervention_raison_tree"/>
             <menuitem name="Catégories de tâches" id="menu_of_planning_tache_categ_tree" parent="of_planning.menu_of_planning_configuration" sequence="109" action="action_of_planning_tache_categ_tree"/>
             <menuitem name="Tâches" id="menu_of_planning_tache_tree" parent="of_planning.menu_of_planning_configuration" sequence="110" action="action_of_planning_tache_tree"/>

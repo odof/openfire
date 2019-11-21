@@ -58,17 +58,17 @@ class HREmployee(models.Model):
     of_mode_horaires = fields.Selection([
         ("easy", "Facile"),
         ("advanced", u"Avancé")], string="Mode de sélection des horaires", required=True, default="easy")
-    of_segment_ids = fields.One2many('of.horaires.segment', 'employee_id', string="Horaires de travail")
+    of_segment_ids = fields.One2many('of.horaire.segment', 'employee_id', string="Horaires de travail")
 
-    of_horaires_recap = fields.Html(compute='_compute_of_horaires_recap', string="Horaires de travail")
-    # of_profil_id = fields.Many2one("of.horaires.profil", "Profil")
-    # of_creneau_ids = fields.Many2many("of.horaires.creneau", "of_employee_creneaux_rel", "employee_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
-    # of_creneau_temp_ids = fields.Many2many("of.horaires.creneau", "of_employee_creneaux_temp_rel", "employee_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
+    of_horaire_recap = fields.Html(compute='_compute_of_horaire_recap', string="Horaires de travail")
+    # of_profil_id = fields.Many2one("of.horaire.profil", "Profil")
+    # of_creneau_ids = fields.Many2many("of.horaire.creneau", "of_employee_creneau_rel", "employee_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
+    # of_creneau_temp_ids = fields.Many2many("of.horaire.creneau", "of_employee_creneau_temp_rel", "employee_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
     # of_creneau_temp_start = fields.Date(string=u"Début des horaires temporaires")
     # of_creneau_temp_stop = fields.Date(string="Fin des horaires temporaires")
     # of_archive_horaires = fields.Text(string="Archive des horaires")
     # of_archive_horaires_temp = fields.Text(string="Archive des horaires temporaires")
-    # of_horaires_du_jour = fields.Text(string=u"Horaires d'aujourd'hui", compute="_compute_horaires_du_jour")
+    # of_horaire_du_jour = fields.Text(string=u"Horaires d'aujourd'hui", compute="_compute_horaires_du_jour")
 
     of_hor_md = fields.Float(string=u'Matin début', digits=(12, 5), default=9)
     of_hor_mf = fields.Float(string=u'Matin fin', digits=(12, 5), default=12)
@@ -121,14 +121,14 @@ class HREmployee(models.Model):
             employee.of_tz_offset = datetime.now(pytz.timezone(employee.of_tz or 'GMT')).strftime('%z')
 
     @api.depends('of_segment_ids')
-    def _compute_of_horaires_recap(self):
+    def _compute_of_horaire_recap(self):
         def format_date(date):
             return fields.Date.from_string(date).strftime(lang.date_format)
 
         def formate_segment(segment):
             return '<p>\n&nbsp;&nbsp;&nbsp;' + '<br/>\n&nbsp;&nbsp;&nbsp;'.join(segment.format_str_list()) + '</p>\n'
 
-        segment_obj = self.env['of.horaires.segment']
+        segment_obj = self.env['of.horaire.segment']
         lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
         date_str = self._context.get('of_horaire_recap_start') or fields.Date.today()
 
@@ -158,13 +158,13 @@ class HREmployee(models.Model):
                 for i_seg in range(len(segments_perm) - 1, 0, -1):
                     seg = segments_perm[i_seg]
                     recap += u"<h3>Changement d'horaires "
-                    """if seg.date_fin:
+                    if seg.date_fin:
                         recap += u"du %s au %s" % (format_date(seg.date_deb),
                                                   format_date(seg.date_fin))
                     
-                    else:"""
+                    else:
                     # ^- toujours "à partir du" ( date_fin implicite à la lecture )
-                    recap += u"à partir du " + format_date(seg.date_deb)
+                        recap += u"à partir du " + format_date(seg.date_deb)
                     if seg.motif:
                         recap += u" (%s)" % seg.motif
                     recap += u'</h3>\n<p>\n' + formate_segment(seg) + u'</p>\n'
@@ -181,14 +181,14 @@ class HREmployee(models.Model):
                     if seg.motif:
                         recap += u" (%s)" % seg.motif
                     recap += u'</h5>\n<p>\n' + formate_segment(seg) + u'</p>\n'
-            employee.of_horaires_recap = recap
+            employee.of_horaire_recap = recap
 
     # @api.multi
     # @api.depends('of_archive_horaires', 'of_archive_horaires_temp')
     # def _compute_horaires_du_jour(self):
     #     horaires_today = self.get_horaires_date(fields.Date.today())
     #     for employee in self:
-    #         employee.of_horaires_du_jour = "\n".join(hours_to_strs(horaires_today[employee.id]))
+    #         employee.of_horaire_du_jour = "\n".join(hours_to_strs(horaires_today[employee.id]))
 
     @api.onchange('of_address_depart_id')
     def _onchange_address_depart_id(self):
@@ -411,7 +411,7 @@ class HREmployee(models.Model):
     def get_horaires_date(self, date_str):
         """Renvoie les horaires des employés à la date donnée en paramètre.
         :rtype: { employee_id :  [(h_deb, h_fin), (h_deb, h_fin), ..] ,  .. }"""
-        segment_obj = self.env['of.horaires.segment']
+        segment_obj = self.env['of.horaire.segment']
         date_da = fields.Date.from_string(date_str)
         num_jour = date_da.isoweekday()  # entre 1 et 7
         res = {}
@@ -721,7 +721,7 @@ class HREmployee(models.Model):
 
 
 class OFHorairesSegment(models.Model):
-    _name = 'of.horaires.segment'
+    _name = 'of.horaire.segment'
     _order = 'date_deb'
 
     name = fields.Char(string="Période", compute="_compute_name")
@@ -734,10 +734,10 @@ class OFHorairesSegment(models.Model):
         help="Horaires valables sur une durée indéterminée."
     )
     creneau_ids = fields.Many2many(
-        "of.horaires.creneau", "of_segment_creneaux_rel", "segment_id", "creneau_id",
+        "of.horaire.creneau", "of_segment_creneau_rel", "segment_id", "creneau_id",
         string=u"Créneaux"
     )
-    modele_id = fields.Many2one('of.horaires.modele', string="Charger un modèle", compute=lambda *args: None)
+    modele_id = fields.Many2one('of.horaire.modele', string="Charger un modèle", compute=lambda *args: None)
     active = fields.Boolean(string="Active", default=True)
     motif = fields.Char(string="Motif du changement")
 
@@ -868,7 +868,7 @@ class OFHorairesSegment(models.Model):
 
 
 class OFHorairesCreneau(models.Model):
-    _name = "of.horaires.creneau"
+    _name = "of.horaire.creneau"
     _order = "jour_number, heure_debut"
 
     name = fields.Char("Créneau", compute="_compute_name", store=True)
@@ -970,11 +970,11 @@ class OFHorairesCreneau(models.Model):
 
 
 class OFHorairesModele(models.Model):
-    _name = "of.horaires.modele"
+    _name = "of.horaire.modele"
 
     name = fields.Char("Nom du modèle")
     creneau_ids = fields.Many2many(
-        'of.horaires.creneau', 'modele_creneaux', 'modele_id', 'creneau_id', string=u"Créneaux"
+        'of.horaire.creneau', 'modele_creneaux', 'modele_id', 'creneau_id', string=u"Créneaux"
     )
     active = fields.Boolean(string="Actif", default=True)
 

@@ -169,10 +169,10 @@ class OfPlanningEquipe(models.Model):
     # Ajout des horaires avancés
     mode_horaires = fields.Selection([
         ("easy", "Facile"),
-        ("advanced", u"Avancé")], string=u"Mode de Sélection des horaires", required=True, default="easy")
-    modele_id = fields.Many2one("of.horaires.modele", "Modèle")
-    of_creneau_ids = fields.Many2many("of.horaires.creneau", "of_equipe_creneaux_rel", "equipe_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
-    of_creneau_temp_ids = fields.Many2many("of.horaires.creneau", "of_equipe_creneaux_temp_rel", "equipe_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
+        ("advanced", u"Avancé")], string=u"Mode de sélection des horaires", required=True, default="easy")
+    modele_id = fields.Many2one("of.horaire.modele", "Modèle")
+    of_creneau_ids = fields.Many2many("of.horaire.creneau", "of_equipe_creneau_rel", "equipe_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
+    of_creneau_temp_ids = fields.Many2many("of.horaire.creneau", "of_equipe_creneau_temp_rel", "equipe_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
     of_creneau_temp_start = fields.Date(string=u"Début des horaires temporaires")
     of_creneau_temp_stop = fields.Date(string="Fin des horaires temporaires")
 
@@ -181,13 +181,13 @@ class OfPlanningEquipe(models.Model):
     ]
 
     _constraints = [
-        (check_no_overlapping, u'Vous ne pourrez pas sauvegarder tant que des créneaux se chevauchent!', []),
+        (check_no_overlapping, u'Vous ne pourrez pas sauvegarder tant que des créneaux se chevauchent.', []),
     ]
 
     @api.onchange("of_creneau_ids", "of_creneau_temp_ids")
     def _onchange_creneaux(self):
         if not self.check_no_overlapping():
-            raise UserError(u"Oups! Des créneaux se chevauchent. Veuillez vous assurer que ce ne soit plus le cas avant de sauvegarder.")
+            raise UserError(u"Oups ! Des créneaux se chevauchent. Veuillez vous assurer que ce ne soit plus le cas avant de sauvegarder.")
 
     @api.depends('tz')
     def _compute_tz_offset(self):
@@ -217,7 +217,7 @@ class OfPlanningEquipe(models.Model):
                 self.of_creneau_temp_stop = self.employee_ids.of_creneau_temp_stop
             else:  # plusieurs employés /!\ ne gère pas les créneaux temporaires
                 les_employees = self.employee_ids[1:]
-                les_creneaux = self.env['of.horaires.creneau']
+                les_creneaux = self.env['of.horaire.creneau']
                 for ce_creneau in self.employee_ids[0].of_creneau_ids:  # on teste tous les créneaux du premier employé et on ne garde que ceux qui sont aussi dans tous les autres employés
                     if les_employees.possede_creneau(ce_creneau.id):
                         les_creneaux |= ce_creneau
@@ -337,8 +337,8 @@ class OfPlanningIntervention(models.Model):
     """mode_horaires = fields.Selection([
         ("easy", "Facile"),
         ("advanced", u"Avancé")], string="Mode de Sélection des horaires", default="easy")
-    of_creneau_ids = fields.Many2many("of.horaires.creneau", "of_intervention_creneaux_rel", "intervention_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
-    of_creneau_temp_ids = fields.Many2many("of.horaires.creneau", "of_intervention_creneaux_temp_rel", "intervention_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
+    of_creneau_ids = fields.Many2many("of.horaire.creneau", "of_intervention_creneau_rel", "intervention_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
+    of_creneau_temp_ids = fields.Many2many("of.horaire.creneau", "of_intervention_creneau_temp_rel", "intervention_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
     of_creneau_temp_start = fields.Date(string=u"Début des horaires temporaires")
     of_creneau_temp_stop = fields.Date(string="Fin des horaires temporaires")
     hor_md = fields.Float(string=u'Matin début', digits=(12, 5))
@@ -563,43 +563,35 @@ class OfPlanningIntervention(models.Model):
                        "WHERE oj.numero >= 1 AND oj.numero <= 5 "
                        "AND he.id NOT IN (SELECT employee_id FROM employee_jours_rel)")
 
-            # Initialise les créneaux.
+            # Initialisation des créneaux
+
             maintenant = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
             # Horaires du matin
-            cr.execute("INSERT INTO of_horaires_creneau(create_uid, write_uid, create_date, write_date, name, heure_debut, heure_fin, jour_number, jour_id) "
+            cr.execute("INSERT INTO of_horaire_creneau(create_uid, write_uid, create_date, write_date, name, heure_debut, heure_fin, jour_number, jour_id) "
                        "SELECT DISTINCT ON(of_hor_md, of_hor_mf, oj.numero) 1, 1, '%s', '%s', oj.abr || ' ' || FLOOR(of_hor_md) || 'h' || REPLACE(RPAD(FLOOR(60*(of_hor_md-FLOOR(of_hor_md)))::text, 2, '0'), '00', '') || ' - ' || FLOOR(of_hor_mf) || 'h' || REPLACE(RPAD(FLOOR(60*(of_hor_mf-FLOOR(of_hor_mf)))::text, 2, '0'), '00', ''), of_hor_md, of_hor_mf, oj.numero, oj.id "
                        "FROM hr_employee he, employee_jours_rel ejr, of_jours oj "
                        "WHERE ejr.employee_id = he.id "
                        "AND ejr.jour_id = oj.id" % (maintenant, maintenant))
             # Horaires de l'après-midi
-            cr.execute("INSERT INTO of_horaires_creneau(create_uid, write_uid, create_date, write_date, name, heure_debut, heure_fin, jour_number, jour_id) "
+            cr.execute("INSERT INTO of_horaire_creneau(create_uid, write_uid, create_date, write_date, name, heure_debut, heure_fin, jour_number, jour_id) "
                        "SELECT DISTINCT ON(of_hor_ad, of_hor_af, oj.numero) 1, 1, '%s', '%s', oj.abr || ' ' || FLOOR(of_hor_ad) || 'h' || REPLACE(RPAD(FLOOR(60*(of_hor_ad-FLOOR(of_hor_ad)))::text, 2, '0'), '00', '') || ' - ' || FLOOR(of_hor_af) || 'h' || REPLACE(RPAD(FLOOR(60*(of_hor_af-FLOOR(of_hor_af)))::text, 2, '0'), '00', ''), of_hor_ad, of_hor_af, oj.numero, oj.id "
                        "FROM hr_employee he, employee_jours_rel ejr, of_jours oj "
                        "WHERE ejr.employee_id = he.id "
                        "AND ejr.jour_id = oj.id "
-                       "AND (SELECT 1 FROM hr_employee WHERE hr_employee.of_hor_md = he.of_hor_ad AND hr_employee.of_hor_mf = he.of_hor_af) <> 1" % (maintenant, maintenant))
-
-            # FROM hr_employee he, employee_jours_rel ejr, of_jours oj
-            # WHERE ejr.employee_id = he.id
-            # AND ejr.jour_id = oj.id
-
-            # # On remplit le champ jour_ids dans les interventions par les valeurs lundi à vendredi.
-            # cr.execute("INSERT INTO of_intervention_jours_rel(intervention_id, jour_id) "
-            #            "SELECT opi.id, oj.numero "
-            #            "FROM of_planning_intervention opi, of_jours oj "
-            #            "WHERE oj.numero >= 1 AND oj.numero <= 5")
-            #
-            # # Pour les interventions effectuées un samedi, on ajoute le samedi dans jour_ids.
-            # cr.execute("INSERT INTO of_intervention_jours_rel(intervention_id, jour_id) "
-            #            "SELECT opi.id, 6 "
-            #            "FROM of_planning_intervention opi "
-            #            "WHERE EXTRACT(DOW FROM opi.date) = 6")
-            #
-            # # Même chose pour le dimanche.
-            # cr.execute("INSERT INTO of_intervention_jours_rel(intervention_id, jour_id) "
-            #            "SELECT opi.id, 7 "
-            #            "FROM of_planning_intervention opi "
-            #            "WHERE EXTRACT(DOW FROM opi.date) = 0")
+                       "AND (SELECT 1 FROM hr_employee WHERE hr_employee.of_hor_md = he.of_hor_ad AND hr_employee.of_hor_mf = he.of_hor_af) IS Null" % (maintenant, maintenant))
+            # Initialisation des segments horaires
+            cr.execute("INSERT INTO of_horaire_segment(create_uid, write_uid, create_date, write_date, employee_id, date_deb, date_fin, permanent, active) "
+                       "SELECT 1, 1, '%s', '%s', id, Null, Null, True, True "
+                       "FROM hr_employee "
+                       "WHERE of_est_intervenant = True" % (maintenant, maintenant))
+            # Initialise lien entre créneau et segment
+            cr.execute("INSERT INTO of_segment_creneau_rel(segment_id, creneau_id) "
+                        "SELECT ohs.id, ohc.id "
+                        "FROM of_horaire_segment ohs, hr_employee he, of_horaire_creneau ohc, employee_jours_rel ejr "
+                        "WHERE ohs.employee_id = he.id "
+                        "AND he.id = ejr.employee_id "
+                        "AND((ohc.heure_debut = he.of_hor_md AND ohc.heure_fin = he.of_hor_mf AND ohc.jour_id = ejr.jour_id) "
+                        "OR(ohc.heure_debut = he.of_hor_ad  AND ohc.heure_fin = he.of_hor_af AND ohc.jour_id = ejr.jour_id))")
 
             # On recopie les tâches des équipes vers les employés.
             cr.execute("INSERT INTO of_employee_tache_rel(employee_id, tache_id) "
