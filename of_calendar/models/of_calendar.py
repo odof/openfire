@@ -91,7 +91,7 @@ class HREmployee(models.Model):
         ('hor_mf_ad_constraint', 'CHECK ( of_hor_mf <= of_hor_ad )', _(u"L'heure de fin de matinée doit être antérieure à l'heure de début d'après-midi.")),
         ('hor_ad_af_constraint', 'CHECK ( of_hor_ad <= of_hor_af )', _(u"L'heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi.")),
         ('hor_af_constraint', 'CHECK ( of_hor_af <= 24 )', _(u"L'heure de fin d'après-midi doit être inférieure ou égale à 24.")),
-        ('of_creneau_temp_start_stop_constraint', 'CHECK ( of_creneau_temp_start <= of_creneau_temp_stop )', _(u"La date de début de validité doit être antérieure ou égale à celle de fin.")),
+        # ('of_creneau_temp_start_stop_constraint', 'CHECK ( of_creneau_temp_start <= of_creneau_temp_stop )', _(u"La date de début de validité doit être antérieure ou égale à celle de fin.")),
     ]
 
     # @api.multi
@@ -148,7 +148,7 @@ class HREmployee(models.Model):
                 segment_perm_cur = segments_perm_passe[0]
 
                 if segment_perm_cur.date_deb:
-                    depuis_cur = u"le " + segment_perm_cur.date_deb
+                    depuis_cur = u"le " + format_date(segment_perm_cur.date_deb)
                 else:
                     depuis_cur = u"l'embauche"
                 if segment_perm_cur.motif:

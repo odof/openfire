@@ -268,7 +268,7 @@ class OFHorairesSegmentWizard(models.TransientModel):
         self.ensure_one()
         if self.mode == "edit" and not self.segment_id:
             raise UserError(u"Veuillez Sélectionner une période à modifier")
-        if self.date_fin and self.date_fin < self.date_deb:
+        if not self.permanent and self.date_fin and self.date_fin < self.date_deb:
             raise UserError(u"la date de fin doit être postérieure ou égale à la date de début")
         self.onchange_hor_ma_df()
         creneau_obj = self.env['of.horaires.creneau']
