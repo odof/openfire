@@ -539,7 +539,7 @@
                     <field name="name" string="Libellé"/>
                     <field name="tache_ids"/>
                     <field name="description"/>
-                    <field name="sequence" invisible="1"/>
+                    <field name="sequence"/>
                 </tree>
             </field>
         </record>
