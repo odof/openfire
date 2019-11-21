@@ -52,7 +52,7 @@ class OfTestEmployees(common.TransactionCase):
             # 'of_jour_ids': [(6, 0, jours_semaine.ids)],
             'of_segment_ids': [
                 (0, 0, {
-                    'date_deb': '2019-06-01',
+                    'date_deb': '2017-01-01',
                     'date_fin': False,
                     'permanent': True,
                     'creneau_ids': generate_creneaux_create_data([
@@ -98,7 +98,7 @@ class OfTestEmployees(common.TransactionCase):
             'of_segment_ids': [
                 # HORAIRES PERMANENTS
                 (0, 0, {
-                    'date_deb': '2019-06-01',
+                    'date_deb': '2018-01-01',
                     'date_fin': '2019-06-30',
                     'permanent': True,
                     'creneau_ids': generate_creneaux_create_data([

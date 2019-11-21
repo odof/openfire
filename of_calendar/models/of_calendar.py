@@ -11,27 +11,29 @@ from copy import deepcopy
 def hours_to_strs(*hours):
     """ Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'
     """
-    return tuple("%dh%02d" % (hour, round((hour % 1) * 60)) if hour % 1 else "%dh" % (hour) for hour in hours)
+    return tuple("%dh%02d" % (hour / 60, hour % 60)
+                 if hour % 60
+                 else "%dh" % (hour / 60) for hour in map(lambda hour: round(hour * 60), hours))
 
 @api.model
 def _tz_get(self):
     # put POSIX 'Etc/*' entries at the end to avoid confusing users - see bug 1086728
     return [(tz, tz) for tz in sorted(pytz.all_timezones, key=lambda tz: tz if not tz.startswith('Etc/') else '_')]
 
-def jour_abr_2_nb(str):
-    u"""
-    :param str: Chaîne de caractères correspondant à une abréviation de jour
-    :return: Le numéro correspondant au jour entré, de 1 à 7
-    """
-    return {
-        'lun.': 1,
-        'mar.': 2,
-        'mer.': 3,
-        'jeu.': 4,
-        'ven.': 5,
-        'sam.': 6,
-        'dim.': 7,
-    }.get(str, str)
+# def jour_abr_2_nb(str):
+#     u"""
+#     :param str: Chaîne de caractères correspondant à une abréviation de jour
+#     :return: Le numéro correspondant au jour entré, de 1 à 7
+#     """
+#     return {
+#         'lun.': 1,
+#         'mar.': 2,
+#         'mer.': 3,
+#         'jeu.': 4,
+#         'ven.': 5,
+#         'sam.': 6,
+#         'dim.': 7,
+#     }.get(str, str)
 
 # @TODO: revoir les nom des fonctions pour qu'ils soient plus explicites
 
@@ -447,9 +449,9 @@ class HREmployee(models.Model):
     @api.multi
     def get_horaires_list_dict(self, date_start, date_stop):
         """Renvoie le résultat de la fusion des archives horaires et archives horaires temporaires des employés
-        @TODO: Optimiser cette fonction en ne passant plus par les fonctions get_archive_list_segments() et get_archive_list_segments_temp()
         :rtype: dict { employee_id :  [(date_debut_da, date_fin_da, horaires_dict), ...] ,  ... }
         """
+        segment_obj = self.env['of.horaires.segment']
         if len(date_start) == 10:  # les paramètres sont des dates
             mode_params = "date"
         else:
@@ -462,10 +464,8 @@ class HREmployee(models.Model):
         un_jour = timedelta(days=1)
 
         res = {}
-        archive_list_horaires = self.get_archive_list_segments()
-        archive_list_horaires_temp = self.get_archive_list_segments_temp()
         for employee in self:
-            if not archive_list_horaires[employee.id]:
+            if not employee.of_segment_ids:
                 # L'employé n'a pas d'horaires définis
                 res[employee.id] = []
                 continue
@@ -481,73 +481,65 @@ class HREmployee(models.Model):
                 date_start_str = date_start
                 date_stop_str = date_stop
 
-            # Le premier segment est ramené au début de la date de recherche si antérieur
-            if archive_list_horaires[employee.id][0][0] > date_start_str:
-                archive_list_horaires[employee.id][0][0] = date_start_str
-            # Le dernier segment est ramené à la fin de la date de recherche (permet aussi de retirer le False)
-            archive_list_horaires[employee.id][-1][1] = date_stop_str
-            horaires_std = iter(archive_list_horaires[employee.id])
-            segment_std = next(horaires_std)
-            while segment_std[1] < date_start_str:
-                # On se place sur le premier horaire concernant l'intervalle de temps voulu
-                segment_std = next(horaires_std)
-
-            horaires_temp = iter(archive_list_horaires_temp[employee.id])
-            try:
-                segment_temp = next(horaires_temp)
-                while segment_temp[1] < date_start_str:
-                    # On se place sur le premier horaire concernant l'intervalle de temps voulu
-                    segment_temp = next(horaires_temp)
-            except StopIteration:
-                segment_temp = False
-
+            segments = segment_obj.search([('employee_id', '=', employee.id),
+                                           '|', ('date_fin', '=', False), ('date_fin', '>', date_start_str),
+                                           '|', ('date_deb', '=', False), ('date_deb', '<=', date_stop_str)])
+            date_deb = date_start_str
+            pile = []
             horaires = []
-            while segment_temp:
-                if segment_temp[0] > date_stop_str:
-                    # Les segments temporaires à partir d'ici ne prendront effet qu'après l'intervalle de temps étudié.
-                    break
+            for segment in segments + segment_obj.browse(-1):
+                # A chaque itération :
+                # date_deb = date à partir de laquelle il faut ajouter des éléments dans horaires
+                # pile = liste des (segment, horaires_str) qui commencent avant date_deb et se terminent après
+                # horaires = liste des horaires à retourner et dont la date de fin est inférieure à date_deb
+                if segment.id != -1:
+                    segment_deb = segment.date_deb
+                    segment_fin = segment.date_fin
+                    date_fin_temp_da = fields.Date.from_string(segment_deb)
+                    date_fin_temp_da -= un_jour
+                    date_fin = fields.Date.to_string(date_fin_temp_da).decode('utf-8')
+                else:
+                    # On a fini de parcourir tous les segments, il ne reste qu'à finir de vider la pile
+                    segment = False
+                    date_fin = date_stop_str
+                    segment_deb = segment_fin = date_stop_str + 'Z'
 
-                while segment_std[1] < segment_temp[0]:
-                    # Segments standards non coupés par des segments temporaires
-                    horaires.append(segment_std)
-                    segment_std = next(horaires_std)
+                while date_deb <= date_fin:
+                    # Ajout des segments de la pile pour combler le vide avant la date segment_deb
+                    if pile:
+                        seg_prec, hor_prec = pile[-1]
+                        if seg_prec.date_fin and seg_prec.date_fin <= date_fin:
+                            # Le segment précédent se termine avant le début du segment en cours
+                            horaires.append([date_deb, seg_prec.date_fin, hor_prec])
+                            pile.pop()
+                            seg_prec_date_fin_da = fields.Date.from_string(seg_prec.date_fin)
+                            date_deb = fields.Date.to_string(seg_prec_date_fin_da + un_jour).decode('utf-8')
+                        elif segment and segment.permanent and not seg_prec.permanent:
+                            # Si le segment en cours est permanent et qu'il reste des segments temporaires non finis,
+                            # ceux-cis sont prioritaires. On continue donc sans ajouter d'horaire.
+                            break
+                        else:
+                            horaires.append([date_deb, date_fin, hor_prec])
+                            date_deb = segment_deb
+                    else:
+                        # Aucun horaire n'a été défini sur cette période
+                        # @todo: Utiliser le prochain horaire permanent ?
+                        horaires.append([date_deb, date_fin, {}])
+                        date_deb = segment_deb
 
-                if segment_std[0] < segment_temp[0]:
-                    # On ajoute un sous-segment du segment standard avant le début du segment temporaire.
-                    sous_seg = deepcopy(segment_std)
+                while pile and pile[-1][0].date_fin <= segment_fin:
+                    pile.pop()
 
-                    # Le sous-segment se termine 1 jour avant le début du segment temporaire.
-                    date_debut_temp_da = fields.Date.from_string(segment_temp[0])
-                    date_debut_temp_da -= un_jour
-                    sous_seg[1] = fields.Date.to_string(date_debut_temp_da).decode('utf-8')
-                    horaires.append(sous_seg)
-
-                # On ajoute le segment temporaire
-                horaires.append(segment_temp)
-
-                if segment_std[1] > segment_temp[1]:
-                    # On met à jour le segment standard
-                    date_fin_temp_da = fields.Date.from_string(segment_temp[1])
-                    date_fin_temp_da += un_jour
-                    segment_std[0] = fields.Date.to_string(date_fin_temp_da).decode('utf-8')
-                elif segment_std[1] < date_stop_str:
-                    # Le segment standard se termine en même temps que le segment temporaire, on passe donc au suivant
-                    segment_std = next(horaires_std)
-
-                try:
-                    segment_temp = next(horaires_temp)
-                except StopIteration:
-                    segment_temp = False
-
-            if horaires and horaires[-1][1] > date_stop_str:
-                horaires[-1][1] = date_stop_str
-            while True:
-                horaires.append(segment_std)
-                if segment_std[1] >= date_stop_str:
-                    segment_std[1] = date_stop_str
-                    break
-                segment_std = next(horaires_std)
-
+                # Ajout du segment dans la pile
+                segment_data = (segment, segment and self.convert_segments_to_list(segment)[0][2])
+                if segment and segment.permanent:
+                    if pile and pile[0][0].permanent:
+                        # Un segment permanent en remplace un autre
+                        pile[0] = segment_data
+                    else:
+                        pile = [segment_data] + pile
+                else:
+                    pile.append(segment_data)
             res[employee.id] = horaires
 
         # WHOO HOO on y est! \o/
@@ -619,7 +611,7 @@ class HREmployee(models.Model):
 
     @api.model
     def get_intersection_heures_dict(self, dict1, dict2):
-        """Fusionne 2 horaires_dict et renvois leur intersection
+        """Fusionne 2 horaires_dict et renvoie leur intersection
         résultat sous la forme { 1..7 :  [(h_debut, h_fin), (h_debut, h_fin)] }
         exemple: dict1[1] = [(9, 12)], dict2 = [(11, 14)]; res[1] = [(11, 12)]"""
         res = {}
