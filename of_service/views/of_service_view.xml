@@ -120,7 +120,7 @@
                                     options='{"terminology": {
                                         "string_true": "Récurrent",
                                         "hover_true": "Ponctuel?",
-                                        "string_false": "Poncutel",
+                                        "string_false": "Ponctuel",
                                         "hover_false": "Récurrent?",
                                         }}'/>
                             </button>
@@ -291,7 +291,7 @@
                                     options='{"terminology": {
                                         "string_true": "Récurrent",
                                         "hover_true": "Ponctuel?",
-                                        "string_false": "Poncutel",
+                                        "string_false": "Ponctuel",
                                         "hover_false": "Récurrent?",
                                         }}'/>
                             </button>

@@ -493,7 +493,7 @@ class HREmployee(models.Model):
                 # pile = liste des (segment, horaires_str) qui commencent avant date_deb et se terminent après
                 # horaires = liste des horaires à retourner et dont la date de fin est inférieure à date_deb
                 if segment.id != -1:
-                    segment_deb = segment.date_deb
+                    segment_deb = segment.date_deb or date_deb
                     segment_fin = segment.date_fin
                     date_fin_temp_da = fields.Date.from_string(segment_deb)
                     date_fin_temp_da -= un_jour
