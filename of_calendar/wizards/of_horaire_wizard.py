@@ -40,7 +40,7 @@ class OFHoraireSaveModeleWizard(models.TransientModel):
             'creneau_ids': [(6, 0, self.creneau_ids.ids)],
         })
         self.fait = True
-        return {'type': 'ir.actions.do_nothing'}  #self.env['of.horaires.modele'].search([('name', '=', 'BB')]).creneau_ids
+        return {'type': 'ir.actions.do_nothing'}  #self.env['of.horaire.modele'].search([('name', '=', 'BB')]).creneau_ids
 
     @api.multi
     def action_retour(self):
@@ -339,7 +339,7 @@ class OFHorairesSegmentWizard(models.TransientModel):
             raise UserError(u"Veuillez Sélectionner une période à supprimer")
         self.segment_id.unlink()
         if self.permanent:
-            self.env['of.horaires.segment'].recompute_permanent_date_fin(self.employee_id.id)
+            self.env['of.horaire.segment'].recompute_permanent_date_fin(self.employee_id.id)
         return {'type': 'ir.actions.act_window_close'}
 
     @api.multi

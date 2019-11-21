@@ -451,7 +451,7 @@ class HREmployee(models.Model):
         """Renvoie le résultat de la fusion des archives horaires et archives horaires temporaires des employés
         :rtype: dict { employee_id :  [(date_debut_da, date_fin_da, horaires_dict), ...] ,  ... }
         """
-        segment_obj = self.env['of.horaires.segment']
+        segment_obj = self.env['of.horaire.segment']
         if len(date_start) == 10:  # les paramètres sont des dates
             mode_params = "date"
         else:
