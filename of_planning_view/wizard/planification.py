@@ -559,9 +559,10 @@ class OfPlanifCreneau(models.TransientModel):
             prop_selected.selected = False
         prop_prioritaires = self.proposition_ids.filtered(lambda p: p.priorite > self.priorite_max)[:100]
         if len(prop_prioritaires) <= 10:
-            prop_prioritaires = self.proposition_ids[25]
+            prop_prioritaires = self.proposition_ids[:25]
         prop_prioritaires.compute_distance_reelle()
         prop_a_supr = self.proposition_ids.filtered(lambda p: p.distance_reelle_tota > self.distance_max)
+        prop_prioritaires -= prop_a_supr
         prop_a_supr.unlink()
         self.selected_id = prop_prioritaires.get_closer_one()
         self.selected_id.selected = True

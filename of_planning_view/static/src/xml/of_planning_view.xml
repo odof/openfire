@@ -227,8 +227,7 @@
                     <span class="of_planning_subinfo of_planning_subinfo_heure_debut"><t t-raw="record['hours_cols'][col_index].heure_debut_str"/></span>
                     <span class="of_planning_subinfo of_planning_subinfo_heure_fin"> -&gt; </span>
                     <span class="of_planning_subinfo of_planning_subinfo_heure_fin"><t t-raw="record['hours_cols'][col_index].heure_fin_str"/></span>
-                    <span class="of_planning_subinfo of_planning_subinfo_duree"> - </span>
-                    <span class="of_planning_subinfo of_planning_subinfo_duree"><t t-raw="record['hours_cols'][col_index].duree_str"/></span>
+                    <span class="of_planning_subinfo of_planning_subinfo_duree">(<t t-raw="record['hours_cols'][col_index].duree_str"/>)</span>
                 </t>
             </div>
 

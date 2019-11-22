@@ -1112,7 +1112,7 @@ PlanningView.Row = Widget.extend({
             var descript_ft = {type: "float_time"};
             var formatted_heure_record, formatted_heure_creneau;
             var options = {};
-            console.log(self.res_id, self.creneaux_dispo)
+            //console.log(self.res_id, self.creneaux_dispo)
             if (!self.creneaux_dispo.length) {// == []) {
                 self.zero_horaire = true;
             }else{
@@ -1282,8 +1282,23 @@ PlanningView.Row = Widget.extend({
                         //console.log("HOURS COLS",planning_record["record"],planning_record["hours_cols"]);
                         planning_record["hours_cols"][i].heure_debut_str = formats.format_value(planning_record["hours_cols"][i].heure_debut,descript_ft);
                         planning_record["hours_cols"][i].heure_fin_str = formats.format_value(planning_record["hours_cols"][i].heure_fin,descript_ft);
-                        planning_record["hours_cols"][i].duree = planning_record["hours_cols"][i].heure_fin - planning_record["hours_cols"][i].heure_debut
-                        planning_record["hours_cols"][i].duree_str = formats.format_value(planning_record["hours_cols"][i].duree,descript_ft).replace(":", "h");
+                        var duree_col = planning_record["hours_cols"][i].heure_fin - planning_record["hours_cols"][i].heure_debut
+                        planning_record["hours_cols"][i].duree = duree_col
+                        var heures = Math.trunc(duree_col);
+                        var minutes = (duree_col - heures) * 60;
+                        var duree_col_str;
+                        if (!heures) {
+                            duree_col_str = minutes + "min";  // exple: 45min
+                        }else if (!minutes) {
+                            duree_col_str = heures + "h"  // exple: 2h
+                        }else{
+                            duree_col_str = formats.format_value(record.duree,descript_ft).replace(":", "h");
+                            if (duree_col_str[0] == "0") {
+                                duree_col_str = duree_col_str.substring(1);  // exple: 2h45
+                            }
+                        }
+                        // /!\ affichage de la durée erronné si l'intervention chevauche une pause. a debugguer en version 2
+                        planning_record["hours_cols"][i].duree_str = duree_col_str;
 
                         if (a_push) {
                             self.columns[i].push(planning_record);
