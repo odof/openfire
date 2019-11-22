@@ -86,11 +86,12 @@ class OfPlanifCreneauProp(models.TransientModel):
     @api.depends('geo_lat', 'geo_lng', 'creneau_id.geo_lat_prec', 'creneau_id.geo_lng_prec',
                  'creneau_id.geo_lat_suiv', 'creneau_id.geo_lng_suiv', 'creneau_id')
     def compute_distance_reelle(self):
+        self = self.filtered('creneau_id')
         if not self:
             return
         creneau = self[0].creneau_id
         lieu_prec = creneau.geo_lat_prec and creneau.lieu_prec_id or creneau.lieu_prec_manual_id
-        lieu_suiv = creneau.geo_lat_suiv and creneau.lieu_suiv_id or creneau.lieu_suiv_manual_idl
+        lieu_suiv = creneau.geo_lat_suiv and creneau.lieu_suiv_id or creneau.lieu_suiv_manual_id
         if not lieu_prec and not lieu_suiv:
             self.distance_reelle_prec = -1
             self.distance_reelle_suiv = -1
@@ -160,6 +161,7 @@ class OfPlanifCreneauProp(models.TransientModel):
                 a_planifier.date_fin = fields.Date.to_string(date_fin_da)
             else:
                 a_planifier.date_fin = service.date_fin
+
 
 
     @api.multi
