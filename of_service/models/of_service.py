@@ -252,24 +252,24 @@ class OfService(models.Model):
     state_ponc = fields.Selection([
         ('draft', u'Brouillon'),  # état par défaut
         ('to_plan', u'À planifier'),  # pas d'intervention
-        ('part_planned', u'Partiellement planifié'),  # intervention(s) et durée restante supérieure à 0
-        ('all_planned', u'Entièrement planifié'),  # intervention(s) et durée restante == 0
+        ('part_planned', u'Partiellement planifiée'),  # intervention(s) et durée restante supérieure à 0
+        ('all_planned', u'Entièrement planifiée'),  # intervention(s) et durée restante == 0
         ('late', u'En retard de planification'),  # date de prochaine planification il y a plus d'un mois
         ('done', u'Fait'),  # intervention(s) et durée restante == 0 et date de fin dépassée
-        ('cancel', u'Annulé'),  # manuellement décidé
+        ('cancel', u'Annulée'),  # manuellement décidé
     ], u'État', compute="_compute_state_poncrec")
 
     state = fields.Selection([
         ('draft', u'Brouillon'),  # état par défaut
         ('to_plan', u'À planifier prochainement'),  # prochaine intervention dans moins d'un mois
-        ('planned', u'Planifié récemment'),  # dernière intervention il y a moins d'un mois
-        ('planned_soon', u'Planifié prochainement'),  # planifié pour dans moins d'un mois
+        ('planned', u'Planifiée récemment'),  # dernière intervention il y a moins d'un mois
+        ('planned_soon', u'Planifiée prochainement'),  # planifié pour dans moins d'un mois
         ('progress', u'En cours'),  # par défaut
         ('late', u'En retard de planification'),  # date de prochaine planification il y a plus d'un mois
         ('done', u'Terminé / Annulé'),  # date de fin <= date du jour (rec) / durée restante == 0 et date de fin dépassée (ponc)
-        ('part_planned', u'Partiellement planifié'),  # intervention(s) et durée restante supérieure à 0
-        ('all_planned', u'Entièrement planifié'),  # intervention(s) et durée restante == 0
-        ('cancel', u'Annulé'),  # manuellement décidé
+        ('part_planned', u'Partiellement planifiée'),  # intervention(s) et durée restante supérieure à 0
+        ('all_planned', u'Entièrement planifiée'),  # intervention(s) et durée restante == 0
+        ('cancel', u'Annulée'),  # manuellement décidé
         ('calculated', u'Calculé'),  # équivalent a state=False mais utile en XML
         ], u'État', help=u"Ce champ permet de choisir manuellement l'état du service", compute="_compute_state_poncrec", store=True)
 
@@ -439,8 +439,11 @@ class OfService(models.Model):
                 'default_duree': self.duree,
                 'default_description': self.note,
                 'default_service_id': self.id,
+                'create': self.base_state == 'calculated',
+                'edit': self.base_state == 'calculated',
             })
             action['context'] = str(context)
+
         return action
 
     @api.model

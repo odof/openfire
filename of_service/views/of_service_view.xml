@@ -94,7 +94,8 @@
                 <form>
                     <header>
                         <button name="button_valider" string="Valider" states="draft" type="object"/>
-                        <button name="button_annuler" attrs="{'invisible': [('base_state', '!=', 'calculated')]}" type="object"/>
+                        <button name="button_annuler" string="Annuler" type="object"
+                                attrs="{'invisible': [('base_state', '!=', 'calculated')]}"/>
                         <button name="button_brouillon" string="Remettre en brouillon" states="cancel" type="object"/>
 
                         <!--field name="state_ponc" widget="statusbar" attrs="{'invisible': [('recurrence', '=', True)]}"/>
@@ -125,14 +126,16 @@
                                         }}'/>
                             </button>
                         </div>
-                        <div class="oe_title of_title">
-                            <h1><b>
-                                <span attrs="{'invisible': [('recurrence', '=', False)]}">Intervention récurrente</span>
-                                <span attrs="{'invisible': [('recurrence', '=', True)]}">Intervention ponctuelle</span>
-                                (
-                                <field name="state_ponc" nolabel="1" attrs="{'invisible': [('recurrence', '=', True)]}"/>
-                                <field name="state" nolabel="1" attrs="{'invisible': [('recurrence', '!=', True)]}"/>
-                                )
+                        <div class="of_title">
+                            <h1 attrs="{'invisible': [('recurrence', '=', False)]}"><b>
+                                <span>Intervention récurrente</span>
+                                <i> (<field name="state" nolabel="1" attrs="{'invisible': [('recurrence', '!=', True)]}"
+                                           class="oe_inline"/>)</i>
+                            </b></h1>
+                            <h1 attrs="{'invisible': [('recurrence', '=', True)]}"><b>
+                                <span>Intervention ponctuelle</span>
+                                <i> (<field name="state_ponc" nolabel="1" attrs="{'invisible': [('recurrence', '=', True)]}"
+                                           class="oe_inline"/>)</i>
                             </b></h1>
                         </div>
                         <group>
@@ -150,6 +153,11 @@
                                 <div colspan="2" attrs="{'invisible': [('base_state', '!=', 'draft')]}">
                                     <b><i class="of_red">
                                         <i class="fa fa-lg fa-warning"/> Vous pourrez planifier cette intervention quand elle sera validée
+                                    </i></b>
+                                </div>
+                                <div colspan="2" attrs="{'invisible': [('base_state', '!=', 'cancel')]}">
+                                    <b><i class="of_red">
+                                        <i class="fa fa-lg fa-warning"/> Une intervention annulée n'est pas planifiable
                                     </i></b>
                                 </div>
                                 <field name="date_next" string="À partir du"/>

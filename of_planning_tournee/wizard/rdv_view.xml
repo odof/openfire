@@ -244,7 +244,9 @@
             <field name="inherit_id" ref="of_service.view_of_service_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//header" position="inside">
-                    <button name="%(action_view_rdv_intervention_wizard_service)d" string="Planifier Intervention" type="action" invisible="context.get('hide_bouton_planif')"/>
+                    <button name="%(action_view_rdv_intervention_wizard_service)d" string="Planifier Intervention"
+                            type="action" invisible="context.get('hide_bouton_planif')"
+                            attrs="{'invisible': [('base_state', '!=', 'calculated')]}"/>
                 </xpath>
             </field>
         </record>
