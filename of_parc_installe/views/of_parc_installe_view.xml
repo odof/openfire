@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-    <data>
+<odoo>
 
 <!-- *************************************************** -->
 <!-- ****************** PARC INSTALLÉ ****************** -->
@@ -376,8 +375,6 @@
             <field name="key2">client_action_multi</field>
             <field name="model">of.parc.installe</field>
             <field name="value" eval="'ir.actions.server,%d'%of_action_pi_open_creer_sav"/>
-            <field name="object" eval="True"/>
         </record>
 
-    </data>
-</openerp>
+</odoo>

@@ -724,7 +724,6 @@
             <field name="key2">client_action_multi</field>
             <field name="model">of.planning.intervention</field>
             <field name="value" eval="'ir.actions.server,%d'%action_of_create_invoice_intervention"/>
-            <field name="object" eval="True"/>
         </record>
 
 
