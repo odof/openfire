@@ -581,7 +581,7 @@ class OfPlanningIntervention(models.Model):
                        "AND (SELECT 1 FROM hr_employee WHERE hr_employee.of_hor_md = he.of_hor_ad AND hr_employee.of_hor_mf = he.of_hor_af) IS Null" % (maintenant, maintenant))
             # Initialisation des segments horaires
             cr.execute("INSERT INTO of_horaire_segment(create_uid, write_uid, create_date, write_date, employee_id, date_deb, date_fin, permanent, active) "
-                       "SELECT 1, 1, '%s', '%s', id, Null, Null, True, True "
+                       "SELECT 1, 1, '%s', '%s', id, '1970-01-01', Null, True, True "
                        "FROM hr_employee "
                        "WHERE of_est_intervenant = True" % (maintenant, maintenant))
             # Initialise lien entre créneau et segment
@@ -1020,9 +1020,19 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def write(self, vals):
-        super(OfPlanningIntervention, self).write(vals)
-        self.do_verif_dispo()
-        self._affect_number()
+        # En cas de modification des horaires d'un employé, toutes les interventions aux dates concernées
+        # par le changement doivent être passée en dates forcées. Dans le cas ou une intervention aurait sa
+        # date de début qui ne serait plus sur des créneaux, cette intervention ne serait plus modifiable
+        if vals.get("forcer_dates", None) != None and not vals.get("date_deadline_forcee", False):
+            for intervention in self:
+                intervention.write({
+                    'forcer_dates': True,
+                    'date_deadline_forcee': intervention.date_deadline,
+                })
+        else:
+            super(OfPlanningIntervention, self).write(vals)
+            self.do_verif_dispo()
+            self._affect_number()
         return True
 
     @api.model

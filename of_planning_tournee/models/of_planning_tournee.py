@@ -292,11 +292,14 @@ class OfPlanningTournee(models.Model):
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')
         intervention_obj = self.env['of.planning.intervention']
+        today_str = fields.Date.today()
         for tournee in self:
             if tournee.is_bloque:
                 tournee.is_complet = False
                 continue
-
+            if tournee.date < today_str:
+                tournee.is_complet = True
+                continue
             employee = tournee.employee_id
             if employee.of_tz and employee.of_tz != 'Europe/Paris':
                 self = self.with_context(tz=employee.of_tz)
