@@ -287,9 +287,7 @@ class OfPlanningTournee(models.Model):
             tournee.date_jour = jour
 
     @api.multi
-    @api.depends('employee_id', 'date', 'is_bloque', 'employee_id.of_tz', 'employee_id.of_tz_offset',
-                 'employee_id.of_hor_md', 'employee_id.of_hor_mf', 'employee_id.of_hor_ad', 'employee_id.of_hor_af',
-                 'employee_id.of_mode_horaires', 'employee_id.of_segment_ids')
+    @api.depends('employee_id', 'date', 'is_bloque', 'employee_id.of_tz', 'employee_id.of_tz_offset')
     def _compute_is_complet(self):
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')
@@ -339,9 +337,9 @@ class OfPlanningTournee(models.Model):
                 if end_local.day != date_local.day:
                     end_flo = fin_journee
                 else:
-                    end_flo = (start_local.hour +
-                               start_local.minute / 60 +
-                               start_local.second / 3600)
+                    end_flo = (end_local.hour +
+                               end_local.minute / 60 +
+                               end_local.second / 3600)
 
                 start_end_list.append((start_flo, end_flo))
             start_end_list.sort()
@@ -412,3 +410,44 @@ class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
     of_tournee_ids = fields.One2many('of.planning.tournee', 'employee_id', string=u"Tournées")
+
+class OFHorairesSegment(models.Model):
+    _inherit = 'of.horaire.segment'
+
+    @api.model
+    def recompute_is_complet_tournee(self, employee_id, deb=False, fin=False):
+        tournee_obj = self.env['of.planning.tournee']
+        if not deb:
+            tournees = tournee_obj.search([('employee_id', '=', employee_id)])
+        else:
+            tournees_domain = [('employee_id', '=', employee_id), ('date', '>=', deb)]
+            tournees_domain = fin and tournees_domain + [('date', '<=', fin)] or tournees_domain
+            tournees = tournee_obj.search(tournees_domain)
+        tournees._compute_is_complet()
+
+    @api.model
+    def create(self, vals):
+        employee_id = vals.get('employee_id')
+        deb = vals.get('date_deb')
+        fin = vals.get('date_fin')
+        res = super(OFHorairesSegment, self).create(vals)
+        self.recompute_is_complet_tournee(employee_id, deb, fin)
+        return res
+
+    @api.multi
+    def write(self, vals):
+        employee_id = vals.get('employee_id') or self.employee_id and self.employee_id.id
+        deb = min(vals.get('date_deb', self.date_deb), self.date_deb)
+        fin = max(vals.get('date_fin', self.date_fin), self.date_fin)
+        res = super(OFHorairesSegment, self).write(vals)
+        self.recompute_is_complet_tournee(employee_id, deb, fin)
+        return res
+
+    @api.model
+    def unlink(self):
+        employee_id = self.employee_id and self.employee_id.id
+        deb = self.date_deb
+        fin = self.date_fin
+        res = super(OFHorairesSegment, self).unlink()
+        self.recompute_is_complet_tournee(employee_id, deb, fin)
+        return res

@@ -161,7 +161,7 @@ class HREmployee(models.Model):
                     if seg.date_fin:
                         recap += u"du %s au %s" % (format_date(seg.date_deb),
                                                   format_date(seg.date_fin))
-                    
+
                     else:
                     # ^- toujours "à partir du" ( date_fin implicite à la lecture )
                         recap += u"à partir du " + format_date(seg.date_deb)
