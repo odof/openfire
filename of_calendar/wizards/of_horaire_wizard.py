@@ -3,6 +3,7 @@
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError
 from datetime import datetime, timedelta
+from odoo.addons.of_utils.models.of_utils import se_chevauchent, format_date
 
 class OFHoraireSaveModeleWizard(models.TransientModel):
     _name = 'of.horaire.save.modele.wizard'
@@ -80,6 +81,22 @@ class OFHoraireSegmentWizard(models.TransientModel):
             ('date_fin', '>=', fields.Date.today()),
             ('date_fin', '=', False),
         ]
+
+    @api.multi
+    @api.constrains('creneau_ids')
+    def check_no_overlapping(self):
+        for wizard in self:
+            for creneaux in (wizard.creneau_ids):
+                creneaux_len = len(creneaux)
+                for j in xrange(creneaux_len - 1):
+                    if creneaux[j].jour_id != creneaux[j+1].jour_id:
+                        continue
+                    d1 = creneaux[j].heure_debut
+                    f1 = creneaux[j].heure_fin
+                    d2 = creneaux[j+1].heure_debut
+                    f2 = creneaux[j+1].heure_fin
+                    if se_chevauchent(d1, f1, d2, f2):
+                        raise UserError(u"Oups! Des créneaux se chevauchent")
 
     mode = fields.Selection([
         ('create', u"Créer"),
@@ -170,7 +187,7 @@ class OFHoraireSegmentWizard(models.TransientModel):
             self.creneau_ids = False  # car on ne peut pas utiliser de code 5 dans create() qui est appelé par clique sur bouton
             self.creneau_ids = self.modele_id.creneau_ids.ids
             self.mode_horaires = 'advanced'
-            #self.profil_id = False
+            self.modele_id = False
 
     @api.multi
     @api.depends('creneau_ids', 'seg_exist_ids', 'date_deb', 'date_fin', 'permanent')

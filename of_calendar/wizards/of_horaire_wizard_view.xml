@@ -10,10 +10,10 @@
                 <group>
                     <field name="name" required="1" attrs="{'readonly': [('fait', '=', True)]}"/>
                     <field name="horaires_recap"/>
-                    <field name="creneau_ids" widget="many2many_tags"/>
-                    <field name="fait"/>
-                    <field name="mode"/>
-                    <field name="wizard_id"/>
+                    <field name="creneau_ids" widget="many2many_tags" invisible="1"/>
+                    <field name="fait" invisible="1"/>
+                    <field name="mode" invisible="1"/>
+                    <field name="wizard_id" invisible="1"/>
                 </group>
 
                 <footer>
