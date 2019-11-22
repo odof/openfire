@@ -50,7 +50,7 @@ class OFHoraireSaveModeleWizard(models.TransientModel):
         action['res_id'] = self.wizard_id.id
         return action
 
-class OFHorairesSegmentWizard(models.TransientModel):
+class OFHoraireSegmentWizard(models.TransientModel):
     _name = 'of.horaire.segment.wizard'
 
     def _default_jours_ids(self):
@@ -117,9 +117,6 @@ class OFHorairesSegmentWizard(models.TransientModel):
 
     # Pour la modification et la suppression
     segment_id = fields.Many2one('of.horaire.segment', string="Période concernée")#, domain=_get_segment_id_domain)
-
-    # @todo: générer la liste des interventions concernées
-    intervention_ids = fields.Many2many('of.planning.intervention', string="Interventions concernées")
 
     @api.multi
     @api.onchange('hor_md', 'hor_mf', 'hor_ad', 'hor_af', 'mode_horaires')

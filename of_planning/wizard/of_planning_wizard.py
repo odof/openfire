@@ -3,6 +3,14 @@
 from odoo import models, fields, api
 from datetime import timedelta
 
+
+class OFHoraireSegmentWizard(models.TransientModel):
+    _inherit = 'of.horaire.segment.wizard'
+
+    # @todo: générer la liste des interventions concernées
+    intervention_ids = fields.Many2many('of.planning.intervention', string="Interventions concernées")
+
+
 class PlanningImpressionWizard(models.TransientModel):
     _name = "of_planning.impression_wizard"
 
