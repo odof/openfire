@@ -147,7 +147,7 @@
                                 <field name="tag_ids" widget="many2many_tags"/>
                             </group>
                             <group name="planif" string="Planification">
-                                <div colspan="2" attrs="{'invisible': [('base_state', '!=', draft)]}">
+                                <div colspan="2" attrs="{'invisible': [('base_state', '!=', 'draft')]}">
                                     <b><i class="of_red">
                                         <i class="fa fa-lg fa-warning"/> Vous pourrez planifier cette intervention quand elle sera validée
                                     </i></b>
