@@ -58,8 +58,8 @@
                             <field name="distance_max"/>
                             <field name="secteur_id" widget="selection"/>
                             <field name="ignorer_duree"/>
-                            <field name="pre_tache_categ_ids" widget="many2many_tags"/>
-                            <field name="pre_tache_ids" widget="many2many_tags"/>
+                            <field name="pre_tache_categ_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                            <field name="pre_tache_ids" widget="many2many_tags" options="{'no_create': True}"/>
                         </group>
                         <group col="2" colspan="2">
                             <field name="pre_a_programmer_id" options="{'no_create': True, 'no_open': True}"/>
@@ -76,7 +76,7 @@
                             <separator string="Intervention à créer" colspan="2"/>
                             <field name="heure_debut_rdv" widget="float_time"/>
                             <field name="duree_rdv" widget="float_time"/>
-                            <field name="employee_other_ids" widget="many2many_tags"/>
+                            <field name="employee_other_ids" widget="many2many_tags" options="{'no_create': True}"/>
                         </group>
                         <group col="2" colspan="2" attrs="{'invisible': ['|', ('aucun_res', '=', False), ('pre_a_programmer_id', '!=', False)]}">
                             <separator string="Aucun résultat" colspan="2"/>
