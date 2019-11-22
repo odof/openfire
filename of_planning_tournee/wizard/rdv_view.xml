@@ -209,12 +209,11 @@
             view_mode="form"
             view_id="view_rdv_intervention_wizard"
             id="action_view_rdv_intervention_wizard_service"
-            key2="client_action_multi"
             target="new"
             groups="of_planning.of_group_planning_intervention_lecture_siens"
         />
 
-        <!--act_window
+        <!--act_window key2="client_action_multi"
             name="Planifier une intervention"
             res_model="of.tournee.rdv"
             src_model="sale.order"
