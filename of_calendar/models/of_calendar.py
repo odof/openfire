@@ -139,15 +139,15 @@ class HREmployee(models.Model):
                 ('date_fin', '>=', date_str)])
             segments_perm = segment_obj.search([
                 ('employee_id', '=', employee.id),
-                ('permanent', '=', True), ], order="date_deb DESC")
+                ('permanent', '=', True), ], order="date_deb")
 
             recap = u"<p><i class='oe_grey'>Les horaires passés ne sont pas affichés.</i></p>"
             if segments_perm:
                 segments_perm_futur = segments_perm.filtered(lambda s: s.date_deb > date_str)
                 segments_perm_passe = (segments_perm - segments_perm_futur)
-                segment_perm_cur = segments_perm_passe[0]
+                segment_perm_cur = segments_perm_passe[-1]
 
-                if segment_perm_cur.date_deb:
+                if segment_perm_cur.date_deb != "1970-01-01":
                     depuis_cur = u"le " + format_date(segment_perm_cur.date_deb)
                 else:
                     depuis_cur = u"l'embauche"
@@ -155,16 +155,9 @@ class HREmployee(models.Model):
                     depuis_cur += u"(%s)" % segment_perm_cur.motif
 
                 recap += u'<h3>Horaires depuis %s</h3>\n<p>\n%s</p>\n' % (depuis_cur, formate_segment(segment_perm_cur))
-                for i_seg in range(len(segments_perm) - 1, 0, -1):
-                    seg = segments_perm[i_seg]
-                    recap += u"<h3>Changement d'horaires "
-                    if seg.date_fin:
-                        recap += u"du %s au %s" % (format_date(seg.date_deb),
-                                                  format_date(seg.date_fin))
 
-                    else:
-                    # ^- toujours "à partir du" ( date_fin implicite à la lecture )
-                        recap += u"à partir du " + format_date(seg.date_deb)
+                for seg in segments_perm_futur:
+                    recap += u"<h3>Changement d'horaires à partir du " + format_date(seg.date_deb)
                     if seg.motif:
                         recap += u" (%s)" % seg.motif
                     recap += u'</h3>\n<p>\n' + formate_segment(seg) + u'</p>\n'
@@ -418,10 +411,15 @@ class HREmployee(models.Model):
         for employee in self:
             # Récupération du segment, si possible temporaire, avec la date de début la plus avancée
             segment = segment_obj.search([('employee_id', '=', employee.id),
-                                          '|', ('date_deb', '=', False), ('date_deb', '<=', date_str),
-                                          '|', ('date_fin', '=', False), ('date_fin', '>=', date_str)],
+                                          ('date_deb', '<=', date_str),
+                                          ('date_fin', '>=', date_str)],
                                          order='permanent, date_deb desc',
                                          limit=1)
+            if not segment:
+                segment = segment_obj.search([('employee_id', '=', employee.id),
+                                              ('date_fin', '=', False)], limit=1)
+            # si même après ça il n'y a aucun segment de défini, res[employee.id] = []
+            # conserver ainsi car utilisé dans le js
             creneaux = segment.creneau_ids.filtered(lambda c: c.jour_number == num_jour)
             res[employee.id] = [[creneau.heure_debut, creneau.heure_fin] for creneau in creneaux]
         return res
@@ -727,7 +725,7 @@ class OFHorairesSegment(models.Model):
     name = fields.Char(string="Période", compute="_compute_name")
 
     employee_id = fields.Many2one('hr.employee', string=u"Employé", required=True, ondelete='cascade')
-    date_deb = fields.Date(string=u"Date de début")
+    date_deb = fields.Date(string=u"Date de début", default="1970-01-01")
     date_fin = fields.Date(string="Date de fin")
     permanent = fields.Boolean(
         string="Est un horaire permanent",
@@ -853,7 +851,7 @@ class OFHorairesSegment(models.Model):
     def recompute_permanent_date_fin(self, employee_id):
         """Cette fonction sera couteuse en temp de calcul au fil des ajout d'horaires permanents
         Une meilleure façon de faire serait de recalculer directement depuis le wizard d'horaires seulement les segments concernés
-        mais on est dans l'hyper urgence alors on verra plus tard"""
+        mais on est dans l'hyper urgence alors on verra plus tard
         seg_perm = self.search([('employee_id', '=', employee_id), ('permanent', '=', True)], order="date_deb DESC")
         for i_seg in range(len(seg_perm) - 1, 0, -1):
             seg = seg_perm[i_seg]
@@ -864,7 +862,17 @@ class OFHorairesSegment(models.Model):
                 seg.date_fin = False
         if len(seg_perm) > 1:
             fin_da = fields.Date.from_string(seg_perm[-1].date_deb) - timedelta(days=1)
-            seg_perm[0].date_fin = fields.Date.to_string(fin_da)
+            seg_perm[0].date_fin = fields.Date.to_string(fin_da)"""
+        seg_perm = self.search([('employee_id', '=', employee_id), ('permanent', '=', True)], order="date_deb")
+        un_jour = timedelta(days=1)
+        if not seg_perm:
+            return
+        for i_seg in range(len(seg_perm) - 1):  # tous les segment sauf le dernier
+            seg = seg_perm[i_seg]
+            # le segment termine la veille du début du segment suivant
+            fin_da = fields.Date.from_string(seg_perm[i_seg + 1].date_deb) - un_jour
+            seg.date_fin = fields.Date.to_string(fin_da)
+        seg_perm[-1].date_fin = False
 
 
 class OFHorairesCreneau(models.Model):

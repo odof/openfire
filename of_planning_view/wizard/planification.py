@@ -483,7 +483,7 @@ class OfPlanifCreneau(models.TransientModel):
         distance_max = self.distance_max * 1.3  # approximation
         priorite_max = 0
         lieu_prec = self.geo_lat_prec and self.lieu_prec_id or self.lieu_prec_manual_id
-        lieu_suiv = self.geo_lat_suiv and self.lieu_suiv_id or self.lieu_suiv_manual_idl
+        lieu_suiv = self.geo_lat_suiv and self.lieu_suiv_id or self.lieu_suiv_manual_id
         calcul_distance_dwazo = True
         if not lieu_prec and not lieu_suiv:
             calcul_distance_dwazo = False
