@@ -30,7 +30,7 @@ class HREmployee(models.Model):
     of_toutes_taches = fields.Boolean(string=u'Apte à toutes les taches')
     of_equipe_ids = fields.Many2many('of.planning.equipe', 'of_planning_employee_rel', 'employee_id', 'equipe_id', u'Équipes')
     of_changed_intervention_id = fields.Many2one('of.planning.intervention', string=u"Dernière intervention modifiée")  # api.depends dans of.planning.intervention
-    of_est_intervenant = fields.Boolean(string=u"Est intervenant?", default=False)
+    of_est_intervenant = fields.Boolean(string=u"Est intervenant ?", default=False)
 
     @api.multi
     def peut_faire(self, tache_id, all_required=False):
@@ -491,6 +491,16 @@ class OfPlanningIntervention(models.Model):
                 "FROM res_users "
                 "WHERE of_planning_intervention.company_id IS Null")
 
+            # Pour les équipes qui n'ont pas d'employé, on en crée un au nom de l'équipe.
+            equipe_obj = self.env['of.planning.equipe']
+            employee_obj = self.env['hr.employee']
+            for equipe in equipe_obj.search([('employee_ids', '=', False)]):
+                employee_obj.create({
+                    'name': u"Équipe " + equipe.name,
+                    'of_est_intervenant': True,
+                    'of_equipe_ids': [(4, equipe.id)]
+                })
+
             # On peuple le champ employee_ids de chaque rdv avec les employés de l'équipe du rdv.
             cr.execute("INSERT INTO of_employee_intervention_rel(intervention_id, employee_id) "
                        "SELECT opi.id, oper.employee_id "
@@ -586,12 +596,12 @@ class OfPlanningIntervention(models.Model):
                        "WHERE of_est_intervenant = True" % (maintenant, maintenant))
             # Initialise lien entre créneau et segment
             cr.execute("INSERT INTO of_segment_creneau_rel(segment_id, creneau_id) "
-                        "SELECT ohs.id, ohc.id "
-                        "FROM of_horaire_segment ohs, hr_employee he, of_horaire_creneau ohc, employee_jours_rel ejr "
-                        "WHERE ohs.employee_id = he.id "
-                        "AND he.id = ejr.employee_id "
-                        "AND((ohc.heure_debut = he.of_hor_md AND ohc.heure_fin = he.of_hor_mf AND ohc.jour_id = ejr.jour_id) "
-                        "OR(ohc.heure_debut = he.of_hor_ad  AND ohc.heure_fin = he.of_hor_af AND ohc.jour_id = ejr.jour_id))")
+                       "SELECT ohs.id, ohc.id "
+                       "FROM of_horaire_segment ohs, hr_employee he, of_horaire_creneau ohc, employee_jours_rel ejr "
+                       "WHERE ohs.employee_id = he.id "
+                       "AND he.id = ejr.employee_id "
+                       "AND((ohc.heure_debut = he.of_hor_md AND ohc.heure_fin = he.of_hor_mf AND ohc.jour_id = ejr.jour_id) "
+                       "OR(ohc.heure_debut = he.of_hor_ad  AND ohc.heure_fin = he.of_hor_af AND ohc.jour_id = ejr.jour_id))")
 
             # On recopie les tâches des équipes vers les employés.
             cr.execute("INSERT INTO of_employee_tache_rel(employee_id, tache_id) "
@@ -599,18 +609,29 @@ class OfPlanningIntervention(models.Model):
                        "FROM equipe_tache_rel etr "
                        "JOIN of_planning_employee_rel oper ON etr.equipe_id = oper.equipe_id")
 
-            # Si le module_of_service est installé, on doit peupler le champ service_id dans les interventions
-            # et supprimer la colonne name pour que les valeurs soient recalculées à la mise à jour du module of_service
+            # Si le module_of_service est installé :
+            # 1) On désactive les services dont l'adresse d'intervention est inactive.
+            # 2) On peuple le champ service_id dans les interventions
+            # et supprime la colonne name pour que les valeurs soient recalculées à la mise à jour du module of_service
             # Règle retenue : on relie une intervention à un service quand les tâches du planning sont les mêmes
             # et que l'adresse de l'intervention est soit égale à l'adresse du service soit égale au client du service.
             # Teste si le module of_service est installé par l'existence du champ service_id.
             cr.execute("SELECT 1 FROM information_schema.columns WHERE table_name = 'of_planning_intervention' AND column_name = 'service_id'")
             if bool(cr.fetchall()):
+                # Désactivation des services dont l'adresse est inactive.
+                # À décommenter si décision de les désactiver.
+                #cr.execute("UPDATE of_service "
+                #           "SET active = False "
+                #           "FROM res_partner "
+                #           "WHERE of_service.address_id = res_partner.id "
+                #           "AND res_partner.active = False")
+
+                # Peuplement champ service_id
                 cr.execute("UPDATE of_planning_intervention "
-                                 "SET service_id = of_service.id "
-                                 "FROM of_service "
-                                 "WHERE of_service.tache_id = of_planning_intervention.tache_id "
-                                 "AND (of_planning_intervention.address_id = of_service.address_id OR of_planning_intervention.address_id = of_service.partner_id)")
+                           "SET service_id = of_service.id "
+                           "FROM of_service "
+                           "WHERE of_service.tache_id = of_planning_intervention.tache_id "
+                           "AND (of_planning_intervention.address_id = of_service.address_id OR of_planning_intervention.address_id = of_service.partner_id)")
                 cr.execute("ALTER TABLE of_service DROP COLUMN name")
         return res
 
