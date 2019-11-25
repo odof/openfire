@@ -19,7 +19,7 @@
         <field name="args">()</field>
     </record>
 
-    <!-- Cron journalier de calcul d'état des services -->
+    <!-- Auto-génération des quinzaines -->
     <record id="of_cron_date_range_gen_yearly" model="ir.cron">
         <field name="name">Auto-génération des quinzaines</field>
         <field name="model">date.range.generator</field>

@@ -257,11 +257,13 @@ class OfPlanningEquipe(models.Model):
             "afternoon_end_field": "hor_af",
         }
 
+
 class OfPlanningInterventionRaison(models.Model):
     _name = "of.planning.intervention.raison"
     _description = u"Raisons d'intervention reportée"
 
     name = fields.Char(u'Libellé', size=128, required=True)
+
 
 class OfPlanningIntervention(models.Model):
     _name = "of.planning.intervention"
