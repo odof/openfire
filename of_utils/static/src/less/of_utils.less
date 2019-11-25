@@ -39,6 +39,18 @@
     color: red;
 }
 
+.of_label {
+    .o-flex(1, 0, auto);
+    padding: 0;
+    display: block;
+    // odoo adds a `style="width: 100%"` by javascript
+    // directly on the tag so we need `!important` here:
+    max-width: 100%;
+    border-right: 1px solid #ddd;
+    font-weight: bold!important;
+    width: 100%!important
+}
+
 //rgba(204,169,44, 0.4)
 @-webkit-keyframes pulse {
   0% {

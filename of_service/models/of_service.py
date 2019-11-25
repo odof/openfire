@@ -732,6 +732,15 @@ class ResPartner(models.Model):
         }
         return action
 
+#    @api.multi
+#    def toggle_active(self):
+#       """ Inverse the value of the field ``active`` on the records in ``self``. """
+#        for service in self:
+#            service.active = not service.active
+#            if not service.active:
+#                service.service_address_ids = False
+
+
 class DateRangeGenerator(models.TransientModel):
     _inherit = 'date.range.generator'
 

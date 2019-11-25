@@ -4,7 +4,16 @@ odoo.define('of_web_widgets.of_form_common', function (require) {
 var form_common = require('web.form_common');
 var utils = require('web.utils');
 var core = require('web.core');
+var Model = require('web.DataModel');
 var _t = core._t;
+
+function isNullOrUndef(value) {
+    return _.isUndefined(value) || _.isNull(value);
+}
+
+function isNUF (value) {
+    return _.isUndefined(value) || _.isNull(value) || value === false;
+}
 
 form_common.CompletionFieldMixin.init = function(){
 	this.limit = 7;
@@ -16,6 +25,68 @@ form_common.CompletionFieldMixin.init = function(){
 };
 
 var FieldMany2One = core.form_widget_registry.get('many2one');
+
+/**
+    This widget is intended to display a warning near a label of any many2one field
+    indicating if the record is archived.
+*/
+FieldMany2One.include({
+    set_active: function () {
+        var self = this;
+
+        var record_id = this.field_manager.get_field_value(this.name)
+        var type = self.field.type;
+        if (!isNUF(record_id) && type == "many2one") {
+            var Relation = new Model(self.field.relation);
+            var active;
+            Relation.query(['id']) // retrieve active from db
+                .filter([['id', '=', record_id]]) // id
+                .all()
+                .then(function (records){
+                    // si le champ 'active' n'existe pas dans le modèle,
+                    // on considère par convention que tous les enregistrements sont actifs
+                    // si records[0] vaut undefined, l'enregistrement est inactif
+                    if (isNullOrUndef(records[0])) {
+                        active = false;
+                    }else{
+                        active = true;
+                    }
+
+                    if (!self.get("id") || !self.get("class_id")) {
+                        self.set({
+                            "id": record_id,
+                            "class_id": "of_m2o_" + record_id
+                        });
+                    }
+                    if(!active && !self.get("invisible")) {
+                        // est désactivé
+                        var options = _.extend({
+                            delay: { show: 501, hide: 0 },
+                            title: _t("Cet enregistrement est archivé."),
+                        });
+                        if (isNullOrUndef(self.$active_warning)) {
+                            self.$active_warning = $('<span/>').addClass('fa fa-archive of_ws_l of_red ' + self.get("class_id"))
+                            .insertAfter(self.$label).tooltip(options);
+                        }
+                    }else if (active) {
+                        $("." + self.get("class_id")).remove();
+                        self.$active_warning = undefined;
+                    }
+                    return active
+                })
+        }else if (!isNullOrUndef(self.$active_warning)) {
+            $("." + self.get("class_id")).remove();
+            self.$active_warning = undefined;
+        }
+
+    },
+    render_value: function() {
+        var self = this;
+        this._super.apply(this, arguments);
+        this.set_active();
+    },
+});
+
 
 /**
     This widget is intended to display a warning near a label of a 'res.partner' many2one field

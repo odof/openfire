@@ -272,6 +272,8 @@ class OfPlanifCreneau(models.TransientModel):
     #])
     aucun_res = fields.Boolean(string=u"Aucun résultat!")
     employee_id = fields.Many2one('hr.employee', string="Intervenant", readonly=True)
+    lieu_prec_depart = fields.Boolean(string=u"lieu de départ de la journée?", compute="_compute_lieu_prec_depart")
+    lieu_suiv_arrivee = fields.Boolean(string=u"lieu d'arrivée de la journée", compute="_compute_lieu_prec_depart")
     # lieu précédent
     lieu_prec_id = fields.Many2one("res.partner", string=u"lieu précédent")
     geo_lat_prec = fields.Float(related='lieu_prec_id.geo_lat', readonly=True)
@@ -322,6 +324,20 @@ class OfPlanifCreneau(models.TransientModel):
          u"Veuillez choisir un lieu précédent et/ou suivant géolocalisés pour ce créneau afin de faciliter les calculs de distances.\n"
          u"Si vous ne le faites pas, les résultat proposés ne tiendront pas compte des distances"),
     ], compute="_compute_messages")
+
+    @api.multi
+    @api.depends('employee_id.of_address_depart_id', 'employee_id.of_address_retour_id', 'employee_id',
+                 'lieu_prec_id', 'lieu_suiv_id')
+    def _compute_lieu_prec_depart(self):
+        for creneau in self:
+            if creneau.employee_id.of_address_depart_id == creneau.lieu_prec_id:
+                creneau.lieu_prec_depart = True
+            else:
+                creneau.lieu_prec_depart = False
+            if creneau.employee_id.of_address_retour_id == creneau.lieu_suiv_id:
+                creneau.lieu_suiv_arrivee = True
+            else:
+                creneau.lieu_suiv_arrivee = False
 
     @api.multi
     @api.depends('lieu_prec_id', 'lieu_prec_manual_id', 'lieu_suiv_id', 'lieu_suiv_manual_id')

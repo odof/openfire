@@ -21,8 +21,8 @@
                     <field name="creneaux_reels" invisible="1"/>
                     <field name="priorite_max" invisible="1"/>
                     <field name="duree_creneau" widget="float_time" invisible="1"/>
-                    <field name="lieu_prec_id" invisible="1"/>
-                    <field name="lieu_suiv_id" invisible="1"/>
+                    <field name="lieu_prec_depart" invisible="1"/>
+                    <field name="lieu_suiv_arrivee" invisible="1"/>
                     <field name="geo_lat_prec" invisible="1"/>
                     <field name="geo_lat_suiv" invisible="1"/>
                     <field name="warning_horaires" invisible="1"/>
@@ -42,8 +42,18 @@
                             <t/>Par conséquent, le temps disponible de cet intervenant pour ce créneau est peut-être erroné.
                         </i>
                         <field name="duree_creneau_readonly" widget="float_time"/>
-                        <field name="lieu_prec_readonly_id"/>
-                        <field name="lieu_suiv_readonly_id"/>
+                        <i class="oe_grey" colspan="2" attrs="{'invisible': [('lieu_prec_depart', '=', False)]}">
+                            Le lieu précédent de ce créneau est le lieu de départ de l'intervenant, vous pouvez donc le modifier
+                        </i>
+                        <field name="lieu_prec_id" attrs="{'invisible': [('lieu_prec_depart', '=', False)]}"
+                          options="{'no_create': True, 'no_open': True}"/>
+                        <field name="lieu_prec_readonly_id" attrs="{'invisible': [('lieu_prec_depart', '=', True)]}"/>
+                        <i class="oe_grey" colspan="2" attrs="{'invisible': [('lieu_suiv_arrivee', '=', False)]}">
+                            Le lieu suivant de ce créneau est le lieu de retour de l'intervenant, vous pouvez donc le modifier
+                        </i>
+                        <field name="lieu_suiv_id" attrs="{'invisible': [('lieu_suiv_arrivee', '=', False)]}"
+                          options="{'no_create': True, 'no_open': True}"/>
+                        <field name="lieu_suiv_readonly_id" attrs="{'invisible': [('lieu_suiv_arrivee', '=', True)]}"/>
                         <i colspan="2"><field name="lieu_prec_message" attrs="{'invisible': [('lieu_prec_message', '=', False)]}"
                                class="oe_grey" nolabel="1"/></i>
                         <field name="lieu_prec_manual_id" attrs="{'invisible': [('lieu_prec_id', '!=', False), ('geo_lat_prec', '!=', False)]}"/>
