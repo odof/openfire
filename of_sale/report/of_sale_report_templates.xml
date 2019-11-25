@@ -194,8 +194,8 @@
                     <table class="table table-condensed">
                         <!-- Affichage des paiements et autres groupes de sous-totaux -->
                         <t t-set='totals_group' t-value="doc._of_get_printable_totals()"/>
-                        <tr class="border-black">
-                            <td><strong>Total hors taxe</strong></td>
+                        <tr name="total_ht" class="border-black">
+                            <td name="total_ht_libelle"><strong>Total hors taxe</strong></td>
                             <td class="text-right">
                                 <span><t t-esc="totals_group['subtotal']" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/></span>
                             </td>
