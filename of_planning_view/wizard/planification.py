@@ -276,14 +276,10 @@ class OfPlanifCreneau(models.TransientModel):
     lieu_suiv_arrivee = fields.Boolean(string=u"lieu d'arrivée de la journée", compute="_compute_lieu_prec_depart")
     # lieu précédent
     lieu_prec_id = fields.Many2one("res.partner", string=u"lieu précédent")
-    geo_lat_prec = fields.Float(related='lieu_prec_id.geo_lat', readonly=True)
-    geo_lng_prec = fields.Float(related='lieu_prec_id.geo_lng', readonly=True)
-    precision_prec = fields.Selection(related='lieu_prec_id.precision', readonly=True)
+
     # lieu suivant
     lieu_suiv_id = fields.Many2one("res.partner", string="lieu suivant")
-    geo_lat_suiv = fields.Float(related='lieu_suiv_id.geo_lat', readonly=True)
-    geo_lng_suiv = fields.Float(related='lieu_suiv_id.geo_lng', readonly=True)
-    precision_suiv = fields.Selection(related='lieu_suiv_id.precision', readonly=True)
+
     secteur_id = fields.Many2one('of.secteur', string="Secteur", help="laisser vide pour ne pas restreindre à un secteur en particulier")
     priorite_max = fields.Integer(string=u"Priorité max", help=u"Priorité la plus haute parmis les propositions")
 
@@ -325,6 +321,75 @@ class OfPlanifCreneau(models.TransientModel):
          u"Si vous ne le faites pas, les résultat proposés ne tiendront pas compte des distances"),
     ], compute="_compute_messages")
 
+    street_suiv = fields.Char(compute="compute_prec_suiv_vals")
+    zip_suiv = fields.Char(compute="compute_prec_suiv_vals")
+    city_suiv = fields.Char(compute="compute_prec_suiv_vals")
+    country_suiv_id = fields.Many2one('res.country', compute="compute_prec_suiv_vals")
+    geo_lat_suiv = fields.Float(compute="compute_prec_suiv_vals")
+    geo_lng_suiv = fields.Float(compute="compute_prec_suiv_vals")
+    precision_suiv = fields.Selection([
+        ('manual', "Manuel"),
+        ('high', "Haut"),
+        ('medium', "Moyen"),
+        ('low', "Bas"),
+        ('no_address', u"--"),
+        ('unknown', u"Indéterminé"),
+        ('not_tried', u"Pas tenté"),
+        ], compute="compute_prec_suiv_vals")
+
+    street_prec = fields.Char(compute="compute_prec_suiv_vals")
+    zip_prec = fields.Char(compute="compute_prec_suiv_vals")
+    city_prec = fields.Char(compute="compute_prec_suiv_vals")
+    country_prec_id = fields.Many2one('res.country', compute="compute_prec_suiv_vals")
+    geo_lat_prec = fields.Float(compute="compute_prec_suiv_vals")
+    geo_lng_prec = fields.Float(compute="compute_prec_suiv_vals")
+    precision_prec = fields.Selection([
+        ('manual', "Manuel"),
+        ('high', "Haut"),
+        ('medium', "Moyen"),
+        ('low', "Bas"),
+        ('no_address', u"--"),
+        ('unknown', u"Indéterminé"),
+        ('not_tried', u"Pas tenté"),
+        ], compute="compute_prec_suiv_vals")
+
+    @api.multi
+    @api.depends('lieu_prec_id', 'lieu_prec_manual_id', 'lieu_suiv_id', 'lieu_suiv_manual_id')
+    def compute_prec_suiv_vals(self):
+        for wizard in self:
+            if wizard.lieu_prec_manual_id:
+                wizard.street_prec = wizard.lieu_prec_manual_id.street
+                wizard.zip_prec = wizard.lieu_prec_manual_id.zip and wizard.lieu_prec_manual_id.zip + u", " or u""
+                wizard.city_prec = wizard.lieu_prec_manual_id.city and wizard.lieu_prec_manual_id.city + u", " or u""
+                wizard.country_prec_id = wizard.lieu_prec_manual_id.country_id.id
+                wizard.geo_lat_prec = wizard.lieu_prec_manual_id.geo_lat
+                wizard.geo_lng_prec = wizard.lieu_prec_manual_id.geo_lng
+                wizard.precision_prec = wizard.lieu_prec_manual_id.precision
+            else:
+                wizard.street_prec = wizard.lieu_prec_id.street
+                wizard.zip_prec = wizard.lieu_prec_id.zip and wizard.lieu_prec_id.zip + u", " or u""
+                wizard.city_prec = wizard.lieu_prec_id.city and wizard.lieu_prec_id.city + u", " or u""
+                wizard.country_prec_id = wizard.lieu_prec_id.country_id.id
+                wizard.geo_lat_prec = wizard.lieu_prec_id.geo_lat
+                wizard.geo_lng_prec = wizard.lieu_prec_id.geo_lng
+                wizard.precision_prec = wizard.lieu_prec_id.precision
+            if wizard.lieu_suiv_manual_id:
+                wizard.street_suiv = wizard.lieu_suiv_manual_id.street
+                wizard.zip_suiv = wizard.lieu_suiv_manual_id.zip and wizard.lieu_suiv_manual_id.zip + u", " or u""
+                wizard.city_suiv = wizard.lieu_suiv_manual_id.city and wizard.lieu_suiv_manual_id.city + u", " or u""
+                wizard.country_suiv_id = wizard.lieu_suiv_manual_id.country_id.id
+                wizard.geo_lat_suiv = wizard.lieu_suiv_manual_id.geo_lat
+                wizard.geo_lng_suiv = wizard.lieu_suiv_manual_id.geo_lng
+                wizard.precision_suiv = wizard.lieu_suiv_manual_id.precision
+            else:
+                wizard.street_suiv = wizard.lieu_suiv_id.street
+                wizard.zip_suiv = wizard.lieu_suiv_id.zip and wizard.lieu_suiv_id.zip + u", " or u""
+                wizard.city_suiv = wizard.lieu_suiv_id.city and wizard.lieu_suiv_id.city + u", " or u""
+                wizard.country_suiv_id = wizard.lieu_suiv_id.country_id.id
+                wizard.geo_lat_suiv = wizard.lieu_suiv_id.geo_lat
+                wizard.geo_lng_suiv = wizard.lieu_suiv_id.geo_lng
+                wizard.precision_suiv = wizard.lieu_suiv_id.precision
+
     @api.multi
     @api.depends('employee_id.of_address_depart_id', 'employee_id.of_address_retour_id', 'employee_id',
                  'lieu_prec_id', 'lieu_suiv_id')
@@ -365,7 +430,6 @@ class OfPlanifCreneau(models.TransientModel):
             else:
                 creneau.lieu_prec_message = False
                 creneau.lieu_suiv_message = False
-
 
     @api.depends('date_creneau')
     def _compute_num_jour(self):
@@ -500,8 +564,8 @@ class OfPlanifCreneau(models.TransientModel):
         services = self.env['of.service'].search(service_domain)
         distance_max = self.distance_max * 1.3  # approximation
         priorite_max = 0
-        lieu_prec = self.geo_lat_prec and self.lieu_prec_id or self.lieu_prec_manual_id
-        lieu_suiv = self.geo_lat_suiv and self.lieu_suiv_id or self.lieu_suiv_manual_id
+        lieu_prec = self.lieu_prec_manual_id or self.lieu_prec_id
+        lieu_suiv = self.lieu_suiv_manual_id or self.lieu_suiv_id
         calcul_distance_dwazo = True
         if not lieu_prec and not lieu_suiv:
             calcul_distance_dwazo = False
@@ -583,11 +647,12 @@ class OfPlanifCreneau(models.TransientModel):
         prop_prioritaires -= prop_a_supr
         prop_a_supr.unlink()
         self.selected_id = prop_prioritaires.get_closer_one()
-        self.selected_id.selected = True
-        if self.selected_id.priorite == self.priorite_max:
-            self.selected_id.priorite += 1
-        self.duree_rdv = self.selected_id.service_id.duree
-        self.description_rdv = self.selected_id.service_id.note
+        if self.selected_id:
+            self.selected_id.selected = True
+            if self.selected_id.priorite == self.priorite_max:
+                self.selected_id.priorite += 1
+            self.duree_rdv = self.selected_id.service_id.duree
+            self.description_rdv = self.selected_id.service_id.note
 
     @api.multi
     def button_dummy(self):
