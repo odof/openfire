@@ -42,8 +42,8 @@ class BetterZip(models.Model):
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
-    of_secteur_com_id = fields.Many2one('of.secteur', string="Secteur Commercial", oldname="secteur_com_id")
-    of_secteur_tech_id = fields.Many2one('of.secteur', string="Secteur Technique")
+    of_secteur_com_id = fields.Many2one('of.secteur', string="Secteur commercial", oldname="secteur_com_id")
+    of_secteur_tech_id = fields.Many2one('of.secteur', string="Secteur technique")
 
     @api.onchange('of_secteur_com_id')
     def _onchange_of_secteur_com_id(self):

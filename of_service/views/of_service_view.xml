@@ -142,24 +142,28 @@
                             <group name="refs" string="Références">
                                 <field name="base_state" invisible="1"/>
                                 <field name="partner_id" invisible="context.get('hide_service_partner_id')"/>
-                                <field name="address_id" invisible="context.get('hide_service_address_id')"/>
+                                <label for="address_id" invisible="context.get('hide_service_address_id')"/>
+                                <div class="o_address_format" invisible="context.get('hide_service_address_id')">
+                                    <field name="address_id"/>
+                                    <field name="address_address"/>
+                                </div>
                                 <field name="secteur_tech_id"/>
-                                <field name="company_id"/>
-                                <field name="origin" readonly="1" attrs="{'invisible': [('recurrence', '=', True)]}"/>
-                                <field name="order_id"/>
                                 <field name="tag_ids" widget="many2many_tags"/>
+                                <field name="company_id"/>
                             </group>
                             <group name="planif" string="Planification">
                                 <div colspan="2" attrs="{'invisible': [('base_state', '!=', 'draft')]}">
                                     <b><i class="of_red">
-                                        <i class="fa fa-lg fa-warning"/> Vous pourrez planifier cette intervention quand elle sera validée
+                                        <i class="fa fa-lg fa-warning"/> Vous pourrez planifier cette intervention quand elle sera validée.
                                     </i></b>
                                 </div>
                                 <div colspan="2" attrs="{'invisible': [('base_state', '!=', 'cancel')]}">
                                     <b><i class="of_red">
-                                        <i class="fa fa-lg fa-warning"/> Une intervention annulée n'est pas planifiable
+                                        <i class="fa fa-lg fa-warning"/> Une intervention annulée n'est pas planifiable.
                                     </i></b>
                                 </div>
+                                <field name="tache_id" context="{'show_rec_icon_first': recurrence}"/>
+                                <field name="duree" widget="float_time"/>
                                 <div name="label_date_next">
                                     <label for="date_next" string="À partir du" class="of_label"
                                            attrs="{'invisible': [('recurrence', '=', True)]}"/>
@@ -168,12 +172,12 @@
                                 </div>
                                 <field name="date_next" string="À partir du" nolabel="1" style="padding-left: 2px;"/>
                                 <div name="label_date_fin">
-                                    <label for="date_fin" string="Au plus tard" class="of_label"
+                                    <label for="date_fin" string="Jusqu'au" class="of_label"
                                            attrs="{'invisible': [('recurrence', '=', True)]}"/>
                                     <label for="date_fin" string="Fin du contrat" class="of_label"
                                            attrs="{'invisible': [('recurrence', '=', False)]}"/>
                                 </div>
-                                <field name="date_fin" string="Au plus tard" nolabel="1" style="padding-left: 2px;"/>
+                                <field name="date_fin" nolabel="1" style="padding-left: 2px;"/>
                                 <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
                                 <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'invisible': [('recurrence', '=', False)]}"/>
                                 <label for="recurring_interval" attrs="{'invisible': [('recurrence', '=', False)]}"/>
@@ -181,38 +185,39 @@
                                     <field name="recurring_interval" nolabel="1" class="oe_inline of_ws"/>
                                     <field name="recurring_rule_type" nolabel="1" class="oe_inline"/>
                                 </div>
-                                <field name="tache_id" context="{'show_rec_icon_first': recurrence}"/>
                                 <field name="recurrence_tache" invisible="1"/>
                                 <div colspan="2" attrs="{'invisible': [('recurrence', '=', '_field_recurrence_tache')]}">
                                     <b><i class="oe_grey">
-                                        Il y a une différence entre la récurrence de la tache et celle de l'intervention à programmer.
+                                        Il y a une différence entre la récurrence de la tâche et celle de l'intervention à programmer.
                                     </i></b>
                                 </div>
-                                <field name="duree" widget="float_time"/>
                                 <field name="duree_planif" widget="float_time"/>
                                 <field name="duree_restante" widget="float_time"/>
                             </group>
-                            <group name="notes" string="Notes" col="4" colspan="4">
+                            <group name="origine" string="Origine">
+                                <field name="order_id"/>
+                                <field name="origin" readonly="1" attrs="{'invisible': [('recurrence', '=', True)]}"/>
+                            </group>
+                            <group name="notes" string="Description" col="4" colspan="4">
                                 <field name="note" colspan="4" nolabel="1"/>
                             </group>
-
                         </group>
-                        <notebook>
-                            <page string="Interventions" invisible="1">
-                                <field name="intervention_ids" nolabel="1" colspan="2" options="{'reload_on_button': True}">
-                                    <tree string="Liste des interventions" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done';purple:state=='unfinished'">
-                                        <field name="name" string="Libellé"/>
-                                        <field name="date"/>
-                                        <field name="duree" string="Durée" widget="float_time"/>
-                                        <field name="employee_ids"/>
-                                        <field name="company_id"/>
-                                        <field name="state"/>
-                                        <button name="button_done" string="Marquer comme fait" type="object"/>
-                                        <field name="description"/>
-                                    </tree>
-                                </field>
-                            </page>
-                        </notebook>
+<!--                        <notebook>-->
+<!--                            <page string="Interventions" invisible="1">-->
+<!--                                <field name="intervention_ids" nolabel="1" colspan="2" options="{'reload_on_button': True}">-->
+<!--                                    <tree string="Liste des interventions" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done';purple:state=='unfinished'">-->
+<!--                                        <field name="name" string="Libellé"/>-->
+<!--                                        <field name="date"/>-->
+<!--                                        <field name="duree" string="Durée" widget="float_time"/>-->
+<!--                                        <field name="employee_ids"/>-->
+<!--                                        <field name="company_id"/>-->
+<!--                                        <field name="state"/>-->
+<!--                                        <button name="button_done" string="Marquer comme fait" type="object"/>-->
+<!--                                        <field name="description"/>-->
+<!--                                    </tree>-->
+<!--                                </field>-->
+<!--                            </page>-->
+<!--                        </notebook>-->
 
                     </sheet>
                 </form>

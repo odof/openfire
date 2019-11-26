@@ -193,7 +193,7 @@ class OfService(models.Model):
 
     # template_id = fields.Many2one('of.mail.template', string='Contrat')
     partner_id = fields.Many2one('res.partner', string='Partenaire', required=True, ondelete='restrict')
-    address_id = fields.Many2one('res.partner', string="Adresse", ondelete='restrict')
+    address_id = fields.Many2one('res.partner', string="Adresse d'intervention", ondelete='restrict')
     secteur_tech_id = fields.Many2one(related='address_id.of_secteur_tech_id', readonly=True)
     company_id = fields.Many2one('res.company', string=u"Société")
 
@@ -226,6 +226,7 @@ class OfService(models.Model):
     date_fin = fields.Date(u"Date d'échéance")  #TODO: pour les servide ponc: "Au plus tard le"
 
     # Partner-related fields
+    address_address = fields.Char('Adresse', related='address_id.contact_address', readonly=True)
     address_zip = fields.Char('Code Postal', size=24, related='address_id.zip', oldname="partner_zip")
     address_city = fields.Char('Ville', related='address_id.city', oldname="partner_city")
 
