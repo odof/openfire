@@ -31,7 +31,7 @@ def voldwazo(lat1, lng1, lat2, lng2):
 class OfPlanifCreneauProp(models.TransientModel):
     _name = 'of.planif.intervention'
     _description = u"Proposition d'intervention à programmer"
-    _order = "priorite DESC, distance_order"
+    _order = "selected DESC, priorite DESC, distance_order"
 
     service_id = fields.Many2one("of.service", string="Service")
     creneau_id = fields.Many2one('of.planif.creneau', string=u"Créneau")
@@ -39,16 +39,22 @@ class OfPlanifCreneauProp(models.TransientModel):
     description_rdv = fields.Text(related='creneau_id.description_rdv')
     heure_debut_rdv = fields.Float(related='creneau_id.heure_debut_rdv')
     duree_rdv = fields.Float(related='creneau_id.duree_rdv')
+    employee_other_ids = fields.Many2many(related='creneau_id.employee_other_ids')
+    employee_name = fields.Char(related="creneau_id.employee_id.name", readonly=True)
 
-    duree_restante = fields.Float(related='service_id.duree_restante')
+    duree_restante = fields.Float(related='service_id.duree_restante', readonly=True)
     recurrence = fields.Boolean(related="service_id.recurrence", readonly=True)
     date_next = fields.Date(string=u"À planifier entre le", related="service_id.date_next", readonly=True)
     date_fin = fields.Date(string="et le", compute="_compute_date_fin", readonly=True)
+    partner_id = fields.Many2one(related="service_id.partner_id")
     partner_name = fields.Char(string="Client", related='service_id.partner_id.name', readonly=True)
     partner_of_telephones = fields.Text(related='service_id.partner_id.of_telephones', readonly=True)
     #partner_phone = fields.Char(related='service_id.partner_id.phone', readonly=True)
 
-    tache_name = fields.Char(related='service_id.tache_id.name', readonly=True)
+    tache_id = fields.Many2one(related='service_id.tache_id', string="Tâche", readonly=True)
+    tache_name = fields.Char(related='service_id.tache_id.name', string="Tâche", readonly=True)
+    address_id = fields.Many2one(related="service_id.address_id")
+    address_html = fields.Html(compute="compute_address_html")
     address_name = fields.Char(string="Adresse", related="service_id.address_id.name", readonly=True)
     address_street = fields.Char(related="service_id.address_id.street", readonly=True)
     address_street2 = fields.Char(related="service_id.address_id.street2", readonly=True)
@@ -66,10 +72,29 @@ class OfPlanifCreneauProp(models.TransientModel):
     distance_reelle_suiv = fields.Float(string=u'Distance du suivant', digits=(5, 2), help=u"Réelle", compute="compute_distance_reelle")
     distance_reelle_tota = fields.Float(string=u'Distance totale (km)', digits=(5, 2), help=u"Réelle", compute="compute_distance_reelle")
     osrm_response = fields.Text(string=u"Réponse OSRM", compute="compute_distance_reelle")
-    distance_order = fields.Float(string=u'Distance totale order', digits=(5, 5), help=u"pour ordonner", store=True, default=99999.99999, compute="compute_distance_reelle")
+    distance_order = fields.Float(string=u'Distance totale order', digits=(5, 5), help=u"pour ordonner", store=True, default=99999, compute="compute_distance_reelle")
     dummy_field = fields.Boolean(string=u"A VER?", compute="_compute_dummy_field")
     priorite = fields.Integer(string=u"Priorité")
     selected = fields.Boolean(string=u"Sélectionné")
+
+    @api.multi
+    @api.depends('address_id')
+    def compute_address_html(self):
+        for a_planifier in self:
+            address = a_planifier.address_id
+            if not address:
+                address = a_planifier.partner_id
+            address_html = u"<div colspan='2' class='oe_grey' style='text-align: right; padding-right: 8px;'>"
+            if address.street2:
+                address_html += u"<div>%s</div>" % address.street2
+            if address.street:
+                address_html += u"<div>%s</div>" % address.street
+            if address.zip or address.city or address.country_id:
+                address_html += u"<div>"
+                val_list = [val for val in [address.zip, address.city, address.country_id] if val]
+                address_html += u"<span>%s</span>" % u", ".join(val_list)
+                address_html += u"</div>"
+            address_html += u"</div>"
 
     @api.multi
     @api.depends('geo_lat', 'geo_lng', 'creneau_id.geo_lat_prec', 'creneau_id.geo_lng_prec',
@@ -109,6 +134,9 @@ class OfPlanifCreneauProp(models.TransientModel):
         geo_lng_suiv = lieu_suiv.geo_lng
 
         for a_planifier in self[:100]:
+            
+            if a_planifier.distance_order != 99999 and a_planifier.distance_order != 0:
+                continue
             #a_planifier.dummy_field = True
             query = ROUTING_BASE_URL + "route/" + ROUTING_VERSION + "/" + ROUTING_PROFILE + "/"
             # Listes de coordonnées : ATTENTION OSRM prend ses coordonnées sous form (lng, lat)
@@ -138,7 +166,7 @@ class OfPlanifCreneauProp(models.TransientModel):
                 a_planifier.distance_reelle_prec = -1
                 a_planifier.distance_reelle_suiv = -1
                 a_planifier.distance_reelle_tota = -1
-                a_planifier.distance_order = 99999.99999
+                a_planifier.distance_order = 99999
                 a_planifier.osrm_response = res
             """
             if a_planifier.distance_dwazo_prec != -1 and a_planifier.distance_dwazo_suiv != -1:
@@ -201,17 +229,13 @@ class OfPlanifCreneauProp(models.TransientModel):
         # calculer la durée avant et la durée après
         # définir si montrer boutons confirmer et suivant, et/ou confirmer et précédent
 
-
-    """@api.multi
+    @api.multi
     @api.onchange('selected')
     def onchange_selected(self):
-        if not len(self) == 1:
-            return
-        if self.selected:
-            if self.creneau_id.selected_id:
-                self.creneau_id.selected_id.selected = False
+        self.ensure_one()
+        if self.selected and self.creneau_id.selected_id.id != self.id:
+            self.creneau_id.selected_id.selected = False
             self.creneau_id.selected_id = self.id
-            self.creneau_id.duree_rdv = self.service_id.duree"""
 
     @api.multi
     def get_closer_one(self):
@@ -623,10 +647,6 @@ class OfPlanifCreneau(models.TransientModel):
         self.ensure_one()
         vals_list = self.get_candidats()
         la_list = [(5, 0, 0)] + [(0, 0, values) for values in vals_list]
-        if not vals_list:
-            self.aucun_res = True
-        else:
-            self.aucun_res = False
 
         self.proposition_ids = la_list
 
@@ -635,6 +655,7 @@ class OfPlanifCreneau(models.TransientModel):
         self.ensure_one()
         if not self.proposition_ids:
             self.selected_id = False
+            self.aucun_res = True
             return
         prop_selected = self.proposition_ids.filtered(lambda p: p.selected == True)
         if prop_selected:
@@ -649,10 +670,13 @@ class OfPlanifCreneau(models.TransientModel):
         self.selected_id = prop_prioritaires.get_closer_one()
         if self.selected_id:
             self.selected_id.selected = True
-            if self.selected_id.priorite == self.priorite_max:
-                self.selected_id.priorite += 1
+            #if self.selected_id.priorite == self.priorite_max:
+            #    self.selected_id.priorite += 1
             self.duree_rdv = self.selected_id.service_id.duree
             self.description_rdv = self.selected_id.service_id.note
+            self.aucun_res = False
+        else:
+            self.aucun_res = True
 
     @api.multi
     def button_dummy(self):
