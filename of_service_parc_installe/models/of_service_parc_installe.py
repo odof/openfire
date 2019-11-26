@@ -20,6 +20,8 @@ class OfService(models.Model):
         self.ensure_one()
         if self.address_id:
             parc_obj = self.env['of.parc.installe']
+            if not parc_obj.check_access_rights('read', raise_exception=False):  # ne pas tenter le onchange si n'a pas les droits
+                return
             parc_installe = parc_obj.search([('site_adresse_id', '=', self.address_id.id)], limit=1)
             if not parc_installe:
                 parc_installe = parc_obj.search([('client_id', '=', self.address_id.id)], limit=1)

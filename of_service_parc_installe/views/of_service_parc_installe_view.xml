@@ -47,9 +47,9 @@
     <record id="view_of_service_parc_installe_planning_form" model="ir.ui.view">
         <field name="name">of.parc.installe.planning.intervention.form</field>
         <field name="model">of.planning.intervention</field>
-        <field name="inherit_id" ref="of_project_issue.of_planning_intervention_sav_liee"/>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='sav_id']" position="after">
+            <xpath expr="//group[@name='liens']" position="inside">
                 <field name="parc_installe_id"/>
             </xpath>
         </field>
