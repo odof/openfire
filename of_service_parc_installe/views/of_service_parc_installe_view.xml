@@ -7,18 +7,16 @@
         <field name="model">of.service</field>
         <field name="inherit_id" ref="of_service.view_of_service_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//notebook/page[1]" position="before">
-                <page string="Produit installé">
-                    <group>
+            <xpath expr="//field[@name='order_id']" position="after">
+                <field name="sav_id" attrs="{'invisible': [('recurrence', '=', True)]}"/>
+            </xpath>
+            <xpath expr="//group[@name='notes']" position="after">
+                <group string="Produit installé" colspan="4">
                         <field name="parc_installe_id"/>
                         <field name="parc_installe_product_id"/>
                         <field name="parc_installe_site_adresse_id"/>
                         <field name="parc_installe_note"/>
-                    </group>
-                </page>
-            </xpath>
-            <xpath expr="//field[@name='origin']" position="after">
-                <field name="sav_id" attrs="{'invisible': [('recurrence', '=', True)]}"/>
+                </group>
             </xpath>
         </field>
     </record>

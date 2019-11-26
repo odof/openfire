@@ -150,7 +150,7 @@
         <field name="name">of.secteur.zip.range.form</field>
         <field name="model">of.secteur.zip.range</field>
         <field name="arch" type="xml">
-            <form string="Codes Postaux des Secteurs">
+            <form string="Codes postaux des secteurs">
                 <group>
                     <group>
                         <field name="name"/>
@@ -169,7 +169,7 @@
         <field name="name">of.secteur.zip.range.tree</field>
         <field name="model">of.secteur.zip.range</field>
         <field name="arch" type="xml">
-            <tree string="Codes Postaux des Secteurs" editable="top">
+            <tree string="Codes postaux des secteurs" editable="top">
                 <field name="name"/>
                 <field name="cp_min"/>
                 <field name="cp_max"/>
@@ -182,7 +182,7 @@
         <field name="name">of.secteur.zip.range.filter</field>
         <field name="model">of.secteur.zip.range</field>
         <field name="arch" type="xml">
-            <search string="Recherche Codes Postaux des Secteurs">
+            <search string="Recherche codes postaux des secteurs">
                 <field name="name"/>
                 <field name="of_secteur_com_id"/>
                 <field name="of_secteur_tech_id"/>
@@ -203,7 +203,7 @@
     </record>
 
     <menuitem
-        name="CP des Secteurs"
+        name="CP des secteurs"
         id="of_secteur_zip_menu"
         parent="base_location.locations_root_menu"
         action="action_of_secteur_zip.range_tree"
