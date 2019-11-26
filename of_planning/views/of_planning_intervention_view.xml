@@ -209,7 +209,7 @@
                                 </div>
                                 <field name="verif_dispo"/>
                             </group>
-                            <group name="liens" invisible="1">
+                            <group name="liens">
                                 <separator string="Documents liés" colspan="2"/>
                                 <field name="order_id"/>
                             </group>
