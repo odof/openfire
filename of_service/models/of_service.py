@@ -295,6 +295,7 @@ class OfService(models.Model):
 
     # Couleur de contrôle
     color = fields.Char(compute='_compute_color', string='Couleur', store=False)
+    recurrence_tache = fields.Boolean(related='tache_id.recurrence', string=u"Récurrence tâche", readonly=True)
 
     def _search_duree_restante(self, operator, operand):
         services = self.search([])
@@ -326,9 +327,8 @@ class OfService(models.Model):
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
         self.ensure_one()
-        if self.tache_id:
+        if self.tache_id and self.tache_id.recurrence == self.recurrence:
             if not self._context.get(u"bloquer_recurrence"):
-                self.recurrence = self.tache_id.recurrence
                 self.recurring_rule_type = self.tache_id.recurring_rule_type
                 self.recurring_interval = self.tache_id.recurring_interval
             self.duree = self.tache_id.duree
