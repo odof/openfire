@@ -624,6 +624,7 @@ class OfPlanifCreneau(models.TransientModel):
             'description': self.description_rdv or '',
             'state': 'confirm',
             'verif_dispo': True,
+            'order_id': service.order_id.id,
         }
 
         return values

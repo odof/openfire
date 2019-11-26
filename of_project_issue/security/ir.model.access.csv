@@ -3,3 +3,4 @@
 "access_of_project_issue_categorie_manager","of.project.issue.categorie","model_of_project_issue_categorie","project.group_project_manager",1,1,1,1
 "access_of_project_issue_canal_user","of.project.issue.canal","model_of_project_issue_canal","project.group_project_user",1,0,0,0
 "access_of_project_issue_canal_manager","of.project.issue.canal","model_of_project_issue_canal","project.group_project_manager",1,1,1,1
+"access_of_project_issue_planning","of.project.issue","model_project_issue","of_planning.of_group_planning_intervention_lecture_siens",1,0,0,0
