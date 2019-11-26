@@ -59,7 +59,7 @@
                             <i colspan="2"><field name="lieu_prec_message" attrs="{'invisible': [('lieu_prec_message', '=', False)]}"
                                                   class="oe_grey" nolabel="1"/></i>
                             <field name="lieu_prec_manual_id" attrs="{'invisible': [('lieu_prec_id', '!=', False), ('geo_lat_prec', '!=', False)]}"/>
-                            <div class="oe_grey" colspan="2">
+                            <div class="oe_grey" colspan="2" style="text-align: right; padding-right: 8px;">
                                 <div><field name="street_prec" nolabel="1"/></div>
                                 <div>
                                     <field name="zip_prec" nolabel="1" class="oe_inline"/>
@@ -79,7 +79,7 @@
                             <i colspan="2"><field name="lieu_suiv_message" attrs="{'invisible': [('lieu_suiv_message', '=', False)]}"
                                    class="oe_grey" nolabel="1"/></i>
                             <field name="lieu_suiv_manual_id" attrs="{'invisible': [('lieu_suiv_id', '!=', False), ('geo_lat_suiv', '!=', False)]}"/>
-                            <div class="oe_grey" colspan="2">
+                            <div class="oe_grey" colspan="2" style="text-align: right; padding-right: 8px;">
                                 <div><field name="street_suiv" nolabel="1"/></div>
                                 <div>
                                     <field name="zip_suiv" nolabel="1" class="oe_inline"/>
@@ -128,14 +128,12 @@
                     <field name="proposition_ids" mode="tree" nolabel="1" colspan="6"
                            attrs="{'invisible': ['|',('proposition_ids', '=', []),('pre_a_programmer_id', '!=', False)]}"
                            options="{'reload_on_button': True}">
-                        <tree limit="5" colors="blue: selected==True;" create="0">
+                        <tree limit="5" colors="blue: selected==True;" create="0" options="{'reload_on_button': True}">
                             <field name="service_id" invisible="1"/>
                             <field name="dummy_field" invisible="1"/>
                             <field name="priorite" invisible="1"/>
                             <field name="selected" invisible="1"/>
                             <field name="id" invisible="1"/>
-                            <!--button name="button_select" type="object" icon="fa-check-circle"
-                                    attrs="{'invisible': [('selected', '=', True)]}"/-->
                             <field name="tache_name"/>
                             <field name="partner_name"/>
                             <field name="address_city"/>
@@ -179,37 +177,45 @@
                         $(".modal-footer").eq(len-1).hide();
                     });
                 </script>
+                <h1 class="of_title"><b>
+                    <span attrs="{'invisible':[('selected','=',True)]}">
+                        Proposition d'
+                    </span>
+                    <span attrs="{'invisible':[('selected','!=',True)]}">
+                        Planifier une
+                    </span>
+                    intervention pour <field name="employee_name" nolabel="1" class="oe_inline"/>
+                </b></h1>
                 <group>
                     <group>
-                        <field name="service_id" readonly="1"/>
-                        <field name="duree_restante" readonly="1" widget="float_time"/>
-                        <field name="date_next" readonly="1"/>
-                        <field name="date_fin" readonly="1"/>
-                        <field name="distance_reelle_prec" readonly="1"/>
-                        <field name="distance_reelle_suiv" readonly="1"/>
-                        <field name="distance_reelle_tota" readonly="1"/>
+                        <group colspan="2" name="partner" string="Partenaire">
+                            <field name="partner_id" options="{'no_create': True, 'no_open': True}" readonly="1"/>
+                            <field name="address_id" attrs="{'invisible': [('address_id', '=', '_field_partner_id')]}"
+                              options="{'no_create': True, 'no_open': True}"/>
+                            <field name="address_html" nolabel="1" colspan="2"/>
+                            <field name="partner_of_telephones"/>
+                        </group>
+                        <group colspan="2" string="Mémo">
+                            <field name="date_next" readonly="1"/>
+                            <field name="date_fin" readonly="1"/>
+                            <field name="distance_reelle_prec" readonly="1"/>
+                            <field name="distance_reelle_suiv" readonly="1"/>
+                            <field name="distance_reelle_tota" readonly="1"/>
+                        </group>
+
                     </group>
-                    <group>
-                        <field name="partner_name" readonly="1"/>
-                        <field name="address_name" readonly="1"
-                               attrs="{'invisible': ['|', ('address_name', '=', '_field_partner_name'), ('address_name', '=', False)]}"/>
-                        <field name="partner_of_telephones" readonly="1" attrs="{'invisible': [('partner_of_telephones', '=', False)]}"/>
-                        <div class="o_address_format" colspan="2">
-                            <field name="address_street" class="o_address_street"/>
-                            <field name="address_street2" class="o_address_street"/>
-                            <field name="address_city" class="o_address_city"/>
-                            <field name="address_state_id" class="o_address_state" options='{"no_open": True}' context="{'country_id': country_id, 'zip': zip}"/>
-                            <field name="address_zip" class="o_address_zip"/>
-                            <field name="address_country_id" class="o_address_country" options='{"no_open": True, "no_create": True}'/>
-                        </div>
-                    </group>
-                    <group attrs="{'invisible':[('selected','!=',True)]}" colspan="2" col="2">
+                    <group name="planif" string="Planification" attrs="{'invisible':[('selected','!=',True)]}">
                         <field name="selected" invisible="1" readonly="1"/>
                         <field name="heure_debut_rdv" widget="float_time"/>
-                        <field name="duree_rdv" widget="float_time"/>
+                        <field name="duree_rdv" string="Durée du RDV" widget="float_time"/>
+                        <field name="duree_restante" string="Durée restante à planifier" widget="float_time"/>
+                        <field name="employee_other_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                        <field name="tache_name"/>
                     </group>
-                    <label for="description_rdv" colspan="2" attrs="{'invisible':[('selected','!=',True)]}"/>
-                    <field name="description_rdv" nolabel="1" colspan="2" widget="html" attrs="{'invisible':[('selected','!=',True)]}"/>
+                    <group colspan="2" string="Description" attrs="{'invisible':[('selected','!=',True)]}">
+                        <field name="description_rdv" nolabel="1" colspan="2" widget="html"/>
+                    </group>
+                    <field name="service_id" invisible="1"/>
                 </group>
                 <footer>
                     <button name="button_select" string="Sélectionner cette intervention à programmer" type="object" colspan="4" class="btn-primary"

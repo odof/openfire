@@ -36,29 +36,17 @@ FieldMany2One.include({
 
         var record_id = this.field_manager.get_field_value(this.name)
         var type = self.field.type;
-        if (!isNUF(record_id) && type == "many2one") {
-            var Relation = new Model(self.field.relation);
-            var active;
-            Relation.query(['id']) // retrieve active from db
-                .filter([['id', '=', record_id]]) // id
-                .all()
-                .then(function (records){
-                    // si le champ 'active' n'existe pas dans le modèle,
-                    // on considère par convention que tous les enregistrements sont actifs
-                    // si records[0] vaut undefined, l'enregistrement est inactif
-                    if (isNullOrUndef(records[0])) {
-                        active = false;
-                    }else{
-                        active = true;
-                    }
-
+        if (!isNUF(record_id) && type == "many2one" && !self.get("invisible")) {
+            var OFWebWidgetsUtils = new Model("of.web.widgets.utils");
+            OFWebWidgetsUtils.call("est_actif", [record_id, self.field.relation]) // retrieve active from db
+                .then(function (active) {
                     if (!self.get("id") || !self.get("class_id")) {
                         self.set({
                             "id": record_id,
                             "class_id": "of_m2o_" + record_id
                         });
                     }
-                    if(!active && !self.get("invisible")) {
+                    if(!active) {
                         // est désactivé
                         var options = _.extend({
                             delay: { show: 501, hide: 0 },
