@@ -536,10 +536,10 @@
             <field name="model">of.planning.tache.categ</field>
             <field name="arch" type="xml" >
                 <tree string="Liste des catégories de tâches" >
+                    <field name="sequence" wdiget="handle"/>
                     <field name="name" string="Libellé"/>
                     <field name="tache_ids"/>
                     <field name="description"/>
-                    <field name="sequence"/>
                 </tree>
             </field>
         </record>

@@ -345,6 +345,13 @@ class OfService(models.Model):
             mois_id = mois[0] and mois[0].id or False
             if mois_id:
                 self.mois_ids = [(4, mois_id, 0)]
+        if self.date_next:
+            date_fin = fields.Date.from_string(self.date_next)
+            if self.recurrence:
+                date_fin += self.get_relative_delta(self.recurring_rule_type, self.recurring_interval * 2)
+            else:
+                date_fin += relativedelta(months=1)
+            self.date_fin = fields.Date.to_string(date_fin)
 
     @api.onchange('date_next', 'date_fin')
     def _onchange_dates(self):
@@ -441,6 +448,7 @@ class OfService(models.Model):
                 'default_service_id': self.id,
                 'create': self.base_state == 'calculated',
                 'edit': self.base_state == 'calculated',
+                'default_order_id': self.order_id and self.order_id.id,
             })
             action['context'] = str(context)
 

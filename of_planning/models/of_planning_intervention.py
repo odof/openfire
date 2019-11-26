@@ -1281,3 +1281,13 @@ class OfPlanningTag(models.Model):
     color = fields.Integer(string='Index couleur')
     active = fields.Boolean(default=True, help="Le champ 'Active' vous permet de cacher l'étiquette sans la supprimer.")
     intervention_ids = fields.Many2many('of.planning.intervention', column1='tag_id', column2='intervention_id', string='Interventions')
+
+class Report(models.Model):
+    _inherit = "report"
+
+    @api.model
+    def get_pdf(self, docids, report_name, html=None, data=None):
+        if report_name == 'of_planning.of_planning_fiche_intervention_report_template':
+            self = self.sudo()
+        result = super(Report, self).get_pdf(docids, report_name, html=html, data=data)
+        return result

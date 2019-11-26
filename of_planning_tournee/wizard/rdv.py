@@ -559,6 +559,7 @@ class OfTourneeRdv(models.TransientModel):
             'description': self.description or '',
             'state': 'confirm',
             'verif_dispo': True,
+            'order_id': self.service_id.order_id.id,
         }
 
         return values

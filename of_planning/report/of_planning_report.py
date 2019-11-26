@@ -58,9 +58,9 @@ class ReportPlanningGeneralSemaine(models.AbstractModel):
         domain = [('date_deadline', '>=', date_start), ('date', '<=', date_stop),
                   ('employee_ids', 'in', employee_ids),
                   ('state', 'in', ('draft', 'confirm', 'done', 'unfinished'))]
-        interventions = intervention_obj.search(domain, order='employee_ids, date')
+        interventions = intervention_obj.search(domain, order='date')
 
-        res = []
+        temp = {}
         days = range(5) # @todo: jours travaillés
 
         for interv in interventions:
@@ -73,18 +73,17 @@ class ReportPlanningGeneralSemaine(models.AbstractModel):
             if day not in days:
                 days.append(day)
 
-            for employee in interv.employee_ids:
-                if not res or res[-1][0] != employee.name:
-                    res.append([employee.name, {}])
-
             heure = date_locale_dt.strftime("%H:%M")
-
-            employee_jours_dict = res[-1][1]
-            employee_jours_dict.setdefault(day, [False, []])[1].append((heure, interv))
-            if interv.tache_id.imp_detail:
-                employee_jours_dict[day][0] = True
+            for employee in interv.employee_ids:
+                if not temp or employee.name not in temp:
+                    temp[employee.name] = {}
+                employee_jours_dict = temp[employee.name]
+                employee_jours_dict.setdefault(day, [False, []])[1].append((heure, interv))
+                if interv.tache_id.imp_detail:
+                    employee_jours_dict[day][0] = True
         days.sort()
 
+        res = [[key, temp[key]] for key in temp.keys()]
         for _, intervs_dict in res:
             for day, (imp_detail, intervs) in intervs_dict.iteritems():
                 if imp_detail:

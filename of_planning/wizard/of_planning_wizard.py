@@ -20,7 +20,7 @@ class PlanningImpressionWizard(models.TransientModel):
         ('week2', u"Général semaine"),
     ], string="Type", required=True, default='day')
     date_start = fields.Date("Date", required=True)
-    employee_ids = fields.Many2many('hr.employee', string=u"Employés")
+    employee_ids = fields.Many2many('hr.employee', string=u"Employés", domain="[('of_est_intervenant', '=', True)]")
 
     @api.onchange('type')
     def check_change(self):
@@ -47,6 +47,7 @@ class PlanningImpressionWizard(models.TransientModel):
                 'ids': self.env.context.get('active_ids', []),
                 'model': self.env.context.get('active_model', 'ir.ui.menu'),
                 'form': tmp,
+                'date_start': self.date_start,
             }
 
             return self.env['report'].get_action(self, 'of_planning.report_planning_general_semaine', data=data)
@@ -61,6 +62,7 @@ class PlanningImpressionWizard(models.TransientModel):
             report_type_name = {
                 'day': 'of_planning.of_planning_jour',
                 'week': 'of_planning.of_planning_semaine',
+                # 'week2': 'of_planning.report_planning_general_semaine',
             }
 
             return {
