@@ -39,13 +39,14 @@ class OfPlanifCreneauProp(models.TransientModel):
     description_rdv = fields.Text(related='creneau_id.description_rdv')
     heure_debut_rdv = fields.Float(related='creneau_id.heure_debut_rdv')
     duree_rdv = fields.Float(related='creneau_id.duree_rdv')
-    employee_other_ids = fields.Many2many(related='creneau_id.employee_other_ids')
+    employee_other_ids = fields.Many2many('hr.employee', related='creneau_id.employee_other_ids')
     employee_name = fields.Char(related="creneau_id.employee_id.name", readonly=True)
 
     duree_restante = fields.Float(related='service_id.duree_restante', readonly=True)
     recurrence = fields.Boolean(related="service_id.recurrence", readonly=True)
     date_next = fields.Date(string=u"À planifier entre le", related="service_id.date_next", readonly=True)
     date_fin = fields.Date(string="et le", compute="_compute_date_fin", readonly=True)
+    origin = fields.Char(related="service_id.origin", readonly=True)
     partner_id = fields.Many2one(related="service_id.partner_id")
     partner_name = fields.Char(string="Client", related='service_id.partner_id.name', readonly=True)
     partner_of_telephones = fields.Text(related='service_id.partner_id.of_telephones', readonly=True)
@@ -78,23 +79,24 @@ class OfPlanifCreneauProp(models.TransientModel):
     selected = fields.Boolean(string=u"Sélectionné")
 
     @api.multi
-    @api.depends('address_id')
+    @api.depends('address_id', 'partner_id')
     def compute_address_html(self):
         for a_planifier in self:
             address = a_planifier.address_id
             if not address:
                 address = a_planifier.partner_id
-            address_html = u"<div colspan='2' class='oe_grey' style='text-align: right; padding-right: 8px;'>"
+            address_html = u"<div class='oe_grey' style='text-align: right; padding-right: 8px;'>"
             if address.street2:
                 address_html += u"<div>%s</div>" % address.street2
             if address.street:
                 address_html += u"<div>%s</div>" % address.street
             if address.zip or address.city or address.country_id:
                 address_html += u"<div>"
-                val_list = [val for val in [address.zip, address.city, address.country_id] if val]
+                val_list = [val for val in [address.zip, address.city, address.country_id.name] if val]
                 address_html += u"<span>%s</span>" % u", ".join(val_list)
                 address_html += u"</div>"
             address_html += u"</div>"
+            a_planifier.address_html = address_html
 
     @api.multi
     @api.depends('geo_lat', 'geo_lng', 'creneau_id.geo_lat_prec', 'creneau_id.geo_lng_prec',
@@ -263,6 +265,11 @@ class OfPlanifCreneauProp(models.TransientModel):
         self.ensure_one()
         return self.creneau_id.button_confirm()
 
+    @api.multi
+    def button_confirm_next(self):
+        self.ensure_one()
+        return self.creneau_id.button_confirm_next()
+
 
 class OfPlanifCreneau(models.TransientModel):
     _name = 'of.planif.creneau'
@@ -312,8 +319,9 @@ class OfPlanifCreneau(models.TransientModel):
     heure_debut_rdv = fields.Float(string=u'Heure de début', digits=(5, 5))
     duree_rdv = fields.Float(string=u"Durée")
     description_rdv = fields.Text(string='Description')
-    employee_other_ids = fields.Many2many('hr.employee', string="Autres intervenants",
-                                          domain="[('of_est_intervenant', '=', True), ('id', '!=', employee_id)]")
+    employee_other_ids = fields.Many2many(
+        'hr.employee', string="Autres intervenants",)
+        # domain="[('of_est_intervenant', '=', True), ('id', '!=', employee_id)]")
 
     proposition_readonly_ids = fields.One2many('of.planif.intervention', compute="_compute_proposition_readonly_ids", readonly=True)
     duree_creneau_readonly = fields.Float(related="duree_creneau", readonly=True)

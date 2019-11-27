@@ -222,6 +222,7 @@ class OfService(models.Model):
 
     note = fields.Text('Notes')
     date_next = fields.Date('Prochaine planification', help=u"Date à partir de laquelle programmer la prochaine intervention", required=True)
+    date_next_fin = fields.Date(u'Au plus tard le', compute="compute_date_next_fin", help=u'Échéance de la prochaine planification')
     date_next_last = fields.Date('Prochaine planification', help=u"Champ pour conserver une possibilité de rollback")
     date_fin = fields.Date(u"Date d'échéance")  #TODO: pour les servide ponc: "Au plus tard le"
 
@@ -230,7 +231,7 @@ class OfService(models.Model):
     address_zip = fields.Char('Code Postal', size=24, related='address_id.zip', oldname="partner_zip")
     address_city = fields.Char('Ville', related='address_id.city', oldname="partner_city")
 
-    recurrence = fields.Boolean(string=u"Récurrent?", default=True)
+    recurrence = fields.Boolean(string=u"Récurrence", default=True)
     recurring_rule_type = fields.Selection([
         #('daily', 'Jour(s)'),
         ('weekly', 'Semaine(s)'),
@@ -312,6 +313,21 @@ class OfService(models.Model):
             tache_name = service.tache_id.name or u''
             service.name = tache_name + " " + partner_name + " " + address_zip
 
+    @api.multi
+    @api.depends('date_next', 'date_fin', 'recurrence')
+    def compute_date_next_fin(self):
+        un_mois = relativedelta(months=1)
+        for service in self:
+            if not service.recurrence:
+                service.date_next_fin = service.date_fin
+            else:
+                date_next_un_mois = fields.Date.from_string(service.date_next) + un_mois
+                if not service.date_fin:
+                    service.date_next_fin = fields.Date.to_string(date_next_un_mois)
+                else:
+                    date_fin_da = fields.Date.from_string(service.date_fin)
+                    service.date_next_fin = fields.Date.to_string(min(date_next_un_mois, date_fin_da))
+
     @api.depends('intervention_ids')
     @api.multi
     def _compute_intervention_count(self):
@@ -354,8 +370,8 @@ class OfService(models.Model):
                 date_fin += relativedelta(months=1)
             self.date_fin = fields.Date.to_string(date_fin)
 
-    @api.onchange('date_next', 'date_fin')
-    def _onchange_dates(self):
+    @api.constrains('date_next', 'date_fin')
+    def constrains_dates(self):
         self.ensure_one()
         if self.date_next and self.date_fin and self.date_next > self.date_fin:
             raise UserError("La date de prochaine planification est postérieure à la date de fin.\n"
