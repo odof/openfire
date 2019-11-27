@@ -348,7 +348,7 @@ class OfService(models.Model):
             if not self._context.get(u"bloquer_recurrence"):
                 self.recurring_rule_type = self.tache_id.recurring_rule_type
                 self.recurring_interval = self.tache_id.recurring_interval
-            self.duree = self.tache_id.duree
+        self.duree = self.tache_id.duree
 
     @api.onchange('date_next')
     def _onchange_date_next(self):
@@ -450,24 +450,28 @@ class OfService(models.Model):
         return self.write({'recurrence': not self.recurrence})
 
     @api.multi
+    def get_action_view_interventions_context(self, context={}):
+        context.update({
+            'default_partner_id' : self.partner_id.id,
+            'default_address_id' : self.address_id and self.address_id.id or self.partner_id.id,
+            'default_tache_id'   : self.tache_id and self.tache_id.id or False,
+            'default_duree'      : self.duree,
+            'default_description': self.note,
+            'default_service_id' : self.id,
+            'create'             : self.base_state == 'calculated',
+            'edit'               : self.base_state == 'calculated',
+            'default_order_id'   : self.order_id and self.order_id.id,
+            })
+        return context
+
+    @api.multi
     def action_view_interventions(self):
         action = self.env.ref('of_planning.of_sale_order_open_interventions').read()[0]
 
         action['domain'] = [('service_id', 'in', self.ids)]
         if len(self._ids) == 1:
             context = safe_eval(action['context'])
-            context.update({
-                'default_partner_id': self.partner_id.id,
-                'default_address_id': self.address_id and self.address_id.id or self.partner_id.id,
-                'default_tache_id': self.tache_id and self.tache_id.id or False,
-                'default_duree': self.duree,
-                'default_description': self.note,
-                'default_service_id': self.id,
-                'create': self.base_state == 'calculated',
-                'edit': self.base_state == 'calculated',
-                'default_order_id': self.order_id and self.order_id.id,
-            })
-            action['context'] = str(context)
+            action['context'] = str(self.get_action_view_interventions_context(context))
 
         return action
 
@@ -596,7 +600,7 @@ class OFPlanningIntervention(models.Model):
     @api.onchange('address_id', 'tache_id')
     def _onchange_address_id(self):
         super(OFPlanningIntervention, self)._onchange_address_id()
-        if self.address_id and self.address_id.service_address_ids:
+        if self.address_id and self.address_id.service_address_ids and not self.service_id:
             if self.tache_id:
                 service = self.address_id.service_address_ids.filtered(lambda x: x.tache_id.id == self.tache_id.id)
                 self.service_id = service and service[0] or False
@@ -638,6 +642,10 @@ class OFPlanningIntervention(models.Model):
 
     @api.model
     def create(self, vals):
+        service_obj = self.env['of.service']
+        service = vals.get('service_id') and service_obj.browse(vals['service_id'])
+        if service:
+            vals['order_id'] = service.order_id and service.order_id.id
         intervention = super(OFPlanningIntervention, self).create(vals)
         state_interv = vals.get('state', False)
         if state_interv:
