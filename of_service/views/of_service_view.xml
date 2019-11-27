@@ -162,37 +162,29 @@
                                         <i class="fa fa-lg fa-warning"/> Une intervention annulée n'est pas planifiable.
                                     </i></b>
                                 </div>
-                                <field name="tache_id" context="{'show_rec_icon_first': recurrence}"/>
-                                <field name="duree" widget="float_time"/>
-                                <div name="label_date_next">
-                                    <label for="date_next" string="À partir du" class="of_label"
-                                           attrs="{'invisible': [('recurrence', '=', True)]}"/>
-                                    <label for="date_next" string="Prochaine à partir du" class="of_label"
-                                           attrs="{'invisible': [('recurrence', '=', False)]}"/>
-                                </div>
-                                <field name="date_next" string="À partir du" nolabel="1" style="padding-left: 2px;"/>
-                                <div name="label_date_fin">
-                                    <label for="date_fin" string="Jusqu'au" class="of_label"
-                                           attrs="{'invisible': [('recurrence', '=', True)]}"/>
-                                    <label for="date_fin" string="Fin du contrat" class="of_label"
-                                           attrs="{'invisible': [('recurrence', '=', False)]}"/>
-                                </div>
-                                <field name="date_fin" nolabel="1" style="padding-left: 2px;"/>
-                                <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
-                                <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'invisible': [('recurrence', '=', False)]}"/>
-                                <label for="recurring_interval" attrs="{'invisible': [('recurrence', '=', False)]}"/>
-                                <div attrs="{'invisible': [('recurrence', '=', False)]}" col="2">
-                                    <field name="recurring_interval" nolabel="1" class="oe_inline of_ws"/>
-                                    <field name="recurring_rule_type" nolabel="1" class="oe_inline"/>
-                                </div>
-                                <field name="recurrence_tache" invisible="1"/>
-                                <div colspan="2" attrs="{'invisible': [('recurrence', '=', '_field_recurrence_tache')]}">
-                                    <b><i class="oe_grey">
-                                        Il y a une différence entre la récurrence de la tâche et celle de l'intervention à programmer.
-                                    </i></b>
-                                </div>
-                                <field name="duree_planif" widget="float_time"/>
-                                <field name="duree_restante" widget="float_time"/>
+                                <group colspan="2">
+                                    <field name="tache_id" context="{'show_rec_icon_first': recurrence}"/>
+                                    <field name="duree" widget="float_time"/>
+                                    <field name="date_next" string="À partir du"/>
+                                    <field name="date_next_fin" attrs="{'invisible': [('recurrence', '=', True)]}"/>
+                                    <field name="date_fin" attrs="{'invisible': [('recurrence', '=', False)]}"/>
+                                    <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                    <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'invisible': [('recurrence', '=', False)]}"/>
+                                    <label for="recurring_interval" attrs="{'invisible': [('recurrence', '=', False)]}"/>
+                                    <div attrs="{'invisible': [('recurrence', '=', False)]}" col="2">
+                                        <field name="recurring_interval" nolabel="1" class="oe_inline of_ws"/>
+                                        <field name="recurring_rule_type" nolabel="1" class="oe_inline"/>
+                                    </div>
+                                    <field name="recurrence_tache" invisible="1"/>
+                                    <div colspan="2" attrs="{'invisible': [('recurrence', '=', '_field_recurrence_tache')]}">
+                                        <b><i class="oe_grey">
+                                            Il y a une différence entre la récurrence de la tâche et celle de l'intervention à programmer.
+                                        </i></b>
+                                    </div>
+                                    <field name="duree_planif" widget="float_time"/>
+                                    <field name="duree_restante" widget="float_time"/>
+                                </group>
+
                             </group>
                             <group name="origine" string="Origine">
                                 <field name="order_id"/>
