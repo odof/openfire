@@ -412,13 +412,15 @@ class OFRapportOpenflamWizard(models.TransientModel):
         invoice_domain = [('type', '=', 'in_invoice')]
         if self.company_ids._ids:
             invoice_domain = (invoice_domain and ['&']) + [('company_id', 'in', self.company_ids._ids)] + invoice_domain
-        invoices = self.env['account.invoice'].search(invoice_domain).sorted(key=lambda r: r.date_due)
+        invoices = self.env['account.invoice'].search(invoice_domain, order='create_date DESC').sorted(key=lambda r: r.date_due)
         line_keep = line_number
         for invoice in invoices:
             # --- Vérification du montant des accomptes ---
-            payments = self.env['account.payment'].search([('communication', '=', invoice.reference)])
-            montant_acomptes = sum(payment.amount for payment in payments)
-            if montant_acomptes >= invoice.amount_total:
+            # Calcul adapté de celui des payments_widget des factures
+            payments = invoice.mapped('payment_move_line_ids').mapped('matched_credit_ids')
+            filt = payments.filtered(lambda ml: ml.credit_move_id.id in invoice.move_id.line_ids._ids)
+            montant_acomptes = sum([p.amount for p in filt])
+            if invoice.currency_id.round(montant_acomptes) >= invoice.currency_id.round(invoice.amount_total):
                 continue
 
             # --- Ajout des lignes total de la semaine ---
