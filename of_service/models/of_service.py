@@ -322,7 +322,7 @@ class OfService(models.Model):
         for service in self:
             if not service.recurrence:
                 service.date_next_fin = service.date_fin
-            else:
+            elif service.date_next:
                 date_next_un_mois = fields.Date.from_string(service.date_next) + un_mois
                 if not service.date_fin:
                     service.date_next_fin = fields.Date.to_string(date_next_un_mois)
