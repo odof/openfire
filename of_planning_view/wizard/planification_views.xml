@@ -131,7 +131,7 @@
                         <tree limit="5" colors="blue: selected==True;" create="0" options="{'reload_on_button': True}">
                             <field name="service_id" invisible="1"/>
                             <field name="dummy_field" invisible="1"/>
-                            <field name="priorite" invisible="1"/>
+                            <field name="priorite" groups="base.group_no_one"/>
                             <field name="selected" invisible="1"/>
                             <field name="id" invisible="1"/>
                             <field name="tache_name"/>
@@ -147,7 +147,7 @@
                             <field name="distance_reelle_prec" invisible="1"/>
                             <field name="distance_reelle_suiv" invisible="1"/>
                             <field name="distance_reelle_tota"/>
-                            <field name="distance_order" invisible="1"/>
+                            <field name="distance_order" groups="base.group_no_one"/>
                             <field name="osrm_response" invisible="1"/>
                         </tree>
                     </field>

@@ -31,7 +31,7 @@ def voldwazo(lat1, lng1, lat2, lng2):
 class OfPlanifCreneauProp(models.TransientModel):
     _name = 'of.planif.intervention'
     _description = u"Proposition d'intervention à programmer"
-    _order = "selected DESC, priorite DESC, distance_order"
+    _order = "selected DESC, priorite DESC, distance_order, date_next, date_fin"
 
     service_id = fields.Many2one("of.service", string="Service")
     creneau_id = fields.Many2one('of.planif.creneau', string=u"Créneau")
@@ -110,21 +110,22 @@ class OfPlanifCreneauProp(models.TransientModel):
         a_planifierzz.compute_distance_reelle()"""
 
     @api.multi
-    @api.depends('geo_lat', 'geo_lng', 'creneau_id.geo_lat_prec', 'creneau_id.geo_lng_prec',
-                 'creneau_id.geo_lat_suiv', 'creneau_id.geo_lng_suiv', 'creneau_id')
+    @api.depends('geo_lat', 'geo_lng', 'creneau_id')
     def compute_distance_reelle(self):
         self = self.filtered('creneau_id')
         if not self:
             return
         creneau = self[0].creneau_id
-        lieu_prec = creneau.geo_lat_prec and creneau.lieu_prec_id or creneau.lieu_prec_manual_id
-        lieu_suiv = creneau.geo_lat_suiv and creneau.lieu_suiv_id or creneau.lieu_suiv_manual_id
+        lieu_prec = creneau.lieu_prec_manual_id or creneau.lieu_prec_id
+        lieu_suiv = creneau.lieu_suiv_manual_id or creneau.lieu_suiv_id
         if not lieu_prec and not lieu_suiv:
-            self.distance_reelle_prec = -1
-            self.distance_reelle_suiv = -1
-            self.distance_reelle_tota = -1
-            self.distance_order = 99999.99999
-            self.osrm_response = ""
+            self.update({
+                'distance_reelle_prec': -1,
+                'distance_reelle_suiv': -1,
+                'distance_reelle_tota': -1,
+                'distance_order': 99999,
+                'osrm_response': "",
+            })
             return
         if not lieu_prec:
             lieu_prec = lieu_suiv
@@ -134,12 +135,14 @@ class OfPlanifCreneauProp(models.TransientModel):
         geo_lng_prec = lieu_prec.geo_lng
         geo_lat_suiv = lieu_suiv.geo_lat
         geo_lng_suiv = lieu_suiv.geo_lng
+        compteur = 0
 
-        for a_planifier in self[:100]:
+        for a_planifier in self[:25]:
 
             if a_planifier.distance_order != 99999 and a_planifier.distance_order != 0:
                 continue
             #a_planifier.dummy_field = True
+            compteur += 1
             query = ROUTING_BASE_URL + "route/" + ROUTING_VERSION + "/" + ROUTING_PROFILE + "/"
             # Listes de coordonnées : ATTENTION OSRM prend ses coordonnées sous form (lng, lat)
             # lieu précédent
@@ -175,6 +178,7 @@ class OfPlanifCreneauProp(models.TransientModel):
                 #asupprimer quand osrm refonctionne
                 a_planifier.distance_order = a_planifier.distance_dwazo_prec + a_planifier.distance_dwazo_suiv
                 a_planifier.distance_reelle_tota = a_planifier.distance_order"""
+        print "compteur " + str(compteur)
 
     @api.multi
     @api.depends('service_id', 'service_id.recurrence', 'service_id.date_next', 'service_id.date_fin')
@@ -192,11 +196,8 @@ class OfPlanifCreneauProp(models.TransientModel):
             else:
                 a_planifier.date_fin = service.date_fin
 
-
-
     @api.multi
-    @api.depends('geo_lat', 'geo_lng', 'creneau_id.geo_lat_prec', 'creneau_id.geo_lng_prec',
-                 'creneau_id.geo_lat_suiv', 'creneau_id.geo_lng_suiv')
+    @api.depends('geo_lat', 'geo_lng', 'creneau_id')
     def _compute_distance_dwazo(self):
         #print "\nDISTANCE DWAZO?"
         #print len(self)
@@ -668,10 +669,10 @@ class OfPlanifCreneau(models.TransientModel):
         prop_selected = self.proposition_ids.filtered(lambda p: p.selected == True)
         if prop_selected:
             prop_selected.selected = False
-        prop_prioritaires = self.proposition_ids.filtered(lambda p: p.priorite > self.priorite_max)[:100]
+        prop_prioritaires = self.proposition_ids.filtered(lambda p: p.priorite > self.priorite_max)[:25]
         if len(prop_prioritaires) <= 10:
             prop_prioritaires = self.proposition_ids[:25]
-        prop_prioritaires.compute_distance_reelle()
+        #prop_prioritaires.compute_distance_reelle()
         prop_a_supr = self.proposition_ids.filtered(lambda p: p.distance_reelle_tota > self.distance_max)
         prop_prioritaires -= prop_a_supr
         prop_a_supr.unlink()

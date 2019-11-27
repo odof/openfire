@@ -1043,19 +1043,19 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def write(self, vals):
-        # En cas de modification des horaires d'un employé, toutes les interventions aux dates concernées
-        # par le changement doivent être passée en dates forcées. Dans le cas ou une intervention aurait sa
-        # date de début qui ne serait plus sur des créneaux, cette intervention ne serait plus modifiable
-        if vals.get("forcer_dates", None) != None and not vals.get("date_deadline_forcee", False):
-            for intervention in self:
-                intervention.write({
-                    'forcer_dates': True,
-                    'date_deadline_forcee': intervention.date_deadline,
-                })
-        else:
-            super(OfPlanningIntervention, self).write(vals)
-            self.do_verif_dispo()
-            self._affect_number()
+        # # En cas de modification des horaires d'un employé, toutes les interventions aux dates concernées
+        # # par le changement doivent être passée en dates forcées. Dans le cas ou une intervention aurait sa
+        # # date de début qui ne serait plus sur des créneaux, cette intervention ne serait plus modifiable
+        # if vals.get("forcer_dates", None) != None and not vals.get("date_deadline_forcee", False):
+        #     for intervention in self:
+        #         intervention.write({
+        #             'forcer_dates': True,
+        #             'date_deadline_forcee': intervention.date_deadline,
+        #         })
+        # else:
+        super(OfPlanningIntervention, self).write(vals)
+        self.do_verif_dispo()
+        self._affect_number()
         return True
 
     @api.model
