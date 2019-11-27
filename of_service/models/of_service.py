@@ -159,7 +159,7 @@ class OfService(models.Model):
         return [('id', 'in', rows and zip(*rows)[0])]
 
     @api.multi
-    @api.depends('date_next')
+    @api.depends('state')
     def _compute_color(self):
         u""" COULEURS :
         Gris  : service dont l'adresse n'a pas de coordonnées GPS, ou service inactif
@@ -167,18 +167,26 @@ class OfService(models.Model):
         Rouge : service dont la date de prochaine intervention est inférieure à la date courante (ou à self._context.get('date_next_max'))
         Noir  : autres services
         """
-        date_next_max = fields.Date.from_string(self._context.get('date_next_max') or fields.Date.today())
+        #date_next_max = fields.Date.from_string(self._context.get('date_next_max') or fields.Date.today())
 
         for service in self:
-            date_next = fields.Date.from_string(service.date_next)
-            if not (service.address_id.geo_lat or service.address_id.geo_lng) or not service.active:
-                service.color = 'gray'
-            elif date_next <= date_next_max:
-                service.color = 'red'
-            elif date_next <= date_next_max + timedelta(days=30):
-                service.color = 'orange'
-            else:
+            if service.state in ('planned', 'planned_soon', 'progress', 'done', 'all_planned'):
                 service.color = 'black'
+            elif service.state in ('to_plan', 'part_planned'):
+                service.color = 'orange'
+            elif service.state == 'late':
+                service.color = 'red'
+            else:
+                service.color = 'gray'
+            # date_next = fields.Date.from_string(service.date_next)
+            # if not (service.address_id.geo_lat or service.address_id.geo_lng) or not service.active:
+            #     service.color = 'gray'
+            # elif date_next <= date_next_max:
+            #     service.color = 'red'
+            # elif date_next <= date_next_max + timedelta(days=30):
+            #     service.color = 'orange'
+            # else:
+            #     service.color = 'black'
 
     @api.model
     def get_color_map(self):
