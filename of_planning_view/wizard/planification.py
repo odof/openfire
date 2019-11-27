@@ -136,7 +136,7 @@ class OfPlanifCreneauProp(models.TransientModel):
         geo_lng_suiv = lieu_suiv.geo_lng
 
         for a_planifier in self[:100]:
-            
+
             if a_planifier.distance_order != 99999 and a_planifier.distance_order != 0:
                 continue
             #a_planifier.dummy_field = True

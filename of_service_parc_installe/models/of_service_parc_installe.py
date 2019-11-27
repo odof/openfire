@@ -30,6 +30,12 @@ class OfService(models.Model):
             if parc_installe:
                 self.parc_installe_id = parc_installe
 
+    @api.multi
+    def get_action_view_interventions_context(self, context={}):
+        context = super(OfService, self).get_action_view_interventions_context(context)
+        context['default_parc_installe_id'] = self.parc_installe_id and self.parc_installe_id.id
+        return context
+
 class OfPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
@@ -46,6 +52,14 @@ class OfPlanningIntervention(models.Model):
                 'res_id': self._ids[0],
                 'type': 'ir.actions.act_window',
             }
+
+    @api.model
+    def create(self, vals):
+        service_obj = self.env['of.service']
+        service = vals.get('service_id') and service_obj.browse(vals['service_id'])
+        if service:
+            vals['parc_installe_id'] = service.parc_installe_id and service.parc_installe_id.id
+        return super(OfPlanningIntervention, self).create(vals)
 
 class OfParcInstalle(models.Model):
     _inherit = "of.parc.installe"
