@@ -1292,7 +1292,7 @@ PlanningView.Row = Widget.extend({
                         }else if (!minutes) {
                             duree_col_str = heures + "h"  // exple: 2h
                         }else{
-                            duree_col_str = formats.format_value(record.duree,descript_ft).replace(":", "h");
+                            duree_col_str = formats.format_value(planning_record.duree,descript_ft).replace(":", "h");
                             if (duree_col_str[0] == "0") {
                                 duree_col_str = duree_col_str.substring(1);  // exple: 2h45
                             }

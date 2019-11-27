@@ -221,8 +221,10 @@ class OfService(models.Model):
     jour_ids = fields.Many2many('of.jours', 'service_jours', 'service_id', 'jour_id', string='Jours', default=_default_jours)
 
     note = fields.Text('Notes')
-    date_next = fields.Date('Prochaine planification', help=u"Date à partir de laquelle programmer la prochaine intervention", required=True)
-    date_next_fin = fields.Date(u'Au plus tard le', compute="compute_date_next_fin", help=u'Échéance de la prochaine planification')
+    date_next = fields.Date(string="Prochaine planif", help=u"Date à partir de laquelle programmer la prochaine intervention", required=True)
+    date_next_fin = fields.Date(
+        string=u'Au plus tard le', compute="compute_date_next_fin", inverse="inverse_date_next_fin",
+        help=u'Échéance de la prochaine planification')
     date_next_last = fields.Date('Prochaine planification', help=u"Champ pour conserver une possibilité de rollback")
     date_fin = fields.Date(u"Date d'échéance")  #TODO: pour les servide ponc: "Au plus tard le"
 
@@ -327,6 +329,11 @@ class OfService(models.Model):
                 else:
                     date_fin_da = fields.Date.from_string(service.date_fin)
                     service.date_next_fin = fields.Date.to_string(min(date_next_un_mois, date_fin_da))
+
+    def inverse_date_next_fin(self):
+        for service in self:
+            if not service.recurrence:
+                service.date_fin = service.date_next_fin
 
     @api.depends('intervention_ids')
     @api.multi
