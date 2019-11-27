@@ -408,10 +408,11 @@
                     <!-- <field name="template_id"/> -->
                     <field name="date_last"/>
                     <field name="date_next"/>
-                    <field name="date_fin"/>
+                    <field name="date_fin" string="Fin du contrat"/>
                     <field name="active" invisible="1"/>
                     <field name="tag_ids" widget="many2many_tags"/>
-                    <!--field name="state" invisible="1"/-->
+                    <field name="recurrence"/>
+                    <field name="state"/>
                 </tree>
             </field>
         </record>
@@ -477,7 +478,9 @@
                     <filter string="En retard de planification" name="filter_late" domain="[('state', '=', 'late')]"/>
                     <filter string="Terminé" name="filter_done" domain="[('state', '=', 'done')]"/>
                     <filter string="Annulé" name="filter_cancel" domain="[('state', '=', 'cancel')]"/>
-
+                    <separator/>
+                    <filter string="Planification restante" name="filter_plan"
+                            domain="[('state', 'in', ('to_plan', 'part_planned'))]"/>
                     <separator/>
                     <filter string="Actif" name="filter_active" domain="[('active', '=', True)]"/>
                     <filter string="Archivé" name="filter_inactive" domain="[('active', '=', False)]"/>
@@ -513,11 +516,13 @@
                     <field name="address_city"/>
                     <field name="tache_id"/>
                     <field name="date_next" string="À partir du"/>
-                    <field name="date_fin" string="Au plus tard le"/>
+                    <field name="date_next_fin" string="Au plus tard le"/>
+                    <field name="date_fin" invisible="1"/>
                     <field name="jour_ids"/>
                     <field name="note"/>
                     <field name="active" invisible="1"/>
-                    <!--field name="state" invisible="1"/-->
+                    <field name="recurrence"/>
+                    <field name="state"/>
                 </tree>
             </field>
         </record>
@@ -741,6 +746,7 @@
                 'search_default_this_week': 1,
                 'search_default_next_week': 1,
                 'search_default_filter_late': 1,
+                'search_default_filter_plan': 1,
                 'default_recurrence': False,
             }</field>
         </record>

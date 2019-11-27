@@ -42,7 +42,6 @@
                             <field name="duree_creneau_readonly" widget="float_time"/>
                         </group>
 
-
                         <i attrs="{'invisible': [('warning_horaires', '=', False)]}" class="oe_grey" colspan="2">
                             <i class="fa fa-warning"/>
                             Au moins une intervention de cette journée a ses horaires forcés.<br/>
@@ -109,12 +108,13 @@
                         </group>
                     </group>
                     <group col="2" colspan="2"
-                           attrs="{'invisible': [('pre_a_programmer_id', '=', False), ('aucun_res', '=', False)]}">
+                           attrs="{'invisible': [('pre_a_programmer_id', '=', False), ('proposition_ids', '=', [])]}">
                         <group col="2" colspan="2">
                             <separator string="RDV à créer" colspan="2"/>
                             <field name="heure_debut_rdv" widget="float_time"/>
                             <field name="duree_rdv" widget="float_time"/>
-                            <field name="employee_other_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                            <field name="employee_other_ids" widget="many2many_tags" options="{'no_create': True}"
+                              domain="[('of_est_intervenant', '=', True), ('id', '!=', employee_id)]"/>
                         </group>
                     </group>
                     <group col="2" colspan="2" attrs="{'invisible': ['|', ('aucun_res', '=', False), ('pre_a_programmer_id', '!=', False)]}">
@@ -141,6 +141,7 @@
                             <field name="partner_of_telephones"/>
                             <field name="date_next"/>
                             <field name="date_fin"/>
+                            <field name="origin"/>
                             <field name="distance_dwazo_prec" invisible="1"/>
                             <field name="distance_dwazo_suiv" invisible="1"/>
                             <field name="distance_reelle_prec" invisible="1"/>
@@ -198,6 +199,7 @@
                         <group colspan="2" string="Mémo">
                             <field name="date_next" readonly="1"/>
                             <field name="date_fin" readonly="1"/>
+                            <field name="origin" readonly="1"/>
                             <field name="distance_reelle_prec" readonly="1"/>
                             <field name="distance_reelle_suiv" readonly="1"/>
                             <field name="distance_reelle_tota" readonly="1"/>
@@ -218,10 +220,12 @@
                     <field name="service_id" invisible="1"/>
                 </group>
                 <footer>
-                    <button name="button_select" string="Sélectionner cette intervention à programmer" type="object" colspan="4" class="btn-primary"
+                    <button name="button_select" string="Sélectionner cette intervention à programmer" type="object" class="btn-primary"
                         attrs="{'invisible': [('selected','!=',False)]}"/>
-                    <button name="button_confirm" string="Confirmer le RDV" type="object" colspan="4" class="btn-primary"
+                    <button name="button_confirm" string="Confirmer le RDV" type="object" class="btn-primary"
                         attrs="{'invisible': [('selected','!=',True)]}"/>
+                    <button name="button_confirm_next" string="Confirmer &amp; Suivant" type="object" colspan="4"
+                            class="btn-primary" attrs="{'invisible': [('selected','!=',True)]}"/>
                 </footer>
             </form>
         </field>
