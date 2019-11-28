@@ -3,6 +3,7 @@
 from odoo import models, fields, api, _
 import odoo.addons.decimal_precision as dp
 from odoo.tools import float_compare
+from odoo.exceptions import UserError
 import os
 import base64
 import tempfile
@@ -640,11 +641,70 @@ class SaleOrderLine(models.Model):
             self = self.sudo()
         return super(SaleOrderLine, self)._write(vals)
 
+    @api.multi
+    def unlink(self):
+        """
+        Ne pas autoriser la suppression de ligne de commandes si la ligne est déjà présente sur une facture qui n'est
+        pas une facture annulée n'ayant jamais été validée.
+        """
+        locked_invoice_lines = self.mapped('invoice_lines').filtered(lambda l: l.invoice_id.state != 'cancel' or l.invoice_id.move_name)
+        if locked_invoice_lines:
+            raise UserError(u"""Vous ne pouvez supprimer une ligne d'article liée à une facture.\n"""
+                            u"""Veuillez annuler vos modifications.""")
+        return super(SaleOrderLine, self).unlink()
+
+    @api.multi
+    def write(self, vals):
+        """
+        Si un des champ de blocked est présent ET une ligne modifiée ne doit pas avoir de modification alors renvoi une
+        erreur. Le champ of_discount_formula est dans le module of_sale_discount, la façon dont on vérifie la présence
+        des champs dans vals ne provoque pas d'erreur si le module n'est pas installé.
+        TODO: Permettre de modifier le montant si modification viens de la facture d'acompte
+        """
+        blocked = [x for x in ('price_unit', 'product_uom_qty', 'product_uom', 'discount', 'of_discount_formula') if x in vals.keys()]
+        for line in self:
+            locked_invoice_lines = line.mapped('invoice_lines').filtered(lambda l: l.of_is_locked)
+            if locked_invoice_lines and blocked:
+                raise UserError(u"""Cette ligne ne peut être modifiée : %s""" % line.name)
+        return super(SaleOrderLine, self).write(vals)
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
     price_unit = fields.Float(digits=False)
+    of_is_locked = fields.Boolean(compute="_compute_is_locked", string=u"Article particulié")
+
+    @api.model
+    def get_locked_categories(self):
+        """
+        Fait dans une fonction pour faciliter l'héritage.
+        :return: Renvoie une liste de catégories dont les articles ne dont le montant ne doit pas changer des bons de commandes
+        """
+        return [self.env['ir.values'].get_default('sale.config.settings',
+                                                  'of_deposit_product_categ_id_setting')]
+
+    @api.model
+    def get_locked_products(self):
+        """
+        Fait dans une fonction pour faciliter l'héritage.
+        :return: Renvoie une liste d'articles qui ne doivent pas être supprimés des bons de commandes
+        """
+        return []
+
+    @api.depends('product_id')
+    def _compute_is_locked(self):
+        """
+        of_is_locked est un champ qui permet de savoir si une ligne de facture doit empêcher sa contrepartie sur bon
+        de commande d'être supprimée (voir sale.order.line.unlink())
+        """
+        locked_categories = self.get_locked_categories()
+        locked_products = self.get_locked_products()
+        for invoice_line in self:
+            if invoice_line.product_id.categ_id.id not in locked_categories and \
+               invoice_line.product_id.id not in locked_products:
+                invoice_line.of_is_locked = False
+            else:
+                invoice_line.of_is_locked = True
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
