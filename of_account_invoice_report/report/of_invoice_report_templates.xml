@@ -37,7 +37,7 @@
 
             <div class="row mt32 mb32" name="vos_references">
             <div class="col-xs-12">
-                <div><strong>References: </strong></div>
+                <div><strong>Références&amp;nbsp;:</strong></div>
                 <div class="mt8" id="informations" style="display: table">
                     <div name="doc_description" t-if="o.name" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                         <strong>Doc Descr.:</strong>
