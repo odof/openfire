@@ -139,59 +139,64 @@
                             </b></h1>
                         </div>
                         <group>
-                            <group name="refs" string="Références">
-                                <field name="base_state" invisible="1"/>
-                                <field name="partner_id" invisible="context.get('hide_service_partner_id')"/>
-                                <label for="address_id" invisible="context.get('hide_service_address_id')"/>
-                                <div class="o_address_format" invisible="context.get('hide_service_address_id')">
-                                    <field name="address_id"/>
-                                    <field name="address_address"/>
-                                </div>
-                                <field name="secteur_tech_id"/>
-                                <field name="tag_ids" widget="many2many_tags"/>
-                                <field name="company_id"/>
-                            </group>
-                            <group name="planif" string="Planification">
-                                <div colspan="2" attrs="{'invisible': [('base_state', '!=', 'draft')]}">
-                                    <b><i class="of_red">
-                                        <i class="fa fa-lg fa-warning"/> Vous pourrez planifier cette intervention quand elle sera validée.
-                                    </i></b>
-                                </div>
-                                <div colspan="2" attrs="{'invisible': [('base_state', '!=', 'cancel')]}">
-                                    <b><i class="of_red">
-                                        <i class="fa fa-lg fa-warning"/> Une intervention annulée n'est pas planifiable.
-                                    </i></b>
-                                </div>
-                                <group colspan="2">
-                                    <field name="tache_id" context="{'show_rec_icon_first': recurrence}"/>
-                                    <field name="duree" widget="float_time"/>
-                                    <field name="date_next" string="À partir du"/>
-                                    <field name="date_next_fin" attrs="{'invisible': [('recurrence', '=', True)]}"/>
-                                    <field name="date_fin" attrs="{'invisible': [('recurrence', '=', False)]}"/>
-                                    <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
-                                    <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'invisible': [('recurrence', '=', False)]}"/>
-                                    <label for="recurring_interval" attrs="{'invisible': [('recurrence', '=', False)]}"/>
-                                    <div attrs="{'invisible': [('recurrence', '=', False)]}" col="2">
-                                        <field name="recurring_interval" nolabel="1" class="oe_inline of_ws"/>
-                                        <field name="recurring_rule_type" nolabel="1" class="oe_inline"/>
+                            <group name="gauche_1">
+                                <group colspan="2" name="refs" string="Références">
+                                    <field name="base_state" invisible="1"/>
+                                    <field name="partner_id" invisible="context.get('hide_service_partner_id')"/>
+                                    <label for="address_id" invisible="context.get('hide_service_address_id')"/>
+                                    <div class="o_address_format" invisible="context.get('hide_service_address_id')">
+                                        <field name="address_id"/>
+                                        <field name="address_address"/>
                                     </div>
-                                    <field name="recurrence_tache" invisible="1"/>
-                                    <div colspan="2" attrs="{'invisible': [('recurrence', '=', '_field_recurrence_tache')]}">
-                                        <b><i class="oe_grey">
-                                            Il y a une différence entre la récurrence de la tâche et celle de l'intervention à programmer.
+                                    <field name="secteur_tech_id"/>
+                                    <field name="tag_ids" widget="many2many_tags"/>
+                                    <field name="company_id"/>
+                                </group>
+                                <group colspan="2" name="origine" string="Origine">
+                                    <field name="order_id"/>
+                                    <field name="origin" readonly="1" attrs="{'invisible': [('recurrence', '=', True)]}"/>
+                                </group>
+                            </group>
+                            <group name="droite_1">
+                                <group colspan="2" name="planif" string="Planification">
+                                    <div colspan="2" attrs="{'invisible': [('base_state', '!=', 'draft')]}">
+                                        <b><i class="of_red">
+                                            <i class="fa fa-lg fa-warning"/> Vous pourrez planifier cette intervention quand elle sera validée.
                                         </i></b>
                                     </div>
-                                    <field name="duree_planif" widget="float_time"/>
-                                    <field name="duree_restante" widget="float_time"/>
-                                </group>
+                                    <div colspan="2" attrs="{'invisible': [('base_state', '!=', 'cancel')]}">
+                                        <b><i class="of_red">
+                                            <i class="fa fa-lg fa-warning"/> Une intervention annulée n'est pas planifiable.
+                                        </i></b>
+                                    </div>
+                                    <group colspan="2">
+                                        <field name="tache_id" context="{'show_rec_icon_first': recurrence}"/>
+                                        <field name="duree" widget="float_time"/>
+                                        <field name="date_next" string="À partir du"/>
+                                        <field name="date_next_fin" attrs="{'invisible': [('recurrence', '=', True)]}"/>
+                                        <field name="date_fin" attrs="{'invisible': [('recurrence', '=', False)]}"/>
+                                        <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                        <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'invisible': [('recurrence', '=', False)]}"/>
+                                        <label for="recurring_interval" attrs="{'invisible': [('recurrence', '=', False)]}"/>
+                                        <div attrs="{'invisible': [('recurrence', '=', False)]}" col="2">
+                                            <field name="recurring_interval" nolabel="1" class="oe_inline of_ws"/>
+                                            <field name="recurring_rule_type" nolabel="1" class="oe_inline"/>
+                                        </div>
+                                        <field name="recurrence_tache" invisible="1"/>
+                                        <div colspan="2" attrs="{'invisible': [('recurrence', '=', '_field_recurrence_tache')]}">
+                                            <b><i class="oe_grey">
+                                                Il y a une différence entre la récurrence de la tâche et celle de l'intervention à programmer.
+                                            </i></b>
+                                        </div>
+                                        <field name="duree_planif" widget="float_time"/>
+                                        <field name="duree_restante" widget="float_time"/>
+                                    </group>
 
+                                </group>
                             </group>
-                            <group name="origine" string="Origine">
-                                <field name="order_id"/>
-                                <field name="origin" readonly="1" attrs="{'invisible': [('recurrence', '=', True)]}"/>
-                            </group>
-                            <group name="notes" string="Description" col="4" colspan="4">
-                                <field name="note" colspan="4" nolabel="1"/>
+
+                            <group name="notes" string="Description">
+                                <field name="note" colspan="2" nolabel="1"/>
                             </group>
                         </group>
 <!--                        <notebook>-->

@@ -550,6 +550,7 @@
             <field name="arch" type="xml" >
                 <tree string="Liste des tâches" >
                     <field name="name" string="Libellé"/>
+                    <field name="tache_categ_id" string="Catégorie"/>
                     <field name="product_id"/>
                     <field name="category_id"/>
                     <field name="duree" widget="float_time"/>

@@ -141,6 +141,7 @@
                             <field name="partner_of_telephones"/>
                             <field name="date_next"/>
                             <field name="date_fin"/>
+                            <field name="duree_restante" string="Durée restante (h)"/>
                             <field name="origin"/>
                             <field name="distance_dwazo_prec" invisible="1"/>
                             <field name="distance_dwazo_suiv" invisible="1"/>
@@ -153,12 +154,12 @@
                     </field>
                 </group>
                 <footer>
-                    <button name="button_dummy" string="Rechercher" type="object" colspan="4" class="btn-primary"
+                    <button name="button_dummy" string="Rechercher" type="object" colspan="4" class="btn btn-primary"
                             attrs="{'invisible': [('pre_a_programmer_id', '!=', False)]}"/>
                     <button name="button_confirm" string="Confirmer &amp; Fermer" type="object" colspan="4"
-                            class="btn-primary" attrs="{'invisible': [('proposition_ids', '=', []), ('pre_a_programmer_id', '=', False)]}"/>
+                            class="btn btn-primary" attrs="{'invisible': [('proposition_ids', '=', []), ('pre_a_programmer_id', '=', False)]}"/>
                     <button name="button_confirm_next" string="Confirmer &amp; Suivant" type="object" colspan="4"
-                            class="btn-primary" attrs="{'invisible': [('proposition_ids', '=', [])]}"/>
+                            class="btn btn-primary" attrs="{'invisible': [('proposition_ids', '=', [])]}"/>
                     <button name="button_close" string="Fermer" type="object" colspan="4" class="btn-default"/>
                 </footer>
             </form>
@@ -204,7 +205,6 @@
                             <field name="distance_reelle_suiv" readonly="1"/>
                             <field name="distance_reelle_tota" readonly="1"/>
                         </group>
-
                     </group>
                     <group name="planif" string="Planification" attrs="{'invisible':[('selected','!=',True)]}">
                         <field name="selected" invisible="1" readonly="1"/>
