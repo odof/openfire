@@ -150,29 +150,35 @@ class OfPlanningEquipe(models.Model):
     employee_ids = fields.Many2many('hr.employee', 'of_planning_employee_rel', 'equipe_id', 'employee_id', u'Employés',
                                     domain=_get_employee_ids_domain)
     active = fields.Boolean('Actif', default=True)
-    category_ids = fields.Many2many('hr.employee.category', 'equipe_category_rel', 'equipe_id', 'category_id', u'Catégories')
+    category_ids = fields.Many2many(
+        'hr.employee.category', 'equipe_category_rel', 'equipe_id', 'category_id', string=u'Catégories')
     intervention_ids = fields.One2many('of.planning.intervention', 'equipe_id', u'Interventions liées', copy=False)
     tache_ids = fields.Many2many('of.planning.tache', 'equipe_tache_rel', 'equipe_id', 'tache_id', u'Compétences')
     hor_md = fields.Float(u'Matin début', digits=(12, 5))
     hor_mf = fields.Float('Matin fin', digits=(12, 5))
     hor_ad = fields.Float(u'Après-midi début', digits=(12, 5))
     hor_af = fields.Float(u'Après-midi fin', digits=(12, 5))
-    jour_ids = fields.Many2many('of.jours', 'of_equipe_jours_rel', 'equipe_id', 'jour_id', string='Jours', default=_get_default_jours)
+    jour_ids = fields.Many2many(
+        'of.jours', 'of_equipe_jours_rel', 'equipe_id', 'jour_id', string='Jours', default=_get_default_jours)
     sequence = fields.Integer(u'Séquence', help=u"Ordre d'affichage (plus petit en premier)")
     color_ft = fields.Char(string="Couleur de texte", help="Choisissez votre couleur", default="#0D0D0D")
     color_bg = fields.Char(string="Couleur de fond", help="Choisissez votre couleur", default="#F0F0F0")
     tz = fields.Selection(
         _tz_get, string='Fuseau horaire', required=True, default=lambda self: self._default_tz(),
-        help="Le fuseau horaire de l'équipe d'intervention")
+        help=u"Le fuseau horaire de l'équipe d'intervention")
     tz_offset = fields.Char(compute='_compute_tz_offset', string='Timezone offset', invisible=True)
 
     # Ajout des horaires avancés
     mode_horaires = fields.Selection([
         ("easy", "Facile"),
         ("advanced", u"Avancé")], string=u"Mode de sélection des horaires", required=True, default="easy")
-    modele_id = fields.Many2one("of.horaire.modele", "Modèle")
-    of_creneau_ids = fields.Many2many("of.horaire.creneau", "of_equipe_creneau_rel", "equipe_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
-    of_creneau_temp_ids = fields.Many2many("of.horaire.creneau", "of_equipe_creneau_temp_rel", "equipe_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
+    modele_id = fields.Many2one("of.horaire.modele", string=u"Modèle")
+    of_creneau_ids = fields.Many2many(
+        'of.horaire.creneau', 'of_equipe_creneau_rel', 'equipe_id', 'creneau_id', string=u"Créneaux",
+        order="jour_number, heure_debut")
+    of_creneau_temp_ids = fields.Many2many(
+        'of.horaire.creneau', 'of_equipe_creneau_temp_rel', 'equipe_id', 'creneau_id', string=u"Créneaux",
+        order="jour_number, heure_debut")
     of_creneau_temp_start = fields.Date(string=u"Début des horaires temporaires")
     of_creneau_temp_stop = fields.Date(string="Fin des horaires temporaires")
 
@@ -308,7 +314,7 @@ class OfPlanningIntervention(models.Model):
     date = fields.Datetime(string='Date intervention', required=True, track_visibility='always')
     date_deadline = fields.Datetime(compute="_compute_date_deadline", string='Date fin', store=True, track_visibility='always')
     forcer_dates = fields.Boolean("Forcer les dates", default=False, help=u"/!\\")
-    date_deadline_forcee = fields.Datetime(string='Date fin (forcée)')
+    date_deadline_forcee = fields.Datetime(string=u"Date fin (forcée)")
     duree = fields.Float(string=u'Durée intervention', required=True, digits=(12, 5), track_visibility='always')
     user_id = fields.Many2one('res.users', string='Utilisateur', default=lambda self: self.env.uid)
     partner_id = fields.Many2one('res.partner', string='Client', compute='_compute_partner_id', store=True)
@@ -317,7 +323,7 @@ class OfPlanningIntervention(models.Model):
     address_zip = fields.Char(related='address_id.zip')
     secteur_id = fields.Many2one(related='address_id.of_secteur_tech_id', readonly=True)
     raison_id = fields.Many2one('of.planning.intervention.raison', string='Raison')
-    tache_id = fields.Many2one('of.planning.tache', string='Tâche', required=True)
+    tache_id = fields.Many2one('of.planning.tache', string=u"Tâche", required=True)
     tache_categ_id = fields.Many2one(related="tache_id.tache_categ_id", readonly=True)
     tache_name = fields.Char(related='tache_id.name')
     equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe', oldname='poseur_id')
@@ -377,7 +383,7 @@ class OfPlanningIntervention(models.Model):
     of_color_ft = fields.Char(related="employee_main_id.of_color_ft", readonly=True, oldname='color_ft')
     of_color_bg = fields.Char(related="employee_main_id.of_color_bg", readonly=True, oldname='color_bg')
 
-    order_id = fields.Many2one("sale.order", string="Commande associée")
+    order_id = fields.Many2one("sale.order", string=u"Commande associée")
     of_notes_intervention = fields.Html(related='order_id.of_notes_intervention', readonly=True)
     of_notes_client = fields.Text(related='partner_id.comment', string="Notes client", readonly=True)
     cleantext_description = fields.Text(compute='_compute_cleantext_description')
@@ -954,7 +960,8 @@ class OfPlanningIntervention(models.Model):
     @api.onchange('forcer_dates')
     def _onchange_forcer_dates(self):
         if self.forcer_dates:
-            self.date_deadline_forcee = fields.Datetime.to_string(fields.Datetime.from_string(self.date) + relativedelta(hours=self.duree))
+            self.date_deadline_forcee = fields.Datetime.to_string(fields.Datetime.from_string(self.date) +
+                                                                  relativedelta(hours=self.duree))
 
     @api.onchange('date_deadline_forcee', 'date', 'duree')
     def _onchange_date_deadline_forcee(self):
@@ -1036,6 +1043,9 @@ class OfPlanningIntervention(models.Model):
 
     @api.model
     def create(self, vals):
+        if 'date' in vals:
+            # Tronqué à la minute
+            date = vals['date'][:17] + '00'
         res = super(OfPlanningIntervention, self).create(vals)
         res.do_verif_dispo()
         res._affect_number()
@@ -1043,6 +1053,7 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def write(self, vals):
+        # @todo: @GF finir ce code + Attention !
         # # En cas de modification des horaires d'un employé, toutes les interventions aux dates concernées
         # # par le changement doivent être passée en dates forcées. Dans le cas ou une intervention aurait sa
         # # date de début qui ne serait plus sur des créneaux, cette intervention ne serait plus modifiable
@@ -1053,6 +1064,9 @@ class OfPlanningIntervention(models.Model):
         #             'date_deadline_forcee': intervention.date_deadline,
         #         })
         # else:
+        if 'date' in vals:
+            # Tronqué à la minute
+            date = vals['date'][:17] + '00'
         super(OfPlanningIntervention, self).write(vals)
         self.do_verif_dispo()
         self._affect_number()
@@ -1274,13 +1288,14 @@ class OfPlanningInterventionTemplate(models.Model):
             template.sequence_id = self.env['ir.sequence'].sudo().create(sequence_data)
 
 class OfPlanningTag(models.Model):
-    _description = "Étiquettes d'intervention"
+    _description = u"Étiquettes d'intervention"
     _name = 'of.planning.tag'
 
     name = fields.Char(string='Nom', required=True, translate=True)
     color = fields.Integer(string='Index couleur')
-    active = fields.Boolean(default=True, help="Le champ 'Active' vous permet de cacher l'étiquette sans la supprimer.")
-    intervention_ids = fields.Many2many('of.planning.intervention', column1='tag_id', column2='intervention_id', string='Interventions')
+    active = fields.Boolean(default=True, help=u"Permet de cacher l'étiquette sans la supprimer.")
+    intervention_ids = fields.Many2many(
+        'of.planning.intervention', column1='tag_id', column2='intervention_id', string='Interventions')
 
 class Report(models.Model):
     _inherit = "report"

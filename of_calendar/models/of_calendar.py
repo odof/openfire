@@ -57,7 +57,7 @@ class HREmployee(models.Model):
     u"""Création horaires avancés"""
     of_mode_horaires = fields.Selection([
         ("easy", "Facile"),
-        ("advanced", u"Avancé")], string="Mode de sélection des horaires", required=True, default="easy")
+        ("advanced", u"Avancé")], string=u"Mode de sélection des horaires", required=True, default="easy")
     of_segment_ids = fields.One2many('of.horaire.segment', 'employee_id', string="Horaires de travail")
 
     of_horaire_recap = fields.Html(compute='_compute_of_horaire_recap', string="Horaires de travail")
@@ -722,20 +722,20 @@ class OFHorairesSegment(models.Model):
     _name = 'of.horaire.segment'
     _order = 'date_deb'
 
-    name = fields.Char(string="Période", compute="_compute_name")
+    name = fields.Char(string=u"Période", compute="_compute_name")
 
     employee_id = fields.Many2one('hr.employee', string=u"Employé", required=True, ondelete='cascade')
     date_deb = fields.Date(string=u"Date de début", default="1970-01-01")
     date_fin = fields.Date(string="Date de fin")
     permanent = fields.Boolean(
         string="Est un horaire permanent",
-        help="Horaires valables sur une durée indéterminée."
+        help=u"Horaires valables sur une durée indéterminée."
     )
     creneau_ids = fields.Many2many(
         "of.horaire.creneau", "of_segment_creneau_rel", "segment_id", "creneau_id",
         string=u"Créneaux"
     )
-    modele_id = fields.Many2one('of.horaire.modele', string="Charger un modèle", compute=lambda *args: None)
+    modele_id = fields.Many2one('of.horaire.modele', string=u"Charger un modèle", compute=lambda *args: None)
     active = fields.Boolean(string="Active", default=True)
     motif = fields.Char(string="Motif du changement")
 
@@ -879,14 +879,14 @@ class OFHorairesCreneau(models.Model):
     _name = "of.horaire.creneau"
     _order = "jour_number, heure_debut"
 
-    name = fields.Char("Créneau", compute="_compute_name", store=True)
+    name = fields.Char(u"Créneau", compute="_compute_name", store=True)
     jour_id = fields.Many2one("of.jours", string="Jour", required=True)
     jour_number = fields.Integer(related="jour_id.numero", store=True)
     heure_debut = fields.Float(string=u"Heure de début", digits=(12, 5), required=True)
     heure_fin = fields.Float(string=u"Heure de fin", digits=(12, 5), required=True)
 
     _sql_constraints = [
-        ('name_uniq', 'unique(name)', 'Oups ! On dirait que ce créneau existe déjà.'),
+        ('name_uniq', 'unique(name)', u'Oups ! On dirait que ce créneau existe déjà.'),
         ('heure_debut_fin_constraint', 'CHECK ( heure_debut <= heure_fin )', _(u"L'heure de début doit être antérieure à l'heure de fin.")),
         ('heures_sont_des_heures_constraint', 'CHECK ( heure_debut <= 24 AND heure_debut >= 0 AND heure_fin <= 24 AND heure_fin >= 0)', _(u"Les horaires doivent se trouver entre 0 et 24."))
     ]
@@ -980,7 +980,7 @@ class OFHorairesCreneau(models.Model):
 class OFHorairesModele(models.Model):
     _name = "of.horaire.modele"
 
-    name = fields.Char("Nom du modèle")
+    name = fields.Char(u"Nom du modèle")
     creneau_ids = fields.Many2many(
         'of.horaire.creneau', 'modele_creneaux', 'modele_id', 'creneau_id', string=u"Créneaux"
     )
@@ -1021,12 +1021,12 @@ class Users(models.Model):
         # Création automatique employee sur création utilisateur?
         return user
 
-class OFPartners(models.Model):
+class ResPartner(models.Model):
     _inherit = 'res.partner'
 
     of_color_ft = fields.Char(string="Couleur de texte", compute="_compute_colors", oldname="color_ft")
     of_color_bg = fields.Char(string="Couleur de fond", compute="_compute_colors", oldname="color_bg")
-    of_telephones = fields.Text(string="Téléphones", compute="_compute_of_telephones")
+    of_telephones = fields.Text(string=u"Téléphones", compute="_compute_of_telephones")
 
     @api.depends("user_ids")
     def _compute_colors(self):
@@ -1060,15 +1060,15 @@ class Meeting(models.Model):
 
     of_lieu = fields.Selection([
         ("onsite", "Dans les locaux"),
-        ("phone", "Au téléphone"),
-        ("offsite", "À l'exterieur"),
+        ("phone", u"Au téléphone"),
+        ("offsite", u"À l'exterieur"),
         ("custom", "Adresse manuelle"),
         ], string="Lieu du RDV", required=True, default="onsite")
     # @TODO : Supprimer le code commenté
     # user_company_ids = fields.Many2many('res.company', 'calendar_user_company_rel', 'calendar_id', 'company_id', u"sociétés du propriétaire",compute="_compute_user_company_ids")#,store=True)#related="user_id.company_ids", readonly=True)
     # tentative de domain ratée
-    of_lieu_company_id = fields.Many2one("res.company", string="(Précisez)")  # ,domain="[('id', 'in', user_company_ids and user_company_ids._ids)]")
-    of_lieu_rdv_id = fields.Many2one("res.partner", string="(Précisez)")
+    of_lieu_company_id = fields.Many2one("res.company", string=u"(Précisez)")  # ,domain="[('id', 'in', user_company_ids and user_company_ids._ids)]")
+    of_lieu_rdv_id = fields.Many2one("res.partner", string=u"(Précisez)")
     of_lieu_address_street = fields.Char(string="Rue")  # , compute="_compute_geo")
     of_lieu_address_street2 = fields.Char(string="Rue (2)")  # , compute="_compute_geo")
     of_lieu_address_city = fields.Char(string="Ville")  # , compute="_compute_geo")
@@ -1344,7 +1344,7 @@ class Meeting(models.Model):
 class CalendarMixin(models.AbstractModel):
     _name = "of.calendar.mixin"
 
-    state_int = fields.Integer(string="Valeur d'état", compute="_compute_state_int", help="valeur allant de 0 à 3 inclus")
+    state_int = fields.Integer(string=u"Valeur d'état", compute="_compute_state_int", help=u"valeur allant de 0 à 3 inclus")
 
     def _compute_state_int(self):
         """

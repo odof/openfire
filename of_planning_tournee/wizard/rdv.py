@@ -89,20 +89,26 @@ class OfTourneeRdv(models.TransientModel):
 
     name = fields.Char(string=u'Libellé', size=64, required=False)
     description = fields.Html(string='Description')
-    tache_id = fields.Many2one('of.planning.tache', string='Tâche', required=True)
+    tache_id = fields.Many2one('of.planning.tache', string=u'Tâche', required=True)
     employee_id = fields.Many2one('hr.employee', string=u"Intervenant")
-    pre_employee_ids = fields.Many2many('hr.employee', string=u'Pré-sélection d\'intervenants',
-                                        domain="['|', ('of_tache_ids', 'in', tache_id), ('of_toutes_taches', '=', True)]",
-                                        help=u"pré-sélection des intervenants")
+    pre_employee_ids = fields.Many2many(
+        'hr.employee', string=u"Pré-sélection d'intervenants",
+        domain="['|', ('of_tache_ids', 'in', tache_id), ('of_toutes_taches', '=', True)]",
+        help=u"pré-sélection des intervenants")
     duree = fields.Float(string=u'Durée', required=True, digits=(12, 5))
     planning_ids = fields.One2many('of.tournee.rdv.line', 'wizard_id', string='Proposition de RDVs')
-    planning_tree_ids = fields.One2many('of.tournee.rdv.line', 'wizard_id', string='Proposition de RDVs',
-                                        domain=[('intervention_id', '=', False), ('allday', '=', False)])
+    planning_tree_ids = fields.One2many(
+        'of.tournee.rdv.line', 'wizard_id', string='Proposition de RDVs',
+        domain=[('intervention_id', '=', False), ('allday', '=', False)])
     date_propos = fields.Datetime(string=u'RDV Début')
     date_propos_hour = fields.Float(string=u'Heure de début', digits=(12, 5))
-    date_recherche_debut = fields.Date(string='À partir du', required=True, default=lambda *a: (date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
-    date_recherche_fin = fields.Date(string="Jusqu'au", required=True, default=lambda *a: (date.today() + timedelta(days=7)).strftime('%Y-%m-%d'))
-    partner_id = fields.Many2one('res.partner', string='Client', required=True, readonly=True, default=lambda x: x._default_partner())
+    date_recherche_debut = fields.Date(
+        string=u"À partir du", required=True,
+        default=lambda *a: (date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
+    date_recherche_fin = fields.Date(
+        string="Jusqu'au", required=True, default=lambda *a: (date.today() + timedelta(days=7)).strftime('%Y-%m-%d'))
+    partner_id = fields.Many2one(
+        'res.partner', string='Client', required=True, readonly=True, default=lambda x: x._default_partner())
     partner_address_id = fields.Many2one(
         'res.partner', string="Adresse d'intervention", required=True, default=lambda x: x._default_address(),
         domain="['|', ('id', '=', partner_id), ('parent_id', '=', partner_id)]")
@@ -117,24 +123,25 @@ class OfTourneeRdv(models.TransientModel):
         'of.service', string='Service client', default=lambda x: x._default_service(),
         domain="[('partner_id', '=', partner_id)]")
     creer_recurrence = fields.Boolean(
-        string="Créer récurrence?", default=True,
-        help="Si cette case est cochée et qu'il n'existe pas de service lié à cette intervention, en crééra un.")
+        string=u"Créer récurrence?", default=True,
+        help=u"Si cette case est cochée et qu'il n'existe pas de service lié à cette intervention, en crééra un.")
     date_next = fields.Date(string=u'Prochaine intervention', help=u"Date à partir de laquelle programmer la prochaine intervention")
     mode_recherche = fields.Selection(SEARCH_MODES, string="Mode de recherche", required=True, default="distance")
     max_recherche = fields.Float(string="Maximum")
 
-    zero_result = fields.Boolean(string="Recherche infructueuse", default=False, help="Aucun résultat")
-    zero_dispo = fields.Boolean(string="Recherche infructueuse", default=False, help="Aucun résultat suffisamment proche")
+    zero_result = fields.Boolean(string="Recherche infructueuse", default=False, help=u"Aucun résultat")
+    zero_dispo = fields.Boolean(
+        string="Recherche infructueuse", default=False, help=u"Aucun résultat suffisamment proche")
     display_res = fields.Boolean(string=u"Voir Résultats", default=False)
-    res_line_id = fields.Many2one("of.tournee.rdv.line", string="Créneau Sélectionné")
+    res_line_id = fields.Many2one("of.tournee.rdv.line", string=u"Créneau Sélectionné")
 
     # champs ajoutés pour la vue map
     geo_lat = fields.Float(related='partner_address_id.geo_lat', readonly=True)
     geo_lng = fields.Float(related='partner_address_id.geo_lng', readonly=True)
     precision = fields.Selection(related='partner_address_id.precision', readonly=True)
     partner_name = fields.Char(related='partner_id.name')
-    geocode_retry = fields.Boolean("Geocodage retenté")
-    ignorer_geo = fields.Boolean("Ignorer données géographiques")
+    geocode_retry = fields.Boolean(u"Geocodage retenté")
+    ignorer_geo = fields.Boolean(u"Ignorer données géographiques")
 
     @api.onchange('mode_recherche')
     def _onchange_mode_recherche(self):

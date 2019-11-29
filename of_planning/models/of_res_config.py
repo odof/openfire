@@ -8,7 +8,7 @@ class OfInterventionSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
     company_id = fields.Many2one(
-        'res.company', string='(OF) Société', required=True,
+        'res.company', string=u'(OF) Société', required=True,
         default=lambda self: self.env.user.company_id)
 
     calendar_min_time = fields.Integer(string='(OF) Heure min', help=u"Heure minimale affichée")

@@ -10,7 +10,7 @@ class OFHoraireSaveModeleWizard(models.TransientModel):
 
     name = fields.Char(string=u"Libellé", required=True)
     creneau_ids = fields.Many2many("of.horaire.creneau", string=u"Créneaux")
-    horaires_recap = fields.Html(compute='_compute_horaires_recap', string="Récapitulatif des horaires")
+    horaires_recap = fields.Html(compute='_compute_horaires_recap', string=u"Récapitulatif des horaires")
     fait = fields.Boolean(string="fait!")
     wizard_id = fields.Many2one('of.horaire.segment.wizard', string="wizard")
     mode = fields.Selection([
@@ -108,16 +108,16 @@ class OFHoraireSegmentWizard(models.TransientModel):
     date_deb = fields.Date(string=u"Date de début", default=lambda self: fields.Date.today())
     date_fin = fields.Date(string="Date de fin", default=lambda self: fields.Date.today())
     permanent = fields.Boolean(
-        string="horaire permanent",
-        help="Horaires valables sur une durée indéterminée.",
-        default = lambda self: self._default_premier_seg()
+        string="Horaire permanent",
+        help=u"Horaires valables sur une durée indéterminée.",
+        default=lambda self: self._default_premier_seg()
     )
-    premier_seg = fields.Boolean(string=u"premier segment permanent?", default = lambda self: self._default_premier_seg())
+    premier_seg = fields.Boolean(string=u"premier segment permanent?", default=lambda self: self._default_premier_seg())
     motif = fields.Char(string="Motif du changement")
-    modele_id = fields.Many2one('of.horaire.modele', string="Charger un modèle")
+    modele_id = fields.Many2one('of.horaire.modele', string=u"Charger un modèle")
     mode_horaires = fields.Selection([
         ("easy", "Facile"),
-        ("advanced", u"Avancé")], string="Mode de Sélection des horaires", required=True, default="easy")
+        ("advanced", u"Avancé")], string=u"Mode de Sélection des horaires", required=True, default="easy")
     creneau_ids = fields.Many2many("of.horaire.creneau", string=u"Créneaux")
     hor_md = fields.Float(string=u'Matin début', digits=(12, 5), default=9)
     hor_mf = fields.Float(string=u'Matin fin', digits=(12, 5), default=12)
@@ -128,12 +128,12 @@ class OFHoraireSegmentWizard(models.TransientModel):
     # Champs en cas de chevauchement
     remplacement = fields.Boolean(string="besoin confirmation")
     seg_1_horaires_recap = fields.Html(compute='_compute_horaires_recap', string="Horaires de travail")
-    seg_exist_ids = fields.Many2many('of.horaire.segment', string="Segment Existants", order="date_deb")
+    seg_exist_ids = fields.Many2many('of.horaire.segment', string="Segment existants", order="date_deb")
     seg_exist_recap = fields.Html(compute='_compute_horaires_recap', string="Horaires de travail")
     result_recap = fields.Html(compute='_compute_horaires_recap', string="Horaires de travail")
 
     # Pour la modification et la suppression
-    segment_id = fields.Many2one('of.horaire.segment', string="Période concernée")#, domain=_get_segment_id_domain)
+    segment_id = fields.Many2one('of.horaire.segment', string=u"Période concernée")#, domain=_get_segment_id_domain)
 
     @api.multi
     @api.onchange('hor_md', 'hor_mf', 'hor_ad', 'hor_af', 'mode_horaires')

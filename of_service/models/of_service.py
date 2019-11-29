@@ -659,7 +659,9 @@ class OFPlanningTache(models.Model):
 class OFPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
-    service_id = fields.Many2one('of.service', string="À programmer", domain="address_id and [('address_id', '=', address_id),('tache_id','=','tache_id')]")
+    service_id = fields.Many2one(
+        'of.service', string=u"À programmer",
+        domain="address_id and [('address_id', '=', address_id),('tache_id','=','tache_id')]")
 
     @api.onchange('address_id', 'tache_id')
     def _onchange_address_id(self):
@@ -743,9 +745,9 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     # Utilisé pour ajouter bouton Interventions à Devis (see order_id many2one field above)
-    of_a_programmer_ids = fields.One2many("of.service", "order_id", string="À programmer")
+    of_a_programmer_ids = fields.One2many("of.service", "order_id", string=u"À programmer")
 
-    of_a_programmer_count = fields.Integer(string='À programmer', compute='_compute_of_a_programmer_count')
+    of_a_programmer_count = fields.Integer(string=u"À programmer", compute='_compute_of_a_programmer_count')
 
     @api.depends('of_a_programmer_ids')
     @api.multi
@@ -800,8 +802,9 @@ class ResPartner(models.Model):
     _inherit = "res.partner"
 
     service_address_ids = fields.One2many('of.service', 'address_id', string='Services', context={'active_test': False})
-    service_partner_ids = fields.One2many('of.service', 'partner_id', string='Services du partenaire', context={'active_test': False},
-                                          help=u"Services liés au partenaire, incluant les services des contacts associés")
+    service_partner_ids = fields.One2many(
+        'of.service', 'partner_id', string='Services du partenaire', context={'active_test': False},
+        help=u"Services liés au partenaire, incluant les services des contacts associés")
 
     @api.multi
     def action_prevoir_intervention(self):
