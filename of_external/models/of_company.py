@@ -4,7 +4,9 @@ from odoo import fields, models, api
 
 class ResCompany(models.Model):
     _inherit = "res.company"
-    use_of_custom_footer = fields.Boolean(string='Utiliser le pied de page personnalisé pour cette société.', help=u"Cochez si vous voulez utiliser ce pied de page personnalisé pour les rapports PDF")
+    use_of_custom_footer = fields.Boolean(
+        string=u'Utiliser le pied de page personnalisé pour cette société.',
+        help=u"Cochez si vous voulez utiliser ce pied de page personnalisé pour les rapports PDF")
     of_custom_footer_line_1 = fields.Char(string='Ligne 1')
     of_custom_footer_line_2 = fields.Char(string='Ligne 2')
     of_custom_footer_line_3 = fields.Char(string='Ligne 3')

@@ -9,7 +9,7 @@ class OFCRMProjetLine(models.Model):
     _order = 'sequence'
 
     name = fields.Char(string=u"Libellé", required=True, translate=True)
-    lead_id = fields.Many2one('crm.lead', string="Opportunité", required=True, ondelete="cascade")
+    lead_id = fields.Many2one('crm.lead', string=u"Opportunité", required=True, ondelete="cascade")
     attr_id = fields.Many2one('of.crm.projet.attr', string="Attribut", required=True, ondelete="restrict")
     type = fields.Selection([
         ('bool', u'Booléen (Oui/Non)'),
@@ -137,18 +137,19 @@ class OFCRMProjetAttr(models.Model):
     active = fields.Boolean(string="Actif", default=True)
     sequence = fields.Integer(string=u'Séquence', default=10)
 
-    val_bool_default = fields.Boolean(string="Valeur par Défaut", default=False)
-    val_char_default = fields.Char(string="Valeur par Défaut")
-    val_text_default = fields.Text(string="Valeur par Défaut")
+    val_bool_default = fields.Boolean(string=u"Valeur par Défaut", default=False)
+    val_char_default = fields.Char(string=u"Valeur par Défaut")
+    val_text_default = fields.Text(string=u"Valeur par Défaut")
     #val_date_default = fields.Date(string="Valeur par Défaut", default=fields.Date.today)
-    val_select_id_default = fields.Many2one('of.crm.projet.attr.select', string="Valeur par Défaut", domain="[('attr_id','=',id)]", ondelete="set null")
+    val_select_id_default = fields.Many2one(
+        'of.crm.projet.attr.select', string=u"Valeur par Défaut", domain="[('attr_id','=',id)]", ondelete="set null")
 
     @api.multi
-    def write(self,vals):
-        super(OFCRMProjetAttr,self).write(vals)
+    def write(self, vals):
+        super(OFCRMProjetAttr, self).write(vals)
         if 'active' in vals:
             select_obj = self.env['of.crm.projet.attr.select'].with_context(active_test=False)
-            select_values = select_obj.search([('attr_id','in',self._ids)])
+            select_values = select_obj.search([('attr_id', 'in', self._ids)])
             select_values.write({'active': vals['active']})
         return True
 
@@ -163,8 +164,8 @@ class OFCRMProjetAttrSelect(models.Model):
     active = fields.Boolean(string="Actif", default=True)
 
     @api.multi
-    def write(self,vals):
+    def write(self, vals):
         if 'active' in vals and len(self._ids) == 1:
             if not self.attr_id.active:
-                raise ValidationError(u"l'Attribut associé à cette valeur est désactivé")
-        return super(OFCRMProjetAttrSelect,self).write(vals)
+                raise ValidationError(u"L'attribut associé à cette valeur est désactivé")
+        return super(OFCRMProjetAttrSelect, self).write(vals)

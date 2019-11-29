@@ -27,7 +27,7 @@ class ResCompany(models.Model):
             companies.write(vals)
         return res
 
-    of_client_id_ref = fields.Boolean('Réf. client automatique',
+    of_client_id_ref = fields.Boolean(u'Réf. client automatique',
                                       help=u"Lors de la création d'un nouveau partenaire, si cette case est cochée, "
                                            u"la référence client prendra par défaut le n° de compte comptable du partenaire.")
     of_code_client = fields.Char('Code client', default="('411%05i' % partner.id, partner.name)")

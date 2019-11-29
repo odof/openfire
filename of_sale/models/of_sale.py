@@ -730,7 +730,7 @@ class Company(models.Model):
             ('factures', 'Dans les factures'),
             ('devis_factures', 'Dans les devis et les factures'),
         ], string="afficher descr. fabricant", default='devis_factures',
-        help="La description du fabricant d'un article sera ajoutée à la description de l'article dans les documents."
+        help=u"La description du fabricant d'un article sera ajoutée à la description de l'article dans les documents."
     )
 
 
@@ -776,12 +776,12 @@ class OFSaleConfiguration(models.TransientModel):
         help="Afficher les messages d'avertissement de stock ?")
 
     pdf_display_product_ref_setting = fields.Boolean(
-        string="(OF) Réf. produits", required=True, default=False,
-        help="Afficher les références produits dans les rapports PDF ?")
+        string=u"(OF) Réf. produits", required=True, default=False,
+        help=u"Afficher les références produits dans les rapports PDF ?")
 
     pdf_date_validite_devis = fields.Boolean(
-        string="(OF) Date validité devis", required=True, default=False,
-        help="Afficher la date de validité dans le rapport PDF des devis ?")
+        string=u"(OF) Date validité devis", required=True, default=False,
+        help=u"Afficher la date de validité dans le rapport PDF des devis ?")
 
     pdf_adresse_nom_parent = fields.Boolean(
         string=u"(OF) Nom parent contact", required=True, default=False,
@@ -791,31 +791,31 @@ class OFSaleConfiguration(models.TransientModel):
         help=u"Afficher la civilité dans les rapport PDF ?")
     pdf_adresse_telephone = fields.Selection([
             (1, "Afficher dans l'encart d'adresse principal"),
-            (2, "Afficher dans une pastille d'informations complémentaires"),
-            (3, "Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
+            (2, u"Afficher dans une pastille d'informations complémentaires"),
+            (3, u"Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
         ], string=u"(OF) Téléphone",
         help=u"Où afficher le numéro de téléphone dans les rapport PDF ? Ne rien mettre pour ne pas afficher.")
     pdf_adresse_mobile = fields.Selection([
             (1, "Afficher dans l'encart d'adresse principal"),
-            (2, "Afficher dans une pastille d'informations complémentaires"),
-            (3, "Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
+            (2, u"Afficher dans une pastille d'informations complémentaires"),
+            (3, u"Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
         ], string=u"(OF) Mobile",
         help=u"Où afficher le numéro de téléphone mobile dans les rapport PDF ? Ne rien mettre pour ne pas afficher.")
     pdf_adresse_fax = fields.Selection([
             (1, "Afficher dans l'encart d'adresse principal"),
-            (2, "Afficher dans une pastille d'informations complémentaires"),
-            (3, "Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
+            (2, u"Afficher dans une pastille d'informations complémentaires"),
+            (3, u"Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
         ], string="(OF) Fax",
         help=u"Où afficher le fax dans les rapport PDF ? Ne rien mettre pour ne pas afficher.")
     pdf_adresse_email = fields.Selection([
             (1, "Afficher dans l'encart d'adresse principal"),
-            (2, "Afficher dans une pastille d'informations complémentaires"),
-            (3, "Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
+            (2, u"Afficher dans une pastille d'informations complémentaires"),
+            (3, u"Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
         ], string="(OF) E-mail",
         help=u"Où afficher l'adresse email dans les rapport PDF ? Ne rien mettre pour ne pas afficher.")
     pdf_afficher_multi_echeances = fields.Boolean(
-        string="(OF) Multi-échéances", required=True, default=False,
-        help="Afficher les échéances multiples dans les rapports PDF ?")
+        string=u"(OF) Multi-échéances", required=True, default=False,
+        help=u"Afficher les échéances multiples dans les rapports PDF ?")
     of_color_bg_section = fields.Char(
         string="(OF) Couleur fond titres section",
         help=u"Choisissez un couleur de fond pour les titres de section", default="#F0F0F0")
@@ -1009,7 +1009,7 @@ class OFSaleEcheance(models.Model):
     currency_id = fields.Many2one(related="order_id.currency_id", readonly=True)  # TODO ADAPT SALE
     amount = fields.Monetary(string="Montant", currency_field='currency_id')
     percent = fields.Float(string=u"Pourcentage", digits=dp.get_precision('Product Price'))
-    last = fields.Boolean(string="Dernière Échéance", compute="_compute_last")
+    last = fields.Boolean(string=u"Dernière Échéance", compute="_compute_last")
 
     sequence = fields.Integer(default=10, help="Gives the sequence order when displaying a list of payment term lines.")
     date = fields.Date(string='Date')

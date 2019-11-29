@@ -51,11 +51,13 @@ class OfMailTemplate(models.Model):
     file_name = fields.Char(string='Nom du fichier', size=64)
     file = fields.Binary("Formulaire PDF", attachment=True)
     chp_ids = fields.One2many('of.gesdoc.chp', 'template_id', string='Liste des champs', copy=True)
-    fillable = fields.Boolean(u"Laisser éditable", help="Autorise la modification du fichier pdf après téléchargement")
+    fillable = fields.Boolean(u"Laisser éditable", help=u"Autorise la modification du fichier pdf après téléchargement")
     note_fields = fields.Text(compute='_compute_note_fields', string='Liste des valeurs', default=_get_note_fields)
     type = fields.Selection([], string="Type de document")
     sequence = fields.Integer(string=u"Séquence", default=10)
-    model_ids = fields.Many2many('ir.model', string=u"Impression rapide", domain=_get_models_domain, copy=False, help=u"Ajoute un raccourci dans le menu \"Imprimer\"")
+    model_ids = fields.Many2many(
+        'ir.model', string=u"Impression rapide", domain=_get_models_domain, copy=False,
+        help=u"Ajoute un raccourci dans le menu \"Imprimer\"")
 
     def copy(self, default=None):
         default = dict(default or {})

@@ -16,7 +16,7 @@
     'version' : "10.0.1.0.0",
     'author' : "OpenFire",
     'website' : "www.openfire.fr",
-    'category': u"Module OpenFire - Employés",
+    'category': u"OpenFire",
     'complexity': "",
     'summary': u"Personnalisation du module Odoo feuilles de temps",
     'description': u"""

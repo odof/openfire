@@ -3,13 +3,13 @@
 from datetime import timedelta
 from odoo import models, fields, api
 
-class of_parc_installe(models.Model):
+class OFParcInstalle(models.Model):
     """Parc installé"""
 
     _name = 'of.parc.installe'
     _description = "Parc installé"
 
-    name = fields.Char("No de série", size=64, required=False, copy=False)
+    name = fields.Char(u"No de série", size=64, required=False, copy=False)
     date_service = fields.Date("Date vente", required=False)
     date_installation = fields.Date("Date d'installation", required=False)
     date_fin_garantie = fields.Date(string="Fin de garantie")
@@ -95,12 +95,12 @@ class of_parc_installe(models.Model):
         """Permet dans un SAV lors de la saisie du no de série d'une machine installée de proposer les machines du contact en premier précédées d'une puce."""
         if self._context.get('partner_id_no_serie_puce'):
             client_id = self._context.get('partner_id_no_serie_puce')
-            res = super(of_parc_installe, self).name_search(name, [['client_id', '=', client_id]], operator, limit) or []
+            res = super(OFParcInstalle, self).name_search(name, [['client_id', '=', client_id]], operator, limit) or []
             limit = limit - len(res)
             res = [(parc[0], "-> " + parc[1]) for parc in res]
-            res += super(of_parc_installe, self).name_search(name, [['client_id', '!=', client_id]], operator, limit) or []
+            res += super(OFParcInstalle, self).name_search(name, [['client_id', '!=', client_id]], operator, limit) or []
             return res
-        return super(of_parc_installe, self).name_search(name, args, operator, limit)
+        return super(OFParcInstalle, self).name_search(name, args, operator, limit)
 
 
 class res_partner(models.Model):
@@ -108,7 +108,7 @@ class res_partner(models.Model):
 
     of_revendeur = fields.Boolean('Revendeur', help="Cocher cette case si ce partenaire est un revendeur.")
     of_installateur = fields.Boolean('Installateur', help="Cocher cette case si ce partenaire est un installateur.")
-    of_parc_installe_count = fields.Integer("Parc installé", compute='_compute_of_parc_installe_count')
+    of_parc_installe_count = fields.Integer(string=u"Parc installé", compute='_compute_of_parc_installe_count')
 
     @api.multi
     def _compute_of_parc_installe_count(self):
@@ -159,7 +159,7 @@ class project_issue(models.Model):
     of_parc_installe_site_zip = fields.Char('Code Postal', size=24, related='of_produit_installe_id.site_adresse_id.zip')
     of_parc_installe_site_city = fields.Char('Ville', related='of_produit_installe_id.site_adresse_id.city')
     of_parc_installe_site_adresse = fields.Char(u"Adresse d'installation", related="of_produit_installe_id.site_adresse_id.contact_address", search='_search_of_parc_installe_site_adresse', readonly=True)
-    of_parc_installe_note = fields.Text('Note produit installé', related="of_produit_installe_id.note", readonly=True)
+    of_parc_installe_note = fields.Text(u'Note produit installé', related="of_produit_installe_id.note", readonly=True)
     of_parc_installe_fin_garantie = fields.Date(string='Fin de garantie', related="of_produit_installe_id.date_fin_garantie", readonly=True)
 
     # Champs ajoutés pour la vue map

@@ -79,7 +79,7 @@ class CrmLead(models.Model):
     email_from = fields.Char(related="partner_id.email")
     description = fields.Html(string="Suivi")
     description_rapport = fields.Html(string="Suivi bis", compute="_compute_description_rapport")
-    user_id = fields.Many2one(help="La couleur des activités en vue calendrier est celle du commercial")
+    user_id = fields.Many2one(help=u"La couleur des activités en vue calendrier est celle du commercial")
 
     meeting_ids = fields.Many2many('calendar.event', string=u"Réunions", related="partner_id.meeting_ids")
     # custom colors
@@ -304,7 +304,7 @@ class ResPartner(models.Model):
         ('lead', u'Prospect'),
         ('customer', u'Client signé'),
         ('other', u'Autre'),
-        ], string=u"État", default='other', required=True, help="""
+        ], string=u"État", default='other', required=True, help=u"""
 Champ uniquement utile pour les partenaires clients.
 Un client est considéré comme prospect tant qu'il n'a ni commande confirmée ni facture validée.
 Ce champ se met à jour automatiquement sur confirmation de commande et sur validation de facture
