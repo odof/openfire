@@ -178,7 +178,7 @@ class OfPlanifCreneauProp(models.TransientModel):
                 #asupprimer quand osrm refonctionne
                 a_planifier.distance_order = a_planifier.distance_dwazo_prec + a_planifier.distance_dwazo_suiv
                 a_planifier.distance_reelle_tota = a_planifier.distance_order"""
-        print "compteur " + str(compteur)
+        #print "compteur " + str(compteur)
 
     @api.multi
     @api.depends('service_id', 'service_id.recurrence', 'service_id.date_next', 'service_id.date_fin')

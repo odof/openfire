@@ -11,7 +11,7 @@
                 <field name="sav_id" attrs="{'invisible': [('recurrence', '=', True)]}"/>
             </xpath>
             <xpath expr="//group[@name='notes']" position="after">
-                <group string="Produit installé" colspan="4">
+                <group string="Produit installé">
                         <field name="parc_installe_id"/>
                         <field name="parc_installe_product_id"/>
                         <field name="parc_installe_site_adresse_id"/>
