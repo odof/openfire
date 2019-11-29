@@ -526,7 +526,7 @@ class OfService(models.Model):
             'default_service_id' : self.id,
             'create'             : self.base_state == 'calculated',
             'edit'               : self.base_state == 'calculated',
-            'default_order_id'   : self.order_id and self.order_id.id,
+            'default_order_id'   : self.order_id and self.order_id.id or False,
             })
         return context
 
