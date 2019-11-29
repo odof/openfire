@@ -110,6 +110,15 @@
                         <filter string="Mois prochain" name="next_month"
                                 domain="[('date_deadline', u'&gt;=', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
                                          ('date', u'&lt;', (context_today() + relativedelta(day=1,months=2)).strftime('%Y-%m-%d'))]"/>
+                        <filter string="Hier" name="yesterday"
+                                domain="[(u'date', u'&gt;=', (context_today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')),
+                                         (u'date', u'&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                        <filter string="Aujourd'hui" name="today"
+                                domain="[(u'date', u'&gt;=', current_date),
+                                         (u'date', u'&lt;', (context_today() + datetime.timedelta(days=1)).strftime('%Y-%m-%d'))]"/>
+                        <filter string="Demain" name="tomorrow"
+                                domain="[(u'date', u'&gt;=', (context_today() + datetime.timedelta(days=1)).strftime('%Y-%m-%d')),
+                                         (u'date', u'&lt;', (context_today() + datetime.timedelta(days=2)).strftime('%Y-%m-%d'))]"/>
                     </group>
                     <newline/>
                     <group>

@@ -145,7 +145,7 @@
                                     <field name="partner_id" invisible="context.get('hide_service_partner_id')"/>
                                     <label for="address_id" invisible="context.get('hide_service_address_id')"/>
                                     <div class="o_address_format" invisible="context.get('hide_service_address_id')">
-                                        <field name="address_id"/>
+                                        <div><field name="address_id"/></div>
                                         <field name="address_address"/>
                                     </div>
                                     <field name="secteur_tech_id"/>
