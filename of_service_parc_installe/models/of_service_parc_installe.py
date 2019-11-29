@@ -13,7 +13,7 @@ class OfService(models.Model):
     parc_installe_product_id = fields.Many2one('product.product', string=u"Désignation", related="parc_installe_id.product_id", readonly=True)
     parc_installe_site_adresse_id = fields.Many2one('res.partner', string=u"Adresse de pose", related="parc_installe_id.site_adresse_id", readonly=True)
     parc_installe_note = fields.Text(string=u"Note", related="parc_installe_id.note", readonly=True)
-    sav_id = fields.Many2one("project.issue", string="SAV")
+    sav_id = fields.Many2one("project.issue", string="SAV", domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', address_id)]")
 
     @api.onchange('address_id')
     def _onchange_address_id(self):

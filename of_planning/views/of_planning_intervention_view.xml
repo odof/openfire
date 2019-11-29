@@ -211,7 +211,11 @@
                             </group>
                             <group name="liens">
                                 <separator string="Documents liés" colspan="2"/>
-                                <field name="order_id"/>
+                                <field name="order_id"
+                                       groups="sales_team.group_sale_salesman,
+                                               account.group_account_invoice,
+                                               stock.group_stock_user,
+                                               mrp.group_mrp_user"/>
                             </group>
                         </group>
                         <notebook>

@@ -228,8 +228,8 @@ class OfPlanifCreneauProp(models.TransientModel):
             if self.creneau_id.creneaux_reels[i][0] <= self.heure_debut_rdv < self.creneau_id.creneaux_reels[i][1]:
                 break
         else:
-            raise UserError(u"l'heure de début choisi est en dehors de ce créneau"
-                            u"pour votre information, les horaires de ce créneau sont"
+            raise UserError(u"l'heure de début choisi est en dehors de ce créneau "
+                            u"pour votre information, les horaires de ce créneau sont "
                             u"%s" % self.creneau_id.creneaux_reels_formatted)
         # calculer la durée avant et la durée après
         # définir si montrer boutons confirmer et suivant, et/ou confirmer et précédent
@@ -261,7 +261,7 @@ class OfPlanifCreneauProp(models.TransientModel):
         self.selected = True
         self.creneau_id.duree_rdv = self.service_id.duree
         self.creneau_id.selected_id = self.id
-        return {'type': 'ir.actions.do_nothing'}
+        # return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
     def button_confirm(self):

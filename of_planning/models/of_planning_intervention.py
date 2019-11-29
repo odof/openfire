@@ -383,7 +383,7 @@ class OfPlanningIntervention(models.Model):
     of_color_ft = fields.Char(related="employee_main_id.of_color_ft", readonly=True, oldname='color_ft')
     of_color_bg = fields.Char(related="employee_main_id.of_color_bg", readonly=True, oldname='color_bg')
 
-    order_id = fields.Many2one("sale.order", string=u"Commande associée")
+    order_id = fields.Many2one("sale.order", string=u"Commande associée", domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', address_id)]")
     of_notes_intervention = fields.Html(related='order_id.of_notes_intervention', readonly=True)
     of_notes_client = fields.Text(related='partner_id.comment', string="Notes client", readonly=True)
     cleantext_description = fields.Text(compute='_compute_cleantext_description')
