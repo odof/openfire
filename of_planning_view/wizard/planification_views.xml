@@ -58,13 +58,11 @@
                             <i colspan="2"><field name="lieu_prec_message" attrs="{'invisible': [('lieu_prec_message', '=', False)]}"
                                                   class="oe_grey" nolabel="1"/></i>
                             <field name="lieu_prec_manual_id" attrs="{'invisible': [('lieu_prec_id', '!=', False), ('geo_lat_prec', '!=', False)]}"/>
-                            <div class="oe_grey" colspan="2" style="text-align: right; padding-right: 8px;">
-                                <div><field name="street_prec" nolabel="1"/></div>
-                                <div>
-                                    <field name="zip_prec" nolabel="1" class="oe_inline"/>
-                                    <field name="city_prec" nolabel="1" class="oe_inline of_ws_l"/>
-                                    <field name="country_prec_id" nolabel="1" class="oe_inline of_ws_l"/>
-                                </div>
+                            <div class="o_address_format oe_grey" colspan="2" ><i>
+                                <field name="street_prec" class="o_address_street" />
+                                <field name="zip_prec" class="o_address_city"/>
+                                <field name="city_prec" class="o_address_zip"/>
+                                <field name="country_prec_id" class="oe_inline of_ws_l" options='{"no_open": True, "no_create": True}'/></i>
                             </div>
                         </group>
                         <group>
@@ -78,13 +76,11 @@
                             <i colspan="2"><field name="lieu_suiv_message" attrs="{'invisible': [('lieu_suiv_message', '=', False)]}"
                                    class="oe_grey" nolabel="1"/></i>
                             <field name="lieu_suiv_manual_id" attrs="{'invisible': [('lieu_suiv_id', '!=', False), ('geo_lat_suiv', '!=', False)]}"/>
-                            <div class="oe_grey" colspan="2" style="text-align: right; padding-right: 8px;">
-                                <div><field name="street_suiv" nolabel="1"/></div>
-                                <div>
-                                    <field name="zip_suiv" nolabel="1" class="oe_inline"/>
-                                    <field name="city_suiv" nolabel="1" class="oe_inline of_ws_l"/>
-                                    <field name="country_suiv_id" nolabel="1" class="oe_inline of_ws_l"/>
-                                </div>
+                            <div class="o_address_format oe_grey" colspan="2" ><i>
+                                <field name="street_suiv" class="o_address_street" />
+                                <field name="zip_suiv" class="o_address_city"/>
+                                <field name="city_suiv" class="o_address_zip"/>
+                                <field name="country_suiv_id" class="oe_inline of_ws_l" options='{"no_open": True, "no_create": True}'/></i>
                             </div>
                         </group>
                     </group>
@@ -129,6 +125,7 @@
                            attrs="{'invisible': ['|',('proposition_ids', '=', []),('pre_a_programmer_id', '!=', False)]}"
                            options="{'reload_on_button': True}">
                         <tree limit="5" colors="blue: selected==True;" create="0" options="{'reload_on_button': True}">
+                            <button name="button_select" type="object" icon="fa-cogs"/>
                             <field name="service_id" invisible="1"/>
                             <field name="dummy_field" invisible="1"/>
                             <field name="priorite" groups="base.group_no_one"/>
@@ -154,13 +151,13 @@
                     </field>
                 </group>
                 <footer>
-                    <button name="button_dummy" string="Rechercher" type="object" colspan="4" class="btn btn-primary"
+                    <button name="button_dummy" string="Rechercher" type="object" class="btn btn-primary" style="margin-right: 4px!important"
                             attrs="{'invisible': [('pre_a_programmer_id', '!=', False)]}"/>
-                    <button name="button_confirm" string="Confirmer &amp; Fermer" type="object" colspan="4"
+                    <button name="button_confirm" string="Confirmer &amp; Fermer" type="object" style="margin-right: 4px!important"
                             class="btn btn-primary" attrs="{'invisible': [('proposition_ids', '=', []), ('pre_a_programmer_id', '=', False)]}"/>
-                    <button name="button_confirm_next" string="Confirmer &amp; Suivant" type="object" colspan="4"
+                    <button name="button_confirm_next" string="Confirmer &amp; Suivant" type="object" style="margin-right: 4px!important"
                             class="btn btn-primary" attrs="{'invisible': [('proposition_ids', '=', [])]}"/>
-                    <button name="button_close" string="Fermer" type="object" colspan="4" class="btn-default"/>
+                    <button name="button_close" string="Fermer" type="object" class="btn-default" style="margin-right: 4px!important"/>
                 </footer>
             </form>
         </field>
@@ -194,7 +191,12 @@
                             <field name="partner_id" options="{'no_create': True, 'no_open': True}" readonly="1"/>
                             <field name="address_id" attrs="{'invisible': [('address_id', '=', '_field_partner_id')]}"
                               options="{'no_create': True, 'no_open': True}"/>
-                            <field name="address_html" nolabel="1" colspan="2"/>
+                            <div class="o_address_format oe_grey" colspan="2" ><i>
+                                <field name="address_street" class="o_address_street" />
+                                <field name="address_zip" class="o_address_city"/>
+                                <field name="address_city" class="o_address_zip"/>
+                                <field name="address_country_id" class="oe_inline of_ws_l" options='{"no_open": True, "no_create": True}'/></i>
+                            </div>
                             <field name="partner_of_telephones"/>
                         </group>
                         <group colspan="2" string="Mémo">
@@ -221,11 +223,11 @@
                 </group>
                 <footer>
                     <button name="button_select" string="Sélectionner cette intervention à programmer" type="object" class="btn-primary"
-                        attrs="{'invisible': [('selected','!=',False)]}"/>
+                        attrs="{'invisible': [('selected','!=',False)]}" style="margin-right: 4px!important"/>
                     <button name="button_confirm" string="Confirmer le RDV" type="object" class="btn-primary"
-                        attrs="{'invisible': [('selected','!=',True)]}"/>
+                        attrs="{'invisible': [('selected','!=',True)]}" style="margin-right: 4px!important"/>
                     <button name="button_confirm_next" string="Confirmer &amp; Suivant" type="object" colspan="4"
-                            class="btn-primary" attrs="{'invisible': [('selected','!=',True)]}"/>
+                            class="btn-primary" attrs="{'invisible': [('selected','!=',True)]}" style="margin-right: 4px!important"/>
                 </footer>
             </form>
         </field>
@@ -238,7 +240,7 @@
         view_mode="form"
         view_id="view_of_planif_wizard"
         id="action_view_of_planif_wizard"
-        target="new"
+        target="current"
         groups="of_planning.of_group_planning_intervention_modification_siens"
     />
 
