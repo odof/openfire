@@ -185,9 +185,19 @@
                                             <i class="oe_grey oe_inline"> (restante).</i>
                                         </div>
 
-                                        <field name="date_next" string="À partir du"/>
-                                        <field name="date_next_fin" attrs="{'invisible': [('recurrence', '=', True)]}"/>
-                                        <field name="date_fin" attrs="{'invisible': [('recurrence', '=', False)]}"/>
+                                        <label for="date_next" string="Dates"/>
+                                        <div>
+                                            <i class="oe_grey oe_inline">Entre le </i>
+                                            <field name="date_next" nolabel="1" class="oe_inline"/>
+                                            <i class="oe_grey oe_inline"> et le </i>
+                                            <field name="date_next_fin" nolabel="1" class="oe_inline"
+                                              attrs="{'readonly': [('recurrence', '=', True)]}"/>
+                                            <span attrs="{'invisible': [('recurrence', '=', False)]}">
+                                                <i class="oe_grey oe_inline">. Expire le </i>
+                                                <field name="date_fin" nolabel="1" class="oe_inline"/>
+                                                <i class="oe_grey oe_inline"> .</i>
+                                            </span>
+                                        </div>
                                         <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
                                         <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'invisible': [('recurrence', '=', False)]}"/>
                                         <label for="recurring_interval" attrs="{'invisible': [('recurrence', '=', False)]}"/>

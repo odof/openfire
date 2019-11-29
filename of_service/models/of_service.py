@@ -428,18 +428,16 @@ class OfService(models.Model):
             mois_id = mois[0] and mois[0].id or False
             if mois_id:
                 self.mois_ids = [(4, mois_id, 0)]
-        if self.date_next:
+        if self.date_next and not self.date_fin:
             date_fin = fields.Date.from_string(self.date_next)
             if self.recurrence:
                 date_fin += self.get_relative_delta(self.recurring_rule_type, self.recurring_interval * 2)
+            elif 'sav_id' in self._fields:
+                date_fin += relativedelta(weeks=2)
             else:
                 date_fin += relativedelta(months=1)
             self.date_fin = fields.Date.to_string(date_fin)
-
-    @api.constrains('date_next', 'date_fin')
-    def constrains_dates(self):
-        self.ensure_one()
-        if self.date_next and self.date_fin and self.date_next > self.date_fin:
+        elif self.date_next and self.date_fin and self.date_next > self.date_fin:
             raise UserError("La date de prochaine planification est postérieure à la date de fin.\n"
                             "Cela signifie que cette intervention ne sera plus jamais sélectionnée par les outils de planification.\n"
                             "Veuillez changer les dates si ce n'est pas ce que vous vouliez faire")
