@@ -274,8 +274,10 @@ class OfService(models.Model):
     origin = fields.Char(string="Origine")
     order_id = fields.Many2one('sale.order', string="Commande client")
 
-    mois_ids = fields.Many2many('of.mois', 'service_mois', 'service_id', 'mois_id', string='Mois')
-    jour_ids = fields.Many2many('of.jours', 'service_jours', 'service_id', 'jour_id', string='Jours', default=_default_jours)
+    mois_ids = fields.Many2many('of.mois', 'service_mois', 'service_id', 'mois_id', string='Mois',
+                                help=u"Mois préférés du client.")
+    jour_ids = fields.Many2many('of.jours', 'service_jours', 'service_id', 'jour_id', string='Jours',
+                                default=_default_jours, help=u"Jours de disponibilité du client.")
 
     note = fields.Text('Notes')
     date_next = fields.Date(string="Prochaine planif", help=u"Date à partir de laquelle programmer la prochaine intervention", required=True)
@@ -297,7 +299,7 @@ class OfService(models.Model):
         ('monthly', 'Mois'),
         ('yearly', u'Année(s)'),
         ], string=u'Récurrence', default='yearly', help=u"Spécifier l'intervalle pour le calcul automatique de date de prochaine intervention dans les services.")
-    recurring_interval = fields.Integer(string=u'Répéter chaque', default=1, help=u"Répéter (Jours/Semaines/Mois/Années)")
+    recurring_interval = fields.Integer(string=u'Répéter chaque', default=1, help=u"Répéter (Mois/Années)")
 
     # state_rec = fields.Selection([
     #     ('draft', u'Brouillon'),  # état par défaut

@@ -10,7 +10,7 @@
             <xpath expr="//field[@name='order_id']" position="after">
                 <field name="sav_id" attrs="{'invisible': [('recurrence', '=', True)]}"/>
             </xpath>
-            <xpath expr="//group[@name='notes']" position="after">
+            <xpath expr="//group[@name='notes']" position="before">
                 <group string="Produit installé">
                         <field name="parc_installe_id"/>
                         <field name="parc_installe_product_id"/>
