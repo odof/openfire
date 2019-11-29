@@ -209,7 +209,7 @@ class OfPlanningEquipe(models.Model):
 
 class OfPlanningTournee(models.Model):
     _name = "of.planning.tournee"
-    _description = "Tournée"
+    _description = u"Tournée"
     _order = 'date DESC'
     _rec_name = 'date'
 
@@ -224,23 +224,28 @@ class OfPlanningTournee(models.Model):
     # À supprimer par la suite.
     equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe')
     employee_id = fields.Many2one('hr.employee', string=u'Intervenant', required=True)
-    employee_other_ids = fields.Many2many('hr.employee', 'tournee_employee_other_rel', 'tournee_id', 'employee_id',
-                                    string=u'Équipiers', required=True, domain="[('of_est_intervenant', '=', True)]")
+    employee_other_ids = fields.Many2many(
+        'hr.employee', 'tournee_employee_other_rel', 'tournee_id', 'employee_id', string=u'Équipiers', required=True,
+        domain="[('of_est_intervenant', '=', True)]")
     secteur_id = fields.Many2one('of.secteur', string='Secteur', domain="[('type', 'in', ['tech', 'tech_com'])]")
     #secteur_name = fields.Char(related="secteur_id.name")
     epi_lat = fields.Float(string=u'Épicentre Lat', digits=(12, 12))
     epi_lon = fields.Float(string=u'Épicentre Lon', digits=(12, 12))
-    address_depart_id = fields.Many2one('res.partner', string='Adresse départ')
+    address_depart_id = fields.Many2one('res.partner', string=u'Adresse départ')
     address_retour_id = fields.Many2one('res.partner', string='Adresse retour')
 
     zip_id = fields.Many2one('res.better.zip', 'Ville')
     distance = fields.Float(string='Eloignement (km)', digits=(12, 4), default=20.0)
     is_complet = fields.Boolean(compute="_compute_is_complet", string='Complet', store=True)
     is_bloque = fields.Boolean(string=u'Bloqué', help=u'Journée bloquée : ne sera pas proposée à la planification')
-    is_confirme = fields.Boolean(string=u'Confirmé', default=True, help=u'Une tournée non confirmée sera supprimée si on lui retire ses rendez-vous')
+    is_confirme = fields.Boolean(
+        string=u'Confirmé', default=True,
+        help=u'Une tournée non confirmée sera supprimée si on lui retire ses rendez-vous')
     date_min = fields.Date(related="date", string="Date min")
     date_max = fields.Date(related="date", string="Date max")
-    intervention_ids = fields.Many2many('of.planning.intervention', 'of_planning_intervention_of_planning_tournee_rel', 'tournee_id', 'intervention_id', string='Interventions')
+    intervention_ids = fields.Many2many(
+        'of.planning.intervention', 'of_planning_intervention_of_planning_tournee_rel', 'tournee_id', 'intervention_id',
+        string='Interventions')
 
     # @api.multi
     # @api.depends('employee_id', 'date')

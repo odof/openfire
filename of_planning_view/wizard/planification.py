@@ -73,7 +73,9 @@ class OfPlanifCreneauProp(models.TransientModel):
     distance_reelle_suiv = fields.Float(string=u'Distance du suivant', digits=(5, 2), help=u"Réelle", compute="compute_distance_reelle")
     distance_reelle_tota = fields.Float(string=u'Distance totale (km)', digits=(5, 2), help=u"Réelle", compute="compute_distance_reelle")
     osrm_response = fields.Text(string=u"Réponse OSRM", compute="compute_distance_reelle")
-    distance_order = fields.Float(string=u'Distance totale order', digits=(5, 5), help=u"pour ordonner", store=True, default=99999, compute="compute_distance_reelle")
+    distance_order = fields.Float(
+        string=u'Distance totale order', digits=(5, 5), help=u"pour ordonner", store=True, default=99999,
+        compute="compute_distance_reelle")
     dummy_field = fields.Boolean(string=u"A VER?", compute="_compute_dummy_field")
     priorite = fields.Integer(string=u"Priorité")
     selected = fields.Boolean(string=u"Sélectionné")
@@ -286,15 +288,17 @@ class OfPlanifCreneau(models.TransientModel):
     distance_max = fields.Integer("Distance max. (km)", default=30)
     duree_creneau = fields.Float(string=u"Durée à planifier")#, compute="_compute_duree_creneau")
     ignorer_duree = fields.Boolean(string=u"Ignorer durée", help=u"Cochez pour proposer aussi les interventions plus longues que le créneau")
-    pre_tache_categ_ids = fields.Many2many('of.planning.tache.categ', string=u"Catégories de tâches", help=u"Remplir pour restreindre la recherche à certaines catégories de tâches")
-    pre_tache_ids = fields.Many2many('of.planning.tache', string="Tâches", help=u"Remplir pour restreindre la recherche à certaines tâches")
-    pre_a_programmer_id = fields.Many2one('of.service', string="Choisir directement l'intervention à programmer",
-                                          help=u"Sans passer par la recherche",
-                                          domain=[('base_state', '=', 'calculated')])
+    pre_tache_categ_ids = fields.Many2many(
+        'of.planning.tache.categ', string=u"Catégories de tâches",
+        help=u"Remplir pour restreindre la recherche à certaines catégories de tâches")
+    pre_tache_ids = fields.Many2many('of.planning.tache', string=u"Tâches", help=u"Remplir pour restreindre la recherche à certaines tâches")
+    pre_a_programmer_id = fields.Many2one(
+        'of.service', string=u"Choisir directement l'intervention à programmer", help=u"Sans passer par la recherche",
+        domain=[('base_state', '=', 'calculated')])
     pre_a_programmer_address_id = fields.Many2one('res.partner', string="Adresse", compute="_compute_pre_a_programer_fields")
     pre_a_programmer_zip = fields.Char(string="Code Postal", compute="_compute_pre_a_programer_fields")
     pre_a_programmer_city = fields.Char(string="Ville", compute="_compute_pre_a_programer_fields")
-    pre_a_programmer_telephones = fields.Text(string="Téléphones", compute="_compute_pre_a_programer_fields")
+    pre_a_programmer_telephones = fields.Text(string=u"Téléphones", compute="_compute_pre_a_programer_fields")
     #pre_a_programmer_distance = fields.Float(string="Distance totale (km)", compute="_compute_pre_a_programer_fields")
 
     creneau_fini = fields.Boolean(string=u"Créneau entièrement planifiée")
@@ -312,7 +316,7 @@ class OfPlanifCreneau(models.TransientModel):
     # lieu suivant
     lieu_suiv_id = fields.Many2one("res.partner", string="lieu suivant")
 
-    secteur_id = fields.Many2one('of.secteur', string="Secteur", help="laisser vide pour ne pas restreindre à un secteur en particulier")
+    secteur_id = fields.Many2one('of.secteur', string="Secteur", help=u"laisser vide pour ne pas restreindre à un secteur en particulier")
     priorite_max = fields.Integer(string=u"Priorité max", help=u"Priorité la plus haute parmis les propositions")
 
     proposition_ids = fields.One2many('of.planif.intervention', 'creneau_id', string="propositions")#, compute="peupler_candidats")

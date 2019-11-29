@@ -8,7 +8,7 @@ class OFHoraireSegmentWizard(models.TransientModel):
     _inherit = 'of.horaire.segment.wizard'
 
     # @todo: générer la liste des interventions concernées
-    intervention_ids = fields.Many2many('of.planning.intervention', string="Interventions concernées")
+    intervention_ids = fields.Many2many('of.planning.intervention', string=u"Interventions concernées")
 
 
 class PlanningImpressionWizard(models.TransientModel):

@@ -9,12 +9,6 @@ class OfTestEmployees(common.TransactionCase):
     """
 
     def setUp(self):
-        super(OfTestEmployees, self).setUp()
-        self.of_jours_model = self.env['of.jours']
-        self.hr_employee_model = self.env['hr.employee']
-        self.creneau_model = self.env['of.horaire.creneau']
-
-    def test_employees(self):
         def generate_creneaux_create_data(creneaux):
             """
             :param creneaux: Créneaux sous forme de liste de tuples : [(jour, heure_deb, heure_fin), ...]
@@ -34,25 +28,31 @@ class OfTestEmployees(common.TransactionCase):
                 result.append((4, creneau.id))
             return result
 
-        # Jours de lundi à vendredi
-        jours_semaine = self.of_jours_model.search([('numero', '<', 6)])
+        super(OfTestEmployees, self).setUp()
+        self.of_jours_model = self.env['of.jours']
+        self.hr_employee_model = self.env['hr.employee']
+        self.creneau_model = self.env['of.horaire.creneau']
+        self.generate_creneaux_create_data = generate_creneaux_create_data
 
         # Jours de la semaine
         lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche = self.of_jours_model.search([])
 
+        # Jours de lundi à vendredi
+        jours_semaine = self.of_jours_model.search([('numero', '<', 6)])
+
         # Création de 2 employés
-        emp_1 = self.hr_employee_model.create({
+        self.emp_1 = self.hr_employee_model.create({
             'name': 'Alphonse',
             'of_est_intervenant': True,
             'of_mode_horaires': 'easy',
-            # 'of_hor_md': 8,
-            # 'of_hor_mf': 12,
-            # 'of_hor_ad': 13,
-            # 'of_hor_af': 17,
-            # 'of_jour_ids': [(6, 0, jours_semaine.ids)],
+            'of_hor_md': 8,
+            'of_hor_mf': 12,
+            'of_hor_ad': 13,
+            'of_hor_af': 17,
+            'of_jour_ids': [(6, 0, jours_semaine.ids)],
             'of_segment_ids': [
                 (0, 0, {
-                    'date_deb': False,
+                    'date_deb': '1970-01-01',
                     'date_fin': False,
                     'permanent': True,
                     'creneau_ids': generate_creneaux_create_data([
@@ -80,25 +80,25 @@ class OfTestEmployees(common.TransactionCase):
         # Merc. : 8h-18h
         # Jeudi : 7h-19h
         # --------Horaires temporaires de l'employé 2 :
-        # -- du mer.09/06 au ven.12/06
+        # -- du mer.12/06 au ven.14/06
         # Jeudi : 11h-15h
         # Vend. : 11h-15h
         # -- du 01/07 au 03/07
-        # Merc. : 15h-18h
-        # Vend. : 8h-12h
-        # -- du jeu.30/07 au mar.04/08
-        # Jeudi : 10h-15h
-        # Vend. : 10h-15h
+        # Lundi : 15h-18h
+        # Merc. : 8h-12h
+        # -- du mar.30/07 au mer.07/08
         # Lundi : 10h-15h
         # Mardi : 10h-15h
-        emp_2 = self.hr_employee_model.create({
+        # Jeudi : 10h-15h
+        # Vend. : 10h-15h
+        self.emp_2 = self.hr_employee_model.create({
             'name': 'Bertrand',
             'of_est_intervenant': True,
             'of_mode_horaires': 'advanced',
             'of_segment_ids': [
                 # HORAIRES PERMANENTS
                 (0, 0, {
-                    'date_deb': False,
+                    'date_deb': '1970-01-01',
                     'date_fin': '2019-06-30',
                     'permanent': True,
                     'creneau_ids': generate_creneaux_create_data([
@@ -136,8 +136,8 @@ class OfTestEmployees(common.TransactionCase):
                 }),
                 # HORAIRES TEMPORAIRES
                 (0, 0, {
-                    'date_deb': '2019-06-09',
-                    'date_fin': '2019-06-12',
+                    'date_deb': '2019-06-12',
+                    'date_fin': '2019-06-14',
                     'permanent': False,
                     'creneau_ids': generate_creneaux_create_data([
                         (jeudi, 11, 15),
@@ -149,25 +149,26 @@ class OfTestEmployees(common.TransactionCase):
                     'date_fin': '2019-07-03',
                     'permanent': False,
                     'creneau_ids': generate_creneaux_create_data([
-                        (mercredi, 15, 18),
-                        (vendredi, 8, 12),
+                        (lundi, 15, 18),
+                        (mercredi, 8, 12),
                     ])
                 }),
                 (0, 0, {
                     'date_deb': '2019-07-30',
-                    'date_fin': '2019-08-04',
+                    'date_fin': '2019-08-07',
                     'permanent': False,
                     'creneau_ids': generate_creneaux_create_data([
-                        (jeudi, 10, 15),
-                        (vendredi, 10, 15),
                         (lundi, 10, 15),
                         (mardi, 10, 15),
+                        (jeudi, 10, 15),
+                        (vendredi, 10, 15),
                     ])
                 }),
             ]
         })
 
-        emps = emp_1 | emp_2
+    def test_employees(self):
+        emps = self.emp_1 | self.emp_2
         intersec = emps.get_list_horaires_intersection('2019-01-01', '2019-12-31')
 
         # Horaires d'intersection attendus :
@@ -184,13 +185,13 @@ class OfTestEmployees(common.TransactionCase):
 
         # Vérification de la période de validité des intervalles
         for i, (deb, fin) in enumerate((
-                ('2019-01-01', '2019-06-08'),
-                ('2019-06-09', '2019-06-12'),
-                ('2019-06-13', '2019-06-30'),
+                ('2019-01-01', '2019-06-11'),
+                ('2019-06-12', '2019-06-14'),
+                ('2019-06-15', '2019-06-30'),
                 ('2019-07-01', '2019-07-03'),
                 ('2019-07-04', '2019-07-29'),
-                ('2019-07-30', '2019-08-04'),
-                ('2019-08-05', '2019-12-31')
+                ('2019-07-30', '2019-08-07'),
+                ('2019-08-08', '2019-12-31')
         )):
             self.assertEqual(
                 intersec[i][0],
@@ -207,7 +208,7 @@ class OfTestEmployees(common.TransactionCase):
         self.assertEqual(
             intersec[0],
             (
-                '2019-01-01', '2019-06-08',
+                '2019-01-01', '2019-06-11',
                 {
                     1: [(8.0, 12.0), (13.5, 17.0)],
                     2: [(8.0, 11.0), (11.5, 12.0), (13.0, 17.0)],
@@ -221,7 +222,7 @@ class OfTestEmployees(common.TransactionCase):
         self.assertEqual(
             intersec[1],
             (
-                '2019-06-09', '2019-06-12',
+                '2019-06-12', '2019-06-14',
                 {
                     1: [], 2: [], 3: [],
                     4: [(11.0, 12.0), (13.0, 15.0)],
@@ -234,7 +235,7 @@ class OfTestEmployees(common.TransactionCase):
         self.assertEqual(
             intersec[2],
             (
-                '2019-06-13', '2019-06-30',
+                '2019-06-15', '2019-06-30',
                 intersec[0][2]
             ),
             "Mauvais calcul d'intersection (#3)"
@@ -244,11 +245,10 @@ class OfTestEmployees(common.TransactionCase):
             (
                 '2019-07-01', '2019-07-03',
                 {
-                    1: [], 2: [],
-                    3: [(15.0, 17.0)],
-                    4: [],
-                    5: [(8.0, 12.0)],
-                    6: [], 7: []
+                    1: [(15.0, 17.0)],
+                    2: [],
+                    3: [(8.0, 12.0)],
+                    4: [], 5: [], 6: [], 7: []
                 }
             ),
             "Mauvais calcul d'intersection (#4)"
@@ -270,7 +270,7 @@ class OfTestEmployees(common.TransactionCase):
         self.assertEqual(
             intersec[5],
             (
-                '2019-07-30', '2019-08-04',
+                '2019-07-30', '2019-08-07',
                 {
                     1: [(10.0, 12.0), (13.0, 15.0)],
                     2: [(10.0, 12.0), (13.0, 15.0)],
@@ -285,7 +285,7 @@ class OfTestEmployees(common.TransactionCase):
         self.assertEqual(
             intersec[6],
             (
-                '2019-08-05', '2019-12-31',
+                '2019-08-08', '2019-12-31',
                 {
                     1: [],
                     2: [(8.0, 12.0)],
@@ -298,19 +298,19 @@ class OfTestEmployees(common.TransactionCase):
         )
 
         self.assertEqual(
-            emp_2.get_horaires_date('2019-06-20')[emp_2.id],
+            self.emp_2.get_horaires_date('2019-06-20')[self.emp_2.id],
             [[7.0, 9.0], [11.0, 14.0], [15.0, 19.0]],
             "Mauvais calcul d'horaire sur date (#1)"
         )
 
         self.assertEqual(
-            emp_2.get_horaires_date('2019-07-03')[emp_2.id],
-            [[15.0, 18.0]],
+            self.emp_2.get_horaires_date('2019-07-03')[self.emp_2.id],
+            [[8.0, 12.0]],
             "Mauvais calcul d'horaire sur date (#2)"
         )
 
         self.assertEqual(
-            emp_2.get_horaires_date('2019-07-04')[emp_2.id],
+            self.emp_2.get_horaires_date('2019-07-04')[self.emp_2.id],
             [[15.0, 19.0]],
             "Mauvais calcul d'horaire sur date (#3)"
         )
