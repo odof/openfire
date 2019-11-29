@@ -181,12 +181,12 @@
                 </script>
                 <h1 class="of_title"><b>
                     <span attrs="{'invisible':[('selected','=',True)]}">
-                        Proposition d'
+                        Proposition d'intervention pour
                     </span>
                     <span attrs="{'invisible':[('selected','!=',True)]}">
-                        Planifier une
+                        Planifier une intervention pour
                     </span>
-                    intervention pour <field name="employee_name" nolabel="1" class="oe_inline"/>
+                    <field name="employee_name" nolabel="1" class="oe_inline"/>
                 </b></h1>
                 <group>
                     <group>

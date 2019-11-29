@@ -171,7 +171,16 @@
                                     </div>
                                     <group colspan="2">
                                         <field name="tache_id" context="{'show_rec_icon_first': recurrence}"/>
-                                        <field name="duree" widget="float_time"/>
+                                        <label for="duree" string="Durées"/>
+                                        <div>
+                                            <field name="duree" widget="float_time" nolabel="1" class="oe_inline"/>
+                                            <i class="oe_grey oe_inline"> (estimée), </i>
+                                            <field name="duree_planif" widget="float_time" nolabel="1" class="oe_inline"/>
+                                            <i class="oe_grey oe_inline"> (planifiée), </i>
+                                            <field name="duree_restante" widget="float_time" nolabel="1" class="oe_inline"/>
+                                            <i class="oe_grey oe_inline"> (restante).</i>
+                                        </div>
+
                                         <field name="date_next" string="À partir du"/>
                                         <field name="date_next_fin" attrs="{'invisible': [('recurrence', '=', True)]}"/>
                                         <field name="date_fin" attrs="{'invisible': [('recurrence', '=', False)]}"/>
@@ -183,13 +192,24 @@
                                             <field name="recurring_rule_type" nolabel="1" class="oe_inline"/>
                                         </div>
                                         <field name="recurrence_tache" invisible="1"/>
-                                        <div colspan="2" attrs="{'invisible': [('recurrence', '=', '_field_recurrence_tache')]}">
+                                        <div colspan="2" attrs="{'invisible': [
+                                            '|',
+                                                ('recurrence', '=', '_field_recurrence_tache'),
+                                                ('recurrence', '=', False)]}">
                                             <b><i class="oe_grey">
-                                                Il y a une différence entre la récurrence de la tâche et celle de l'intervention à programmer.
+                                                La tâche de cette intervention est ponctuelle alors que cette intervention est récurrente.
                                             </i></b>
                                         </div>
-                                        <field name="duree_planif" widget="float_time"/>
-                                        <field name="duree_restante" widget="float_time"/>
+                                        <div colspan="2" attrs="{'invisible': [
+                                            '|',
+                                                ('recurrence', '=', '_field_recurrence_tache'),
+                                                ('recurrence', '=', True)]}">
+                                            <b><i class="oe_grey">
+                                                La tâche de cette intervention est récurrente alors que cette intervention est ponctuelle.
+                                            </i></b>
+                                        </div>
+                                        <!--field name="duree_planif" widget="float_time"/>
+                                        <field name="duree_restante" widget="float_time"/-->
                                     </group>
 
                                 </group>
