@@ -559,7 +559,7 @@ class OfPlanifCreneau(models.TransientModel):
 
         vals_list = []
         service_domain = [
-            ('state', 'in', ['to_plan', 'part_planned', 'late']),
+            #('state', 'in', ['to_plan', 'part_planned', 'late']),
             '|', ('jour_ids', 'in', self.num_jour),
                  ('jour_ids', '=', False),  # les jours peuvent ne pas être renseignés
             ('tache_id', 'in', taches_possibles.ids),
@@ -594,7 +594,7 @@ class OfPlanifCreneau(models.TransientModel):
                         service_domain.append(('address_zip', '>', zip_range.cp_max))
                 service_domain.append(('address_zip', 'not in', zip_range_excluded.ids))
         # services
-        services = self.env['of.service'].search(service_domain)
+        services = self.env['of.service'].search(service_domain).filter_state_poncrec_date(date=self.date_creneau)
         distance_max = self.distance_max * 1.3  # approximation
         priorite_max = 0
         lieu_prec = self.lieu_prec_manual_id or self.lieu_prec_id

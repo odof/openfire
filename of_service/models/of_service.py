@@ -129,6 +129,55 @@ class OfService(models.Model):
                 service.state = service.base_state
                 service.state_ponc = service.base_state
 
+    @api.multi
+    def filter_state_poncrec_date(self, date=fields.Date.today(), state_list=('to_plan', 'part_planned', 'late')):
+        un_mois = relativedelta(months=1)
+        date_filter_da = fields.Date.from_string(date)
+        dans_un_mois_da = date_filter_da + un_mois
+        il_y_a_un_mois_da = date_filter_da - un_mois
+        services_pass = self.env['of.service']
+        for service in self:
+            if service.base_state and service.base_state == 'calculated':
+                date_next_da = fields.Date.from_string(service.date_next)
+                date_last_da = service.date_last and fields.Date.from_string(service.date_last) or False
+                date_fin_da = service.date_fin and fields.Date.from_string(service.date_fin) or date_next_da + relativedelta(days=14)
+                if service.recurrence:
+                    # service.state_ponc = False
+                    if il_y_a_un_mois_da <= date_next_da <= date_filter_da and \
+                            (not date_last_da or date_last_da < il_y_a_un_mois_da):
+                        # prochaine planification à faire dans moins d'un mois
+                        # et pas de dernière intervention ou dernière intervention il y a plus d'un mois
+                        service_state = 'to_plan'
+                    elif date_last_da and (il_y_a_un_mois_da <= date_last_da <= date_filter_da):  # dernière intervention il y a moins d'un mois
+                        service_state = 'planned'
+                    elif date_last_da and (date_filter_da < date_last_da <= dans_un_mois_da):  # dernière intervention dans moins d'un mois
+                        service_state = 'planned_soon'
+                    elif date_next_da < il_y_a_un_mois_da:  # prochaine planification en retard de plus d'un mois
+                        service_state = 'late'
+                    elif date_fin_da and (date_fin_da < date_next_da or date_fin_da < date_filter_da):  # le service a expiré ou expire avant la date de prochaine planif
+                        service_state = 'done'
+                    else:  # par défaut
+                        service_state = 'progress'
+                else:
+                    # l'état 'annulé' est provoqué manuellement
+                    # dans le cas d'un service ponctuel, le champ 'date_next' correspond à la date de début de la fourchette de planification
+                    # et le champ 'date_fin' à la date de fin de la fourchette de planification
+                    # service.state_rec = False
+                    if date_fin_da < date_filter_da and service.duree_restante != 0:  # la durée restante n'est pas nulle et la date de fin est dépassée
+                        service_state = 'late'
+                    elif not date_last_da:  # aucune intervention planifiée
+                        service_state = 'to_plan'
+                    elif service.duree_restante == 0 and date_last_da < date_filter_da:  # durée restant == 0 et la dernière intervention planifiée est passée
+                        service_state = 'done'
+                    elif service.duree_restante == 0 and service.duree:  # durée restante == 0 et la dernière intervention planifiée est future
+                        service_state = 'all_planned'
+                    else:  # la durée restant n'est pas nulle et la date de fin est future
+                        service_state = 'part_planned'
+            else:
+                service_state = service.base_state
+            if service_state in state_list:
+                services_pass |= service
+        return services_pass
 
     @api.model
     def _search_last_date(self, operator, operand):
