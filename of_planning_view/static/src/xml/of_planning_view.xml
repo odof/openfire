@@ -111,7 +111,7 @@
             <div class="btn-group btn-group-sm">
                 <!-- vue 'jour' et 'mois' peut-être dans une implémentation future -->
                 <!--button class="btn btn-sm btn-default of_planning_button_day">Day</button-->
-                <button class="btn btn-sm btn-default of_planning_button_week">Week</button>
+                <!--button class="btn btn-sm btn-default of_planning_button_week">Week</button-->
                 <!--button class="btn btn-sm btn-default of_planning_button_month">Month</button-->
             </div>
         </div>
@@ -212,8 +212,10 @@
                 border-bottom: 1px solid #{record.color_ft};">
             <t t-set="attendees" t-value="record.attendee_other_ids"/>
             <t t-foreach="attendees">
-                <i class="of_calendar_attendee_box_flat"
+                <i t-if="record.view.rows[attendees_value] != undefined" class="of_calendar_attendee_box_flat"
                    t-attf-style="background: #{record.view.rows[attendees_value].color_bg}; border: 1px solid #0D0D0D; float: right; margin-left: 2px; margin-top: -3px;"/>
+                <i t-else="" class="of_calendar_attendee_box_flat"
+                   t-attf-style="background: grey; border: 1px solid #0D0D0D; float: right; margin-left: 2px; margin-top: -3px;"/>
             </t>
             <div class="of_planning_info of_planning_info_heures">
                 <i class="fa fa-clock-o"/><span class="of_ws"/>
@@ -265,8 +267,10 @@
         <div>
             <t t-set="attendees" t-value="record.attendee_other_ids"/>
             <t t-foreach="attendees">
-                <i class="of_calendar_attendee_box_flat"
+                <i t-if="record.view.rows[attendees_value] != undefined" class="of_calendar_attendee_box_flat"
                    t-attf-style="background: #{record.view.rows[attendees_value].color_bg}; border: 1px solid #0D0D0D; float: right; margin-left: 2px; margin-top: -3px;"/>
+                <i t-else="" class="of_calendar_attendee_box_flat"
+                   t-attf-style="background: grey; border: 1px solid #0D0D0D; float: right; margin-left: 2px; margin-top: -3px;"/>
             </t>
             <div>
                 <i class="fa fa-clock-o"/><span class="of_ws"/>
