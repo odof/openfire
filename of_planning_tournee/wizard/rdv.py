@@ -326,7 +326,6 @@ class OfTourneeRdv(models.TransientModel):
         Parcourt tous les jours inclus entre la date de début de recherche et la date de fin de recherche.
         Prend en compte les équipes qui peuvent effectuer la tache, et qui sont disponibles
         Ne prend pas en compte les jours non travaillés
-        @TODO: passer les jours travaillés en many2many vers of.jour (module of_utils)
         """
         while date_recherche_da < apres_recherche_da:
             date_recherche_da += un_jour

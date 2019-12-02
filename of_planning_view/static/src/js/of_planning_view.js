@@ -58,7 +58,7 @@ var MODE_COLUMN_NBS = {
 };
 /*
 NEXT: action click creneau dispo on_close, nettoyage et commentaire du code
-TODO: wizard de planification; ligne connectante: grouper connected divs
+TODO:
 */
 var PlanningView = View.extend({
     template: 'PlanningView',
@@ -127,7 +127,7 @@ var PlanningView = View.extend({
         this.date_stop = attrs.date_stop;
         this.all_day = attrs.all_day;
 
-        this.mode = attrs.mode || options.mode || "week";  // one of month, week or day
+        this.mode = attrs.mode || options.mode || "week";  // Just week for now. Later one of month, week or day.
         this.column_nb = MODE_COLUMN_NBS[this.mode];
         this.range_start = moment().startOf(this.mode)._d;
         this.range_stop = moment().endOf(this.mode)._d;
@@ -144,6 +144,9 @@ var PlanningView = View.extend({
         }
         console.log("PLANNING VIEW THIS: ",this);
         this.first_search_done = false;
+        this.on_today_clicked = _.debounce(this.on_today_clicked, 300, true);
+        this.on_next_clicked = _.debounce(this.on_next_clicked, 300, true);
+        this.on_prev_clicked = _.debounce(this.on_prev_clicked, 300, true);
     },
     /**
      *
@@ -259,19 +262,6 @@ var PlanningView = View.extend({
      *
      */
     start: function () {
-        //console.log("START", this.to_show_ids);
-        /*this.all_filters = {};
-        var filter_item, emp_id;
-        for (var i in this.to_show_ids) {
-            emp_id = this.to_show_ids[i];
-           //console.log(emp_id);
-            filter_item = {
-                value: emp_id,
-                input_id: emp_id + "_input",
-                is_checked: true,
-            };
-            this.all_filters[emp_id] = filter_item;
-        }*/
         this.$sidebar_container = this.$(".of_planning_sidebar_container");
         this.$table_container = this.$(".of_planning_table_container");
         this.$el.addClass(this.fields_view.arch.attrs.class);
@@ -375,12 +365,6 @@ var PlanningView = View.extend({
                 self._do_search(self.domain, self.context, self.group_by);
             }else{
                 self.first_search_done = true;
-                /*if (!isNullOrUndef(domain)) {
-                    self.domain = JSON.parse(domain);
-                }
-                if (!isNullOrUndef(context)) {
-                    self.context = JSON.parse(context);
-                }*/
                 console.log('do_search not done, planning view not inited');
             }
         })
@@ -464,32 +448,6 @@ var PlanningView = View.extend({
                         //console.log("self.res_ids",self.res_ids);
                         for (var j in event_res_ids) {
                             res_id = event_res_ids[j];
-                            /*if (!self.all_filters[res_id]) {
-                                filter_item = {
-                                    value: res_id,
-                                    input_id: res_id + "_input",
-                                    label: event[self.resource],
-                                    //color: self.get_color(key),
-                                    //avatar_model: (utils.toBoolElse(self.avatar_filter, true) ? self.avatar_filter : false ),
-                                    is_checked: true,
-                                };
-                                self.all_filters[res_id] = filter_item;
-                            };
-                            if (! _.contains(self.now_filter_ids, res_id)) {
-                                self.now_filter_ids.push(res_id);
-                            };
-                            if (!self.rows[res_id]) {
-                                row_options = {
-                                    "res_id": res_id,
-                                    //"head_column": "",
-                                    //"color_bg": event[self.color_bg] || "#7FFF00",
-                                    //"color_ft": event[self.color_ft] || "#0C0C0C",
-                                    "auto_render": false,
-                                }
-                                //console.log("PLANNING_ROECORD",planning_record);
-                                self.rows[res_id] = new PlanningView.Row(self.table,self,[],row_options);
-                            }*/
-                            //console.log("WEUT");
 
                             planning_record = new PlanningRecord(self.rows[res_id],self,event,record_options);
                             self.rows[res_id]["records_to_add"].push(planning_record);
@@ -502,13 +460,6 @@ var PlanningView = View.extend({
                 $.when(prom).then(function () {
                     if (self.sidebar) {
                         self.sidebar.reso_filter.render();
-                        /*if (self.sidebar.info_filter.rendered) {
-                           //console.log("ALREADY RENDERED!");
-                            self.sidebar.info_filter.apply_filters();
-                        }else{
-                            self.sidebar.info_filter.render(); //@TODO: trouver un meilleur endroit pour faire ça!//
-                        }*/
-
                         //console.log("self.now_filter_ids:",self.now_filter_ids);
                         for (var key in self.rows) {
                             var key_num = Number(key);
@@ -578,24 +529,7 @@ var PlanningView = View.extend({
      */
     get_all_filters_ordered: function() {
         var self = this
-        var filters = _.values(this.all_filters)/*.sort(function(f1,f2) {
-            return _.string.naturalCmp(f1.label, f2.label);
-        });/*
-        var dfd = $.Deferred();
-        var p = dfd.promise({target: filters});
-        $.when(self._set_all_custom_colors()).then(function(kays) {
-                /*for (var i=0; i<filters.length; i++) { // doesn't work somehow. doesn't need to work apparently
-                    if (filters[i].value in kays) {
-                        var index = filters[i].value;
-                        filters[i]['color_bg'] = self.all_filters[index].color_bg;
-                        filters[i]['color_ft'] = self.all_filters[index].color_ft;
-                        filters[i]['custom_colors'] = true;
-                    }
-                }* /
-                dfd.resolve();
-            });
-
-        return p;*/
+        var filters = _.values(this.all_filters);
         return filters;
     },
     render_table: function() {
@@ -641,6 +575,7 @@ var PlanningView = View.extend({
             self.dataset.index = null;
             self.do_switch_view('form');
         });
+        //
 
         this.$buttons.find(".of_planning_button_prev").click(
             this.proxy(self.on_prev_clicked));
@@ -740,12 +675,13 @@ var PlanningView = View.extend({
     on_reload_events: function () {
         this._do_search(this.domain, this.context, this.group_by);
     },
-    on_reload_partiel: function (res_id, column) {
-        //console.log("on_reload_partiel", res_id, column);
+    on_reload_column: function (res_id, column, columns_done=[]) {
+        console.log("on_reload_column", res_id, column);
         var self = this;
         var date_column = moment(this.range_start).add(column, 'days')
         var date_fin = date_column.endOf('day')._d;
         date_column = date_column._d;
+        var columns_todo = [];
         var event_domain = this.get_range_domain(this.domain || [], date_column, date_fin, [res_id]);
         //event_domain = new CompoundDomain(event_domain, ['id', '=', res_id]);
         //console.log("event_domain",event_domain);
@@ -762,15 +698,6 @@ var PlanningView = View.extend({
                     event_res_ids = event[self.resource];
                     // how many days?
                     day_span = moment(event[self.date_stop]).startOf('day').diff(moment(event[self.date_start]).startOf('day'), 'days')+1;
-                    //console.log("EVENT:",event);
-                    //console.log("DAY SPAN:",day_span);
-                    if (day_span > 1) {
-                        col_offset_stop = moment(event[self.date_stop]).startOf('day').diff(moment(self.range_start), 'days');
-                        //col_offset_stop = Math.min(col_offset_stop,6);
-                    }else{
-                        col_offset_stop = undefined;
-                    }
-                    //console.log("duration: ",day_span);
                     // the column index to insert the record
                     col_offset_start = moment(event[self.date_start]).startOf('day').diff(moment(self.range_start), 'days');
                     if (col_offset_start < 0) {
@@ -778,6 +705,21 @@ var PlanningView = View.extend({
                     }else if (col_offset_start >= self.column_nb) {
                        //console.log("TROP TARD");
                     }
+                    //console.log("EVENT:",event);
+                    //console.log("DAY SPAN:",day_span);
+                    if (day_span > 1) {  // multiple day record, we need to reload every column this record is in
+                        col_offset_stop = moment(event[self.date_stop]).startOf('day').diff(moment(self.range_start), 'days');
+                        /*for (var c=Math.max(0, col_offset_start); c < Math.min(self.column_nb, col_offset_stop + 1)) {
+                            if (!_.contains(columns_done, c) && !_.contains(columns_todo, c) && c != column) {
+                                columns_todo.push(c)
+                            }
+                        }*/
+                        //col_offset_stop = Math.min(col_offset_stop,6);
+                    }else{
+                        col_offset_stop = undefined;
+                    }
+                    //console.log("duration: ",day_span);
+                    
                     record_options = {
                         "col_offset_start": col_offset_start,
                         "col_offset_stop": col_offset_stop,
@@ -874,7 +816,9 @@ var PlanningView = View.extend({
         //console.log("event data:",event.data);   event.target.id
         this.do_execute_action(event.data, this.dataset, undefined, function(){return})//_.bind(self.reload_record, this, event.target));
     },
-
+    /**
+     *  Init columns data based on mode. right now just 'week'
+     */
     set_columns: function() {
         switch (this.mode) {
             case "week": return this.set_columns_week();
@@ -1343,25 +1287,6 @@ PlanningView.Row = Widget.extend({
     },
 });
 
-/*var PlanningFillerBar = Widget.extend({
-    template: 'PlanningView.fillerbar',
-    init: function(row, column, fillerbar_data, view) {
-        this._super.apply(this, arguments);
-        this.row = row;
-        this.res_id = row.res_id;
-        this.column = column;
-        this.fillerbar_data = fillerbar_data;
-        this.view = view;
-    },
-    render: function() {
-        var $la_div = $("#of_planning_fillerbar_" + this.res_id + "_" + this.column);
-        if ($la_div.length > 0) {
-           //console.log("TROUVÉ",$la_div);
-        }else{
-           //console.log("pas trouvé...")
-        }
-    },
-});*/
 
 var PlanningCreneauDispo = Widget.extend({
     /**
@@ -1459,7 +1384,7 @@ var PlanningCreneauDispo = Widget.extend({
         this.trigger_up('reload_events');
     },
     reload_column: function () {
-        this.view.on_reload_partiel(this.row.res_id, this.col_offset);
+        this.view.on_reload_column(this.row.res_id, this.col_offset);
     },
     /**
      *  Ouvre le pop-up de planification @todo fonction on_close
@@ -1481,7 +1406,7 @@ var PlanningCreneauDispo = Widget.extend({
                 var options = {
                     'additional_context': pyeval.eval('context', additional_context),  // pour une raison inconnue le additional_context n'est pas pris en compte avant
                     'on_close': function () {self.reload_secteur();},
-                };  // @todo: appel reload_events
+                };
                 //return self.view.ViewManager.action_manager.ir_actions_act_window(result,options);
                 return self.view.ViewManager.action_manager.do_action(result,options);
             }).then(function(){
@@ -1516,7 +1441,8 @@ var PlanningCreneauDispo = Widget.extend({
                 var options = {
                     'additional_context': pyeval.eval('context', additional_context),  // pour une raison inconnue le additional_context n'est pas pris en compte avant
                     'on_close': function () {self.reload_events();},
-                };  // @todo: appel reload_events
+                    //'on_close': function () {self.reload_column();},
+                };  // @todo: appel reload_column
                 //return self.view.ViewManager.action_manager.ir_actions_act_window(result,options);
                 return self.view.ViewManager.action_manager.do_action(result,options);
             }).then(function(){
@@ -1533,14 +1459,8 @@ var PlanningRecord = Widget.extend({
     init: function(row, view, record, options) {
         //console.log('MapRecord.init arguments: ',arguments);
         this.id = record.id;
-        console.log(record.id);
         this._super(row);
         this.row = row;
-        if (!this.row.record_consoled) {
-           //console.log("PlanningRecord",record);
-           //console.log("row color",this.row.color_bg);
-            this.row.record_consoled = true;
-        }
         this.view = view;
         this.options = options;
         //this.color_bg = options.color_bg;
@@ -1762,17 +1682,6 @@ PlanningView.SidebarResoFilter = Widget.extend({
     render: function() {
         var self = this;
         self.$('.of_planning_contacts').html(qweb.render('PlanningView.sidebar.contacts', { filters: self.view.all_filters }));
-        /*
-        var fil = self.view.get_all_filters_ordered()
-        //async
-        $.when(fil).then(function(){ // fil is a promise
-            console.log("filters")
-            var filters = _.filter(fil.target, function(filter) {
-                return _.contains(self.view.now_filter_ids, filter.value);
-            });
-            //console.log("filters",filters);
-            self.$('.of_planning_contacts').html(qweb.render('PlanningView.sidebar.contacts', { filters: self.view.all_filters }));
-        });*/
     },
     on_click: function(e) {
        //console.log("CLICK");

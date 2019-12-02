@@ -285,7 +285,7 @@ class OfService(models.Model):
         string=u'Au plus tard le', compute="compute_date_next_fin", inverse="inverse_date_next_fin",
         help=u'Échéance de la prochaine planification')
     date_next_last = fields.Date('Prochaine planification', help=u"Champ pour conserver une possibilité de rollback")
-    date_fin = fields.Date(u"Date d'échéance")  #TODO: pour les servide ponc: "Au plus tard le"
+    date_fin = fields.Date(u"Date d'échéance")
 
     # Partner-related fields
     address_address = fields.Char('Adresse', related='address_id.contact_address', readonly=True)

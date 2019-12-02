@@ -558,68 +558,6 @@
             </field>
         </record>
 
-        <!--record id="view_of_service_ponc_filter" model="ir.ui.view">
-            <field name="name">of.service.select</field>
-            <field name="model">of.service</field>
-            <field name="type">search</field>
-            <field name="arch" type="xml">
-                <search>
-                    <filter string="À faire" name="filter_todo" domain="[('state', '=', 'todo')]"/>
-                    <filter string="Fait" name="filter_done" domain="[('state', '=', 'done')]"/>
-                    <filter string="Annulé" name="filter_cancel" domain="[('state', '=', 'cancel')]"/>
-                    <separator/>
-                    <filter string="Récurrent" name="filter_rec" domain="[('recurrence', '=', True)]"/>
-                    <filter string="Ponctuel" name="filter_ponc" domain="[('recurrence', '=', False)]"/>
-                    <separator/>
-                    <filter string="Semaine en cours" name="this_week"
-                            domain="['|',
-                                     '&amp;', '&amp;', ('recurrence', '=', True),
-                                     ('date_next', u'&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
-                                     ('date_next', u'&lt;', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d')),
-                                     '&amp;', '&amp;', ('recurrence', '=', False),
-                                     ('date_fin', u'&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
-                                     ('date_next', u'&lt;', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
-                    <filter string="Semaine prochaine" name="next_week"
-                            domain="['|',
-                                     '&amp;', '&amp;', ('recurrence', '=', True),
-                                     ('date_next', u'&gt;=', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d')),
-                                     ('date_next', u'&lt;', (context_today() + datetime.timedelta(days=14-context_today().weekday())).strftime('%Y-%m-%d')),
-                                     '&amp;', '&amp;', ('recurrence', '=', False),
-                                     ('date_fin', u'&gt;=', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d')),
-                                     ('date_next', u'&lt;', (context_today() + datetime.timedelta(days=14-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
-                    <filter string="Mois en cours" name="this_month"
-                            domain="['|',
-                                     '&amp;', '&amp;', ('recurrence', '=', True),
-                                     ('date_next', u'&gt;=', context_today().strftime('%Y-%m-01')),
-                                     ('date_next', u'&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
-                                     '&amp;', '&amp;', ('recurrence', '=', False),
-                                     ('date_fin', u'&gt;=', context_today().strftime('%Y-%m-01')),
-                                     ('date_next', u'&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d'))]"/>
-                    <filter string="Mois prochain" name="next_month"
-                            domain="['|',
-                                     '&amp;', '&amp;', ('recurrence', '=', True),
-                                     ('date_next', u'&gt;=', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
-                                     ('date_next', u'&lt;', (context_today() + relativedelta(day=1,months=2)).strftime('%Y-%m-%d')),
-                                     '&amp;', '&amp;', ('recurrence', '=', False),
-                                     ('date_fin', u'&gt;=', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
-                                     ('date_next', u'&lt;', (context_today() + relativedelta(day=1,months=2)).strftime('%Y-%m-%d'))]"/>
-                    <field name="date_next" filter_domain="[('date_next','&lt;=',self)]"
-                           string="Prochaine intervention min" context="{'date_next_max': self}"/>
-                    <field name="partner_id"/>
-                    <field name="address_id"/>
-                    <field name="address_zip" string="CP"/>
-                    <field name="tache_id"/>
-                    <field name="mois_ids"/>
-                    <field name="jour_ids"/>
-                    <field name="date_fin" invisible="1"/>
-                    <field name="date_next" invisible="1"/>
-                    <field name="recurrence" invisible="1"/>
-                    <field name="date_fin_min" filter_domain="[('date_fin','&gt;=',self)]"/>
-                    <field name="date_fin_max" filter_domain="[('date_fin','&lt;=',self)]"/>
-                </search>
-            </field>
-        </record-->
-
 <!--##########################################################################################################################-->
 <!--#################################################________Actions_________#################################################-->
 <!--##########################################################################################################################-->
