@@ -631,7 +631,7 @@
                     <field name="tag_ids"/>
                     <templates>
                         <t t-name="of_map_record_box">
-                            <div t-attf-class="#{map_record_color(record.of_color_map.raw_value)} of_map_record_global_click"><!-- TODO: gestion couleur -->
+                            <div t-attf-class="#{map_record_color(record.of_color_map.raw_value)} of_map_record_global_click">
                                 <div class="of_map_record_buttons">
                                     <i class="of_map_record_close fa fa-lg fa-times"/>
                                     <!--i class="of_map_record_min fa fa-lg fa-minus"/>  later implementation...
@@ -704,7 +704,6 @@
                     'default_user_id': uid,
             }</field>
         </record>
-
 
 <!-- #######################################################################################
                                         VENTES

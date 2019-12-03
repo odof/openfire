@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, models, fields
-from datetime import datetime, timedelta, date as d_date
+from datetime import datetime, timedelta, date
 import pytz
 from odoo.exceptions import UserError
+
 import urllib, json, requests
+
+from odoo.tools.float_utils import float_compare
 
 SEARCH_MODES = [
     ('distance', u'Distance (km)'),
@@ -14,11 +17,14 @@ SEARCH_MODES = [
 ROUTING_BASE_URL = "http://s-hotel.openfire.fr:5000/"
 ROUTING_VERSION = "v1"
 ROUTING_PROFILE = "driving"
-
+"""
+bug description quand changement de tache ou service lié puis changé?
+# refonte employés et équipes: dans un premier temp, on limite la prise de rdv aux tache à 1 intervenant
+"""
 def hours_to_strs(*hours):
     """ Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'
     """
-    return tuple("%02dh%02d" % (hour, round((hour % 1) * 60)) for hour in hours)
+    return tuple("%dh%02d" % (hour, round((hour % 1) * 60)) if hour % 1 else "%dh" % (hour) for hour in hours)
 
 class OfTourneeRdv(models.TransientModel):
     _name = 'of.tournee.rdv'
@@ -52,7 +58,7 @@ class OfTourneeRdv(models.TransientModel):
         elif active_model in ["res.partner", "sale.order"]:
             partner = self._default_partner()
             if partner:
-                service = self.env['of.service'].search([('partner_id', '=', partner.id)], limit=1)
+                service = self.env['of.service'].search([('partner_id', '=', partner.id),('recurrence', '=', True)], limit=1)
         return service
 
     @api.model
@@ -72,6 +78,8 @@ class OfTourneeRdv(models.TransientModel):
                 return False
             partner = order.partner_id
             address = order.partner_shipping_id or order.partner_id
+        else:
+            address = False
 
         if address and not (address.geo_lat or address.geo_lng):
             address = partner_obj.search(['|', ('id', '=', partner.id), ('parent_id', '=', partner.id),
@@ -81,17 +89,26 @@ class OfTourneeRdv(models.TransientModel):
 
     name = fields.Char(string=u'Libellé', size=64, required=False)
     description = fields.Html(string='Description')
-    tache_id = fields.Many2one('of.planning.tache', string='Prestation', required=True)
-    equipe_id = fields.Many2one('of.planning.equipe', string=u"Équipe")
-    pre_equipe_ids = fields.Many2many('of.planning.equipe', string=u'Équipes', domain="[('tache_ids', 'in', tache_id)]")
+    tache_id = fields.Many2one('of.planning.tache', string=u'Tâche', required=True)
+    employee_id = fields.Many2one('hr.employee', string=u"Intervenant")
+    pre_employee_ids = fields.Many2many(
+        'hr.employee', string=u"Pré-sélection d'intervenants",
+        domain="['|', ('of_tache_ids', 'in', tache_id), ('of_toutes_taches', '=', True)]",
+        help=u"pré-sélection des intervenants")
     duree = fields.Float(string=u'Durée', required=True, digits=(12, 5))
     planning_ids = fields.One2many('of.tournee.rdv.line', 'wizard_id', string='Proposition de RDVs')
-    planning_tree_ids = fields.One2many('of.tournee.rdv.line', 'wizard_id', string='Proposition de RDVs', domain=[('allday', '=', False)])
+    planning_tree_ids = fields.One2many(
+        'of.tournee.rdv.line', 'wizard_id', string='Proposition de RDVs',
+        domain=[('intervention_id', '=', False), ('allday', '=', False)])
     date_propos = fields.Datetime(string=u'RDV Début')
-    date_propos_hour = fields.Float(string=u'Heude de début', digits=(12, 5))
-    date_recherche_debut = fields.Date(string='À partir du', required=True, default=lambda *a: (d_date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
-    date_recherche_fin = fields.Date(string="Jusqu'au", required=True, default=lambda *a: (d_date.today() + timedelta(days=7)).strftime('%Y-%m-%d'))
-    partner_id = fields.Many2one('res.partner', string='Client', required=True, readonly=True, default=lambda x: x._default_partner())
+    date_propos_hour = fields.Float(string=u'Heure de début', digits=(12, 5))
+    date_recherche_debut = fields.Date(
+        string=u"À partir du", required=True,
+        default=lambda *a: (date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
+    date_recherche_fin = fields.Date(
+        string="Jusqu'au", required=True, default=lambda *a: (date.today() + timedelta(days=7)).strftime('%Y-%m-%d'))
+    partner_id = fields.Many2one(
+        'res.partner', string='Client', required=True, readonly=True, default=lambda x: x._default_partner())
     partner_address_id = fields.Many2one(
         'res.partner', string="Adresse d'intervention", required=True, default=lambda x: x._default_address(),
         domain="['|', ('id', '=', partner_id), ('parent_id', '=', partner_id)]")
@@ -106,24 +123,25 @@ class OfTourneeRdv(models.TransientModel):
         'of.service', string='Service client', default=lambda x: x._default_service(),
         domain="[('partner_id', '=', partner_id)]")
     creer_recurrence = fields.Boolean(
-        string="Créer récurrence?", default=True,
-        help="Si cette case est cochée et qu'il n'existe pas de service lié à cette intervention, en crééra un.")
+        string=u"Créer récurrence?", default=True,
+        help=u"Si cette case est cochée et qu'il n'existe pas de service lié à cette intervention, en crééra un.")
     date_next = fields.Date(string=u'Prochaine intervention', help=u"Date à partir de laquelle programmer la prochaine intervention")
     mode_recherche = fields.Selection(SEARCH_MODES, string="Mode de recherche", required=True, default="distance")
     max_recherche = fields.Float(string="Maximum")
 
-    zero_result = fields.Boolean(string="Recherche infructueuse", default=False, help="Aucun résultat")
-    zero_dispo = fields.Boolean(string="Recherche infructueuse", default=False, help="Aucun résultat suffisamment proche")
+    zero_result = fields.Boolean(string="Recherche infructueuse", default=False, help=u"Aucun résultat")
+    zero_dispo = fields.Boolean(
+        string="Recherche infructueuse", default=False, help=u"Aucun résultat suffisamment proche")
     display_res = fields.Boolean(string=u"Voir Résultats", default=False)
-    res_line_id = fields.Many2one("of.tournee.rdv.line", string="Créneau Sélectionné")
+    res_line_id = fields.Many2one("of.tournee.rdv.line", string=u"Créneau Sélectionné")
 
     # champs ajoutés pour la vue map
     geo_lat = fields.Float(related='partner_address_id.geo_lat', readonly=True)
     geo_lng = fields.Float(related='partner_address_id.geo_lng', readonly=True)
     precision = fields.Selection(related='partner_address_id.precision', readonly=True)
     partner_name = fields.Char(related='partner_id.name')
-    geocode_retry = fields.Boolean("Geocodage retenté")
-    ignorer_geo = fields.Boolean("Ignorer données géographiques")
+    geocode_retry = fields.Boolean(u"Geocodage retenté")
+    ignorer_geo = fields.Boolean(u"Ignorer données géographiques")
 
     @api.onchange('mode_recherche')
     def _onchange_mode_recherche(self):
@@ -158,15 +176,17 @@ class OfTourneeRdv(models.TransientModel):
                                               ('tache_id', '=', self.tache_id.id)], limit=1)
                 if service:
                     vals['service_id'] = service
+            if not vals.get('service_id', False):
+                vals['creer_recurrence'] = self.tache_id.recurrence
 
             if self.tache_id.duree:
                 vals['duree'] = self.tache_id.duree
 
-            equipes = []
-            for equipe in self.pre_equipe_ids:
-                if equipe in self.tache_id.equipe_ids:
-                    equipes.append(equipe.id)
-            vals['pre_equipe_ids'] = equipes
+            employees = []
+            for employee in self.pre_employee_ids:
+                if employee in self.tache_id.employee_ids:
+                    employees.append(employee.id)
+            vals['pre_employee_ids'] = employees
         self.update(vals)
 
     @api.onchange('service_id')
@@ -187,13 +207,13 @@ class OfTourneeRdv(models.TransientModel):
         self.update(vals)
 
     @api.multi
-    def _get_equipe_possible(self):
+    def _get_employee_possible(self):
         self.ensure_one()
-        equipe_ids = []
+        employee_ids = []
         for planning in self.planning_ids:
-            if planning.equipe_id.id not in equipe_ids:
-                equipe_ids.append(planning.equipe_id.id)
-        return equipe_ids
+            if planning.employee_id.id not in employee_ids:
+                employee_ids.append(planning.employee_id.id)
+        return employee_ids
 
     @api.multi
     def button_geocode(self):
@@ -214,7 +234,7 @@ class OfTourneeRdv(models.TransientModel):
           ne charge pas correctement la vue du planning.
         """
         self.compute()
-        context = dict(self._context, equipe_domain=self._get_equipe_possible())
+        context = dict(self._context, employee_domain=self._get_employee_possible())
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'of.tournee.rdv',
@@ -234,222 +254,238 @@ class OfTourneeRdv(models.TransientModel):
         """
         #TODO: finir de commenter
         self.ensure_one()
+        compare_precision = 5
 
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')
         tz = pytz.timezone(self._context['tz'])
 
-        equipe_obj = self.env['of.planning.equipe']
+        employee_obj = self.env['hr.employee']
         wizard_line_obj = self.env['of.tournee.rdv.line']
         intervention_obj = self.env['of.planning.intervention']
 
-        address = self.partner_address_id
         service = self.service_id
-        jours = [jour.numero for jour in service.jour_ids] if service else range(1, 6)
 
         # Suppression des anciens créneaux
         self.planning_ids.unlink()
 
         # Récupération des équipes
-        equipes = self.env['of.planning.equipe']
-        if not self.tache_id.equipe_ids:
-            raise UserError(u"Aucune équipe ne peut réaliser cette tâche.")
-        if self.pre_equipe_ids:
-            for equipe in self.pre_equipe_ids:
-                if equipe in self.tache_id.equipe_ids:
-                    equipes |= equipe
-            if len(equipes) == 0:
-                raise UserError(u"Aucune des équipes sélectionnées n'a la compétence pour réaliser cette prestation.")
-        else:
-            equipes = self.tache_id.equipe_ids
+        if not self.tache_id.employee_ids:
+            raise UserError(u"Aucun intervenant ne peut réaliser cette tâche.")
+        employees = self.tache_id.employee_ids
+        if self.pre_employee_ids:
+            employees &= self.pre_employee_ids
+            if not employees:
+                raise UserError(u"Aucun des intervenants sélectionnés n'a la compétence pour réaliser cette prestation.")
+
+        # Jours du service, jours travaillés des équipes et horaires de travail
+        jours_service = [jour.numero for jour in service.jour_ids] if service else range(1, 8)
 
         un_jour = timedelta(days=1)
-
         # --- Création des créneaux de début et fin de recherche ---
-        d_avant_recherche = fields.Date.from_string(self.date_recherche_debut) - un_jour
-        avant_recherche = fields.Date.to_string(d_avant_recherche)
-        dt_avant_recherche_debut = tz.localize(datetime.strptime(avant_recherche+" 00:00:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
-        dt_avant_recherche_fin = tz.localize(datetime.strptime(avant_recherche+" 23:59:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
-        d_apres_recherche = fields.Date.from_string(self.date_recherche_fin) + un_jour
-        apres_recherche = fields.Date.to_string(d_apres_recherche)
-        dt_apres_recherche_debut = tz.localize(datetime.strptime(apres_recherche+" 00:00:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
-        dt_apres_recherche_fin = tz.localize(datetime.strptime(apres_recherche+" 23:59:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
+        avant_recherche_da = fields.Date.from_string(self.date_recherche_debut) - un_jour
+        avant_recherche = fields.Date.to_string(avant_recherche_da)
+        avant_recherche_debut_dt = tz.localize(datetime.strptime(avant_recherche+" 00:00:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
+        avant_recherche_fin_dt = tz.localize(datetime.strptime(avant_recherche+" 23:59:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
+        apres_recherche_da = fields.Date.from_string(self.date_recherche_fin) + un_jour
+        apres_recherche = fields.Date.to_string(apres_recherche_da)
+        apres_recherche_debut_dt = tz.localize(datetime.strptime(apres_recherche+" 00:00:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
+        apres_recherche_fin_dt = tz.localize(datetime.strptime(apres_recherche+" 23:59:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
 
-        for equipe in equipes:
+        for employee in employees:
             wizard_line_obj.create({
                 'name': u"Début de la recherche",
-                'debut_dt': dt_avant_recherche_debut,
-                'fin_dt': dt_avant_recherche_fin,
+                'debut_dt': avant_recherche_debut_dt,
+                'fin_dt': avant_recherche_fin_dt,
                 'date_flo': 0.0,
                 'date_flo_deadline': 23.9,
-                'date': d_avant_recherche,
+                'date': avant_recherche_da,
                 'wizard_id': self.id,
-                'equipe_id': equipe.id,
+                'employee_id': employee.id,
                 'intervention_id': False,
                 'disponible': False,
                 'allday': True,
             })
             wizard_line_obj.create({
                 'name': "Fin de la recherche",
-                'debut_dt': dt_apres_recherche_debut,
-                'fin_dt': dt_apres_recherche_fin,
+                'debut_dt': apres_recherche_debut_dt,
+                'fin_dt': apres_recherche_fin_dt,
                 'date_flo': 0.0,
                 'date_flo_deadline': 23.9,
-                'date': d_apres_recherche,
+                'date': apres_recherche_da,
                 'wizard_id': self.id,
-                'equipe_id': equipe.id,
+                'employee_id': employee.id,
                 'intervention_id': False,
                 'disponible': False,
                 'allday': True,
             })
 
         # --- Recherche des créneaux ---
-        d_recherche = d_avant_recherche
+        date_recherche_da = avant_recherche_da
         u"""
         Parcourt tous les jours inclus entre la date de début de recherche et la date de fin de recherche.
         Prend en compte les équipes qui peuvent effectuer la tache, et qui sont disponibles
         Ne prend pas en compte les jours non travaillés
-        @TODO: passer les jours travaillés en many2many vers of.jour (module of_utils)
         """
-        while d_recherche < d_apres_recherche:
-            d_recherche += un_jour
-            num_jour = d_recherche.isoweekday()
+        while date_recherche_da < apres_recherche_da:
+            date_recherche_da += un_jour
+            num_jour = date_recherche_da.isoweekday()
 
             # Restriction aux jours spécifiés dans le service
-            while num_jour not in jours:
-                d_recherche += un_jour
-                num_jour = (num_jour + 1) % 7
+            while num_jour not in jours_service:
+                date_recherche_da += un_jour
+                num_jour = ((num_jour + 1) % 7) or 7  # num jour de la semaine entre 1 et 7
             # Arreter la recherche si on dépasse la date de fin
-            if d_recherche >= d_apres_recherche:
+            if date_recherche_da >= apres_recherche_da:
                 continue
-            str_d_recherche = fields.Date.to_string(d_recherche)
+            date_recherche_str = fields.Date.to_string(date_recherche_da)
+            horaires_du_jour = employees.get_horaires_date(date_recherche_str)
 
             # Interdiction de chercher dans les tournées bloquées ou complètes
-            self._cr.execute("SELECT equipe_id "
+            self._cr.execute("SELECT employee_id "
                              "FROM of_planning_tournee "
-                             "WHERE equipe_id IN %s "
+                             "WHERE employee_id IN %s "
                              "  AND date = %s"
                              "  AND (is_bloque OR is_complet)",
-                             (equipe._ids, str_d_recherche))
-            equipes_bloquees = [row[0] for row in self._cr.fetchall()]
-            equipes_dispo = [equipe_id for equipe_id in equipes._ids if equipe_id not in equipes_bloquees]
-            if not equipes_dispo:
+                             (employees._ids, date_recherche_str))
+            employees_bloques = [row[0] for row in self._cr.fetchall()]
+            employees_dispo = []
+
+            for employee in employees:
+                employee_id = employee.id
+                if employee_id not in employees_bloques and horaires_du_jour[employee_id] != []:
+                    employees_dispo.append(employee_id)
+            if employees_dispo == []:
                 continue
 
             # Recherche de créneaux pour la date voulue et les équipes sélectionnées
-            dt_jour_deb = tz.localize(datetime.strptime(str_d_recherche+" 00:00:00", "%Y-%m-%d %H:%M:%S"))
-            dt_jour_fin = tz.localize(datetime.strptime(str_d_recherche+" 23:59:00", "%Y-%m-%d %H:%M:%S"))
+            jour_deb_dt = tz.localize(datetime.strptime(date_recherche_str+" 00:00:00", "%Y-%m-%d %H:%M:%S"))
+            jour_fin_dt = tz.localize(datetime.strptime(date_recherche_str+" 23:59:00", "%Y-%m-%d %H:%M:%S"))
             # Récupération des interventions déjà planifiées
-            interventions = intervention_obj.search([('equipe_id', 'in', equipes_dispo),
-                                                     ('date', '<=', str_d_recherche),
-                                                     ('date_deadline', '>=', str_d_recherche),
+            interventions = intervention_obj.search([('employee_ids', 'in', employees_dispo),
+                                                     ('date', '<=', date_recherche_str),
+                                                     ('date_deadline', '>=', date_recherche_str),
                                                      ('state', 'in', ('draft', 'confirm', 'done', 'unfinished')),
                                                      ], order='date')
 
-            equipe_intervention_dates = {equipe_id: [] for equipe_id in equipes_dispo}
+            employee_intervention_dates = {employee_id: [] for employee_id in employees_dispo}
             for intervention in interventions:
                 intervention_dates = [intervention]
                 for intervention_date in (intervention.date, intervention.date_deadline):
-                    # Conversion des dates de début et de fin en nombres flottants et à l'heure locale
-                    dt_intervention_local = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(intervention_date))
+                    # Conversion des dates de début et de fin en nombre flottant et à l'heure locale
+                    date_intervention_locale_dt = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(intervention_date))
 
                     # Comme on n'affiche que les heures, il faut s'assurer de rester dans le bon jour
                     #   (pour les interventions étalées sur plusieurs jours)
-                    dt_intervention_local = max(dt_intervention_local, dt_jour_deb)
-                    dt_intervention_local = min(dt_intervention_local, dt_jour_fin)
-                    flo_dt_intervention_local = round(dt_intervention_local.hour +
-                                                      dt_intervention_local.minute / 60.0 +
-                                                      dt_intervention_local.second / 3600.0, 5)
-                    intervention_dates.append(flo_dt_intervention_local)
+                    date_intervention_locale_dt = max(date_intervention_locale_dt, jour_deb_dt)
+                    date_intervention_locale_dt = min(date_intervention_locale_dt, jour_fin_dt)
+                    date_intervention_locale_flo = round(date_intervention_locale_dt.hour +
+                                                         date_intervention_locale_dt.minute / 60.0 +
+                                                         date_intervention_locale_dt.second / 3600.0, 5)
+                    intervention_dates.append(date_intervention_locale_flo)
 
-                equipe_intervention_dates[intervention.equipe_id.id].append(intervention_dates)  # (intervention_id, flo_debut, flo_fin)
+                for employee_id in intervention.employee_ids.ids:
+                    employee_intervention_dates[employee_id].append(intervention_dates)  # (intervention_id, flo_debut, flo_fin)
 
-            # Calcul des créneaux
-            # @todo: Gestion des employés dans plusieurs équipes
-            for equipe in equipe_obj.browse(equipes_dispo):
-                intervention_dates = equipe_intervention_dates[equipe.id]
-                deb = equipe.hor_md
-                fin = equipe.hor_mf
-                ad = equipe.hor_ad
+            # Calcul des créneaux dispos
+            for employee in employee_obj.browse(employees_dispo):
+                intervention_dates = employee_intervention_dates[employee.id]
+
+                horaires_employee = horaires_du_jour[employee.id]
+
+                index_courant = 0
+                deb, fin = horaires_employee[index_courant]  # horaires courants
                 creneaux = []
-                # @todo: possibilité intervention chevauchant la nuit
+                # @todo: Possibilité intervention chevauchant la nuit
                 for intervention, intervention_deb, intervention_fin in intervention_dates + [(False, 24, 24)]:
-                    if deb < intervention_deb and deb < fin:
+                    # Calcul du temps disponible avant l'intervention étudiée
+                    if float_compare(intervention_deb, deb, compare_precision) == 1:
                         # Un trou dans le planning, suffisant pour un créneau?
-                        if deb < ad and intervention_deb >= ad:
-                            # On passe du matin à l'après-midi
-                            # On vérifie la durée cumulée de la matinée et de l'après-midi car une intervention peut
-                            # commencer avant la pause repas
-                            intervention_deb = min(intervention_deb, equipe.hor_af)
-                            duree = equipe.hor_mf - deb + intervention_deb - ad
-                            if duree >= self.duree:
-                                # deb < fin donc il y a du temps disponible le matin
-                                creneaux.append((deb, fin, equipe))
-                                if ad < intervention_deb:
-                                    # Il y a du temps disponible entre le début d'après-midi et le début de l'intervention
-                                    creneaux.append((ad, intervention_deb, equipe))
-                            fin = equipe.hor_af
+                        duree = 0.0
+                        creneaux_temp = []
+                        while float_compare(fin, intervention_deb, compare_precision) != 1:   # fin <= intervention_deb
+                            # Le temps disponible est éclaté avec des temps de pause
+                            duree += fin - deb
+                            creneaux_temp.append((deb, fin))
+                            index_courant += 1
+                            if index_courant == len(horaires_employee):
+                                # L'intervention commence quand l'employé a déjà fini sa journée ...
+                                break
+                            deb, fin = horaires_employee[index_courant]
                         else:
-                            duree = min(intervention_deb, fin) - deb
-                            if duree >= self.duree:
-                                creneaux.append((deb, deb+duree, equipe))
+                            # L'intervention commence avant la fin du créneau courant
+                            if float_compare(deb, intervention_deb, compare_precision) == 1:
+                                # L'intervention commence au milieu du créneau courant
+                                duree += intervention_deb - deb
+                                creneaux_temp.append((deb, intervention_deb))
+                        if float_compare(self.duree, duree, compare_precision) != 1:
+                            # Le temps dégagé est suffisant pour la tâche à réaliser
+                            creneaux += creneaux_temp
+                    if index_courant == len(horaires_employee):
+                        break
 
-                    if intervention_fin >= fin and fin <= ad:
-                        deb = max(intervention_fin, ad)
-                        fin = equipe.hor_af
-                    elif intervention_fin > deb:
-                        deb = intervention_fin
+                    # Récupération du prochain créneau potentiellement disponible
+                    deb = max(deb, intervention_fin)
+                    while float_compare(fin, deb, compare_precision) != 1:
+                        index_courant += 1
+                        if index_courant == len(horaires_employee):
+                            break
+                        deb = max(deb, horaires_employee[index_courant][0])
+                        fin = horaires_employee[index_courant][1]
+                    if index_courant == len(horaires_employee):
+                        break
+
                 if not creneaux:
                     # Aucun creneau libre pour cette équipe
                     continue
 
                 # Création des créneaux disponibles
-                for intervention_deb, intervention_fin, equipe in creneaux:
+                for intervention_deb, intervention_fin in creneaux:
                     description = "%s-%s" % tuple(hours_to_strs(intervention_deb, intervention_fin))
 
-                    dt_debut = datetime.combine(d_recherche, datetime.min.time()) + timedelta(hours=intervention_deb)
-                    dt_debut = tz.localize(dt_debut, is_dst=None).astimezone(pytz.utc)
-                    dt_fin = datetime.combine(d_recherche, datetime.min.time()) + timedelta(hours=intervention_fin)
-                    dt_fin = tz.localize(dt_fin, is_dst=None).astimezone(pytz.utc)
+                    date_debut_dt = datetime.combine(date_recherche_da, datetime.min.time()) + timedelta(hours=intervention_deb)
+                    date_debut_dt = tz.localize(date_debut_dt, is_dst=None).astimezone(pytz.utc)
+                    date_fin_dt = datetime.combine(date_recherche_da, datetime.min.time()) + timedelta(hours=intervention_fin)
+                    date_fin_dt = tz.localize(date_fin_dt, is_dst=None).astimezone(pytz.utc)
 
                     wizard_line_obj.create({
-                        'debut_dt': dt_debut,
-                        'fin_dt': dt_fin,
+                        'debut_dt': date_debut_dt,
+                        'fin_dt': date_fin_dt,
                         'date_flo': intervention_deb,
                         'date_flo_deadline': intervention_fin,
-                        'date': str_d_recherche,
+                        'date': date_recherche_str,
                         'description': description,
                         'wizard_id': self.id,
-                        'equipe_id': equipe.id,
+                        'employee_id': employee.id,
                         'intervention_id': False,
                     })
                 # Création des créneaux d'intervention
                 for intervention, intervention_deb, intervention_fin in intervention_dates:
                     description = "%s-%s" % tuple(hours_to_strs(intervention_deb, intervention_fin))
 
-                    dt_debut = datetime.combine(d_recherche, datetime.min.time()) + timedelta(hours=intervention_deb)
-                    dt_debut = tz.localize(dt_debut, is_dst=None).astimezone(pytz.utc)
-                    dt_fin = datetime.combine(d_recherche, datetime.min.time()) + timedelta(hours=intervention_fin)
-                    dt_fin = tz.localize(dt_fin, is_dst=None).astimezone(pytz.utc)
+                    date_debut_dt = datetime.combine(date_recherche_da, datetime.min.time()) + timedelta(hours=intervention_deb)
+                    date_debut_dt = tz.localize(date_debut_dt, is_dst=None).astimezone(pytz.utc)
+                    date_fin_dt = datetime.combine(date_recherche_da, datetime.min.time()) + timedelta(hours=intervention_fin)
+                    date_fin_dt = tz.localize(date_fin_dt, is_dst=None).astimezone(pytz.utc)
 
                     wizard_line_obj.create({
-                        'debut_dt': dt_debut,  # datetime utc
-                        'fin_dt': dt_fin,  # datetime utc
+                        'debut_dt': date_debut_dt,  # datetime utc
+                        'fin_dt': date_fin_dt,  # datetime utc
                         'date_flo': intervention_deb,
                         'date_flo_deadline': intervention_fin,
-                        'date': str_d_recherche,
+                        'date': date_recherche_str,
                         'description': description,
                         'wizard_id': self.id,
-                        'equipe_id': intervention.equipe_id.id,
+                        'employee_id': employee.id,
                         'intervention_id': intervention.id,
                         'name': intervention.name,
                         'disponible': False,
                     })
         # Calcul des durées et distances
-        d_debut = d_avant_recherche + un_jour
-        d_fin = d_apres_recherche - un_jour
+        date_debut_da = avant_recherche_da + un_jour
+        date_fin_da = apres_recherche_da - un_jour
         if not self.ignorer_geo:
-            self.calc_distances_dates_equipes(d_debut, d_fin, equipes)
+            self.calc_distances_dates_employees(date_debut_da, date_fin_da, employees)
 
         nb, nb_dispo, first_res = wizard_line_obj.get_nb_dispo(self)
 
@@ -461,15 +497,15 @@ class OfTourneeRdv(models.TransientModel):
             name += address.zip and (" " + address.zip) or ""
             name += address.city and (" " + address.city) or ""
 
-            d_first_res = fields.Date.from_string(first_res.date)
-            dt_propos = datetime.combine(d_first_res, datetime.min.time()) + timedelta(hours=first_res.date_flo)  # datetime naive
-            dt_propos = tz.localize(dt_propos, is_dst=None).astimezone(pytz.utc)  # datetime utc
+            first_res_da = fields.Date.from_string(first_res.date)
+            date_propos_dt = datetime.combine(first_res_da, datetime.min.time()) + timedelta(hours=first_res.date_flo)  # datetime naive
+            date_propos_dt = tz.localize(date_propos_dt, is_dst=None).astimezone(pytz.utc)  # datetime utc
 
             vals = {
                 'date_display'    : first_res.date,
                 'name'            : name,
-                'equipe_id'       : first_res.equipe_id.id,
-                'date_propos'     : dt_propos,  # datetime utc
+                'employee_id'       : first_res.employee_id.id,
+                'date_propos'     : date_propos_dt,  # datetime utc
                 'date_propos_hour': first_res.date_flo,
                 'res_line_id'     : first_res.id,
                 'display_res'     : True,
@@ -477,10 +513,12 @@ class OfTourneeRdv(models.TransientModel):
                 'zero_dispo'      : False,
             }
 
-            if self.service_id:
-                vals['date_next'] = self.service_id.get_next_date(d_first_res.strftime('%Y-%m-%d'))
+            if self.service_id and self.service_id.recurrence:
+                vals['date_next'] = self.service_id.get_next_date(first_res_da.strftime('%Y-%m-%d'))
+            elif self.creer_recurrence:
+                vals['date_next'] = "%s-%02i-01" % (first_res_da.year + 1, first_res_da.month)
             else:
-                vals['date_next'] = "%s-%02i-01" % (d_first_res.year + 1, d_first_res.month)
+                vals['date_next'] = False
 
             if nb_dispo == 0:
                 vals['display_res'] = True
@@ -510,6 +548,29 @@ class OfTourneeRdv(models.TransientModel):
         }
 
     @api.multi
+    def get_values_intervention_create(self):
+        self.ensure_one()
+        employee = self.employee_id
+        values = {
+            'partner_id': self.partner_id.id,
+            'address_id': self.partner_address_id.id,
+            'tache_id': self.tache_id.id,
+            'service_id': self.service_id.id,
+            'employee_ids': [(4, self.employee_id.id, 0)],
+            'date': self.date_propos,
+            'duree': self.duree,
+            'user_id': self._uid,
+            'company_id': self.partner_address_id.company_id and self.partner_address_id.company_id.id,
+            'name': self.name,
+            'description': self.description or '',
+            'state': 'confirm',
+            'verif_dispo': True,
+            'order_id': self.service_id.order_id.id,
+        }
+
+        return values
+
+    @api.multi
     def button_confirm(self):
         self.ensure_one()
         if not self._context.get('tz'):
@@ -519,55 +580,15 @@ class OfTourneeRdv(models.TransientModel):
         service_obj = self.env['of.service']
 
         # Vérifier que la date de début et la date de fin sont dans les créneaux
-        equipe = self.equipe_id
-        if (not equipe.hor_md) or (not equipe.hor_mf) or (not equipe.hor_ad) or (not equipe.hor_af):
-            raise UserError("Il faut configurer l'horaire de travail de toutes les équipes.")
+        employee = self.employee_id
+        if not employee.of_segment_ids:
+            raise UserError("Il faut configurer l'horaire de travail de tous les intervenants.")
 
-        td_pause_midi = timedelta(hours=equipe.hor_ad - equipe.hor_mf)
-        dt_propos = fields.Datetime.from_string(self.date_propos)  # datetime utc proposition de rdv
-        dt_propos_deadline = dt_propos + timedelta(hours=self.duree)  # datetime utc proposition fin de rdv
+        #td_pause_midi = timedelta(hours=equipe.hor_ad - equipe.hor_mf)
+        date_propos_dt = fields.Datetime.from_string(self.date_propos)  # datetime utc proposition de rdv
+        date_propos_str = self.date_propos[:10]
 
-        rdv_ok = False
-        for planning in self.planning_ids.filtered(lambda p: p.equipe_id == equipe):
-            fin_dt = fields.Datetime.from_string(planning.fin_dt)
-
-            if fin_dt < dt_propos:
-                # Créneau avant le début de l'intervention
-                continue
-            if fin_dt >= dt_propos_deadline:
-                # Créneau suffisant pour terminer l'intervention
-                rdv_ok = True
-                break
-            if fin_dt == 'midi':
-                dt_propos_deadline += td_pause_midi
-            if fin_dt == 'soir':
-                raise UserError('Cet outil ne permet pas de planifier une intervention sur plusieurs jours\n'
-                                'Veuillez saisir votre rendez-vous directement dans le planning des interventions.')
-        if not rdv_ok:
-            raise UserError("RDV PAS OK !!!")
-
-        values = {
-            'hor_md': equipe.hor_md,
-            'hor_mf': equipe.hor_mf,
-            'hor_ad': equipe.hor_ad,
-            'hor_af': equipe.hor_af,
-            'partner_id': self.partner_id.id,
-            'address_id': self.partner_address_id.id,
-            'tache_id': self.tache_id.id,
-            'equipe_id': self.equipe_id.id,
-            'date': self.date_propos,
-            'duree': self.duree,
-            'user_id': self._uid,
-            'company_id': self.partner_address_id.company_id and self.partner_address_id.company_id.id,
-            'name': self.name,
-            'description': self.description or '',
-            'state': 'confirm',
-            'verif_dispo': True,
-        }
-
-        # Si rdv RES pris depuis un SAV, on le lie au SAV
-        if self._context.get('active_model') == 'crm.helpdesk':
-            values['sav_id'] = self._context.get('active_id', False)
+        values = self.get_values_intervention_create()
 
         res = intervention_obj.create(values)
 
@@ -576,7 +597,7 @@ class OfTourneeRdv(models.TransientModel):
             if self.service_id:
                 self.service_id.write({'date_next': self.date_next})
             elif self.creer_recurrence:
-                service_obj.create(self._get_service_data(dt_propos.month))
+                service_obj.create(self._get_service_data(date_propos_dt.month))
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'of.planning.intervention',
@@ -588,57 +609,55 @@ class OfTourneeRdv(models.TransientModel):
         }
 
     @api.multi
-    def calc_distances_dates_equipes(self, date_debut, date_fin, equipes):
+    def calc_distances_dates_employees(self, date_debut, date_fin, employees):
         u"""
-            Une requête http par jour et par équipe.
-            En cas de problème de performance on pourra se débrouiller pour faire une requête par équipe.
+            Une requête http par jour et par employé.
+            En cas de problème de performance on pourra se débrouiller pour faire une requête par employé.
         """
         self.ensure_one()
         wizard_line_obj = self.env['of.tournee.rdv.line']
+        tournee_obj = self.env['of.planning.tournee']
         lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
         un_jour = timedelta(days=1)
         date_courante = date_debut
         while date_courante <= date_fin:
             mode_recherche = self.mode_recherche
             maxi = self.max_recherche
-            for equipe in equipes:
+            for employee in employees:
                 creneaux = wizard_line_obj.search([('wizard_id', '=', self.id),
                                                    ('date', '=', date_courante),
-                                                   ('equipe_id', '=', equipe.id)], order="debut_dt")
+                                                   ('employee_id', '=', employee.id)], order="debut_dt")
                 if len(creneaux) == 0:
                     continue
-                tournee = creneaux.mapped("intervention_id").mapped("tournee_id")
-                # S'il y a une tournée, on favorise son point de départ plutôt que celui de l'équipe.
-                # Note : une tournée est unique par équipe et par date (contrainte SQL) donc len(tournee) <= 1
+                tournee = tournee_obj.search([('date', '=', date_courante),
+                                              ('employee_id', '=', employee.id)], limit=1)
+                #tournee = creneaux.mapped("intervention_id").mapped("tournee_ids").filtered(lambda t: t.employee_id == employee.id)
+                # S'il y a une tournée, on favorise son point de départ plutôt que celui de l'employé.
+                # Note : une tournée est unique par employé et par date (contrainte SQL) donc len(tournee) <= 1
                 origine = (tournee.address_depart_id or
-                           equipe.address_id or
-                           equipe.employee_ids and equipe.employee_ids[0].address_id or
+                           employee.of_address_depart_id or
                            False)
                 arrivee = (tournee.address_retour_id or
-                           equipe.address_retour_id or
-                           equipe.employee_ids and equipe.employee_ids[0].address_id or
+                           employee.of_address_retour_id or
                            False)
-                # Pas d'origine ou d'arrivée ni pour la tournée ni pour l'équipe et pas d'employés dans l'équipe
-                if not (equipe.employee_ids or (origine and arrivee)):
-                    raise UserError(u"L'équipe \"%s\" n'a pas d'employé." % equipe.name)
-                # Pas d'origine ni pour la tournée ni pour l'équipe ni pour ses employés
-                elif not origine:
-                    raise UserError(u"L'équipe \"%s\" n'a pas d'adresse de départ." % equipe.name)
-                # Pas d'arrivée ni pour la tournée ni pour l'équipe ni pour ses employés
+                # Pas d'origine ni pour la tournée ni pour l'employé
+                if not origine:
+                    raise UserError(u"L'intervenant \"%s\" n'a pas d'adresse de départ." % employee.name)
+                # Pas d'arrivée ni pour la tournée ni pour l'employé
                 elif not arrivee:
-                    raise UserError(u"L'équipe \"%s\" n'a pas d'adresse d'arrivée." % equipe.name)
+                    raise UserError(u"L'intervenant \"%s\" n'a pas d'adresse d'arrivée." % employee.name)
                 elif origine.geo_lat == origine.geo_lng == 0:
-                    raise UserError(u"L'adresse de départ de l'équipe \"%s\" n'est pas géolocalisée.\nDate : %s" %
-                                    (equipe.name, date_courante.strftime(lang.date_format)))
+                    raise UserError(u"L'adresse de départ de l'intervenant \"%s\" n'est pas géolocalisée.\nDate : %s" %
+                                    (employee.name, date_courante.strftime(lang.date_format)))
                 elif arrivee.geo_lat == arrivee.geo_lng == 0:
-                    raise UserError(u"L'adresse de retour de l'équipe \"%s\" n'est pas géolocalisée.\nDate : %s" %
-                                    (equipe.name, date_courante.strftime(lang.date_format)))
+                    raise UserError(u"L'adresse de retour de l'intervenant \"%s\" n'est pas géolocalisée.\nDate : %s" %
+                                    (employee.name, date_courante.strftime(lang.date_format)))
 
                 query = ROUTING_BASE_URL + "route/" + ROUTING_VERSION + "/" + ROUTING_PROFILE + "/"
 
                 # Listes de coordonnées : ATTENTION OSRM prend ses coordonnées sous form (lng, lat)
                 # Point de départ
-                str_coords = str(origine.geo_lng) + "," + str(origine.geo_lat)
+                coords_str = str(origine.geo_lng) + "," + str(origine.geo_lat)
 
                 # Créneaux et interventions
                 non_loc = False
@@ -646,15 +665,15 @@ class OfTourneeRdv(models.TransientModel):
                     if line.geo_lat == line.geo_lng == 0:
                         non_loc = True
                         break
-                    str_coords += ";" + str(line.geo_lng) + "," + str(line.geo_lat)
+                    coords_str += ";" + str(line.geo_lng) + "," + str(line.geo_lat)
                 if non_loc:
                     continue
 
                 # Point d'arrivée
-                str_coords += ";" + str(arrivee.geo_lng) + "," + str(arrivee.geo_lat)
+                coords_str += ";" + str(arrivee.geo_lng) + "," + str(arrivee.geo_lat)
 
                 query_send = urllib.quote(query.strip().encode('utf8')).replace('%3A', ':')
-                full_query = query_send + str_coords + "?"
+                full_query = query_send + coords_str + "?"
                 try:
                     req = requests.get(full_query)
                     res = req.json()
@@ -714,7 +733,7 @@ class OfTourneeRdv(models.TransientModel):
 class OfTourneeRdvLine(models.TransientModel):
     _name = 'of.tournee.rdv.line'
     _description = 'Propositions des RDVs'
-    _order = "date, equipe_id, date_flo"
+    _order = "date, employee_id, date_flo"
     _inherit = "of.calendar.mixin"
 
     @api.model
@@ -739,17 +758,17 @@ class OfTourneeRdvLine(models.TransientModel):
     date_flo_deadline = fields.Float(string='Date', required=True, digits=(12, 5))
     description = fields.Char(string=u"Créneau", size=128)
     wizard_id = fields.Many2one('of.tournee.rdv', string="RDV", required=True, ondelete='cascade')
-    equipe_id = fields.Many2one('of.planning.equipe', string='Equipe')
+    employee_id = fields.Many2one('hr.employee', string='Intervenant')
     intervention_id = fields.Many2one('of.planning.intervention', string="Planning")
     name = fields.Char(string="name", default="DISPONIBLE")
     distance = fields.Float(string='Dist.tot. (km)', digits=(12, 0), help="distance prec + distance suiv")
     dist_prec = fields.Float(string='Dist.Prec. (km)', digits=(12, 0))
     dist_suiv = fields.Float(string='Dist.Suiv. (km)', digits=(12, 0))
-    duree = fields.Float(string=u'Durée.tot. (min)', digits=(12, 0), help=u"durée prec + durée suiv")
+    duree = fields.Float(string=u'Durée.tot. (min)', default=-1, digits=(12, 0), help=u"durée prec + durée suiv")
     duree_prec = fields.Float(string=u'Durée.Prec. (min)', digits=(12, 0))
     duree_suiv = fields.Float(string=u'Durée.Suiv. (min)', digits=(12, 0))
-    color_ft = fields.Char(related="equipe_id.color_ft", readonly=True)
-    color_bg = fields.Char(related="equipe_id.color_bg", readonly=True)
+    of_color_ft = fields.Char(related="employee_id.of_color_ft", readonly=True)
+    of_color_bg = fields.Char(related="employee_id.of_color_bg", readonly=True)
     disponible = fields.Boolean(string="Est dispo", default=True)
     force_color = fields.Char("Couleur")
     allday = fields.Boolean('All Day', default=False)
@@ -821,9 +840,9 @@ class OfTourneeRdvLine(models.TransientModel):
             self = self.with_context(tz='Europe/Paris')
         tz = pytz.timezone(self._context['tz'])
         d = fields.Date.from_string(self.date)
-        dt_propos = datetime.combine(d, datetime.min.time()) + timedelta(hours=self.selected_hour)  # datetime local
-        dt_propos = tz.localize(dt_propos, is_dst=None).astimezone(pytz.utc)  # datetime utc
-        self.wizard_id.date_propos = dt_propos
+        date_propos_dt = datetime.combine(d, datetime.min.time()) + timedelta(hours=self.selected_hour)  # datetime local
+        date_propos_dt = tz.localize(date_propos_dt, is_dst=None).astimezone(pytz.utc)  # datetime utc
+        self.wizard_id.date_propos = date_propos_dt
         return self.wizard_id.button_confirm()
 
     @api.multi
@@ -843,14 +862,14 @@ class OfTourneeRdvLine(models.TransientModel):
         wizard_vals = {
             'date_display'    : self.date,  # .strftime('%A %d %B %Y'),
             'name'            : name,
-            'equipe_id'       : self.equipe_id.id,
+            'employee_id'       : self.employee_id.id,
             'date_propos'     : self.debut_dt,
             'date_propos_hour': self.date_flo,
             'res_line_id'     : self.id,
         }
         if self.wizard_id.service_id:
-            d_date = fields.Date.from_string(self.date)
-            wizard_vals['date_next'] = self.wizard_id.service_id.get_next_date(d_date.strftime('%Y-%m-%d'))
+            date_da = fields.Date.from_string(self.date)
+            wizard_vals['date_next'] = self.wizard_id.service_id.get_next_date(date_da.strftime('%Y-%m-%d'))
         self.wizard_id.write(wizard_vals)
 
         return {'type': 'ir.actions.do_nothing'}

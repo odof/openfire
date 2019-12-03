@@ -44,6 +44,8 @@ Fonctionnalités
 """,
     'depends' : [
         'base',
+        'web',
+        'of_utils',
     ],
     'external_dependancies': {
         'python': ['requests', 'googlemaps'],
@@ -51,6 +53,7 @@ Fonctionnalités
     'data' : [
         'wizards/of_geo_wizard_views.xml',
         'views/of_geo_views.xml',
+        'views/of_geolocalize_templates.xml',
         'data/ir_config_parameters_of_geo.xml',
     ],
     'installable': True,

@@ -499,8 +499,8 @@ class OFSMSConfiguration(models.TransientModel):
     _name = 'of.sms.config.settings'
     _inherit = 'res.config.settings'
 
-    alerte_interventions_equipes_veille = fields.Boolean(string=u"Équipes d'intervention", default=False,
-        help=u"Envoyer des alertes SMS aux équipes d'intervention contenant un récapitulatif des interventions du lendemain")
+    alerte_interventions_equipes_veille = fields.Boolean(string=u"Intervenants", default=False,
+        help=u"Envoyer des alertes SMS aux intervenants contenant un récapitulatif des interventions du lendemain")
     alerte_interventions_clients_veille = fields.Boolean(string=u"Clients d'intervention", default=False,
         help=u"Envoyer des alertes SMS aux clients contenant un récapitulatif de l'intervention du lendemain")
 
@@ -569,11 +569,11 @@ class OFPlanningIntervention(models.Model):
             country_id_defaut  = False
 
         # RAPPEL ÉQUIPE : on envoie un texto aux équipes si option activée.
-        # Contrairement aux clients, pour les rendez-vous sur plusieurs jours, on envoie un texto de rappel tous les jours. 
+        # Contrairement aux clients, pour les rendez-vous sur plusieurs jours, on envoie un texto de rappel tous les jours.
         if self.env['ir.values'].get_default('of.sms.config.settings', 'alerte_interventions_equipes_veille'):
-            for equipe in self.env["of.planning.equipe"].search([]):
+            for employee in self.env["hr.employee"].search([]):
                 message_body = u"Vos prochaines interventions :\n"
-                interventions = intervention_obj.search([('equipe_id', '=', equipe.id),
+                interventions = intervention_obj.search([('employee_ids', 'in', [employee.id]),
                                                         ('date', '<=', date_fin_relance_str),
                                                         ('date_deadline', '>=', date_demain_str),
                                                         ('state', '=', 'confirm')
@@ -583,19 +583,19 @@ class OFPlanningIntervention(models.Model):
 
                 # On récupère les numéros de mobile des destinataires (membres équipe)
                 mobile_partners_to = []
-                for employe in equipe.employee_ids:
-                    if employe.mobile_phone:
-                        # Si le pays n'est pas renseigné dans l'adresse de l'employé, on met le pays par défaut (France).
-                        if not employe.address_id.country_id:
-                            country_id =  country_id_defaut
-                        else:
-                            country_id = employe.address_id.country_id
-                        mobile_partners_to.append(
-                            convert_phone_number(employe.mobile_phone, country_id and country_id.code or "FR"))
+                if employee.mobile_phone:
+                    # Si le pays n'est pas renseigné dans l'adresse de l'employé, on met le pays par défaut (France).
+                    if not employee.address_id.country_id:
+                        country_id = country_id_defaut
+                    else:
+                        country_id = employee.address_id.country_id
+                    mobile_partners_to.append(
+                            convert_phone_number(employee.mobile_phone, country_id and country_id.code or "FR"))
+
                 # Si aucun no de portable renseigné, on passe à l'équipe suivante.
                 if not mobile_partners_to:
                     continue
-                str_mobile_partners_to = ','.join(mobile_partners_to)
+                mobile_partners_to_str = ','.join(mobile_partners_to)
 
                 # On parcourt la liste des interventions.
                 for intervention in interventions:
@@ -608,7 +608,7 @@ class OFPlanningIntervention(models.Model):
                     'model_id': my_model[0].id,
                     'account_id': from_number.account_id.id,
                     'from_mobile': from_number.mobile_number,
-                    'to_mobile': str_mobile_partners_to,
+                    'to_mobile': mobile_partners_to_str,
                     'sms_content': message_body,
                     'direction': 'O',
                     'message_date': datetime.utcnow(),
