@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 from odoo import api, models, fields
-from datetime import datetime, timedelta, date as d_date
+from datetime import datetime, timedelta, date
 import pytz, math, json, urllib, requests
 from math import cos
 from odoo.addons.of_planning_tournee.models.of_planning_tournee import distance_points
@@ -127,9 +127,9 @@ class OFRDVCommercial(models.TransientModel):
     duree = fields.Float(string=u'Durée du RDV', required=True, digits=(12, 2), default=1)
     creneau_ids = fields.One2many('of.rdv.commercial.line', 'wizard_id', string='Proposition de RDVs')
     date_propos = fields.Datetime(string=u'RDV Début')
-    date_propos_hour = fields.Float(string=u'Heude de début', digits=(12, 5))
-    date_recherche_debut = fields.Date(string=u'À partir du', required=True, default=lambda *a: (d_date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
-    date_recherche_fin = fields.Date(string=u"Jusqu'au", required=True, default=lambda *a: (d_date.today() + timedelta(days=7)).strftime('%Y-%m-%d'))
+    date_propos_hour = fields.Float(string=u'Heure de début', digits=(12, 5))
+    date_recherche_debut = fields.Date(string=u'À partir du', required=True, default=lambda *a: (date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
+    date_recherche_fin = fields.Date(string=u"Jusqu'au", required=True, default=lambda *a: (date.today() + timedelta(days=7)).strftime('%Y-%m-%d'))
     partner_id = fields.Many2one('res.partner', string='Client', required=True, readonly=True, default=_default_partner)
     partner_name = fields.Char(related='partner_id.name')
     partner_child_ids = fields.One2many(related="partner_id.child_ids", readonly=True)  # pour domain dans XML
@@ -438,34 +438,6 @@ class OFRDVCommercial(models.TransientModel):
         self.ensure_one()
         return 0 <= self.hor_md <= self.hor_mf <= self.hor_ad <= self.hor_af <= 24
 
-    @api.model
-    def get_working_hours_fields(self):
-        return {
-            "morning_start_field": "hor_md",
-            "morning_end_field": "hor_mf",
-            "afternoon_start_field": "hor_ad",
-            "afternoon_end_field": "hor_af"
-        }
-
-    """
-    a voir si réimplémenter cette fonctionnalité
-    # Note: Séparation en 3 fonctions car, avec une seule fonction button_calcul(self, creneau_suivant=False),
-    #       Odoo place le contexte dans cette variable si elle n'est pas fournie en paramètre ...
-    @api.multi
-    def button_calcul_suivant(self):
-        # Calcule a prochaine intervention à partir de la dernière intervention proposée
-        self.compute(creneau_suivant=True)
-        context = dict(self._context, equipe_domain=self._get_equipe_possible())
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'of.tournee.rdv',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_id': self.id,
-            'target': 'new',
-            'context': context,
-        }"""
-
     @api.multi
     def toggle_horaires(self):
         """Affiche / cache les horaires pour pouvoir les modifier"""
@@ -507,30 +479,30 @@ class OFRDVCommercial(models.TransientModel):
             'context': context,
         }
 
-    def create_creneau(self, event_deb, event_fin, tz, d_recherche, str_d_recherche, event=False):
+    def create_creneau(self, event_deb, event_fin, tz, date_recherche_da, date_recherche_str, event=False):
         """
         Permet la création de créneau dans le wizard
         :param event_deb: Heure de début
         :param event_fin: Heure de fin
         :param tz: Timezone
-        :param d_recherche: Date de recherche (datetime)
-        :param str_d_recherche: Date de recherche (str)
+        :param date_recherche_da: Date de recherche (datetime)
+        :param date_recherche_str: Date de recherche (str)
         :param event: RDV déjà existant
         """
         wizard_line_obj = self.env['of.rdv.commercial.line']
         description = "%s-%s" % tuple(hours_to_strs(event_deb, event_fin))
 
-        dt_debut = datetime.combine(d_recherche, datetime.min.time()) + timedelta(hours=event_deb)
-        dt_debut = tz.localize(dt_debut, is_dst=None).astimezone(pytz.utc)
-        dt_fin = datetime.combine(d_recherche, datetime.min.time()) + timedelta(hours=event_fin)
-        dt_fin = tz.localize(dt_fin, is_dst=None).astimezone(pytz.utc)
+        date_debut_dt = datetime.combine(date_recherche_da, datetime.min.time()) + timedelta(hours=event_deb)
+        date_debut_dt = tz.localize(date_debut_dt, is_dst=None).astimezone(pytz.utc)
+        date_fin_dt = datetime.combine(date_recherche_da, datetime.min.time()) + timedelta(hours=event_fin)
+        date_fin_dt = tz.localize(date_fin_dt, is_dst=None).astimezone(pytz.utc)
 
         wizard_line_obj.create({
-            'debut_dt': dt_debut,
-            'fin_dt': dt_fin,
+            'debut_dt': date_debut_dt,
+            'fin_dt': date_fin_dt,
             'date_flo': event_deb,
             'date_flo_deadline': event_fin,
-            'date': str_d_recherche,
+            'date': date_recherche_str,
             'description': description,
             'wizard_id': self.id,
             'user_id': self.user_id.id,
@@ -573,18 +545,18 @@ class OFRDVCommercial(models.TransientModel):
 
         d_avant_recherche = fields.Date.from_string(self.date_recherche_debut) - un_jour
         avant_recherche = fields.Date.to_string(d_avant_recherche)
-        dt_avant_recherche_debut = tz.localize(datetime.strptime(avant_recherche+" 00:00:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
-        dt_avant_recherche_fin = tz.localize(datetime.strptime(avant_recherche+" 23:59:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
+        avant_recherche_debut_dt = tz.localize(datetime.strptime(avant_recherche+" 00:00:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
+        avant_recherche_fin_dt = tz.localize(datetime.strptime(avant_recherche+" 23:59:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
         d_apres_recherche = fields.Date.from_string(self.date_recherche_fin) + un_jour
         apres_recherche = fields.Date.to_string(d_apres_recherche)
-        dt_apres_recherche_debut = tz.localize(datetime.strptime(apres_recherche+" 00:00:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
-        dt_apres_recherche_fin = tz.localize(datetime.strptime(apres_recherche+" 23:59:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
+        apres_recherche_debut_dt = tz.localize(datetime.strptime(apres_recherche+" 00:00:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
+        apres_recherche_fin_dt = tz.localize(datetime.strptime(apres_recherche+" 23:59:00", "%Y-%m-%d %H:%M:%S"))  # local datetime
 
         # Création des créneaux de début et fin de recherche
         wizard_line_obj.create({
             'name': 'Début de la recherche',
-            'debut_dt': dt_avant_recherche_debut,
-            'fin_dt': dt_avant_recherche_fin,
+            'debut_dt': avant_recherche_debut_dt,
+            'fin_dt': avant_recherche_fin_dt,
             'date_flo': 0.0,
             'date_flo_deadline': 23.9,
             'date': d_avant_recherche,
@@ -600,8 +572,8 @@ class OFRDVCommercial(models.TransientModel):
         })
         wizard_line_obj.create({
             'name': 'Fin de la recherche',
-            'debut_dt': dt_apres_recherche_debut,
-            'fin_dt': dt_apres_recherche_fin,
+            'debut_dt': apres_recherche_debut_dt,
+            'fin_dt': apres_recherche_fin_dt,
             'date_flo': 0.0,
             'date_flo_deadline': 23.9,
             'date': d_apres_recherche,
@@ -616,33 +588,33 @@ class OFRDVCommercial(models.TransientModel):
             'ignorer_geo': self.ignorer_geo,
         })
 
-        d_recherche = d_avant_recherche
+        date_recherche_da = d_avant_recherche
         u"""
         Parcours tous les jours inclus entre la date de début de recherche et la date de fin de recherche.
         Prends en compte les équipes qui peuvent effectuer la tache, et qui sont disponibles
         Ne prends pas en compte les jours non travaillés @TODO: passer les jours travaillés en many2many vers of.jour (module of_utils)
         """
-        while d_recherche < d_apres_recherche:
-            d_recherche += un_jour
-            num_jour = d_recherche.isoweekday()
+        while date_recherche_da < d_apres_recherche:
+            date_recherche_da += un_jour
+            num_jour = date_recherche_da.isoweekday()
 
             # Restriction aux jours spécifiés dans le service
             while num_jour not in jours:
-                d_recherche += un_jour
+                date_recherche_da += un_jour
                 num_jour = (num_jour + 1) % 7
             # Arreter la recherche si on dépasse la date de fin
-            if d_recherche >= d_apres_recherche:
+            if date_recherche_da >= d_apres_recherche:
                 break
-            str_d_recherche = fields.Date.to_string(d_recherche)
+            date_recherche_str = fields.Date.to_string(date_recherche_da)
 
             # Recherche de creneaux pour la date voulue et les équipes sélectionnées
-            dt_jour_deb = tz.localize(datetime.strptime(str_d_recherche+" 00:00:00", "%Y-%m-%d %H:%M:%S"))
-            dt_jour_fin = tz.localize(datetime.strptime(str_d_recherche+" 23:59:00", "%Y-%m-%d %H:%M:%S"))
+            jour_deb_dt = tz.localize(datetime.strptime(date_recherche_str+" 00:00:00", "%Y-%m-%d %H:%M:%S"))
+            jour_fin_dt = tz.localize(datetime.strptime(date_recherche_str+" 23:59:00", "%Y-%m-%d %H:%M:%S"))
             # Récupération des évenements déjà planifiées
             events = calendar_obj.search([
-                                        ('start_datetime', '<=', str_d_recherche),
-                                        ('stop_datetime', '>=', str_d_recherche),
-                                        # ('start_date', '=', str_d_recherche)
+                                        ('start_datetime', '<=', date_recherche_str),
+                                        ('stop_datetime', '>=', date_recherche_str),
+                                        # ('start_date', '=', date_recherche_str)
                                         ], order='start_date')
             events = events.filtered(lambda e: self.user_id.partner_id in e.partner_ids or self.partner_id in e.partner_ids)
 
@@ -651,17 +623,17 @@ class OFRDVCommercial(models.TransientModel):
                 event_dates = [event]
                 for event_date in (event.start_datetime, event.stop_datetime):
                     # Conversion des dates de début et de fin en nombres flottants et à l'heure locale
-                    dt_event_local = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(event_date))
+                    event_local_dt = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(event_date))
 
                     # Comme on n'affiche que les heures, il faut s'assurer de rester dans le bon jour
                     #   (pour les interventions étalées sur plusieurs jours)
-                    dt_event_local = max(dt_event_local, dt_jour_deb)
-                    dt_event_local = min(dt_event_local, dt_jour_fin)
-                    flo_dt_event_local = round(dt_event_local.hour +
-                                               dt_event_local.minute / 60.0 +
-                                               dt_event_local.second / 3600.0, 5)
-                    event_dates.append(flo_dt_event_local)
-                self.create_creneau(event_dates[1], event_dates[2], tz, d_recherche, str_d_recherche, event=event_dates[0])
+                    event_local_dt = max(event_local_dt, jour_deb_dt)
+                    event_local_dt = min(event_local_dt, jour_fin_dt)
+                    date_event_locale_flo = round(event_local_dt.hour +
+                                               event_local_dt.minute / 60.0 +
+                                               event_local_dt.second / 3600.0, 5)
+                    event_dates.append(date_event_locale_flo)
+                self.create_creneau(event_dates[1], event_dates[2], tz, date_recherche_da, date_recherche_str, event=event_dates[0])
                 event_dates_all.append(event_dates)
 
             deb = self.hor_md
@@ -678,14 +650,14 @@ class OFRDVCommercial(models.TransientModel):
                         event_deb = min(event_deb, self.hor_af)
                         duree = self.hor_mf - deb + event_deb - ad
                         if duree >= self.duree:
-                            self.create_creneau(deb, fin, tz, d_recherche, str_d_recherche)
+                            self.create_creneau(deb, fin, tz, date_recherche_da, date_recherche_str)
                             if ad < event_deb:
-                                self.create_creneau(ad, event_deb, tz, d_recherche, str_d_recherche)
+                                self.create_creneau(ad, event_deb, tz, date_recherche_da, date_recherche_str)
                         fin = self.hor_af
                     else:
                         duree = min(event_deb, fin) - deb
                         if duree >= self.duree:
-                            self.create_creneau(deb, deb + duree, tz, d_recherche, str_d_recherche)
+                            self.create_creneau(deb, deb + duree, tz, date_recherche_da, date_recherche_str)
 
                 if event_fin >= fin and fin <= ad:
                     deb = max(event_fin, ad)
@@ -694,10 +666,10 @@ class OFRDVCommercial(models.TransientModel):
                     deb = event_fin
 
         # Calcul des durées et distances
-        d_debut = d_avant_recherche + un_jour
-        d_fin = d_apres_recherche - un_jour
+        date_debut_da = d_avant_recherche + un_jour
+        date_fin_da = apres_recherche_da - un_jour
         if not self.ignorer_geo:
-            wizard_line_obj.calc_distances_dates(d_debut, d_fin, self.id)
+            wizard_line_obj.calc_distances_dates(date_debut_da, date_fin_da, self.id)
 
         nb, nb_dispo, first_res = wizard_line_obj.get_nb_dispo(self)
 
@@ -717,15 +689,15 @@ class OFRDVCommercial(models.TransientModel):
                 name += address.zip and (" " + address.zip) or ""
                 name += address.city and (" " + address.city) or ""
 
-            d_first_res = fields.Date.from_string(first_res.date)
-            dt_propos = datetime.combine(d_first_res, datetime.min.time()) + timedelta(hours=first_res.date_flo)  # datetime naive
-            dt_propos = tz.localize(dt_propos, is_dst=None).astimezone(pytz.utc)  # datetime utc
+            first_res_da = fields.Date.from_string(first_res.date)
+            date_propos_dt = datetime.combine(first_res_da, datetime.min.time()) + timedelta(hours=first_res.date_flo)  # datetime naive
+            date_propos_dt = tz.localize(date_propos_dt, is_dst=None).astimezone(pytz.utc)  # datetime utc
 
             vals = {
                 'date_display'    : first_res.date,
                 'name'            : name,
                 'user_id'       : first_res.user_id.id,
-                'date_propos'     : dt_propos,  # datetime utc
+                'date_propos'     : date_propos_dt,  # datetime utc
                 'date_propos_hour': first_res.date_flo,
                 'res_line_id'     : first_res.id,
                 'display_search'  : False,
@@ -764,8 +736,8 @@ class OFRDVCommercial(models.TransientModel):
         # verifier que la date de début et la date de fin sont dans les créneaux
         td_pause_midi = timedelta(hours=self.hor_ad - self.hor_mf)
         td_pause_nuit = timedelta(hours=24 - self.hor_af + self.hor_md)
-        dt_propos = fields.Datetime.from_string(self.date_propos)  # datetime utc proposition de rdv
-        dt_propos_deadline = dt_propos + timedelta(hours=self.duree)  # datetime utc proposition fin de rdv
+        date_propos_dt = fields.Datetime.from_string(self.date_propos)  # datetime utc proposition de rdv
+        date_propos_deadline_dt = date_propos_dt + timedelta(hours=self.duree)  # datetime utc proposition fin de rdv
         propos_deadline_flo = self.date_propos_hour + self.duree
         found = False
         err = False
@@ -774,25 +746,25 @@ class OFRDVCommercial(models.TransientModel):
             fin_dt = fields.Datetime.from_string(planning.fin_dt)
             if err:
                 continue
-            elif debut_dt <= dt_propos <= fin_dt and not planning.calendar_id:  # le debut du rdv est dans un créneau dispo
+            elif debut_dt <= date_propos_dt <= fin_dt and not planning.calendar_id:  # le debut du rdv est dans un créneau dispo
                 found = True
-                if debut_dt <= dt_propos_deadline <= fin_dt:  # le rdv se termine dans ce même créneau
+                if debut_dt <= date_propos_deadline_dt <= fin_dt:  # le rdv se termine dans ce même créneau
                     break
-                elif self.date_propos_hour <= self.hor_mf and dt_propos_deadline > fin_dt:  # chevauchement pause midi
-                    dt_propos_deadline += td_pause_midi
+                elif self.date_propos_hour <= self.hor_mf and date_propos_deadline_dt > fin_dt:  # chevauchement pause midi
+                    date_propos_deadline_dt += td_pause_midi
                     propos_deadline_flo += self.hor_ad - self.hor_mf
-                elif self.date_propos_hour <= self.hor_af and dt_propos_deadline > fin_dt:  # chevauchement nuit
-                    dt_propos_deadline += td_pause_nuit
+                elif self.date_propos_hour <= self.hor_af and date_propos_deadline_dt > fin_dt:  # chevauchement nuit
+                    date_propos_deadline_dt += td_pause_nuit
                     propos_deadline_flo = (propos_deadline_flo + 24 - self.hor_af + self.hor_md) % 24
             elif found and planning.calendar_id:  # une intervention entre le début et la fin du rdv
                 err = True
-            elif found and debut_dt <= dt_propos_deadline <= fin_dt and not planning.calendar_id:  # la fin du rdv est dans un créneau dispo
+            elif found and debut_dt <= date_propos_deadline_dt <= fin_dt and not planning.calendar_id:  # la fin du rdv est dans un créneau dispo
                 break
         else:
             raise UserError(u"Vérifier la date de RDV et l'équipe technique")
 
         if (not self.hor_md) or (not self.hor_mf) or (not self.hor_ad) or (not self.hor_af):
-            raise UserError("Il faut configurer l'horaire de travail de toutes les équipes.")
+            raise UserError(u"Il faut configurer l'horaire de travail de toutes les équipes.")
 
         la_company = False
         l_adresse = False
@@ -812,8 +784,8 @@ class OFRDVCommercial(models.TransientModel):
         values = {
             'name': self.name,
             'state': 'open',
-            'start': fields.Datetime.to_string(dt_propos),
-            'stop': fields.Datetime.to_string(dt_propos_deadline),
+            'start': fields.Datetime.to_string(date_propos_dt),
+            'stop': fields.Datetime.to_string(date_propos_deadline_dt),
             'user_id': self.user_id.id,
             'allday': self.allday,
             'description': self.description or '',
@@ -824,8 +796,8 @@ class OFRDVCommercial(models.TransientModel):
             'opportunity_id': self.lead_id.id,
         }
 
-        start = fields.Datetime.to_string(dt_propos)
-        stop = fields.Datetime.to_string(dt_propos_deadline)
+        start = fields.Datetime.to_string(date_propos_dt)
+        stop = fields.Datetime.to_string(date_propos_deadline_dt)
         existing = calendar_obj.search([('partner_ids', 'in', [self.user_id.partner_id.id, self.partner_id.id]),
                                         '|', '&', ('start', '>=', start), ('start', '<', stop),
                                              '&', ('stop', '>', start), ('stop', '<=', stop)])
@@ -876,27 +848,27 @@ class OfRDVCommercialLine(models.TransientModel):
             if retour.geo_lat == retour.geo_lng == 0:
                 raise UserError(u"L'adressse de retour du commercial n'est pas géolocalisé.")
 
-            str_coords = u""
+            coords_str = u""
             coords = []
             query = ROUTING_BASE_URL + u"route/" + ROUTING_VERSION + u"/" + ROUTING_PROFILE + u"/"
 
             # coordonnées du point de départ
-            str_coords += str(origine.geo_lng) + u"," + str(origine.geo_lat)
+            coords_str += str(origine.geo_lng) + u"," + str(origine.geo_lat)
             coords.append((origine.geo_lng, origine.geo_lat))
 
             # listess de coordonnées: ATTENTION OSRM prend ses coordonnées sous forme (lng, lat)
             # créneaux et rdvs
             for line in creneaux:
                 # if line.geo_lat != 0 or line.geo_lng != 0: <- plus besoin: seulement créneaux géolocalisés dans la recherche
-                str_coords += u";" + str(line.geo_lng) + u"," + str(line.geo_lat)
+                coords_str += u";" + str(line.geo_lng) + u"," + str(line.geo_lat)
                 coords.append((line.geo_lng, line.geo_lat))
 
             # coordonnées du point de retour
-            str_coords += u";" + str(retour.geo_lng) + u"," + str(retour.geo_lat)
+            coords_str += u";" + str(retour.geo_lng) + u"," + str(retour.geo_lat)
             coords.append((retour.geo_lng, retour.geo_lat))
 
             query_send = urllib.quote(query.strip().encode('utf8')).replace('%3A', ':')
-            full_query = query_send + str_coords + "?"
+            full_query = query_send + coords_str + "?"
             if len(coords) < 2:
                 date_courante += un_jour
                 continue
@@ -963,7 +935,7 @@ class OfRDVCommercialLine(models.TransientModel):
         return (nb, nb_dispo, first_res)
 
     date = fields.Date(string="Date")
-    debut_dt = fields.Datetime(string="Début")
+    debut_dt = fields.Datetime(string=u"Début")
     fin_dt = fields.Datetime(string="Fin")
     date_flo = fields.Float(string='Date', required=True, digits=(12, 5))
     date_flo_deadline = fields.Float(string='Date', required=True, digits=(12, 5))
@@ -1095,9 +1067,9 @@ class OfRDVCommercialLine(models.TransientModel):
             self = self.with_context(tz='Europe/Paris')
         tz = pytz.timezone(self._context['tz'])
         d = fields.Date.from_string(self.date)
-        dt_propos = datetime.combine(d, datetime.min.time()) + timedelta(hours=self.selected_hour)  # datetime local
-        dt_propos = tz.localize(dt_propos, is_dst=None).astimezone(pytz.utc)  # datetime utc
-        self.wizard_id.date_propos = dt_propos
+        date_propos_dt = datetime.combine(d, datetime.min.time()) + timedelta(hours=self.selected_hour)  # datetime local
+        date_propos_dt = tz.localize(date_propos_dt, is_dst=None).astimezone(pytz.utc)  # datetime utc
+        self.wizard_id.date_propos = date_propos_dt
         return self.wizard_id.button_confirm()
 
     @api.multi

@@ -11,17 +11,58 @@
                     <button string="Appliquer" type="object" name="execute" class="oe_highlight"/>
                     <button string="Annuler" type="object" name="cancel" class="oe_link" special="cancel"/>
                 </header>
-                <group string="Société" groups="base.group_multi_company">
-                    <label for="id" string="Société"/>
-                    <div>
-                        <field name="company_id" options="{'no_create': True}" class="oe_inline"/>
-                    </div>
-                </group>
-                <group name="intervention" string="Intervention">
-                    <label for="id" string="Configuration des interventions" style="width: 250px"/>
-                    <div name="general_config">
-                    </div>
-                </group>
+                <div id="main">
+                    <group string="Société" groups="base.group_multi_company">
+                        <label for="id" string="Société"/>
+                        <div>
+                            <field name="company_id" options="{'no_create': True}" class="oe_inline"/>
+                        </div>
+                    </group>
+                    <group name="intervention" string="Interventions">
+                        <!--label for="id" string="Configuration des interventions" style="width: 250px"/-->
+                        <div name="general_config">
+                        </div>
+                    </group>
+                    <group name="creneaux" string="Créneaux non travaillés">
+                        <label for="color_ft_creneaux_dispo" string="(OF) Créneaux dispo"/>
+                        <div name="color_ft_creneaux_dispo">
+                            <field name="color_ft_creneaux_dispo" class="oe_inline" widget="color"/>
+                            <span> Couleur de texte</span>
+                        </div>
+                        <label for="color_bg_creneaux_dispo" string=" "/>
+                        <div name="color_bg_creneaux_dispo">
+                            <field name="color_bg_creneaux_dispo" class="oe_inline" widget="color"/>
+                            <span> Couleur de fond</span>
+                        </div>
+                        <label for="duree_min_creneaux_dispo" string=" "/>
+                        <div name="duree_min_creneaux_dispo">
+                            <field name="duree_min_creneaux_dispo" class="oe_inline" widget="float_time"/>
+                            <span> Durée minimale</span>
+                        </div>
+                        <label for="color_ft_creneaux_indispo" string="(OF) Créneaux indispo"/>
+                        <div name="color_ft_creneaux_indispo">
+                            <field name="color_ft_creneaux_indispo" class="oe_inline" widget="color"/>
+                            <span> Couleur de texte</span>
+                        </div>
+                        <label for="color_bg_creneaux_indispo" string=" "/>
+                        <div name="color_bg_creneaux_indispo">
+                            <field name="color_bg_creneaux_indispo" class="oe_inline" widget="color"/>
+                            <span> Couleur de fond</span>
+                        </div>
+                    </group>
+                    <group name="calendar_view" string="Vue Calendrier">
+                        <label for="calendar_min_time" string="(OF) heure min"/>
+                        <div name="calendar_min_time">
+                            <field name="calendar_min_time" class="oe_inline"/>
+                            <span>h. <i>(Pour ne pas afficher les premières heures de la journée)</i></span>
+                        </div>
+                        <label for="calendar_max_time" string="(OF) heure max"/>
+                        <div name="calendar_max_time">
+                            <field name="calendar_max_time" class="oe_inline"/>
+                            <span>h. <i>(Pour ne pas afficher les dernières heures de la journée)</i></span>
+                        </div>
+                    </group>
+                </div>
             </form>
         </field>
     </record>
@@ -36,8 +77,9 @@
     </record>
 
     <menuitem id="menu_intervention_general_settings" name="Configuration" parent="of_planning.menu_of_planning_configuration"
-                sequence="0" action="of_planning.action_intervention_settings" groups="of_base.of_group_root_only"/>
+                sequence="0" action="of_planning.action_intervention_settings" groups="of_planning.of_group_planning_intervention_modification_tout"/>
 
+    <!-- Refonte droits accès/modification planning intervention 02 sept. 2019 -->
     <!-- Lors de la 1ère mise à jour, affecter les nouveaux droits planning aux utilisateurs. -->
     <function model="of.planning.intervention" name="_modifier_droits_existants_utilisateurs"/>
 
