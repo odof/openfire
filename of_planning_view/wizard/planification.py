@@ -822,8 +822,7 @@ class OfPlanifCreneau(models.TransientModel):
 
     @api.multi
     def button_close(self):
-        self.ensure_one()
-        return {'type': 'ir.actions.act_window_close'}
+        return {'type': 'ir.actions.client', 'tag': 'history_back'}
 
 
 
