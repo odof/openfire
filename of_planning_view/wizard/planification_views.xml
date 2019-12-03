@@ -10,9 +10,20 @@
                 <script>
                     $(document).ready(function(){
                         // élargir le pop-up
-                        $(".modal-dialog").width('80%');
+                        //$(".modal-dialog").width('80%');
+                        $(".o_cp_right").hide();
+                        $(".o_cp_left").hide();
                     });
                 </script><!-- -->
+                <header>
+                    <button name="button_dummy" string="Rechercher" type="object" class="btn btn-primary" style="margin-right: 4px!important"
+                            attrs="{'invisible': [('pre_a_programmer_id', '!=', False)]}"/>
+                    <button name="button_confirm" string="Confirmer &amp; Fermer" type="object" style="margin-right: 4px!important"
+                            class="btn btn-primary" attrs="{'invisible': [('proposition_ids', '=', []), ('pre_a_programmer_id', '=', False)]}"/>
+                    <button name="button_confirm_next" string="Confirmer &amp; Suivant" type="object" style="margin-right: 4px!important"
+                            class="btn btn-primary" attrs="{'invisible': [('proposition_ids', '=', [])]}"/>
+                    <button name="button_close" string="Fermer" type="object" class="btn-default" style="margin-right: 4px!important"/>
+                </header>
                 <group colspan="2" col="8" name="invisblez" style="display: none">
                     <field name="creneau_fini" invisible="1"/>
                     <field name="aucun_res" invisible="1"/>
@@ -26,6 +37,7 @@
                     <field name="geo_lat_prec" invisible="1"/>
                     <field name="geo_lat_suiv" invisible="1"/>
                     <field name="warning_horaires" invisible="1"/>
+                    <field name="tout_calcule" invisible="1"/>
                 </group>
                 <group col="1" colspan="2" attrs="{'invisible': [('creneau_fini', '=', False)]}">
                     <div>Félicitation! Ce créneau est entièrement planifié! \o/</div>
@@ -124,10 +136,10 @@
                     <field name="proposition_ids" mode="tree" nolabel="1" colspan="6"
                            attrs="{'invisible': ['|',('proposition_ids', '=', []),('pre_a_programmer_id', '!=', False)]}"
                            options="{'reload_on_button': True}">
-                        <tree limit="5" colors="blue: selected==True;" create="0" options="{'reload_on_button': True}">
+                        <tree limit="10" colors="blue: selected==True; grey: fait==False;" create="0" options="{'reload_on_button': True}">
                             <button name="button_select" type="object" icon="fa-cogs"/>
                             <field name="service_id" invisible="1"/>
-                            <field name="dummy_field" invisible="1"/>
+                            <field name="fait" invisible="1"/>
                             <field name="priorite" groups="base.group_no_one"/>
                             <field name="selected" invisible="1"/>
                             <field name="id" invisible="1"/>
@@ -138,7 +150,7 @@
                             <field name="partner_of_telephones"/>
                             <field name="date_next"/>
                             <field name="date_fin"/>
-                            <field name="duree_restante" string="Durée restante (h)"/>
+                            <field name="duree_restante" string="Durée restante" widget="float_time"/>
                             <field name="origin"/>
                             <field name="distance_dwazo_prec" invisible="1"/>
                             <field name="distance_dwazo_suiv" invisible="1"/>
@@ -149,16 +161,15 @@
                             <field name="osrm_response" invisible="1"/>
                         </tree>
                     </field>
+                    <group colspan="4"><!-- string="Calculer plus de résultats"  -->
+                        <button name="button_compute_more" type="object" class="btn btn-default oe_grey"
+                            attrs="{'invisible': [('tout_calcule', '!=', False)]}">
+                            <span>Calculer plus de résultats (déjà fait </span><field name="calcule_nb" nolabel="1" class="oe_inline"/>
+                            <span>/</span><field name="prop_nb" nolabel="1" class="oe_inline"/><span>)</span>
+                        </button>
+                    </group>
                 </group>
-                <footer>
-                    <button name="button_dummy" string="Rechercher" type="object" class="btn btn-primary" style="margin-right: 4px!important"
-                            attrs="{'invisible': [('pre_a_programmer_id', '!=', False)]}"/>
-                    <button name="button_confirm" string="Confirmer &amp; Fermer" type="object" style="margin-right: 4px!important"
-                            class="btn btn-primary" attrs="{'invisible': [('proposition_ids', '=', []), ('pre_a_programmer_id', '=', False)]}"/>
-                    <button name="button_confirm_next" string="Confirmer &amp; Suivant" type="object" style="margin-right: 4px!important"
-                            class="btn btn-primary" attrs="{'invisible': [('proposition_ids', '=', [])]}"/>
-                    <button name="button_close" string="Fermer" type="object" class="btn-default" style="margin-right: 4px!important"/>
-                </footer>
+
             </form>
         </field>
     </record>

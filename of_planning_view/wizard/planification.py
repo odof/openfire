@@ -44,8 +44,8 @@ class OfPlanifCreneauProp(models.TransientModel):
 
     duree_restante = fields.Float(related='service_id.duree_restante', readonly=True)
     recurrence = fields.Boolean(related="service_id.recurrence", readonly=True)
-    date_next = fields.Date(string=u"À planifier entre le", related="service_id.date_next", readonly=True)
-    date_fin = fields.Date(string="et le", compute="_compute_date_fin", readonly=True)
+    date_next = fields.Date(string=u"À planifier entre le", readonly=True)
+    date_fin = fields.Date(string="et le", readonly=True)
     origin = fields.Char(related="service_id.origin", readonly=True)
     partner_id = fields.Many2one(related="service_id.partner_id")
     partner_name = fields.Char(string="Client", related='service_id.partner_id.name', readonly=True)
@@ -69,14 +69,14 @@ class OfPlanifCreneauProp(models.TransientModel):
 
     distance_dwazo_prec = fields.Float(string=u'Distance du précédent', digits=(5, 5), compute="_compute_distance_dwazo", help=u"À vol d'oiseau")
     distance_dwazo_suiv = fields.Float(string=u'Distance du suivant', digits=(5, 5), compute="_compute_distance_dwazo", help=u"À vol d'oiseau")
-    distance_reelle_prec = fields.Float(string=u'Distance du précédent', digits=(5, 2), help=u"Réelle", compute="compute_distance_reelle")
-    distance_reelle_suiv = fields.Float(string=u'Distance du suivant', digits=(5, 2), help=u"Réelle", compute="compute_distance_reelle")
-    distance_reelle_tota = fields.Float(string=u'Distance totale (km)', digits=(5, 2), help=u"Réelle", compute="compute_distance_reelle")
-    osrm_response = fields.Text(string=u"Réponse OSRM", compute="compute_distance_reelle")
+    distance_reelle_prec = fields.Float(string=u'Distance du précédent', digits=(5, 2), help=u"Réelle")#, compute="compute_distance_reelle")
+    distance_reelle_suiv = fields.Float(string=u'Distance du suivant', digits=(5, 2), help=u"Réelle")#, compute="compute_distance_reelle")
+    distance_reelle_tota = fields.Float(string=u'Distance totale (km)', digits=(5, 2), help=u"Réelle", default=-1)#, compute="compute_distance_reelle")
+    osrm_response = fields.Text(string=u"Réponse OSRM")#, compute="compute_distance_reelle")
     distance_order = fields.Float(
-        string=u'Distance totale order', digits=(5, 5), help=u"pour ordonner", store=True, default=99999,
-        compute="compute_distance_reelle")
-    dummy_field = fields.Boolean(string=u"A VER?", compute="_compute_dummy_field")
+        string=u'Distance totale order', digits=(5, 2), help=u"pour ordonner", default="99999")
+        #compute="compute_distance_reelle", store=True)
+    fait = fields.Boolean(string=u"déjà calculé")
     priorite = fields.Integer(string=u"Priorité")
     selected = fields.Boolean(string=u"Sélectionné")
 
@@ -100,6 +100,11 @@ class OfPlanifCreneauProp(models.TransientModel):
             address_html += u"</div>"
             a_planifier.address_html = address_html
 
+    @api.onchange('fait')
+    def onchange_fait(self):
+        self.ensure_one()
+        self.creneau_id.proposition_ids.compute_distance_reelle()
+
     @api.multi
     @api.depends('geo_lat', 'geo_lng', 'creneau_id.geo_lat_prec', 'creneau_id.geo_lng_prec',
                  'creneau_id.geo_lat_suiv', 'creneau_id.geo_lng_suiv', 'creneau_id')
@@ -112,7 +117,7 @@ class OfPlanifCreneauProp(models.TransientModel):
         a_planifierzz.compute_distance_reelle()"""
 
     @api.multi
-    @api.depends('geo_lat', 'geo_lng', 'creneau_id')
+    #@api.depends('geo_lat', 'geo_lng', 'creneau_id')
     def compute_distance_reelle(self):
         self = self.filtered('creneau_id')
         if not self:
@@ -139,12 +144,19 @@ class OfPlanifCreneauProp(models.TransientModel):
         geo_lng_suiv = lieu_suiv.geo_lng
         compteur = 0
 
-        for a_planifier in self[:25]:
+        # Recuperation des 25 premiers elements tries par priorite puis par distance a vol d'oiseau
+        #a_planifier = a_planifier.sort()
 
-            if a_planifier.distance_order != 99999 and a_planifier.distance_order != 0:
+        for indice in range(len(self)):
+        #for a_planifier in self[:25]:
+            a_planifier = self[indice]
+
+            if a_planifier.fait:
                 continue
+            if compteur >= 25:
+                break
             #a_planifier.dummy_field = True
-            compteur += 1
+            #compteur += 1
             query = ROUTING_BASE_URL + "route/" + ROUTING_VERSION + "/" + ROUTING_PROFILE + "/"
             # Listes de coordonnées : ATTENTION OSRM prend ses coordonnées sous form (lng, lat)
             # lieu précédent
@@ -164,23 +176,29 @@ class OfPlanifCreneauProp(models.TransientModel):
 
             if res and res.get('routes'):
                 legs = res['routes'][0]['legs']
-                a_planifier.distance_reelle_prec = round(legs[0][u'distance'] / 1000.0, 2)
-                a_planifier.distance_reelle_suiv = round(legs[1][u'distance'] / 1000.0, 2)
-                a_planifier.distance_reelle_tota = a_planifier.distance_reelle_prec + a_planifier.distance_reelle_suiv
-                a_planifier.distance_order = a_planifier.distance_reelle_tota
+                dist_prec = round(legs[0][u'distance'] / 1000.0, 2)
+                dist_suiv = round(legs[1][u'distance'] / 1000.0, 2)
+                a_planifier.distance_reelle_prec = dist_prec
+                a_planifier.distance_reelle_suiv = dist_suiv
+                a_planifier.distance_reelle_tota = dist_prec + dist_suiv
+                a_planifier.distance_order = dist_prec + dist_suiv
                 a_planifier.osrm_response = legs
+                a_planifier.fait = True
             else:
                 a_planifier.distance_reelle_prec = -1
                 a_planifier.distance_reelle_suiv = -1
                 a_planifier.distance_reelle_tota = -1
                 a_planifier.distance_order = 99999
                 a_planifier.osrm_response = res
-            """
+                a_planifier.fait = True
+            compteur += 1
+        #print "compteur " + str(compteur)
+        """
             if a_planifier.distance_dwazo_prec != -1 and a_planifier.distance_dwazo_suiv != -1:
                 #asupprimer quand osrm refonctionne
                 a_planifier.distance_order = a_planifier.distance_dwazo_prec + a_planifier.distance_dwazo_suiv
                 a_planifier.distance_reelle_tota = a_planifier.distance_order"""
-        #print "compteur " + str(compteur)
+
 
     @api.multi
     @api.depends('service_id', 'service_id.recurrence', 'service_id.date_next', 'service_id.date_fin')
@@ -329,6 +347,9 @@ class OfPlanifCreneau(models.TransientModel):
         # domain="[('of_est_intervenant', '=', True), ('id', '!=', employee_id)]")
 
     proposition_readonly_ids = fields.One2many('of.planif.intervention', compute="_compute_proposition_readonly_ids", readonly=True)
+    tout_calcule = fields.Boolean(string=u"réelles toutes calculées", compute="compute_tout_calcule")
+    prop_nb = fields.Integer(string=u"Nombre propositionsé", compute="compute_tout_calcule")
+    calcule_nb = fields.Integer(string=u"Nombre déjà calculé", compute="compute_tout_calcule")
     duree_creneau_readonly = fields.Float(related="duree_creneau", readonly=True)
     lieu_prec_readonly_id = fields.Many2one(related="lieu_prec_id", readonly=True)
     lieu_suiv_readonly_id = fields.Many2one(related="lieu_suiv_id", readonly=True)
@@ -397,6 +418,20 @@ class OfPlanifCreneau(models.TransientModel):
         for creneau in self:
             creneau.name = u'%s : Créneau %s' % ((creneau.employee_id.name or u''),
                                                  (creneau.creneaux_reels_formatted or u''))
+
+    @api.multi
+    @api.depends('proposition_ids','proposition_ids.fait')
+    def compute_tout_calcule(self):
+        for wizard in self:
+            if not wizard.proposition_ids:
+                wizard.tout_calcule = True
+                wizard.calcule_nb = 0
+                wizard.prop_nb = 0
+            else:
+                pas_fait = wizard.proposition_ids.filtered(lambda prop: not prop.fait)
+                wizard.tout_calcule = not pas_fait
+                wizard.calcule_nb = len(wizard.proposition_ids) - len(pas_fait)
+                wizard.prop_nb = len(wizard.proposition_ids)
 
     @api.multi
     @api.depends('lieu_prec_id', 'lieu_prec_manual_id', 'lieu_suiv_id', 'lieu_suiv_manual_id')
@@ -656,7 +691,10 @@ class OfPlanifCreneau(models.TransientModel):
 
             vals = {
                 'priorite': priorite,
+                # 'distance_order': 12345,
                 'service_id': service.id,
+                'date_next': service.date_next,
+                'date_fin': service.date_next_fin,
             }
             vals_list.append(vals)
         self.priorite_max = priorite_max
@@ -684,7 +722,7 @@ class OfPlanifCreneau(models.TransientModel):
         prop_prioritaires = self.proposition_ids.filtered(lambda p: p.priorite > self.priorite_max)[:25]
         if len(prop_prioritaires) <= 10:
             prop_prioritaires = self.proposition_ids[:25]
-        #prop_prioritaires.compute_distance_reelle()
+        prop_prioritaires.compute_distance_reelle()
         prop_a_supr = self.proposition_ids.filtered(lambda p: p.distance_reelle_tota > self.distance_max)
         prop_prioritaires -= prop_a_supr
         prop_a_supr.unlink()
@@ -698,6 +736,11 @@ class OfPlanifCreneau(models.TransientModel):
             self.aucun_res = False
         else:
             self.aucun_res = True
+
+    @api.multi
+    def button_compute_more(self):
+        prop_a_faire = self.proposition_ids.filtered(lambda prop: not prop.fait)[:25]
+        prop_a_faire.compute_distance_reelle()
 
     @api.multi
     def button_dummy(self):

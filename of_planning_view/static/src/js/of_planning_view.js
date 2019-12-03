@@ -337,6 +337,8 @@ var PlanningView = View.extend({
     },
     do_search: function (domain, context, group_by) {
         var self = this;
+        $(".o_cp_left").show();
+        $(".o_cp_right").show();
         //console.log("DO_SEARCH doamin:",domain);
         //console.log("group_by",group_by);
         var context_dfd, domain_dfd, range_start_dfd = $.Deferred();
