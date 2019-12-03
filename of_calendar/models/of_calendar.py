@@ -849,20 +849,10 @@ class OFHorairesSegment(models.Model):
 
     @api.model
     def recompute_permanent_date_fin(self, employee_id):
-        """Cette fonction sera couteuse en temp de calcul au fil des ajout d'horaires permanents
+        """#TODO Cette fonction sera couteuse en temp de calcul au fil des ajout d'horaires permanents
         Une meilleure façon de faire serait de recalculer directement depuis le wizard d'horaires seulement les segments concernés
         mais on est dans l'hyper urgence alors on verra plus tard
-        seg_perm = self.search([('employee_id', '=', employee_id), ('permanent', '=', True)], order="date_deb DESC")
-        for i_seg in range(len(seg_perm) - 1, 0, -1):
-            seg = seg_perm[i_seg]
-            if seg_perm[i_seg - 1].date_deb:
-                fin_da = fields.Date.from_string(seg_perm[i_seg - 1].date_deb) - timedelta(days=1)
-                seg.date_fin = fields.Date.to_string(fin_da)
-            else:
-                seg.date_fin = False
-        if len(seg_perm) > 1:
-            fin_da = fields.Date.from_string(seg_perm[-1].date_deb) - timedelta(days=1)
-            seg_perm[0].date_fin = fields.Date.to_string(fin_da)"""
+        """
         seg_perm = self.search([('employee_id', '=', employee_id), ('permanent', '=', True)], order="date_deb")
         un_jour = timedelta(days=1)
         if not seg_perm:

@@ -200,59 +200,6 @@ class OfPlanningEquipe(models.Model):
         for equipe in self:
             equipe.tz_offset = datetime.now(pytz.timezone(equipe.tz or 'GMT')).strftime('%z')
 
-    """@api.onchange('employee_ids')
-    def onchange_employees(self):
-        # @TODO: horaires simples
-        self.ensure_one()
-        if len(self.employee_ids) == 0:  # aucun employé
-            return
-        self.mode_horaires = self.employee_ids[0].ofmode_horaires
-        "" "self.tz = self.employee_ids[0].tz  # la tz et les horaires en mode facile seront ajoutées par of_sale_rdvcom quand validé
-        if self.employee_ids[0].mode_horaires == 'easy':  # si le mode horaire est à 'facile' on prend les horaires du premier employé
-            self.hor_md = self.employee_ids[0].hor_md
-            self.hor_mf = self.employee_ids[0].hor_mf
-            self.hor_ad = self.employee_ids[0].hor_ad
-            self.hor_af = self.employee_ids[0].hor_af
-            self.jour_ids = [(4,le_id,False) for le_id in self.employee_ids[0].jour_ids._ids]
-        else:"" "
-        if self.employee_ids[0].mode_horaires == 'advanced':
-            if len(self.employee_ids) == 1:  # un employé
-                self.of_creneau_ids = [(4, le_id, False) for le_id in self.employee_ids.of_creneau_ids._ids]
-                self.of_creneau_temp_ids = [(4, le_id, False) for le_id in self.employee_ids.of_creneau_temp_ids._ids]
-                self.of_creneau_temp_start = self.employee_ids.of_creneau_temp_start
-                self.of_creneau_temp_stop = self.employee_ids.of_creneau_temp_stop
-            else:  # plusieurs employés /!\ ne gère pas les créneaux temporaires
-                les_employees = self.employee_ids[1:]
-                les_creneaux = self.env['of.horaire.creneau']
-                for ce_creneau in self.employee_ids[0].of_creneau_ids:  # on teste tous les créneaux du premier employé et on ne garde que ceux qui sont aussi dans tous les autres employés
-                    if les_employees.possede_creneau(ce_creneau.id):
-                        les_creneaux |= ce_creneau
-                self.of_creneau_ids = [(4, le_id, False) for le_id in les_creneaux._ids]
-        if not self.category_ids:
-            category_ids = []
-            for employee in self.employee_ids:
-                for category in employee.category_ids:
-                    if category.id not in category_ids:
-                        category_ids.append(category.id)
-            if category_ids:
-                self.category_ids = category_ids"""
-
-    @api.onchange('hor_md', 'hor_mf', 'hor_ad', 'hor_af')
-    def onchange_horaires(self):
-        hors = (self.hor_md, self.hor_mf, self.hor_ad, self.hor_af)
-        self.hor_md = round(self.hor_md, 5)
-        self.hor_mf = round(self.hor_mf, 5)
-        self.hor_ad = round(self.hor_ad, 5)
-        self.hor_af = round(self.hor_af, 5)
-        if all(hors):
-            for hor in hors:
-                if hor > 24:
-                    raise ValidationError(u"L'heure doit être inférieure ou égale à 24")
-            if hors[0] > hors[1] or hors[2] > hors[3]:
-                raise ValidationError(u"L'heure de début ne peut pas être supérieure à l'heure de fin")
-            if hors[1] > hors[2]:
-                raise ValidationError(u"L'heure de l'après-midi ne peut pas être inférieure à l'heure du matin")
-
     @api.model
     def get_working_hours_fields(self):
         # @TODO: supprimer cette fonctionnalité de la classe utilitaire

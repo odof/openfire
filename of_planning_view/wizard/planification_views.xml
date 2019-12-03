@@ -152,8 +152,8 @@
                             <field name="date_fin"/>
                             <field name="duree_restante" string="Durée restante" widget="float_time"/>
                             <field name="origin"/>
-                            <field name="distance_dwazo_prec" invisible="1"/>
-                            <field name="distance_dwazo_suiv" invisible="1"/>
+                            <field name="distance_oiseau_prec" invisible="1"/>
+                            <field name="distance_oiseau_suiv" invisible="1"/>
                             <field name="distance_reelle_prec" invisible="1"/>
                             <field name="distance_reelle_suiv" invisible="1"/>
                             <field name="distance_reelle_tota"/>

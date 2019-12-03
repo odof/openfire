@@ -20,7 +20,7 @@ def hours_to_strs(*hours):
     """
     return tuple("%dh%02d" % (hour, round((hour % 1) * 60)) if hour % 1 else "%dh" % (hour) for hour in hours)
 
-def voldwazo(lat1, lng1, lat2, lng2):
+def voloiseau(lat1, lng1, lat2, lng2):
     u"""
     Retourne la distance entre deux points en Km, à vol d'oiseau
     @param *: Coordonnées gps en degrés
@@ -67,8 +67,8 @@ class OfPlanifCreneauProp(models.TransientModel):
     geo_lng = fields.Float(related='service_id.geo_lng', readonly=True)
     precision = fields.Selection(related='service_id.precision', readonly=True)
 
-    distance_dwazo_prec = fields.Float(string=u'Distance du précédent', digits=(5, 5), compute="_compute_distance_dwazo", help=u"À vol d'oiseau")
-    distance_dwazo_suiv = fields.Float(string=u'Distance du suivant', digits=(5, 5), compute="_compute_distance_dwazo", help=u"À vol d'oiseau")
+    distance_oiseau_prec = fields.Float(string=u'Distance du précédent', digits=(5, 5), compute="_compute_distance_oiseau", help=u"À vol d'oiseau")
+    distance_oiseau_suiv = fields.Float(string=u'Distance du suivant', digits=(5, 5), compute="_compute_distance_oiseau", help=u"À vol d'oiseau")
     distance_reelle_prec = fields.Float(string=u'Distance du précédent', digits=(5, 2), help=u"Réelle")#, compute="compute_distance_reelle")
     distance_reelle_suiv = fields.Float(string=u'Distance du suivant', digits=(5, 2), help=u"Réelle")#, compute="compute_distance_reelle")
     distance_reelle_tota = fields.Float(string=u'Distance totale (km)', digits=(5, 2), help=u"Réelle", default=-1)#, compute="compute_distance_reelle")
@@ -194,9 +194,9 @@ class OfPlanifCreneauProp(models.TransientModel):
             compteur += 1
         #print "compteur " + str(compteur)
         """
-            if a_planifier.distance_dwazo_prec != -1 and a_planifier.distance_dwazo_suiv != -1:
+            if a_planifier.distance_oiseau_prec != -1 and a_planifier.distance_oiseau_suiv != -1:
                 #asupprimer quand osrm refonctionne
-                a_planifier.distance_order = a_planifier.distance_dwazo_prec + a_planifier.distance_dwazo_suiv
+                a_planifier.distance_order = a_planifier.distance_oiseau_prec + a_planifier.distance_oiseau_suiv
                 a_planifier.distance_reelle_tota = a_planifier.distance_order"""
 
 
@@ -218,23 +218,23 @@ class OfPlanifCreneauProp(models.TransientModel):
 
     @api.multi
     @api.depends('geo_lat', 'geo_lng', 'creneau_id')
-    def _compute_distance_dwazo(self):
+    def _compute_distance_oiseau(self):
         #print "\nDISTANCE DWAZO?"
         #print len(self)
         #print "\n"
         for a_planifier in self:
             if a_planifier.geo_lat == 0.0 or a_planifier.geo_lng == 0.0:
-                a_planifier.distance_dwazo_prec = -1
-                a_planifier.distance_dwazo_suiv = -1
+                a_planifier.distance_oiseau_prec = -1
+                a_planifier.distance_oiseau_suiv = -1
                 continue
             if a_planifier.creneau_id.geo_lat_prec == 0.0 or a_planifier.creneau_id.geo_lng_prec == 0.0:
-                a_planifier.distance_dwazo_prec = -1
+                a_planifier.distance_oiseau_prec = -1
             else:
-                a_planifier.distance_dwazo_prec = voldwazo(a_planifier.geo_lat, a_planifier.geo_lng, a_planifier.creneau_id.geo_lat_prec, a_planifier.creneau_id.geo_lng_prec)
+                a_planifier.distance_oiseau_prec = voloiseau(a_planifier.geo_lat, a_planifier.geo_lng, a_planifier.creneau_id.geo_lat_prec, a_planifier.creneau_id.geo_lng_prec)
             if a_planifier.creneau_id.geo_lat_suiv == 0.0 or a_planifier.creneau_id.geo_lng_suiv == 0.0:
-                a_planifier.distance_dwazo_suiv = -1
+                a_planifier.distance_oiseau_suiv = -1
             else:
-                a_planifier.distance_dwazo_suiv = voldwazo(a_planifier.geo_lat, a_planifier.geo_lng, a_planifier.creneau_id.geo_lat_suiv, a_planifier.creneau_id.geo_lng_suiv)
+                a_planifier.distance_oiseau_suiv = voloiseau(a_planifier.geo_lat, a_planifier.geo_lng, a_planifier.creneau_id.geo_lat_suiv, a_planifier.creneau_id.geo_lng_suiv)
 
     @api.multi
     @api.onchange('heure_debut_rdv')
@@ -646,28 +646,28 @@ class OfPlanifCreneau(models.TransientModel):
         priorite_max = 0
         lieu_prec = self.lieu_prec_manual_id or self.lieu_prec_id
         lieu_suiv = self.lieu_suiv_manual_id or self.lieu_suiv_id
-        calcul_distance_dwazo = True
+        calcul_distance_oiseau = True
         if not lieu_prec and not lieu_suiv:
-            calcul_distance_dwazo = False
+            calcul_distance_oiseau = False
         elif not lieu_prec:
             lieu_prec = lieu_suiv
         elif not lieu_suiv:
             lieu_suiv = lieu_prec
 
         for service in services:
-            if calcul_distance_dwazo:
-                voldwazo_prec = voldwazo(service.geo_lat, service.geo_lng, lieu_prec.geo_lat, lieu_prec.geo_lng)
-                voldwazo_suiv = voldwazo(service.geo_lat, service.geo_lng, lieu_suiv.geo_lat, lieu_suiv.geo_lng)
+            if calcul_distance_oiseau:
+                voloiseau_prec = voloiseau(service.geo_lat, service.geo_lng, lieu_prec.geo_lat, lieu_prec.geo_lng)
+                voloiseau_suiv = voloiseau(service.geo_lat, service.geo_lng, lieu_suiv.geo_lat, lieu_suiv.geo_lng)
                 priorite = 0
-                if voldwazo_prec > distance_max:  # trop loins
+                if voloiseau_prec > distance_max:  # trop loins
                     continue
-                if voldwazo_suiv > distance_max:
+                if voloiseau_suiv > distance_max:
                     continue
-                if voldwazo_prec + voldwazo_suiv <= 5:
+                if voloiseau_prec + voloiseau_suiv <= 5:
                     priorite += 3
-                elif voldwazo_prec + voldwazo_suiv <= 10:
+                elif voloiseau_prec + voloiseau_suiv <= 10:
                     priorite += 2
-                elif voldwazo_prec + voldwazo_suiv <= 15:
+                elif voloiseau_prec + voloiseau_suiv <= 15:
                     priorite += 1
             if service.recurrence and (not service.date_fin or service.date_fin > date_un_mois_str):  # service recurrent sans date de fin ou qui termine dans + d'un mois
                 # on prend en compte la date de prochaine intervention
