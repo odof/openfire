@@ -267,3 +267,13 @@ msgstr "sale.config.settings"
 #: model:ir.ui.view,arch_db:of_sale.of_sale_order_view_search_inherit_sale
 msgid "À facturer entièrement"
 msgstr "À facturer entièrement"
+
+#. module: of_sale
+#: selection:sale.order,of_force_invoice_status:0
+msgid "Nothing to Invoice"
+msgstr "Rien à facturer"
+
+#. module: of_sale
+#: selection:sale.order,of_force_invoice_status:0
+msgid "Fully Invoiced"
+msgstr "Entièrement facturé"

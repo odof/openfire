@@ -118,7 +118,8 @@ class SaleOrder(models.Model):
                          "WHERE qty_to_invoice + qty_invoiced < product_uom_qty")
         order_ids = self._cr.fetchall()
 
-        domain = ['&',
+        domain = ['&', '&',
+                  ('of_force_invoice_status', 'not in', ('invoiced', 'no')),
                   ('state', 'in', ('sale', 'done')),
                   ('order_line.qty_to_invoice', '>', 0)]
         if order_ids:
@@ -152,6 +153,13 @@ class SaleOrder(models.Model):
     of_echeance_line_ids = fields.One2many('of.sale.echeance', 'order_id', string=u"Échéances")
 
     of_echeances_modified = fields.Boolean(u"Les échéances ont besoin d'être recalculées", compute="_compute_of_echeances_modified")
+    of_force_invoice_status = fields.Selection([
+        ('invoiced', 'Fully Invoiced'),
+        ('no', 'Nothing to Invoice')
+        ], string=u"Forcer état de facturation",
+        help=u"Permet de forcer l'état de facturation de la commande.\n"
+             u"Utile pour les commandes facturées qui refusent de changer d'état "
+             u"(e.g. une ligne a été supprimée dans la facture).")
 
     @api.depends('of_echeance_line_ids', 'amount_total')
     def _compute_of_echeances_modified(self):
@@ -219,6 +227,14 @@ class SaleOrder(models.Model):
             result[-1][2]['percent'] = pct_left
         return result
 
+    @api.depends('state', 'order_line.invoice_status', 'of_force_invoice_status')
+    def _get_invoiced(self):
+        # Appel du super dans tous les cas pour le calcul de invoice_count et invoice_ids
+        super(SaleOrder, self)._get_invoiced()
+        for order in self:
+            if order.of_force_invoice_status:
+                order.invoice_status = order.of_force_invoice_status
+
     @api.onchange('payment_term_id')
     def _onchange_payment_term_id(self):
         if self.payment_term_id:
@@ -283,8 +299,9 @@ class SaleOrder(models.Model):
     @api.depends('state', 'order_line', 'order_line.qty_to_invoice', 'order_line.product_uom_qty')
     def _compute_of_to_invoice(self):
         for order in self:
-            if order.state not in ('sale', 'done'):
+            if order.state not in ('sale', 'done') or order.of_force_invoice_status in ('invoiced', 'no'):
                 order.of_to_invoice = False
+                continue
             for line in order.order_line:
                 if line.qty_to_invoice + line.qty_invoiced < line.product_uom_qty:
                     order.of_to_invoice = False

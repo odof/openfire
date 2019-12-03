@@ -109,6 +109,11 @@
                         </span>
                     </group>
                 </xpath>
+                <!-- Ajout de la possibilité de forcer l'état de facturation de la commande -->
+                <xpath expr="//group[@name='sale_pay']//field[@name='invoice_status']" position="after">
+                    <field name="of_force_invoice_status" groups="account.group_account_manager"
+                           attrs="{'invisible': [('state', 'not in', ('sale','done'))]}"/>
+                </xpath>
             </field>
         </record>
 
