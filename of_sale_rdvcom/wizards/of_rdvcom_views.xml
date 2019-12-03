@@ -102,7 +102,7 @@
                         <field name="creneau_ids" mode="calendar" colspan="4" nolabel="1" options="{'no_create': True}">
                             <calendar string="Calendrier" date_start="debut_dt" color="employee_id" date_stop="fin_dt" all_day="allday"
                                 attendee_model="hr.employee" color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1"
-                                filters_radio="1" dispo_field="disponible" show_first_evt="1" working_hours="parent"
+                                filters_radio="1" dispo_field="disponible" show_first_evt="1"
                                 force_color_field="force_color" display_states="1" selected_field="selected">
                                 <field name="name"/>
                                 <field name="distance" suffix=" km"/>

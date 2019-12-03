@@ -1,28 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Vue services formulaire : ajout onglet parc installé -->
+    <!-- Vue services recurrents formulaire : ajout onglet parc installé -->
     <record id="view_of_service_parc_installe_service_form" model="ir.ui.view">
         <field name="name">of.parc.installe.service.form</field>
         <field name="model">of.service</field>
         <field name="inherit_id" ref="of_service.view_of_service_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//notebook/page[1]" position="before">
-                <page string="Produit installé">
-                    <group>
-                        <field name="parc_installe_id" domain="[('site_adresse_id', 'child_of', [partner_id])]"/>
+            <xpath expr="//field[@name='order_id']" position="after">
+                <field name="sav_id"
+                       attrs="{'invisible': [('recurrence', '=', True)]}"
+                       groups="project.group_project_user, base.group_portal"/>
+            </xpath>
+            <xpath expr="//group[@name='notes']" position="before">
+                <group string="Produit installé" groups="project.group_project_user">
+                        <field name="parc_installe_id"/>
                         <field name="parc_installe_product_id"/>
                         <field name="parc_installe_site_adresse_id"/>
                         <field name="parc_installe_note"/>
-                    </group>
-                </page>
+                </group>
             </xpath>
         </field>
     </record>
 
-    <!-- Action pour ouvrir le parc installé depuis vue service -->
+    <!-- Action pour ouvrir les services depuis parc installé -->
     <record id="of_service_parc_installe_open_service" model="ir.actions.act_window">
         <field name="name">Services</field>
+        <field name="res_model">of.service</field>
+        <field name="domain">[]</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_ids" eval="[(5,0,0),
+                          (0,0,{'view_mode':'tree'}),
+                          (0,0,{'view_mode':'form', 'view_id': ref('view_of_service_parc_installe_service_form')})]"/>
+    </record>
+
+    <!-- Action pour ouvrir les interventions à programmer depuis parc installé -->
+    <record id="of_service_parc_installe_open_a_programmer" model="ir.actions.act_window">
+        <field name="name">Interventions à programmer</field>
         <field name="res_model">of.service</field>
         <field name="domain">[]</field>
         <field name="view_mode">tree,form</field>
@@ -35,10 +49,10 @@
     <record id="view_of_service_parc_installe_planning_form" model="ir.ui.view">
         <field name="name">of.parc.installe.planning.intervention.form</field>
         <field name="model">of.planning.intervention</field>
-        <field name="inherit_id" ref="of_project_issue.of_planning_intervention_sav_liee"/>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='sav_id']" position="after">
-                <field name="parc_installe_id" domain="[('site_adresse_id', '=', address_id)]"/>
+            <xpath expr="//group[@name='liens']" position="inside">
+                <field name="parc_installe_id" groups="project.group_project_user"/>
             </xpath>
         </field>
     </record>
@@ -49,14 +63,24 @@
         <field name="model">of.parc.installe</field>
         <field name="inherit_id" ref="of_parc_installe.of_parc_installe_form_view"/>
         <field name="arch" type="xml">
+            <!-- Ajout bouton prévoir une intervention-->
+            <xpath expr="//header" position="inside">
+                <button name="action_prevoir_intervention" string="Prévoir Intervention" type="object"/>
+            </xpath>
             <xpath expr="//group[@name='produit_installe']" position="inside">
                 <field name="id" invisible="1"/>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button class="oe_stat_button" name="action_view_service" type="object" icon="fa-archive" context="{'default_partner_id': client_id, 'default_address_id': site_adresse_id, 'default_parc_installe_id': id}">
+                <button class="oe_stat_button" name="action_view_service" type="object" icon="fa-home">
                     <div class="o_form_field o_stat_info">
                         <span class="o_stat_value"><field name="service_count"/></span>
                         <span class="o_stat_text">Services</span>
+                    </div>
+                </button>
+                <button class="oe_stat_button" name="action_view_a_programmer" type="object" icon="fa-calendar-o">
+                    <div class="o_form_field o_stat_info">
+                        <span class="o_stat_value"><field name="a_programmer_count"/></span>
+                        <span class="o_stat_text">À programmer</span>
                     </div>
                 </button>
             </xpath>
@@ -69,7 +93,7 @@
                         <field name="intervention_ids" nolabel="1" context="{'default_address_id':site_adresse_id, 'default_parc_installe_id':id}">
                             <tree string="intervention" colors="darkolivegreen:state=='confirm';grey:state=='cancel';darkred:state=='postponed';darkblue:state=='done';purple:state=='unfinished'">
                                 <field name="date"/>
-                                <field name="equipe_id"/>
+                                <field name="employee_ids"/>
                                 <field name="tache_id"/>
                                 <field name="duree" context="{'tz': 'Europe/Paris'}" string="Durée" widget="float_time"/>
                                 <button name="button_open_of_planning_intervention" class="oe_link" type="object" string="Ouvrir"/>
@@ -89,10 +113,50 @@
         <field name="inherit_id" ref="of_service.of_service_view_partner_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='service_partner_ids']" position="attributes">
-                <attribute name="context">{'default_address_id':id, 'form_view_ref':'of_service_parc_installe.view_of_service_parc_installe_service_form'}</attribute>
+                <attribute name="context">{'default_address_id':id, 'form_view_ref':'of_service_parc_installe.view_of_service_parc_installe_service_rec_form'}</attribute>
             </xpath>
             <xpath expr="//field[@name='service_address_ids']" position="attributes">
-                <attribute name="context">{'hide_service_address_id':True, 'form_view_ref':'of_service_parc_installe.view_of_service_parc_installe_service_form'}</attribute>
+                <attribute name="context">{'hide_service_address_id':True, 'form_view_ref':'of_service_parc_installe.view_of_service_parc_installe_service_rec_form'}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!--act_window
+        name="Prévoir une intervention"
+        res_model="of.service"
+        src_model="project.issue"
+        view_mode="form"
+        view_id="of_service.view_of_service_form"
+        id="action_prevoir_intervention_sav"
+        key2="client_action_multi"
+        target="new"
+        groups="of_planning.of_group_planning_intervention_lecture_siens"
+        context="{
+            'partner_id': self.of_produit_installe_id and self.of_parc_installe_client_id or self.partner_id,
+            'address_id': self.of_produit_installe_id and self.of_parc_installe_lieu_id or self.partner_id,
+            'recurrence': False,
+            'bloquer_recurrence': True,
+        }"
+    /><!- - dump:  -->
+
+
+    <record id="of_project_issue_form_view_serviceparc" model="ir.ui.view">
+        <field name="name">project.issue.form.service_parc_installe</field>
+        <field name="model">project.issue</field>
+        <field name="inherit_id" ref="of_project_issue.of_project_issue_form_view"/>
+        <field name="arch" type="xml">
+            <!-- Ajout bouton prévoir une intervention dans vue form SAV-->
+            <xpath expr="//header" position="inside">
+                <button name="action_prevoir_intervention" string="Prévoir Intervention" type="object"/>
+            </xpath>
+            <!-- smart button 'à programmer' -->
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+                <button class="oe_stat_button" name="action_view_a_programmer" type="object" icon="fa-calendar-o">
+                    <div class="o_form_field o_stat_info">
+                        <span class="o_stat_value"><field name="of_a_programmer_count"/></span>
+                        <span class="o_stat_text">À programmer</span>
+                    </div>
+                </button>
             </xpath>
         </field>
     </record>

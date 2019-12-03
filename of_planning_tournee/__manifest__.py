@@ -15,8 +15,6 @@
         'of_service',
         'of_geolocalize',
         'of_map_view',
-        # 'of_gesdoc',
-        # 'of_imports',
         'of_base_location',
         'of_sale',
     ],
@@ -24,14 +22,8 @@
     "demo_xml" : [],
     "data" : [
         'security/ir.model.access.csv',
-        # 'wizard/add_partner_view.xml',
         'wizard/rdv_view.xml',
-        'wizard/planification_view.xml',
-        # 'wizard/search_partner_view.xml',
-        # 'wizard/impression_view.xml',
         'views/of_planning_tournee_view.xml',
-        # 'of_planning_res_report.xml',
-        # 'data/of_imports_prechamp_client.xml',
     ],
     "installable": True,
 }

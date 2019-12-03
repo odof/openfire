@@ -65,7 +65,7 @@
   <story>
   <pto>
   <para style="terp_default_8">[[ setLang(user.lang) ]]</para>
-  <para style="terp_default_8">[[repeatIn(objects.equipe_ids,'e') ]]</para>
+  <para style="terp_default_8">[[repeatIn(objects.employee_ids,'e') ]]</para>
   <pto_header>
     <blockTable colWidths="45.0,160.0,95.0,250.0" repeatRows="1" style="Table1">
       <tr>

@@ -16,11 +16,13 @@ Pour faire l'import, aller dans Configuration -> Technique -> Cities/Locations M
     'author': "OpenFire",
     'website': 'http://www.akretion.com',
     'depends': [
+        'of_base',
         'base_location_geonames_import',
         'l10n_fr_base_location_geonames_import',  # Dépendance inutile pour le module. Sert uniquement à ne pas oublier d'installer ce module
     ],
     'data': [
         'views/of_better_zip_view.xml',
+        'security/ir.model.access.csv',
     ],
     'installable': True,
 }
