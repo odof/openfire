@@ -48,7 +48,7 @@
         <record id="of_planning_intervention_lecture_siens_rule" model="ir.rule">
             <field name="name">Lire propres rendez-vous</field>
             <field ref="model_of_planning_intervention" name="model_id"/>
-            <field name="domain_force">[('equipe_id.employee_ids.user_id','=',user.id)]</field>
+            <field name="domain_force">[('employee_ids.user_id','=',user.id)]</field>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
             <field name="perm_unlink" eval="False"/>
@@ -68,7 +68,7 @@
         <record id="of_planning_intervention_modification_siens_rule" model="ir.rule">
             <field name="name">Modifier propres rendez-vous</field>
             <field ref="model_of_planning_intervention" name="model_id"/>
-            <field name="domain_force">[('equipe_id.employee_ids.user_id','=',user.id)]</field>
+            <field name="domain_force">[('employee_ids.user_id','=',user.id)]</field>
             <field name="perm_read" eval="False"/>
             <field name="groups" eval="[(4, ref('of_planning.of_group_planning_intervention_modification_siens'))]"/>
         </record>

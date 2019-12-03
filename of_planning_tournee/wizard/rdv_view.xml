@@ -25,7 +25,7 @@
                     <field name="partner_id" invisible="1"/>
                     <field name="res_line_id" invisible="1"/>
                     <field name="name" invisible="1"/>
-                    <field name="equipe_id" domain="[('id', 'in', context.get('equipe_domain',[]))]" invisible="1"/>
+                    <field name="employee_id" domain="[('id', 'in', context.get('employee_domain',[]))]" invisible="1"/>
                     <field name="date_propos" invisible="1"/>
                     <field name="date_propos_hour" widget="float_time" invisible="1"/>
                     <field name="date_next" invisible="1"/>
@@ -62,7 +62,7 @@
                             <field name="tache_id"/>
                             <field name="creer_recurrence" attrs="{'invisible': [('service_id', '!=', False)]}"/>
                             <field name="duree" widget="float_time"/>
-                            <field name="pre_equipe_ids" widget="many2many_tags"/>
+                            <field name="pre_employee_ids" widget="many2many_tags"/>
                         </group>
                         <group col="2" colspan="2">
                             <field name="date_recherche_debut"/>
@@ -85,9 +85,9 @@
                             <separator string="Aucun résultat suffisament proche" colspan="4" attrs="{'invisible':[('zero_dispo','!=',True)]}"/>
                             <separator string="Aucun résultat" colspan="4" attrs="{'invisible':[('zero_result','!=',True)]}"/>
                             <field name="planning_ids" mode="calendar" colspan="4" nolabel="1">
-                                <calendar string="Calendrier" date_start="debut_dt" color="equipe_id" date_stop="fin_dt" all_day="allday"
-                                    attendee_model="of.planning.equipe" color_ft_field="color_ft" color_bg_field="color_bg" custom_colors="1"
-                                    working_hours="1" filters_radio="1" dispo_field="disponible" jump_to="selected" display_states="1"
+                                <calendar string="Calendrier" date_start="debut_dt" color="employee_id" date_stop="fin_dt" all_day="allday"
+                                    attendee_model="hr.employee" color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1"
+                                    filters_radio="1" dispo_field="disponible" jump_to="selected" display_states="1"
                                     force_color_field="force_color" selected_field="selected">
                                     <field name="name"/>
                                     <field name="distance" suffix=" km"/>
@@ -96,8 +96,8 @@
                                     <field name="disponible" invisible="1"/>
                                     <field name="force_color" invisible="1"/>
                                     <field name="selected" invisible="1"/>
-                                    <field name="color_ft" invisible="1"/>
-                                    <field name="color_bg" invisible="1"/>
+                                    <field name="of_color_ft" invisible="1"/>
+                                    <field name="of_color_bg" invisible="1"/>
                                 </calendar>
                             </field>
                         </page>
@@ -111,7 +111,7 @@
                                     <field name="disponible" invisible="1"/>
                                     <field name="selected" invisible="1"/>
                                     <field name="date"/>
-                                    <field name="equipe_id"/>
+                                    <field name="employee_id"/>
                                     <field name="description" string="Créneau"/>
                                     <field name="distance" string="Distance"/>
                                     <field name="duree" string="Durée"/>
@@ -126,7 +126,7 @@
                         <button name="button_calcul" string="Rechercher" type="object" colspan="2" class="btn-default"
                                 attrs="{'invisible': [('date_propos','=',False)]}"/>
                         <button string="Confirmer RDV" name="button_confirm" type="object" class="btn-primary"
-                                attrs="{'invisible': ['|','|','|',('name','=',False),('equipe_id','=',False),('date_propos','=',False),('date_propos_hour','=',False)]}"/>
+                                attrs="{'invisible': ['|','|','|',('name','=',False),('employee_id','=',False),('date_propos','=',False),('date_propos_hour','=',False)]}"/>
                         <button string="Annuler" class="btn-default" special="cancel"/>
                     </footer>
                 </form>
@@ -151,7 +151,7 @@
                         <group>
                             <field name="date" readonly="1"/>
                             <field name="description" readonly="1"/>
-                            <field name="equipe_id" readonly="1"/>
+                            <field name="employee_id" readonly="1"/>
                             <field name="intervention_id" readonly="1" attrs="{'invisible':[('intervention_id','=',False)]}"/>
                             <field name="disponible" readonly="1"/>
                         </group>
@@ -209,12 +209,11 @@
             view_mode="form"
             view_id="view_rdv_intervention_wizard"
             id="action_view_rdv_intervention_wizard_service"
-            key2="client_action_multi"
             target="new"
             groups="of_planning.of_group_planning_intervention_lecture_siens"
         />
 
-        <act_window
+        <!--act_window key2="client_action_multi"
             name="Planifier une intervention"
             res_model="of.tournee.rdv"
             src_model="sale.order"
@@ -224,7 +223,7 @@
             key2="client_action_multi"
             target="new"
             groups="of_planning.of_group_planning_intervention_lecture_siens"
-        />
+        /-->
 
         <!-- Ajout bouton planifier une intervention dans vue form partenaire-->
         <record id="of_view_partner_form_rdv_intervention" model="ir.ui.view">
@@ -238,19 +237,21 @@
             </field>
         </record>
 
-        <!-- Ajout bouton planifier une intervention dans vue form service-->
+        <!-- Ajout bouton planifier une intervention dans vue form service recurrent-->
         <record id="view_of_service_form_rdv_intervention" model="ir.ui.view">
             <field name="name">of.service.form.rdv.intervention</field>
             <field name="model">of.service</field>
             <field name="inherit_id" ref="of_service.view_of_service_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//header" position="inside">
-                    <button name="%(action_view_rdv_intervention_wizard_service)d" string="Planifier Intervention" type="action"/>
+                    <button name="%(action_view_rdv_intervention_wizard_service)d" string="Planifier Intervention"
+                            type="action" invisible="context.get('hide_bouton_planif')"
+                            attrs="{'invisible': [('base_state', '!=', 'calculated')]}"/>
                 </xpath>
             </field>
         </record>
 
-        <!-- Ajout bouton planifier une intervention dans vue form devis/bon de commande-->
+        <!-- Ajout bouton planifier une intervention dans vue form devis/bon de commande- ->
         <record id="view_of_order_form_planning_tournee" model="ir.ui.view">
             <field name="name">of.sale.order.form.planning.tournee</field>
             <field name="model">sale.order</field>
@@ -260,6 +261,6 @@
                     <button name="%(action_view_rdv_intervention_wizard_sale_order)d" string="Planifier Intervention" type="action"/>
                 </xpath>
             </field>
-        </record>
+        </record-->
     </data>
 </odoo>

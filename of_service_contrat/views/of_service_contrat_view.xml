@@ -6,9 +6,11 @@
         <field name="model">of.service</field>
         <field name="inherit_id" ref="of_service.view_of_service_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='date_fin']" position="before">
-                <field name="contrat"/>
-                <field name="date_contrat"/>
+            <xpath expr="//group[@name='origine']" position="after">
+                <group name="contrat" string="Contrat">
+                    <field name="contrat"/>
+                    <field name="date_contrat"/>
+                </group>
             </xpath>
         </field>
     </record>

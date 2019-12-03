@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_horaire_segment_user,of.horaire.segment.user,model_of_horaire_segment,base.group_user,1,0,0,0
+access_of_horaire_segment_manager,of.horaire.segment.manager,model_of_horaire_segment,hr.group_hr_manager,1,1,1,1
+access_of_horaire_creneau_user,of.horaire.creneau.user,model_of_horaire_creneau,base.group_user,1,0,0,0
+access_of_horaire_creneau_manager,of.horaire.creneau.manager,model_of_horaire_creneau,hr.group_hr_manager,1,1,1,1
+access_of_horaire_modele_user,of.horaire.modele.user,model_of_horaire_modele,base.group_user,1,0,0,0
+access_of_horaire_modele_manager,of.horaire.modele.manager,model_of_horaire_modele,hr.group_hr_manager,1,1,1,1

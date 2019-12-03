@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_horaire_save_modele_form_view" model="ir.ui.view">
+        <field name="name">of.horaire.save.modele.form.view</field>
+        <field name="model">of.horaire.save.modele.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <h3>Choisir un nom pour le modèle :</h3>
+                <group>
+                    <field name="name" required="1" attrs="{'readonly': [('fait', '=', True)]}"/>
+                    <field name="horaires_recap"/>
+                    <field name="creneau_ids" widget="many2many_tags" invisible="1"/>
+                    <field name="fait" invisible="1"/>
+                    <field name="mode" invisible="1"/>
+                    <field name="wizard_id" invisible="1"/>
+                </group>
+
+                <footer>
+                    <button string="Sauvegarder le modèle" name="action_confirm" type="object"
+                        class="oe_highlight" attrs="{'invisible': [('fait', '=', True)]}"/>
+                    <span attrs="{'invisible': [('fait', '=', False)]}">
+                        Félicitation! le modèle à été sauvegardé avec succès!
+                    </span>
+                    <button string="Retour" name="action_retour" type="object" class="btn btn_default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_horaire_segment_form_view" model="ir.ui.view">
+        <field name="name">of.horaire.segment.form.view</field>
+        <field name="model">of.horaire.segment.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <!--script>
+                    $(document).ready(function(){
+                        // Cacher les boutons "Sauvegarder" et "Annuler" quand on clique sur un créneau du calendrier
+                        var len = $(".modal-footer").length;
+                        $(".modal-footer").eq(len-1).hide();
+                    });
+                </script-->
+                <script>
+                    $(document).ready(function(){
+                        // élargir le pop-up
+                        $(".modal-dialog").width('80%');
+                    });
+                </script>
+                <h1 class="of_title"><b>
+                    <span attrs="{'invisible': [('mode', '!=', 'create')]}">Nouvel horaire pour </span>
+                    <span attrs="{'invisible': [('mode', '!=', 'edit')]}">Modifier un horaire pour </span>
+                    <span attrs="{'invisible': [('mode', '!=', 'unlink')]}">Supprimer un horaire pour </span>
+                    <field name="employee_id" readonly="1" nolabel="1" class="oe_inline of_title"/>
+                </b></h1>
+                <field name="mode" invisible="1"/>
+                <group col="3">
+                    <group name="periode" string="Période">
+                        <field name="permanent" attrs="{'readonly': [('premier_seg', '=', True)]}"/>
+                        <field name="segment_id" attrs="{'invisible': [('mode', '=', 'create')]}"
+                          domain="[
+                            ('employee_id', '=', employee_id),
+                            ('permanent', '=', permanent),
+                        ]" context="{'restrict_date': 1,}" options="{'no_create': 1, 'no_open': 1,}"/>
+                        <field name="date_deb" attrs="{
+                            'required': [
+                                ('mode', 'in', ('create', 'edit')),
+                                '|',
+                                    ('permanent', '=', False),
+                                    ('premier_seg', '=', False)],
+                            'invisible': [
+                                '|',
+                                '|',
+                                '&amp;',
+                                    ('permanent', '=', True),
+                                    ('premier_seg', '=', True),
+                                    ('mode', '=', 'unlink'),
+                                    '&amp;',
+                                        ('mode','=', 'edit'),
+                                        ('segment_id', '=', False)]}"/>
+                        <field name="date_fin" attrs="{'required': [('permanent', '=', False)],
+                            'invisible': [
+                                '|',
+                                '|',
+                                    ('permanent', '=', True),
+                                    ('mode', '=', 'unlink'),
+                                    '&amp;',
+                                        ('mode', '=', 'edit'),
+                                        ('segment_id', '=', False)]}"/>
+                        <field name="motif" attrs="{
+                          'invisible': [
+                            '|',
+                            '|',
+                                ('mode', '=', 'unlink'),
+                                '&amp;',
+                                    ('mode', '=', 'unlink'),
+                                    ('segment_id', '=', False),
+                                '&amp;',
+                                    ('permanent', '=', True),
+                                    ('premier_seg', '=', True)]}"/>
+                        <div colspan="2" attrs="{
+                          'invisible': [
+                            '|',
+                            '|',
+                                ('mode', '!=', 'create'),
+                                ('premier_seg', '=', False),
+                                ('permanent', '=', False)]}">
+                            <i>
+                                <p>Ces horaires sont les premiers horaires permanents de cet employé</p>
+                                <p>Il n'y a donc pas besoin de rentrer une date de début</p>
+                            </i>
+                        </div>
+                        <field name="premier_seg" invisible="1"/>
+                        <field name="remplacement" invisible="1"/>
+                    </group>
+                    <group name="horaires" string="Horaires" colspan="2"
+                           attrs="{'invisible': [('mode', '=', 'unlink'), ('segment_id', '=', False)]}">
+                        <group colspan="2">
+                            <field name="modele_id" readonly="0" attrs="{'invisible': [('mode', '=', 'unlink')]}"
+                                   context="{'default_creneau_ids':creneau_ids}"/>
+                            <field name="mode_horaires" attrs="{'required': [('mode', '!=', 'unlink')],
+                              'readonly': [('mode', '=', 'unlink')]}"/>
+                            <field name="creneau_ids" attrs="{'invisible': [('mode_horaires', '!=', 'advanced')],
+                              'readonly': [('mode', '=', 'unlink')]}" widget="many2many_tags"/>
+                        </group>
+                        <group name="easy" col="3" colspan="2" attrs="{'invisible': [('mode_horaires', '!=', 'easy')]}">
+                            <field name="hor_md" string="Matin" widget="float_time" colspan="2"/>
+                            <field name="hor_mf" widget="float_time" colspan="1" nolabel="1"/>
+                            <field name="hor_ad" string="Après-midi" widget="float_time" colspan="2"/>
+                            <field name="hor_af" widget="float_time" colspan="1" nolabel="1"/>
+                            <field name="jour_ids" widget="many2many_tags" colspan="3" options="{'no_create_edit': 1}"/>
+                        </group>
+                        <!-- invisible si au moins un créneau -->
+                        <group colspan="2">
+                            <i colspan="2" class="oe_grey" attrs="{'invisible': ['|', '&amp;', ('mode_horaires', '=', 'advanced'), ('creneau_ids', '!=', []),
+                            '&amp;', '|', ('mode_horaires', '=', 'easy'), ('hor_md', '!=', '_field_hor_mf'), ('hor_ad', '!=', '_field_hor_af')]}">
+                                Si vous ne choisissez aucun créneau, cela revient à dire que cet employé ne travaille pas entre les dates de début et de fin.
+                            </i>
+                        </group>
+                    </group>
+
+                </group>
+                <group col="3" attrs="{'invisible': [('result_recap', '=', '')]}">
+                    <field name="seg_1_horaires_recap" nolabel="1"/>
+                    <field name="seg_exist_recap" nolabel="1"/>
+                    <field name="result_recap" nolabel="1"/>
+                </group>
+
+                <footer>
+                    <!--attrs="{'invisible': ['|', ('mode', '!=', 'create'), ('result_recap', '=', False)]}"
+                    attrs="{'invisible': [('result_recap', '!=', False)]}"
+                    -->
+                    <button name="button_create_edit" string="Créer horaires" class="btn btn-primary" type="object"
+                      attrs="{'invisible': ['|', ('mode', '!=', 'create'), ('remplacement', '=', True)]}"/>
+                    <button name="button_create_edit" string="Modifier horaires" class="btn btn-primary" type="object"
+                      attrs="{'invisible': ['|', ('mode', '!=', 'edit'), ('segment_id', '=', False)]}"/>
+                    <button name="button_unlink" string="Supprimer horaires" class="btn btn-primary" type="object"
+                      attrs="{'invisible': [('mode', '!=', 'unlink')]}"/>
+                    <button name="button_save_modele" string="Enregistrer les horaires comme modèle" class="btn btn-default"
+                      attrs="{'invisible': [('mode', '=', 'unlink')]}" type="object"/>
+                    <button name="button_remplacer" string="Remplacer" class="btn btn-primary" type="object"
+                            confirm="Êtes-vous sûr de vouloir remplacer les périodes existantes?"
+                            attrs="{'invisible': [('remplacement', '=', False)]}"/>
+                    <button name="button_cancel" string="Annuler" special="cancel" class="btn btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window
+        name="Enregistrer un modèle"
+        res_model="of.horaire.save.modele.wizard"
+        view_mode="form"
+        view_id="of_horaire_save_modele_form_view"
+        id="action_of_horaire_save_modele_form_view"
+        target="new"
+        groups="hr.group_hr_manager"
+    />
+
+    <act_window
+        name="Créer un horaire"
+        res_model="of.horaire.segment.wizard"
+        view_mode="form"
+        view_id="of_horaire_segment_form_view"
+        id="action_of_horaire_segment_create_form_view"
+        target="new"
+        groups="hr.group_hr_manager"
+    />
+
+    <act_window
+        name="Modifier un horaire"
+        res_model="of.horaire.segment.wizard"
+        view_mode="form"
+        view_id="of_horaire_segment_form_view"
+        id="action_of_horaire_segment_edit_form_view"
+        target="new"
+        groups="hr.group_hr_manager"
+    />
+
+    <act_window
+        name="Supprimer un horaire"
+        res_model="of.horaire.segment.wizard"
+        view_mode="form"
+        view_id="of_horaire_segment_form_view"
+        id="action_of_horaire_segment_unlink_form_view"
+        target="new"
+        groups="hr.group_hr_manager"
+    />
+
+    <!--act_window
+        name="Résoudre un chevauchement de fiches horaires"
+        res_model="of.horaire.segment.choose.wizard"
+        view_mode="form"
+        view_id="of_horaire_segment_choose_form_view"
+        id="action_of_horaire_segment_choose_form_view"
+        target="new"
+        groups="hr.group_hr_manager"
+    /-->
+
+
+
+</odoo>

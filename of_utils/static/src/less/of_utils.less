@@ -10,6 +10,52 @@
   animation: pulse 1s infinite;
 }
 
+.of_title {
+    color: #1D1D54;
+}
+
+.of_icon_button {
+    cursor: pointer;
+}
+
+.of_ws {
+    padding-right: 4px;
+}
+
+.of_ws_l {
+    padding-left: 4px;
+}
+
+.of_ws_lr {
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.of_pulse:hover {
+  //animation: none;
+}
+
+.of_red {
+    color: red;
+}
+
+.of_label {
+    .o-flex(1, 0, auto);
+    padding: 0;
+    display: block;
+    // odoo adds a `style="width: 100%"` by javascript
+    // directly on the tag so we need `!important` here:
+    max-width: 100%;
+    //border-right: 1px solid #ddd;
+    font-weight: bold!important;
+    width: 25%!important
+}
+
+.of_label_form_field {
+    border-left: 1px solid #ddd;
+    padding-left: 8px;
+}
+
 //rgba(204,169,44, 0.4)
 @-webkit-keyframes pulse {
   0% {
@@ -37,7 +83,3 @@
   }
 }
 
-//white space
-.of_ws {
-    padding-right: 4px;
-}

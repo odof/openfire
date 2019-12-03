@@ -194,7 +194,7 @@
                         <field colspan="4" mode="tree" name="interventions_liees" nolabel="1" widget="one2many_list"
                                groups="project.group_project_user" context="{'default_partner_id':partner_id, 'view_readonly_sav':True}">
                             <tree string="Interventions">
-                                <field name="equipe_id"/>
+                                <field name="employee_ids" widget="many2many_tags"/>
                                 <field name="tache_id"/>
                                 <field name="date" string="Date"/>
                                 <field name="duree" string="Durée"/>
@@ -465,16 +465,13 @@
             <field name="name">of.planning.intervention.sav.liee</field>
             <field name="model">of.planning.intervention</field>
             <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
+            <field name="groups_id" eval="[(4, ref('project.group_project_user')), (4, ref('base.group_portal'))]"/>
             <field name="arch" type="xml" >
-                <group name="liens" position="attributes">
-                    <attribute name="invisible">0</attribute>
-                </group>
                 <group name="liens" position="inside">
-                    <field name="sav_id" string="SAV" readonly="context.get('view_readonly_sav')"/>
+                    <field name="sav_id" string="SAV" readonly="context.get('view_readonly_sav')" widget="selection"/>
                 </group>
             </field>
         </record>
-
 
 
        <!-- wizard interface courriel SAV -->

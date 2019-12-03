@@ -370,19 +370,40 @@
             </field>
         </record>
 
-    <data noupdate="1">
-    <record model="ir.ui.view" id="of_sale_order_form_fiscal_position_required">
-        <field name="name">of.sale.order.form.fiscal.position.required</field>
-        <field name="model">sale.order</field>
-        <field name="active">False</field>
-        <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='fiscal_position_id']" position="attributes">
-                <attribute name="required">True</attribute>
-            </xpath>
-        </field>
-    </record>
-    </data>
+        <record id="action_of_secteur_tree_sale" model="ir.actions.act_window">
+            <field name="name">Secteurs</field>
+            <field name="res_model">of.secteur</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="of_base_location.of_view_secteur_tree"/>
+            <field name="search_view_id" ref="of_base_location.of_view_secteur_filter"/>
+        </record>
+
+        <!--record id="action_of_secteur_zip_tree_sale" model="ir.actions.act_window">
+            <field name="name">CP des secteurs</field>
+            <field name="res_model">of.secteur.zip</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="of_base_location.of_view_secteur_zip_tree"/>
+            <field name="search_view_id" ref="of_base_location.of_view_secteur_zip_filter"/>
+        </record-->
+
+        <menuitem name="Secteurs" id="of_secteur_sale_menu" parent="sales_team.menu_localisation" action="action_of_secteur_tree_sale" sequence="10"/>
+        <!--menuitem name="CP des Secteurs" id="of_secteur_zip_sale_menu" parent="sales_team.menu_localisation" action="action_of_secteur_zip_tree_sale" sequence="11"/-->
+
+        <data noupdate="1">
+            <record model="ir.ui.view" id="of_sale_order_form_fiscal_position_required">
+                <field name="name">of.sale.order.form.fiscal.position.required</field>
+                <field name="model">sale.order</field>
+                <field name="active">False</field>
+                <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+                <field name="arch" type="xml">
+                    <xpath expr="//field[@name='fiscal_position_id']" position="attributes">
+                        <attribute name="required">True</attribute>
+                    </xpath>
+                </field>
+            </record>
+        </data>
 
 <!--##############################################################################-->
 <!--########################### ______ Compta ______ #############################-->

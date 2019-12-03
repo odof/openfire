@@ -104,6 +104,12 @@ class OFParcInstalle(models.Model):
             self.brand_id = self.product_id.brand_id
             self.product_category_id = self.product_id.categ_id
 
+    @api.onchange('client_id')
+    def _onchange_client_id(self):
+        self.ensure_one()
+        if self.client_id:
+            self.site_adresse_id = self.client_id
+
     @api.multi
     @api.depends('client_id', 'client_id.geo_lat', 'client_id.geo_lng', 'client_id.precision',
                  'site_adresse_id', 'site_adresse_id.geo_lat', 'site_adresse_id.geo_lng', 'site_adresse_id.precision')
@@ -217,6 +223,8 @@ class project_issue(models.Model):
     of_parc_installe_site_adresse = fields.Char(u"Adresse d'installation", related="of_produit_installe_id.site_adresse_id.contact_address", search='_search_of_parc_installe_site_adresse', readonly=True)
     of_parc_installe_note = fields.Text(u'Note produit installé', related="of_produit_installe_id.note", readonly=True)
     of_parc_installe_fin_garantie = fields.Date(string='Fin de garantie', related="of_produit_installe_id.date_fin_garantie", readonly=True)
+    of_parc_installe_lieu_id = fields.Many2one('res.partner', string=u"lieu du produit installé", compute="_compute_of_parc_installe_lieu_id")
+    of_parc_installe_client_id = fields.Many2one('res.partner', string=u"Client du produit installé", compute="_compute_of_parc_installe_lieu_id")
 
     # Champs ajoutés pour la vue map
     of_geo_lat = fields.Float(related='of_produit_installe_id.geo_lat')
@@ -241,6 +249,17 @@ class project_issue(models.Model):
                 else:  # deadline passée
                     color = "red"
             issue.of_color_map = color
+
+    @api.multi
+    @api.depends('of_produit_installe_id', 'of_produit_installe_id.client_id', 'of_produit_installe_id.site_adresse_id')
+    def _compute_of_parc_installe_lieu_id(self):
+        for issue in self:
+            if issue.of_produit_installe_id:
+                issue.of_parc_installe_client_id = issue.of_produit_installe_id.client_id.id
+                if issue.of_produit_installe_id.site_adresse_id:
+                    issue.of_parc_installe_lieu_id = issue.of_produit_installe_id.site_adresse_id.id
+                else:
+                    issue.of_parc_installe_lieu_id = issue.of_produit_installe_id.client_id.id
 
     @api.model
     def get_color_map(self):

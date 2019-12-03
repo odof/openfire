@@ -134,7 +134,7 @@ class ProjectIssue(models.Model):
     of_payant_client = fields.Boolean('Payant client', default=False)
     of_payant_fournisseur = fields.Boolean('Payant fournisseur', default=False)
     of_intervention = fields.Text("Nature de l'intervention")
-    of_piece_commande = fields.Text('Pièces à commander')
+    of_piece_commande = fields.Text(u'Pièces à commander')
     # Migration 'shop_id'            : fields_oldapi.many2one('sale.shop', 'Magasin'),
     # Migration 'partner_shop_id'    : fields_oldapi.related('partner_id', 'partner_maga', type="many2one", relation="sale.shop", string="Magasin client", readonly=True),
     doc_ids = fields.One2many('of.sav.docs', 'project_issue_id', string="Liste de documents")
@@ -568,10 +568,14 @@ class ProjectIssue(models.Model):
 # Catégorie de SAV
 class OfProjectIssueCategorie(models.Model):
     _name = "of.project.issue.categorie"
+    _parent_name = "parent_id"
+    _parent_store = True
+    _parent_order = 'sequence, name'
+    _order = 'parent_left'
 
     name = fields.Char(u'Catégorie', size=32)
-    parent_id = fields.Many2one('of.project.issue.categorie', 'Catégorie parente', ondelete='restrict')
-    pparent_id = fields.Many2one('of.project.issue.categorie', string='Catégorie mère', readonly=True)
+    parent_id = fields.Many2one('of.project.issue.categorie', string=u'Catégorie parente', ondelete='restrict')
+    pparent_id = fields.Many2one('of.project.issue.categorie', string=u'Catégorie mère', readonly=True)
     sequence = fields.Integer(u'Séquence', help=u"Ordre d'affichage (plus petit en premier)")
     parent_left = fields.Integer('Left Parent')
     parent_right = fields.Integer('Right Parent')
@@ -581,13 +585,8 @@ class OfProjectIssueCategorie(models.Model):
     ]
 
     _defaults = {
-        'sequence' : 10
+        'sequence': 10
     }
-
-    _parent_name = "parent_id"
-    _parent_store = True
-    _parent_order = 'sequence, name'
-    _order = 'parent_left'
 
     # Pour afficher la hiérarchie des catégories
     @api.multi
@@ -659,7 +658,6 @@ class of_project_issue_canal(models.Model):
     name = fields.Char(u'Catégorie', size=32)
 
 class of_sav_docs(models.TransientModel):
-
     _name = 'of.sav.docs'
     _description = 'Liste des documents'
 
@@ -674,7 +672,7 @@ class of_sav_docs(models.TransientModel):
     residual = fields.Float('Balance', digits=(16, 2))
     amount_untaxed = fields.Float('HT', digits=(16, 2))
     amount_total = fields.Float('Total', digits=(16, 2))
-    state = fields.Char('État', size=64)
+    state = fields.Char(u'État', size=64)
     project_issue_id = fields.Many2one('project.issue', 'SAV')
     invoice_id = fields.Many2one('account.invoice', 'Facture')
     sale_order_id = fields.Many2one('sale.order', 'Devis/Commande Client')
@@ -781,7 +779,9 @@ class OfPlanningIntervention(models.Model):
     _name = "of.planning.intervention"
     _inherit = "of.planning.intervention"
 
-    sav_id = fields.Many2one('project.issue', string='SAV', readonly=False)
+    sav_id = fields.Many2one(
+        'project.issue', string='SAV', readonly=False,
+        domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', address_id)]")
 
 
 class OfMailTemplate(models.Model):

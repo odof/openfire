@@ -136,7 +136,7 @@ l'intervention</td>
 	      <td>Date</td>
           <td>Durée</td>
           <td>État</td>
-	      <td>Équipe</td>
+	      <td>Intervenant</td>
 	      <td>Description</td>
       </tr>
   </blockTable>
@@ -149,7 +149,7 @@ l'intervention</td>
 	          <td>[[ formatLang(i.date, date_time=True) ]]</td>
 	          <td>[[ i.duree and 'h'.join(str(datetime.timedelta(hours=i.duree)).split(':')[:-1]) or '' ]]</td>
 	          <td>[[ i.state or '' ]]</td>
-	          <td>[[ i.equipe_id.name or '' ]]</td>
+	          <td>[[ i.employee_ids[0].name or '' ]]</td>
 	          <td>[[ i.cleantext_description or '' ]]</td>
 	      </tr>
   	  </blockTable>

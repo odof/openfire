@@ -193,7 +193,7 @@
                     <label for="alerte_interventions_equipes_veille"/>
                     <div name="alerte_interventions_equipes_veille">
                         <field name="alerte_interventions_equipes_veille" class="oe_inline"/>
-                        <span>Envoyer des alertes SMS aux équipes d'interventions contenant un récapitulatif des interventions du lendemain</span>
+                        <span>Envoyer des alertes SMS aux intervenants contenant un récapitulatif des interventions du lendemain</span>
                     </div>
                     <label for="alerte_interventions_clients_veille"/>
                     <div name="alerte_interventions_clients_veille">

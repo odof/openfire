@@ -9,7 +9,9 @@
                     background: #{filters_value.color_bg}; 
                     padding: 2px 8px 4px; 
                     border-radius: 4px;
-                    border: 1px solid #0D0D0D;">
+                    border: 1px solid #0D0D0D;"
+                    t-attf-class="of_calendar_attendee_#{filters_value.value} of_calendar_filter"
+                    t-attf-id="of_calendar_attendee_#{filters_value.value}">
                     <t t-esc="filters_value.label"/>
                 </span>
             </t>
