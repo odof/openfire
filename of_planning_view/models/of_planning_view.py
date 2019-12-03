@@ -68,13 +68,8 @@ class OfPlanningIntervention(models.Model):
         if not creneaux_travailles:
             return []
         compare_precision = 5
-        #index_courant = intervention_heures and 0 or -1  # index de parcours de intervention_heures
         employee = self.env['hr.employee'].browse(int(employee_id))
-        #deb = creneaux_travailles[index_courant][0]  # début courant
-        #fin = creneaux_travailles[index_courant][1]  # fin courante
         creneaux = []
-        vals = {}
-        #warning_forcer_horaires = any([forcee for forcee ])
         lieu_depart = employee.of_address_depart_id and employee.of_address_depart_id.get_infos_lieu() or False
         lieu_retour = employee.of_address_retour_id and employee.of_address_retour_id.get_infos_lieu() or False
         tournee = self.env['of.planning.tournee'].search([('date', '=', date), ('employee_id', '=', employee_id)],
@@ -87,24 +82,6 @@ class OfPlanningIntervention(models.Model):
         else:
             secteur = False
         secteur_str = secteur and secteur.name or ""
-
-        # if not intervention_heures:
-        #     secteur_str = secteur and secteur.name or ""
-        #     duree = sum(c[1] - c[0] for c in creneaux_travailles)
-        #     if duree >= duree_min:
-        #         creneaux = [{
-        #             'heure_debut': creneaux_travailles[0][0],
-        #             'heure_fin': creneaux_travailles[-1][-1],
-        #             'lieu_debut': lieu_depart,
-        #             'lieu_fin': lieu_retour,
-        #             'duree': duree,
-        #             'creneaux_reels': creneaux_travailles,
-        #             'secteur_id': secteur and secteur.id or False,
-        #             'secteur_str': secteur_str,
-        #             'display_secteur': True,
-        #             'warning_horaires': intervention_forcee,
-        #         }]
-        #     return creneaux
 
         creneau_ind = 0
         creneau = creneaux_travailles[0]
@@ -124,21 +101,14 @@ class OfPlanningIntervention(models.Model):
             if not creneau:
                 break
 
+            creneaux_reels = []
             lieu_fin = interv.address_id and interv.address_id.get_infos_lieu() or False if interv else lieu_retour
-            # if interv_debut <= heure_debut:
-            #     # Cette intervention commence avant le créneau, il n'y a donc pas de temps disponible
-            #     heure_debut = max(heure_debut, interv_fin)
-            #     lieu_depart = lieu_fin
-            #     continue
-
-            duree = 0
             while True:
                 # if creneau and creneau[1] < interv_debut:
                 if creneau and float_compare(creneau[1], interv_debut, compare_precision) == -1:
                     # Le créneau se termine avant le début de l'intervention
                     # on l'inclut dans le temps disponible et on passe au créneau suivant
-                    duree += creneau[1] - max(heure_debut, creneau[0])
-                    heure_fin = creneau[1]
+                    creneaux_reels.append((max(heure_debut, creneau[0]), creneau[1]))
                     creneau_ind += 1
                     creneau = creneaux_travailles[creneau_ind] if creneau_ind < len(creneaux_travailles) else False
                     continue
@@ -147,16 +117,20 @@ class OfPlanningIntervention(models.Model):
                 # if creneau[0] < interv_debut:
                 if creneau and float_compare(creneau[0], interv_debut, compare_precision) == -1:
                     # Le créneau est coupé par l'intervention
-                    duree += interv_debut - max(heure_debut, creneau[0])
-                    heure_fin = interv_debut
-                if duree:
+                    creneaux_reels.append((max(heure_debut, creneau[0]), interv_debut))
+                # On retire les créneaux vides
+                # Survient quand un horaire de 0 minutes a été saisi pour l'employé
+                #    ou quand deux interventions se suivent sur un créneau
+                creneaux_reels = [creneau_reel for creneau_reel in creneaux_reels
+                                  if float_compare(creneau_reel[0], creneau_reel[1], compare_precision) == -1]
+                if creneaux_reels:
                     creneaux.append({
                         'heure_debut': heure_debut,
-                        'heure_fin': heure_fin,
+                        'heure_fin': creneaux_reels[-1][1],
                         'lieu_debut': lieu_depart,
                         'lieu_fin': lieu_fin,
-                        'duree': duree,
-                        'creneaux_reels': creneaux_travailles,
+                        'duree': sum(hor[1] - hor[0] for hor in creneaux_reels),
+                        'creneaux_reels': creneaux_reels,
                         'secteur_id': secteur and secteur.id or False,
                         'secteur_str': secteur_str,
                         'display_secteur': display_secteur,
@@ -169,169 +143,6 @@ class OfPlanningIntervention(models.Model):
             if interv and not tournee:
                 secteur = interv.secteur_id or secteur
                 secteur_str = secteur and secteur.name or ""
-
-        return creneaux
-        #
-        # float_compare(creneau[1], creneau[0], compare_precision) > 0
-        # # il reste du temps entre la fin de la dernière intervention de pendant_listzz et la fin du créneau
-        #
-        #
-        #
-        #
-        #
-        #
-        # lieu_debut = lieu_depart
-        # duree = 0
-        # heure_debut = heure_fin = 0
-        #
-        # interv_ind = 0
-        # interv = intervention_heures and intervention_heures[0]
-        # interv_ind_max = len(intervention_heures)
-        # for creneau in creneaux_travailles + [False]:
-        #     # Invariants de boucle :
-        #     #
-        #     #
-        #     if not creneau:
-        #         # Tous les créneaux ont été analysés.
-        #         if duree:
-        #             # Ajout du dernier créneau obtenu le cas échéant
-        #             lieu_fin = interv[0].address_id and interv[0].address_id.get_infos_lieu() if interv else lieu_retour
-        #             creneaux.append({
-        #                 'heure_debut': heure_debut,
-        #                 'heure_fin': heure_fin,
-        #                 'lieu_debut': lieu_debut,
-        #                 'lieu_fin': lieu_fin,
-        #                 'duree': duree,
-        #                 'creneaux_reels': creneaux_travailles,
-        #                 'secteur_id': secteur and secteur.id or False,
-        #                 'secteur_str': secteur_str,
-        #                 'display_secteur': True,
-        #                 'warning_horaires': intervention_forcee,
-        #             })
-        #         break
-        #     while interv and interv[1] < creneau[1]:
-        #         # Une intervention commence avant la fin du créneau étudié
-        #         # On ajoute donc les morceaux
-        #         if duree:
-        #             lieu_fin = interv[0].address_id and interv[0].address_id.get_infos_lieu() or False
-        #             creneaux.append({
-        #                 'heure_debut': heure_debut,
-        #                 'heure_fin': min(heure_fin, interv[1]),
-        #                 'lieu_debut': lieu_debut,
-        #                 'lieu_fin': lieu_fin,
-        #                 'duree': duree,
-        #                 'creneaux_reels': creneaux_travailles,
-        #                 'secteur_id': secteur and secteur.id or False,
-        #                 'secteur_str': secteur_str,
-        #                 'display_secteur': True,
-        #                 'warning_horaires': intervention_forcee,
-        #             })
-        #             duree = 0
-        #
-        #
-        #     if interv_ind == interv_ind_max:
-        #         duree += creneau[1] - creneau[0]
-        #
-        #
-        #
-        #
-        #
-        #
-        #
-        #
-        #
-        #
-        #
-        #
-        #
-        # deb_h = creneaux_travailles[0][0]
-        # fin_h = creneaux_travailles[0][1]
-        #
-        # # toutes les intervention qui commencent avant le premier creneau de la journée
-        # avant_listzz = filter(lambda t: t[1] < deb_h, intervention_heures)
-        # pendant_listzz = []  # sera rempli dans le for
-        # apres_listzz = [tup for tup in intervention_heures if tup not in avant_listzz]
-        # lieu_deb = avant_listzz and avant_listzz[-1][0].address_id and avant_listzz[-1][0].address_id.get_infos_lieu() or lieu_depart
-        # secteur = avant_listzz and avant_listzz[-1][0].secteur_id or secteur
-        # secteur_str = secteur and secteur.name or ""
-        # fin_libre = False
-        #
-        # for index_creneau in range(len(creneaux_travailles)):
-        #     creneau = creneaux_travailles[index_creneau]
-        #     pendant_listzz = filter(lambda t: t[1] < creneau[1], apres_listzz)
-        #     if avant_listzz and avant_listzz[-1][2] > creneau[0]:  # chevauchement
-        #         pendant_listzz.insert(0, avant_listzz.pop(-1))
-        #     apres_listzz = filter(lambda t: t not in pendant_listzz, apres_listzz)
-        #     already_added = False
-        #     if fin_libre:  # fusion ou nettoyage
-        #         fin = pendant_listzz and pendant_listzz[0][1] or creneau[1]
-        #         vals = creneaux[-1]
-        #         vals['heure_fin'] = fin
-        #         vals['duree'] += fin - creneau[0]
-        #         vals['lieu_fin'] = lieu_fin
-        #         vals['creneaux_reels'] += [(creneau[0], fin)]
-        #         if creneaux[-1]["duree"] < duree_min:
-        #             creneaux.pop(-1)
-        #         already_added = True
-        #         vals = {}
-        #     elif creneaux and creneaux[-1]["duree"] < duree_min:
-        #         creneaux.pop(-1)
-        #
-        #     while pendant_listzz:
-        #         interv_list = pendant_listzz.pop(0)  # (intervention, heure_debut, heure_fin)
-        #         lieu_fin = interv_list[0].address_id and interv_list[0].address_id.get_infos_lieu() or False
-        #
-        #         if not already_added and float_compare(interv_list[1] - creneau[0], duree_min, compare_precision) >= 0:
-        #             # l'intervention commence après le début du créneau
-        #             # on ajoute le créneau dispo à la liste
-        #             vals['heure_debut'] = creneau[0]
-        #             vals['heure_fin'] = interv_list[1]
-        #             vals['lieu_debut'] = lieu_deb
-        #             vals['lieu_fin'] = lieu_fin
-        #             vals['duree'] = interv_list[1] - creneau[0]
-        #             vals['creneaux_reels'] = [(creneau[0], interv_list[1])]
-        #             vals['secteur_id'] = secteur and secteur.id or False
-        #             vals['secteur_str'] = secteur_str
-        #             vals['display_secteur'] = False
-        #             vals['warning_horaires'] = intervention_forcee
-        #             creneaux.append(vals)
-        #             vals = {}
-        #         elif already_added:
-        #             already_added = False
-        #         # mettre à jour les données pour la prochaine itération interventions
-        #         secteur = interv_list[0].secteur_id or secteur
-        #         secteur_str = secteur and secteur.name or ""
-        #         creneau[0] = interv_list[2]  # min(creneau[1], interv_list[2])?
-        #         avant_listzz.append(interv_list)
-        #         lieu_deb = lieu_fin
-        #     if not already_added and float_compare(creneau[1], creneau[0], compare_precision) > 0:
-        #         # il reste du temps entre la fin de la dernière intervention de pendant_listzz et la fin du créneau
-        #         # on ajoute le créneau dispo à la liste:
-        #         #   si la durée est suffisante dans le cas du dernier créneau de la journée
-        #         #   tout le temp sinon: il sera fusionné ou supprimé dans la prochaine itération créneau
-        #         lieu_fin = apres_listzz and apres_listzz[0][0].address_id and apres_listzz[0][0].address_id.get_infos_lieu() or False
-        #         vals['heure_debut'] = creneau[0]
-        #         vals['heure_fin'] = creneau[1]
-        #         vals['lieu_debut'] = lieu_deb
-        #         vals['lieu_fin'] = lieu_fin
-        #         vals['duree'] = creneau[1] - creneau[0]
-        #         vals['creneaux_reels'] = [(creneau[0], creneau[1])]
-        #         vals['secteur_id'] = secteur and secteur.id or False
-        #         vals['secteur_str'] = secteur_str
-        #         vals['display_secteur'] = False
-        #         vals['warning_horaires'] = intervention_forcee
-        #         if float_compare(vals['duree'], duree_min, compare_precision) >= 0 or index_creneau != len(creneaux_travailles) -1:
-        #             # ne pas ajouter le dernier créneau de la journée si il est trop court car il ne sera pas nettoyé
-        #             vals['lieu_fin'] = apres_listzz and apres_listzz[0][0].address_id and \
-        #                 apres_listzz[0][0].address_id.get_infos_lieu() or lieu_retour
-        #             creneaux.append(vals)
-        #             fin_libre = True
-        #         vals = {}
-        #
-        #     elif not already_added:
-        #         fin_libre = False
-        #     # mettre à jour les données pour la prochaine itération créneaux
-        #     lieu_deb = lieu_fin
 
         return creneaux
 
