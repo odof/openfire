@@ -36,7 +36,6 @@ CalendarView.include({
         this._super.apply(this, arguments);
 
         var attrs = this.fields_view.arch.attrs;
-        this.working_hours = !isNullOrUndef(attrs.working_hours) && attrs.working_hours; // "parent" or "attendees"
         this.filters_radio = !isNullOrUndef(attrs.filters_radio) && _.str.toBool(attrs.filters_radio); // true or 1 if we want filters to be of type radio
         this.custom_colors = !isNullOrUndef(attrs.custom_colors) && _.str.toBool(attrs.custom_colors); // true or 1 if we want to use custom colors
         this.show_first_evt = !isNullOrUndef(attrs.show_first_evt) && _.str.toBool(attrs.show_first_evt); // true or 1 if we want to jump to the first event
@@ -105,18 +104,6 @@ CalendarView.include({
         var dnd_dfd = ir_config_model.call('get_param',['Calendar_Drag_And_Drop']);
         var mintime_dfd = ir_values_model.call("get_default", ["of.intervention.settings", "calendar_min_time"]);
         var maxtime_dfd = ir_values_model.call("get_default", ["of.intervention.settings", "calendar_max_time"]);
-
-
-/*
-        if (this.attendee_model && this.working_hours == 'attendees' || this.parent_model && this.working_hours == 'parent') {
-            this.set_min_max_time()
-            .then(function () {
-                dfd2.resolve();
-                return;
-            });
-        }else{
-            dfd2.resolve();
-        }*/
 
         return $.when(dnd_dfd, mintime_dfd, maxtime_dfd, this._super())
         .then(function () {
@@ -373,77 +360,6 @@ CalendarView.include({
             },
         };
         this.$calendar.fullCalendar('addEventSource', this.event_source);
-    },
-    /**
-     *  render states caption if display_states in attributes
-     */
-    init_working_hours_fields: function () {
-        var self = this;
-        var dfd = $.Deferred();
-        var model;
-        if (this.attendee_model && this.working_hours == "attendees") {
-            model = new Model(this.attendee_model);
-        }else if (this.working_hours == "parent" && this.parent_model) { // only in One2many
-            model = new Model(this.parent_model);
-        }
-
-        if (!isNullOrUndef(model)) {
-            $.when(model.call('get_working_hours_fields'))
-            .then(function (res){
-                self.working_hours_fields = {};
-
-                self.working_hours_fields.mor_start_field = res["morning_start_field"];
-                self.working_hours_fields.mor_end_field = res["morning_end_field"];
-                self.working_hours_fields.aft_start_field = res["afternoon_start_field"];
-                self.working_hours_fields.aft_end_field = res["afternoon_end_field"];
-
-                dfd.resolve();
-            });
-
-        }else{
-            this.working_hours_fields = undefined;
-            dfd.resolve();
-        }
-        return $.when(dfd);//.then(function(){console.log("YAY: ",self.working_hours_fields)});
-    },
-    /**
-     *  Sets up this.minTime and this.maxTime
-     * /
-    set_min_max_time: function() {
-        var self = this;
-        var dfd = $.Deferred();
-        var model;
-        //console.log("SET MIN MAX TIME")
-
-        if (self.working_hours == 'parent') {
-            model = new Model(this.parent_model);
-        }else{
-            model = new Model(this.attendee_model);
-        }
-        model.call('get_min_max_time')
-        .then(function (res) {
-            // res is a tuple (min, max) in UTC
-            if (!res) {
-                //console.log("OUCH!",res)
-                dfd.resolve();
-                return;
-            }
-            var descript = {type: "float_time"};
-            var min_time_utc = formats.format_value(res[0],descript) + ":00";
-            var max_time_utc = formats.format_value(res[1],descript) + ":00";;
-            var date_today = new Date();
-            var UTC_str = date_today.toUTCString();
-            var prefix_str = UTC_str.substring(0,17);
-            var suffix_str = UTC_str.substring(25);
-            var minUTC = new Date(prefix_str + min_time_utc + suffix_str );
-            var maxUTC = new Date(prefix_str + max_time_utc + suffix_str );
-            self.minTime = minUTC.toLocaleTimeString();
-            self.maxTime = maxUTC.toLocaleTimeString();
-            //console.log("MIN MAX",self.minTime,self.maxTime);
-            dfd.resolve();
-            return;
-        });
-        return $.when(dfd);
     },
     /**
      *  Override of parent function

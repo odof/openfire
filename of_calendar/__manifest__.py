@@ -22,7 +22,6 @@ Vue calendar
 - attribut 'custom_colors': mettre à "1" pour utiliser les couleurs custom
 - attribut 'attendee_model': nom du modèle des participants, inutile si 'use_contacts' à "1". exemple: attendee_model="res.partner"
 - attribut 'color_bg_field' et 'color_ft_field': nom des champs de couleur de texte et de fond
-- attribut 'working_hours': mettre à "1" pour n'afficher que les horaires travaillés. Nécéssite 'attendee_model' héritant de "of.calendar.attendee.mixin"
 - attribut 'filters_radio': mettre à "1" pour que les filtres de la barre latérale soient de type radio button
 - attribut 'show_first_evt': mettre à "1" pour sauter au premier évenement disponible trouvé lors de la recherche
 - attribut 'dispo_field': champ de disponibilité utilisé si 'show_first_evt' est à "1"

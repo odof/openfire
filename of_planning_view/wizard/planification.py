@@ -289,7 +289,11 @@ class OfPlanifCreneauProp(models.TransientModel):
     @api.multi
     def button_confirm_next(self):
         self.ensure_one()
-        return self.creneau_id.button_confirm_next()
+        self = self.with_context({
+            'from_popup': True,
+        })
+        self.creneau_id.button_confirm_next()
+        return {'type': 'ir.actions.act_window_close'}
 
 
 class OfPlanifCreneau(models.TransientModel):
@@ -743,10 +747,10 @@ class OfPlanifCreneau(models.TransientModel):
         prop_a_faire.compute_distance_reelle()
 
     @api.multi
-    def button_dummy(self):
+    def button_search(self):
         self.set_proposition_ids()
         self.set_selected_id()
-        return {'type': 'ir.actions.do_nothing'}
+        return
 
     @api.multi
     def get_values_intervention_create(self):
@@ -796,15 +800,7 @@ class OfPlanifCreneau(models.TransientModel):
         intervention = self.create_intervention()
         #if self.selected_id.service_id.recurrence:  # conception: calculer date next à la création de l'intervention ou à sa validation?
         #    intervention.service_id.date_next = intervention.service_id.get_next_date(self.date_creneau)
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'of.planning.intervention',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_id': intervention.id,
-            'target': 'current',
-            'context': self._context,
-        }
+        return {'type': 'ir.actions.client', 'tag': 'history_back'}
 
     @api.multi
     def button_confirm_next(self):
@@ -849,7 +845,7 @@ class OfPlanifCreneau(models.TransientModel):
                 raise UserError(u"On dirait que cette journée est entièrement planifiée pour %s" % self.employee_id.name)
         if creneau_fini:  # le créneau est entièrement planifié!
             self.creneau_fini = creneau_fini
-            return {'type': 'ir.actions.do_nothing'}
+            return
         # mise à jour des données du créneau
         self.creneaux_reels = json.dumps(creneaux)
 
@@ -861,7 +857,7 @@ class OfPlanifCreneau(models.TransientModel):
 
         self.set_proposition_ids()
         self.set_selected_id()
-        return {'type': 'ir.actions.do_nothing'}
+        return
 
     @api.multi
     def button_close(self):

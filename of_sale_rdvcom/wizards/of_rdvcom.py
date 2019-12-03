@@ -438,15 +438,6 @@ class OFRDVCommercial(models.TransientModel):
         self.ensure_one()
         return 0 <= self.hor_md <= self.hor_mf <= self.hor_ad <= self.hor_af <= 24
 
-    @api.model
-    def get_working_hours_fields(self):
-        return {
-            "morning_start_field": "hor_md",
-            "morning_end_field": "hor_mf",
-            "afternoon_start_field": "hor_ad",
-            "afternoon_end_field": "hor_af"
-        }
-
     @api.multi
     def toggle_horaires(self):
         """Affiche / cache les horaires pour pouvoir les modifier"""

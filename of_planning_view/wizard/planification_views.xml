@@ -16,13 +16,14 @@
                     });
                 </script><!-- -->
                 <header>
-                    <button name="button_dummy" string="Rechercher" type="object" class="btn btn-primary" style="margin-right: 4px!important"
+                    <button name="button_search" string="Rechercher" type="object" class="btn btn-primary" style="margin-right: 4px!important"
                             attrs="{'invisible': [('pre_a_programmer_id', '!=', False)]}"/>
-                    <button name="button_confirm" string="Confirmer &amp; Fermer" type="object" style="margin-right: 4px!important"
+                    <button name="button_confirm" string="Confirmer" type="object" style="margin-right: 4px!important"
                             class="btn btn-primary" attrs="{'invisible': [('proposition_ids', '=', []), ('pre_a_programmer_id', '=', False)]}"/>
                     <button name="button_confirm_next" string="Confirmer &amp; Suivant" type="object" style="margin-right: 4px!important"
-                            class="btn btn-primary" attrs="{'invisible': [('proposition_ids', '=', [])]}"/>
-                    <button name="button_close" string="Fermer" type="object" class="btn-default" style="margin-right: 4px!important"/>
+                            class="btn btn-primary" attrs="{'invisible': [('proposition_ids', '=', [])]}"
+                            context="{'next': 1}"/>
+                    <button name="button_close" string="Annuler" type="object" class="btn-default" style="margin-right: 4px!important"/>
                 </header>
                 <group colspan="2" col="8" name="invisblez" style="display: none">
                     <field name="creneau_fini" invisible="1"/>
@@ -237,8 +238,8 @@
                         attrs="{'invisible': [('selected','!=',False)]}" style="margin-right: 4px!important"/>
                     <button name="button_confirm" string="Confirmer le RDV" type="object" class="btn-primary"
                         attrs="{'invisible': [('selected','!=',True)]}" style="margin-right: 4px!important"/>
-                    <button name="button_confirm_next" string="Confirmer &amp; Suivant" type="object" colspan="4"
-                            class="btn-primary" attrs="{'invisible': [('selected','!=',True)]}" style="margin-right: 4px!important"/>
+                    <!--button name="button_confirm_next" string="Confirmer &amp; Suivant" type="object" colspan="4"
+                            class="btn-primary" attrs="{'invisible': [('selected','!=',True)]}" style="margin-right: 4px!important"/-->
                 </footer>
             </form>
         </field>

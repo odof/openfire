@@ -200,17 +200,6 @@ class OfPlanningEquipe(models.Model):
         for equipe in self:
             equipe.tz_offset = datetime.now(pytz.timezone(equipe.tz or 'GMT')).strftime('%z')
 
-    @api.model
-    def get_working_hours_fields(self):
-        # @TODO: supprimer cette fonctionnalité de la classe utilitaire
-        return {
-            "morning_start_field": "hor_md",
-            "morning_end_field": "hor_mf",
-            "afternoon_start_field": "hor_ad",
-            "afternoon_end_field": "hor_af",
-        }
-
-
 class OfPlanningInterventionRaison(models.Model):
     _name = "of.planning.intervention.raison"
     _description = u"Raisons d'intervention reportée"

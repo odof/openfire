@@ -225,15 +225,6 @@ class HREmployee(models.Model):
         if self.of_hor_ad and self.of_hor_af and self.of_hor_ad > self.of_hor_af:
             raise UserError(u"L'heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi.")
 
-    @api.model
-    def get_working_hours_fields(self):
-        return {
-            "morning_start_field": "of_hor_md",
-            "morning_end_field": "of_hor_mf",
-            "afternoon_start_field": "of_hor_ad",
-            "afternoon_end_field": "of_hor_af"
-        }
-
     # @api.onchange("of_creneau_ids", "of_creneau_temp_ids")
     # def _onchange_creneaux(self):
     #     if not self.check_no_overlapping():
@@ -1351,17 +1342,5 @@ class CalendarMixin(models.AbstractModel):
         'value' ranges from 0 to 3 included.
         'label' is a string that will be displayed in the caption.
         See template 'CalendarView.sidebar.captions'
-        """
-        raise NotImplementedError("A class inheriting from this one must implement a 'get_state_int_map' function")
-
-
-class OFCalendarAttendeeMixin(models.AbstractModel):
-    _name = "of.calendar.attendee.mixin"
-
-    @api.model
-    def get_working_hours_fields(self):
-        """
-        Returns a dictionnary with 4 properties: morning_start, morning_end, afternoon_start, afternoon_end
-        these properties have names of corresponding fields as values
         """
         raise NotImplementedError("A class inheriting from this one must implement a 'get_state_int_map' function")
