@@ -27,13 +27,12 @@ class OfTourneeRdv(models.TransientModel):
         active_model = self._context.get('active_model', '')
         service = False
         if active_model == "of.parc.installe":
-            parc_installe = self.env['of.parc.installe'].browse(self._context['active_ids'][0])
-            if parc_installe.service_count > 0:
-                service = self.env["of.service"].search([('parc_installe_id','=',parc_installe.id)], limit=1)
-        elif active_model == "project.issue":
-            partner = self._default_partner()
-            if partner:
-                service = self.env['of.service'].search([('partner_id', '=', partner.id)], limit=1)
+            sav = self._default_sav()
+            # soit service soit sav
+            if not sav:
+                parc_installe = self.env['of.parc.installe'].browse(self._context['active_ids'][0])
+                if parc_installe.service_count > 0:
+                    service = self.env["of.service"].search([('parc_installe_id','=',parc_installe.id),('recurrence', '=', True)], limit=1)
         else:
             return super(OfTourneeRdv, self)._default_service()
         return service
@@ -56,3 +55,20 @@ class OfTourneeRdv(models.TransientModel):
                                           '|', ('geo_lat', '!=', 0), ('geo_lng', '!=', 0)],
                                          limit=1) or address
         return address or False
+
+    @api.model
+    def _default_sav(self):
+        active_model = self._context.get('active_model', '')
+        sav = False
+        if active_model == 'project.issue':
+            sav = self.env['project.issue'].browse(self._context['active_ids'][0])
+        return sav
+
+    sav_id = fields.Many2one('project.issue', string='SAV', default=lambda x: x._default_sav(), domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', partner_address_id)]")
+
+    @api.multi
+    def get_values_intervention_create(self):
+        values = super(OfTourneeRdv, self).get_values_intervention_create()
+        if self.sav_id:
+            values['sav_id'] = self.sav_id.id
+        return values

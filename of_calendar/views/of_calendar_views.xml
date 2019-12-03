@@ -1,6 +1,173 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-<data>
+
+<!--##############################################################################-->
+<!--########################### ______ Employés ______ ###########################-->
+<!--##############################################################################-->
+    <!-- Employee -->
+    <record id="view_of_employee_form" model="ir.ui.view">
+        <field name="name">of.hr.employee.form</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='public']/group" position="after">
+                <group name="page1_group2" col="4" colspan="4">
+                    <group name="deplacements" string="Déplacements" colspan="2">
+                        <field name="of_address_depart_id"/>
+                        <field name="of_address_retour_id"/>
+                    </group>
+                    <group name="couleurs" string="Couleurs" colspan="2">
+                        <field name="of_color_ft" widget="color"/>
+                        <field name="of_color_bg" widget="color"/>
+                    </group>
+                </group>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page name="horaires" string="Horaires">
+                    <field name="of_horaire_recap"/>
+                    <button name="%(action_of_horaire_segment_create_form_view)d" string="Créer un horaire" type="action"
+                    context="{
+                        'default_employee_id': id,
+                        'default_mode': 'create',
+                        'default_mode_horaires': of_mode_horaires,
+                    }"/>
+                    <button name="%(action_of_horaire_segment_edit_form_view)d" string="Modifier un horaire" type="action"
+                    context="{
+                        'default_employee_id': id,
+                        'default_mode': 'edit',
+                        'default_mode_horaires': of_mode_horaires,
+                    }"/>
+                    <button name="%(action_of_horaire_segment_unlink_form_view)d" string="Supprimer un horaire" type="action"
+                    context="{
+                        'default_employee_id': id,
+                        'default_mode': 'unlink',
+                        'default_mode_horaires': 'advanced',
+                    }"/>
+
+                    <group invisible="1">
+                        <group>
+                            <field name="of_mode_horaires"/>
+                        </group>
+                        <group>
+                            <field name="of_tz" widget="timezone_mismatch" options="{'tz_offset_field': 'of_tz_offset'}"/>
+                            <field name="of_tz_offset" invisible="1"/>
+                        </group>
+                    </group>
+                    <group invisible="1" name="horaires_advanced" attrs="{'invisible': [('of_mode_horaires', '!=', 'advanced')]}">
+                        <group name="horaires">
+                            <separator string="Horaires de travail" colspan="2"/>
+                            <field name="of_segment_ids" nolabel="1" colspan="2">
+                                <tree>
+                                    <field name="date_deb"/>
+                                    <field name="date_fin"/>
+                                    <field name="creneau_ids" widget="many2many_tags"/>
+                                    <field name="permanent"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="date_deb"/>
+                                        <field name="date_fin"/>
+                                        <field name="permanent"/>
+                                        <field name="modele_id" readonly="0"
+                                               context="{'default_creneau_ids':creneau_ids}"/>
+                                    </group>
+                                    <field name="creneau_ids"/>
+                                </form>
+                            </field>
+                        </group>
+
+                    </group>
+                    <group invisible="1" name="horaires_easy" attrs="{'invisible': [('of_mode_horaires', '!=', 'easy')]}" col="4" colspan="4">
+                        <group name="horaires" string="Horaires" col="3" colspan="2">
+                            <field name="of_hor_md" string="Matin" widget="float_time" colspan="2" attrs="{'required': [('of_mode_horaires', '=', 'easy')]}"/>
+                            <field name="of_hor_mf" widget="float_time" colspan="1" nolabel="1" attrs="{'required': [('of_mode_horaires', '=', 'easy')]}"/>
+                            <field name="of_hor_ad" string="Après-midi" widget="float_time" colspan="2" attrs="{'required': [('of_mode_horaires', '=', 'easy')]}"/>
+                            <field name="of_hor_af" widget="float_time" colspan="1" nolabel="1" attrs="{'required': [('of_mode_horaires', '=', 'easy')]}"/>
+                            <field name="of_jour_ids" widget="many2many_tags" colspan="3" attrs="{'required': [('of_mode_horaires', '=', 'easy')]}"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Créneaux d'horaires -->
+    <record id="view_of_horaire_creneau_tree" model="ir.ui.view">
+        <field name="name">of.horaire.creneau.tree</field>
+        <field name="model">of.horaire.creneau</field>
+        <field name="arch" type="xml">
+            <tree string="Créneaux horaires" editable="bottom">
+                <field name="jour_number" invisible="1"/>
+                <field name="name"/>
+                <field name="jour_id" options='{"no_open": True, "no_create": True}'/>
+                <field name="heure_debut" widget="float_time"/>
+                <field name="heure_fin" widget="float_time"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_of_horaire_creneau_form" model="ir.ui.view">
+        <field name="name">of.horaire.creneau.form</field>
+        <field name="model">of.horaire.creneau</field>
+        <field name="arch" type="xml">
+            <form string="Créneaux">
+                <field name="jour_number" invisible="1"/>
+                <h1><field name="name"/></h1>
+                <group>
+                    <group>
+                        <field name="jour_id"/>
+                    </group>
+                    <group>
+                        <field name="heure_debut" widget="float_time"/>
+                        <field name="heure_fin" widget="float_time"/>
+                    </group>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_of_horaire_creneau_filter" model="ir.ui.view">
+        <field name="name">of.horaire.creneau.search</field>
+        <field name="model">of.horaire.creneau</field>
+        <field name="arch" type="xml">
+            <search string="Créneaux">
+                <field name="name" string="Créneau"/>
+                <field name="jour_id" string="Jour"/>
+                <filter domain="[('heure_fin','&lt;=',12)]" string="Matin"/>
+                <filter domain="[('heure_debut','&gt;=',12)]" string="Après-Midi"/>
+                <separator/>
+                <filter string="Lundi" name="lundi" domain="[('jour_id','=',1)]"/>
+                <filter string="Mardi" name="mardi" domain="[('jour_id','=',2)]"/>
+                <filter string="Mercredi" name="mercredi" domain="[('jour_id','=',3)]"/>
+                <filter string="Jeudi" name="jeudi" domain="[('jour_id','=',4)]"/>
+                <filter string="Vendredi" name="vendredi" domain="[('jour_id','=',5)]"/>
+                <filter string="Samedi" name="samedi" domain="[('jour_id','=',6)]"/>
+                <filter string="Dimanche" name="dimanche" domain="[('jour_id','=',7)]"/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Jour" domain="[]" context="{'group_by':'jour_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_view_of_horaire_creneau_tree" model="ir.actions.act_window">
+        <field name="name">Créneaux horaires</field>
+        <field name="res_model">of.horaire.creneau</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form,tree</field>
+        <field name="view_id" eval="view_of_horaire_creneau_tree"/>
+        <field name="search_view_id" ref="view_of_horaire_creneau_filter"/>
+    </record>
+
+    <menuitem
+        id="menu_hr_config_of_creneau"
+        name="Créneaux horaires"
+        parent="hr.menu_human_resources_configuration"
+        groups="hr.group_hr_manager"
+        action="action_view_of_horaire_creneau_tree"
+        sequence="100"/>
+
+
 <!--##############################################################################-->
 <!--######################### ______ Utilisateurs ______ #########################-->
 <!--##############################################################################-->
@@ -25,34 +192,6 @@
         <field name="arch" type="xml">
             <xpath expr="//tree//field[@name='login']" position="after">
                 <field name="of_color_bg" string="couleur" widget="color"/>
-            </xpath>
-        </field>
-    </record>
-
-<!--##############################################################################-->
-<!--######################### ______ Employés ______ #############################-->
-<!--##############################################################################-->
-    <record id="of_view_employee_form" model="ir.ui.view">
-        <field name="name">of.hr.employee.form</field>
-        <field name="model">hr.employee</field>
-        <field name="inherit_id" ref="hr.view_employee_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//page[@name='public']/group" position="after">
-                <group name="page1_group2" col="4" colspan="4">
-                    <group name="horaires" string="Horaires" col="3" colspan="2">
-                        <field name="of_hor_md" string="Matin" widget="float_time" colspan="2"/>
-                        <field name="of_hor_mf" widget="float_time" colspan="1" nolabel="1"/>
-                        <field name="of_hor_ad" string="Après-midi" widget="float_time" colspan="2"/>
-                        <field name="of_hor_af" widget="float_time" colspan="1" nolabel="1"/>
-                        <field name="of_jour_ids" widget="many2many_tags" colspan="3"/>
-                        <field name="of_tz" widget="timezone_mismatch" options="{'tz_offset_field': 'of_tz_offset'}" colspan="3"/>
-                        <field name="of_tz_offset" invisible="1" colspan="3"/>
-                    </group>
-                    <group name="deplacements" string="Déplacements" colspan="2">
-                        <field name="of_address_depart_id"/>
-                        <field name="of_address_retour_id"/>
-                    </group>
-                </group>
             </xpath>
         </field>
     </record>
@@ -164,5 +303,4 @@
             </xpath>
         </field>
     </record>
-</data>
 </odoo>

@@ -163,7 +163,7 @@
                                         <div style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
                                         <div class="h5" style="padding: 0px 16px;">
                                            <span>Tâche&amp;nbsp;:</span>
-                                           <t t-if="o.equipe_id">
+                                           <t t-if="o.employee_ids">
                                                <t t-if="o.tache_id">
                                                    <strong><span t-field="o.tache_id"/></strong>
                                                </t>
@@ -172,9 +172,11 @@
                                         <div style="margin-bottom: 8px; border-top: 1px solid lightgray; width: 100%;"/>
                                         <div class="h5" style="padding: 0px 16px;">
                                             <div>
-                                                <span>Équipe&amp;nbsp;:</span>
-                                                <t t-if="o.equipe_id">
-                                                    <span t-field="o.equipe_id"/>
+                                                <span>Employés&amp;nbsp;:</span>
+                                                <t t-if="o.employee_ids">
+                                                    <t t-foreach="o.employee_ids" t-as="employee">
+                                                        <span t-raw="employee_value.name"/>&amp;nbsp;
+                                                    </t>
                                                 </t>
                                             </div>
                                         </div>

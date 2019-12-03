@@ -42,16 +42,18 @@ class OfComposeMail(models.TransientModel):
             self = self.with_context(tz='Europe/Paris')
         result = super(OfComposeMail, self)._get_dict_values(o, objects)
 
-        equipes = []
+        employees = []
         dates = []
 
         for intervention in objects['interventions']:
-            equipes.append(intervention.equipe_id.name)
-            d_interv = fields.Datetime.from_string(intervention.date)
-            d_interv = fields.Datetime.context_timestamp(self, d_interv)
+            for employee in intervention.employee_ids:
+                if not employee.name in employees:
+                    employees.append(employee.name)
+            date_interv_da = fields.Datetime.from_string(intervention.date)
+            date_interv_da = fields.Datetime.context_timestamp(self, date_interv_da)
 
             # La fonction date.strftime ne gère pas correctement les chaînes unicode, on ne peut donc pas faire strftime(u"%d/%m/%Y à %H:%M")
-            dates.append(d_interv.strftime("%d/%m/%Y à %H:%M").decode('utf-8'))
+            dates.append(date_interv_da.strftime("%d/%m/%Y à %H:%M").decode('utf-8'))
 
         tache_product_ttc = ''
         duree = ''
@@ -83,8 +85,8 @@ class OfComposeMail(models.TransientModel):
             'date_intervention': dates and dates[0] or '',
             'date_intervention_date': dates and dates[0].split()[0] or '',
             'date_intervention_heure': dates and dates[0].split()[2] or '',
-            'equipe': equipes and equipes[0] or '',
-            'equipes': "\n".join(equipes),
+            'employee': employees and employees[0] or '',
+            'employees': "\n".join(employees),
             'dates_intervention': "\n".join(dates),
             'duree_intervention': duree,
             'tache': intervention and intervention.tache_id and intervention.tache_id.name or '',
@@ -95,8 +97,8 @@ class OfComposeMail(models.TransientModel):
         result.update({
             'date_pose': result['date_intervention'],
             'date_pose_date': result['date_intervention_date'],
-            'equipe_pose': result['equipe'],
-            'equipe_poses': result['equipes'],
+            'employee_pose': result['employee'],
+            'employee_poses': result['employees'],
             'date_poses': result['dates_intervention'],
             'duree_pose': result['duree_intervention'],
             'tache_pose': result['tache'],

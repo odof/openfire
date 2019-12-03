@@ -79,7 +79,8 @@ Droits utilisateurs:
     'depends' : [
         "of_account_invoice_report",  # définition des paramètres d'adresse dans les rapports
         "of_account_tax",  # of_sale ajoute les modifications de of_account_tax dans la creation de facture d'acompte
-        "of_base",
+        #"of_base", <- par of_base_location
+        "of_base_location",
         "of_gesdoc",
         "of_product",
         "of_sale_discount",

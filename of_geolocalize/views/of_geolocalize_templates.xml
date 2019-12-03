@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- inherit from web assets backend -->
+    <template id="assets_backend" name="partner_map assets" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/of_geolocalize/static/src/js/of_form_relational_widgets.js"></script>
+        </xpath>
+    </template>
+</odoo>

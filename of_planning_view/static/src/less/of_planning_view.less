@@ -1,0 +1,278 @@
+@nb-planning-colors: 24;
+
+.of_planning_container {
+    height: 100%;
+    .o-webclient-padding(@top: @odoo-horizontal-padding/2, @bottom: @odoo-horizontal-padding/2);
+    .o-flex-display();
+
+    .of_planning_color_loop(@index) when (@index < @nb-planning-colors+1) {
+        .of_planning_color_@{index} {
+            color: #0D0D0D;
+            background-color: spin(rgb(255, 192, 192), 360/(@nb-planning-colors+1) * @index);
+            border-color:  spin(rgb(255, 192, 192), 360/(@nb-planning-colors+1) * @index);
+            opacity: 0.7;
+        }
+        .of_planning_color_loop(@index + 1);
+    }
+    .of_planning_color_loop(1);
+
+    .underline_color_loop(@index) when (@index < @nb-planning-colors+1) {
+        .of_underline_color_@{index} {
+            border-bottom: 4px solid spin(rgba(255, 192, 192, 0.7), 360/(@nb-planning-colors+1) * @index);
+        }
+        .underline_color_loop(@index + 1);
+    }
+    .underline_color_loop(1);
+
+    .of_planning_view {
+        .o-flex(1, 1, auto);
+        min-width: 0;
+        height: 100%;
+
+        .of_planning_table {
+            background-color: @odoo-view-background-color;
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 20px;
+            * {
+                z-index: 0; // FIXME
+            }
+            .o_attendee_head {
+                float: right;
+                margin-left: 1px;
+                width: 18px;
+                height: 18px;
+            }
+            .fc-view {
+                overflow-x: auto;
+            }
+        }
+
+        .of_planning_column_head {
+            width: 4%;
+        }
+
+        .of_planning_column_day {
+            width: 13.6%;
+        }
+
+        .of_planning_column_today {
+            background-color: #337ab7;
+            color: #ffffff;
+        }
+
+        .of_planning_column_foot {
+            width: 0.8%;
+        }
+
+        .of_planning_table > thead > tr > th,
+        .of_planning_table > tbody > tr > th,
+        .of_planning_table > tfoot > tr > th,
+        .of_planning_table > thead > tr > td,
+        .of_planning_table > tbody > tr > td,
+        .of_planning_table > tfoot > tr > td {
+          padding: 4px;
+          line-height: 1.42857143;
+          vertical-align: top;
+          border-top: 1px solid #ddd;
+        }
+        .of_planning_table > thead > tr > th {
+          vertical-align: bottom;
+          border-bottom: 2px solid #ddd;
+        }
+
+        .of_planning_record {
+            padding: 2px 8px 4px;
+            border-radius: 4px;
+        }
+
+        .of_planning_creneau_dispo {
+            padding: 2px 8px 4px;
+            border-radius: 4px;
+            //background-color: #7FFF00;
+            //background-color: #F0F0F0;
+            //border: 1px solid #0C0C0C;
+            //color: #0C0C0C;
+            cursor: pointer;
+        }
+
+        .of_planning_fillerbar {
+            display: table;
+            width: 100%;
+            height: 10px;
+            border: 1px solid #0C0C0C;
+            border-radius: 3px;
+            margin: 2px;
+            background-color: lightGray;
+        }
+        .of_planning_fillerbar_empty {
+            display: table-cell;
+            background-color: lightGray;
+        }
+        .of_planning_fillerbar_disponible {
+            display: table-cell;
+            //background-color: #7FFF00;
+            //background-color: #F0F0F0;
+        }
+        .of_planning_fillerbar_occupe {
+            display: table-cell;
+            background-color: #337AB7;
+            border-right: 1px solid #0C0C0C;
+        }
+        .of_planning_fillerbar_warning {
+            font-size: 10px;
+            float: right;
+            color: black;
+        }
+    }
+
+    .of_planning_sidebar_container {
+        .o-flex(0, 0, @odoo-horizontal-padding);
+        position: relative;
+
+        &.of_sidebar_hidden {
+            margin-right: -@odoo-horizontal-padding; // hack to display the toggler in the gutter
+            .of_planning_sidebar_toggler {
+                padding: 4px;
+                color: darken(@odoo-webclient-background-color, 30%);
+            }
+        }
+
+        .of_planning_sidebar_toggler {
+            .o-position-absolute(@top: 0, @right: 0);
+            cursor: pointer;
+            padding: 6px;
+            &:hover {
+                color: black;
+            }
+        }
+
+        .of_planning_sidebar {
+            width: 250px;
+            padding-left: 8px;
+        }
+
+        .ui-datepicker {
+            width: 100%;
+            font-size: 8pt;
+            border-radius: 0;
+            border: none;
+            padding: 0;
+
+            .ui-widget-header {
+                .o-flex-display();
+                background: none;
+                background-color: lighten(@odoo-brand-secondary, 30%);
+                border-radius: 0;
+
+                .ui-datepicker-prev, .ui-datepicker-next {
+                    .o-flex(0, 0, auto);
+                    position: static;
+                    cursor: pointer;
+                    padding: 2px;
+                    text-align: center;
+                    color: @odoo-main-text-color;
+                    &.ui-state-hover {
+                        background: none;
+                        border: none;
+                        color: black;
+                    }
+                    .ui-icon {
+                        display: none;
+                    }
+                }
+                .ui-datepicker-prev {
+                    order: 1;
+                    &:after {
+                        font-family: FontAwesome;
+                        content: "";
+                    }
+                }
+                .ui-datepicker-next {
+                    order: 3;
+                    &:before {
+                        font-family: FontAwesome;
+                        content: "";
+                    }
+                }
+                .ui-datepicker-title {
+                    .o-flex(0, 0, auto);
+                    order: 2;
+                    display: inline-block;
+                    margin: 0 10px;
+                }
+            }
+            table {
+                td {
+                    padding: 0 2px 2px 0;
+                    background-color: @odoo-view-background-color;
+                    a {
+                        border: none;
+                        background: none;
+                        background-color: lighten(@odoo-brand-secondary, 40%);
+                        text-align: center;
+                    }
+                }
+                .ui-state-default {
+                    color: @odoo-brand-primary;
+                    &:hover {
+                        background: none;
+                        background-color: fade(@odoo-brand-primary, 50%);
+                        border-color: @odoo-brand-primary;
+                        color: @odoo-view-background-color;
+                    };
+                }
+                .ui-state-active {
+                    background: none;
+                    background-color: @odoo-brand-primary;
+                    color: @odoo-view-background-color;
+                }
+            }
+        }
+        .of_planning_reso_filter {
+            padding: 8px;
+            background: @odoo-view-background-color;
+            border-top: 1px solid lightgray;
+        }
+        .of_planning_info_filter {
+            padding: 8px;
+            background: @odoo-view-background-color;
+            border-top: 1px solid lightgray;
+        }
+    }
+}
+
+.of_planning_reso_filter {
+    .of_planning_contact {
+        margin-top: 6px;
+        margin-bottom: 5px;
+    }
+}
+
+.of_planning_info_filter {
+    .of_planning_info_filter_show {
+        padding: 4px;
+        float: right;
+    }
+    .of_planning_info_filter_hide {
+        padding: 4px;
+        float: right;
+    }
+    .of_planning_ev_info {
+        margin-top: 6px;
+        margin-bottom: 5px;
+    }
+}
+
+.modal {
+    .o_attendee_head {
+        width: 32px;
+        margin-right: 5px;
+    }
+}
+
+.o_dashboard {
+    .of_planning_container .of_planning_sidebar_container {
+        display: none;
+    }
+}

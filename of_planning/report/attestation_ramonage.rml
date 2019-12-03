@@ -89,7 +89,7 @@
                             <para style="default">Nom du technicien ramoneur :</para>
                         </td>
                         <td>
-                            <para style="default">[[ o.equipe_id.name ]]</para>
+                            <para style="default">[[ o.employee_ids[0].name ]]</para>
                         </td>
                     </tr>
                 </blockTable>

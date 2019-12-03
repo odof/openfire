@@ -20,7 +20,7 @@
                     <group>
                         <field name="type"/>
                         <field name="date_start"/>
-                        <field name="equipe_ids" widget="many2many_tags" attrs="{'invisible': [('type','=','week2')], 'required': [('type', '!=', 'week2')]}"/>
+                        <field name="employee_ids" widget="many2many_tags" attrs="{'invisible': [('type','=','week2')], 'required': [('type', '!=', 'week2')]}"/>
                     </group>
                     <footer>
                         <button string="Imprimer" name="button_print" type="object" class="btn-primary"/>
