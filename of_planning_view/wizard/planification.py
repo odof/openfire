@@ -389,6 +389,14 @@ class OfPlanifCreneau(models.TransientModel):
         ('unknown', u"Indéterminé"),
         ('not_tried', u"Pas tenté"),
         ], compute="compute_prec_suiv_vals")
+    name = fields.Char(compute='_compute_name')
+
+    @api.multi
+    @api.depends('employee_id', 'heure_debut_creneau', 'heure_fin_creneau')
+    def _compute_name(self):
+        for creneau in self:
+            creneau.name = u'%s : Créneau %s' % ((creneau.employee_id.name or u''),
+                                                 (creneau.creneaux_reels_formatted or u''))
 
     @api.multi
     @api.depends('lieu_prec_id', 'lieu_prec_manual_id', 'lieu_suiv_id', 'lieu_suiv_manual_id')

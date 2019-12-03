@@ -38,6 +38,10 @@ class OfService(models.Model):
                        "WHERE of_service.tache_id = of_planning_tache.id")
             # On met le champ state à "calculated" quand state est différent de "cancel".
             cr.execute("UPDATE of_service SET base_state = 'calculated'")
+            services = self.env['of.service'].search([])
+            services = services.filtered(lambda s: s.date_last and (not s.date_next or fields.Date.from_string(s.date_last) >= fields.Date.from_string(s.date_next)))
+            for service in services:
+                service.date_next = service.get_next_date(service.date_last)
         return res
 
     def _default_jours(self):
@@ -53,7 +57,7 @@ class OfService(models.Model):
             plannings = service.intervention_ids
             # ne pas prendre les interventions annulées / reportées / non terminées
             planning_filtered = plannings.filtered(lambda p: p.state in ('draft', 'confirm', 'done'))
-            service.date_last = planning_filtered and planning_filtered[0].date or False
+            service.date_last = planning_filtered and planning_filtered[-1].date or False
 
             if service.recurrence:
                 # les interventions faites il y a plus d'une periode ne sont pas a prendre en compte dans le calcul de la durée planifiée
