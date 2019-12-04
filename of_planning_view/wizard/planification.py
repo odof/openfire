@@ -307,7 +307,7 @@ class OfPlanifCreneau(models.TransientModel):
     creneaux_reels = fields.Char(string=u"Créneaux réels")
     creneaux_reels_formatted = fields.Char(string=u"Créneaux réels", compute="_compute_creneaux_reels_formatted")
     warning_horaires = fields.Boolean(string="Attention")
-    distance_max = fields.Integer("Distance max. (km)", default=30)
+    distance_max = fields.Integer("Distance max. (km)", default=30, help=u"À vol d'oiseau.")
     duree_creneau = fields.Float(string=u"Durée à planifier")#, compute="_compute_duree_creneau")
     ignorer_duree = fields.Boolean(string=u"Ignorer durée", help=u"Cochez pour proposer aussi les interventions plus longues que le créneau")
     pre_tache_categ_ids = fields.Many2many(
