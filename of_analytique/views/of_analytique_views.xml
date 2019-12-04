@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="of_analytique_view_sale_config_settings" model="ir.ui.view">
+        <field name="name">of sale settings</field>
+        <field name="model">sale.config.settings</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_sale_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_deposit_product_categ_id_setting']" position="before">
+                <label for="of_compte_analytique" groups="analytic.group_analytic_accounting"/>
+                <div name="of_compte_analytique" groups="analytic.group_analytic_accounting">
+                    <field name="of_compte_analytique" class="oe_inline"/>
+                    <span>Forcer l'utilisation des comptes analytique</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <data noupdate="1">
+    <record model="ir.ui.view" id="of_analytique_sale_order">
+        <field name="name">sale.order.analyse.chantier.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="active">False</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook//field[@name='related_project_id']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+            <xpath expr="//notebook//field[@name='project_id']" position="replace"/>
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="project_id"
+                       required="1"
+                       attrs="{'readonly': ['|',('project_id','!=',False),('invoice_count','!=',0),('state','=','sale')],
+                       'required': ['!','&amp;','|',('project_id','!=',False),('invoice_count','!=',0),('state','=','sale')]}"
+                       context="{'default_partner_id':partner_invoice_id, 'default_name':name}"
+                       groups="analytic.group_analytic_accounting"/>
+            </xpath>
+        </field>
+    </record>
+    </data>
+
+    <record id="of_analytic_invoice_form" model="ir.ui.view">
+        <field name="name">of.analytic.invoice.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='account_analytic_id']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+            <xpath expr="//field[@name='move_id']" position="after">
+                <field name="of_project_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_analytic_invoice_line_form" model="ir.ui.view">
+        <field name="name">of.analytic.invoice.line.form</field>
+        <field name="model">account.invoice.line</field>
+        <field name="inherit_id" ref="account.view_invoice_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='account_analytic_id']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
