@@ -11,8 +11,9 @@
                     $(document).ready(function(){
                         // élargir le pop-up
                         //$(".modal-dialog").width('80%');
-                        //$(".o_cp_right").hide();
-                        //$(".o_cp_left").hide();
+                        //$(".o_form_button_view").hide();
+                        //$(".o_form_button_edit").hide();
+                        //$(".o_cp_pager").hide();
                     });
                 </script><!-- -->
                 <header>
