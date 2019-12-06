@@ -11,8 +11,8 @@
                     $(document).ready(function(){
                         // élargir le pop-up
                         //$(".modal-dialog").width('80%');
-                        $(".o_cp_right").hide();
-                        $(".o_cp_left").hide();
+                        //$(".o_cp_right").hide();
+                        //$(".o_cp_left").hide();
                     });
                 </script><!-- -->
                 <header>
@@ -125,6 +125,10 @@
                             <field name="employee_other_ids" widget="many2many_tags" options="{'no_create': True}"
                               domain="[('of_est_intervenant', '=', True), ('id', '!=', employee_id)]"/>
                         </group>
+                    </group>
+                    <group colspan="2" string="Description" attrs="{'invisible':[('pre_a_programmer_id', '=', False), ('proposition_ids', '=', [])]}">
+                        <label for="description_rdv" style="font-weight: bold!important"/>
+                        <field name="description_rdv" nolabel="1" colspan="2" widget="html"/>
                     </group>
                     <group col="2" colspan="2" attrs="{'invisible': ['|', ('aucun_res', '=', False), ('pre_a_programmer_id', '!=', False)]}">
                         <separator string="Aucun résultat" colspan="2"/>
