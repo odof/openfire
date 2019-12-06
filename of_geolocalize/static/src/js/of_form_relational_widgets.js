@@ -41,7 +41,8 @@ FieldMany2One.include({
         var self = this;
 
         var partner_id = this.field_manager.get_field_value(this.name)
-        if (!partner_id) {
+        var type = self.field.type;
+        if (!partner_id || type != "many2one" ) {
             self.set({"geo_lat": undefined});
             self.dfd_geo_lat.resolve();
         }else{
