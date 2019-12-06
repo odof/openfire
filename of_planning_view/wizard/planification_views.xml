@@ -169,7 +169,11 @@
                     </field>
                     <group colspan="4"><!-- string="Calculer plus de résultats"  -->
                         <button name="button_compute_more" type="object" class="btn btn-default oe_grey"
-                            attrs="{'invisible': [('tout_calcule', '!=', False)]}">
+                            attrs="{'invisible': [
+                                '|', '|',
+                                    ('tout_calcule', '!=', False),
+                                    ('proposition_ids', '=', []),
+                                    ('pre_a_programmer_id', '!=', False)]}">
                             <span>Calculer plus de résultats (déjà fait </span><field name="calcule_nb" nolabel="1" class="oe_inline"/>
                             <span>/</span><field name="prop_nb" nolabel="1" class="oe_inline"/><span>)</span>
                         </button>
