@@ -279,6 +279,7 @@ class OfPlanifCreneauProp(models.TransientModel):
         self.selected = True
         self.creneau_id.duree_rdv = self.service_id.duree
         self.creneau_id.selected_id = self.id
+        self.creneau_id.onchange_selected_id()
         # return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
@@ -563,6 +564,14 @@ class OfPlanifCreneau(models.TransientModel):
     def onchange_employee_other_ids(self):
         self.ensure_one()
         # verifier debut_sur_creneau -> quand code de cédric à disposition
+
+    @api.onchange('selected_id', 'pre_a_programmer_id')
+    def onchange_selected_id(self):
+        self.ensure_one()
+        if self.pre_a_programmer_id:
+            self.description_rdv = self.pre_a_programmer_id.note
+        elif self.selected_id:
+            self.description_rdv = self.selected_id.service_id.note
 
     @api.onchange('pre_a_programmer_id')
     def onchange_pre_a_programmer_id(self):
