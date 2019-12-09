@@ -277,6 +277,7 @@ class OfPlanningIntervention(models.Model):
     company_id = fields.Many2one('res.company', string='Magasin', required=True, default=lambda self: self.env.user.company_id.id)
     tag_ids = fields.Many2many('of.planning.tag', column1='intervention_id', column2='tag_id', string=u'Étiquettes')
     description = fields.Html(string='Description')  # Non utilisé, changé pour notes intervention
+    origin_interface = fields.Char(string=u"Origine création", default=u"Manuelle")
 
     """mode_horaires = fields.Selection([
         ("easy", "Facile"),

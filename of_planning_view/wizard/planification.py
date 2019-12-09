@@ -28,10 +28,17 @@ def voloiseau(lat1, lng1, lat2, lng2):
     lat1, lng1, lat2, lng2 = [radians(v) for v in (lat1, lng1, lat2, lng2)]
     return 2*asin(sqrt((sin((lat1-lat2)/2)) ** 2 + cos(lat1)*cos(lat2)*(sin((lng1-lng2)/2)) ** 2)) * 6366
 
+def round_a_cinq(val):
+    u"""arrondi au multiple de 5 supérieur"""
+    reste = val % 5
+    if not reste:
+        return val
+    return 5 * (int(val / 5) + 1)
+
 class OfPlanifCreneauProp(models.TransientModel):
     _name = 'of.planif.intervention'
     _description = u"Proposition d'intervention à programmer"
-    _order = "selected DESC, priorite DESC, distance_order, date_next, date_fin"
+    _order = "selected DESC, priorite DESC, distance_arrondi_order, date_next, date_fin, distance_order"
 
     service_id = fields.Many2one("of.service", string="Service")
     creneau_id = fields.Many2one('of.planif.creneau', string=u"Créneau")
@@ -52,8 +59,8 @@ class OfPlanifCreneauProp(models.TransientModel):
     partner_of_telephones = fields.Text(related='service_id.partner_id.of_telephones', readonly=True)
     #partner_phone = fields.Char(related='service_id.partner_id.phone', readonly=True)
 
-    tache_id = fields.Many2one(related='service_id.tache_id', string="Tâche", readonly=True)
-    tache_name = fields.Char(related='service_id.tache_id.name', string="Tâche", readonly=True)
+    tache_id = fields.Many2one(related='service_id.tache_id', string="Prestation", readonly=True)
+    tache_name = fields.Char(related='service_id.tache_id.name', string="Prestation", readonly=True)
     address_id = fields.Many2one(related="service_id.address_id")
     address_html = fields.Html(compute="compute_address_html")
     address_name = fields.Char(string="Adresse", related="service_id.address_id.name", readonly=True)
@@ -76,6 +83,8 @@ class OfPlanifCreneauProp(models.TransientModel):
     distance_order = fields.Float(
         string=u'Distance totale order', digits=(5, 2), help=u"pour ordonner", default="99999")
         #compute="compute_distance_reelle", store=True)
+    distance_arrondi_order = fields.Float(
+        string=u'Distance arrondi order', digits=(5, 2), help=u"pour ordonner", default="99999")
     fait = fields.Boolean(string=u"déjà calculé")
     priorite = fields.Integer(string=u"Priorité")
     selected = fields.Boolean(string=u"Sélectionné")
@@ -131,6 +140,7 @@ class OfPlanifCreneauProp(models.TransientModel):
                 'distance_reelle_suiv': -1,
                 'distance_reelle_tota': -1,
                 'distance_order': 99999,
+                'distance_arrondi_order': 99999,
                 'osrm_response': "",
             })
             return
@@ -182,6 +192,7 @@ class OfPlanifCreneauProp(models.TransientModel):
                 a_planifier.distance_reelle_suiv = dist_suiv
                 a_planifier.distance_reelle_tota = dist_prec + dist_suiv
                 a_planifier.distance_order = dist_prec + dist_suiv
+                a_planifier.distance_arrondi_order = round_a_cinq(dist_prec + dist_suiv)
                 a_planifier.osrm_response = legs
                 a_planifier.fait = True
             else:
@@ -189,6 +200,7 @@ class OfPlanifCreneauProp(models.TransientModel):
                 a_planifier.distance_reelle_suiv = -1
                 a_planifier.distance_reelle_tota = -1
                 a_planifier.distance_order = 99999
+                a_planifier.distance_arrondi_order = 99999
                 a_planifier.osrm_response = res
                 a_planifier.fait = True
             compteur += 1
@@ -259,16 +271,44 @@ class OfPlanifCreneauProp(models.TransientModel):
         if self.selected and self.creneau_id.selected_id.id != self.id:
             self.creneau_id.selected_id.selected = False
             self.creneau_id.selected_id = self.id
+            self.description_rdv = self.service_id.note
 
     @api.multi
     def get_closer_one(self):
-        """Renvois la proposition dont la distance réelle est la plus petite parmis les éléments de self"""
+        """Renvois la proposition dont la distance réelle est la plus petite parmis les éléments de self
+           priorite DESC, distance_arrondi_order, date_next, date_fin, distance_order"""
         min_prop = False
-        for prop in self:
+        if not len(self):
+            return False
+        propositions = self.filtered(lambda p: p.distance_order < 99000)
+        while not propositions:
+            self.compute_distance_reelle()
+            propositions = self.filtered(lambda p: p.distance_order < 99000)
+        for prop in propositions:
             if not min_prop:  # initialisation min_prop
                 min_prop = prop
-            elif prop.distance_reelle_tota < min_prop.distance_reelle_tota and prop.distance_order < 99000:  # nouveau min!
+            elif prop.priorite < min_prop.priorite:
+            #elif prop.distance_reelle_tota < min_prop.distance_reelle_tota and prop.distance_order < 99000:  # nouveau min!
                 min_prop = prop
+            elif prop.priorite > min_prop.priorite:
+                continue
+            elif prop.distance_arrondi_order < min_prop.distance_arrondi_order:
+                min_prop = prop
+            elif prop.distance_arrondi_order > min_prop.distance_arrondi_order:
+                continue
+            elif prop.date_next < min_prop.date_next:
+                min_prop = prop
+            elif prop.date_next > min_prop.date_next:
+                continue
+            elif prop.date_fin < min_prop.date_fin:
+                min_prop = prop
+            elif prop.date_fin > min_prop.date_fin:
+                continue
+            elif prop.distance_order < min_prop.distance_order:
+                min_prop = prop
+            elif prop.distance_order > min_prop.distance_order:
+                continue
+
         return min_prop
 
     @api.multi
@@ -280,7 +320,13 @@ class OfPlanifCreneauProp(models.TransientModel):
         self.creneau_id.duree_rdv = self.service_id.duree
         self.creneau_id.selected_id = self.id
         self.creneau_id.onchange_selected_id()
-        # return {'type': 'ir.actions.do_nothing'}
+        return {'type': 'ir.actions.do_nothing'}
+
+    @api.multi
+    def button_select_from_list(self):
+        """Sélectionne cette proposition comme résultat"""
+        self.ensure_one()
+        return self.creneau_id.button_select(self.id)
 
     @api.multi
     def button_confirm(self):
@@ -290,11 +336,8 @@ class OfPlanifCreneauProp(models.TransientModel):
     @api.multi
     def button_confirm_next(self):
         self.ensure_one()
-        self = self.with_context({
-            'from_popup': True,
-        })
-        self.creneau_id.button_confirm_next()
-        return {'type': 'ir.actions.act_window_close'}
+        self = self.with_context(from_prop=True)
+        return self.creneau_id.button_confirm_next()
 
 
 class OfPlanifCreneau(models.TransientModel):
@@ -342,7 +385,8 @@ class OfPlanifCreneau(models.TransientModel):
     secteur_id = fields.Many2one('of.secteur', string="Secteur", help=u"laisser vide pour ne pas restreindre à un secteur en particulier")
     priorite_max = fields.Integer(string=u"Priorité max", help=u"Priorité la plus haute parmis les propositions")
 
-    proposition_ids = fields.One2many('of.planif.intervention', 'creneau_id', string="propositions")#, compute="peupler_candidats")
+    proposition_ids = fields.One2many('of.planif.intervention', 'creneau_id', string="propositions",
+                    order="selected DESC, priorite DESC, distance_arrondi_order, date_next, date_fin, distance_order")#, compute="peupler_candidats")
     selected_id = fields.Many2one('of.planif.intervention', string="Proposition")
     heure_debut_rdv = fields.Float(string=u'Heure de début', digits=(5, 5))
     duree_rdv = fields.Float(string=u"Durée")
@@ -732,14 +776,15 @@ class OfPlanifCreneau(models.TransientModel):
         prop_selected = self.proposition_ids.filtered(lambda p: p.selected == True)
         if prop_selected:
             prop_selected.selected = False
-        prop_prioritaires = self.proposition_ids.filtered(lambda p: p.priorite > self.priorite_max)[:25]
-        if len(prop_prioritaires) <= 10:
-            prop_prioritaires = self.proposition_ids[:25]
-        prop_prioritaires.compute_distance_reelle()
+        # prop_prioritaires = self.proposition_ids.filtered(lambda p: p.priorite > self.priorite_max)[:25]
+        # if len(prop_prioritaires) <= 10:
+        #     prop_prioritaires = self.proposition_ids[:25]
+        self.proposition_ids.compute_distance_reelle()
         prop_a_supr = self.proposition_ids.filtered(lambda p: p.distance_reelle_tota > self.distance_max)
-        prop_prioritaires -= prop_a_supr
+        self.proposition_ids -= prop_a_supr
         prop_a_supr.unlink()
-        self.selected_id = prop_prioritaires.get_closer_one()
+        #self.selected_id = prop_prioritaires.get_closer_one()
+        self.selected_id = self.proposition_ids.get_closer_one()
         if self.selected_id:
             self.selected_id.selected = True
             #if self.selected_id.priorite == self.priorite_max:
@@ -751,15 +796,36 @@ class OfPlanifCreneau(models.TransientModel):
             self.aucun_res = True
 
     @api.multi
+    def reload_wizard(self):
+        action = self.env.ref('of_planning_view.action_view_of_planif_wizard').read()[0]
+        action['context'] = self._context
+        action['res_id'] = self.id
+        return action
+
+    @api.multi
     def button_compute_more(self):
         prop_a_faire = self.proposition_ids.filtered(lambda prop: not prop.fait)[:25]
         prop_a_faire.compute_distance_reelle()
+        return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
     def button_search(self):
         self.set_proposition_ids()
         self.set_selected_id()
-        return
+        return {'type': 'ir.actions.do_nothing'}
+
+    @api.multi
+    def button_select(self, prop_id):
+        """Sélectionne cette proposition comme résultat"""
+        self.ensure_one()
+        self.selected_id.selected = False
+        prop = self.env['of.planif.intervention'].browse(prop_id)
+        prop.selected = True
+        self.duree_rdv = prop.service_id.duree
+        self.selected_id = prop.id
+        self.onchange_selected_id()
+        return self.reload_wizard()
+        # return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
     def get_values_intervention_create(self):
@@ -791,6 +857,7 @@ class OfPlanifCreneau(models.TransientModel):
             'state': 'confirm',
             'verif_dispo': True,
             'order_id': service.order_id.id,
+            'origin_interface': u"Remplir un créneau (wizard planif)",
         }
 
         return values
@@ -807,9 +874,9 @@ class OfPlanifCreneau(models.TransientModel):
         if not self.duree_rdv:
             raise UserError(u"Avez-vous pensé à vérifier la durée de votre intervention?")
         intervention = self.create_intervention()
-        #if self.selected_id.service_id.recurrence:  # conception: calculer date next à la création de l'intervention ou à sa validation?
-        #    intervention.service_id.date_next = intervention.service_id.get_next_date(self.date_creneau)
-        return {'type': 'ir.actions.client', 'tag': 'history_back'}
+        if self.selected_id.service_id.recurrence:  # conception: calculer date next à la création de l'intervention ou à sa validation?
+            intervention.service_id.date_next = intervention.service_id.get_next_date(self.date_creneau)
+        return #{'type': 'ir.actions.client', 'tag': 'history_back'}
 
     @api.multi
     def button_confirm_next(self):
@@ -840,7 +907,7 @@ class OfPlanifCreneau(models.TransientModel):
             for i in range(len(creneaux)):
                 creneau = creneaux[i]
                 if creneau[0] <= interv_heure_fin <= creneau[1]:  # trouvé!
-                    if float_compare(interv_heure_fin, creneau[1], 5) == 0.0:  # le créneau a été entièrement rempli: on le supprime
+                    if float_compare(interv_heure_fin, creneau[1], 5) == 0:  # le créneau a été entièrement rempli: on le supprime
                         if i < len(creneaux) - 1:  # il reste d'autres créneaux à planifier ce jour
                             creneaux = creneaux[i+1:]
                         else:  # la journée est totalement planifiée
@@ -854,25 +921,25 @@ class OfPlanifCreneau(models.TransientModel):
                 raise UserError(u"On dirait que cette journée est entièrement planifiée pour %s" % self.employee_id.name)
         if creneau_fini:  # le créneau est entièrement planifié!
             self.creneau_fini = creneau_fini
-            return
-        # mise à jour des données du créneau
-        self.creneaux_reels = json.dumps(creneaux)
+        else:
+            # mise à jour des données du créneau
+            self.creneaux_reels = json.dumps(creneaux)
 
-        self.priorite_max = 0
-        self.lieu_prec_id = intervention.address_id
-        self.proposition_ids.unlink()
-        self.heure_debut_creneau = interv_heure_fin
-        self.heure_debut_rdv = interv_heure_fin
+            self.priorite_max = 0
+            self.lieu_prec_id = intervention.address_id
+            self.proposition_ids.unlink()
+            self.heure_debut_creneau = creneaux[0][0]
+            self.heure_debut_rdv = creneaux[0][0]
 
-        self.set_proposition_ids()
-        self.set_selected_id()
-        return
+            self.set_proposition_ids()
+            self.set_selected_id()
+        if self._context.get('from_prop', False):
+            return self.reload_wizard()
+        return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
     def button_close(self):
-        return {'type': 'ir.actions.client', 'tag': 'history_back'}
-
-
+        return #{'type': 'ir.actions.client', 'tag': 'history_back'}
 
 
     """@api.multi
