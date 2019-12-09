@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 {
-    'name' : "OpenFire / Comptabilité",
-    'version' : "10.0.1.0.0",
-    'author' : "OpenFire",
+    'name': "OpenFire / Comptabilité",
+    'version': "10.0.1.0.0",
+    'author': "OpenFire",
     'license': '',
-    'website' : "www.openfire.fr",
-    'category' : "Generic Modules/Accounting",
+    'website': "www.openfire.fr",
+    'category': "Generic Modules/Accounting",
     'description': u"""
 Module de comptabilité OpenFire.
 ================================
@@ -23,11 +23,11 @@ Module de comptabilité OpenFire.
 - Ajout d'options dans les conditions de règlement (inspiré du module OCA account_payment_term_extension).
 - Rendre visible le menu "Écritures comptables" sans le mode développeur.
 """,
-    'depends' : [
+    'depends': [
         'account',
         'of_base',
     ],
-    'demo_xml' : [],
+    'demo_xml': [],
     'data': [
         'views/of_account_view.xml',
         'wizards/wizard_edit_export_view.xml'

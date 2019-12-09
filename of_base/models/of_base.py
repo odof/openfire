@@ -2,12 +2,22 @@
 
 import threading
 import re
+import logging
 
 from odoo import models, api, tools, fields, SUPERUSER_ID
 from odoo.exceptions import ValidationError, AccessError
 from odoo.modules import get_module_resource
 from odoo.tools import OrderedSet
 from odoo.osv import expression
+from odoo.models import regex_order
+
+_logger = logging.getLogger(__name__)
+
+class IrModelFields(models.Model):
+    _inherit = 'ir.model.fields'
+
+    of_custom_groupby = fields.Boolean(string=u"Autorisation forcée pour le regroupement")
+
 
 class OfReadGroup(models.AbstractModel):
     """
@@ -123,6 +133,77 @@ class OfReadGroup(models.AbstractModel):
                 aggregated_fields, count_field, result, read_group_order=order,
             )
         return result
+
+    @api.model_cr_context
+    def _field_create(self):
+        """
+        Ajoute la mise à jour de of_custom_groupby dans la table ir_model_fields
+        """
+        super(OfReadGroup, self)._field_create()
+        cr = self._cr
+        for field in self._fields.itervalues():
+            query = "UPDATE ir_model_fields SET of_custom_groupby=%s WHERE model=%s AND name=%s"
+            cr.execute(query, (getattr(field, 'of_custom_groupby', False), self._name, field.name))
+
+    @api.model
+    def _generate_order_by_inner(self, alias, order_spec, query, reverse_direction=False, seen=None):
+        """
+        Fonction identique à la fonction définie dans models.py, à l'exception de la zone spécifiée.
+        Permet d'ordonner les résultats d'une requête en fonction de champs avec of_custom_groupby=True.
+        Nécessite que la fonction of_custom_groupby_generate_order soit surchargée pour chacun de ces champs.
+        """
+        if seen is None:
+            seen = set()
+        self._check_qorder(order_spec)
+
+        order_by_elements = []
+        for order_part in order_spec.split(','):
+            order_split = order_part.strip().split(' ')
+            order_field = order_split[0].strip()
+            order_direction = order_split[1].strip().upper() if len(order_split) == 2 else ''
+            if reverse_direction:
+                order_direction = 'ASC' if order_direction == 'DESC' else 'DESC'
+            do_reverse = order_direction == 'DESC'
+
+            field = self._fields.get(order_field)
+            if not field:
+                raise ValueError(_("Sorting field %s not found on model %s") % (order_field, self._name))
+
+            if order_field == 'id':
+                order_by_elements.append('"%s"."%s" %s' % (alias, order_field, order_direction))
+            else:
+                if field.inherited:
+                    field = field.base_field
+                if field.store and field.type == 'many2one':
+                    key = (field.model_name, field.comodel_name, order_field)
+                    if key not in seen:
+                        seen.add(key)
+                        order_by_elements += self._generate_m2o_order_by(alias, order_field, query, do_reverse, seen)
+                elif field.store and field.column_type:
+                    qualifield_name = self._inherits_join_calc(alias, order_field, query, implicit=False, outer=True)
+                    if field.type == 'boolean':
+                        qualifield_name = "COALESCE(%s, false)" % qualifield_name
+                    order_by_elements.append("%s %s" % (qualifield_name, order_direction))
+                # OF Modification OpenFire
+                elif getattr(field, 'of_custom_groupby', False):
+                    key = (field.model_name, field.comodel_name, order_field)
+                    if key not in seen:
+                        seen.add(key)
+                        order_by_elements += self.of_custom_groupby_generate_order(
+                            alias, order_field, query, do_reverse, seen)
+                # Fin modification OpenFire
+                else:
+                    continue  # ignore non-readable or "non-joinable" fields
+
+        return order_by_elements
+
+    @api.model
+    def of_custom_groupby_generate_order(self, alias, order_field, query, do_reverse, seen):
+        """
+        Fonction à surcharger pour ajouter des jointures dans query et retourner un ordre de tri.
+        Le format de retour est le même que celui de _generate_order_by_inner()
+        """
+        return False
 
 class ResUsers(models.Model):
     _inherit = "res.users"

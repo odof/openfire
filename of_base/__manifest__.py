@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name' : "OpenFire / Base",
-    'version' : "10.0",
-    'author' : "OpenFire",
+    'name': "OpenFire / Base",
+    'version': "10.0.1.0.0",
+    'author': "OpenFire",
     'license': '',
     'complexity': "easy",
-    'description' : """
+    'description': u"""
 Personnalisation des fonctions de base Odoo :
 
 - Ajout des colonnes destinataire et partenaire dans la vue liste des emails
@@ -23,10 +23,10 @@ Personnalisation des fonctions de base Odoo :
 - Ajout d'un champ calculé et d'un bouton sur les actions d'envoi de mail pour avoir une pré-visualisation du mail
 - Permet à l'auteur d'un mail de le recevoir en copie (par défaut odoo retire l'expéditeur de la liste des destinataires)
 """,
-    'website' : "www.openfire.fr",
-    'depends' : ['product', 'mail', 'contacts'],
-    'category' : "OpenFire",
-    'data' : [
+    'website': "www.openfire.fr",
+    'depends': ['product', 'mail', 'contacts'],
+    'category': "OpenFire",
+    'data': [
         'data/report_paperformat.xml',
         'security/of_group_intranet_security.xml',
         'views/of_base_view.xml',

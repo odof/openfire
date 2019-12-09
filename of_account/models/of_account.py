@@ -2,6 +2,7 @@
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError,  ValidationError
+from odoo.models import regex_order
 
 NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
 
@@ -84,7 +85,8 @@ class AccountInvoice(models.Model):
         self.journal_id = self.with_context(company_id=self.company_id.id)._default_journal()
 
 class AccountInvoiceLine(models.Model):
-    _inherit = 'account.invoice.line'
+    _name = 'account.invoice.line'
+    _inherit = ['account.invoice.line', 'of.readgroup']
 
     of_product_categ_id = fields.Many2one(
         'product.category', related='product_id.categ_id', string=u"Catégorie d'article",
@@ -94,6 +96,53 @@ class AccountInvoiceLine(models.Model):
         related='invoice_id.date_invoice', string="Date de facturation",
         store=True, index=True
     )
+    of_gb_partner_tag_id = fields.Many2one(
+        'res.partner.category', compute=lambda *a, **k: {}, search='_search_of_gb_partner_tag_id',
+        string="Étiquette client", of_custom_groupby=True)
+
+    @api.model
+    def _search_of_gb_partner_tag_id(self, operator, value):
+        return [('partner_id.category_id', operator, value)]
+
+    @api.model
+    def _read_group_process_groupby(self, gb, query):
+        # Ajout de la possibilité de regrouper par employé
+        if gb != 'of_gb_partner_tag_id':
+            return super(AccountInvoiceLine, self)._read_group_process_groupby(gb, query)
+
+        alias, _ = query.add_join(
+            (self._table, 'res_partner_res_partner_category_rel', 'partner_id', 'partner_id', 'partner_category'),
+            implicit=False, outer=True,
+        )
+
+        return {
+            'field': gb,
+            'groupby': gb,
+            'type': 'many2one',
+            'display_format': None,
+            'interval': None,
+            'tz_convert': False,
+            'qualified_field': '"%s".category_id' % (alias,)
+        }
+
+    @api.model
+    def of_custom_groupby_generate_order(self, alias, order_field, query, reverse_direction, seen):
+        if order_field == 'of_gb_partner_tag_id':
+            dest_model = self.env['res.partner.category']
+            m2o_order = dest_model._order
+            if not regex_order.match(m2o_order):
+                # _order is complex, can't use it here, so we default to _rec_name
+                m2o_order = dest_model._rec_name
+
+            rel_alias, _ = query.add_join(
+                (alias, 'res_partner_res_partner_category_rel', 'partner_id', 'partner_id', 'partner_category_rel'),
+                implicit=False, outer=True)
+            dest_alias, _ = query.add_join(
+                (rel_alias, 'res_partner_category', 'category_id', 'id', 'partner_category'),
+                implicit=False, outer=True)
+            return dest_model._generate_order_by_inner(dest_alias, m2o_order, query,
+                                                       reverse_direction, seen)
+        return []
 
     def _write(self, vals):
         for field in vals:

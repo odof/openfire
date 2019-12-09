@@ -4,6 +4,7 @@ from odoo import models, fields, api, _
 import odoo.addons.decimal_precision as dp
 from odoo.tools import float_compare
 from odoo.exceptions import UserError
+from odoo.models import regex_order
 import os
 import base64
 import tempfile
@@ -606,7 +607,8 @@ class OFInvoiceReportTotalGroup(models.Model):
 
 
 class SaleOrderLine(models.Model):
-    _inherit = 'sale.order.line'
+    _name = 'sale.order.line'
+    _inherit = ['sale.order.line', 'of.readgroup']
 
     price_unit = fields.Float(digits=False)
     of_client_view = fields.Boolean(string="Vue client/vendeur", related="order_id.of_client_view")
@@ -616,6 +618,55 @@ class SaleOrderLine(models.Model):
         store=True, index=True
     )
     date_order = fields.Datetime(related='order_id.date_order', string="Date de commande", store=True, index=True)
+    confirmation_date_order = fields.Datetime(
+        related='order_id.confirmation_date', string="Date de confirmation de commande", store=True, index=True)
+    of_gb_partner_tag_id = fields.Many2one(
+        'res.partner.category', compute=lambda *a, **k: {}, search='_search_of_gb_partner_tag_id',
+        string="Étiquette client", of_custom_groupby=True)
+
+    @api.model
+    def _search_of_gb_partner_tag_id(self, operator, value):
+        return [('order_partner_id.category_id', operator, value)]
+
+    @api.model
+    def _read_group_process_groupby(self, gb, query):
+        # Ajout de la possibilité de regrouper par employé
+        if gb != 'of_gb_partner_tag_id':
+            return super(SaleOrderLine, self)._read_group_process_groupby(gb, query)
+
+        alias, _ = query.add_join(
+            (self._table, 'res_partner_res_partner_category_rel', 'order_partner_id', 'partner_id', 'partner_category'),
+            implicit=False, outer=True,
+        )
+
+        return {
+            'field': gb,
+            'groupby': gb,
+            'type': 'many2one',
+            'display_format': None,
+            'interval': None,
+            'tz_convert': False,
+            'qualified_field': '"%s".category_id' % (alias,)
+        }
+
+    @api.model
+    def of_custom_groupby_generate_order(self, alias, order_field, query, reverse_direction, seen):
+        if order_field == 'of_gb_partner_tag_id':
+            dest_model = self.env['res.partner.category']
+            m2o_order = dest_model._order
+            if not regex_order.match(m2o_order):
+                # _order is complex, can't use it here, so we default to _rec_name
+                m2o_order = dest_model._rec_name
+
+            rel_alias, _ = query.add_join(
+                (alias, 'res_partner_res_partner_category_rel', 'order_partner_id', 'partner_id', 'partner_category_rel'),
+                implicit=False, outer=True)
+            dest_alias, _ = query.add_join(
+                (rel_alias, 'res_partner_category', 'category_id', 'id', 'partner_category'),
+                implicit=False, outer=True)
+            return dest_model._generate_order_by_inner(dest_alias, m2o_order, query,
+                                                       reverse_direction, seen)
+        return []
 
     @api.multi
     @api.onchange('product_id')
