@@ -14,7 +14,8 @@
                     <field name="id" invisible="1"/>
                     <group name="histo_interventions" string="Interventions">
                         <field name="intervention_partner_ids" colspan="4" nolabel="1" attrs="{'invisible': [('parent_id','!=', False)]}"
-                               context="{'form_view_ref':'of_planning.of_planning_intervention_view_form2'}">
+                               context="{'form_view_ref':'of_planning.of_planning_intervention_view_form2',
+                                         'force_read': True}">
                             <tree string="Plannings">
                                 <field name="tache_id"/>
                                 <field name="equipe_id"/>
@@ -26,7 +27,8 @@
                             </tree>
                         </field>
                         <field name="intervention_address_ids" colspan="4" nolabel="1" attrs="{'invisible': [('parent_id','=', False)]}"
-                                context="{'form_view_ref':'of_planning.of_planning_intervention_view_form2', 'default_address_id':id}">
+                                context="{'form_view_ref':'of_planning.of_planning_intervention_view_form2', 'default_address_id':id,
+                                          'force_read': True}">
                             <tree string="Plannings">
                                 <field name="equipe_id"/>
                                 <field name="tache_id"/>

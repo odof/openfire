@@ -167,13 +167,35 @@ class OfPlanningIntervention(models.Model):
     of_notes_intervention = fields.Html(related='order_id.of_notes_intervention', readonly=True)
     of_notes_client = fields.Text(related='partner_id.comment', string="Notes client", readonly=True)
     cleantext_description = fields.Text(compute='_compute_cleantext_description')
-    cleantext_intervention = fields.Text(compute='_compute_cleantext_intervention')
+    cleantext_intervention = fields.Text(compute='_compute_cleantext_intervention', store=True)
     jour = fields.Char("Jour", compute="_compute_jour")
     date_date = fields.Date(string='Jour intervention', compute='_compute_date_date', search='_search_date_date', readonly=True)
 
     template_id = fields.Many2one('of.planning.intervention.template', string=u"Modèle d'intervention")
     number = fields.Char(String=u"Numéro", copy=False)
     calendar_name = fields.Char(string="Calendar Name", compute="_compute_calendar_name")
+
+    @api.multi
+    def read(self, fields=None, load='_classic_read'):
+        """
+        Permettre la lecture de toutes les interventions d'un client depuis la fiche client
+        """
+        if self._context.get('force_read'):
+            res = super(OfPlanningIntervention, self.sudo()).read(fields, load)
+        else:
+            res = super(OfPlanningIntervention, self).read(fields, load)
+        return res
+
+    @api.multi
+    def check_access_rule(self, operation):
+        """
+        Permettre la lecture de toutes les interventions d'un client depuis la fiche client
+        """
+        if self._context.get('force_read') and operation == 'read':
+            res = super(OfPlanningIntervention, self.sudo()).check_access_rule(operation)
+        else:
+            res = super(OfPlanningIntervention, self).check_access_rule(operation)
+        return res
 
     @api.model
     def _modifier_droits_existants_utilisateurs(self):
@@ -646,8 +668,15 @@ class OfPlanningIntervention(models.Model):
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    intervention_partner_ids = fields.One2many('of.planning.intervention', 'partner_id', "Interventions client")
-    intervention_address_ids = fields.One2many('of.planning.intervention', 'address_id', "Interventions adresse")
+    intervention_partner_ids = fields.One2many('of.planning.intervention', string="Interventions client", compute="_compute_interventions")
+    intervention_address_ids = fields.One2many('of.planning.intervention', string="Interventions adresse", compute="_compute_interventions")
+
+    @api.multi
+    def _compute_interventions(self):
+        intervention_obj = self.sudo().env['of.planning.intervention']
+        for partner in self:
+            partner.intervention_partner_ids = intervention_obj.search([('partner_id', '=', partner.id)])
+            partner.intervention_address_ids = intervention_obj.search([('address_id', '=', partner.id)])
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
