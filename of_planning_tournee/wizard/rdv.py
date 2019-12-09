@@ -566,6 +566,7 @@ class OfTourneeRdv(models.TransientModel):
             'state': 'confirm',
             'verif_dispo': True,
             'order_id': self.service_id.order_id.id,
+            'origin_interface': u"Trouver un créneau (rdv.py)",
         }
 
         return values

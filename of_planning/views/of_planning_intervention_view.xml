@@ -186,6 +186,7 @@
                             </b></h1>
                         </div>
                         <group>
+                            <field name="origin_interface"/>
                             <group col="2" name="refs" string="Références">
                                 <field name="equipe_id" autofocus="autofocus"/>
                                 <field name="employee_ids" string="Intervenants" widget="many2many_tags" options='{"no_open": True, "no_create": True}'/>

@@ -10,13 +10,15 @@
                 <script>
                     $(document).ready(function(){
                         // élargir le pop-up
-                        //$(".modal-dialog").width('80%');
-                        //$(".o_form_button_view").hide();
-                        //$(".o_form_button_edit").hide();
+                        $(".modal-dialog").width('80%');
+                        $(".o_form_button_view").hide();
+                        $(".o_form_button_edit").hide();
+                        //var len = $(".modal-footer").length;
+                        //$(".modal-footer").eq(len-1).hide();
                         //$(".o_cp_pager").hide();
                     });
                 </script><!-- -->
-                <header>
+                <!--header>
                     <button name="button_search" string="Rechercher" type="object" class="btn btn-primary" style="margin-right: 4px!important"
                             attrs="{'invisible': [('pre_a_programmer_id', '!=', False)]}"/>
                     <button name="button_confirm" string="Confirmer" type="object" style="margin-right: 4px!important"
@@ -25,7 +27,7 @@
                             class="btn btn-primary" attrs="{'invisible': [('proposition_ids', '=', [])]}"
                             context="{'next': 1}"/>
                     <button name="button_close" string="Annuler" type="object" class="btn-default" style="margin-right: 4px!important"/>
-                </header>
+                </header-->
                 <group colspan="2" col="8" name="invisblez" style="display: none">
                     <field name="creneau_fini" invisible="1"/>
                     <field name="aucun_res" invisible="1"/>
@@ -42,10 +44,56 @@
                     <field name="tout_calcule" invisible="1"/>
                 </group>
                 <group col="1" colspan="2" attrs="{'invisible': [('creneau_fini', '=', False)]}">
-                    <div>Félicitation! Ce créneau est entièrement planifié! \o/</div>
+                    <div>Félicitation! Ce créneau est entièrement planifié!</div>
                 </group>
-                <group attrs="{'invisible': [('creneau_fini', '=', True)]}" col="4" colspan="2">
-                    <group col="2" colspan="2">
+                <group attrs="{'invisible': [('creneau_fini', '=', True)]}" col="6" colspan="2">
+                    <group colspan="3"
+                           attrs="{'invisible': [('pre_a_programmer_id', '=', False), ('proposition_ids', '=', [])]}">
+                        <group col="2" colspan="2">
+                            <separator string="RDV à créer" colspan="2"/>
+                            <field name="heure_debut_rdv" widget="float_time"/>
+                            <field name="duree_rdv" widget="float_time"/>
+                            <field name="employee_other_ids" widget="many2many_tags" options="{'no_create': True}"
+                              domain="[('of_est_intervenant', '=', True), ('id', '!=', employee_id)]"/>
+                        </group>
+                    </group>
+                    <group colspan="3" string="Description" attrs="{'invisible':[('pre_a_programmer_id', '=', False), ('proposition_ids', '=', [])]}">
+                        <label for="description_rdv" style="font-weight: bold!important"/>
+                        <field name="description_rdv" nolabel="1" colspan="2" widget="html"/>
+                    </group>
+                    <group colspan="6" col="1" name="propositions" string="Propositions"
+                      attrs="{'invisible': ['|',('proposition_ids', '=', []),('pre_a_programmer_id', '!=', False)]}">
+                        <field name="proposition_ids" mode="tree" nolabel="1"
+                           options="{'reload_on_button': True}">
+                            <tree limit="10" colors="blue: selected==True; grey: fait==False;" create="0" options="{'reload_on_button': True}">
+                                <button name="button_select_from_list" type="object" icon="fa-cogs"/>
+                                <field name="service_id" invisible="1"/>
+                                <field name="fait" invisible="1"/>
+                                <field name="priorite" groups="base.group_no_one"/>
+                                <field name="selected" invisible="1"/>
+                                <field name="id" invisible="1"/>
+                                <field name="tache_name"/>
+                                <field name="partner_name"/>
+                                <field name="address_city"/>
+                                <field name="address_zip"/>
+                                <field name="partner_of_telephones"/>
+                                <field name="date_next"/>
+                                <field name="date_fin"/>
+                                <field name="duree_restante" string="Durée restante" widget="float_time"/>
+                                <field name="origin"/>
+                                <field name="distance_oiseau_prec" invisible="1"/>
+                                <field name="distance_oiseau_suiv" invisible="1"/>
+                                <field name="distance_reelle_prec" invisible="1"/>
+                                <field name="distance_reelle_suiv" invisible="1"/>
+                                <field name="distance_reelle_tota"/>
+                                <field name="distance_order" groups="base.group_no_one"/>
+                                <field name="distance_arrondi_order" groups="base.group_no_one"/>
+                                <field name="osrm_response" invisible="1"/>
+                            </tree>
+                        </field>
+                    </group>
+
+                    <group col="2" colspan="4">
                         <separator string="Créneau" colspan="2"/>
                         <group>
                             <field name="employee_id" widget="many2one" options="{'force_link': True}"/>
@@ -98,7 +146,7 @@
                             </div>
                         </group>
                     </group>
-                    <group col="2" colspan="2"><!--  widget="localizable" options="{'geo_lat_field': 'geo_lat_prec'}" widget="localizable" options="{'geo_lat_field': 'geo_lat_suiv'}" -->
+                    <group colspan="2"><!--  widget="localizable" options="{'geo_lat_field': 'geo_lat_prec'}" widget="localizable" options="{'geo_lat_field': 'geo_lat_suiv'}" -->
                         <separator string="Recherche" colspan="2"/>
                         <group col="2" colspan="2" attrs="{'invisible': [('pre_a_programmer_id', '!=', False)]}">
                             <field name="distance_max"/>
@@ -117,21 +165,8 @@
                             <field name="pre_a_programmer_telephones"/>
                         </group>
                     </group>
-                    <group col="2" colspan="2"
-                           attrs="{'invisible': [('pre_a_programmer_id', '=', False), ('proposition_ids', '=', [])]}">
-                        <group col="2" colspan="2">
-                            <separator string="RDV à créer" colspan="2"/>
-                            <field name="heure_debut_rdv" widget="float_time"/>
-                            <field name="duree_rdv" widget="float_time"/>
-                            <field name="employee_other_ids" widget="many2many_tags" options="{'no_create': True}"
-                              domain="[('of_est_intervenant', '=', True), ('id', '!=', employee_id)]"/>
-                        </group>
-                    </group>
-                    <group colspan="2" string="Description" attrs="{'invisible':[('pre_a_programmer_id', '=', False), ('proposition_ids', '=', [])]}">
-                        <label for="description_rdv" style="font-weight: bold!important"/>
-                        <field name="description_rdv" nolabel="1" colspan="2" widget="html"/>
-                    </group>
-                    <group col="2" colspan="2" attrs="{'invisible': ['|', ('aucun_res', '=', False), ('pre_a_programmer_id', '!=', False)]}">
+
+                    <group col="2" colspan="6" attrs="{'invisible': ['|', ('aucun_res', '=', False), ('pre_a_programmer_id', '!=', False)]}">
                         <separator string="Aucun résultat" colspan="2"/>
                         <div colspan="2" style="color: red">
                             <i>
@@ -139,47 +174,30 @@
                             </i>
                         </div>
                     </group>
-                    <field name="proposition_ids" mode="tree" nolabel="1" colspan="6"
-                           attrs="{'invisible': ['|',('proposition_ids', '=', []),('pre_a_programmer_id', '!=', False)]}"
-                           options="{'reload_on_button': True}">
-                        <tree limit="10" colors="blue: selected==True; grey: fait==False;" create="0" options="{'reload_on_button': True}">
-                            <button name="button_select" type="object" icon="fa-cogs"/>
-                            <field name="service_id" invisible="1"/>
-                            <field name="fait" invisible="1"/>
-                            <field name="priorite" groups="base.group_no_one"/>
-                            <field name="selected" invisible="1"/>
-                            <field name="id" invisible="1"/>
-                            <field name="tache_name"/>
-                            <field name="partner_name"/>
-                            <field name="address_city"/>
-                            <field name="address_zip"/>
-                            <field name="partner_of_telephones"/>
-                            <field name="date_next"/>
-                            <field name="date_fin"/>
-                            <field name="duree_restante" string="Durée restante" widget="float_time"/>
-                            <field name="origin"/>
-                            <field name="distance_oiseau_prec" invisible="1"/>
-                            <field name="distance_oiseau_suiv" invisible="1"/>
-                            <field name="distance_reelle_prec" invisible="1"/>
-                            <field name="distance_reelle_suiv" invisible="1"/>
-                            <field name="distance_reelle_tota"/>
-                            <field name="distance_order" groups="base.group_no_one"/>
-                            <field name="osrm_response" invisible="1"/>
-                        </tree>
-                    </field>
+
                     <group colspan="4"><!-- string="Calculer plus de résultats"  -->
-                        <button name="button_compute_more" type="object" class="btn btn-default oe_grey"
-                            attrs="{'invisible': [
-                                '|', '|',
-                                    ('tout_calcule', '!=', False),
-                                    ('proposition_ids', '=', []),
-                                    ('pre_a_programmer_id', '!=', False)]}">
-                            <span>Calculer plus de résultats (déjà fait </span><field name="calcule_nb" nolabel="1" class="oe_inline"/>
-                            <span>/</span><field name="prop_nb" nolabel="1" class="oe_inline"/><span>)</span>
-                        </button>
+
                     </group>
                 </group>
-
+                <footer>
+                    <button name="button_search" string="Rechercher" type="object" class="btn btn-primary" style="margin-right: 4px!important"
+                            attrs="{'invisible': [('pre_a_programmer_id', '!=', False)]}"/>
+                    <button name="button_confirm" string="Confirmer" type="object" style="margin-right: 4px!important"
+                            class="btn btn-primary" attrs="{'invisible': [('proposition_ids', '=', []), ('pre_a_programmer_id', '=', False)]}"/>
+                    <button name="button_confirm_next" string="Confirmer &amp; Suivant" type="object" style="margin-right: 4px!important"
+                            class="btn btn-primary" attrs="{'invisible': [('proposition_ids', '=', [])]}"
+                            context="{'next': 1}"/>
+                    <button name="button_close" string="Fermer" type="object" class="btn-default" style="margin-right: 4px!important"/>
+                    <button name="button_compute_more" type="object" class="btn btn-default oe_grey"
+                        attrs="{'invisible': [
+                            '|', '|',
+                                ('tout_calcule', '!=', False),
+                                ('proposition_ids', '=', []),
+                                ('pre_a_programmer_id', '!=', False)]}">
+                        <span>Calculer plus de résultats (déjà fait </span><field name="calcule_nb" nolabel="1" class="oe_inline"/>
+                        <span>/</span><field name="prop_nb" nolabel="1" class="oe_inline"/><span>)</span>
+                    </button>
+                </footer>
             </form>
         </field>
     </record>
@@ -247,8 +265,8 @@
                         attrs="{'invisible': [('selected','!=',False)]}" style="margin-right: 4px!important"/>
                     <button name="button_confirm" string="Confirmer le RDV" type="object" class="btn-primary"
                         attrs="{'invisible': [('selected','!=',True)]}" style="margin-right: 4px!important"/>
-                    <!--button name="button_confirm_next" string="Confirmer &amp; Suivant" type="object" colspan="4"
-                            class="btn-primary" attrs="{'invisible': [('selected','!=',True)]}" style="margin-right: 4px!important"/-->
+                    <button name="button_confirm_next" string="Confirmer &amp; Suivant" type="object" colspan="4"
+                            class="btn-primary" attrs="{'invisible': [('selected','!=',True)]}" style="margin-right: 4px!important"/>
                 </footer>
             </form>
         </field>
@@ -261,7 +279,7 @@
         view_mode="form"
         view_id="view_of_planif_wizard"
         id="action_view_of_planif_wizard"
-        target="current"
+        target="new"
         groups="of_planning.of_group_planning_intervention_modification_siens"
     />
 
