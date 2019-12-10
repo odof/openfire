@@ -220,7 +220,7 @@ class OfPlanningIntervention(models.Model):
                 diff_heures = relativedelta(fields.Datetime.from_string(intervention.date_deadline_forcee),
                                             fields.Datetime.from_string(intervention.date))
                 # on convertit la durée pour faciliter la comparaison
-                heures, minutes = float_2_heures_minutes(self.duree)
+                heures, minutes = float_2_heures_minutes(intervention.duree)
                 duree_rd = relativedelta(hours=heures, minutes=minutes)
                 if diff_heures < duree_rd and (duree_rd - diff_heures).minutes > 1:
                     return False
