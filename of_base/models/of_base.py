@@ -203,7 +203,7 @@ class OfReadGroup(models.AbstractModel):
         Fonction à surcharger pour ajouter des jointures dans query et retourner un ordre de tri.
         Le format de retour est le même que celui de _generate_order_by_inner()
         """
-        return False
+        return []
 
 class ResUsers(models.Model):
     _inherit = "res.users"
