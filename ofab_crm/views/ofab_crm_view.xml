@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_res_partner_form_view" model="ir.ui.view">
+        <field name="name">ofab.crm.res.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <field name="category_id" position="after">
+                <field name="of_brand_distributeur_ids" widget="many2many_tags"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="of_view_res_partner_filter" model="ir.ui.view">
+        <field name="name">ofab.crm.res.partner.select</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <field name="category_id" position="before">
+                <field name="of_brand_distributeur_ids" widget="many2one"/>
+            </field>
+            <group name="group_by" position="inside">
+                <filter name="tag" string="Marque distribuée" domain="[]" context="{'group_by' : 'of_gb_marque_distributeur_id'}"/>
+            </group>
+        </field>
+    </record>
+
+</odoo>
