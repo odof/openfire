@@ -385,7 +385,8 @@ class OfTourneeRdv(models.TransientModel):
                     intervention_dates.append(date_intervention_locale_flo)
 
                 for employee_id in intervention.employee_ids.ids:
-                    employee_intervention_dates[employee_id].append(intervention_dates)  # (intervention_id, flo_debut, flo_fin)
+                    if employee_id in employees_dispo:
+                        employee_intervention_dates[employee_id].append(intervention_dates)  # (intervention_id, flo_debut, flo_fin)
 
             # Calcul des créneaux dispos
             for employee in employee_obj.browse(employees_dispo):
