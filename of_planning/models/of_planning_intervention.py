@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.addons.of_planning_tournee.wizard.rdv import ROUTING_BASE_URL, ROUTING_VERSION, ROUTING_PROFILE
-from odoo.addons.of_utils.models.of_utils import se_chevauchent
+from odoo.addons.of_utils.models.of_utils import se_chevauchent, float_2_heures_minutes, heures_minutes_2_float
 import urllib
 import requests
 import re
@@ -219,7 +219,10 @@ class OfPlanningIntervention(models.Model):
             if intervention.date_deadline_forcee and intervention.forcer_dates and intervention.date and intervention.duree:
                 diff_heures = relativedelta(fields.Datetime.from_string(intervention.date_deadline_forcee),
                                             fields.Datetime.from_string(intervention.date))
-                if float_compare(diff_heures.hours, intervention.duree, 5) < 0:
+                # on convertit la durée pour faciliter la comparaison
+                heures, minutes = float_2_heures_minutes(self.duree)
+                duree_rd = relativedelta(hours=heures, minutes=minutes)
+                if diff_heures < duree_rd and (duree_rd - diff_heures).minutes > 1:
                     return False
         return True
 
@@ -919,8 +922,10 @@ class OfPlanningIntervention(models.Model):
     @api.onchange('forcer_dates')
     def _onchange_forcer_dates(self):
         if self.forcer_dates:
+            heures, minutes = float_2_heures_minutes(self.duree)
             self.date_deadline_forcee = fields.Datetime.to_string(fields.Datetime.from_string(self.date) +
-                                                                  relativedelta(hours=self.duree))
+                                                                  relativedelta(hours=heures, minutes=minutes))
+        print "OYE"
 
     @api.onchange('date_deadline_forcee', 'date', 'duree')
     def _onchange_date_deadline_forcee(self):
