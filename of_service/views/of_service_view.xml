@@ -894,12 +894,22 @@
                 <xpath expr="//header" position="inside">
                     <button name="action_prevoir_intervention" string="Prévoir Intervention" type="object"/>
                 </xpath>
+                <xpath expr="//form//div[@name='button_box']" position="inside">
+                    <button class="oe_stat_button" name="action_view_recurrent" type="object" icon="fa-wrench"
+                      groups="of_planning.of_group_planning_intervention_lecture_tout">
+                        <field string="Récurrents" name="recurrent_count" widget="statinfo"/>
+                    </button>
+                    <button class="oe_stat_button" name="action_view_a_programmer" type="object" icon="fa-wrench"
+                      groups="of_planning.of_group_planning_intervention_lecture_tout">
+                        <field string="À programmer" name="a_programmer_count" widget="statinfo"/>
+                    </button>
+                </xpath>
                 <page name="sales_purchases" position="after">
-                    <page string="Service" name="service">
+                    <page string="Intervention" name="service" invisible="1">
                         <!-- Affichage des services liés au partenaire -->
                         <field name="service_partner_ids" nolabel="1" attrs="{'invisible': [('parent_id','!=', False)]}"
                                context="{'default_address_id':id}">
-                            <tree string="Service" colors="grey:active==False">
+                            <tree string="Interventions" colors="grey:active==False">
                                 <field name="address_id" domain="[('parent_id','=',parent.id)]"/>
                                 <field name="tache_id"/>
                                 <field name="mois_ids"/>

@@ -303,7 +303,7 @@
 <!--  Menu -->
 
        <!-- Menu SAV dans ventes -->
-       <record id="action_of_project_issue_view_sale" model="ir.actions.act_window">
+        <record id="action_of_project_issue_view_sale" model="ir.actions.act_window">
             <field name="name">SAV</field>
             <field name="res_model">project.issue</field>
             <field name="view_type">form</field>
@@ -316,7 +316,7 @@
         </record>
 
        <!-- Menu SAV dans planning -->
-       <record id="action_of_project_issue_view_planning" model="ir.actions.act_window">
+        <record id="action_of_project_issue_view_planning" model="ir.actions.act_window">
             <field name="name">SAV</field>
             <field name="res_model">project.issue</field>
             <field name="view_type">form</field>
@@ -460,8 +460,8 @@
 <!-- ************** PLANNING INTERVENTION ************** -->
 <!-- *************************************************** -->
 
-       <!-- insertion SAV lié dans planning intervention form -->
-       <record id="of_planning_intervention_sav_liee" model="ir.ui.view" >
+        <!-- insertion SAV lié dans planning intervention form -->
+        <record id="of_planning_intervention_sav_liee" model="ir.ui.view" >
             <field name="name">of.planning.intervention.sav.liee</field>
             <field name="model">of.planning.intervention</field>
             <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
@@ -474,7 +474,7 @@
         </record>
 
 
-       <!-- wizard interface courriel SAV -->
+        <!-- wizard interface courriel SAV -->
  <!--       <record id="view_of_crm_mail_sav_wizard" model="ir.ui.view">
             <field name="name">Interface courriel SAV</field>
             <field name="model">of.project.issue.mail.wizard</field>
@@ -531,6 +531,18 @@
                         </field>
                     </group>
                 </page>
+            </field>
+        </record>
+
+        <!-- remplacer string dans smart button SAV dans vue partenaires -->
+        <record id="of_project_issue_partner_form_view" model="ir.ui.view">
+            <field name="name">of.project.issue.partner.form.view.projectissue</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="project_issue.res_partner_issues_button_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='issue_count']" position="attributes">
+                    <attribute name="string">SAV</attribute>
+                </xpath>
             </field>
         </record>
 
