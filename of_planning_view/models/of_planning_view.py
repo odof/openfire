@@ -344,6 +344,10 @@ class OFInterventionConfiguration(models.TransientModel):
                                                        help=u"Intervenants à NE PAS montrer en vue planning",
                                                        domain=[('of_est_intervenant', '=', True)])
 
+    planningview_filter_intervenant_ids = fields.Many2many('hr.employee', string=u"(OF) Intervenants sélectionnés",
+                                                       help=u"Intervenants à montrer en vue planning (user-dependant)",
+                                                       domain=[('of_est_intervenant', '=', True)])
+
     #planningview_employee_ids = fields.Many2many()
 
     """planningview_range_start = fields.Date(string=u"Date début vue planning",
@@ -433,6 +437,15 @@ class OFInterventionConfiguration(models.TransientModel):
             planningview_range_start_da -= timedelta(days=planningview_range_start_da.weekday() % 7)  # replacé un lundi
             self.planningview_range_start = fields.Date.to_string(planningview_range_start_da)
         return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'planningview_range_start', self.planningview_range_start)"""
+
+    @api.multi
+    def set_planningview_filter_intervenant_ids_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings',
+            'filter_intervenant_ids',
+            [(6, 0, self.filter_intervenant_ids.ids)],
+            False,
+        )
 
     @api.multi
     def set_planningview_filter_client_defaults(self):

@@ -288,7 +288,7 @@ class OfService(models.Model):
     date_next_fin = fields.Date(
         string=u'Au plus tard le', compute="compute_date_next_fin", inverse="inverse_date_next_fin",
         help=u'Échéance de la prochaine planification')
-    date_next_last = fields.Date('Prochaine planification', help=u"Champ pour conserver une possibilité de rollback")
+    date_next_last = fields.Date('Prochaine planif (svg)', help=u"Champ pour conserver une possibilité de rollback")
     date_fin = fields.Date(u"Date d'échéance")
 
     # Partner-related fields
@@ -665,7 +665,7 @@ class OFPlanningIntervention(models.Model):
 
     service_id = fields.Many2one(
         'of.service', string=u"À programmer",
-        domain="address_id and [('address_id', '=', address_id),('tache_id','=','tache_id')]")
+        domain="address_id and ['|', ('address_id', '=', address_id), ('partner_id', '=', address_id)] or []") #,('tache_id','=','tache_id')
 
     @api.onchange('address_id', 'tache_id')
     def _onchange_address_id(self):
@@ -809,6 +809,24 @@ class ResPartner(models.Model):
     service_partner_ids = fields.One2many(
         'of.service', 'partner_id', string='Services du partenaire', context={'active_test': False},
         help=u"Services liés au partenaire, incluant les services des contacts associés")
+    a_programmer_ids = fields.Many2many('of.service', string=u"À programmer", compute="compute_a_programmer")
+    a_programmer_count = fields.Integer(string='Nombre à programmer', compute='compute_a_programmer')
+    recurrent_ids = fields.Many2many('of.service', string=u"Récurrents", compute="compute_a_programmer")
+    recurrent_count = fields.Integer(string='Nombre recurrents', compute='compute_a_programmer')
+
+    @api.multi
+    def compute_a_programmer(self):
+        service_obj = self.env['of.service']
+        for partner in self:
+            service_ids = service_obj.search([
+                '|',
+                    ('partner_id', 'child_of', partner.id),
+                    ('address_id', 'child_of', partner.id),
+            ])
+            partner.a_programmer_ids = service_ids.filtered(lambda s: s.state in ('draft', 'to_plan', 'part_planned', 'late'))
+            partner.a_programmer_count = len(partner.a_programmer_ids)
+            partner.recurrent_ids = service_ids.filtered(lambda s: s.recurrence and s.state not in ('draft', 'done', 'cancel'))
+            partner.recurrent_count = len(partner.recurrent_ids)
 
     @api.multi
     def action_prevoir_intervention(self):
@@ -836,13 +854,75 @@ class ResPartner(models.Model):
         }
         return action
 
-#    @api.multi
-#    def toggle_active(self):
-#       """ Inverse the value of the field ``active`` on the records in ``self``. """
-#        for service in self:
-#            service.active = not service.active
-#            if not service.active:
-#                service.service_address_ids = False
+    @api.multi
+    def _get_action_view_a_programmer_context(self, context={}):
+        today_str = fields.Date.today()
+        today_da = fields.Date.from_string(today_str)
+        deux_semaines_da = today_da + timedelta(days=14)
+        deux_semaines_str = fields.Date.to_string(deux_semaines_da)
+        context.update({
+            'default_partner_id': self.id,
+            'default_address_id': self.address_get(adr_pref=['delivery']) or self.id,
+            'default_recurrence': False,
+            'default_date_next': today_str,
+            'default_date_fin': deux_semaines_str,
+            'default_origin': u"[Partenaire] " + self.name,
+            'bloquer_recurrence': True,
+            'hide_bouton_planif': True,
+            })
+        return context
+
+    @api.multi
+    def action_view_a_programmer(self):
+        action = self.env.ref('of_service.action_of_service_prog_form_planning').read()[0]
+
+        if len(self._ids) == 1:
+            #context = 'context' in action and safe_eval(action['context']) or {}
+            action['context'] = str(self._get_action_view_a_programmer_context())
+
+        action['domain'] = [
+            '|',
+            ('partner_id', 'child_of', self.ids),
+            ('address_id', 'child_of', self.ids),
+            ('state', 'in', ('draft', 'to_plan', 'part_planned', 'late')),
+        ]
+
+        return action
+
+    @api.multi
+    def _get_action_view_recurrent_context(self, context={}):
+        today_str = fields.Date.today()
+        today_da = fields.Date.from_string(today_str)
+        deux_semaines_da = today_da + timedelta(days=14)
+        deux_semaines_str = fields.Date.to_string(deux_semaines_da)
+        context.update({
+            'default_partner_id': self.id,
+            'default_address_id': self.address_get(adr_pref=['delivery']) or self.id,
+            'default_recurrence': True,
+            'default_date_next': today_str,
+            'default_origin': u"[Partenaire] " + self.name,
+            'hide_bouton_planif': True,
+            'bloquer_recurrence': True,
+            })
+        return context
+
+    @api.multi
+    def action_view_recurrent(self):
+        action = self.env.ref('of_service.action_of_service_rec_form_planning').read()[0]
+
+        if len(self._ids) == 1:
+            #context = 'context' in action and safe_eval(action['context']) or {}
+            action['context'] = str(self._get_action_view_recurrent_context())
+
+        action['domain'] = [
+            '|',
+                ('partner_id', 'child_of', self.ids),
+                ('address_id', 'child_of', self.ids),
+            ('recurrence', '=', True),
+            ('state', 'not in', ('draft', 'done', 'cancel', 'late')),
+        ]
+
+        return action
 
 
 class DateRangeGenerator(models.TransientModel):
