@@ -220,13 +220,13 @@ var PlanningView = View.extend({
         var ids = _.reject(_.keys(self.all_filters),function(num){ return num == 'undefined'; });
 
         var dfd = $.Deferred();
+        var dfd2 = $.Deferred();
         var p = dfd.promise({target: kays});
+        var p2 = dfd2.promise();
         var kays = [];
         var model_name = self.fields[self.resource].relation;
-        //console.log("MODEL NAME:",model_name);
-
         var Attendees = new Model(model_name);
-        //console.log(self.view_res_ids);
+
         Attendees.query(['id', self.color_ft, self.color_bg, 'name']) // retrieve colors from db
             .filter([['id', 'in', self.view_res_ids || []]]) // id
             .all()
@@ -244,17 +244,43 @@ var PlanningView = View.extend({
                         input_id: a['id'] + "_input",
                         is_checked: true,
                     }
-                    //self.all_filters[key]['label'] = a['name'];
-                    //self.all_filters[key]['color_bg'] = a[self.color_bg];
-                    //self.all_filters[key]['color_ft'] = a[self.color_ft];
                     self.all_filters[key] = filter_item;
-                    //self.rows[key] = new PlanningView.Row(self.table,self,[],row_options);
-                    //self.rows[key].head_column = a['name'];
                 };
                 dfd.resolve();
+                var ir_values_model = new Model("ir.values");
+                ir_values_model.call("get_default", ["of.intervention.settings", "planningview_filter_intervenant_ids", false])
+
+                .then(function (attendee_ids) {
+                    if (isNullOrUndef(attendee_ids)) {
+                        console.log("A");
+                        self.filter_attendee_ids = []
+                        for (var k in self.all_filters) {
+                            self.filter_attendee_ids.push(self.all_filters[k].value);
+                        };
+                    }else if (attendee_ids[0].length == 3 && attendee_ids[0][0] == 6 && !attendee_ids[0][1]) {
+                        self.filter_attendee_ids = attendee_ids[0][2];
+                    }else{
+                        self.filter_attendee_ids = attendee_ids;
+                        var idf;
+                        var found;
+                        for (var k in self.all_filters) {
+                            found = false;
+                            idf = self.all_filters[k].value;
+                            for (var j in attendee_ids) {
+                                if (attendee_ids[j] == idf) {
+                                    found = true;
+                                }
+                            }
+                            if (!found) {
+                                self.all_filters[k].is_checked = false;
+                            }
+                        };
+                    }
+                    dfd2.resolve();
+                });
             });
 
-        return $.when(p).then(function(){
+        return $.when(p, p2).then(function(){
             return kays;
         });
     },
@@ -1589,7 +1615,8 @@ PlanningView.SidebarResoFilter = Widget.extend({
         self.$('.of_planning_contacts').html(qweb.render('PlanningView.sidebar.contacts', { filters: self.view.all_filters }));
     },
     on_click: function(e) {
-       //console.log("CLICK");
+        //console.log("CLICK");
+        var ir_values_model = new Model('ir.values');
         if (e.target.tagName == 'SPAN') {  // click sur span -> la checkboxe est a coté
             var la_input = e.target.previousElementSibling.firstElementChild;
             $("#"+la_input.id).click();
@@ -1599,7 +1626,31 @@ PlanningView.SidebarResoFilter = Widget.extend({
             $(e.target).find('input').click();
             return;
         }
+        /*
+            ir_values_model.call("set_default",
+                ["of.intervention.settings",
+                "planningview_filter_intervenant_" + e.target.value,
+                e.target.checked, false]);
+        */
         this.view.all_filters[e.target.value].is_checked = e.target.checked;
+        if (e.target.checked) {
+            this.view.filter_attendee_ids.push(parseInt(e.target.value));
+            ir_values_model.call("set_default",
+                ["of.intervention.settings",
+                "planningview_filter_intervenant_ids",
+                //[[6, 0, this.view.filter_attendee_ids]], false]);
+                this.view.filter_attendee_ids, false]);
+        }else{
+            for (var i=0; i<this.view.filter_attendee_ids.length; i++) {
+                if (this.view.filter_attendee_ids[i] == e.target.value) {
+                    this.view.filter_attendee_ids.splice(i, 1); 
+                }
+            }
+            ir_values_model.call("set_default",
+                ["of.intervention.settings",
+                "planningview_filter_intervenant_ids",
+                this.view.filter_attendee_ids, false]);
+        }
         var row_id = "of_planning_row_"+e.target.value;
         var la_row = this.view.rows[e.target.value];
         la_row.hidden = !e.target.checked;

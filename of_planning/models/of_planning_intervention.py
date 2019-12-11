@@ -1178,6 +1178,8 @@ class ResPartner(models.Model):
 
     intervention_partner_ids = fields.One2many('of.planning.intervention', string="Interventions client", compute="_compute_interventions")
     intervention_address_ids = fields.One2many('of.planning.intervention', string="Interventions adresse", compute="_compute_interventions")
+    intervention_ids = fields.Many2many('of.planning.intervention', string=u"RDVs Tech", compute="compute_interventions")
+    intervention_count = fields.Integer(string='Nombre RDVs Tech', compute='compute_interventions')
 
     @api.multi
     def _compute_interventions(self):
@@ -1185,6 +1187,36 @@ class ResPartner(models.Model):
         for partner in self:
             partner.intervention_partner_ids = intervention_obj.search([('partner_id', '=', partner.id)])
             partner.intervention_address_ids = intervention_obj.search([('address_id', '=', partner.id)])
+            intervention_ids = intervention_obj.search([
+                '|',
+                    ('partner_id', 'child_of', partner.id),
+                    ('address_id', 'child_of', partner.id),
+            ])
+            partner.intervention_ids = intervention_ids
+            partner.intervention_count = len(intervention_ids)
+
+    @api.multi
+    def _get_action_view_intervention_context(self, context={}):
+        context.update({
+            'default_partner_id': self.id,
+            'default_address_id': self.id,
+            'default_date': fields.Date.today(9),
+            #'create': self.base_state == 'calculated',
+            #'edit': self.base_state == 'calculated',
+            })
+        return context
+
+    @api.multi
+    def action_view_interventions(self):
+        action = self.env.ref('of_planning.of_sale_order_open_interventions').read()[0]
+
+        action['domain'] = ['|', ('partner_id', 'child_of', self.ids), ('partner_id', 'child_of', self.ids)]
+        if len(self._ids) == 1:
+            context = safe_eval(action['context'])
+            action['context'] = str(self._get_action_view_intervention_context(context))
+
+        return action
+
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
