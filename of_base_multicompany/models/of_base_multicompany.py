@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, models, fields
+from odoo import api, models, fields, _
 from odoo.addons.account.models.account_invoice import TYPE2JOURNAL
+from odoo.exceptions import UserError
 
 # @todo: Certains paramètres de la société (e.g. méthode d'arrondi des taxes) devraient être communs à la société
 
@@ -80,6 +81,34 @@ class AccountMove(models.Model):
     # La société de la pièce comptable doit être la même que celle des écritures (voir account.move._post_validate())
     company_id = fields.Many2one('res.company', related='journal_id.company_id.accounting_company_id', string='Company', store=True, readonly=True,
         default=lambda self: self.env.user.company_id.accounting_company_id)
+
+    @api.model
+    def _move_reverse_prepare(self, date=False, journal=False,
+                              move_prefix=False):
+        u"""
+        Surcharge de la fonction définie dans le module oca/account_financial_tools/account_reversal
+        afin de permettre la création d'extourne quand le journal de la pièce appartient à un magasin
+        """
+        self.ensure_one()
+        journal = journal or self.journal_id
+        # OF Ligne modifiée :
+        if journal.company_id.accounting_company_id != self.company_id.accounting_company_id:
+            raise UserError(
+                _("Wrong company Journal is '%s' but we have '%s'") % (
+                    journal.company_id.name, self.company_id.name))
+        ref = self.ref or move_prefix
+        if move_prefix and move_prefix != ref:
+            ref = ' '.join([move_prefix, ref])
+        date = date or self.date
+        move = self.copy_data()[0]
+        move.update({
+            'journal_id': journal.id,
+            'date': date,
+            'ref': ref,
+            'to_be_reversed': False,
+            'state': 'draft',
+        })
+        return move
 
 class Property(models.Model):
     _inherit = 'ir.property'
