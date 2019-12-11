@@ -88,7 +88,7 @@
                                 <calendar string="Calendrier" date_start="debut_dt" color="employee_id" date_stop="fin_dt" all_day="allday"
                                     attendee_model="hr.employee" color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1"
                                     filters_radio="1" dispo_field="disponible" jump_to="selected" display_states="1"
-                                    force_color_field="force_color" selected_field="selected">
+                                    force_color_field="force_color" selected_field="selected" create="0">
                                     <field name="name"/>
                                     <field name="distance" suffix=" km"/>
                                     <field name="duree" suffix=" min"/>

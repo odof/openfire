@@ -120,7 +120,7 @@ class OfTourneeRdv(models.TransientModel):
     partner_address_country_id = fields.Many2one(related="partner_address_id.country_id", readonly=True)
     date_display = fields.Char(string='Jour du RDV', size=64, readonly=True)
     service_id = fields.Many2one(
-        'of.service', string='Service client', default=lambda x: x._default_service(),
+        'of.service', string='À programmer', default=lambda x: x._default_service(),
         domain="[('partner_id', '=', partner_id)]")
     creer_recurrence = fields.Boolean(
         string=u"Créer récurrence?", default=True,
@@ -342,21 +342,21 @@ class OfTourneeRdv(models.TransientModel):
             horaires_du_jour = employees.get_horaires_date(date_recherche_str)
 
             # Interdiction de chercher dans les tournées bloquées ou complètes
-            self._cr.execute("SELECT employee_id "
-                             "FROM of_planning_tournee "
-                             "WHERE employee_id IN %s "
-                             "  AND date = %s"
-                             "  AND (is_bloque OR is_complet)",
-                             (employees._ids, date_recherche_str))
-            employees_bloques = [row[0] for row in self._cr.fetchall()]
-            employees_dispo = []
+            # self._cr.execute("SELECT employee_id "
+            #                  "FROM of_planning_tournee "
+            #                  "WHERE employee_id IN %s "
+            #                  "  AND date = %s"
+            #                  "  AND (is_bloque OR is_complet)",
+            #                  (employees._ids, date_recherche_str))
+            # employees_bloques = [row[0] for row in self._cr.fetchall()]
+            employees_dispo = [employee.id for employee in employees]
 
-            for employee in employees:
-                employee_id = employee.id
-                if employee_id not in employees_bloques and horaires_du_jour[employee_id] != []:
-                    employees_dispo.append(employee_id)
-            if employees_dispo == []:
-                continue
+            # for employee in employees:
+            #     employee_id = employee.id
+            #     if employee_id not in employees_bloques and horaires_du_jour[employee_id] != []:
+            #         employees_dispo.append(employee_id)
+            # if employees_dispo == []:
+            #     continue
 
             # Recherche de créneaux pour la date voulue et les équipes sélectionnées
             jour_deb_dt = tz.localize(datetime.strptime(date_recherche_str+" 00:00:00", "%Y-%m-%d %H:%M:%S"))
@@ -393,73 +393,70 @@ class OfTourneeRdv(models.TransientModel):
                 intervention_dates = employee_intervention_dates[employee.id]
 
                 horaires_employee = horaires_du_jour[employee.id]
+                if horaires_employee:
 
-                index_courant = 0
-                deb, fin = horaires_employee[index_courant]  # horaires courants
-                creneaux = []
-                # @todo: Possibilité intervention chevauchant la nuit
-                for intervention, intervention_deb, intervention_fin in intervention_dates + [(False, 24, 24)]:
-                    # Calcul du temps disponible avant l'intervention étudiée
-                    if float_compare(intervention_deb, deb, compare_precision) == 1:
-                        # Un trou dans le planning, suffisant pour un créneau?
-                        duree = 0.0
-                        creneaux_temp = []
-                        while float_compare(fin, intervention_deb, compare_precision) != 1:   # fin <= intervention_deb
-                            # Le temps disponible est éclaté avec des temps de pause
-                            duree += fin - deb
-                            creneaux_temp.append((deb, fin))
-                            index_courant += 1
-                            if index_courant == len(horaires_employee):
-                                # L'intervention commence quand l'employé a déjà fini sa journée ...
-                                break
-                            deb, fin = horaires_employee[index_courant]
-                        else:
-                            # L'intervention commence avant la fin du créneau courant
-                            if float_compare(deb, intervention_deb, compare_precision) == 1:
-                                # L'intervention commence au milieu du créneau courant
-                                duree += intervention_deb - deb
-                                creneaux_temp.append((deb, intervention_deb))
-                        if float_compare(self.duree, duree, compare_precision) != 1:
-                            # Le temps dégagé est suffisant pour la tâche à réaliser
-                            creneaux += creneaux_temp
-                    if index_courant == len(horaires_employee):
-                        break
-
-                    # Récupération du prochain créneau potentiellement disponible
-                    deb = max(deb, intervention_fin)
-                    while float_compare(fin, deb, compare_precision) != 1:
-                        index_courant += 1
+                    index_courant = 0
+                    deb, fin = horaires_employee[index_courant]  # horaires courants
+                    creneaux = []
+                    # @todo: Possibilité intervention chevauchant la nuit
+                    for intervention, intervention_deb, intervention_fin in intervention_dates + [(False, 24, 24)]:
+                        # Calcul du temps disponible avant l'intervention étudiée
+                        if float_compare(intervention_deb, deb, compare_precision) == 1:
+                            # Un trou dans le planning, suffisant pour un créneau?
+                            duree = 0.0
+                            creneaux_temp = []
+                            while float_compare(fin, intervention_deb, compare_precision) != 1:   # fin <= intervention_deb
+                                # Le temps disponible est éclaté avec des temps de pause
+                                duree += fin - deb
+                                creneaux_temp.append((deb, fin))
+                                index_courant += 1
+                                if index_courant == len(horaires_employee):
+                                    # L'intervention commence quand l'employé a déjà fini sa journée ...
+                                    break
+                                deb, fin = horaires_employee[index_courant]
+                            else:
+                                # L'intervention commence avant la fin du créneau courant
+                                if float_compare(deb, intervention_deb, compare_precision) == 1:
+                                    # L'intervention commence au milieu du créneau courant
+                                    duree += intervention_deb - deb
+                                    creneaux_temp.append((deb, intervention_deb))
+                            if float_compare(self.duree, duree, compare_precision) != 1:
+                                # Le temps dégagé est suffisant pour la tâche à réaliser
+                                creneaux += creneaux_temp
                         if index_courant == len(horaires_employee):
                             break
-                        deb = max(deb, horaires_employee[index_courant][0])
-                        fin = horaires_employee[index_courant][1]
-                    if index_courant == len(horaires_employee):
-                        break
 
-                if not creneaux:
-                    # Aucun creneau libre pour cette équipe
-                    continue
+                        # Récupération du prochain créneau potentiellement disponible
+                        deb = max(deb, intervention_fin)
+                        while float_compare(fin, deb, compare_precision) != 1:
+                            index_courant += 1
+                            if index_courant == len(horaires_employee):
+                                break
+                            deb = max(deb, horaires_employee[index_courant][0])
+                            fin = horaires_employee[index_courant][1]
+                        if index_courant == len(horaires_employee):
+                            break
 
-                # Création des créneaux disponibles
-                for intervention_deb, intervention_fin in creneaux:
-                    description = "%s-%s" % tuple(hours_to_strs(intervention_deb, intervention_fin))
+                    # Création des créneaux disponibles
+                    for intervention_deb, intervention_fin in creneaux:
+                        description = "%s-%s" % tuple(hours_to_strs(intervention_deb, intervention_fin))
 
-                    date_debut_dt = datetime.combine(date_recherche_da, datetime.min.time()) + timedelta(hours=intervention_deb)
-                    date_debut_dt = tz.localize(date_debut_dt, is_dst=None).astimezone(pytz.utc)
-                    date_fin_dt = datetime.combine(date_recherche_da, datetime.min.time()) + timedelta(hours=intervention_fin)
-                    date_fin_dt = tz.localize(date_fin_dt, is_dst=None).astimezone(pytz.utc)
+                        date_debut_dt = datetime.combine(date_recherche_da, datetime.min.time()) + timedelta(hours=intervention_deb)
+                        date_debut_dt = tz.localize(date_debut_dt, is_dst=None).astimezone(pytz.utc)
+                        date_fin_dt = datetime.combine(date_recherche_da, datetime.min.time()) + timedelta(hours=intervention_fin)
+                        date_fin_dt = tz.localize(date_fin_dt, is_dst=None).astimezone(pytz.utc)
 
-                    wizard_line_obj.create({
-                        'debut_dt': date_debut_dt,
-                        'fin_dt': date_fin_dt,
-                        'date_flo': intervention_deb,
-                        'date_flo_deadline': intervention_fin,
-                        'date': date_recherche_str,
-                        'description': description,
-                        'wizard_id': self.id,
-                        'employee_id': employee.id,
-                        'intervention_id': False,
-                    })
+                        wizard_line_obj.create({
+                            'debut_dt': date_debut_dt,
+                            'fin_dt': date_fin_dt,
+                            'date_flo': intervention_deb,
+                            'date_flo_deadline': intervention_fin,
+                            'date': date_recherche_str,
+                            'description': description,
+                            'wizard_id': self.id,
+                            'employee_id': employee.id,
+                            'intervention_id': False,
+                        })
                 # Création des créneaux d'intervention
                 for intervention, intervention_deb, intervention_fin in intervention_dates:
                     description = "%s-%s" % tuple(hours_to_strs(intervention_deb, intervention_fin))
