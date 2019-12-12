@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 {
-    "name" : "OpenFire / Tarifs centralisés",
-    "version" : "10.0.1.0.0",
-    "author" : "OpenFire",
-    "website" : "http://www.openfire.fr",
-    "category" : "Openfire",
-    "description": """
+    "name": u"OpenFire / Tarifs centralisés",
+    "version": "10.0.1.0.0",
+    "author": "OpenFire",
+    "website": "http://www.openfire.fr",
+    "category": "Openfire",
+    "description": u"""
 Module OpenFire de centralisation des tarifs.
 =============================================
 
@@ -31,7 +31,7 @@ Une action permet de supprimer tous les produits inutilisés d'une marque.
 /!\\\\ Information OpenFire :
 Ce module nécessite l'installation de openerplib sur le serveur : sudo easy_install openerp-client-lib
 """,
-    "depends" : [
+    "depends": [
         # Les marques sont utilisées pour filtrer les produits accédés dans la base centralisée
         'of_product_brand',
         # Surcharge des lignes de facture
@@ -44,10 +44,11 @@ Ce module nécessite l'installation de openerplib sur le serveur : sudo easy_ins
         # (matching des catégories d'articles, calcul des prix d'achat et de vente, etc.)
         'of_import',
         'of_kit',
+        'of_utils',
     ],
-    "init_xml" : [],
-    "demo_xml" : [],
-    "data" : [
+    "init_xml": [],
+    "demo_xml": [],
+    "data": [
         'wizard/of_datastore_import_brand.xml',
         'wizard/of_datastore_update_product.xml',
         'wizard/of_remove_unused_products.xml',

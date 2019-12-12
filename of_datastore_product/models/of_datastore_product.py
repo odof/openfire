@@ -4,6 +4,7 @@ from odoo import models, fields, api, registry, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.osv.expression import NEGATIVE_TERM_OPERATORS, TERM_OPERATORS_NEGATION, TRUE_LEAF, FALSE_LEAF
 from odoo.tools.safe_eval import safe_eval
+from odoo.addons.of_utils.models.of_utils import BigInteger
 
 import copy
 from contextlib import contextmanager
@@ -309,7 +310,7 @@ class OfProductBrand(models.Model):
                             categ.unlink()
 
                     brand.categ_ids = categs
-            except:
+            except Exception:
                 pass
         return super(OfProductBrand, self).read(fields, load=load)
 
@@ -464,7 +465,7 @@ class OfProductBrand(models.Model):
         """ Fonction de nettoyage du cache.
         Le cache étant un TransientModel, il est automatiquement nettoyé tous les jours
         La fonction _transient_vacuum() d'Odoo efface tous les TransientModel dont le write_date ou create_date
-          est vieux de plus d'une heure)
+          est vieux de plus d'une heure
          - Tous les jours, via le cron base.autovacuum_job
          - Tous les 20 appels de _create()
         Cette fonction de nettoyage permet un nettoyage manuel supplémentaire par base centrale.
@@ -499,8 +500,20 @@ class OfDatastoreCache(models.TransientModel):
     _datastore_cache_locks = {'main': Lock()}
 
     model = fields.Char(string='Model', required=True)
-    res_id = fields.Integer(string='Resource id', required=True)
+    res_id = BigInteger(string='Resource id', required=True)
     vals = fields.Char(string='Values', help="Dictionnary of values for this object", required=True)
+
+    @api.model_cr_context
+    def _auto_init(self):
+        """
+        @TODO : A Supprimer après application en ligne
+        Passage de res_id de Integer vers BigInteger
+        """
+        cr = self._cr
+        column_data = self._select_column_data().get('res_id')
+        if column_data and column_data['typname'] == 'int4':
+            cr.execute("ALTER TABLE of_datastore_cache ALTER COLUMN res_id TYPE int8")
+        return super(OfDatastoreCache, self)._auto_init()
 
     @contextmanager
     def _get_cache_token(self, key, blocking=True):
@@ -529,7 +542,7 @@ class OfDatastoreCache(models.TransientModel):
             if acquired:
                 try:
                     cr.close()
-                except:
+                except Exception:
                     pass
                 self._datastore_cache_locks[key].release()
 
@@ -540,7 +553,8 @@ class OfDatastoreCache(models.TransientModel):
         """
         model_obj = self.env[model]
         res_ids = [v['id'] for v in vals]
-        stored = {ds_cache.res_id: ds_cache for ds_cache in self.search([('model', '=', model), ('res_id', 'in', res_ids)])}
+        stored = {ds_cache.res_id: ds_cache
+                  for ds_cache in self.search([('model', '=', model), ('res_id', 'in', res_ids)])}
         for v in vals:
             # Les champs calculés ne doivent pas être stockés
             v = {key: val for key, val in v.iteritems() if not model_obj._of_datastore_is_computed_field(key)}

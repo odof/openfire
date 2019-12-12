@@ -1,3 +1,3 @@
 # -*- encoding: utf-8 -*-
 
-import of_utils
+from . import of_utils

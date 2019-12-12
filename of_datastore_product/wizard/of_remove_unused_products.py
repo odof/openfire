@@ -19,6 +19,6 @@ class OfRemoveUnusedProducts(models.TransientModel):
                     product.unlink()
                     cr_temp.commit()
                     cpt += 1
-                except:
+                except Exception:
                     cr_temp.rollback()
         return self.env['of.popup.wizard'].popup_return(_('%i products were removed') % cpt, titre=_('Products removal'))
