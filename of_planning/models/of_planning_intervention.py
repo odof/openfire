@@ -1309,3 +1309,10 @@ class Report(models.Model):
             self = self.sudo()
         result = super(Report, self).get_pdf(docids, report_name, html=html, data=data)
         return result
+
+class OfMailTemplate(models.Model):
+    _inherit = "of.mail.template"
+
+    @api.model
+    def _get_allowed_models(self):
+        return super(OfMailTemplate, self)._get_allowed_models() + ['of.planning.intervention']
