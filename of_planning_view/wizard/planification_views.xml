@@ -202,9 +202,9 @@
         </field>
     </record>
 
-    <record id="view_of_planif_intervention_form" model="ir.ui.view">
+    <record id="view_of_planif_creneau_prop_form" model="ir.ui.view">
         <field name="name">Planifier une intervention</field>
-        <field name="model">of.planif.intervention</field>
+        <field name="model">of.planif.creneau.prop</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
             <form>
