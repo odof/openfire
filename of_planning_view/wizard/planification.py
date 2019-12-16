@@ -36,7 +36,7 @@ def round_a_cinq(val):
     return 5 * (int(val / 5) + 1)
 
 class OfPlanifCreneauProp(models.TransientModel):
-    _name = 'of.planif.intervention'
+    _name = 'of.planif.creneau.prop'
     _description = u"Proposition d'intervention à programmer"
     _order = "selected DESC, priorite DESC, distance_arrondi_order, date_next, date_fin, distance_order"
 
@@ -118,7 +118,7 @@ class OfPlanifCreneauProp(models.TransientModel):
     @api.depends('geo_lat', 'geo_lng', 'creneau_id.geo_lat_prec', 'creneau_id.geo_lng_prec',
                  'creneau_id.geo_lat_suiv', 'creneau_id.geo_lng_suiv', 'creneau_id')
     def _compute_dummy_field(self):
-        a_planifierzz = self.env['of.planif.intervention']
+        a_planifierzz = self.env['of.planif.creneau.prop']
         """for a_planifier in self:
             a_planifier.dummy_field = True
             if not a_planifier.distance_reelle_tota and not a_planifier.distance_reelle_tota == -1:
@@ -385,9 +385,9 @@ class OfPlanifCreneau(models.TransientModel):
     secteur_id = fields.Many2one('of.secteur', string="Secteur", help=u"laisser vide pour ne pas restreindre à un secteur en particulier")
     priorite_max = fields.Integer(string=u"Priorité max", help=u"Priorité la plus haute parmis les propositions")
 
-    proposition_ids = fields.One2many('of.planif.intervention', 'creneau_id', string="propositions",
+    proposition_ids = fields.One2many('of.planif.creneau.prop', 'creneau_id', string="propositions",
                     order="selected DESC, priorite DESC, distance_arrondi_order, date_next, date_fin, distance_order")#, compute="peupler_candidats")
-    selected_id = fields.Many2one('of.planif.intervention', string="Proposition")
+    selected_id = fields.Many2one('of.planif.creneau.prop', string="Proposition")
     heure_debut_rdv = fields.Float(string=u'Heure de début', digits=(5, 5))
     duree_rdv = fields.Float(string=u"Durée")
     description_rdv = fields.Text(string='Description')
@@ -395,7 +395,7 @@ class OfPlanifCreneau(models.TransientModel):
         'hr.employee', string="Autres intervenants",)
         # domain="[('of_est_intervenant', '=', True), ('id', '!=', employee_id)]")
 
-    proposition_readonly_ids = fields.One2many('of.planif.intervention', compute="_compute_proposition_readonly_ids", readonly=True)
+    proposition_readonly_ids = fields.One2many('of.planif.creneau.prop', compute="_compute_proposition_readonly_ids", readonly=True)
     tout_calcule = fields.Boolean(string=u"réelles toutes calculées", compute="compute_tout_calcule")
     prop_nb = fields.Integer(string=u"Nombre propositionsé", compute="compute_tout_calcule")
     calcule_nb = fields.Integer(string=u"Nombre déjà calculé", compute="compute_tout_calcule")
@@ -819,7 +819,7 @@ class OfPlanifCreneau(models.TransientModel):
         """Sélectionne cette proposition comme résultat"""
         self.ensure_one()
         self.selected_id.selected = False
-        prop = self.env['of.planif.intervention'].browse(prop_id)
+        prop = self.env['of.planif.creneau.prop'].browse(prop_id)
         prop.selected = True
         self.duree_rdv = prop.service_id.duree
         self.selected_id = prop.id

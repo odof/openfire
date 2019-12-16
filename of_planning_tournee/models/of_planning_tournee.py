@@ -414,6 +414,23 @@ class OfPlanningTournee(models.Model):
         return super(OfPlanningTournee, self).write(vals)
 
 
+class OfPlanningRessourceConfig(models.Model):
+    _name = "of.planning.ressource.config"
+    #@TODO: auto-génerer les enregistrements
+
+    quinzaine_id = fields.Many2one('date.range', string="Quinzaine") #@TODO: domain quinzaines civiles
+    quinzaine_debut = fields.Date(compute="")
+    quinzaine_fin = fields.Date(compute="")
+    employee_id = fields.Many2one('hr.employee') #TODO domain
+
+    tache_categ_id = fields.Many2one('of.planning.tache.categ')  # TODO domain
+
+    nb_heures_total = fields.Integer(compute="")
+    nb_heures_categ = fields.Integer()  # l'Utilisateur affecte ce champ
+    nb_heures_non_planif = fields.Integer(compute="")
+
+
+
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
