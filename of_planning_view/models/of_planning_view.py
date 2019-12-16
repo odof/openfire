@@ -51,7 +51,6 @@ class OfPlanifTag(models.Model):
     color = fields.Integer(string='Index couleur')
     active = fields.Boolean(default=True, help=u"Le champ 'Active' vous permet de cacher l'étiquette sans la supprimer.")
 
-
 class OfPlanningIntervention(models.Model):
     _name = "of.planning.intervention"
     _inherit = ["of.planning.intervention", "of.readgroup", "of.calendar.mixin"]
