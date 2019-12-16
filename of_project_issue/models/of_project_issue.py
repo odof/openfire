@@ -553,6 +553,13 @@ class ProjectIssue(models.Model):
 #         res = self.name_get(cr, access_rights_uid, ids, context)
 #         return res
 
+    @api.model
+    def _read_group_stage_ids(self, stages, domain, order):
+        """
+        Surcharge de la fonction pour afficher toutes les étapes existantes sur vue kanban
+        """
+        return stages.search([], order=order)
+
 # Catégorie de SAV
 class OfProjectIssueCategorie(models.Model):
     _name = "of.project.issue.categorie"

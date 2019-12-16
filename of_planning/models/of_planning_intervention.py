@@ -419,7 +419,7 @@ class OfPlanningIntervention(models.Model):
     @api.depends('name', 'number')
     def _compute_calendar_name(self):
         for intervention in self:
-            intervention.calendar_name = intervention.number or intervention.name
+            intervention.calendar_name = intervention.number and ' - '.join([intervention.number, intervention.name]) or intervention.name
 
     @api.onchange('template_id')
     def onchange_template_id(self):
