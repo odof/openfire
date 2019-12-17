@@ -343,72 +343,6 @@ class OFInterventionConfiguration(models.TransientModel):
                                                        help=u"Intervenants à NE PAS montrer en vue planning",
                                                        domain=[('of_est_intervenant', '=', True)])
 
-    planningview_filter_intervenant_ids = fields.Many2many('hr.employee', string=u"(OF) Intervenants sélectionnés",
-                                                       help=u"Intervenants à montrer en vue planning (user-dependant)",
-                                                       domain=[('of_est_intervenant', '=', True)])
-
-    #planningview_employee_ids = fields.Many2many()
-
-    """planningview_range_start = fields.Date(string=u"Date début vue planning",
-                                           help=u"pris en compte en sous-marin pour conserver l'état de la vue planning"
-                                                u"à niveau utilisateur")
-
-    planningview_domain = fields.Char(string=u"Domaine vue planning",
-                                      help=u"pris en compte en sous-marin pour conserver l'état de la vue planning"
-                                           u"à niveau utilisateur")
-    planningview_context = fields.Char(string=u"Contexte vue planning",
-                                       help=u"pris en compte en sous-marin pour conserver l'état de la vue planning"
-                                            u"à niveau utilisateur")"""
-
-    planningview_filter_client = fields.Boolean(
-        string=u"(OF) Nom du client", required=True, default=True,
-        help=u"Afficher le nom du client des interventions en vue planning ?")
-
-    planningview_filter_tache = fields.Boolean(
-        string=u"(OF) Nom de la tâche", required=True, default=True,
-        help=u"Afficher le nom de la tâche des interventions en vue planning ?")
-
-    planningview_filter_zip = fields.Boolean(
-        string=u"(OF) Code postal", required=True, default=True,
-        help=u"Afficher le code postal des interventions en vue planning ?")
-
-    planningview_filter_city = fields.Boolean(
-        string=u"(OF) Ville", required=True, default=True,
-        help=u"Afficher la ville des interventions en vue planning ?")
-
-    planningview_filter_heure_debut = fields.Boolean(
-        string=u"(OF) Heure de début", required=True, default=True,
-        help=u"Afficher l'heure de début des interventions en vue planning ?")
-
-    planningview_filter_heure_fin = fields.Boolean(
-        string=u"(OF) Heure de fin", required=True, default=True,
-        help=u"Afficher l'heure de fin des interventions en vue planning ?")
-
-    planningview_filter_duree = fields.Boolean(
-        string=u"(OF) Durée", required=True, default=True,
-        help=u"Afficher la durée des interventions en vue planning ?")
-
-    """@api.model
-    def get_default_planningview_domain(self, fields):
-        value = self.env['ir.values'].sudo().get_default('of.intervention.settings', 'planningview_domain', False)
-        return {
-            'planningview_domain': json.loads(value)
-        }
-
-    @api.model
-    def get_default_planningview_context(self, fields):
-        value = self.env['ir.values'].sudo().get_default('of.intervention.settings', 'planningview_context', False)
-        return {
-            'planningview_context': json.loads(value)
-        }
-
-    @api.model
-    def get_default_planningview_context(self, fields):
-        value = self.env['ir.values'].sudo().get_default('of.intervention.settings', 'planningview_context', False)
-        return {
-            'planningview_context': json.loads(value)
-        }"""
-
     @api.multi
     def set_planningview_employee_exclu_ids_defaults(self):
         return self.env['ir.values'].sudo().set_default(
@@ -416,63 +350,6 @@ class OFInterventionConfiguration(models.TransientModel):
             'planningview_employee_exclu_ids',
             [(6, 0, self.planningview_employee_exclu_ids.ids)],
         )
-
-    """@api.multi
-    def set_planningview_context_defaults(self):
-        if not isinstance(self.planningview_context, basestring):
-            self.planningview_context = json.dumps(self.planningview_context)
-        return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'planningview_context', self.planningview_context)
-
-    @api.multi
-    def set_planningview_domain_defaults(self):
-        if not isinstance(self.planningview_domain, basestring):
-            self.planningview_domain = json.dumps(self.planningview_domain)
-        return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'planningview_domain', self.planningview_domain)
-
-    @api.multi
-    def set_planningview_range_start_defaults(self):
-        planningview_range_start_da = fields.Date.from_string(self.planningview_range_start)
-        if planningview_range_start_da.weekday() != 0:  # n'est pas un lundi
-            planningview_range_start_da -= timedelta(days=planningview_range_start_da.weekday() % 7)  # replacé un lundi
-            self.planningview_range_start = fields.Date.to_string(planningview_range_start_da)
-        return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'planningview_range_start', self.planningview_range_start)"""
-
-    @api.multi
-    def set_planningview_filter_intervenant_ids_defaults(self):
-        return self.env['ir.values'].sudo().set_default(
-            'of.intervention.settings',
-            'planningview_filter_intervenant_ids',
-            [(6, 0, self.planningview_filter_intervenant_ids.ids)],
-            False,
-        )
-
-    @api.multi
-    def set_planningview_filter_client_defaults(self):
-        return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'planningview_filter_client', self.planningview_filter_client)
-
-    @api.multi
-    def set_planningview_filter_tache_defaults(self):
-        return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'planningview_filter_tache', self.planningview_filter_tache)
-
-    @api.multi
-    def set_planningview_filter_zip_defaults(self):
-        return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'planningview_filter_zip', self.planningview_filter_zip)
-
-    @api.multi
-    def set_planningview_filter_city_defaults(self):
-        return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'planningview_filter_city', self.planningview_filter_city)
-
-    @api.multi
-    def set_planningview_filter_heure_debut_defaults(self):
-        return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'planningview_filter_heure_debut', self.planningview_filter_heure_debut)
-
-    @api.multi
-    def set_planningview_filter_heure_fin_defaults(self):
-        return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'planningview_filter_heure_fin', self.planningview_filter_heure_fin)
-
-    @api.multi
-    def set_planningview_filter_duree_defaults(self):
-        return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'planningview_filter_duree', self.planningview_filter_duree)
 
 class IrUIView(models.Model):
     _inherit = 'ir.ui.view'
