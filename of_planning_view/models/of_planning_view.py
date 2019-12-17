@@ -441,8 +441,8 @@ class OFInterventionConfiguration(models.TransientModel):
     def set_planningview_filter_intervenant_ids_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'of.intervention.settings',
-            'filter_intervenant_ids',
-            [(6, 0, self.filter_intervenant_ids.ids)],
+            'planningview_filter_intervenant_ids',
+            [(6, 0, self.planningview_filter_intervenant_ids.ids)],
             False,
         )
 

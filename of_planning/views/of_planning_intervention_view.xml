@@ -231,8 +231,7 @@
                                 <field name="order_id"
                                        groups="sales_team.group_sale_salesman,
                                                account.group_account_invoice,
-                                               stock.group_stock_user,
-                                               mrp.group_mrp_user"/>
+                                               stock.group_stock_user"/>
                             </group>
                         </group>
                         <notebook>
@@ -929,7 +928,7 @@
             <menuitem id="menu_of_planning_clients_clients" name="Clients" parent="of_planning.menu_of_planning_clients" action="action_of_partner_form_planning" sequence="10"/>
 
         <menuitem id="menu_of_planning_vente" name="Articles" parent="of_planning.menu_of_planning" sequence="30"
-                  groups="sales_team.group_sale_salesman,account.group_account_invoice,stock.group_stock_user,mrp.group_mrp_user"/>
+                  groups="sales_team.group_sale_salesman,account.group_account_invoice,stock.group_stock_user"/>
             <menuitem id="menu_of_planning_vente_articles" name="Articles" parent="of_planning.menu_of_planning_vente" action="of_product_template_action_planning" sequence="10"/>
             <menuitem id="menu_of_planning_vente_kits" name="Kits" parent="of_planning.menu_of_planning_vente" action="of_template_open_kit_planning" sequence="20"/>
 
