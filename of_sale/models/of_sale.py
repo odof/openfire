@@ -757,12 +757,29 @@ class SaleOrderLine(models.Model):
         des champs dans vals ne provoque pas d'erreur si le module n'est pas installé.
         TODO: Permettre de modifier le montant si modification viens de la facture d'acompte
         """
+        force = self._context.get('force_price')
         blocked = [x for x in ('price_unit', 'product_uom_qty', 'product_uom', 'discount', 'of_discount_formula') if x in vals.keys()]
         for line in self:
             locked_invoice_lines = line.mapped('invoice_lines').filtered(lambda l: l.of_is_locked)
-            if locked_invoice_lines and blocked:
+            if locked_invoice_lines and blocked and not force:
                 raise UserError(u"""Cette ligne ne peut être modifiée : %s""" % line.name)
         return super(SaleOrderLine, self).write(vals)
+
+    @api.multi
+    def _additionnal_tax_verifications(self):
+        invoice_line_obj = self.env['account.invoice.line']
+        if self.product_id and self.product_id.id in invoice_line_obj.get_locked_products():
+            return True
+        if self.product_id and self.product_id.categ_id and self.product_id.categ_id.id in invoice_line_obj.\
+                get_locked_categories():
+            return True
+        return False
+
+    @api.multi
+    def _compute_tax_id(self):
+        return super(SaleOrderLine, self.filtered(lambda line: not line._additionnal_tax_verifications())).\
+            _compute_tax_id()
+
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
@@ -813,6 +830,28 @@ class AccountInvoiceLine(models.Model):
         )
         if product and product.description_fabricant and afficher:
             self.name += '\n' + product.description_fabricant
+        return res
+
+    @api.multi
+    def write(self, vals):
+        fields_to_sync = {
+            'price_unit': 'price_unit',
+            'quantity': 'product_uom_qty',
+            'uom_id': 'product_uom',
+            'discount': 'discount',
+            'of_discount_formula': 'of_discount_formula',
+            'invoice_line_tax_ids': 'tax_id'
+        }
+        res = super(AccountInvoiceLine, self).write(vals)
+        if res:
+            for line in self.filtered('of_is_locked'):
+                if line.invoice_id.invoice_line_ids.filtered('of_is_locked') == line.invoice_id.invoice_line_ids \
+                   and len(line.sale_line_ids) == 1 and line.sale_line_ids.invoice_lines == line:
+                    sync = [x for x in fields_to_sync.keys() if x in vals.keys()]
+                    vals_order_line = {}
+                    for field in sync:
+                        vals_order_line[fields_to_sync[field]] = vals[field]
+                    line.sale_line_ids.with_context(force_price=True).write(vals_order_line)
         return res
 
 
