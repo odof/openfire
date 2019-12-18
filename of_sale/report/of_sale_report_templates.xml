@@ -106,16 +106,16 @@
             <t t-set="display_discount" t-value="any([l.discount for l in doc.order_line])"/>
 
             <t t-foreach="doc.order_lines_layouted()" t-as="page">
-                <table class="table table-condensed">
+                <table name="order_lines_layouted" class="table table-condensed">
                     <thead>
                         <tr>
-                            <th style="width: 60%">Description</th>
-                            <th class="text-right">Quantity</th>
-                            <th class="text-right">Unit Price</th>
-                            <th t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">Disc.(%)</th>
-                            <th class="text-right">Taxes</th>
-                            <th class="text-right" groups="sale.group_show_price_subtotal">Price</th>
-                            <th class="text-right price_tax_included" groups="sale.group_show_price_total">Total Price</th>
+                            <th name="descr" style="width: 60%">Description</th>
+                            <th name="quant" class="text-right">Quantity</th>
+                            <th name="price_unit" class="text-right">Unit Price</th>
+                            <th name="disc" t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">Disc.(%)</th>
+                            <th name="taxe" class="text-right">Taxes</th>
+                            <th name="price_ht" class="text-right" groups="sale.group_show_price_subtotal">Price</th>
+                            <th name="price_total" class="text-right price_tax_included" groups="sale.group_show_price_total">Total Price</th>
                         </tr>
                    </thead>
                    <tbody class="sale_tbody">
@@ -135,7 +135,7 @@
                                     <t t-set="the_name" t-value="l.of_get_line_name()"/>
                                     <t t-set="name_line" t-value="the_name[0]"/>
                                     <t t-set="the_name" t-value="the_name[1:]"/>
-                                    <td>
+                                    <td name="descr">
                                         <span t-esc="name_line"/>
                                         <br t-if="len(the_name) > 0"/>
                                         <t t-foreach="the_name" t-as="name_line">
@@ -145,24 +145,25 @@
                                         </t>
                                         <span t-field="l.name" style="display: none;"/>
                                     </td>
-                                    <td class="text-right">
+                                    <td class="text-right" name="quant">
                                         <span t-esc="(str(l.product_uom_qty)).rstrip('0').rstrip('.').replace('.', ',')"/>
                                         <span t-field="l.product_uom" groups="product.group_uom"/>
                                     </td>
-                                    <td class="text-right">
+                                    <td class="text-right" name="price_unit">
                                         <span t-field="l.price_unit" t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
                                     </td>
-                                    <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
+                                    <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line"
+                                        name="disc">
                                         <span t-field="l.discount"/>
                                     </td>
-                                    <td class="text-right">
+                                    <td class="text-right" name="taxe">
                                         <span t-esc="', '.join(map(lambda x: (x.description or x.name), l.tax_id))"/>
                                     </td>
-                                    <td class="text-right" groups="sale.group_show_price_subtotal">
+                                    <td class="text-right" groups="sale.group_show_price_subtotal" name="price_ht">
                                         <span t-field="l.price_subtotal"
                                             t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
                                     </td>
-                                    <td class="text-right" groups="sale.group_show_price_total">
+                                    <td class="text-right" groups="sale.group_show_price_total" name="price_total">
                                         <span t-field="l.price_total"
                                             t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
                                     </td>
