@@ -173,3 +173,21 @@ class OfDatastoreConnector(models.AbstractModel):
                              ('context', self._get_context())]
             if val is not None}
         return ds_model.read_group(domain, fields, groupby, **kwargs)
+
+    @api.model
+    def of_datastore_write(self, ds_model, ids, vals):
+        kwargs = {
+            key: val
+            for key, val in [('vals', vals),
+                             ('context', self._get_context())]
+            if val is not None}
+        return ds_model.write(ids, **kwargs)
+
+    @api.model
+    def of_datastore_create(self, ds_model, vals):
+        kwargs = {
+            key: val
+            for key, val in [('vals', vals),
+                             ('context', self._get_context())]
+            if val is not None}
+        return ds_model.create(**kwargs)

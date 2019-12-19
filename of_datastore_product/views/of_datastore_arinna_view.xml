@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_of_datastore_arinna_intervention_push" model="ir.actions.server">
+        <field name="name">Envoyer les modifications à Arinna</field>
+        <field name="model_id" ref="model_of_planning_intervention"/>
+        <field name="state">code</field>
+        <field name="code">action = records.arinna_synchronize()</field>
+    </record>
+
+    <record id="action_datastore_arinna_intervention_push" model="ir.values">
+        <field name="name">Envoyer les modifications à Arinna</field>
+        <field name="key2">client_action_multi</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="value" eval="'ir.actions.server,%d'%action_of_datastore_arinna_intervention_push"/>
+    </record>
+
+</odoo>
