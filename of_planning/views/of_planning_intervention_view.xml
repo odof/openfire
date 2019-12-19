@@ -236,7 +236,7 @@
                         </group>
                         <notebook>
                             <!-- Description -->
-                            <page name="description" string="Descripton">
+                            <page name="description" string="Description">
                                 <field name="description" nolabel="1" witget="html"
                                     help="Ce champ sera imprimé dans la fiche d'intervention."/>
                                 <div class="oe_edit_only" style="margin-top: -20px; padding-top: 0px">
