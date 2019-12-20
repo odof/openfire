@@ -1008,7 +1008,7 @@ class OfImport(models.Model):
 
                 if model == 'product.template' and len(res_objet) > 1:
                     # Plusieurs articles trouvés, recherche sur la marque
-                    res_objet = res_objet.filtered(lambda o: o.brand_id == valeurs.get('brand_id')) or res_objet
+                    res_objet = res_objet.filtered(lambda o: o.brand_id.id == valeurs.get('brand_id')) or res_objet
 
                 if len(res_objet) > 1:
                     # Il existe plusieurs articles dans la base avec cette référence. On ne sait pas lequel mettre à jour. On passe au suivant en générant une erreur.
