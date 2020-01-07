@@ -92,7 +92,8 @@ odoo.define('list_editor.main', function (require) {
                 if (i === -1) {
                     var attrs;
                     if (self.fields_get[name].type === "many2many" || self.fields_get[name].type === "one2many") {
-                        attrs = {name: name, modifiers: "{}", widget: "many2many_tags"};
+                        // assigner un widget empeche creation de filtres personnalisés pour une raison inconnue
+                        attrs = {name: name, modifiers: "{}"};//, widget: "many2many_tags"};
                     }else {
                         attrs = {name: name, modifiers: "{}"};
                     }
