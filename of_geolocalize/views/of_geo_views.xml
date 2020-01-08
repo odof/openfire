@@ -56,7 +56,8 @@
                         </group>
                     </group>
                     <button name="%(action_regeocode)d" string="Géolocaliser" type="action" style="margin-bottom: 10px;"
-                        class="btn-primary" icon="fa-map-marker" help="Réessayer, géolocaliser avec un autre géocodeur ou effacer les géodonnes"/>
+                        class="btn-primary" icon="fa-map-marker" help="Réessayer, géolocaliser avec un autre géocodeur ou effacer les géodonnes"
+                        context="{'default_partner_id': active_id}"/>
                     <group colspan="2" col="2" groups="base.group_no_one">
                         <separator string="Données de géolocalisation" colspan="2"/>
                         <field name="street_query"/>

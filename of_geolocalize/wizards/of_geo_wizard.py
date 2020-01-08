@@ -20,6 +20,9 @@ try:
 except ImportError:
     googlemaps = None
 
+# @TODO: revoir le concept de précision
+
+
 class OFGeoWizard(models.TransientModel):
     _name = "of.geo.wizard"
     _description = u"Géocodage des partenaires sélectionnés"
@@ -135,11 +138,14 @@ class OFGeoWizard(models.TransientModel):
     best_precision = fields.Boolean(string=u"Choisir la meilleure précision des géocodeurs sélectionnés (lente)", default=False)
 
     # Traitement de données déjà géolocalisées
+    overwrite_if_failure = fields.Boolean(string=u"Écraser aussi en cas d'echec de géolocalisation", default=False)
     overwrite_geoloc_all = fields.Boolean(string=u"Écraser tous ceux sélectionnés", default=False)
     overwrite_geoloc_except_manual = fields.Boolean(string=u"Écraser tous ceux sélectionnés sauf ceux geolocalisés manuellement", default=False)
 
     # Selected Partners
     partner_ids = fields.Many2many('res.partner', string=u"Partenaires sélectionnés", default=_get_partner_ids)
+    partner_id = fields.Many2one('res.partner', string=u"Partenaire à géocoder")
+    country_name = fields.Char(string=u"Pays du partenaire", related="partner_id.country_id.name", readonly=True)
 
     nb_selected_partners = fields.Integer(string=u'Nb partenaires sélectionnés', compute='_compute_selected_stats', readonly=True)
     nb_selected_partners_success = fields.Integer(string=u'Nb partenaires sélectionnés reussi', compute='_compute_selected_stats', readonly=True)
@@ -148,6 +154,11 @@ class OFGeoWizard(models.TransientModel):
     nb_selected_partners_not = fields.Integer(string=u'Nb partenaires sélectionnés pas tentés', compute='_compute_selected_stats', readonly=True)
     nb_selected_partners_manual = fields.Integer(string=u'Nb partenaires sélectionnés manuel', compute='_compute_selected_stats', readonly=True)
     nb_selected_partners_to_geoloc = fields.Integer(string=u'Nb partenaires sélectionnés à géolocaliser', compute='_compute_selected_stats', readonly=True)
+
+    @api.onchange('overwrite_geoloc_all', 'overwrite_geoloc_except_manual')
+    def onchange_overwrite_geoloc(self):
+        if not (self.overwrite_geoloc_all or self.overwrite_geoloc_except_manual):
+            self.overwrite_if_failure = False
 
     @api.onchange('partner_ids', 'overwrite_geoloc_all', 'overwrite_geoloc_except_manual')
     def _compute_selected_stats(self):
@@ -229,11 +240,10 @@ class OFGeoWizard(models.TransientModel):
     # Geocoding with OPENFIRE
     def geo_openfire(self, partner):
         # Variables
-        geocoding = ""
         geocodeur = 'nominatim_openfire'
-        latitud = ""
-        longitud = ""
-        precision = ""
+        lat = 0
+        lng = 0
+        precision = 'unknown'
 
         # Start
         API_URL = self.env['ir.config_parameter'].get_param('url_openfire').strip()
@@ -250,105 +260,60 @@ class OFGeoWizard(models.TransientModel):
         query = partner.get_addr_params()
 
         if not query:
-            geocoding = 'no_address'
-            geocodeur = ""
-            latitud = 0
-            longitud = 0
-            precision = 'no_address'
+            return 'no_address', '', lat, lng, 'no_address'
+
+        query = urllib.quote_plus(query.strip().encode('utf8'))
+        full_query = API_URL + query + '&format=jsonv2&addressdetails=1'
+
+        # Server query and response
+        try:
+            req = requests.get(full_query)
+            res = req.json()
+            self.openfire_try += 1
+        except Exception as e:
+            raise UserError((u"Impossible de contacter le serveur de géolocalisation. Assurez-vous que votre connexion internet est opérationnelle et que l'URL est définie (%s)") % e)
+
+        if not res:
+            self.openfire_fail += 1
+            return 'failure', geocodeur, lat, lng, precision
+
+        partner_zip = partner.zip
+        for prop in res:
+            prop_address = prop.get('address', {})
+            prop_zip = prop_address.get('postcode', '').strip()
+            if prop_zip == partner_zip:
+                break
+        else:  # aucun résultat au bon code postal
+            return 'failure', geocodeur, lat, lng, precision
+
+        lng = prop['lon']
+        lat = prop['lat']
+        geocoding = 'success_openfire'
+
+        osm_type = prop.get('osm_type', 'unknown')
+
+        # Determine precision @TODO: à revoir
+        if osm_type == "way" or osm_type == "node":
+            precision = "high"
+        elif osm_type == "relation":
+            precision = "medium"
+        elif osm_type == "unknown":
+            precision = "low"
+
+        if lat and lng:
+            self.openfire_success += 1
         else:
-            query = urllib.quote_plus(query.strip().encode('utf8'))
-            full_query = API_URL + query + '&format=json'
+            self.openfire_fail += 1
 
-            # Server query and response
-            try:
-                req = requests.get(full_query)
-                res = req.json()
-                self.openfire_try += 1
-            except Exception as e:
-                raise UserError((u"Impossible de contacter le serveur de géolocalisation. Assurez-vous que votre connexion internet est opérationnelle et que l'URL est définie (%s)") % e)
-
-            if not res:
-                self.openfire_fail += 1
-                geocoding = 'failure'
-                latitud = 0
-                longitud = 0
-                precision = "unknown"
-            else:
-                try:
-                    longitud = res[0]['lon']
-                except:
-                    longitud = ""
-                try:
-                    latitud = res[0]['lat']
-                except:
-                    latitud = ""
-                try:
-                    osm_type = res[0]['osm_type']
-                except:
-                    osm_type = "unknown"
-
-                # Determine precision
-                if osm_type == "way" or osm_type == "node":
-                    precision = "high"
-                elif osm_type == "relation":
-                    precision = "medium"
-                elif osm_type == "unknown":
-                    precision = "low"
-                else:
-                    precision = "unknown"
-
-                # Discriminate false positives
-                if precision == 'high':
-                    # Simplify response address
-                    res_address = res[0]['display_name']
-                    fields = res_address.split(",")
-                    res_street = fields[0]
-                    res_zip = fields[-2]
-                    res_city = fields[3]
-                    reformed_res_address = res_street + res_zip + res_city
-                    reformed_res_address = reformed_res_address.upper()
-                    # Simplify query address
-                    reformed_query_address = query.upper()
-                    has_country = reformed_query_address.split(' ')[-1]
-                    if has_country == "FRANCE":
-                        reformed_query_address = ' '.join(reformed_query_address.split(' ')[:-1])
-                    # Compare
-                    ratio = self.similar(reformed_query_address, reformed_res_address)
-
-                    if ratio < 0.6:
-                        precision = "low"
-                        # Detect different zip (mark as failure if dif)
-                        if partner.zip:
-                            res_zip = fields[-2]
-                            zip_ratio = self.similar(partner.zip, res_zip)
-                            if zip_ratio < 0.9:
-                                precision = ""
-                    elif ratio < 0.7:
-                        precision = "medium"
-
-                if longitud and latitud and precision:
-                    self.openfire_success += 1
-                    geocoding = 'success_openfire'
-                    latitud = latitud
-                    longitud = longitud
-                    precision = precision
-                else:
-                    self.openfire_fail += 1
-                    geocoding = 'failure'
-                    latitud = 0
-                    longitud = 0
-                    precision = "unknown"
-
-        return geocoding, geocodeur, latitud, longitud, precision
+        return geocoding, geocodeur, lat, lng, precision
 
     # Géocodage avec OSM
     def geo_osm(self, partner):
         # Variables
-        geocoding = ""
         geocodeur = 'nominatim_osm'
-        latitud = ""
-        longitud = ""
-        precision = ""
+        lat = 0
+        lng = 0
+        precision = "unknown"
 
         # Start
         API_URL = partner.env['ir.config_parameter'].get_param('url_osm')
@@ -365,96 +330,53 @@ class OFGeoWizard(models.TransientModel):
         query = partner.get_addr_params()
 
         if not query:
-            geocoding = 'no_address'
-            geocodeur = ""
-            latitud = 0
-            longitud = 0
-            precision = 'no_address'
+            return 'no_address', '', lat, lng, 'no_address'
+
+        query_send = urllib.quote_plus(query.strip().encode('utf8'))
+        full_query = API_URL + query_send + '&format=jsonv2&addressdetails=1'
+
+        # Server query and response
+        try:
+            req = requests.get(full_query)
+            res = req.json()
+            self.osm_try += 1
+        except Exception as e:
+            raise UserError((u"Impossible de contacter le serveur de géolocalisation. Assurez-vous que votre connexion Internet est opérationnelle et que l'URL est définie (%s)") % e)
+
+        if not res:
+            self.osm_fail += 1
+            return 'failure', geocodeur, lat, lng, precision
+
+        partner_zip = partner.zip
+        for prop in res:
+            prop_address = prop.get('address', {})
+            prop_zip = prop_address.get('postcode', '').strip()
+            if prop_zip == partner_zip:
+                break
+        else:  # aucun résultat au bon code postal
+            self.osm_fail += 1
+            return 'failure', geocodeur, lat, lng, precision
+
+        lng = prop['lon']
+        lat = prop['lat']
+        geocoding = 'success_osm'
+
+        osm_type = prop.get('osm_type', 'unknown')
+
+        # Determine precision @TODO: à revoir
+        if osm_type == "way" or osm_type == "node":
+            precision = "high"
+        elif osm_type == "relation":
+            precision = "medium"
+        elif osm_type == "unknown":
+            precision = "low"
+
+        if lat and lng:
+            self.osm_success += 1
         else:
-            query_send = urllib.quote_plus(query.strip().encode('utf8'))
-            full_query = API_URL + query_send + '&format=json'
+            self.osm_fail += 1
 
-            # Server query and response
-            try:
-                req = requests.get(full_query)
-                res = req.json()
-                self.osm_try += 1
-            except Exception as e:
-                raise UserError((u"Impossible de contacter le serveur de géolocalisation. Assurez-vous que votre connexion Internet est opérationnelle et que l'URL est définie (%s)") % e)
-
-            if not res:
-                self.osm_fail += 1
-                geocoding = 'failure'
-                latitud = 0
-                longitud = 0
-                precision = "unknown"
-            else:
-                try:
-                    longitud = res[0]['lon']
-                except:
-                    longitud = ""
-                try:
-                    latitud = res[0]['lat']
-                except:
-                    latitud = ""
-                try:
-                    osm_type = res[0]['osm_type']
-                except:
-                    osm_type = "unknown"
-
-                # Determine precision
-                if osm_type == "way" or osm_type == "node":
-                    precision = "high"
-                elif osm_type == "relation":
-                    precision = "medium"
-                elif osm_type == "unknown":
-                    precision = "low"
-                else:
-                    precision = "unknown"
-
-                # Discriminate false positives
-                if precision == 'high':
-                    # Simplify response address
-                    res_address = res[0]['display_name']
-                    fields = res_address.split(",")
-                    res_street = fields[0]
-                    res_zip = fields[-2]
-                    res_city = fields[3]
-                    reformed_res_address = res_street + res_zip + res_city
-                    reformed_res_address = reformed_res_address.upper()
-                    # Simplify query address
-                    reformed_query_address = query.upper()
-                    has_country = reformed_query_address.split(' ')[-1]
-                    if has_country == "FRANCE":
-                        reformed_query_address = ' '.join(reformed_query_address.split(' ')[:-1])
-                    # Compare
-                    ratio = self.similar(reformed_query_address, reformed_res_address)
-
-                    if ratio < 0.6:
-                        precision = "low"
-                        # Detect different zip (mark as failure if dif)
-                        if partner.zip:
-                            res_zip = fields[-2]
-                            zip_ratio = self.similar(partner.zip, res_zip)
-                            if zip_ratio < 0.9:
-                                precision = ""
-                    elif ratio < 0.7:
-                        precision = "medium"
-
-                if longitud and latitud and precision:
-                    self.osm_success += 1
-                    geocoding = 'success_osm'
-                    latitud = latitud
-                    longitud = longitud
-                    precision = precision
-                else:
-                    self.osm_fail += 1
-                    geocoding = 'failure'
-                    latitud = 0
-                    longitud = 0
-                    precision = "unknown"
-
-        return geocoding, geocodeur, latitud, longitud, precision
+        return geocoding, geocodeur, lat, lng, precision
 
     # Geocoding with BANO
     def geo_ban(self, partner):
@@ -478,7 +400,6 @@ class OFGeoWizard(models.TransientModel):
 
         # Get address data
         query = partner.get_addr_params()
-
         if not query:
             geocoding = 'no_address'
             geocodeur = ""
@@ -502,7 +423,7 @@ class OFGeoWizard(models.TransientModel):
 
             if not res:
                 self.ban_fail += 1
-                geocoding = 'fail_ban'
+                geocoding = 'failure'
                 latitud = 0
                 longitud = 0
                 precision = "unknown"
@@ -736,7 +657,7 @@ class OFGeoWizard(models.TransientModel):
                         longitud = 0
                         precision = "unknown"
 
-                elif res['status'] == "OVER_QUERY_LIMIT":
+                elif res['status'] == "OVER_QUERY_LIMIT" or res['status'] == "REQUEST_DENIED":
 
                     # Get Google API key
                     google_api_key = partner.env['ir.config_parameter'].get_param('google_api_key')
@@ -1006,16 +927,24 @@ class OFGeoWizard(models.TransientModel):
                 continue
 
             for partner in self.partner_ids:
+                partner_country = (partner.country_id and partner.country_id.name) or\
+                                  (self.env.user.company_id.country_id and self.env.user.company_id.country_id.name) or\
+                                  u"France"
                 if (self.overwrite_geoloc_all or
                     (self.overwrite_geoloc_except_manual and partner.geocoding != 'manual') or
                     partner.geocoding not in ('success_openfire', 'success_osm', 'success_bano', 'success_google', 'manual', 'no_address')
                     ):
+                    if geocoder_name == 'ban' and partner_country != u'France':
+                        continue
                     results = geocoder_function(partner)
                     to_update = True
                     if self.best_precision:
                         get_precision = prec_to_int.get(results[4], 0)
                         get_record_precision = prec_to_int.get(partner.precision)
                         to_update = get_record_precision and get_precision > get_record_precision
+                    if (partner.geo_lat != 0 or partner.geo_lng != 0) and not self.overwrite_if_failure and \
+                            results[0] == 'failure':
+                        to_update = False
                     if to_update:
                         partner.write({
                             'geocoding': results[0],
