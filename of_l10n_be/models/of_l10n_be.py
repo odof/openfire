@@ -18,6 +18,7 @@ class AccountConfigSettings(models.TransientModel):
 
     @api.onchange('company_id')
     def onchange_company_id(self):
+        super(AccountConfigSettings, self).onchange_company_id()
         if self.company_id:
             # Mise à jour des taxes par défaut des services
             ir_values = self.env['ir.values']
