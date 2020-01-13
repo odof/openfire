@@ -66,6 +66,7 @@ Paramètres de ventes (sale.config.settings)
 - inhibition affichage réf produit dans les rapports PDF (of_sale)
 - redéfinition templates sale.report_saleorder_document, sale.report_invoice_document_inherit_sale et sale.report_invoice_layouted
 - permettre le réglage de la couleur de fond des titres de section dans les bons de commandes et les factures (paramètres de comptabilité pour les factures)
+- permettre de choisir si la date de confirmation est toujours recalculée après validation du devis.
 
 Droits utilisateurs:
 --------------------
@@ -97,6 +98,7 @@ Droits utilisateurs:
         'report/of_sale_report_templates.xml',
         'wizards/of_sale_order_gestion_prix_views.xml',
         'wizards/sale_make_invoice_advance_views.xml',
+        'wizards/of_sale_order_confirmation_views.xml',
     ],
     'installable': True,
     'application': False,
