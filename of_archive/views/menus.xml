@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <menuitem name="Archives" id="of_archive_root_menu" sequence="80"
+        web_icon="of_archive,static/description/icon.png"/>
+
+    <menuitem name="Archives" id="of_archive_menu" parent="of_archive_root_menu"
+        sequence="10" action="of_archive_action"/>
+
+    <menuitem name="Imports" id="of_archive_import_menu" parent="of_archive_root_menu"
+        sequence="20" action="of_archive_import_action"/>
+
+    <menuitem name="Configuration" id="of_archive_config_menu" parent="of_archive_root_menu"
+        sequence="30"/>
+
+    <menuitem name="Types d'archive" id="of_archive_type_menu" parent="of_archive_config_menu"
+        sequence="10" action="of_archive_type_action"/>
+</odoo>

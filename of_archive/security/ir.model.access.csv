@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_archive,access.of.archive,model_of_archive,base.group_user,1,1,1,1
+access_of_archive_type,access.of.archive.type,model_of_archive_type,base.group_user,1,1,1,1
+access_of_archive_import,access.of.archive.import,model_of_archive_import,base.group_user,1,0,0,0
+access_of_archive_import_message,access.of.archive.import.message,model_of_archive_import_message,base.group_user,1,0,0,0
+access_of_archive_import_admin,access.of.archive.import.admin,model_of_archive_import,of_base.of_group_root_only,1,1,1,1
+access_of_archive_import_message_admin,access.of.archive.import.message.admin,model_of_archive_import_message,of_base.of_group_root_only,1,1,1,1
