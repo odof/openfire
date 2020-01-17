@@ -111,11 +111,11 @@
                         <tr>
                             <th name="descr" style="width: 60%">Description</th>
                             <th name="quant" class="text-right">Quantity</th>
-                            <th name="price_unit" class="text-right">Unit Price</th>
+                            <th name="price_unit" class="text-right">Prix/U&amp;nbsp;HT</th>
                             <th name="disc" t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">Disc.(%)</th>
                             <th name="taxe" class="text-right">Taxes</th>
-                            <th name="price_ht" class="text-right" groups="sale.group_show_price_subtotal">Price</th>
-                            <th name="price_total" class="text-right price_tax_included" groups="sale.group_show_price_total">Total Price</th>
+                            <th name="price_ht" class="text-right" groups="sale.group_show_price_subtotal">Prix&amp;nbsp;HT</th>
+                            <th name="price_total" class="text-right price_tax_included" groups="sale.group_show_price_total">Prix&amp;nbsp;TTC</th>
                         </tr>
                    </thead>
                    <tbody class="sale_tbody">
@@ -150,7 +150,8 @@
                                         <span t-field="l.product_uom" groups="product.group_uom"/>
                                     </td>
                                     <td class="text-right" name="price_unit">
-                                        <span t-field="l.price_unit" t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
+                                        <span t-field="l.of_price_unit_ht" t-options='{"widget": "monetary",
+                                            "display_currency": doc.pricelist_id.currency_id}'/>
                                     </td>
                                     <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line"
                                         name="disc">
@@ -333,7 +334,7 @@
         <attribute name="groups">sale.group_show_price_subtotal</attribute>
     </xpath>
     <xpath expr="//table/thead/tr" position="inside">
-        <th class="text-right" groups="sale.group_show_price_total">Prix TTC</th>
+        <th class="text-right" groups="sale.group_show_price_total">Prix&amp;nbsp;TTC</th>
     </xpath>
 
     <!-- Correction des lignes de la facture non personnalisée  -->
@@ -352,14 +353,14 @@
             <table class="table table-condensed">
                 <thead>
                     <tr>
-                        <th style="width: 60%">Description</th>
-                        <th class="hidden">Doc Source</th>
-                        <th class="text-right">Qté</th>
-                        <th class="text-right">Prix/U</th>
-                        <th t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">Réduc.(%)</th>
-                        <th class="text-right">TVA</th>
-                        <th class="text-right" groups="sale.group_show_price_subtotal">Prix HT</th>
-                        <th class="text-right price_tax_included" groups="sale.group_show_price_total">Prix TTC</th>
+                        <th name="descr" style="width: 60%">Description</th>
+                        <th name="source" class="hidden">Doc Source</th>
+                        <th name="quant" class="text-right">Quantité</th>
+                        <th name="price_unit" class="text-right">Prix/U&amp;nbsp;HT</th>
+                        <th name="disc" t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">Réduc.(%)</th>
+                        <th name="taxe" class="text-right">TVA</th>
+                        <th name="price_ht" class="text-right" groups="sale.group_show_price_subtotal">Prix&amp;nbsp;HT</th>
+                        <th name="price_total" class="text-right price_tax_included" groups="sale.group_show_price_total">Prix&amp;nbsp;TTC</th>
                     </tr>
                 </thead>
                 <tbody class="invoice_tbody">
@@ -379,7 +380,7 @@
                                 <t t-set="the_name" t-value="l.of_get_line_name()"/>
                                 <t t-set="name_line" t-value="the_name[0]"/>
                                 <t t-set="the_name" t-value="the_name[1:]"/>
-                                <td>
+                                <td name="descr">
                                     <span t-esc="name_line"/>
                                     <t t-foreach="the_name" t-as="name_line">
                                         <br/>
@@ -387,26 +388,27 @@
                                     </t>
                                     <span t-field="l.name" style="display: none;"/>  <!-- à conserver pour héritages -->
                                 </td>
-                                <td class="hidden"><span t-field="l.origin"/></td>
-                                <td class="text-right">
+                                <td name="source" class="hidden"><span t-field="l.origin"/></td>
+                                <td name="quant" class="text-right">
                                     <span t-esc="(str(l.quantity)).rstrip('0').rstrip('.').replace('.', ',')"/>
                                     <span t-field="l.uom_id"  groups="product.group_uom"/>
                                 </td>
-                                <td class="text-right">
+                                <td name="price_unit" class="text-right">
                                     <!-- Nous avons retiré la précision du champ python, il faut donc la forcer dans le qweb -->
-                                    <span t-field="l.price_unit" t-options="{'precision':2}"/>
+                                    <span t-field="l.of_price_unit_ht" t-options="{'precision':2,
+                                        'widget': 'monetary', 'display_currency': o.currency_id}"/>
                                 </td>
-                                <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
+                                <td name="disc" t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
                                     <span t-field="l.discount"/>
                                 </td>
-                                <td class="text-right">
+                                <td name="taxe" class="text-right">
                                     <span t-esc="', '.join(map(lambda x: x.description or x.name, l.invoice_line_tax_ids))"/>
                                 </td>
-                                <td class="text-right" groups="sale.group_show_price_subtotal">
+                                <td name="price_ht" class="text-right" groups="sale.group_show_price_subtotal">
                                     <span t-field="l.price_subtotal"
                                         t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                                 </td>
-                                <td class="text-right" groups="sale.group_show_price_total">
+                                <td name="price_total" class="text-right" groups="sale.group_show_price_total">
                                     <span t-field="l.price_total"
                                         t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                                 </td>

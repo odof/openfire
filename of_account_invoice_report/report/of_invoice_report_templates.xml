@@ -103,7 +103,7 @@
                         <th style="width: 60%">Description</th>
                         <th class="hidden">Source Doc</th>
                         <th class="text-right">Qty</th>
-                        <th class="text-right">Unit Price</th>
+                        <th class="text-right">Prix/U&amp;nbsp;HT</th>
                         <th t-if="display_discount" class="text-right">Disc.(%)</th>
                         <th class="text-right">Taxes</th>
                         <th class="text-right">Tax Excluded Price</th>
@@ -118,7 +118,8 @@
                             <span t-field="l.uom_id"  groups="product.group_uom"/>
                         </td>
                         <td class="text-right">
-                            <span t-field="l.price_unit"/>
+                            <span t-field="l.of_price_unit_ht" t-options="{'precision':2,
+                                        'widget': 'monetary', 'display_currency': o.currency_id}"/>
                         </td>
                         <td t-if="display_discount" class="text-right">
                             <span t-field="l.discount"/>

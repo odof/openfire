@@ -100,6 +100,24 @@ class AccountInvoiceLine(models.Model):
         'res.partner.category', compute=lambda *a, **k: {}, search='_search_of_gb_partner_tag_id',
         string="Étiquette client", of_custom_groupby=True)
 
+    of_price_unit_ht = fields.Float(string='Unit Price',
+        store=True, readonly=True, compute='_compute_price', help="Total amount without taxes")
+
+    price_unit = fields.Float(help="""
+    Prix unitaire de l'article.
+    À entrer HT ou TTC suivant la TVA de la ligne de facture.
+    Sera toujours affiché HT dans la facture et la facture PDF.
+    """)
+
+    @api.one
+    @api.depends('price_unit', 'discount', 'invoice_line_tax_ids', 'quantity',
+                 'product_id', 'invoice_id.partner_id', 'invoice_id.currency_id', 'invoice_id.company_id',
+                 'invoice_id.date_invoice', 'invoice_id.date')
+    def _compute_price(self):
+        super(AccountInvoiceLine, self)._compute_price()
+        if self.quantity:
+            self.of_price_unit_ht = self.price_subtotal_signed / self.quantity
+
     @api.model
     def _search_of_gb_partner_tag_id(self, operator, value):
         return [('partner_id.category_id', operator, value)]
