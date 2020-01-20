@@ -140,8 +140,20 @@ class OfTourneeRdv(models.TransientModel):
     geo_lng = fields.Float(related='partner_address_id.geo_lng', readonly=True)
     precision = fields.Selection(related='partner_address_id.precision', readonly=True)
     partner_name = fields.Char(related='partner_id.name')
-    geocode_retry = fields.Boolean(u"Geocodage retenté")
+    geocode_retry = fields.Boolean(u"Geocodage retenté", compute="_compute_geocode_retry")
     ignorer_geo = fields.Boolean(u"Ignorer données géographiques")
+
+    @api.depends('partner_address_id', 'partner_address_id.geocoding', 'partner_address_id.precision')
+    def _compute_geocode_retry(self):
+        geocodeur = self.env['ir.config_parameter'].get_param('geocoder_by_default')
+        for wizard in self:
+            address_id = wizard.partner_address_id
+            if address_id.geocodeur != geocodeur:
+                wizard.geocode_retry = False
+            elif address_id.precision == 'not_tried' or address_id.geocoding == 'not_tried':
+                wizard.geocode_retry = False
+            else:
+                wizard.geocode_retry = True
 
     @api.onchange('mode_recherche')
     def _onchange_mode_recherche(self):
@@ -416,8 +428,9 @@ class OfTourneeRdv(models.TransientModel):
                                 deb, fin = horaires_employee[index_courant]
                             else:
                                 # L'intervention commence avant la fin du créneau courant
-                                if float_compare(deb, intervention_deb, compare_precision) == 1:
-                                    # L'intervention commence au milieu du créneau courant
+                                if float_compare(fin, intervention_deb, compare_precision) == 1 and \
+                                  float_compare(deb, intervention_deb, compare_precision) != 0:
+                                    # L'intervention commence au milieu du créneau courant (et pas en même temps!)
                                     duree += intervention_deb - deb
                                     creneaux_temp.append((deb, intervention_deb))
                             if float_compare(self.duree, duree, compare_precision) != 1:
