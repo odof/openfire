@@ -227,7 +227,12 @@ class OfPlanningIntervention(models.Model):
         return True
 
     _sql_constraints = [
-        ('dates_forcees_constraint', 'CHECK ( date <= date_deadline_forcee )', _(u"La date de début doit être antérieure ou égale à celle de fin")),
+        ('dates_forcees_constraint',
+         'CHECK ( date <= date_deadline_forcee )',
+         _(u"La date de début doit être antérieure ou égale à celle de fin")),
+        ('duree_non_nulle_constraint',
+         'CHECK ( duree != 0 )',
+         _(u'La durée de l\'intervention ne peut pas être nulle!')),
     ]
 
     _constraints = [
@@ -424,6 +429,14 @@ class OfPlanningIntervention(models.Model):
     def _auto_init(self):
         # Lors de la 1ère mise à jour après la refonte des équipes (sept. 2019), on migre les données existantes.
         cr = self._cr
+
+        # Interdiction pour les interventions d'avoir une durée nulle: on passe la durée à 1 et l'état à 'annulé'
+        # on pourra supprimer ce code une fois que toutes les bases seront passées en branche planning
+        # en pensant bien à le répercuter sur of_migration ;) ;)
+        cr.execute("UPDATE of_planning_intervention SET duree = 1, state = 'cancel'"
+                   "WHERE duree = 0")
+
+
         cr.execute("SELECT 1 FROM information_schema.tables WHERE table_name = 'of_employee_intervention_rel'")
         existe_avant = bool(cr.fetchall())
         res = super(OfPlanningIntervention, self)._auto_init()

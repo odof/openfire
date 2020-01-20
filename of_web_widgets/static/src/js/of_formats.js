@@ -84,7 +84,6 @@ function format_value (value, descriptor, value_if_empty) {
             /////////////////////////////////////// DEBUT CODE OF
             else if (value.length == 0) {
                 return "-"
-                console.log("HAN");
             }
             ////////////////////////////////////// FIN CODE OF
             return _.str.sprintf(_t("(%d records)"), value.length);
