@@ -17,14 +17,14 @@ msgstr ""
 
 #. module: of_web_widgets
 #. openerp-web
-#: code:addons/of_web_widgets/static/src/js/of_kanban_widgets.js:78
+#: code:addons/of_web_widgets/static/src/js/of_kanban.js:78
 #, python-format
 msgid "Click to set value"
 msgstr "Cliquer pour choisir"
 
 #. module: of_web_widgets
 #. openerp-web
-#: code:addons/of_web_widgets/static/src/js/of_kanban_widgets.js:87
+#: code:addons/of_web_widgets/static/src/js/of_kanban.js:87
 #, python-format
 msgid "Unknown / Unset"
 msgstr "Inconnu / Vide"

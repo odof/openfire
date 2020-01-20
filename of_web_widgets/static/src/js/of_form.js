@@ -1,20 +1,40 @@
-odoo.define('of_web_widgets.of_form_relational', function (require) {
+odoo.define('of_web_widgets.of_form', function (require) {
 "use strict";
 
+var form_common = require('web.form_common');
+var form_widgets = require('web.form_widgets');
 var form_relational = require('web.form_relational');
+var utils = require('web.utils');
 var core = require('web.core');
 var data = require('web.data');
-var common = require('web.form_common');
 var Model = require('web.DataModel');
 var Dialog = require('web.Dialog');
 var ViewManager = require('web.ViewManager');
 var ControlPanel = require('web.ControlPanel');
-var utils = require('web.utils');
 
 var FieldMany2One = form_relational.FieldMany2One;
 var FieldOne2Many = core.form_widget_registry.get('one2many');
 
 var _t = core._t;
+
+form_common.CompletionFieldMixin.init = function(){
+    this.limit = 7;
+    this.orderer = new utils.DropMisordered();
+    this.can_create = this.node.attrs.can_write == "false" ? false : true;
+    this.can_write = this.node.attrs.can_write == "false" ? false : true;
+    this.options.no_quick_create = true;
+};
+
+/**
+ *  Empecher le multi-click
+ */
+form_widgets.WidgetButton.include({
+    willStart: function() {
+        this.on_click = _.debounce(this.on_click, 300, true);
+        this.on_confirmed = _.debounce(this.on_confirmed, 300, true);
+        return $.when(this._super.apply(this, arguments));
+    },
+})
 
 /**
  *  Copy from form_relational_widget for FieldOne2Many.load_views
@@ -49,7 +69,7 @@ var X2ManyViewManager = ViewManager.extend({
         }
         var self = this;
         var id = self.x2m.dataset.index !== null ? self.x2m.dataset.ids[self.x2m.dataset.index] : null;
-        var pop = new common.FormViewDialog(this, {
+        var pop = new form_common.FormViewDialog(this, {
             res_model: self.x2m.field.relation,
             res_id: id,
             context: self.x2m.build_context(),
@@ -201,7 +221,7 @@ var FieldOne2One = FieldMany2One.extend({
                 var context = self.build_context().eval();
                 var model_obj = new Model(self.field.relation);
                 model_obj.call('get_formview_id', [[self.get("value")], context]).then(function(view_id){
-                    var pop = new common.FormViewDialog(self, {
+                    var pop = new form_common.FormViewDialog(self, {
                         res_model: self.field.relation,
                         res_id: self.get("value"),
                         context: self.build_context(),
@@ -235,7 +255,7 @@ var FieldOne2One = FieldMany2One.extend({
                 var context = self.build_context().eval();
                 var model_obj = new Model(self.field.relation);
                 model_obj.call('get_formview_id', [[self.get("value")], context]).then(function(view_id){
-                    var pop = new common.FormViewDialog(self, {
+                    var pop = new form_common.FormViewDialog(self, {
                         res_model: self.field.relation,
                         res_id: self.get("value"),
                         context: self.build_context(),
@@ -270,4 +290,5 @@ core.form_widget_registry
     .add('one2one', FieldOne2One);
 
 return FieldOne2One;
+
 });

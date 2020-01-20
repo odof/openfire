@@ -1,4 +1,4 @@
-odoo.define('of_web_widgets.of_kanban_widgets', function (require) {
+odoo.define('of_web_widgets.of_kanban', function (require) {
 "use strict";
 
 var core = require('web.core');
