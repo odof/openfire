@@ -180,6 +180,7 @@ Cette action irréversible recalculera la catégorie, le prix d'achat et le prix
                                 <field name="nb_ajout"/>
                                 <field name="nb_maj"/>
                                 <field name="nb_echoue"/>
+                                <field name="nb_ignores"/>
                             </group>
                         </div>
                         <div class="col-xs-4">
@@ -191,11 +192,22 @@ Cette action irréversible recalculera la catégorie, le prix d'achat et le prix
                             </group>
                         </div>
                     </div>
-                    <separator string="Résultat"/>
-                    <group colspan="4" col="6">
-                        <field name="sortie_succes" style="max-height: 300px; overflow: auto;"/>
-                        <field name="sortie_avertissement" style="max-height: 300px; overflow: auto;"/>
-                        <field name="sortie_erreur" style="max-height: 300px; overflow: auto;"/>
+                    <group string="Journal" col="3">
+                        <field name="import_error_ids" nolabel="1" style="margin-left: -10px;" options="{'single_page_hidden': false}">
+                            <tree>
+                                <field name='message' string="Erreurs"/>
+                            </tree>
+                        </field>
+                        <field name="import_warning_ids" nolabel="1" options="{'single_page_hidden': false}">
+                            <tree>
+                                <field name='message' string="Avertissements"/>
+                            </tree>
+                        </field>
+                        <field name="import_success_ids" nolabel="1" style="margin-left: 10px;" options="{'single_page_hidden': false}">
+                            <tree>
+                                <field name='message' string="Infos"/>
+                            </tree>
+                        </field>
                     </group>
                     <separator string="Champs disponibles"/>
                     <group colspan="4" col="4">

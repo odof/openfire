@@ -49,6 +49,7 @@ SELECT_EXTENSIONS = [
     ]
 
 CODE_IMPORT_ERREUR = -1
+CODE_IMPORT_AVERT = -2
 CODE_IMPORT_CREATION = 0
 CODE_IMPORT_MODIFICATION = 1
 
@@ -368,12 +369,17 @@ class OfImport(models.Model):
     nb_total = fields.Integer(u'Nombre total', readonly=True)
     nb_ajout = fields.Integer(u'Ajoutés', readonly=True)
     nb_maj = fields.Integer(u'Mis à jour', readonly=True)
-    nb_echoue = fields.Integer(u'Échoués/ignorés', readonly=True)
+    nb_echoue = fields.Integer(u'Échoués', readonly=True)
+    nb_ignores = fields.Integer(u'Ignorés', readonly=True)
 
     sortie_note = fields.Text(u'Note', compute='_compute_sortie_note', readonly=True)
-    sortie_succes = fields.Text(u'Information', readonly=True)
-    sortie_avertissement = fields.Text(u'Avertissements', readonly=True)
-    sortie_erreur = fields.Text(u'Erreurs', readonly=True)
+
+    import_success_ids = fields.One2many(comodel_name='of.import.message', inverse_name='import_id',
+                                      string=u"Infos", domain=[('type', '=', 'info')], readonly=True)
+    import_warning_ids = fields.One2many(comodel_name='of.import.message', inverse_name='import_id',
+                                         string=u"Avertissements", domain=[('type', '=', 'warning')], readonly=True)
+    import_error_ids = fields.One2many(comodel_name='of.import.message', inverse_name='import_id',
+                                       string=u"Erreurs", domain=[('type', '=', 'error')], readonly=True)
 
     @api.multi
     @api.depends('lang_id')
@@ -624,6 +630,9 @@ class OfImport(models.Model):
     def bouton_remettre_brouillon(self):
         for imp in self:
             imp.state = 'brouillon'
+            imp.import_success_ids.unlink()
+            imp.import_warning_ids.unlink()
+            imp.import_error_ids.unlink()
         return True
 
     @api.multi
@@ -719,7 +728,8 @@ class OfImport(models.Model):
             ce qui facilitera les mises à jour futures
 
         """
-        erreur_msg = [""]
+        import_error = []
+        code = 0
 
         def erreur(msg):
             """
@@ -727,9 +737,10 @@ class OfImport(models.Model):
             En mode simulation, toutes les anomalies sont listées pour chaque ligne d'import.
             En mode import, chaque ligne est abandonnée à la première anomalie rencontrée.
             """
-            erreur_msg[0] += msg
+            if msg:
+                import_error.append((0, 0, {'type': 'error', 'message': msg}))
             if not simuler:
-                raise OfImportError(erreur_msg[0])
+                raise OfImportError(import_error)
         # On se place dans la langue du fichier d'import (notamment pour la recherche des champs many2one).
         if self.lang_id.code and self.lang_id.code != self.env.lang:
             self = self.with_context(lang=self.lang_id.code)
@@ -774,14 +785,14 @@ class OfImport(models.Model):
 
                 # si le champs est requis, vérification qu'il est renseigné
                 if champs_odoo[champ_fichier_sansrel]['requis'] and (ligne[champ_fichier] == "#vide" or (ligne[champ_fichier] == "" and not valeurs.get(champ_fichier_sansrel))):
-                    erreur(u"Ligne %s : champ %s (%s) vide alors que requis. %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, model_data['nom_objet'].capitalize()))
+                    erreur(u"Ligne %s : champ %s (%s) vide alors que requis. %s non importé." % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, model_data['nom_objet'].capitalize()))
 
                 # Si le champ relation est un id, vérification qu'est un entier
                 if champs_odoo[champ_fichier_sansrel]['relation_champ'] == 'id':
                     try:
                         int(ligne[champ_fichier])
                     except ValueError:
-                        erreur(u"Ligne %s : champ %s (%s) n'est pas un id (nombre entier) alors que le champ relation (après le /) est un id. %s non importé.\n" % (i,  champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, model_data['nom_objet'].capitalize()))
+                        erreur(u"Ligne %s : champ %s (%s) n'est pas un id (nombre entier) alors que le champ relation (après le /) est un id. %s non importé." % (i,  champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, model_data['nom_objet'].capitalize()))
 
     #
     # FORMATAGE ET VÉRIFICATION DE L'INTÉGRITÉ DE LA VALEUR DES CHAMPS
@@ -795,13 +806,13 @@ class OfImport(models.Model):
                         try:
                             valeurs[champ_fichier_sansrel] = float(ligne[champ_fichier])
                         except ValueError:
-                            erreur(u"Ligne %s : champ %s (%s) n'est pas un nombre. %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier_sansrel, model_data['nom_objet'].capitalize()))
+                            erreur(u"Ligne %s : champ %s (%s) n'est pas un nombre. %s non importé." % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier_sansrel, model_data['nom_objet'].capitalize()))
 
                 # Si est un field selection
                 elif champs_odoo[champ_fichier_sansrel]['type'] == 'selection':
                     # C'est un champ sélection. On vérifie que les données sont autorisées.
                     if ligne[champ_fichier] not in dict(self.env[model]._fields[champ_fichier].selection):
-                        erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" non autorisée. %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], model_data['nom_objet'].capitalize()))
+                        erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" non autorisée. %s non importé." % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], model_data['nom_objet'].capitalize()))
                     else:
                         valeurs[champ_fichier_sansrel] = ligne[champ_fichier]
 
@@ -812,7 +823,7 @@ class OfImport(models.Model):
                     elif ligne[champ_fichier].upper() in ('0', "FALSE", "FAUX"):
                         valeurs[champ_fichier] = False
                     else:
-                        erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" non autorisée (admis 0, 1, True, False, vrai, faux). %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], model_data['nom_objet'].capitalize()))
+                        erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" non autorisée (admis 0, 1, True, False, vrai, faux). %s non importé." % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], model_data['nom_objet'].capitalize()))
 
                 # si est un many2one
                 elif champs_odoo[champ_fichier_sansrel]['type'] == 'many2one':
@@ -877,7 +888,7 @@ class OfImport(models.Model):
                                 if res_ids.partner_id:  # Le fournisseur est devenu un champ obligatoire de la marque. Cette vérification pourra être retirée.
                                     valeurs['seller_ids'] = [(5, ), (0, 0, {'name': res_ids.partner_id.id})]
                         elif len(res_ids) > 1:
-                            erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" a plusieurs correspondances. %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], model_data['nom_objet'].capitalize()))
+                            erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" a plusieurs correspondances. %s non importé." % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], model_data['nom_objet'].capitalize()))
                         else:
                             # Si import de partenaires et champ compte comptable (client et fournisseur), on le crée.
                             if model == 'res.partner' and champ_fichier == 'property_account_receivable_id' and 'name' in ligne:
@@ -889,7 +900,7 @@ class OfImport(models.Model):
                             elif ligne[champ_fichier] == "#vide":
                                 valeurs[champ_fichier_sansrel] = ''
                             else:
-                                erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" n'a pas de correspondance. %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], model_data['nom_objet'].capitalize()))
+                                erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" n'a pas de correspondance. %s non importé." % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], model_data['nom_objet'].capitalize()))
 
                 # Si est un one2many
                 elif champs_odoo[champ_fichier_sansrel]['type'] == 'one2many':
@@ -902,16 +913,16 @@ class OfImport(models.Model):
                         brand = self.env['of.product.brand'].browse(valeurs['brand_id'])
                         if brand.partner_id:
                             if brand.partner_id.name.strip() != ligne[champ_fichier]:
-                                erreur(u"Ligne %s : champ %s (%s) Le fournisseur choisi (%s) ne correspond pas à celui de la marque %s (%s). %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], brand.name, brand.partner_id.name, model_data['nom_objet'].capitalize()))
+                                erreur(u"Ligne %s : champ %s (%s) Le fournisseur choisi (%s) ne correspond pas à celui de la marque %s (%s). %s non importé." % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], brand.name, brand.partner_id.name, model_data['nom_objet'].capitalize()))
                         else:
                             res_ids = self.env['res.partner'].search([('name', '=', ligne[champ_fichier]), ('supplier', '=', True)])
 
                             if len(res_ids) == 1:
                                 valeurs[champ_fichier_sansrel] = [(5, ), (0, 0, {'name': res_ids.id})]
                             elif len(res_ids) > 1:
-                                erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" a plusieurs correspondances. %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], model_data['nom_objet'].capitalize()))
+                                erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" a plusieurs correspondances. %s non importé." % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], model_data['nom_objet'].capitalize()))
                             else:
-                                erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" n'a pas de correspondance. %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], model_data['nom_objet'].capitalize()))
+                                erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" n'a pas de correspondance. %s non importé." % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], model_data['nom_objet'].capitalize()))
 
                 # Si est un many2many
                 elif champs_odoo[champ_fichier_sansrel]['type'] == 'many2many':
@@ -927,10 +938,10 @@ class OfImport(models.Model):
                             if len(res_ids) == 1:
                                 tag_ids.append(res_ids.id)
                             elif len(res_ids) > 1:
-                                erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" a plusieurs correspondances. %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, tag, model_data['nom_objet'].capitalize()))
+                                erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" a plusieurs correspondances. %s non importé." % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, tag, model_data['nom_objet'].capitalize()))
                             else:
-                                erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" n'a pas de correspondance. %s non importé.\n" % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, tag, model_data['nom_objet'].capitalize()))
-                    if not erreur_msg[0]:
+                                erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" n'a pas de correspondance. %s non importé." % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, tag, model_data['nom_objet'].capitalize()))
+                    if not import_error:
                         if ligne[champ_fichier] == "#vide":
                             valeurs[champ_fichier_sansrel] = [(5,)]
                         elif ligne[champ_fichier]:
@@ -993,7 +1004,9 @@ class OfImport(models.Model):
                 # Si la référence est un champ vide, on ne s'arrête pas, ça sera une création,
                 #   mais on garde une copie des lignes pour faire un message d'avertissement.
                 if valeur and valeur in doublons:
-                    erreur('')
+                    code = CODE_IMPORT_AVERT
+                    if not simuler:
+                        break
 
                 # On regarde si l'enregistrement existe déjà dans la base
                 domain = [(model_data['champ_primaire'], '=', valeur)]
@@ -1012,7 +1025,7 @@ class OfImport(models.Model):
 
                 if len(res_objet) > 1:
                     # Il existe plusieurs articles dans la base avec cette référence. On ne sait pas lequel mettre à jour. On passe au suivant en générant une erreur.
-                    erreur(u"Ligne %s %s %s en plusieurs exemplaires dans la base, on ne sait pas lequel mettre à jour. %s non importé.\n" % (i, model_data['nom_objet'], libelle_ref, model_data['nom_objet'].capitalize()))
+                    erreur(u"Ligne %s %s %s en plusieurs exemplaires dans la base, on ne sait pas lequel mettre à jour. %s non importé." % (i, model_data['nom_objet'], libelle_ref, model_data['nom_objet'].capitalize()))
                     # Afin de continuer la simulation d'import correctement, on prend arbitrairement un des objets disponibles
                     # Evite notamment des erreurs pour la simulation d'import d'articles, car l'objet contient des paramètres d'import
                     res_objet = res_objet[0]
@@ -1020,17 +1033,18 @@ class OfImport(models.Model):
         try:
             self._post_calcule_ligne(champs_fichier, ligne, model_data, res_objet, valeurs)  # Champs à importer (pour envoi à fonction create ou write)
         except OfImportError, e:
-            erreur(u"Ligne %s : %s %s non importé.\n" % (i, e.name, model_data['nom_objet'].capitalize()))
+            erreur(u"Ligne %s : %s %s non importé." % (i, e.name, model_data['nom_objet'].capitalize()))
 
-        if not res_objet:
+        if not res_objet and code != CODE_IMPORT_AVERT:
             # En cas de création, on doit vérifier que tous les champs Odoo requis ont bien été renseignés.
             for cle in champs_odoo:
                 if champs_odoo[cle]['requis'] is True and cle not in valeurs:
-                    erreur(u"Ligne %s : champ %s (%s) obligatoire mais non présent dans le fichier d'import. %s non importé.\n" % (i, champs_odoo[cle]['description'], cle, model_data['nom_objet'].capitalize()))
+                    erreur(u"Ligne %s : champ %s (%s) obligatoire mais non présent dans le fichier d'import. %s non importé." % (i, champs_odoo[cle]['description'], cle, model_data['nom_objet'].capitalize()))
 
-        message = erreur_msg[0]
-        code = CODE_IMPORT_ERREUR
-        if not message:
+        message = import_error
+        if message:
+            code = CODE_IMPORT_ERREUR
+        if not (message or code == CODE_IMPORT_AVERT):
             if res_objet:
                 # Il y a un (et un seul) enregistrement dans la base avec cette référence. On le met à jour.
                 try:
@@ -1041,9 +1055,13 @@ class OfImport(models.Model):
                         for lang, vals in valeurs_trad.iteritems():
                             res_objet.with_context(lang=lang).write(vals)
                     code = CODE_IMPORT_MODIFICATION
-                    message = u"MAJ %s %s (ligne %s)\n" % (model_data['nom_objet'], libelle_ref, i)
+                    message = [(0, 0, {'type': 'info',
+                                       'message': u"MAJ %s %s (ligne %s)" % (model_data['nom_objet'], libelle_ref, i)})]
                 except Exception, exp:
-                    message = u"Ligne %s : échec mise à jour %s %s - Erreur : %s\n" % (i, model_data['nom_objet'], libelle_ref, str(exp).decode('utf8', 'ignore'))
+                    message = [(0, 0, {'type': 'error',
+                                       'message': u"Ligne %s : échec mise à jour %s %s - Erreur : %s" %
+                                                  (i, model_data['nom_objet'], libelle_ref,
+                                                   str(exp).decode('utf8', 'ignore'))})]
             else:
                 # L'enregistrement n'existe pas dans la base, on l'importe (création)
                 try:
@@ -1054,9 +1072,14 @@ class OfImport(models.Model):
                         for lang, vals in valeurs_trad.iteritems():
                             res_objet.with_context(lang=lang).write(vals)
                     code = CODE_IMPORT_CREATION
-                    message = u"Création %s %s (ligne %s)\n" % (model_data['nom_objet'], libelle_ref, i)
+                    message = [(0, 0, {'type': 'info',
+                                       'message': u"Création %s %s (ligne %s)" %
+                                                  (model_data['nom_objet'], libelle_ref, i)})]
                 except Exception, exp:
-                    message = u"Ligne %s : échec création %s %s - Erreur : %s\n" % (i, model_data['nom_objet'], libelle_ref, str(exp).decode('utf8', 'ignore'))
+                    message = [(0, 0, {'type': 'error',
+                                       'message': u"Ligne %s : échec création %s %s - Erreur : %s" %
+                                                  (i, model_data['nom_objet'], libelle_ref,
+                                                   str(exp).decode('utf8', 'ignore'))})]
 
         if (simuler or code != CODE_IMPORT_ERREUR) and model_data['champ_primaire'] in valeurs:
             ref = valeurs[model_data['champ_primaire']]
@@ -1122,15 +1145,24 @@ class OfImport(models.Model):
         champs_odoo = self.get_champs_odoo(model, self.lang_id.code or self.env.lang)  # On récupère la liste des champs de l'objet (depuis ir.model.fields)
         date_debut = time.strftime('%Y-%m-%d %H:%M:%S')
 
+        self.import_success_ids.unlink()
+        self.import_warning_ids.unlink()
+        self.import_error_ids.unlink()
+
+        import_success = []
+        import_warning = []
+        import_error = []
+
         if simuler:
-            sortie_succes = sortie_avertissement = sortie_erreur = u"SIMULATION - Rien n'a été créé/modifié.\n"
-        else:
-            sortie_succes = sortie_avertissement = sortie_erreur = u""
+            import_success += [(0, 0, {'type': 'info', 'message': u"SIMULATION - Rien n'a été créé/modifié."})]
+            import_warning += [(0, 0, {'type': 'warning', 'message': u"SIMULATION - Rien n'a été créé/modifié."})]
+            import_error += [(0, 0, {'type': 'error', 'message': u"SIMULATION - Rien n'a été créé/modifié."})]
 
         nb_total = 0
         nb_ajout = 0
         nb_maj = 0
         nb_echoue = 0
+        nb_ignores = 0
         erreur = 0
 
         # LECTURE DU FICHIER D'IMPORT SELON EXTENSION (CHOISIR READER)
@@ -1162,14 +1194,18 @@ class OfImport(models.Model):
                         model_data['default_seller_ids'] = [(5, ), (0, 0, {'name': default_brand.partner_id.id})]
                 else:
                     erreur = 1
-                    sortie_erreur += u"Aucune marque enregistrée ne correspond au préfixe %s.\n" % (self.prefixe, )
+                    import_error += [(0, 0, {'type': 'error',
+                                             'message': u"Aucune marque enregistrée ne correspond au préfixe %s." %
+                                                        (self.prefixe, )})]
             else:
                 for champ_fichier in champs_fichier:
                     champ_relation = champ_fichier.split('/')[0]
                     if champ_relation == 'brand_id':
                         break
                 else:
-                    sortie_erreur += u"Un préfixe doit être choisi pour l'import, ou une colonne du fichier doit définir la marque des articles\n"
+                    import_error += [(0, 0, {'type': 'info',
+                                             'message': u"Un préfixe doit être choisi pour l'import, ou une colonne du "
+                                                        u"fichier doit définir la marque des articles"})]
 
             # Les udm des articles seront nécessaires pour le calcul des prix de revient et de vente
             for key, val in self.env['product.template'].default_get(('uom_id', 'uom_po_id')).iteritems():
@@ -1189,7 +1225,10 @@ class OfImport(models.Model):
         # Vérification si le champ primaire est bien dans le fichier d'import (si le champ primaire est défini)
         if model_data['champ_primaire'] and model_data['champ_primaire'] not in champs_fichier:
             erreur = 1
-            sortie_erreur += u"Le champ référence qui permet d'identifier un %s (%s) n'est pas dans le fichier d'import.\n" % (model_data['nom_objet'], model_data['champ_primaire'])
+            import_error += [(0, 0, {'type': 'error',
+                                     'message': u"Le champ référence qui permet d'identifier un %s (%s) n'est pas dans "
+                                                u"le fichier d'import." %
+                                                (model_data['nom_objet'], model_data['champ_primaire'])})]
 
         # Vérification si il y a des champs du fichier d'import qui sont en plusieurs exemplaires et détection champ relation (id, id externe, nom)
         doublons = {}
@@ -1209,28 +1248,44 @@ class OfImport(models.Model):
 
             # Test si est un champ de l'objet (sinon message d'information que le champ est ignoré à l'import)
             if champ_fichier not in champs_odoo:
-                sortie_avertissement += u"Info : colonne \"%s\" dans le fichier d'import non reconnue. Ignorée lors de l'import.\n" % champ_fichier
+                import_warning += [(0, 0, {'type': 'warning',
+                                           'message': u"Info : colonne \"%s\" dans le fichier d'import non reconnue. "
+                                                      u"Ignorée lors de l'import." % champ_fichier})]
             else:
                 # Vérification que le champ relation (si est indiqué) est correct.
                 if champ_relation and champs_odoo[champ_fichier]['type'] in ('many2one', ) and not champs_odoo[champ_fichier]['relation_champ']:
                     if not self.env['ir.model.fields'].search([('model', '=', champs_odoo[champ_fichier]['relation']),
                                                                ('name', '=', champ_relation)]):
-                        sortie_erreur += u"Le champ relation \"%s\" (après le /) de la colonne \"%s\" n'existe pas.\n" % (champ_relation, champ_fichier)
+                        import_error += [(0, 0, {'type': 'error',
+                                                 'message': u"Le champ relation \"%s\" (après le /) de la colonne "
+                                                            u"\"%s\" n'existe pas." %
+                                                            (champ_relation, champ_fichier)})]
                         erreur = 1
                     else:
                         champs_odoo[champ_fichier]['relation_champ'] = champ_relation
                 elif champ_relation:
-                    sortie_erreur += u"Un champ relation (après le /) dans la colonne \"%s\" n'est pas possible pour ce champ.\n" % champ_fichier
+                    import_error += [(0, 0, {'type': 'error',
+                                             'message': u"Un champ relation (après le /) dans la colonne \"%s\" n'est "
+                                                        u"pas possible pour ce champ." % champ_fichier})]
                     erreur = 1
 
         for champ_fichier in doublons:
             # On affiche un message d'avertissement si le champ existe en plusieurs exemplaires et si c'est un champ connu à importer
             if champ_fichier in champs_odoo and doublons[champ_fichier] > 1:
-                sortie_erreur += u"La colonne \"%s\" dans le fichier d'import existe en %s exemplaires.\n" % (champ_fichier, doublons[champ_fichier])
+                import_error += [(0, 0, {'type': 'error',
+                                         'message': u"La colonne \"%s\" dans le fichier d'import existe en %s "
+                                                    u"exemplaires." % (champ_fichier, doublons[champ_fichier])})]
                 erreur = 1
 
         if erreur:  # On arrête si erreur
-            self.write({'nb_total': nb_total, 'nb_ajout': nb_ajout, 'nb_maj': nb_maj, 'nb_echoue': nb_echoue, 'sortie_succes': sortie_succes, 'sortie_avertissement': sortie_avertissement, 'sortie_erreur': sortie_erreur})
+            self.write({'nb_total': nb_total,
+                        'nb_ajout': nb_ajout,
+                        'nb_maj': nb_maj,
+                        'nb_echoue': nb_echoue,
+                        'nb_ignores': nb_ignores,
+                        'import_success_ids': import_success,
+                        'import_warning_ids': import_warning,
+                        'import_error_ids': import_error})
             return
 
         # On ajoute le séparateur (caractère souligné) entre le préfixe et la référence si il n'a pas déjà été mis.
@@ -1253,12 +1308,26 @@ class OfImport(models.Model):
                 break
 
             if (nb_total + 1) % frequence_commit == 0:
-                sortie_avert = sortie_avertissement
                 if model == 'product.template':
                     product_categ_configs = product_categ_config_obj.search([('id', 'not in', product_categ_config_ids)], order='brand_id, categ_origin')
                     if product_categ_configs:
-                        sortie_avert = "\n".join([u"Marque %s : Ajout de la configuration pour la catégorie \"%s\"" % (config.brand_id.name, config.categ_origin) for config in product_categ_configs]) + "\n\n" + sortie_avert
-                self.write({'nb_total': nb_total, 'nb_ajout': nb_ajout, 'nb_maj': nb_maj, 'nb_echoue': nb_echoue, 'sortie_succes': sortie_succes, 'sortie_avertissement': sortie_avert, 'sortie_erreur': sortie_erreur})
+                        for config in product_categ_configs:
+                            import_warning += [(0, 0, {'type': 'warning',
+                                                       'message': u"Marque %s : Ajout de la configuration pour la "
+                                                                  u"catégorie \"%s\"" %
+                                                                  (config.brand_id.name, config.categ_origin)})]
+                self.write({'nb_total': nb_total,
+                            'nb_ajout': nb_ajout,
+                            'nb_maj': nb_maj,
+                            'nb_echoue': nb_echoue,
+                            'nb_ignores': nb_ignores,
+                            'import_success_ids': import_success,
+                            'import_warning_ids': import_warning,
+                            'import_error_ids': import_error})
+
+                import_success = []
+                import_warning = []
+                import_error = []
 
             i = i + 1
             nb_total += 1
@@ -1268,15 +1337,17 @@ class OfImport(models.Model):
 
                 if message:
                     if code == CODE_IMPORT_ERREUR:
-                        sortie_erreur += message
+                        import_error += message
                     else:
-                        sortie_succes += message
+                        import_success += message
             except OfImportError, e:
                 code = CODE_IMPORT_ERREUR
-                sortie_erreur += e.name
+                import_error += e.name
 
             if code == CODE_IMPORT_ERREUR:
                 nb_echoue += 1
+            elif code == CODE_IMPORT_AVERT:
+                nb_ignores += 1
             elif code == CODE_IMPORT_CREATION:
                 nb_ajout += 1
             elif code == CODE_IMPORT_MODIFICATION:
@@ -1285,19 +1356,87 @@ class OfImport(models.Model):
         # On affiche les enregistrements qui étaient en plusieurs exemplaires dans le fichier d'import.
         for cle in doublons:
             if cle == "":
-                sortie_avertissement += u"ATTENTION : les enregistrements suivants ont été créés mais ont un champ référence vide (risque de doublon en cas d'import en plusieurs passes) : ligne(s) %s.\n" % (doublons[cle][1])
+                import_warning += [(0, 0, {'type': 'warning',
+                                           'message': u"ATTENTION : les enregistrements suivants ont été créés mais "
+                                                      u"ont un champ référence vide (risque de doublon en cas d'import "
+                                                      u"en plusieurs passes) : ligne(s) %s." % (doublons[cle][1])})]
             elif doublons[cle][0] > 1:
-                sortie_avertissement += u"%s réf. %s existe en %s exemplaires dans le fichier d'import (lignes %s). Seule la première ligne est importée.\n" % (model_data['nom_objet'].capitalize(), cle, doublons[cle][0], doublons[cle][1])
+                import_warning += [(0, 0, {'type': 'warning',
+                                           'message': u"%s réf. %s existe en %s exemplaires dans le fichier d'import "
+                                                      u"(lignes %s). Seule la première ligne est importée." %
+                                                      (model_data['nom_objet'].capitalize(), cle, doublons[cle][0],
+                                                       doublons[cle][1])})]
 
         # On enregistre les dernières lignes qui ne l'auraient pas été.
-        sortie_avert = sortie_avertissement
         if model == 'product.template':
             product_categ_configs = product_categ_config_obj.search([('id', 'not in', product_categ_config_ids)], order='brand_id, categ_origin')
             if product_categ_configs:
-                sortie_avert = "\n".join([u"Marque %s : Ajout de la configuration pour la catégorie \"%s\" (%s correspondance)" % (config.brand_id.name, config.categ_origin, config.of_import_categ_id and 'avec' or 'sans') for config in product_categ_configs]) + "\n\n" + sortie_avert
-        self.write({'nb_total': nb_total, 'nb_ajout': nb_ajout, 'nb_maj': nb_maj, 'nb_echoue': nb_echoue, 'sortie_succes': sortie_succes, 'sortie_avertissement': sortie_avert, 'sortie_erreur': sortie_erreur, 'date_debut_import' : date_debut, 'date_fin_import' : time.strftime('%Y-%m-%d %H:%M:%S')})
+                for config in product_categ_configs:
+                    import_warning += [(0, 0, {'type': 'warning',
+                                               'message': u"Marque %s : Ajout de la configuration pour la catégorie "
+                                                          u"\"%s\" (%s correspondance)" %
+                                                          (config.brand_id.name, config.categ_origin,
+                                                           config.of_import_categ_id and 'avec' or 'sans')})]
+        self.write({'nb_total': nb_total,
+                    'nb_ajout': nb_ajout,
+                    'nb_maj': nb_maj,
+                    'nb_echoue': nb_echoue,
+                    'nb_ignores': nb_ignores,
+                    'import_success_ids': import_success,
+                    'import_warning_ids': import_warning,
+                    'import_error_ids': import_error,
+                    'date_debut_import': date_debut,
+                    'date_fin_import': time.strftime('%Y-%m-%d %H:%M:%S')})
 
         if not simuler:
             self.write({'state': 'importe'})
 
         return
+
+
+class OFImportMessage(models.Model):
+    _name = 'of.import.message'
+    _description = "Message du journal d'OpenImport"
+
+    import_id = fields.Many2one(comodel_name='of.import', string=u"Import")
+    type = fields.Selection(selection=[('error', u"Erreur"), ('warning', u"vertissement"), ('info', u"Info")],
+                            string=u"Type de message")
+    message = fields.Text(string=u"Message")
+
+    @api.model_cr_context
+    def _auto_init(self):
+        """
+        Recover old import messages
+        """
+        cr = self._cr
+        cr.execute("SELECT * FROM information_schema.tables WHERE table_name = '%s'" % (self._table,))
+        exists = bool(cr.fetchall())
+        res = super(OFImportMessage, self)._auto_init()
+        if not exists:
+            import_ids = self.env['of.import'].search([])
+            for import_id in import_ids:
+                import_success = []
+                import_warning = []
+                import_error = []
+                cr.execute("SELECT sortie_succes FROM of_import WHERE id = '%s'" % (import_id.id,))
+                sortie_succes = cr.fetchone()[0]
+                if sortie_succes:
+                    for line in sortie_succes.splitlines():
+                        if line:
+                            import_success += [(0, 0, {'type': 'info', 'message': line})]
+                cr.execute("SELECT sortie_avertissement FROM of_import WHERE id = '%s'" % (import_id.id,))
+                sortie_avertissement = cr.fetchone()[0]
+                if sortie_avertissement:
+                    for line in sortie_avertissement.splitlines():
+                        if line:
+                            import_warning += [(0, 0, {'type': 'warning', 'message': line})]
+                cr.execute("SELECT sortie_erreur FROM of_import WHERE id = '%s'" % (import_id.id,))
+                sortie_erreur = cr.fetchone()[0]
+                if sortie_erreur:
+                    for line in sortie_erreur.splitlines():
+                        if line:
+                            import_error += [(0, 0, {'type': 'error', 'message': line})]
+                import_id.write({'import_success_ids': import_success,
+                                 'import_warning_ids': import_warning,
+                                 'import_error_ids': import_error})
+        return res
