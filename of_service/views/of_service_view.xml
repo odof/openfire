@@ -173,6 +173,7 @@
                                         </i></b>
                                     </div>
                                     <group colspan="2">
+                                        <field name="date_last" invisible="1"/>
                                         <field name="tache_id" context="{'show_rec_icon_first': recurrence}"/>
                                         <label for="duree" string="Durées"/>
                                         <div>

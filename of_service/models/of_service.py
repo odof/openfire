@@ -51,7 +51,8 @@ class OfService(models.Model):
         return res
 
     @api.multi
-    @api.depends('tache_id', 'address_id', 'duree', 'intervention_ids', 'recurrence', 'recurring_interval', 'recurring_rule_type')
+    @api.depends('tache_id', 'address_id', 'duree', 'intervention_ids', 'recurrence', 'recurring_interval',
+                 'recurring_rule_type', 'intervention_ids.state')
     def _compute_durees(self):
         for service in self:
             plannings = service.intervention_ids
@@ -98,7 +99,7 @@ class OfService(models.Model):
                 date_fin_da = service.date_fin and fields.Date.from_string(service.date_fin) or date_next_da + relativedelta(days=14)
                 if service.recurrence:
                     # service.state_ponc = False
-                    if il_y_a_un_mois_da <= date_next_da <= today_da and \
+                    if il_y_a_un_mois_da <= date_next_da <= dans_un_mois_da and \
                             (not date_last_da or date_last_da < il_y_a_un_mois_da):
                         # prochaine planification à faire dans moins d'un mois
                         # et pas de dernière intervention ou dernière intervention il y a plus d'un mois
@@ -495,8 +496,16 @@ class OfService(models.Model):
             date_next_da = date_from_da + self.get_relative_delta(self.recurring_rule_type, self.recurring_interval)
             date_next_mois_int = date_next_da.month
 
-            res_mois_int = min(mois_ints, key=lambda m: (m < date_next_mois_int, m))
-            res_year_int = date_next_da.year + (res_mois_int < date_next_mois_int)
+            # générer les mois de l'année suivante pour faciliter calcul du mois et de l'année du résultat
+            mois_int_temp = mois_ints + [m + 12 for m in mois_ints]
+
+            res_mois_int = min(mois_int_temp, key=lambda m: (abs(m - date_next_mois_int), m))
+            if res_mois_int > 12:
+                res_next_year = True
+                res_mois_int -= 12
+            else:
+                res_next_year = False
+            res_year_int = date_next_da.year + res_next_year
 
             return fields.Date.to_string(date(year=res_year_int, month=res_mois_int, day=1))
         else:
