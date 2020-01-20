@@ -24,25 +24,76 @@
             </xpath>
             <xpath expr="//notebook" position="inside">
                 <page name="horaires" string="Horaires">
-                    <field name="of_horaire_recap"/>
-                    <button name="%(action_of_horaire_segment_create_form_view)d" string="Créer un horaire" type="action"
-                    context="{
-                        'default_employee_id': id,
-                        'default_mode': 'create',
-                        'default_mode_horaires': of_mode_horaires,
-                    }"/>
-                    <button name="%(action_of_horaire_segment_edit_form_view)d" string="Modifier un horaire" type="action"
-                    context="{
-                        'default_employee_id': id,
-                        'default_mode': 'edit',
-                        'default_mode_horaires': of_mode_horaires,
-                    }"/>
-                    <button name="%(action_of_horaire_segment_unlink_form_view)d" string="Supprimer un horaire" type="action"
-                    context="{
-                        'default_employee_id': id,
-                        'default_mode': 'unlink',
-                        'default_mode_horaires': 'advanced',
-                    }"/>
+                    <group>
+                        <div>
+                            <field name="of_horaire_recap"/>
+                            <button name="%(action_of_horaire_segment_create_form_view)d" string="Créer un horaire" type="action"
+                            context="{
+                                'default_employee_id': id,
+                                'default_mode': 'create',
+                                'default_mode_horaires': of_mode_horaires,
+                            }"/>
+                            <button name="%(action_of_horaire_segment_edit_form_view)d" string="Modifier un horaire" type="action"
+                            context="{
+                                'default_employee_id': id,
+                                'default_mode': 'edit',
+                                'default_mode_horaires': of_mode_horaires,
+                            }"/>
+                            <button name="%(action_of_horaire_segment_unlink_form_view)d" string="Supprimer un horaire" type="action"
+                            context="{
+                                'default_employee_id': id,
+                                'default_mode': 'unlink',
+                                'default_mode_horaires': 'advanced',
+                            }"/>
+                        </div>
+                        <div class="oe_grey">
+                            <i>
+                            <p>
+                                TYPES: <br/>
+                                Il y a deux types d'horaires: temporaires et permanents
+                                <ul>
+                                    <li>
+                                        Permanents: horaires standards de l'employé, À durée indéfinie.
+                                        Un horaire permanent s'arrête quand le suivant commence.
+                                        Pour être pris en compte par les outils de planification, chaque intervenant doit avoir au moins un horaire permanent.
+                                    </li>
+                                    <li>
+                                        Temporaires: horaires avec une date de début et une date de fin.
+                                        Remplace l'horaire permanent entre ces dates.
+                                    </li>
+                                </ul>
+                            </p>
+                            <p>
+                                ACTIONS:
+                                <ul>
+                                    <li>
+                                        "Créer un horaire": Ajouter un horaire temporaire ou changer les horaires standards.
+                                        Les horaires passés sont conservés. À utiliser dans la majeure partie des cas.
+                                    </li>
+                                    <li>
+                                        "Modifier un horaire": Modifier un horaire existant, dont les anciennes valeurs sont perdues.
+                                    </li>
+                                    <li>
+                                        "Supprimer un horaire": supprimer un horaire existant.
+                                    </li>
+                                </ul>
+                            </p>
+                            <p>
+                                MODES DE SÉLECTION:
+                                <ul>
+                                    <li>
+                                        Facile: Entrer les heures de début et de fin du matin et de l'après-midi, puis choisir les jours travaillés.
+                                        Utile pour un employé qui travaille tous les jours aux mêmes heures.
+                                    </li>
+                                    <li>
+                                        Avancé: Entrer un à un les créneaux travaillés. Utile pour personnaliser les horaires d'un employé.
+                                    </li>
+                                </ul>
+                            </p>
+                            </i>
+                        </div>
+                    </group>
+
 
                     <group invisible="1">
                         <group>

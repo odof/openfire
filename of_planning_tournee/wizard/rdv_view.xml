@@ -38,7 +38,7 @@
                         <separator string="Informations" colspan="4"/>
 
                         <group colspan="2" col="2">
-                            <field name="partner_address_id" string="Adresse" widget="selection"/>
+                            <field name="partner_address_id" string="Adresse" options="{'no_edit': True, 'no_open': True, 'no_create': True}"/>
                             <div colspan="2" style="color:red;" attrs="{'invisible': ['|','|',('geo_lat', '!=', 0.0),('geo_lng', '!=', 0.0),('geocode_retry','!=',False)]}">
                                 <i>Cette adresse n'est pas géocodée. pour continuer la recherche vous pouvez la géocoder ou ignorer les données géographiques</i>
                             </div>
@@ -84,11 +84,11 @@
                             <separator string="Résultat" colspan="4" attrs="{'invisible':['|',('zero_dispo','!=',False),('zero_result','!=',False)]}"/>
                             <separator string="Aucun résultat suffisament proche" colspan="4" attrs="{'invisible':[('zero_dispo','!=',True)]}"/>
                             <separator string="Aucun résultat" colspan="4" attrs="{'invisible':[('zero_result','!=',True)]}"/>
-                            <field name="planning_ids" mode="calendar" colspan="4" nolabel="1">
+                            <field name="planning_ids" mode="calendar" colspan="4" nolabel="1" create="0">
                                 <calendar string="Calendrier" date_start="debut_dt" color="employee_id" date_stop="fin_dt" all_day="allday"
                                     attendee_model="hr.employee" color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1"
                                     filters_radio="1" dispo_field="disponible" jump_to="selected" display_states="1"
-                                    force_color_field="force_color" selected_field="selected" create="0">
+                                    force_color_field="force_color" selected_field="selected" create="0" quick_add="0">
                                     <field name="name"/>
                                     <field name="distance" suffix=" km"/>
                                     <field name="duree" suffix=" min"/>
@@ -147,7 +147,7 @@
                         });
                     </script>
                     <field name="allday" invisible="1"/>
-                    <group attrs="{'invisible':[('allday','!=',False)]}">
+                    <group attrs="{'invisible':['|', ('allday', '!=', False), ('date', '=', False)]}">
                         <group>
                             <field name="date" readonly="1"/>
                             <field name="description" readonly="1"/>
@@ -180,7 +180,10 @@
                     <div attrs="{'invisible':[('allday','!=',True)]}">
                         Ce créneau est virtuel. Il existe seulement pour montrer les limites de la recherche.
                     </div>
-                    <footer>
+                    <div attrs="{'invisible':[('date','!=',False)]}">
+                        Pour sélectionner ou voir les informations d'un créneau, veuillez cliquer dessus.
+                    </div>
+                    <footer attrs="{'invisible':[('date','=',False)]}">
                         <button name="button_select" string="Sélectionner ce créneau" type="object" colspan="4" class="btn-primary"
                             attrs="{'invisible': ['|','|',('allday','!=',False),('intervention_id','!=',False),('selected','!=',False)]}"/>
                         <button name="button_confirm" string="Confirmer le RDV" type="object" colspan="4" class="btn-primary"

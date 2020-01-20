@@ -106,24 +106,13 @@
                     <sheet>
                         <div class="oe_button_box" name="button_box">
                             <button class="oe_stat_button" name="action_view_interventions" type="object" icon="fa-calendar">
-                                <field string="RDVs" name="intervention_count" widget="statinfo"/>
+                                <field string="RDVs Tech" name="intervention_count" widget="statinfo"/>
                             </button>
                             <button name="toggle_active" type="object"
                                     class="oe_stat_button" icon="fa-archive"
                                     confirm="Êtes-vous sûr de vouloir archiver/activer ce service ?">
                                 <field name="active" widget="boolean_button"
                                     options='{"terminology": "archive"}'/>
-                            </button>
-                            <button name="toggle_recurrence" type="object" invisible="context.get('bloquer_recurrence')"
-                                    class="oe_stat_button" icon="fa-repeat"
-                                    confirm="Êtes-vous sûr de vouloir activer/désactiver la récurrence de ce service ?">
-                                <field name="recurrence" widget="boolean_button"
-                                    options='{"terminology": {
-                                        "string_true": "Récurrent",
-                                        "hover_true": "Ponctuel?",
-                                        "string_false": "Ponctuel",
-                                        "hover_false": "Récurrent?",
-                                        }}'/>
                             </button>
                         </div>
                         <div class="of_title">
@@ -173,6 +162,7 @@
                                         </i></b>
                                     </div>
                                     <group colspan="2">
+                                        <field name="date_last" invisible="1"/>
                                         <field name="tache_id" context="{'show_rec_icon_first': recurrence}"/>
                                         <label for="duree" string="Durées"/>
                                         <div>
@@ -198,6 +188,7 @@
                                             </span>
                                         </div>
                                         <field name="jour_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                        <field name="recurrence"/>
                                         <field name="mois_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'invisible': [('recurrence', '=', False)]}"/>
                                         <label for="recurring_interval" attrs="{'invisible': [('recurrence', '=', False)]}"/>
                                         <div attrs="{'invisible': [('recurrence', '=', False)]}" col="2">
