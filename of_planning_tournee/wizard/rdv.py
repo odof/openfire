@@ -416,8 +416,9 @@ class OfTourneeRdv(models.TransientModel):
                                 deb, fin = horaires_employee[index_courant]
                             else:
                                 # L'intervention commence avant la fin du créneau courant
-                                if float_compare(deb, intervention_deb, compare_precision) == 1:
-                                    # L'intervention commence au milieu du créneau courant
+                                if float_compare(fin, intervention_deb, compare_precision) == 1 and \
+                                  float_compare(deb, intervention_deb, compare_precision) != 0:
+                                    # L'intervention commence au milieu du créneau courant (et pas en même temps!)
                                     duree += intervention_deb - deb
                                     creneaux_temp.append((deb, intervention_deb))
                             if float_compare(self.duree, duree, compare_precision) != 1:
