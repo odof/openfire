@@ -297,7 +297,7 @@ class OfService(models.Model):
     address_zip = fields.Char('Code Postal', size=24, related='address_id.zip', oldname="partner_zip")
     address_city = fields.Char('Ville', related='address_id.city', oldname="partner_city")
 
-    recurrence = fields.Boolean(string=u"Récurrence", default=True)
+    recurrence = fields.Boolean(string=u"Est récurrente", default=True)
     recurring_rule_type = fields.Selection([
         #('daily', 'Jour(s)'),
         ('weekly', 'Semaine(s)'),
@@ -433,13 +433,13 @@ class OfService(models.Model):
             mois_id = mois[0] and mois[0].id or False
             if mois_id:
                 self.mois_ids = [(4, mois_id, 0)]
-        if self.date_next and not self.date_fin:
+        if self.date_next:
             date_fin = fields.Date.from_string(self.date_next)
-            if self.recurrence:
+            if self.recurrence and not self.date_fin:
                 date_fin += self.get_relative_delta(self.recurring_rule_type, self.recurring_interval * 2)
-            elif 'sav_id' in self._fields:
+            elif not self.recurrence and 'sav_id' in self._fields and self.sav_id:
                 date_fin += relativedelta(weeks=2)
-            else:
+            elif not self.recurrence:
                 date_fin += relativedelta(months=1)
             self.date_fin = fields.Date.to_string(date_fin)
         elif self.date_next and self.date_fin and self.date_next > self.date_fin:
