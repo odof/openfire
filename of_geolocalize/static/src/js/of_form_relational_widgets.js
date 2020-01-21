@@ -97,24 +97,21 @@ FieldMany2One.include({
             // on attend d'avoir set la valeur de geo_lat avant de la verifier :D
 
             $.when(this.dfd_geo_lat).then(function(){
-                //console.log(self,self.get("id"),self.get("tooltip_title"),self.get("geo_lat"),self.get("precision"))
                 var localized = self.check_localized();
                 if(!localized && !self.get("invisible")) {  //&& $('.of_warning_' + self.field_manager.datarecord[self.name][1]).length == 0
-                    //console.log(self.$label.length, self);
                     // n'est pas géolocalisé
                     var options = _.extend({
                         delay: { show: 501, hide: 0 },
                         title: _t("Cliquez ici pour tenter de géolocaliser ce partenaire avec votre géocodeur par défaut"),
                     });
                     if (self.get("precision") == "not_tried" && isNullOrUndef(self.$geo_button)) {
-                        console.log("ICI",self.$label);
                         //setTimeout(function(){
                         self.$geo_button = $('<span/>').addClass('fa fa-map-marker fa-lg of_ws_lr of_icon_button ' + self.get("geo_class_id"))
                         .appendTo(self.$icon_buttons).tooltip(options)
                         .click(self.geocode_fast.bind(self))//;}, 10);
                     }else if (self.get("precision") != "not_tried" && !isNullOrUndef(self.$geo_button)) {
-                        console.log("WHAT?");
                         self.$geo_button.remove()
+                        self.$geo_button = undefined;
                     }
                     options["title"] = _t(self.get('tooltip_title'))
                     if (isNullOrUndef(self.$geo_warning)) {
@@ -122,8 +119,9 @@ FieldMany2One.include({
                         .insertAfter(self.$label).tooltip(options);
                     }
                 }else if (localized) {
-                    console.log("WOOT?",self,self.get("geo_class_id"));
                     $("." + self.get("geo_class_id")).remove();
+                    self.$geo_warning = undefined;
+                    self.$geo_button = undefined;
                 }
             });
         }
