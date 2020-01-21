@@ -63,10 +63,10 @@ FieldMany2One.include({
                         "precision": partners[0]["precision"],
                         "tooltip_title": tooltip_title,
                     });
-                    if (!self.get("id") || !self.get("class_id")) {
+                    if (!self.get("id") || !self.get("geo_class_id")) {
                         self.set({
                             "id": partner_id,
-                            "class_id": "of_geo_partner_m2o_" + partner_id
+                            "geo_class_id": "of_geo_partner_m2o_" + partner_id
                         });
                     }
                     // on peut vérifier la géo_loc maintenant
@@ -87,13 +87,17 @@ FieldMany2One.include({
     render_value: function() {
         var self = this;
         this._super.apply(this, arguments);
+        this.render_geo_buttons();
+    },
+    render_geo_buttons: function() {
+        var self = this;
         if (this.field.relation == 'res.partner') {
             this.dfd_geo_lat = $.Deferred()
             this.set_geo_lat();
             // on attend d'avoir set la valeur de geo_lat avant de la verifier :D
 
             $.when(this.dfd_geo_lat).then(function(){
-                //console.log(self.get("id"),self.get("tooltip_title"),self.get("geo_lat"),self.get("precision"))
+                //console.log(self,self.get("id"),self.get("tooltip_title"),self.get("geo_lat"),self.get("precision"))
                 var localized = self.check_localized();
                 if(!localized && !self.get("invisible")) {  //&& $('.of_warning_' + self.field_manager.datarecord[self.name][1]).length == 0
                     //console.log(self.$label.length, self);
@@ -103,19 +107,23 @@ FieldMany2One.include({
                         title: _t("Cliquez ici pour tenter de géolocaliser ce partenaire avec votre géocodeur par défaut"),
                     });
                     if (self.get("precision") == "not_tried" && isNullOrUndef(self.$geo_button)) {
-                        self.$geo_button = $('<span/>').addClass('fa fa-map-marker fa-lg of_ws_lr of_icon_button ' + self.get("class_id"))
-                        .insertAfter(self.$label).tooltip(options)
-                        .click(self.geocode_fast.bind(self));
+                        console.log("ICI",self.$label);
+                        //setTimeout(function(){
+                        self.$geo_button = $('<span/>').addClass('fa fa-map-marker fa-lg of_ws_lr of_icon_button ' + self.get("geo_class_id"))
+                        .appendTo(self.$icon_buttons).tooltip(options)
+                        .click(self.geocode_fast.bind(self))//;}, 10);
                     }else if (self.get("precision") != "not_tried" && !isNullOrUndef(self.$geo_button)) {
+                        console.log("WHAT?");
                         self.$geo_button.remove()
                     }
                     options["title"] = _t(self.get('tooltip_title'))
                     if (isNullOrUndef(self.$geo_warning)) {
-                        self.$geo_warning = $('<span/>').addClass('fa fa-exclamation-triangle o_tz_warning of_ws_l ' + self.get("class_id"))
+                        self.$geo_warning = $('<span/>').addClass('fa fa-exclamation-triangle o_tz_warning of_ws_l ' + self.get("geo_class_id"))
                         .insertAfter(self.$label).tooltip(options);
                     }
                 }else if (localized) {
-                    $("." + self.get("class_id")).remove();
+                    console.log("WOOT?",self,self.get("geo_class_id"));
+                    $("." + self.get("geo_class_id")).remove();
                 }
             });
         }

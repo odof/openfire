@@ -40,10 +40,10 @@ FieldMany2One.include({
             var OFWebWidgetsUtils = new Model("of.web.widgets.utils");
             OFWebWidgetsUtils.call("est_actif", [record_id, self.field.relation]) // retrieve active from db
                 .then(function (active) {
-                    if (!self.get("id") || !self.get("class_id")) {
+                    if (!self.get("id") || !self.get("active_class_id")) {
                         self.set({
                             "id": record_id,
-                            "class_id": "of_m2o_" + record_id
+                            "active_class_id": "of_m2o_" + record_id
                         });
                     }
                     if(!active) {
@@ -53,25 +53,33 @@ FieldMany2One.include({
                             title: _t("Cet enregistrement est archivé."),
                         });
                         if (isNullOrUndef(self.$active_warning)) {
-                            self.$active_warning = $('<span/>').addClass('fa fa-archive of_ws_l of_red ' + self.get("class_id"))
-                            .insertAfter(self.$label).tooltip(options);
+                            self.$active_warning = $('<span/>').addClass('fa fa-archive of_ws_l of_red ' + self.get("active_class_id"))
+                            .appendTo(self.$icon_buttons).tooltip(options);
                         }
                     }else if (active) {
-                        $("." + self.get("class_id")).remove();
+                        $("." + self.get("active_class_id")).remove();
                         self.$active_warning = undefined;
                     }
                     return active
                 })
         }else if (!isNullOrUndef(self.$active_warning)) {
-            $("." + self.get("class_id")).remove();
+            $("." + self.get("active_class_id")).remove();
             self.$active_warning = undefined;
         }
 
     },
+    renderElement: function() {
+        var self = this;
+        this._super();
+        self.$icon_buttons = $('<span/>')
+            .addClass('of_icon_buttons')
+            .insertAfter(self.$label)
+    },
+
     render_value: function() {
         var self = this;
-        this._super.apply(this, arguments);
-        this.set_active();
+        self._super.apply(self, arguments);
+        self.set_active();
     },
 });
 

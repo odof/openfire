@@ -46,6 +46,7 @@ Fonctionnalités
         'base',
         'web',
         'of_utils',
+        'of_web_widgets',  # ordre des héritages FieldMany2one
     ],
     'external_dependancies': {
         'python': ['requests', 'googlemaps'],
