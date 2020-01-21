@@ -391,7 +391,7 @@ class OfImport(models.Model):
     def _compute_file_type(self):
         """Get file type par extension ('csv', 'xls', 'xlsx', 'ods')"""
         for imp in self:
-            file_name = self.file_name
+            file_name = imp.file_name
             if file_name:
                 splitted = file_name.split(".")
                 if len(splitted) > 1:
