@@ -624,6 +624,10 @@ class SaleOrderLine(models.Model):
         'res.partner.category', compute=lambda *a, **k: {}, search='_search_of_gb_partner_tag_id',
         string="Étiquette client", of_custom_groupby=True)
 
+    of_price_unit_display = fields.Float(related='product_id.list_price', string=u"Prix unitaire", readonly=True)
+    of_product_forbidden_discount = fields.Boolean(
+        related='product_id.of_forbidden_discount', string=u"Remise interdite pour ce produit")
+
     @api.model
     def _search_of_gb_partner_tag_id(self, operator, value):
         return [('order_partner_id.category_id', operator, value)]
@@ -682,6 +686,11 @@ class SaleOrderLine(models.Model):
             name = self.name
             name += '\n' + product.description_fabricant
             self.update({'name': name})
+
+        # Remise interdite
+        if self.product_id and self.product_id.of_forbidden_discount and self.of_discount_formula:
+            self.of_discount_formula = False
+
         return res
 
     def of_get_line_name(self):
