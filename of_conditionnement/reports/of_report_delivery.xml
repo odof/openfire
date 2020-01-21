@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <!-- Inherit report_delivery_document (depuis module stock) -->
+        <template id="of_report_delivery_packaging_unit" inherit_id="stock.report_delivery_document">
+            <xpath expr="//span[@t-field='move.product_id']" position="replace">
+                <t t-if="move.product_id.of_packaging_unit">
+                    <t t-set="name_lines" t-value="move.name.split('\n')"/>
+                    <t t-foreach="name_lines" t-as="name_line">
+                        <span t-esc="name_line"/>
+                        <br/>
+                    </t>
+                </t>
+                <t t-if="not move.product_id.of_packaging_unit">
+                    <span t-field="move.product_id"/>
+                </t>
+            </xpath>
+            <xpath expr="//span[@t-field='pack_operation.product_id']" position="replace">
+                <t t-if="pack_operation.product_id.of_packaging_unit">
+                    <t t-set="name_lines" t-value="pack_operation.move_name.split('\n')"/>
+                    <t t-foreach="name_lines" t-as="name_line">
+                        <span t-esc="name_line"/>
+                        <br/>
+                    </t>
+                </t>
+                <t t-if="not pack_operation.product_id.of_packaging_unit">
+                    <span t-field="pack_operation.product_id"/>
+                </t>
+            </xpath>
+        </template>
+</odoo>

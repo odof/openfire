@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_conditionnement_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.conditionnement.product.template.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='uom_po_id']" position="after">
+                <label for="of_packaging_unit"/>
+                <div>
+                    <field name="of_packaging_unit" class="oe_inline"/>
+                    <field name="of_uom_id_display" nolabel="1" class="oe_inline" style="margin-left:5px;" readonly="True"/> / <field name="of_packaging_type" class="oe_inline"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_conditionnement_sale_order_form_view" model="ir.ui.view">
+        <field name="name">of.conditionnement.sale.order.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/form//field[@name='product_uom']/parent::node()" position="after">
+                <field name="of_display_force_qty" invisible="1"/>
+                <field name="of_force_qty" attrs="{'invisible': [('of_display_force_qty', '=', False)]}"/>
+                <field name="of_display_required_units" invisible="1"/>
+                <field name="of_packaging_unit" attrs="{'invisible': [('of_display_required_units', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
