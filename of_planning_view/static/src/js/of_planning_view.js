@@ -251,8 +251,10 @@ var PlanningView = View.extend({
                 ir_values_model.call("get_default", ["of.intervention.settings", "planningview_filter_intervenant_ids", false])
 
                 .then(function (attendee_ids) {
-                    if (isNullOrUndef(attendee_ids)) {
-                        console.log("A");
+                    if (typeof attendee_ids == "string") {
+                        attendee_ids = JSON.parse(attendee_ids)
+                    }
+                    if (isNullOrUndef(attendee_ids) || attendee_ids.length == 0) {
                         self.filter_attendee_ids = []
                         for (var k in self.all_filters) {
                             self.filter_attendee_ids.push(self.all_filters[k].value);
