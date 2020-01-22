@@ -215,6 +215,13 @@
                 <xpath expr="//field[@name='deposit_product_id_setting']" position="after">
                     <field name="of_deposit_product_categ_id_setting" class="oe_inline"/>
                 </xpath>
+                <xpath expr="//group[@name='quotations_sales']" position="inside">
+                    <label for="of_position_fiscale"/>
+                    <div name="of_position_fiscale">
+                        <field name="of_position_fiscale" class="oe_inline"/>
+                        <span>Forcer l'utilisation des positions fiscales dans les devis/commandes</span>
+                    </div>
+                </xpath>
                 <xpath expr="//div[@id='main']" position="inside">
                     <group name="rubrique_report" string="Devis &amp; commandes PDF">
                         <label for="pdf_adresse_civilite"/>
@@ -331,6 +338,20 @@
                 </xpath>
             </field>
         </record>
+
+    <data noupdate="1">
+    <record model="ir.ui.view" id="of_sale_order_form_fiscal_position_required">
+        <field name="name">of.sale.order.form.fiscal.position.required</field>
+        <field name="model">sale.order</field>
+        <field name="active">False</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='fiscal_position_id']" position="attributes">
+                <attribute name="required">True</attribute>
+            </xpath>
+        </field>
+    </record>
+    </data>
 
 <!--##############################################################################-->
 <!--########################### ______ Compta ______ #############################-->

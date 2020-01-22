@@ -888,6 +888,8 @@ class OFSaleConfiguration(models.TransientModel):
         string="(OF) Couleur fond titres section",
         help=u"Choisissez un couleur de fond pour les titres de section", default="#F0F0F0")
 
+    of_position_fiscale = fields.Boolean(string="(OF) Position fiscale")
+
     @api.multi
     def set_pdf_adresse_nom_parent_defaults(self):
         return self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_nom_parent', self.pdf_adresse_nom_parent)
@@ -940,6 +942,14 @@ class OFSaleConfiguration(models.TransientModel):
     def set_pdf_afficher_multi_echeances_defaults(self):
         return self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_afficher_multi_echeances', self.pdf_afficher_multi_echeances)
 
+    @api.multi
+    def set_of_position_fiscale(self):
+        view = self.env.ref('of_sale.of_sale_order_form_fiscal_position_required')
+        if view:
+            view.write({'active': self.of_position_fiscale})
+        return self.env['ir.values'].sudo().set_default(
+                'sale.config.settings', 'of_position_fiscale',
+                self.of_position_fiscale)
 
 class AccountInvoice(models.Model):
     _name = 'account.invoice'
