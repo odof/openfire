@@ -48,7 +48,7 @@ FieldMany2One.include({
         }else{
             var ResPartner = new Model("res.partner");
             ResPartner._context = ResPartner.context({'active_test': false})
-            ResPartner.query(['id', 'geo_lat', 'precision', 'name']) // retrieve geo_lat from db
+            ResPartner.query(['id', 'geo_lat', 'precision', 'geocoding', 'name']) // retrieve geo_lat from db
                 .filter([['id', '=', partner_id]]) // id
                 .all()
                 .then(function (partners){
@@ -58,17 +58,19 @@ FieldMany2One.include({
                     }else{
                         tooltip_title = "cette adresse n'est pas géolocalisée."
                     }
+                    if (self.get("id") != partner_id && !!self.get("geo_class_id")) {  // value changed
+                        $("." + self.get("geo_class_id")).remove();
+                        self.$geo_warning = undefined;
+                        self.$geo_button = undefined;
+                    }
                     self.set({
                         "geo_lat": partners[0]["geo_lat"],
                         "precision": partners[0]["precision"],
+                        "geocoding": partners[0]["geocoding"],
                         "tooltip_title": tooltip_title,
+                        "id": partner_id,
+                        "geo_class_id": "of_geo_partner_m2o_" + partner_id,
                     });
-                    if (!self.get("id") || !self.get("geo_class_id")) {
-                        self.set({
-                            "id": partner_id,
-                            "geo_class_id": "of_geo_partner_m2o_" + partner_id
-                        });
-                    }
                     // on peut vérifier la géo_loc maintenant
                     self.dfd_geo_lat.resolve();
                     return partners[0]["geo_lat"]
@@ -91,6 +93,7 @@ FieldMany2One.include({
     },
     render_geo_buttons: function() {
         var self = this;
+
         if (this.field.relation == 'res.partner') {
             this.dfd_geo_lat = $.Deferred()
             this.set_geo_lat();
@@ -104,12 +107,12 @@ FieldMany2One.include({
                         delay: { show: 501, hide: 0 },
                         title: _t("Cliquez ici pour tenter de géolocaliser ce partenaire avec votre géocodeur par défaut"),
                     });
-                    if (self.get("precision") == "not_tried" && isNullOrUndef(self.$geo_button)) {
+                    if ((self.get("precision") == "not_tried" || self.get("geocoding") == "not_tried") && isNullOrUndef(self.$geo_button)) {
                         //setTimeout(function(){
                         self.$geo_button = $('<span/>').addClass('fa fa-map-marker fa-lg of_ws_lr of_icon_button ' + self.get("geo_class_id"))
                         .appendTo(self.$icon_buttons).tooltip(options)
                         .click(self.geocode_fast.bind(self))//;}, 10);
-                    }else if (self.get("precision") != "not_tried" && !isNullOrUndef(self.$geo_button)) {
+                    }else if (self.get("precision") != "not_tried" && self.get("geocoding") != "not_tried" && !isNullOrUndef(self.$geo_button)) {
                         self.$geo_button.remove()
                         self.$geo_button = undefined;
                     }

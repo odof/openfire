@@ -38,7 +38,7 @@
                         <separator string="Informations" colspan="4"/>
 
                         <group colspan="2" col="2">
-                            <field name="partner_address_id" string="Adresse" widget="selection"/>
+                            <field name="partner_address_id" string="Adresse" options="{'no_edit': True, 'no_open': True, 'no_create': True}"/>
                             <div colspan="2" style="color:red;" attrs="{'invisible': ['|','|',('geo_lat', '!=', 0.0),('geo_lng', '!=', 0.0),('geocode_retry','!=',False)]}">
                                 <i>Cette adresse n'est pas géocodée. pour continuer la recherche vous pouvez la géocoder ou ignorer les données géographiques</i>
                             </div>
