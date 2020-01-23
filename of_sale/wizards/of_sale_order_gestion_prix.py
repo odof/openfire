@@ -324,7 +324,8 @@ class GestionPrix(models.TransientModel):
 
     @api.multi
     def bouton_inclure_tout(self):
-        self.line_ids.filtered(lambda l: not l.is_selected).write({'is_selected': True})
+        self.line_ids.filtered(lambda l: not l.is_selected and not l.product_forbidden_discount).\
+            write({'is_selected': True})
 
     @api.multi
     def bouton_exclure_tout(self):
@@ -361,6 +362,9 @@ class GestionPrixLine(models.TransientModel):
     marge = fields.Float(string=u"Marge HT", compute='_compute_marge_simul')
     pc_marge = fields.Float(string=u"% Marge", compute='_compute_marge_simul')
     of_client_view = fields.Boolean(string='Vue client/vendeur', related="wizard_id.of_client_view")
+
+    product_forbidden_discount = fields.Boolean(
+        related='order_line_id.product_id.of_forbidden_discount', string=u"Remise interdite pour ce produit")
 
     @api.depends('is_selected')
     def _compute_text_selected(self):
@@ -401,7 +405,7 @@ class SaleOrder(models.Model):
         for line in self.order_line:
             values = {
                 'order_line_id': line.id,
-                'is_selected': bool(line.product_uom_qty and line.price_unit),
+                'is_selected': not line.of_product_forbidden_discount and bool(line.product_uom_qty and line.price_unit),
                 'prix_total_ht_simul': line.price_subtotal,
                 'prix_total_ttc_simul': line.price_total,
             }

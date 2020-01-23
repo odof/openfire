@@ -81,6 +81,7 @@ Droits utilisateurs:
         "of_base",
         "of_gesdoc",
         "of_product",
+        "of_sale_discount",
         "sale",
         "sale_margin",
         "sale_crm",

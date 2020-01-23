@@ -49,6 +49,7 @@
                     </div>
                     <label for="marge"/>
                     <span><field name="marge" class="oe_inline"/>%</span>
+                    <field name="of_forbidden_discount"/>
                 </xpath>
 
                 <xpath expr="//field[@name='type']" position="before">

@@ -35,6 +35,8 @@ class ProductTemplate(models.Model):
 
     of_tag_ids = fields.Many2many('of.product.template.tag', column1='product_id', column2='tag_id', string=u'Étiquettes')
 
+    of_forbidden_discount = fields.Boolean(string=u"Remise interdite")
+
     @api.multi
     @api.depends('lst_price', 'standard_price')
     def _compute_marge(self):
