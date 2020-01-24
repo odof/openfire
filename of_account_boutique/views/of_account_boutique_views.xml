@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_account_boutique_action_invoice_tree" model="ir.actions.act_window">
+        <field name="name">Factures boutiques</field>
+        <field name="res_model">account.invoice</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+        <field eval="False" name="view_id"/>
+        <field name="domain">[('type','in',('out_invoice', 'out_refund')), ('of_boutique', '=', True)]</field>
+        <field name="context">{'type':'out_invoice', 'journal_type': 'sale',
+                               'default_of_boutique': True, 'of_boutique': True,
+                               'form_view_ref': 'of_account_boutique.of_account_boutique_invoice_form'}</field>
+        <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+        <field name="help" type="html">
+          <p class="oe_view_nocontent_create">
+            Click to create a customer invoice.
+          </p><p>
+            Odoo's electronic invoicing allows to ease and fasten the
+            collection of customer payments. Your customer receives the
+            invoice by email and he can pay online and/or import it
+            in his own system.
+          </p><p>
+            The discussions with your customer are automatically displayed at
+            the bottom of each invoice.
+          </p>
+        </field>
+    </record>
+
+    <menuitem action="of_account_boutique.of_account_boutique_action_invoice_tree" id="menu_action_invoice_boutique"
+              parent="account.menu_finance_receivables" sequence="2"/>
+
+     <record id="of_account_boutique_invoice_form" model="ir.ui.view">
+        <field name="name">of.account.boutique.invoice.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="of_account.of_account_invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/label[1]" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <field name="of_boutique" invisible="1"/>
+                    <button type="object" name="action_view_delivery" class="oe_stat_button" icon="fa-truck"
+                        attrs="{'invisible': ['|', ('of_picking_count', '=', 0), ('of_boutique', '=', False)]}">
+                        <field name="of_picking_count" widget="statinfo" string="Livraisons"/>
+                    </button>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='of_etiquette_partenaire_ids']" position="after">
+                <field name="of_warehouse_id" attrs="{'invisible': [('of_boutique', '=', False)]}" options='{"no_open": True, "no_create": True}'/>
+                <field name="of_route_id" attrs="{'invisible': [('of_boutique', '=', False)]}"/>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']" position="attributes">
+                <attribute name="context">{'type': type, 'journal_id': journal_id, 'default_invoice_id': id, 'default_of_route_id': of_route_id, 'of_boutique': of_boutique}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Vue ligne de facture form -->
+    <record id="of_account_invoice_line_form" model="ir.ui.view">
+        <field name="name">of.account.invoice.line.form</field>
+        <field name="model">account.invoice.line</field>
+        <field name="inherit_id" ref="of_account.of_account_invoice_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_tax_ids']" position="after">
+                <field name="of_route_id" invisible="not context.get('of_boutique')"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
