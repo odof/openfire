@@ -74,6 +74,16 @@
                     <attribute name="attrs">{'invisible': [('of_product_forbidden_discount', '=', True)]}</attribute>
                 </xpath>
 
+                <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="before">
+                    <field name="of_price_unit_ht" string="Prix unitaire HT"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="before">
+                    <field name="of_price_unit_ht" string="Prix unitaire HT"
+                      attrs="{'invisible': [('of_price_unit_ht', '=', '_field_price_unit')]}"/>
+                </xpath>
                 <!-- Ajout onglet Notes : client, facture, intervention -->
                 <xpath expr="//notebook" position="inside">
                      <page string="Notes" name="notes">

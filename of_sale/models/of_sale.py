@@ -628,6 +628,25 @@ class SaleOrderLine(models.Model):
     of_product_forbidden_discount = fields.Boolean(
         related='product_id.of_forbidden_discount', string=u"Remise interdite pour ce produit")
 
+    of_price_unit_ht = fields.Float(string='Unit Price',
+        store=True, readonly=True, compute='_compute_amount', help="Unit price without taxes")
+
+    price_unit = fields.Float(help="""
+    Prix unitaire de l'article.
+    À entrer HT ou TTC suivant la TVA de la ligne de commande.
+    Sera toujours affiché HT dans la commande et la commande PDF.
+    """)
+
+    @api.depends('product_uom_qty', 'discount', 'price_unit', 'tax_id')
+    def _compute_amount(self):
+        """
+        Compute the amounts of the SO line.
+        """
+        super(SaleOrderLine, self)._compute_amount()
+        for line in self:
+            if line.product_uom_qty:
+                line.of_price_unit_ht = line.price_subtotal / line.product_uom_qty
+
     @api.model
     def _search_of_gb_partner_tag_id(self, operator, value):
         return [('order_partner_id.category_id', operator, value)]
