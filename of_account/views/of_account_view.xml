@@ -43,6 +43,21 @@
         </field>
     </record>
 
+    <!-- Vue facture tree -->
+    <record id="of_account_invoice_tree" model="ir.ui.view">
+        <field name="name">of.account.invoice.tree</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_tree"/>
+        <field name="arch" type="xml">
+            <field name="number" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="number" position="after">
+                <field name="move_name" string="Numéro"/>
+            </field>
+        </field>
+    </record>
+
     <!-- Vue ligne de facture form -->
     <record id="of_account_invoice_line_form" model="ir.ui.view">
         <field name="name">of.account.invoice.line.form</field>
