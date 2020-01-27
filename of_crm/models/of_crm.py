@@ -92,6 +92,11 @@ class CrmLead(models.Model):
     next_activity_name = fields.Char(related='next_activity_id.name')
     of_color_map = fields.Char(string="Couleur du marqueur", compute="_compute_of_color_map")
 
+    @api.onchange('partner_id')
+    def onchange_partner_id(self):
+        if self.partner_id.user_id:
+            self.user_id = self.partner_id.user_id
+
     @api.multi
     @api.depends('date_action')
     def _compute_of_color_map(self):
@@ -300,6 +305,10 @@ class CrmTeam(models.Model):
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
+    def _get_default_user_id(self):
+        return self._uid
+
+    user_id = fields.Many2one('res.users', default=lambda s: s._get_default_user_id())
     of_customer_state = fields.Selection([
         ('lead', u'Prospect'),
         ('customer', u'Client signé'),
@@ -463,6 +472,8 @@ class SaleOrder(models.Model):
             self.medium_id = self.opportunity_id.medium_id
             self.source_id = self.opportunity_id.source_id
             self.team_id = self.opportunity_id.team_id
+            if self.opportunity_id.user_id and self.state != 'sale':
+                self.user_id = self.opportunity_id.user_id
 
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
