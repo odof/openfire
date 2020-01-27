@@ -610,7 +610,11 @@ class SaleOrderLine(models.Model):
     _name = 'sale.order.line'
     _inherit = ['sale.order.line', 'of.readgroup']
 
-    price_unit = fields.Float(digits=False)
+    price_unit = fields.Float(digits=False, help="""
+    Prix unitaire de l'article.
+    À entrer HT ou TTC suivant la TVA de la ligne de commande.
+    Sera toujours affiché HT dans la commande et la commande PDF.
+    """)
     of_client_view = fields.Boolean(string="Vue client/vendeur", related="order_id.of_client_view")
     of_article_principal = fields.Boolean(string="Article principal", help="Cet article est l'article principal de la commande")
     of_product_categ_id = fields.Many2one(
@@ -628,14 +632,7 @@ class SaleOrderLine(models.Model):
     of_product_forbidden_discount = fields.Boolean(
         related='product_id.of_forbidden_discount', string=u"Remise interdite pour ce produit")
 
-    of_price_unit_ht = fields.Float(string='Unit Price',
-        store=True, readonly=True, compute='_compute_amount', help="Unit price without taxes")
-
-    price_unit = fields.Float(help="""
-    Prix unitaire de l'article.
-    À entrer HT ou TTC suivant la TVA de la ligne de commande.
-    Sera toujours affiché HT dans la commande et la commande PDF.
-    """)
+    of_price_unit_ht = fields.Float(string='Unit Price', compute='_compute_amount', help="Unit price without taxes")
 
     @api.depends('product_uom_qty', 'discount', 'price_unit', 'tax_id')
     def _compute_amount(self):

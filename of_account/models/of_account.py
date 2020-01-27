@@ -100,8 +100,7 @@ class AccountInvoiceLine(models.Model):
         'res.partner.category', compute=lambda *a, **k: {}, search='_search_of_gb_partner_tag_id',
         string="Étiquette client", of_custom_groupby=True)
 
-    of_price_unit_ht = fields.Float(string='Unit Price',
-        store=True, readonly=True, compute='_compute_price', help="Total amount without taxes")
+    of_price_unit_ht = fields.Float(string='Unit Price', compute='_compute_price', help="Total amount without taxes")
 
     price_unit = fields.Float(help="""
     Prix unitaire de l'article.
@@ -116,7 +115,7 @@ class AccountInvoiceLine(models.Model):
     def _compute_price(self):
         super(AccountInvoiceLine, self)._compute_price()
         if self.quantity:
-            self.of_price_unit_ht = self.price_subtotal_signed / self.quantity
+            self.of_price_unit_ht = self.price_subtotal / self.quantity
 
     @api.model
     def _search_of_gb_partner_tag_id(self, operator, value):
