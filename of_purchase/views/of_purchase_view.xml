@@ -99,4 +99,63 @@
         <field name="view_type">form</field>
     </record>
 
+    <!-- Ajout du client sur Bon de réception -->
+    <record id="of_purchase_view_picking_form" model="ir.ui.view">
+        <field name="name">of.purchase.view.picking.form</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='origin']" position="after">
+                <field name="of_location_usage" invisible="1"/>
+                <field name="of_customer_id" attrs="{'invisible': [('of_location_usage', '!=', 'supplier')]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_purchase_view_picking_search" model="ir.ui.view">
+        <field name="name">of.purchase.view.picking.search</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_internal_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="of_customer_id" string="Client final"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_purchase_view_picking_tree" model="ir.ui.view">
+        <field name="name">of.purchase.view.picking.tree</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.vpicktree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="of_customer_id" string="Client final"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_purchase_open_picking" model="ir.actions.act_window">
+        <field name="name">Réceptions</field>
+        <field name="res_model">stock.picking</field>
+        <field name="domain">[]</field> <!-- Force empty -->
+        <field name="view_type">form</field>
+    </record>
+
+    <!-- Smart button des BRs dans les partenaires -->
+    <record id="of_purchase_open_picking_view_partner" model="ir.ui.view">
+        <field name="name">of.purchase.open.picking.view.partner</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="/form/sheet/div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" name="action_view_picking" type="object" icon="fa-shopping-cart">
+                    <div class="o_form_field o_stat_info">
+                        <span class="o_stat_value"><field name="of_br_count"/></span>
+                        <span class="o_stat_text">Réceptions</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>

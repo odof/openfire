@@ -52,6 +52,9 @@ class OfFusionCommandeFournisseur(models.TransientModel):
 
         procurement_orders.write({'purchase_id': fuse_on.id})
         fuse_on.write({'of_sale_order_ids': sale_orders, 'of_fused': True, 'customer_id': customer and customer.id})
+        # màj origin dans les BRs
+        for picking in fuse_on.picking_ids:
+            picking.origin = fuse_on.name
 
         delete_orders = purchase_orders - fuse_on
         for order in delete_orders:

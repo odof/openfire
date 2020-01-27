@@ -10,7 +10,7 @@ class SaleOrder(models.Model):
     @api.depends('purchase_ids', 'of_purchase_id')
     def _compute_purchase_count(self):
         for sale_order in self:
-            sale_order.purchase_count = len(sale_order.purchase_ids + sale_order.of_purchase_id)
+            sale_order.purchase_count = len(sale_order.purchase_ids | sale_order.of_purchase_id)
 
     @api.multi
     def action_view_achats(self):
@@ -55,4 +55,33 @@ class PurchaseOrder(models.Model):
     def action_view_ventes(self):
         action = self.env.ref('of_purchase_fusion.of_purchase_open_ventes').read()[0]
         action['domain'] = ['|', ('of_purchase_id', 'in', self._ids), ('purchase_ids', 'in', self._ids)]
+        return action
+
+class StockMove(models.Model):
+    _inherit = 'stock.move'
+
+    of_customer_id = fields.Many2one('res.partner', related="move_dest_id.partner_id", string="Client")
+
+
+class ResPartner(models.Model):
+    _inherit = 'res.partner'
+
+    def compute_br_count(self):
+        picking_obj = self.env['stock.picking']
+        move_obj = self.env['stock.move']
+        for partner in self:
+            pickings = picking_obj.search([('of_customer_id', '=', partner.id), ('of_location_usage', '=', 'supplier')])
+            pickings |= move_obj.search([('of_customer_id', '=', partner.id)]).mapped('picking_id')
+            partner.of_br_count = len(pickings)
+
+    @api.multi
+    def action_view_picking(self):
+        picking_obj = self.env['stock.picking']
+        move_obj = self.env['stock.move']
+        action = self.env.ref('of_purchase.of_purchase_open_picking').read()[0]
+        pickings = self.env['stock.picking']
+        for partner in self:
+            pickings |= picking_obj.search([('of_customer_id', '=', partner.id), ('of_location_usage', '=', 'supplier')])
+            pickings |= move_obj.search([('of_customer_id', '=', partner.id)]).mapped('picking_id')
+        action['domain'] = [('id', 'in', pickings._ids)]
         return action
