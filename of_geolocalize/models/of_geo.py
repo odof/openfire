@@ -88,22 +88,25 @@ class ResPartner(models.Model):
             # Avoid requests with incomplete data
             return ""
 
+        country = (self.country_id and self.country_id.name) or \
+                  (self.env.user.company_id.country_id and self.env.user.company_id.country_id.name) or u"France"
+
         # zip is not number (test france only)
         if self.zip:
-            if not self.country_id.name or self.country_id.name.upper() == "FRANCE":
+            if country.upper() == "FRANCE":
                 if not self.zip.strip().isdigit():
                     return ""
 
         params = [
-            filter(lambda c: not c.isdigit(), self.street or ''),
-            filter(lambda c: not c.isdigit(), self.street2 or ''),
-            self.zip,
+            filter(lambda c: c != u',', self.street or '') + ' ' +
+            filter(lambda c: c != u',', self.street2 or ''),
+            self.zip + ' ' +
             self.city,
-            self.country_id.name or "France",
+            country,
         ]
         params = [p and p.strip() for p in params]
         params = [p for p in params if p]
-        return " ".join(params)
+        return ", ".join(params)
 
     @api.multi
     def geo_code(self, geocodeur=False):

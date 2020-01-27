@@ -7,6 +7,12 @@
         <field name="model">of.geo.wizard</field>
         <field name="arch" type="xml">
             <form string="Géolocalisation">
+                <script>
+                    $(document).ready(function(){
+                        // élargir le pop-up
+                        $(".modal-dialog").width('80%');
+                    });
+                </script>
                 <field name="show_stats_wizard" invisible="1"/>
                 <separator string="Statistiques" style="margin-top: 0px; margin-bottom: 0px;" attrs="{'invisible':[('show_stats_wizard', '=', False)]}"/>
                 <table class="table table-condensed" attrs="{'invisible':[('show_stats_wizard', '=', False)]}">
@@ -73,6 +79,7 @@
                         <field name="use_nominatim_openfire"/>
                         <field name="use_nominatim_osm"/>
                         <field name="use_bano"/>
+                        <div colspan="2" class="oe_grey"><i>/!\ BANO est seulement valable en France</i></div>
                         <field name="use_google"/> <!-- reaonly if no api key attrs="{'readonly':[('api_key','!=','not')]}"/> -->
                     </group>
                     <group style="margin-top: 0px; padding-top: 0px">
@@ -81,6 +88,13 @@
                         <div style="margin-bottom: 4px; font-weight: bold; font-size: 12pt; color: #7c7bad" colspan="6" attrs="{'invisible':[('nb_selected_partners_success', '=', 0)]}">Traitement partenaires déjà géolocalisées</div>
                         <field name="overwrite_geoloc_all" attrs="{'readonly': [('overwrite_geoloc_except_manual', '=', True)], 'invisible':[('nb_selected_partners_success', '=', 0)]}"/>
                         <field name="overwrite_geoloc_except_manual" attrs="{'readonly': [('overwrite_geoloc_all', '=', True)], 'invisible':[('nb_selected_partners_manual', '=', 0)]}"/>
+                        <field name="overwrite_if_failure"
+                               attrs="{'invisible':[
+                                 '|',
+                                   ('nb_selected_partners_success', '=', 0),
+                                   '&amp;',
+                                     ('overwrite_geoloc_all', '=', False),
+                                     ('overwrite_geoloc_except_manual', '=', False)]}"/>
                     </group>
                 </group>
 
@@ -181,10 +195,13 @@
             <form string="Re-géolocaliser">
                 <button class="btn-primary" name="action_button_geo_openfire" string="OpenFire" type="object" icon="fa-map-marker"/>
                 <button class="btn-primary" name="action_button_geo_osm" string="OpenStreetMap" type="object" style="margin-left: 8px" icon="fa-map-marker"/>
-                <button class="btn-primary" name="action_button_geo_ban" string="BANO" type="object" style="margin-left: 8px" icon="fa-map-marker"/>
+                <button class="btn-primary" name="action_button_geo_ban" string="BANO" type="object" style="margin-left: 8px"
+                        attrs="{'invisible': [('country_name', '!=', u'France')]}" icon="fa-map-marker"/>
                 <button class="btn-primary" name="action_button_geo_google" string="Google Maps" type="object" style="margin-left: 8px" icon="fa-map-marker"/>
                 <button class="oe_right btn-default" special="cancel" string="Annuler" style="margin-left: 8px"/>
                 <button class="oe_right btn-primary" name="action_button_reset_geo_val" type="object" string="Effacer" style="margin-left: 8px" icon="fa-eraser"/>
+                <field name="partner_id" invisible="1"/>
+                <field name="country_name" invisible="1"/>
                 <footer position="replace"><div></div></footer>
             </form>
         </field>
