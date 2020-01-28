@@ -74,13 +74,7 @@
                 <xpath expr="//field[@name='order_line']//form//field[@name='of_discount_formula']" position="attributes">
                     <attribute name="attrs">{'invisible': [('of_product_forbidden_discount', '=', True)]}</attribute>
                 </xpath>
-
-                <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </xpath>
-                <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="before">
-                    <field name="of_price_unit_ht" string="Prix unitaire HT"/>
-                </xpath>
+                <!-- prix unitaire HT dans la vue form des lignes de commande -->
                 <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="before">
                     <field name="of_price_unit_ht" string="Prix unitaire HT"
                       attrs="{'invisible': [('of_price_unit_ht', '=', '_field_price_unit')]}"/>
@@ -250,6 +244,7 @@
                 </xpath>
                 <xpath expr="//div[@id='main']" position="inside">
                     <group name="rubrique_report" string="Devis &amp; commandes PDF">
+                        <field name="pdf_price_unit" widget="radio"/>
                         <label for="pdf_adresse_civilite"/>
                         <div name="pdf_afficher_civilite">
                             <field name="pdf_adresse_civilite" class="oe_inline"/>

@@ -33,13 +33,6 @@
             <xpath expr="//field[@name='date_due']" position="replace">
                 <field name="date_due"/>
             </xpath>
-            <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='price_unit']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
-            <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='price_unit']" position="before">
-                <field name="of_price_unit_ht" string="Prix unitaire HT"/>
-            </xpath>
-
         </field>
     </record>
 
