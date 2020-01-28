@@ -89,6 +89,21 @@ class OfAccountBankReconciliation(models.Model):
                 raise UserError(u'Vous ne pouvez pas valider un rapprochement bancaire avec un écart.')
         self.write({'state': 'done'})
 
+    @api.model
+    def create(self, vals):
+        """ Mettre check_move_validity = False dans le contexte
+        pour pouvoir lier les écritures comptables avec le rapprochement bancaire.
+        """
+        return super(OfAccountBankReconciliation, self.with_context(check_move_validity=False)).create(vals)
+
+    @api.multi
+    def write(self, vals):
+        """ Mettre check_move_validity = False dans le contexte
+        pour pouvoir lier les écritures comptables avec le rapprochement bancaire.
+        """
+        return super(OfAccountBankReconciliation, self.with_context(check_move_validity=False)).write(vals)
+
+
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
