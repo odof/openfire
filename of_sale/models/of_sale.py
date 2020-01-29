@@ -109,6 +109,9 @@ class SaleOrder(models.Model):
     def pdf_afficher_date_validite(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_date_validite_devis')
 
+    def pdf_price_unit(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_price_unit') or 1
+
     def get_color_section(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'of_color_bg_section')
 
@@ -613,7 +616,6 @@ class SaleOrderLine(models.Model):
     price_unit = fields.Float(digits=False, help="""
     Prix unitaire de l'article.
     À entrer HT ou TTC suivant la TVA de la ligne de commande.
-    Sera toujours affiché HT dans la commande et la commande PDF.
     """)
     of_client_view = fields.Boolean(string="Vue client/vendeur", related="order_id.of_client_view")
     of_article_principal = fields.Boolean(string="Article principal", help="Cet article est l'article principal de la commande")
@@ -632,17 +634,22 @@ class SaleOrderLine(models.Model):
     of_product_forbidden_discount = fields.Boolean(
         related='product_id.of_forbidden_discount', string=u"Remise interdite pour ce produit")
 
-    of_price_unit_ht = fields.Float(string='Unit Price', compute='_compute_amount', help="Unit price without taxes")
+    of_price_unit_ht = fields.Float(string='Unit Price excl', compute='_compute_of_price_unit', help="Unit price without taxes", store=True)
+    of_price_unit_ttc = fields.Float(string='Unit Price incl', compute='_compute_of_price_unit',
+                                    help="Unit price with taxes", store=True)
 
-    @api.depends('product_uom_qty', 'discount', 'price_unit', 'tax_id')
-    def _compute_amount(self):
+    @api.depends('price_unit', 'order_id.currency_id', 'order_id.partner_shipping_id', 'product_id',
+                 'price_subtotal', 'product_uom_qty')
+    def _compute_of_price_unit(self):
         """
-        Compute the amounts of the SO line.
+        @ TODO: à fusionner avec _compute_amount
+        :return:
         """
-        super(SaleOrderLine, self)._compute_amount()
         for line in self:
-            if line.product_uom_qty:
-                line.of_price_unit_ht = line.price_subtotal / line.product_uom_qty
+            taxes = line.tax_id.compute_all(line.price_unit, line.order_id.currency_id, 1,
+                                            product=line.product_id, partner=line.order_id.partner_shipping_id)
+            line.of_price_unit_ht = taxes['total_excluded']
+            line.of_price_unit_ttc = taxes['total_included']
 
     @api.model
     def _search_of_gb_partner_tag_id(self, operator, value):
@@ -948,6 +955,12 @@ class OFSaleConfiguration(models.TransientModel):
     pdf_afficher_multi_echeances = fields.Boolean(
         string=u"(OF) Multi-échéances", required=True, default=False,
         help=u"Afficher les échéances multiples dans les rapports PDF ?")
+    pdf_price_unit = fields.Selection([
+            (1, "Afficher en HT"),
+            (2, u"Afficher en TTC"),
+            (3, u"Afficher en HT et en TTC"),
+        ], string="(OF) Prix Unitaire", default=1,
+        help=u"Quel prix unitaire afficher dans les rapports PDF ?")
     of_color_bg_section = fields.Char(
         string="(OF) Couleur fond titres section",
         help=u"Choisissez un couleur de fond pour les titres de section", default="#F0F0F0")
@@ -977,6 +990,12 @@ class OFSaleConfiguration(models.TransientModel):
     @api.multi
     def set_pdf_adresse_email_defaults(self):
         return self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_email', self.pdf_adresse_email)
+
+    @api.multi
+    def set_pdf_price_unit_defaults(self):
+        self.env['ir.values'].sudo().set_default('account.config.settings', 'pdf_price_unit', self.pdf_price_unit)
+        return self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_price_unit',
+                                                        self.pdf_price_unit)
 
     @api.multi
     def set_stock_warning_defaults(self):

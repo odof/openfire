@@ -7,6 +7,7 @@
         <t t-set="pdf_mobile" t-value="doc.pdf_afficher_mobile()"/>
         <t t-set="pdf_fax" t-value="doc.pdf_afficher_fax()"/>
         <t t-set="pdf_email" t-value="doc.pdf_afficher_email()"/>
+        <t t-set="pdf_price_unit" t-value="doc.pdf_price_unit()"/>
         <t t-set="client_info_pastille" t-value="(pdf_telephone &gt; 1 and doc.partner_id.phone) or (pdf_mobile &gt; 1 and doc.partner_id.mobile) or (pdf_fax &gt; 1 and doc.partner_id.fax) or (pdf_email &gt; 1 and doc.partner_id.email)"/>
         <!--####################
             La vue d'origine est entièrement réécrite ici.
@@ -111,7 +112,8 @@
                         <tr>
                             <th name="descr" style="width: 60%">Description</th>
                             <th name="quant" class="text-right">Quantity</th>
-                            <th name="price_unit" class="text-right">Prix/U&amp;nbsp;HT</th>
+                            <th name="price_unit_ht" t-if="pdf_price_unit % 2 == 1" class="text-right">Prix/U&amp;nbsp;HT</th> <!-- HT ou les 2 -->
+                            <th name="price_unit_ttc" t-if="pdf_price_unit >= 2" class="text-right">Prix/U&amp;nbsp;TTC</th> <!-- TTC ou les 2 -->
                             <th name="disc" t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">Disc.(%)</th>
                             <th name="taxe" class="text-right">Taxes</th>
                             <th name="price_ht" class="text-right" groups="sale.group_show_price_subtotal">Prix&amp;nbsp;HT</th>
@@ -149,8 +151,12 @@
                                         <span t-esc="(str(l.product_uom_qty)).rstrip('0').rstrip('.').replace('.', ',')"/>
                                         <span t-field="l.product_uom" groups="product.group_uom"/>
                                     </td>
-                                    <td class="text-right" name="price_unit">
+                                    <td name="price_unit_ht" class="text-right" t-if="pdf_price_unit % 2 == 1">
                                         <span t-field="l.of_price_unit_ht" t-options='{"widget": "monetary",
+                                            "display_currency": doc.pricelist_id.currency_id}'/>
+                                    </td>
+                                    <td name="price_unit_ttc" class="text-right" t-if="pdf_price_unit >= 2">
+                                        <span t-field="l.of_price_unit_ttc" t-options='{"widget": "monetary",
                                             "display_currency": doc.pricelist_id.currency_id}'/>
                                     </td>
                                     <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line"
@@ -356,7 +362,8 @@
                         <th name="descr" style="width: 60%">Description</th>
                         <th name="source" class="hidden">Doc Source</th>
                         <th name="quant" class="text-right">Quantité</th>
-                        <th name="price_unit" class="text-right">Prix/U&amp;nbsp;HT</th>
+                        <th name="price_unit_ht" t-if="pdf_price_unit % 2 == 1" class="text-right">Prix/U&amp;nbsp;HT</th> <!-- HT ou les 2 -->
+                        <th name="price_unit_ttc" t-if="pdf_price_unit >= 2" class="text-right">Prix/U&amp;nbsp;TTC</th> <!-- TTC ou les 2 -->
                         <th name="disc" t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">Réduc.(%)</th>
                         <th name="taxe" class="text-right">TVA</th>
                         <th name="price_ht" class="text-right" groups="sale.group_show_price_subtotal">Prix&amp;nbsp;HT</th>
@@ -393,10 +400,13 @@
                                     <span t-esc="(str(l.quantity)).rstrip('0').rstrip('.').replace('.', ',')"/>
                                     <span t-field="l.uom_id"  groups="product.group_uom"/>
                                 </td>
-                                <td name="price_unit" class="text-right">
-                                    <!-- Nous avons retiré la précision du champ python, il faut donc la forcer dans le qweb -->
+                                <td name="price_unit_ht" t-if="pdf_price_unit % 2 == 1" class="text-right">
                                     <span t-field="l.of_price_unit_ht" t-options="{'precision':2,
-                                        'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                                'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                </td>
+                                <td name="price_unit_ttc" t-if="pdf_price_unit >= 2" class="text-right">
+                                    <span t-field="l.of_price_unit_ttc" t-options="{'precision':2,
+                                                'widget': 'monetary', 'display_currency': o.currency_id}"/>
                                 </td>
                                 <td name="disc" t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
                                     <span t-field="l.discount"/>

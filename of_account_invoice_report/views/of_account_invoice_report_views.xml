@@ -64,6 +64,7 @@
             </xpath>
             <!-- ajout param -->
             <xpath expr="//group[@name='rubrique_report']" position="inside">
+                <field name="pdf_price_unit" widget="radio"/>
                 <label for="pdf_adresse_civilite"/>
                 <div name="pdf_afficher_civilite">
                     <field name="pdf_adresse_civilite" class="oe_inline"/>

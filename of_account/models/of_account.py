@@ -100,22 +100,27 @@ class AccountInvoiceLine(models.Model):
         'res.partner.category', compute=lambda *a, **k: {}, search='_search_of_gb_partner_tag_id',
         string="Étiquette client", of_custom_groupby=True)
 
-    of_price_unit_ht = fields.Float(string='Unit Price', compute='_compute_price', help="Total amount without taxes")
+    of_price_unit_ht = fields.Float(string='Unit Price', compute='_compute_of_price_unit', help="Total amount without taxes", store=True)
+    of_price_unit_ttc = fields.Float(string='Unit Price incl', compute='_compute_of_price_unit',
+                                     help="Unit price with taxes", store=True)
 
     price_unit = fields.Float(help="""
     Prix unitaire de l'article.
     À entrer HT ou TTC suivant la TVA de la ligne de facture.
-    Sera toujours affiché HT dans la facture et la facture PDF.
     """)
 
-    @api.one
-    @api.depends('price_unit', 'discount', 'invoice_line_tax_ids', 'quantity',
-                 'product_id', 'invoice_id.partner_id', 'invoice_id.currency_id', 'invoice_id.company_id',
-                 'invoice_id.date_invoice', 'invoice_id.date')
-    def _compute_price(self):
-        super(AccountInvoiceLine, self)._compute_price()
-        if self.quantity:
-            self.of_price_unit_ht = self.price_subtotal / self.quantity
+    @api.depends('price_unit', 'invoice_id.currency_id', 'invoice_id.partner_id', 'product_id',
+                 'price_subtotal', 'quantity', 'invoice_line_tax_ids')
+    def _compute_of_price_unit(self):
+        """
+        @ TODO: à fusionner avec _compute_price
+        :return:
+        """
+        for line in self:
+            taxes = line.invoice_line_tax_ids.compute_all(line.price_unit, line.invoice_id.currency_id, 1,
+                                            product=line.product_id, partner=line.invoice_id.partner_id)
+            line.of_price_unit_ht = taxes['total_excluded']
+            line.of_price_unit_ttc = taxes['total_included']
 
     @api.model
     def _search_of_gb_partner_tag_id(self, operator, value):
