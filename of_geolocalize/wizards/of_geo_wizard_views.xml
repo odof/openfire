@@ -193,6 +193,12 @@
         <field name="priority">1</field>
         <field name="arch" type="xml">
             <form string="Re-géolocaliser">
+                <group col="4">
+                    <field name="overwrite_if_failure" nolabel="1"/>
+                    <label string="Écraser les coordonnées en cas d'échec de géolocalisation" style="margin-left: -260px"/>
+                </group>
+                <field name="partner_id" invisible="1"/>
+                <field name="country_name" invisible="1"/>
                 <button class="btn-primary" name="action_button_geo_openfire" string="OpenFire" type="object" icon="fa-map-marker"/>
                 <button class="btn-primary" name="action_button_geo_osm" string="OpenStreetMap" type="object" style="margin-left: 8px" icon="fa-map-marker"/>
                 <button class="btn-primary" name="action_button_geo_ban" string="BANO" type="object" style="margin-left: 8px"
@@ -200,8 +206,6 @@
                 <button class="btn-primary" name="action_button_geo_google" string="Google Maps" type="object" style="margin-left: 8px" icon="fa-map-marker"/>
                 <button class="oe_right btn-default" special="cancel" string="Annuler" style="margin-left: 8px"/>
                 <button class="oe_right btn-primary" name="action_button_reset_geo_val" type="object" string="Effacer" style="margin-left: 8px" icon="fa-eraser"/>
-                <field name="partner_id" invisible="1"/>
-                <field name="country_name" invisible="1"/>
                 <footer position="replace"><div></div></footer>
             </form>
         </field>
