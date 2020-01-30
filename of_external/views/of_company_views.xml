@@ -16,6 +16,11 @@
                             <field name="of_position_header_lines"/>
                             <button name="%(of_external_open_mako_wizard_action)d" type="action"
                               string="Variables Mako" class="pull-right" icon="fa-question"/>
+                            <field name="of_max_height_bandeau" groups="base.group_no_one"/>
+                            <newline/>
+                            <div attrs="{'invisible':[('of_position_header_lines','!=','bandeau_pastille'),('of_position_header_lines','!=','bandeau_totalite')]}" colspan="3">
+                                Le logo doit s'appeler "Bandeau".
+                            </div>
                         </group>
                         <div>
                             <div>Ligne 1 : </div>
@@ -44,8 +49,17 @@
                                 <field name="of_custom_header_line_3" nolabel="1" class="oe_inline" 
                                   placeholder="remplacer par le contenu voulu pour la ligne 3" style="min-width: 90%;"/>
                                 <br/>
-                                <span>Taille: </span>
+                                <span>Size: </span>
                                 <field name="of_custom_header_line_3_size" class="oe_inline"/>
+                            </div>
+                            <div>Ligne 4 : </div>
+                            <div style="padding: 8px 16px; border: 1px dotted lightgray">
+                                <span style="max-width: 10%">Contenu : </span>
+                                <field name="of_custom_header_line_4" nolabel="1" class="oe_inline"
+                                  placeholder="remplacer par le contenu voulu pour la ligne 4" style="min-width: 90%"/>
+                                <br/>
+                                <span>Size: </span>
+                                <field name="of_custom_header_line_4_size" class="oe_inline"/>
                             </div>
                         </div>
 

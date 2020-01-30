@@ -5,29 +5,49 @@
 
     <!--  On redéfinit totalement l'en-tête par défaut d'Odoo par un en-tête personnalisable. -->
     <div class="header">
-        <div style="height: 132px; padding-top: 16px">
-            <div name="company_header" style="width: 73%; display: inline-block; vertical-align: top;">
+        <!-- Si bandeau image en totalité -->
+        <div t-if="company.of_position_header_lines == 'bandeau_totalite'" name="cadre_bandeau_totalite" class="header">
+            <div style="height: 132px;">
+                <img t-att-src="'data:image/png;base64,%s' % company.getLogo('Bandeau')" t-attf-style="max-height: #{company.of_max_height_bandeau}"/>
+            </div>
+        </div>
+
+        <!-- Si bandeau image + pastille ou en-tête logo société et adresse configurable à droite ou en dessous-->
+        <div t-if="company.of_position_header_lines != 'bandeau_totalite'" name="cadre_adresse_pastille" t-attf-style="max-height: #{company.of_max_height_bandeau}; padding-top: 16px;">
+            <!-- Si bandeau image + pastille -->
+            <div t-if="company.of_position_header_lines == 'bandeau_pastille'" name="company_header_image_pastille" style="width: 73%; display: inline-block; vertical-align: top;">
+                <img t-att-src="'data:image/png;base64,%s' % company.getLogo('Bandeau')" t-attf-style="max-height: #{company.of_max_height_bandeau}; max-width: 665px;"/>
+            </div>
+
+            <!-- Si en-tête logo société et adresse configurable à droite ou en dessous -->
+            <div t-if="company.of_position_header_lines != 'bandeau_pastille'" name="company_header" style="width: 73%; display: inline-block; vertical-align: top;">
                 <div name="company_header_logo" style="display: inline-block; vertical-align: top;">
-                    <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo" style="max-height: 128px; max-width: 192px;"/>
+                    <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo" t-attf-style="max-height: #{company.of_max_height_bandeau}; max-width: 192px;"/>
                 </div>
+                <t t-set="ligne1" t-value="company.get_line_content('header', 1)"/>
+                <t t-set="ligne2" t-value="company.get_line_content('header', 2)"/>
+                <t t-set="ligne3" t-value="company.get_line_content('header', 3)"/>
+                <t t-set="ligne4" t-value="company.get_line_content('header', 4)"/>
                 <div name="company_header_center" style="min-width: 60%; display: inline-block; vertical-align: top; padding-left: 8px;">
                     <!-- Les multi-logos viennent là. -->
                     <div name="company_header_center_top" style="display: block;"/>
 
                     <div name="company_address_right" t-if="company.of_position_header_lines == 'logo_right'" style="min-width: 99%;">
                         <div style="display: inline-block; min-width: 99%; vertical-align: top;">
-                            <span t-esc="company.get_line_content('header', 1)" t-attf-style="font-size: #{company.of_custom_header_line_1_size};"/><br/>
-                            <span t-esc="company.get_line_content('header', 2)" t-attf-style="font-size: #{company.of_custom_header_line_2_size};"/><br/>
-                            <span name="of_custom_header_line_3_right" t-esc="company.get_line_content('header', 3)" t-attf-style="font-size: #{company.of_custom_header_line_3_size};"/>
+                            <t t-if="ligne1"><span name="of_custom_header_line_1_right" t-esc="ligne1" t-attf-style="font-size: #{company.of_custom_header_line_1_size};"/><br/></t>
+                            <t t-if="ligne2"><span name="of_custom_header_line_2_right" t-esc="ligne2" t-attf-style="font-size: #{company.of_custom_header_line_2_size};"/><br/></t>
+                            <t t-if="ligne3"><span name="of_custom_header_line_3_right" t-esc="ligne3" t-attf-style="font-size: #{company.of_custom_header_line_3_size};"/><br/></t>
+                            <t t-if="ligne4"><span name="of_custom_header_line_4_right" t-esc="ligne4" t-attf-style="font-size: #{company.of_custom_header_line_4_size};"/></t>
                         </div>
                     </div>
                 </div>
                 <br t-if="company.of_position_header_lines == 'logo_under'"/>
                 <div t-if="company.of_position_header_lines == 'logo_under'" style="min-width: 99%; display: inline-block;">
                     <div name="company_address" style="display: inline-block; min-width: 50%; vertical-align: top;">
-                        <span t-esc="company.get_line_content('header', 1)" t-attf-style="font-size: #{company.of_custom_header_line_1_size};"/><br/>
-                        <span t-esc="company.get_line_content('header', 2)" t-attf-style="font-size: #{company.of_custom_header_line_2_size};"/><br/>
-                        <span name="of_custom_header_line_3" t-esc="company.get_line_content('header', 3)" t-attf-style="font-size: #{company.of_custom_header_line_3_size};"/>
+                        <t t-if="ligne1"><span name="of_custom_header_line_1" t-esc="ligne1" t-attf-style="font-size: #{company.of_custom_header_line_1_size};"/><br/></t>
+                        <t t-if="ligne2"><span name="of_custom_header_line_2" t-esc="ligne2" t-attf-style="font-size: #{company.of_custom_header_line_2_size};"/><br/></t>
+                        <t t-if="ligne3"><span name="of_custom_header_line_3" t-esc="ligne3" t-attf-style="font-size: #{company.of_custom_header_line_3_size};"/><br/></t>
+                        <t t-if="ligne4"><span name="of_custom_header_line_4" t-esc="ligne4" t-attf-style="font-size: #{company.of_custom_header_line_4_size};"/></t>
                     </div>
                 </div>
             </div>
