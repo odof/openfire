@@ -82,14 +82,17 @@ class ResPartner(models.Model):
         ], default='not_tried', readonly=True, help=u"Niveau de précision de la géolocalisation")
     street_query = fields.Char(string=u"Adresse requête", readonly=True)
 
+    def get_geocoding_country(self):
+        return (self.country_id and self.country_id.name) or \
+               (self.env.user.company_id.country_id and self.env.user.company_id.country_id.name) or u"France"
+
     # Get address data from db (same format for all geocoders)
     def get_addr_params(self):
         if not (self.zip or self.city):
             # Avoid requests with incomplete data
             return ""
 
-        country = (self.country_id and self.country_id.name) or \
-                  (self.env.user.company_id.country_id and self.env.user.company_id.country_id.name) or u"France"
+        country = self.get_geocoding_country()
 
         # zip is not number (test france only)
         if self.zip:
@@ -100,8 +103,7 @@ class ResPartner(models.Model):
         params = [
             filter(lambda c: c != u',', self.street or '') + ' ' +
             filter(lambda c: c != u',', self.street2 or ''),
-            self.zip + ' ' +
-            self.city,
+            self.zip or '' + ' ' + self.city or '',
             country,
         ]
         params = [p and p.strip() for p in params]
@@ -209,6 +211,13 @@ class ResPartner(models.Model):
             # Get geocoder by default
             res_geocoder_by_default = self.env['ir.config_parameter'].get_param('geocoder_by_default')
 
+            # Ne pas utiliser BANO si le pays n'est pas la France
+            if res_geocoder_by_default == 'bano':
+                for rec in self:
+                    if rec.get_geocoding_country() != u"France":
+                        res_geocoder_by_default = 'nominatim_osm'
+                        break
+
             # Reset geocoder use
             use_openfire = use_osm = use_bano = use_google = False
 
@@ -232,6 +241,7 @@ class ResPartner(models.Model):
                 'best_precision': False,
                 'overwrite_geoloc_all': True,
                 'overwrite_geoloc_except_manual': False,
+                'overwrite_if_failure': True,
             })
             wizard.action_geocode()
         return result

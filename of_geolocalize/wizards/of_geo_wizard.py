@@ -145,7 +145,7 @@ class OFGeoWizard(models.TransientModel):
     # Selected Partners
     partner_ids = fields.Many2many('res.partner', string=u"Partenaires sélectionnés", default=_get_partner_ids)
     partner_id = fields.Many2one('res.partner', string=u"Partenaire à géocoder")
-    country_name = fields.Char(string=u"Pays du partenaire", related="partner_id.country_id.name", readonly=True)
+    country_name = fields.Char(string=u"Pays du partenaire", compute='_compute_partner_country_name')
 
     nb_selected_partners = fields.Integer(string=u'Nb partenaires sélectionnés', compute='_compute_selected_stats', readonly=True)
     nb_selected_partners_success = fields.Integer(string=u'Nb partenaires sélectionnés reussi', compute='_compute_selected_stats', readonly=True)
@@ -159,6 +159,10 @@ class OFGeoWizard(models.TransientModel):
     def onchange_overwrite_geoloc(self):
         if not (self.overwrite_geoloc_all or self.overwrite_geoloc_except_manual):
             self.overwrite_if_failure = False
+
+    @api.onchange('partner_id')
+    def _compute_partner_country_name(self):
+        self.country_name = self.partner_id.get_geocoding_country()
 
     @api.onchange('partner_ids', 'overwrite_geoloc_all', 'overwrite_geoloc_except_manual')
     def _compute_selected_stats(self):
@@ -277,7 +281,7 @@ class OFGeoWizard(models.TransientModel):
             self.openfire_fail += 1
             return 'failure', geocodeur, lat, lng, precision
 
-        partner_zip = partner.zip
+        partner_zip = partner.zip or res[0].get('address', {}).get('postcode', '').strip()
         for prop in res:
             prop_address = prop.get('address', {})
             prop_zip = prop_address.get('postcode', '').strip()
@@ -347,7 +351,7 @@ class OFGeoWizard(models.TransientModel):
             self.osm_fail += 1
             return 'failure', geocodeur, lat, lng, precision
 
-        partner_zip = partner.zip
+        partner_zip = partner.zip or res[0].get('address', {}).get('postcode', '').strip()
         for prop in res:
             prop_address = prop.get('address', {})
             prop_zip = prop_address.get('postcode', '').strip()
@@ -798,15 +802,21 @@ class OFGeoWizard(models.TransientModel):
             raise UserError((u"L'URL du géocodeur OpenFire ne semble pas correcte: %s. Vérifiez votre paramétrage ou utilisez un autre géocodeur") % API_URL)
 
         results = self.geo_openfire(partner)
-        partner.write({
-            'geocoding': results[0],
-            'geocodeur': results[1],
-            'geo_lat': results[2],
-            'geo_lng': results[3],
-            'precision': results[4],
-            'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
-            'geocoding_response': json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
-        })
+
+        to_update = True
+        if (partner.geo_lat != 0 or partner.geo_lng != 0) and not self.overwrite_if_failure and \
+                results[0] == 'failure':
+            to_update = False
+        if to_update:
+            partner.write({
+                'geocoding': results[0],
+                'geocodeur': results[1],
+                'geo_lat': results[2],
+                'geo_lng': results[3],
+                'precision': results[4],
+                'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
+                'geocoding_response': json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
+            })
         return True
 
     def action_button_geo_osm(self):
@@ -826,15 +836,20 @@ class OFGeoWizard(models.TransientModel):
 
         results = self.geo_osm(partner)
 
-        partner.write({
-            'geocoding': results[0],
-            'geocodeur': results[1],
-            'geo_lat': results[2],
-            'geo_lng': results[3],
-            'precision': results[4],
-            'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
-            'geocoding_response': json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
-        })
+        to_update = True
+        if (partner.geo_lat != 0 or partner.geo_lng != 0) and not self.overwrite_if_failure and \
+                results[0] == 'failure':
+            to_update = False
+        if to_update:
+            partner.write({
+                'geocoding': results[0],
+                'geocodeur': results[1],
+                'geo_lat': results[2],
+                'geo_lng': results[3],
+                'precision': results[4],
+                'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
+                'geocoding_response': json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
+            })
         return True
 
     def action_button_geo_ban(self):
@@ -853,15 +868,20 @@ class OFGeoWizard(models.TransientModel):
             raise UserError((u"L'URL du géocodeur BANO ne semble pas correcte: %s. Vérifiez votre paramétrage ou utilisez un autre géocodeur") % API_URL)
 
         results = self.geo_ban(partner)
-        partner.write({
-            'geocoding': results[0],
-            'geocodeur': results[1],
-            'geo_lat': results[2],
-            'geo_lng': results[3],
-            'precision': results[4],
-            'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
-            'geocoding_response': json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
-        })
+        to_update = True
+        if (partner.geo_lat != 0 or partner.geo_lng != 0) and not self.overwrite_if_failure and \
+                results[0] == 'failure':
+            to_update = False
+        if to_update:
+            partner.write({
+                'geocoding': results[0],
+                'geocodeur': results[1],
+                'geo_lat': results[2],
+                'geo_lng': results[3],
+                'precision': results[4],
+                'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
+                'geocoding_response': json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
+            })
         return True
 
     def action_button_geo_google(self):
@@ -880,15 +900,20 @@ class OFGeoWizard(models.TransientModel):
             raise UserError((u"L'URL du géocodeur Google Maps ne semble pas correcte: %s. Vérifiez votre paramétrage ou désactivez ce géocodeur") % API_URL)
 
         results = self.geo_google(partner)
-        partner.write({
-            'geocoding': results[0],
-            'geocodeur': results[1],
-            'geo_lat': results[2],
-            'geo_lng': results[3],
-            'precision': results[4],
-            'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
-            'geocoding_response': json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
-        })
+        to_update = True
+        if (partner.geo_lat != 0 or partner.geo_lng != 0) and not self.overwrite_if_failure and \
+                results[0] == 'failure':
+            to_update = False
+        if to_update:
+            partner.write({
+                    'geocoding': results[0],
+                    'geocodeur': results[1],
+                    'geo_lat': results[2],
+                    'geo_lng': results[3],
+                    'precision': results[4],
+                    'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
+                    'geocoding_response': json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
+                })
         return True
 
     def action_button_reset_geo_val(self):
@@ -927,9 +952,7 @@ class OFGeoWizard(models.TransientModel):
                 continue
 
             for partner in self.partner_ids:
-                partner_country = (partner.country_id and partner.country_id.name) or\
-                                  (self.env.user.company_id.country_id and self.env.user.company_id.country_id.name) or\
-                                  u"France"
+                partner_country = partner.get_geocoding_country()
                 if (self.overwrite_geoloc_all or
                     (self.overwrite_geoloc_except_manual and partner.geocoding != 'manual') or
                     partner.geocoding not in ('success_openfire', 'success_osm', 'success_bano', 'success_google', 'manual', 'no_address')
