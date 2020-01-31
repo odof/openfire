@@ -28,9 +28,6 @@ class AccountInvoice(models.Model):
     def pdf_afficher_email(self):
         return self.env['ir.values'].get_default('account.config.settings', 'pdf_adresse_email') or 0
 
-    def pdf_price_unit(self):
-        return self.env['ir.values'].get_default('account.config.settings', 'pdf_price_unit') or 1
-
     @api.multi
     def _of_get_total_lines_by_group(self):
         """
@@ -284,12 +281,6 @@ class AccountConfigSettings(models.TransientModel):
     pdf_display_product_ref = fields.Boolean(
         string="(OF) Réf. produits", required=True, default=False,
         help="Afficher les références produits dans les rapports PDF ?")
-    pdf_price_unit = fields.Selection([
-        (1, "Afficher en HT"),
-        (2, u"Afficher en TTC"),
-        (3, u"Afficher en HT et en TTC"),
-    ], string="(OF) Prix Unitaire", default=1,
-        help=u"Quel prix unitaire afficher dans les rapports PDF ?")
 
     @api.multi
     def set_pdf_adresse_nom_parent_defaults(self):
@@ -319,10 +310,6 @@ class AccountConfigSettings(models.TransientModel):
     def set_pdf_display_product_ref_defaults(self):
         return self.env['ir.values'].sudo().set_default('account.config.settings', 'pdf_display_product_ref', self.pdf_display_product_ref)
 
-    @api.multi
-    def set_pdf_price_unit_defaults(self):
-        self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_price_unit', self.pdf_price_unit)
-        return self.env['ir.values'].sudo().set_default('account.config.settings', 'pdf_price_unit', self.pdf_price_unit)
 
 class OFInvoiceReportTotalGroup(models.Model):
     _name = 'of.invoice.report.total.group'

@@ -109,9 +109,6 @@ class SaleOrder(models.Model):
     def pdf_afficher_date_validite(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_date_validite_devis')
 
-    def pdf_price_unit(self):
-        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_price_unit') or 1
-
     def get_color_section(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'of_color_bg_section')
 
@@ -955,12 +952,6 @@ class OFSaleConfiguration(models.TransientModel):
     pdf_afficher_multi_echeances = fields.Boolean(
         string=u"(OF) Multi-échéances", required=True, default=False,
         help=u"Afficher les échéances multiples dans les rapports PDF ?")
-    pdf_price_unit = fields.Selection([
-            (1, "Afficher en HT"),
-            (2, u"Afficher en TTC"),
-            (3, u"Afficher en HT et en TTC"),
-        ], string="(OF) Prix Unitaire", default=1,
-        help=u"Quel prix unitaire afficher dans les rapports PDF ?")
     of_color_bg_section = fields.Char(
         string="(OF) Couleur fond titres section",
         help=u"Choisissez un couleur de fond pour les titres de section", default="#F0F0F0")
@@ -990,12 +981,6 @@ class OFSaleConfiguration(models.TransientModel):
     @api.multi
     def set_pdf_adresse_email_defaults(self):
         return self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_email', self.pdf_adresse_email)
-
-    @api.multi
-    def set_pdf_price_unit_defaults(self):
-        self.env['ir.values'].sudo().set_default('account.config.settings', 'pdf_price_unit', self.pdf_price_unit)
-        return self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_price_unit',
-                                                        self.pdf_price_unit)
 
     @api.multi
     def set_stock_warning_defaults(self):
