@@ -558,7 +558,12 @@ class ProjectIssue(models.Model):
         """
         Surcharge de la fonction pour afficher toutes les étapes existantes sur vue kanban
         """
-        return stages.search([], order=order)
+        search_domain = ['|', ('project_ids', '=', False), ('id', 'in', stages.ids)]
+        # retrieve project_id from the context, add them to already fetched columns (ids)
+        if 'default_project_id' in self.env.context:
+            search_domain = ['|', ('project_ids', '=', self.env.context['default_project_id'])] + search_domain
+        # perform search
+        return stages.search(search_domain, order=order)
 
 # Catégorie de SAV
 class OfProjectIssueCategorie(models.Model):
