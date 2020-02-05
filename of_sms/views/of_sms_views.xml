@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Action "Envoyer SMS" dans vue formaulaire partenaires et prospects (res.partner) -->
+    <!-- Action "Envoyer SMS" dans vue formulaire partenaires et prospects (res.partner) -->
     <record id="of_sms_partner_more_menu_server_action" model="ir.actions.server">
         <field name="name">Envoyer SMS</field>
         <field name="model_id" ref="model_res_partner"/>
@@ -16,7 +16,7 @@
         <field name="value" eval="'ir.actions.server,%d'%of_sms_partner_more_menu_server_action"/>
     </record>
 
-    <!-- Action "Envoyer SMS" dans vue formaulaire opportunités/pipeline (crm.lead) -->
+    <!-- Action "Envoyer SMS" dans vue formulaire opportunités/pipeline (crm.lead) -->
     <record id="of_sms_lead_more_menu_server_action" model="ir.actions.server">
         <field name="name">Envoyer SMS</field>
         <field name="model_id" ref="model_crm_lead"/>
@@ -44,6 +44,36 @@
         <field name="model" eval="'of.planning.intervention'"/>
         <field name="key2" eval="'client_action_multi'" />
         <field name="value" eval="'ir.actions.server,%d'%of_sms_intervention_more_menu_server_action"/>
+    </record>
+
+    <!-- Action "Envoyer SMS" pour le modèle sale.order -->
+    <record id="of_sms_sale_order_more_menu_server_action" model="ir.actions.server">
+        <field name="name">Envoyer SMS</field>
+        <field name="model_id" ref="model_sale_order"/>
+        <field name="condition">True</field>
+        <field name="state">code</field>
+        <field name="code">action = record.sms_action()</field>
+    </record>
+    <record id="of_sms_sale_order_more_menu_client_action" model="ir.values">
+        <field name="name">SMS Partner</field>
+        <field name="model" eval="'sale.order'"/>
+        <field name="key2" eval="'client_action_multi'" />
+        <field name="value" eval="'ir.actions.server,%d'%of_sms_sale_order_more_menu_server_action"/>
+    </record>
+
+    <!-- Action "Envoyer SMS" pour le modèle account.invoice -->
+    <record id="of_sms_account_invoice_more_menu_server_action" model="ir.actions.server">
+        <field name="name">Envoyer SMS</field>
+        <field name="model_id" ref="model_account_invoice"/>
+        <field name="condition">True</field>
+        <field name="state">code</field>
+        <field name="code">action = record.sms_action()</field>
+    </record>
+    <record id="of_sms_account_invoice_more_menu_client_action" model="ir.values">
+        <field name="name">SMS Partner</field>
+        <field name="model" eval="'account.invoice'"/>
+        <field name="key2" eval="'client_action_multi'" />
+        <field name="value" eval="'ir.actions.server,%d'%of_sms_account_invoice_more_menu_server_action"/>
     </record>
 
     <!-- Vue partenaire formulaire : ajouter exemple de paramètre (placeholder) pour le champ mobile format international -->

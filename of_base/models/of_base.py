@@ -793,16 +793,20 @@ class OFPhoneNumberConverter(models.TransientModel):
             phone_number = phonenumbers.parse(value)
             if phone_number:
                 return {
-                    'international': phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.INTERNATIONAL),
+                    'e164': phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164),
+                    'international': phonenumbers.format_number(
+                        phone_number, phonenumbers.PhoneNumberFormat.INTERNATIONAL),
                     'national': phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.NATIONAL),
                 }
             else:
                 return {
+                    'e164': None,
                     'international': None,
                     'national': None,
                 }
         except:
             return {
+                'e164': None,
                 'international': None,
                 'national': None,
             }
