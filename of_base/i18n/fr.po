@@ -19,3 +19,8 @@ msgstr ""
 #: model:ir.ui.view,arch_db:of_base.of_base_login
 msgid "Login"
 msgstr "Identifiant"
+
+#. module: of_base
+#: model:ir.ui.view,arch_db:of_base.of_base_partner_form
+msgid "e.g. Sales Director"
+msgstr "ex : Directeur Commercial"
