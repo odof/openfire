@@ -7,7 +7,7 @@
 
         <!-- Filtres recherche devis / commande -->
         <record id="of_sale_view_devis_search" model="ir.ui.view">
-            <field name="name">of.view.novagroupe.devis.search</field>
+            <field name="name">of.sale.view.devis.search</field>
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_sales_order_filter"/>
             <field name="arch" type="xml">

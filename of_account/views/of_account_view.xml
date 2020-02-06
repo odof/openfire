@@ -66,8 +66,8 @@
     </record>
 
     <!-- Filtres recherche factures -->
-    <record id="of_sale_view_invoice_search" model="ir.ui.view">
-        <field name="name">of.sale.view.invoice.search</field>
+    <record id="of_account_view_invoice_search" model="ir.ui.view">
+        <field name="name">of.account.view.invoice.search</field>
         <field name="model">account.invoice</field>
         <field name="inherit_id" ref="account.view_account_invoice_filter"/>
         <field name="arch" type="xml">
