@@ -82,7 +82,7 @@ class AccountInvoice(models.Model):
         """
         Recalcul auto du journal par défaut en fonction de la société.
         """
-        self.journal_id = self.with_context(company_id=self.company_id.id)._default_journal()
+        self.journal_id = self.with_context(company_id=self.company_id.id).default_get(['journal_id'])['journal_id']
 
 class AccountInvoiceLine(models.Model):
     _name = 'account.invoice.line'
