@@ -321,6 +321,7 @@ class GestionPrix(models.TransientModel):
             text = u"Remise exceptionnelle déduite de %s.\n"
             text = text % (format_amount(self.env, total_ttc_init - total_ttc_fin, cur))
             order.note = text + (order.note or '')
+        order.write({'of_echeance_line_ids': order._of_compute_echeances()})
 
     @api.multi
     def bouton_inclure_tout(self):
