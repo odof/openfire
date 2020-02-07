@@ -142,34 +142,37 @@ var PlanningView = View.extend({
                 this.info_fields.push(this.fields_view.arch.children[fld].attrs.name); // don't add field to description if invisible="1"
             }
         }
-        console.log("PLANNING VIEW THIS: ",this);
+
         this.first_search_done = false;
+        // debounce des handlers de click pour éviter le multiclick
         this.on_today_clicked = _.debounce(this.on_today_clicked, 300, true);
         this.on_next_clicked = _.debounce(this.on_next_clicked, 300, true);
         this.on_prev_clicked = _.debounce(this.on_prev_clicked, 300, true);
     },
     /**
-     *
+     *  Appel des fonction asynchrones qui doivent être terminées avant le lancement de la vue
      */
      willStart: function () {
-        //console.log("WILLSTART");
         var self = this;
-        var write_def = this.dataset.call("check_access_rights", ["write", false]);
-        var create_def = this.dataset.call("check_access_rights", ["create", false]);
+        var write_def = this.dataset.call("check_access_rights", ["write", false]);  // vérifier droits d'écriture
+        var create_def = this.dataset.call("check_access_rights", ["create", false]);  // vérifier droits de lecture
         var rendered_prom = this.$el.html(qweb.render(this.template, this)).promise();
+        // récupérer les employés à ne pas montrer en vue planning
         var excluded_ids_def = new Model("ir.values").call("get_default", ["of.intervention.settings", "planningview_employee_exclu_ids"]);
         var intervenants_ids_def = new Model("hr.employee").query(['id']) // retrieve ids from db
             .filter([['of_est_intervenant', '=', true]]) // seulement les intervenants
-            .all();
+            .all();  // récupérer tous les employés qui sont des intervenants
         var ir_values_model = new Model("ir.values");
+        // récupérer la dernière semaine affichée en vue planning pour l'utilisateur en cours
         var range_start_def = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_range_start", false]);
+        // initialiser les couleurs des créneaux dispo et leur durée minimale
         var creneaux_dispo_data_def = self.set_creneaux_dispo_data();
 
         return $.when(write_def, create_def, excluded_ids_def, intervenants_ids_def, range_start_def, rendered_prom, creneaux_dispo_data_def, this._super()).then(
             function (write, create, excluded, emp_ids, range_start) {
                 self.write_right = write;
                 self.create_right = create;
-                //console.log("arguments!", arguments);
+                // retirer les intervenants à ne pas montrer en vue planning
                 var excluded_ids = [], to_show_ids = [];
                 if (!!excluded) {
                     excluded_ids = excluded[0][2]  // [(6, 0, [ids_list])]
@@ -179,21 +182,21 @@ var PlanningView = View.extend({
                         to_show_ids.push(emp_ids[i].id)
                     }
                 }
-                if (!isNullOrUndef(range_start)) {
+                self.view_res_ids = to_show_ids;
+                if (!isNullOrUndef(range_start)) {  // saut à la dernière semaine consultée si existante
                     self.range_start = moment.utc(range_start).local().startOf(self.mode)._d;
                     self.range_stop = moment.utc(range_start).local().endOf(self.mode)._d;
-                    //console.log("RANGE_START",self.range_start);
-                    //console.log("RANGE_STOP",self.range_stop)
                 }
-                self.view_res_ids = to_show_ids;
-
+                // initialiser les filtres grâce à la liste des intervenants à montrer en vue planning
                 var all_filters_def = self._set_all_custom_colors();
 
                 return $.when(all_filters_def);
-        }).then(function (all_filters) {
-            //console.log("ALL_FILTERS", all_filters);
         });
     },
+    /**
+     *  initialise les couleurs des créneaux dispos. 
+     *  Ainsi que la durée minimale pour qu'un créneau libre soit considéré comme disponible
+     */
     set_creneaux_dispo_data: function () {
         var self = this;
         var ir_values_model = new Model("ir.values")
@@ -213,7 +216,7 @@ var PlanningView = View.extend({
 
     /**
      *  called by PlanningView.willStart
-     *  sets custom colors for all_filter.
+     *  initialise this.all_filters
      */
     _set_all_custom_colors: function() {
         var self = this;
@@ -248,23 +251,27 @@ var PlanningView = View.extend({
                 };
                 dfd.resolve();
                 var ir_values_model = new Model("ir.values");
+                // récupérer la sélection (coché/décoché) des filtres de la dernière utilisation de la vue planning
                 ir_values_model.call("get_default", ["of.intervention.settings", "planningview_filter_intervenant_ids", false])
-
                 .then(function (attendee_ids) {
-                    if (typeof attendee_ids == "string") {
+                    if (typeof attendee_ids == "string") {  // transformer en tableau si besoin
                         attendee_ids = JSON.parse(attendee_ids)
                     }
+                    // tout cocher si tout était décoché
                     if (isNullOrUndef(attendee_ids) || attendee_ids.length == 0) {
                         self.filter_attendee_ids = []
                         for (var k in self.all_filters) {
                             self.filter_attendee_ids.push(self.all_filters[k].value);
                         };
+                    // code 6: [(6, 0 [ids])]
                     }else if (attendee_ids[0].length == 3 && attendee_ids[0][0] == 6 && !attendee_ids[0][1]) {
                         self.filter_attendee_ids = attendee_ids[0][2];
+                    // liste d'identifiants
                     }else{
                         self.filter_attendee_ids = attendee_ids;
                         var idf;
                         var found;
+                        // décocher les filtres qui ne sont pas dans attendee_ids //@totest: nécessaire?
                         for (var k in self.all_filters) {
                             found = false;
                             idf = self.all_filters[k].value;
@@ -290,8 +297,9 @@ var PlanningView = View.extend({
      *
      */
     start: function () {
-        this.$sidebar_container = this.$(".of_planning_sidebar_container");
-        this.$table_container = this.$(".of_planning_table_container");
+        // raccourcis jquery
+        this.$sidebar_container = this.$(".of_planning_sidebar_container");  // Panneau latéral droit
+        this.$table_container = this.$(".of_planning_table_container");  // Contenu de la vue
         this.$el.addClass(this.fields_view.arch.attrs.class);
         this.shown.done(this.init_table.bind(this));
         return this._super();
@@ -301,11 +309,14 @@ var PlanningView = View.extend({
         this.shown.resolve();
         return this._super();
     },
+    /**
+     *  Initialise la Table et le panneau latéral droit, puis lance do_search
+     */
     init_table: function() {
         var self = this;
         this.table = new PlanningView.Table(this);
         var defs = [];
-        if (!this.sidebar) {
+        if (!this.sidebar) {  // n'a pas déjà été initialisé
             this.sidebar = new PlanningView.Sidebar(this);
             defs.push(this.sidebar.appendTo(this.$sidebar_container));
 
@@ -341,7 +352,6 @@ var PlanningView = View.extend({
                 }else{
                     context.range_start = moment(curDate).startOf("week")._d;
                     context.range_stop = moment(curDate).endOf("week")._d;
-                    //console.log("new range!",context.range_start,context.range_stop);
                     context.do_search(context.domain,context.context,context.group_by);
                 }
             }
@@ -365,22 +375,12 @@ var PlanningView = View.extend({
     },
     do_search: function (domain, context, group_by) {
         var self = this;
-        $(".o_cp_left").show();
-        $(".o_cp_right").show();
-        //console.log("DO_SEARCH doamin:",domain);
-        //console.log("group_by",group_by);
         var context_dfd, domain_dfd, range_start_dfd = $.Deferred();
         var ir_values_model = new Model('ir.values');
         // 1ère recherche: on charge la config, autres recherches, on affecte la config
         if (!this.first_search_done) {
-            //context_dfd = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_context", false]);
-            //domain_dfd = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_domain", false]);
             range_start_dfd = $.when();
         }else{
-            //this.domain = domain;
-            //this.context = context;
-            //context_dfd = ir_values_model.call("set_default", ["of.intervention.settings", "planningview_context", JSON.stringify(this.context), false]);
-            //domain_dfd = ir_values_model.call("set_default", ["of.intervention.settings", "planningview_domain", JSON.stringify(this.domain), false]);
             var format = time.datetime_to_str;
             var range_start_str = format(this.range_start);
             range_start_dfd = ir_values_model.call("set_default", ["of.intervention.settings", "planningview_range_start", range_start_str, false]);
@@ -390,7 +390,6 @@ var PlanningView = View.extend({
         this.group_by = group_by;
 
         $.when(range_start_dfd).then(function(){
-            //console.log("ARGUS",arguments)
             if (self.table_inited && self.first_search_done) {
                 self._do_search(self.domain, self.context, self.group_by);
             }else{
