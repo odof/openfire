@@ -27,11 +27,13 @@ class PurchaseOrder(models.Model):
     customer_id = fields.Many2one('res.partner', string='Client')
     sale_order_id = fields.Many2one('sale.order', string="Commande d'origine")
     delivery_expected = fields.Char(string='Livraison attendue', states={'done': [('readonly', True)]})
+    of_sent = fields.Boolean(string=u"CF envoyée")
 
     @api.model
     def _prepare_picking(self):
         values = super(PurchaseOrder, self)._prepare_picking()
         return isinstance(values, dict) and values.update({'of_customer_id': self.customer_id.id}) or values
+
 
 class ProcurementOrder(models.Model):
     _inherit = 'procurement.order'
