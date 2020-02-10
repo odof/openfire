@@ -36,7 +36,7 @@ class OfService(models.Model):
                        "SET duree = of_planning_tache.duree "
                        "FROM of_planning_tache "
                        "WHERE of_service.tache_id = of_planning_tache.id")
-            # On met le champ state à "calculated" quand state est différent de "cancel".
+            # On met le champ base_state à "calculated" quand state est différent de "cancel".
             cr.execute("UPDATE of_service SET base_state = 'calculated'")
             services = self.env['of.service'].search([])
             services = services.filtered(lambda s: s.date_last and (not s.date_next or fields.Date.from_string(s.date_last) >= fields.Date.from_string(s.date_next)))
@@ -316,7 +316,7 @@ class OfService(models.Model):
     #     ('done', u'Terminé'),  # date de fin <= date du jour
     #     ('cancel', u'Annulé'),  # manuellement décidé
     # ], u'État', compute="_compute_state_poncrec", store=True)
-    #
+
     state_ponc = fields.Selection([
         ('draft', u'Brouillon'),  # état par défaut
         ('to_plan', u'À planifier'),  # pas d'intervention
@@ -334,18 +334,17 @@ class OfService(models.Model):
         ('planned_soon', u'Planifiée prochainement'),  # planifié pour dans moins d'un mois
         ('progress', u'En cours'),  # par défaut
         ('late', u'En retard de planification'),  # date de prochaine planification il y a plus d'un mois
-        ('done', u'Terminé / Annulé'),  # date de fin <= date du jour (rec) / durée restante == 0 et date de fin dépassée (ponc)
+        ('done', u'Terminée'),  # date de fin <= date du jour (rec) / durée restante == 0 et date de fin dépassée (ponc)
         ('part_planned', u'Partiellement planifiée'),  # intervention(s) et durée restante supérieure à 0
         ('all_planned', u'Entièrement planifiée'),  # intervention(s) et durée restante == 0
         ('cancel', u'Annulée'),  # manuellement décidé
-        ('calculated', u'Calculé'),  # équivalent a state=False mais utile en XML
-        ], u'État', help=u"Ce champ permet de choisir manuellement l'état du service", compute="_compute_state_poncrec", store=True)
+        ], u'État de planification', compute="_compute_state_poncrec", store=True)
 
     base_state = fields.Selection([
         ('draft', u'Brouillon'),  # état par défaut
         ('calculated', u'Calculé'),  # équivalent a state=False mais utile en XML
         ('cancel', u'Annulé'),  # manuellement décidé
-        ], u'État', help=u"Ce champ permet de choisir manuellement l'état du service", default="draft", required=True)
+        ], u'État de calcul', default="draft", required=True)
 
     active = fields.Boolean(string="Active", default=True)
 
