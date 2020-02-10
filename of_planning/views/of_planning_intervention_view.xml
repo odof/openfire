@@ -933,16 +933,19 @@
             <menuitem id="menu_of_planning_vente_kits" name="Kits" parent="of_planning.menu_of_planning_vente" action="of_template_open_kit_planning" sequence="20"/>
 
         <menuitem id="menu_of_planning_configuration" name="Configuration" parent="of_planning.menu_of_planning" groups="hr.group_hr_manager" sequence="100"/>
-            <menuitem name="Modèles d'intervention" id="menu_of_planning_intervention_template" parent="of_planning.menu_of_planning_configuration" sequence="10" action="action_of_planning_intervention_template"/>
-            <menuitem name="Modèles de courriers" id="menu_of_planning_mail_templates" parent="of_planning.menu_of_planning_configuration" sequence="70" action="of_gesdoc.action_of_mail_template_tree_all" />
-            <menuitem name="Employés" id="menu_hr_employee_tree" parent="of_planning.menu_of_planning_configuration" sequence="80" action="action_hr_employee_tree"/>
-            <menuitem name="Équipes" id="menu_of_planning_equipe_tree" parent="of_planning.menu_of_planning_configuration" sequence="90" action="action_of_planning_equipe_tree"/>
-            <menuitem id="menu_hr_config_of_creneau_intervention" name="Créneaux horaires" parent="menu_of_planning_configuration" groups="hr.group_hr_manager" action="action_view_of_horaire_creneau_tree_intervention" sequence="95"/>
-            <menuitem name="Erreurs" id="menu_of_planning_intervention_raison_tree" parent="of_planning.menu_of_planning_configuration" sequence="100" action="action_of_planning_intervention_raison_tree"/>
-            <menuitem name="Catégories de tâches" id="menu_of_planning_tache_categ_tree" parent="of_planning.menu_of_planning_configuration" sequence="109" action="action_of_planning_tache_categ_tree"/>
-            <menuitem name="Tâches" id="menu_of_planning_tache_tree" parent="of_planning.menu_of_planning_configuration" sequence="110" action="action_of_planning_tache_tree"/>
-            <menuitem name="Étiquettes d'intervention" id="menu_of_planning_tag_tree" parent="of_planning.menu_of_planning_configuration" sequence="115" action="action_of_planning_tag_tree"/>
-            <menuitem name="Secteurs" id="of_secteur_intervention_menu" parent="of_planning.menu_of_planning_configuration" action="action_of_secteur_tree_intervention" sequence="120"/>
+            <menuitem id="menu_of_planning_configuration_res" name="Ressources" parent="of_planning.menu_of_planning_configuration" sequence="10"/>
+                <menuitem name="Employés" id="menu_hr_employee_tree" parent="of_planning.menu_of_planning_configuration_res" sequence="10" action="action_hr_employee_tree"/>
+                <menuitem name="Équipes" id="menu_of_planning_equipe_tree" parent="of_planning.menu_of_planning_configuration_res" sequence="20" action="action_of_planning_equipe_tree"/>
+                <menuitem id="menu_hr_config_of_creneau_intervention" name="Créneaux horaires" parent="menu_of_planning_configuration_res" groups="hr.group_hr_manager" action="action_view_of_horaire_creneau_tree_intervention" sequence="30"/>
+                <menuitem name="Catégories de tâches" id="menu_of_planning_tache_categ_tree" parent="of_planning.menu_of_planning_configuration_res" sequence="40" action="action_of_planning_tache_categ_tree"/>
+                <menuitem name="Tâches" id="menu_of_planning_tache_tree" parent="of_planning.menu_of_planning_configuration_res" sequence="50" action="action_of_planning_tache_tree"/>
+                <menuitem name="Erreurs" id="menu_of_planning_intervention_raison_tree" parent="of_planning.menu_of_planning_configuration_res" sequence="60" action="action_of_planning_intervention_raison_tree"/>
+                <menuitem name="Secteurs" id="of_secteur_intervention_menu" parent="of_planning.menu_of_planning_configuration_res" action="action_of_secteur_tree_intervention" sequence="70"/>
+                <menuitem name="Étiquettes d'intervention" id="menu_of_planning_tag_tree" parent="of_planning.menu_of_planning_configuration_res" sequence="80" action="action_of_planning_tag_tree"/>
+            <menuitem id="menu_of_planning_configuration_template" name="Modèles" parent="of_planning.menu_of_planning_configuration" sequence="30"/>
+                <menuitem name="Modèles d'intervention" id="menu_of_planning_intervention_template" parent="of_planning.menu_of_planning_configuration_template" sequence="10" action="action_of_planning_intervention_template"/>
+                <menuitem name="Modèles de courriers" id="menu_of_planning_mail_templates" parent="of_planning.menu_of_planning_configuration_template" sequence="20" action="of_gesdoc.action_of_mail_template_tree_all" />
+
             <!--menuitem name="CP des Secteurs" id="of_secteur_zip_intervention_menu" parent="of_planning.menu_of_planning_configuration" action="action_of_secteur_zip_tree_intervention" sequence="121"/-->
 
         <!-- Creation la facture depuis planning intervention -->
