@@ -52,8 +52,7 @@ function isNUF (value) {
 FieldMany2One.include({
     set_active: function () {
         var self = this;
-
-        var record_id = this.field_manager.get_field_value(this.name)
+        var record_id = this.field_manager.fields[this.name] ? this.field_manager.get_field_value(this.name) : false;
         var type = self.field.type;
         if (!isNUF(record_id) && type == "many2one" && !self.get("invisible")) {
             var OFWebWidgetsUtils = new Model("of.web.widgets.utils");
@@ -85,7 +84,6 @@ FieldMany2One.include({
             $("." + self.get("active_class_id")).remove();
             self.$active_warning = undefined;
         }
-
     },
     renderElement: function() {
         var self = this;
