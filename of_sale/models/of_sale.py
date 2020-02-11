@@ -629,7 +629,8 @@ class SaleOrderLine(models.Model):
 
     of_price_unit_display = fields.Float(related='product_id.list_price', string=u"Prix unitaire", readonly=True)
     of_product_forbidden_discount = fields.Boolean(
-        related='product_id.of_forbidden_discount', string=u"Remise interdite pour ce produit")
+        related='product_id.of_forbidden_discount', string=u"Remise interdite pour ce produit",
+        readonly=True)
 
     of_price_unit_ht = fields.Float(string='Unit Price excl', compute='_compute_of_price_unit', help="Unit price without taxes", store=True)
     of_price_unit_ttc = fields.Float(string='Unit Price incl', compute='_compute_of_price_unit',
