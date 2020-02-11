@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Archive views -->
+
+    <record id="of_archive_form_view" model="ir.ui.view">
+        <field name="name">of.archive.form.view</field>
+        <field name="model">of.archive</field>
+        <field name="arch" type="xml">
+            <form string="Archive">
+                <sheet>
+                    <group col="8">
+                        <group col="2" colspan="2">
+                            <field name="id" invisible="1"/>
+                            <field name="type_id" options="{'no_open': True}" attrs="{'readonly': [('id', '!=', False)]}"/>
+                            <field name="number" attrs="{'readonly': [('id', '!=', False)]}"/>
+                            <field name="date" attrs="{'readonly': [('id', '!=', False)]}"/>
+                            <field name="customer_type" attrs="{'invisible': [('id', '!=', False)]}"/>
+                            <!-- Informations client interne -->
+                            <field name="partner_id" string="Client" attrs="{'readonly': [('id', '!=', False)], 'invisible': [('customer_type', '=', 'ext')], 'required': [('customer_type', '=', 'int')]}"/>
+                            <field name="partner_ref" string="Numéro de client" readonly="1" attrs="{'invisible': [('customer_type', '=', 'ext')]}"/>
+                            <field name="partner_title" string="Civilité" readonly="1" attrs="{'invisible': [('customer_type', '=', 'ext')]}"/>
+                            <label for="partner_street" string="Adresse" attrs="{'invisible': [('customer_type', '=', 'ext')]}"/>
+                            <div class="o_address_format">
+                                <field name="partner_street" class="o_address_street" readonly="1" attrs="{'invisible': [('customer_type', '=', 'ext')]}"/>
+                                <field name="partner_street2" class="o_address_street" readonly="1" attrs="{'invisible': [('customer_type', '=', 'ext')]}"/>
+                                <field name="partner_zip" class="o_address_zip" readonly="1" attrs="{'invisible': [('customer_type', '=', 'ext')]}"/>
+                                <field name="partner_city" class="o_address_city" style="margin-left: 10px" readonly="1" attrs="{'invisible': [('customer_type', '=', 'ext')]}"/>
+                                <field name="partner_country" class="o_address_country" readonly="1" attrs="{'invisible': [('customer_type', '=', 'ext')]}"/>
+                            </div>
+                            <field name="partner_phone" string="Téléphone" readonly="1" attrs="{'invisible': [('customer_type', '=', 'ext')]}"/>
+                            <field name="partner_mobile" string="Mobile" readonly="1" attrs="{'invisible': [('customer_type', '=', 'ext')]}"/>
+                            <field name="partner_fax" string="Fax" readonly="1" attrs="{'invisible': [('customer_type', '=', 'ext')]}"/>
+                            <field name="partner_email" string="Email" readonly="1" attrs="{'invisible': [('customer_type', '=', 'ext')]}"/>
+                            <!-- Informations client externe -->
+                            <field name="customer_name" string="Client" attrs="{'readonly': [('id', '!=', False)], 'invisible': [('customer_type', '!=', 'ext')], 'required': [('customer_type', '=', 'ext')]}"/>
+                            <field name="customer_ref" string="Numéro de client" attrs="{'readonly': [('id', '!=', False)], 'invisible': [('customer_type', '!=', 'ext')], 'required': [('customer_type', '=', 'ext')]}"/>
+                            <field name="customer_title" string="Civilité" attrs="{'readonly': [('id', '!=', False)], 'invisible': [('customer_type', '!=', 'ext')]}"/>
+                            <label for="customer_street" string="Adresse" attrs="{'invisible': [('customer_type', '!=', 'ext')]}"/>
+                            <div class="o_address_format">
+                                <field name="customer_street" placeholder="Rue..." class="o_address_street" attrs="{'readonly': [('id', '!=', False)], 'invisible': [('customer_type', '!=', 'ext')]}"/>
+                                <field name="customer_street2" placeholder="Rue 2..." class="o_address_street" attrs="{'readonly': [('id', '!=', False)], 'invisible': [('customer_type', '!=', 'ext')]}"/>
+                                <field name="customer_zip" placeholder="CP" class="o_address_zip" attrs="{'readonly': [('id', '!=', False)], 'invisible': [('customer_type', '!=', 'ext')]}"/>
+                                <field name="customer_city" placeholder="Ville" class="o_address_city" style="margin-left: 5px" attrs="{'readonly': [('id', '!=', False)], 'invisible': [('customer_type', '!=', 'ext')]}"/>
+                                <field name="customer_country" placeholder="Pays" class="o_address_country" attrs="{'readonly': [('id', '!=', False)], 'invisible': [('customer_type', '!=', 'ext')]}"/>
+                            </div>
+                            <field name="customer_phone" string="Téléphone" attrs="{'readonly': [('id', '!=', False)], 'invisible': [('customer_type', '!=', 'ext')]}"/>
+                            <field name="customer_mobile" string="Mobile" attrs="{'readonly': [('id', '!=', False)], 'invisible': [('customer_type', '!=', 'ext')]}"/>
+                            <field name="customer_fax" string="Fax" attrs="{'readonly': [('id', '!=', False)], 'invisible': [('customer_type', '!=', 'ext')]}"/>
+                            <field name="customer_email" string="Email" attrs="{'readonly': [('id', '!=', False)], 'invisible': [('customer_type', '!=', 'ext')]}"/>
+                            <field name="display_amount_untaxed" invisible="1"/>
+                            <field name="display_amount_total" invisible="1"/>
+                            <field name="amount_untaxed" widget="monetary"
+                                   attrs="{'invisible': [('type_id', '!=', False), ('display_amount_untaxed', '=', False)],
+                                   'readonly': [('id', '!=', False)]}"/>
+                            <field name="amount_total" widget="monetary"
+                                   attrs="{'invisible': [('type_id', '!=', False), ('display_amount_total', '=', False)],
+                                   'readonly': [('id', '!=', False)]}"/>
+                        </group>
+                        <group col="1" colspan="6">
+                            <field name="document_name" invisible="1"/>
+                            <field name="document_pdf" nolabel="1" readonly="1" widget="of_pdf_viewer"
+                                   attrs="{'invisible': [('document_pdf', '=', False)]}" style="height: 1500px"/>
+                            <field name="document_no_pdf" filename="document_name" nolabel="1" readonly="1"
+                                   attrs="{'invisible': [('document_no_pdf', '=', False)]}"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_archive_list_view" model="ir.ui.view">
+        <field name="name">of.archive.list.view</field>
+        <field name="model">of.archive</field>
+        <field name="arch" type="xml">
+            <tree string="Archives">
+                <field name="customer_type" invisible="1"/>
+                <field name="type_id"/>
+                <field name="number"/>
+                <field name="date"/>
+                <field name="customer_name_display" string="Client"/>
+                <field name="customer_ref_display" string="Numéro de client"/>
+                <field name="customer_zip_display" string="Code postal"/>
+                <field name="customer_city_display" string="Ville"/>
+                <field name="amount_untaxed"/>
+                <field name="amount_total"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_archive_search_view" model="ir.ui.view">
+        <field name="name">of.archive.search.view</field>
+        <field name="model">of.archive</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="type_id"/>
+                <field name="number"/>
+                <field name="date"/>
+                <field name="customer_name_display" string="Client"/>
+                <field name="customer_ref_display" string="Numéro de client"/>
+                <field name="customer_zip_display" string="Code postal"/>
+                <field name="customer_city_display" string="Ville"/>
+                <field name="partner_id" invisible="1"/>
+                <separator/>
+                <filter string="Factures" name="invoice" domain="[('type_id', '=', %(of_archive.archive_type_invoice)d)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="of_archive_action">
+        <field name="name">Archives</field>
+        <field name="res_model">of.archive</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_invoice': 1}</field>
+    </record>
+
+    <record model="ir.actions.act_window" id="of_archive_partner_action">
+        <field name="name">Archives</field>
+        <field name="res_model">of.archive</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Archive type views -->
+
+    <record id="of_archive_type_list_view" model="ir.ui.view">
+        <field name="name">of.archive.type.list.view</field>
+        <field name="model">of.archive.type</field>
+        <field name="arch" type="xml">
+            <tree string="Types d'archive" editable="bottom">
+                <field name="name"/>
+                <field name="display_amount_untaxed"/>
+                <field name="display_amount_total"/>
+                <field name="default_type"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="of_archive_type_action">
+        <field name="name">Types d'archive</field>
+        <field name="res_model">of.archive.type</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <!-- Archive import views -->
+
+    <record id="of_archive_import_form_view" model="ir.ui.view">
+        <field name="name">of.archive.import.form.view</field>
+        <field name="model">of.archive.import</field>
+        <field name="arch" type="xml">
+            <form string="Import">
+                <header>
+                    <button name="run_import" states="draft"
+                            string="Importer"
+                            type="object" class="oe_highlight"
+                            groups="of_base.of_group_root_only"/>
+                    <button name="set_to_draft" states="done"
+                            string="Remettre en brouillon"
+                            type="object"
+                            groups="of_base.of_group_root_only"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="dir_path"/>
+                            <field name="extension"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                        </group>
+                    </group>
+                    <field name="import_message_ids" invisible="1"/>
+                    <group string="Journal" attrs="{'invisible': [('import_message_ids', '=', [])]}">
+                        <notebook>
+                            <page string="Erreurs">
+                                <field name="import_error_ids" nolabel="1">
+                                    <tree>
+                                        <field name="date"/>
+                                        <field name="message"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Avertissements">
+                                <field name="import_warning_ids" nolabel="1">
+                                    <tree>
+                                        <field name="date"/>
+                                        <field name="message"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Infos">
+                                <field name="import_info_ids" nolabel="1">
+                                    <tree>
+                                        <field name="date"/>
+                                        <field name="message"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_archive_import_list_view" model="ir.ui.view">
+        <field name="name">of.archive.import.list.view</field>
+        <field name="model">of.archive.import</field>
+        <field name="arch" type="xml">
+            <tree string="Imports">
+                <field name="name"/>
+                <field name="dir_path"/>
+                <field name="extension"/>
+                <field name="date"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_archive_import_search_view" model="ir.ui.view">
+        <field name="name">of.archive.import.search.view</field>
+        <field name="model">of.archive.import</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="date"/>
+                <separator/>
+                <filter string="Terminés" name="done" domain="[('state', '=', 'done')]"/>
+                <filter string="Brouillons" name="draft" domain="[('state', '=', 'draft')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="of_archive_import_action">
+        <field name="name">Imports</field>
+        <field name="res_model">of.archive.import</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

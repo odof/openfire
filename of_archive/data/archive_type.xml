@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <record model="of.archive.type" id="archive_type_invoice">
+        <field name="name">Facture</field>
+        <field name="display_amount_untaxed" eval="True"/>
+        <field name="display_amount_total" eval="True"/>
+        <field name="default_type" eval="True"/>
+    </record>
+
+    <record model="of.archive.type" id="archive_type_refund">
+        <field name="name">Avoir</field>
+        <field name="display_amount_untaxed" eval="True"/>
+        <field name="display_amount_total" eval="True"/>
+    </record>
+
+    <record model="of.archive.type" id="archive_type_quote">
+        <field name="name">Devis</field>
+        <field name="display_amount_untaxed" eval="True"/>
+        <field name="display_amount_total" eval="True"/>
+    </record>
+
+    <record model="of.archive.type" id="archive_type_order">
+        <field name="name">Commande</field>
+        <field name="display_amount_untaxed" eval="True"/>
+        <field name="display_amount_total" eval="True"/>
+    </record>
+</odoo>
