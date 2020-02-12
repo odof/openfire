@@ -3,6 +3,7 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError,  ValidationError
 from odoo.models import regex_order
+from odoo.tools.float_utils import float_compare
 
 NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
 
@@ -273,10 +274,29 @@ class AccountMoveLine(models.Model):
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
         if self.partner_id and not self.account_id and not self._context.get('line_ids', False):
-            if self.journal_id.type == 'sale': # Est un journal de vente, on prend le compte de tiers client.
+            if self.journal_id.type == 'sale':  # Est un journal de vente, on prend le compte de tiers client.
                 self.account_id = self.partner_id.property_account_receivable_id
-            elif self.journal_id.type == 'purchase': # Est un journal d'achat, on prend le compte de tiers fournisseur.
+            elif self.journal_id.type == 'purchase':  # Est un journal d'achat, on prend le compte de tiers fournisseur.
                 self.account_id = self.partner_id.property_account_payable_id
+
+    @api.multi
+    def write(self, vals):
+        if self.invoice_id and 'account_id' in vals:
+            lines = self.invoice_id.invoice_line_ids.filtered(lambda l: l.account_id.id == self.account_id.id)
+            if lines:
+                if 'credit' in vals:
+                    balance = abs(vals['credit'])
+                elif 'debit' in vals:
+                    balance = abs(vals['debit'])
+                else:
+                    balance = abs(self.balance)
+                if float_compare(abs(sum(lines.mapped('price_subtotal'))), balance, 2) != 0:
+                    raise UserError(u"""Vous ne pouvez pas changer le compte %s - %s car la balance de cette ligne"""
+                                    u"""n'est pas égale au montant total HT des lignes de facture avec ce compte.""" %
+                                    (self.account_id.code, self.account_id.name))
+                lines.write({'account_id': vals['account_id']})
+        super(AccountMoveLine, self).write(vals)
+
 
 class AccountMove(models.Model):
     _inherit = "account.move"
