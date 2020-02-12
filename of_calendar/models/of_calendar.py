@@ -516,7 +516,7 @@ class HREmployee(models.Model):
                         horaires.append([date_deb, date_fin, {}])
                         date_deb = segment_deb
 
-                while pile and pile[-1][0].date_fin <= segment_fin:
+                while pile and (pile[-1][0].date_fin or date_stop_str) <= segment_fin:
                     pile.pop()
 
                 # Ajout du segment dans la pile

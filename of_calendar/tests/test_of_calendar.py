@@ -164,6 +164,17 @@ class OfTestEmployees(common.TransactionCase):
                         (vendredi, 10, 15),
                     ])
                 }),
+                (0, 0, {
+                    'date_deb': '2019-10-07',
+                    'date_fin': '2019-10-11',
+                    'permanent': False,
+                    'creneau_ids': generate_creneaux_create_data([
+                        (lundi, 10, 15),
+                        (mardi, 10, 15),
+                        (jeudi, 10, 15),
+                        (vendredi, 10, 15),
+                    ])
+                }),
             ]
         })
 
@@ -171,17 +182,8 @@ class OfTestEmployees(common.TransactionCase):
         emps = self.emp_1 | self.emp_2
         intersec = emps.get_list_horaires_intersection('2019-01-01', '2019-12-31')
 
-        # Horaires d'intersection attendus :
-        # [ ('2019-01-01', '2019-06-08', {}),
-        #   ('2019-06-09', '2019-06-12', {}),
-        #   ('2019-06-13', '2019-06-30', {}),
-        #   ('2019-07-01', '2019-07-03', {}),
-        #   ('2019-07-04', '2019-07-29', {}),
-        #   ('2019-07-30', '2019-08-04', {}),
-        #   ('2019-08-05', False, {}) ]
-
         # Vérification du nombre d'intervalles trouvés
-        self.assertEqual(len(intersec), 7, "Mauvais nombre d'intervalles : %s au lieu de 7" % len(intersec))
+        self.assertEqual(len(intersec), 9, "Mauvais nombre d'intervalles : %s au lieu de 9" % len(intersec))
 
         # Vérification de la période de validité des intervalles
         for i, (deb, fin) in enumerate((
@@ -191,7 +193,9 @@ class OfTestEmployees(common.TransactionCase):
                 ('2019-07-01', '2019-07-03'),
                 ('2019-07-04', '2019-07-29'),
                 ('2019-07-30', '2019-08-07'),
-                ('2019-08-08', '2019-12-31')
+                ('2019-08-08', '2019-10-06'),
+                ('2019-10-07', '2019-10-11'),
+                ('2019-10-12', '2019-12-31'),
         )):
             self.assertEqual(
                 intersec[i][0],
@@ -285,7 +289,7 @@ class OfTestEmployees(common.TransactionCase):
         self.assertEqual(
             intersec[6],
             (
-                '2019-08-08', '2019-12-31',
+                '2019-08-08', '2019-10-06',
                 {
                     1: [],
                     2: [(8.0, 12.0)],
@@ -295,6 +299,22 @@ class OfTestEmployees(common.TransactionCase):
                 }
             ),
             "Mauvais calcul d'intersection (#7)"
+        )
+        self.assertEqual(
+            intersec[7],
+            (
+                '2019-10-07', '2019-10-11',
+                intersec[5][2]
+            ),
+            "Mauvais calcul d'intersection (#8)"
+        )
+        self.assertEqual(
+            intersec[8],
+            (
+                '2019-10-12', '2019-12-31',
+                intersec[6][2]
+            ),
+            "Mauvais calcul d'intersection (#9)"
         )
 
         self.assertEqual(
