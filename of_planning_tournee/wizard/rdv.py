@@ -556,6 +556,8 @@ class OfTourneeRdv(models.TransientModel):
             'mois_ids': [(4, mois)],
             'date_next': self.date_next,
             'note': self.description or '',
+            'base_state': 'calculated',
+            'duree': self.duree,
         }
 
     @api.multi
@@ -609,7 +611,7 @@ class OfTourneeRdv(models.TransientModel):
             if self.service_id:
                 self.service_id.write({'date_next': self.date_next})
             elif self.creer_recurrence:
-                service_obj.create(self._get_service_data(date_propos_dt.month))
+                res.service_id = service_obj.create(self._get_service_data(date_propos_dt.month))
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'of.planning.intervention',

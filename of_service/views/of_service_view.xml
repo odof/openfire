@@ -153,7 +153,8 @@
                                 <group colspan="2" name="planif" string="Planification">
                                     <div colspan="2" attrs="{'invisible': [('base_state', '!=', 'draft')]}">
                                         <b><i class="of_red">
-                                            <i class="fa fa-lg fa-warning"/> Vous pourrez planifier cette intervention quand elle sera validée.
+                                            <i class="fa fa-lg fa-warning"/>
+                                            Vous ne pourrez planifier cette intervention que lorsqu’elle sera validée.
                                         </i></b>
                                     </div>
                                     <div colspan="2" attrs="{'invisible': [('base_state', '!=', 'cancel')]}">

@@ -7,7 +7,7 @@
             <field name="model">of.tournee.rdv</field>
             <field name="type">form</field>
             <field name="arch" type="xml">
-                <form string="Planifier une intervention">
+                <form string="Trouver un créneau">
                     <script>
                         $(document).ready(function(){
                             // élargir le pop-up
@@ -194,7 +194,7 @@
         </record>
 
         <act_window
-            name="Planifier une intervention"
+            name="Trouver un créneau"
             res_model="of.tournee.rdv"
             src_model="res.partner"
             view_mode="form"
