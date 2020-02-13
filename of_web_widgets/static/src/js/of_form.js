@@ -1,6 +1,7 @@
 odoo.define('of_web_widgets.of_form', function (require) {
 "use strict";
 
+var FormView = require('web.FormView')
 var form_common = require('web.form_common');
 var form_widgets = require('web.form_widgets');
 var form_relational = require('web.form_relational');
@@ -34,7 +35,19 @@ form_widgets.WidgetButton.include({
         this.on_confirmed = _.debounce(this.on_confirmed, 300, true);
         return $.when(this._super.apply(this, arguments));
     },
-})
+});
+
+/**
+ *  Ajout gestion de context pour cacher les boutons 'créer' et 'sauvegarder'
+ */
+FormView.include({
+    render_buttons: function($node) {
+        if (this.options && this.options.action && this.options.action.context["hide_action_buttons"]) {
+            this.options.action_buttons = false;
+        }
+        this._super($node)
+    },
+});
 
 function isNullOrUndef(value) {
     return _.isUndefined(value) || _.isNull(value);
@@ -295,6 +308,7 @@ FieldOne2Many.include({
             self.$el.addClass('o_view_manager_content');
             self.alive(self.viewmanager.attachTo(self.$el));
         });
+
         return def;
     },
 });
@@ -311,7 +325,6 @@ var FieldOne2One = FieldMany2One.extend({
 
     init: function(field_manager, node) {
         this._super.apply(this, arguments);
-        //console.log("FieldOne2One init this and arguments: ",this,arguments);
 
     },
 
@@ -376,7 +389,6 @@ var FieldOne2One = FieldMany2One.extend({
                         self.render_value();
                         self.focus();
                         self.trigger('changed_value');
-                        //console.log("record_saved B self: ",self);
                     });
                 });
             });

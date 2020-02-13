@@ -904,13 +904,19 @@ class Meeting(models.Model):
     of_geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_geo", store=False, search='_search_lng')
     of_precision = fields.Selection([
         ('manual', "Manuel"),
+        ('very_high', u"Excellent"),
         ('high', "Haut"),
         ('medium', "Moyen"),
         ('low', "Bas"),
         ('no_address', u"--"),
         ('unknown', u"Indéterminé"),
         ('not_tried', u"Pas tenté"),
-        ], default='no_address', help=u"Niveau de précision de la géolocalisation", compute="_compute_geo", store=False, search='_search_precision')
+        ], default='no_address', compute="_compute_geo", store=False, search='_search_precision',
+            help=u"Niveau de précision de la géolocalisation.\n"
+                u"bas: à la ville.\n"
+                u"moyen: au village\n"
+                u"haut: à la rue / au voisinage\n"
+                u"très haut: au numéro de rue\n")
 
     def _search_lat(self, operator, operand):
         partners = self.env['res.partner']

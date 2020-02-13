@@ -3,12 +3,38 @@
 <odoo>
     <data>
 
+        <!-- Ajout vue map dans onglet localisation -->
+        <record id="view_of_partner_geo_form__mapview" model="ir.ui.view">
+            <field name="name">of.partner.form.map</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="of_geolocalize.of_partner_geo_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='geo_location_tab']/group" position="before">
+                <!--<xpath expr="//page[1]" position="inside">-->
+                    <field name="partner_map_ids" mode="map" colspan="2" nolabel="1"
+                        context="{'active_partner_id': active_id}"/>
+                    <div colspan="2" col="3" attrs="{'invisible': [('partner_map_ids', '=', [])]}">
+                        <div style="color: blue;">
+                            <i class="fa fa-map-marker"/>: Le partenaire
+                        </div>
+                        <div style="color: green;">
+                            <i class="fa fa-map-marker"/>: Son parent
+                        </div>
+                        <div style="color: black;">
+                            <i class="fa fa-map-marker"/>: Ses contacts
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
         <!-- Partner Map View -->
         <record id="of_partner_map_view" model="ir.ui.view">
             <field name="name">of.partner.map</field>
             <field name="model">res.partner</field>
             <field name="arch" type="xml">
-                <map string="Map" class="o_res_partner_map" latitude_field="geo_lat" longitude_field="geo_lng">
+                <map string="Map" class="o_res_partner_map" latitude_field="geo_lat" longitude_field="geo_lng"
+                    color_field="color_parent_enfant">
                     <field name="geo_lat" required="1"/>
                     <field name="geo_lng" required="1"/>
                     <field name="precision"/>
@@ -18,6 +44,7 @@
                     <field name="city"/>
                     <field name="phone"/>
                     <field name="mobile"/>
+                    <field name="color_parent_enfant"/>
                     <templates>
                         <t t-name="of_map_record_box">
                             <div name="record_box" class="of_map_record_global_click">
@@ -89,6 +116,85 @@
             <field name="view_mode">map</field>
             <field name="view_id" ref="of_partner_map_view"/>
             <field name="act_window_id" ref="contacts.action_contacts"/>
+        </record>
+
+
+        <!-- Vue map des propositions de résultat de géocoding -->
+        <record id="view_of_geo_wizard_mono_line_map" model="ir.ui.view">
+            <field name="name">Proposition de résultat</field>
+            <field name="model">of.geo.wizard.mono.line</field>
+            <field name="arch" type="xml">
+                <map string="Map" class="of_map" latitude_field="geo_lat" longitude_field="geo_lng">
+                    <field name="wizard_id"/>
+                    <field name="name"/>
+                    <field name="geocodeur"/>
+                    <field name="geocoding"/>
+                    <field name="precision"/>
+                    <field name="id"/>
+                    <field name="score"/>
+                    <field name="geo_lat"/>
+                    <field name="geo_lng"/>
+                    <field name="street"/>
+                    <field name="city"/>
+                    <field name="zip"/>
+                    <field name="country"/>
+                    <templates>
+                        <t t-name="of_map_record_box">
+                            <div class="of_map_record_global_click">
+                                <div class="of_map_record_buttons">
+                                    <i class="of_map_record_close fa fa-lg fa-times"/>
+                                </div>
+                                <div name="content" class="of_map_record_content">
+                                    <t t-if="record.street.raw_value">
+                                        <strong><span>Rue:</span></strong><span class="of_ws"/><field name="street"/><br/>
+                                    </t>
+                                    <t t-if="record.zip.raw_value">
+                                        <strong><span>Code postal:</span></strong><span class="of_ws"/><field name="zip"/><br/>
+                                    </t>
+                                    <t t-if="record.city.raw_value">
+                                        <strong><span>Ville:</span></strong><span class="of_ws"/><field name="city"/><br/>
+                                    </t>
+                                    <t t-if="record.country.raw_value" groups="base.group_no_one">
+                                        <strong><span>Pays:</span></strong><span class="of_ws"/><field name="country"/><br/>
+                                    </t>
+                                    <t t-if="record.precision.raw_value">
+                                        <strong><span>Précision:</span></strong><span class="of_ws"/><field name="precision"/><br/>
+                                    </t>
+                                    <t t-if="record.score.raw_value" groups="base.group_no_one">
+                                        <strong><span>Score:</span></strong><span class="of_ws"/><field name="score"/>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                        <t t-name="of_map_marker_tooltip">
+                            <div name="marker_tooltip">
+                                <i class="fa fa-user"/><span class="of_ws"/>
+                                <field name="partner_name"/><br/>
+                                Précision:
+                                <t t-if='["manual","very_high","high","medium","low"].includes(record.precision.raw_value)'>
+                                    <field name="precision"/>
+                                </t>
+                                <t t-else="">
+                                    <span class="of_ws"/>
+                                    Indeterminée
+                                </t>
+                            </div>
+                        </t>
+                    </templates>
+                </map>
+            </field>
+        </record>
+
+        <!-- View wizard geocoding monocible -->
+        <record id="of_view_geo_wizard_mono_inh_map_view" model="ir.ui.view">
+            <field name="name">Géolocaliser un partenaire</field>
+            <field name="model">of.geo.wizard.mono</field>
+            <field name="inherit_id" ref="of_geolocalize.of_view_geo_wizard_mono"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='group_map']" position="inside">
+                    <field name="line_map_ids" mode="map" colspan="2" nolabel="1"/>
+                </xpath>
+            </field>
         </record>
 
     </data>

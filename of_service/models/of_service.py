@@ -281,7 +281,7 @@ class OfService(models.Model):
                 service.color = 'gray'
 
     @api.model
-    def get_color_map(self):
+    def get_color_map(self, context={}):
         u"""
         fonction pour la légende de la vue map
         """

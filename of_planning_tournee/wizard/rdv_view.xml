@@ -15,9 +15,10 @@
                         });
                     </script>
                     <header>
-                        <button name="button_geocode" string="Géolocaliser" type="object" style="margin-bottom: 10px;"
+                        <button name="%(of_geolocalize.action_geocode_mono)d" string="Géolocaliser" type="action" style="margin-bottom: 10px;"
                           class="btn-primary" icon="fa-map-marker" help="Utiliser votre gécodeur par défaut pour tenter de géolocaliser l'adresse d'intervention"
-                          attrs="{'invisible': ['|','|',('geo_lat', '!=', 0.0),('geo_lng', '!=', 0.0),('geocode_retry','!=',False)]}"/>
+                          attrs="{'invisible': ['|','|',('geo_lat', '!=', 0.0),('geo_lng', '!=', 0.0),('geocode_retry','!=',False)]}"
+                          context="{'default_partner_id': partner_id}"/>
                     </header>
                     <field name="geocode_retry" invisible="1"/>
                     <field name="zero_result" invisible="1"/>

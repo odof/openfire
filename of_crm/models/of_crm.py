@@ -134,7 +134,7 @@ class CrmLead(models.Model):
             lead.of_color_map = color
 
     @api.model
-    def get_color_map(self):
+    def get_color_map(self, context={}):
         u"""
         fonction pour la légende de la vue map
         """

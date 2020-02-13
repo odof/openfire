@@ -180,13 +180,19 @@ class OFRDVCommercial(models.TransientModel):
     geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_address", search='_search_lng')
     precision = fields.Selection([
         ('manual', "Manuel"),
+        ('very_high', 'Excellent'),
         ('high', "Haut"),
         ('medium', "Moyen"),
         ('low', "Bas"),
         ('no_address', u"--"),
         ('unknown', u"Indéterminé"),
         ('not_tried', u"Pas tenté"),
-        ], default='not_tried', help=u"Niveau de précision de la géolocalisation", compute="_compute_address", search='_search_precision')
+        ], default='not_tried', compute="_compute_address", search='_search_precision',
+        help=u"Niveau de précision de la géolocalisation.\n"
+             u"bas: à la ville.\n"
+             u"moyen: au village\n"
+             u"haut: à la rue / au voisinage\n"
+             u"très haut: au numéro de rue\n")
     ignorer_geo = fields.Boolean(u"Ignorer données géographiques")
     geocode_retry = fields.Boolean("Geocodage retenté")
 
@@ -970,13 +976,19 @@ class OfRDVCommercialLine(models.TransientModel):
     geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_geo", readonly=True, search='_search_lng')
     precision = fields.Selection([
         ('manual', "Manuel"),
+        ('very_high', 'Excellent'),
         ('high', "Haut"),
         ('medium', "Moyen"),
         ('low', "Bas"),
         ('no_address', u"--"),
         ('unknown', u"Indéterminé"),
         ('not_tried', u"Pas tenté"),
-        ], default='not_tried', readonly=True, help=u"Niveau de précision de la géolocalisation", compute="_compute_geo", search='_search_precision')
+        ], default='not_tried', readonly=True, compute="_compute_geo", search='_search_precision',
+        help=u"Niveau de précision de la géolocalisation.\n"
+             u"bas: à la ville.\n"
+             u"moyen: au village\n"
+             u"haut: à la rue / au voisinage\n"
+             u"très haut: au numéro de rue\n")
 
     def _search_lat(self, operator, operand):
         calendars = self.env['calendar.event']

@@ -36,15 +36,15 @@ function isNullOrUndef(value) {
 }
 
 var iconUrls = {
-        "black": '/of_map_view/static/src/img/marker-icon-black.png',
-        "blue": '/of_map_view/static/src/img/marker-icon-blue.png',
-        "green": '/of_map_view/static/src/img/marker-icon-green.png',
-        "grey": '/of_map_view/static/src/img/marker-icon-grey.png',
-        "gray": '/of_map_view/static/src/img/marker-icon-grey.png',
-        "orange": '/of_map_view/static/src/img/marker-icon-orange.png',
-        "red": '/of_map_view/static/src/img/marker-icon-red.png',
-        "violet": '/of_map_view/static/src/img/marker-icon-violet.png',
-        "yellow": '/of_map_view/static/src/img/marker-icon-yellow.png',
+    "black": '/of_map_view/static/src/img/marker-icon-black.png',
+    "blue": '/of_map_view/static/src/img/marker-icon-blue.png',
+    "green": '/of_map_view/static/src/img/marker-icon-green.png',
+    "grey": '/of_map_view/static/src/img/marker-icon-grey.png',
+    "gray": '/of_map_view/static/src/img/marker-icon-grey.png',
+    "orange": '/of_map_view/static/src/img/marker-icon-orange.png',
+    "red": '/of_map_view/static/src/img/marker-icon-red.png',
+    "violet": '/of_map_view/static/src/img/marker-icon-violet.png',
+    "yellow": '/of_map_view/static/src/img/marker-icon-yellow.png',
 };
 
 var MapView = View.extend({
@@ -92,6 +92,7 @@ var MapView = View.extend({
         this.lat_field = this.fields_view.arch.attrs.latitude_field;
         this.lng_field = this.fields_view.arch.attrs.longitude_field;
         this.name = "" + this.fields_view.arch.attrs.string;
+        this.legend_context = JSON.parse(this.fields_view.arch.attrs.legend_context || "{}");
         this.fields = this.fields_view.fields;
         this.fields_keys = _.keys(this.fields_view.fields);
 
@@ -121,6 +122,9 @@ var MapView = View.extend({
         this.nondisplayable_records = [];
         this.records = [];
 
+        // generate random id
+        this.map_id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+
         //console.log("MapView.init this: ",this);
     },
     /**
@@ -138,6 +142,7 @@ var MapView = View.extend({
         this.displayer_options = {};
         this.displayer_options.qweb = this.qweb;
         this.displayer_options.legends = [];
+        this.displayer_options.context = this.legend_context;
         if (this.fields_view.arch.attrs.color_field) {
             var legend_color = {
                 name: 'legend_color',
@@ -178,7 +183,7 @@ var MapView = View.extend({
         this.init_record_options();
         this.init_displayer_options();
 
-        var rendered_prom = this.$el.html(qweb.render(this.template, this)).promise();
+        var rendered_prom = this.$el.html(qweb.render(this.template, {widget: this})).promise();
         var options = {};
         if (!this.options.map_center_and_zoom) { // the map will use default center and zoom config, found in ir.config_parameter
             options.map_center_and_zoom = true;
@@ -209,6 +214,7 @@ var MapView = View.extend({
         var options = {center: this.options.map_center_and_zoom[0], zoom: this.options.map_center_and_zoom[1]};
         if (this.options.tile_server_addr) options.tile_server_addr = this.options.tile_server_addr;
         options.displayer_options = this.displayer_options;
+        options.container_id = this.map_id;
         var args = {view: this, options};
         //console.log("map options: ",options);
         this.map = new MapView.Map(args);
@@ -389,7 +395,7 @@ var MapView = View.extend({
                         var le_index = i + offset;
                         if (self.records[le_index] == undefined && records[i] != undefined) {
                             self.records[le_index] = records[i];
-                            // console.log("new record in list");  // tu peux décommenter ça pour tes tests ;)
+                            //console.log("new record in list");  // tu peux décommenter ça pour tes tests ;)
                         }
                     }
                     return $.when();
@@ -742,6 +748,7 @@ MapView.Map = Widget.extend({
      *  @param {String} mode Mode to apply. Defaults to 'visible'.
      */
     set_bounds: function (mode=this.options.set_bounds_mode) {
+        //console.log("Set bounds")
         var bounds = new L.LatLngBounds();
         switch (mode) {
             case 'visible': 
@@ -761,13 +768,16 @@ MapView.Map = Widget.extend({
             default:
                 console.log("given string doesn't match any of the available modes. modes are 'visible', 'current', current_visible' and 'all'");
         };
-        //console.log("the_map: ",this.the_map,bounds);
+        
         if (!isNullOrUndef(bounds._northEast)) {
             this.the_map.fitBounds(bounds, {padding: [30, 30]});
         }
         if (this.the_map.getZoom() > 15) {
             this.the_map.setZoom(15);
         }
+        //console.log("the_map: ",this.the_map,bounds);
+        var self = this;
+        //setTimeout(function(){self.the_map.invalidateSize()}, 3000)
     },
 
     /**
@@ -1036,7 +1046,7 @@ MapView.LayerGroup = Widget.extend({
      */
     get_color_url: function (record) {
         var color_field =  this.options.color_field;
-        if (color_field) {
+        if (color_field && record[color_field]) {
             return iconUrls[record[color_field]];
         }else{
             return iconUrls["blue"];
@@ -1426,6 +1436,11 @@ MapView.Marker = L.Marker.extend({
         var options;
         this.selected ? options = this.group.options.icon_options.selected : options = this.group.options.icon_options.unselected;
         options['id'] = 'icon_'+this.id;
+        if (color) {
+            return iconUrls[color];
+        }else{
+            return iconUrls["blue"];
+        }
         options["iconUrl"] = iconUrls[color];
 
         var icon = L.icon.glyph(options);

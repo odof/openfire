@@ -70,13 +70,19 @@ class OFParcInstalle(models.Model):
     geo_lng = fields.Float('geo_lng', compute='_compute_geo', store=True)
     precision = fields.Selection([
         ('manual', "Manuel"),
+        ('very_high', 'Excellent'),
         ('high', "Haut"),
         ('medium', "Moyen"),
         ('low', "Bas"),
         ('no_address', u"--"),
         ('unknown', u"Indéterminé"),
         ('not_tried', u"Pas tenté"),
-        ], default='not_tried', string='precision', compute='_compute_geo', store=True)
+        ], default='not_tried', string='precision', compute='_compute_geo', store=True,
+        help=u"Niveau de précision de la géolocalisation.\n"
+             u"bas: à la ville.\n"
+             u"moyen: au village\n"
+             u"haut: à la rue / au voisinage\n"
+             u"très haut: au numéro de rue\n")
 
     _sql_constraints = [('no_serie_uniq', 'unique(name)', u"Ce numéro de série est déjà utilisé et doit être unique.")]
 
@@ -262,7 +268,7 @@ class project_issue(models.Model):
                     issue.of_parc_installe_lieu_id = issue.of_produit_installe_id.client_id.id
 
     @api.model
-    def get_color_map(self):
+    def get_color_map(self, context={}):
         u"""
         fonction pour la légende de la vue map
         """

@@ -14,6 +14,7 @@
             <script type="text/javascript" src="/of_map_view/static/src/js/map_widgets.js"></script>
             <script type="text/javascript" src="/of_map_view/static/src/js/map_utils.js"></script>
             <script type="text/javascript" src="/of_map_view/static/src/js/map_controls.js"></script>
+            <script type="text/javascript" src="/of_map_view/static/src/js/map_relational.js"></script>
             <script type="text/javascript" src="/of_map_view/static/src/js/map_record.js"></script>
             <script type="text/javascript" src="/of_map_view/static/src/js/map_view.js"></script>
             <!-- pour tests - ->

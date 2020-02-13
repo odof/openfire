@@ -26,7 +26,7 @@
                         class="btn-primary" icon="fa-map-marker" help="Réessayer, géolocaliser avec un autre géocodeur ou effacer les géodonnes"/>
                     <group colspan="2" col="2" groups="base.group_no_one">
                         <separator string="Données de géolocalisation" colspan="2"/>
-                        <field name="street_query"/>
+                        <field name="street_query" readonly="1"/>
                         <field name="geocoding_response"/>
                     </group>
                 </page>
@@ -40,6 +40,14 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//label[@for='street']" position="before">
+                <div col="2" colspan="2" attrs="{'invisible': [('geocoding', 'not in', ('not_tried', 'failure'))]}">
+                    <div colspan="1"/>
+                    <button name="%(action_geocode_mono)d" string="Géolocaliser" type="action"
+                        class="btn-primary" icon="fa-map-marker" colspan="1"
+                        context="{'default_partner_id': active_id}"/>
+                </div>
+            </xpath><!--  style="margin-bottom: 10px;" -->
             <xpath expr="//notebook[last()]" position="inside">
                 <page string="Localisation" name="geo_location_tab">
                     <separator string="Géolocalisation"/>
@@ -47,20 +55,30 @@
                         <group>
                             <field name="geo_lat" string="Latitude"/>
                             <field name="geo_lng" string="Longitude"/>
-                            <field name="precision" string="Précision"/>
+
                         </group>
                         <group>
-                            <field name="geocodeur"/>
                             <field name="geocoding" string="Géocodage"/>
-                            <field name="date_last_localization" string="Date" widget="date"/>
+                            <field name="precision" string="Précision"/>
+                            <div colspan="1" string=" "/>
+                            <div>
+                                <button name="button_verify_geocoding" type="object" icon="fa-check" string="Vérifier"
+                                        attrs="{'invisible': [('geocoding', '!=', 'need_verif')]}"/>
+                                <button name="button_refute_geocoding" type="object" icon="fa-times" string="Réfuter"
+                                        attrs="{'invisible': [('geocoding', '!=', 'need_verif')]}"/>
+                            </div>
+                            <field name="street_response" readonly="1" attrs="{'invisible': [('geocoding', '!=', 'need_verif')]}"/>
+
                         </group>
                     </group>
-                    <button name="%(action_regeocode)d" string="Géolocaliser" type="action" style="margin-bottom: 10px;"
-                        class="btn-primary" icon="fa-map-marker" help="Réessayer, géolocaliser avec un autre géocodeur ou effacer les géodonnes"
+                    <button name="%(action_geocode_mono)d" string="Géolocaliser" type="action" style="margin-bottom: 10px;"
+                        class="btn-primary" icon="fa-map-marker" help="Réessayer ou géolocaliser avec un autre géocodeur"
                         context="{'default_partner_id': active_id}"/>
                     <group colspan="2" col="2" groups="base.group_no_one">
                         <separator string="Données de géolocalisation" colspan="2"/>
-                        <field name="street_query"/>
+                        <field name="date_last_localization" string="Date" widget="date"/>
+                        <field name="geocodeur"/>
+                        <field name="street_query" readonly="1"/>
                         <field name="geocoding_response"/>
                     </group>
                 </page>
@@ -77,7 +95,14 @@
             <filter name="supplier" position="after">
                 <separator/>
                 <filter string="Non localisés" name='not_localized' domain="[('geo_lat', '=', 0)]" help="Partners who need localization"/>
-                <filter name="geocoding_success" string="Géocodage réussi" domain="['|','|','|',('geocoding','=','success_openfire'),('geocoding','=','success_osm'),('geocoding','=','success_bano'),('geocoding','=','success_google')]"/>
+                <filter name="geocoding_success" string="Géocodage réussi"
+                        domain="['|', '|', '|', '|',
+                            ('geocoding','=','success_openfire'),
+                            ('geocoding','=','success_osm'),
+                            ('geocoding','=','success_mapbox'),
+                            ('geocoding','=','success_bano'),
+                            ('geocoding','=','success_google')]"/>
+                <filter name="geocoding_verif" string="Géocodage à vérifier" domain="[('geocoding','=','need_verif')]"/>
                 <filter name="geocoding_failure" string="Géocodage échoué" domain="[('geocoding','=','failure')]"/>
                 <separator/>
             </filter>
@@ -109,7 +134,8 @@
                 <field name="geocoding" string="Géocodage"/>
                 <field name="geocodeur"/>
                 <field name="date_last_localization" string="Date" widget="date"/>
-                <button name="%(action_regeocode)d" string="Géolocaliser" type="action" icon="fa-map-marker"/>
+                <button name="%(action_geocode_mono)d" string="Géolocaliser" type="action" icon="fa-map-marker"
+                    context="{'default_partner_id': active_id}"/>
                 <field name="user_id" invisible="1"/>
                 <field name="is_company" invisible="1"/>
                 <field name="parent_id" invisible="1"/>
@@ -139,19 +165,25 @@
                 <filter name="all_entries" string="Tous" domain="[('display_name','!=',False)]"/>
                 <filter name="all_address" string="Tous avec adresse" domain="['|','|','|',('street','!=',False),('street2','!=',False),('zip','!=', False),('city','!=', False)]"/>
                 <separator/>
-                <filter name="geocoding_success" string="Géocodage réussi" domain="['|','|','|',('geocoding','=','success_openfire'),('geocoding','=','success_osm'),('geocoding','=','success_bano'),('geocoding','=','success_google')]"/>
+                <filter name="geocoding_success" string="Géocodage réussi"
+                        domain="['|', '|', '|', '|'
+                        ('geocoding','=','success_openfire'),
+                        ('geocoding','=','success_osm'),
+                        ('geocoding','=','success_mapbox'),
+                        ('geocoding','=','success_bano'),
+                        ('geocoding','=','success_google')]"/>
+                <filter name="geocoding_verif" string="Géocodage à vérifier" domain="[('geocoding','=','need_verif')]"/>
                 <filter name="geocoding_failure" string="Géocodage échoué" domain="[('geocoding','=','failure')]"/>
                 <filter name="geocoding_not_tried" string="Géocodage non tenté" domain="[('geocoding','=','not_tried')]"/>
                 <filter name="geocoding_manual" string="Géocodage manuel" domain="[('geocoding','=','manual')]"/>
                 <separator/>
+                <filter name="precision_tres_haut" string="Précision excellent haut" domain="[('precision','=','very_high')]"/>
                 <filter name="precision_haut" string="Précision haut" domain="[('precision','=','high')]"/>
                 <filter name="precision_medium" string="Précision moyen" domain="[('precision','=','medium')]"/>
                 <filter name="precision_low" string="Précision bas" domain="[('precision','=','low')]"/>
                 <separator/>
-                <filter name="geocodeur_of" string="Géocodeur OpenFire" domain="[('geocodeur','=','nominatim_openfire')]"/>
-                <filter name="geocodeur_osm" string="Géocodeur OpenStreeMap" domain="[('geocodeur','=','nominatim_osm')]"/>
+                <filter name="geocodeur_mapbox" string="Géocodeur MapBox" domain="[('geocodeur','=','mapbox')]"/>
                 <filter name="geocodeur_ban" string="Géocodeur BANO" domain="[('geocodeur','=','bano')]"/>
-                <filter name="geocodeur_goo" string="Géocodeur Google Maps" domain="[('geocodeur','=','google_maps')]"/>
                 <separator/>
                 <filter name="date_last_localization" string="Dernière geocodage"/>
                 <filter name="geocoding" string="Géocodage" domain="[]" context="{'group_by':'geocoding'}"/>
@@ -176,54 +208,6 @@
                     <button string="Appliquer" type="object" name="execute" class="oe_highlight" confirm="Êtes-vous sûr de valider les modifications?"/>
                     <button string="Annuler" type="object" name="cancel" class="oe_link" special="cancel"/>
                 </header>
-                <group string="Geocodeurs URLs" name="geo_urls">
-                    <label for="url_openfire" string="OpenFire"/>
-                    <div>
-                        <field name="url_openfire" style="display: inline-block; width: 30%;"/>
-                        <field name="url_openfire_status" invisible="1"/>
-                        <span style="margin-left: 6px; color: green;" attrs="{'invisible': ['|',('url_openfire_status','=','new'),('url_openfire_status','=','fail')]}">OK</span>
-                        <span style="margin-left: 6px; color: orange;" attrs="{'invisible': ['|',('url_openfire_status','=','ok'),('url_openfire_status','=','fail')]}">URL inconnue</span>
-                        <span style="margin-left: 6px; color: red;" attrs="{'invisible': ['|',('url_openfire_status','=','ok'),('url_openfire_status','=','new')]}">Échec</span>
-                        <span style="margin-left: 6px; color: grey;" attrs="{'invisible': [('url_openfire_status','=','ok')]}">Suggérée : https://openfire.fr/nominatim/search?q=</span>
-                    </div>
-                    <label for="url_osm" string="OpenStreetMap"/>
-                    <div>
-                        <field name="url_osm" style="display: inline-block; width: 30%;"/>
-                        <field name="url_osm_status" invisible="1"/>
-                        <span style="margin-left: 6px; color: green;" attrs="{'invisible': ['|',('url_osm_status','=','new'),('url_osm_status','=','fail')]}">OK</span>
-                        <span style="margin-left: 6px; color: orange;" attrs="{'invisible': ['|',('url_osm_status','=','ok'),('url_osm_status','=','fail')]}">URL inconnue</span>
-                        <span style="margin-left: 6px; color: red;" attrs="{'invisible': ['|',('url_osm_status','=','ok'),('url_osm_status','=','new')]}">Échec</span>
-                        <span style="margin-left: 6px; color: grey;" attrs="{'invisible': [('url_osm_status','=','ok')]}">Suggérée : https://nominatim.openstreetmap.org/search?q=</span>
-                    </div>
-                    <label for="url_bano" string="BANO"/>
-                    <div>
-                        <field name="url_bano" style="display: inline-block; width: 30%;"/>
-                        <field name="url_bano_status" invisible="1"/>
-                        <span style="margin-left: 6px; color: green;" attrs="{'invisible': ['|',('url_bano_status','=','new'),('url_bano_status','=','fail')]}">OK</span>
-                        <span style="margin-left: 6px; color: orange;" attrs="{'invisible': ['|',('url_bano_status','=','ok'),('url_bano_status','=','fail')]}">URL inconnue</span>
-                        <span style="margin-left: 6px; color: red;" attrs="{'invisible': ['|',('url_bano_status','=','ok'),('url_bano_status','=','new')]}">Échec</span>
-                        <span style="margin-left: 6px; color: grey;" attrs="{'invisible': [('url_bano_status','=','ok')]}">Suggérée : https://api-adresse.data.gouv.fr/search/?</span>
-                    </div>
-                    <label for="url_google" string="Google Maps"/>
-                    <div>
-                        <field name="url_google" style="display: inline-block; width: 30%;"/>
-                        <field name="url_google_status" invisible="1"/>
-                        <span style="margin-left: 6px; color: green;" attrs="{'invisible': ['|',('url_google_status','=','new'),('url_google_status','=','fail')]}">OK</span>
-                        <span style="margin-left: 6px; color: orange;" attrs="{'invisible': ['|',('url_google_status','=','ok'),('url_google_status','=','fail')]}">URL inconnue</span>
-                        <span style="margin-left: 6px; color: red;" attrs="{'invisible': ['|',('url_google_status','=','ok'),('url_google_status','=','new')]}">Échec</span>
-                        <span style="margin-left: 6px; color: grey;" attrs="{'invisible': [('url_google_status','=','ok')]}">Suggérée : http://maps.googleapis.com/maps/api/geocode/json</span>
-                    </div>
-                </group>
-                <group string="APIs" name="config_apis">
-                    <label for="google_api_key" string="Clé API Google"/>
-                    <div>
-                        <field name="google_api_key_status" invisible="1"/>
-                        <field name="google_api_key" password="True" style="display: inline-block; width: 25%;"/>
-                        <span style="margin-left: 6px; color: green;" attrs="{'invisible': [('google_api_key_status','=',False)]}">OK</span>
-                        <span style="margin-left: 6px; color: red;" attrs="{'invisible': [('google_api_key_status','=',True)]}">Pas de clé.</span>
-                        <a href="https://developers.google.com/places/web-service/get-api-key" target="_blank" attrs="{'invisible': [('google_api_key_status','=',True)]}"> Obtenir une clé API Google </a>
-                    </div>
-                </group>
                 <group string="Comportement des fonctions automatiques" name="comportement_config">
                     <field name="show_stats"/>
                     <field name="geocoding_on_write" widget="radio"/>

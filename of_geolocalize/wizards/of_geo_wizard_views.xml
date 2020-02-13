@@ -1,5 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <!-- View wizard geocoding monocible -->
+    <record id="of_view_geo_wizard_mono" model="ir.ui.view">
+        <field name="name">Géolocaliser un partenaire</field>
+        <field name="model">of.geo.wizard.mono</field>
+        <field name="arch" type="xml">
+            <form string="Géolocaliser un partenaire">
+                <h1 class="of_title"><b>
+                    <field name="partner_id" nolabel="1" class="oe_inline"/>
+                </b></h1>
+                <group col="3">
+                    <group colspan="2" col="1">
+                        <field name="addr_search" style="max-width: 90% !important;"/>
+                    </group>
+                    <group colspan="1" col="1">
+                        <field name="geocodeur"/>
+                    </group>
+                </group>
+
+                <group col="1" attrs="{'invisible': [('line_ids', '=', [])]}">
+                    <field name="line_id" options="{'no_open': True, 'no_edit': True, 'no_create': True}"
+                        domain="[('wizard_id', '=', id), ('wizard_id', '!=', False)]"/>
+                    <div>
+                        <strong class="of_ws">Mettre à jour l'adresse du partenaire pour qu'elle corresponde au résultat </strong>
+                        <field name="write_addr" class="oe_inline" nolabel="1"/>
+                    </div>
+                </group>
+
+                <group col="1" attrs="{'invisible': [('aucun_res', '=', False)]}">
+                    <strong><i class="fa fa-warning"/>Aucun résultat</strong>
+                </group>
+                <group name="group_map">
+                    <!-- ici viens la map déclarée dans of_map_view  attrs="{'invisible': [('line_ids', '=', [])]}"-->
+                </group>
+                <field name="line_ids" invisible="1"/>
+                <field name="aucun_res" invisible="1"/>
+                <footer>
+                    <button name="button_search" class="btn btn-primary" string="Rechercher" type="object"
+                        attrs="{'invisible': [('line_ids', '!=', [])]}" icon="fa-map-marker"/>
+                    <button name="button_search" class="btn btn-default" string="Rechercher" type="object"
+                        attrs="{'invisible': [('line_ids', '=', [])]}" icon="fa-rotate-right"/>
+                    <button name="button_confirm" class="btn btn-primary" string="Valider" type="object"
+                        attrs="{'invisible': [('line_ids', '=', [])]}" icon="fa-check"/>
+                    <button name="button_cancel" class="btn btn-default" string="Annuler" special="cancel" icon="fa-close"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action geocode moncible -->
+    <record id="action_geocode_mono" model="ir.actions.act_window">
+         <field name="name">Géolocaliser une adresse</field>
+         <field name="res_model">of.geo.wizard.mono</field>
+         <field name="type">ir.actions.act_window</field>
+         <field name="view_type">form</field>
+         <field name="view_mode">form</field>
+         <field name="view_id" ref="of_view_geo_wizard_mono"/>
+         <field name="target">new</field>
+    </record>
 
     <!-- View wizard geocoding -->
     <record id="of_view_geo_wizard" model="ir.ui.view">
@@ -13,16 +71,24 @@
                         $(".modal-dialog").width('80%');
                     });
                 </script>
+                <header>
+                    <button class="btn-primary" name="action_geocode" string="Géolocaliser" type="object" icon="fa-map-marker"
+                        attrs="{'invisible': [('line_ids', '!=', [])]}"/>
+                    <button class="btn-primary" name="button_confirm" string="Valider les résultats" type="object" icon="fa-check"
+                        attrs="{'invisible': [('line_ids', '=', [])]}"/>
+                    <button class="btn-primary" name="action_reset_geo_val_selected" type="object" string="Effacer" icon="fa-eraser"
+                            groups="base.group_no_one"
+                        confirm="Êtes-vous sûr de réinitialiser les partenaires sélectionnés ? Ceci effacera les données de géolocalisation des partenaires sélectionnés sauf ceux manuellement géolocalisés."/>
+                    <button class="btn-default" special="cancel" string="Annuler"/>
+                </header>
                 <field name="show_stats_wizard" invisible="1"/>
                 <separator string="Statistiques" style="margin-top: 0px; margin-bottom: 0px;" attrs="{'invisible':[('show_stats_wizard', '=', False)]}"/>
                 <table class="table table-condensed" attrs="{'invisible':[('show_stats_wizard', '=', False)]}">
                     <thead>
                         <th class="text-center"></th>
                         <th class="text-center">Partners</th>
-                        <th class="text-center" style="background-color: #F2F2F2">OpenFire</th>
-                        <th class="text-center" style="background-color: #F2F2F2">OSM</th>
                         <th class="text-center" style="background-color: #F2F2F2">BANO</th>
-                        <th class="text-center" style="background-color: #F2F2F2">Google</th>
+                        <th class="text-center" style="background-color: #F2F2F2">Mapbox</th>
                         <th class="text-center">Manuel</th>
                         <th class="text-center">Total géolocalisés</th>
                         <th class="text-center">Échoués</th>
@@ -33,23 +99,19 @@
                         <tr name="numbers">
                             <td style="font-weight: bold;">Nombre</td>
                             <td class="text-center"><field name="nb_partners"/></td>
-                            <td class="text-center" style="background-color: #F2F2F2"><field name="nb_geocoding_success_openfire"/></td>
-                            <td class="text-center" style="background-color: #F2F2F2"><field name="nb_geocoding_success_osm"/></td>
                             <td class="text-center" style="background-color: #F2F2F2"><field name="nb_geocoding_success_ban"/></td>
-                            <td class="text-center" style="background-color: #F2F2F2"><field name="nb_geocoding_success_google"/></td>
+                            <td class="text-center" style="background-color: #F2F2F2"><field name="nb_geocoding_success_mapbox"/></td>
                             <td class="text-center"><field name="nb_geocoding_manually"/></td>
                             <td class="text-center"><field name="nb_geocoding_total_success"/></td>
                             <td class="text-center"><field name="nb_geocoding_failure"/></td>
                             <td class="text-center"><field name="nb_no_address"/></td>
                             <td class="text-center"><field name="nb_geocoding_not"/></td>
                         </tr>
-                        <tr name="porcentage total">
+                        <tr name="pourcentage total">
                             <td style="font-weight: bold;">% du total</td>
                             <td></td>
-                            <td class="text-center" style="background-color: #F2F2F2"><field name="por_success_openfire"/><span>%</span></td>
-                            <td class="text-center" style="background-color: #F2F2F2"><field name="por_success_osm"/><span>%</span></td>
                             <td class="text-center" style="background-color: #F2F2F2"><field name="por_success_ban"/><span>%</span></td>
-                            <td class="text-center" style="background-color: #F2F2F2"><field name="por_success_google"/><span>%</span></td>
+                            <td class="text-center" style="background-color: #F2F2F2"><field name="por_success_mapbox"/><span>%</span></td>
                             <td class="text-center"><field name="por_manually"/><span>%</span></td>
                             <td class="text-center"><field name="por_total_success"/><span>%</span></td>
                             <td class="text-center"><field name="por_failure"/><span>%</span></td>
@@ -59,10 +121,8 @@
                         <tr name="porcentage reussi">
                             <td style="font-weight: bold;">Dernier taux réussite</td>
                             <td></td>
-                            <td class="text-center" style="background-color: #F2F2F2"><field name="taux_success_openfire"/><span>%</span></td>
-                            <td class="text-center" style="background-color: #F2F2F2"><field name="taux_success_osm"/><span>%</span></td>
                             <td class="text-center" style="background-color: #F2F2F2"><field name="taux_success_ban"/><span>%</span></td>
-                            <td class="text-center" style="background-color: #F2F2F2"><field name="taux_success_google"/><span>%</span></td>
+                            <td class="text-center" style="background-color: #F2F2F2"><field name="taux_success_mapbox"/><span>%</span></td>
                             <td></td>
                             <td></td>
                             <td></td>
@@ -72,101 +132,109 @@
                     </tbody>
                 </table>
 
-                <separator string="Paramétrage" style="margin-top: 0px; margin-bottom: 0px;"/>
-                <group style="margin-top: 0px; padding-top: 0px">
-                    <group style="margin-top: 0px; padding-top: 0px">
-                        <div style="margin-top: 0px; margin-bottom: 4px; font-weight: bold; font-size: 12pt; color: #7c7bad" colspan="4">Géocodeur</div>
-                        <field name="use_nominatim_openfire"/>
-                        <field name="use_nominatim_osm"/>
-                        <field name="use_bano"/>
-                        <div colspan="2" class="oe_grey"><i>/!\ BANO est seulement valable en France</i></div>
-                        <field name="use_google"/> <!-- reaonly if no api key attrs="{'readonly':[('api_key','!=','not')]}"/> -->
-                    </group>
-                    <group style="margin-top: 0px; padding-top: 0px">
-                        <div style="margin-top: 0px; margin-bottom: 4px; font-weight: bold; font-size: 12pt; color: #7c7bad" colspan="6">Options</div>
-                        <field name="best_precision"/>
-                        <div style="margin-bottom: 4px; font-weight: bold; font-size: 12pt; color: #7c7bad" colspan="6" attrs="{'invisible':[('nb_selected_partners_success', '=', 0)]}">Traitement partenaires déjà géolocalisées</div>
-                        <field name="overwrite_geoloc_all" attrs="{'readonly': [('overwrite_geoloc_except_manual', '=', True)], 'invisible':[('nb_selected_partners_success', '=', 0)]}"/>
-                        <field name="overwrite_geoloc_except_manual" attrs="{'readonly': [('overwrite_geoloc_all', '=', True)], 'invisible':[('nb_selected_partners_manual', '=', 0)]}"/>
-                        <field name="overwrite_if_failure"
-                               attrs="{'invisible':[
-                                 '|',
-                                   ('nb_selected_partners_success', '=', 0),
-                                   '&amp;',
-                                     ('overwrite_geoloc_all', '=', False),
-                                     ('overwrite_geoloc_except_manual', '=', False)]}"/>
-                    </group>
-                </group>
-
-                <separator string="Partenaires sélectionnés"/>
-                <group style="margin: 0px; padding: 0px">
-                    <table class="table table-condensed">
-                        <thead>
-                            <th class="text-center" attrs="{'invisible':[('nb_selected_partners', '=', 0)]}">Sélectionnés</th>
-                            <th class="text-center" attrs="{'invisible':[('nb_selected_partners_success', '=', 0)]}">Géolocalisés</th>
-                            <th class="text-center" attrs="{'invisible':[('nb_selected_partners_manual', '=', 0)]}">Manuels</th>
-                            <th class="text-center" attrs="{'invisible':[('nb_selected_partners_failure', '=', 0)]}">Échoués</th>
-                            <th class="text-center" attrs="{'invisible':[('nb_selected_partners_no_address', '=', 0)]}">Pas d'adresse</th>
-                            <th class="text-center" attrs="{'invisible':[('nb_selected_partners_not', '=', 0)]}">Pas tentés</th>
-                            <th class="text-center" style="font-weight: bold; color: #7c7bad" >À géolocaliser</th>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="text-center" attrs="{'invisible':[('nb_selected_partners', '=', 0)]}"><field name="nb_selected_partners"/></td>
-                                <td class="text-center" attrs="{'invisible':[('nb_selected_partners_success', '=', 0)]}"><field name="nb_selected_partners_success"/></td>
-                                <td class="text-center" attrs="{'invisible':[('nb_selected_partners_manual', '=', 0)]}"><field name="nb_selected_partners_manual"/></td>
-                                <td class="text-center" attrs="{'invisible':[('nb_selected_partners_failure', '=', 0)]}"><field name="nb_selected_partners_failure"/></td>
-                                <td class="text-center" attrs="{'invisible':[('nb_selected_partners_no_address', '=', 0)]}"><field name="nb_selected_partners_no_address"/></td>
-                                <td class="text-center" attrs="{'invisible':[('nb_selected_partners_not', '=', 0)]}"><field name="nb_selected_partners_not"/></td>
-                                <td class="text-center"><field name="nb_selected_partners_to_geoloc"/></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div name="messages" attrs="{'invisible':[('nb_selected_partners_success', '=', 0)]}">
-                        <!-- Message si géolocalisés -->
-                        <div class="oe_grey" style="padding-left: 24px" attrs="{'invisible':['|',('overwrite_geoloc_all', '=', True),('overwrite_geoloc_except_manual', '=', True)]}">
-                            INFO :
-                              Seulement les partenaires dont la géolocalisation a échoué ou qui n'a pas été tentée seront tentés à nouveau. Les
-                              données des partenaires déjà géolocalisés sont protegées par défaut.
-                              <br/>
-                              Vous pouvez selectioner une option de traitement ou utiliser des filres pour definir les partenaires à geolocaliser.
+                <group style="margin-top: 0px; padding-top: 0px" col="3">
+                    <div>
+                        <separator string="Sélection" colspan="1"/>
+                        <table class="table table-condensed">
+                            <thead>
+                                <th class="text-center" attrs="{'invisible':[('nb_selected_partners', '=', 0)]}">Sélectionnés</th>
+                                <th class="text-center" attrs="{'invisible':[('nb_selected_partners_success', '=', 0)]}">Géolocalisés</th>
+                                <th class="text-center" attrs="{'invisible':[('nb_selected_partners_manual', '=', 0)]}">Manuels</th>
+                                <th class="text-center" attrs="{'invisible':[('nb_selected_partners_failure', '=', 0)]}">Échoués</th>
+                                <th class="text-center" attrs="{'invisible':[('nb_selected_partners_no_address', '=', 0)]}">Pas d'adresse</th>
+                                <th class="text-center" attrs="{'invisible':[('nb_selected_partners_need_verif', '=', 0)]}">Nécessite vérification</th>
+                                <th class="text-center" attrs="{'invisible':[('nb_selected_partners_not', '=', 0)]}">Pas tentés</th>
+                                <th class="text-center" style="font-weight: bold; color: #7c7bad" >À géolocaliser</th>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center" attrs="{'invisible':[('nb_selected_partners', '=', 0)]}"><field name="nb_selected_partners"/></td>
+                                    <td class="text-center" attrs="{'invisible':[('nb_selected_partners_success', '=', 0)]}"><field name="nb_selected_partners_success"/></td>
+                                    <td class="text-center" attrs="{'invisible':[('nb_selected_partners_manual', '=', 0)]}"><field name="nb_selected_partners_manual"/></td>
+                                    <td class="text-center" attrs="{'invisible':[('nb_selected_partners_failure', '=', 0)]}"><field name="nb_selected_partners_failure"/></td>
+                                    <td class="text-center" attrs="{'invisible':[('nb_selected_partners_no_address', '=', 0)]}"><field name="nb_selected_partners_no_address"/></td>
+                                    <td class="text-center" attrs="{'invisible':[('nb_selected_partners_need_verif', '=', 0)]}"><field name="nb_selected_partners_need_verif"/></td>
+                                    <td class="text-center" attrs="{'invisible':[('nb_selected_partners_not', '=', 0)]}"><field name="nb_selected_partners_not"/></td>
+                                    <td class="text-center"><field name="nb_selected_partners_to_geoloc"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <separator string="Traitement partenaires déjà géolocalisées" colspan="1"
+                        attrs="{'invisible':[('nb_selected_partners_success', '=', 0)]}"/>
+                        <group style="margin-top: 0px; padding-top: 0px">
+                            <field name="overwrite_geoloc_all" attrs="{'readonly': [('overwrite_geoloc_except_manual', '=', True)], 'invisible':[('nb_selected_partners_success', '=', 0)]}"/>
+                            <field name="overwrite_geoloc_except_manual" attrs="{'readonly': [('overwrite_geoloc_all', '=', True)], 'invisible':[('nb_selected_partners_manual', '=', 0)]}"/>
+                            <field name="overwrite_if_failure"
+                                   attrs="{'invisible':[
+                                     '|',
+                                       ('nb_selected_partners_success', '=', 0),
+                                       '&amp;',
+                                         ('overwrite_geoloc_all', '=', False),
+                                         ('overwrite_geoloc_except_manual', '=', False)]}"/>
+                        </group>
+                    </div>
+                    <div>
+                        <separator string="Aide" attrs="{'invisible':[('nb_selected_partners_success', '=', 0)]}" colspan="1"/>
+                        <div name="messages" attrs="{'invisible':[('nb_selected_partners_success', '=', 0)]}">
+                            <!-- Message si géolocalisés -->
+                            <div class="oe_grey" style="padding-left: 24px" attrs="{'invisible':['|',('overwrite_geoloc_all', '=', True),('overwrite_geoloc_except_manual', '=', True)]}">
+                                  Seulement les partenaires dont la géolocalisation a échoué ou qui n'a pas été tentée seront tentés à nouveau. Les
+                                  données des partenaires déjà géolocalisés sont protegées par défaut.
+                                  <br/>
+                                  Vous pouvez selectioner une option de traitement ou utiliser des filres pour definir les partenaires à geolocaliser.
+                            </div>
+                            <!-- Message si géolocalisés et tout écraser -->
+                            <div class="oe_grey" style="padding-left: 24px" attrs="{'invisible':[('overwrite_geoloc_all', '=', False)]}">
+                                  Tous les partenaires déjà géolocalisés seront essayés à nouveau, et les données de géolocalisation
+                                  réinitialisées.
+                                  <br/>
+                                  Vous pouvez utiliser des filtres pour définir les partenaries à géolocaliser.
+                            </div>
+                            <!-- Message si géolocalisés et écraser tout sauf manuel -->
+                            <div class="oe_grey" style="padding-left: 24px" attrs="{'invisible':[('overwrite_geoloc_except_manual', '=', False)]}">
+                                  Tous les partenaires déjà géolocalisés sauf ceux fait manuellement seront essayés à nouveau et les
+                                  données de géolocalisation réinitialisées.
+                                  <br/>
+                                  Vous pouvez utiliser des filres pour définir les partenaires à géolocaliser.
+                            </div>
                         </div>
-                        <!-- Message si géolocalisés et tout écraser -->
-                        <div class="oe_grey" style="padding-left: 24px" attrs="{'invisible':[('overwrite_geoloc_all', '=', False)]}">
-                            INFO :
-                              Tous les partenaires déjà géolocalisés seront essayés à nouveau, et les données de géolocalisation
-                              réinitialisées.
-                              <br/>
-                              Vous pouvez utiliser des filtres pour définir les partenaries à géolocaliser.  
-                        </div> 
-                        <!-- Message si géolocalisés et écraser tout sauf manuel -->
-                        <div class="oe_grey" style="padding-left: 24px" attrs="{'invisible':[('overwrite_geoloc_except_manual', '=', False)]}">
-                            INFO :
-                              Tous les partenaires déjà géolocalisés sauf ceux fait manuellement seront essayés à nouveau et les 
-                              données de géolocalisation réinitialisées.
-                              <br/>
-                              Vous pouvez utiliser des filres pour définir les partenaires à géolocaliser.
-                        </div> 
                     </div>
                 </group>
-
-                <field name="partner_ids" nolabel="1" options="{'no_create':True}">
-                    <tree string="Partenaires" editable="top" creatable="false" 
-                        colors="black:precision == 'manual';
-                                green:precision == 'high';
-                                #999900:precision == 'medium';
-                                orange:precision == 'low';
-                                gray:precision == 'no_address';
-                                #e0311c:precision == 'unknown';
-                                #307496:precision == 'not_tried'">
+                <field name="line_ids" nolabel="1" options="{'reload_on_button': True}"
+                    attrs="{'invisible':[('selection_done', '=', False)]}">
+                    <tree string="Partenaires" editable="top" create="0"
+                        colors="orange:geocoding == 'need_verif';
+                                red:geocoding in ('no_address', 'failure');
+                                #307496:precision == 'not_tried'" options="{'reload_on_button': True}">
+                        <field name="name" string="Partenaire" readonly="1"/>
+                        <field name="street_query"/>
+                        <field name="street_response"/>
+                        <!--field name="geo_lat" string="Latitude"/>
+                        <field name="geo_lng" string="Longitude"/-->
+                        <field name="precision" string="Précision"/>
+                        <field name="geocodeur"/>
+                        <field name="geocoding" string="Géocodage"/>
+                        <button name="button_verify_geocoding" string="Vérifier" type="object" icon="fa-check"/>
+                        <button name="button_refute_geocoding" string="Réfuter" type="object" icon="fa-times"/>
+                        <button name="button_try_again" string="Réessayer" type="object" icon="fa-rotate-right"/>
+                    </tree>
+                </field>
+                <field name="partner_ids" nolabel="1" options="{'no_create':True, 'reload_on_button': True}"
+                    attrs="{'invisible':[('selection_done', '=', True)]}">
+                    <tree string="Partenaires" editable="top"  create="0"
+                        colors="orange:geocoding == 'need_verif';
+                                red:geocoding in ('no_address', 'failure');
+                                #307496:precision == 'not_tried'" options="{'reload_on_button': True}">
                         <field name="display_name" string="Name" readonly="1"/>
                         <field name="street"/>
                         <field name="street2"/>
                         <field name="zip" string="CP"/>
                         <field name="city"/>
                         <field name="country_id"/>
-                        <field name="geo_lat" string="Latitude"/>
-                        <field name="geo_lng" string="Longitude"/>
+                        <!--field name="geo_lat" string="Latitude"/>
+                        <field name="geo_lng" string="Longitude"/-->
                         <field name="precision" string="Précision"/>
                         <field name="geocodeur"/>
                         <field name="geocoding" string="Géocodage"/>
@@ -176,9 +244,14 @@
                         <field name="active" invisible="1"/>
                     </tree>
                 </field>
+                <field name="selection_done" invisible="1"/>
                 <footer>
-                    <button class="btn-primary" name="action_geocode" string="Géolocaliser" type="object" icon="fa-map-marker"/>
+                    <button class="btn-primary" name="action_geocode" string="Géolocaliser" type="object" icon="fa-map-marker"
+                        attrs="{'invisible': [('line_ids', '!=', [])]}"/>
+                    <button class="btn-primary" name="button_confirm" string="Valider les résultats" type="object" icon="fa-check"
+                        attrs="{'invisible': [('line_ids', '=', [])]}"/>
                     <button class="btn-primary" name="action_reset_geo_val_selected" type="object" string="Effacer" icon="fa-eraser"
+                            groups="base.group_no_one"
                         confirm="Êtes-vous sûr de réinitialiser les partenaires sélectionnés ? Ceci effacera les données de géolocalisation des partenaires sélectionnés sauf ceux manuellement géolocalisés."/>
                     <button class="btn-default" special="cancel" string="Annuler"/>
                 </footer>
@@ -201,6 +274,7 @@
                 <field name="country_name" invisible="1"/>
                 <button class="btn-primary" name="action_button_geo_openfire" string="OpenFire" type="object" icon="fa-map-marker"/>
                 <button class="btn-primary" name="action_button_geo_osm" string="OpenStreetMap" type="object" style="margin-left: 8px" icon="fa-map-marker"/>
+                <button class="btn-primary" name="action_button_geo_mapbox" string="MapBox" type="object" style="margin-left: 8px" icon="fa-map-marker"/>
                 <button class="btn-primary" name="action_button_geo_ban" string="BANO" type="object" style="margin-left: 8px"
                         attrs="{'invisible': [('country_name', '!=', u'France')]}" icon="fa-map-marker"/>
                 <button class="btn-primary" name="action_button_geo_google" string="Google Maps" type="object" style="margin-left: 8px" icon="fa-map-marker"/>
@@ -232,6 +306,7 @@
         view_type="form"
         multi="True"
         view_id="of_view_geo_wizard"
-        target="new"/>
+        target="current"
+        context="{'hide_action_buttons': True}"/>
 
 </odoo>

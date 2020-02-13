@@ -276,11 +276,14 @@ L.Control.LegendDisplayer = L.Control.extend({
         for (var i in this.options.legends) {
             legend = this.options.legends[i];
             //console.log("legend: ",legend);
-            $.when(new Model(this.view.dataset.model).call(legend.method))
+            var context = self.options.context;
+            $.when(new Model(this.view.dataset.model).call(legend.method, context))
             .then(function (result){
                 //console.log("result: ", result);
-                var html = qweb.render(legend.template, { title: result.title, lines: result.values });
-                self.container.innerHTML += html;
+                if (result) {
+                  var html = qweb.render(legend.template, { title: result.title, lines: result.values });
+                  self.container.innerHTML += html;
+                }
             });
         }
     },

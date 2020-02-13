@@ -19,9 +19,43 @@ var X2ManyMapView = MapView.extend({
         });
         this._super($node, options);
     },*/
+    start: function() {
+        console.log("test", this);
+        var self = this
+        var res = this._super();
+        /*
+            Si la map est dans un onglet qui n'est pas directement visible elle sera mal centrée.
+            cela est dû au fait que leaflet pense que la map est de taille nulle.
+            il faut donc vérifier que la map est dans un onglet et ajouter un listener sur le clique sur onglet
+            même cas si la map commence à l'état invisible puis devient visible mais on traitera ça en temp voulu
+        */
+        if (this.$el.parent('div.o_notebook'.length)) {
+            // la map est dans un onglet
+            $(document)
+            .on('click.bs.tab.data-api', '[data-toggle="tab"]', function(){
+                console.log("oui?");
+                if (self.$el.is(":visible")) {
+                    // l'onglet est visible
+                    self.map.the_map.invalidateSize();
+                    self.map.set_bounds();
+                }
+            });
+        }
+        // à debugguer quand temp dispo
+        this.on("change:effective_invisible", this, function() {
+            console.log("HAHA");
+            if (self.get("effective_invisible") === false) {
+                self.map.the_map.invalidateSize();
+                self.map.set_bounds();
+                console.log("HOHO");
+            }
+        });
+
+        return res
+    },
 });
 
-var One2ManyCalendarView = X2ManyMapView.extend({
+var One2ManyMapView = X2ManyMapView.extend({
     /*add_record: function() {
         var self = this;
         new common.FormViewDialog(this, {
@@ -47,7 +81,7 @@ var One2ManyCalendarView = X2ManyMapView.extend({
     },*/
 });
 
-var Many2ManyCalendarView = X2ManyMapView.extend({
+var Many2ManyMapView = X2ManyMapView.extend({
     /*add_record: function() {
         var self = this;
         new common.SelectCreateDialog(this, {

@@ -22,6 +22,8 @@ class ResCompany(models.Model):
         ('success_osm', u"Réussi"),
         ('success_bano', u"Réussi"),
         ('success_google', u"Réussi"),
+        ('success_mapbox', u"Réussi"),
+        ('need_verif', u"Nécessite vérification"),
         ('failure', u"Échoué"),
         ('manual', u"Manuel")
         ], default='not_tried', readonly=True, help="field defining the state of the geocoding for this partner", related='partner_id.geocoding')
@@ -30,18 +32,25 @@ class ResCompany(models.Model):
         ('nominatim_osm', u"OpenStreetMap"),
         ('bano', u"BANO"),
         ('google_maps', u"Google Maps"),
+        ('mapbox', u"MapBox"),
         ('manual', u"Manuel"),
         ('unknown', u"Indéterminé")
         ], default='unknown', readonly=True, related='partner_id.geocodeur', help=u"Champ définissant le géocodeur utilisé")
     precision = fields.Selection([
         ('manual', "Manuel"),
+        ('very_high', "Excellent"),
         ('high', "Haut"),
         ('medium', "Moyen"),
         ('low', "Bas"),
         ('no_address', u"--"),
         ('unknown', u"Indéterminé"),
         ('not_tried', u"Pas tenté"),
-        ], default='not_tried', readonly=True, related='partner_id.precision', help=u"Niveau de précision de la géolocalisation")
+        ], default='not_tried', readonly=True, related='partner_id.precision',
+            help=u"Niveau de précision de la géolocalisation.\n"
+                u"bas: à la ville.\n"
+                u"moyen: au village\n"
+                u"haut: à la rue / au voisinage\n"
+                u"très haut: au numéro de rue\n")
     street_query = fields.Char(string=u"Adresse requête", related='partner_id.street_query', readonly=True)
 
 
@@ -60,6 +69,8 @@ class ResPartner(models.Model):
         ('success_osm', u"Réussi"),
         ('success_bano', u"Réussi"),
         ('success_google', u"Réussi"),
+        ('success_mapbox', u"Réussi"),
+        ('need_verif', u"Nécessite vérification"),
         ('failure', u"Échoué"),
         ('manual', u"Manuel")
         ], default='not_tried', readonly=True, help="field defining the state of the geocoding for this partner", required=True)
@@ -68,19 +79,45 @@ class ResPartner(models.Model):
         ('nominatim_osm', u"OpenStreetMap"),
         ('bano', u"BANO"),
         ('google_maps', u"Google Maps"),
+        ('mapbox', u"MapBox"),
         ('manual', u"Manuel"),
         ('unknown', u"Indéterminé")
         ], default='unknown', readonly=True, help=u"Champ définissant le géocodeur utilisé")
     precision = fields.Selection([
         ('manual', "Manuel"),
+        ('very_high', "Excellent"),
         ('high', "Haut"),
         ('medium', "Moyen"),
         ('low', "Bas"),
         ('no_address', u"--"),
         ('unknown', u"Indéterminé"),
         ('not_tried', u"Pas tenté"),
-        ], default='not_tried', readonly=True, help=u"Niveau de précision de la géolocalisation")
-    street_query = fields.Char(string=u"Adresse requête", readonly=True)
+        ], default='not_tried', readonly=True,
+           help=u"Niveau de précision de la géolocalisation.\n"
+                u"bas: à la ville.\n"
+                u"moyen: au village\n"
+                u"haut: à la rue / au voisinage\n"
+                u"très haut: au numéro de rue\n")
+    street_query = fields.Char(string=u"Adresse requête")
+    street_response = fields.Char(string=u"Adresse réponse", readonly=True)
+
+    @api.multi
+    def button_verify_geocoding(self):
+        self.ensure_one()
+        if self.geocodeur == 'bano':
+            self.geocoding = 'success_bano'
+        elif self.geocodeur == 'mapbox':
+            self.geocoding = 'success_mapbox'
+        return True
+
+    @api.multi
+    def button_refute_geocoding(self):
+        self.ensure_one()
+        self.geocoding = 'failure'
+        self.geo_lat = 0
+        self.geo_lng = 0
+        self.precision = 'unknown'
+        return True
 
     def get_geocoding_country(self):
         return (self.country_id and self.country_id.name) or \
@@ -103,7 +140,7 @@ class ResPartner(models.Model):
         params = [
             filter(lambda c: c != u',', self.street or '') + ' ' +
             filter(lambda c: c != u',', self.street2 or ''),
-            self.zip or '' + ' ' + self.city or '',
+            '%s %s' % (self.zip or '', self.city or ''),
             country,
         ]
         params = [p and p.strip() for p in params]
@@ -120,6 +157,7 @@ class ResPartner(models.Model):
             'nominatim_osm': geo_obj.geo_osm,
             'bano': geo_obj.geo_ban,
             'google_maps': geo_obj.geo_google,
+            'mapbox': geo_obj.geo_mapbox,
         }.get(geocodeur, geo_obj.geo_openfire)
         for partner in self:
             results = geocode(partner)
@@ -130,7 +168,8 @@ class ResPartner(models.Model):
                 'geo_lng': results[3],
                 'precision': results[4],
                 'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
-                'geocoding_response': json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
+                'geocoding_response': results[5],
+                'street_response': results[6],
             })
 
     # Conditional create when new partner is added
@@ -148,8 +187,15 @@ class ResPartner(models.Model):
                 # Get geocoder by default
                 res_geocoder_by_default = self.env['ir.config_parameter'].get_param('geocoder_by_default')
 
+                # Ne pas utiliser BANO si le pays n'est pas la France
+                if res_geocoder_by_default == 'bano':
+                    for rec in self:
+                        if rec.get_geocoding_country() != u"France":
+                            res_geocoder_by_default = 'mapbox'
+                            break
+
                 # Reset geocoder use
-                use_openfire = use_osm = use_bano = use_google = False
+                use_openfire = use_osm = use_bano = use_google = use_mapbox = False
 
                 # Set geocoder by default
                 if not res_geocoder_by_default or res_geocoder_by_default == 'nominatim_openfire':
@@ -160,6 +206,8 @@ class ResPartner(models.Model):
                     use_bano = True
                 elif res_geocoder_by_default == 'google_maps':
                     use_google = True
+                elif res_geocoder_by_default == 'mapbox':
+                    use_mapbox = True
 
                 # Create wizard objet to do the action
                 wizard_obj = self.env['of.geo.wizard']
@@ -168,6 +216,7 @@ class ResPartner(models.Model):
                     'use_nominatim_osm': use_osm,
                     'use_bano': use_bano,
                     'use_google': use_google,
+                    'use_mapbox': use_mapbox,
                     'best_precision': False,
                     'overwrite_geoloc_all': True,
                     'overwrite_geoloc_except_manual': False,
@@ -215,7 +264,7 @@ class ResPartner(models.Model):
             if res_geocoder_by_default == 'bano':
                 for rec in self:
                     if rec.get_geocoding_country() != u"France":
-                        res_geocoder_by_default = 'nominatim_osm'
+                        res_geocoder_by_default = 'mapbox'
                         break
 
             # Reset geocoder use
@@ -230,6 +279,8 @@ class ResPartner(models.Model):
                 use_bano = True
             elif res_geocoder_by_default == 'google_maps':
                 use_google = True
+            elif res_geocoder_by_default == 'mapbox':
+                use_mapbox = True
 
             # Create wizard objet to do the action
             wizard_obj = self.env['of.geo.wizard']
@@ -238,6 +289,7 @@ class ResPartner(models.Model):
                 'use_nominatim_osm': use_osm,
                 'use_bano': use_bano,
                 'use_google': use_google,
+                'use_mapbox': use_mapbox,
                 'best_precision': False,
                 'overwrite_geoloc_all': True,
                 'overwrite_geoloc_except_manual': False,
@@ -274,85 +326,6 @@ class OFGeoConfiguration(models.TransientModel):
             self.env['ir.config_parameter'].set_param('geocoding_on_create', 'yes' if on_create == '1' else 'no')
         return super(OFGeoConfiguration, self)._auto_init()
 
-    # Check, get and prefill URLs geocoders
-    @api.multi
-    def _get_openfire_url(self):
-        return self.env['ir.config_parameter'].get_param('url_openfire', '').strip()
-
-    @api.model
-    def _get_openfire_url_status(self):
-        url_openfire_saved = self.env['ir.config_parameter'].get_param('url_openfire', '').strip()
-        suggest_url_openfire = 'https://openfire.fr/nominatim/search?q='
-        if url_openfire_saved and url_openfire_saved == suggest_url_openfire:
-            openfire_url_status = 'ok'
-        elif url_openfire_saved and url_openfire_saved.startswith('https://'):
-            openfire_url_status = 'new'
-        else:
-            openfire_url_status = 'fail'
-        return openfire_url_status
-
-    @api.multi
-    def _get_osm_url(self):
-        return self.env['ir.config_parameter'].get_param('url_osm', '').strip()
-
-    @api.model
-    def _get_osm_url_status(self):
-        url_osm_saved = self.env['ir.config_parameter'].get_param('url_osm', '').strip()
-        suggest_url_osm = 'https://nominatim.openstreetmap.org/search?q='
-        if url_osm_saved and url_osm_saved == suggest_url_osm:
-            osm_url_status = 'ok'
-        elif url_osm_saved and url_osm_saved.startswith('https://'):
-            osm_url_status = 'new'
-        else:
-            osm_url_status = 'fail'
-        return osm_url_status
-
-    @api.multi
-    def _get_bano_url(self):
-        return self.env['ir.config_parameter'].get_param('url_bano', '').strip()
-
-    @api.model
-    def _get_bano_url_status(self):
-        url_bano_saved = self.env['ir.config_parameter'].get_param('url_bano', '').strip()
-        suggest_url_bano = 'https://api-adresse.data.gouv.fr/search/?'
-        if url_bano_saved and url_bano_saved == suggest_url_bano:
-            bano_url_status = 'ok'
-        elif url_bano_saved and url_bano_saved.startswith('https://'):
-            bano_url_status = 'new'
-        else:
-            bano_url_status = 'fail'
-        return bano_url_status
-
-    @api.multi
-    def _get_google_url(self):
-        return self.env['ir.config_parameter'].get_param('url_google', '').strip()
-
-    @api.model
-    def _get_google_url_status(self):
-        url_google_saved = self.env['ir.config_parameter'].get_param('url_google', '').strip()
-        suggest_url_google = 'http://maps.googleapis.com/maps/api/geocode/json'
-        if url_google_saved and url_google_saved == suggest_url_google:
-            google_url_status = 'ok'
-        elif url_google_saved and url_google_saved.startswith('https://'):
-            google_url_status = 'new'
-        else:
-            google_url_status = 'fail'
-        return google_url_status
-
-    # Check, get and prefill Google API key
-    @api.multi
-    def _get_google_api_key(self):
-        return self.env['ir.config_parameter'].get_param('google_api_key', '').strip()
-
-    @api.model
-    def _get_google_api_key_status(self):
-        saved_google_api_key = self.env['ir.config_parameter'].get_param('google_api_key', '').strip()
-        if saved_google_api_key and len(saved_google_api_key) == 39:
-            google_api_key_status = 1
-        else:
-            google_api_key_status = 0
-        return google_api_key_status
-
     @api.model
     def _get_default_show_stats(self):
         return self.env['ir.config_parameter'].get_param('show_stats', '')
@@ -369,19 +342,6 @@ class OFGeoConfiguration(models.TransientModel):
     def _get_default_geocoder_by_default(self):
         return self.env['ir.config_parameter'].get_param('geocoder_by_default', '')
 
-    # Config fields
-    url_openfire = fields.Char(string=u"OpenFire", default=_get_openfire_url)
-    url_osm = fields.Char(string=u"OpenStreetMap", default=_get_osm_url)
-    url_bano = fields.Char(string=u"BANO", default=_get_bano_url)
-    url_google = fields.Char(string=u"Google Maps", default=_get_google_url)
-    google_api_key = fields.Char(string=u"Google API key", size=40, default=_get_google_api_key)
-
-    url_openfire_status = fields.Char(string="Status URL OpenFire", default=_get_openfire_url_status)
-    url_osm_status = fields.Char(string="Status URL OpenStreetMap", default=_get_osm_url_status)
-    url_bano_status = fields.Char(string="Status URL BANO", default=_get_bano_url_status)
-    url_google_status = fields.Char(string="Status URL Google", default=_get_google_url_status)
-    google_api_key_status = fields.Boolean(string="Status Google API key", default=_get_google_api_key_status)
-
     show_stats = fields.Boolean(string=u'Afficher stats', default=_get_default_show_stats)
     geocoding_on_write = fields.Selection([
         ('no', u"Ne pas recalculer les valeurs du géocodage automatiquement (Les coordonnées GPS sont remises à zéro si elles ne sont pas entrées en même temps.)"),
@@ -394,44 +354,10 @@ class OFGeoConfiguration(models.TransientModel):
         ], u"Si un partenaire est ajouté", default=_get_default_geocoding_on_create,
         help=u"Calculer automatiquement les valeurs de géocodage lorsqu'un nouveau partenaire est ajouté")
     geocoder_by_default = fields.Selection([
-        ('nominatim_openfire', "OpenFire"),
-        ('nominatim_osm', "OpenStreetMap"),
+        ('mapbox', "MapBox"),
         ('bano', u"Base Adresse Nationale Ouverte (BANO)"),
-        ('google_maps', "Google Maps")], u"Géocodeur fonctions automatiques", default=_get_default_geocoder_by_default,
+    ], u"Géocodeur fonctions automatiques", default=_get_default_geocoder_by_default,
         help=u"Géocodeur par défaut pour fonctions automatiques")
-
-    # Save fields
-    # URLs
-    @api.multi
-    def set_url_openfire(self):
-        self.ensure_one()
-        value = getattr(self, 'url_openfire', '')
-        self.env['ir.config_parameter'].set_param('url_openfire', value)
-
-    @api.multi
-    def set_url_osm(self):
-        self.ensure_one()
-        value = getattr(self, 'url_osm', '')
-        self.env['ir.config_parameter'].set_param('url_osm', value)
-
-    @api.multi
-    def set_url_bano(self):
-        self.ensure_one()
-        value = getattr(self, 'url_bano', '')
-        self.env['ir.config_parameter'].set_param('url_bano', value)
-
-    @api.multi
-    def set_url_google(self):
-        self.ensure_one()
-        value = getattr(self, 'url_google', '')
-        self.env['ir.config_parameter'].set_param('url_google', value)
-
-    # Google API key
-    @api.multi
-    def set_google_api_key(self):
-        self.ensure_one()
-        value = getattr(self, 'google_api_key', '')
-        self.env['ir.config_parameter'].set_param('google_api_key', value)
 
     # Automatics functions
     @api.multi
