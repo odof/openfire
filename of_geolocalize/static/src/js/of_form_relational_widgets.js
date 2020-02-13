@@ -40,7 +40,10 @@ FieldMany2One.include({
     set_geo_lat: function () {
         var self = this;
 
-        var partner_id = this.field_manager.fields[this.name] ? this.field_manager.get_field_value(this.name) : false;
+        var partner_id = false;
+        if (this.field_manager.fields && this.field_manager.fields[this.name]) {
+            partner_id = this.field_manager.get_field_value(this.name);
+        }
         var type = self.field.type;
         if (!partner_id || type != "many2one" ) {
             self.set({"geo_lat": undefined});
