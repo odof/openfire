@@ -142,7 +142,7 @@ class ResPartner(models.Model):
         """
         partner = super(ResPartner, self).create(vals)
 
-        if self.env['ir.config_parameter'].get_param('geocoding_on_create') == "1" and not self._context.get('from_import'):
+        if self.env['ir.config_parameter'].get_param('geocoding_on_create') == "yes" and not self._context.get('from_import'):
             # Check address parameters
             if (partner.street or partner.street2) and (partner.zip or partner.city):
                 # Get geocoder by default
@@ -179,7 +179,7 @@ class ResPartner(models.Model):
     @api.multi
     def write(self, vals):
         # Get config paramenter geocoding on write
-        res_geocoding_on_write = self.env['ir.config_parameter'].get_param('geocoding_on_write')
+        res_geocoding_on_write = self.env['ir.config_parameter'].get_param('geocoding_on_write') == 'yes'
 
         # Determine if geocoding was manual and write geodata for it.
         do_geocoding_auto = False
@@ -266,13 +266,18 @@ class OFGeoConfiguration(models.TransientModel):
             " ELSE value "
             "END "
             "WHERE key = 'geocoder_by_default'")
+        on_write = self.env['ir.config_parameter'].get_param('geocoding_on_write', None)
+        on_create = self.env['ir.config_parameter'].get_param('geocoding_on_create', None)
+        if on_write is not None and on_write in ('0', '1'):
+            self.env['ir.config_parameter'].set_param('geocoding_on_write', 'yes' if on_write == '1' else 'no')
+        if on_create is not None and on_create in ('0', '1'):
+            self.env['ir.config_parameter'].set_param('geocoding_on_create', 'yes' if on_create == '1' else 'no')
         return super(OFGeoConfiguration, self)._auto_init()
 
     # Check, get and prefill URLs geocoders
     @api.multi
     def _get_openfire_url(self):
-        url_openfire_saved = self.env['ir.config_parameter'].get_param('url_openfire', '').strip()
-        return url_openfire_saved
+        return self.env['ir.config_parameter'].get_param('url_openfire', '').strip()
 
     @api.model
     def _get_openfire_url_status(self):
@@ -288,8 +293,7 @@ class OFGeoConfiguration(models.TransientModel):
 
     @api.multi
     def _get_osm_url(self):
-        url_osm_saved = self.env['ir.config_parameter'].get_param('url_osm', '').strip()
-        return url_osm_saved
+        return self.env['ir.config_parameter'].get_param('url_osm', '').strip()
 
     @api.model
     def _get_osm_url_status(self):
@@ -305,8 +309,7 @@ class OFGeoConfiguration(models.TransientModel):
 
     @api.multi
     def _get_bano_url(self):
-        url_bano_saved = self.env['ir.config_parameter'].get_param('url_bano', '').strip()
-        return url_bano_saved
+        return self.env['ir.config_parameter'].get_param('url_bano', '').strip()
 
     @api.model
     def _get_bano_url_status(self):
@@ -322,8 +325,7 @@ class OFGeoConfiguration(models.TransientModel):
 
     @api.multi
     def _get_google_url(self):
-        url_google_saved = self.env['ir.config_parameter'].get_param('url_google', '').strip()
-        return url_google_saved
+        return self.env['ir.config_parameter'].get_param('url_google', '').strip()
 
     @api.model
     def _get_google_url_status(self):
@@ -340,8 +342,7 @@ class OFGeoConfiguration(models.TransientModel):
     # Check, get and prefill Google API key
     @api.multi
     def _get_google_api_key(self):
-        saved_google_api_key = self.env['ir.config_parameter'].get_param('google_api_key', '').strip()
-        return saved_google_api_key
+        return self.env['ir.config_parameter'].get_param('google_api_key', '').strip()
 
     @api.model
     def _get_google_api_key_status(self):
@@ -354,23 +355,19 @@ class OFGeoConfiguration(models.TransientModel):
 
     @api.model
     def _get_default_show_stats(self):
-        saved_show_stats = self.env['ir.config_parameter'].get_param('show_stats', '')
-        return saved_show_stats
+        return self.env['ir.config_parameter'].get_param('show_stats', '')
 
     @api.model
     def _get_default_geocoding_on_write(self):
-        saved_geocoding_on_write = self.env['ir.config_parameter'].get_param('geocoding_on_write', '')
-        return saved_geocoding_on_write
+        return self.env['ir.config_parameter'].get_param('geocoding_on_write', '')
 
     @api.model
     def _get_default_geocoding_on_create(self):
-        saved_geocoding_on_create = self.env['ir.config_parameter'].get_param('geocoding_on_create', '')
-        return saved_geocoding_on_create
+        return self.env['ir.config_parameter'].get_param('geocoding_on_create', '')
 
     @api.model
     def _get_default_geocoder_by_default(self):
-        saved_geocoder = self.env['ir.config_parameter'].get_param('geocoder_by_default', '')
-        return saved_geocoder
+        return self.env['ir.config_parameter'].get_param('geocoder_by_default', '')
 
     # Config fields
     url_openfire = fields.Char(string=u"OpenFire", default=_get_openfire_url)
@@ -387,13 +384,13 @@ class OFGeoConfiguration(models.TransientModel):
 
     show_stats = fields.Boolean(string=u'Afficher stats', default=_get_default_show_stats)
     geocoding_on_write = fields.Selection([
-        (0, u"Ne pas recalculer les valeurs du géocodage automatiquement (Les coordonnées GPS sont remises à zéro si elles ne sont pas entrées en même temps.)"),
-        (1, u"Recalculer les valeurs de géocodage (Le géocodage est tenté si les coordonnées GPS ne sont pas entrées en même temps.)"),
+        ('no', u"Ne pas recalculer les valeurs du géocodage automatiquement (Les coordonnées GPS sont remises à zéro si elles ne sont pas entrées en même temps.)"),
+        ('yes', u"Recalculer les valeurs de géocodage (Le géocodage est tenté si les coordonnées GPS ne sont pas entrées en même temps.)"),
         ], u"Si une adresse est modifiée", default=_get_default_geocoding_on_write,
         help=u"Recalculer automatiquement les valeurs de géocodage lorsque l'adresse d'un partenaire est modifiée")
     geocoding_on_create = fields.Selection([
-        (0, u"Ne pas calculer les valeurs de géocodage (recommandé lorsqu'un grand nombre de partenaires sont importés)"),
-        (1, u"Calculer les valeurs de géocodage automatiquement"),
+        ('no', u"Ne pas calculer les valeurs de géocodage (recommandé lorsqu'un grand nombre de partenaires sont importés)"),
+        ('yes', u"Calculer les valeurs de géocodage automatiquement"),
         ], u"Si un partenaire est ajouté", default=_get_default_geocoding_on_create,
         help=u"Calculer automatiquement les valeurs de géocodage lorsqu'un nouveau partenaire est ajouté")
     geocoder_by_default = fields.Selection([
