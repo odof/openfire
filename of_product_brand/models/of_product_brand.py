@@ -23,6 +23,9 @@ class OfProductBrand(models.Model):
     show_in_sales = fields.Boolean(
         string="Afficher dans les lignes de ventes",
         help="Si cette option est cochée, la marque sera ajoutée au début du descriptif des lignes de commandes et factures")
+    # les 2 champs suivant sont affichés dans le module of_import car il redéfini la vue form des marques
+    description_sale = fields.Text(string=u"Description pour les devis")
+    use_brand_description_sale = fields.Boolean(string=u"Utiliser la description vente au niveau de la marque")
 
     def _compute_product_count(self):
         read_group_res = self.env['product.template'].read_group([('brand_id', 'in', self.ids)], ['brand_id'], ['brand_id'])
@@ -249,16 +252,24 @@ class SaleOrderLine(models.Model):
     @api.onchange('product_id')
     def product_id_change(self):
         super(SaleOrderLine, self).product_id_change()
+        name = self.name
+        if self.product_id.brand_id.use_brand_description_sale:
+            # Recalcul du libelllé de la ligne
+            name = self.product_id.name_get()[0][1]
+            brand_desc = self.env['mail.template'].render_template(
+                self.product_id.brand_id.description_sale, 'product.product', self.product_id.id, post_process=False)
+            name += u'\n%s' % brand_desc
         if self.product_id.brand_id.show_in_sales:
             # Ajout de la marque dans le descriptif de l'article
             brand_code = self.product_id.brand_id.name + ' - '
-            if self.name[0] == '[':
-                i = self.name.find(']') + 1
-                if self.name[i] == ' ':
+            if name[0] == '[':
+                i = name.find(']') + 1
+                if name[i] == ' ':
                     i += 1
-                self.name = self.name[:i] + brand_code + self.name[i:]
+                name = name[:i] + brand_code + name[i:]
             else:
-                self.name = brand_code + self.name
+                name = brand_code + name
+        self.name = name
 
     def _write(self, vals):
         for field in vals:
@@ -280,16 +291,24 @@ class AccountInvoiceLine(models.Model):
     @api.onchange('product_id')
     def _onchange_product_id(self):
         super(AccountInvoiceLine, self)._onchange_product_id()
+        name = self.name
+        if self.product_id.brand_id.use_brand_description_sale:
+            # Recalcul du libelllé de la ligne
+            name = self.product_id.name_get()[0][1]
+            brand_desc = self.env['mail.template'].render_template(
+                self.product_id.brand_id.description_sale, 'product.product', self.product_id.id, post_process=False)
+            name += u'\n%s' % brand_desc
         if self.product_id.brand_id.show_in_sales:
             # Ajout de la marque dans le descriptif de l'article
             brand_code = self.product_id.brand_id.name + ' - '
-            if self.name[0] == '[':
-                i = self.name.find(']') + 1
-                if self.name[i] == ' ':
+            if name[0] == '[':
+                i = name.find(']') + 1
+                if name[i] == ' ':
                     i += 1
-                self.name = self.name[:i] + brand_code + self.name[i:]
+                name = name[:i] + brand_code + name[i:]
             else:
-                self.name = brand_code + self.name
+                name = brand_code + name
+        self.name = name
 
     def _write(self, vals):
         for field in vals:

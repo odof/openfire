@@ -32,7 +32,10 @@ La description d'une norme est copiée dans l'article quand elle lui est associ�
 Quand la description d'une norme est modifiée, met à jour le champ 'description_norme' des articles associés. Les articles dont la description norme a été modifiée ne sont pas mis à jour.
 """,
     "website": "www.openfire.fr",
-    "depends": ["sale"],
+    "depends": [
+        "sale",
+        "of_product",
+    ],
     "category": "OpenFire",
     "data": [
         'views/of_sale_norme_view.xml',

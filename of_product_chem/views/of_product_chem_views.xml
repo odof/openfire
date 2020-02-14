@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Product Template view -->
+    <record id="of_article_chem_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.article.chem.product.template.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="of_sale_norme.of_sale_norme_view_product_template_form"/>
+        <field name="arch" type="xml">
+            <field name="norme_id" position="replace"/>
+            <xpath expr="//page[@name='notes']//separator[last()]" position="replace"/>
+            <field name="description_norme" position="replace"/>
+            <xpath expr="//page[@name='technique']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
+            <xpath expr="//page[@name='technique']" position="inside">
+                <group name="technique_chem">
+                    <group>
+                        <field name="norme_id" widget="selection"/>
+                        <field name="description_norme"/>
+                    </group>
+                    <group>
+                        <field name="of_flamme_verte"/>
+                        <field name="of_eco_label"/>
+                        <field name="of_puissance_nom"/>
+                        <field name="of_rendement"/>
+                        <field name="of_emission_co"/>
+                        <field name="of_emission_poussiere"/>
+                        <field name="of_indice_i"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Product Brand view -->
+
+    <record id="of_article_chem_of_product_brand_form_view" model="ir.ui.view">
+        <field name="name">of.article.chem.of.product.brand.form.view</field>
+        <field name="model">of.product.brand</field>
+        <field name="inherit_id" ref="of_import.of_product_brand_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='use_brand_description_sale']" position="replace"/>
+            <xpath expr="//field[@name='show_in_sales']" position="after">
+                <field name="use_brand_description_sale" string="Utiliser le descriptif Flamme Verte"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

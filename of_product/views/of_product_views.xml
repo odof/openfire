@@ -63,6 +63,9 @@
                     <field name="description_fabricant" colspan="4" nolabel="1"
                         placeholder="Cette note correspond à la description du produit par son fabricant."/>
                 </xpath>
+                <xpath expr="//notebook//page[@name='notes']" position="before">
+                    <page string="Technique" name="technique" invisible="1"/>
+                </xpath>
             </field>
         </record>
 
