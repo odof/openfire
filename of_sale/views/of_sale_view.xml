@@ -57,6 +57,12 @@
                     <attribute name="domain">[('tax_ids.tax_src_id.type_tax_use', '=', 'sale')]</attribute>
                     <attribute name="options">{'no_open': True}</attribute>
                 </field>
+                <xpath expr="//field[@name='date_order']" position="attributes">
+                    <attribute name="attrs">{}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='confirmation_date']" position="attributes">
+                    <attribute name="attrs">{}</attribute>
+                </xpath>
                 <xpath expr="//field[@name='order_line']/form/group/group[2]" position="inside">
                     <field name="of_article_principal" string="Est l'article principal"/>
                 </xpath>
@@ -139,6 +145,7 @@
                 </xpath>
             </field>
         </record>
+
 
         <!-- Ajout etiquettes partenaire sur les devis -->
         <record id="of_sale_view_devis" model="ir.ui.view">

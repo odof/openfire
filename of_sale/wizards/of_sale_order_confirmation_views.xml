@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_order_confirmation_view_form" model="ir.ui.view">
+        <field name="name">Confirmation de devis</field>
+        <field name="model">of.sale.order.confirmation</field>
+        <field name="arch" type="xml">
+            <form string="Openflam report">
+                <field name="order_id" invisible="1"/>
+                <span>
+                    Voulez-vous changer la date de confirmation du devis ?
+                </span>
+                <footer>
+                    <button string="Oui" name="button_ok" type="object" class="btn-primary"/>
+                    <button string="Non" name="button_no" type="object" class="btn-default"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window id="action_of_sale_confirmation_devis"
+        name="Confirmer la vente"
+        res_model="of.sale.order.confirmation"
+        src_model="sale.order"
+        view_mode="form"
+        view_type="form"
+        view_id="of_sale_order_confirmation_view_form"
+        target="new"
+        context="{'default_order_id': active_id}"/>
+
+    <data noupdate="1">
+        <record id="of_sale_view_confirmation_date_order_form" model="ir.ui.view">
+            <field name="name">of.sale.view.confirmation.date.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="active">False</field>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_confirm'][1]" position="before">
+                    <button string="Confirmer la vente" type="action" class="o_sale_confirm"
+                            name="of_sale.action_of_sale_confirmation_devis"
+                            context="{'default_order_id': active_id}"
+                            attrs="{'invisible': ['|', ('confirmation_date', '=', False), ('state', 'not in', 'draft')]}"/>
+                    <button string="Confirmer la vente" type="action" class="btn-primary o_sale_confirm"
+                            name="of_sale.action_of_sale_confirmation_devis"
+                            context="{'default_order_id': active_id}"
+                            attrs="{'invisible': ['|', ('confirmation_date', '=', False), ('state', 'not in', 'sent')]}"/>
+                </xpath>
+                <xpath expr="//button[@name='action_confirm'][1]" position="attributes">
+                    <attribute name="states"></attribute>
+                    <attribute name="attrs">{'invisible': ['|', ('confirmation_date', '!=', False), ('state', 'not in', ['draft'])]}</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_confirm'][2]" position="attributes">
+                    <attribute name="states"></attribute>
+                    <attribute name="attrs">{'invisible': ['|', ('confirmation_date', '!=', False), ('state', 'not in', ['sent'])]}</attribute>
+                </xpath>
+            </field>
+        </record>
+    </data>
+    <!-- Sale config wizard -->
+    <record id="of_sale_order_confirmation_view_sale_config_settings" model="ir.ui.view">
+        <field name="name">of sale settings</field>
+        <field name="model">sale.config.settings</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_sale_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//label[@for='of_position_fiscale']" position="before">
+                <field name="of_recalcul_date_confirmation" class="oe_inline" widget="radio"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
