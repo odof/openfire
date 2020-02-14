@@ -10,7 +10,13 @@
                     <group>
                         <field name="location_ids" widget="many2many_tags"/>
                         <field name="date_stock"/>
-                        <field name="product_ids" options="{'no_create':True}">
+                        <field name="prix"/>
+                        <field name="brand_ids" widget="many2many_tags"/>
+                        <field name="categ_ids" widget="many2many_tags"/>
+                        <field name="active_product"/>
+                        <field name="product_ids" options="{'no_create':True}"
+                               domain="[('categ_id', categ_ids and 'child_of' or 'ilike', categ_ids and categ_ids[0][2] or ''),
+                                        ('brand_id', brand_ids and 'in' or 'ilike', brand_ids and brand_ids[0][2] or '')]">
                             <tree edit="0">
                                 <field name="default_code"/>
                                 <field name="name"/>
@@ -46,5 +52,5 @@
         <menuitem id="menu_of_sale_stock_report" name="Rapport gestion stock" parent="stock.menu_stock_inventory_control" action="action_of_rapport_gestion_stock" sequence="4"/>
 
     </data>
-</openerp>  
+</openerp>
 
