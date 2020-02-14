@@ -8,7 +8,13 @@
             <form string="Openflam report">
                 <field name="order_id" invisible="1"/>
                 <span>
-                    Voulez-vous changer la date de confirmation du devis ?
+                    <p>
+                        Voulez-vous mettre à jour la date de confirmation du devis ? <br/>
+                    </p>
+                    <i class="oe_grey">
+                        Oui : la date de confirmation devient la date d'aujourd'hui. <br/>
+                        Non : la date de confirmation existante est conservée.
+                    </i>
                 </span>
                 <footer>
                     <button string="Oui" name="button_ok" type="object" class="btn-primary"/>
