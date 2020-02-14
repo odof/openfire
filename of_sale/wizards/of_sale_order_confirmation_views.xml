@@ -20,7 +20,6 @@
     </record>
 
     <act_window id="action_of_sale_confirmation_devis"
-        key2="client_action_multi"
         name="Confirmer la vente"
         res_model="of.sale.order.confirmation"
         src_model="sale.order"
