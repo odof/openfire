@@ -39,6 +39,8 @@ class ProductTemplate(models.Model):
 
     of_forbidden_discount = fields.Boolean(string=u"Remise interdite")
 
+    of_obsolete = fields.Boolean(string=u"Article obsolète")
+
     # Structure de prix
     of_purchase_transport = fields.Float(string=u"Transport sur achat")
     of_sale_transport = fields.Float(string=u"Transport sur vente")

@@ -12,6 +12,12 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='sale_ok']/parent::div" position="replace"/>
                 <xpath expr="//field[@name='purchase_ok']/parent::div" position="replace"/>
+                <xpath expr="//div[@name='options']" position="inside">
+                    <div>
+                        <field name="of_obsolete"/>
+                        <label for="of_obsolete"/>
+                    </div>
+                </xpath>
                 <!-- étiquettes -->
                 <xpath expr="//field[@name='categ_id']" position="after">
                     <field name="of_tag_ids" widget="many2many_tags"/>
