@@ -136,3 +136,25 @@ class ProductTemplateTag(models.Model):
     active = fields.Boolean(default=True)
     product_ids = fields.Many2many('product.template', column1='tag_id', column2='product_id', string='Produits')
 
+
+class ProductCategory(models.Model):
+    _inherit = "product.category"
+
+    route_ids = fields.Many2many(
+            'stock.location.route', 'stock_location_route_categ', 'categ_id', 'route_id', 'Routes',
+            domain=[('product_categ_selectable', '=', True)], copy=True)
+
+    @api.multi
+    def copy_data(self, default=None):
+        if default is None:
+            default = {}
+        default['name'] = self.name + u" (Copie)"
+        default['property_account_creditor_price_difference_categ'] = self.property_account_creditor_price_difference_categ
+        default['property_account_income_categ_id'] = self.property_account_income_categ_id
+        default['property_account_expense_categ_id'] = self.property_account_expense_categ_id
+        default['property_stock_account_input_categ_id'] = self.property_stock_account_input_categ_id
+        default['property_stock_account_output_categ_id'] = self.property_stock_account_output_categ_id
+        default['property_stock_valuation_account_id'] = self.property_stock_valuation_account_id
+        default['property_stock_journal'] = self.property_stock_journal
+        res = super(ProductCategory, self).copy_data(default)
+        return res
