@@ -805,6 +805,9 @@ class SaleOrderLine(models.Model):
                                        store=True)
     of_seller_price = fields.Float(string=u"Prix d'achat")
 
+    of_date_tarif = fields.Date(string="Date du tarif", related="product_id.date_tarif", readonly=True)
+    of_obsolete = fields.Boolean(string=u"Article obsolète", related="product_id.of_obsolete", readonly=True)
+
     @api.model_cr_context
     def _auto_init(self):
         """

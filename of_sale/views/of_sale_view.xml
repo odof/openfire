@@ -248,6 +248,29 @@
             </field>
         </record>
 
+        <record id="of_sale_obsolete_sale_order_form_view" model="ir.ui.view">
+            <field name="name">of.sale.obsolete.sale.order.form.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="priority">100</field>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="replace">
+                    <label for="price_unit"/>
+                    <div>
+                        <field name="price_unit" class="oe_inline" style="max-width: 150px;"/>
+                        (<field name="of_date_tarif" class="oe_inline"/>
+                        <span attrs="{'invisible': [('of_date_tarif', '!=', False)]}">Non daté</span>)
+                        <br/>
+                        <field name="of_obsolete" invisible="1"/>
+                        <span style="display: inline; color: white; border: 1px solid black; border-radius: 5px; background: red; padding-left: 5px; padding-right: 5px;"
+                            attrs="{'invisible': [('of_obsolete', '=', False)]}">
+                            Obsolète
+                        </span>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
         <record id="of_sale_echeance_form" model="ir.ui.view">
             <field name="name">of.sale.echeance.form</field>
             <field name="model">of.sale.echeance</field>
