@@ -409,22 +409,34 @@ class OFRapportOpenflamWizard(models.TransientModel):
         line_number += 1
         solde = 0
         day, total = [], []
-        invoice_domain = [('type', '=', 'in_invoice')]
+        move_domain = [('journal_id.type', '=', 'purchase')]
         if self.company_ids._ids:
-            invoice_domain = (invoice_domain and ['&']) + [('company_id', 'in', self.company_ids._ids)] + invoice_domain
-        invoices = self.env['account.invoice'].search(invoice_domain, order='create_date DESC').sorted(key=lambda r: r.date_due)
+            move_domain = ['&', ('company_id', 'in', self.company_ids._ids)] + move_domain
+        moves = self.env['account.move'].search(move_domain, order='of_date_due DESC')
+        move_line_obj = self.env['account.move.line']
+
         line_keep = line_number
-        for invoice in invoices:
-            # --- Vérification du montant des accomptes ---
+        for move in moves:
+            payment_line_ids = []
+            # Lignes copiées de account.invoice._compute_payments()
+            # payment_line_ids est la liste des ids de account.move.line représentant des paiements/avoirs.
+            for line in move.line_ids.filtered('credit').filtered(lambda ml: ml.account_id.user_type_id.type == 'payable'):
+                payment_line_ids.extend(filter(None, [rp.debit_move_id.id for rp in line.matched_debit_ids]))
+            # payments est la liste des account.partial.reconcile associés aux lignes de paiements/avoirs trouvées.
+            payments = move_line_obj.browse(list(set(payment_line_ids))).mapped('matched_credit_ids')
+
+            # --- Vérification du montant des acomptes ---
             # Calcul adapté de celui des payments_widget des factures
-            payments = invoice.mapped('payment_move_line_ids').mapped('matched_credit_ids')
-            filt = payments.filtered(lambda ml: ml.credit_move_id.id in invoice.move_id.line_ids._ids)
+            # filt est la liste des lettrages entre écritures de paiements/avoirs et écritures de facture.
+            filt = payments.filtered(lambda ml: ml.credit_move_id.id in move.line_ids._ids)
             montant_acomptes = sum([p.amount for p in filt])
-            if invoice.currency_id.round(montant_acomptes) >= invoice.currency_id.round(invoice.amount_total):
+            amount_total = sum(move.line_ids.filtered(lambda ml: ml.account_id.user_type_id.type == 'payable').mapped('credit'))
+            if move.currency_id.round(montant_acomptes) >= move.currency_id.round(amount_total):
                 continue
 
             # --- Ajout des lignes total de la semaine ---
-            date = invoice.date_due and fields.Datetime.from_string(invoice.date_due).strftime("%Y-%m-%d") or ''
+            date_due = move.of_date_due
+            date = date_due and fields.Datetime.from_string(date_due).strftime("%Y-%m-%d") or ''
             if not day:
                 day.append(date)
             if solde and date not in day:
@@ -438,16 +450,24 @@ class OFRapportOpenflamWizard(models.TransientModel):
                 line_number += 1
                 line_keep = line_number
 
+            line_taxes = move.line_ids.filtered(lambda ml: ml.account_id.code.startswith('445'))
+            taxes = sum(line_taxes.mapped('debit')) - sum(line_taxes.mapped('credit'))
+
+            payment_term = False
+            invoice = move.line_ids.mapped('invoice_id')
+            if len(invoice) == 1:
+                payment_term = invoice.payment_term_id
+
             # --- lignes régulières ---
-            solde = invoice.amount_total - montant_acomptes
-            worksheet.write(line_number, 0, invoice.date_due.split(' ')[0] if invoice.date_due else '', styles['text_border'])
-            worksheet.write(line_number, 1, invoice.number, styles['text_border'])
-            worksheet.write(line_number, 2, invoice.create_date.split(' ')[0], styles['text_border'])
-            worksheet.write(line_number, 3, invoice.partner_id.name, styles['text_border'])
-            worksheet.write(line_number, 4, invoice.reference, styles['text_border'])
-            worksheet.write(line_number, 5, invoice.payment_term_id.name or '', styles['text_border'])
-            worksheet.write(line_number, 6, invoice.amount_untaxed, styles['number_border'])
-            worksheet.write(line_number, 7, invoice.amount_total, styles['number_border'])
+            solde = amount_total - montant_acomptes
+            worksheet.write(line_number, 0, date_due.split(' ')[0] if date_due else '', styles['text_border'])
+            worksheet.write(line_number, 1, move.name, styles['text_border'])
+            worksheet.write(line_number, 2, move.date.split(' ')[0], styles['text_border'])
+            worksheet.write(line_number, 3, move.partner_id.name, styles['text_border'])
+            worksheet.write(line_number, 4, move.ref, styles['text_border'])
+            worksheet.write(line_number, 5, payment_term and payment_term.name or '', styles['text_border'])
+            worksheet.write(line_number, 6, amount_total - taxes, styles['number_border'])
+            worksheet.write(line_number, 7, amount_total, styles['number_border'])
             worksheet.write(line_number, 8, montant_acomptes, styles['number_border'])
             worksheet.write(line_number, 9, solde, styles['number_bold_border'])
             line_number += 1
@@ -673,8 +693,6 @@ class OFRapportOpenflamWizard(models.TransientModel):
             stats.append(('categ', sorted_brand, u'statistiques de ventes par marques'))
 
         for page, values, name in stats:
-#             values, name = stats[page]
-
             # --- Création de la page ---
             worksheet = workbook.add_worksheet(name)
             worksheet.set_paper(9)  # Format d'impression A4
@@ -763,11 +781,13 @@ class OFRapportOpenflamWizard(models.TransientModel):
                 # fin du récap des marques
 
             for obj, valeurs in values:
-                if valeurs.get('oqté', None) != None:
-                    del valeurs['oqté'] # On a plus besoin de la quantité dans le dictionnaire donc on l'enlève pour pouvoir trier correctement
-                if valeurs.get('iqté', None) != None:
+                if valeurs.get('oqté', None) is not None:
+                    # On n'a plus besoin de la quantité dans le dictionnaire donc on l'enlève pour pouvoir trier correctement
+                    del valeurs['oqté']
+                if valeurs.get('iqté', None) is not None:
                     del valeurs['iqté']
-                if 'oqté1' in valeurs:  # Si ils sont présents on les enlève
+                if 'oqté1' in valeurs:
+                    # Si ils sont présents on les enlève
                     del valeurs['oqté1']
                     del valeurs['oca']
                     del valeurs['oca1']
