@@ -255,8 +255,8 @@ class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
     @api.model
-    def get_locked_products(self):
-        locked_products = super(AccountInvoiceLine, self).get_locked_categories()
+    def get_locked_product_ids(self):
+        locked_products = super(AccountInvoiceLine, self).get_locked_product_ids()
         locked_products += [
             self.env['ir.values'].get_default('sale.config.settings', 'of_product_prorata_id_setting'),
             self.env['ir.values'].get_default('sale.config.settings', 'of_product_situation_id_setting'),
