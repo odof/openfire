@@ -123,4 +123,45 @@
         </field>
     </record>
 
+    <record id="of_stock_product_template_form_view_procurement_button" model="ir.ui.view">
+        <field name="name">of.stock.product.template.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="stock.product_template_form_view_procurement_button"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_open_quants']/field[@name='qty_available']" position="replace">
+                <div class="o_form_field o_stat_info">
+                    <span class="o_stat_value"><field name="qty_available" widget="integer"/>
+                        <span>
+                            (<field name="of_qty_unreserved" widget="integer"/>)
+                        </span>
+                    </span>
+                    <span class="o_stat_text"></span>
+                </div>
+            </xpath>
+            <xpath expr="//button[@name=%(stock.action_stock_level_forecast_report_template)d]/div/span/span" position="attributes">
+                <attribute name="groups"></attribute>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="of_stock_product_form_view_procurement_button" model="ir.ui.view">
+        <field name="name">of.stock.product.product.form</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="stock.product_form_view_procurement_button"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name=%(stock.product_open_quants)d]/field[@name='qty_available']" position="replace">
+                <div class="o_form_field o_stat_info">
+                    <span class="o_stat_value"><field name="qty_available" widget="integer"/>
+                        <span>
+                            (<field name="of_qty_unreserved" widget="integer"/>)
+                        </span>
+                    </span>
+                    <span class="o_stat_text"></span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+
 </odoo>

@@ -189,3 +189,17 @@ class PackOperation(models.Model):
 
     move_id = fields.Many2one('stock.move', related='linked_move_operation_ids.move_id', string='Move_id')
     move_name = fields.Char(related='move_id.name', string='Description')
+
+class ProductTemplate(models.Model):
+    _inherit = 'product.template'
+
+    of_qty_unreserved = fields.Float(string=u'Qté non réservée', compute='_compute_of_qty_unreserved')
+
+    @api.depends('product_variant_ids')
+    def _compute_of_qty_unreserved(self):
+        quant_obj = self.env['stock.quant']
+        for product_template in self:
+            products = product_template.mapped('product_variant_ids')
+            quants = quant_obj.search([('product_id', 'in', products.ids)]).filtered(lambda q: not q.reservation_id)
+            product_template.of_qty_unreserved = sum(quants.mapped('qty'))
+
