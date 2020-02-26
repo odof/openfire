@@ -325,8 +325,12 @@ class OfAnalyseChantierRemise(models.Model):
     _inherit = 'of.analyse.chantier.inherit'
     _order_ = 'subtotal desc'
 
+    active = fields.Boolean(string="Active", default=True)
     affectation = fields.Selection([('product', 'Produits'), ('service', 'Services')], string="Affectation", required=True, default='product')
 
+    @api.multi
+    def change_use(self):
+        self.affectation = 'product' if self.affectation == 'service' else 'service'
 
 class OfAnalyseChantier(models.Model):
     _name = "of.analyse.chantier"
@@ -342,7 +346,7 @@ class OfAnalyseChantier(models.Model):
 
     product_line_ids = fields.One2many('of.analyse.chantier.product', 'chantier_id', string="Produits")
     service_line_ids = fields.One2many('of.analyse.chantier.service', 'chantier_id', string="Services")
-    remise_ids = fields.One2many('of.analyse.chantier.remise', 'chantier_id', string="Remises")
+    remise_ids = fields.One2many('of.analyse.chantier.remise', 'chantier_id', string="Remises", context={'active_test':False})
 
     cout_chantier = fields.Float(string="Coût du chantier", compute="_compute_marge")
     vente_chantier = fields.Float(string="Vente du chantier", compute="_compute_marge")
@@ -399,7 +403,8 @@ class OfAnalyseChantier(models.Model):
     def button_dummy(self):
         return {'type': 'ir.actions.do_nothing'}
 
-    @api.depends('product_line_ids.subtotal_compute', 'product_line_ids.purchase_price')
+    @api.depends('product_line_ids.subtotal_compute', 'product_line_ids.purchase_price',
+                 'remise_ids.affectation')
     def _compute_produit(self):
         for analyse in self:
             product_used = analyse.product_line_ids.filtered('in_use').filtered(lambda l: l.order_line_ids)
@@ -412,9 +417,10 @@ class OfAnalyseChantier(models.Model):
             analyse.vente_produit = sum(product_used.mapped('subtotal'))
             analyse.vente_produit_additionnels = sum(product_added.mapped('subtotal'))
             analyse.vente_produit_total = analyse.vente_produit + analyse.vente_produit_additionnels + sum(
-                analyse.remise_ids.filtered(lambda r: r.affectation == 'product').mapped('subtotal'))
+                analyse.remise_ids.filtered(lambda r: r.active and r.affectation == 'product').mapped('subtotal'))
 
-    @api.depends('service_line_ids.subtotal_compute', 'service_line_ids.purchase_price')
+    @api.depends('service_line_ids.subtotal_compute', 'service_line_ids.purchase_price',
+                 'remise_ids.affectation')
     def _compute_service(self):
         for analyse in self:
             service_used = analyse.service_line_ids.filtered('in_use').filtered(
@@ -428,7 +434,7 @@ class OfAnalyseChantier(models.Model):
             analyse.vente_service = sum(service_used.mapped('subtotal'))
             analyse.vente_service_additionnels = sum(service_added.mapped('subtotal'))
             analyse.vente_service_total = analyse.vente_service + analyse.vente_service_additionnels + sum(
-                analyse.remise_ids.filtered(lambda r: r.affectation == 'service').mapped('subtotal'))
+                analyse.remise_ids.filtered(lambda r: r.active and r.affectation == 'service').mapped('subtotal'))
 
     @api.depends('product_line_ids.subtotal_compute', 'product_line_ids.purchase_price',
                  'service_line_ids.subtotal_compute', 'service_line_ids.purchase_price',
@@ -438,7 +444,7 @@ class OfAnalyseChantier(models.Model):
             product_line_filtered = analyse.product_line_ids.filtered('in_use')
             service_line_filtered = analyse.service_line_ids.filtered('in_use')
             cost = sum(product_line_filtered.mapped('purchase_price_compute')) + sum(service_line_filtered.mapped('purchase_price_compute'))
-            sold = sum(product_line_filtered.mapped('subtotal_compute')) + sum(service_line_filtered.mapped('subtotal_compute')) + sum(analyse.remise_ids.mapped('subtotal'))
+            sold = sum(product_line_filtered.mapped('subtotal_compute')) + sum(service_line_filtered.mapped('subtotal_compute')) + sum(analyse.remise_ids.filtered('active').mapped('subtotal'))
             analyse.cout_chantier = cost
             analyse.vente_chantier = sold
             if sold != 0 and cost != 0:

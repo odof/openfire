@@ -18,7 +18,7 @@
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="account.invoice_tree"/>
-        <field name="context">{'form_view_ref': 'account.invoice_form'}</field>
+        <field name="context">{'form_view_ref': 'account.invoice_form', 'active_test':False}</field>
     </record>
 
     <record id="of_analyse_chantier_filter" model="ir.ui.view">
@@ -33,8 +33,9 @@
     <record id="of_analyse_chantier_view_form" model="ir.ui.view" >
         <field name="name">of.analyse.chantier.form</field>
         <field name="model">of.analyse.chantier</field>
+        <field name="context">{'active_test':False}</field>
         <field name="arch" type="xml" >
-            <form string="Analyse de chantier" >
+            <form string="Analyse de chantier">
                 <header>
                     <button name="synchroniser" string="Synchroniser" type="object"
                             confirm="Toutes modifications apportées manuellement à des lignes liées avec une commande/facture seront écrasées. Continuer ?"/>
@@ -104,7 +105,8 @@
                         <separator string="Remises" colspan="2"/>
                         <field name="remise_ids" nolabel="1" colspan="2"
                                context="{'tree_view_ref': view_qty and 'of_analyse_chantier.of_analyse_chantier_remise_view_tree' or
-                                                          'of_analyse_chantier.of_analyse_chantier_remise_view_tree_hide'}"
+                                                          'of_analyse_chantier.of_analyse_chantier_remise_view_tree_hide',
+                                         'active_test':False}"
                                options="{'reload_on_button': True}"/>
                         <separator string="Poses liées" colspan="2"/>
                         <field name="intervention_ids" nolabel="1" colspan="2" options="{'reload_on_button': True}">
@@ -252,14 +254,18 @@
     <record id="of_analyse_chantier_remise_view_tree" model="ir.ui.view" >
         <field name="name">of.analyse.chantier.remise.tree</field>
         <field name="model">of.analyse.chantier.remise</field>
+        <field name="context">{'active_test':False}</field>
         <field name="arch" type="xml" >
-            <tree editable="bottom">
+            <tree editable="bottom" colors="grey:active==False">
+                <field name="active" invisible="1"/>
                 <field name="name"/>
                 <field name="product_id"/>
-                <field name="affectation"/>
+                <field name="affectation" readonly="1"/>
                 <field name="qty_ordered"/>
                 <field name="qty_invoiced"/>
                 <field name="subtotal" sum="Total"/>
+                <button name="change_use" type="object" icon="fa-refresh"/>
+                <button name="toggle_active" type="object" icon="fa-cogs"/>
             </tree>
         </field>
     </record>
@@ -267,14 +273,18 @@
     <record id="of_analyse_chantier_remise_view_tree_hide" model="ir.ui.view" >
         <field name="name">of.analyse.chantier.remise.tree.hide</field>
         <field name="model">of.analyse.chantier.remise</field>
+        <field name="context">{'active_test':False}</field>
         <field name="arch" type="xml" >
-            <tree editable="bottom">
+            <tree editable="bottom" colors="grey:active==False">
+                <field name="active" invisible="1"/>
                 <field name="name"/>
                 <field name="product_id" />
                 <field name="affectation"/>
                 <field name="qty_ordered" invisible="1"/>
                 <field name="qty_invoiced" invisible="1"/>
                 <field name="subtotal" sum="Total"/>
+                <button name="change_use" type="object" icon="fa-refresh"/>
+                <button name="toggle_active" type="object" icon="fa-cogs"/>
             </tree>
         </field>
     </record>
