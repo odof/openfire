@@ -1,0 +1,107 @@
+.o_kanban_view.o_kanban_dashboard.of_followup_kanban {
+
+    .o_kanban_record {
+        .o-flex-display();
+        position: relative;
+        min-height: 140px;
+    }
+
+    .o_kanban_card_content {
+        min-height: 140px;
+    }
+
+    .o_kanban_tags {
+        margin: 0 0 8px 0;
+    }
+
+    .oe_kanban_bottom_left {
+        .o-position-absolute(@bottom: 5px, @left: 5px);
+    }
+
+    &.o_kanban_grouped {
+        a {
+            display: inline;
+
+            &.fa-star-o {
+                color: @odoo-main-color-muted;
+                &:hover {
+                    color: gold;
+                }
+            }
+            &.fa-star {
+                color: gold;
+            }
+        }
+    }
+
+    .of_followup_kanban_color_0 {
+        background-color: #ffffff !important;
+    }
+    .of_followup_kanban_color_in_progress {
+        background-color: #ffffff !important;
+    }
+    .of_followup_kanban_color_late {
+        background-color: #ffa8a8 !important;
+    }
+    .of_followup_kanban_color_ready {
+        background-color: #bcffa8 !important;
+    }
+    .of_followup_kanban_color_done {
+        background-color: #d7d7d7 !important;
+    }
+    .of_followup_kanban_color_cancel {
+        background-color: #eeeeee !important;
+    }
+
+    .of_followup_kanban_main {
+        .o-flex(0, 0, auto);
+        width: 70%; // for IE11 overflow issue
+
+        .o_kanban_card_content {
+            font-size: 12px;
+            .o_primary {
+                font-size: larger;
+            }
+        }
+    }
+
+    .of_alert_tag {
+        display: inline;
+        color: white;
+        border-radius: 5px;
+        background: #a90606;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    .of_followup_kanban_boxes {
+        width: 30%;
+        .o-flex(0, 0, auto);
+
+        .o-flex-display();
+        .o-flex-flow(column, nowrap);
+
+        .of_followup_kanban_box {
+            height: 60%;
+            position: relative;
+            text-align: center;
+            padding: 0 0 0 0;
+            .o-flex(1, 1, auto);
+            .o-flex-display();
+            .o-flex-flow(column, nowrap);
+            .o-justify-content(center);
+            border-top: 0.5px solid lightgray;
+            border-left: 0.5px solid lightgray;
+            font-weight: bold;
+        }
+        .of_followup_kanban_box:first-child {
+            height: 20%;
+            border-top: none;
+        }
+        .of_followup_kanban_box:last-child {
+            height: 20%;
+            font-style: italic;
+            font-size: 10px;
+        }
+    }
+}

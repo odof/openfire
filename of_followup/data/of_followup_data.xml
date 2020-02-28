@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Stages -->
+
+        <record id="of_followup_project_stage_coming" model="of.followup.project.stage">
+            <field name="name">Projets à venir</field>
+            <field name="code">coming</field>
+            <field name="sequence">10</field>
+            <field name="fold">True</field>
+            <field name="week_diff_min">9</field>
+            <field name="week_diff_max">1000</field>
+        </record>
+
+        <record id="of_followup_project_stage_s8" model="of.followup.project.stage">
+            <field name="name">Sem. 7 et 8</field>
+            <field name="code">s-8</field>
+            <field name="sequence">20</field>
+            <field name="fold">False</field>
+            <field name="week_diff_min">7</field>
+            <field name="week_diff_max">8</field>
+        </record>
+
+        <record id="of_followup_project_stage_s6" model="of.followup.project.stage">
+            <field name="name">Sem. 5 et 6</field>
+            <field name="code">s-6</field>
+            <field name="sequence">30</field>
+            <field name="fold">False</field>
+            <field name="week_diff_min">5</field>
+            <field name="week_diff_max">6</field>
+        </record>
+
+        <record id="of_followup_project_stage_s4" model="of.followup.project.stage">
+            <field name="name">Sem. 3 et 4</field>
+            <field name="code">s-4</field>
+            <field name="sequence">40</field>
+            <field name="fold">False</field>
+            <field name="week_diff_min">3</field>
+            <field name="week_diff_max">4</field>
+        </record>
+
+        <record id="of_followup_project_stage_s2" model="of.followup.project.stage">
+            <field name="name">Sem. 1 et 2</field>
+            <field name="code">s-2</field>
+            <field name="sequence">50</field>
+            <field name="fold">False</field>
+            <field name="week_diff_min">1</field>
+            <field name="week_diff_max">2</field>
+        </record>
+
+        <record id="of_followup_project_stage_s0" model="of.followup.project.stage">
+            <field name="name">Intervention</field>
+            <field name="code">s</field>
+            <field name="sequence">60</field>
+            <field name="fold">False</field>
+            <field name="week_diff_min">0</field>
+            <field name="week_diff_max">0</field>
+        </record>
+
+        <record id="of_followup_project_stage_s+" model="of.followup.project.stage">
+            <field name="name">S+</field>
+            <field name="code">s+</field>
+            <field name="sequence">70</field>
+            <field name="fold">True</field>
+        </record>
+
+        <!-- Types de tâches pré-définis -->
+
+        <record id="of_followup_task_type_state_planif_01" model="of.followup.task.type.state">
+            <field name="sequence">1</field>
+            <field name="name">A programmer</field>
+            <field name="starting_state">True</field>
+            <field name="stage_id" eval="ref('of_followup_project_stage_s6')"/>
+        </record>
+
+        <record id="of_followup_task_type_state_planif_02" model="of.followup.task.type.state">
+            <field name="sequence">2</field>
+            <field name="name">Programmée</field>
+            <field name="stage_id" eval="False"/>
+        </record>
+
+        <record id="of_followup_task_type_state_planif_03" model="of.followup.task.type.state">
+            <field name="sequence">3</field>
+            <field name="name">Terminée</field>
+            <field name="final_state">True</field>
+        </record>
+
+        <record id="of_followup_task_type_planif" model="of.followup.task.type">
+            <field name="name">Planification</field>
+            <field name="short_name">Planif.</field>
+            <field name="predefined_task">True</field>
+            <field name="state_ids" eval="[(6, 0, [ref('of_followup_task_type_state_planif_01'),
+                                                   ref('of_followup_task_type_state_planif_02'),
+                                                   ref('of_followup_task_type_state_planif_03')])]"/>
+        </record>
+
+        <record id="of_followup_task_type_state_vt_01" model="of.followup.task.type.state">
+            <field name="sequence">1</field>
+            <field name="name">A programmer</field>
+            <field name="starting_state">True</field>
+            <field name="stage_id" eval="ref('of_followup_project_stage_s6')"/>
+        </record>
+
+        <record id="of_followup_task_type_state_vt_02" model="of.followup.task.type.state">
+            <field name="sequence">2</field>
+            <field name="name">Programmée</field>
+            <field name="stage_id" eval="ref('of_followup_project_stage_s4')"/>
+        </record>
+
+        <record id="of_followup_task_type_state_vt_03" model="of.followup.task.type.state">
+            <field name="sequence">3</field>
+            <field name="name">Réalisée</field>
+            <field name="final_state">True</field>
+        </record>
+
+        <record id="of_followup_task_type_vt" model="of.followup.task.type">
+            <field name="name">Visite Technique</field>
+            <field name="short_name">VT</field>
+            <field name="predefined_task">True</field>
+            <field name="state_ids" eval="[(6, 0, [ref('of_followup_task_type_state_vt_01'),
+                                                   ref('of_followup_task_type_state_vt_02'),
+                                                   ref('of_followup_task_type_state_vt_03')])]"/>
+        </record>
+
+        <record id="of_followup_task_type_state_app_01" model="of.followup.task.type.state">
+            <field name="sequence">1</field>
+            <field name="name">A commander</field>
+            <field name="starting_state">True</field>
+            <field name="stage_id" eval="ref('of_followup_project_stage_s6')"/>
+        </record>
+
+        <record id="of_followup_task_type_state_app_02" model="of.followup.task.type.state">
+            <field name="sequence">2</field>
+            <field name="name">Commandé</field>
+            <field name="stage_id" eval="ref('of_followup_project_stage_s2')"/>
+        </record>
+
+        <record id="of_followup_task_type_state_app_03" model="of.followup.task.type.state">
+            <field name="sequence">3</field>
+            <field name="name">Reçu / En stock</field>
+            <field name="final_state">True</field>
+        </record>
+
+        <record id="of_followup_task_type_app" model="of.followup.task.type">
+            <field name="name">Appareil</field>
+            <field name="short_name">App.</field>
+            <field name="predefined_task">True</field>
+            <field name="state_ids" eval="[(6, 0, [ref('of_followup_task_type_state_app_01'),
+                                                   ref('of_followup_task_type_state_app_02'),
+                                                   ref('of_followup_task_type_state_app_03')])]"/>
+        </record>
+
+        <record id="of_followup_task_type_state_acc_01" model="of.followup.task.type.state">
+            <field name="sequence">1</field>
+            <field name="name">A commander</field>
+            <field name="starting_state">True</field>
+            <field name="stage_id" eval="ref('of_followup_project_stage_s4')"/>
+        </record>
+
+        <record id="of_followup_task_type_state_acc_02" model="of.followup.task.type.state">
+            <field name="sequence">2</field>
+            <field name="name">Commandé</field>
+            <field name="stage_id" eval="ref('of_followup_project_stage_s2')"/>
+        </record>
+
+        <record id="of_followup_task_type_state_acc_03" model="of.followup.task.type.state">
+            <field name="sequence">3</field>
+            <field name="name">Reçu / En stock</field>
+            <field name="final_state">True</field>
+        </record>
+
+        <record id="of_followup_task_type_acc" model="of.followup.task.type">
+            <field name="name">Accessoires</field>
+            <field name="short_name">Acc.</field>
+            <field name="predefined_task">True</field>
+            <field name="state_ids" eval="[(6, 0, [ref('of_followup_task_type_state_acc_01'),
+                                                   ref('of_followup_task_type_state_acc_02'),
+                                                   ref('of_followup_task_type_state_acc_03')])]"/>
+        </record>
+
+        <record id="of_followup_task_type_state_out_app_01" model="of.followup.task.type.state">
+            <field name="sequence">1</field>
+            <field name="name">A commander</field>
+            <field name="starting_state">True</field>
+            <field name="stage_id" eval="ref('of_followup_project_stage_s6')"/>
+        </record>
+
+        <record id="of_followup_task_type_state_out_app_02" model="of.followup.task.type.state">
+            <field name="sequence">2</field>
+            <field name="name">Commandé</field>
+            <field name="stage_id" eval="ref('of_followup_project_stage_s2')"/>
+        </record>
+
+        <record id="of_followup_task_type_state_out_app_03" model="of.followup.task.type.state">
+            <field name="sequence">3</field>
+            <field name="name">Reçu / En stock</field>
+            <field name="final_state">True</field>
+        </record>
+
+        <record id="of_followup_task_type_out_app" model="of.followup.task.type">
+            <field name="name">Appareil hors commande</field>
+            <field name="short_name">App. hors cmd</field>
+            <field name="predefined_task">True</field>
+            <field name="state_ids" eval="[(6, 0, [ref('of_followup_task_type_state_out_app_01'),
+                                                   ref('of_followup_task_type_state_out_app_02'),
+                                                   ref('of_followup_task_type_state_out_app_03')])]"/>
+        </record>
+
+        <record id="of_followup_task_type_state_out_acc_01" model="of.followup.task.type.state">
+            <field name="sequence">1</field>
+            <field name="name">A commander</field>
+            <field name="starting_state">True</field>
+            <field name="stage_id" eval="ref('of_followup_project_stage_s4')"/>
+        </record>
+
+        <record id="of_followup_task_type_state_out_acc_02" model="of.followup.task.type.state">
+            <field name="sequence">2</field>
+            <field name="name">Commandé</field>
+            <field name="stage_id" eval="ref('of_followup_project_stage_s2')"/>
+        </record>
+
+        <record id="of_followup_task_type_state_out_acc_03" model="of.followup.task.type.state">
+            <field name="sequence">3</field>
+            <field name="name">Reçu / En stock</field>
+            <field name="final_state">True</field>
+        </record>
+
+        <record id="of_followup_task_type_out_acc" model="of.followup.task.type">
+            <field name="name">Accessoires hors commande</field>
+            <field name="short_name">Acc. hors cmd</field>
+            <field name="predefined_task">True</field>
+            <field name="state_ids" eval="[(6, 0, [ref('of_followup_task_type_state_out_acc_01'),
+                                                   ref('of_followup_task_type_state_out_acc_02'),
+                                                   ref('of_followup_task_type_state_out_acc_03')])]"/>
+        </record>
+
+        <!-- État spécial non traité -->
+        <record id="of_followup_task_type_state_np" model="of.followup.task.type.state">
+            <field name="sequence">0</field>
+            <field name="name">Non traité</field>
+        </record>
+
+        <!-- Modèles de suivi -->
+
+        <record id="of_followup_project_template_complete" model="of.followup.project.template">
+            <field name="name">Suivi Complet</field>
+            <field name="default">True</field>
+            <field name="task_ids" eval="[(0, 0, {'sequence': 1,
+                                                 'type_id': ref('of_followup_task_type_planif')}),
+                                          (0, 0, {'sequence': 1,
+                                                 'type_id': ref('of_followup_task_type_vt')}),
+                                          (0, 0, {'sequence': 1,
+                                                 'type_id': ref('of_followup_task_type_app')}),
+                                          (0, 0, {'sequence': 1,
+                                                 'type_id': ref('of_followup_task_type_acc')}),
+                                          (0, 0, {'sequence': 1,
+                                                 'type_id': ref('of_followup_task_type_out_app')}),
+                                          (0, 0, {'sequence': 1,
+                                                 'type_id': ref('of_followup_task_type_out_acc')})]"/>
+        </record>
+
+        <!-- Alertes de suivi -->
+
+        <record id="of_followup_project_alert_date" model="of.followup.project.alert">
+            <field name="name">Vérifier Dates</field>
+        </record>
+
+        <record id="of_followup_project_alert_bl" model="of.followup.project.alert">
+            <field name="name">Vérifier BL</field>
+        </record>
+
+        <record id="of_followup_project_alert_br" model="of.followup.project.alert">
+            <field name="name">Vérifier BR</field>
+        </record>
+
+        <!-- Cron d'avancement des projets dans le workflow -->
+
+        <record id="of_followup_cron_move_projects" model="ir.cron">
+            <field name="name">Suivi des projets - Avancement</field>
+            <field name="model">of.followup.project</field>
+            <field name="function">cron_move_project</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">weeks</field>
+            <field name="nextcall"
+               eval="(datetime.now() + timedelta(days=(0 - datetime.now().weekday() + 7)%7)).strftime('%Y-%m-%d 02:00:00')"/>
+            <field name="numbercall">-1</field>
+            <field name="active">true</field>
+            <field name="args">()</field>
+        </record>
+
+        <!-- Modèle de mail -->
+
+        <record id="of_followup_project_email_template" model="mail.template">
+            <field name="name">Suivi de commande - Envoyer par email</field>
+            <field name="email_from">${object.user_id.email and '%s &lt;%s&gt;' % (object.user_id.name, object.user_id.email) or '')|safe}</field>
+            <field name="subject">${object.order_id.company_id.name} - Suivi de cotre commande (Ref ${object.order_id.name or 'n/a' })</field>
+            <field name="model_id" ref="of_followup.model_of_followup_project"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="body_html"><![CDATA[
+<p>Bonjour ${object.partner_id.title and object.partner_id.title.shortcut or ''} ${object.partner_id.name},</p>
+<p>
+Afin de gérer au mieux le suivi de cotre commande (Ref ${object.order_id.name or 'n/a' }), nous sohaiterions vous exposer les points suivants :<br/><br/>
+Nous vous laissons en prendre connaissance et nous nous tenons à votre disposition pour tous renseignements complémentaires.
+</p>
+<p>
+Vous en souhaitant bonne réception.<br/>
+</p>
+<p>
+% if user and user.signature:
+    ${user.signature | safe}
+% endif
+</p>
+]]></field>
+        </record>
+
+    </data>
+</odoo>

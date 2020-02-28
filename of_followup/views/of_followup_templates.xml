@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="assets_backend" name="OF Followup Backend Assets" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/of_followup/static/src/js/of_followup.js"/>
+            <link rel="stylesheet" type="text/less" href="/of_followup/static/src/less/of_followup.less"/>
+        </xpath>
+   </template>
+
+</odoo>
