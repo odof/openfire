@@ -62,28 +62,56 @@
                             <field name="template_id" options="{'no_create': True, 'no_open': True}"/>
                             <field name="info"/>
                         </group>
-                        <group col="4" colspan="4" string="Liste des tâches">
-                            <field name="task_ids" nolabel="1">
-                                <tree decoration-danger="is_late" decoration-success="is_done" decoration-muted="is_not_processed">
-                                    <field name="is_late" invisible="1"/>
-                                    <field name="is_done" invisible="1"/>
-                                    <field name="is_not_processed" invisible="1"/>
-                                    <field name="type_id" invisible="1"/>
-                                    <field name="predefined_task" invisible="1"/>
-                                    <field name="state_id" invisible="1"/>
-                                    <field name="predefined_state_id" invisible="1"/>
-                                    <field name="sequence" widget="handle"/>
-                                    <field name="name"/>
-                                    <field name="global_state"/>
-                                    <button name="next_step" class="btn btn-sm btn-primary" type="object" string="Étape suivante" help="Passer à l'étape suivante"
-                                            attrs="{'invisible': [('is_done', '=', True)]}"/>
-                                </tree>
-                            </field>
-                        </group>
-                        <group col="4" colspan="4" string="Notes">
-                            <field name="notes" nolabel="1"/>
-                        </group>
                     </group>
+                    <notebook>
+                        <page name="task" string="Tâches">
+                            <group>
+                                <group col="4" colspan="4" string="Approvisionnement et planification">
+                                    <field name="predefined_task_ids" nolabel="1" colspan="4">
+                                        <tree decoration-danger="is_late" decoration-success="is_done" decoration-muted="is_not_processed">
+                                            <field name="is_late" invisible="1"/>
+                                            <field name="is_done" invisible="1"/>
+                                            <field name="is_not_processed" invisible="1"/>
+                                            <field name="type_id" invisible="1"/>
+                                            <field name="predefined_task" invisible="1"/>
+                                            <field name="state_id" invisible="1"/>
+                                            <field name="predefined_state_id" invisible="1"/>
+                                            <field name="sequence" widget="handle"/>
+                                            <field name="name"/>
+                                            <field name="global_state"/>
+                                            <button name="next_step" class="btn btn-sm btn-primary" type="object" string="Étape suivante" help="Passer à l'étape suivante"
+                                                    attrs="{'invisible': [('is_done', '=', True)]}"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                                <group col="4" colspan="4" string="Autres tâches">
+                                    <field name="other_task_ids" nolabel="1" colspan="4">
+                                        <tree decoration-danger="is_late" decoration-success="is_done" decoration-muted="is_not_processed">
+                                            <field name="is_late" invisible="1"/>
+                                            <field name="is_done" invisible="1"/>
+                                            <field name="is_not_processed" invisible="1"/>
+                                            <field name="type_id" invisible="1"/>
+                                            <field name="predefined_task" invisible="1"/>
+                                            <field name="state_id" invisible="1"/>
+                                            <field name="predefined_state_id" invisible="1"/>
+                                            <field name="sequence" widget="handle"/>
+                                            <field name="name"/>
+                                            <field name="global_state"/>
+                                            <button name="next_step" class="btn btn-sm btn-primary" type="object" string="Étape suivante" help="Passer à l'étape suivante"
+                                                    attrs="{'invisible': [('is_done', '=', True)]}"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                            </group>
+                        </page>
+                        <page name="other" string="Autres informations">
+                            <group>
+                                <group col="4" colspan="4" name="notes" string="Notes">
+                                    <field name="notes" nolabel="1"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers"/>

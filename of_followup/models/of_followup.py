@@ -39,6 +39,12 @@ class OFFollowupProject(models.Model):
     reference_laying_date = fields.Date(string=u"Date de pose de référence")
     laying_week = fields.Char(string=u"Semaine de pose", compute='_compute_laying_week')
     task_ids = fields.One2many(comodel_name='of.followup.task', inverse_name='project_id', string=u"Tâches")
+    predefined_task_ids = fields.One2many(
+        comodel_name='of.followup.task', inverse_name='project_id', string=u"Tâches pré-définies",
+        domain=[('predefined_task', '=', True)])
+    other_task_ids = fields.One2many(
+        comodel_name='of.followup.task', inverse_name='project_id', string=u"Autres tâches",
+        domain=[('predefined_task', '=', False)])
     template_id = fields.Many2one(comodel_name='of.followup.project.template', string=u"Modèle")
     color = fields.Char(string=u"Couleur", compute="_compute_color")
     priority = fields.Selection(AVAILABLE_PRIORITIES, string='Rating', index=True, default=AVAILABLE_PRIORITIES[0][0])
@@ -454,6 +460,8 @@ class OFFollowupTask(models.Model):
     @api.multi
     def _compute_predefined_state_id(self):
         for rec in self:
+            if not rec.type_id.state_ids or not rec.type_id.state_ids.filtered(lambda s: s.starting_state):
+                continue
             rec.predefined_state_id = rec.type_id.state_ids.filtered(lambda s: s.starting_state)[0]
             # Planification
             if rec.type_id == self.env.ref('of_followup.of_followup_task_type_planif'):
