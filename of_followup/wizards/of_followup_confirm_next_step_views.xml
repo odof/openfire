@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- OF Followup Confirm Next Step views -->
+
+    <record id="of_followup_confirm_next_step_form_view" model="ir.ui.view">
+        <field name="name">of.followup.confirm.next.step.form.view</field>
+        <field name="model">of.followup.confirm.next.step</field>
+        <field name="arch" type="xml">
+            <form>
+                <span>
+                    <p>
+                        Attention, il s'agit d'une tâche pré-définie (calcul automatique de son état).<br/>
+                        Si vous validez, la tâche passera en gestion manuelle de l'état.
+                    </p>
+                </span>
+                <footer>
+                    <button string="Valider" name="validate" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

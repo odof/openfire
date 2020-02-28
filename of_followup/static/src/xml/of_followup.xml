@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+<!--    <tr t-extend="ListView.row">-->
+<!--        <t t-jquery="t td t:last" t-operation="replace">-->
+<!--            <t t-if="column.widget !='color' &amp;&amp; column.type != 'color'" t-raw="render_cell(record, column)"/>-->
+<!--        </t>-->
+<!--    </tr>-->
+
+    <button t-name="ListView.row.text_button" type="button"
+            t-att-title="widget.string" t-att-disabled="disabled || undefined"
+            t-attf-class="#{disabled ? 'oe_list_button_disabled' : ''} #{widget.class or 'btn_txt oe_link'}"
+            ><t t-esc="widget.string"/></button>
+
+</templates>
