@@ -1,0 +1,577 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Followup Project Views -->
+
+    <record id="of_followup_project_form_view" model="ir.ui.view">
+        <field name="name">of.followup.project.form.view</field>
+        <field name="model">of.followup.project</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="is_done" invisible="1"/>
+                    <button string="Marquer comme terminé" type="object" name="set_to_done" class="oe_highlight" confirm="Êtes-vous sûr que le projet est terminé ?"
+                        attrs="{'invisible': [('is_done', '=', True)]}"/>
+                    <button string="Remettre en cours" type="object" name="set_to_in_progress"
+                        attrs="{'invisible': [('is_done', '=', False)]}"/>
+                    <button name="action_send_email" type="object" string="Envoyer un email"/>
+                    <button name="update_laying_date" type="object" string="Actualiser date de pose"/>
+                    <field name="state" widget="statusbar" statusbar_visible="in_progress,late,ready,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_invoice" type="object" class="oe_stat_button" icon="fa-pencil-square-o">
+                            <field name="invoice_count" widget="statinfo" string="Facture(s)"/>
+                        </button>
+                        <button name="action_view_purchase" type="object" class="oe_stat_button" icon="fa-shopping-cart">
+                            <field name="purchase_count" widget="statinfo" string="Achat(s)"/>
+                        </button>
+                        <button name="action_view_interventions" type="object" class="oe_stat_button" icon="fa-calendar">
+                            <field name="intervention_count" widget="statinfo" string="RDV(s) Tech"/>
+                        </button>
+                        <button name="action_view_to_schedule" type="object" class="oe_stat_button" icon="fa-clock-o">
+                            <field name="to_schedule_count" widget="statinfo" string="À programmer"/>
+                        </button>
+                        <button name="action_view_delivery" type="object" class="oe_stat_button" icon="fa-truck">
+                            <field name="delivery_count" widget="statinfo" string="Livraison(s)"/>
+                        </button>
+                        <button name="action_view_picking" type="object" class="oe_stat_button" icon="fa-truck">
+                            <field name="picking_count" widget="statinfo" string="Réception(s)"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <span style="color: #337ab7; font-weight: bold;">Suivi de Projet</span>
+                            <br/>
+                            <field name="priority" widget="priority"/>
+                        </h1>
+                        <field name="tag_ids" widget="many2many_tags" options="{'no_create_edit': True}" nolabel="1" placeholder="Étiquettes..."/>
+                        <br/>
+                        <field name="alert_ids" widget="many2many_tags" readonly="1" nolabel="1"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="order_id"/>
+                            <field name="partner_id"/>
+                            <field name="intervention_address_id"/>
+                            <field name="invoice_status"/>
+                        </group>
+                        <group>
+                            <field name="reference_laying_date"/>
+                            <field name="user_id"/>
+                            <field name="template_id" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="info"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="task" string="Tâches">
+                            <group>
+                                <group col="4" colspan="4" string="Approvisionnement et planification">
+                                    <field name="predefined_task_ids" nolabel="1" colspan="4">
+                                        <tree decoration-danger="is_late" decoration-success="is_done" decoration-muted="is_not_processed">
+                                            <field name="is_late" invisible="1"/>
+                                            <field name="is_done" invisible="1"/>
+                                            <field name="is_not_processed" invisible="1"/>
+                                            <field name="type_id" invisible="1"/>
+                                            <field name="predefined_task" invisible="1"/>
+                                            <field name="state_id" invisible="1"/>
+                                            <field name="predefined_state_id" invisible="1"/>
+                                            <field name="sequence" widget="handle"/>
+                                            <field name="name"/>
+                                            <field name="global_state"/>
+                                            <button name="next_step" class="btn btn-sm btn-primary" type="object" string="Étape suivante" help="Passer à l'étape suivante"
+                                                    attrs="{'invisible': [('is_done', '=', True)]}"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                                <group col="4" colspan="4" string="Autres tâches">
+                                    <field name="other_task_ids" nolabel="1" colspan="4">
+                                        <tree decoration-danger="is_late" decoration-success="is_done" decoration-muted="is_not_processed">
+                                            <field name="is_late" invisible="1"/>
+                                            <field name="is_done" invisible="1"/>
+                                            <field name="is_not_processed" invisible="1"/>
+                                            <field name="type_id" invisible="1"/>
+                                            <field name="predefined_task" invisible="1"/>
+                                            <field name="state_id" invisible="1"/>
+                                            <field name="predefined_state_id" invisible="1"/>
+                                            <field name="sequence" widget="handle"/>
+                                            <field name="name"/>
+                                            <field name="global_state"/>
+                                            <button name="next_step" class="btn btn-sm btn-primary" type="object" string="Étape suivante" help="Passer à l'étape suivante"
+                                                    attrs="{'invisible': [('is_done', '=', True)]}"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                            </group>
+                        </page>
+                        <page name="other" string="Autres informations">
+                            <group>
+                                <group col="4" colspan="4" name="notes" string="Notes">
+                                    <field name="notes" nolabel="1"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_followup_project_kanban_view" model="ir.ui.view">
+        <field name="name">of.followup.project.kanban.view</field>
+        <field name="model">of.followup.project</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="stage_id" group_create="false" group_edit="false" group_delete="false" create="false" delete="false" drag_group="false"
+                    class="o_kanban_dashboard of_followup_kanban">
+                <field name="priority"/>
+                <field name="stage_id" readonly="1" options="{'group_by_tooltip': {'legend_priority': 'Use of stars'}}"/>
+                <field name="tag_ids"/>
+                <field name="order_id"/>
+                <field name="partner_id"/>
+                <field name="laying_week"/>
+                <field name="invoice_status"/>
+                <field name="state"/>
+                <field name="late_tasks_number"/>
+                <field name="late_tasks"/>
+                <field name="info_display"/>
+                <field name="date_alert_display"/>
+                <field name="picking_alert_display"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="of_followup_kanban_main">
+                                <div class="o_kanban_card_content">
+                                    <div class="o_kanban_tags_section">
+                                        <field name="tag_ids"/>
+                                    </div>
+                                    <div style="margin-left: 5px; margin-bottom: 25px;">
+                                        <h4>
+                                            <b><field name="order_id"/></b> - <field name="partner_id"/><br/>
+                                        </h4>
+                                        <span><b>Semaine de pose : <field name="laying_week"/></b>
+                                        <t t-value="JSON.parse(record.date_alert_display.raw_value)[0]" t-set="date_alert"/>
+                                        <span t-if="date_alert" class="of_alert_tag"><t t-esc="date_alert"/></span>
+                                        </span>
+                                        <br/>
+                                        <ul t-if="record.info_display">
+                                            <t t-value="JSON.parse(record.info_display.raw_value)" t-set="info_lines"/>
+                                            <t t-foreach="info_lines" t-as="info_line">
+                                                <li><i><t t-esc="info_line"/></i></li>
+                                            </t>
+                                        </ul>
+                                    </div>
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="priority" widget="priority"/>
+                                        <t t-value="JSON.parse(record.picking_alert_display.raw_value)" t-set="picking_alerts"/>
+                                        <t t-if="picking_alerts" t-foreach="picking_alerts" t-as="picking_alert">
+                                            <span class="of_alert_tag"><t t-esc="picking_alert"/></span>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="of_followup_kanban_boxes">
+                                <div class="of_followup_kanban_box">
+                                    <field name="state" class="oe_inline"/>
+                                    <field t-if="record.state.raw_value == 'late'" name="late_tasks_number" class="oe_inline"/>
+                                </div>
+                                <div t-att-class="'of_followup_kanban_color_' + (record.state.raw_value or '0') + ' of_followup_kanban_box'">
+                                    <ul t-if="record.state.raw_value == 'late'">
+                                        <t t-value="JSON.parse(record.late_tasks.raw_value)" t-set="late_tasks"/>
+                                        <t t-foreach="late_tasks" t-as="late_task">
+                                            <li><t t-esc="late_task"/></li>
+                                        </t>
+                                    </ul>
+                                </div>
+                                <div class="of_followup_kanban_box">
+                                    <field name="invoice_status"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="of_followup_project_list_view" model="ir.ui.view">
+        <field name="name">of.followup.project.list.view</field>
+        <field name="model">of.followup.project</field>
+        <field name="arch" type="xml">
+            <tree default_order='reference_laying_date desc'>
+                <field name="order_id"/>
+                <field name="partner_id"/>
+                <field name="intervention_address_id"/>
+                <field name="reference_laying_date"/>
+                <field name="state"/>
+                <field name="color" widget="color" string=""/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_followup_project_search_view" model="ir.ui.view">
+        <field name="name">of.followup.project.search.view</field>
+        <field name="model">of.followup.project</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="order_id"/>
+                <field name="partner_id"/>
+                <field name="intervention_address_id"/>
+                <field name="reference_laying_date"/>
+                <filter name='in_progress' string="En cours" domain="[('state', '=', 'in_progress')]"/>
+                <filter name='late' string="En retard" domain="[('state', '=', 'late')]"/>
+                <filter name='ready' string="Prêts" domain="[('state', '=', 'ready')]"/>
+                <filter name='done' string="Terminés" domain="[('state', '=', 'done')]"/>
+                <filter name='cancel' string="Annulés" domain="[('state', '=', 'cancel')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_followup_project_action" model="ir.actions.act_window">
+        <field name="name">Suivi des projets</field>
+        <field name="res_model">of.followup.project</field>
+        <field name="view_mode">kanban,tree,form</field>
+    </record>
+
+    <!-- Followup Task Views -->
+
+    <record id="of_followup_task_form_view" model="ir.ui.view">
+        <field name="name">of.followup.task.form.view</field>
+        <field name="model">of.followup.task</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="is_late" invisible="1"/>
+                            <field name="is_done" invisible="1"/>
+                            <field name="is_not_processed" invisible="1"/>
+                            <field name="type_id" widget="selection"/>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="predefined_task" invisible="1"/>
+                            <field name="global_state" invisible="1"/>
+                            <field name="state_id" widget="selection" domain="[('task_type_id', '=', type_id)]"
+                                   attrs="{'invisible': [('predefined_task', '=', True), ('force_state', '=', False)]}"/>
+                            <field name="predefined_state_id" widget="selection" domain="[('task_type_id', '=', type_id)]"
+                                   attrs="{'invisible': ['|', ('predefined_task', '=', False), ('force_state', '=', True)]}" readonly="1"/>
+                            <field name="force_state" attrs="{'invisible': [('predefined_task', '=', False)]}"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="display_planif_interventions" invisible="1"/>
+                        <field name="display_vt_interventions" invisible="1"/>
+                        <field name="display_app_order_lines" invisible="1"/>
+                        <field name="display_acc_order_lines" invisible="1"/>
+                        <field name="display_app_picking_lines" invisible="1"/>
+                        <field name="display_acc_picking_lines" invisible="1"/>
+                        <group col="4" colspan="4" string="RDVs d'intervention planifiés" attrs="{'invisible': [('display_planif_interventions', '=', False)]}">
+                            <field name="planif_intervention_ids" nolabel="1"/>
+                        </group>
+                        <group col="4" colspan="4" string="RDVs visite technique" attrs="{'invisible': [('display_vt_interventions', '=', False)]}">
+                            <field name="vt_intervention_ids" nolabel="1"/>
+                        </group>
+                        <group col="4" colspan="4" string="Lignes de commandes appareils" attrs="{'invisible': [('display_app_order_lines', '=', False)]}">
+                            <field name="app_order_line_ids" nolabel="1">
+                                <form>
+                                    <group>
+                                        <group>
+                                            <field name="product_id"/>
+                                            <field name="of_product_categ_id"/>
+                                            <label for="product_uom_qty" string="Quantité commandée"/>
+                                            <div>
+                                                <field name="product_uom_qty" class="oe_inline"/>
+                                                <field name="product_uom" class="oe_inline oe_no_button"/>
+                                            </div>
+                                            <field name="price_unit"/>
+                                            <field name="price_subtotal"/>
+                                            <field name="qty_delivered" string="Quantité livrée"/>
+                                            <field name="qty_invoiced" string="Quantité facturée"/>
+                                        </group>
+                                        <group>
+                                            <field name="order_partner_id"/>
+                                            <field name="date_order"/>
+                                            <field name="confirmation_date_order"/>
+                                            <field name="of_invoice_policy"/>
+                                            <field name="invoice_status"/>
+                                            <field name="of_invoice_date_prev"/>
+                                        </group>
+                                    </group>
+                                    <label for="name"/>
+                                    <field name="name"/>
+                                    <label for="procurement_ids"/>
+                                    <field name="procurement_ids"/>
+                                </form>
+                            </field>
+                        </group>
+                        <group col="4" colspan="4" string="Lignes de commandes accessoires" attrs="{'invisible': [('display_acc_order_lines', '=', False)]}">
+                            <field name="acc_order_line_ids" nolabel="1">
+                                <form>
+                                    <group>
+                                        <group>
+                                            <field name="product_id"/>
+                                            <field name="of_product_categ_id"/>
+                                            <label for="product_uom_qty" string="Quantité commandée"/>
+                                            <div>
+                                                <field name="product_uom_qty" class="oe_inline"/>
+                                                <field name="product_uom" class="oe_inline oe_no_button"/>
+                                            </div>
+                                            <field name="price_unit"/>
+                                            <field name="price_subtotal"/>
+                                            <field name="qty_delivered" string="Quantité livrée"/>
+                                            <field name="qty_invoiced" string="Quantité facturée"/>
+                                        </group>
+                                        <group>
+                                            <field name="order_partner_id"/>
+                                            <field name="date_order"/>
+                                            <field name="confirmation_date_order"/>
+                                            <field name="of_invoice_policy"/>
+                                            <field name="invoice_status"/>
+                                            <field name="of_invoice_date_prev"/>
+                                        </group>
+                                    </group>
+                                    <label for="name"/>
+                                    <field name="name"/>
+                                    <label for="procurement_ids"/>
+                                    <field name="procurement_ids"/>
+                                </form>
+                            </field>
+                        </group>
+                        <group col="4" colspan="4" string="Lignes de BL appareils" attrs="{'invisible': [('display_app_picking_lines', '=', False)]}">
+                            <field name="app_picking_line_ids" nolabel="1"/>
+                        </group>
+                        <group col="4" colspan="4" string="Lignes de BL accessoires" attrs="{'invisible': [('display_acc_picking_lines', '=', False)]}">
+                            <field name="acc_picking_line_ids" nolabel="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Followup Task Type Views -->
+
+    <record id="of_followup_task_type_form_view" model="ir.ui.view">
+        <field name="name">of.followup.task.type.form.view</field>
+        <field name="model">of.followup.task.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name" attrs="{'readonly': [('predefined_task', '=', True)]}"/>
+                            <field name="short_name" attrs="{'readonly': [('predefined_task', '=', True)]}"/>
+                        </group>
+                        <group>
+                            <field name="predefined_task"/>
+                            <field name="id" invisible="1"/>
+                            <field name="planning_tache_categ_ids" widget="many2many_tags"
+                                   attrs="{'invisible': ['|', ('predefined_task', '=', False), ('id', 'not in', [%(of_followup.of_followup_task_type_planif)d, %(of_followup.of_followup_task_type_vt)d])]}"/>
+                            <field name="product_categ_ids" widget="many2many_tags"
+                                   attrs="{'invisible': ['|', ('predefined_task', '=', False), ('id', 'not in', [%(of_followup.of_followup_task_type_app)d, %(of_followup.of_followup_task_type_out_app)d])]}"/>
+                        </group>
+                        <group col="4" colspan="4" string="Etats">
+                            <field name="state_ids" nolabel="1" attrs="{'readonly': [('predefined_task', '=', True)]}">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="starting_state"/>
+                                    <field name="final_state"/>
+                                    <field name="stage_id"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_followup_task_type_admin_form_view" model="ir.ui.view">
+        <field name="name">of.followup.task.type.admin.form.view</field>
+        <field name="model">of.followup.task.type</field>
+        <field name="inherit_id" ref="of_followup.of_followup_task_type_form_view"/>
+        <field name="groups_id" eval="[(6,0, [ref('of_base.of_group_root_only')])]"/>
+        <field name="arch" type="xml">
+            <field name="name" position="attributes">
+               <attribute name="attrs">{}</attribute>
+            </field>
+            <field name="short_name" position="attributes">
+               <attribute name="attrs">{}</attribute>
+            </field>
+            <field name="state_ids" position="attributes">
+               <attribute name="attrs">{}</attribute>
+            </field>
+        </field>
+    </record>
+
+    <record id="of_followup_task_type_list_view" model="ir.ui.view">
+        <field name="name">of.followup.task.type.list.view</field>
+        <field name="model">of.followup.task.type</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="predefined_task"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_followup_task_type_search_view" model="ir.ui.view">
+        <field name="name">of.followup.task.type.search.view</field>
+        <field name="model">of.followup.task.type</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_followup_task_type_action" model="ir.actions.act_window">
+        <field name="name">Type de tâches pour le suivi</field>
+        <field name="res_model">of.followup.task.type</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Followup Project Template Views -->
+
+    <record id="of_followup_project_template_form_view" model="ir.ui.view">
+        <field name="name">of.followup.project.template.form.view</field>
+        <field name="model">of.followup.project.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="default"/>
+                        </group>
+                        <group col="4" colspan="4" string="Tâches">
+                            <field name="task_ids" nolabel="1">
+                                <tree>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="predefined_task"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_followup_project_template_list_view" model="ir.ui.view">
+        <field name="name">of.followup.project.template.list.view</field>
+        <field name="model">of.followup.project.template</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_followup_project_template_search_view" model="ir.ui.view">
+        <field name="name">of.followup.project.template.search.view</field>
+        <field name="model">of.followup.project.template</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_followup_project_template_action" model="ir.actions.act_window">
+        <field name="name">Modèles de suivi</field>
+        <field name="res_model">of.followup.project.template</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- crm.lead.tag views -->
+
+    <record id="of_followup_project_tag_form_view" model="ir.ui.view">
+        <field name="name">of.followup.project.tag.form.view</field>
+        <field name="model">of.followup.project.tag</field>
+        <field name="arch" type="xml">
+            <form string="Étiquette de suivi">
+                <group>
+                    <field name="name"/>
+                    <field name="color" groups="base.group_no_one"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_followup_project_tag_list_view" model="ir.ui.view">
+        <field name="name">of.followup.project.tag.list.view</field>
+        <field name="model">of.followup.project.tag</field>
+        <field name="arch" type="xml">
+            <tree string="Étiquettes de suivi">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_followup_project_tag_action" model="ir.actions.act_window">
+        <field name="name">Étiquettes</field>
+        <field name="res_model">of.followup.project.tag</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Sale Order Views -->
+
+    <record id="of_followup_sale_order_form_view" model="ir.ui.view">
+        <field name="name">of.followup.sale.order.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='button_gestion_prix']" position="after">
+                <field name="of_followup_project_id" invisible="1"/>
+                <button name="button_followup_project" type="object" string="Suivi" attrs="{'invisible': [('of_followup_project_id', '!=', False)]}"/>
+            </xpath>
+            <xpath expr="/form/sheet/div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" name="action_view_followup" type="object" icon="fa-arrow-right">
+                    <div class="o_form_field o_stat_info">
+                        <span class="o_stat_value"><field name="of_follow_count"/></span>
+                        <span class="o_stat_text">Suivi</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_followup_quotation_search_view" model="ir.ui.view">
+        <field name="name">of.followup.quotation.search.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.sale_order_view_search_inherit_quotation"/>
+        <field name="arch" type="xml">
+            <xpath expr="//separator[2]" position="after">
+                <filter name='wo_followup' string="Sans suivi" domain="[('of_followup_project_id', '=', False)]"/>
+                <separator/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_followup_sale_order_search_view" model="ir.ui.view">
+        <field name="name">of.followup.sale.order.search.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_order_view_search_inherit_sale"/>
+        <field name="arch" type="xml">
+            <xpath expr="//separator[3]" position="after">
+                <filter name='wo_followup' string="Sans suivi" domain="[('of_followup_project_id', '=', False)]"/>
+                <separator/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
