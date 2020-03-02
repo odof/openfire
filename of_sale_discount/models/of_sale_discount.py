@@ -64,6 +64,18 @@ class SaleOrderLine(models.Model):
         res['of_discount_formula'] = self.of_discount_formula
         return res
 
+    @api.model
+    def create(self, vals):
+        if not vals.get('of_discount_formula') and vals.get('discount'):
+            vals['of_discount_formula'] = "%s" % vals['discount']
+        return super(SaleOrderLine, self).create(vals)
+
+    @api.multi
+    def write(self, vals):
+        if not vals.get('of_discount_formula') and vals.get('discount'):
+            vals['of_discount_formula'] = "%s" % vals['discount']
+        return super(SaleOrderLine, self).write(vals)
+
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
@@ -89,6 +101,18 @@ class AccountInvoiceLine(models.Model):
 
     discount = fields.Float(string='Discount (%)', compute='_get_discount', digits=dp.get_precision('Discount'), store=True)
     of_discount_formula = fields.Char("Remise (%)", help="Remise ou somme de remises.\nEg. \"40 + 10.5\" équivaut à \"46.3\"")
+
+    @api.model
+    def create(self, vals):
+        if not vals.get('of_discount_formula') and vals.get('discount'):
+            vals['of_discount_formula'] = "%s" % vals['discount']
+        return super(AccountInvoiceLine, self).create(vals)
+
+    @api.multi
+    def write(self, vals):
+        if not vals.get('of_discount_formula') and vals.get('discount'):
+            vals['of_discount_formula'] = "%s" % vals['discount']
+        return super(AccountInvoiceLine, self).write(vals)
 
 class PricelistItem(models.Model):
     _inherit = "product.pricelist.item"
