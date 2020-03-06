@@ -111,7 +111,7 @@
                                         </div>
                                         <div colspan="2"
                                              attrs="{'invisible': ['|',
-                                                                    ('date_next', '&lt;=', '_field_fin_contrat'),
+                                                                    ('date_next', '&lt;=', '_field_date_fin_contrat'),
                                                                     ('fin_contrat', '=', False)]}">
                                             <b><i class="oe_grey">
                                                 La date de prochaine planification est postérieure à la date de fin
