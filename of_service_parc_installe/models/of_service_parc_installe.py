@@ -39,7 +39,8 @@ class OfService(models.Model):
 class OfPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
-    parc_installe_id = fields.Many2one('of.parc.installe', string=u"Parc installé", domain="['|', '|', ('client_id', '=', partner_id), ('client_id', '=', address_id), ('site_adresse_id', '=', address_id)]")
+    parc_installe_id = fields.Many2one('of.parc.installe', string=u"Parc installé",
+        domain="['|', '|', ('client_id', '=', partner_id), ('client_id', '=', address_id), ('site_adresse_id', '=', address_id)]")
 
     @api.multi
     def button_open_of_planning_intervention(self):
@@ -60,6 +61,7 @@ class OfPlanningIntervention(models.Model):
         if service:
             vals['parc_installe_id'] = service.parc_installe_id and service.parc_installe_id.id
         return super(OfPlanningIntervention, self).create(vals)
+
 
 class OfParcInstalle(models.Model):
     _inherit = "of.parc.installe"
@@ -127,7 +129,7 @@ class OfParcInstalle(models.Model):
         'default_address_id': self.site_adresse_id.id,
         'default_recurrence': False,
         'default_date_next': today_str,
-        'default_date_fin': deux_semaines_str,
+        #'default_date_fin': deux_semaines_str,
         'default_parc_installe_id': self.id,
         'default_origin': u"[Parc installé] " + (self.name or ''),
         'bloquer_recurrence': True,
@@ -161,7 +163,7 @@ class ProjectIssue(models.Model):
         'default_address_id': self.of_parc_installe_lieu_id.id,
         'default_recurrence': False,
         'default_date_next': today_str,
-        'default_date_fin': deux_semaines_str,
+        #'default_date_fin': deux_semaines_str,
         'default_sav_id': self.id,
         'default_parc_installe_id': self.of_produit_installe_id.id,
         'default_origin': u"[SAV] " + self.name,
@@ -190,7 +192,7 @@ class ProjectIssue(models.Model):
         'default_address_id': self.of_parc_installe_lieu_id.id,
         'default_recurrence': False,
         'default_date_next': today_str,
-        'default_date_fin': deux_semaines_str,
+        #'default_date_fin': deux_semaines_str,
         'default_sav_id': self.id,
         'default_parc_installe_id': self.of_produit_installe_id.id,
         'default_origin': u"[SAV] " + self.name,

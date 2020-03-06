@@ -50,6 +50,37 @@ class HREmployee(models.Model):
             taches = taches.filtered(lambda t: t.id in employee.of_tache_ids.ids)
         return taches
 
+    @api.multi
+    def name_get(self):
+        """Permet dans un RDV d'intervention de proposer les intervenant inaptes entre parenthèses"""
+        tache_id = self._context.get('tache_prio_id')
+        tache = tache_id and self.env['of.planning.tache'].browse(tache_id) or False
+        result = []
+        for employee in self:
+            peut_faire = employee.peut_faire(tache) if tache else True
+            result.append((employee.id, "%s%s%s" % ('' if peut_faire else '(', employee.name, '' if peut_faire else ')')))
+        return result
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        """Permet dans un RDV d'intervention de proposer en priorité les intervenant aptes à la tâche"""
+        if self._context.get('tache_prio_id'):
+            tache_id = self._context.get('tache_prio_id')
+            args = args or []
+            res = super(HREmployee, self).name_search(
+                name,
+                args + ['|', ['of_tache_ids', 'in', tache_id], ['of_toutes_taches', '=', True]],
+                operator,
+                limit) or []
+            limit = limit - len(res)
+            res += super(HREmployee, self).name_search(
+                name,
+                args + [['of_tache_ids', 'not in', tache_id], ['of_toutes_taches', '=', False]],
+                operator,
+                limit) or []
+            return res
+        return super(HREmployee, self).name_search(name, args, operator, limit)
+
 
 class OfPlanningTacheCateg(models.Model):
     _name = "of.planning.tache.categ"
@@ -60,6 +91,16 @@ class OfPlanningTacheCateg(models.Model):
     tache_ids = fields.One2many('of.planning.tache', 'tache_categ_id', string=u"Tâches")
     active = fields.Boolean('Actif', default=True)
     sequence = fields.Integer(u'Séquence', help=u"Ordre d'affichage (plus petit en premier)")
+
+    fourchette_planif = fields.Selection([
+        ('semaine', u"À la semaine"),
+        ('quinzaine', u"À la quinzaine"),
+        ('mois', u"Au mois"),
+    ], string="Granularité de planif",
+    help=u"Exemple:\n"
+        u"Entretien -> au mois"
+        u"Pose -> à la quinzaine"
+        u"SAV -> à la semaine")
 
 
 class OfPlanningTache(models.Model):
@@ -83,9 +124,24 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
     equipe_ids = fields.Many2many('of.planning.equipe', 'equipe_tache_rel', 'tache_id', 'equipe_id', u'Équipes qualifiées')
     #employee_ids = fields.Many2many('hr.employee', 'of_employee_tache_rel', 'tache_id', 'employee_id', u'Employés qualifiés',
     #                                domain=_get_employee_ids_domain)
-    employee_ids = fields.Many2many('hr.employee', u'Employés qualifiés', compute="_compute_employee_ids")
+    employee_ids = fields.Many2many('hr.employee', u'Employés qualifiés', compute="_compute_employee_ids",
+                                    search="_search_employee_ids")
     category_id = fields.Many2one('hr.employee.category', string=u"Catégorie d'employés")
     #employee_nb = fields.Integer(string=u'Nombre d\'intervenants', default=1)
+    fourchette_planif = fields.Selection(related="tache_categ_id.fourchette_planif", readonly=True)
+
+    def _search_employee_ids(self, operator, value):
+        def intersection(lst1, lst2):
+            # Use of hybrid method
+            temp = set(lst2)
+            lst3 = [value for value in lst1 if value in temp]
+            return lst3
+        taches = self.search([])
+        if operator == 'in':
+            taches = taches.filtered(lambda t: intersection(t.employee_ids.ids, value))
+        else:
+            taches = taches.filtered(lambda t: not intersection(t.employee_ids.ids, value))
+        return [('id', 'in', taches.ids)]
 
     @api.multi
     def _compute_employee_ids(self):
@@ -98,6 +154,40 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
         if self.search([('id', 'in', self._ids), ('verr', '=', True)]):
             raise ValidationError(u'Vous essayez de supprimer une tâche verrouillée.')
         return super(OfPlanningTache, self).unlink()
+
+    @api.multi
+    def name_get(self):
+        """Permet dans un RDV d'intervention de proposer les taches non faisables entre parenthèses"""
+        intervenant_ids = self._context.get('intervenant_prio_ids')
+        if intervenant_ids:
+            intervenants = self.env['hr.employee'].browse(intervenant_ids[0][2]) or []  # code 6
+            result = []
+            for tache in self:
+                peut_faire = any([i in tache.employee_ids for i in intervenants])
+                result.append((tache.id, "%s%s%s" % ('' if peut_faire else '(', tache.name, '' if peut_faire else ')')))
+            return result
+        return super(OfPlanningTache, self).name_get()
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        """Permet dans un RDV d'intervention de proposer en priorité les tâches possibles"""
+        if self._context.get('intervenant_prio_ids'):
+            intervenant_ids = self._context.get('intervenant_prio_ids', [(6, 0, [])])[0][2]  # code 6 [(6, 0, [ids])]
+            args = args or []
+            res = super(OfPlanningTache, self).name_search(
+                name,
+                args + [['employee_ids', 'in', intervenant_ids]],
+                operator,
+                limit) or []
+            limit = limit - len(res)
+            res += super(OfPlanningTache, self).name_search(
+                name,
+                args + [['employee_ids', 'not in', intervenant_ids]],
+                operator,
+                limit) or []
+            return res
+        return super(OfPlanningTache, self).name_search(name, args, operator, limit)
+
 
 class OfPlanningEquipe(models.Model):
     _name = "of.planning.equipe"
@@ -941,7 +1031,6 @@ class OfPlanningIntervention(models.Model):
             heures, minutes = float_2_heures_minutes(self.duree)
             self.date_deadline_forcee = fields.Datetime.to_string(fields.Datetime.from_string(self.date) +
                                                                   relativedelta(hours=heures, minutes=minutes))
-        print "OYE"
 
     @api.onchange('date_deadline_forcee', 'date', 'duree')
     def _onchange_date_deadline_forcee(self):

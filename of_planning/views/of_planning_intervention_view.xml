@@ -194,7 +194,9 @@
                         <group>
                             <group col="2" name="refs" string="Références">
                                 <field name="equipe_id" autofocus="autofocus"/>
-                                <field name="employee_ids" string="Intervenants" widget="many2many_tags" options='{"no_open": True, "no_create": True}'/>
+                                <field name="employee_ids" string="Intervenants" widget="many2many_tags"
+                                       options='{"no_open": True, "no_create": True}'
+                                       context="{'tache_prio_id': tache_id}"/>
                                 <field name="partner_id" invisible="1"/>
                                 <field name="address_id" domain="[('customer','=',True)]" colspan="2"/>
                                 <field name="secteur_id"/>
@@ -205,7 +207,7 @@
                             </group>
                             <group col="2" name="planif" string="Planification">
                                 <field name="template_id" attrs="{'readonly': [('number', '!=', False), ('state', 'not in', ('draft', 'cancel'))]}"/>
-                                <field name="tache_id"/>
+                                <field name="tache_id" context="{'intervenant_prio_ids': employee_ids}"/>
                                 <field name="forcer_dates"/>
                                 <label for="date"/>
                                 <div>
