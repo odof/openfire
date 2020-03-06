@@ -163,13 +163,13 @@ var PlanningView = View.extend({
             .filter([['of_est_intervenant', '=', true]]) // seulement les intervenants
             .all();  // récupérer tous les employés qui sont des intervenants
         var ir_values_model = new Model("ir.values");
-        // récupérer la dernière semaine affichée en vue planning pour l'utilisateur en cours
-        var range_start_def = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_range_start", false]);
+        // récupérer la dernière semaine affichée en vue planning pour l'utilisateur en cours -> inhibé pour l'instant
+        //var range_start_def = ir_values_model.call("get_default", ["of.intervention.settings", "planningview_range_start", false]);
         // initialiser les couleurs des créneaux dispo et leur durée minimale
         var creneaux_dispo_data_def = self.set_creneaux_dispo_data();
 
-        return $.when(write_def, create_def, excluded_ids_def, intervenants_ids_def, range_start_def, rendered_prom, creneaux_dispo_data_def, this._super()).then(
-            function (write, create, excluded, emp_ids, range_start) {
+        return $.when(write_def, create_def, excluded_ids_def, intervenants_ids_def, rendered_prom, creneaux_dispo_data_def, this._super()).then(
+            function (write, create, excluded, emp_ids) {
                 self.write_right = write;
                 self.create_right = create;
                 // retirer les intervenants à ne pas montrer en vue planning
@@ -183,10 +183,10 @@ var PlanningView = View.extend({
                     }
                 }
                 self.view_res_ids = to_show_ids;
-                if (!isNullOrUndef(range_start)) {  // saut à la dernière semaine consultée si existante
+                /*if (!isNullOrUndef(range_start)) {  // saut à la dernière semaine consultée si existante
                     self.range_start = moment.utc(range_start).local().startOf(self.mode)._d;
                     self.range_stop = moment.utc(range_start).local().endOf(self.mode)._d;
-                }
+                }*/
                 // initialiser les filtres grâce à la liste des intervenants à montrer en vue planning
                 var all_filters_def = self._set_all_custom_colors();
 
@@ -377,26 +377,26 @@ var PlanningView = View.extend({
         var self = this;
         var context_dfd, domain_dfd, range_start_dfd = $.Deferred();
         var ir_values_model = new Model('ir.values');
-        // 1ère recherche: on charge la config, autres recherches, on affecte la config
-        if (!this.first_search_done) {
+        // 1ère recherche: on charge la config, autres recherches, on affecte la config inhibé pour l'instant
+        /*if (!this.first_search_done) {
             range_start_dfd = $.when();
         }else{
             var format = time.datetime_to_str;
             var range_start_str = format(this.range_start);
             range_start_dfd = ir_values_model.call("set_default", ["of.intervention.settings", "planningview_range_start", range_start_str, false]);
-        }
+        }*/
         this.domain = [];
         this.context = context;
         this.group_by = group_by;
 
-        $.when(range_start_dfd).then(function(){
-            if (self.table_inited && self.first_search_done) {
-                self._do_search(self.domain, self.context, self.group_by);
-            }else{
-                self.first_search_done = true;
-                console.log('do_search not done, planning view not inited');
-            }
-        })
+        //$.when(range_start_dfd).then(function(){
+        if (self.table_inited && self.first_search_done) {
+            self._do_search(self.domain, self.context, self.group_by);
+        }else{
+            self.first_search_done = true;
+            console.log('do_search not done, planning view not inited');
+        }
+        //})
 
     },
     _do_search: function(domain, context, group_by) {
@@ -797,7 +797,7 @@ var PlanningView = View.extend({
 
         return data_manager.load_action(action_id, pyeval.eval('context', additional_context)).then(function(result) {
                 //console.log("LE RESUUUULT",result);
-                result.target = "new";
+                //result.target = "new"; -> inhibé pour avoir accès aux actions
                 result.res_id = event.data.id;
                 var options = {
                     'additional_context': pyeval.eval('context', additional_context),  // pour une raison inconnue le additional_context n'est pas pris en compte avant
@@ -1270,6 +1270,10 @@ var PlanningCreneauDispo = Widget.extend({
         this.date = moment(this.view.range_start).add(self.col_offset, 'days').format('YYYY-MM-DD'),
         this.lieu_debut = record.lieu_debut;
         this.lieu_fin = record.lieu_fin;
+
+        // inhiber double-clique
+        this.on_planning_creneau_secteur_action_clicked = _.debounce(this.on_planning_creneau_secteur_action_clicked, 300, true);
+        this.on_planning_creneau_action_clicked = _.debounce(this.on_planning_creneau_action_clicked, 300, true);
     },
     /**
      *  génère le rendu visuel du créneau et l'attache à la colonne correspondante
@@ -1448,6 +1452,7 @@ var PlanningRecord = Widget.extend({
         }else{
             this.attendee_other_ids = []
         }
+        this.on_global_click = _.debounce(this.on_global_click, 300, true);
 
         //this.init_content(record);
         //console.log('MapRecord this: ',this);

@@ -212,7 +212,7 @@ class OfPlanifCreneauProp(models.TransientModel):
                 a_planifier.distance_reelle_tota = a_planifier.distance_order"""
 
 
-    @api.multi
+    """@api.multi
     @api.depends('service_id', 'service_id.recurrence', 'service_id.date_next', 'service_id.date_fin')
     def _compute_date_fin(self):
         un_mois = relativedelta(months=1)
@@ -226,7 +226,7 @@ class OfPlanifCreneauProp(models.TransientModel):
                     date_fin_da = service_date_fin_da
                 a_planifier.date_fin = fields.Date.to_string(date_fin_da)
             else:
-                a_planifier.date_fin = service.date_fin
+                a_planifier.date_fin = service.date_fin"""
 
     @api.multi
     @api.depends('geo_lat', 'geo_lng', 'creneau_id')
@@ -638,21 +638,15 @@ class OfPlanifCreneau(models.TransientModel):
             self.priorite_max = 7
             return [vals]
 
-        un_mois = timedelta(days=30)
-        une_semaine = timedelta(days=7)
+        un_mois = relativedelta(months=1)
+        une_semaine = relativedelta(weeks=1)
         date_creneau_da = fields.Date.from_string(self.date_creneau)
         date_un_mois_da = date_creneau_da + un_mois
-        date_1_semaine_da = date_creneau_da + une_semaine  # pour les services recurrents
-        date_2_semaines_da = date_creneau_da + 2 * une_semaine  # pour les services recurrents
-        date_moins_un_mois_da = date_creneau_da - un_mois  # pour les services recurrents
-        date_moins_3_semaines_da = date_creneau_da - 3 * une_semaine  # pour les services recurrents
-        date_moins_2_semaines_da = date_creneau_da - 2 * une_semaine  # pour les services recurrents
+        date_1_semaine_da = date_creneau_da + une_semaine
+        date_2_semaines_da = date_creneau_da + 2 * une_semaine
         date_un_mois_str = fields.Date.to_string(date_un_mois_da)
         date_1_semaine_str = fields.Date.to_string(date_1_semaine_da)
         date_2_semaines_str = fields.Date.to_string(date_2_semaines_da)
-        date_moins_un_mois_str = fields.Date.to_string(date_moins_un_mois_da)
-        date_moins_3_semaines_str = fields.Date.to_string(date_moins_3_semaines_da)
-        date_moins_2_semaines_str = fields.Date.to_string(date_moins_2_semaines_da)
         taches_possibles = self.employee_id.get_taches_possibles()
         if not self.ignorer_duree:
             taches_possibles = taches_possibles.filtered(lambda t: t.duree <= self.duree_creneau)  # seulement les taches suffisamment courtes a prendre en compte
@@ -670,8 +664,8 @@ class OfPlanifCreneau(models.TransientModel):
             ('date_next', '<=', date_un_mois_str),  # ne pas proposer d'interventions à programmer dans plus d'un mois
             '|',
                 '&', ('recurrence', '=', True),
-                     '|', ('date_fin', '=', False),
-                          ('date_fin', '>', self.date_creneau),  # pour les service récurrents, la date de fin est la date de fin du contrat
+                     '|', ('date_fin_contrat', '=', False),
+                          ('date_fin_contrat', '>', self.date_creneau),
                 ('recurrence', '=', False),
         ]
         if self.secteur_id:
@@ -698,7 +692,7 @@ class OfPlanifCreneau(models.TransientModel):
                         service_domain.append(('address_zip', '>', zip_range.cp_max))
                 service_domain.append(('address_zip', 'not in', zip_range_excluded.ids))
         # services
-        services = self.env['of.service'].search(service_domain).filter_state_poncrec_date(date=self.date_creneau)
+        services = self.env['of.service'].search(service_domain).filter_state_poncrec_date(date_eval=self.date_creneau)
         distance_max = self.distance_max * 1.3  # approximation
         priorite_max = 0
         lieu_prec = self.lieu_prec_manual_id or self.lieu_prec_id
@@ -712,10 +706,11 @@ class OfPlanifCreneau(models.TransientModel):
             lieu_suiv = lieu_prec
 
         for service in services:
+            priorite = 0
+            # priorité par spatialité
             if calcul_distance_oiseau:
                 voloiseau_prec = voloiseau(service.geo_lat, service.geo_lng, lieu_prec.geo_lat, lieu_prec.geo_lng)
                 voloiseau_suiv = voloiseau(service.geo_lat, service.geo_lng, lieu_suiv.geo_lat, lieu_suiv.geo_lng)
-                priorite = 0
                 if voloiseau_prec > distance_max:  # trop loins
                     continue
                 if voloiseau_suiv > distance_max:
@@ -726,23 +721,14 @@ class OfPlanifCreneau(models.TransientModel):
                     priorite += 2
                 elif voloiseau_prec + voloiseau_suiv <= 15:
                     priorite += 1
-            if service.recurrence and (not service.date_fin or service.date_fin > date_un_mois_str):  # service recurrent sans date de fin ou qui termine dans + d'un mois
-                # on prend en compte la date de prochaine intervention
-                if service.date_next <= date_moins_un_mois_str:  # date de prochaine intervention il y a plus d'un mois: en retard!
-                    priorite += 3
-                elif service.date_next <= date_moins_3_semaines_str:  # date de prochaine intervention il y a plus de 3 semaines: à faire cette semaine
-                    priorite += 2
-                elif service.date_next <= date_moins_2_semaines_str:  # date de prochaine intervention il y a plus de 2 semaines: à faire cette quinzaine
-                    priorite += 1
-            # pas besoin de gérer le cas service récurrent déjà terminé grace au search plus haut
-            else:
-                # on prend en compte la date de fin
-                if service.date_fin < self.date_creneau:  # en retard!
-                    priorite += 3
-                elif service.date_fin <= date_1_semaine_str:  # à faire cette semaine
-                    priorite += 2
-                elif service.date_fin <= date_2_semaines_str:  # à faire cette quinzaine
-                    priorite += 1
+            # priorité par temporalité
+            if service.date_fin < self.date_creneau:  # en retard!
+                priorite += 3
+            elif service.date_fin <= date_1_semaine_str:  # à faire cette semaine
+                priorite += 2
+            elif service.date_fin <= date_2_semaines_str:  # à faire cette quinzaine
+                priorite += 1
+
             if priorite > priorite_max:
                 priorite_max = priorite
 
@@ -751,7 +737,7 @@ class OfPlanifCreneau(models.TransientModel):
                 # 'distance_order': 12345,
                 'service_id': service.id,
                 'date_next': service.date_next,
-                'date_fin': service.date_next_fin,
+                'date_fin': service.date_fin,
             }
             vals_list.append(vals)
         self.priorite_max = priorite_max
@@ -876,6 +862,7 @@ class OfPlanifCreneau(models.TransientModel):
         intervention = self.create_intervention()
         if self.selected_id.service_id.recurrence:  # conception: calculer date next à la création de l'intervention ou à sa validation?
             intervention.service_id.date_next = intervention.service_id.get_next_date(self.date_creneau)
+            intervention.service_id.date_fin = intervention.service_id.get_fin_date(service.date_next)
         return #{'type': 'ir.actions.client', 'tag': 'history_back'}
 
     @api.multi

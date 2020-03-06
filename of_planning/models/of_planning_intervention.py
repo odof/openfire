@@ -10,6 +10,7 @@ import urllib
 import requests
 import re
 import pytz
+import json
 
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError, ValidationError
@@ -50,6 +51,37 @@ class HREmployee(models.Model):
             taches = taches.filtered(lambda t: t.id in employee.of_tache_ids.ids)
         return taches
 
+    @api.multi
+    def name_get(self):
+        """Permet dans un RDV d'intervention de proposer les intervenant inaptes entre parenthèses"""
+        tache_id = self._context.get('tache_prio_id')
+        tache = tache_id and self.env['of.planning.tache'].browse(tache_id) or False
+        result = []
+        for employee in self:
+            peut_faire = employee.peut_faire(tache) if tache else True
+            result.append((employee.id, "%s%s%s" % ('' if peut_faire else '(', employee.name, '' if peut_faire else ')')))
+        return result
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        """Permet dans un RDV d'intervention de proposer en priorité les intervenant aptes à la tâche"""
+        if self._context.get('tache_prio_id'):
+            tache_id = self._context.get('tache_prio_id')
+            args = args or []
+            res = super(HREmployee, self).name_search(
+                name,
+                args + ['|', ['of_tache_ids', 'in', tache_id], ['of_toutes_taches', '=', True]],
+                operator,
+                limit) or []
+            limit = limit - len(res)
+            res += super(HREmployee, self).name_search(
+                name,
+                args + [['of_tache_ids', 'not in', tache_id], ['of_toutes_taches', '=', False]],
+                operator,
+                limit) or []
+            return res
+        return super(HREmployee, self).name_search(name, args, operator, limit)
+
 
 class OfPlanningTacheCateg(models.Model):
     _name = "of.planning.tache.categ"
@@ -60,6 +92,20 @@ class OfPlanningTacheCateg(models.Model):
     tache_ids = fields.One2many('of.planning.tache', 'tache_categ_id', string=u"Tâches")
     active = fields.Boolean('Actif', default=True)
     sequence = fields.Integer(u'Séquence', help=u"Ordre d'affichage (plus petit en premier)")
+
+    fourchette_planif = fields.Selection([
+        ('semaine', u"À la semaine"),
+        ('quinzaine', u"À la quinzaine"),
+        ('mois', u"Au mois"),
+    ], string="Granularité de planif",
+    help=u"""
+La granularité permet de définir la période de planification de référence par type de tâche.\n
+Cette granularité permet, à la saisie d'une intervention à programmer,
+de calculer la date de fin une fois la date de début saisie. par défaut :\n
+  * Pour une pose la granularité de planification est la quinzaine
+  * Pour un SAV (quand le champ SAV est rempli), la granularité de planification est la semaine
+  * Pour un entretien, la granularité de planification est le mois
+    """)
 
 
 class OfPlanningTache(models.Model):
@@ -83,9 +129,24 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
     equipe_ids = fields.Many2many('of.planning.equipe', 'equipe_tache_rel', 'tache_id', 'equipe_id', u'Équipes qualifiées')
     #employee_ids = fields.Many2many('hr.employee', 'of_employee_tache_rel', 'tache_id', 'employee_id', u'Employés qualifiés',
     #                                domain=_get_employee_ids_domain)
-    employee_ids = fields.Many2many('hr.employee', u'Employés qualifiés', compute="_compute_employee_ids")
+    employee_ids = fields.Many2many('hr.employee', u'Employés qualifiés', compute="_compute_employee_ids",
+                                    search="_search_employee_ids")
     category_id = fields.Many2one('hr.employee.category', string=u"Catégorie d'employés")
     #employee_nb = fields.Integer(string=u'Nombre d\'intervenants', default=1)
+    fourchette_planif = fields.Selection(related="tache_categ_id.fourchette_planif", readonly=True)
+
+    def _search_employee_ids(self, operator, value):
+        def intersection(lst1, lst2):
+            # Use of hybrid method
+            temp = set(lst2)
+            lst3 = [value for value in lst1 if value in temp]
+            return lst3
+        taches = self.search([])
+        if operator == 'in':
+            taches = taches.filtered(lambda t: intersection(t.employee_ids.ids, value))
+        else:
+            taches = taches.filtered(lambda t: not intersection(t.employee_ids.ids, value))
+        return [('id', 'in', taches.ids)]
 
     @api.multi
     def _compute_employee_ids(self):
@@ -98,6 +159,40 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
         if self.search([('id', 'in', self._ids), ('verr', '=', True)]):
             raise ValidationError(u'Vous essayez de supprimer une tâche verrouillée.')
         return super(OfPlanningTache, self).unlink()
+
+    @api.multi
+    def name_get(self):
+        """Permet dans un RDV d'intervention de proposer les taches non faisables entre parenthèses"""
+        intervenant_ids = self._context.get('intervenant_prio_ids')
+        if intervenant_ids:
+            intervenants = self.env['hr.employee'].browse(intervenant_ids[0][2]) or []  # code 6
+            result = []
+            for tache in self:
+                peut_faire = any([i in tache.employee_ids for i in intervenants])
+                result.append((tache.id, "%s%s%s" % ('' if peut_faire else '(', tache.name, '' if peut_faire else ')')))
+            return result
+        return super(OfPlanningTache, self).name_get()
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        """Permet dans un RDV d'intervention de proposer en priorité les tâches possibles"""
+        if self._context.get('intervenant_prio_ids'):
+            intervenant_ids = self._context.get('intervenant_prio_ids', [(6, 0, [])])[0][2]  # code 6 [(6, 0, [ids])]
+            args = args or []
+            res = super(OfPlanningTache, self).name_search(
+                name,
+                args + [['employee_ids', 'in', intervenant_ids]],
+                operator,
+                limit) or []
+            limit = limit - len(res)
+            res += super(OfPlanningTache, self).name_search(
+                name,
+                args + [['employee_ids', 'not in', intervenant_ids]],
+                operator,
+                limit) or []
+            return res
+        return super(OfPlanningTache, self).name_search(name, args, operator, limit)
+
 
 class OfPlanningEquipe(models.Model):
     _name = "of.planning.equipe"
@@ -200,6 +295,7 @@ class OfPlanningEquipe(models.Model):
         for equipe in self:
             equipe.tz_offset = datetime.now(pytz.timezone(equipe.tz or 'GMT')).strftime('%z')
 
+
 class OfPlanningInterventionRaison(models.Model):
     _name = "of.planning.intervention.raison"
     _description = u"Raisons d'intervention reportée"
@@ -213,7 +309,7 @@ class OfPlanningIntervention(models.Model):
     _inherit = ["of.readgroup", "of.calendar.mixin", 'mail.thread']
     _order = 'date'
 
-    @api.multi
+    @api.constrains('date_deadline_forcee', 'forcer_dates', 'date', 'duree')
     def check_coherence_dates(self):
         for intervention in self:
             if intervention.date_deadline_forcee and intervention.forcer_dates and intervention.date and intervention.duree:
@@ -225,21 +321,33 @@ class OfPlanningIntervention(models.Model):
                 # si on compare des relativedelta: (1h,0min) < (0h, 30min)
                 # donc on créé un datetime pour pouvoir comparer
                 now = fields.Datetime.from_string(fields.Datetime.now())
-                if now + diff_heures < now + duree_rd and (duree_rd - diff_heures).minutes > 1:
-                    return False
-        return True
+                # éviter les erreurs d'arrondi de minute
+                une_minute = relativedelta(minutes=1)
+                ecart = duree_rd - diff_heures
+                if now + diff_heures < now + duree_rd and now + une_minute < now + ecart:
+                    raise UserError(_(u"Attention /!\ la date de fin doit être au moins égale à la date de début + la durée"))
+
+    @api.constrains('date', 'date_deadline')
+    def check_alert_hors_creneau(self):
+        for intervention in self:
+            if intervention.alert_hors_creneau:
+                horaires_du_jour = intervention.employee_ids.get_horaires_date(intervention.date_date, mode="text")
+                raise UserError(_(u'La date de début des travaux est en dehors des horaires de travail: \n%s') % horaires_du_jour)
+
+    @api.constrains('tache_id', 'employee_ids')
+    def check_alert_incapable(self):
+        for intervention in self:
+            if intervention.alert_incapable:
+                raise UserError(
+                    _(u'Aucun des intervenants sélectionnés ne peut réaliser cette tâche'))
 
     _sql_constraints = [
         ('dates_forcees_constraint',
-         'CHECK ( date <= date_deadline_forcee )',
+         'CHECK ( date < date_deadline )',
          _(u"La date de début doit être antérieure ou égale à celle de fin")),
         ('duree_non_nulle_constraint',
          'CHECK ( duree != 0 )',
-         _(u'La durée de l\'intervention ne peut pas être nulle!')),
-    ]
-
-    _constraints = [
-        (check_coherence_dates, u"Attention /!\ la date de fin doit être au moins égale à la date de début + la durée", []),
+         _(u'La durée du RDV d\'intervention ne peut pas être nulle!')),
     ]
 
     @api.model
@@ -259,10 +367,13 @@ class OfPlanningIntervention(models.Model):
 
     name = fields.Char(string=u'Libellé', required=True)
     date = fields.Datetime(string='Date intervention', required=True, track_visibility='always')
-    date_deadline = fields.Datetime(compute="_compute_date_deadline", string='Date fin', store=True, track_visibility='always')
+    date_deadline = fields.Datetime(compute="_compute_date_deadline", string='Date fin', store=True,
+                                    track_visibility='always')
     forcer_dates = fields.Boolean("Forcer les dates", default=False, help=u"/!\\")
     date_deadline_forcee = fields.Datetime(string=u"Date fin (forcée)")
     duree = fields.Float(string=u'Durée intervention', required=True, digits=(12, 5), track_visibility='always')
+    alert_hors_creneau = fields.Boolean(string="RDV hors des créneaux", compute="_compute_date_deadline")
+    alert_coherence_date = fields.Boolean(string=u"Incohérence dans les dates", compute="_compute_alert_coherence_date")
     user_id = fields.Many2one('res.users', string='Utilisateur', default=lambda self: self.env.uid)
     partner_id = fields.Many2one('res.partner', string='Client', compute='_compute_partner_id', store=True)
     address_id = fields.Many2one('res.partner', string='Adresse', track_visibility='onchange')
@@ -277,6 +388,8 @@ class OfPlanningIntervention(models.Model):
     employee_ids = fields.Many2many('hr.employee', 'of_employee_intervention_rel', 'intervention_id', 'employee_id',
                                     string='Intervenants', required=True, domain=_get_employee_ids_domain)
     employee_main_id = fields.Many2one('hr.employee', string=u"Employé principal", compute="_compute_employee_main_id", store=True)
+    alert_incapable = fields.Boolean(string="Aucun intervenant apte", compute="_compute_alert_incapable")
+    horaire_du_jour = fields.Text(string=u"Horaires du jour", compute="_compute_horaire_du_jour")
     state = fields.Selection([
         ('draft', 'Brouillon'),
         ('confirm', u'Confirmé'),
@@ -284,38 +397,14 @@ class OfPlanningIntervention(models.Model):
         ('unfinished', u'Inachevé'),
         ('cancel', u'Annulé'),
         ('postponed', u'Reporté'),
-        ], string=u'État', index=True, readonly=True, default='draft')
+        ], string=u'État', index=True, readonly=True, default='draft', track_visibility='onchange')
     company_id = fields.Many2one('res.company', string='Magasin', required=True, default=lambda self: self.env.user.company_id.id)
     tag_ids = fields.Many2many('of.planning.tag', column1='intervention_id', column2='tag_id', string=u'Étiquettes')
     description = fields.Html(string='Description')  # Non utilisé, changé pour notes intervention
     origin_interface = fields.Char(string=u"Origine création", default=u"Manuelle")
 
-    """mode_horaires = fields.Selection([
-        ("easy", "Facile"),
-        ("advanced", u"Avancé")], string="Mode de Sélection des horaires", default="easy")
-    of_creneau_ids = fields.Many2many("of.horaire.creneau", "of_intervention_creneau_rel", "intervention_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
-    of_creneau_temp_ids = fields.Many2many("of.horaire.creneau", "of_intervention_creneau_temp_rel", "intervention_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
-    of_creneau_temp_start = fields.Date(string=u"Début des horaires temporaires")
-    of_creneau_temp_stop = fields.Date(string="Fin des horaires temporaires")
-    hor_md = fields.Float(string=u'Matin début', digits=(12, 5))
-    hor_mf = fields.Float(string='Matin fin', digits=(12, 5))
-    hor_ad = fields.Float(string=u'Après-midi début', digits=(12, 5))
-    hor_af = fields.Float(string=u'Après-midi fin', digits=(12, 5))
-    jour_ids = fields.Many2many('of.jours', 'of_intervention_jours_rel', 'intervention_id', 'jour_id', string='Jours', default=_get_default_jours)"""
     tz = fields.Selection(_tz_get, compute='_compute_tz', string="fuseau horaires")
     tz_offset = fields.Char(compute='_compute_tz_offset', string='Timezone offset', invisible=True)
-
-    """# champs copiés pour le readonly, le xml, les onchange Many2many
-    mode_horaires_readonly = fields.Selection(related="mode_horaires", readonly=True, string="Mode de Sélection des horaires")
-    of_creneau_readonly_ids = fields.Many2many(related="of_creneau_ids", readonly=True)
-    of_creneau_temp_readonly_ids = fields.Many2many(related="of_creneau_temp_ids", readonly=True)
-    of_creneau_temp_start_readonly = fields.Date(related="of_creneau_temp_start", readonly=True)
-    of_creneau_temp_stop_readonly = fields.Date(related="of_creneau_temp_stop", readonly=True)
-    hor_md_readonly = fields.Float(related="hor_md", readonly=True)
-    hor_mf_readonly = fields.Float(related="hor_mf", readonly=True)
-    hor_ad_readonly = fields.Float(related="hor_ad", readonly=True)
-    hor_af_readonly = fields.Float(related="hor_af", readonly=True)
-    jour_readonly_ids = fields.Many2many(related="jour_ids", readonly=True)"""
 
     # 3 champs ajoutés pour la vue map
     geo_lat = fields.Float(related='address_id.geo_lat')
@@ -688,13 +777,51 @@ class OfPlanningIntervention(models.Model):
 
         return True
 
+    @api.depends('forcer_dates', 'date_deadline_forcee', 'date', 'duree')
+    def _compute_alert_coherence_date(self):
+        for intervention in self:
+            if intervention.date_deadline_forcee and intervention.forcer_dates and intervention.date and intervention.duree:
+                diff_heures = relativedelta(fields.Datetime.from_string(intervention.date_deadline_forcee),
+                                            fields.Datetime.from_string(intervention.date))
+                # on convertit la durée pour faciliter la comparaison
+                heures, minutes = float_2_heures_minutes(intervention.duree)
+                duree_rd = relativedelta(hours=heures, minutes=minutes)
+                # si on compare des relativedelta: (1h,0min) < (0h, 30min)
+                # donc on créé un datetime pour pouvoir comparer
+                now = fields.Datetime.from_string(fields.Datetime.now())
+                # éviter les erreurs d'arrondi de minute
+                une_minute = relativedelta(minutes=1)
+                ecart = duree_rd - diff_heures
+                if now + diff_heures < now + duree_rd and now + une_minute < now + ecart:
+                    intervention.alert_coherence_date = True
+                    continue
+            intervention.alert_coherence_date = False
+
+    @api.depends('employee_ids', 'tache_id')
+    def _compute_alert_incapable(self):
+        for intervention in self:
+            if intervention.tache_id and intervention.employee_ids \
+                    and not intervention.employee_ids.peut_faire(intervention.tache_id):
+                intervention.alert_incapable = True
+            else:
+                intervention.alert_incapable = False
+
+    @api.depends('employee_ids', 'date_date')
+    def _compute_horaire_du_jour(self):
+        for intervention in self:
+            if intervention.employee_ids:
+                intervention.horaire_du_jour = intervention.employee_ids.get_horaires_date(intervention.date_date,
+                                                                                           mode="text")
+            else:
+                intervention.horaire_du_jour = False
+
     @api.depends('employee_ids')
     def _compute_tz(self):
         for intervention in self:
             if intervention.employee_ids:
                 intervention.tz = intervention.employee_ids[0].of_tz
 
-    @api.depends('date', 'duree', 'employee_ids', 'forcer_dates')
+    @api.depends('date', 'duree', 'employee_ids', 'forcer_dates', 'date_deadline_forcee')
     def _compute_date_deadline(self):
         compare_precision = 5
         employee_obj = self.env['hr.employee']
@@ -704,8 +831,8 @@ class OfPlanningIntervention(models.Model):
 
             if intervention.forcer_dates:
                 intervention.date_deadline = intervention.date_deadline_forcee
+                intervention.alert_hors_creneau = False
             else:
-
                 employees = intervention.employee_ids
                 tz = pytz.timezone(intervention.tz)
                 if not tz:
@@ -735,7 +862,10 @@ class OfPlanningIntervention(models.Model):
                 # Vérifier que l'intervention commence sur un créneau travaillé
                 index_creneau = employee_obj.debut_sur_creneau(date_courante_str, heure_debut, segments_equipe)
                 if index_creneau == -1:
-                    raise UserError(u"L'horaire de début des travaux est en dehors des heures de travail.")
+                    #raise UserError(u"L'horaire de début des travaux est en dehors des heures de travail.")
+                    intervention.alert_hors_creneau = True
+                    intervention.date_deadline = False
+                    continue
 
                 heure_courante = heure_debut
                 segment_courant = segments_equipe.pop(0)
@@ -786,6 +916,7 @@ class OfPlanningIntervention(models.Model):
                 date_deadline_utc_dt = date_deadline_locale_dt - date_deadline_locale_dt.tzinfo._utcoffset
                 date_deadline_str = date_deadline_utc_dt.strftime("%Y-%m-%d %H:%M:%S")
                 intervention.date_deadline = date_deadline_str
+                intervention.alert_hors_creneau = False
 
 
     @api.depends('address_id', 'address_id.parent_id')
@@ -932,42 +1063,21 @@ class OfPlanningIntervention(models.Model):
     def _onchange_tache_id(self):
         if self.tache_id and self.tache_id.duree:
             self.duree = self.tache_id.duree
-            if self.employee_ids and not self.employee_ids.peut_faire(self.tache_id):
-                raise UserError("Aucun des intervenants de cette intervention ne peut réaliser cette Tâche")
 
     @api.onchange('forcer_dates')
     def _onchange_forcer_dates(self):
-        if self.forcer_dates:
+        if self.forcer_dates and self.duree and self.date:
             heures, minutes = float_2_heures_minutes(self.duree)
             self.date_deadline_forcee = fields.Datetime.to_string(fields.Datetime.from_string(self.date) +
                                                                   relativedelta(hours=heures, minutes=minutes))
-        print "OYE"
 
     @api.onchange('date_deadline_forcee', 'date', 'duree')
     def _onchange_date_deadline_forcee(self):
         #if self.date_deadline_forcee and self.forcer_dates and self.date and self.duree:
         #    diff_heures = relativedelta(fields.Datetime.from_string(self.date_deadline_forcee), fields.Datetime.from_string(self.date))
-        if not self.check_coherence_dates():
-            raise UserError(u"Attention /!\ la date de fin doit être au moins égale à la date de début + la durée")
-
-    """@api.onchange('employee_ids')
-    def _onchange_employee_ids(self):
-        self.ensure_one()
-        employee = self.employee_main_id
-        if employee:
-            self.hor_md = employee.of_hor_md
-            self.hor_mf = employee.of_hor_mf
-            self.hor_ad = employee.of_hor_ad
-            self.hor_af = employee.of_hor_af
-            emp_jours_ids = employee.of_jour_ids._ids
-            if not emp_jours_ids:
-                emp_jours_ids = self.env['of.jours'].search([('numero', 'in', [1, 2, 3, 4, 5])])._ids
-            self.jour_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in emp_jours_ids]
-            self.of_creneau_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in employee.of_creneau_ids._ids]
-            self.of_creneau_temp_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in employee.of_creneau_temp_ids._ids]
-            self.of_creneau_temp_start = employee.of_creneau_temp_start
-            self.of_creneau_temp_stop = employee.of_creneau_temp_stop
-            self.mode_horaires = employee.of_mode_horaires"""
+        #if not self.check_coherence_dates():
+        #    raise UserError(u"Attention /!\ la date de fin doit être au moins égale à la date de début + la durée")
+        self.ensure_one() #ON EST ICI
 
     @api.onchange('equipe_id')
     def _onchange_equipe_id(self):
@@ -1251,14 +1361,16 @@ class SaleOrder(models.Model):
     @api.multi
     def action_view_interventions(self):
         action = self.env.ref('of_planning.of_sale_order_open_interventions').read()[0]
-
-        action['domain'] = [('order_id', 'in', self._ids)]
+        #action['domain'] = [('order_id', 'in', self._ids)]
         if len(self._ids) == 1:
             context = safe_eval(action['context'])
             context.update({
                 'default_address_id': self.partner_shipping_id.id or False,
                 'default_order_id': self.id,
             })
+            if self.intervention_ids:
+                context['force_date_start'] = self.intervention_ids[-1].date_date
+                context['search_default_order_id'] = self.id
             action['context'] = str(context)
         return action
 
