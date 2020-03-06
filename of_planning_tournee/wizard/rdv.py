@@ -126,6 +126,8 @@ class OfTourneeRdv(models.TransientModel):
         string=u"Créer récurrence?", default=True,
         help=u"Si cette case est cochée et qu'il n'existe pas de service lié à cette intervention, en crééra un.")
     date_next = fields.Date(string=u'Prochaine intervention', help=u"Date à partir de laquelle programmer la prochaine intervention")
+    date_fin_planif = fields.Date(string=u'expiration de prochaine planif',
+                            help=u"Date à partir de laquelle l'intervention devient en retard")
     mode_recherche = fields.Selection(SEARCH_MODES, string="Mode de recherche", required=True, default="distance")
     max_recherche = fields.Float(string="Maximum")
 
@@ -526,8 +528,10 @@ class OfTourneeRdv(models.TransientModel):
 
             if self.service_id and self.service_id.recurrence:
                 vals['date_next'] = self.service_id.get_next_date(first_res_da.strftime('%Y-%m-%d'))
+                vals['date_fin_planif'] = self.service_id.get_fin_date(vals['date_next'])
             elif self.creer_recurrence:
                 vals['date_next'] = "%s-%02i-01" % (first_res_da.year + 1, first_res_da.month)
+                vals['date_fin_planif'] = self.service_id.get_fin_date(vals['date_next'])
             else:
                 vals['date_next'] = False
 
@@ -555,6 +559,7 @@ class OfTourneeRdv(models.TransientModel):
             'tache_id': self.tache_id.id,
             'mois_ids': [(4, mois)],
             'date_next': self.date_next,
+            'date_fin': self.date_fin_planif,
             'note': self.description or '',
             'base_state': 'calculated',
             'duree': self.duree,
@@ -610,6 +615,7 @@ class OfTourneeRdv(models.TransientModel):
         if self.date_next:
             if self.service_id:
                 self.service_id.write({'date_next': self.date_next})
+                self.service_id.write({'date_fin': self.date_fin_planif})
             elif self.creer_recurrence:
                 res.service_id = service_obj.create(self._get_service_data(date_propos_dt.month))
         return {
@@ -884,6 +890,7 @@ class OfTourneeRdvLine(models.TransientModel):
         if self.wizard_id.service_id:
             date_da = fields.Date.from_string(self.date)
             wizard_vals['date_next'] = self.wizard_id.service_id.get_next_date(date_da.strftime('%Y-%m-%d'))
+            wizard_vals['date_fin_planif'] = self.wizard_id.service_id.get_fin_date(wizard_vals['date_next'])
         self.wizard_id.write(wizard_vals)
 
         return {'type': 'ir.actions.do_nothing'}

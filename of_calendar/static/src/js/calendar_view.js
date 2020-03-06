@@ -6,6 +6,7 @@ odoo.define('of_calendar.calendar_view', function (require) {
 
 var core = require('web.core');
 var CalendarView = require('web_calendar.CalendarView');
+var Dialog = require('web.Dialog');
 var widgets = require('web_calendar.widgets');
 var Model = require('web.DataModel');
 var Widget = require('web.Widget');
@@ -38,8 +39,8 @@ CalendarView.include({
         var attrs = this.fields_view.arch.attrs;
         this.filters_radio = !isNullOrUndef(attrs.filters_radio) && _.str.toBool(attrs.filters_radio); // true or 1 if we want filters to be of type radio
         this.custom_colors = !isNullOrUndef(attrs.custom_colors) && _.str.toBool(attrs.custom_colors); // true or 1 if we want to use custom colors
-        this.show_first_evt = !isNullOrUndef(attrs.show_first_evt) && _.str.toBool(attrs.show_first_evt); // true or 1 if we want to jump to the first event
-        this.jump_to = !isNullOrUndef(attrs.jump_to) && attrs.jump_to; // "first" or "selected"
+        //this.show_first_evt = !isNullOrUndef(attrs.show_first_evt) && _.str.toBool(attrs.show_first_evt); // true or 1 if we want to jump to the first event
+        this.jump_to = !isNullOrUndef(attrs.jump_to) && attrs.jump_to; // "first", "last" or "selected"
         this.dispo_field = attrs.dispo_field;
         this.force_color_field = attrs.force_color_field;
         this.selected_field = attrs.selected_field;
@@ -87,7 +88,6 @@ CalendarView.include({
         if (isNullOrUndef(this.options.sidebar)) {
             this.display_states = false;
         }
-        //this.dfd_filters_rendered = $.Deferred();
 
         this.on_event_after_all_render = _.debounce(this.on_event_after_all_render, 300, true);
     },
@@ -145,6 +145,12 @@ CalendarView.include({
                 }
 
                 var current_event_source = self.event_source;
+                    // pour sauter au dernier event il faut changer les bornes de recherche pour trouver l'event en question
+                    // en attendant une meilleure solution, on passe par le contexte de recherche
+                    if (context.force_date_start && !self.first_jump) {
+                        start = moment(context.force_date_start)._d
+                        end = moment(context.force_date_start).add(1, 'days')._d
+                    }
                     var event_domain = self.get_range_domain(domain, start, end);
                     if (self.useContacts && (!self.all_filters[-1] || !self.all_filters[-1].is_checked)){// || self.attendee_multiple) {
                         var attendee_ids = $.map(self.all_filters, function(o) { if (o.is_checked) { return o.value; }});
@@ -175,7 +181,7 @@ CalendarView.include({
                     */
                     //console.log("EVENTS",events);
                     self.first_evt = events.length > 0 && events[0] || undefined;
-                    if (!isNullOrUndef(self.jump_to) && !isNullOrUndef(self.first_evt)) {
+                    if (!isNullOrUndef(self.jump_to) && !isNullOrUndef(self.first_evt) && !isNullOrUndef(self.dispo_field)) {
                         var tmp, strdate1, strdate2, strtime1, strtime2;
                         strdate1 = self.first_evt[self.date_start].substring(0,10);
                         strtime1 = self.first_evt[self.date_start].substring(11);
@@ -199,6 +205,10 @@ CalendarView.include({
                                 }
                             }
                         }
+                    }
+                    if (self.jump_to == "last" && !isNullOrUndef(self.first_evt)) {
+                        var last_index = events.length -1;
+                        self.first_evt = events[last_index];
                     }
                     if (self.jump_to == "selected" && !isNullOrUndef(self.first_evt)) {
                         for (var i=1; i < events.length ; i++) {
@@ -387,6 +397,19 @@ CalendarView.include({
                 self.on_event_after_all_render();
             }
         };
+        fc.select = function (start_date, end_date, all_day, _js_event, _view) {
+            if (self.options.action.context.inhiber_create) {
+                Dialog.alert(self.$el, self.options.action.context.inhiber_message);  // inhiber création
+                self.$calendar.fullCalendar('unselect');
+            }else{
+                var data_template = self.get_event_data({
+                    start: start_date,
+                    end: end_date,
+                    allDay: all_day,
+                });
+                self.open_quick_create(data_template);
+            }
+        }
         return fc;
     },
     /**
@@ -396,8 +419,10 @@ CalendarView.include({
         var self = this;
         if (!isNullOrUndef(self.first_evt) && !self.first_jump) { // only jump once, else we can't navigate through the calendar
             self.first_jump = true;
-            var date_tmp = new Date(self.first_evt[self.date_start]);
-            self.$calendar.fullCalendar('gotoDate', date_tmp);
+            var date_tmp = moment(self.first_evt[self.date_start])._d;
+            if (!isNaN(date_tmp.getTime())) {
+                self.$calendar.fullCalendar('gotoDate', date_tmp);
+            }
         }
     },
     on_filters_rendered: function() {

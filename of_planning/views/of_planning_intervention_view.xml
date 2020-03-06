@@ -144,6 +144,7 @@
                         <field name="equipe_id" widget="selection"/>
                         <field name="employee_ids"/>
                         <field name="address_id"/>
+                        <field name="order_id"/>
                         <field name="company_id" widget="selection"/>
                     </group>
                     <newline/>
@@ -191,10 +192,21 @@
                                 <field name="number" placeholder="N° d'intervention" readonly="1" nolabel="1" class="oe_inline"/>
                             </b></h1>
                         </div>
+                        <field name="alert_hors_creneau" invisible="1"/>
+                        <field name="alert_incapable" invisible="1"/>
+                        <field name="alert_coherence_date" invisible="1"/>
                         <group>
                             <group col="2" name="refs" string="Références">
                                 <field name="equipe_id" autofocus="autofocus"/>
-                                <field name="employee_ids" string="Intervenants" widget="many2many_tags" options='{"no_open": True, "no_create": True}'/>
+                                <label for="employee_ids" string="Intervenants"/>
+                                <div>
+                                    <field name="employee_ids" string="Intervenants" widget="many2many_tags"
+                                       options='{"no_open": True, "no_create": True}'
+                                       context="{'tache_prio_id': tache_id}"/>
+                                    <div attrs="{'invisible': [('alert_incapable', '=', False)]}" class="of_red">
+                                        <i class="fa fa-warning of_ws"/>Aucun intervenant ne peut réaliser cette tâche
+                                    </div>
+                                </div>
                                 <field name="partner_id" invisible="1"/>
                                 <field name="address_id" domain="[('customer','=',True)]" colspan="2"/>
                                 <field name="secteur_id"/>
@@ -205,7 +217,7 @@
                             </group>
                             <group col="2" name="planif" string="Planification">
                                 <field name="template_id" attrs="{'readonly': [('number', '!=', False), ('state', 'not in', ('draft', 'cancel'))]}"/>
-                                <field name="tache_id"/>
+                                <field name="tache_id" context="{'intervenant_prio_ids': employee_ids}"/>
                                 <field name="forcer_dates"/>
                                 <label for="date"/>
                                 <div>
@@ -215,14 +227,23 @@
                                 <field name="duree" string="Durée" widget="float_time"/>
                                 <label for="date_deadline" attrs="{'invisible': [('forcer_dates', '=', True)]}"/>
                                 <div attrs="{'invisible': [('forcer_dates', '=', True)]}">
-                                    <field name="jour_fin" class="oe_inline of_ws"/>
-                                    <field name="date_deadline" class="oe_inline"/>
+                                    <field name="jour_fin" class="oe_inline of_ws"
+                                           attrs="{'invisible': [('alert_hors_creneau', '=', True)]}"/>
+                                    <field name="date_deadline" class="oe_inline"
+                                           attrs="{'invisible': [('alert_hors_creneau', '=', True)]}"/>
+                                    <div attrs="{'invisible': [('alert_hors_creneau', '=', False)]}" class="of_red">
+                                        <i class="fa fa-warning of_ws"/>L'horaire de début des travaux est en dehors des heures de travail.
+                                    </div>
                                 </div>
+                                <field name="horaire_du_jour" attrs="{'invisible': [('alert_hors_creneau', '=', False)]}"/>
                                 <label for="date_deadline_forcee" attrs="{'invisible': [('forcer_dates', '=', False)]}"/>
                                 <div attrs="{'invisible': [('forcer_dates', '=', False)]}">
                                     <field name="jour_fin_force" class="oe_inline of_ws"/>
                                     <field name="date_deadline_forcee" class="oe_inline"
                                            attrs="{'required': [('forcer_dates', '=', True)]}"/>
+                                    <div attrs="{'invisible': [('alert_coherence_date', '=', False)]}" class="of_red">
+                                        <i class="fa fa-warning of_ws"/>la date de fin doit être au moins égale à la date de début + la durée
+                                    </div>
                                 </div>
                                 <field name="verif_dispo"/>
                             </group>
@@ -259,74 +280,6 @@
                                     </group>
                                 </group>
                             </page>
-                            <!--page name="horaires" string="Horaires de travail">
-                                <group colspan="4">
-                                    <group>
-                                        <field name="forcer_horaires"/>
-                                        <field name="mode_horaires_readonly" attrs="{'invisible':[('forcer_horaires', '=', True)]}"/>
-                                    </group>
-                                    <group></group>
-                                </group>
-                                <group name="horaires_easy" attrs="{'invisible':[('forcer_horaires', '=', False), ('mode_horaires', '=', 'advanced')]}" colspan="4" col="4" >
-                                    <separator string="Horaires" colspan="4"/>
-                                    <group col="2" colspan="2">
-                                        <label for="hor_md" string="Matin"/>
-                                        <span class="oe_inline">
-                                            <field class="oe_inline" name="hor_md" nolabel="1" widget="float_time" attrs="{'invisible':[('forcer_horaires', '=', False)], 'required': ['|', ('forcer_horaires', '=', True), ('mode_horaires', '=', 'easy')]}"/>
-                                            <field class="oe_inline" name="hor_md_readonly" nolabel="1" widget="float_time" attrs="{'invisible':[('forcer_horaires', '=', True)]}"/> -
-                                            <field class="oe_inline" name="hor_mf" nolabel="1" widget="float_time" attrs="{'invisible':[('forcer_horaires', '=', False)], 'required': ['|', ('forcer_horaires', '=', True), ('mode_horaires', '=', 'easy')]}"/>
-                                            <field class="oe_inline" name="hor_mf_readonly" nolabel="1" widget="float_time" attrs="{'invisible':[('forcer_horaires', '=', True)]}"/>
-                                        </span>
-                                        <label for="hor_ad" string="Après-midi"/>
-                                        <span class="oe_inline">
-                                            <field class="oe_inline" name="hor_ad" nolabel="1" widget="float_time" attrs="{'invisible':[('forcer_horaires', '=', False)], 'required': ['|', ('forcer_horaires', '=', True), ('mode_horaires', '=', 'easy')]}"/>
-                                            <field class="oe_inline" name="hor_ad_readonly" nolabel="1" widget="float_time" attrs="{'invisible':[('forcer_horaires', '=', True)]}"/> -
-                                            <field class="oe_inline" name="hor_af" nolabel="1" widget="float_time" attrs="{'invisible':[('forcer_horaires', '=', False)], 'required': ['|', ('forcer_horaires', '=', True), ('mode_horaires', '=', 'easy')]}"/>
-                                            <field class="oe_inline" name="hor_af_readonly" nolabel="1" widget="float_time" attrs="{'invisible':[('forcer_horaires', '=', True)]}"/>
-                                        </span>
-                                    </group>
-                                    <group col="2" colspan="2">
-                                        <field name="jour_ids" attrs="{'invisible':[('forcer_horaires', '=', False)], 'required': ['|', ('forcer_horaires', '=', True), ('mode_horaires', '=', 'easy')]}" widget="many2many_tags" colspan="2"/>
-                                        <field name="jour_readonly_ids" attrs="{'invisible':[('forcer_horaires', '=', True)]}" widget="many2many_tags" colspan="2"/>
-                                    </group>
-                                </group>
-                                <group col="4" name="horaires_advanced" attrs="{'invisible': ['|',('mode_horaires', '!=', 'advanced'), ('forcer_horaires', '=', True)]}">
-                                    <group name="horaires_defaut" col="4" colspan="2">
-                                        <separator string="Horaires par défaut" attrs="{'invisible':[('of_creneau_temp_start', '=', False)]}" colspan="4"/>
-                                        <separator string="Horaires" attrs="{'invisible':[('of_creneau_temp_start', '!=', False)]}" colspan="4"/>
-                                        <field name="of_creneau_readonly_ids" nolabel="1" colspan="4" style="padding: 8px;">
-                                            <tree string="Créneaux" editable="0">
-                                                <field name="jour_number" invisible="1"/>
-                                                <field name="name"/>
-                                                <field name="jour_id" invisible="1"/>
-                                                <field name="heure_debut" invisible="1" widget="float_time"/>
-                                                <field name="heure_fin" invisible="1" widget="float_time"/>
-                                            </tree>
-                                        </field>
-                                    </group>
-                                    <group name="horaires_temp" attrs="{'invisible':[('of_creneau_temp_start','=',False)]}" col="4" colspan="2">
-                                        <group col="4" colspan="4">
-                                            <separator string="Horaires temporaires" colspan="4"/>
-                                            <field name="of_creneau_temp_start_readonly" string="Début de validité" attrs="{'required': [('of_creneau_temp_stop', '!=', False)]}"/>
-                                            <field name="of_creneau_temp_stop_readonly" string="Fin de validité" attrs="{'required': [('of_creneau_temp_start', '!=', False)]}"/>
-                                        </group>
-                                        <field name="of_creneau_temp_readonly_ids" nolabel="1" colspan="4" style="padding: 8px;">
-                                            <tree string="Créneaux" editable="0">
-                                                <field name="jour_number" invisible="1"/>
-                                                <field name="name"/>
-                                                <field name="jour_id" invisible="1"/>
-                                                <field name="heure_debut" invisible="1" widget="float_time"/>
-                                                <field name="heure_fin" invisible="1" widget="float_time"/>
-                                            </tree>
-                                        </field>
-                                    </group>
-                                </group>
-                                <field name="of_creneau_ids" invisible="1" widget="many2many_tags"/>
-                                <field name="of_creneau_temp_start" invisible="1"/>
-                                <field name="of_creneau_temp_stop" invisible="1"/>
-                                <field name="of_creneau_temp_ids" invisible="1" widget="many2many_tags"/>
-                                <field name="mode_horaires" invisible="1"/>
-                            </page-->
                         </notebook>
                     </sheet>
                     <div class="oe_chatter">
@@ -392,6 +345,27 @@
                 </calendar>
             </field>
         </record>
+
+        <record id="of_planning_intervention_view_calendar_with_jump" model="ir.ui.view">
+            <field name="name">of.planning.intervention.calendar</field>
+            <field name="model">of.planning.intervention</field>
+            <field name="arch" type="xml">
+                <!-- À vérifier  -->
+                <calendar string="Calendrier" date_start="date" color="employee_ids" attendee="employee_ids"
+                          date_stop="date_deadline" display_states="1" quick_add="0" attendee_model="hr.employee"
+                          color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1"
+                          color_is_attendee="1" jump_to="last">
+                    <field name="calendar_name"/>
+                    <field name="state" invisible="1"/>
+                    <field name="state_int" invisible="1"/>
+                    <field name="of_color_ft" invisible="1"/>
+                    <field name="of_color_bg" invisible="1"/>
+                    <!--field name="color" invisible="1"/>
+                    <field name="sidebar_color" invisible="1"/-->
+                </calendar>
+            </field>
+        </record>
+
 <!--##########################################################################################################################-->
 <!--###########################################_________Étiquettes_________###################################################-->
 <!--##########################################################################################################################-->
@@ -538,6 +512,7 @@
                         </div>
                         <group>
                             <group>
+                                <field name="fourchette_planif"/>
                                 <field name="tache_ids" widget="many2many"/>
                             </group>
                             <group>
@@ -987,6 +962,8 @@
             <field name="res_model">of.planning.intervention</field>
             <field name="domain">[]</field> <!-- Force empty -->
             <field name="view_type">form</field>
+            <field name="view_mode">calendar,tree,form</field>
+            <field name="view_id" ref="of_planning_intervention_view_calendar_with_jump"/>
         </record>
 
 </odoo>

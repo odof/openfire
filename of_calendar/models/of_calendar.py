@@ -61,15 +61,6 @@ class HREmployee(models.Model):
     of_segment_ids = fields.One2many('of.horaire.segment', 'employee_id', string="Horaires de travail")
 
     of_horaire_recap = fields.Html(compute='_compute_of_horaire_recap', string="Horaires de travail")
-    # of_profil_id = fields.Many2one("of.horaire.profil", "Profil")
-    # of_creneau_ids = fields.Many2many("of.horaire.creneau", "of_employee_creneau_rel", "employee_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
-    # of_creneau_temp_ids = fields.Many2many("of.horaire.creneau", "of_employee_creneau_temp_rel", "employee_id", "creneau_id", string=u"Créneaux", order="jour_number, heure_debut")
-    # of_creneau_temp_start = fields.Date(string=u"Début des horaires temporaires")
-    # of_creneau_temp_stop = fields.Date(string="Fin des horaires temporaires")
-    # of_archive_horaires = fields.Text(string="Archive des horaires")
-    # of_archive_horaires_temp = fields.Text(string="Archive des horaires temporaires")
-    # of_horaire_du_jour = fields.Text(string=u"Horaires d'aujourd'hui", compute="_compute_horaires_du_jour")
-
     of_hor_md = fields.Float(string=u'Matin début', digits=(12, 5), default=9)
     of_hor_mf = fields.Float(string=u'Matin fin', digits=(12, 5), default=12)
     of_hor_ad = fields.Float(string=u'Après-midi début', digits=(12, 5), default=14)
@@ -94,27 +85,6 @@ class HREmployee(models.Model):
         # ('of_creneau_temp_start_stop_constraint', 'CHECK ( of_creneau_temp_start <= of_creneau_temp_stop )', _(u"La date de début de validité doit être antérieure ou égale à celle de fin.")),
     ]
 
-    # @api.multi
-    # def check_no_overlapping(self):
-    #     for employee in self:
-    #         for creneaux in (employee.of_creneau_ids, employee.of_creneau_temp_ids):
-    #             creneaux_len = len(creneaux)
-    #             for j in xrange(creneaux_len - 1):
-    #                 if creneaux[j].jour_id != creneaux[j+1].jour_id:
-    #                     continue
-    #                 d1 = creneaux[j].heure_debut
-    #                 f1 = creneaux[j].heure_fin
-    #                 d2 = creneaux[j+1].heure_debut
-    #                 f2 = creneaux[j+1].heure_fin
-    #                 if se_chevauchent(d1, f1, d2, f2):
-    #                     # raise UserError(u"Oups! Des créneaux se chevauchent")
-    #                     return False
-    #     return True
-    #
-    # _constraints = [
-    #     (check_no_overlapping, u'Vous ne pouvez pas sauvegarder tant que des créneaux se chevauchent.', []),
-    # ]
-    #
     @api.depends('of_tz')
     def _compute_of_tz_offset(self):
         for employee in self:
@@ -176,13 +146,6 @@ class HREmployee(models.Model):
                     recap += u'</h5>\n<p>\n' + formate_segment(seg) + u'</p>\n'
             employee.of_horaire_recap = recap
 
-    # @api.multi
-    # @api.depends('of_archive_horaires', 'of_archive_horaires_temp')
-    # def _compute_horaires_du_jour(self):
-    #     horaires_today = self.get_horaires_date(fields.Date.today())
-    #     for employee in self:
-    #         employee.of_horaire_du_jour = "\n".join(hours_to_strs(horaires_today[employee.id]))
-
     @api.onchange('of_address_depart_id')
     def _onchange_address_depart_id(self):
         self.ensure_one()
@@ -225,19 +188,6 @@ class HREmployee(models.Model):
         if self.of_hor_ad and self.of_hor_af and self.of_hor_ad > self.of_hor_af:
             raise UserError(u"L'heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi.")
 
-    # @api.onchange("of_creneau_ids", "of_creneau_temp_ids")
-    # def _onchange_creneaux(self):
-    #     if not self.check_no_overlapping():
-    #         raise UserError(u"Oups ! Des créneaux se chevauchent. Veuillez vous assurer que ce ne soit plus le cas avant de sauvegarder.")
-    #
-    # @api.onchange("of_creneau_temp_start")
-    # def _onchange_of_creneau_temp_start(self):
-    #     self.ensure_one()
-    #     if self.of_creneau_temp_start:
-    #         date_deb = fields.Date.from_string(self.of_creneau_temp_start)
-    #         date_fin = date_deb + timedelta(days=6)
-    #         self.of_creneau_temp_stop = fields.Date.to_string(date_fin)
-
     @api.multi
     def possede_creneau(self, creneau_id):
         u"""vérifie que tous les employés présents dans self possèdent tel ou tel créneau.
@@ -250,114 +200,6 @@ class HREmployee(models.Model):
             else:
                 return False
         return True
-
-    # @api.multi
-    # def archiver_horaires(self):
-    #     """
-    #     Fonction d'archivage des horaires des employés.
-    #     Les horaires sont archivés en format texte dans la variable of_archive_horaires.
-    #     Chaque ligne du texte représente un segment horaire sous la forme
-    #        '[date_debut, date_fin ou false, {créneaux pour chaque jour de lun. à dim.}]'
-    #     Ces lignes sont triées par ordre croissant de date.
-    #     """
-    #     date_today_str = fields.Date.today()
-    #     date_today_da = fields.Date.from_string(date_today_str)
-    #     un_jour = timedelta(days=1)
-    #     for employee in self:
-    #         """On récupère l'archive actuelle. Si la date d'aujourd'hui existe déjà dans l'archive, on la remplace."""
-    #         archive = employee.of_archive_horaires
-    #         if archive:
-    #             morceaux_list = archive.split(u"\n")
-    #             if date_today_str == morceaux_list[-1][2:12]:  # la date commence au 3eme caractère du morceau
-    #                 morceaux_list.pop()
-    #         else:
-    #             morceaux_list = []
-    #         """Si elle existe, remplit la date de fin de la dernière archive enregistrée avec la date de la veille."""
-    #         if morceaux_list:
-    #             morceau = morceaux_list[-1]
-    #             if morceau[15] == u'f':  # le dernier morceau de la liste n'a pas de date de fin.
-    #                 date_hier_da = date_today_da - un_jour
-    #                 date_hier_str = fields.Date.to_string(date_hier_da)
-    #                 morceaux_list[-1] = morceau[:15] + u'"' + date_hier_str + u'"' + morceau[20:]
-    #         """Création de l'archive"""
-    #         nouveau_morceau_dict = {}  # dict contenant les horaires de travail
-    #         # Attention : les créneaux doivent être insérés sous forme de liste et non de tuples
-    #         #   sans quoi la comparaison avec le json.loads plus bas renverra toujours False
-    #         if employee.of_mode_horaires == 'advanced':
-    #             # Mode avancé
-    #             for creneau in employee.of_creneau_ids:
-    #                 if creneau.jour_id.abr not in nouveau_morceau_dict:
-    #                     nouveau_morceau_dict[creneau.jour_id.abr] = []
-    #                 nouveau_morceau_dict[creneau.jour_id.abr].append([creneau.heure_debut, creneau.heure_fin])
-    #         else:
-    #             # Mode facile
-    #             for jour in employee.of_jour_ids:
-    #                 nouveau_morceau_dict[jour.abr] = [
-    #                     [employee.of_hor_md, employee.of_hor_mf],
-    #                     [employee.of_hor_ad, employee.of_hor_af],
-    #                 ]
-    #         horaire = json.dumps(nouveau_morceau_dict)
-    #         if archive:
-    #             if morceaux_list and json.loads(morceaux_list[-1][29:-1]) == nouveau_morceau_dict:
-    #                 # L'horaire n'a pas changé (ou bien une modification effectuée le même jour vient d'être annulée)
-    #                 date_start_str = morceaux_list[-1][2:12]
-    #                 morceaux_list.pop()
-    #             else:
-    #                 date_start_str = date_today_str
-    #         else:
-    #             # Lors de la permière création d'horaires, on considère que l'employé avait ces horaires depuis sa création.
-    #             date_start_str = employee.create_date[:10]
-    #         nouveau_morceau_str = u'["%s", false, %s]' % (date_start_str, horaire)
-    #         morceaux_list.append(nouveau_morceau_str)
-    #         employee.of_archive_horaires = u"\n".join(morceaux_list)
-    #
-    # @api.multi
-    # def archiver_horaires_temp(self):
-    #     for employee in self:
-    #         archive = employee.of_archive_horaires_temp
-    #         if archive:
-    #             morceaux_list = archive.split("\n")
-    #             """Vérification qu'il n'y a pas de chevauchement avec des dates d'horaires temporaires existants"""
-    #             for morceau in morceaux_list:
-    #                 creneau_start, creneau_stop = json.loads(morceau)[:2]
-    #                 if se_chevauchent(creneau_start, creneau_stop,
-    #                                   employee.of_creneau_temp_start, employee.of_creneau_temp_stop,
-    #                                   strict=False):
-    #                     raise UserError(
-    #                         _("Deux configurations d'horaires temporaires ne peuvent pas se superposer dans le temps.\n"
-    #                           "Dates source du conflit : entre le %s et le %s") % (creneau_start, creneau_stop)
-    #                     )
-    #         else:
-    #             morceaux_list = []
-    #         """Création du nouveau morceau et de l'archive"""
-    #         nouveau_morceau_dict = {}  # dict contenant les horaires de travail temporaire
-    #         for creneau in employee.of_creneau_temp_ids:
-    #             if creneau.jour_id.abr not in nouveau_morceau_dict:
-    #                 nouveau_morceau_dict[creneau.jour_id.abr] = []
-    #             nouveau_morceau_dict[creneau.jour_id.abr].append((creneau.heure_debut, creneau.heure_fin))
-    #         nouveau_morceau_str = u'["%s", "%s", %s]' % (employee.of_creneau_temp_start, employee.of_creneau_temp_stop, json.dumps(nouveau_morceau_dict))
-    #         morceaux_list.append(nouveau_morceau_str)
-    #         morceaux_list.sort(key=lambda x: x[2:12])  # si quelqu'un ajoute des horaires temporaires antérieurs à ceux déjà ajoutés, BIM FOOLPROOF
-    #         nouvelle_archive = u"\n".join(morceaux_list)
-    #         employee.of_archive_horaires_temp = nouvelle_archive
-    #
-    # @api.model
-    # def convert_archive_from_str(self, archive_str):
-    #     """Renvoie l'archive des horaires d'un employé sous forme de liste
-    #     :param archive_str: Archive au format texte
-    #     :return: Archive au format liste
-    #     :rtype: list [ [date_debut, date_fin, horaires_dict], ...]
-    #     """
-    #     if not archive_str:
-    #         return []
-    #     archive_str = '[%s]' % archive_str.replace('\n', ',')
-    #     list_archive = json.loads(archive_str)
-    #     if jour_keys == 'number':
-    #         for segment in list_archive:
-    #             horaires_dict = segment[2]
-    #             for k in horaires_dict:
-    #                 horaires_dict[jour_abr_2_nb(k)] = horaires_dict.pop(k)
-    #     return list_archive
 
     @api.multi
     def convert_segments_to_list(self, segments=False):
@@ -392,13 +234,19 @@ class HREmployee(models.Model):
         }
 
     @api.multi
-    def get_horaires_date(self, date_str):
+    def get_horaires_date(self, date_str, mode="dict"):
         """Renvoie les horaires des employés à la date donnée en paramètre.
         :rtype: { employee_id :  [(h_deb, h_fin), (h_deb, h_fin), ..] ,  .. }"""
         segment_obj = self.env['of.horaire.segment']
         date_da = fields.Date.from_string(date_str)
+        if not date_da:  # sur création depuis vue liste, date peut être None
+            if mode == 'dict':
+                return {employee.id: [] for employee in self}
+            else:
+                return u""
         num_jour = date_da.isoweekday()  # entre 1 et 7
         res = {}
+        res_text = u""
         for employee in self:
             # Récupération du segment, si possible temporaire, avec la date de début la plus avancée
             segment = segment_obj.search([('employee_id', '=', employee.id),
@@ -413,27 +261,19 @@ class HREmployee(models.Model):
             # conserver ainsi car utilisé dans le js
             creneaux = segment.creneau_ids.filtered(lambda c: c.jour_number == num_jour)
             res[employee.id] = [[creneau.heure_debut, creneau.heure_fin] for creneau in creneaux]
-        return res
+            if res_text:
+                res_text += u"\n"
+            if not creneaux:
+                res_text += u"Non travaillé"
+            else:
+                res_text += u"%s: %s" % (employee.name, ", ".join(
+                    ["%s-%s" % (
+                        hours_to_strs(creneau.heure_debut)[0], hours_to_strs(creneau.heure_fin)[0]) for creneau in creneaux]))
+        if mode == 'dict':
+            return res
+        return res_text
 
-    # @api.model
-    # def get_horaires_date_model(self, date_str, archive_list_horaires, archive_list_horaires_temp):
-    #     """Renvoie les horaires de l'employé dont les archives horaires sont données en paramètres à la date donnée.
-    #     Fonction pour éviter de faire des appels à get_archive_list_segments non nécessaires.
-    #     :rtype: list [(h_deb, h_fin), (h_deb, h_fin), ..]
-    #     """
-    #     date_da = fields.Date.from_string(date_str)
-    #     num_jour = date_da.isoweekday()  # entre 1 et 7
-    #     res = []
-    #     for segment in archive_list_horaires_temp:  # la date demandée correspond-elle à des horaires temporaires pour cet employé?
-    #         if segment[0] <= date_str <= segment[1]:
-    #             res = segment[2][num_jour]
-    #             break
-    #     else:  # la date demandée n'est pas sur un segment d'horaires temporaires
-    #         for segment in archive_list_horaires:
-    #             if segment[0] <= date_str <= segment[1]:
-    #                 res = segment[2][num_jour]
-    #                 break
-    #     return res
+
 
     @api.multi
     def get_horaires_list_dict(self, date_start, date_stop):
