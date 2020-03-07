@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_saleorder_line_to_parc_installe_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.saleorder.line.to.parc.installe.wizard.form</field>
+        <field name="model">of.saleorder.line.to.parc.installe.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group col="4">
+                    <field name="name"/>
+                    <field name="product_id" required="1"/>
+                    <field name="client_id" required="1"/>
+                    <field name="site_adresse_id"/>
+                    <field name="revendeur_id"/>
+                    <field name="installateur_id"/>
+                    <field name="date_service"/>
+                </group>
+                <footer>
+                    <button string="Créer et afficher" name="create_and_display_parc_installe" type="object" class="btn-primary"/>
+                    <button string="Créer" name="create_parc_installe" type="object" class="btn-primary"/>
+                    <button string="OK" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window id="action_of_saleorder_line_to_parc_installe_wizard_view_form"
+        name="Créer parc installé"
+        res_model="of.saleorder.line.to.parc.installe.wizard"
+        src_model="sale.order"
+        view_mode="form"
+        view_type="form"
+        view_id="of_saleorder_line_to_parc_installe_wizard_view_form"
+        target="new"/>
+<!--         key2="client_action_multi" -->
+<!--         context="{'model':'res.partner'}"/> -->
+
+</odoo>

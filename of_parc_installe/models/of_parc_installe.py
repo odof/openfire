@@ -9,12 +9,30 @@ class OFParcInstalle(models.Model):
     _name = 'of.parc.installe'
     _description = "Parc installé"
 
+    @api.model_cr_context
+    def _auto_init(self):
+        # A SUPRIMER
+        cr = self._cr
+        update_brand = False
+        if self._auto:
+            cr.execute(
+                "SELECT * FROM information_schema.columns WHERE table_name = 'of_parc_installe' AND column_name = 'brand_id'")
+            update_brand = not bool(cr.fetchall())
+
+        super(OFParcInstalle, self)._auto_init()
+        if update_brand:
+            cr.execute("UPDATE of_parc_installe AS opi "
+                       "SET brand_id = pp.brand_id, product_category_id = pt.categ_id\n"
+                       "FROM product_product AS pp\n"
+                       "LEFT JOIN product_template AS pt ON pt.id=pp.product_tmpl_id\n"
+                       "WHERE pp.id = opi.product_id")
+
     name = fields.Char(u"No de série", size=64, required=False, copy=False)
     date_service = fields.Date("Date vente", required=False)
     date_installation = fields.Date("Date d'installation", required=False)
     date_fin_garantie = fields.Date(string="Fin de garantie")
     product_id = fields.Many2one('product.product', 'Produit', required=True, ondelete='restrict')
-    product_category_id = fields.Char(u'Famille', related="product_id.categ_id.name", readonly=True)
+    product_category_id = fields.Many2one('product.category', u'Famille', readonly=False)
     client_id = fields.Many2one('res.partner', 'Client', required=True, domain="[('parent_id','=',False)]", ondelete='restrict')
     client_name = fields.Char(related='client_id.name')  # for map view
     client_mobile = fields.Char(related='client_id.mobile')  # for map view
@@ -32,6 +50,20 @@ class OFParcInstalle(models.Model):
     no_piece = fields.Char(u'N° pièce', size=64, required=False)
     project_issue_ids = fields.One2many('project.issue', 'of_produit_installe_id', 'SAV')
     active = fields.Boolean(string=u'Actif', default=True)
+    brand_id = fields.Many2one('of.product.brand')
+    modele = fields.Char(u'Modèle')
+    installation = fields.Char(u"Type d'installation")
+    conforme = fields.Boolean('Conforme', default=True)
+    state = fields.Selection(selection=[
+        ('neuf', 'Neuf'),
+        ('bon', 'Bon'),
+        ('usage', u'Usagé'),
+        ('remplacer', u"À remplacer"),
+        ], string=u'État', default="neuf")
+    sale_order_ids = fields.Many2many('sale.order', string="Commandes")
+    sale_order_amount = fields.Float(compute='_compute_links')
+    account_invoice_ids = fields.Many2many('account.invoice', string="Factures")
+    account_invoice_amount = fields.Float(compute='_compute_links')
 
     # Champs ajoutés pour la vue map
     geo_lat = fields.Float('geo_lat', compute='_compute_geo', store=True)
@@ -47,6 +79,30 @@ class OFParcInstalle(models.Model):
         ], default='not_tried', string='precision', compute='_compute_geo', store=True)
 
     _sql_constraints = [('no_serie_uniq', 'unique(name)', u"Ce numéro de série est déjà utilisé et doit être unique.")]
+
+    @api.depends('sale_order_ids', 'account_invoice_ids')
+    def _compute_links(self):
+        for parc in self:
+            parc.sale_order_amount = len(parc.sale_order_ids)
+            parc.account_invoice_amount = len(parc.account_invoice_ids)
+
+    @api.multi
+    def action_view_orders(self):
+        action = self.env.ref('sale.action_quotations').read()[0]
+        action['domain'] = [('id', 'in', self.sale_order_ids._ids)]
+        return action
+
+    @api.multi
+    def action_view_invoices(self):
+        action = self.env.ref('account.action_invoice_tree1').read()[0]
+        action['domain'] = [('id', 'in', self.account_invoice_ids._ids)]
+        return action
+
+    @api.onchange('product_id')
+    def onchange_product_id(self):
+        if self.product_id:
+            self.brand_id = self.product_id.brand_id
+            self.product_category_id = self.product_id.categ_id
 
     @api.multi
     @api.depends('client_id', 'client_id.geo_lat', 'client_id.geo_lng', 'client_id.precision',
@@ -222,3 +278,39 @@ class project_issue(models.Model):
         # Si pas de no de série, on laisse la possibilité de choisir un article
         if self.of_produit_installe_id: # Si no de série existe, on récupère l'article associé
             self.on_change_of_produit_installe_id()
+
+
+class SaleOrder(models.Model):
+    _inherit = 'sale.order'
+
+    of_parc_installe_ids = fields.Many2many('of.parc.installe', string=u'Parcs installés')
+    of_parc_count = fields.Integer(compute='_compute_parc_count')
+
+    @api.multi
+    def action_view_parc_installe(self):
+        action = self.env.ref('of_parc_installe.action_view_of_parc_installe_sale').read()[0]
+        action['domain'] = [('id', 'in', self.of_parc_installe_ids._ids)]
+        return action
+
+    @api.depends('of_parc_installe_ids')
+    def _compute_parc_count(self):
+        for order in self:
+            order.of_parc_count = len(order.of_parc_installe_ids)
+
+
+class AccountInvoice(models.Model):
+    _inherit = 'account.invoice'
+
+    of_parc_installe_ids = fields.Many2many('of.parc.installe', string=u'Parcs installés')
+    of_parc_count = fields.Integer(compute='_compute_parc_count')
+
+    @api.multi
+    def action_view_parc_installe(self):
+        action = self.env.ref('of_parc_installe.action_view_of_parc_installe_sale').read()[0]
+        action['domain'] = [('id', 'in', self.of_parc_installe_ids._ids)]
+        return action
+
+    @api.depends('of_parc_installe_ids')
+    def _compute_parc_count(self):
+        for invoice in self:
+            invoice.of_parc_count = len(invoice.of_parc_installe_ids)
