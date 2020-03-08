@@ -32,7 +32,7 @@ class OFParcInstalle(models.Model):
     date_installation = fields.Date("Date d'installation", required=False)
     date_fin_garantie = fields.Date(string="Fin de garantie")
     product_id = fields.Many2one('product.product', 'Produit', required=True, ondelete='restrict')
-    product_category_id = fields.Many2one('product.category', u'Famille', readonly=False)
+    product_category_id = fields.Many2one('product.category', u'Catégorie', readonly=False)
     client_id = fields.Many2one('res.partner', 'Client', required=True, domain="[('parent_id','=',False)]", ondelete='restrict')
     client_name = fields.Char(related='client_id.name')  # for map view
     client_mobile = fields.Char(related='client_id.mobile')  # for map view
@@ -50,7 +50,7 @@ class OFParcInstalle(models.Model):
     no_piece = fields.Char(u'N° pièce', size=64, required=False)
     project_issue_ids = fields.One2many('project.issue', 'of_produit_installe_id', 'SAV')
     active = fields.Boolean(string=u'Actif', default=True)
-    brand_id = fields.Many2one('of.product.brand')
+    brand_id = fields.Many2one('of.product.brand', string="Marque")
     modele = fields.Char(u'Modèle')
     installation = fields.Char(u"Type d'installation")
     conforme = fields.Boolean('Conforme', default=True)
