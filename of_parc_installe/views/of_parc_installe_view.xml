@@ -94,7 +94,7 @@
                                 <label for="tel_site_id" string=" "/>
                                 <field name="tel_site_id" nolabel="1"/>
                             </group>
-                            <group name="pose" string="Pose">
+                            <group name="pose" string="Installation">
                                 <field name="installation"/>
                                 <field name="conforme"/>
                                 <field name="revendeur_id"/>

@@ -6,24 +6,19 @@
 ##############################################################################
 
 {
-    'name': u"OpenFire / Module Parc installé",
+    'name': u"OpenFire / Module Parc installé - Cheministe",
     'version': "10.0.1.0.0",
     'author': "OpenFire",
     'website': "www.openfire.fr",
     'category': "OpenFire",
     'description': u"""
-Module Parc installé : gestion des produits installés avec no de série.
+Module Parc installé : spécial cheministe.
 """,
     'depends': [
-        'product',
-        'of_project_issue',
-        'of_map_view',
-        'of_product_brand',
+        'of_parc_installe',
     ],
     'data': [
-        'security/ir.model.access.csv',
-        'views/of_parc_installe_view.xml',
-        'wizard/of_wizard_saleorder_to_parc_installe_view.xml',
+        'views/of_parc_cheministe_view.xml',
     ],
     'installable': True,
 }

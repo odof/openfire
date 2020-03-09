@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- *************************************************** -->
+<!-- ****************** PARC INSTALLÉ ****************** -->
+<!-- *************************************************** -->
+
+        <!-- Parc installé form -->
+    <record id="of_parc_installe_cheministe_form_view" model="ir.ui.view">
+        <field name="name">of.parc.installe.cheministe.form.view</field>
+        <field name="model">of.parc.installe</field>
+        <field name="inherit_id" ref="of_parc_installe.of_parc_installe_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='pose']/field[@name='installation']" position="after">
+                <field name="type_conduit"/>
+                <field name="type_air"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
