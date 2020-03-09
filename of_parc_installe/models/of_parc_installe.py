@@ -22,7 +22,7 @@ class OFParcInstalle(models.Model):
         super(OFParcInstalle, self)._auto_init()
         if update_brand:
             cr.execute("UPDATE of_parc_installe AS opi "
-                       "SET brand_id = pp.brand_id, product_category_id = pt.categ_id\n"
+                       "SET brand_id = pt.brand_id, product_category_id = pt.categ_id\n"
                        "FROM product_product AS pp\n"
                        "LEFT JOIN product_template AS pt ON pt.id=pp.product_tmpl_id\n"
                        "WHERE pp.id = opi.product_id")
