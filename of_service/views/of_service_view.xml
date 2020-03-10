@@ -88,12 +88,21 @@
                                         <field name="tache_id" context="{'show_rec_icon_first': recurrence}"/>
                                         <label for="duree" string="Durées"/>
                                         <div>
-                                            <field name="duree" widget="float_time" nolabel="1" class="oe_inline"/>
-                                            <i class="oe_grey oe_inline"> (estimée), </i>
-                                            <field name="duree_planif" widget="float_time" nolabel="1" class="oe_inline"/>
-                                            <i class="oe_grey oe_inline"> (planifiée), </i>
-                                            <field name="duree_restante" widget="float_time" nolabel="1" class="oe_inline"/>
-                                            <i class="oe_grey oe_inline"> (restante).</i>
+                                            <field name="duree" widget="float_time" nolabel="1" class="oe_inline"
+                                                   attrs="{'invisible': [('state', '=', 'done')]}"/>
+                                            <i class="oe_grey oe_inline"
+                                                attrs="{'invisible': [('state', '=', 'done')]}"> (estimée), </i>
+                                            <field name="duree_planif" widget="float_time" nolabel="1" class="oe_inline"
+                                                attrs="{'invisible': [('state', '=', 'done')]}"/>
+                                            <i class="oe_grey oe_inline"
+                                                attrs="{'invisible': [('state', '=', 'done')]}"> (planifiée), </i>
+                                            <field name="duree_restante" widget="float_time" nolabel="1" class="oe_inline"
+                                                attrs="{'invisible': [('state', '=', 'done')]}"/>
+                                            <i class="oe_grey oe_inline"
+                                                attrs="{'invisible': [('state', '=', 'done')]}"> (restante).</i>
+                                            <i class="oe_grey oe_inline" attrs="{'invisible': [('state', '!=', 'done')]}">
+                                                Cette intervention est terminée
+                                            </i>
                                         </div>
 
                                         <label for="date_next" string="Dates"/>
@@ -101,8 +110,7 @@
                                             <i class="oe_grey oe_inline">Entre le </i>
                                             <field name="date_next" nolabel="1" class="oe_inline"/>
                                             <i class="oe_grey oe_inline"> et le </i>
-                                            <field name="date_fin" nolabel="1" class="oe_inline"
-                                              attrs="{'readonly': [('recurrence', '=', True)]}"/>
+                                            <field name="date_fin" nolabel="1" class="oe_inline"/>
                                             <span attrs="{'invisible': [('recurrence', '=', False)]}">
                                                 <i class="oe_grey oe_inline">. Expire le </i>
                                                 <field name="date_fin_contrat" nolabel="1" class="oe_inline"/>
@@ -670,21 +678,32 @@
 <!--##################################################______Planning______####################################################-->
 <!--##########################################################################################################################-->
 
-        <record id="of_planning_intervention_view_form_service" model="ir.ui.view" >
-            <field name="name">of.planning.intervention.form.service</field>
-            <field name="model">of.planning.intervention</field>
-            <field name="type">form</field>
-            <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='order_id']" position="after">
-                    <field name="service_id" context="{
-                    'default_partner_id': partner_id,
-                    'default_address_id': address_id,
-                    'default_tache_id': tache_id,
-                    }"/>
-                </xpath>
-            </field>
-        </record>
+    <record id="of_planning_intervention_filter_inh_service" model="ir.ui.view">
+        <field name="name">of.planning.intervention.filter.service</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_id']" position="after">
+                <field name="service_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_planning_intervention_view_form_service" model="ir.ui.view" >
+        <field name="name">of.planning.intervention.form.service</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_id']" position="after">
+                <field name="service_id" context="{
+                'default_partner_id': partner_id,
+                'default_address_id': address_id,
+                'default_tache_id': tache_id,
+                }"/>
+            </xpath>
+        </field>
+    </record>
 
 <!--##########################################################################################################################-->
 <!--##################################################______sale.order______##################################################-->

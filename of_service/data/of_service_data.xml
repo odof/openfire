@@ -26,7 +26,7 @@
         <field name="function">auto_genere_quinzaines</field>
         <field name="interval_number">12</field>
         <field name="interval_type">months</field>
-        <field name="nextcall">2019-06-01 22:30:00</field>
+        <field name="nextcall">2019-06-01 06:30:00</field>
         <field name="numbercall">-1</field>
         <field name="doall">true</field>
         <field name="active">true</field>

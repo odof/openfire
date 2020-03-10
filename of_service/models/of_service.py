@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 
-from odoo import api, models, fields
+from odoo import api, models, fields, _
 from datetime import date
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
@@ -22,6 +22,12 @@ class OfService(models.Model):
     @api.model_cr_context
     def _auto_init(self):
         cr = self._cr
+        # Interdiction pour les interventions d'avoir une durée nulle: on passe la durée à 1 et l'état à 'annulé'
+        # on pourra supprimer ce code une fois que toutes les bases seront passées en branche planning
+        # en pensant bien à le répercuter sur of_migration ;) ;)
+        cr.execute("UPDATE of_service SET duree = 1, base_state = 'cancel'"
+                   "WHERE duree = 0")
+
         # Lors de la 1ère mise à jour après la refonte des planning (sept. 2019), on migre les données existantes.
         cr.execute("SELECT 1 FROM information_schema.columns WHERE table_name = 'of_service' AND column_name = 'recurrence'")
         existe_avant = bool(cr.fetchall())
@@ -113,7 +119,8 @@ class OfService(models.Model):
     def _compute_state_poncrec(self):
         un_mois = relativedelta(months=1)
         today_da = fields.Date.from_string(fields.Date.context_today(self))
-        il_y_a_un_mois_da = today_da - un_mois # voir les a_programmer 1 mois avant leur date de prochaine planif
+        il_y_a_un_mois_da = today_da - un_mois  # voir les a_programmer 1 mois avant leur date de prochaine planif
+        dans_un_mois_da = today_da + un_mois
         for service in self:
             # les états 'annulé' et 'brouillon' sont provoqués manuellement
             if service.base_state and service.base_state == 'calculated':
@@ -125,9 +132,15 @@ class OfService(models.Model):
                                  or date_next_da + relativedelta(days=13)
                 fin_contrat_da = service.date_fin_contrat and fields.Date.from_string(service.date_fin_contrat) or False
                 if service.recurrence:
+                    # le service a expiré ou expire avant la date de prochaine planif
+                    if fin_contrat_da and (fin_contrat_da < date_next_da or fin_contrat_da < today_da):
+                        service.state = 'done'
+                    # fin de prochaine planification passée: en retard
+                    elif date_fin_da < today_da:
+                        service.state = 'late'
                     # prochaine planification à faire dans moins d'un mois
                     # et pas de dernière intervention ou dernière intervention il y a plus d'un mois: à planifier
-                    if il_y_a_un_mois_da <= date_next_da <= date_fin_da and \
+                    elif il_y_a_un_mois_da <= date_next_da <= dans_un_mois_da and \
                             (not date_last_da or date_last_da < il_y_a_un_mois_da):
                         service.state = 'to_plan'
                     # dernière intervention il y a moins d'un mois: récemment planifié
@@ -136,12 +149,6 @@ class OfService(models.Model):
                     # dernière intervention dans le futur: planifié prochainement
                     elif date_last_da and (today_da < date_last_da):
                         service.state = 'planned_soon'
-                    # fin de prochaine planification passée: en retard
-                    elif date_fin_da < today_da:
-                        service.state = 'late'
-                    # le service a expiré ou expire avant la date de prochaine planif
-                    elif fin_contrat_da and (fin_contrat_da < date_next_da or fin_contrat_da < today_da):
-                        service.state = 'done'
                     else:  # par défaut
                         service.state = 'progress'
                 else:
@@ -279,6 +286,12 @@ class OfService(models.Model):
         v2 = {'label': u'En retard', 'value': 'red'}
         return {"title": title, "values": (v0, v1, v2)}
 
+    _sql_constraints = [
+        ('duree_non_nulle_constraint',
+         'CHECK ( duree != 0 )',
+         _(u'La durée de l\'intervention ne peut pas être nulle!')),
+    ]
+
     # template_id = fields.Many2one('of.mail.template', string='Contrat')
     partner_id = fields.Many2one('res.partner', string='Partenaire', required=True, ondelete='restrict')
     address_id = fields.Many2one('res.partner', string="Adresse d'intervention", ondelete='restrict')
@@ -345,7 +358,7 @@ class OfService(models.Model):
         ('late', u'En retard de planification'),  # date de prochaine planification il y a plus d'un mois
         ('done', u'Fait'),  # intervention(s) et durée restante == 0 et date de fin dépassée
         ('cancel', u'Annulée'),  # manuellement décidé
-    ], u'État', compute="_compute_state_poncrec")
+    ], u'État', compute="_compute_state_poncrec", search="_search_state_ponc")
 
     state = fields.Selection([
         ('draft', u'Brouillon'),  # état par défaut
@@ -382,6 +395,11 @@ class OfService(models.Model):
     # Couleur de contrôle
     color = fields.Char(compute='_compute_color', string='Couleur', store=False)
     recurrence_tache = fields.Boolean(related='tache_id.recurrence', string=u"Récurrence tâche", readonly=True)
+
+    def _search_state_ponc(self, operator, operand):
+        services = self.search([])
+        res = safe_eval("services.filtered(lambda s: s.state_ponc %s %s)" % (operator, operand), {'services': services})
+        return [('id', 'in', res.ids)]
 
     def _search_secteur_tech_id(self, operator, operand):
         services = self.search([])
@@ -438,6 +456,7 @@ class OfService(models.Model):
                 self.recurring_rule_type = self.tache_id.recurring_rule_type
                 self.recurring_interval = self.tache_id.recurring_interval
         self.duree = self.tache_id.duree
+        self.date_fin = self.get_fin_date()
 
     @api.onchange('date_next')
     def _onchange_date_next(self):
@@ -598,13 +617,16 @@ class OfService(models.Model):
             'edit'               : self.base_state == 'calculated',
             'default_order_id'   : self.order_id and self.order_id.id or False,
             })
+        if self.intervention_ids:
+            context['force_date_start'] = self.intervention_ids[-1].date_date
+            context['search_default_service_id'] = self.id
         return context
 
     @api.multi
     def action_view_interventions(self):
         action = self.env.ref('of_planning.of_sale_order_open_interventions').read()[0]
 
-        action['domain'] = [('service_id', 'in', self.ids)]
+        #action['domain'] = [('service_id', 'in', self.ids)]
         if len(self._ids) == 1:
             context = safe_eval(action['context'])
             action['context'] = str(self.get_action_view_interventions_context(context))
@@ -735,6 +757,7 @@ class OFPlanningIntervention(models.Model):
     def _onchange_service_id(self):
         if self.service_id:
             self.tache_id = self.service_id.tache_id
+            self.address_id = self.service_id.address_id or self.service_id.partner_id
 
     @api.multi
     def write(self, vals):
@@ -757,12 +780,11 @@ class OFPlanningIntervention(models.Model):
                 elif not fait and pas_planif_avant and intervention in pas_planif_avant:
                     # calculer et affecter la nouvelle date de prochaine planification
                     service.date_next = service.get_next_date(intervention.date_date)
-                    service.date_fin = service.get_fin_date(service.date_next)
                 # l'intervention est marquée comme faite
                 elif fait and service.date_next_last <= intervention.date_date:  # mettre à jour l'ancienne date de prochaine planification
                     service.date_next_last = service.date_next
                     service.date_next = service.get_next_date(intervention.date_date)
-                    service.date_fin = service.get_fin_date(service.date_next)
+                service.date_fin = service.get_fin_date(service.date_next)
         return res
 
     @api.model
@@ -779,7 +801,7 @@ class OFPlanningIntervention(models.Model):
             if state_interv in ('draft', 'confirm', 'done') and not service.duree_restante:  # calculer date de prochaine intervention
                 if state_interv == 'done':  # mettre à jour l'ancienne date de prochaine intervention avant tout
                     service.date_next_last = service.date_next
-                service.date_next = service.get_next_date(service.date_next)
+                service.date_next = service.get_next_date(intervention.date_date)
                 service.date_fin = service.get_fin_date(service.date_next)
 
         return intervention

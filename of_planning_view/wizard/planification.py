@@ -692,7 +692,7 @@ class OfPlanifCreneau(models.TransientModel):
                         service_domain.append(('address_zip', '>', zip_range.cp_max))
                 service_domain.append(('address_zip', 'not in', zip_range_excluded.ids))
         # services
-        services = self.env['of.service'].search(service_domain).filter_state_poncrec_date(date=self.date_creneau)
+        services = self.env['of.service'].search(service_domain).filter_state_poncrec_date(date_eval=self.date_creneau)
         distance_max = self.distance_max * 1.3  # approximation
         priorite_max = 0
         lieu_prec = self.lieu_prec_manual_id or self.lieu_prec_id
