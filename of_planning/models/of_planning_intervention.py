@@ -98,10 +98,14 @@ class OfPlanningTacheCateg(models.Model):
         ('quinzaine', u"À la quinzaine"),
         ('mois', u"Au mois"),
     ], string="Granularité de planif",
-    help=u"Exemple:\n"
-        u"Entretien -> au mois"
-        u"Pose -> à la quinzaine"
-        u"SAV -> à la semaine")
+    help=u"""
+La granularité permet de définir la période de planification de référence par type de tâche.\n
+Cette granularité permet, à la saisie d'une intervention à programmer,
+de calculer la date de fin une fois la date de début saisie. par défaut :\n
+  * Pour une pose la granularité de planification est la quinzaine
+  * Pour un SAV (quand le champ SAV est rempli), la granularité de planification est la semaine
+  * Pour un entretien, la granularité de planification est le mois
+    """)
 
 
 class OfPlanningTache(models.Model):
@@ -291,6 +295,7 @@ class OfPlanningEquipe(models.Model):
         for equipe in self:
             equipe.tz_offset = datetime.now(pytz.timezone(equipe.tz or 'GMT')).strftime('%z')
 
+
 class OfPlanningInterventionRaison(models.Model):
     _name = "of.planning.intervention.raison"
     _description = u"Raisons d'intervention reportée"
@@ -327,7 +332,7 @@ class OfPlanningIntervention(models.Model):
                 raise UserError(_('La date de début des travaux est en dehors des horaires de travail: \n%s') % horaires_du_jour)
 
     @api.constrains('tache_id', 'employee_ids', 'alert_incapable')
-    def check_alert_hors_creneau(self):
+    def check_alert_incapable(self):
         for intervention in self:
             if intervention.alert_incapable:
                 raise UserError(
@@ -369,6 +374,7 @@ class OfPlanningIntervention(models.Model):
     date_deadline_forcee = fields.Datetime(string=u"Date fin (forcée)")
     duree = fields.Float(string=u'Durée intervention', required=True, digits=(12, 5), track_visibility='always')
     alert_hors_creneau = fields.Boolean(string="RDV hors des créneaux", compute="_compute_date_deadline")
+    alert_coherence_date = fields.Boolean(string=u"Incohérence dans les dates", compute="_compute_alert_coherence_date")
     user_id = fields.Many2one('res.users', string='Utilisateur', default=lambda self: self.env.uid)
     partner_id = fields.Many2one('res.partner', string='Client', compute='_compute_partner_id', store=True)
     address_id = fields.Many2one('res.partner', string='Adresse', track_visibility='onchange')
@@ -383,7 +389,7 @@ class OfPlanningIntervention(models.Model):
     employee_ids = fields.Many2many('hr.employee', 'of_employee_intervention_rel', 'intervention_id', 'employee_id',
                                     string='Intervenants', required=True, domain=_get_employee_ids_domain)
     employee_main_id = fields.Many2one('hr.employee', string=u"Employé principal", compute="_compute_employee_main_id", store=True)
-    alert_incapable = fields.Char(string="Aucun intervenant apte", compute="_compute_alert_incapable")
+    alert_incapable = fields.Boolean(string="Aucun intervenant apte", compute="_compute_alert_incapable")
     horaire_du_jour = fields.Text(string=u"Horaires du jour", compute="_compute_horaire_du_jour")
     state = fields.Selection([
         ('draft', 'Brouillon'),
@@ -772,13 +778,29 @@ class OfPlanningIntervention(models.Model):
 
         return True
 
+    @api.depends('forcer_dates', 'date_deadline_forcee', 'date', 'duree')
+    def _compute_alert_coherence_date(self):
+        for intervention in self:
+            if intervention.date_deadline_forcee and intervention.forcer_dates and intervention.date and intervention.duree:
+                diff_heures = relativedelta(fields.Datetime.from_string(intervention.date_deadline_forcee),
+                                            fields.Datetime.from_string(intervention.date))
+                # on convertit la durée pour faciliter la comparaison
+                heures, minutes = float_2_heures_minutes(intervention.duree)
+                duree_rd = relativedelta(hours=heures, minutes=minutes)
+                # si on compare des relativedelta: (1h,0min) < (0h, 30min)
+                # donc on créé un datetime pour pouvoir comparer
+                now = fields.Datetime.from_string(fields.Datetime.now())
+                if now + diff_heures < now + duree_rd and (duree_rd - diff_heures).minutes > 1:
+                    intervention.alert_coherence_date = True
+                    continue
+            intervention.alert_coherence_date = False
+
     @api.depends('employee_ids', 'tache_id')
     def _compute_alert_incapable(self):
         for intervention in self:
             if intervention.tache_id and intervention.employee_ids \
                     and not intervention.employee_ids.peut_faire(intervention.tache_id):
                 intervention.alert_incapable = True
-                #raise UserError("Aucun des intervenants de cette intervention ne peut réaliser cette Tâche") #@todo message ON EST ICI
             else:
                 intervention.alert_incapable = False
 

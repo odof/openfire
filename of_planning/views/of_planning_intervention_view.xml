@@ -194,6 +194,7 @@
                         </div>
                         <field name="alert_hors_creneau" invisible="1"/>
                         <field name="alert_incapable" invisible="1"/>
+                        <field name="alert_coherence_date" invisible="1"/>
                         <group>
                             <group col="2" name="refs" string="Références">
                                 <field name="equipe_id" autofocus="autofocus"/>
@@ -240,6 +241,9 @@
                                     <field name="jour_fin_force" class="oe_inline of_ws"/>
                                     <field name="date_deadline_forcee" class="oe_inline"
                                            attrs="{'required': [('forcer_dates', '=', True)]}"/>
+                                    <div attrs="{'invisible': [('alert_coherence_date', '=', False)]}" class="of_red">
+                                        <i class="fa fa-warning of_ws"/>la date de fin doit être au moins égale à la date de début + la durée
+                                    </div>
                                 </div>
                                 <field name="verif_dispo"/>
                             </group>
