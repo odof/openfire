@@ -88,6 +88,7 @@ class OfParcInstalle(models.Model):
         'default_partner_id': self.client_id.id,
         'default_address_id': self.site_adresse_id.id,
         'default_recurrence': True,
+        'default_date_next': fields.Date.today(),
         'default_parc_installe_id': self.id,
         'default_origin': u"[parc installé] " + (self.name or ''),
         'bloquer_recurrence': True,
@@ -102,6 +103,7 @@ class OfParcInstalle(models.Model):
         'default_partner_id': self.client_id.id,
         'default_address_id': self.site_adresse_id.id,
         'default_recurrence': False,
+        'default_date_next': fields.Date.today(),
         'default_parc_installe_id': self.id,
         'default_origin': u"[parc installé] " + (self.name or ''),
         'bloquer_recurrence': True,
@@ -112,12 +114,6 @@ class OfParcInstalle(models.Model):
     def action_prevoir_intervention(self):
         self.ensure_one()
         action = self.env.ref('of_service_parc_installe.of_service_parc_installe_open_a_programmer').read()[0]
-#         action['active_id'] = False,
-#         action['active_ids'] = [],
-        today_str = fields.Date.today()
-        today_da = fields.Date.from_string(today_str)
-        deux_semaines_da = today_da + timedelta(days=14)
-        deux_semaines_str = fields.Date.to_string(deux_semaines_da)
         action['name'] = u"Prévoir une intervention"
         action['view_mode'] = "form"
         action['view_ids'] = False
@@ -128,8 +124,7 @@ class OfParcInstalle(models.Model):
         'default_partner_id': self.client_id.id,
         'default_address_id': self.site_adresse_id.id,
         'default_recurrence': False,
-        'default_date_next': today_str,
-        #'default_date_fin': deux_semaines_str,
+        'default_date_next': fields.Date.today(),
         'default_parc_installe_id': self.id,
         'default_origin': u"[Parc installé] " + (self.name or ''),
         'bloquer_recurrence': True,
@@ -152,18 +147,13 @@ class ProjectIssue(models.Model):
     @api.multi
     def action_view_a_programmer(self):
         self.ensure_one()
-        today_str = fields.Date.today()
-        today_da = fields.Date.from_string(today_str)
-        deux_semaines_da = today_da + timedelta(days=14)
-        deux_semaines_str = fields.Date.to_string(deux_semaines_da)
         action = self.env.ref('of_service_parc_installe.of_service_parc_installe_open_a_programmer').read()[0]
         action['domain'] = [('sav_id', '=', self.id), ('recurrence', '=', False)]
         action['context'] = {
         'default_partner_id': self.of_parc_installe_client_id.id,
         'default_address_id': self.of_parc_installe_lieu_id.id,
         'default_recurrence': False,
-        'default_date_next': today_str,
-        #'default_date_fin': deux_semaines_str,
+        'default_date_next': fields.Date.today(),
         'default_sav_id': self.id,
         'default_parc_installe_id': self.of_produit_installe_id.id,
         'default_origin': u"[SAV] " + self.name,
@@ -175,12 +165,6 @@ class ProjectIssue(models.Model):
     def action_prevoir_intervention(self):
         self.ensure_one()
         action = self.env.ref('of_service_parc_installe.of_service_parc_installe_open_a_programmer').read()[0]
-#         action['active_id'] = False,
-#         action['active_ids'] = [],
-        today_str = fields.Date.today()
-        today_da = fields.Date.from_string(today_str)
-        deux_semaines_da = today_da + timedelta(days=14)
-        deux_semaines_str = fields.Date.to_string(deux_semaines_da)
         action['name'] = u"Prévoir une intervention"
         action['view_mode'] = "form"
         action['view_ids'] = False
@@ -191,8 +175,7 @@ class ProjectIssue(models.Model):
         'default_partner_id': self.of_parc_installe_client_id.id,
         'default_address_id': self.of_parc_installe_lieu_id.id,
         'default_recurrence': False,
-        'default_date_next': today_str,
-        #'default_date_fin': deux_semaines_str,
+        'default_date_next': fields.Date.today(),
         'default_sav_id': self.id,
         'default_parc_installe_id': self.of_produit_installe_id.id,
         'default_origin': u"[SAV] " + self.name,

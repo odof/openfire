@@ -347,10 +347,6 @@ class OfPlanningIntervention(models.Model):
          _(u'La durée du RDV d\'intervention ne peut pas être nulle!')),
     ]
 
-    #_constraints = [
-    #    (check_coherence_dates, u"Attention /!\ la date de fin doit être au moins égale à la date de début + la durée", []),
-    #]
-
     @api.model
     def _get_employee_ids_domain(self):
         return [('of_est_intervenant', '=', True)]
