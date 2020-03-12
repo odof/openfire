@@ -287,9 +287,28 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']" position="before">
+                <field name="of_difference" invisible="1"/>
+                <div class="oe_grey" attrs="{'invisible': [('of_difference', '=', False)]}">
+                    <i>
+                        <p>
+                            Un des kits en tarification calculée n'a pas correctement actualisé son prix.
+                        </p>
+                    </i>
+                </div>
+            </xpath>
             <xpath expr="//field[@name='order_line']/tree" position="attributes">
                 <!-- Edition des lignes de commande par formulaire -->
                 <attribute name="editable"/>
+                <attribute name="colors">red:of_difference==True</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree" position="inside">
+                <!-- Permet de mettre de la couleur lors d'un problème de montant -->
+                <field name="of_difference" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form" position="inside">
+                <!-- Permet de mettre de la couleur lors d'un problème de montant -->
+                <field name="of_difference" invisible="1"/>
             </xpath>
             <xpath expr="//page//group[@name='technical']" position="after">
                 <group string="Kit" name='kit'>
