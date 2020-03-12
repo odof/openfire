@@ -388,6 +388,16 @@ class SaleOrderLine(models.Model):
         return True
 
     @api.multi
+    def _write(self, vals):
+        if len(vals.keys()) == 1 and vals.get('of_difference'):
+            # Permet de forcer un recalcul du prix unitaire, la valeur ainsi forcée ne sera prise en compte que si
+            # l'utilisateur ne sauvegarde pas la ligne, le devis ou les deux
+            self._refresh_price_unit()
+            vals['of_difference'] = False
+        res = super(SaleOrderLine, self)._write(vals)
+        return res
+
+    @api.multi
     def copy_data(self, default=None):
         # La duplication d'une ligne de commande implique la duplication de son kit
         res = super(SaleOrderLine, self).copy_data(default)
