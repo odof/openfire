@@ -137,10 +137,9 @@ class OfService(models.Model):
     def _compute_state_poncrec(self):
         for service in self:
             service_state = service.get_state_poncrec_date(fields.Date.context_today(self))
-            if service.recurrence:
-                service.state = service_state
-            else:
+            if not service.recurrence:
                 service.state_ponc = service_state
+            service.state = service_state
 
     @api.multi
     def filter_state_poncrec_date(self, date_eval=fields.Date.today(), state_list=('to_plan', 'part_planned', 'late')):
@@ -817,8 +816,11 @@ class OFPlanningIntervention(models.Model):
             if state_interv in ('draft', 'confirm', 'done') and not service.duree_restante:  # calculer date de prochaine intervention
                 if state_interv == 'done':  # mettre à jour l'ancienne date de prochaine intervention avant tout
                     service.date_next_last = service.date_next
-                service.date_next = service.get_next_date(intervention.date_date)
-                service.date_fin = service.get_fin_date(service.date_next)
+                date_next = service.get_next_date(intervention.date_date)
+                service.write({
+                    'date_next': date_next,
+                    'date_fin': service.get_fin_date(date_next),
+                })
 
         return intervention
 
