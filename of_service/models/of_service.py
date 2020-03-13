@@ -829,7 +829,7 @@ class OFPlanningIntervention(models.Model):
             service = intervention.service_id
             if not service or not service.recurrence or not service.intervention_ids:
                 continue
-            service_last_rdv = service.intervention_ids.sorted('date', reverse=True)
+            service_last_rdv = service.intervention_ids.sorted('date', reverse=True)[0]
             if intervention == service_last_rdv:  # était la dernière intervention planifiée pour ce service -> rollback!
                 date_next = service.get_date_proche(service.date_next_last or intervention.date_date)
                 service.write({
