@@ -112,9 +112,8 @@ class OfService(models.Model):
                 date_avance_str = fields.Date.to_string(date_avance_da)
                 # RDVs pris en retard, même principe que pour les RDVs pris en avance
                 date_next_suiv_str = service.get_next_date(date_next_ref_str, forward=True)
-                date_fin_suiv_str = service.get_fin_date(date_next_suiv_str)
-                date_suiv_da = fields.Date.from_string(date_fin_suiv_str)
-                diff_suiv_td = (date_suiv_da - date_next_ref_da) / 2
+                date_suiv_da = fields.Date.from_string(date_next_suiv_str)
+                diff_suiv_td = (date_suiv_da - date_fin_ref_da) / 2
                 date_retard_da = date_next_ref_da + diff_suiv_td
                 date_retard_str = fields.Date.to_string(date_retard_da)
 
@@ -832,8 +831,11 @@ class OFPlanningIntervention(models.Model):
                 continue
             service_last_rdv = service.intervention_ids.sorted('date', reverse=True)
             if intervention == service_last_rdv:  # était la dernière intervention planifiée pour ce service -> rollback!
-                service.date_next = service.get_date_proche(service.date_next_last or intervention.date_date)
-                service.date_fin = service.get_fin_date(service.date_next)
+                date_next = service.get_date_proche(service.date_next_last or intervention.date_date)
+                service.write({
+                    'date_next': date_next,
+                    'date_fin': service.get_fin_date(date_next),
+                })
 
         return super(OFPlanningIntervention, self).unlink()
 
