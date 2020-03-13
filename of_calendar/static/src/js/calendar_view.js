@@ -6,6 +6,7 @@ odoo.define('of_calendar.calendar_view', function (require) {
 
 var core = require('web.core');
 var CalendarView = require('web_calendar.CalendarView');
+var Dialog = require('web.Dialog');
 var widgets = require('web_calendar.widgets');
 var Model = require('web.DataModel');
 var Widget = require('web.Widget');
@@ -87,7 +88,6 @@ CalendarView.include({
         if (isNullOrUndef(this.options.sidebar)) {
             this.display_states = false;
         }
-        //this.dfd_filters_rendered = $.Deferred();
 
         this.on_event_after_all_render = _.debounce(this.on_event_after_all_render, 300, true);
     },
@@ -397,6 +397,19 @@ CalendarView.include({
                 self.on_event_after_all_render();
             }
         };
+        fc.select = function (start_date, end_date, all_day, _js_event, _view) {
+            if (self.options.action.context.inhiber_create) {
+                Dialog.alert(self.$el, self.options.action.context.inhiber_message);  // inhiber création
+                self.$calendar.fullCalendar('unselect');
+            }else{
+                var data_template = self.get_event_data({
+                    start: start_date,
+                    end: end_date,
+                    allDay: all_day,
+                });
+                self.open_quick_create(data_template);
+            }
+        }
         return fc;
     },
     /**

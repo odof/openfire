@@ -263,9 +263,12 @@ class HREmployee(models.Model):
             res[employee.id] = [[creneau.heure_debut, creneau.heure_fin] for creneau in creneaux]
             if res_text:
                 res_text += u"\n"
-            res_text += u"%s: %s" % (employee.name, ", ".join(
-                ["%s-%s" % (
-                    hours_to_strs(creneau.heure_debut)[0], hours_to_strs(creneau.heure_fin)[0]) for creneau in creneaux]))
+            if not creneaux:
+                res_text += u"Non travaillé"
+            else:
+                res_text += u"%s: %s" % (employee.name, ", ".join(
+                    ["%s-%s" % (
+                        hours_to_strs(creneau.heure_debut)[0], hours_to_strs(creneau.heure_fin)[0]) for creneau in creneaux]))
         if mode == 'dict':
             return res
         return res_text
