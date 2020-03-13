@@ -321,26 +321,29 @@ class OfPlanningIntervention(models.Model):
                 # si on compare des relativedelta: (1h,0min) < (0h, 30min)
                 # donc on créé un datetime pour pouvoir comparer
                 now = fields.Datetime.from_string(fields.Datetime.now())
-                if now + diff_heures < now + duree_rd and (duree_rd - diff_heures).minutes > 1:
+                # éviter les erreurs d'arrondi de minute
+                une_minute = relativedelta(minutes=1)
+                ecart = duree_rd - diff_heures
+                if now + diff_heures < now + duree_rd and now + une_minute < now + ecart:
                     raise UserError(_(u"Attention /!\ la date de fin doit être au moins égale à la date de début + la durée"))
 
-    @api.constrains('alert_hors_creneau', 'date', 'date_deadline')
+    @api.constrains('date', 'date_deadline')
     def check_alert_hors_creneau(self):
         for intervention in self:
             if intervention.alert_hors_creneau:
                 horaires_du_jour = intervention.employee_ids.get_horaires_date(intervention.date_date, mode="text")
-                raise UserError(_('La date de début des travaux est en dehors des horaires de travail: \n%s') % horaires_du_jour)
+                raise UserError(_(u'La date de début des travaux est en dehors des horaires de travail: \n%s') % horaires_du_jour)
 
-    @api.constrains('tache_id', 'employee_ids', 'alert_incapable')
+    @api.constrains('tache_id', 'employee_ids')
     def check_alert_incapable(self):
         for intervention in self:
             if intervention.alert_incapable:
                 raise UserError(
-                    _('Aucun des intervenants sélectionnés ne peuvent réaliser cette tâche'))
+                    _(u'Aucun des intervenants sélectionnés ne peut réaliser cette tâche'))
 
     _sql_constraints = [
         ('dates_forcees_constraint',
-         'CHECK ( date <= date_deadline_forcee )',
+         'CHECK ( date < date_deadline )',
          _(u"La date de début doit être antérieure ou égale à celle de fin")),
         ('duree_non_nulle_constraint',
          'CHECK ( duree != 0 )',
@@ -394,7 +397,7 @@ class OfPlanningIntervention(models.Model):
         ('unfinished', u'Inachevé'),
         ('cancel', u'Annulé'),
         ('postponed', u'Reporté'),
-        ], string=u'État', index=True, readonly=True, default='draft')
+        ], string=u'État', index=True, readonly=True, default='draft', track_visibility='onchange')
     company_id = fields.Many2one('res.company', string='Magasin', required=True, default=lambda self: self.env.user.company_id.id)
     tag_ids = fields.Many2many('of.planning.tag', column1='intervention_id', column2='tag_id', string=u'Étiquettes')
     description = fields.Html(string='Description')  # Non utilisé, changé pour notes intervention
@@ -786,7 +789,10 @@ class OfPlanningIntervention(models.Model):
                 # si on compare des relativedelta: (1h,0min) < (0h, 30min)
                 # donc on créé un datetime pour pouvoir comparer
                 now = fields.Datetime.from_string(fields.Datetime.now())
-                if now + diff_heures < now + duree_rd and (duree_rd - diff_heures).minutes > 1:
+                # éviter les erreurs d'arrondi de minute
+                une_minute = relativedelta(minutes=1)
+                ecart = duree_rd - diff_heures
+                if now + diff_heures < now + duree_rd and now + une_minute < now + ecart:
                     intervention.alert_coherence_date = True
                     continue
             intervention.alert_coherence_date = False
@@ -815,7 +821,7 @@ class OfPlanningIntervention(models.Model):
             if intervention.employee_ids:
                 intervention.tz = intervention.employee_ids[0].of_tz
 
-    @api.depends('date', 'duree', 'employee_ids', 'forcer_dates')
+    @api.depends('date', 'duree', 'employee_ids', 'forcer_dates', 'date_deadline_forcee')
     def _compute_date_deadline(self):
         compare_precision = 5
         employee_obj = self.env['hr.employee']
@@ -1060,7 +1066,7 @@ class OfPlanningIntervention(models.Model):
 
     @api.onchange('forcer_dates')
     def _onchange_forcer_dates(self):
-        if self.forcer_dates:
+        if self.forcer_dates and self.duree and self.date:
             heures, minutes = float_2_heures_minutes(self.duree)
             self.date_deadline_forcee = fields.Datetime.to_string(fields.Datetime.from_string(self.date) +
                                                                   relativedelta(hours=heures, minutes=minutes))

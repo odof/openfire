@@ -18,13 +18,9 @@
                         <button name="button_annuler" string="Annuler" type="object"
                                 attrs="{'invisible': [('base_state', '!=', 'calculated')]}"/>
                         <button name="button_brouillon" string="Remettre en brouillon" states="cancel" type="object"/>
-
-                        <!--field name="state_ponc" widget="statusbar" attrs="{'invisible': [('recurrence', '=', True)]}"/>
-                        <field name="state" widget="statusbar" attrs="{'invisible': [('recurrence', '=', False)]}"
-                               statusbar_visible="draft,to_plan,planned_soon,planned,progress,late,done,cancel"/>
-<!- -                        <field name="state" widget="statusbar" attrs="{'invisible': [('recurrence', '=', True)]}" statusbar_visible="draft,to_plan,planned_soon,planned,progress,late,done,cancel"/>-->
                     </header>
                     <sheet>
+                        <field name="alert_dates" invisible="1"/>
                         <div class="oe_button_box" name="button_box">
                             <button class="oe_stat_button" name="action_view_interventions" type="object" icon="fa-calendar">
                                 <field string="RDVs Tech" name="intervention_count" widget="statinfo"/>
@@ -116,6 +112,9 @@
                                                 <field name="date_fin_contrat" nolabel="1" class="oe_inline"/>
                                                 <i class="oe_grey oe_inline"> .</i>
                                             </span>
+                                            <div attrs="{'invisible': [('alert_dates', '=', False)]}" class="of_red">
+                                                <i class="fa fa-warning of_ws"/>Incohérence dans les dates
+                                            </div>
                                         </div>
                                         <div colspan="2"
                                              attrs="{'invisible': ['|',
