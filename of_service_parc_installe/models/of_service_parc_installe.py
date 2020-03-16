@@ -83,9 +83,13 @@ class OfPlanningIntervention(models.Model):
     @api.model
     def create(self, vals):
         service_obj = self.env['of.service']
+        parc_obj = self.env['of.parc.installe']
         service = vals.get('service_id') and service_obj.browse(vals['service_id'])
+        parc = False
         if service:
-            vals['parc_installe_id'] = service.parc_installe_id and service.parc_installe_id.id
+            parc = service.parc_installe_id
+            vals['parc_installe_id'] = parc and parc.id
+        parc = not parc and vals.get('parc_installe_id') and parc_obj.browse(vals['parc_installe_id'])
         return super(OfPlanningIntervention, self).create(vals)
 
     @api.multi
@@ -166,6 +170,17 @@ class OfParcInstalle(models.Model):
         }
         return action
 
+    @api.multi
+    def historique(self, intervention):
+        """
+        :param intervention: Intervention de départ
+        :return: Renvoi les 3 interventions précédent celle envoyée en paramètre.
+        """
+        self.ensure_one()
+        return self.env['of.planning.intervention'].search([
+            ('id', 'in', self.intervention_ids.ids),
+            ('date', '<', intervention.date)
+            ], order="date DESC", limit=3)
 
 class ProjectIssue(models.Model):
     _inherit = 'project.issue'

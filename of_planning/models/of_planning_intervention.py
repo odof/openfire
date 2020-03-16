@@ -203,6 +203,46 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
             return res
         return super(OfPlanningTache, self).name_search(name, args, operator, limit)
 
+    @api.multi
+    def _prepare_invoice_line(self, intervention):
+        self.ensure_one()
+        product = self.product_id
+        partner = intervention.partner_id
+        if not intervention.fiscal_position_id and not partner.property_account_position_id:
+            return {}, u"Veuillez définir une position fiscale pour l'intervention %s" % self.name
+        fiscal_position = intervention.fiscal_position_id or partner.property_account_position_id
+        taxes = product.taxes_id
+        if partner.company_id:
+            taxes = taxes.filtered(lambda r: r.company_id == partner.company_id)
+        taxes = fiscal_position and fiscal_position.map_tax(taxes, product, partner) or []
+
+        line_account = product.property_account_income_id or product.categ_id.property_account_income_categ_id
+        if not line_account:
+            return {}, u'Il faut configurer les comptes de revenus pour la catégorie du produit %s.\n' % product.name
+
+        # Mapping des comptes par taxe induit par le module of_account_tax
+        for tax in taxes:
+            line_account = tax.map_account(line_account)
+
+        pricelist = partner.property_product_pricelist
+        company = intervention._get_invoicing_company(partner)
+
+        if pricelist.discount_policy == 'without_discount':
+            from_currency = company.currency_id
+            price_unit = from_currency.compute(product.lst_price, pricelist.currency_id)
+        else:
+            price_unit = product.with_context(pricelist=pricelist.id).price
+        price_unit = self.env['account.tax']._fix_tax_included_price(price_unit, product.taxes_id, taxes)
+        return {
+                   'name'                : product.name_get()[0][1],
+                   'account_id'          : line_account.id,
+                   'price_unit'          : price_unit,
+                   'quantity'            : 1.0,
+                   'discount'            : 0.0,
+                   'uom_id'              : product.uom_id.id,
+                   'product_id'          : product.id,
+                   'invoice_line_tax_ids': [(6, 0, taxes._ids)],
+                   }, ""
 
 class OfPlanningEquipe(models.Model):
     _name = "of.planning.equipe"
@@ -748,17 +788,42 @@ class OfPlanningIntervention(models.Model):
                 val = getattr(self.address_id, field)
                 if val:
                     name.append(val)
+            self.fiscal_position_id = self.address_id.commercial_partner_id.property_account_position_id
         self.name = name and " ".join(name) or "Intervention"
 
     @api.onchange('template_id')
-    def _onchange_template_id(self):
-        if self.state == "draft" and self.template_id:
-            self.tache_id = self.template_id.tache_id
+    def onchange_template_id(self):
+        intervention_line_obj = self.env['of.planning.intervention.line']
+        template = self.template_id
+        if self.state == "draft" and template:
+            self.tache_id = template.tache_id
+            if not self.lien_commande:
+                self.fiscal_position_id = template.fiscal_position_id
+            if self.line_ids:
+                new_lines = self.line_ids
+            else:
+                new_lines = intervention_line_obj
+            for line in template.line_ids:
+                data = line.get_intervention_line_values()
+                data['intervention_id'] = self.id
+                new_lines += intervention_line_obj.new(data)
+            new_lines.compute_taxes()
+            self.line_ids = new_lines
 
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
-        if self.tache_id and self.tache_id.duree:
-            self.duree = self.tache_id.duree
+        if self.tache_id:
+            if self.tache_id.duree:
+                self.duree = self.tache_id.duree
+            if self.tache_id.product_id:
+                self.line_ids.new({
+                    'intervention_id': self.id,
+                    'product_id'     : self.tache_id.product_id.id,
+                    'qty'            : 1,
+                    'price_unit'     : self.tache_id.product_id.lst_price,
+                    'name'           : self.tache_id.product_id.name,
+                    })
+                self.line_ids.compute_taxes()
 
     @api.onchange('forcer_dates')
     def _onchange_forcer_dates(self):
@@ -845,6 +910,10 @@ class OfPlanningIntervention(models.Model):
 
         msgs = []
         for interv in self:
+            if interv.lien_commande:
+                msgs.append(u"Les lignes facturables du rendez-vous %s étant liées à des lignes de commandes "
+                            u"veuillez effectuer la facturation depuis le bon de commande." % interv.name)
+                continue
             invoice_data, msg = interv._prepare_invoice()
             msgs.append(msg)
             if invoice_data:
@@ -856,13 +925,13 @@ class OfPlanningIntervention(models.Model):
         msg = "\n".join(msgs)
 
         return {
-            'name'     : u"Création de la facture",
+            'name': u"Création de la facture",
             'view_type': 'form',
             'view_mode': 'form',
             'res_model': 'of.planning.message.invoice',
-            'type'     : 'ir.actions.act_window',
-            'target'   : 'new',
-            'context'  : {'default_msg': msg}
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {'default_msg': msg}
         }
 
     @api.multi
@@ -888,6 +957,34 @@ class OfPlanningIntervention(models.Model):
     @api.multi
     def button_draft(self):
         return self.write({'state': 'draft'})
+
+    @api.multi
+    def button_import_order_line(self):
+        self.ensure_one()
+        line_obj = self.env['of.planning.intervention.line']
+        if not self.order_id:
+            raise UserError(u"Il n'y a pas de commande liée a l'intervention.")
+        self.fiscal_position_id = self.order_id.fiscal_position_id
+        in_use = self.line_ids.mapped('order_line_id')._ids
+        for line in self.order_id.order_line.filtered(lambda l: l.id not in in_use):
+            qty = line.product_uom_qty - sum(line.of_intervention_line_ids \
+                                             .filtered(lambda r: r.intervention_id.state not in ('cancel', 'postponed')) \
+                                             .mapped('qty'))
+            if qty > 0.0:
+                line_obj.create({
+                    'order_line_id': line.id,
+                    'intervention_id': self.id,
+                    'product_id': line.product_id.id,
+                    'qty': qty,
+                    'price_unit': line.price_unit,
+                    'name': line.name,
+                    'taxe_ids': [(4, tax.id) for tax in line.tax_id]
+                })
+
+    @api.multi
+    def button_update_lines(self):
+        self.ensure_one()
+        self.line_ids.update_vals()
 
     # Autres
 
@@ -985,74 +1082,52 @@ class OfPlanningIntervention(models.Model):
         return self.company_id or partner.company_id
 
     @api.multi
+    def _prepare_invoice_lines(self):
+        self.ensure_one()
+        lines_data = []
+        error = ''
+        for line in self.line_ids:
+            line_data, line_error = line._prepare_invoice_line()
+            lines_data.append((0, 0, line_data))
+            error += line_error
+        return lines_data, error
+
+    @api.multi
     def _prepare_invoice(self):
         self.ensure_one()
-        fpos_obj = self.env['account.fiscal.position']
 
-        msg_succes = u"SUCCES : création de la facture depuis l'intervention %s"
+        msg_succes = u"SUCCÈS : création de la facture depuis l'intervention %s"
         msg_erreur = u"ÉCHEC : création de la facture depuis l'intervention %s : %s"
 
         partner = self.partner_id
-        err = []
         if not partner:
-            err.append("sans partenaire")
-        product = self.tache_id.product_id
-        if not product:
-            err.append(u"pas de produit lié")
-        elif product.type != 'service':
-            err.append(u"le produit lié doit être de type 'Service'")
-        if err:
             return (False,
-                    msg_erreur % (self.name, ", ".join(err)))
-        fiscal_position_id = fpos_obj.get_fiscal_position(partner.id, delivery_id=self.address_id.id)
-        if not fiscal_position_id:
-            return (False,
-                    msg_erreur % (self.name, u"pas de position fiscale définie pour le partenaire ni pour la société"))
-
-        # Préparation de la ligne de facture
-        taxes = product.taxes_id
-        if partner.company_id:
-            taxes = taxes.filtered(lambda r: r.company_id == partner.company_id)
-        taxes = fpos_obj.browse(fiscal_position_id).map_tax(taxes, product, partner)
-
-        line_account = product.property_account_income_id or product.categ_id.property_account_income_categ_id
-        if not line_account:
-            return (False,
-                    msg_erreur % (self.name,
-                                  u"Il faut configurer les comptes de revenus pour la catégorie du produit.\n"))
-
-        # Mapping des comptes par taxe induit par le module of_account_tax
-        for tax in taxes:
-            line_account = tax.map_account(line_account)
-
+                    msg_erreur % (self.name, u'Pas de partenaire défini'))
         pricelist = partner.property_product_pricelist
+        lines_data, error = self._prepare_invoice_lines()
+        if error:
+            return (False,
+                    msg_erreur % (self.name, error))
+        if not lines_data:
+            line_data, error = self.tache_id._prepare_invoice_line(self)
+            if error:
+                return (False,
+                        msg_erreur % (self.name, error))
+            if line_data:
+                lines_data = [(0, 0, line_data)]
+        if not lines_data:
+            return (False,
+                    msg_erreur % (self.name, u"Aucune ligne facturable."))
         company = self._get_invoicing_company(partner)
-
-        if pricelist.discount_policy == 'without_discount':
-            from_currency = company.currency_id
-            price_unit = from_currency.compute(product.lst_price, pricelist.currency_id)
-        else:
-            price_unit = product.with_context(pricelist=pricelist.id).price
-        price_unit = self.env['account.tax']._fix_tax_included_price(price_unit, product.taxes_id, taxes)
-
-        line_data = {
-            'name': product.name_get()[0][1],
-            'origin': "Intervention",
-            'account_id': line_account.id,
-            'price_unit': price_unit,
-            'quantity': 1.0,
-            'discount': 0.0,
-            'uom_id': product.uom_id.id,
-            'product_id': product.id,
-            'invoice_line_tax_ids': [(6, 0, taxes._ids)],
-        }
+        fiscal_position_id = self.fiscal_position_id.id or partner.property_account_position_id.id
 
         journal_id = (self.env['account.invoice'].with_context(company_id=company.id)
                       .default_get(['journal_id'])['journal_id'])
         if not journal_id:
-            raise UserError(u"Vous devez définir un journal des ventes pour cette société (%s)." % company.name)
+            return (False,
+                    msg_erreur % (self.name, u"Vous devez définir un journal des ventes pour cette société (%s)." % company.name))
         invoice_data = {
-            'origin': "Intervention",
+            'origin': self.number or 'Intervention',
             'type': 'out_invoice',
             'account_id': partner.property_account_receivable_id.id,
             'partner_id': partner.id,
@@ -1062,11 +1137,132 @@ class OfPlanningIntervention(models.Model):
             'fiscal_position_id': fiscal_position_id,
             'company_id': company.id,
             'user_id': self._uid,
-            'invoice_line_ids': [(0, 0, line_data)],
+            'invoice_line_ids': lines_data,
         }
 
         return (invoice_data,
                 msg_succes % (self.name,))
+
+
+class OfPlanningInterventionLine(models.Model):
+    _name = "of.planning.intervention.line"
+
+    intervention_id = fields.Many2one('of.planning.intervention', string='Intervention', required=True)
+    partner_id = fields.Many2one('res.partner', related='intervention_id.partner_id')
+    company_id = fields.Many2one('res.company', related='intervention_id.company_id', string=u'Société')
+    currency_id = fields.Many2one('res.currency', string='Currency', readonly=True, related="company_id.currency_id")
+
+    order_line_id = fields.Many2one('sale.order.line', string='Ligne de commande')
+    product_id = fields.Many2one('product.product', string='Article')
+    price_unit = fields.Monetary(
+        string='Prix unitaire', digits=dp.get_precision('Product Price'), default=0.0, currency_field='currency_id'
+    )
+    qty = fields.Float(string=u'Qté', digits=dp.get_precision('Product Unit of Measure'))
+    name = fields.Text(string='Description')
+    taxe_ids = fields.Many2many('account.tax', string="TVA")
+    discount = fields.Float(string='Remise (%)', digits=dp.get_precision('Discount'), default=0.0)
+
+    price_subtotal = fields.Monetary(compute='_compute_amount', string='Sous-total HT', readonly=True, store=True)
+    price_tax = fields.Monetary(compute='_compute_amount', string='Taxes', readonly=True, store=True)
+    price_total = fields.Monetary(compute='_compute_amount', string='Sous-total TTC', readonly=True, store=True)
+
+    intervention_state = fields.Selection(related="intervention_id.state", store=True)
+
+    @api.depends('qty', 'price_unit', 'taxe_ids')
+    def _compute_amount(self):
+        """
+        Calcule le montant de la ligne.
+        """
+        for line in self:
+            price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
+            taxes = line.taxe_ids.compute_all(price, line.currency_id, line.qty,
+                                              product=line.product_id, partner=line.intervention_id.address_id)
+            line.update({
+                'price_tax'     : taxes['total_included'] - taxes['total_excluded'],
+                'price_total'   : taxes['total_included'],
+                'price_subtotal': taxes['total_excluded'],
+                })
+
+    @api.onchange('product_id')
+    def _onchange_product(self):
+        product = self.product_id
+        self.qty = 1
+        self.price_unit = product.lst_price
+        if product:
+            name = product.name_get()[0][1]
+            if product.description_sale:
+                name += '\n' + product.description_sale
+            self.name = name
+        else:
+            self.name = ''
+        if product:
+            self.compute_taxes()
+
+    @api.multi
+    def compute_taxes(self):
+        for line in self:
+            product = line.product_id
+            partner = line.partner_id
+            fiscal_position = line.intervention_id.fiscal_position_id
+            taxes = product.taxes_id
+            if partner.company_id:
+                taxes = taxes.filtered(lambda r: r.company_id == partner.company_id)
+            if fiscal_position:
+                taxes = fiscal_position.map_tax(taxes, product, partner)
+                line.taxe_ids = taxes
+
+    @api.multi
+    def _prepare_invoice_line(self):
+        self.ensure_one()
+        product = self.product_id
+        partner = self.partner_id
+        if not self.intervention_id.fiscal_position_id:
+            return {}, u"Veuillez définir une position fiscale pour l'intervention %s" % self.name
+        fiscal_position = self.intervention_id.fiscal_position_id
+        taxes = self.taxe_ids
+        if partner.company_id and taxes:
+            taxes = taxes.filtered(lambda r: r.company_id == partner.company_id)
+        elif not taxes and fiscal_position:
+            taxes = fiscal_position.map_tax(taxes, product, partner)
+
+        line_account = product.property_account_income_id or product.categ_id.property_account_income_categ_id
+        if not line_account:
+            return {}, u'Il faut configurer les comptes de revenus pour la catégorie du produit %s.\n' % product.name
+
+        # Mapping des comptes par taxe induit par le module of_account_tax
+        for tax in taxes:
+            line_account = tax.map_account(line_account)
+
+        return {
+            'name'                : product.name_get()[0][1],
+            'account_id'          : line_account.id,
+            'price_unit'          : self.price_unit,
+            'quantity'            : self.qty,
+            'discount'            : 0.0,
+            'uom_id'              : product.uom_id.id,
+            'product_id'          : product.id,
+            'invoice_line_tax_ids': [(6, 0, taxes._ids)],
+            }, ""
+
+    @api.multi
+    def update_vals(self):
+        for line in self:
+            if not line.order_line_id:
+                continue
+            order_line = line.order_line_id
+            planned = sum(order_line.of_intervention_line_ids
+                          .filtered(lambda r: r.intervention_id.state not in ('cancel', 'postponed')
+                                              and r.id != line.id)
+                          .mapped('qty'))
+            qty = order_line.product_uom_qty - planned
+            line.update({
+                'order_line_id'  : order_line.id,
+                'product_id'     : order_line.product_id.id,
+                'qty'            : qty,
+                'price_unit'     : order_line.price_unit,
+                'name'           : order_line.name,
+                'taxe_ids'       : [(5, )] + [(4, tax.id) for tax in order_line.tax_id]
+                })
 
 
 class ResPartner(models.Model):
@@ -1121,12 +1317,23 @@ class SaleOrder(models.Model):
     intervention_ids = fields.One2many("of.planning.intervention", "order_id", string="Interventions")
 
     intervention_count = fields.Integer(string="Nb d'interventions", compute='_compute_intervention_count')
+    of_planned = fields.Boolean(string=u"Planifiée", compute="_compute_planned", store=True)
 
     @api.depends('intervention_ids')
     @api.multi
     def _compute_intervention_count(self):
         for sale_order in self:
             sale_order.intervention_count = len(sale_order.intervention_ids)
+
+    @api.depends('order_line', 'order_line.of_intervention_state')
+    def _compute_planned(self):
+        for order in self:
+            for line in order.order_line:
+                if line.of_intervention_state not in ['confirm', 'done']:
+                    order.of_planned = False
+                    break
+            else:
+                order.of_planned = True
 
     @api.multi
     def action_view_intervention(self):
@@ -1156,6 +1363,9 @@ class OfPlanningInterventionTemplate(models.Model):
     code = fields.Char(string="Code", compute="_compute_code", inverse="_inverse_code", store=True, required=True)
     sequence_id = fields.Many2one('ir.sequence', string=u"Séquence", readonly=True)
     tache_id = fields.Many2one('of.planning.tache', string=u"Tâche")
+    fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale")
+    line_ids = fields.One2many('of.planning.intervention.template.line', 'template_id', string="Lignes de facturation")
+    product_ids = fields.Many2many('product.product')
 
     @api.depends('sequence_id')
     def _compute_code(self):
@@ -1193,6 +1403,39 @@ class OfPlanningInterventionTemplate(models.Model):
             template.sequence_id = self.env['ir.sequence'].sudo().create(sequence_data)
 
 
+class OfPlanningInterventionTemplateLine(models.Model):
+    _name = 'of.planning.intervention.template.line'
+
+    template_id = fields.Many2one('of.planning.intervention.template', string=u"Modèle", required=True)
+    product_id = fields.Many2one('product.product', string='Article')
+    price_unit = fields.Float(string='Prix unitaire', digits=dp.get_precision('Product Price'), default=0.0)
+    qty = fields.Float(string=u'Qté', digits=dp.get_precision('Product Unit of Measure'))
+    name = fields.Text(string='Description')
+
+    @api.onchange('product_id')
+    def _onchange_product(self):
+        product = self.product_id
+        self.qty = 1
+        self.price_unit = product.lst_price
+        if product:
+            name = product.name_get()[0][1]
+            if product.description_sale:
+                name += '\n' + product.description_sale
+            self.name = name
+        else:
+            self.name = ''
+
+    @api.multi
+    def get_intervention_line_values(self):
+        self.ensure_one()
+        return {
+            'product_id': self.product_id,
+            'price_unit': self.price_unit,
+            'qty': self.qty,
+            'name': self.name,
+            }
+
+
 class OfPlanningTag(models.Model):
     _description = u"Étiquettes d'intervention"
     _name = 'of.planning.tag'
@@ -1221,3 +1464,37 @@ class OfMailTemplate(models.Model):
     @api.model
     def _get_allowed_models(self):
         return super(OfMailTemplate, self)._get_allowed_models() + ['of.planning.intervention']
+
+
+class SaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
+
+    of_intervention_line_ids = fields.One2many('of.planning.intervention.line', 'order_line_id')
+    of_qty_planifiee = fields.Float(string=u"Qté(s) réalisée(s)", compute="_compute_of_qty_planifiee", store=True)
+    of_intervention_state = fields.Selection([
+            ('todo', u'À planifier'),
+            ('confirm', u'Planifée'),
+            ('done', u'Réalisée'),
+            ], string=u"État de planification", compute="_compute_intervention_state", store=True)
+
+    @api.depends('of_intervention_line_ids', 'of_intervention_line_ids.qty', 'of_intervention_line_ids.intervention_state')
+    def _compute_of_qty_planifiee(self):
+        for line in self:
+            lines = line.of_intervention_line_ids.filtered(lambda l: l.intervention_state in ('done', ))
+            line.of_qty_planifiee = sum(lines.mapped('qty'))
+
+    @api.depends('of_intervention_line_ids', 'of_intervention_line_ids.intervention_state')
+    def _compute_intervention_state(self):
+        for line in self:
+            state_done = [True if state == 'done' else False
+                          for state in line.of_intervention_line_ids.mapped('intervention_state')]
+            state_confirm = [True if state in ('draft', 'confirm', 'done') else False
+                             for state in line.of_intervention_line_ids.mapped('intervention_state')]
+            if state_done and all(state_done):
+                line.of_intervention_state = 'done'
+            elif state_confirm and all(state_confirm):
+                line.of_intervention_state = 'confirm'
+            else:
+                line.of_intervention_state = 'todo'
+
+

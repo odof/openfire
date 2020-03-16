@@ -227,7 +227,7 @@
                             <field name="tag_ids" widget="many2many_tags"/>
                         </group>
                         <group col="2" name="planif" string="Planification">
-                            <field name="template_id" attrs="{'readonly': [('number', '!=', False), ('state', 'not in', ('draft', 'cancel'))]}"/>
+                            <field name="template_id" attrs="{'readonly': ['|', ('number', '!=', False), ('state', '!=', 'draft')]}"/>
                             <field name="tache_id" context="{'intervenant_prio_ids': employee_ids}"/>
                             <field name="forcer_dates"/>
                             <label for="date"/>
@@ -269,7 +269,8 @@
                     <notebook>
                         <!-- Description -->
                         <page name="description" string="Description">
-                            <field name="description" nolabel="1" witget="html"
+                            <separator string="Description"/>
+                                <field name="description" nolabel="1" witget="html"
                                 help="Ce champ sera imprimé dans la fiche d'intervention."/>
                             <div class="oe_edit_only" style="margin-top: -20px; padding-top: 0px">
                                 * Les données saisies dans ce champ seront imprimées dans la fiche d'intervention.
@@ -289,6 +290,46 @@
                                     <field name="of_notes_intervention" nolabel="1"
                                         help="Ces notes proviennent du devis / commande sous la rubrique 'Notes intervention'. Ils sont uniquement modifiables dans le  devis / commande (voir la commande associée)."/>
                                 </group>
+                                </group>
+                            </page>
+                            <page name="facturation" string="Facturation">
+                                <field name="lien_commande" invisible="1"/>
+                                <field name="currency_id" invisible="1"/>
+                                <group>
+                                    <group>
+                                        <field name="fiscal_position_id" attrs="{'readonly': [('order_id', '!=', False)]}"/>
+                                    </group>
+                                    <div class="oe_button_box">
+                                        <button name="button_import_order_line" string="Importer"
+                                                type="object"
+                                                attrs="{'invisible': [('order_id','=',False)]}"
+                                                class="oe_right btn-default"/>
+                                        <button name="button_update_lines" string="Mettre à jour"
+                                                type="object"
+                                                attrs="{'invisible': [('order_id','=',False)]}"
+                                                class="oe_right btn-default"/>
+                                    </div>
+                                </group>
+                                <field name="line_ids">
+                                    <tree editable="bottom" colors="blue:order_line_id!=False;">
+                                        <field name="order_line_id" invisible="1"/>
+                                        <field name="product_id" attrs="{'readonly': [('order_line_id', '!=', False)]}"/>
+                                        <field name="name" attrs="{'readonly': [('order_line_id', '!=', False)]}"/>
+                                        <field name="qty"/>
+                                        <field name="price_unit" attrs="{'readonly': [('order_line_id', '!=', False)]}"/>
+                                        <field name="taxe_ids" attrs="{'readonly': [('order_line_id', '!=', False)]}"
+                                               widget="many2many_tags"/>
+                                        <field name="price_subtotal" readonly="1"/>
+                                        <field name="price_total" readonly="1"/>
+                                    </tree>
+                                </field>
+                                <group class="oe_subtotal_footer oe_right" colspan="2" name="intervention_total">
+                                    <field name="price_subtotal" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <field name="price_tax" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                                        <label for="price_total"/>
+                                    </div>
+                                    <field name="price_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                             </group>
                         </page>
                     </notebook>
@@ -386,6 +427,33 @@
         </field>
     </record>
 
+
+<!--##########################################################################################################################-->
+<!--###########################################_Facturation d'intervention_###################################################-->
+<!--##########################################################################################################################-->
+
+<!--###################################################______Vue form______###################################################-->
+
+        <record id="of_planning_intervention_line_view_form" model="ir.ui.view" >
+            <field name="name">of.planning.intervention.line.form</field>
+            <field name="model">of.planning.intervention.line</field>
+            <field name="arch" type="xml" >
+                <form string="Ligne facturable">
+                    <group>
+                        <group>
+                            <field name="order_line_id" invisible="1"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="product_id"/>
+                            <field name="qty"/>
+                            <field name="price_unit"/>
+                        </group>
+                        <separator string="Description" name="s_description"/>
+                        <field name="name" nolabel="1"/>
+                    </group>
+                </form>
+            </field>
+        </record>
 
 <!--##########################################################################################################################-->
 <!--###########################################_________Étiquettes_________###################################################-->
@@ -808,6 +876,31 @@
                                 <field name="sequence_id" colspan="2"/>
                             </group>
                         </page>
+                        <page name="facturation" string="Facturation">
+                            <group>
+                                <group>
+                                    <field name="fiscal_position_id"/>
+                                </group>
+                                <group>
+                                </group>
+                            </group>
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="name"/>
+                                    <field name="qty"/>
+                                    <field name="price_unit"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page name="products" string="Articles supplémentaires">
+                            <field name="product_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="list_price"/>
+                                </tree>
+                            </field>
+                        </page>
                     </notebook>
                 </sheet>
             </form>
@@ -940,6 +1033,7 @@
         <field name="model_id" ref="model_of_planning_intervention"/>
         <field name="state">code</field>
         <field name="code">action = records.create_invoice()</field>
+        <field name="groups">account.group_account_invoice</field>
     </record>
 
     <record id="action_create_invoice_intervention" model="ir.values">
@@ -947,6 +1041,7 @@
         <field name="key2">client_action_multi</field>
         <field name="model">of.planning.intervention</field>
         <field name="value" eval="'ir.actions.server,%d'%action_of_create_invoice_intervention"/>
+        <field name="groups">account.group_account_invoice</field>
     </record>
 
 
@@ -960,10 +1055,22 @@
         <field name="arch" type="xml">
             <xpath expr="/form/sheet/div[@name='button_box']/button[@name='action_view_invoice']" position="after">
                 <button class="oe_stat_button" name="action_view_intervention" type="object" icon="fa-calendar">
-                    <field string="RDVs Tech" name="intervention_count" widget="statinfo"/>
-                </button>
-            </xpath>
-        </field>
+                        <field string="RDVs Tech" name="intervention_count" widget="statinfo"/>
+                    </button>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree/field[@name='qty_invoiced']" position="before">
+                    <field name="of_qty_planifiee" invisible="context.get('hide_sale')" string="Qté(s) réalisée(s)"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form//field[@name='qty_delivered']/parent::node()" position="after">
+                    <label for="of_qty_planifiee" string="Qté(s) réalisée(s)" invisible="context.get('hide_sale')"/>
+                    <div invisible="context.get('hide_sale')">
+                        <field name="of_qty_planifiee" invisible="context.get('hide_sale')"/>
+                    </div>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree" position="inside">
+                    <field name="of_intervention_state"/>
+                </xpath>
+            </field>
     </record>
 
     <!-- Action pour afficher liste d'interventions -->
@@ -974,6 +1081,28 @@
         <field name="view_type">form</field>
         <field name="view_mode">calendar,tree,form,pivot</field>
         <field name="view_id" ref="of_planning_intervention_view_calendar_with_jump"/>
+    </record>
+
+    <record id="of_planning_sale_order_view_search_inherit_sale" model="ir.ui.view">
+        <field name="name">of.planning.sale.order.search.inherit.sale</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.sale_order_view_search_inherit_sale"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[3]" position="after">
+                <filter string="Planification restante" domain="[('of_planned', '=', False)]" name="planned"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_planning_sale_order_line_tree" model="ir.ui.view">
+        <field name="name">of.planning.sale.order.line.tree</field>
+        <field name="model">sale.order.line</field>
+        <field name="inherit_id" ref="of_sale.of_sale_order_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_invoice_policy']" position="after">
+                <field name="of_intervention_state"/>
+            </xpath>
+        </field>
     </record>
 
 </odoo>
