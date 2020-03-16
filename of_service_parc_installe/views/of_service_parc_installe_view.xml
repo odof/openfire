@@ -54,6 +54,7 @@
             <xpath expr="//group[@name='liens']" position="inside">
                 <field name="parc_installe_id" groups="project.group_project_user"/>
             </xpath>
+
         </field>
     </record>
 
