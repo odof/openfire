@@ -66,6 +66,32 @@
                         * Les données saisies dans ce champ seront affichées sous la rubrique 'Notes clients' dans le devis et le planning d'intervention.
                     </div>
                 </xpath>
+
+                <!-- Gestion des numéros de téléphone -->
+                <field name="title" position="replace"/>
+                <field name="type" position="after">
+                    <field name="title" options="{&quot;no_open&quot;: True}" attrs="{'invisible': [('is_company', '=', True)]}"/>
+                </field>
+                <field name="function" position="replace"/>
+                <field name="email" position="replace"/>
+                <field name="phone" position="replace">
+                    <group colspan="4">
+                        <field name="of_phone_number_ids" string="Téléphones" class="of_phone_table">
+                            <tree editable="bottom">
+                                <field name="type" string="Type"/>
+                                <field name="title_id" string="Civilité" options="{'no_open': True}" widget="selection"/>
+                                <field name="number_display" string="Numéro" required="True"/>
+                            </tree>
+                        </field>
+                        <field name="email"/>
+                        <field name="function" placeholder="e.g. Sales Director" attrs="{'invisible': [('is_company','=', True)]}"/>
+                    </group>
+                </field>
+                <field name="mobile" position="replace"/>
+                <field name="fax" position="replace"/>
+                <field name="lang" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
             </field>
         </record>
 
@@ -101,7 +127,7 @@
                     filter_domain="['|',('street','ilike',self),('street2','ilike',self)]"/>
                 <field name="zip"/>
                 <field name="city"/>
-                <field name="phone" filter_domain="['|','|',('phone','ilike',self),('mobile','ilike',self),('fax','ilike',self)]"/>
+                <field name="phone" filter_domain="[('of_phone_number_ids.number', 'ilike', self)]"/>
             </xpath>
             <xpath expr="//field[@name='user_id']" position="attributes">
                 <attribute name="string">Commercial</attribute>
@@ -209,6 +235,18 @@
     <!-- Vue tree par défaut pour les contacts -->
     <record id="contacts.action_contacts_view_kanban" model="ir.actions.act_window.view">
         <field name="sequence" eval="2"/>
+    </record>
+
+    <!-- Civilités - Vue formulaire -->
+    <record id="of_res_partner_title_form_view" model="ir.ui.view">
+        <field name="name">of.res.partner.title.form.view</field>
+        <field name="model">res.partner.title</field>
+        <field name="inherit_id" ref="base.view_partner_title_form"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="of_used_for_phone"/>
+            </field>
+        </field>
     </record>
 
 </odoo>

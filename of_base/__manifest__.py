@@ -22,6 +22,8 @@ Personnalisation des fonctions de base Odoo :
 - API fonction permettant d'afficher un message dans une fenêtre au cours de l'exécution d'une fonction
 - Ajout d'un champ calculé et d'un bouton sur les actions d'envoi de mail pour avoir une pré-visualisation du mail
 - Permet à l'auteur d'un mail de le recevoir en copie (par défaut odoo retire l'expéditeur de la liste des destinataires)
+- Nouvelle gestion des numéros de téléphone des partenaires avec formatage automatique des numéros
+    -> Librairie Python phonenumbers nécessaire, pour installer : pip install phonenumbers
 """,
     'website': "www.openfire.fr",
     'depends': ['product', 'mail', 'contacts'],
@@ -29,7 +31,9 @@ Personnalisation des fonctions de base Odoo :
     'data': [
         'data/report_paperformat.xml',
         'security/of_group_intranet_security.xml',
+        'security/ir.model.access.csv',
         'views/of_base_view.xml',
+        'views/templates.xml',
         'wizard/wizard_change_active_product.xml',
         'wizard/of_popup_wizard_view.xml',
     ],

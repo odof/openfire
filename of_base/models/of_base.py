@@ -13,6 +13,31 @@ from odoo.models import regex_order
 
 _logger = logging.getLogger(__name__)
 
+try:
+    import phonenumbers
+except ImportError:
+    _logger.debug(u"Impossible d'importer la librairie Python 'phonenumbers'.")
+
+PHONE_TYPES = [('01_domicile', u"Domicile"),
+               ('02_bureau', u"Bureau"),
+               ('03_mobile', u"Mobile"),
+               ('04_fax', u"Fax")]
+
+
+def convert_phone_number(value, country_code):
+    try:
+        res_parse = phonenumbers.parse(value, country_code)
+        national_number = str(res_parse.national_number)
+        res_parse = phonenumbers.parse(national_number, country_code)
+        new_value = phonenumbers.format_number(res_parse, phonenumbers.PhoneNumberFormat.E164)
+    except:
+        _logger.error(
+            u"Impossible de formater le numéro de téléphone '%s' au format international avec le code pays '%s'",
+            value, country_code)
+        new_value = value
+    return new_value
+
+
 class IrModelFields(models.Model):
     _inherit = 'ir.model.fields'
 
@@ -223,8 +248,111 @@ class ResUsers(models.Model):
             raise AccessError(u'Seul le compte administrateur peut modifier les informations du compte administrateur.')
         return super(ResUsers, self).write(values)
 
+
 class ResPartner(models.Model):
     _inherit = "res.partner"
+
+    phone = fields.Char(compute='_compute_old_phone_fields', inverse='_set_phone')
+    mobile = fields.Char(compute='_compute_old_phone_fields', inverse='_set_mobile')
+    fax = fields.Char(compute='_compute_old_phone_fields', inverse='_set_fax')
+
+    of_phone_number_ids = fields.One2many(
+        comodel_name='of.res.partner.phone', inverse_name='partner_id', string=u"Numéros de téléphone")
+
+    @api.multi
+    def _compute_old_phone_fields(self):
+        conv_obj = self.env['of.phone.number.converter']
+        for rec in self:
+            phone = rec.of_phone_number_ids.filtered(lambda p: p.type == '01_domicile')
+            if phone:
+                phone = phone[0]
+                phone_number = conv_obj.format(phone.number)
+                if phone_number.get('national'):
+                    rec.phone = phone_number.get('national')
+                else:
+                    rec.phone = phone.number
+            else:
+                phone = rec.of_phone_number_ids.filtered(lambda p: p.type == '02_bureau')
+                if phone:
+                    phone = phone[0]
+                    phone_number = conv_obj.format(phone.number)
+                    if phone_number.get('national'):
+                        rec.phone = phone_number.get('national')
+                    else:
+                        rec.phone = phone.number
+            mobile = rec.of_phone_number_ids.filtered(lambda p: p.type == '03_mobile')
+            if mobile:
+                mobile = mobile[0]
+                phone_number = conv_obj.format(mobile.number)
+                if phone_number.get('national'):
+                    rec.mobile = phone_number.get('national')
+                else:
+                    rec.mobile = mobile.number
+            fax = rec.of_phone_number_ids.filtered(lambda p: p.type == '04_fax')
+            if fax:
+                fax = fax[0]
+                phone_number = conv_obj.format(fax.number)
+                if phone_number.get('national'):
+                    rec.fax = phone_number.get('national')
+                else:
+                    rec.fax = fax.number
+
+    @api.multi
+    def _set_phone(self):
+        for rec in self:
+            country_code = (rec.country_id and rec.country_id.code) or \
+                           (self.env.user.company_id.country_id and self.env.user.company_id.country_id.code) or \
+                           "FR"
+            number = convert_phone_number(rec.phone, country_code)
+            # Ne rien faire si le numéro est déjà présent
+            if rec.of_phone_number_ids.filtered(lambda p: p.number == number):
+                continue
+            else:
+                # On remplace la valeur actuelle s'il y en a une
+                current_phone = rec.of_phone_number_ids.filtered(lambda p: p.type == '01_domicile')
+                if current_phone:
+                    rec.of_phone_number_ids = [(1, current_phone[0].id, {'number': number})]
+                # Sinon on crée le nouveau numéro
+                else:
+                    rec.of_phone_number_ids = [(0, 0, {'number': number, 'type': '01_domicile'})]
+
+    @api.multi
+    def _set_mobile(self):
+        for rec in self:
+            country_code = (rec.country_id and rec.country_id.code) or \
+                           (self.env.user.company_id.country_id and self.env.user.company_id.country_id.code) or \
+                           "FR"
+            number = convert_phone_number(rec.mobile, country_code)
+            # Ne rien faire si le numéro est déjà présent
+            if rec.of_phone_number_ids.filtered(lambda p: p.number == number):
+                continue
+            else:
+                # On remplace la valeur actuelle s'il y en a une
+                current_phone = rec.of_phone_number_ids.filtered(lambda p: p.type == '03_mobile')
+                if current_phone:
+                    rec.of_phone_number_ids = [(1, current_phone[0].id, {'number': number})]
+                # Sinon on crée le nouveau numéro
+                else:
+                    rec.of_phone_number_ids = [(0, 0, {'number': number, 'type': '03_mobile'})]
+
+    @api.multi
+    def _set_fax(self):
+        for rec in self:
+            country_code = (rec.country_id and rec.country_id.code) or \
+                           (self.env.user.company_id.country_id and self.env.user.company_id.country_id.code) or \
+                           "FR"
+            number = convert_phone_number(rec.fax, country_code)
+            # Ne rien faire si le numéro est déjà présent
+            if rec.of_phone_number_ids.filtered(lambda p: p.number == number):
+                continue
+            else:
+                # On remplace la valeur actuelle s'il y en a une
+                current_phone = rec.of_phone_number_ids.filtered(lambda p: p.type == '04_fax')
+                if current_phone:
+                    rec.of_phone_number_ids = [(1, current_phone[0].id, {'number': number})]
+                # Sinon on crée le nouveau numéro
+                else:
+                    rec.of_phone_number_ids = [(0, 0, {'number': number, 'type': '04_fax'})]
 
     # Pour afficher l'adresse au format français par défaut quand le pays n'est pas renseigné et non le format US
     @api.multi
@@ -399,6 +527,109 @@ class ResPartner(models.Model):
                 ('notify_email', '!=', 'none')])._notify_by_email(message, force_send=force_send, send_after_commit=send_after_commit, user_signature=user_signature)
         return super(ResPartner, self)._notify(message, force_send, send_after_commit, user_signature)
 
+
+class OFResPartnerPhone(models.Model):
+    _name = 'of.res.partner.phone'
+    _order = 'type,id'
+
+    partner_id = fields.Many2one(comodel_name='res.partner', string=u"Partenaire", index=True, ondelete='cascade')
+    number = fields.Char(string="Numéro")
+    number_display = fields.Char(
+        string="Numéro au format national", compute="_get_number_display", inverse="_set_number_display")
+    type = fields.Selection(selection=PHONE_TYPES, string="Type de numéro", required=True)
+    title_id = fields.Many2one(
+        comodel_name="res.partner.title", string="Civilité du numéro", domain="[('of_used_for_phone', '=', True)]")
+
+    @api.multi
+    def _get_number_display(self):
+        conv_obj = self.env['of.phone.number.converter']
+        for rec in self:
+            phone_number = conv_obj.format(rec.number)
+            if phone_number.get('national'):
+                rec.number_display = phone_number.get('national')
+            else:
+                rec.number_display = rec.number
+
+    @api.multi
+    def _set_number_display(self):
+        for rec in self:
+            country_code = (rec.partner_id.country_id and rec.partner_id.country_id.code) or \
+                           (self.env.user.company_id.country_id and self.env.user.company_id.country_id.code) or \
+                           "FR"
+            rec.number = convert_phone_number(rec.number_display, country_code)
+
+    @api.model_cr_context
+    def _auto_init(self):
+        """
+        Recover old phone numbers
+        """
+        cr = self._cr
+        cr.execute("SELECT * FROM information_schema.tables WHERE table_name = '%s'" % (self._table,))
+        exists = bool(cr.fetchall())
+        res = super(OFResPartnerPhone, self)._auto_init()
+        if not exists:
+            partner_ids = self.env['res.partner'].search([])
+            for partner_id in partner_ids:
+                phone_number_ids = []
+                cr.execute("""  SELECT  phone
+                                ,       mobile
+                                ,       fax
+                                FROM    res_partner
+                                WHERE   id          = %s""" % partner_id.id)
+                result = cr.fetchone()
+                phone = result[0]
+                mobile = result[1]
+                fax = result[2]
+                if phone:
+                    number = convert_phone_number(phone, partner_id.country_id and partner_id.country_id.code or "FR")
+                    phone_number_ids.append((0, 0, {'number': number, 'type': '01_domicile'}))
+                if mobile:
+                    number = convert_phone_number(mobile, partner_id.country_id and partner_id.country_id.code or "FR")
+                    phone_number_ids.append((0, 0, {'number': number, 'type': '03_mobile'}))
+                if fax:
+                    number = convert_phone_number(fax, partner_id.country_id and partner_id.country_id.code or "FR")
+                    phone_number_ids.append((0, 0, {'number': number, 'type': '04_fax'}))
+                partner_id.write({'of_phone_number_ids': phone_number_ids})
+        return res
+
+    @api.model
+    def create(self, vals):
+        if vals.get('number', False):
+            partner_id = vals.get('partner_id', False)
+            if partner_id:
+                partner = self.env['res.partner'].browse(partner_id)
+                country_code = (partner.country_id and partner.country_id.code) or \
+                    (self.env.user.company_id.country_id and self.env.user.company_id.country_id.code) or \
+                    "FR"
+            vals['number'] = convert_phone_number(vals.get('number'), country_code)
+        return super(OFResPartnerPhone, self).create(vals)
+
+    @api.multi
+    def write(self, vals):
+        if vals.get('number', False):
+            partner = self[0].partner_id
+            country_code = (partner.country_id and partner.country_id.code) or \
+                (self.env.user.company_id.country_id and self.env.user.company_id.country_id.code) or \
+                "FR"
+            vals['number'] = convert_phone_number(vals.get('number'), country_code)
+        return super(OFResPartnerPhone, self).write(vals)
+
+    @api.model
+    def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
+        if args and len(args) == 1 and args[0][0] == 'number':
+            if args[0][2] and args[0][2][0] == '0':
+                args = [(args[0][0], args[0][1], args[0][2] and args[0][2][1:].replace(" ", "") or '')]
+
+        return super(OFResPartnerPhone, self)._search(args, offset=offset, limit=limit, order=order,
+                                                      count=count, access_rights_uid=access_rights_uid)
+
+
+class ResPartnerTitle(models.Model):
+    _inherit = 'res.partner.title'
+
+    of_used_for_phone = fields.Boolean(string="Utilisée pour les numéros de téléphone", default=True)
+
+
 class Module(models.Model):
     _inherit = 'ir.module.module'
 
@@ -551,3 +782,34 @@ class BaseConfigSettings(models.TransientModel):
     @api.multi
     def set_of_affichage_ville_defaults(self):
         return self.env['ir.values'].sudo().set_default('base.config.settings', 'of_affichage_ville', self.of_affichage_ville)
+
+
+class OFPhoneNumberConverter(models.TransientModel):
+    _name = 'of.phone.number.converter'
+
+    @api.model
+    def format(self, value):
+        try:
+            phone_number = phonenumbers.parse(value)
+            if phone_number:
+                return {
+                    'e164': phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164),
+                    'international': phonenumbers.format_number(
+                        phone_number, phonenumbers.PhoneNumberFormat.INTERNATIONAL),
+                    'national': phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.NATIONAL),
+                }
+            else:
+                return {
+                    'e164': None,
+                    'international': None,
+                    'national': None,
+                }
+        except:
+            return {
+                'e164': None,
+                'international': None,
+                'national': None,
+            }
+
+
+OFPhoneNumberConverter()

@@ -1,32 +1,17 @@
 # -*- coding: utf-8 -*-
 
 import logging
-_logger = logging.getLogger(__name__)
 from odoo.exceptions import UserError
 from datetime import datetime, timedelta
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT
-
 from odoo import api, fields, models
 import re
 import requests
 from HTMLParser import HTMLParser
 import urllib
+from odoo.addons.of_base.models.of_base import convert_phone_number
 
-
-# Fonction qui convertit un no de tél au format international e.164 (+33...)
-def format_tel_e164(mobile="", country_id=False):
-    """Tries to convert a local number to e.164 format based on the partners country, don't change if already in e164 format"""
-    if mobile:
-        if country_id and country_id.phone_code:
-            if mobile.startswith("0"):
-                mobile = "+" + str(country_id.phone_code) + mobile[1:].replace(" ","")
-            elif mobile.startswith("+"):
-                mobile = mobile.replace(" ","")
-            else:
-                mobile = "+" + str(country_id.phone_code) + mobile.replace(" ","")
-        else:
-            mobile = mobile.replace(" ","")
-    return mobile
+_logger = logging.getLogger(__name__)
 
 
 class OFSmsTemplate(models.Model):
@@ -164,7 +149,10 @@ class OFSmsMessage(models.Model):
             queued_sms.status_code = my_sms.delivary_state
 
             # Record the message in the communication log (RSE)
-            self.env[queued_sms.model_id.model].browse(queued_sms.record_id).message_post(body=queued_sms.sms_content.encode('utf-8'), subject="SMS")
+            self.env[queued_sms.model_id.model].browse(queued_sms.record_id).message_post(
+                body=u"SMS envoyé au %s :<br/><br/>%s" %
+                     (queued_sms.to_mobile, queued_sms.sms_content.replace(u"\n", u"<br/>").encode('utf-8')),
+                subject="SMS")
 
 
 class OFSmsCompose(models.Model):
@@ -218,7 +206,12 @@ class OFSmsCompose(models.Model):
                 })
 
             sms_subtype = self.env['ir.model.data'].get_object('of_sms', 'of_sms_subtype')
-            self.env[self.model].search([('id','=', self.record_id)]).message_post(body=self.sms_content, subject="SMS Sent", message_type="comment", subtype_id=sms_subtype.id, attachments=[])
+            self.env[self.model].search([('id', '=', self.record_id)]).message_post(
+                body=u"SMS envoyé au %s :<br/><br/>%s" % (self.to_number, self.sms_content.replace(u"\n", u"<br/>")),
+                subject="SMS Sent",
+                message_type="comment",
+                subtype_id=sms_subtype.id,
+                attachments=[])
 
             return True
         else:
@@ -263,11 +256,38 @@ class OFSmsCompose(models.Model):
 
             sms_subtype = self.env['ir.model.data'].get_object('of_sms', 'of_sms_subtype')
 
-            self.env[self.model].search([('id','=',self.record_id)]).message_post(body=self.sms_content, subject="SMS Sent", message_type="comment", subtype_id=sms_subtype.id, attachments=[])
+            self.env[self.model].search([('id', '=', self.record_id)]).message_post(
+                body=u"SMS envoyé au %s :<br/><br/>%s" % (self.to_number, self.sms_content.replace(u"\n", u"<br/>")),
+                subject="SMS Sent",
+                message_type="comment",
+                subtype_id=sms_subtype.id,
+                attachments=[])
 
 
 class ResPartnerSms(models.Model):
     _inherit = "res.partner"
+
+    @api.multi
+    def get_mobile_numbers(self):
+        self.ensure_one()
+        conv_obj = self.env['of.phone.number.converter']
+        mobile_numbers = []
+        for mobile in self.of_phone_number_ids.filtered(lambda p: p.type == '03_mobile'):
+            phone_number = conv_obj.format(mobile.number)
+            if phone_number.get('e164'):
+                mobile_numbers.append(phone_number.get('e164'))
+            # On teste si on peut extraire un numéro de téléphone valide de la chaine de caractères
+            else:
+                number_digit = filter(lambda c: c.isdigit(), mobile.number)
+                if len(number_digit) >= 10:
+                    number_digit = number_digit[0:10]
+                    country_code = (self.country_id and self.country_id.code) or \
+                        (self.env.user.company_id.country_id and self.env.user.company_id.country_id.code) or \
+                        "FR"
+                    phone_number = conv_obj.format(convert_phone_number(number_digit, country_code))
+                    if phone_number.get('e164'):
+                        mobile_numbers.append(phone_number.get('e164'))
+        return mobile_numbers
 
     # Appel par l'action "Envoyer SMS" dans vue partenaires
     @api.multi
@@ -277,22 +297,22 @@ class ResPartnerSms(models.Model):
         if default_mobile:
             default_mobile = default_mobile[0]
         else:
-            raise UserError(u"Erreur ! (#ED100)\n\nAucun émetteur SMS trouvé. Les émetteurs se configurent dans le menu Configuration/Technique/(OF) SMS.")
-        return {
-            'name': u'Rédaction SMS',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'of.sms.compose',
-            'target': 'new',
-            'type': 'ir.actions.act_window',
-            'context': {'default_from_mobile_id': default_mobile.id,'default_to_number':self.mobile, 'default_record_id':self.id,'default_model':'res.partner'}
-        }
-
-    @api.onchange('country_id','mobile')
-    def _onchange_mobile(self):
-        """Conversion du no de tél. mobile au format international e.164 (+33...)"""
-        if self.mobile:
-            self.mobile = format_tel_e164(self.mobile, self.country_id)
+            raise UserError(u"Erreur ! (#ED100)\n\nAucun émetteur SMS trouvé. Les émetteurs se configurent dans le "
+                            u"menu Configuration/SMS/Comptes émetteurs.")
+        mobile_numbers = self.get_mobile_numbers()
+        if mobile_numbers:
+            return {
+                'name': u'Rédaction SMS',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'of.sms.compose',
+                'target': 'new',
+                'type': 'ir.actions.act_window',
+                'context': {'default_from_mobile_id': default_mobile.id, 'default_to_number': ','.join(mobile_numbers),
+                            'default_record_id': self.id, 'default_model': 'res.partner'}
+            }
+        else:
+            raise UserError(u"Aucun numéro de mobile valide n'est défini pour ce partenaire !")
 
 
 class CRMLead(models.Model):
@@ -302,16 +322,83 @@ class CRMLead(models.Model):
     @api.multi
     def sms_action(self):
         self.ensure_one()
-        default_mobile = self.env['of.sms.number'].search([])[0]
-        return {
-            'name': u'Rédaction SMS',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'of.sms.compose',
-            'target': 'new',
-            'type': 'ir.actions.act_window',
-            'context': {'default_from_mobile_id': default_mobile.id,'default_to_number':self.mobile, 'default_record_id':self.id,'default_model':'crm.lead'}
-        }
+        default_mobile = self.env['of.sms.number'].search([])
+        if default_mobile:
+            default_mobile = default_mobile[0]
+        else:
+            raise UserError(u"Erreur ! (#ED100)\n\nAucun émetteur SMS trouvé. Les émetteurs se configurent dans le "
+                            u"menu Configuration/SMS/Comptes émetteurs.")
+        mobile_numbers = self.partner_id.get_mobile_numbers()
+        if mobile_numbers:
+            return {
+                'name': u'Rédaction SMS',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'of.sms.compose',
+                'target': 'new',
+                'type': 'ir.actions.act_window',
+                'context': {'default_from_mobile_id': default_mobile.id, 'default_to_number': ','.join(mobile_numbers),
+                            'default_record_id': self.id, 'default_model': 'crm.lead'}
+            }
+        else:
+            raise UserError(u"Aucun numéro de mobile valide n'est défini pour ce partenaire !")
+
+
+class SaleOrder(models.Model):
+    _inherit = 'sale.order'
+
+    @api.multi
+    def sms_action(self):
+        self.ensure_one()
+        default_mobile = self.env['of.sms.number'].search([])
+        if default_mobile:
+            default_mobile = default_mobile[0]
+        else:
+            raise UserError(u"Erreur ! (#ED100)\n\nAucun émetteur SMS trouvé. Les émetteurs se configurent dans le "
+                            u"menu Configuration/SMS/Comptes émetteurs.")
+        mobile_numbers = self.partner_id.get_mobile_numbers()
+        if mobile_numbers:
+            return {
+                'name': u'Rédaction SMS',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'of.sms.compose',
+                'target': 'new',
+                'type': 'ir.actions.act_window',
+                'context': {'default_from_mobile_id': default_mobile.id, 'default_to_number': ','.join(mobile_numbers),
+                            'default_record_id': self.id, 'default_model': 'sale.order'}
+            }
+        else:
+            raise UserError(u"Aucun numéro de mobile valide n'est défini pour ce client !")
+
+
+class AccountInvoice(models.Model):
+    _inherit = 'account.invoice'
+
+    @api.multi
+    def sms_action(self):
+        self.ensure_one()
+        default_mobile = self.env['of.sms.number'].search([])
+        if default_mobile:
+            default_mobile = default_mobile[0]
+        else:
+            raise UserError(u"Erreur ! (#ED100)\n\nAucun émetteur SMS trouvé. Les émetteurs se configurent dans le "
+                            u"menu Configuration/SMS/Comptes émetteurs.")
+        mobile_numbers = self.partner_id.get_mobile_numbers()
+        if mobile_numbers:
+            return {
+                'name': u'Rédaction SMS',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'of.sms.compose',
+                'target': 'new',
+                'type': 'ir.actions.act_window',
+                'context': {'default_from_mobile_id': default_mobile.id, 'default_to_number': ','.join(mobile_numbers),
+                            'default_record_id': self.id, 'default_model': 'account.invoice'}
+            }
+        else:
+            raise UserError(u"Aucun numéro de mobile valide n'est défini pour ce partenaire !")
+
 
 class sms_response():
      delivary_state = ""
@@ -343,7 +430,7 @@ class OFSMSGatewayOVH(models.Model):
         format_from = from_number
         if u" " in format_from: format_from = format_from.replace(u" ", u"")
         # Format the to number before sending
-        format_to = re.sub('[^\+0-9]', "", to_number)
+        format_to = re.sub('[^\+,0-9]', "", to_number)
         if u"+" in format_to: format_to = format_to.replace(u"+", u"00")
 
         gateway = self.env["of.sms.gateway.ovh"].search([])[0]
@@ -503,7 +590,8 @@ class OFPlanningIntervention(models.Model):
                             country_id =  country_id_defaut
                         else:
                             country_id = employe.address_id.country_id
-                        mobile_partners_to.append(format_tel_e164(employe.mobile_phone, country_id))
+                        mobile_partners_to.append(
+                            convert_phone_number(employe.mobile_phone, country_id and country_id.code or "FR"))
                 # Si aucun no de portable renseigné, on passe à l'équipe suivante.
                 if not mobile_partners_to:
                     continue
@@ -547,11 +635,7 @@ class OFPlanningIntervention(models.Model):
             for intervention in interventions:
                 # On récupère le no de mobile du destinataire.
                 # Si le pays n'est pas renseigné dans l'adresse du client, on met la France par défaut.
-                if not intervention.address_id.country_id:
-                    country_id = country_id_defaut
-                else:
-                    country_id = intervention.address_id.country_id
-                mobile_partner_to = format_tel_e164(intervention.address_id.mobile, country_id)
+                mobile_partner_to = intervention.address_id.get_mobile_numbers()
                 if not mobile_partner_to:
                     continue
 
