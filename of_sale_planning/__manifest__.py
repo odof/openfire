@@ -24,16 +24,18 @@
 Module OpenFire / Ventes - planning
 ===================================
 
-Module de lien entre of_sale et of_planning :
-    - Ajoute la gestion estimative des temps de pose pour les devis/commandes
-
+Module de lien entre of_sale et of_planning permettant la facturation sur quantités plafiniées depuis une commande.
+    - Ajoute la gestion estimative des temps de pose pour les devis/commandes.
 """,
     'depends': [
         'of_sale',
+        'of_planning',
         'of_sale_report',
         'of_sale_quote_template_kit',
-        'of_planning',
-    ],
+        ],
+    'external_dependancies': {
+        'python': ['pdfminer', 'pypdftk', 'pyPdf'],
+    },
     'data': [
         'views/of_sale_planning_views.xml',
     ],

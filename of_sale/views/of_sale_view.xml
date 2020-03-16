@@ -24,6 +24,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//filter[3]" position="after">
                     <filter string="À facturer entièrement" domain="[('of_to_invoice','=',True)]"/>
+                    <filter string="Livraison restante" domain="[('of_delivered', '=', False)]" name="delivered"/>
                 </xpath>
             </field>
         </record>
@@ -55,6 +56,7 @@
                 </field>
                 <xpath expr="//group[@name='sale_pay']" position="inside">
                     <field name="of_invoice_policy" groups="account.group_account_invoice"/>
+                    <field name="of_invoice_date_prev" attrs="{'readonly': [('of_invoice_policy', '!=', 'order')]}"/>
                 </xpath>
                 <field name="fiscal_position_id" position="attributes">
                     <attribute name="domain">[('tax_ids.tax_src_id.type_tax_use', '=', 'sale')]</attribute>
@@ -88,6 +90,28 @@
                 <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="before">
                     <field name="of_price_unit_ht" string="Prix unitaire HT"
                       attrs="{'invisible': [('of_price_unit_ht', '=', '_field_price_unit')]}"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form/group/group[2]" position="inside">
+                    <field name="of_invoice_policy" groups="sales_team.group_sale_manager"/>
+                    <field name="of_invoice_date_prev" groups="sales_team.group_sale_manager"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='product_uom_qty']" position="attributes">
+                    <attribute name="string">Qté(s) commandée(s)</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form//label[1]" position="attributes">
+                    <attribute name="string">Qté(s) commandée(s)</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='qty_delivered']" position="attributes">
+                    <attribute name="string">Qté(s) livrée(s)</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form//label[2]" position="attributes">
+                    <attribute name="string">Qté(s) livrée(s)</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='qty_invoiced']" position="attributes">
+                    <attribute name="string">Qté(s) facturée(s)</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form//label[3]" position="attributes">
+                    <attribute name="string">Qté(s) facturée(s)</attribute>
                 </xpath>
                 <!-- Ajout onglet Notes : client, facture, intervention -->
                 <xpath expr="//notebook" position="inside">
@@ -535,5 +559,47 @@ Tous les articles seront considérés comme disponibles et marqués comme livré
         </field>
     </record>
 
+    <record id="of_sale_order_line_pivot" model="ir.ui.view">
+        <field name="name">of.sale.order.line.pivot</field>
+        <field name="model">sale.order.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Lignes à facturer" disable_linking="True">
+                <field name="salesman_id" type="col"/>
+                <field name="of_confirmation_date" interval="month" type="row"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="of_sale_order_line_tree" model="ir.ui.view">
+        <field name="name">of.sale.order.line.tree</field>
+        <field name="model">sale.order.line</field>
+        <field name="arch" type="xml">
+            <tree string="Lignes de commande" >
+                <field name="order_id"/>
+                <field name="order_partner_id"/>
+                <field name="of_confirmation_date"/>
+                <field name="product_id"/>
+                <field name="product_uom_qty" string="Qté(s) commandée(s)"/>
+                <field name="qty_delivered" string="Qté(s) livrée(s)"/>
+                <field name="qty_invoiced" string="Qté(s) facturée(s)"/>
+                <field name="price_subtotal"/>
+                <field name="of_invoice_policy"/>
+                <field name="invoice_status"/>
+                <field name="of_invoice_date_prev"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_sale_order_line_tree_all" model="ir.actions.act_window">
+        <field name="name">Lignes à facturer</field>
+        <field name="res_model">sale.order.line</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,pivot</field>
+        <field name="view_id" ref="of_sale_order_line_tree" />
+        <field name="domain">[('order_id.state', '=', 'sale'), ('invoice_status', '!=', 'invoiced')]</field>
+    </record>
+
+    <menuitem id="menu_sale_order_line_test" parent="sale.menu_sale_invoicing" action="action_sale_order_line_tree_all"
+              sequence="30"/>
 
 </odoo>
