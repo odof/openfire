@@ -14,6 +14,7 @@ class OfService(models.Model):
     parc_installe_site_adresse_id = fields.Many2one('res.partner', string=u"Adresse de pose", related="parc_installe_id.site_adresse_id", readonly=True)
     parc_installe_note = fields.Text(string=u"Note", related="parc_installe_id.note", readonly=True)
     sav_id = fields.Many2one("project.issue", string="SAV", domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', address_id)]")
+    notes_suiv = fields.Text(string="Notes de prochaine intervention")
 
     @api.onchange('address_id')
     def _onchange_address_id(self):
@@ -41,6 +42,18 @@ class OfPlanningIntervention(models.Model):
 
     parc_installe_id = fields.Many2one('of.parc.installe', string=u"Parc installé",
         domain="['|', '|', ('client_id', '=', partner_id), ('client_id', '=', address_id), ('site_adresse_id', '=', address_id)]")
+    notes_suiv = fields.Text(string="Notes de prochaine intervention")
+
+    @api.onchange('service_id')
+    def _onchange_service_id(self):
+        super(OfPlanningIntervention, self)._onchange_service_id()
+        if self.service_id and not self.parc_installe_id.notes_suiv:
+            self.notes_suiv = self.service_id.notes_suiv
+
+    @api.onchange('parc_installe_id')
+    def _onchange_parc_installe_id(self):
+        if self.parc_installe_id:
+            self.notes_suiv = self.parc_installe_id.notes_suiv
 
     @api.multi
     def button_open_of_planning_intervention(self):
@@ -57,11 +70,27 @@ class OfPlanningIntervention(models.Model):
     @api.model
     def create(self, vals):
         service_obj = self.env['of.service']
+        parc_obj = self.env['of.parc.installe']
         service = vals.get('service_id') and service_obj.browse(vals['service_id'])
+        parc = False
         if service:
-            vals['parc_installe_id'] = service.parc_installe_id and service.parc_installe_id.id
+            parc = service.parc_installe_id
+            vals['parc_installe_id'] = parc and parc.id
+            vals['notes_suiv'] = service.notes_suiv
+        parc = not parc and vals.get('parc_installe_id') and parc_obj.browse(vals['parc_installe_id'])
+        if parc and parc.notes_suiv:
+            vals['notes_suiv'] = parc.notes_suiv
         return super(OfPlanningIntervention, self).create(vals)
 
+    @api.multi
+    def write(self, vals):
+        res = super(OfPlanningIntervention, self).write(vals)
+        if self.state == "done":
+            if self.parc_installe_id:
+                self.parc_installe_id.write({'notes_suiv': self.notes_suiv})
+            if self.service_id:
+                self.service_id.write({'notes_suiv': self.notes_suiv})
+        return res
 
 class OfParcInstalle(models.Model):
     _inherit = "of.parc.installe"
@@ -69,6 +98,7 @@ class OfParcInstalle(models.Model):
     intervention_ids = fields.One2many('of.planning.intervention', 'parc_installe_id', string="Interventions")
     service_count = fields.Integer(compute="_get_service_count")
     a_programmer_count = fields.Integer(compute="_get_service_count")
+    notes_suiv = fields.Text(string="Notes de prochaine intervention")
 
     @api.multi
     def _get_service_count(self):
@@ -131,6 +161,17 @@ class OfParcInstalle(models.Model):
         }
         return action
 
+    @api.multi
+    def historique(self, intervention):
+        """
+        :param intervention: Intervention de départ
+        :return: Renvoi les 3 interventions précédent celle envoyée en paramètre.
+        """
+        self.ensure_one()
+        return self.env['of.planning.intervention'].search([
+            ('id', 'in', self.intervention_ids.ids),
+            ('date', '<', intervention.date)
+            ], order="date DESC", limit=3)
 
 class ProjectIssue(models.Model):
     _inherit = 'project.issue'
