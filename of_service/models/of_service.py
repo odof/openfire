@@ -22,12 +22,6 @@ class OfService(models.Model):
     @api.model_cr_context
     def _auto_init(self):
         cr = self._cr
-        # Interdiction pour les interventions d'avoir une durée nulle: on passe la durée à 1 et l'état à 'annulé'
-        # on pourra supprimer ce code une fois que toutes les bases seront passées en branche planning
-        # en pensant bien à le répercuter sur of_migration ;) ;)
-        cr.execute("UPDATE of_service SET duree = 1, base_state = 'cancel'"
-                   "WHERE duree = 0")
-
         # Lors de la 1ère mise à jour après la refonte des planning (sept. 2019), on migre les données existantes.
         cr.execute("SELECT 1 FROM information_schema.columns WHERE table_name = 'of_service' AND column_name = 'recurrence'")
         existe_avant = bool(cr.fetchall())
@@ -38,6 +32,14 @@ class OfService(models.Model):
         date_fin_contrat_avant = bool(cr.fetchall())
         ### */
         res = super(OfService, self)._auto_init()
+
+        # Interdiction pour les interventions d'avoir une durée nulle: on passe la durée à 1 et l'état à 'annulé'
+        # on pourra supprimer ce code une fois que toutes les bases seront passées en branche planning
+        # en pensant bien à le répercuter sur of_migration ;) ;)
+        cr.execute("UPDATE of_service SET duree = 1, base_state = 'cancel'"
+                   "WHERE duree = 0")
+
+
         cr.execute("SELECT 1 FROM information_schema.columns WHERE table_name = 'of_service' AND column_name = 'recurrence'")
         existe_apres = bool(cr.fetchall())
         # Si le champ recurrence n'existe pas avant et l'est après la mise à jour,
