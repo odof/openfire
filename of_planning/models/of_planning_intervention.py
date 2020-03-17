@@ -342,9 +342,6 @@ class OfPlanningIntervention(models.Model):
                     _(u'Aucun des intervenants sélectionnés ne peut réaliser cette tâche'))
 
     _sql_constraints = [
-        ('dates_forcees_constraint',
-         'CHECK ( date < date_deadline )',
-         _(u"La date de début doit être antérieure ou égale à celle de fin")),
         ('duree_non_nulle_constraint',
          'CHECK ( duree != 0 )',
          _(u'La durée du RDV d\'intervention ne peut pas être nulle!')),
