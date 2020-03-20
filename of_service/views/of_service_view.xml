@@ -6,6 +6,9 @@
 <!--###################################################______Service______####################################################-->
 <!--##########################################################################################################################-->
 
+    <!-- Recalcul de la date de prochaine intervention lors du passage aux nouveaux plannings. -->
+    <function model="of.service" name="function_set_date_next" />
+
 <!-- ### Services récurrents et ponctuels -->
 
         <record id="view_of_service_form" model="ir.ui.view">

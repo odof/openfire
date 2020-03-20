@@ -36,9 +36,8 @@ class OfService(models.Model):
         # Interdiction pour les interventions d'avoir une durée nulle: on passe la durée à 1 et l'état à 'annulé'
         # on pourra supprimer ce code une fois que toutes les bases seront passées en branche planning
         # en pensant bien à le répercuter sur of_migration ;) ;)
-        cr.execute("UPDATE of_service SET duree = 1, base_state = 'cancel'"
+        cr.execute("UPDATE of_service SET duree = 1, base_state = 'cancel' "
                    "WHERE duree = 0")
-
 
         cr.execute("SELECT 1 FROM information_schema.columns WHERE table_name = 'of_service' AND column_name = 'recurrence'")
         existe_apres = bool(cr.fetchall())
@@ -52,25 +51,50 @@ class OfService(models.Model):
                        "WHERE of_service.tache_id = of_planning_tache.id")
             # On met le champ base_state à "calculated" quand state est différent de "cancel".
             cr.execute("UPDATE of_service SET base_state = 'calculated'")
-            services = self.env['of.service'].search([])
-            services = services.filtered(lambda s: s.date_last and (not s.date_next or fields.Date.from_string(s.date_last) >= fields.Date.from_string(s.date_next)))
-            for service in services:
-                service.date_next = service.get_next_date(service.date_last)
-        # /* modifications champs date_next, date_next_fin, date_fin, date_fin_contrat
-        # à retirer dans quelques semaines
-        cr.execute("SELECT 1 FROM information_schema.columns WHERE table_name = 'of_service' AND column_name = 'date_fin_contrat'")
-        date_fin_contrat_apres = bool(cr.fetchall())
-        if not date_fin_contrat_avant and date_fin_contrat_apres: # mettre à jour les champs
+
+            # On demande la mise à jour du champ date_next des services
+            cr.execute("INSERT INTO ir_config_parameter(key,value) "
+                       "VALUES ('of_service_compute_date_next', 'include_date_fin')")
+        return res
+
+    @api.model
+    def function_set_date_next(self):
+        cr = self._cr
+        cr.execute("SELECT value FROM ir_config_parameter WHERE key = 'of_service_compute_date_next'")
+        values = cr.fetchall()
+        if not values:
+            return
+        cr.execute("DELETE FROM ir_config_parameter WHERE key = 'of_service_compute_date_next'")
+        include_date_fin = values[0][0] == 'include_date_fin'
+
+        all_services = self.search([])
+        services = all_services.filtered(
+            lambda s: (s.recurrence
+                       and s.date_last
+                       and (not s.date_next
+                            or fields.Date.from_string(s.date_last) >= fields.Date.from_string(s.date_next))))
+
+        if include_date_fin:
             # On peuple le champ date_fin_contrat des services recurrents avec le champ date_fin
             cr.execute("UPDATE of_service "
                        "SET date_fin_contrat = date_fin "
                        "WHERE recurrence = 't'")
-            # puis on recalcul date_fin pour les services recurrents
-            cr.execute("UPDATE of_service "
-                       "SET date_fin = (date_next + interval '1 month' - interval '1 day') "
-                       "WHERE recurrence = 't'")
-        ### */
-        return res
+
+        for service in services:
+            date_next = service.get_next_date(service.date_last)
+            if include_date_fin:
+                cr.execute("UPDATE of_service "
+                           "SET date_fin = (%s::date + interval '1 month' - interval '1 day'), "
+                           "    date_next = %s "
+                           "WHERE recurrence = 't' AND id = %s", (date_next, date_next, service.id))
+            else:
+                cr.execute("UPDATE of_service "
+                           "SET date_next = %s "
+                           "WHERE recurrence = 't' AND id = %s "
+                           "  AND date_fin >= %s", (date_next, service.id, date_next))
+
+        # with_context pour bien récupérer les données en DB
+        all_services.with_context(vide_cache=True)._compute_state_poncrec()
 
     @api.constrains('date_next', 'date_fin')
     def check_alert_dates(self):
@@ -312,7 +336,7 @@ class OfService(models.Model):
                             required=True)
     date_next_last = fields.Date('Prochaine planif (svg)', help=u"Champ pour conserver une possibilité de rollback")
     date_fin = fields.Date(string=u"Date de fin de planification",
-                           help=u"Date à partir de laquelle l'intervention devient en retard de planifiaction")
+                           help=u"Date à partir de laquelle l'intervention devient en retard de planification")
     date_fin_contrat = fields.Date(u"Date de fin de contrat")
 
     # Partner-related fields
@@ -394,9 +418,9 @@ class OfService(models.Model):
 
     @api.depends('date_next', 'date_fin')
     def _compute_alert_dates(self):
-        for intervention in self:
-            intervention.alert_dates = intervention.date_next and intervention.date_fin \
-                                       and intervention.date_next > intervention.date_fin
+        for service in self:
+            service.alert_dates = service.date_next and service.date_fin \
+                                  and service.date_next > service.date_fin
 
     @api.multi
     @api.depends('address_id', 'partner_id', 'tache_id')
