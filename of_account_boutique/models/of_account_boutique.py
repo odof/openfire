@@ -3,6 +3,7 @@
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 
+
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
@@ -14,43 +15,32 @@ class AccountInvoice(models.Model):
 
     of_boutique = fields.Boolean(string="Est une vente en boutique", default=False)
     of_procurement_group_id = fields.Many2one('procurement.group', 'Procurement Group', copy=False)
-    of_picking_ids = fields.Many2many('stock.picking', compute='_compute_picking_ids')
-    of_picking_count = fields.Integer(string="Bon de livraisons", compute='_compute_picking_ids')
     of_warehouse_id = fields.Many2one('stock.warehouse', string=u"Entrepôt", default=lambda s: s._default_warehouse_id())
     of_route_id = fields.Many2one('stock.location.route', string="Route")
 
     @api.multi
-    @api.depends('of_procurement_group_id')
-    def _compute_picking_ids(self):
+    @api.depends('invoice_line_ids', 'invoice_line_ids.sale_line_ids', 'invoice_line_ids.sale_line_ids.order_id',
+                 'invoice_line_ids.sale_line_ids.order_id.picking_ids', 'of_procurement_group_id')
+    def _compute_of_picking_ids(self):
         """
         Calcule le nombre de BL liés à la facture.
         :return:
         """
         for invoice in self:
-            invoice.of_picking_ids = self.env['stock.picking'].search(
-                    [('group_id', '=', invoice.of_procurement_group_id.id)]) if invoice.of_procurement_group_id else []
+            pickings = invoice.of_sale_order_ids.mapped('picking_ids')
+            invoice.of_picking_ids = pickings
+            if invoice.of_procurement_group_id:
+                invoice.of_picking_ids |= self.env['stock.picking'].search(
+                                            [('group_id', '=', invoice.of_procurement_group_id.id)])
             invoice.of_picking_count = len(invoice.of_picking_ids)
-
-    @api.multi
-    def action_view_delivery(self):
-        """
-        Afficher les BL liés à la facture
-        :return:
-        """
-        action = self.env.ref('stock.action_picking_tree_all').read()[0]
-
-        pickings = self.mapped('of_picking_ids')
-        if len(pickings) > 1:
-            action['domain'] = [('id', 'in', pickings.ids)]
-        elif pickings:
-            action['views'] = [(self.env.ref('stock.view_picking_form').id, 'form')]
-            action['res_id'] = pickings.id
-        return action
+            invoice.of_waiting_delivery = invoice.of_picking_ids\
+                                                 .filtered(lambda p: p.state not in ['draft', 'cancel', 'done'])\
+                                                 and True or False
 
     def _prepare_procurement_group(self):
         return {
             'name': self.move_name,
-            'partner_id': self.partner_shipping_id and self.partner_shipping_id.id or\
+            'partner_id': self.partner_shipping_id and self.partner_shipping_id.id or
                           self.partner_id.id
         }
 
@@ -60,16 +50,24 @@ class AccountInvoice(models.Model):
         Surcharge de la fonction pour générer et valider un BL lors de vente en boutique
         :return:
         """
+        transfer_obj = self.env['stock.immediate.transfer']
         res = super(AccountInvoice, self).action_invoice_open()
-        if self.of_boutique:
-            if not self.partner_id.property_stock_customer:
+        for inv in self:
+            if not inv.of_boutique:
+                continue
+            if inv.of_picking_ids:
+                # On vérifie qu'il n'y a pas d'autres BL sinon ça valide deux fois la sortie
+                # Si jamais il faut valider TOUS les BL il y a un bouton pour ça
+                continue
+            if not inv.partner_id.property_stock_customer:
                 raise UserError(u"""Votre client n'a pas d'emplacement lié.\n"""
-                                u"""Veuillez vérifier dans la fiche partenaire, onglet 'Ventes & Achats' """
-                                u"""le champ 'Emplacement Client'.""")
-            transfer_obj = self.env['stock.immediate.transfer']
-            procs = self.invoice_line_ids._action_procurement_create()
+                                u"""Veuillez vérifier dans la fiche partenaire, onglet "Ventes & Achats" """
+                                u"""le champ "Emplacement Client".""")
+            procs = inv.invoice_line_ids._action_procurement_create()
             moves = procs.mapped('move_ids')
             pickings = moves.mapped('picking_id')
+            # force_assign() ne fonctionne pas bien si des articles sont déjà considérés comme fait
+            pickings.pack_operation_product_ids.write({'qty_done': 0.0})
             pickings.force_assign()
             for picking in pickings:
                 new_transfer = transfer_obj.create({'pick_id': picking.id})
@@ -80,7 +78,7 @@ class AccountInvoice(models.Model):
     def create(self, vals):
         if vals.get('of_boutique'):
             partner = self.env['res.partner'].browse(vals['partner_id'])
-            vals.update({'name': 'Vente boutique - %s' % partner.name})
+            vals.update({'name': 'Facture boutique - %s' % partner.name})
         return super(AccountInvoice, self).create(vals)
 
 
@@ -112,7 +110,6 @@ class AccountInvoiceLine(models.Model):
             'route_ids'      : self.of_route_id and [(4, self.of_route_id.id)] or [],
             'warehouse_id'   : warehouse_id and warehouse_id.id or False,
             'partner_dest_id': self.invoice_id.partner_id.id,
-            # 'sale_line_id'   : self.id,
             }
 
     @api.multi

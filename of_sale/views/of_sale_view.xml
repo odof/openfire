@@ -415,6 +415,9 @@
         <field name="model">account.config.settings</field>
         <field name="inherit_id" ref="of_account_invoice_report.of_view_account_config_settings"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='group_warning_account']" position="after">
+                <field name="of_validate_pickings" widget="radio" class="oe_inline"/>
+            </xpath>
             <xpath expr="//div[@name='pdf_display_product_ref']" position="after">
                 <field name="of_color_bg_section" widget="color"/>
             </xpath>
@@ -427,6 +430,16 @@
         <field name="model">account.invoice</field>
         <field name="inherit_id" ref="account.invoice_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="of_is_locked" invisible="1"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button type="object" name="action_view_delivery" class="oe_stat_button" icon="fa-truck"
+                    attrs="{'invisible': [('of_picking_count', '=', 0)]}">
+                    <field name="of_picking_count" widget="statinfo" string="Livraisons"/>
+                </button>
+            </xpath>
+
             <xpath expr="//field[@name='date_due']" position="after">
                 <field name="of_date_vt"/>
             </xpath>
@@ -446,6 +459,32 @@
             </xpath>
         </field>
     </record>
+
+    <record id="of_account_invoice_picking_view_form" model="ir.ui.view">
+        <field name="name">of.account.invoice.picking.view.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="of_sale.of_account_invoice_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="of_waiting_delivery" invisible="1"/>
+                <button name="validate_pickings" type="object" string="Valider BL liés"
+                        attrs="{'invisible': ['|','|',('of_waiting_delivery','=',False),
+                                                      ('state','not in',['open','paid']),
+                                                  ('of_is_locked', '=', True)]}"
+                        confirm="Tous les bons de livraison liés aux commandes de cette facture vont être validés.
+Tous les articles seront considérés comme disponibles et marqués comme livrés."/>
+            </xpath>
+            <xpath expr="//notebook" position="before">
+                <div style="color:red;" attrs="{'invisible': ['|','|',('of_waiting_delivery','=',False),
+                                                                      ('state','not in',['open','paid']),
+                                                                  ('of_is_locked', '=', True)]}">
+                    <i>Il reste des bons de livraisons non validés.</i>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <function model="account.invoice" name="_of_function_active_picking"/>
 
 <!--##############################################################################-->
 <!--########################### ______ Sociétés ______ ###########################-->

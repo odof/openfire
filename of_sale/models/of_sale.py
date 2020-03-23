@@ -777,10 +777,10 @@ class SaleOrderLine(models.Model):
     @api.multi
     def _additionnal_tax_verifications(self):
         invoice_line_obj = self.env['account.invoice.line']
-        if self.product_id and self.product_id.id in invoice_line_obj.get_locked_products():
+        if self.product_id and self.product_id.id in invoice_line_obj.get_locked_product_ids():
             return True
         if self.product_id and self.product_id.categ_id and self.product_id.categ_id.id in invoice_line_obj.\
-                get_locked_categories():
+                get_locked_category_ids():
             return True
         return False
 
@@ -845,22 +845,22 @@ class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
     price_unit = fields.Float(digits=False)
-    of_is_locked = fields.Boolean(compute="_compute_is_locked", string=u"Article particulié")
+    of_is_locked = fields.Boolean(compute="_compute_is_locked", string=u"Article particulier")
 
     @api.model
-    def get_locked_categories(self):
+    def get_locked_category_ids(self):
         """
         Fait dans une fonction pour faciliter l'héritage.
-        :return: Renvoie une liste de catégories dont les articles ne dont le montant ne doit pas changer des bons de commandes
+        :return: Ids des catégories dont le montant des articles ne doit pas changer des bons de commandes
         """
         return [self.env['ir.values'].get_default('sale.config.settings',
                                                   'of_deposit_product_categ_id_setting')]
 
     @api.model
-    def get_locked_products(self):
+    def get_locked_product_ids(self):
         """
         Fait dans une fonction pour faciliter l'héritage.
-        :return: Renvoie une liste d'articles qui ne doivent pas être supprimés des bons de commandes
+        :return: Ids des articles qui ne doivent pas être supprimés des bons de commandes
         """
         return []
 
@@ -870,11 +870,11 @@ class AccountInvoiceLine(models.Model):
         of_is_locked est un champ qui permet de savoir si une ligne de facture doit empêcher sa contrepartie sur bon
         de commande d'être supprimée (voir sale.order.line.unlink())
         """
-        locked_categories = self.get_locked_categories()
-        locked_products = self.get_locked_products()
+        locked_category_ids = self.get_locked_category_ids()
+        locked_product_ids = self.get_locked_product_ids()
         for invoice_line in self:
-            if invoice_line.product_id.categ_id.id not in locked_categories and \
-               invoice_line.product_id.id not in locked_products:
+            if invoice_line.product_id.categ_id.id not in locked_category_ids and \
+               invoice_line.product_id.id not in locked_product_ids:
                 invoice_line.of_is_locked = False
             else:
                 invoice_line.of_is_locked = True
@@ -1082,16 +1082,34 @@ class AccountInvoice(models.Model):
     _name = 'account.invoice'
     _inherit = ["account.invoice", "of.documents.joints"]
 
+    @api.model
+    def _of_function_active_picking(self):
+        """
+        Fonction appelée lors de la mise à jour du module.
+        Détermine l'activation de la vue liée aux bons de livraison dans le formulaire des factures.
+        """
+        view = self.env.ref('of_sale.of_account_invoice_picking_view_form')
+        if view:
+            view.write({
+                'active': self.env['ir.values'].get_default('account.config.settings', 'of_validate_pickings') in (2, 3)
+            })
+
     of_date_vt = fields.Date(string="Date visite technique")
     of_sale_order_ids = fields.Many2many('sale.order', compute="_compute_of_sale_order_ids", string="Bons de commande")
     of_residual = fields.Float(string=u"Somme du montant non payé des factures d'acompte et de la facture finale", compute="_compute_of_residual")
     of_residual_equal = fields.Boolean(compute="_compute_of_residual")
     of_suivi_interne = fields.Char(string="Suivi interne")
+    of_is_locked = fields.Boolean(compute="_compute_of_is_locked")
+    of_waiting_delivery = fields.Boolean(string="Livraison en attente", compute="_compute_of_picking_ids")
+    of_picking_ids = fields.Many2many('stock.picking', compute='_compute_of_picking_ids')
+    of_picking_count = fields.Integer(string="Bon de livraisons", compute='_compute_of_picking_ids')
 
+    @api.depends('invoice_line_ids')
     def _compute_of_sale_order_ids(self):
         for invoice in self:
             invoice.of_sale_order_ids = invoice.invoice_line_ids.mapped('sale_line_ids').mapped('order_id')
 
+    @api.depends('invoice_line_ids')
     def _compute_of_residual(self):
         group_paiements = self.env['of.invoice.report.total.group'].get_group_paiements()
         if not group_paiements.invoice:
@@ -1116,6 +1134,41 @@ class AccountInvoice(models.Model):
             invoice.of_residual = sum(invoices.mapped('residual'))
             invoice.of_residual_equal = invoice.state == 'draft' or float_compare(invoice.of_residual, invoice.residual, 2) == 0
 
+    @api.depends('invoice_line_ids', 'invoice_line_ids.of_is_locked')
+    def _compute_of_is_locked(self):
+        for invoice in self:
+            if invoice.invoice_line_ids == invoice.invoice_line_ids.filtered('of_is_locked'):
+                invoice.of_is_locked = True
+
+    @api.multi
+    @api.depends('invoice_line_ids', 'invoice_line_ids.sale_line_ids', 'invoice_line_ids.sale_line_ids.order_id',
+                 'invoice_line_ids.sale_line_ids.order_id.picking_ids')
+    def _compute_of_picking_ids(self):
+        """
+        Calcule le nombre de BL liés à la facture.
+        :return:
+        """
+        for invoice in self:
+            pickings = invoice.of_sale_order_ids.mapped('picking_ids')
+            if pickings:
+                invoice.of_waiting_delivery = pickings.filtered(lambda p: p.state not in ['draft', 'cancel', 'done'])\
+                                              and True or False
+                invoice.of_picking_ids = pickings
+                invoice.of_picking_count = len(pickings)
+
+    @api.multi
+    def validate_pickings(self):
+        transfer_obj = self.env['stock.immediate.transfer']
+        for invoice in self.filtered(lambda i: not i.of_is_locked):
+            pickings = invoice.of_picking_ids
+            # force_assign() ne fonctionne pas bien si des articles sont déjà considérés comme fait
+            pickings.pack_operation_product_ids.write({'qty_done': 0.0})
+            pickings.force_assign()
+            for picking in pickings:
+                new_transfer = transfer_obj.create({'pick_id': picking.id})
+                new_transfer.process()
+        self._compute_of_picking_ids()
+
     def get_color_section(self):
         return self.env['ir.values'].get_default('account.config.settings', 'of_color_bg_section')
 
@@ -1127,7 +1180,25 @@ class AccountInvoice(models.Model):
         lines = self.mapped('invoice_line_ids').filtered(lambda line: line.product_id.categ_id.id != acompte_categ_id)
         orders = lines.mapped('sale_line_ids').mapped('order_id')
         orders.of_update_dates_echeancier()
+        if self.env['ir.values'].get_default('account.config.settings', 'of_validate_pickings') == 3:
+            self.validate_pickings()
         return res
+
+    @api.multi
+    def action_view_delivery(self):
+        """
+        Afficher les BL liés à la facture
+        :return:
+        """
+        action = self.env.ref('stock.action_picking_tree_all').read()[0]
+
+        pickings = self.mapped('of_picking_ids')
+        if len(pickings) > 1:
+            action['domain'] = [('id', 'in', pickings.ids)]
+        elif pickings:
+            action['views'] = [(self.env.ref('stock.view_picking_form').id, 'form')]
+            action['res_id'] = pickings.id
+        return action
 
     @api.multi
     def _of_get_linked_invoices(self, lines):
@@ -1210,11 +1281,27 @@ class AccountInvoice(models.Model):
 class AccountConfigSettings(models.TransientModel):
     _inherit = 'account.config.settings'
 
-    of_color_bg_section = fields.Char(string="(OF) Couleur fond titres section", help=u"Choisissez un couleur de fond pour les titres de section", default="#F0F0F0")
+    of_color_bg_section = fields.Char(
+        string="(OF) Couleur fond titres section", help=u"Choisissez une couleur de fond pour les titres de section",
+        default="#F0F0F0")
+    of_validate_pickings = fields.Selection([
+            (1, u"Ne pas gérer les BL depuis la facture"),
+            (2, u"Gérer les BL après la validation de la facture"),
+            (3, u"Valider les BL au moment de la validation de la facture")],
+        string="(OF) Validation des BL",
+        default=1)
 
     @api.multi
     def set_of_color_bg_section_defaults(self):
         return self.env['ir.values'].sudo().set_default('account.config.settings', 'of_color_bg_section', self.of_color_bg_section)
+
+    @api.multi
+    def set_of_validate_pickings(self):
+        view = self.env.ref('of_sale.of_account_invoice_picking_view_form')
+        if view:
+            view.write({'active': self.of_validate_pickings in (2, 3)})
+        return self.env['ir.values'].sudo().set_default('account.config.settings', 'of_validate_pickings',
+                                                        self.of_validate_pickings)
 
 
 class OFSaleEcheance(models.Model):

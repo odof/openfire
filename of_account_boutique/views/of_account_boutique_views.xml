@@ -33,16 +33,12 @@
      <record id="of_account_boutique_invoice_form" model="ir.ui.view">
         <field name="name">of.account.boutique.invoice.form</field>
         <field name="model">account.invoice</field>
-        <field name="inherit_id" ref="of_account.of_account_invoice_form"/>
+        <field name="inherit_id" ref="of_sale.of_account_invoice_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//sheet/label[1]" position="before">
-                <div class="oe_button_box" name="button_box">
-                    <field name="of_boutique" invisible="1"/>
-                    <button type="object" name="action_view_delivery" class="oe_stat_button" icon="fa-truck"
-                        attrs="{'invisible': ['|', ('of_picking_count', '=', 0), ('of_boutique', '=', False)]}">
-                        <field name="of_picking_count" widget="statinfo" string="Livraisons"/>
-                    </button>
-                </div>
+            <xpath expr="//field[@name='number']" position="after">
+                <field name="of_boutique" invisible="1"/>
+                <span attrs="{'invisible': [('of_boutique', '=', False)]}"> - Facture Boutique</span>
+
             </xpath>
             <xpath expr="//field[@name='of_etiquette_partenaire_ids']" position="after">
                 <field name="of_warehouse_id" attrs="{'invisible': [('of_boutique', '=', False)]}" options='{"no_open": True, "no_create": True}'/>

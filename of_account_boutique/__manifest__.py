@@ -22,6 +22,7 @@ Comptabilité:
     'depends': [
         'of_account',
         'stock',
+        'of_sale',
     ],
     'demo_xml': [],
     'data': [
