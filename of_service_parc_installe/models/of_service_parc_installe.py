@@ -3,6 +3,7 @@
 from odoo import models, fields, api
 from datetime import timedelta
 
+
 class OfService(models.Model):
     _inherit = "of.service"
 
@@ -30,17 +31,55 @@ class OfService(models.Model):
             if parc_installe:
                 self.parc_installe_id = parc_installe
 
+    @api.onchange('sav_id')
+    def _onchange_sav_id(self):
+        self.ensure_one()
+        if self.sav_id:
+            self.date_fin = self.get_fin_date()
+
     @api.multi
-    def get_action_view_interventions_context(self, context={}):
-        context = super(OfService, self).get_action_view_interventions_context(context)
+    def get_fin_date(self, date_str=False):
+        """
+        :param date_str: Date de prochaine planif à utuliser pour le calcul, sous format string
+        :return: Date à partir de laquelle l'intervention passe à l'état 'en retard'
+        :rtype string
+        """
+        self.ensure_one()
+        date_next_str = date_str or self.date_next or False
+
+        if date_next_str:
+            date_fin = fields.Date.from_string(date_next_str)
+            if (not self.tache_id or not self.tache_id.fourchette_planif) and self.sav_id:
+                # une semaine par défaut pour les SAV
+                date_fin += relativedelta(weeks=1)
+                date_fin -= relativedelta(days=1)
+                # ^- moins 1 jour car les intervalles de dates sont inclusifs
+                return fields.Date.to_string(date_fin)
+            else:
+                return super(OfService, self).get_fin_date(date_next_str)
+        else:
+            return ""
+
+    @api.multi
+    def get_action_view_rdvtech_context(self, context={}):
+        context = super(OfService, self).get_action_view_rdvtech_context(context)
         context['default_parc_installe_id'] = self.parc_installe_id and self.parc_installe_id.id or False
         return context
+
 
 class OfPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
     parc_installe_id = fields.Many2one('of.parc.installe', string=u"Parc installé",
         domain="['|', '|', ('client_id', '=', partner_id), ('client_id', '=', address_id), ('site_adresse_id', '=', address_id)]")
+
+    @api.model
+    def create(self, vals):
+        service_obj = self.env['of.service']
+        service = vals.get('service_id') and service_obj.browse(vals['service_id'])
+        if service:
+            vals['parc_installe_id'] = service.parc_installe_id and service.parc_installe_id.id
+        return super(OfPlanningIntervention, self).create(vals)
 
     @api.multi
     def button_open_of_planning_intervention(self):
@@ -53,14 +92,6 @@ class OfPlanningIntervention(models.Model):
                 'res_id': self._ids[0],
                 'type': 'ir.actions.act_window',
             }
-
-    @api.model
-    def create(self, vals):
-        service_obj = self.env['of.service']
-        service = vals.get('service_id') and service_obj.browse(vals['service_id'])
-        if service:
-            vals['parc_installe_id'] = service.parc_installe_id and service.parc_installe_id.id
-        return super(OfPlanningIntervention, self).create(vals)
 
 
 class OfParcInstalle(models.Model):
@@ -91,7 +122,6 @@ class OfParcInstalle(models.Model):
         'default_date_next': fields.Date.today(),
         'default_parc_installe_id': self.id,
         'default_origin': u"[parc installé] " + (self.name or ''),
-        'bloquer_recurrence': True,
         }
         return action
 
@@ -106,7 +136,6 @@ class OfParcInstalle(models.Model):
         'default_date_next': fields.Date.today(),
         'default_parc_installe_id': self.id,
         'default_origin': u"[parc installé] " + (self.name or ''),
-        'bloquer_recurrence': True,
         }
         return action
 
@@ -127,7 +156,6 @@ class OfParcInstalle(models.Model):
         'default_date_next': fields.Date.today(),
         'default_parc_installe_id': self.id,
         'default_origin': u"[Parc installé] " + (self.name or ''),
-        'bloquer_recurrence': True,
         }
         return action
 
@@ -157,7 +185,6 @@ class ProjectIssue(models.Model):
         'default_sav_id': self.id,
         'default_parc_installe_id': self.of_produit_installe_id.id,
         'default_origin': u"[SAV] " + self.name,
-        'bloquer_recurrence': True,
         }
         return action
 
@@ -179,6 +206,5 @@ class ProjectIssue(models.Model):
         'default_sav_id': self.id,
         'default_parc_installe_id': self.of_produit_installe_id.id,
         'default_origin': u"[SAV] " + self.name,
-        'bloquer_recurrence': True,
         }
         return action

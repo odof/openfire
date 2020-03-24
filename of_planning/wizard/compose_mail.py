@@ -3,6 +3,7 @@
 from odoo import models, fields, api
 import re
 
+
 def remove_html_balise(text):
     regex_remove = re.compile("<.*?>")  # permet de chercher toute chaine de charactère commançant par '<' et se terminant par '>'
     regex_replace = re.compile("</p>|</br>|</li>")  # liste des expression a remplacer par '\n'
@@ -10,6 +11,7 @@ def remove_html_balise(text):
     text = regex_replace.sub('\n', text)
     text = regex_remove.sub('', text)
     return text
+
 
 class OfComposeMail(models.TransientModel):
     _inherit = 'of.compose.mail'

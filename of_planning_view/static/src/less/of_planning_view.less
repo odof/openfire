@@ -5,25 +5,6 @@
     .o-webclient-padding(@top: @odoo-horizontal-padding/2, @bottom: @odoo-horizontal-padding/2);
     .o-flex-display();
 
-    .of_planning_color_loop(@index) when (@index < @nb-planning-colors+1) {
-        .of_planning_color_@{index} {
-            color: #0D0D0D;
-            background-color: spin(rgb(255, 192, 192), 360/(@nb-planning-colors+1) * @index);
-            border-color:  spin(rgb(255, 192, 192), 360/(@nb-planning-colors+1) * @index);
-            opacity: 0.7;
-        }
-        .of_planning_color_loop(@index + 1);
-    }
-    .of_planning_color_loop(1);
-
-    .underline_color_loop(@index) when (@index < @nb-planning-colors+1) {
-        .of_underline_color_@{index} {
-            border-bottom: 4px solid spin(rgba(255, 192, 192, 0.7), 360/(@nb-planning-colors+1) * @index);
-        }
-        .underline_color_loop(@index + 1);
-    }
-    .underline_color_loop(1);
-
     .of_planning_view {
         .o-flex(1, 1, auto);
         min-width: 0;
@@ -35,7 +16,7 @@
             max-width: 100%;
             margin-bottom: 20px;
             * {
-                z-index: 0; // FIXME
+                z-index: 0;
             }
             .o_attendee_head {
                 float: right;
@@ -89,10 +70,6 @@
         .of_planning_creneau_dispo {
             padding: 2px 8px 4px;
             border-radius: 4px;
-            //background-color: #7FFF00;
-            //background-color: #F0F0F0;
-            //border: 1px solid #0C0C0C;
-            //color: #0C0C0C;
             cursor: pointer;
         }
 
@@ -111,8 +88,6 @@
         }
         .of_planning_fillerbar_disponible {
             display: table-cell;
-            //background-color: #7FFF00;
-            //background-color: #F0F0F0;
         }
         .of_planning_fillerbar_occupe {
             display: table-cell;

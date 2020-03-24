@@ -1,122 +1,27 @@
 <template>
+    <!-- Conteneur principal -->
     <div t-name="PlanningView" class="of_planning_container">
-        
-        <div class="of_planning_view"><!-- <svg id="of_planning_view_svg"></svg> -->
-            
+        <div class="of_planning_view">
             <div class="of_planning_buttons" />
             <div class="of_planning_table_container" style="width: 100%;"/>
         </div>
         <div class="of_planning_sidebar_container hidden-xs"/>
     </div>
 
-    <t t-name="PlanningView.sidebar">
-        <div class="of_planning_sidebar">
-            <div class="of_planning_calendar_mini"/>
-        </div>
-    </t>
-
-    <t t-name="PlanningView.sidebar.reso_filters">
-        <div class="of_planning_reso_filter">
-            <div class="of_planning_contacts"/>
-        </div>
-    </t>
-
-    <t t-name="PlanningView.sidebar.contacts">
-        <div t-foreach="filters" class="of_planning_contact">
-            <t t-if="filters_value.value"><!-- don't display if no value given (or undefined) -->
-                <div class="o_checkbox">
-                    <input type="checkbox" name="selection"
-                        t-att-value="filters_value.value" t-att-id="filters_value.input_id"
-                        t-att-checked="(filters_value.is_checked ? true : undefined)"/><span/>
-                </div>
-                <t t-if="filters_value.value == -1">
-                    <span><i class="fa fa-users fa-fw o_cal_avatar"/></span>
-                </t>
-                <t t-if="(filters_value.value != -1) &amp;&amp; filters_value.avatar_model">
-                    <img t-attf-src="/web/image/#{filters_value.avatar_model}/#{filters_value.value}/image_small" class="o_cal_avatar"/>
-                </t>
-                <span t-attf-style="
-                    color: #{filters_value.color_ft}; 
-                    background: #{filters_value.color_bg}; 
-                    padding: 2px 8px 4px; 
-                    border-radius: 4px;
-                    margin: 1px 0;
-                    border: 1px solid #0D0D0D;">
-                    <t t-esc="filters_value.label"/>
-                </span>
-            </t>
-        </div>
-    </t>
-
-    <t t-name="PlanningView.sidebar.info_filters">
-        <div class="of_planning_info_filter">
-            <div class="of_planning_info_filter_title">
-                <span>AFFICHAGE</span>
-                <i class='fa fa-lg fa-angle-double-down of_planning_info_filter_show'/>
-                <i class='fa fa-lg fa-angle-double-up of_planning_info_filter_hide o_hidden'/>
-            </div>
-            <div class="of_planning_ev_infos o_hidden"/>
-        </div>
-    </t>
-
-    <t t-name="PlanningView.sidebar.event_info">
-        <div t-foreach="filters" class="of_planning_ev_info">
-            <t t-if="filters_value.value"><!-- don't display if no value given (or undefined) -->
-                <div t-if="filters_value.separated" style="border-top: #000000; width: 100%"/>
-                <div class="o_checkbox">
-                    <input type="checkbox" name="selection"
-                        t-att-id="filters_value.input_id"
-                        t-att-value="filters_value.value" class="of_planning_ev_info_input"
-                        t-att-checked="(filters_value.is_checked ? true : undefined)"/><span/>
-                </div>
-                <span t-attf-style="
-                    padding: 2px 8px 4px; 
-                    margin: 1px 0;">
-                    <t t-esc="filters_value.label"/>
-                </span>
-                <!-- child filters -->
-                <t t-if="filters_value.child_filters != undefined">
-                    <i t-attf-class='fa fa-angle-double-down of_planning_ev_info_show of_planning_ev_info_toggle_#{filters_value.value}'
-                        t-attf-id="#{filters_value.value}_show"/>
-                    <i t-attf-class='fa fa-angle-double-up of_planning_ev_info_hide o_hidden of_planning_ev_info_toggle_#{filters_value.value}'
-                        t-attf-id="#{filters_value.value}_hide"/>
-                    <t t-set="les_children" t-value="filters_value.child_filters"/>
-                    <div t-foreach="les_children" t-attf-class="of_planning_ev_subinfo of_planning_ev_subinfo_#{filters_value.value} o_hidden">
-                        <div class="o_checkbox" style="margin-left: 8px;">
-                            <input type="checkbox" name="selection" t-att-id="les_children_value.input_id"
-                                t-att-value="les_children_value.value" class="of_planning_ev_subinfo_input"
-                                t-att-checked="(les_children_value.is_checked ? true : undefined)"/><span/>
-                        </div>
-                        <span t-attf-style="
-                            padding: 2px 8px 4px; 
-                            margin: 1px 0;">
-                            <t t-esc="les_children_value.label"/>
-                        </span>
-                    </div>
-                </t><!--  -->
-            </t>
-            <t t-else="">HO!</t>
-        </div>
-    </t>
-<!-- dump: border: 1px solid #0D0D0D; border-radius: 4px; -->
+    <!-- Boutons: précédent - Aujourd'hui - suivant -->
     <t t-name="PlanningView.buttons">
         <div class="of_planning_buttons">
-            <!--
-            <button t-if="widget.options.action_buttons !== false &amp;&amp; widget.is_action_enabled('create') &amp;&amp; ((widget.field_widget &amp;&amp; (widget.field_widget.open_popup_add)) || (!widget.field_widget))" type="button" class="btn btn-primary planning_button_new o_highlight"><t t-esc="widget.options.create_text || _t('Create')"/></button>
-            -->
-            <button class="btn btn-primary of_planning_button_prev"><span class="fa fa-chevron-left"/></button>
+            <button class="btn btn-primary of_planning_button_prev">
+                <span class="fa fa-chevron-left"/>
+            </button>
             <button class="btn btn-primary of_planning_button_today">Today</button>
-            <button class="btn btn-primary of_planning_button_next"><span class="fa fa-chevron-right"/></button>
-
-            <div class="btn-group btn-group-sm">
-                <!-- vue 'jour' et 'mois' peut-être dans une implémentation future -->
-                <!--button class="btn btn-sm btn-default of_planning_button_day">Day</button-->
-                <!--button class="btn btn-sm btn-default of_planning_button_week">Week</button-->
-                <!--button class="btn btn-sm btn-default of_planning_button_month">Month</button-->
-            </div>
+            <button class="btn btn-primary of_planning_button_next">
+                <span class="fa fa-chevron-right"/>
+            </button>
         </div>
     </t>
 
+    <!-- Table -->
     <t t-name="PlanningView.table">
         <table class="of_planning_table">
             <thead>
@@ -133,24 +38,20 @@
                 </tr>
             </thead>
             <tbody class="of_planning_table_tbody">
-                <tr t-if="table.rows.length == 0"><!-- ne fonctionne pas? -->
-                    <td colspan="9">Il n'y a aucun enregistrement pour cette semaine</td>
+                <!-- Est affiché le temps que le rendu des lignes soit généré -->
+                <tr t-if="table.rows.length == 0">
+                    <td colspan="9">Chargement des données...</td>
                 </tr>
-                <!--t t-foreach="rows" t-as="k_rows">
-                    <tr t-attf-id="#{rows[k_rows].res_id}"/>
-                    <!- - t t-call="PlanningView.row">
-                        <t t-set="row" t-value="rows[k_rows]"/>
-                    </t- ->
-                </t-->
             </tbody>
         </table>
     </t>
-<!-- <span class="of_planning_fillerbar_occupe" t-attf-style="min-width: #{la_fillerbar.pct_occupe}%;"/> -->
+
+    <!-- Lignes de ressource (Attendees - Employés) -->
     <t t-name="PlanningView.row">
         <td t-attf-style="
-                    color: #{row.color_ft}; 
-                    background: #{row.color_bg}; 
-                    padding: 2px 8px 4px; 
+                    color: #{row.color_ft};
+                    background: #{row.color_bg};
+                    padding: 2px 8px 4px;
                     border-radius: 5px;
                     min-height: 95%;
                     opacity: 1 !important;
@@ -161,14 +62,16 @@
             <t t-foreach="row.columns.length" t-as="col_index">
                 <t t-set="records" t-value="row.columns[col_index]"/>
                 <t t-set="la_fillerbar" t-value="row.fillerbars[col_index]"/>
-                <td t-attf-id="of_planning_td_#{row.res_id}_#{col_index}" t-attf-style="background: #{col_index == row.col_offset_today and row.color_bg_rgba_today or row.color_bg_rgba}">
+                <td t-attf-id="of_planning_td_#{row.res_id}_#{col_index}"
+                    t-attf-style="background: #{col_index == row.col_offset_today and row.color_bg_rgba_today or row.color_bg_rgba}">
                     <div t-attf-id="of_planning_fillerbar_#{row.res_id}_#{col_index}" class="of_planning_fillerbar">
                         <div t-if="la_fillerbar.pct_occupe > 0" class="of_planning_fillerbar_occupe"
-                          t-attf-style="width: #{la_fillerbar.pct_occupe}% !important; background: #{row.color_bg}; ">
-                            <i t-if="la_fillerbar.pct_occupe > 100" class="of_planning_fillerbar_warning fa fa-warning"/>
+                             t-attf-style="width: #{la_fillerbar.pct_occupe}% !important; background: #{row.color_bg}; ">
+                            <i t-if="la_fillerbar.pct_occupe > 100"
+                               class="of_planning_fillerbar_warning fa fa-warning"/>
                         </div>
                         <div t-if="la_fillerbar.pct_disponible > 0" class="of_planning_fillerbar_disponible"
-                            t-attf-style="background-color: #{row.fillerbar_color_dispo}">
+                             t-attf-style="background-color: #{row.fillerbar_color_dispo}">
                         </div>
                     </div>
                 </td>
@@ -180,9 +83,9 @@
             </td>
         </t>
         <td t-attf-style="
-                    color: #{row.color_ft}; 
-                    background: #{row.color_bg}; 
-                    padding: 2px 8px 4px; 
+                    color: #{row.color_ft};
+                    background: #{row.color_bg};
+                    padding: 2px 8px 4px;
                     border-radius: 5px;
                     width: 4px;
                     opacity: 1 !important;
@@ -190,23 +93,28 @@
         </td>
     </t>
 
+    <!-- Colonne d'une ligne de ressource. Prévu pour regénérer le rendu d'une seule colonne.
+        N'est pas utilisé pour le moment -->
     <t t-name="PlanningView.row.column">  <!-- donné par le js: col_index-->
         <t t-set="records" t-value="row.columns[col_index]"/>
         <t t-set="la_fillerbar" t-value="row.fillerbars[col_index]"/>
-        <td t-attf-id="of_planning_td_#{row.res_id}_#{col_index}" t-attf-style="background: #{col_index == row.col_offset_today and row.color_bg_rgba_today or row.color_bg_rgba}">
+        <td t-attf-id="of_planning_td_#{row.res_id}_#{col_index}"
+            t-attf-style="background: #{col_index == row.col_offset_today and row.color_bg_rgba_today or row.color_bg_rgba}">
             <div t-attf-id="of_planning_fillerbar_#{row.res_id}_#{col_index}" class="of_planning_fillerbar">
                 <div t-if="la_fillerbar.pct_occupe > 0" class="of_planning_fillerbar_occupe"
-                  t-attf-style="width: #{la_fillerbar.pct_occupe}% !important; background: #{row.color_bg}; ">
+                     t-attf-style="width: #{la_fillerbar.pct_occupe}% !important; background: #{row.color_bg}; ">
                     <i t-if="la_fillerbar.pct_occupe > 100" class="of_planning_fillerbar_warning fa fa-warning"/>
                 </div>
                 <div t-if="la_fillerbar.pct_disponible > 0" class="of_planning_fillerbar_disponible"
-                    t-attf-style="background-color: #{row.fillerbar_color_dispo}">
+                     t-attf-style="background-color: #{row.fillerbar_color_dispo}">
                 </div>
             </div>
         </td>
     </t>
 
-    <div t-name="PlanningView.record" class="of_planning_record_global_click">  <!-- variables données par le javascript: record et col_index -->
+    <!-- Évènement (RDV d'intervention) -->
+    <div t-name="PlanningView.record"
+         class="of_planning_record_global_click">  <!-- variables données par le javascript: record et col_index -->
         <div t-att-class="record.class"
              t-attf-style="color: #{record.color_ft}; background-color: #{record.color_bg}; border-top: 1px solid #{record.color_ft};
                 border-bottom: 1px solid #{record.color_ft};">
@@ -218,27 +126,43 @@
                    t-attf-style="background: grey; border: 1px solid #0D0D0D; float: right; margin-left: 2px; margin-top: -3px;"/>
             </t>
             <div class="of_planning_info of_planning_info_heures">
-                <i class="fa fa-clock-o"/><span class="of_ws"/>
+                <i class="fa fa-clock-o"/>
+                <span class="of_ws"/>
                 <t t-if="record.col_offset_stop == undefined">
-                    <span class="of_planning_subinfo of_planning_subinfo_heure_debut"><t t-raw="record.heure_debut_str"/></span>
-                    <span class="of_planning_subinfo of_planning_subinfo_heure_fin"> -&gt; </span>
-                    <span class="of_planning_subinfo of_planning_subinfo_heure_fin"><t t-raw="record.heure_fin_str"/></span>
-                    <span class="of_planning_subinfo of_planning_subinfo_duree">(<t t-raw="record.duree_str"/>)</span>
+                    <span class="of_planning_subinfo of_planning_subinfo_heure_debut">
+                        <t t-raw="record.heure_debut_str"/>
+                    </span>
+                    <span class="of_planning_subinfo of_planning_subinfo_heure_fin">-&gt;</span>
+                    <span class="of_planning_subinfo of_planning_subinfo_heure_fin">
+                        <t t-raw="record.heure_fin_str"/>
+                    </span>
+                    <span class="of_planning_subinfo of_planning_subinfo_duree">(<t t-raw="record.duree_str"/>)
+                    </span>
                 </t>
                 <t t-else="">
-                    <span class="of_planning_subinfo of_planning_subinfo_heure_debut"><t t-raw="record['hours_cols'][col_index].heure_debut_str"/></span>
-                    <span class="of_planning_subinfo of_planning_subinfo_heure_fin"> -&gt; </span>
-                    <span class="of_planning_subinfo of_planning_subinfo_heure_fin"><t t-raw="record['hours_cols'][col_index].heure_fin_str"/></span>
-                    <span class="of_planning_subinfo of_planning_subinfo_duree">(<t t-raw="record['hours_cols'][col_index].duree_str"/>)</span>
+                    <span class="of_planning_subinfo of_planning_subinfo_heure_debut">
+                        <t t-raw="record['hours_cols'][col_index].heure_debut_str"/>
+                    </span>
+                    <span class="of_planning_subinfo of_planning_subinfo_heure_fin">-&gt;</span>
+                    <span class="of_planning_subinfo of_planning_subinfo_heure_fin">
+                        <t t-raw="record['hours_cols'][col_index].heure_fin_str"/>
+                    </span>
+                    <span class="of_planning_subinfo of_planning_subinfo_duree">(<t
+                            t-raw="record['hours_cols'][col_index].duree_str"/>)
+                    </span>
                 </t>
             </div>
 
             <div t-if="record.tache_name" class="of_planning_info of_planning_info_tache_name">
-                <i class="fa fa-cogs"/><span class="of_ws"/><t t-raw="record.tache_name"/>
+                <i class="fa fa-cogs"/>
+                <span class="of_ws"/>
+                <t t-raw="record.tache_name"/>
             </div>
 
             <div t-if="record.partner_name" class="of_planning_info of_planning_info_partner_name">
-                <i class="fa fa-user"/><span class="of_ws"/><t t-raw="record.partner_name"/>
+                <i class="fa fa-user"/>
+                <span class="of_ws"/>
+                <t t-raw="record.partner_name"/>
             </div>
 
             <div class="of_planning_info of_planning_info_lieu">
@@ -250,12 +174,14 @@
                     <t t-raw="record.address_zip"/>
                 </span>
 
-                <span t-if="record.address_zip &amp;&amp; record.address_city" class="of_ws of_planning_subinfo of_planning_subinfo_city"/>
+                <span t-if="record.address_zip &amp;&amp; record.address_city"
+                      class="of_ws of_planning_subinfo of_planning_subinfo_city"/>
                 <span t-if="record.address_city" class="of_planning_subinfo of_planning_subinfo_city">
                     <t t-raw="record.address_city"/>
                 </span>
 
-                <span t-if="record.address_zip || record.address_city" class="of_ws of_planning_subinfo of_planning_subinfo_secteur"/>
+                <span t-if="record.address_zip || record.address_city"
+                      class="of_ws of_planning_subinfo of_planning_subinfo_secteur"/>
                 <span t-if="record.secteur_name" class="of_planning_subinfo of_planning_subinfo_secteur">
                     <t t-raw="record.secteur_name"/>
                 </span>
@@ -263,7 +189,9 @@
         </div>
     </div>
 
-    <div t-name="PlanningView.record.tooltip" class="of_planning_record_tooltip">  <!-- variables données par le javascript: record et col_index -->
+    <!-- Info-bulle d'évènement (RDV d'intervention) -->
+    <div t-name="PlanningView.record.tooltip"
+         class="of_planning_record_tooltip">  <!-- variables données par le javascript: record et col_index -->
         <div>
             <t t-set="attendees" t-value="record.attendee_other_ids"/>
             <t t-foreach="attendees">
@@ -273,22 +201,35 @@
                    t-attf-style="background: grey; border: 1px solid #0D0D0D; float: right; margin-left: 2px; margin-top: -3px;"/>
             </t>
             <div>
-                <i class="fa fa-clock-o"/><span class="of_ws"/>
+                <i class="fa fa-clock-o"/>
+                <span class="of_ws"/>
                 <t t-if="record.col_offset_stop == undefined">
-                    <span><t t-raw="record.heure_debut_str"/></span>
-                    <span> -&gt; </span>
-                    <span><t t-raw="record.heure_fin_str"/></span>
-                    <span> - </span>
-                    <span><t t-raw="record.duree_str"/></span>
+                    <span>
+                        <t t-raw="record.heure_debut_str"/>
+                    </span>
+                    <span>-&gt;</span>
+                    <span>
+                        <t t-raw="record.heure_fin_str"/>
+                    </span>
+                    <span>-</span>
+                    <span>
+                        <t t-raw="record.duree_str"/>
+                    </span>
                 </t>
                 <t t-else="">
                     <span>[
                         <t t-foreach="record['hours_cols']" t-as="record_heures">(
-                            <span><t t-raw="record_heures_value.heure_debut_str"/></span>
-                            <span> -&gt; </span>
-                            <span><t t-raw="record_heures_value.heure_fin_str"/></span>
-                            <span> - </span>
-                            <span><t t-raw="record_heures_value.duree_str"/></span>
+                            <span>
+                                <t t-raw="record_heures_value.heure_debut_str"/>
+                            </span>
+                            <span>-&gt;</span>
+                            <span>
+                                <t t-raw="record_heures_value.heure_fin_str"/>
+                            </span>
+                            <span>-</span>
+                            <span>
+                                <t t-raw="record_heures_value.duree_str"/>
+                            </span>
                             ),
                         </t>
                         ]
@@ -297,11 +238,15 @@
             </div>
 
             <div t-if="record.tache_name">
-                <i class="fa fa-cogs"/><span class="of_ws"/><t t-raw="record.tache_name"/>
+                <i class="fa fa-cogs"/>
+                <span class="of_ws"/>
+                <t t-raw="record.tache_name"/>
             </div>
 
             <div t-if="record.partner_name">
-                <i class="fa fa-user"/><span class="of_ws"/><t t-raw="record.partner_name"/>
+                <i class="fa fa-user"/>
+                <span class="of_ws"/>
+                <t t-raw="record.partner_name"/>
             </div>
 
             <div>
@@ -326,14 +271,16 @@
         </div>
     </div>
 
-<!-- t-attf-data-context="{'default_partner_id': {{partner_id}}, 'default_service_id': {{service_id}}, 'default_address_id': {{address_id}},}" -->
+    <!-- Créneaux disponibles -->
     <div t-name="PlanningView.creneau_dispo" class="of_planning_creneau_dispo"
-        t-attf-style="color: #{creneau.color_ft}; background-color: #{creneau.color_bg}; border: 1px solid #{creneau.color_ft};">  <!-- variable donnée par le javascript: creneau et col_index -->
+         t-attf-style="color: #{creneau.color_ft}; background-color: #{creneau.color_bg}; border: 1px solid #{creneau.color_ft};">  <!-- variable donnée par le javascript: creneau et col_index -->
         <div>
             <i t-if="creneau.warning_horaires" class="fa fa-warning of_warning_horaires"
                style="float: right; padding-top: 4px;"/>
             <i class="fa fa-calendar-o of_ws"/>
-            <span>Dispo (<t t-esc="creneau.duree_str"/>) : </span><br/>
+            <span>Dispo (<t t-esc="creneau.duree_str"/>) :
+            </span>
+            <br/>
             <a name="%(of_planning_view.action_view_of_planif_wizard)d" type="action"
                class="of_planning_creneau_action"
                action_id="of_planning_view.action_view_of_planif_wizard"
@@ -364,4 +311,99 @@
             </t>
         </div>
     </div>
+
+    <!-- Panneau latéral droit -->
+    <t t-name="PlanningView.sidebar">
+        <div class="of_planning_sidebar">
+            <div class="of_planning_calendar_mini"/>
+        </div>
+    </t>
+
+    <!-- Conteneur des filtres de ressources (Attendees) -->
+    <t t-name="PlanningView.sidebar.reso_filters">
+        <div class="of_planning_reso_filter">
+            <div class="of_planning_contacts"/>
+        </div>
+    </t>
+
+    <!-- filtres de ressources (Attendees) -->
+    <t t-name="PlanningView.sidebar.contacts">
+        <div t-foreach="filters" class="of_planning_contact">
+            <t t-if="filters_value.value"><!-- foolproofing: don't display if no value given (or undefined) -->
+                <div class="o_checkbox">
+                    <input type="checkbox" name="selection"
+                        t-att-value="filters_value.value" t-att-id="filters_value.input_id"
+                        t-att-checked="(filters_value.is_checked ? true : undefined)"/><span/>
+                </div>
+                <!-- Les images d'avatars ne sont pas encore implémentée, à voir si on veut le faire -->
+                <t t-if="(filters_value.value != -1) &amp;&amp; filters_value.avatar_model">
+                    <img t-attf-src="/web/image/#{filters_value.avatar_model}/#{filters_value.value}/image_small" class="o_cal_avatar"/>
+                </t>
+                <span t-attf-style="
+                    color: #{filters_value.color_ft}; 
+                    background: #{filters_value.color_bg}; 
+                    padding: 2px 8px 4px; 
+                    border-radius: 4px;
+                    margin: 1px 0;
+                    border: 1px solid #0D0D0D;">
+                    <t t-esc="filters_value.label"/>
+                </span>
+            </t>
+            <t t-else="">Une erreur s'est produite au niveau de l'affichage des filtres</t>
+        </div>
+    </t>
+
+    <!-- Conteneur des filtres d'informations -->
+    <t t-name="PlanningView.sidebar.info_filters">
+        <div class="of_planning_info_filter">
+            <div class="of_planning_info_filter_title">
+                <span>AFFICHAGE</span>
+                <i class='fa fa-lg fa-angle-double-down of_planning_info_filter_show'/>
+                <i class='fa fa-lg fa-angle-double-up of_planning_info_filter_hide o_hidden'/>
+            </div>
+            <div class="of_planning_ev_infos o_hidden"/>
+        </div>
+    </t>
+
+    <!-- Filtres d'informations -->
+    <t t-name="PlanningView.sidebar.event_info">
+        <div t-foreach="filters" class="of_planning_ev_info">
+            <t t-if="filters_value.value"><!-- don't display if no value given (or undefined) -->
+                <div t-if="filters_value.separated" style="border-top: #000000; width: 100%"/>
+                <div class="o_checkbox">
+                    <input type="checkbox" name="selection"
+                        t-att-id="filters_value.input_id"
+                        t-att-value="filters_value.value" class="of_planning_ev_info_input"
+                        t-att-checked="(filters_value.is_checked ? true : undefined)"/><span/>
+                </div>
+                <span t-attf-style="
+                    padding: 2px 8px 4px; 
+                    margin: 1px 0;">
+                    <t t-esc="filters_value.label"/>
+                </span>
+                <!-- sous-filtres -->
+                <t t-if="filters_value.child_filters != undefined">
+                    <i t-attf-class='fa fa-angle-double-down of_planning_ev_info_show of_planning_ev_info_toggle_#{filters_value.value}'
+                        t-attf-id="#{filters_value.value}_show"/>
+                    <i t-attf-class='fa fa-angle-double-up of_planning_ev_info_hide o_hidden of_planning_ev_info_toggle_#{filters_value.value}'
+                        t-attf-id="#{filters_value.value}_hide"/>
+                    <t t-set="les_children" t-value="filters_value.child_filters"/>
+                    <div t-foreach="les_children" t-attf-class="of_planning_ev_subinfo of_planning_ev_subinfo_#{filters_value.value} o_hidden">
+                        <div class="o_checkbox" style="margin-left: 8px;">
+                            <input type="checkbox" name="selection" t-att-id="les_children_value.input_id"
+                                t-att-value="les_children_value.value" class="of_planning_ev_subinfo_input"
+                                t-att-checked="(les_children_value.is_checked ? true : undefined)"/><span/>
+                        </div>
+                        <span t-attf-style="
+                            padding: 2px 8px 4px; 
+                            margin: 1px 0;">
+                            <t t-esc="les_children_value.label"/>
+                        </span>
+                    </div>
+                </t>
+            </t>
+            <t t-else="">Une erreur s'est produite au niveau de l'affichage des filtres</t>
+        </div>
+    </t>
+
 </template>

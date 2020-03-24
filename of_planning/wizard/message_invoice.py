@@ -2,6 +2,7 @@
 
 from odoo import api, fields, models
 
+
 class OfPlanningMessageInvoice(models.TransientModel):
     _name = 'of.planning.message.invoice'
     _description = u'Création de la facture'

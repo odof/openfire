@@ -3,9 +3,8 @@
 from odoo import api, models, fields
 from datetime import datetime, timedelta, date
 import pytz, math, json, urllib, requests
-from math import cos
-from odoo.addons.of_planning_tournee.models.of_planning_tournee import distance_points
 from odoo.exceptions import UserError
+from odoo.addons.of_utils.models.of_utils import hours_to_strs
 
 SEARCH_MODES = [
     ('distance', u'Distance (km)'),
@@ -16,15 +15,12 @@ ROUTING_BASE_URL = u"http://s-hotel.openfire.fr:5000/"
 ROUTING_VERSION = u"v1"
 ROUTING_PROFILE = u"driving"
 
+
 @api.model
 def _tz_get(self):
     # put POSIX 'Etc/*' entries at the end to avoid confusing users - see bug 1086728
     return [(tz, tz) for tz in sorted(pytz.all_timezones, key=lambda tz: tz if not tz.startswith('Etc/') else '_')]
 
-def hours_to_strs(*hours):
-    """ Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'
-    """
-    return tuple("%02dh%02d" % (hour, round((hour % 1) * 60)) for hour in hours)
 
 class OFRDVCommercial(models.TransientModel):
     _name = 'of.rdv.commercial'

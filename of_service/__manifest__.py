@@ -8,8 +8,7 @@
     'category' : "Generic Modules",
     'description': """ Module OpenFire de gestion des services.""",
     'depends' : [
-        'of_project_issue',
-        #'of_planning',  <- par of_project_issue
+        'of_planning',
         'of_map_view',
         'of_utils',
         'sales_team',  # <- bouton 'prévoir intervention' dans les commandes client

@@ -1,10 +1,34 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields
+from odoo.tools.safe_eval import safe_eval
+from math import asin, sin, cos, sqrt, radians
+
+ROUTING_BASE_URL = "http://s-hotel.openfire.fr:5000/"
+ROUTING_VERSION = "v1"
+ROUTING_PROFILE = "driving"
+
+
+def round_a_cinq(val):
+    u"""arrondi au multiple de 5 supérieur"""
+    reste = val % 5
+    if not reste:
+        return val
+    return 5 * (int(val / 5) + 1)
+
+
+def distance_points(lat1, lon1, lat2, lon2):
+    u"""
+    Retourne la distance entre deux points en Km, à vol d'oiseau
+    @param *: Coordonnées gps en degrés
+    """
+    lat1, lon1, lat2, lon2 = [radians(v) for v in (lat1, lon1, lat2, lon2)]
+    return 2*asin(sqrt((sin((lat1-lat2)/2)) ** 2 + cos(lat1)*cos(lat2)*(sin((lon1-lon2)/2)) ** 2)) * 6366
 
 
 def format_date(date, lang):
     return fields.Date.from_string(date).strftime(lang.date_format)
+
 
 def se_chevauchent(min_1, max_1, min_2, max_2, strict=True):
     """
@@ -17,13 +41,30 @@ def se_chevauchent(min_1, max_1, min_2, max_2, strict=True):
         return min_1 < max_2 and min_2 < max_1
     return min_1 <= max_2 and min_2 <= max_1
 
+
+def hours_to_strs(*hours):
+    """ Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'
+    """
+    return tuple("%dh%02d" % (hour, round((hour % 1) * 60)) if hour % 1 else "%dh" % (hour) for hour in hours)
+
+
 def float_2_heures_minutes(flo):
     heures = flo // 1
     minutes = (flo - heures) * 60
     return heures, minutes
 
+
 def heures_minutes_2_float(heures, minutes):
     return heures + minutes / 60
+
+
+def compare_date(date1, date2, compare="==", isdatetime=False):
+    if not date1 or not date2:
+        return False
+    date1 = fields.Datetime.from_string(date1)
+    date2 = fields.Datetime.from_string(date2)
+    return safe_eval("date1 " + compare + " date2", {'date1': date1.strftime("%d/%m/%Y %H:%M:%S") if isdatetime else date1.strftime("%d/%m/%Y"),
+                                                     'date2': date2.strftime("%d/%m/%Y %H:%M:%S") if isdatetime else date2.strftime("%d/%m/%Y")})
 
 
 class BigInteger(fields.Integer):

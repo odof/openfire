@@ -2,6 +2,7 @@
 
 from odoo import models, api
 
+
 class OfComposeMail(models.TransientModel):
     _inherit = 'of.compose.mail'
 

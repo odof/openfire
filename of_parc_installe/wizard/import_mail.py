@@ -3,12 +3,13 @@
 from odoo import models, api
 from odoo.exceptions import UserError
 
-class of_gesdoc_import(models.TransientModel):
+
+class OFGesDocImport(models.TransientModel):
     _inherit = 'of.gesdoc.import'
 
     def import_data_obj(self, data, obj):
         parc_obj = self.env['of.parc.installe']
-        result = super(of_gesdoc_import, self).import_data_obj(data, obj)
+        result = super(OFGesDocImport, self).import_data_obj(data, obj)
         if obj._name == 'project.issue':
             parc_name = data.get('pi_produit_installe','').strip()
             if not parc_name:

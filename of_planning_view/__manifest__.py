@@ -8,7 +8,7 @@
     'summary': 'Planning view',
     'license': 'LGPL-3',
     "description": """
-
+Ajout de la vue PLanning.
 """,
     "website": "www.openfire.fr",
     "depends": [
