@@ -2,19 +2,13 @@
 
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError
-from odoo.addons.of_utils.models.of_utils import se_chevauchent, format_date
+from odoo.addons.of_utils.models.of_utils import se_chevauchent, format_date, hours_to_strs
 from odoo.tools.float_utils import float_compare
 from datetime import datetime, timedelta
 from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
 import pytz
 from copy import deepcopy
 
-def hours_to_strs(*hours):
-    """ Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'
-    """
-    return tuple("%dh%02d" % (hour / 60, hour % 60)
-                 if hour % 60
-                 else "%dh" % (hour / 60) for hour in map(lambda hour: round(hour * 60), hours))
 
 @api.model
 def _tz_get(self):
@@ -238,16 +232,16 @@ class HREmployee(models.Model):
         }
 
     @api.multi
-    def get_horaires_date(self, date_str, mode="dict"):
+    def get_horaires_date(self, date_str, response_text=False):
         """Renvoie les horaires des employés à la date donnée en paramètre.
         :rtype: { employee_id :  [(h_deb, h_fin), (h_deb, h_fin), ..] ,  .. }"""
         segment_obj = self.env['of.horaire.segment']
         date_da = fields.Date.from_string(date_str)
         if not date_da:  # sur création depuis vue liste, date peut être None
-            if mode == 'dict':
-                return {employee.id: [] for employee in self}
-            else:
+            if response_text:
                 return u""
+            else:
+                return {employee.id: [] for employee in self}
         num_jour = date_da.isoweekday()  # entre 1 et 7
         res = {}
         res_text = u""
@@ -268,16 +262,14 @@ class HREmployee(models.Model):
             if res_text:
                 res_text += u"\n"
             if not creneaux:
-                res_text += u"Non travaillé"
+                res_text += u"%s: Non travaillé" % employee.name
             else:
                 res_text += u"%s: %s" % (employee.name, ", ".join(
                     ["%s-%s" % (
                         hours_to_strs(creneau.heure_debut)[0], hours_to_strs(creneau.heure_fin)[0]) for creneau in creneaux]))
-        if mode == 'dict':
-            return res
-        return res_text
-
-
+        if response_text:
+            return res_text
+        return res
 
     @api.multi
     def get_horaires_list_dict(self, date_start, date_stop):

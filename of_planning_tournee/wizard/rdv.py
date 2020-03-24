@@ -6,9 +6,11 @@ from dateutil.relativedelta import relativedelta
 import pytz
 from odoo.exceptions import UserError
 from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
-from odoo.addons.of_utils.models.of_utils import voloiseau
+from odoo.addons.of_utils.models.of_utils import voloiseau, hours_to_strs
 
-import urllib, json, requests
+
+import urllib
+import requests
 
 from odoo.tools import config
 from odoo.tools.float_utils import float_compare
@@ -22,130 +24,119 @@ SEARCH_MODES = [
 bug description quand changement de tache ou service lié puis changé?
 # refonte employés et équipes: dans un premier temp, on limite la prise de rdv aux tache à 1 intervenant
 """
-def hours_to_strs(*hours):
-    """ Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'
-    """
-    return tuple("%dh%02d" % (hour, round((hour % 1) * 60)) if hour % 1 else "%dh" % (hour) for hour in hours)
+
 
 class OfTourneeRdv(models.TransientModel):
     _name = 'of.tournee.rdv'
     _description = u'Prise de RDV dans les tournées'
 
     @api.model
-    def _default_partner(self):
-        # Suivant que la prise de rdv se fait depuis la fiche client ou un service
-        active_model = self._context.get('active_model', '')
-        if active_model == 'res.partner':
-            partner_id = self._context['active_ids'][0]
-        elif active_model == 'of.service':
-            partner_id = self.env['of.service'].browse(self._context['active_ids'][0]).partner_id.id
-        elif active_model == 'sale.order':
-            partner_id = self.env['sale.order'].browse(self._context['active_ids'][0]).partner_id.id
-        else:
-            return False
-
-        partner = self.env['res.partner'].browse(partner_id)
-        while partner.parent_id:
-            partner = partner.parent_id
-        return partner
-
-    @api.model
-    def _default_service(self):
-        active_model = self._context.get('active_model', '')
-        service = False
-        if active_model == "of.service":
-            service_id = self._context['active_ids'][0]
-            service = self.env["of.service"].browse(service_id)
-        elif active_model in ["res.partner", "sale.order"]:
-            partner = self._default_partner()
-            if partner:
-                service = self.env['of.service'].search([('partner_id', '=', partner.id),('recurrence', '=', True)], limit=1)
-        return service
-
-    @api.model
-    def _default_address(self):
+    def default_get(self, fields=None):
+        res = super(OfTourneeRdv, self).default_get(fields)
+        # Suivant que la prise de rdv se fait depuis la fiche client ou une intervention à programmer
+        a_programmer_obj = self.env['of.service']
         partner_obj = self.env['res.partner']
         active_model = self._context.get('active_model', '')
-        if active_model == "of.service":
-            service = self.env["of.service"].browse(self._context['active_ids'][0])
-            partner = service.partner_id
-            address = service.address_id
-        elif active_model == "res.partner":
-            partner = partner_obj.browse(self._context['active_ids'][0])
+        service_id = False
+        partner_id = False
+        address = False
+        if active_model == 'res.partner':
+            partner_id = self._context['active_ids'][0]
+            partner = partner_obj.browse(partner_id)
+            service = a_programmer_obj.search([('partner_id', '=', partner.id), ('recurrence', '=', True)],
+                                                    limit=1)
+            service_id = service and service.id or False
             address = partner_obj.browse(partner.address_get(['delivery'])['delivery'])
-        elif active_model == "sale.order":
-            order = self.env['sale.order'].browse(self._context['active_ids'][0])
-            if not order:
-                return False
-            partner = order.partner_id
+        elif active_model == 'of.service':
+            service_id = self._context['active_ids'][0]
+            service = a_programmer_obj.browse(service_id)
+            partner_id = service.partner_id.id
+            address = service.address_id
+        elif active_model == 'sale.order':
+            order_id = self._context['active_ids'][0]
+            order = self.env['sale.order'].browse(order_id)
+            partner_id = order.partner_id.id
+            service = a_programmer_obj.search([('order_id', '=', order_id)], limit=1)
+            if not service:
+                service = a_programmer_obj.search([('partner_id', '=', partner_id)], limit=1)
+            service_id = service and service.id or False
             address = order.partner_shipping_id or order.partner_id
-        else:
-            address = False
 
         if address and not (address.geo_lat or address.geo_lng):
             address = partner_obj.search(['|', ('id', '=', partner.id), ('parent_id', '=', partner.id),
                                           '|', ('geo_lat', '!=', 0), ('geo_lng', '!=', 0)],
                                          limit=1) or address
-        return address or False
+        address_id = address and address.id or False
 
-    name = fields.Char(string=u'Libellé', size=64, required=False)
-    description = fields.Html(string='Description')
-    tache_id = fields.Many2one('of.planning.tache', string=u'Tâche', required=True)
-    employee_id = fields.Many2one('hr.employee', string=u"Intervenant")
-    pre_employee_ids = fields.Many2many(
-        'hr.employee', string=u"Pré-sélection d'intervenants",
-        domain="['|', ('of_tache_ids', 'in', tache_id), ('of_toutes_taches', '=', True)]",
-        help=u"pré-sélection des intervenants")
-    duree = fields.Float(string=u'Durée', required=True, digits=(12, 5))
-    planning_ids = fields.One2many('of.tournee.rdv.line', 'wizard_id', string='Proposition de RDVs')
-    planning_tree_ids = fields.One2many(
-        'of.tournee.rdv.line', 'wizard_id', string='Proposition de RDVs',
-        domain=[('intervention_id', '=', False), ('allday', '=', False)])
-    date_propos = fields.Datetime(string=u'RDV Début')
-    date_propos_hour = fields.Float(string=u'Heure de début', digits=(12, 5))
-    date_recherche_debut = fields.Date(
-        string=u"À partir du", required=True,
-        default=lambda *a: (date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
-    date_recherche_fin = fields.Date(
-        string="Jusqu'au", required=True, default=lambda *a: (date.today() + timedelta(days=7)).strftime('%Y-%m-%d'))
+        res['partner_id'] = partner_id
+        res['partner_address_id'] = address_id
+        res['service_id'] = service_id
+
+        return res
+
+    # Champs de recherche
+
     partner_id = fields.Many2one(
-        'res.partner', string='Client', required=True, readonly=True, default=lambda x: x._default_partner())
+        'res.partner', string='Client', required=True, readonly=True)
     partner_address_id = fields.Many2one(
-        'res.partner', string="Adresse d'intervention", required=True, default=lambda x: x._default_address(),
+        'res.partner', string="Adresse d'intervention", required=True,
         domain="['|', ('id', '=', partner_id), ('parent_id', '=', partner_id)]")
+    geo_lat = fields.Float(related='partner_address_id.geo_lat', readonly=True)
+    geo_lng = fields.Float(related='partner_address_id.geo_lng', readonly=True)
+    precision = fields.Selection(related='partner_address_id.precision', readonly=True)
+    geocode_retry = fields.Boolean(u"Geocodage retenté", compute="_compute_geocode_retry")
+    ignorer_geo = fields.Boolean(u"Ignorer données géographiques")
     partner_address_street = fields.Char(related="partner_address_id.street", readonly=True)
     partner_address_street2 = fields.Char(related="partner_address_id.street2", readonly=True)
     partner_address_city = fields.Char(related="partner_address_id.city", readonly=True)
     partner_address_state_id = fields.Many2one(related="partner_address_id.state_id", readonly=True)
     partner_address_zip = fields.Char(related="partner_address_id.zip", readonly=True)
     partner_address_country_id = fields.Many2one(related="partner_address_id.country_id", readonly=True)
-    date_display = fields.Char(string='Jour du RDV', size=64, readonly=True)
-    service_id = fields.Many2one(
-        'of.service', string='À programmer', default=lambda x: x._default_service(),
-        domain="[('partner_id', '=', partner_id)]")
+    service_id = fields.Many2one('of.service', string=u'À programmer', domain="[('partner_id', '=', partner_id)]")
+    tache_id = fields.Many2one('of.planning.tache', string=u'Tâche', required=True)
     creer_recurrence = fields.Boolean(
         string=u"Créer récurrence?",
-        help=u"Si cette case est cochée et qu'il n'existe pas de service lié à cette intervention, en crééra un.")
-    date_next = fields.Date(string=u'Prochaine intervention', help=u"Date à partir de laquelle programmer la prochaine intervention")
-    date_fin_planif = fields.Date(string=u'expiration de prochaine planif',
-                            help=u"Date à partir de laquelle l'intervention devient en retard")
+        help=u"Si cette case est cochée et qu'il n'existe pas d'intervention récurrente lié à ce RDV, en crééra un.")
+    duree = fields.Float(string=u'Durée', required=True, digits=(12, 5))
+    pre_employee_ids = fields.Many2many(
+        'hr.employee', string=u"Pré-sélection d'intervenants",
+        domain="['|', ('of_tache_ids', 'in', tache_id), ('of_toutes_taches', '=', True)]",
+        help=u"pré-sélection des intervenants")
+
+    date_recherche_debut = fields.Date(
+        string=u"À partir du", required=True,
+        default=lambda *a: (date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
+    date_recherche_fin = fields.Date(
+        string="Jusqu'au", required=True, default=lambda *a: (date.today() + timedelta(days=7)).strftime('%Y-%m-%d'))
     mode_recherche = fields.Selection(SEARCH_MODES, string="Mode de recherche", required=True, default="distance")
     max_recherche = fields.Float(string="Maximum")
+    orthodromique = fields.Boolean(string=u"Distances à vol d'oiseau")
 
+    # Champs de résultat
+
+    display_res = fields.Boolean(string=u"Voir Résultats", default=False)  # Utilisé pour attrs invisible des résultats
     zero_result = fields.Boolean(string="Recherche infructueuse", default=False, help=u"Aucun résultat")
     zero_dispo = fields.Boolean(
         string="Recherche infructueuse", default=False, help=u"Aucun résultat suffisamment proche")
-    display_res = fields.Boolean(string=u"Voir Résultats", default=False)
+    planning_ids = fields.One2many('of.tournee.rdv.line', 'wizard_id', string='Proposition de RDVs')
+    planning_tree_ids = fields.One2many(
+        'of.tournee.rdv.line', 'wizard_id', string='Proposition de RDVs',
+        domain=[('intervention_id', '=', False), ('allday', '=', False)])
     res_line_id = fields.Many2one("of.tournee.rdv.line", string=u"Créneau Sélectionné")
 
-    # champs ajoutés pour la vue map
-    geo_lat = fields.Float(related='partner_address_id.geo_lat', readonly=True)
-    geo_lng = fields.Float(related='partner_address_id.geo_lng', readonly=True)
-    precision = fields.Selection(related='partner_address_id.precision', readonly=True)
-    partner_name = fields.Char(related='partner_id.name')
-    geocode_retry = fields.Boolean(u"Geocodage retenté", compute="_compute_geocode_retry")
-    ignorer_geo = fields.Boolean(u"Ignorer données géographiques")
-    orthodromique = fields.Boolean(string=u"Distances à vol d'oiseau")
+    name = fields.Char(string=u'Libellé', size=64, required=False)
+    description = fields.Html(string='Description')
+    employee_id = fields.Many2one('hr.employee', string=u"Intervenant")
+    date_propos = fields.Datetime(string=u'RDV Début')
+    date_propos_hour = fields.Float(string=u'Heure de début', digits=(12, 5))
+    date_display = fields.Char(string='Jour du RDV', size=64, readonly=True)
+
+    # champs pour la création ou mise à jour d'interventions récurrentes
+    date_next = fields.Date(string=u'Prochaine intervention', help=u"Date à partir de laquelle programmer la prochaine intervention")
+    date_fin_planif = fields.Date(string=u'expiration de prochaine planif',
+                            help=u"Date à partir de laquelle l'intervention devient en retard")
+
+    # @api.depends
 
     @api.depends('partner_address_id', 'partner_address_id.geocoding', 'partner_address_id.precision')
     def _compute_geocode_retry(self):
@@ -159,28 +150,29 @@ class OfTourneeRdv(models.TransientModel):
             else:
                 wizard.geocode_retry = True
 
-    @api.onchange('mode_recherche')
-    def _onchange_mode_recherche(self):
-        self.ensure_one()
-        if self.mode_recherche:
-            self.max_recherche = self.mode_recherche == 'distance' and 50 or 60
+    # @api.onchange
 
-    @api.onchange('date_recherche_debut')
-    def _onchange_date_recherche_debut(self):
-        self.ensure_one()
-        if self.date_recherche_debut:
-            date_deb = fields.Date.from_string(self.date_recherche_debut)
-            date_fin = date_deb + timedelta(days=6)
-            self.date_recherche_fin = fields.Date.to_string(date_fin)
+    @api.onchange('service_id')
+    def _onchange_service(self):
+        """Affecter la tâche, la description et l'adresse"""
+        if not self.service_id:
+            return
 
-    @api.onchange('date_recherche_fin')
-    def _onchange_date_recherche_fin(self):
-        self.ensure_one()
-        if self.date_recherche_fin and self.date_recherche_fin < self.date_recherche_debut:
-            raise UserError(u"La date de fin de recherche doit être postérieure à la date de début de recherche")
+        service = self.service_id
+        notes = [service.tache_id.name]
+        if service.note:
+            notes.append(service.note)
+
+        vals = {
+            'description': "\n".join(notes),
+            'tache_id': service.tache_id,
+            'partner_address_id': service.address_id,
+        }
+        self.update(vals)
 
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
+        """Affecter creer_recurrence, duree et pre_employee_ids"""
         service_obj = self.env['of.service']
         vals = {'service_id': False}
         if self.tache_id:
@@ -208,34 +200,34 @@ class OfTourneeRdv(models.TransientModel):
             vals['pre_employee_ids'] = employees
         self.update(vals)
 
-    @api.onchange('service_id')
-    def _onchange_service(self):
-        if not self.service_id:
-            return
-
-        service = self.service_id
-        notes = [service.tache_id.name]
-        if service.note:
-            notes.append(service.note)
-
-        vals = {
-            'description': "\n".join(notes),
-            'tache_id': service.tache_id,
-            'partner_address_id': service.address_id,
-        }
-        self.update(vals)
-
-    @api.multi
-    def _get_employee_possible(self):
+    @api.onchange('date_recherche_debut')
+    def _onchange_date_recherche_debut(self):
+        """Affecter date_recherche_fin"""
         self.ensure_one()
-        employee_ids = []
-        for planning in self.planning_ids:
-            if planning.employee_id.id not in employee_ids:
-                employee_ids.append(planning.employee_id.id)
-        return employee_ids
+        if self.date_recherche_debut:
+            date_deb = fields.Date.from_string(self.date_recherche_debut)
+            date_fin = date_deb + timedelta(days=6)
+            self.date_recherche_fin = fields.Date.to_string(date_fin)
+
+    @api.onchange('date_recherche_fin')
+    def _onchange_date_recherche_fin(self):
+        """Vérifier cohérence des dates de recherche"""
+        self.ensure_one()
+        if self.date_recherche_fin and self.date_recherche_fin < self.date_recherche_debut:
+            raise UserError(u"La date de fin de recherche doit être postérieure à la date de début de recherche")
+
+    @api.onchange('mode_recherche')
+    def _onchange_mode_recherche(self):
+        """Affecter max_recherche"""
+        self.ensure_one()
+        if self.mode_recherche:
+            self.max_recherche = self.mode_recherche == 'distance' and 50 or 60
+
+    # Actions
 
     @api.multi
     def button_geocode(self):
+        """Géocoder le partenaire"""
         self.ensure_one()
         if self.geocode_retry:
             raise UserError("Votre géocodeur par défaut n'a pas réussi a géocoder cette adresse")
@@ -248,7 +240,7 @@ class OfTourneeRdv(models.TransientModel):
     @api.multi
     def button_calcul(self):
         """
-        Calcule la prochaine intervention à partir du lendemain de la date courante
+        Lance la recherche de créneaux dispos
         @todo: Remplacer le retour d'action par un return True, mais pour l'instant cela
           ne charge pas correctement la vue du planning.
         """
@@ -266,14 +258,67 @@ class OfTourneeRdv(models.TransientModel):
         }
 
     @api.multi
-    def compute(self):
-        u"""Calcul des prochains créneaux disponibles
-        NOTE : Si un service est sélectionné incluant le samedi et/ou le dimanche,
-               ceux-cis seront traités comme des jours normaux du point de vue des équipes
+    def button_confirm(self):
         """
-        #TODO: finir de commenter
+        Créé un RDV d'intervention puis l'ouvre en vue form.
+        Créé aussi une intervention récurrente si besoin
+        """
         self.ensure_one()
+        if not self._context.get('tz'):
+            self = self.with_context(tz='Europe/Paris')
 
+        intervention_obj = self.env['of.planning.intervention']
+        service_obj = self.env['of.service']
+
+        # Vérifier que la date de début et la date de fin sont dans les créneaux
+        employee = self.employee_id
+        if not employee.of_segment_ids:
+            raise UserError("Il faut configurer l'horaire de travail de tous les intervenants.")
+
+        date_propos_dt = fields.Datetime.from_string(self.date_propos)  # datetime utc proposition de rdv
+
+        values = self.get_values_intervention_create()
+
+        res = intervention_obj.create(values)
+
+        # Creation/mise à jour du service si creer_recurrence
+        if self.date_next:
+            if self.service_id:
+                self.service_id.write({
+                    'date_next': self.date_next,
+                    'date_fin': self.date_fin_planif
+                })
+            elif self.creer_recurrence:
+                res.service_id = service_obj.create(self._get_service_data(date_propos_dt.month))
+
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'of.planning.intervention',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_id': res.id,
+            'target': 'current',
+            'context': self._context
+        }
+
+    # Autres
+
+    @api.multi
+    def _get_employee_possible(self):
+        self.ensure_one()
+        employee_ids = []
+        for planning in self.planning_ids:
+            if planning.employee_id.id not in employee_ids:
+                employee_ids.append(planning.employee_id.id)
+        return employee_ids
+
+    @api.multi
+    def compute(self):
+        u"""
+        Remplis le champ planning_ids avec les créneaux non travaillés et les RDV tech.
+        Lance le calcul des distances et sélectionne un résultat si il y en a
+        """
+        self.ensure_one()
         compare_precision = 5
 
         if not self._context.get('tz'):
@@ -291,7 +336,7 @@ class OfTourneeRdv(models.TransientModel):
 
         # Récupération des équipes
         if not self.tache_id.employee_ids:
-            raise UserError(u"Aucun intervenant ne peut réaliser cette tâche.")
+            raise UserError(u"Aucun intervenant ne peut réaliser cette prestation.")
         employees = self.tache_id.employee_ids
         if self.pre_employee_ids:
             employees &= self.pre_employee_ids
@@ -344,8 +389,7 @@ class OfTourneeRdv(models.TransientModel):
         date_recherche_da = avant_recherche_da
         u"""
         Parcourt tous les jours inclus entre la date de début de recherche et la date de fin de recherche.
-        Prend en compte les équipes qui peuvent effectuer la tache, et qui sont disponibles
-        Ne prend pas en compte les jours non travaillés
+        Prend en compte les employés présélectionnés si il y en a et ceux qui peuvent effectuer la tache sinon
         """
         while date_recherche_da < apres_recherche_da:
             date_recherche_da += un_jour
@@ -361,22 +405,7 @@ class OfTourneeRdv(models.TransientModel):
             date_recherche_str = fields.Date.to_string(date_recherche_da)
             horaires_du_jour = employees.get_horaires_date(date_recherche_str)
 
-            # Interdiction de chercher dans les tournées bloquées ou complètes
-            # self._cr.execute("SELECT employee_id "
-            #                  "FROM of_planning_tournee "
-            #                  "WHERE employee_id IN %s "
-            #                  "  AND date = %s"
-            #                  "  AND (is_bloque OR is_complet)",
-            #                  (employees._ids, date_recherche_str))
-            # employees_bloques = [row[0] for row in self._cr.fetchall()]
             employees_dispo = [employee.id for employee in employees]
-
-            # for employee in employees:
-            #     employee_id = employee.id
-            #     if employee_id not in employees_bloques and horaires_du_jour[employee_id] != []:
-            #         employees_dispo.append(employee_id)
-            # if employees_dispo == []:
-            #     continue
 
             # Recherche de créneaux pour la date voulue et les équipes sélectionnées
             jour_deb_dt = tz.localize(datetime.strptime(date_recherche_str+" 00:00:00", "%Y-%m-%d %H:%M:%S"))
@@ -525,7 +554,6 @@ class OfTourneeRdv(models.TransientModel):
 
         nb, nb_dispo, first_res = wizard_line_obj.get_nb_dispo(self)
 
-        vals = {}
         # Sélection du résultat
         if nb > 0:
             address = self.partner_address_id
@@ -577,7 +605,10 @@ class OfTourneeRdv(models.TransientModel):
 
     @api.multi
     def _get_service_data(self, mois):
-        u"""Renvois le dictionnaire de valeurs nécessaire à la création d'une intervention récurrentes"""
+        """
+        :param mois: mois de référence pour l'intervention récurrente
+        :return: dictionnaires de valeurs pour la création d'intervention récurrente
+        """
         return {
             'partner_id': self.partner_id.id,
             'address_id': self.partner_address_id.id,
@@ -593,9 +624,11 @@ class OfTourneeRdv(models.TransientModel):
 
     @api.multi
     def get_values_intervention_create(self):
+        """
+        :return: dictionnaires de valeurs pour la création du RDV Tech
+        """
         self.ensure_one()
-        employee = self.employee_id
-        values = {
+        return {
             'partner_id': self.partner_id.id,
             'address_id': self.partner_address_id.id,
             'tache_id': self.tache_id.id,
@@ -613,52 +646,10 @@ class OfTourneeRdv(models.TransientModel):
             'origin_interface': u"Trouver un créneau (rdv.py)",
         }
 
-        return values
-
-    @api.multi
-    def button_confirm(self):
-        self.ensure_one()
-        if not self._context.get('tz'):
-            self = self.with_context(tz='Europe/Paris')
-
-        intervention_obj = self.env['of.planning.intervention']
-        service_obj = self.env['of.service']
-
-        # Vérifier que la date de début et la date de fin sont dans les créneaux
-        employee = self.employee_id
-        if not employee.of_segment_ids:
-            raise UserError("Il faut configurer l'horaire de travail de tous les intervenants.")
-
-        #td_pause_midi = timedelta(hours=equipe.hor_ad - equipe.hor_mf)
-        date_propos_dt = fields.Datetime.from_string(self.date_propos)  # datetime utc proposition de rdv
-        date_propos_str = self.date_propos[:10]
-
-        values = self.get_values_intervention_create()
-
-        res = intervention_obj.create(values)
-
-        # Creation/mise à jour du service si creer_recurrence
-        if self.date_next:
-            if self.service_id:
-                self.service_id.write({
-                    'date_next': self.date_next,
-                    'date_fin': self.date_fin_planif
-                })
-            elif self.creer_recurrence:
-                res.service_id = service_obj.create(self._get_service_data(date_propos_dt.month))
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'of.planning.intervention',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_id': res.id,
-            'target': 'current',
-            'context': self._context
-        }
-
     @api.multi
     def calc_distances_dates_employees(self, date_debut, date_fin, employees):
         u"""
+            Appelle le serveur OSRM openfire pour calculer les distances des créneaux libres avec les RDV existants.
             Une requête http par jour et par employé.
             En cas de problème de performance on pourra se débrouiller pour faire une requête par employé.
         """
@@ -679,13 +670,12 @@ class OfTourneeRdv(models.TransientModel):
                     continue
                 tournee = tournee_obj.search([('date', '=', date_courante),
                                               ('employee_id', '=', employee.id)], limit=1)
-                #tournee = creneaux.mapped("intervention_id").mapped("tournee_ids").filtered(lambda t: t.employee_id == employee.id)
                 # S'il y a une tournée, on favorise son point de départ plutôt que celui de l'employé.
                 # Note : une tournée est unique par employé et par date (contrainte SQL) donc len(tournee) <= 1
-                origine = (tournee.address_depart_id or
+                origine = (tournee and tournee.address_depart_id or
                            employee.of_address_depart_id or
                            False)
-                arrivee = (tournee.address_retour_id or
+                arrivee = (tournee and tournee.address_retour_id or
                            employee.of_address_retour_id or
                            False)
                 # Pas d'origine ni pour la tournée ni pour l'employé
@@ -802,21 +792,6 @@ class OfTourneeRdvLine(models.TransientModel):
     _order = "date, employee_id, date_flo"
     _inherit = "of.calendar.mixin"
 
-    @api.model
-    def get_nb_dispo(self, wizard):
-        """Retourne le nombre de créneaux disponibles (qui correspondent aux critères de recherche),
-            le nombre de créneaux trop éloignés, et le premier résultat (en fonction du critère de résultat)"""
-        # ne pas inclure les lignes associées a une intervention ni les lignes de début et fin de recherche
-        lines = self.search([('wizard_id', '=', wizard.id),
-                             ('allday', '=', False),
-                             ('intervention_id', '=', False)],
-                            order="distance, debut_dt")  # events allDay sont debut et fin de recherche
-        lines_dispo = self.search([('wizard_id', '=', wizard.id), ('disponible', '=', True)], order="distance, debut_dt")
-        nb = len(lines)
-        nb_dispo = len(lines_dispo)
-        first_res = lines_dispo and lines_dispo[0] or lines and lines[0] or False
-        return (nb, nb_dispo, first_res)
-
     date = fields.Date(string="Date")
     debut_dt = fields.Datetime(string=u"Début")
     fin_dt = fields.Datetime(string="Fin")
@@ -859,6 +834,8 @@ class OfTourneeRdvLine(models.TransientModel):
              u"haut: à la rue / au voisinage\n"
              u"très haut: au numéro de rue\n")
 
+    # @api.depends
+
     @api.multi
     @api.depends("intervention_id")
     def _compute_geo(self):
@@ -894,14 +871,7 @@ class OfTourneeRdvLine(models.TransientModel):
             else:
                 line.state_int = 3
 
-    @api.model
-    def get_state_int_map(self):
-        """de of.calendar.mixin"""
-        v0 = {'label': 'Brouillon', 'value': 0}
-        v1 = {'label': u'Confirmé', 'value': 1}
-        v2 = {'label': u'Réalisé', 'value': 2}
-        v3 = {'label': u'Disponibilité', 'value': 3}
-        return (v0, v1, v2, v3)
+    # Actions
 
     @api.multi
     def button_confirm(self):
@@ -931,7 +901,7 @@ class OfTourneeRdvLine(models.TransientModel):
         name += address.zip and (" " + address.zip) or ""
         name += address.city and (" " + address.city) or ""
         wizard_vals = {
-            'date_display'    : self.date,  # .strftime('%A %d %B %Y'),
+            'date_display'    : self.date,
             'name'            : name,
             'employee_id'       : self.employee_id.id,
             'date_propos'     : self.debut_dt,
@@ -941,3 +911,30 @@ class OfTourneeRdvLine(models.TransientModel):
         self.wizard_id.write(wizard_vals)
 
         return {'type': 'ir.actions.do_nothing'}
+
+    # Autres
+
+    @api.model
+    def get_nb_dispo(self, wizard):
+        """Retourne le nombre de créneaux disponibles (qui correspondent aux critères de recherche),
+            le nombre de créneaux trop éloignés, et le premier résultat (en fonction du critère de résultat)"""
+        # ne pas inclure les lignes associées a une intervention ni les lignes de début et fin de recherche
+        lines = self.search([('wizard_id', '=', wizard.id),
+                             ('allday', '=', False),
+                             ('intervention_id', '=', False)],
+                            order="distance, debut_dt")  # events allDay sont debut et fin de recherche
+        lines_dispo = self.search([('wizard_id', '=', wizard.id), ('disponible', '=', True)],
+                                  order="distance, debut_dt")
+        nb = len(lines)
+        nb_dispo = len(lines_dispo)
+        first_res = lines_dispo and lines_dispo[0] or lines and lines[0] or False
+        return nb, nb_dispo, first_res
+
+    @api.model
+    def get_state_int_map(self):
+        """de of.calendar.mixin"""
+        v0 = {'label': 'Brouillon', 'value': 0}
+        v1 = {'label': u'Confirmé', 'value': 1}
+        v2 = {'label': u'Réalisé', 'value': 2}
+        v3 = {'label': u'Disponibilité', 'value': 3}
+        return (v0, v1, v2, v3)
