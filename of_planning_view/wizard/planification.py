@@ -862,7 +862,7 @@ class OfPlanifCreneau(models.TransientModel):
         intervention = self.create_intervention()
         if self.selected_id.service_id.recurrence:  # conception: calculer date next à la création de l'intervention ou à sa validation?
             intervention.service_id.date_next = intervention.service_id.get_next_date(self.date_creneau)
-            intervention.service_id.date_fin = intervention.service_id.get_fin_date(service.date_next)
+            intervention.service_id.date_fin = intervention.service_id.get_fin_date(intervention.service_id.date_next)
         return #{'type': 'ir.actions.client', 'tag': 'history_back'}
 
     @api.multi

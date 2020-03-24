@@ -69,6 +69,8 @@ class HREmployee(models.Model):
         'of.jours', 'employee_jours_rel', 'employee_id', 'jour_id', string=u'Jours travaillés',
         default=lambda self: self._default_of_jours_ids()
     )
+    sequence = fields.Integer(string=u"Séquence d'affichage", help=u"""
+        Champ pour définir l'ordre d'affichage des employés. Du plus petit au plus grand.""")
 
     of_address_depart_id = fields.Many2one('res.partner', string=u'Adresse de départ')
     of_address_retour_id = fields.Many2one('res.partner', string='Adresse de retour')
