@@ -3,7 +3,8 @@
 from odoo import models, api
 import time
 
-class of_gesdoc_import(models.TransientModel):
+
+class OFGesDocImport(models.TransientModel):
     _inherit = 'of.gesdoc.import'
 
     @api.model
@@ -18,12 +19,12 @@ class of_gesdoc_import(models.TransientModel):
                     if user:
                         result['user_id'] = user.id
         else:
-            result = super(of_gesdoc_import, self).import_data_obj(data, obj)
+            result = super(OFGesDocImport, self).import_data_obj(data, obj)
         return result
 
     @api.multi
     def import_data(self, data):
-        result = super(of_gesdoc_import, self).import_data(data)
+        result = super(OFGesDocImport, self).import_data(data)
         if 'pi_of_code' in data:
             # Detection de la clef
             issue = self.env['project.issue'].search([('of_code', '=', data['pi_of_code'])])

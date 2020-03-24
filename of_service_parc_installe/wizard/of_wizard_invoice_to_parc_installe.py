@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api
 
+
 class OfInvoiceLineToParcInstalleWizard(models.TransientModel):
     _name = "of.invoice.line.to.parc.installe.wizard"
 

@@ -3,560 +3,420 @@
 
 <!-- Help Desk (menu) -->
 
-  <!--  <record model="ir.actions.act_window" id="project_issue.crm_case_helpdesk_act111">
-            <field name="context">{"search_default_current":1, "search_default_current":1, 'search_default_section_id': section_id}</field>
-        </record>
--->
-        <record id="of_view_project_issue_filter" model="ir.ui.view">
-            <field name="name">of.view.project.issue.filter</field>
-            <field name="model">project.issue</field>
-            <field name="inherit_id" ref="project_issue.view_project_issue_filter"/>
-            <field name="arch" type="xml">
-                <field name="name" position="replace">
-                    <field name="of_code" string="Code SAV"/>
-                    <field name="name" string="Requête"/>
-                </field>
-                <field name="id" position="replace"/>
-                <field name="user_id" position="replace">
-                    <field name="user_id" string="Responsable"/>
-                    </field>
-                <field name="project_id" position="replace"/>
-
-                <filter name="project" position="after">
-                    <filter name="categ_id" string="Catégorie" context="{'group_by' : 'of_categorie_id'}"/>
-                    <filter name="categ_mere_id" string="Catégorie mère" context="{'group_by' : 'of_categorie_mere_id'}"/>
-                </filter>
- <!--               <filter string="Open" position="replace">
-                    <filter icon="terp-camera_test"
-                        string="Open"
-                        name="current"
-                        domain="[('state','=','open')]"
-                        help="Demande de support ouverte"
-                    />
-                </filter>
-                <filter string="Pending" position="after">
-                    <filter icon="terp-camera_test"
-                        string="Terminé"
-                        domain="[('state','=','done')]"
-                        help="Demande de support terminée"
-                    /> -->
-                        <!-- help="Done Helpdesk Request" -->
-   <!--              </filter>
-                <field name="section_id" position="replace"/>
-                <field name="partner_id" position="after">
-                    <field name="shop_id"/>
-                </field>
--->
+    <record id="of_view_project_issue_filter" model="ir.ui.view">
+        <field name="name">of.view.project.issue.filter</field>
+        <field name="model">project.issue</field>
+        <field name="inherit_id" ref="project_issue.view_project_issue_filter"/>
+        <field name="arch" type="xml">
+            <field name="name" position="replace">
+                <field name="of_code" string="Code SAV"/>
+                <field name="name" string="Requête"/>
             </field>
-        </record>
+            <field name="id" position="replace"/>
+            <field name="user_id" position="replace">
+                <field name="user_id" string="Responsable"/>
+                </field>
+            <field name="project_id" position="replace"/>
 
-        <record model="ir.ui.view" id="of_crm_case_tree_view_helpdesk">
-            <field name="name">SAV Support Tree</field>
-            <field name="model">project.issue</field>
-            <field name="inherit_id" ref="project_issue.project_issue_tree_view"/>
-            <field name="arch" type="xml">
-                <field name="id" position="replace"/>
-                <field name="name" position="before">
-                    <field name="of_code"/>
-                </field>
-                <field name="name" position="replace">
-                    <field name="name" string="Requête"/>
-                </field>
-                <field name="partner_id" position="replace">
-                    <field name="partner_id" string="Partenaire"/>
-                </field>
-                <field name="priority" position="replace"/>
+            <filter name="project" position="after">
+                <filter name="categ_id" string="Catégorie" context="{'group_by' : 'of_categorie_id'}"/>
+                <filter name="categ_mere_id" string="Catégorie mère" context="{'group_by' : 'of_categorie_mere_id'}"/>
+            </filter>
+        </field>
+    </record>
 
-<!-- Migration 9                <field name="partner_id" position="after">
-                    <field name="shop_id"/>
-                    <field name="categ_parent_id" invisible="1"/>
-                    <field name="categ_id" invisible="1"/>
-                </field>
--->
-                <field name="project_id" position="replace"/>
-                <field name="create_date" position="replace">
-                    <field name="date"/>
-                </field>
-                <field name="date" position="after">
-                    <field name="date_deadline"/>
-                </field>
-                <field name="user_id" position="replace">
-                    <field name="user_id" string="Responsable"/>
-                    <field name="priority"/>
-                </field>
+    <record model="ir.ui.view" id="of_crm_case_tree_view_helpdesk">
+        <field name="name">SAV Support Tree</field>
+        <field name="model">project.issue</field>
+        <field name="inherit_id" ref="project_issue.project_issue_tree_view"/>
+        <field name="arch" type="xml">
+            <field name="id" position="replace"/>
+            <field name="name" position="before">
+                <field name="of_code"/>
             </field>
-        </record>
+            <field name="name" position="replace">
+                <field name="name" string="Requête"/>
+            </field>
+            <field name="partner_id" position="replace">
+                <field name="partner_id" string="Partenaire"/>
+            </field>
+            <field name="priority" position="replace"/>
+            <field name="project_id" position="replace"/>
+            <field name="create_date" position="replace">
+                <field name="date"/>
+            </field>
+            <field name="date" position="after">
+                <field name="date_deadline"/>
+            </field>
+            <field name="user_id" position="replace">
+                <field name="user_id" string="Responsable"/>
+                <field name="priority"/>
+            </field>
+        </field>
+    </record>
 
-        <record id="of_project_issue_form_view" model="ir.ui.view">
-            <field name="name">SAV Form</field>
-            <field name="model">project.issue</field>
-            <field name="inherit_id" ref="project_issue.project_issue_form_view"/>
-            <field name="arch" type="xml">
-                <xpath expr="//div[@name='button_box']/button[@name='toggle_active']" position="attributes">
-                    <attribute name="groups"></attribute>
-                </xpath>
-                <xpath expr="//form/sheet/group/group" position="attributes">
-                    <attribute name="string">SAV</attribute>
-                </xpath>
-                <xpath expr="//form/sheet/group/group[2]" position="attributes">
-                    <attribute name="string">Contact</attribute>
-                </xpath>
-                <xpath expr="//div[@class='oe_title']/h1" position="replace">
-                    <h1><field name="of_code"/></h1>
-                    <h1><field name="name" placeholder="Requête ..."/></h1>
-                </xpath>
-                <field name="user_id" position="before">
-                    <field name="date"/>
-                    <field name="of_categorie_id"/>
-                    <field name="date_deadline"/>
-                </field>
-                <field name="email_from" position="after">
-                    <field name="of_canal_id"/>
-                </field>
-                <field name="project_id" position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </field>
-                <field name="task_id" position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </field>
-                <field name="task_id" position="after">
-<!--  Migration     <field name="shop_id" on_change="onchange_shop_id(shop_id,partner_shop_id)"/>
-                    <field name="show_partner_shop" invisible="1"/> -->
-                    <field name="of_garantie"/>
-                    <field name="of_payant_client"/>
-                    <field name="of_payant_fournisseur"/>
-<!-- Migration      <field name="partner_shop_id" attrs="{'invisible':[('show_partner_shop','=',False)]}"/> -->
-                </field>
-                <field name="description" position="replace">
-                    <group>
-                        <field name="description" placeholder="Ajouter une note interne ..." string="Description"/>
-                        <field name="of_piece_commande"/>
-                        <field name="of_intervention"/>
-                    </group>
-                </field>
-<!-- Migration 9                <field name="categ_id" position="attributes">
-                    <attribute name="widget">many2one</attribute>
-                </field> -->
-<!-- Migration 9                <separator string="Notes" position="replace">
-                     <separator string="Description"/>
-                </separator> -->
-                <field name="partner_id" position="replace">
-                    <!--  <field name="partner_id" on_change="onchange_partner_id(partner_id)" required="1" select="1" context="{'show_address': True}"/> -->
-                    <field name="partner_id" required="1" select="1" context="{'show_address': True}"/>
-                    <field name="of_partner_id_ref"/>
-                    <field name="of_partner_id_address"/>
-                    <field name="of_partner_id_phone"/>
-                    <field name="of_partner_id_mobile"/>
-                    <field name="of_partner_id_function"/>
-                </field>
+    <record id="of_project_issue_form_view" model="ir.ui.view">
+        <field name="name">SAV Form</field>
+        <field name="model">project.issue</field>
+        <field name="inherit_id" ref="project_issue.project_issue_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']/button[@name='toggle_active']" position="attributes">
+                <attribute name="groups"></attribute>
+            </xpath>
+            <xpath expr="//form/sheet/group/group" position="attributes">
+                <attribute name="string">SAV</attribute>
+            </xpath>
+            <xpath expr="//form/sheet/group/group[2]" position="attributes">
+                <attribute name="string">Contact</attribute>
+            </xpath>
+            <xpath expr="//div[@class='oe_title']/h1" position="replace">
+                <h1><field name="of_code"/></h1>
+                <h1><field name="name" placeholder="Requête ..."/></h1>
+            </xpath>
+            <field name="user_id" position="before">
+                <field name="date"/>
+                <field name="of_categorie_id"/>
+                <field name="date_deadline"/>
+            </field>
+            <field name="email_from" position="after">
+                <field name="of_canal_id"/>
+            </field>
+            <field name="project_id" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="task_id" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="task_id" position="after">
+                <field name="of_garantie"/>
+                <field name="of_payant_client"/>
+                <field name="of_payant_fournisseur"/>
+            </field>
+            <field name="description" position="replace">
+                <group>
+                    <field name="description" placeholder="Ajouter une note interne ..." string="Description"/>
+                    <field name="of_piece_commande"/>
+                    <field name="of_intervention"/>
+                </group>
+            </field>
+            <field name="partner_id" position="replace">
+                <field name="partner_id" required="1" select="1" context="{'show_address': True}"/>
+                <field name="of_partner_id_ref"/>
+                <field name="of_partner_id_address"/>
+                <field name="of_partner_id_phone"/>
+                <field name="of_partner_id_mobile"/>
+                <field name="of_partner_id_function"/>
+            </field>
 
-                <xpath expr="//page[@name='extra_info']/group" position="replace"/>
+            <xpath expr="//page[@name='extra_info']/group" position="replace"/>
 
-                <page name="extra_info" position="inside">
-                    <group string="Liste de documents">
-                        <field name="invoice_ids" nolabel="1" colspan="4" invisible="1"/>
-                        <field name="doc_ids" nolabel="1" colspan="4" readonly="1">
-                            <tree string="Documents" editable="bottom">
-                                <field name="date"/>
-                                <field name="number"/>
-                                <field name="partner_id"/>
-                                <field name="user_id"/>
-                                <field name="date_due"/>
-                                <field name="origin"/>
-                                <field name="residual"/>
-                                <field name="amount_untaxed"/>
-                                <field name="amount_total"/>
-                                <field name="state"/>
-                                <field name="doc_objet" invisible="1"/>
-                                <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
-                            </tree>
-                            <form string="Documents">
-                                <field name="number"/>
-                                <field name="partner_id"/>
-                                <field name="date"/>
-                                <field name="date_due"/>
-                                <field name="user_id"/>
-                                <field name="origin"/>
-                                <field name="residual"/>
-                                <field name="amount_untaxed"/>
-                                <field name="amount_total"/>
-                                <field name="state"/>
-                                <field name="doc_objet" invisible="1"/>
-                                <group colspan="4" col="4">
-                                    <field name="invoice_id" attrs="{'invisible': [('doc_objet', '!=', 'account.invoice')]}"/>
-                                    <field name="sale_order_id" attrs="{'invisible': [('doc_objet', '!=', 'sale.order')]}"/>
-                                    <field name="purchase_order_id" attrs="{'invisible': [('doc_objet', '!=', 'purchase.order')]}"/>
-                                </group>
-                            </form>
-                        </field>
-                    </group>
-                    <group name="of_interventions" string="Interventions" groups="project.group_project_user">
-                        <field colspan="4" mode="tree" name="interventions_liees" nolabel="1" widget="one2many_list"
-                               groups="project.group_project_user" context="{'default_partner_id':partner_id, 'view_readonly_sav':True}">
-                            <tree string="Interventions">
-                                <field name="employee_ids" widget="many2many_tags"/>
-                                <field name="tache_id"/>
-                                <field name="date" string="Date"/>
-                                <field name="duree" string="Durée"/>
-                                <field name="date_deadline" string="Date fin"/>
-                                <field name="state"/>
-                                <field name="name"/>
-                                <field name="cleantext_description" string="Description"/>
-                            </tree>
-                        </field>
-                    </group>
-                    <group colspan="4" string="Notes client">
-                        <field name="partner_note" colspan="4" nolabel="1"/>
-                    </group>
-                </page>
-<!--                 <field name="email_cc" position="before">
-                    <group colspan="4">
-                        <field name="fourn_ids" colspan="3" nolabel="1" readonly="1" mode="tree">
-                            <tree string="Fournisseurs">
-                                <field name="name"/>
-                                <field name="courriels"/>
-                            </tree>
-                        </field>
-                    </group>
-                </field>
-                <page string="Communication &amp; History" position="inside">
-                    <field name="fourn_msg_ids" colspan="4" nolabel="1" mode="tree">
-                        <tree string="Historique fournisseur">
-                            <field name="display_text" string="History Information"/>
-                            <field name="email_from" invisible="1"/>
+            <page name="extra_info" position="inside">
+                <group string="Liste de documents">
+                    <field name="invoice_ids" nolabel="1" colspan="4" invisible="1"/>
+                    <field name="doc_ids" nolabel="1" colspan="4" readonly="1">
+                        <tree string="Documents" editable="bottom">
+                            <field name="date"/>
+                            <field name="number"/>
+                            <field name="partner_id"/>
+                            <field name="user_id"/>
+                            <field name="date_due"/>
+                            <field name="origin"/>
+                            <field name="residual"/>
+                            <field name="amount_untaxed"/>
+                            <field name="amount_total"/>
                             <field name="state"/>
-                            <button string="Reply" attrs="{'invisible': [('email_from', '=', False)]}" name="110" context="{'mail.compose.message.mode':'reply', 'message_id':active_id}" icon="terp-mail-replied" type="action"/>
+                            <field name="doc_objet" invisible="1"/>
+                            <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
+                        </tree>
+                        <form string="Documents">
+                            <field name="number"/>
+                            <field name="partner_id"/>
+                            <field name="date"/>
+                            <field name="date_due"/>
+                            <field name="user_id"/>
+                            <field name="origin"/>
+                            <field name="residual"/>
+                            <field name="amount_untaxed"/>
+                            <field name="amount_total"/>
+                            <field name="state"/>
+                            <field name="doc_objet" invisible="1"/>
+                            <group colspan="4" col="4">
+                                <field name="invoice_id" attrs="{'invisible': [('doc_objet', '!=', 'account.invoice')]}"/>
+                                <field name="sale_order_id" attrs="{'invisible': [('doc_objet', '!=', 'sale.order')]}"/>
+                                <field name="purchase_order_id" attrs="{'invisible': [('doc_objet', '!=', 'purchase.order')]}"/>
+                            </group>
+                        </form>
+                    </field>
+                </group>
+                <group name="of_interventions" string="Interventions" groups="project.group_project_user">
+                    <field colspan="4" mode="tree" name="interventions_liees" nolabel="1" widget="one2many_list"
+                           groups="project.group_project_user" context="{'default_partner_id':partner_id, 'view_readonly_sav':True}">
+                        <tree string="Interventions">
+                            <field name="employee_ids" widget="many2many_tags"/>
+                            <field name="tache_id"/>
+                            <field name="date" string="Date"/>
+                            <field name="duree" string="Durée"/>
+                            <field name="date_deadline" string="Date fin"/>
+                            <field name="state"/>
+                            <field name="name"/>
+                            <field name="cleantext_description" string="Description"/>
                         </tree>
                     </field>
-                </page>
-                <button name="remind_user" position="attributes">
-                    <attribute name="states">draft,open,pending</attribute>
-                </button>
-                <button name="remind_partner" position="attributes">
-                    <attribute name="states">draft,open,pending</attribute>
-                </button> -->
-            </field>
-        </record> -->
-
-<!-- Migration 9        <record id="of_crm_case_categ-view" model="ir.ui.view">
-            <field name="name">of.crm.case.categ.form</field>
-            <field name="model">crm.case.categ</field>
-            <field name="type">form</field>
-            <field name="inherit_id" ref="crm.crm_case_categ-view"/>
-            <field name="arch" type="xml">
-                <field name="name" position="replace">
-                    <field name="name" select="1" string="Catégorie"/>
-                    <field name="parent_id" select="1"/>
-                </field>
-            </field>
-        </record>
-
-        <record id="of_crm_case_categ_tree-view" model="ir.ui.view">
-            <field name="name">of.crm.case.categ.tree</field>
-            <field name="model">crm.case.categ</field>
-            <field name="type">tree</field>
-            <field name="inherit_id" ref="crm.crm_case_categ_tree-view"/>
-            <field name="arch" type="xml">
-                <field name="name" position="replace">
-                    <field name="complete_name"/>
-                </field>
-            </field>
-        </record>
-
-        <record id="of_crm_case_categ_search-view" model="ir.ui.view">
-            <field name="name">of.crm.case.categ.search</field>
-            <field name="model">crm.case.categ</field>
-            <field name="arch" type="xml">
-                <search string="Catégories d'assistance">
-                    <field name="parent_id"/>
-                    <field name="name"/>
-                    <field name="section_id"/>
-                </search>
-            </field>
-        </record> -->
+                </group>
+                <group colspan="4" string="Notes client">
+                    <field name="partner_note" colspan="4" nolabel="1"/>
+                </group>
+            </page>
+        </field>
+    </record>
 
 <!-- Rapport Fiche SAV dans le SAV -->
 
-        <report
-            auto="True"
-            id="report_of_project_issue"
-            model="project.issue"
-            name="of_project_issue.sav"
-            rml="of_project_issue/report/sav.rml"
-            string="Fiche SAV"
-            header="False"
-            />
+    <report
+        auto="True"
+        id="report_of_project_issue"
+        model="project.issue"
+        name="of_project_issue.sav"
+        rml="of_project_issue/report/sav.rml"
+        string="Fiche SAV"
+        header="False"
+        />
 
 <!-- Rapport Fiche SAV dans le panning intervention-->
 
-        <report
-            auto="True"
-            id="report_of_project_issue_planning"
-            model="of.planning.intervention"
-            name="of_project_issue.sav_planning"
-            rml="of_project_issue/report/sav.rml"
-            string="Fiche SAV"
-            header="False"
-            />
+    <report
+        auto="True"
+        id="report_of_project_issue_planning"
+        model="of.planning.intervention"
+        name="of_project_issue.sav_planning"
+        rml="of_project_issue/report/sav.rml"
+        string="Fiche SAV"
+        header="False"
+        />
 
 
 <!--  Menu -->
 
-       <!-- Menu SAV dans ventes -->
-        <record id="action_of_project_issue_view_sale" model="ir.actions.act_window">
-            <field name="name">SAV</field>
-            <field name="res_model">project.issue</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,kanban,form,pivot,graph</field>
-            <field name="view_id" ref="project_issue.project_issue_tree_view"/>
-            <field name="domain" eval=""/>
-            <field name="help" type="html">
-                <p>Service après-vente</p>
-            </field>
-        </record>
+   <!-- Menu SAV dans ventes -->
+    <record id="action_of_project_issue_view_sale" model="ir.actions.act_window">
+        <field name="name">SAV</field>
+        <field name="res_model">project.issue</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,kanban,form,pivot,graph</field>
+        <field name="view_id" ref="project_issue.project_issue_tree_view"/>
+        <field name="domain" eval=""/>
+        <field name="help" type="html">
+            <p>Service après-vente</p>
+        </field>
+    </record>
 
-       <!-- Menu SAV dans planning -->
-        <record id="action_of_project_issue_view_planning" model="ir.actions.act_window">
-            <field name="name">SAV</field>
-            <field name="res_model">project.issue</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,kanban,form,pivot,graph</field>
-            <field name="view_id" ref="project_issue.project_issue_tree_view"/>
-            <field name="domain" eval=""/>
-            <field name="help" type="html">
-                <p>Service après-vente</p>
-            </field>
-        </record>
+   <!-- Menu SAV dans planning -->
+    <record id="action_of_project_issue_view_planning" model="ir.actions.act_window">
+        <field name="name">SAV</field>
+        <field name="res_model">project.issue</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,kanban,form,pivot,graph</field>
+        <field name="view_id" ref="project_issue.project_issue_tree_view"/>
+        <field name="domain" eval=""/>
+        <field name="help" type="html">
+            <p>Service après-vente</p>
+        </field>
+    </record>
 
-        <menuitem id="of_menu_project_issue_ventes"
-            parent="sales_team.menu_sales"
-            action="action_of_project_issue_view_sale"
-            groups="project.group_project_user"
-            sequence="100"/>
+    <menuitem id="of_menu_project_issue_ventes"
+        parent="sales_team.menu_sales"
+        action="action_of_project_issue_view_sale"
+        groups="project.group_project_user"
+        sequence="100"/>
 
-        <menuitem id="menu_of_planning_intervention_sav"
-            parent="of_planning.menu_of_planning_intervention"
-            action="action_of_project_issue_view_planning"
-            groups="project.group_project_user"
-            sequence="40"/>
+    <menuitem id="menu_of_planning_intervention_sav"
+        parent="of_planning.menu_of_planning_intervention"
+        action="action_of_project_issue_view_planning"
+        groups="project.group_project_user"
+        sequence="40"/>
 
-        <!-- Menu configuration catégories de SAV dans Ventes/Configuration-->
-        <record id="of_project_issue_categorie_action_form" model="ir.actions.act_window">
-            <field name="name">Catégories de SAV</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">of.project.issue.categorie</field>
-            <field name="view_type">form</field>
-        </record>
+    <!-- Menu configuration catégories de SAV dans Ventes/Configuration-->
+    <record id="of_project_issue_categorie_action_form" model="ir.actions.act_window">
+        <field name="name">Catégories de SAV</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.project.issue.categorie</field>
+        <field name="view_type">form</field>
+    </record>
 
-        <menuitem action="of_project_issue_categorie_action_form"
-            groups="project.group_project_manager"
-            id="menu_of_project_issue_categorie_action_form"
-            parent="sales_team.menu_sale_config" sequence="100"/>
+    <menuitem action="of_project_issue_categorie_action_form"
+        groups="project.group_project_manager"
+        id="menu_of_project_issue_categorie_action_form"
+        parent="sales_team.menu_sale_config" sequence="100"/>
 
-        <!-- Menu configuration étiquettes de SAV dans Ventes/Configuration -->
-        <record id="of_project_issue_tag_action_form" model="ir.actions.act_window">
-            <field name="name">Etiquettes de SAV</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">project.tags</field>
-            <field name="view_type">form</field>
-        </record>
+    <!-- Menu configuration étiquettes de SAV dans Ventes/Configuration -->
+    <record id="of_project_issue_tag_action_form" model="ir.actions.act_window">
+        <field name="name">Etiquettes de SAV</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">project.tags</field>
+        <field name="view_type">form</field>
+    </record>
 
-        <menuitem action="of_project_issue_tag_action_form"
-            groups="project.group_project_manager"
-            id="menu_of_project_issue_tag_action_form"
-            parent="sales_team.menu_sale_config" sequence="100"/>
+    <menuitem action="of_project_issue_tag_action_form"
+        groups="project.group_project_manager"
+        id="menu_of_project_issue_tag_action_form"
+        parent="sales_team.menu_sale_config" sequence="100"/>
 
 
 <!-- *************************************************** -->
 <!-- ************** SAV CONFIG CATEGORIES ************** -->
 <!-- *************************************************** -->
 
-        <!-- SAV catégories tree -->
-        <record id="of_project_issue_categorie_tree_view" model="ir.ui.view">
-            <field name="name">of.project.issue.categorie.tree.view</field>
-            <field name="model">of.project.issue.categorie</field>
-            <field name="arch" type="xml">
-                <tree string="Catégories SAV">
+    <!-- SAV catégories tree -->
+    <record id="of_project_issue_categorie_tree_view" model="ir.ui.view">
+        <field name="name">of.project.issue.categorie.tree.view</field>
+        <field name="model">of.project.issue.categorie</field>
+        <field name="arch" type="xml">
+            <tree string="Catégories SAV">
+                <field name="name"/>
+                <field name="parent_id"/>
+                <field name="sequence"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- SAV catégories form -->
+    <record id="of_project_issue_categorie_form_view" model="ir.ui.view">
+        <field name="name">of.project.issue.categorie.form.view</field>
+        <field name="model">of.project.issue.categorie</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
                     <field name="name"/>
                     <field name="parent_id"/>
                     <field name="sequence"/>
-                </tree>
-            </field>
-        </record>
-
-        <!-- SAV catégories form -->
-        <record id="of_project_issue_categorie_form_view" model="ir.ui.view">
-            <field name="name">of.project.issue.categorie.form.view</field>
-            <field name="model">of.project.issue.categorie</field>
-            <field name="arch" type="xml">
-                <form>
-                    <group>
-                        <field name="name"/>
-                        <field name="parent_id"/>
-                        <field name="sequence"/>
-                    </group>
-                </form>
-            </field>
-        </record>
+                </group>
+            </form>
+        </field>
+    </record>
 
 
 <!-- *************************************************** -->
 <!-- ********************* ACTIONS ********************* -->
 <!-- *************************************************** -->
 
-        <!-- *** Action dans sav (project.issue) *** -->
+    <!-- *** Action dans sav (project.issue) *** -->
 
-        <!-- Lien pour action créer un rendez-vous depuis SAV -->
-        <record id="action_open_creer_rdv" model="ir.actions.server">
-            <field name="name">Rendez-vous</field>
-            <field name="model_id" ref="of_planning.model_of_planning_intervention"/>
-            <field name="state">code</field>
-            <field name="code">action = env['project.issue'].action_creer_rdv()</field>
-        </record>
+    <!-- Lien pour action créer un rendez-vous depuis SAV -->
+    <record id="action_open_creer_rdv" model="ir.actions.server">
+        <field name="name">Rendez-vous</field>
+        <field name="model_id" ref="of_planning.model_of_planning_intervention"/>
+        <field name="state">code</field>
+        <field name="code">action = env['project.issue'].action_creer_rdv()</field>
+    </record>
 
-        <record id="action_create_rdv" model="ir.values">
-            <field name="name">Rendez-vous</field>
-            <field name="key2">client_action_multi</field>
-            <field name="model">project.issue</field>
-            <field name="value" eval="'ir.actions.server,%d'%action_open_creer_rdv"/>
-        </record>
-
-
-        <!-- Pour créer devis -->
-
-        <record id="action_open_sale_order" model="ir.actions.server">
-            <field name="name">Générer devis client</field>
-            <field name="model_id" ref="sale.model_sale_order"/>
-            <field name="state">code</field>
-            <field name="code">action = env['project.issue'].open_sale_order()</field>
-        </record>
-
-        <record id="action_create_sale_order" model="ir.values">
-            <field name="name">Générer devis client</field>
-            <field name="key2">client_action_multi</field>
-            <field name="model">project.issue</field>
-            <field name="value" eval="'ir.actions.server,%d'%action_open_sale_order"/>
-        </record>
+    <record id="action_create_rdv" model="ir.values">
+        <field name="name">Rendez-vous</field>
+        <field name="key2">client_action_multi</field>
+        <field name="model">project.issue</field>
+        <field name="value" eval="'ir.actions.server,%d'%action_open_creer_rdv"/>
+    </record>
 
 
-        <!-- Lien pour créer demande de prix -->
+    <!-- Pour créer devis -->
 
-        <record id="action_open_purchase_order" model="ir.actions.server">
-            <field name="name">Générer commande fournisseur</field>
-            <field name="model_id" ref="purchase.model_purchase_order"/>
-            <field name="state">code</field>
-            <field name="code">action = env['project.issue'].open_purchase_order()</field>
-        </record>
+    <record id="action_open_sale_order" model="ir.actions.server">
+        <field name="name">Générer devis client</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code">action = env['project.issue'].open_sale_order()</field>
+    </record>
 
-        <record id="action_create_purchase_order" model="ir.values">
-            <field name="name">Générer commande fournisseur</field>
-            <field name="key2">client_action_multi</field>
-            <field name="model">project.issue</field>
-            <field name="value" eval="'ir.actions.server,%d'%action_open_purchase_order" />
-        </record>
+    <record id="action_create_sale_order" model="ir.values">
+        <field name="name">Générer devis client</field>
+        <field name="key2">client_action_multi</field>
+        <field name="model">project.issue</field>
+        <field name="value" eval="'ir.actions.server,%d'%action_open_sale_order"/>
+    </record>
+
+
+    <!-- Lien pour créer demande de prix -->
+
+    <record id="action_open_purchase_order" model="ir.actions.server">
+        <field name="name">Générer commande fournisseur</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="state">code</field>
+        <field name="code">action = env['project.issue'].open_purchase_order()</field>
+    </record>
+
+    <record id="action_create_purchase_order" model="ir.values">
+        <field name="name">Générer commande fournisseur</field>
+        <field name="key2">client_action_multi</field>
+        <field name="model">project.issue</field>
+        <field name="value" eval="'ir.actions.server,%d'%action_open_purchase_order" />
+    </record>
 
 
 <!-- *************************************************** -->
 <!-- ************** PLANNING INTERVENTION ************** -->
 <!-- *************************************************** -->
 
-        <!-- insertion SAV lié dans planning intervention form -->
-        <record id="of_planning_intervention_sav_liee" model="ir.ui.view" >
-            <field name="name">of.planning.intervention.sav.liee</field>
-            <field name="model">of.planning.intervention</field>
-            <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
-            <field name="groups_id" eval="[(4, ref('project.group_project_user')), (4, ref('base.group_portal'))]"/>
-            <field name="arch" type="xml" >
-                <group name="liens" position="inside">
-                    <field name="sav_id" string="SAV" readonly="context.get('view_readonly_sav')" widget="selection"/>
+    <!-- insertion SAV lié dans planning intervention form -->
+    <record id="of_planning_intervention_sav_liee" model="ir.ui.view" >
+        <field name="name">of.planning.intervention.sav.liee</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
+        <field name="groups_id" eval="[(4, ref('project.group_project_user')), (4, ref('base.group_portal'))]"/>
+        <field name="arch" type="xml" >
+            <group name="liens" position="inside">
+                <field name="sav_id" string="SAV" readonly="context.get('view_readonly_sav')" widget="selection"/>
+            </group>
+        </field>
+    </record>
+
+    <!-- Ajout historique SAV dans vue partenaires -->
+    <record id="of_project_issue_partner_form_view" model="ir.ui.view">
+        <field name="name">of.project.issue.partner.form.view</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="groups_id" eval="[(4, ref('project.group_project_user'))]"/>
+        <field name="arch" type="xml">
+            <page name="historique" position="inside">
+                <group name="sav" string="SAV">
+                    <field name="project_issue_ids" nolabel="1" context="{'default_partner_id':id}">
+                        <tree string="SAV">
+                            <field name="of_code"/>
+                            <field name="name"/>
+                            <field name="date"/>
+                            <field name="date_deadline"/>
+                            <field name="user_id"/>
+                            <field name="priority"/>
+                            <!-- Migration 9 <field name="state"/> -->
+                            <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
+                        </tree>
+                    </field>
                 </group>
-            </field>
-        </record>
+            </page>
+        </field>
+    </record>
 
+    <!-- remplacer string dans smart button SAV dans vue partenaires -->
+    <record id="of_project_issue_partner_form_view" model="ir.ui.view">
+        <field name="name">of.project.issue.partner.form.view.projectissue</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="project_issue.res_partner_issues_button_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='issue_count']" position="attributes">
+                <attribute name="string">SAV</attribute>
+            </xpath>
+        </field>
+    </record>
 
-        <!-- wizard interface courriel SAV -->
- <!--       <record id="view_of_crm_mail_sav_wizard" model="ir.ui.view">
-            <field name="name">Interface courriel SAV</field>
-            <field name="model">of.project.issue.mail.wizard</field>
-            <field name="type">form</field>
-            <field name="arch" type="xml">
-                <form string="Compose Email">
-                    <group colspan="6" col="4">
-                    <field name="src" colspan="4" required="1"/>
-                    <field name="dest" colspan="4" required="1"/>
-                    <field name="subject" colspan="4" widget="char" size="512"/>
-                    </group>
-                    <notebook colspan="4">
-                        <page string="Corps (texte)">
-                            <field name="body" colspan="4" nolabel="1" height="300" width="300"/>
-                        </page>
-                    </notebook>
-                    <group col="4" colspan="4">
-                        <label string="" name="placeholder" colspan="1"/>
-                        <button icon="gtk-close" special="cancel" string="Annuler"/>
-                        <button icon="gtk-ok" name="envoyer_courriel" string="Envoyer" type="object"/>
-                    </group>
-                </form>
-            </field>
-        </record>  -->
-
-
-        <!-- SAV suppression du filtre par défaut (par responsable)
-        NE FONCTIONNE PAS car action en noupdate="1" dans project_issue
-        A REECRIRE -->
-        <!--record model="ir.actions.act_window" id="project_issue.crm_case_helpdesk_act111">
-              <field name="context">{}</field>
-        </record-->
-
-        <!-- Ajout historique SAV dans vue partenaires -->
-        <record id="of_project_issue_partner_form_view" model="ir.ui.view">
-            <field name="name">of.project.issue.partner.form.view</field>
-            <field name="model">res.partner</field>
-            <field name="inherit_id" ref="base.view_partner_form"/>
-            <field name="groups_id" eval="[(4, ref('project.group_project_user'))]"/>
-            <field name="arch" type="xml">
-                <page name="historique" position="inside">
-                    <group name="sav" string="SAV">
-                        <field name="project_issue_ids" nolabel="1" context="{'default_partner_id':id}">
-                            <tree string="SAV">
-                                <field name="of_code"/>
-                                <field name="name"/>
-                                <field name="date"/>
-                                <field name="date_deadline"/>
-                                <field name="user_id"/>
-                                <field name="priority"/>
-                                <!-- Migration 9 <field name="state"/> -->
-                                <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
-                            </tree>
-                        </field>
-                    </group>
-                </page>
-            </field>
-        </record>
-
-        <!-- remplacer string dans smart button SAV dans vue partenaires -->
-        <record id="of_project_issue_partner_form_view" model="ir.ui.view">
-            <field name="name">of.project.issue.partner.form.view.projectissue</field>
-            <field name="model">res.partner</field>
-            <field name="inherit_id" ref="project_issue.res_partner_issues_button_view"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='issue_count']" position="attributes">
-                    <attribute name="string">SAV</attribute>
-                </xpath>
-            </field>
-        </record>
-
-        <!-- Ajoute action générer pdf dans menu "Imprimer" -->
-        <act_window
-            name="Générer un pdf"
-            res_model="of.compose.mail"
-            src_model="project.issue"
-            view_mode="form"
-            key2="client_print_multi"
-            view_id="of_gesdoc.view_courrier_wizard"
-            id="action_view_courrier_wizard_project_issue"
-            target="new"
-            context="{'model':'project.issue'}"
-        />
+    <!-- Ajoute action générer pdf dans menu "Imprimer" -->
+    <act_window
+        name="Générer un pdf"
+        res_model="of.compose.mail"
+        src_model="project.issue"
+        view_mode="form"
+        key2="client_print_multi"
+        view_id="of_gesdoc.view_courrier_wizard"
+        id="action_view_courrier_wizard_project_issue"
+        target="new"
+        context="{'model':'project.issue'}"
+    />
 
 </odoo>

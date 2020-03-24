@@ -3,6 +3,7 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 
+
 class OfInterventionSettings(models.TransientModel):
     _name = 'of.intervention.settings'
     _inherit = 'res.config.settings'
@@ -13,12 +14,6 @@ class OfInterventionSettings(models.TransientModel):
 
     calendar_min_time = fields.Integer(string='(OF) Heure min', help=u"Heure minimale affichée")
     calendar_max_time = fields.Integer(string='(OF) Heure max', help=u"Heure maximale affichée")
-
-    """color_dispo_ft = fields.Char(string="(OF) créneaux dispo", help=u"Couleur de texte des créneaux disponibles.", default="#0C0C0C")
-    color_dispo_bg = fields.Char(string="(OF) créneaux dispo", help=u"Couleur de fond des créneaux disponibles.", default="#7FFF00")
-    color_indispo_ft = fields.Char(string="(OF) créneaux indispo", help=u"Couleur de texte des créneaux indisponibles.", default="#0C0C0C")
-    color_indispo_bg = fields.Char(string="(OF) créneaux indispo", help=u"Couleur de fond des créneaux indisponibles", default="#FF2222")"""
-
     color_bg_creneaux_dispo = fields.Char(string=u"(OF) Créneaux dispo couleur fond",
         help=u"Choisissez un couleur de fond pour les créneaux dispos", default="#7FFF00")
     color_ft_creneaux_dispo = fields.Char(string=u"(OF) Créneaux dispo couleur texte",
@@ -26,7 +21,6 @@ class OfInterventionSettings(models.TransientModel):
                                           default="#0C0C0C")
     duree_min_creneaux_dispo = fields.Float(string=u"(OF) Créneaux dispo durée min", default="1",
                                             help=u"durée minimale pour qu'un trou dans le planning soit considéré commme un créneau dispo")
-
     color_bg_creneaux_indispo = fields.Char(string=u"(OF) Créneaux indispo couleur fond",
         help=u"Choisissez un couleur de fond pour les créneaux dispos", default="#FF2222")
     color_ft_creneaux_indispo = fields.Char(string=u"(OF) Crenéaux indispo couleur texte", default="#0C0C0C",

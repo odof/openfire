@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- Config des interventions -->
     <record id="view_of_intervention_settings_planning_view" model="ir.ui.view">
         <field name="name">paramètres interventions vue planning</field>
         <field name="model">of.intervention.settings</field>
@@ -19,20 +20,19 @@
         </field>
     </record>
 
+    <!-- Vue planning -->
     <record id="of_planning_intervention_view_planning" model="ir.ui.view">
         <field name="name">of.planning.intervention.timeline</field>
         <field name="model">of.planning.intervention</field>
         <field name="arch" type="xml">
             <planning date_start="date" date_stop="date_deadline"
                       string="Interventions" color_ft="of_color_ft" color_bg="of_color_bg"
-                      resource="employee_ids" event_open_popup="true">
-                <field name="date" class="of_planning_info_heures of_planning_subinfo_heure_debut"/>
-                <field name="date_deadline" class="of_planning_info_heures of_planning_subinfo_heure_fin"/>
-                <field name="duree" class="of_planning_info_heures of_planning_subinfo_duree"/>
-                <field name="tache_name" class="of_planning_info_tache_name"/>
-                <field name="partner_name" class="of_planning_info_partner_name"/>
-                <field name="address_zip" class="of_planning_info_lieu of_planning_subinfo_zip"/>
-                <field name="address_city" class="of_planning_info_lieu of_planning_subinfo_city"/>
+                      resource="employee_ids">
+                <field name="duree"/>
+                <field name="tache_name"/>
+                <field name="partner_name"/>
+                <field name="address_zip"/>
+                <field name="address_city"/>
                 <field name="secteur_id"/>
                 <field name="state_int"/>
             </planning>
