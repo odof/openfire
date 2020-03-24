@@ -61,7 +61,7 @@ CalendarView.include({
             throw new Error(_t("Calendar views with 'custom_colors' attribute set to true need to define either 'use_contacts' or 'attendee_model' attribute. \n\
                 (use_contacts takes precedence)."));
         }
-        this.draggable = !isNullOrUndef(attrs.draggable)  && _.str.toBool(attrs.draggable); // make drag n drop defaults to false
+        this.draggable = !isNullOrUndef(attrs.draggable)  && _.str.toBool(attrs.draggable) || undefined;
 
         this.display_states = attrs.display_states  && _.str.toBool(attrs.display_states); // integer to make state easily visible. see .less file
 
@@ -107,7 +107,8 @@ CalendarView.include({
 
         return $.when(dnd_dfd, mintime_dfd, maxtime_dfd, this._super())
         .then(function () {
-            self.draggable = _.str.toBool(arguments[0]) || self.draggable; // if false in system parameters but true in view definition, make it true
+            // privilégier l'attribut draggable de la vue XML si présent: exemple rdv_view.xml
+            self.draggable = !isNullOrUndef(self.draggable) && self.draggable || _.str.toBool(arguments[0]);
             var min_time = arguments[1];
             var max_time = arguments[2]
             if (min_time && min_time < 10) {  // minTime

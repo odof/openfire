@@ -6,8 +6,8 @@ from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
 from datetime import datetime
 
 
-# Pour la génération de pdf depuis le SAV
 class OfComposeMail(models.TransientModel):
+    # Pour la génération de pdf depuis le SAV
     _inherit = 'of.compose.mail'
 
     @api.model
