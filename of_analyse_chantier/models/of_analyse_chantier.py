@@ -661,10 +661,10 @@ class OfPlanningIntervention(models.Model):
     cout_moyen_equipe_heure = fields.Float(string=u"Coût moyen", compute="_compute_cout_theorique")
     cout_moyen_theorique = fields.Float(string=u"Coût moyen théorique", compute="_compute_cout_theorique")
 
-    @api.depends('equipe_id', 'duree')
+    @api.depends('duree', 'employee_ids')
     def _compute_cout_theorique(self):
         for intervention in self:
-            intervention.cout_moyen_equipe_heure = intervention.equipe_id.cout_moyen_equipe()
-            intervention.cout_moyen_theorique = intervention.equipe_id.cout_moyen_equipe() * intervention.duree
-            intervention.cout_equipe_heure = sum(intervention.equipe_id.employee_ids.mapped('of_cout_horaire'))
-            intervention.cout_theorique = sum(intervention.equipe_id.employee_ids.mapped('of_cout_horaire')) * intervention.duree
+            intervention.cout_moyen_equipe_heure = intervention.employee_ids.get_cout_horaire_moyen() * len(intervention.employee_ids)
+            intervention.cout_moyen_theorique = intervention.employee_ids.get_cout_horaire_moyen() * len(intervention.employee_ids) * intervention.duree
+            intervention.cout_equipe_heure = sum(intervention.employee_ids.mapped('of_cout_horaire'))
+            intervention.cout_theorique = sum(intervention.employee_ids.mapped('of_cout_horaire')) * intervention.duree
