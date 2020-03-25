@@ -56,10 +56,7 @@ var MODE_COLUMN_NBS = {
     "week": 7,
     "month": 7,
 };
-/*
-NEXT: action click creneau dispo on_close, nettoyage et commentaire du code
-TODO:
-*/
+
 var PlanningView = View.extend({
     template: 'PlanningView',
     display_name: _lt('Planning'),
@@ -120,7 +117,7 @@ var PlanningView = View.extend({
         this.fields = this.fields_view.fields;
         this.fields_keys = _.keys(this.fields_view.fields);
         this.name = this.fields_view.name || attrs.string;
-        this.rows = {}; // dict of events {id1: [ev1,ev2], id2: [ev3], ..}
+        this.rows = []; // Array of rows
 
         this.date_start = attrs.date_start;     // Field name of starting date field
         this.date_delay = attrs.date_delay;     // duration
@@ -161,6 +158,7 @@ var PlanningView = View.extend({
         var excluded_ids_def = new Model("ir.values").call("get_default", ["of.intervention.settings", "planningview_employee_exclu_ids"]);
         var intervenants_ids_def = new Model("hr.employee").query(['id']) // retrieve ids from db
             .filter([['of_est_intervenant', '=', true]]) // seulement les intervenants
+            .order_by(['sequence'])
             .all();  // récupérer tous les employés qui sont des intervenants
         var ir_values_model = new Model("ir.values");
         // récupérer la dernière semaine affichée en vue planning pour l'utilisateur en cours -> inhibé pour l'instant
@@ -220,7 +218,7 @@ var PlanningView = View.extend({
      */
     _set_all_custom_colors: function() {
         var self = this;
-        var ids = _.reject(_.keys(self.all_filters),function(num){ return num == 'undefined'; });
+        var ids = _.reject(self.all_filters,function(filter){ return filter.id == 'undefined'; });
 
         var dfd = $.Deferred();
         var dfd2 = $.Deferred();
@@ -230,11 +228,13 @@ var PlanningView = View.extend({
         var model_name = self.fields[self.resource].relation;
         var Attendees = new Model(model_name);
 
-        Attendees.query(['id', self.color_ft, self.color_bg, 'name']) // retrieve colors from db
+        Attendees.query(['id', self.color_ft, self.color_bg, 'name', 'sequence']) // retrieve colors from db
             .filter([['id', 'in', self.view_res_ids || []]]) // id
+            .order_by(['sequence'])
             .all()
             .then(function (attendees){
-                self.all_filters = {};
+                self.all_filters = new Array(attendees.length);
+                self.res_ids_indexes = {}
                 for (var i=0; i<attendees.length; i++) {
                     var a = attendees[i];
                     var key = a.id;
@@ -246,8 +246,10 @@ var PlanningView = View.extend({
                         value: a['id'],
                         input_id: a['id'] + "_input",
                         is_checked: true,
+                        sequence: a['sequence'],
                     }
-                    self.all_filters[key] = filter_item;
+                    self.all_filters[i] = filter_item;
+                    self.res_ids_indexes[a['id']] = i;
                 };
                 dfd.resolve();
                 var ir_values_model = new Model("ir.values");
@@ -403,9 +405,10 @@ var PlanningView = View.extend({
         var self = this;
         var la_key;
         if (! self.all_filters) {
-            self.all_filters = {};
+            self.all_filters = [];
         }
-        self.rows = {};
+        self.rows = new Array(self.view_res_ids.length);
+        self.rows_ids_indexes = {}
         var row_options, emp_id;
         for (var i in self.view_res_ids) {
             emp_id = self.view_res_ids[i];
@@ -413,9 +416,10 @@ var PlanningView = View.extend({
                 "res_id": emp_id,
                 "auto_render": false,
             }
+            self.rows_ids_indexes[emp_id] = i
 
-            self.rows[emp_id] = new PlanningView.Row(self.table,self,[],row_options);
-            self.rows[emp_id].head_column = self.all_filters[emp_id].label;
+            self.rows[i] = new PlanningView.Row(self.table,self,[],row_options);
+            self.rows[i].head_column = self.all_filters[self.res_ids_indexes[emp_id]].label;
         }
         self.col_offset_today = null;
         if (moment(self.range_start) <= moment() && moment() <= moment(self.range_stop)) {
@@ -435,7 +439,8 @@ var PlanningView = View.extend({
                    //console.log("events: ",events,self.fields_keys);
 
                     var filter_item;
-                    var event, planning_record, day_span, col_offset_start, col_offset_stop, record_options, row_options, event_res_ids, res_id;
+                    var event, planning_record, day_span, col_offset_start, col_offset_stop, record_options, row_options,
+                        event_res_ids, res_id, row_index;
                     for (var i=0; i<events.length; i++) {
                         event = events[i];
                         event_res_ids = event[self.resource];
@@ -462,9 +467,10 @@ var PlanningView = View.extend({
 
                         for (var j in event_res_ids) {
                             res_id = event_res_ids[j];
+                            row_index = self.rows_ids_indexes[res_id]
                             if (_.contains(self.view_res_ids, res_id)) {  // don't the one from employees not to be shown
-                                planning_record = new PlanningRecord(self.rows[res_id],self,event,record_options);
-                                self.rows[res_id]["records_to_add"].push(planning_record);
+                                planning_record = new PlanningRecord(self.rows[row_index],self,event,record_options);
+                                self.rows[row_index]["records_to_add"].push(planning_record);
                             }
                         }
                     }
@@ -476,29 +482,32 @@ var PlanningView = View.extend({
                     if (self.sidebar) {
                         self.sidebar.reso_filter.render();
                         //console.log("self.now_filter_ids:",self.now_filter_ids);
-                        for (var key in self.rows) {
-                            var key_num = Number(key);
-                            if (self.all_filters[key_num].is_checked) {
-                                self.rows[key].hidden = false;
+                        for (var row_index in self.rows) {
+                            var key_num = Number(self.rows[row_index].res_id);
+                            if (self.all_filters[self.res_ids_indexes[key_num]].is_checked) {
+                                self.rows[row_index].hidden = false;
                             }else{
-                                self.rows[key].hidden = true;
+                                self.rows[row_index].hidden = true;
                             }
                         }
                     }
-                    var rgb, rgb_today;
-                    for (var key in self.rows) {
-                        self.rows[key].segments_horaires = self.res_horaires_info[key]['segments'];
-                        self.rows[key].col_offset_to_segment = self.res_horaires_info[key]['col_offset_to_segment'];
-                        self.rows[key].fillerbars = self.res_horaires_info[key]['fillerbars'];
-                        self.rows[key].creneaux_dispo = self.res_horaires_info[key]['creneaux_dispo'];
-                        self.rows[key].color_bg = self.res_horaires_info[key]['color_bg'];
-                        self.rows[key].color_ft = self.res_horaires_info[key]['color_ft'];
+                    var rgb, rgb_today, key;
+                    for (var row_index in self.rows) {
+                        key = self.rows[row_index].res_id;
+                        self.rows[row_index].segments_horaires = self.res_horaires_info[key]['segments'];
+                        self.rows[row_index].col_offset_to_segment = self.res_horaires_info[key]['col_offset_to_segment'];
+                        self.rows[row_index].fillerbars = self.res_horaires_info[key]['fillerbars'];
+                        self.rows[row_index].creneaux_dispo = self.res_horaires_info[key]['creneaux_dispo'];
+                        self.rows[row_index].color_bg = self.res_horaires_info[key]['color_bg'];
+                        self.rows[row_index].color_ft = self.res_horaires_info[key]['color_ft'];
+                        self.rows[row_index].tz = self.res_horaires_info[key]['tz'];
+                        self.rows[row_index].tz_offset = self.res_horaires_info[key]['tz_offset'];
                         rgb = hexToRgb(self.res_horaires_info[key]['color_bg']);
-                        self.rows[key].color_bg_rgba = "rgba(" + rgb.r + "," + rgb.g + "," + rgb.b + ",0.3);";
-                        self.rows[key].col_offset_today = isNullOrUndef(self.col_offset_today) ? -1 : self.col_offset_today;
-                        if (self.rows[key].col_offset_today != -1) {
+                        self.rows[row_index].color_bg_rgba = "rgba(" + rgb.r + "," + rgb.g + "," + rgb.b + ",0.3);";
+                        self.rows[row_index].col_offset_today = isNullOrUndef(self.col_offset_today) ? -1 : self.col_offset_today;
+                        if (self.rows[row_index].col_offset_today != -1) {
                             rgb_today = hexToRgb(self.res_horaires_info[key]['color_bg'], -30);
-                            self.rows[key].color_bg_rgba_today = "rgba(" + rgb_today.r + "," + rgb_today.g + "," + rgb_today.b + ",0.4);";
+                            self.rows[row_index].color_bg_rgba_today = "rgba(" + rgb_today.r + "," + rgb_today.g + "," + rgb_today.b + ",0.4);";
                         }
                     }
 
@@ -518,7 +527,6 @@ var PlanningView = View.extend({
         var Planning = new Model(self.model);
         Planning.call('get_emp_horaires_info', [res_ids, start, end, get_segments])
         .then(function (result) {
-            //console.log("result",result);
             if (isNullOrUndef(self.res_horaires_info)) {
                 self.res_horaires_info = result;
             }else{
@@ -537,8 +545,9 @@ var PlanningView = View.extend({
      */
     get_all_filters_ordered: function() {
         var self = this
-        var filters = _.values(this.all_filters);
-        return filters;
+        //var filters = _.values(this.all_filters);
+        //return filters;
+        return this.all_filters
     },
     /**
      *  Renders the table then each of its rows
@@ -571,7 +580,6 @@ var PlanningView = View.extend({
             self.dataset.index = null;
             self.do_switch_view('form');
         });
-        //
 
         this.$buttons.find(".of_planning_button_prev").click(
             this.proxy(self.on_prev_clicked));
@@ -918,8 +926,8 @@ PlanningView.Table = Widget.extend({
         }
     },
     check_all_rows_rendered: function() {
-        for (var k in this.rows) {
-            if (!this.rows[k].rendered) {
+        for (var i in this.rows) {
+            if (!this.rows[i].rendered) {
                 return false;
             }
         }
@@ -1323,7 +1331,7 @@ var PlanningCreneauDispo = Widget.extend({
         this.view.on_reload_column(this.row.res_id, this.col_offset);
     },
     /**
-     *  Ouvre le pop-up de planification @todo fonction on_close
+     *  Ouvre le pop-up de sélection de secteur
      */
     on_planning_creneau_secteur_action_clicked: function(ev){
         ev.preventDefault();
@@ -1350,11 +1358,24 @@ var PlanningCreneauDispo = Widget.extend({
             });
     },
     /**
-     *  Ouvre le pop-up de sélection de secteur @todo fonction on_close
+     *  handler de clique sur action
      */
     on_planning_creneau_action_clicked: function(ev){
         ev.preventDefault();
-       //console.log(ev);
+        var self = this;
+        var action_id = $(ev.currentTarget).attr('action_id')
+        if (action_id == "of_planning_view.action_view_of_planif_wizard") {
+            return self.action_wizard_planif();
+        }else if (action_id == "of_planning_view.action_view_of_planning_intervention_form_wizard") {
+            return self.action_creer_rdv();
+        }else{
+            console.log("Action inconnue...")
+        }
+    },
+    /**
+     *  Ouvre le pop-up de planification
+     */
+    action_wizard_planif: function() {
         var self = this;
         var action_id = "of_planning_view.action_view_of_planif_wizard"
         var additional_context = {
@@ -1369,20 +1390,36 @@ var PlanningCreneauDispo = Widget.extend({
             "default_secteur_id": self.secteur_id,
             "default_creneaux_reels": self.creneaux_reels.length > 0 ? self.creneaux_reels : false,
             "default_warning_horaires": self.warning_horaires,
-        };  // à voir quoi mettre
-       //console.log("ADDITIONNAL CONTEXT",pyeval.eval('context', additional_context));
+        };
 
         return data_manager.load_action(action_id, pyeval.eval('context', additional_context)).then(function(result) {
-               //console.log("LE RESUUUULT",result);
                 var options = {
                     'additional_context': pyeval.eval('context', additional_context),  // pour une raison inconnue le additional_context n'est pas pris en compte avant
                     'on_close': function () {self.reload_events();},
-                    //'on_close': function () {self.reload_column();},
-                };  // @todo: appel reload_column
-                //return self.view.ViewManager.action_manager.ir_actions_act_window(result,options);
+                };
                 return self.view.ViewManager.action_manager.do_action(result,options);
             }).then(function(){
                 $(".o_form_buttons_edit").eq(0).hide();  // cacher les boutons "Sauvergarder" et "Annuler"
+            });
+    },
+    /**
+     *  Ouvre le pop-up de création de rdv
+     */
+    action_creer_rdv: function() {
+        var self = this;
+        var action_id = "of_planning_view.action_view_of_planning_intervention_form_wizard"
+        var la_date = new Date(self.date + " " + self.heure_debut_str + ":00" + self.row.tz_offset);
+
+        var additional_context = {
+            "default_employee_ids": [[6, 0, [self.row.res_id]]],
+            "default_date": moment.utc(la_date.toUTCString()).format('YYYY-MM-DD HH:mm:ss'),
+        };
+        return data_manager.load_action(action_id, pyeval.eval('context', additional_context)).then(function(result) {
+                var options = {
+                    'additional_context': pyeval.eval('context', additional_context),  // pour une raison inconnue le additional_context n'est pas pris en compte avant
+                    'on_close': function () {self.reload_events();},
+                };
+                return self.view.ViewManager.action_manager.do_action(result,options);
             });
     },
 });
@@ -1638,7 +1675,7 @@ PlanningView.SidebarResoFilter = Widget.extend({
                 "planningview_filter_intervenant_" + e.target.value,
                 e.target.checked, false]);
         */
-        this.view.all_filters[e.target.value].is_checked = e.target.checked;
+        this.view.all_filters[this.view.res_ids_indexes[e.target.value]].is_checked = e.target.checked;
         if (e.target.checked) {
             this.view.filter_attendee_ids.push(parseInt(e.target.value));
             ir_values_model.call("set_default",
@@ -1658,7 +1695,7 @@ PlanningView.SidebarResoFilter = Widget.extend({
                 this.view.filter_attendee_ids, false]);
         }
         var row_id = "of_planning_row_"+e.target.value;
-        var la_row = this.view.rows[e.target.value];
+        var la_row = this.view.rows[this.view.rows_ids_indexes[e.target.value]];
         la_row.hidden = !e.target.checked;
         la_row.do_toggle(e.target.checked);
         //console.log("LA ROW",la_row);

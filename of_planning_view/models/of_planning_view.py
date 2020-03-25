@@ -13,17 +13,11 @@ from datetime import datetime, timedelta
 
 PLANNING_VIEW = ('planning', 'Planning')
 
+
 @api.model
 def _tz_get(self):
     # put POSIX 'Etc/*' entries at the end to avoid confusing users - see bug 1086728
     return [(tz, tz) for tz in sorted(pytz.all_timezones, key=lambda tz: tz if not tz.startswith('Etc/') else '_')]
-
-
-class HREmployee(models.Model):
-    _inherit = "hr.employee"
-
-    planning_seq = fields.Integer(string=u"Séquence affichage vue Planning", default=20)
-
 
 class ResPartner(models.Model):
     _inherit = "res.partner"
@@ -176,6 +170,7 @@ class OfPlanningIntervention(models.Model):
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')
         tz = pytz.timezone(self._context['tz'])
+        tz_offset = datetime.now(tz).strftime('%z')
         compare_precision = 5
 
         duree_min = self.env['ir.values'].get_default("of.intervention.settings", "duree_min_creneaux_dispo") or 1
@@ -204,6 +199,8 @@ class OfPlanningIntervention(models.Model):
 #float_compare(la_duree_restante, 0.0, compare_precision)  > 0.0
         for employee in employees:
             employee_id = employee.id
+            res[employee_id]['tz'] = self._context.get('tz')
+            res[employee_id]['tz_offset'] = tz_offset
             res[employee_id]['color_bg'] = employee.of_color_bg
             res[employee_id]['color_ft'] = employee.of_color_ft
             res[employee_id]['col_offset_to_segment'] = []

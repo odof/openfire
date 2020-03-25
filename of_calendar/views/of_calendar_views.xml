@@ -142,6 +142,17 @@
         </field>
     </record>
 
+    <record id="view_of_employee_tree_inh_calendar" model="ir.ui.view">
+        <field name="name">hr.employee.tree.of.calendar</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="before">
+                <field name="sequence" widget="handle"/>
+            </xpath>
+        </field>
+    </record>
+
     <!-- Créneaux d'horaires -->
     <record id="view_of_horaire_creneau_tree" model="ir.ui.view">
         <field name="name">of.horaire.creneau.tree</field>

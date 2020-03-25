@@ -29,10 +29,15 @@
             <xpath expr="//notebook" position="inside">
                 <page name="interventions" string="Interventions" attrs="{'invisible': [('of_est_intervenant','=', False)]}">
                     <group>
-                        <field name="of_equipe_ids" widget="many2many_tags"/>
-                        <field name="of_toutes_taches"/>
-                        <field name="of_tache_ids" widget="many2many" attrs="{'invisible': [('of_toutes_taches', '=', True)]}"/>
+                        <group name="gauche_1">
+                            <field name="of_equipe_ids" widget="many2many_tags"/>
+                            <field name="of_toutes_taches"/>
+
+                        </group>
+                        <group name="droite_1"/>
                     </group>
+                    <field name="of_tache_ids" widget="many2many"
+                           attrs="{'invisible': [('of_toutes_taches', '=', True)]}"/>
                 </page>
             </xpath>
         </field>

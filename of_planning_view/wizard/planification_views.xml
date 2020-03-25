@@ -283,6 +283,17 @@
         groups="of_planning.of_group_planning_intervention_modification_siens"
     />
 
+    <act_window
+        name="Créer RDV Tech"
+        res_model="of.planning.intervention"
+        src_model="of.planning.intervention"
+        view_mode="form"
+        view_id="of_planning.of_planning_intervention_view_form"
+        id="action_view_of_planning_intervention_form_wizard"
+        target="new"
+        groups="of_planning.of_group_planning_intervention_modification_siens"
+    />
+
     <record id="view_of_planif_creneau_secteur_wizard" model="ir.ui.view">
         <field name="name">Assigner un secteur</field>
         <field name="model">of.planif.creneau.secteur</field>
