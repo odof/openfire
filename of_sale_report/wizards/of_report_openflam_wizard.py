@@ -3,6 +3,8 @@
 import base64
 from datetime import datetime
 from odoo import models, fields, api
+from odoo.tools import float_compare
+
 from cStringIO import StringIO
 import xlsxwriter
 from xlsxwriter.utility import xl_rowcol_to_cell, xl_range
@@ -20,6 +22,7 @@ class OFRapportOpenflamWizard(models.TransientModel):
             result.append(('echeancier', u"Échéancier des règlements fournisseurs"))
         if param_rapport_sur_mesure != 'revendeur':
             result.append(('stats', "Statistiques de ventes"))
+            result.append(('encaissement', "TVA sur encaissement"))
         return result
 
     file_name = fields.Char('Nom du fichier', size=64)
@@ -28,8 +31,8 @@ class OFRapportOpenflamWizard(models.TransientModel):
     user_company_id = fields.Many2one('res.company', compute="_compute_company_id")
     date = fields.Date(u'Date de création', default=datetime.now().strftime("%Y-%m-%d"))
     report_model = fields.Selection(_get_allowed_report_types, string=u"Modèle de rapport", required=True)
-    period_n = fields.Many2one('date.range', string=u"Principale")
-    period_n1 = fields.Many2one('date.range', string=u"À comparer")
+    period_n = fields.Many2one('date.range', string=u"Période")
+    period_n1 = fields.Many2one('date.range', string=u"Période")
     product_ids = fields.Many2many('product.template', string="Articles")
     partner_ids = fields.Many2many('res.partner', string="Clients")
     category_ids = fields.Many2many('product.category', string=u"Catégories d'articles")
@@ -38,11 +41,11 @@ class OFRapportOpenflamWizard(models.TransientModel):
     filtre_client = fields.Boolean(string="Filtre par client")
     filtre_article = fields.Boolean(string="Filtre par article")
 
-    debut_n = fields.Date(string=u"Début période principale")
-    fin_n = fields.Date(string=u"Fin période principale")
-    debut_n1 = fields.Date(string=u"Début période à comparer")
-    fin_n1 = fields.Date(string=u"Fin période à comparer")
-    type_filtre_date = fields.Selection([('period', u'Périodes'), ('date', 'Date')], string="Type de filtre", default="period")
+    debut_n = fields.Date(string=u"Début")
+    fin_n = fields.Date(string="Fin")
+    debut_n1 = fields.Date(string=u"Début")
+    fin_n1 = fields.Date(string="Fin")
+    type_filtre_date = fields.Selection([('period', u'Périodes'), ('date', 'Dates')], string="Type de filtre", default="period")
     brand_ids = fields.Many2many('of.product.brand', string="Marques")
     stats_brand = fields.Boolean(string="Stats/marques/clients", default=True)
     etiquette_ids = fields.Many2many('res.partner.category', string=u"Étiquettes clients")
@@ -850,10 +853,177 @@ class OFRapportOpenflamWizard(models.TransientModel):
         fp.close()
         return base64.b64encode(data)
 
+    @api.multi
+    def _create_encaissements_excel(self):
+        # --- Ouverture du workbook ---
+        fp = StringIO()
+        workbook = xlsxwriter.Workbook(fp, {'in_memory': True})
+
+        # --- Couleur de police ---
+        styles = self._get_styles_excel(workbook)
+
+        # --- Création de la page ---
+        worksheet = workbook.add_worksheet(self.file_name.split('.')[0])
+        worksheet.set_paper(9)  # Format d'impression A4
+        worksheet.set_landscape()  # Format d'impression paysage
+        worksheet.set_margins(left=0.35, right=0.35, top=0.2, bottom=0.2)
+
+        # --- Initialisation des colonnes ---
+        worksheet.set_column(0, 0, 20)  # Largeur colonne 'Paiements'
+        worksheet.set_column(1, 1, 20)  # Largeur colonne 'Partenaire'
+        worksheet.set_column(2, 2, 20)  # Largeur colonne 'Date'
+        worksheet.set_column(3, 3, 26)  # Largeur colonne 'taxe 1'
+        worksheet.set_column(4, 4, 26)  # Largeur colonne 'taxe 2'
+        worksheet.set_column(5, 5, 26)  # Largeur colonne 'taxe 3'
+        worksheet.set_column(6, 6, 26)  # Largeur colonne 'taxe 4'
+        worksheet.set_column(7, 7, 26)  # Largeur colonne 'taxe 5'
+        worksheet.set_column(8, 8, 26)  # Largeur colonne 'taxe 6'
+
+        # --- Entête ---
+        worksheet.merge_range(0, 0, 0, 2, 'Nom du fichier', styles['text_title_ita_border'])
+        worksheet.merge_range(0, 3, 0, 5, u'Date de création', styles['text_title_ita_border'])
+        worksheet.merge_range(0, 6, 0, 8, u'Société(s)', styles['text_title_ita_border'])
+        worksheet.merge_range(1, 0, 1, 2, self.file_name.split('.')[0], styles['text_title_border'])
+        worksheet.merge_range(1, 3, 1, 5, self.date, styles['text_title_border'])
+        worksheet.merge_range(1, 6, 1, 8, ", ".join(self.company_ids.mapped('name')), styles['text_title_border_wrap'])
+
+        # --- Ajout des lignes ---
+        line_number = 3
+        payment_obj = self.env['account.payment']
+        aml_obj = self.env['account.move.line']
+        move_line_obj = self.env['account.move.line']
+        domain = [('partner_type', '=', 'customer')]
+        if self.type_filtre_date == 'period':
+            domain += [('payment_date', '>=', self.period_n.date_start), ('payment_date', '<=', self.period_n.date_end)]
+        else:
+            domain += [('payment_date', '>=', self.debut_n), ('payment_date', '<=', self.fin_n)]
+        companies = self.company_ids or self.env['res.company'].search([])
+        if self.company_ids:
+            domain += [('company_id', 'in', self.company_ids._ids)]
+        payments = payment_obj.search(domain, order='payment_date')
+        tax_accounts_ids = self.env['account.tax'].search([('type_tax_use', '=', 'sale')]).mapped('account_id')._ids
+
+        display = {}
+        for company in companies:
+            # Vérification par société
+            payment_filtered = payments.filtered(lambda p: p.company_id == company)
+            display[company] = {'payments': {}, 'tax_account_used': {}, 'undefined_payments': []}
+            display_company = display[company]
+            payments_dict = display_company['payments']
+            tax_account_used_dict = display_company['tax_account_used']
+            undefined_payments_list = display_company['undefined_payments']
+            tax_column = 3
+
+            for payment in payment_filtered:
+                affectations = []
+                aml = aml_obj.search([('payment_id', '=', payment.id)])
+                partner_invoice_line_ids = []
+                for line in aml.filtered(lambda l: l.account_id.user_type_id.type == 'receivable'):
+                    partner_invoice_line_ids.extend(filter(None, [rp.credit_move_id.id for rp in line.matched_credit_ids]))
+                    partner_invoice_line_ids.extend(filter(None, [rp.debit_move_id.id for rp in line.matched_debit_ids]))
+                invoice_move_lines = move_line_obj.browse(list(set(partner_invoice_line_ids)))
+                reconciles = invoice_move_lines.mapped('matched_credit_ids').filtered(lambda r: r.credit_move_id.id in aml._ids)
+                total = 0.0
+                for reconcile in reconciles:
+                    affectations.append((reconcile.debit_move_id.move_id, reconcile.amount))
+                    total += reconcile.amount
+
+                # Vérification que le montant total lettré est égal au montant du paiement
+                if float_compare(total, payment.amount, 2) == 0:
+                    # Calcul du montant affecté aux différents comptes de taxes
+                    for invoice_move, amount in affectations:
+                        percent = amount / invoice_move.amount
+                        if payment not in payments_dict:
+                            payments_dict[payment] = {}
+                        payment_dict = payments_dict[payment]
+                        tax_move_lines = invoice_move.line_ids.filtered(lambda l: l.account_id.id in tax_accounts_ids)
+                        for tax_move_line in tax_move_lines:
+                            account = tax_move_line.account_id
+                            if account not in tax_account_used_dict:
+                                tax_account_used_dict[account] = tax_column
+                                tax_column += 1
+                            if account not in payment_dict:
+                                payment_dict[account] = 0.0
+                            payment_dict[account] += abs(tax_move_line.balance) * percent
+                else:
+                    # On conserve les paiements non intégralement lettrés pour les signaler a l'utilisateur
+                    undefined_payments_list.append(payment)
+
+        for company in display.keys():
+            # Affichage par société
+            display_company = display[company]
+            payments_sorted = sorted(display_company['payments'].iteritems(), key=lambda x: x[0].payment_date)
+            tax_account_used_dict = display_company['tax_account_used']
+            undefined_payments_list = display_company['undefined_payments']
+            line_number += 1
+            worksheet.merge_range(line_number, 0, line_number, 2, company.name, styles['text_title_border_red'])
+            line_number += 1
+
+            worksheet.write(line_number, 0, "Paiements", styles['text_title_border'])
+            worksheet.write(line_number, 1, "Partenaire", styles['text_title_border'])
+            worksheet.write(line_number, 2, "Date", styles['text_title_border'])
+
+            # Création des colonnes de taxes
+            for tax in tax_account_used_dict.keys():
+                worksheet.write(line_number, tax_account_used_dict[tax], "%s-%s" % (tax.code, tax.name),
+                                styles['text_title_border'])
+                if tax_account_used_dict[tax] > 8:
+                    worksheet.set_column(tax_account_used_dict[tax], tax_account_used_dict[tax], 26)
+            line_number += 1
+            line_keep = line_number
+            # Ajout des paiements et des montants par compte
+            for payment, tax_dict in payments_sorted:
+                worksheet.write(line_number, 0, "%s" % payment.name,
+                                styles['text_title_border'])
+                worksheet.write(line_number, 1, "%s" % payment.partner_id.name,
+                                styles['text_title_border'])
+                worksheet.write(line_number, 2, "%s" % payment.payment_date,
+                                styles['text_title_border'])
+                for tax in tax_account_used_dict.keys():
+                    column = tax_account_used_dict[tax]
+                    worksheet.write(line_number, column, tax_dict[tax] if tax in tax_dict else "",
+                                    styles['number_border'])
+                line_number += 1
+
+            # Ligne du total
+            worksheet.write(line_number, 0, "Total", styles['text_title_border'])
+            worksheet.write(line_number, 1, "", styles['text_title_border'])
+            worksheet.write(line_number, 2, "", styles['text_title_border'])
+            for tax in tax_account_used_dict.keys():
+                tax_column = tax_account_used_dict[tax]
+                worksheet.write(line_number, tax_column,
+                                '=SUM(%s:%s)' % (xl_rowcol_to_cell(line_keep, tax_column),
+                                                 xl_rowcol_to_cell(line_number - 1, tax_column)),
+                                styles['number_title_border'])
+            line_number += 2
+
+            # Si des paiements sont présent dans la liste, on les affiches à la fin
+            if undefined_payments_list:
+                worksheet.merge_range(line_number, 0, line_number, 2,
+                                      u"Les paiements suivants ne sont pas complètement lettrés",
+                                      styles['text_title_ita_border'])
+                line_number += 1
+                while undefined_payments_list:
+                    payment = undefined_payments_list.pop()
+                    worksheet.write(line_number, 0, "%s" % payment.name, styles['text_title_border'])
+                    worksheet.write(line_number, 1, "%s" % payment.partner_id.name, styles['text_title_border'])
+                    worksheet.write(line_number, 2, "%s" % payment.payment_date, styles['text_title_border'])
+                    line_number += 1
+                line_number += 1
+
+        workbook.close()
+        fp.seek(0)
+        data = fp.read()
+        fp.close()
+        return base64.b64encode(data)
+
+
+
     FUNDICT = {
         'encours' : '_create_encours_excel',
         'echeancier' : '_create_echeancier_excel',
         'stats' : '_create_stats_excel',
+        'encaissement' : '_create_encaissements_excel',
         'autre' : '_dummy_function'
     }
 
@@ -866,6 +1036,7 @@ class OFRapportOpenflamWizard(models.TransientModel):
             'encours' : 'Encours des commandes de vente.xlsx',
             'echeancier': u'Échéancier des règlements fournisseurs.xlsx',
             'stats' : "Statistiques de ventes.xlsx",
+            'encaissement': ' TVA sur encaissement.xlsx',
             'autre': 'Autre.xlsx'
         }
         self.file_name = file_name[self.report_model]

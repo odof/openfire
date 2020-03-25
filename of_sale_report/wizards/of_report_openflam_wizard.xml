@@ -21,19 +21,25 @@
                     <field name="stats_partner"/>
                     <field name="stats_product"/>
                     <field name="stats_brand"/>
-                    <separator string="Périodes / Dates" colspan="4"/>
-                    <field name="type_filtre_date" attrs="{'required' : [('report_model', '=', 'stats')]}"/>
                 </group>
-                <group attrs="{'invisible': [('report_model', 'not in', ('stats', ))]}" col="4">
+                <group attrs="{'invisible': [('report_model', 'not in', ('stats', 'encaissement'))]}" col="4">
+                    <separator string="Périodes / Dates" colspan="4"/>
+                    <field nolabel="1" name="type_filtre_date" attrs="{'required' : [('report_model', 'in', ('stats', 'encaissement'))]}" colspan="4"/>
                     <group colspan="2">
+                        <div colspan="2" attrs="{'invisible': [('report_model', 'not in', ('stats', ))]}">
+                            <h4><p>Principale</p></h4>
+                        </div>
                         <field name="period_n" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'period')], 'invisible': [('type_filtre_date', 'not in', 'period')]}"/>
                         <field name="debut_n" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'date')], 'invisible': [('type_filtre_date', 'not in', 'date')]}"/>
                         <field name="fin_n" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'date')], 'invisible': [('type_filtre_date', 'not in', 'date')]}"/>
                     </group>
-                    <group colspan="2">
-                        <field name="period_n1" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'period')], 'invisible': [('type_filtre_date', 'not in', 'period')]}"/>
-                        <field name="debut_n1" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'date')], 'invisible': [('type_filtre_date', 'not in', 'date')]}"/>
-                        <field name="fin_n1" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'date')], 'invisible': [('type_filtre_date', 'not in', 'date')]}"/>
+                    <group attrs="{'invisible': [('report_model', 'not in', ('stats', ))]}" colspan="2">
+                        <div colspan="2">
+                            <h4><p>A comparer</p></h4>
+                        </div>
+                        <field name="period_n1" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', '=', 'period')], 'invisible': [('type_filtre_date', '!=', 'period')]}"/>
+                        <field name="debut_n1" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', '=', 'date')], 'invisible': [('type_filtre_date', '!=', 'date')]}"/>
+                        <field name="fin_n1" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', '=', 'date')], 'invisible': [('type_filtre_date', '!=', 'date')]}"/>
                     </group>
                 </group>
                 <separator string="Filtres" colspan="4" attrs="{'invisible': [('report_model', 'not in', ('stats', ))]}" col="2"/>
