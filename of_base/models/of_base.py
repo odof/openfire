@@ -252,12 +252,31 @@ class ResUsers(models.Model):
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
+    @api.model_cr_context
+    def _auto_init(self):
+        """
+        Synchronisation des champs 'customer' et 'supplier' entre les contacts enfants physiques et leur parent
+        """
+        res = super(ResPartner, self)._auto_init()
+        cr = self._cr
+        cr.execute("""  UPDATE  res_partner     RP
+                        SET     customer        = RP1.customer
+                        ,       supplier        = RP1.supplier
+                        FROM    res_partner     RP1
+                        WHERE   RP.parent_id    IS NOT NULL
+                        AND     RP.is_company   = False
+                        AND     RP1.id          = RP.parent_id""")
+        return res
+
     phone = fields.Char(compute='_compute_old_phone_fields', inverse='_set_phone')
     mobile = fields.Char(compute='_compute_old_phone_fields', inverse='_set_mobile')
     fax = fields.Char(compute='_compute_old_phone_fields', inverse='_set_fax')
 
     of_phone_number_ids = fields.One2many(
         comodel_name='of.res.partner.phone', inverse_name='partner_id', string=u"Numéros de téléphone")
+
+    of_parent_category_id = fields.Many2many('res.partner.category', string=u"Étiquettes parent",
+                                             compute="_compute_parent_category")
 
     @api.multi
     def _compute_old_phone_fields(self):
@@ -296,6 +315,17 @@ class ResPartner(models.Model):
                     rec.fax = phone_number.get('national')
                 else:
                     rec.fax = fax.number
+
+    @api.depends('parent_id', 'parent_id.category_id')
+    def _compute_parent_category(self):
+        for partner in self:
+            parent = partner
+            while parent.parent_id:
+                parent = parent.parent_id
+            if not isinstance(parent.id, models.NewId):
+                partners = self.search([('id', 'child_of', parent.id)])
+                partners -= partner
+                partner.of_parent_category_id = partners.mapped('category_id')
 
     @api.multi
     def _set_phone(self):
@@ -353,6 +383,7 @@ class ResPartner(models.Model):
                 # Sinon on crée le nouveau numéro
                 else:
                     rec.of_phone_number_ids = [(0, 0, {'number': number, 'type': '04_fax'})]
+
 
     # Pour afficher l'adresse au format français par défaut quand le pays n'est pas renseigné et non le format US
     @api.multi
@@ -477,6 +508,10 @@ class ResPartner(models.Model):
 
     @api.model
     def create(self, vals):
+        parent_id = vals.get('parent_id', False)
+        if parent_id and not vals.get('is_company', False):
+            parent = self.browse(parent_id)
+            vals.update(customer=parent.customer, supplier=parent.supplier)
         res = super(ResPartner, self).create(vals)
         self._check_no_ref_duplicate(vals.get('ref'))
         return res
@@ -506,6 +541,19 @@ class ResPartner(models.Model):
             # La référence est modifiée, il va falloir propager la nouvelle valeur aux enfants
             ref = vals['ref']
             partner_refs = [(partner, partner.ref) for partner in self if partner.ref != ref]
+        # Permet la synchronisation des champs customer et supplier pour tout les contacts liés
+        if ('customer' in vals or 'supplier' in vals) and self._context.get('partner_recursion', True):
+            for partner in self:
+                parent = partner
+                while parent.parent_id:
+                    parent = parent.parent_id
+                partners = self.search([('id', 'child_of', parent.id), ('is_company', '=', False)])
+                values = {}
+                if 'customer' in vals:
+                    values['customer'] = vals['customer']
+                if 'supplier' in vals:
+                    values['supplier'] = vals['supplier']
+                partners.with_context(partner_recursion=False).write(values)
         super(ResPartner, self).write(vals)
         if write_ref:
             self._update_refs(ref, partner_refs)

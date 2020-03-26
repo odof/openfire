@@ -44,6 +44,25 @@ class CrmLead(models.Model):
         account_obj._parent_store = account_parent_store
         account_obj._parent_store_compute()
 
+    @api.model_cr_context
+    def _auto_init(self):
+        """ Changement du fonctionnement des tag_ids de crm.lead pour que le champ soit
+        related a partner_id.category_id donc ajout des tags présent sur le crm.lead
+        dans le res.partner associé
+        """
+        cr = self._cr
+        cr.execute("SELECT 1 FROM ir_model_fields WHERE model = 'crm.lead' AND name = 'tag_ids' AND (related IS NULL OR related = '')")
+        if cr.fetchall():
+            # Remplissage des étiquettes partenaire manquantes à partir des étiquettes du pipeline
+            cr.execute("INSERT INTO res_partner_res_partner_category_rel(partner_id, category_id) "
+                       "SELECT lead.partner_id, rel.category_id "
+                       "FROM crm_lead lead "
+                       "INNER JOIN crm_lead_res_partner_category_rel rel ON rel.lead_id = lead.id "
+                       "WHERE lead.partner_id IS NOT NULL "
+                       "ON CONFLICT DO NOTHING")
+        res = super(CrmLead, self)._auto_init()
+        return res
+
     of_website = fields.Char(related="partner_id.website")
     of_description_projet = fields.Html('Notes de projet')  # champs inutile à supprimer bientôt
     of_ref = fields.Char(string=u"Référence", copy=False)
@@ -65,7 +84,7 @@ class CrmLead(models.Model):
     # activity_ids = fields.One2many('of.crm.opportunity.activity', 'lead_id', string=u"Activités de cette opportunité")
 
     # surcharges
-    tag_ids = fields.Many2many('res.partner.category', 'crm_lead_res_partner_category_rel', 'lead_id', 'category_id', string='Tags', help="Classify and analyze your lead/opportunity categories like: Training, Service", oldname="of_tag_ids")
+    tag_ids = fields.Many2many('res.partner.category', related="partner_id.category_id", string='Tags', help="Classify and analyze your lead/opportunity categories like: Training, Service", oldname="of_tag_ids")
     of_referred_id = fields.Many2one('res.partner', string=u"Apporté par", help="Nom de l'apporteur d'affaire")
     street = fields.Char(related='partner_id.street')
     street2 = fields.Char(related='partner_id.street2')
@@ -305,6 +324,21 @@ class CrmTeam(models.Model):
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
+    @api.model_cr_context
+    def _auto_init(self):
+        """
+        Synchronisation du champ 'of_customer_state' entre les contacts enfants physiques et leur parent
+        """
+        res = super(ResPartner, self)._auto_init()
+        cr = self._cr
+        cr.execute("""  UPDATE  res_partner         RP
+                        SET     of_customer_state   = RP1.of_customer_state
+                        FROM    res_partner         RP1
+                        WHERE   RP.parent_id        IS NOT NULL
+                        AND     RP.is_company       = False
+                        AND     RP1.id              = RP.parent_id""")
+        return res
+
     def _get_default_user_id(self):
         return self._uid
 
@@ -407,14 +441,33 @@ Ce champ se met à jour automatiquement sur confirmation de commande et sur vali
         """
         On creation of a partner, will set of_customer_state field.
         """
-        if not vals.get('customer'):  # partner is not a customer -> set to 'other'
-            vals['of_customer_state'] = 'other'
-        elif vals.get('of_customer_state', 'other') == 'other':  # partner is a customer -> defaults to 'lead'
-            vals['of_customer_state'] = 'lead'
+        parent_id = vals.get('parent_id', False)
+        if parent_id and not vals.get('is_company', False):
+            parent = self.browse(parent_id)
+            vals.update(of_customer_state=parent.of_customer_state)
+        else:
+            if not vals.get('customer'):  # partner is not a customer -> set to 'other'
+                vals['of_customer_state'] = 'other'
+            elif vals.get('of_customer_state', 'other') == 'other':  # partner is a customer -> defaults to 'lead'
+                vals['of_customer_state'] = 'lead'
 
         partner = super(ResPartner, self).create(vals)
 
         return partner
+
+    @api.multi
+    def write(self, vals):
+        """ Permet la synchronisation du champ of_customer_state pour tout les contacts liés
+        """
+        if 'of_customer_state' in vals and self._context.get('customer_state_recursion', True):
+            for partner in self:
+                parent = partner
+                while parent.parent_id:
+                    parent = parent.parent_id
+                partners = self.search([('id', 'child_of', parent.id), ('is_company', '=', False)])
+                partners.with_context(customer_state_recursion=False).\
+                    write({'of_customer_state': vals['of_customer_state']})
+        return super(ResPartner, self).write(vals)
 
     def get_crm_partner_name(self):
         res = self.name
