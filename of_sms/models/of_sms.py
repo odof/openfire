@@ -13,6 +13,11 @@ from odoo.addons.of_base.models.of_base import convert_phone_number
 
 _logger = logging.getLogger(__name__)
 
+try:
+    import phonenumbers
+except ImportError:
+    _logger.debug(u"Impossible d'importer la librairie Python 'phonenumbers'.")
+
 
 class OFSmsTemplate(models.Model):
     _name = "of.sms.template"
@@ -168,15 +173,21 @@ class OFSmsCompose(models.Model):
     media_id = fields.Binary(string=u"Media (MMS)") # Non utilisé. Laissé pour cause de compatibilité avec code d'origine.
     media_filename = fields.Char(string=u"Media filename")
     delivery_time = fields.Datetime(string=u"Date d'envoi")
-    is_commercial = fields.Boolean(u'Est commercial',
-        help=u"Indique si le texto est commercial.\nSi oui, un message de désinscription sera ajouté à la fin du message et ne sera envoyé que du lundi au samedi 8h-20h.\nNote : la loi réprime pénalement le fait d'envoyer des textos non liés à l'exécution du contrat sans ces mentions.")
+    is_commercial = fields.Boolean(
+        u'Est commercial',
+        help=u"Indique si le texto est commercial.\nSi oui, un message de désinscription sera ajouté à la fin "
+             u"du message et ne sera envoyé que du lundi au samedi 8h-20h.\nNote : la loi réprime pénalement "
+             u"le fait d'envoyer des textos non liés à l'exécution du contrat sans ces mentions.")
 
     @api.onchange('sms_template_id')
     def _onchange_sms_template_id(self):
         """Prefills from mobile, sms_account and sms_content but allow them to manually change the content after"""
         if self.sms_template_id:
             # On passe le contenu du texto par l'interpréteur Mako.
-            sms_rendered_content = HTMLParser().unescape(self.env['mail.template'].render_template(self.sms_template_id.template_body, self.sms_template_id.model_id.model, self.record_id, post_process=False))
+            content = self.env['mail.template'].render_template(self.sms_template_id.template_body,
+                                                                self.sms_template_id.model_id.model,
+                                                                self.record_id, post_process=False)
+            sms_rendered_content = HTMLParser().unescape(content)
             self.from_mobile_id = self.sms_template_id.from_mobile_verified_id.id
             self.media_id = self.sms_template_id.media_id
             self.media_filename = self.sms_template_id.media_filename
@@ -184,12 +195,16 @@ class OFSmsCompose(models.Model):
 
     @api.multi
     def send_entity(self):
-        """Attempt to send the sms, if any error comes back show it self.sms_template_id.model_id.modelto the user and only log the smses that successfully sent"""
+        """
+        Attempts to send the sms.
+        Logs successfully sent smses.
+        Errors will be shown to the user.
+        """
         self.ensure_one()
 
         if self.delivery_time:
             # Create the queued sms
-            my_model = self.env['ir.model'].search([('model','=',self.model)])
+            my_model = self.env['ir.model'].search([('model', '=', self.model)])
             self.env['of.sms.message'].create({
                 'record_id': self.record_id,
                 'model_id': my_model[0].id,
@@ -215,7 +230,10 @@ class OFSmsCompose(models.Model):
 
             return True
         else:
-            my_sms = self.from_mobile_id.account_id.send_message(self.from_mobile_id.mobile_number, self.to_number, self.sms_content, self.model, self.record_id, self.media_id, media_filename=self.media_filename, is_commercial=self.is_commercial)
+            my_sms = self.from_mobile_id.account_id.send_message(self.from_mobile_id.mobile_number, self.to_number,
+                                                                 self.sms_content, self.model, self.record_id,
+                                                                 self.media_id, media_filename=self.media_filename,
+                                                                 is_commercial=self.is_commercial)
 
         # Use the human readable error message if present
         error_message = ""
@@ -227,16 +245,21 @@ class OFSmsCompose(models.Model):
         # Display the screen with an error code if the sms/mms was not successfully sent
         if my_sms.delivary_state == "failed":
             return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'of.sms.compose',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'target': 'new',
-            'context': {'default_to_number': self.to_number, 'default_record_id': self.record_id, 'default_model': self.model, 'default_error_message': error_message}
+                'type': 'ir.actions.act_window',
+                'res_model': 'of.sms.compose',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'target': 'new',
+                'context': {
+                    'default_to_number': self.to_number,
+                    'default_record_id': self.record_id,
+                    'default_model': self.model,
+                    'default_error_message': error_message,
+                }
             }
         else:
 
-            my_model = self.env['ir.model'].search([('model','=',self.model)])
+            my_model = self.env['ir.model'].search([('model', '=', self.model)])
 
             # For single smses we only record succesful sms, failed ones reopen the form with the error message
             self.env['of.sms.message'].create({
@@ -264,29 +287,24 @@ class OFSmsCompose(models.Model):
                 attachments=[])
 
 
-class ResPartnerSms(models.Model):
+class ResPartner(models.Model):
     _inherit = "res.partner"
 
     @api.multi
     def get_mobile_numbers(self):
         self.ensure_one()
-        conv_obj = self.env['of.phone.number.converter']
         mobile_numbers = []
         for mobile in self.of_phone_number_ids.filtered(lambda p: p.type == '03_mobile'):
-            phone_number = conv_obj.format(mobile.number)
-            if phone_number.get('e164'):
-                mobile_numbers.append(phone_number.get('e164'))
-            # On teste si on peut extraire un numéro de téléphone valide de la chaine de caractères
+            phone_number = convert_phone_number(mobile.number, new_format='e164', strict=True)
+            if phone_number:
+                mobile_numbers.append(phone_number)
             else:
-                number_digit = filter(lambda c: c.isdigit(), mobile.number)
-                if len(number_digit) >= 10:
-                    number_digit = number_digit[0:10]
-                    country_code = (self.country_id and self.country_id.code) or \
-                        (self.env.user.company_id.country_id and self.env.user.company_id.country_id.code) or \
-                        "FR"
-                    phone_number = conv_obj.format(convert_phone_number(number_digit, country_code))
-                    if phone_number.get('e164'):
-                        mobile_numbers.append(phone_number.get('e164'))
+                country_code = (self.country_id and self.country_id.code) or \
+                               (self.env.user.company_id.country_id and self.env.user.company_id.country_id.code) or \
+                               "FR"
+                for match in phonenumbers.PhoneNumberMatcher(mobile.number, country_code):
+                    phone_number = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
+                    mobile_numbers.append(phone_number)
         return mobile_numbers
 
     # Appel par l'action "Envoyer SMS" dans vue partenaires

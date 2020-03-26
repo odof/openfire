@@ -7,7 +7,7 @@
             </xpath>
         </template>
 
- 		<!-- Ajouter des champs à la liste des courriels -->
+        <!-- Ajouter des champs à la liste des courriels -->
         <record id="of_view_mail_mail_tree" model="ir.ui.view">
             <field name="name">of.mail.mail.tree</field>
             <field name="model">mail.mail</field>
@@ -87,10 +87,12 @@
                 <field name="phone" position="replace">
                     <group colspan="4">
                         <field name="of_phone_number_ids" string="Téléphones" class="of_phone_table">
-                            <tree editable="bottom">
+                            <tree editable="bottom" colors="red: not is_valid">
                                 <field name="type" string="Type"/>
                                 <field name="title_id" string="Civilité" options="{'no_open': True}" widget="selection"/>
                                 <field name="number_display" string="Numéro" required="True"/>
+                                <field name="number" invisible="1" readonly="1"/>
+                                <field name="is_valid" invisible="1"/>
                             </tree>
                         </field>
                         <field name="email" widget="email" attrs="{'required': [('user_ids','!=', [])]}"/>
