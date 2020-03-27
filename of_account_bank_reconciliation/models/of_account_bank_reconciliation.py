@@ -3,6 +3,7 @@
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 
+
 class OfAccountBankReconciliation(models.Model):
     _name = 'of.account.bank.reconciliation'
     _description = "Rapprochement bancaire OpenFire"
@@ -55,7 +56,8 @@ class OfAccountBankReconciliation(models.Model):
         for rec in self:
             if rec.date and rec.account_id:
                 if isinstance(rec.id, (int, long)):
-                    domain = [('account_id', '=', rec.account_id.id), '|', ('date', '<', rec.date), '&', ('date', '=', rec.date), ('id', '<', rec.id)]
+                    domain = [('account_id', '=', rec.account_id.id),
+                              '|', ('date', '<', rec.date), '&', ('date', '=', rec.date), ('id', '<', rec.id)]
                 else:
                     domain = [('account_id', '=', rec.account_id.id), ('date', '<=', rec.date)]
                 rec_prec = self.search(domain, limit=1)
@@ -67,7 +69,8 @@ class OfAccountBankReconciliation(models.Model):
     def _compute_amount_account(self):
         for rec in self:
             if rec.date and rec.account_id:
-                move_lines = self.env['account.move.line'].search([('account_id', '=', rec.account_id.id), ('date', '<=', rec.date)])
+                move_lines = self.env['account.move.line'].search([('account_id', '=', rec.account_id.id),
+                                                                   ('date', '<=', rec.date)])
                 rec.amount_account = sum(move_line.balance for move_line in move_lines)
             else:
                 rec.amount_account = 0.0
@@ -107,4 +110,5 @@ class OfAccountBankReconciliation(models.Model):
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
-    of_reconciliation_id = fields.Many2one('of.account.bank.reconciliation', string="Rapprochement bancaire", readonly=True)
+    of_reconciliation_id = fields.Many2one(
+        'of.account.bank.reconciliation', string="Rapprochement bancaire", readonly=True, copy=False)
