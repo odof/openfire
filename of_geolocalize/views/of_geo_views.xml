@@ -47,7 +47,7 @@
                         class="btn-primary" icon="fa-map-marker" colspan="1"
                         context="{'default_partner_id': active_id}"/>
                 </div>
-            </xpath><!--  style="margin-bottom: 10px;" -->
+            </xpath>
             <xpath expr="//notebook[last()]" position="inside">
                 <page string="Localisation" name="geo_location_tab">
                     <separator string="Géolocalisation"/>
@@ -55,7 +55,6 @@
                         <group>
                             <field name="geo_lat" string="Latitude"/>
                             <field name="geo_lng" string="Longitude"/>
-
                         </group>
                         <group>
                             <field name="geocoding" string="Géocodage"/>
@@ -67,8 +66,8 @@
                                 <button name="button_refute_geocoding" type="object" icon="fa-times" string="Réfuter"
                                         attrs="{'invisible': [('geocoding', '!=', 'need_verif')]}"/>
                             </div>
-                            <field name="street_response" readonly="1" attrs="{'invisible': [('geocoding', '!=', 'need_verif')]}"/>
-
+                            <field name="street_response" readonly="1"
+                                   attrs="{'invisible': [('geocoding', '!=', 'need_verif')]}"/>
                         </group>
                     </group>
                     <button name="%(action_geocode_mono)d" string="Géolocaliser" type="action" style="margin-bottom: 10px;"
@@ -96,12 +95,7 @@
                 <separator/>
                 <filter string="Non localisés" name='not_localized' domain="[('geo_lat', '=', 0)]" help="Partners who need localization"/>
                 <filter name="geocoding_success" string="Géocodage réussi"
-                        domain="['|', '|', '|', '|',
-                            ('geocoding','=','success_openfire'),
-                            ('geocoding','=','success_osm'),
-                            ('geocoding','=','success_mapbox'),
-                            ('geocoding','=','success_bano'),
-                            ('geocoding','=','success_google')]"/>
+                        domain="[('geocoding','=like','success\\_%')]"/>
                 <filter name="geocoding_verif" string="Géocodage à vérifier" domain="[('geocoding','=','need_verif')]"/>
                 <filter name="geocoding_failure" string="Géocodage échoué" domain="[('geocoding','=','failure')]"/>
                 <separator/>
@@ -114,7 +108,7 @@
         <field name="name">of.view.geocoding.tree</field>
         <field name="model">res.partner</field>
         <field name="arch" type="xml">
-            <tree string="Contacts" editable="top" creatable="false" 
+            <tree string="Contacts" editable="top" create="false" delete="false"
                 colors="black:precision == 'manual';
                         green:precision == 'high';
                         #999900:precision == 'medium';
@@ -166,12 +160,7 @@
                 <filter name="all_address" string="Tous avec adresse" domain="['|','|','|',('street','!=',False),('street2','!=',False),('zip','!=', False),('city','!=', False)]"/>
                 <separator/>
                 <filter name="geocoding_success" string="Géocodage réussi"
-                        domain="['|', '|', '|', '|'
-                        ('geocoding','=','success_openfire'),
-                        ('geocoding','=','success_osm'),
-                        ('geocoding','=','success_mapbox'),
-                        ('geocoding','=','success_bano'),
-                        ('geocoding','=','success_google')]"/>
+                        domain="[('geocoding','=like','success\\_%')]"/>
                 <filter name="geocoding_verif" string="Géocodage à vérifier" domain="[('geocoding','=','need_verif')]"/>
                 <filter name="geocoding_failure" string="Géocodage échoué" domain="[('geocoding','=','failure')]"/>
                 <filter name="geocoding_not_tried" string="Géocodage non tenté" domain="[('geocoding','=','not_tried')]"/>

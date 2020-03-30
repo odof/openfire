@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 
-# Requires a nominatim server up and running (for OpenFire geocoder)
-# Requires request and googlemaps python packages (for Google Maps geocoder)
-
 from odoo import api, fields, models, tools
 from odoo.exceptions import UserError
 from difflib import SequenceMatcher
-from mapbox import Geocoder
 import time
-
 import json
-import urllib
-
 import requests
-import googlemaps
+import logging
+
+_logger = logging.getLogger(__name__)
+
+try:
+    from mapbox import Geocoder
+except ImportError:
+    _logger.debug(u"Impossible d'importer la librairie Python 'mapbox.Geocoder'.")
 
 CORRESPONDANCE_PRECISION_BANO = {
     'housenumber': 'very_high',
@@ -169,16 +169,16 @@ class OFGeoWizardMono(models.TransientModel):
 
         try:
             result = geocoder.forward(self.addr_search).json()
-        except Exception as e:
-            raise UserError(u"Une erreur inattendue est survenue lors de la requète")
+        except Exception:
+            raise UserError(u"Une erreur inattendue est survenue lors de la requête")
 
         if not result or not result.get('features'):
             self.aucun_res = True
         else:
-            line_ids_vals = [(5,)]
-            for res in result.get('features'):
+            line_ids_vals = [(5, )]
+            for res in result.get('features', []):
                 coords = res.get("center", {})
-                for elem in res.get('context'):
+                for elem in res.get('context', []):
                     if elem.get("id", u"").startswith(u"postcode"):
                         res['zip'] = elem.get("text")
                     if elem.get("id", u"").startswith(u"place"):
@@ -245,28 +245,32 @@ class OFGeoWizardMonoLine(models.TransientModel):
     partner_name = fields.Char(string="Nom du partenaire", related="wizard_id.partner_id.name", readonly=True)
 
     geocodeur = fields.Char(string=u"Géocodeur")
-    geocoding = fields.Selection([
-        ('not_tried', u"Pas tenté"),
-        ('no_address', u"--"),
-        ('success_bano', u"Réussi"),
-        ('success_google', u"Réussi"),
-        ('success_mapbox', u"Réussi"),
-        ('need_verif', u"Nécessite vérification"),
-        ('failure', u"Échoué"),
-        ('manual', u"Manuel")
-    ], string=u"Géocoding")
-    precision = fields.Selection([
-        ('manual', "Manuel"),
-        ('very_high', "Excellent"),
-        ('high', "Haut"),
-        ('medium', "Moyen"),
-        ('low', "Bas"),
-        ('unknown', u"Indéterminé"),
-    ], default='unknown', help=u"Niveau de précision de la géolocalisation.\n"
-                u"bas: à la ville.\n"
-                u"moyen: au village\n"
-                u"haut: à la rue / au voisinage\n"
-                u"très haut: au numéro de rue\n")
+    geocoding = fields.Selection(
+        [
+            ('not_tried', u"Pas tenté"),
+            ('no_address', u"--"),
+            ('success_bano', u"Réussi"),
+            ('success_google', u"Réussi"),
+            ('success_mapbox', u"Réussi"),
+            ('need_verif', u"Nécessite vérification"),
+            ('failure', u"Échoué"),
+            ('manual', u"Manuel")
+        ], string=u"Géocoding")
+    precision = fields.Selection(
+        [
+            ('manual', "Manuel"),
+            ('very_high', "Excellent"),
+            ('high', "Haut"),
+            ('medium', "Moyen"),
+            ('low', "Bas"),
+            ('no_address', u"--"),
+            ('unknown', u"Indéterminé"),
+        ], default='unknown',
+        help=u"Niveau de précision de la géolocalisation.\n"
+             u"bas: à la ville.\n"
+             u"moyen: au village\n"
+             u"haut: à la rue / au voisinage\n"
+             u"très haut: au numéro de rue\n")
     geocoding_response = fields.Text(string=u"Réponse géocodage", readonly=True)
     score = fields.Float(string="Score", digits=(1, 2), help=u"Nombre entre 0 et 1, \n0: aucun rapport, \n1: très bon")
 
@@ -316,22 +320,16 @@ class OFGeoWizard(models.TransientModel):
 
     # Stats
     nb_partners = fields.Integer(string=u'Nb partenaires', compute='_compute_global_geo_stats', readonly=True)
-    nb_geocoding_success_openfire = fields.Integer(string=u'Geolocalisés avec OpenFire', compute='_compute_global_geo_stats', readonly=True)
-    nb_geocoding_success_osm = fields.Integer(string=u'Geolocalisés avec OpenStreetMap', compute='_compute_global_geo_stats', readonly=True)
     nb_geocoding_success_mapbox = fields.Integer(string=u'Geolocalisés avec MapBox', compute='_compute_global_geo_stats', readonly=True)
     nb_geocoding_success_ban = fields.Integer(string=u'Geolocalisés avec BANO', compute='_compute_global_geo_stats', readonly=True)
-    nb_geocoding_success_google = fields.Integer(string=u'Geolocalisés avec Google Maps', compute='_compute_global_geo_stats', readonly=True)
     nb_geocoding_manually = fields.Integer(string=u'Geolocalisés manuellement', compute='_compute_global_geo_stats', readonly=True)
     nb_geocoding_total_success = fields.Integer(string=u'Total geolocalisés', compute='_compute_global_geo_stats', readonly=True)
     nb_geocoding_failure = fields.Integer(string=u'Échec du géocodage', compute='_compute_global_geo_stats', readonly=True)
     nb_no_address = fields.Integer(string=u"Sans adresse", compute='_compute_global_geo_stats', readonly=True)
     nb_geocoding_not = fields.Integer(string=u'Non géolocalisés', compute='_compute_global_geo_stats', readonly=True)
 
-    por_success_openfire = fields.Float(digits=(3, 1), compute='_compute_global_geo_stats', readonly=True)
-    por_success_osm = fields.Float(digits=(3, 1), compute='_compute_global_geo_stats', readonly=True)
     por_success_mapbox = fields.Float(digits=(3, 1), compute='_compute_global_geo_stats', readonly=True)
     por_success_ban = fields.Float(digits=(3, 1), compute='_compute_global_geo_stats', readonly=True)
-    por_success_google = fields.Float(digits=(3, 1), compute='_compute_global_geo_stats', readonly=True)
     por_manually = fields.Float(digits=(3, 1), compute='_compute_global_geo_stats', readonly=True)
     por_total_success = fields.Float(digits=(3, 1), compute='_compute_global_geo_stats', readonly=True)
     por_failure = fields.Float(digits=(3, 1), compute='_compute_global_geo_stats', readonly=True)
@@ -341,14 +339,6 @@ class OFGeoWizard(models.TransientModel):
     show_stats_wizard = fields.Boolean(string=u"Montrer statistiques", default=_get_config_stats)
 
     # Stats géocodeurs
-    openfire_try = 0
-    openfire_success = 0
-    openfire_fail = 0
-
-    osm_try = 0
-    osm_success = 0
-    osm_fail = 0
-
     mapbox_try = 0
     mapbox_success = 0
     mapbox_fail = 0
@@ -357,29 +347,7 @@ class OFGeoWizard(models.TransientModel):
     ban_success = 0
     ban_fail = 0
 
-    google_try = 0
-    google_success = 0  # (web and API queries)
-    google_fail = 0
-
     # Get taux success from last record in the of.geo.wizard
-    @api.model
-    def _get_taux_success_openfire(self):
-        try:
-            last_record = self.env['of.geo.wizard'].search([])[-1]
-            taux_success_openfire = last_record.taux_success_openfire
-        except:
-            taux_success_openfire = ""
-        return taux_success_openfire
-
-    @api.model
-    def _get_taux_success_osm(self):
-        try:
-            last_record = self.env['of.geo.wizard'].search([])[-1]
-            taux_success_osm = last_record.taux_success_osm
-        except:
-            taux_success_osm = ""
-        return taux_success_osm
-
     @api.model
     def _get_taux_success_mapbox(self):
         try:
@@ -398,28 +366,8 @@ class OFGeoWizard(models.TransientModel):
             taux_success_ban = ""
         return taux_success_ban
 
-    @api.model
-    def _get_taux_success_google(self):  # from last record in the of.geo.wizard
-        try:
-            last_record = self.env['of.geo.wizard'].search([])[-1]
-            taux_success_google = last_record.taux_success_google
-        except:
-            taux_success_google = ""
-        return taux_success_google
-
-    taux_success_openfire = fields.Float(default=_get_taux_success_openfire, digits=(3, 1), readonly=True)
-    taux_success_osm = fields.Float(default=_get_taux_success_osm, digits=(3, 1), readonly=True)
     taux_success_mapbox = fields.Float(default=_get_taux_success_mapbox, digits=(3, 1), readonly=True)
     taux_success_ban = fields.Float(default=_get_taux_success_ban, digits=(3, 1), readonly=True)
-    taux_success_google = fields.Float(default=_get_taux_success_google, digits=(3, 1), readonly=True)
-
-    # Config parameters
-    # Géocodeurs
-    use_nominatim_openfire = fields.Boolean(string=u"OpenFire")
-    use_nominatim_osm = fields.Boolean(string=u"OpenStreetMap (OSM)")
-    use_mapbox = fields.Boolean(string=u"MapBox")
-    use_bano = fields.Boolean(string=u"Base d'adresses nationale ouverte (BANO)")
-    use_google = fields.Boolean(string=u"Google maps")
 
     # Options
     best_precision = fields.Boolean(string=u"Choisir la meilleure précision des géocodeurs sélectionnés (lente)", default=False)
@@ -481,23 +429,17 @@ class OFGeoWizard(models.TransientModel):
 
         # Get
         nb_partners = len(partners)
-        nb_geocoding_success_openfire = partner_obj.search([('geocoding', '=', 'success_openfire')], count=True)
-        nb_geocoding_success_osm = partner_obj.search([('geocoding', '=', 'success_osm')], count=True)
         nb_geocoding_success_mapbox = partner_obj.search([('geocoding', '=', 'success_mapbox')], count=True)
         nb_geocoding_success_ban = partner_obj.search([('geocoding', '=', 'success_bano')], count=True)
-        nb_geocoding_success_google = partner_obj.search([('geocoding', '=', 'success_google')], count=True)
+        nb_geocoding_total_success = partner_obj.search([('geocoding', '=like', 'success\\_%')], count=True)
         nb_geocoding_manually = partner_obj.search([('geocoding', '=', 'manual')], count=True)
         nb_geocoding_failure = partner_obj.search([('geocoding', '=', 'failure')], count=True)
         nb_no_address = partner_obj.search([('geocoding', '=', 'no_address')], count=True)
         nb_geocoding_not = partner_obj.search([('geocoding', '=', 'not_tried')], count=True)
 
         # Calcule
-        nb_geocoding_total_success = nb_geocoding_success_openfire + nb_geocoding_success_osm + nb_geocoding_success_ban + nb_geocoding_success_google + nb_geocoding_manually
-        por_success_openfire = float(nb_geocoding_success_openfire) / float(nb_partners) * 100
-        por_success_osm = float(nb_geocoding_success_osm) / float(nb_partners) * 100
         por_success_mapbox = float(nb_geocoding_success_mapbox) / float(nb_partners) * 100
         por_success_ban = float(nb_geocoding_success_ban) / float(nb_partners) * 100
-        por_success_google = float(nb_geocoding_success_google) / float(nb_partners) * 100
         por_manually = float(nb_geocoding_manually) / float(nb_partners) * 100
         por_total_success = float(nb_geocoding_total_success) / float(nb_partners) * 100
         por_failure = float(nb_geocoding_failure) / float(nb_partners) * 100
@@ -506,22 +448,16 @@ class OFGeoWizard(models.TransientModel):
 
         # Return
         self.nb_partners = nb_partners
-        self.nb_geocoding_success_openfire = nb_geocoding_success_openfire
-        self.nb_geocoding_success_osm = nb_geocoding_success_osm
         self.nb_geocoding_success_mapbox = nb_geocoding_success_mapbox
         self.nb_geocoding_success_ban = nb_geocoding_success_ban
-        self.nb_geocoding_success_google = nb_geocoding_success_google
         self.nb_geocoding_manually = nb_geocoding_manually
         self.nb_geocoding_total_success = nb_geocoding_total_success
         self.nb_geocoding_failure = nb_geocoding_failure
         self.nb_no_address = nb_no_address
         self.nb_geocoding_not = nb_geocoding_not
 
-        self.por_success_openfire = por_success_openfire
-        self.por_success_osm = por_success_osm
         self.por_success_mapbox = por_success_mapbox
         self.por_success_ban = por_success_ban
-        self.por_success_google = por_success_google
         self.por_manually = por_manually
         self.por_total_success = por_total_success
         self.por_failure = por_failure
@@ -625,7 +561,7 @@ class OFGeoWizard(models.TransientModel):
                 req = requests.get(API_URL, params=params)
                 res = req.json()
                 self.ban_try += 1
-            except Exception as e:
+            except Exception:
                 return 'not_tried', "", 0, 0, 'not_tried', "", ""
 
             if not res or not res.get('features'):
@@ -695,7 +631,7 @@ class OFGeoWizard(models.TransientModel):
                 'geo_lng': results[3],
                 'precision': results[4],
                 'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
-                'geocoding_response': results[5],#json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
+                'geocoding_response': results[5],
                 'street_response': results[6],
             })
         return True
@@ -719,7 +655,7 @@ class OFGeoWizard(models.TransientModel):
                 'geo_lng': results[3],
                 'precision': results[4],
                 'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
-                'geocoding_response': results[5],#json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
+                'geocoding_response': results[5],
                 'street_response': results[6],
             })
         return True
@@ -766,19 +702,19 @@ class OFGeoWizard(models.TransientModel):
         self.ensure_one()
         line = self.env['of.geo.wizard.line'].browse(line_id)
         partner_country = line.partner_id.get_geocoding_country()
-        #on essaie d'abord bano puis mapbox
+        # On essaie d'abord bano puis mapbox
         if partner_country == u"France":
             geocoding, geocodeur, latitud, longitud, precision, geocoding_response, street_response = self.geo_ban(line)
             if geocoding == 'success_bano':
                 line.write({
-                        'geocoding': geocoding,
-                        'geocodeur': 'bano',
-                        'geo_lat': latitud,
-                        'geo_lng': longitud,
-                        'precision': precision,
-                        'geocoding_response': geocoding_response,
-                        'street_response': street_response,
-                    })
+                    'geocoding': geocoding,
+                    'geocodeur': 'bano',
+                    'geo_lat': latitud,
+                    'geo_lng': longitud,
+                    'precision': precision,
+                    'geocoding_response': geocoding_response,
+                    'street_response': street_response,
+                })
                 return True
         geocoding, geocodeur, latitud, longitud, precision, geocoding_response, street_response = self.geo_mapbox(line)
         line.write({
@@ -808,7 +744,7 @@ class OFGeoWizard(models.TransientModel):
                 'geocoding_response': line.geocoding_response,
                 'date_last_localization': date_last_localization,
             }
-            if line.geocoding not in ('success_mapbox', 'succes_bano', 'need_verif'):
+            if line.geocoding not in ('success_mapbox', 'success_bano', 'need_verif'):
                 vals['geo_lat'] = 0
                 vals['geo_lng'] = 0
                 vals['precision'] = 'unknown'
@@ -834,12 +770,12 @@ class OFGeoWizard(models.TransientModel):
         else:
             use_bano = False
 
-        line_vals = [(5,)]
+        line_vals = [(5, )]
         for partner in self.partner_ids:
-            if (self.overwrite_geoloc_all or
+            if (
+                self.overwrite_geoloc_all or
                 (self.overwrite_geoloc_except_manual and partner.geocoding != 'manual') or
-                partner.geocoding not in ('success_openfire', 'success_osm', 'success_bano', 'success_google',
-                                       'success_mapbox', 'manual', 'no_address')
+                partner.geocoding in ('not_tried', 'need_verif', 'failure')
             ):
                 vals = {
                     'partner_id': partner.id,
@@ -880,8 +816,7 @@ class OFGeoWizard(models.TransientModel):
                         'geo_lat': results[2],
                         'geo_lng': results[3],
                         'precision': results[4],
-                        #'date_last_localization': fields.Datetime.context_timestamp(self, fields.datetime.now()),
-                        'geocoding_response': results[5],#json.dumps(results, indent=3, sort_keys=True, ensure_ascii=False),
+                        'geocoding_response': results[5],
                         'street_response': results[6],
                     })
                     cmpt += 1
@@ -891,7 +826,7 @@ class OFGeoWizard(models.TransientModel):
                 taux_success = float(getattr(self, '%s_success' % geocoder_name)) / float(getattr(self, '%s_try' % geocoder_name)) * 100
                 taux_success = float("{0:.2f}".format(taux_success))
                 self['taux_success_%s' % geocoder_name] = taux_success
-            except Exception as e:
+            except Exception:
                 self['taux_success_%s' % geocoder_name] = ""
 
             if cmpt % 100 == 0:
@@ -911,30 +846,33 @@ class OFGeoWizardLine(models.TransientModel):
     name = fields.Char(string="Nom du partenaire", related="partner_id.name", readonly=True)
 
     geocodeur = fields.Char(string=u"Géocodeur", readonly=True)
-    geocoding = fields.Selection([
-        ('not_tried', u"Pas tenté"),
-        ('no_address', u"--"),
-        ('success_bano', u"Réussi"),
-        ('success_google', u"Réussi"),
-        ('success_mapbox', u"Réussi"),
-        ('need_verif', u"Nécessite vérification"),
-        ('failure', u"Échoué"),
-        ('manual', u"Manuel")
-    ], string=u"Géocoding", readonly=True)
-    precision = fields.Selection([
-        ('manual', "Manuel"),
-        ('very_high', "Excellent"),
-        ('high', "Haut"),
-        ('medium', "Moyen"),
-        ('low', "Bas"),
-        ('no_address', u"--"),
-        ('unknown', u"Indéterminé"),
-        ('not_tried', u"Pas tenté"),
-    ], default='not_tried', readonly=True, help=u"Niveau de précision de la géolocalisation.\n"
-                u"bas: à la ville.\n"
-                u"moyen: au village\n"
-                u"haut: à la rue / au voisinage\n"
-                u"très haut: au numéro de rue\n")
+    geocoding = fields.Selection(
+        [
+            ('not_tried', u"Pas tenté"),
+            ('no_address', u"--"),
+            ('success_bano', u"Réussi"),
+            ('success_google', u"Réussi"),
+            ('success_mapbox', u"Réussi"),
+            ('need_verif', u"Nécessite vérification"),
+            ('failure', u"Échoué"),
+            ('manual', u"Manuel")
+        ], string=u"Géocoding", readonly=True)
+    precision = fields.Selection(
+        [
+            ('manual', "Manuel"),
+            ('very_high', "Excellent"),
+            ('high', "Haut"),
+            ('medium', "Moyen"),
+            ('low', "Bas"),
+            ('no_address', u"--"),
+            ('unknown', u"Indéterminé"),
+            ('not_tried', u"Pas tenté"),
+        ], default='not_tried', readonly=True,
+        help=u"Niveau de précision de la géolocalisation.\n"
+             u"bas: à la ville.\n"
+             u"moyen: au village\n"
+             u"haut: à la rue / au voisinage\n"
+             u"très haut: au numéro de rue\n")
     geocoding_response = fields.Text(string=u"Réponse géocodage", readonly=True)
     score = fields.Float(string="Score", digits=(1, 2), help=u"Nombre entre 0 et 1, \n0: aucun rapport, \n1: très bon")
     sequence = fields.Integer(store=True, compute="_compute_sequence")

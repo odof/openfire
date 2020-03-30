@@ -187,9 +187,6 @@ class project_issue(models.Model):
     _name = 'project.issue'
     _inherit = ['project.issue', 'of.map.view.mixin']
 
-#     def _get_product_sav_ids(self, cr, uid, ids, context={}):
-#         return self.pool['project.issue'].search(cr, uid, [('product_name_id','in',ids)], context=context)
-
     def _search_of_parc_installe_site_adresse(self, operator, value):
         "Permet la recherche sur l'adresse d'installation de la machine depuis un SAV"
         # Deux cas :
@@ -268,7 +265,7 @@ class project_issue(models.Model):
                     issue.of_parc_installe_lieu_id = issue.of_produit_installe_id.client_id.id
 
     @api.model
-    def get_color_map(self, context={}):
+    def get_color_map(self):
         u"""
         fonction pour la légende de la vue map
         """

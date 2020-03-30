@@ -12,11 +12,11 @@
 ##############################################################################
 
 {
-    'name' : u"OpenFire / Géolocalisation",
-    'version' : "10.0.1.0.0",
+    'name': u"OpenFire / Géolocalisation",
+    'version': "10.0.1.0.0",
     'license': '',
-    'author' : "OpenFire",
-    'website' : "www.openfire.fr",
+    'author': "OpenFire",
+    'website': "www.openfire.fr",
     'category': "Module OpenFlam",
     'summary': u"Géolocalisation des adresses des partenaires",
     'description': u"""
@@ -36,17 +36,18 @@ Fonctionnalités
  - Statistiques par geocodeur mesurées à chaque exécution (incluant le taux de réussite)
  - Recherches et filtres pour traitement de geodonnès
 
+Ce module nécessite la librairie mapbox : pip install mapbox
 """,
-    'depends' : [
+    'depends': [
         'base',
         'web',
         'of_utils',
         'of_web_widgets',  # ordre des héritages FieldMany2one
     ],
     'external_dependancies': {
-        'python': ['requests', 'googlemaps'],
+        'python': ['requests', 'googlemaps', 'mapbox'],
     },
-    'data' : [
+    'data': [
         'wizards/of_geo_wizard_views.xml',
         'views/of_geo_views.xml',
         'views/of_geolocalize_templates.xml',

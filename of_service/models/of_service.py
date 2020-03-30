@@ -281,7 +281,7 @@ class OfService(models.Model):
                 service.color = 'gray'
 
     @api.model
-    def get_color_map(self, context={}):
+    def get_color_map(self):
         u"""
         fonction pour la légende de la vue map
         """
@@ -625,8 +625,8 @@ class OfService(models.Model):
             return relativedelta(years=interval, day=1)
 
     @api.multi
-    def get_action_view_interventions_context(self, context={}):
-        context.update({
+    def get_action_view_interventions_context(self, action_context={}):
+        action_context.update({
             'default_partner_id' : self.partner_id.id,
             'default_address_id' : self.address_id and self.address_id.id or self.partner_id.id,
             'default_tache_id'   : self.tache_id and self.tache_id.id or False,
@@ -638,26 +638,26 @@ class OfService(models.Model):
             'default_order_id'   : self.order_id and self.order_id.id or False,
             })
         if self.intervention_ids:
-            context['force_date_start'] = self.intervention_ids[-1].date_date
-            context['search_default_service_id'] = self.id
+            action_context['force_date_start'] = self.intervention_ids[-1].date_date
+            action_context['search_default_service_id'] = self.id
         elif self.base_state != 'calculated' or self.state == 'done':
             # inhiber la création en vue calendrier si l'intervention n'est pas planifiable (brouillon, annulée, terminée)
-            context['inhiber_create'] = True
+            action_context['inhiber_create'] = True
             if self.state == 'done':
                 param = u"terminée"
             else:
                 param = self.base_state == 'cancel' and u"annulée" or u"qui n'est pas validée"
-            context['inhiber_message'] = u"Vous ne pouvez pas créer de RDV pour une intervention %s." % param
+            action_context['inhiber_message'] = u"Vous ne pouvez pas créer de RDV pour une intervention %s." % param
 
-        return context
+        return action_context
 
     @api.multi
     def action_view_interventions(self):
         action = self.env.ref('of_planning.of_sale_order_open_interventions').read()[0]
 
         if len(self._ids) == 1:
-            context = safe_eval(action['context'])
-            action['context'] = str(self.get_action_view_interventions_context(context))
+            action_context = safe_eval(action['context'])
+            action['context'] = str(self.get_action_view_interventions_context(action_context))
 
         return action
 
@@ -976,12 +976,12 @@ class ResPartner(models.Model):
         return action
 
     @api.multi
-    def _get_action_view_a_programmer_context(self, context={}):
+    def _get_action_view_a_programmer_context(self):
         today_str = fields.Date.today()
         today_da = fields.Date.from_string(today_str)
         deux_semaines_da = today_da + timedelta(days=14)
         deux_semaines_str = fields.Date.to_string(deux_semaines_da)
-        context.update({
+        context = {
             'default_partner_id': self.id,
             'default_address_id': self.address_get(adr_pref=['delivery']) or self.id,
             'default_recurrence': False,
@@ -990,7 +990,7 @@ class ResPartner(models.Model):
             'default_origin': u"[Partenaire] " + self.name,
             'bloquer_recurrence': True,
             'hide_bouton_planif': True,
-            })
+        }
         return context
 
     @api.multi
@@ -1010,12 +1010,12 @@ class ResPartner(models.Model):
         return action
 
     @api.multi
-    def _get_action_view_recurrent_context(self, context={}):
+    def _get_action_view_recurrent_context(self):
         today_str = fields.Date.today()
         today_da = fields.Date.from_string(today_str)
         deux_semaines_da = today_da + timedelta(days=14)
         deux_semaines_str = fields.Date.to_string(deux_semaines_da)
-        context.update({
+        context = {
             'default_partner_id': self.id,
             'default_address_id': self.address_get(adr_pref=['delivery']) or self.id,
             'default_recurrence': True,
@@ -1023,7 +1023,7 @@ class ResPartner(models.Model):
             'default_origin': u"[Partenaire] " + self.name,
             'hide_bouton_planif': True,
             'bloquer_recurrence': True,
-            })
+        }
         return context
 
     @api.multi
@@ -1031,7 +1031,6 @@ class ResPartner(models.Model):
         action = self.env.ref('of_service.action_of_service_rec_form_planning').read()[0]
 
         if len(self._ids) == 1:
-            #context = 'context' in action and safe_eval(action['context']) or {}
             action['context'] = str(self._get_action_view_recurrent_context())
 
         action['domain'] = [
