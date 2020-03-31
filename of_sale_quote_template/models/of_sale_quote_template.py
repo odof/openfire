@@ -190,7 +190,7 @@ class SaleOrder(models.Model):
         for doc in template.of_mail_template_ids:
             docs.append((4, doc.id))
         self.of_mail_template_ids = docs
-        if inactif:  #  @TODO : voir si peut être fait avec une fenêtre en javascript.
+        if inactif:  # @TODO : voir si peut être fait avec une fenêtre en javascript.
             self.of_note_insertion = u"Un ou plusieurs articles du modèle ne sont plus utilisés ou ne peuvent être vendus et n'ont donc pas été importés."
 
 class OFSaleConfiguration(models.TransientModel):
@@ -199,7 +199,8 @@ class OFSaleConfiguration(models.TransientModel):
     of_quote_template = fields.Selection([('add', u'Ajoute les lignes de commande du modèle au devis'), ('replace', u'Remplace les lignes de commande du devis par celles du modèle')],
         string=u"(OF) Modèle de devis", required=True, default='replace',
         help=u"Ceci ne modifie que le fonctionnement des lignes de commandes du modèle."
-             u"Les autres informations (ex: position fiscale) ne sont pas impactées par ce paramètre et seront toujours remplacer par ceux du dernier modèle choisi")
+             u"Les autres informations (ex: position fiscale) ne sont pas impactées par ce paramètre et seront "
+             u"toujours remplacées par celles du dernier modèle choisi")
 
     @api.multi
     def set_of_quote_template_defaults(self):
