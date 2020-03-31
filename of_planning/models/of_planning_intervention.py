@@ -194,6 +194,46 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
             return res
         return super(OfPlanningTache, self).name_search(name, args, operator, limit)
 
+    @api.multi
+    def _prepare_invoice_line(self, intervention):
+        self.ensure_one()
+        product = self.product_id
+        partner = intervention.partner_id
+        if not intervention.fiscal_position_id and not partner.property_account_position_id:
+            return {}, u"Veuillez définir une position fiscale pour l'intervention %s" % self.name
+        fiscal_position_id = intervention.fiscal_position_id.id or partner.property_account_position_id.id
+        taxes = product.taxes_id
+        if partner.company_id:
+            taxes = taxes.filtered(lambda r: r.company_id == partner.company_id)
+        taxes = self.env['account.fiscal.position'].browse(fiscal_position_id).map_tax(taxes, product, partner)
+
+        line_account = product.property_account_income_id or product.categ_id.property_account_income_categ_id
+        if not line_account:
+            return {}, u'Il faut configurer les comptes de revenus pour la catégorie du produit %s.\n' % product.name
+
+        # Mapping des comptes par taxe induit par le module of_account_tax
+        for tax in taxes:
+            line_account = tax.map_account(line_account)
+
+        pricelist = partner.property_product_pricelist
+        company = intervention._get_invoicing_company(partner)
+
+        if pricelist.discount_policy == 'without_discount':
+            from_currency = company.currency_id
+            price_unit = from_currency.compute(product.lst_price, pricelist.currency_id)
+        else:
+            price_unit = product.with_context(pricelist=pricelist.id).price
+        price_unit = self.env['account.tax']._fix_tax_included_price(price_unit, product.taxes_id, taxes)
+        return {
+                   'name'                : product.name_get()[0][1],
+                   'account_id'          : line_account.id,
+                   'price_unit'          : price_unit,
+                   'quantity'            : 1.0,
+                   'discount'            : 0.0,
+                   'uom_id'              : product.uom_id.id,
+                   'product_id'          : product.id,
+                   'invoice_line_tax_ids': [(6, 0, taxes._ids)],
+                   }, ""
 
 class OfPlanningEquipe(models.Model):
     _name = "of.planning.equipe"
@@ -1156,15 +1196,15 @@ class OfPlanningIntervention(models.Model):
         self.fiscal_position_id = self.order_id.fiscal_position_id
         in_use = self.line_ids.mapped('order_line_id')._ids
         for line in self.order_id.order_line.filtered(lambda l: l.id not in in_use):
-            n_line = line_obj.create({
+            line_obj.create({
                 'order_line_id': line.id,
                 'intervention_id': self.id,
                 'product_id': line.product_id.id,
                 'qty': line.product_uom_qty,
                 'price_unit': line.price_unit,
                 'name': line.name,
+                'taxe_ids': [(4, tax.id) for tax in line.tax_id]
                 })
-            n_line.compute_taxes()
 
     @api.multi
     def do_verif_dispo(self):
@@ -1271,12 +1311,23 @@ class OfPlanningIntervention(models.Model):
         if error:
             return (False,
                     msg_erreur % (self.name, error))
+        if not lines_data:
+            line_data, error = self.tache_id._prepare_invoice_line(self)
+            if error:
+                return (False,
+                        msg_erreur % (self.name, error))
+            if line_data:
+                lines_data = [(0, 0, line_data)]
+        if not lines_data:
+            return (False,
+                    msg_erreur % (self.name, u"Aucune ligne facturable."))
         company = self._get_invoicing_company(partner)
+        fiscal_position_id = self.fiscal_position_id.id or partner.property_account_position_id.id
 
         journal_id = self.env['account.invoice'].with_context(company_id=company.id).default_get(['journal_id'])['journal_id']
         if not journal_id:
             return (False,
-                    msg_erreur % (self.name, u'Pas de partenaire défini'u"Vous devez définir un journal des ventes pour cette société (%s)." % company.name))
+                    msg_erreur % (self.name, u"Vous devez définir un journal des ventes pour cette société (%s)." % company.name))
         invoice_data = {
             'origin': 'Intervention',
             'type': 'out_invoice',
@@ -1285,7 +1336,7 @@ class OfPlanningIntervention(models.Model):
             'partner_shipping_id': self.address_id.id,
             'journal_id': journal_id,
             'currency_id': pricelist.currency_id.id,
-            'fiscal_position_id': self.fiscal_position_id.id,
+            'fiscal_position_id': fiscal_position_id,
             'company_id': company.id,
             'user_id': self._uid,
             'invoice_line_ids': lines_data,
@@ -1345,6 +1396,8 @@ class OfPlanningInterventionLine(models.Model):
     price_tax = fields.Monetary(compute='_compute_amount', string='Taxes', readonly=True, store=True)
     price_total = fields.Monetary(compute='_compute_amount', string='Sous-total TTC', readonly=True, store=True)
 
+    intervention_state = fields.Selection(related="intervention_id.state", store=True)
+
     @api.depends('qty', 'price_unit', 'taxe_ids')
     def _compute_amount(self):
         """
@@ -1395,10 +1448,11 @@ class OfPlanningInterventionLine(models.Model):
         if not self.intervention_id.fiscal_position_id:
             return {}, u"Veuillez définir une position fiscale pour l'intervention %s" % self.name
         fiscal_position_id = self.intervention_id.fiscal_position_id.id
-        taxes = product.taxes_id
-        if partner.company_id:
+        taxes = self.taxe_ids
+        if partner.company_id and taxes:
             taxes = taxes.filtered(lambda r: r.company_id == partner.company_id)
-        taxes = self.env['account.fiscal.position'].browse(fiscal_position_id).map_tax(taxes, product, partner)
+        elif not taxes:
+            taxes = self.env['account.fiscal.position'].browse(fiscal_position_id).map_tax(taxes, product, partner)
 
         line_account = product.property_account_income_id or product.categ_id.property_account_income_categ_id
         if not line_account:
