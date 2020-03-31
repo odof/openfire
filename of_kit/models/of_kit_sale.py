@@ -26,6 +26,15 @@ class SaleOrder(models.Model):
              "- None: One line per kit. Nothing printed out about components\n"
              "- Collapse: One line per kit, with minimal info\n"
              "- Expand: One line per kit, plus one line per component")
+    of_difference = fields.Boolean(compute='_compute_of_difference', readonly=True)
+
+    @api.depends('order_line', 'order_line.of_difference')
+    def _compute_of_difference(self):
+        for order in self:
+            if order.order_line.filtered('of_difference'):
+                order.of_difference = True
+            else:
+                order.of_difference = False
 
     @api.multi
     @api.depends('order_line.product_id')
@@ -102,6 +111,7 @@ class SaleOrderLine(models.Model):
         help="This field is only relevant if the product is a kit. It represents the way the price should be computed.\n"
              "if set to 'fixed', the price of it's components won't be taken into account and the price will be the one of the kit.\n"
              "if set to 'computed', the price will be computed according to the components of the kit.")
+    of_difference = fields.Boolean(compute='_compute_of_difference', store=True)
 
     sale_kits_to_unlink = fields.Boolean(string="sale kits to unlink?", default=False, help="True if at least 1 sale kit needs to be deleted from database")
 
@@ -378,12 +388,34 @@ class SaleOrderLine(models.Model):
         return True
 
     @api.multi
+    def _write(self, vals):
+        if len(vals.keys()) == 1 and vals.get('of_difference'):
+            # Permet de forcer un recalcul du prix unitaire, la valeur ainsi forcée ne sera prise en compte que si
+            # l'utilisateur ne sauvegarde pas la ligne, le devis ou les deux
+            self._refresh_price_unit()
+            vals['of_difference'] = False
+        res = super(SaleOrderLine, self)._write(vals)
+        return res
+
+    @api.multi
     def copy_data(self, default=None):
         # La duplication d'une ligne de commande implique la duplication de son kit
         res = super(SaleOrderLine, self).copy_data(default)
         if res[0].get('kit_id'):
             res[0]['kit_id'] = self.kit_id.copy().id
         return res
+
+    @api.depends('of_pricing', 'price_unit',
+                 'kit_id', 'kit_id.kit_line_ids',
+                 'kit_id.kit_line_ids.price_unit',
+                 'kit_id.kit_line_ids.qty_per_kit')
+    def _compute_of_difference(self):
+        for line in self:
+            if line.kit_id and line.of_pricing == 'computed':
+                line.of_difference = float_compare(line.kit_id.price_comps, line.price_unit, 2)
+            else:
+                line.of_difference = False
+
 
 class OfSaleOrderKit(models.Model):
     _name = 'of.saleorder.kit'
