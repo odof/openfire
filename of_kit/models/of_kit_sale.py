@@ -165,6 +165,9 @@ class SaleOrderLine(models.Model):
     @api.onchange('price_comps', 'cost_comps', 'of_pricing', 'product_id')
     def _refresh_price_unit(self):
         for line in self:
+            if line.order_id.state == 'done':
+                # Impossible de modifier les montants d'une commande verrouillée
+                continue
             if line.of_is_kit:
                 if line.of_pricing == 'computed':
                     price = line.price_unit
