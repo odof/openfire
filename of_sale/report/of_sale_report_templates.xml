@@ -368,7 +368,7 @@
     </xpath>
 
     <xpath expr="//table" position="after">
-        <t groups="sale.group_sale_layout" t-foreach="o.order_lines_layouted()" t-as="page">
+        <t groups="sale.group_sale_layout" t-foreach="invoice_data['lines_layouted']" t-as="page">
             <table class="table table-condensed">
                 <thead>
                     <tr>
