@@ -24,3 +24,15 @@ msgstr "Identifiant"
 #: model:ir.ui.view,arch_db:of_base.of_base_partner_form
 msgid "e.g. Sales Director"
 msgstr "ex : Directeur Commercial"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:base.field_res_partner_bank_acc_type
+msgid "Acc type"
+msgstr "Type de compte"
+
+#. module: of_base
+#: model:ir.model.fields,help:base.field_res_partner_bank_acc_type
+msgid "Laissez le type de compte IBAN pour laisser le logiciel vérifier la validité du code saisi.\n"
+"Utiliser le type Banque pour tout autre type de compte, aucune vérification ne sera effectuée."
+msgstr "Laissez le type de compte IBAN pour laisser le logiciel vérifier la validité du code saisi.\n"
+"Utiliser le type Banque pour tout autre type de compte, aucune vérification ne sera effectuée."
