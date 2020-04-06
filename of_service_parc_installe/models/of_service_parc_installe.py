@@ -70,8 +70,26 @@ class OfService(models.Model):
 class OfPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
+    @api.model
+    def _get_parc_installe_id_domain(self):
+        return """[
+            '|',
+                '|',
+                    '|',
+                        ('client_id', '=', partner_id),
+                        ('client_id', '=', address_id),
+                    ('site_adresse_id', '=', address_id),
+                ('project_issue_ids', 'in', sav_id),
+        ]"""
+
     parc_installe_id = fields.Many2one('of.parc.installe', string=u"Parc installé",
-        domain="['|', '|', ('client_id', '=', partner_id), ('client_id', '=', address_id), ('site_adresse_id', '=', address_id)]")
+                                       domain=_get_parc_installe_id_domain)
+
+    @api.onchange('sav_id')
+    def _onchange_sav_id(self):
+        self.ensure_one()
+        if self.sav_id:
+            self.parc_installe_id = self.sav_id.of_produit_installe_id.id
 
     @api.model
     def create(self, vals):
