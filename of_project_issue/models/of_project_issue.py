@@ -37,7 +37,7 @@ class ProjectIssue(models.Model):
     @api.model
     def default_get(self, fields=None):
         res = super(ProjectIssue, self).default_get(fields)
-        res['date'] = lambda *a: time.strftime('%Y-%m-%d %H:%M:00')
+        res['date'] = time.strftime('%Y-%m-%d %H:%M:00')
         return res
 
     of_code = fields.Char('Code', size=64, required=True, readonly=True, default='Nouveau')
