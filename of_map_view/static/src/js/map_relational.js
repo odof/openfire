@@ -20,7 +20,6 @@ var X2ManyMapView = MapView.extend({
         this._super($node, options);
     },*/
     start: function() {
-        console.log("test", this);
         var self = this
         var res = this._super();
         /*
@@ -33,7 +32,6 @@ var X2ManyMapView = MapView.extend({
             // la map est dans un onglet
             $(document)
             .on('click.bs.tab.data-api', '[data-toggle="tab"]', function(){
-                console.log("oui?");
                 if (self.$el.is(":visible")) {
                     // l'onglet est visible
                     self.map.the_map.invalidateSize();
@@ -43,11 +41,9 @@ var X2ManyMapView = MapView.extend({
         }
         // à debugguer quand temp dispo
         this.on("change:effective_invisible", this, function() {
-            console.log("HAHA");
             if (self.get("effective_invisible") === false) {
                 self.map.the_map.invalidateSize();
                 self.map.set_bounds();
-                console.log("HOHO");
             }
         });
 

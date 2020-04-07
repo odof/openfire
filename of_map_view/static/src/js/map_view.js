@@ -722,9 +722,7 @@ MapView.Map = Widget.extend({
                 console.log("??????");
             }
             return $.when();
-        }else{
-            throw new Error(_.str.sprintf( _t("the map is not attached to its container")));
-        };
+        }
     },
 
     /**
@@ -737,9 +735,7 @@ MapView.Map = Widget.extend({
                 this.render_one(this.layer_groups[i],false);
             };
             return $.when().then(this.set_bounds(this.options.set_bounds_mode));
-        }else{
-            throw new Error(_.str.sprintf( _t("the map is not attached to its container")));
-        };
+        }
     },
 
     /**
@@ -849,8 +845,6 @@ MapView.Map = Widget.extend({
             this.layer_groups = [];
             this.record_displayer.remove_all();
             return $.when();
-        }else{
-            throw new Error(_.str.sprintf( _t("the map is not attached to its container")));
         };
     },
     /**
