@@ -27,6 +27,15 @@ Fiche de projet dynamique
  - Attributs de Projets: correspond à un 'champ' d'une fiche projet. possède un libellé et un type.
     Les types possibles sont pour l'instant 'Texte Court', 'Booléen', 'Date' et 'Choix Unique'.
     Dans une future version les types 'Monétaire' et 'Choix Multiples' pourront être implémentés.
+
+Workflow CRM
+------------
+
+ - Mise en place d'un nouveau workflow CRM automatisé
+ - Modification du workflow des devis/commandes
+ - Ajout de la possibilité de plannifier des RDVs techniques depuis les opportunités
+ - Refonte des activités
+ - Mise en place d'un tunnel de conversion
 """,
     'depends': [
         'crm',
@@ -38,16 +47,24 @@ Fiche de projet dynamique
         'of_calendar',
         # 'of_base',  # <- par of_base_location
         'of_base_location',
+        'of_planning',
     ],
     'data': [
+        'security/ir.model.access.csv',
+        'security/of_crm_security.xml',
+        'wizards/of_crm_activity_action_views.xml',
+        'reports/of_crm_funnel_conversion_views.xml',
         'views/crm_lead_views.xml',
         'views/sale_order_views.xml',
         'views/partner_views.xml',
         'views/of_crm_projet_views.xml',
+        'views/of_planning_intervention_views.xml',
         'views/of_crm_templates.xml',
-        'report/of_crm_fiche_rdv_report_view.xml',
+        'reports/of_crm_fiche_rdv_report_view.xml',
         'data/data.xml',
-        'security/ir.model.access.csv',
+    ],
+    'qweb': [
+        'static/src/xml/of_sales_team_dashboard.xml',
     ],
     'installable': True,
 }

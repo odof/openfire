@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- OF Planning Intervention views -->
+
+    <record id="of_crm_planning_intervention_form_view" model="ir.ui.view">
+        <field name="name">of.crm.planning.intervention.form.view</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
+        <field name="arch" type="xml">
+            <field name="order_id" position="after">
+                <field name="opportunity_id"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="of_crm_planning_intervention_search_view" model="ir.ui.view">
+        <field name="name">of.crm.planning.intervention.search.view</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_filter"/>
+        <field name="arch" type="xml">
+            <field name="order_id" position="after">
+                <field name="opportunity_id"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

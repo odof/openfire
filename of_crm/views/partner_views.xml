@@ -110,9 +110,9 @@
 
         <menuitem id="of_crm_menu_prospect_form"
             action="of_crm_action_prospect_form"
-            parent="sales_team.menu_sales"
+            parent="of_crm.of_crm_crm_menu"
             name="Prospects"
-            sequence="3"/>
+            sequence="10"/>
 
 
 <!-- #######################################################################################
@@ -126,13 +126,6 @@
             <field name="arch" type="xml">
                 <xpath expr="//notebook//page[@name='advanced_settings']" position="attributes">
                     <attribute name="invisible">0</attribute>
-                </xpath>
-                <xpath expr="//notebook//page[@name='advanced_settings']/group[@name='advanced_settings_group_2']" position="inside">
-                    <group colspan="2">
-                        <separator string="CRM" colspan="2"/>
-                        <field name="crm_suivi"/>
-                        <field name="crm_suivi_notes"/>
-                    </group>
                 </xpath>
             </field>
         </record>
