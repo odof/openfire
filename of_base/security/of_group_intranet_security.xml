@@ -8,4 +8,9 @@
         <field name="comment">Droits OpenFire : donne les droits d'accès à l'intranet</field>
     </record>
 
+    <record id="of_group_hidden" model="res.groups">
+        <field name="name">Groupe spécial caché</field>
+        <field name="comment">Groupe spécial OpenFire : permet de cacher certains éléments de menu</field>
+    </record>
+
 </odoo>
