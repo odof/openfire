@@ -3,6 +3,7 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError,  ValidationError
 from odoo.models import regex_order
+from odoo.tools.float_utils import float_compare
 
 NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
 
@@ -273,10 +274,95 @@ class AccountMoveLine(models.Model):
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
         if self.partner_id and not self.account_id and not self._context.get('line_ids', False):
-            if self.journal_id.type == 'sale': # Est un journal de vente, on prend le compte de tiers client.
+            if self.journal_id.type == 'sale':
+                # Pour un journal de vente on prend le compte de tiers client.
                 self.account_id = self.partner_id.property_account_receivable_id
-            elif self.journal_id.type == 'purchase': # Est un journal d'achat, on prend le compte de tiers fournisseur.
+            elif self.journal_id.type == 'purchase':
+                # Pour un journal d'achat on prend le compte de tiers fournisseur.
                 self.account_id = self.partner_id.property_account_payable_id
+
+    @api.multi
+    def write(self, vals):
+        if 'account_id' in vals:
+            for line in self:
+                if not line.invoice_id:
+                    continue
+                invoice = line.invoice_id
+                balance = vals.get('debit', line.debit) - vals.get('credit', line.credit)
+                if line.invoice_id.type in ('out_invoice', 'in_refund'):
+                    balance = -balance
+
+                # On tente de synchroniser le compte utilisé avec la facture
+                # 1 - Compte de tiers
+                if line.account_id == invoice.account_id:
+                    invoice.account_id = vals['account_id']
+                    continue
+
+                # 2 - Compte de taxe
+                if line.account_id in invoice.tax_line_ids.mapped('account_id'):
+                    tax_lines = invoice.tax_line_ids.filtered(lambda l: l.account_id == line.account_id)
+                    if tax_lines:
+                        if float_compare(sum(tax_lines.mapped('amount')), balance, 2) == 0:
+                            tax_lines.write({'account_id': vals['account_id']})
+                        else:
+                            for tax_line in tax_lines:
+                                if float_compare(tax_line.amount, balance, 2) == 0:
+                                    tax_line.account_id = vals['account_id']
+                                    break
+                            else:
+                                raise UserError(
+                                    u"Vous ne pouvez pas changer le compte \"%s - %s\" car les montants des taxes "
+                                    u"de la facture ne correspondent pas." %
+                                    (line.account_id.code, line.account_id.name))
+                        continue
+                    for tax_line in invoice.tax_line_ids:
+                        if tax_line.account_id.id == line.account_id.id and float_compare(balance, tax_line.amount, 2) == 0:
+                            tax_line.account_id = vals['account_id']
+                            break
+
+                # 3 - Compte de ligne de facture
+                # On tente de synchroniser le compte utilisé dans les lignes de factures correspondantes
+
+                invoice_lines = invoice.invoice_line_ids.filtered(lambda l: l.account_id.id == self.account_id.id)
+                if not invoice_lines:
+                    # Les comptes ne sont déjà pas synchronisés, on laisse faire...
+                    continue
+
+                # Regroupement des lignes de factures selon la règle définie dans le journal.
+                if invoice.journal_id.group_invoice_lines:
+                    if invoice.journal_id.group_method == 'product':
+                        # Les écritures sont groupées par article
+                        values = {}
+                        for invoice_line in invoice_lines:
+                            product_id = line.product_id.id
+                            if product_id in values:
+                                vals[product_id] |= invoice_line
+                        values = values.values()
+                    else:
+                        # Les écritures sont groupées par compte
+                        values = [invoice_lines]
+                else:
+                    # Une écriture par ligne de facture
+                    values = invoice_lines
+
+                # Les montants des lignes de facture doivent correspondre au montant de l'écriture
+                values = [
+                    inv_lines for inv_lines in values
+                    if float_compare(sum(inv_lines.mapped('price_subtotal')), balance, 2) == 0]
+                if not values:
+                    raise UserError(
+                        u"Vous ne pouvez pas changer le compte \"%s - %s\" car les montants de la facture "
+                        u"ne correspondent pas." %
+                        (line.account_id.code, line.account_id.name))
+                if len(values) > 1:
+                    raise UserError(
+                        u"Vous ne pouvez pas changer le compte \"%s - %s\" car plusieurs lignes de la facture sont "
+                        u"candidates pour ce changement." %
+                        (line.account_id.code, line.account_id.name))
+                values[0].write({'account_id': vals['account_id']})
+
+        super(AccountMoveLine, self).write(vals)
+
 
 class AccountMove(models.Model):
     _inherit = "account.move"

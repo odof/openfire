@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models
+from odoo.tools.float_utils import float_compare
 import odoo.addons.decimal_precision as dp
 
 class AccountInvoice(models.Model):
@@ -233,20 +234,21 @@ class AccountInvoiceLine(models.Model):
 
     @api.multi
     def write(self, vals):
-        if len(self._ids) == 1 and self.of_pricing == 'computed' and not self.price_unit == self.price_comps:
-            vals['price_unit'] = self.price_comps
-        if vals.get("invoice_kits_to_unlink") or self.invoice_kits_to_unlink:
-            self.env["of.invoice.kit"].search([("to_unlink", "=", True)]).unlink()
-            vals["invoice_kits_to_unlink"] = False
         update_il_id = False
-        if len(self) == 1 and vals.get("kit_id") and not self.kit_id:
-            # a account_invoice_kit was added
-            update_il_id = True
-        elif len(self) == 1 and vals.get("name") and self.kit_id:
-            # line changed name
-            update_il_id = True
-        if len(self) == 1 and ((self.of_pricing == 'computed' and not vals.get('of_pricing')) or vals.get('of_pricing') == 'computed'):
-            vals['price_unit'] = vals.get('price_comps', self.price_comps)  # price_unit is equal to price_comps if pricing is computed
+        if len(self._ids) == 1:
+            if self.of_pricing == 'computed' and not float_compare(self.price_unit, self.price_comps, 2):
+                vals['price_unit'] = self.price_comps
+            if vals.get("invoice_kits_to_unlink") or self.invoice_kits_to_unlink:
+                self.env["of.invoice.kit"].search([("to_unlink", "=", True)]).unlink()
+                vals["invoice_kits_to_unlink"] = False
+            if vals.get("kit_id") and not self.kit_id:
+                # a account_invoice_kit was added
+                update_il_id = True
+            elif vals.get("name") and self.kit_id:
+                # line changed name
+                update_il_id = True
+            if (vals.get('of_pricing') or self.of_pricing) == 'computed':
+                vals['price_unit'] = vals.get('price_comps', self.price_comps)  # price_unit is equal to price_comps if pricing is computed
         super(AccountInvoiceLine, self).write(vals)
         if update_il_id:
             account_kit_vals = {'invoice_line_id': self.id}
