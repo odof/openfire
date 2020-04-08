@@ -261,4 +261,16 @@
         </field>
     </record>
 
+    <!-- Comptes bancaires - Vue formulaire -->
+    <record id="of_view_partner_bank_form" model="ir.ui.view">
+        <field name="name">of.res.partner.bank.form</field>
+        <field name="model">res.partner.bank</field>
+        <field name="inherit_id" ref="base.view_partner_bank_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="/form/group" position="inside">
+                <field name="acc_type"/>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>

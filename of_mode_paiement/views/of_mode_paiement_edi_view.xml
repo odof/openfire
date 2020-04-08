@@ -27,13 +27,14 @@
         <field name="model">res.partner.bank</field>
         <field name="inherit_id" ref="base.view_partner_bank_form"/>
         <field name="arch" type="xml">
-            <field name="bank_id" position="after">
-                <newline/>
-                <separator string="Mandat SEPA" colspan="4"/>
-                <field name="of_sepa_rum"/>
-                <field name="of_sepa_date_mandat"/>
-                <field name="of_sepa_type_prev"/>
-            </field>
+            <xpath expr="/form/group" position="after">
+                <group name="of_sepa" col="4">
+                    <separator string="Mandat SEPA" colspan="4"/>
+                    <field name="of_sepa_rum"/>
+                    <field name="of_sepa_date_mandat"/>
+                    <field name="of_sepa_type_prev"/>
+                </group>
+            </xpath>
         </field>
     </record>
 

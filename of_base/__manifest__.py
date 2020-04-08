@@ -26,7 +26,7 @@ Personnalisation des fonctions de base Odoo :
     -> Librairie Python phonenumbers nécessaire, pour installer : pip install phonenumbers
 """,
     'website': "www.openfire.fr",
-    'depends': ['product', 'mail', 'contacts'],
+    'depends': ['base_iban', 'product', 'mail', 'contacts'],
     'category': "OpenFire",
     'data': [
         'data/report_paperformat.xml',
