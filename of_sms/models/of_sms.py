@@ -9,7 +9,7 @@ import re
 import requests
 from HTMLParser import HTMLParser
 import urllib
-from odoo.addons.of_base.models.of_base import convert_phone_number
+from odoo.addons.of_base.models.partner import convert_phone_number
 
 _logger = logging.getLogger(__name__)
 
