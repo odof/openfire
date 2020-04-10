@@ -13,11 +13,8 @@ class StockInventory(models.Model):
         res = super(StockInventory, self)._get_inventory_lines_values()
         for vals in res:
             product = vals.get('product_id') and self.env['product.product'].browse(vals['product_id'])
-            uom = vals.get('product_uom_id') and self.env['product.uom'].browse(vals['product_uom_id'])
-            if product and uom:
-                # On ramène la quantité saisie à l'unité de mesure d'achat
-                qty = uom._compute_quantity(1.0, product.uom_po_id)
-                vals['product_value_unit'] = product.standard_price * qty
+            if product:
+                vals['product_value_unit'] = product.standard_price
         return res
 
 class StockInventoryLine(models.Model):
@@ -47,10 +44,8 @@ class StockInventoryLine(models.Model):
 
     @api.onchange('product_id', 'product_uom_id')
     def _onchange_product_id(self):
-        if self.product_id and self.product_uom_id:
-            # On ramène la quantité saisie à l'unité de mesure d'achat
-            qty = self.product_uom_id._compute_quantity(1.0, self.product_id.uom_po_id)
-            self.product_value_unit = self.product_id.standard_price * qty
+        if self.product_id:
+            self.product_value_unit = self.product_id.standard_price
         else:
             self.product_value_unit = 0.0
 
