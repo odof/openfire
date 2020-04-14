@@ -33,7 +33,7 @@ Module OpenFire / Ventes - planning
         'python': ['pdfminer', 'pypdftk', 'pyPdf'],
     },
     'data' : [
-        # 'views/of_sale_view.xml',
+        'views/of_sale_planning_views.xml',
     ],
     'installable': True,
     'application': False,

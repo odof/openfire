@@ -47,6 +47,18 @@ class SaleOrderLine(models.Model):
                 line.qty_to_invoice = 0
 
 
+class OfPlanningInterventionTemplate(models.Model):
+    _inherit = 'of.planning.intervention.template'
+
+    product_ids = fields.Many2many('product.product')
+
+
+class OfPlanningIntervention(models.Model):
+    _inherit = 'of.planning.intervention'
+
+    product_ids = fields.Many2many('product.product', related='template_id.product_ids')
+
+
 class SaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'
 
