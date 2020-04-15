@@ -2,25 +2,29 @@
 
 from odoo import models, fields
 from odoo.tools.safe_eval import safe_eval
-from math import asin, sin, cos, sqrt, radians
+from math import asin, sin, cos, sqrt, radians, ceil
 
 ROUTING_BASE_URL = "http://s-hotel.openfire.fr:5000/"
 ROUTING_VERSION = "v1"
 ROUTING_PROFILE = "driving"
 
 
-def round_a_cinq(val):
-    u"""arrondi au multiple de 5 supérieur"""
-    reste = val % 5
-    if not reste:
-        return val
-    return 5 * (int(val / 5) + 1)
+def arrondi_sup(val, mult):
+    """
+    Arrondi au multiple supérieur
+    :param val: Valeur à arrondir
+    :param mult: Multiplicateur
+    :return: Valeur arrondie au multiple supérieur de Multiplicateur
+    """
+    if val % mult:
+        val = mult * (int(val / mult) + 1)
+    return val
 
 
 def distance_points(lat1, lon1, lat2, lon2):
     u"""
     Retourne la distance entre deux points en Km, à vol d'oiseau
-    @param *: Coordonnées gps en degrés
+    @param: Coordonnées gps en degrés
     """
     lat1, lon1, lat2, lon2 = [radians(v) for v in (lat1, lon1, lat2, lon2)]
     return 2*asin(sqrt((sin((lat1-lat2)/2)) ** 2 + cos(lat1)*cos(lat2)*(sin((lon1-lon2)/2)) ** 2)) * 6366

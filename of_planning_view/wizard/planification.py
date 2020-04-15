@@ -7,7 +7,7 @@ import pytz
 import json
 from odoo.exceptions import UserError
 from odoo.tools.float_utils import float_compare
-from odoo.addons.of_utils.models.of_utils import hours_to_strs, distance_points as voloiseau, round_a_cinq,\
+from odoo.addons.of_utils.models.of_utils import hours_to_strs, distance_points as voloiseau, arrondi_sup,\
     ROUTING_BASE_URL, ROUTING_VERSION, ROUTING_PROFILE
 import urllib, urllib3
 import requests
@@ -765,7 +765,7 @@ class OfPlanifCreneauProp(models.TransientModel):
                 a_planifier.distance_reelle_suiv = dist_suiv
                 a_planifier.distance_reelle_tota = dist_prec + dist_suiv
                 a_planifier.distance_order = dist_prec + dist_suiv
-                a_planifier.distance_arrondi_order = round_a_cinq(dist_prec + dist_suiv)
+                a_planifier.distance_arrondi_order = arrondi_sup(dist_prec + dist_suiv, 5)
                 a_planifier.osrm_response = legs
                 a_planifier.fait = True
             else:

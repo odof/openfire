@@ -8,7 +8,7 @@ class OfComposeMail(models.TransientModel):
 
     @api.model
     def _get_objects(self, o):
-        result = super(OfComposeMail,self)._get_objects(o)
+        result = super(OfComposeMail, self)._get_objects(o)
         parc = False
         if o._name == 'of.parc.installe':
             parc = o
@@ -23,7 +23,7 @@ class OfComposeMail(models.TransientModel):
 
     @api.model
     def _get_dict_values(self, o, objects):
-        result = super(OfComposeMail,self)._get_dict_values(o, objects)
+        result = super(OfComposeMail, self)._get_dict_values(o, objects)
 
         sav = objects.get('sav')
         parc = objects.get('parc_installe')
