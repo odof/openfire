@@ -7,16 +7,17 @@ from odoo.exceptions import UserError
 class OFGesDocImport(models.TransientModel):
     _inherit = 'of.gesdoc.import'
 
+    @api.model
     def import_data_obj(self, data, obj):
         parc_obj = self.env['of.parc.installe']
         result = super(OFGesDocImport, self).import_data_obj(data, obj)
         if obj._name == 'project.issue':
-            parc_name = data.get('pi_produit_installe','').strip()
+            parc_name = data.get('pi_produit_installe', '').strip()
             if not parc_name:
                 return result
 
             # Recherche de tous les parcs dont le numéro de série correspond
-            all_parcs = parc_obj.search([('name','=ilike',parc_name)])
+            all_parcs = parc_obj.search([('name', '=ilike', parc_name)])
             if not all_parcs:
                 raise UserError(u'Erreur!\n'
                                 u'Aucun parc installé ne correspond au numéro de série saisi.\n'

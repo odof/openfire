@@ -723,10 +723,8 @@ class OfPlanifCreneauProp(models.TransientModel):
 
             if a_planifier.fait:
                 continue
-            if compteur >= 25:
+            if compteur >= 25:  # Ne pas calculer plus de 25 d'un coup pour éviter les lenteurs
                 break
-            # a_planifier.dummy_field = True
-            # compteur += 1
             routing_base_url = config.get("of_routing_base_url", "")
             routing_version = config.get("of_routing_version", "")
             routing_profile = config.get("of_routing_profile", "")
