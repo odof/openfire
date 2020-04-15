@@ -1,21 +1,17 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.tools import config
-from odoo.addons.of_utils.models.of_utils import se_chevauchent, float_2_heures_minutes, heures_minutes_2_float, \
-    compare_date
-import urllib
 import requests
-import re
-import pytz
+import urllib
 
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.tools.safe_eval import safe_eval
 from odoo.tools.float_utils import float_compare
-
+from odoo.addons.of_utils.models.of_utils import se_chevauchent, float_2_heures_minutes, heures_minutes_2_float, \
+    compare_date
 
 @api.model
 def _tz_get(self):
@@ -28,7 +24,8 @@ class HREmployee(models.Model):
 
     of_tache_ids = fields.Many2many('of.planning.tache', 'of_employee_tache_rel', 'employee_id', 'tache_id', u'Tâches')
     of_toutes_taches = fields.Boolean(string=u'Apte à toutes les tâches')
-    of_equipe_ids = fields.Many2many('of.planning.equipe', 'of_planning_employee_rel', 'employee_id', 'equipe_id', u'Équipes')
+    of_equipe_ids = fields.Many2many(
+        'of.planning.equipe', 'of_planning_employee_rel', 'employee_id', 'equipe_id', u'Équipes')
     # api.depends dans of.planning.intervention
     of_changed_intervention_id = fields.Many2one('of.planning.intervention', string=u"Dernier RDV modifié")
     of_est_intervenant = fields.Boolean(string=u"Est intervenant ?", default=False)
@@ -36,8 +33,8 @@ class HREmployee(models.Model):
     @api.multi
     def peut_faire(self, tache_id, all_required=False):
         """
-        renvois True si les employés dans self peuvent faire la tâche. Sauf all_required=True, il suffit qu'un
-        des employés puisse faire la tâche pour que la fonction renvois True
+        Renvoie True si les employés dans self peuvent faire la tâche. Sauf si all_required=True, il suffit qu'un
+        des employés puisse faire la tâche pour que la fonction renvoie True
         :param tache_id: La tâche en question
         :param all_required: True si tous les employés doivent savoir faire la tâche
         :return: True si peut faire, False sinon
@@ -50,7 +47,7 @@ class HREmployee(models.Model):
     @api.multi
     def get_taches_possibles(self, en_commun=False):
         """
-        renvois la liste des tâches possibles pour self, en prenant en compte le champ of_toutes_taches
+        Renvoie la liste des tâches possibles pour self, en prenant en compte le champ of_toutes_taches
         :param en_commun: à True pour ne renvoyer que les tâches que tout self peut faire
         :return: liste des tâches possibles
         :rtype env['of.planning.tache']
@@ -73,7 +70,9 @@ class HREmployee(models.Model):
         result = []
         for employee in self:
             peut_faire = employee.peut_faire(tache) if tache else True
-            result.append((employee.id, "%s%s%s" % ('' if peut_faire else '(', employee.name, '' if peut_faire else ')')))
+            result.append((employee.id, "%s%s%s" % ('' if peut_faire else '(',
+                                                    employee.name,
+                                                    '' if peut_faire else ')')))
         return result
 
     @api.model
@@ -107,28 +106,25 @@ class OfPlanningTacheCateg(models.Model):
     active = fields.Boolean('Actif', default=True)
     sequence = fields.Integer(u'Séquence', help=u"Ordre d'affichage (plus petit en premier)")
 
-    fourchette_planif = fields.Selection([
-        ('semaine', u"À la semaine"),
-        ('quinzaine', u"À la quinzaine"),
-        ('mois', u"Au mois"),
-    ], string=u"Granularité de planif",
-    help=u"""
+    fourchette_planif = fields.Selection(
+        [
+            ('semaine', u"À la semaine"),
+            ('quinzaine', u"À la quinzaine"),
+            ('mois', u"Au mois"),
+        ], string=u"Granularité de planif",
+        help=u"""
 La granularité permet de définir la période de planification de référence par type de tâche.\n
 Cette granularité permet, à la saisie d'une intervention à programmer,
 de calculer la date de fin une fois la date de début saisie. par défaut :\n
   * Pour une pose la granularité de planification est la quinzaine\n
   * Pour un SAV (quand le champ SAV est rempli), la granularité de planification est la semaine\n
   * Pour un entretien (intervention récurrente), la granularité de planification est le mois\n
-    """)
+""")
 
 
 class OfPlanningTache(models.Model):
     _name = "of.planning.tache"
     _description = u"Planning OpenFire : Tâches"
-
-    @api.model
-    def _get_employee_ids_domain(self):
-        return [('of_est_intervenant', '=', True)]
 
     name = fields.Char(u'Libellé', size=64, required=True)
     description = fields.Text('Description')
@@ -140,9 +136,10 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
     duree = fields.Float(u'Durée par défaut', digits=(12, 5), default=1.0)
     tache_categ_id = fields.Many2one('of.planning.tache.categ', string=u"Catégorie de tâche")
     is_crm = fields.Boolean(u'Tâche CRM')
-    equipe_ids = fields.Many2many('of.planning.equipe', 'equipe_tache_rel', 'tache_id', 'equipe_id', u'Équipes qualifiées')
-    employee_ids = fields.Many2many('hr.employee', u'Employés qualifiés', compute="_compute_employee_ids",
-                                    search="_search_employee_ids")
+    equipe_ids = fields.Many2many(
+        'of.planning.equipe', 'equipe_tache_rel', 'tache_id', 'equipe_id', u'Équipes qualifiées')
+    employee_ids = fields.Many2many(
+        'hr.employee', string=u'Employés qualifiés', compute="_compute_employee_ids", search="_search_employee_ids")
     category_id = fields.Many2one('hr.employee.category', string=u"Catégorie d'employés")
     fourchette_planif = fields.Selection(related="tache_categ_id.fourchette_planif", readonly=True)
 
@@ -186,7 +183,7 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
     def name_search(self, name='', args=None, operator='ilike', limit=100):
         """Permet dans un RDV d'intervention de proposer en priorité les tâches possibles"""
         if self._context.get('intervenant_prio_ids'):
-            intervenant_ids = self._context.get('intervenant_prio_ids', [(6, 0, [])])[0][2]  # code 6 [(6, 0, [ids])]
+            intervenant_ids = self._context['intervenant_prio_ids'][0][2]  # code 6 [(6, 0, [ids])]
             args = args or []
             res = super(OfPlanningTache, self).name_search(
                 name,
@@ -209,7 +206,7 @@ class OfPlanningEquipe(models.Model):
     _order = "sequence, name"
 
     @api.model
-    def _get_employee_ids_domain(self):
+    def _domain_employee_ids(self):
         return [('of_est_intervenant', '=', True)]
 
     def _default_tz(self):
@@ -217,8 +214,8 @@ class OfPlanningEquipe(models.Model):
 
     name = fields.Char(u'Équipe', size=128, required=True)
     note = fields.Text('Description')
-    employee_ids = fields.Many2many('hr.employee', 'of_planning_employee_rel', 'equipe_id', 'employee_id', u'Employés',
-                                    domain=_get_employee_ids_domain)
+    employee_ids = fields.Many2many(
+        'hr.employee', 'of_planning_employee_rel', 'equipe_id', 'employee_id', u'Employés', domain=_domain_employee_ids)
     active = fields.Boolean('Actif', default=True)
     category_ids = fields.Many2many(
         'hr.employee.category', 'equipe_category_rel', 'equipe_id', 'category_id', string=u'Catégories')
@@ -235,7 +232,8 @@ class OfPlanningEquipe(models.Model):
     modele_id = fields.Many2one("of.horaire.modele", string=u"Modèle")
 
     _sql_constraints = [
-        ('of_creneau_temp_start_stop_constraint', 'CHECK ( name != NULL )', _(u"contrainte vide")),  #@todo: apply_sql supprimer colonne of_creneau_temp_start
+        ('of_creneau_temp_start_stop_constraint', 'CHECK ( name != NULL )', _(u"contrainte vide")),
+        #  @todo: apply_sql supprimer colonne of_creneau_temp_start
     ]
 
     @api.depends('tz')
@@ -500,7 +498,7 @@ class OfPlanningIntervention(models.Model):
     # Domain #
 
     @api.model
-    def _get_employee_ids_domain(self):
+    def _domain_employee_ids(self):
         return [('of_est_intervenant', '=', True)]
 
     # Constraints #
@@ -516,8 +514,10 @@ class OfPlanningIntervention(models.Model):
     def check_alert_hors_creneau(self):
         for intervention in self:
             if intervention.alert_hors_creneau:
-                horaires_du_jour = intervention.employee_ids.get_horaires_date(intervention.date_date, response_text=True)
-                raise UserError(_(u'La date de début des travaux est en dehors des horaires de travail: \n%s') % horaires_du_jour)
+                horaires_du_jour = intervention.employee_ids.get_horaires_date(intervention.date_date,
+                                                                               response_text=True)
+                raise UserError(_(u'La date de début des travaux est en dehors des horaires de travail: \n%s')
+                                % horaires_du_jour)
 
     @api.constrains('tache_id', 'employee_ids')
     def check_alert_incapable(self):
@@ -570,30 +570,34 @@ class OfPlanningIntervention(models.Model):
     # Champs #
 
     # Header
-    state = fields.Selection([
-        ('draft', 'Brouillon'),
-        ('confirm', u'Confirmé'),
-        ('done', u'Réalisé'),
-        ('unfinished', u'Inachevé'),
-        ('cancel', u'Annulé'),
-        ('postponed', u'Reporté'),
-    ], string=u'État', index=True, readonly=True, default='draft', track_visibility='onchange')
+    state = fields.Selection(
+        [
+            ('draft', 'Brouillon'),
+            ('confirm', u'Confirmé'),
+            ('done', u'Réalisé'),
+            ('unfinished', u'Inachevé'),
+            ('cancel', u'Annulé'),
+            ('postponed', u'Reporté'),
+        ], string=u'État', index=True, readonly=True, default='draft', track_visibility='onchange')
     raison_id = fields.Many2one('of.planning.intervention.raison', string='Raison')
     number = fields.Char(String=u"Numéro", copy=False)
 
     # Rubrique Référence
     equipe_id = fields.Many2one('of.planning.equipe', string=u'Équipe', oldname='poseur_id')
-    employee_ids = fields.Many2many('hr.employee', 'of_employee_intervention_rel', 'intervention_id', 'employee_id',
-                                    string='Intervenants', required=True, domain=_get_employee_ids_domain)
-    employee_main_id = fields.Many2one('hr.employee', string=u"Employé principal", compute="_compute_employee_main_id",
-                                       store=True, search="_search_employee_main_id")
+    employee_ids = fields.Many2many(
+        'hr.employee', 'of_employee_intervention_rel', 'intervention_id', 'employee_id',
+        string='Intervenants', required=True, domain=lambda self: self._domain_employee_ids())
+    employee_main_id = fields.Many2one(
+        'hr.employee', string=u"Employé principal", compute="_compute_employee_main_id",
+        search="_search_employee_main_id", store=True)
     partner_id = fields.Many2one('res.partner', string='Client', compute='_compute_partner_id', store=True)
     address_id = fields.Many2one('res.partner', string='Adresse', track_visibility='onchange')
     address_city = fields.Char(related='address_id.city', string="Ville", oldname="partner_city")
     address_zip = fields.Char(related='address_id.zip')
     secteur_id = fields.Many2one(related='address_id.of_secteur_tech_id', readonly=True)
     user_id = fields.Many2one('res.users', string='Utilisateur', default=lambda self: self.env.uid)
-    company_id = fields.Many2one('res.company', string='Magasin', required=True, default=lambda self: self.env.user.company_id.id)
+    company_id = fields.Many2one(
+        'res.company', string='Magasin', required=True, default=lambda self: self.env.user.company_id.id)
     name = fields.Char(string=u'Libellé', required=True)
     tag_ids = fields.Many2many('of.planning.tag', column1='intervention_id', column2='tag_id', string=u'Étiquettes')
 
@@ -601,24 +605,27 @@ class OfPlanningIntervention(models.Model):
     template_id = fields.Many2one('of.planning.intervention.template', string=u"Modèle d'intervention")
     tache_id = fields.Many2one('of.planning.tache', string=u"Tâche", required=True)
     tache_categ_id = fields.Many2one(related="tache_id.tache_categ_id", readonly=True)
-    forcer_dates = fields.Boolean("Forcer les dates", default=False, help=u"/!\\ outrepasser les horaires des intervenants")
+    forcer_dates = fields.Boolean(
+        "Forcer les dates", default=False, help=u"/!\\ outrepasser les horaires des intervenants")
     jour = fields.Char("Jour", compute="_compute_jour")
     date = fields.Datetime(string='Date intervention', required=True, track_visibility='always')
-    date_date = fields.Date(string='Jour intervention', compute='_compute_date_date', search='_search_date_date',
-                            readonly=True)
+    date_date = fields.Date(
+        string='Jour intervention', compute='_compute_date_date', search='_search_date_date', readonly=True)
     duree = fields.Float(string=u'Durée intervention', required=True, digits=(12, 5), track_visibility='always')
     jour_fin = fields.Char("Jour fin", compute="_compute_jour")
-    date_deadline = fields.Datetime(compute="_compute_date_deadline", string='Date fin', store=True,
-                                    track_visibility='always')
+    date_deadline = fields.Datetime(
+        compute="_compute_date_deadline", string='Date fin', store=True, track_visibility='always')
     jour_fin_force = fields.Char(u"Jour fin forcé", compute="_compute_jour")
     date_deadline_forcee = fields.Datetime(string=u"Date fin (forcée)")
     horaire_du_jour = fields.Text(string=u"Horaires du jour", compute="_compute_horaire_du_jour")
-    verif_dispo = fields.Boolean(string=u'Vérif chevauchement', default=True,
-                                 help=u"Vérifier que cette intervention n'en chevauche pas une autre")
+    verif_dispo = fields.Boolean(
+        string=u'Vérif chevauchement', default=True,
+        help=u"Vérifier que cette intervention n'en chevauche pas une autre")
 
     # Rubrique Documents liés
-    order_id = fields.Many2one("sale.order", string=u"Commande associée",
-                               domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', address_id)]")
+    order_id = fields.Many2one(
+        "sale.order", string=u"Commande associée",
+        domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', address_id)]")
 
     # Onglet Description
     description = fields.Html(string='Description')
@@ -633,8 +640,9 @@ class OfPlanningIntervention(models.Model):
     alert_incapable = fields.Boolean(string="Aucun intervenant apte", compute="_compute_alert_incapable")
 
     # Pour recherche
-    gb_employee_id = fields.Many2one('hr.employee', compute=lambda *a, **k: {}, search='_search_gb_employee_id',
-                                     string="Intervenant", of_custom_groupby=True)
+    gb_employee_id = fields.Many2one(
+        'hr.employee', compute=lambda *a, **k: {}, search='_search_gb_employee_id', string="Intervenant",
+        of_custom_groupby=True)
 
     # Vue Calendar / Planning / Map
     calendar_name = fields.Char(string="Calendar Name", compute="_compute_calendar_name")  # vue Calendar
@@ -655,8 +663,10 @@ class OfPlanningIntervention(models.Model):
     # cleantext: afficher les champs Html dans des vues liste sans les balises html exple: <p> description </p>
     cleantext_description = fields.Text(compute='_compute_cleantext_description')
     cleantext_intervention = fields.Text(compute='_compute_cleantext_intervention', store=True)
-    interv_before_id = fields.Many2one('of.planning.intervention', compute="_compute_interventions_before_after", store=True)
-    interv_after_id = fields.Many2one('of.planning.intervention', compute="_compute_interventions_before_after", store=True)
+    interv_before_id = fields.Many2one(
+        'of.planning.intervention', compute="_compute_interventions_before_after", store=True)
+    interv_after_id = fields.Many2one(
+        'of.planning.intervention', compute="_compute_interventions_before_after", store=True)
     before_to_this = fields.Float(compute="_compute_interval", store=True, digits=(12, 5))
 
     # Compute
@@ -729,9 +739,9 @@ class OfPlanningIntervention(models.Model):
                 date_courante_da = fields.Date.from_string(date_locale_str)  # Date local
                 date_courante_str = fields.Date.to_string(date_courante_da).decode('utf-8')
                 un_jour = timedelta(days=1)
-
                 une_semaine = timedelta(days=7)
-                date_stop_dt = date_locale_dt + une_semaine  # Pour des raisons pratiques on limite la recherche des horaires à une semaine après la date d'intervention
+                # Pour des raisons pratiques on limite la recherche des horaires à une semaine après la date d'intervention
+                date_stop_dt = date_locale_dt + une_semaine
                 date_stop_str = fields.Datetime.to_string(date_stop_dt).decode('utf-8')
                 # Récupérer le dictionnaire des segments horaires des employés
                 horaires_list_dict = employees.get_horaires_list_dict(date_locale_str, date_stop_str)
@@ -741,12 +751,12 @@ class OfPlanningIntervention(models.Model):
                 jour_courant = date_locale_dt.isoweekday()
 
                 duree_restante = rdv.duree
-                heure_debut = date_locale_dt.hour + (date_locale_dt.minute + date_locale_dt.second / 60.0) / 60.0  # heure en float
+                # heure en float
+                heure_debut = date_locale_dt.hour + (date_locale_dt.minute + date_locale_dt.second / 60.0) / 60.0
 
                 # Vérifier que le RDV commence sur un créneau travaillé
                 index_creneau = employee_obj.debut_sur_creneau(date_courante_str, heure_debut, segments_equipe)
                 if index_creneau == -1:
-                    #raise UserError(u"L'horaire de début des travaux est en dehors des heures de travail.")
                     rdv.alert_hors_creneau = True
                     rdv.date_deadline = False
                     continue
@@ -775,14 +785,17 @@ class OfPlanningIntervention(models.Model):
                     date_courante_da += un_jour
                     date_courante_str = fields.Date.to_string(date_courante_da).decode('utf-8')
 
-                    if date_courante_str > segment_courant[1] and len(segments_equipe) > 0:  # Changer de segment courant
+                    if date_courante_str > segment_courant[1] and len(segments_equipe) > 0:
+                        # Changer de segment courant
                         segment_courant = segments_equipe.pop(0)
                         horaires_dict = segment_courant[2]
 
-                    while jour_courant not in horaires_dict or horaires_dict[jour_courant] == []:  # On saute les jours non travaillés.
+                    while jour_courant not in horaires_dict or horaires_dict[jour_courant] == []:
+                        # On saute les jours non travaillés.
                         jour_courant = ((jour_courant + 1) % 7) or 7  # num jour de la semaine entre 1 et 7
                         date_courante_da += un_jour
-                        if date_courante_str > segment_courant[1] and len(segments_equipe) > 0:  # Changer de segment courant
+                        if date_courante_str > segment_courant[1] and len(segments_equipe) > 0:
+                            # Changer de segment courant
                             segment_courant = segments_equipe.pop(0)
                             horaires_dict = segment_courant[2]
 
@@ -791,8 +804,10 @@ class OfPlanningIntervention(models.Model):
                     heure_courante = horaires_dict[jour_courant][index_creneau][0]
 
                 # La durée restante est égale à 0 ! on y est !
-                date_courante_str = fields.Date.to_string(date_courante_da).decode('utf-8')  # String date courante locale
-                date_courante_deb_dt = tz.localize(datetime.strptime(date_courante_str+" 00:00:00", "%Y-%m-%d %H:%M:%S"))  # Datetime local début du jour
+                # String date courante locale
+                date_courante_str = fields.Date.to_string(date_courante_da).decode('utf-8')
+                # Datetime local début du jour
+                date_courante_deb_dt = tz.localize(datetime.strptime(date_courante_str, "%Y-%m-%d"))
                 # Calcul de la nouvelle date
                 date_deadline_locale_dt = date_courante_deb_dt + timedelta(hours=heure_courante)
                 # Conversion en UTC
@@ -837,7 +852,8 @@ class OfPlanningIntervention(models.Model):
     @api.depends('tz')
     def _compute_tz_offset(self):
         for rdv in self:
-            rdv.tz_offset = datetime.now(pytz.timezone(rdv.employee_ids and rdv.employee_ids[0].tz or 'GMT')).strftime('%z')
+            tz = rdv.employee_ids and rdv.employee_ids[0].tz or 'GMT'
+            rdv.tz_offset = datetime.now(pytz.timezone(tz)).strftime('%z')
 
     @api.depends('description')
     def _compute_cleantext_description(self):
@@ -861,19 +877,22 @@ class OfPlanningIntervention(models.Model):
                     not compare_date(rdv.date, rdv.employee_main_id.of_changed_intervention_id.date):
                 continue
             if rdv.interv_before_id and rdv.interv_before_id == rdv.employee_main_id.of_changed_intervention_id:
-                limit_date = fields.Datetime.to_string(fields.Datetime.from_string(rdv.date) + relativedelta(hour=0, minute=0, second=0))
+                limit_date = fields.Datetime.to_string(fields.Datetime.from_string(rdv.date)
+                                                       + relativedelta(hour=0, minute=0, second=0))
                 rdv.interv_before_id = rdv_obj.search([
                     ('date_deadline', '<=', rdv.date),
                     ('date', '>=', limit_date),
                     ('employee_main_id', '=', rdv.employee_main_id.id)], order='date DESC', limit=1)
             if rdv.interv_after_id and rdv.interv_after_id == rdv.employee_main_id.of_changed_intervention_id:
-                limit_date = fields.Datetime.to_string(fields.Datetime.from_string(rdv.date) + relativedelta(days=1, hour=0, minute=0, second=0))
+                limit_date = fields.Datetime.to_string(fields.Datetime.from_string(rdv.date)
+                                                       + relativedelta(days=1, hour=0, minute=0, second=0))
                 rdv.interv_after_id = rdv_obj.search([
                     ('date', '>=', rdv.date_deadline),
                     ('date', '<=', limit_date),
                     ('employee_main_id', '=', rdv.employee_main_id.id)], order='date ASC', limit=1)
             if not rdv.interv_before_id or rdv == rdv.employee_main_id.of_changed_intervention_id:
-                limit_date = fields.Datetime.to_string(fields.Datetime.from_string(rdv.date) + relativedelta(hour=0, minute=0, second=0))
+                limit_date = fields.Datetime.to_string(fields.Datetime.from_string(rdv.date)
+                                                       + relativedelta(hour=0, minute=0, second=0))
                 res = rdv_obj.search([
                     ('date_deadline', '<=', rdv.date),
                     ('date', '>=', limit_date),
@@ -881,7 +900,8 @@ class OfPlanningIntervention(models.Model):
                 if res:
                     rdv.interv_before_id = res
             if not rdv.interv_after_id or rdv == rdv.employee_main_id.of_changed_intervention_id:
-                limit_date = fields.Datetime.to_string(fields.Datetime.from_string(rdv.date) + relativedelta(days=1, hour=0, minute=0, second=0))
+                limit_date = fields.Datetime.to_string(fields.Datetime.from_string(rdv.date)
+                                                       + relativedelta(days=1, hour=0, minute=0, second=0))
                 res = rdv_obj.search([
                     ('date', '>=', rdv.date_deadline),
                     ('date', '<=', limit_date),
@@ -1024,7 +1044,7 @@ class OfPlanningIntervention(models.Model):
             return super(OfPlanningIntervention, self)._read_group_process_groupby(gb, query)
 
         alias, _ = query.add_join(
-            (self._table, 'of_planning_employee_rel', 'equipe_id', 'equipe_id', 'equipe_id'),
+            (self._table, 'of_employee_intervention_rel', 'id', 'intervention_id', 'employee_ids'),
             implicit=False, outer=True,
         )
 
@@ -1094,25 +1114,25 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def get_interv_prec_suiv(self, employee_id):
-        """renvois le RDV précédent à celle-ci, pour l'employé donné
+        """Renvoie le RDV précédent à celui-ci, pour l'employé donné
         (différent potentiellement de interv_before_id pour les RDVs à plusieurs employés)"""
         if not self:
-            return (False, False)
+            return False, False
         self.ensure_one()
         if not employee_id:
             employee_id = self.employee_ids and self.employee_ids[0].id
         rdv_obj = self.env['of.planning.intervention']
         rdv_prec = rdv_obj.search([
-            ('date_date', '=', self.date_date),
-            ('date', '<', self.date),  # strict pour ne pas récupérer le RDV du self
-            ('employee_ids', 'in', employee_id)
-        ], order="date DESC", limit=1)
+                ('date_date', '=', self.date_date),
+                ('date', '<', self.date),  # strict pour ne pas récupérer le RDV du self
+                ('employee_ids', 'in', employee_id)
+            ], order="date DESC", limit=1)
         rdv_suiv = rdv_obj.search([
-            ('date_date', '=', self.date_date),
-            ('date', '>', self.date),  # strict pour ne pas récupérer le RDV du self
-            ('employee_ids', 'in', employee_id)
-        ], order="date DESC", limit=1)
-        return (rdv_prec or False, rdv_suiv or False)
+                ('date_date', '=', self.date_date),
+                ('date', '>', self.date),  # strict pour ne pas récupérer le RDV du self
+                ('employee_ids', 'in', employee_id)
+            ], order="date DESC", limit=1)
+        return rdv_prec or False, rdv_suiv or False
 
     @api.multi
     def of_get_report_name(self, docs):
@@ -1142,7 +1162,8 @@ class OfPlanningIntervention(models.Model):
         """
         self.ensure_one()
         if self.date_deadline_forcee and self.forcer_dates and self.date and self.duree:
-            diff_heures = fields.Datetime.from_string(self.date_deadline_forcee) - fields.Datetime.from_string(self.date)
+            diff_heures = (fields.Datetime.from_string(self.date_deadline_forcee)
+                          - fields.Datetime.from_string(self.date))
             # on convertit la durée pour faciliter la comparaison
             heures, minutes = float_2_heures_minutes(self.duree)
             duree_td = timedelta(hours=heures, minutes=minutes)
@@ -1160,7 +1181,8 @@ class OfPlanningIntervention(models.Model):
         for rdv in self:
             if rdv.verif_dispo:
                 rdv_res = rdv_obj.search([
-                    ('employee_ids', 'in', rdv.employee_ids.ids),  # /!\ conserver .ids : ._ids est un tuple et génère une erreur à l'évaluation
+                    # /!\ conserver .ids : ._ids est un tuple et génère une erreur à l'évaluation
+                    ('employee_ids', 'in', rdv.employee_ids.ids),
                     ('date', '<', rdv.date_deadline),
                     ('date_deadline', '>', rdv.date),
                     ('id', '!=', rdv.id),
@@ -1183,6 +1205,7 @@ class OfPlanningIntervention(models.Model):
     @api.multi
     def _prepare_invoice(self):
         self.ensure_one()
+        fpos_obj = self.env['account.fiscal.position']
 
         msg_succes = u"SUCCES : création de la facture depuis le RDV d'intervention %s"
         msg_erreur = u"ÉCHEC : création de la facture depuis le RDV d'intervention %s : %s"
@@ -1199,7 +1222,7 @@ class OfPlanningIntervention(models.Model):
         if err:
             return (False,
                     msg_erreur % (self.name, ", ".join(err)))
-        fiscal_position_id = self.env['account.fiscal.position'].get_fiscal_position(partner.id, delivery_id=self.address_id.id)
+        fiscal_position_id = fpos_obj.get_fiscal_position(partner.id, delivery_id=self.address_id.id)
         if not fiscal_position_id:
             return (False,
                     msg_erreur % (self.name, u"pas de position fiscale définie pour le partenaire ni pour la société"))
@@ -1208,12 +1231,13 @@ class OfPlanningIntervention(models.Model):
         taxes = product.taxes_id
         if partner.company_id:
             taxes = taxes.filtered(lambda r: r.company_id == partner.company_id)
-        taxes = self.env['account.fiscal.position'].browse(fiscal_position_id).map_tax(taxes, product, partner)
+        taxes = fpos_obj.browse(fiscal_position_id).map_tax(taxes, product, partner)
 
         line_account = product.property_account_income_id or product.categ_id.property_account_income_categ_id
         if not line_account:
             return (False,
-                    msg_erreur % (self.name, u'Il faut configurer les comptes de revenus pour la catégorie du produit.\n'))
+                    msg_erreur % (self.name,
+                                  u'Il faut configurer les comptes de revenus pour la catégorie du produit.\n'))
 
         # Mapping des comptes par taxe induit par le module of_account_tax
         for tax in taxes:
@@ -1241,11 +1265,12 @@ class OfPlanningIntervention(models.Model):
             'invoice_line_tax_ids': [(6, 0, taxes._ids)],
         }
 
-        journal_id = self.env['account.invoice'].with_context(company_id=company.id).default_get(['journal_id'])['journal_id']
+        journal_id = (self.env['account.invoice'].with_context(company_id=company.id)
+                      .default_get(['journal_id'])['journal_id'])
         if not journal_id:
             raise UserError(u"Vous devez définir un journal des ventes pour cette société (%s)." % company.name)
         invoice_data = {
-            'origin': 'RDV d\'intervention',
+            'origin': "RDV d'intervention",
             'type': 'out_invoice',
             'account_id': partner.property_account_receivable_id.id,
             'partner_id': partner.id,
