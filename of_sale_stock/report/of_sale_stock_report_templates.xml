@@ -5,11 +5,12 @@
         <!--####################
             Cette vue est entièrement modifiée depuis le module of_sale_stock.
             ####################-->
-        <xpath expr="//div[@name='payment_term']" position="after">
-            <div class="col-xs-3" t-if="doc.incoterm" groups="sale.group_display_incoterm">
+        <xpath expr="//div[@name='pastille_date_vt']" position="before">
+            <div style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;" t-if="doc.incoterm" groups="sale.group_display_incoterm">
                 <strong>Incoterms:</strong>
                 <p t-field="doc.incoterm.code"/>
             </div>
+            <div t-if="doc.incoterm" groups="sale.group_display_incoterm" style="display: table-cell; width: 4px;"/>
         </xpath>
     </template>
 

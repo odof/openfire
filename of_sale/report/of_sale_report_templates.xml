@@ -7,6 +7,7 @@
         <t t-set="pdf_mobile" t-value="doc.pdf_afficher_mobile()"/>
         <t t-set="pdf_fax" t-value="doc.pdf_afficher_fax()"/>
         <t t-set="pdf_email" t-value="doc.pdf_afficher_email()"/>
+        <t t-set="pdf_vt_pastille" t-value="doc.pdf_vt_pastille()"/>
         <t t-set="client_info_pastille" t-value="(pdf_telephone &gt; 1 and doc.partner_id.phone) or (pdf_mobile &gt; 1 and doc.partner_id.mobile) or (pdf_fax &gt; 1 and doc.partner_id.fax) or (pdf_email &gt; 1 and doc.partner_id.email)"/>
         <!--####################
             La vue d'origine est entièrement réécrite ici.
@@ -94,10 +95,20 @@
                             <strong>Conditions de règlement&amp;nbsp;:</strong>
                             <p t-field="doc.payment_term_id"/>
                         </div>
+                        <div t-if="doc.payment_term_id" style="display: table-cell; width: 4px;"/>
+
+                        <div name="pastille_date_vt" t-if="doc.of_date_vt and pdf_vt_pastille"
+                             style="flex: 1; padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                            <strong>Visite technique&amp;nbsp;:</strong>
+                            <p t-field="doc.of_date_vt"/>
+                        </div>
+                        <div t-if="doc.of_date_vt and pdf_vt_pastille" style="display: table-cell; width: 4px;"/>
+
                         <div name="date_validite" t-if="doc.validity_date and doc.state in ('draft', 'sent') and doc.pdf_afficher_date_validite()" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                             <strong>Date de validité&amp;nbsp;:</strong>
                             <p t-field="doc.validity_date"/>
                         </div>
+                        <div t-if="doc.validity_date and doc.state in ('draft', 'sent') and doc.pdf_afficher_date_validite()" style="display: table-cell; width: 4px;"/>
                     </div>
                 </div>
             </div>
@@ -253,7 +264,7 @@
                 </div>
             </div>
 
-            <p t-if="doc.of_date_vt">
+            <p t-if="doc.of_date_vt and not pdf_vt_pastille">
                 <t t-set="date_order" t-value="doc.of_date_vt[8:10] + '/' + doc.of_date_vt[5:7] + '/' + doc.of_date_vt[0:4]"/>
                 Date de visite technique : <span t-esc="date_order"/>
             </p>
@@ -281,6 +292,7 @@
         <attribute name="groups">!sale.group_delivery_invoice_address</attribute>
     </xpath>
     <xpath expr="//div[@name='invoice_address']" position="before">
+        <t t-set="pdf_vt_pastille" t-value="o.pdf_vt_pastille()"/>
         <div name="addresses" class="row mt8" groups="sale.group_delivery_invoice_address">
             <div class="col-xs-6">
                 <div name="adresse_livraison" t-if="o.partner_shipping_id and o.partner_shipping_id != o.partner_id">
@@ -319,8 +331,17 @@
         </div>
     </xpath>
 
+    <xpath expr="//div[@name='date_echeance']" position="before">
+        <div name="pdf_vt_pastille" t-if="o.of_date_vt and pdf_vt_pastille"
+             style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+            <strong>Visite technique:</strong>
+            <p t-field="o.of_date_vt"/>
+        </div>
+        <div t-if="o.of_date_vt and pdf_vt_pastille" style="display: table-cell; width: 4px;"/>
+    </xpath>
+
     <xpath expr="//p[@t-if='o.comment']" position="before">
-        <p t-if="o.of_date_vt">
+        <p t-if="o.of_date_vt and not pdf_vt_pastille">
             <t t-set="date_vt" t-value="o.of_date_vt[8:10] + '/' + o.of_date_vt[5:7] + '/' + o.of_date_vt[0:4]"/>
             Date de visite technique : <span t-esc="date_vt"/>
         </p>

@@ -109,6 +109,9 @@ class SaleOrder(models.Model):
     def pdf_afficher_date_validite(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_date_validite_devis')
 
+    def pdf_vt_pastille(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_vt_pastille')
+
     def get_color_section(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'of_color_bg_section')
 
@@ -980,6 +983,10 @@ class OFSaleConfiguration(models.TransientModel):
         string=u"(OF) Date validité devis", required=True, default=False,
         help=u"Afficher la date de validité dans le rapport PDF des devis ?")
 
+    pdf_vt_pastille = fields.Boolean(
+        string=u"(OF) Date VT pastille", required=True, default=False,
+        help=u"Afficher la date de visite technique dans une pastille dans le rapport PDF des devis ?")
+
     pdf_adresse_nom_parent = fields.Boolean(
         string=u"(OF) Nom parent contact", required=True, default=False,
         help=u"Afficher le nom du 'parent' du contact au lieu du nom du contact dans les rapport PDF ?")
@@ -1061,6 +1068,11 @@ class OFSaleConfiguration(models.TransientModel):
     def set_pdf_date_validite_devis_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'pdf_date_validite_devis', self.pdf_date_validite_devis)
+
+    @api.multi
+    def set_pdf_vt_pastille_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_vt_pastille', self.pdf_vt_pastille)
 
     @api.multi
     def set_of_deposit_product_categ_id_defaults(self):
@@ -1340,9 +1352,16 @@ class AccountInvoice(models.Model):
                         result[i][2][name] = [(6, 0, lines[i][name].ids)]
         return result
 
+    def pdf_vt_pastille(self):
+        return self.env['ir.values'].get_default('account.config.settings', 'pdf_vt_pastille')
+
 
 class AccountConfigSettings(models.TransientModel):
     _inherit = 'account.config.settings'
+
+    pdf_vt_pastille = fields.Boolean(
+        string=u"(OF) Date VT pastille", required=True, default=False,
+        help=u"Afficher la date de visite technique dans une pastille dans le rapport PDF des factures ?")
 
     of_color_bg_section = fields.Char(
         string="(OF) Couleur fond titres section", help=u"Choisissez une couleur de fond pour les titres de section",
@@ -1353,6 +1372,11 @@ class AccountConfigSettings(models.TransientModel):
             (3, u"Valider les BL au moment de la validation de la facture")],
         string="(OF) Validation des BL",
         default=1)
+
+    @api.multi
+    def set_pdf_vt_pastille_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'account.config.settings', 'pdf_vt_pastille', self.pdf_vt_pastille)
 
     @api.multi
     def set_of_color_bg_section_defaults(self):
