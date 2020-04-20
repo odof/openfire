@@ -85,11 +85,16 @@ ListView.List.include({
             // non-resolved (string) m2m values are arrays
             if (value instanceof Array && !_.isEmpty(value)
                     && (!record.get(column.id + '__display') && record.get(column.id + '__display') !== '')) {
-                var ids;
+                var ids = [];
                 // they come in two shapes:
                 if (value[0] instanceof Array) {
                     _.each(value, function(command) {
                         switch (command[0]) {
+                            case 0:
+                            case 1:
+                            case 2:
+                            case 3:
+                                break;
                             case 4: ids.push(command[1]); break;
                             case 5: ids = []; break;
                             case 6: ids = command[2]; break;
