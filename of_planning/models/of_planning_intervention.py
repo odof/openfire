@@ -1301,8 +1301,8 @@ class ResPartner(models.Model):
 
     intervention_partner_ids = fields.One2many('of.planning.intervention', string="Interventions client", compute="_compute_interventions")
     intervention_address_ids = fields.One2many('of.planning.intervention', string="Interventions adresse", compute="_compute_interventions")
-    intervention_ids = fields.Many2many('of.planning.intervention', string=u"RDVs Tech", compute="compute_interventions")
-    intervention_count = fields.Integer(string='Nombre RDVs Tech', compute='compute_interventions')
+    intervention_ids = fields.Many2many('of.planning.intervention', string=u"RDVs Tech", compute="_compute_interventions")
+    intervention_count = fields.Integer(string='Nombre RDVs Tech', compute='_compute_interventions')
 
     @api.multi
     def _compute_interventions(self):
