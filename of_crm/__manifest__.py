@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name' : "OpenFire / CRM",
-    'version' : "10.0.1.0.0",
-    'author' : "OpenFire",
-    'website' : "http://openfire.fr",
+    'name': "OpenFire / CRM",
+    'version': "10.0.1.0.0",
+    'author': "OpenFire",
+    'website': "http://openfire.fr",
     'category': 'Customer Relationship Management',
     'description': u"""
 Module OpenFire pour le CRM Odoo
@@ -28,7 +28,7 @@ Fiche de projet dynamique
     Les types possibles sont pour l'instant 'Texte Court', 'Booléen', 'Date' et 'Choix Unique'.
     Dans une future version les types 'Monétaire' et 'Choix Multiples' pourront être implémentés.
 """,
-    'depends' : [
+    'depends': [
         'crm',
         'sale_crm',
         'of_geolocalize',
@@ -36,12 +36,14 @@ Fiche de projet dynamique
         'of_gesdoc',
         'of_web_widgets',
         'of_calendar',
-        #'of_base',  # <- par of_base_location
+        # 'of_base',  # <- par of_base_location
         'of_base_location',
     ],
-    'data' : [
-        'views/of_crm_view.xml',
-        'views/of_crm_projet_view.xml',
+    'data': [
+        'views/crm_lead_views.xml',
+        'views/sale_order_views.xml',
+        'views/partner_views.xml',
+        'views/of_crm_projet_views.xml',
         'views/of_crm_templates.xml',
         'report/of_crm_fiche_rdv_report_view.xml',
         'data/data.xml',
