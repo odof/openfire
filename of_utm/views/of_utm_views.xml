@@ -5,16 +5,39 @@
 <!--###############################################################################################################
 ##############################       U T M (utm.medium, utm.source)
 #################################################################################################################-->
-        <menuitem id="utm.menu_link_tracker_root" parent= "sales_team.menu_sale_config"/>
-        <menuitem id="utm.menu_utm_medium" sequence="4" parent="utm.menu_link_tracker_root"/>
-        <menuitem id="utm.menu_utm_source" sequence="5" parent="utm.menu_link_tracker_root"/>
-        <menuitem id="utm.menu_utm_campaign_act" sequence="6" parent="utm.menu_link_tracker_root"/>
+        <menuitem id="utm.menu_link_tracker_root" parent= "sales_team.menu_sale_config" groups="-base.group_no_one"/>
+        <menuitem id="utm.menu_utm_campaign_act" sequence="10" parent="utm.menu_link_tracker_root" groups="-base.group_no_one"/>
+        <menuitem id="utm.menu_utm_medium" sequence="20" parent="utm.menu_link_tracker_root" groups="-base.group_no_one"/>
+        <menuitem id="utm.menu_utm_source" sequence="30" parent="utm.menu_link_tracker_root" groups="-base.group_no_one"/>
+
+        <record id="of_utm_campaign_form_view" model="ir.ui.view">
+            <field name="name">of.utm.campaign.form.view</field>
+            <field name="model">utm.campaign</field>
+            <field name="inherit_id" ref="utm.utm_campaign_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group" position="before">
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
+                        </button>
+                    </div>
+                </xpath>
+            </field>
+        </record>
 
         <record id="of_crm_utm_medium_view_form" model="ir.ui.view">
             <field name="name">of.utm.medium.form</field>
             <field name="model">utm.medium</field>
             <field name="inherit_id" ref="utm.utm_medium_view_form"/>
             <field name="arch" type="xml">
+                <xpath expr="//field[@name='active']" position="replace"/>
+                <xpath expr="//group" position="before">
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
+                        </button>
+                    </div>
+                </xpath>
                 <xpath expr="//form//group" position="inside">
                     <field name="source_ids" mode="tree">
                         <tree>
@@ -31,6 +54,13 @@
             <field name="model">utm.source</field>
             <field name="inherit_id" ref="utm.utm_source_view_form"/>
             <field name="arch" type="xml">
+                <xpath expr="//group" position="before">
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
+                        </button>
+                    </div>
+                </xpath>
                 <xpath expr="//form//group" position="inside">
                     <field name="sequence"/>
                     <field name="medium_id"/>
