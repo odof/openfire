@@ -27,9 +27,10 @@
         <field name="arch" type="xml">
             <planning date_start="date" date_stop="date_deadline"
                       string="Interventions" color_ft="of_color_ft" color_bg="of_color_bg"
-                      resource="employee_ids">
+                      resource="employee_ids" color_multiple="1">
                 <field name="duree"/>
                 <field name="tache_name"/>
+                <field name="tache_id"/>
                 <field name="partner_name"/>
                 <field name="address_zip"/>
                 <field name="address_city"/>
