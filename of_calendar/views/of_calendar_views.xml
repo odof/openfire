@@ -116,6 +116,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="before">
                 <field name="sequence" widget="handle"/>
+                <field name="of_color_bg" widget="color"/>
             </xpath>
         </field>
     </record>

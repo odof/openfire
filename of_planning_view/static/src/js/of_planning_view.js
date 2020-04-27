@@ -92,6 +92,8 @@ var PlanningView = View.extend({
         this.name = this.fields_view.name || attrs.string;
         this.rows = []; // liste des lignes
 
+        // true or 1 if we want to use multiple colors
+        this.color_multiple = !isNullOrUndef(attrs.color_multiple) && _.str.toBool(attrs.color_multiple);
         this.resource = attrs.resource;  // nom du champ de ressource du modèle
         this.color_ft = attrs.color_ft;  // nom du champ de couleur de texte
         this.color_bg = attrs.color_bg;  // nom du champ de couleur de fond
@@ -115,7 +117,6 @@ var PlanningView = View.extend({
         this.on_today_clicked = _.debounce(this.on_today_clicked, 300, true);
         this.on_next_clicked = _.debounce(this.on_next_clicked, 300, true);
         this.on_prev_clicked = _.debounce(this.on_prev_clicked, 300, true);
-        console.log(this);
     },
     /**
      *  Appel des fonction asynchrones qui doivent être terminées avant le lancement de la vue
@@ -1364,8 +1365,24 @@ var PlanningRecord = Widget.extend({
         if (isNullOrUndef(col_index)) {  // foolproofing
             col_index = Math.max(self.col_offset_start, 0);
         }
-        self.color_bg = self.row.color_bg;
-        self.color_ft = self.row.color_ft;
+        var color_captions = false;
+        if (self.view.color_multiple) {
+            var color_filter = self.view.sidebar.color_filter
+            var current_filter = color_filter.color_filter_data[color_filter.current_radio_key]
+            color_captions = current_filter.captions
+        }
+        if (color_captions) {
+            var caption_key = self.record[current_filter.field]
+            if (typeof caption_key === "object") { // make sure caption_key is an integer before testing captions[caption_key]
+                caption_key = caption_key[0];
+            }
+            self.color_ft = color_captions[caption_key]["color_ft"];
+            self.color_bg = color_captions[caption_key]["color_bg"];
+        }else{
+            self.color_bg = self.row.color_bg;
+            self.color_ft = self.row.color_ft;
+        }
+
         if (isNullOrUndef(self.col_offset_stop)) {  // 1 day event
             return self.$el.html(qweb.render('PlanningView.record', {"record": self, "col_index": col_index})).promise()
                 .then(function (){
@@ -1493,12 +1510,27 @@ PlanningView.Sidebar = Widget.extend({
      */
     start: function() {
         var self = this;
-        this.caption = new SidebarCaption(this, this.getParent());
-        this.reso_filter = new PlanningView.SidebarResoFilter(this, this.getParent());
-        this.info_filter = new PlanningView.SidebarInfoFilter(this, this.getParent());
-        return $.when(this._super(), this.reso_filter.appendTo(this.$el), this.info_filter.appendTo(this.$el), this.caption.appendTo(this.$el))
+        this.view = this.getParent()
+        this.caption = new SidebarCaption(this, this.view);
+        this.reso_filter = new PlanningView.SidebarResoFilter(this, this.view);
+        this.info_filter = new PlanningView.SidebarInfoFilter(this, this.view);
+        var dfd_color_filter = $.Deferred();
+        if (this.view.color_multiple) {
+            this.color_filter = new SidebarColorFilter(this, this.view);
+            dfd_color_filter = this.color_filter.appendTo(this.$el).promise()
+        }else{
+            dfd_color_filter.resolve()
+        }
+        return $.when(this._super(),
+                      this.reso_filter.appendTo(this.$el),
+                      this.info_filter.appendTo(this.$el),
+                      this.caption.appendTo(this.$el),
+                      dfd_color_filter)
         .then(function() {
             self.caption.render();
+            if (!isNullOrUndef(self.color_filter)) {
+                self.color_filter.render();
+            }
         });
     }
 });
@@ -1912,6 +1944,74 @@ PlanningView.SidebarInfoFilter = Widget.extend({
     },
 });
 
+var SidebarColorFilter = Widget.extend({
+    events: {
+        'click .of_color_filter': 'on_click',
+    },
+    /**
+     *  called by Sidebar.start
+     */
+    init: function(parent, view) {
+        this._super(parent,view);
+        this.filters_radio = true;
+        this.view = view;
+        this.willStart();
+        this.ready_to_render = $.Deferred();
+    },
+    willStart: function () {
+        var self = this;
+        this.dfd_color_filter = this.view.dataset.call("get_color_filter_data");
+        return $.when(this.dfd_color_filter, this._super()).then(function (color_filter_data) {
+            self.color_filter_data = color_filter_data;
+            for (var k in color_filter_data) {
+                if (color_filter_data[k].is_checked) {
+                    self.current_radio_key = k;
+                    break;
+                }
+            }
+            self.ready_to_render.resolve()
+        });
+    },
+    /**
+     *  called by CalendarView._do_show_init
+     */
+    render: function () {
+        var self = this;
+        $.when(this.ready_to_render)
+        .then(function (){
+            return self.$el.html(qweb.render('CalendarView.sidebar.color_filter', { widget: self,
+                                                                                    filters: self.color_filter_data,
+                                                                                    filter_captions: self.color_filter_data })).promise();
+
+        }).then(function() {
+            return self.$el.insertAfter($(".of_planning_reso_filter"))
+        });
+    },
+    /**
+     *  Override of parent function. handles radio filters.
+     */
+    on_click: function(e) {
+        var ir_values_model = new Model('ir.values');
+        if (e.target.tagName !== 'INPUT') {
+            $(e.currentTarget).find('input').click();
+            return;
+        }
+        for(var key in this.color_filter_data){
+            if (this.color_filter_data[key].field == e.target.value) {
+                this.color_filter_data[key].is_checked = e.target.checked;
+                this.current_radio_key = key;
+                ir_values_model.call("set_default", ["of.intervention.settings",
+                                                     "planningview_color_filter",
+                                                     key, false]);
+            }else{
+                this.color_filter_data[key].is_checked = false;
+            }
+        };
+        this.render();
+        this.trigger_up('reload_events');
+    },
+});
+
 var SidebarCaption = Widget.extend({
     /**
      *  Appelé par Sidebar.start
@@ -1920,6 +2020,10 @@ var SidebarCaption = Widget.extend({
         this._super(parent);
         this.view = view;
         this.start();
+    },
+    start: function() {
+        this.$el.addClass("of_sidebar_element");
+        return $.when(this._super());
     },
     /**
      *  Appelé par PlanningView.Sidebar.start

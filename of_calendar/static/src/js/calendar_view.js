@@ -37,8 +37,9 @@ CalendarView.include({
         this._super.apply(this, arguments);
 
         var attrs = this.fields_view.arch.attrs;
-        this.filters_radio = !isNullOrUndef(attrs.filters_radio) && _.str.toBool(attrs.filters_radio); // true or 1 if we want filters to be of type radio
+        this.filters_radio = !isNullOrUndef(attrs.filters_radio) && _.str.toBool(attrs.filters_radio);
         this.custom_colors = !isNullOrUndef(attrs.custom_colors) && _.str.toBool(attrs.custom_colors); // true or 1 if we want to use custom colors
+        this.color_multiple = !isNullOrUndef(attrs.color_multiple) && _.str.toBool(attrs.color_multiple); // true or 1 if we want to use multiple colors
         //this.show_first_evt = !isNullOrUndef(attrs.show_first_evt) && _.str.toBool(attrs.show_first_evt); // true or 1 if we want to jump to the first event
         this.jump_to = !isNullOrUndef(attrs.jump_to) && attrs.jump_to; // "first", "last" or "selected"
         this.dispo_field = attrs.dispo_field;
@@ -338,7 +339,6 @@ CalendarView.include({
                             });
                         }else{
                             self.dfd_filters_rendered.resolve()
-                            console.log("OUPSY NO SIDEBAR")
                         }
                     }else{
                         self.dfd_filters_rendered.resolve()
@@ -380,6 +380,9 @@ CalendarView.include({
      */
     _do_show_init: function () {
         this._super.apply(this,arguments);
+        if (this.color_multiple) {
+            this.sidebar.color_filter.render();
+        }
         if (this.display_states) {
             this.sidebar.caption.render();
         }
@@ -601,6 +604,13 @@ CalendarView.include({
             }
             the_title = _.escape(the_title);
 
+            var color_captions = false;
+            if (self.color_multiple) {
+                var color_filter = self.sidebar.color_filter
+                var current_filter = color_filter.color_filter_data[color_filter.current_radio_key]
+                color_captions = current_filter.captions
+            }
+
             var the_title_avatar = '';
 
             if (! _.isUndefined(this.attendee_people)) {
@@ -635,7 +645,7 @@ CalendarView.include({
                                     if (self.all_filters[now_id].is_checked && !found) {  // this will be the main color of the event
                                         evt["color_filter_id"] = now_id;
                                         found = true;
-                                        if (!self.colorIsAttendee) {
+                                        if (!self.colorIsAttendee || color_captions) {
                                             the_title_avatar += '<i class="of_calendar_evt_top of_calendar_attendee_box" title="' + _.escape(self.all_attendees[the_attendee_people]) + '"' +
                                                 'style="background: ' + tempColorBG + '; border: 1px solid #0D0D0D; position: absolute; right: ' + icon_offset_px + 'px;" ></i>';
                                                 icon_offset_px += 15;
@@ -745,6 +755,15 @@ CalendarView.include({
                 r.className = 'o_calendar_color_'+ (self.all_filters[-1] ? self.all_filters[-1].color : 1);
             }
         };
+        // color_captions  == false -> la couleur de l'evt est celle des attendees et donc déjà initialisée
+        if (color_captions) {
+            var caption_key = evt[current_filter.field]
+            if (typeof caption_key === "object") { // make sure caption_key is an integer before testing captions[caption_key]
+                caption_key = caption_key[0];
+            }
+            r.textColor = color_captions[caption_key]["color_ft"];
+            r.backgroundColor = color_captions[caption_key]["color_bg"];
+        }
         ////////////////////////////////////////////////////////////////////////////////////////////
         return r;
     },
@@ -752,11 +771,21 @@ CalendarView.include({
 
 Sidebar.include({
     /**
+     *  called by Sidebar.start
+     */
+    init: function(parent, view) {
+        this._super(parent);
+        this.view = this.getParent();
+    },
+    /**
      *  Override of parent function. Adds captions.
      */
     start: function() {
-        this.caption = new SidebarCaption(this, this.getParent());
-        return $.when(this._super(), this.caption.appendTo(this.$el));
+        this.caption = new SidebarCaption(this, this.view);
+        if (this.view.color_multiple) {
+            this.color_filter = new SidebarColorFilter(this, this.getParent());
+        }
+        return $.when(this._super(), this.caption.appendTo(this.$el))
     },
 });
 
@@ -827,6 +856,76 @@ SidebarFilter.include({
     },
 });
 
+var SidebarColorFilter = Widget.extend({
+    events: {
+        'click .of_color_filter': 'on_click',
+    },
+    /**
+     *  called by Sidebar.start
+     */
+    init: function(parent, view) {
+        this._super(parent,view);
+        this.filters_radio = true;
+        this.view = view;
+        this.willStart();
+        this.ready_to_render = $.Deferred();
+    },
+    willStart: function () {
+        var self = this;
+        this.dfd_color_filter = this.view.dataset.call("get_color_filter_data");
+        return $.when(this.dfd_color_filter, this._super()).then(function (color_filter_data) {
+            self.color_filter_data = color_filter_data;
+            for (var k in color_filter_data) {
+                if (color_filter_data[k].is_checked) {
+                    self.current_radio_key = k;
+                    break;
+                }
+            }
+            self.ready_to_render.resolve()
+        });
+    },
+    /**
+     *  called by CalendarView._do_show_init
+     */
+    render: function () {
+        var self = this;
+        $.when(this.ready_to_render)
+        .then(function (){
+            // Le Qweb a besoin de 2 variables même si les 2 pointent sur self.color_filter_data
+            return self.$el.html(QWeb.render('CalendarView.sidebar.color_filter',
+                                             {widget: self,
+                                              filters: self.color_filter_data,
+                                              filter_captions: self.color_filter_data})).promise();
+        }).then(function() {
+            return self.$el.insertAfter($(".o_calendar_filter"))
+        });
+    },
+    /**
+     *  Override of parent function. handles radio filters.
+     */
+    on_click: function(e) {
+        var ir_values_model = new Model('ir.values');
+        if (e.target.tagName !== 'INPUT') {
+            $(e.currentTarget).find('input').click();
+            return;
+        }
+        for(var key in this.color_filter_data){
+            if (this.color_filter_data[key].field == e.target.value) {
+                this.color_filter_data[key].is_checked = e.target.checked;
+                this.current_radio_key = key;
+                // Conserver le choix de couleur des évènements
+                ir_values_model.call("set_default", ["of.intervention.settings",
+                                                     "planningview_color_filter",
+                                                     key, false]);
+            }else{
+                this.color_filter_data[key].is_checked = false;
+            }
+        };
+        this.render();
+        this.trigger_up('reload_events');
+    },
+});
+
 var SidebarCaption = Widget.extend({
     /**
      *  called by Sidebar.start
@@ -839,7 +938,7 @@ var SidebarCaption = Widget.extend({
 
     start: function() {
         if (this.view.display_states) {
-            this.$el.addClass("of_calendar_captions");
+            this.$el.addClass("of_sidebar_element");
         };
         return $.when(this._super());
     },
