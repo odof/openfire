@@ -121,7 +121,9 @@
             <t t-set="attendees" t-value="record.attendee_other_ids"/>
             <t t-foreach="attendees">
                 <i t-if="record.view.rows[record.view.rows_ids_indexes[attendees_value]] != undefined" class="of_calendar_attendee_box_flat"
-                   t-attf-style="background: #{record.view.rows[record.view.rows_ids_indexes[attendees_value]].color_bg}; border: 1px solid #0D0D0D; float: right; margin-left: 2px; margin-top: -3px;"/>
+                   t-attf-style="
+                    background: #{record.view.rows[record.view.rows_ids_indexes[attendees_value]].color_bg};
+                    border: 1px solid #0D0D0D; float: right; margin-left: 2px; margin-top: -3px;"/>
                 <i t-else="" class="of_calendar_attendee_box_flat"
                    t-attf-style="background: grey; border: 1px solid #0D0D0D; float: right; margin-left: 2px; margin-top: -3px;"/>
             </t>
@@ -351,6 +353,54 @@
             </t>
             <t t-else="">Une erreur s'est produite au niveau de l'affichage des filtres</t>
         </div>
+    </t>
+
+    <t t-name="PlanningView.sidebar.color_filter">
+        <div class="of_sidebar_element">
+            <div>
+                <strong>Choix de la couleur par:</strong>
+            </div>
+            <!-- Filtre de choix de couleur -->
+            <div t-foreach="filters" class="of_color_filter" style="margin-top: 4px;">
+                <t t-if="filters_value.label"><!-- don't display if no label given (or undefined) -->
+                    <div class="o_checkbox">
+                        <input type="radio" name="selection" t-att-value="filters_value.field"
+                               t-att-checked="(filters_value.is_checked ? true : undefined)"/>
+                        <span/>
+                    </div>
+                    <span t-attf-style="
+                        padding: 0px 8px;"
+                          t-attf-class="of_calendar_color_filter_#{filters_value.value}"
+                          t-attf-id="of_calendar_color_filter_#{filters_value.value}">
+                        <t t-esc="filters_value.label"/>
+                    </span>
+                </t>
+            </div>
+        </div>
+        <!-- Légende couleurs -->
+        <t t-foreach="filter_captions" t-as="fil">
+            <t t-if="fil_value.captions &amp;&amp; fil_value.is_checked">
+                <div class="of_sidebar_element">
+                    <div>
+                        <strong>Légende couleur</strong>
+                    </div>
+                    <t t-foreach="fil_value.captions" t-as="caption">
+                        <t t-if="caption_value.value || caption_value.value===0"><!-- don't display if no value given (or undefined) -->
+                            <span t-attf-style="
+                                color: #{caption_value.color_ft};
+                                background: #{caption_value.color_bg};
+                                margin: 4px;
+                                padding: 0px 8px;
+                                border-radius: 4px;
+                                border: 1px solid #0D0D0D;
+                                display: block;">
+                                <t t-esc="caption_value.label"/>
+                            </span>
+                        </t>
+                    </t>
+                </div>
+            </t>
+        </t>
     </t>
 
     <!-- Conteneur des filtres d'informations -->
