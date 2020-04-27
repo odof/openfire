@@ -146,6 +146,8 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
         'hr.employee', string=u"Employés qualifiés", compute="_compute_employee_ids", search="_search_employee_ids")
     category_id = fields.Many2one('hr.employee.category', string=u"Catégorie d'employés")
     fourchette_planif = fields.Selection(related="tache_categ_id.fourchette_planif", readonly=True)
+    color_ft = fields.Char(string="Couleur de texte", help="Choisissez votre couleur", default="#0D0D0D")
+    color_bg = fields.Char(string="Couleur de fond", help="Choisissez votre couleur", default="#F0F0F0")
 
     @api.multi
     def _compute_employee_ids(self):
@@ -202,6 +204,19 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
                 limit) or []
             return res
         return super(OfPlanningTache, self).name_search(name, args, operator, limit)
+
+    @api.model
+    def get_caption_data(self):
+        data = {}
+        taches = self.search([])
+        for tache in taches:
+            data[tache.id] = {
+                'value': tache.id,
+                'label': tache.name,
+                'color_bg': tache.color_bg,
+                'color_ft': tache.color_ft,
+            }
+        return data
 
 
 class OfPlanningEquipe(models.Model):
@@ -1061,6 +1076,31 @@ class OfPlanningIntervention(models.Model):
 
         return (invoice_data,
                 msg_succes % (self.name,))
+
+    @api.model
+    def get_color_filter_data(self):
+        res = {}
+        default_filter = self.env['ir.values'].get_default('of.intervention.settings',
+                                                           'planningview_color_filter',
+                                                           for_all_users=False)
+        res['intervenant'] = {
+            'is_checked': not default_filter or default_filter == u'intervenant',
+            'label': u'Intervenant',
+            'field': u'employee_ids',
+            'color_ft_field': u'of_color_ft',
+            'color_bg_field': u'of_color_bg',
+            'catpions': False,
+        }
+        res['tache'] = {
+            'is_checked': default_filter == u'tache',
+            'label': u'Tâche',
+            'field': u'tache_id',
+            'color_ft_field': u'color_ft',
+            'color_bg_field': u'color_bg',
+            'captions': self.env['of.planning.tache'].get_caption_data(),
+        }
+
+        return res
 
 
 class ResPartner(models.Model):
