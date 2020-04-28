@@ -326,11 +326,11 @@ class CrmLead(models.Model):
         action = self.env.ref('of_crm.of_crm_activity_schedule_action').read()[0]
         if len(self._ids) == 1:
             context = safe_eval(action['context'])
-            if self.of_activity_ids.filtered(lambda act: act.state == 'planned'):
-                action['res_id'] = self.of_activity_ids.filtered(lambda act: act.state == 'planned')[-1].id
+            if self.of_next_action_activity_id:
+                action['res_id'] = self.of_next_action_activity_id.id
                 context.update({
-                    'res_id': self.of_activity_ids.filtered(lambda act: act.state == 'planned')[-1].id,
-                    'active_ids': self.of_activity_ids.filtered(lambda act: act.state == 'planned')[-1].ids,
+                    'res_id': self.of_next_action_activity_id.id,
+                    'active_ids': self.of_next_action_activity_id.ids,
                 })
             else:
                 context.update({
@@ -365,7 +365,7 @@ class CrmLead(models.Model):
                     result['activity']['overdue'] += 1
 
         activities_done = self.env['of.crm.activity'].\
-            search([('state', '=', 'realized'), ('vendor_id', '=', self._uid)])
+            search([('state', '=', 'done'), ('vendor_id', '=', self._uid)])
 
         for activity in activities_done:
             if activity.date:
@@ -473,7 +473,7 @@ class OFCRMActivity(models.Model):
     date = fields.Datetime(string=u"Date", required=True)
     state = fields.Selection(
         selection=[('planned', u"Planifiée"),
-                   ('realized', u"Réalisée"),
+                   ('done', u"Réalisée"),
                    ('canceled', u"Annulée")], string=u"État", required=True, default='planned')
     user_id = fields.Many2one(
         comodel_name='res.users', string=u"Auteur", required=True, default=lambda self: self.env.user)

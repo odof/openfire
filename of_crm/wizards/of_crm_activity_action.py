@@ -32,7 +32,7 @@ class OFCRMActivityAction(models.TransientModel):
         }
         self.activity_id.opportunity_id.message_post(
             body_html, subject=self.activity_id.title, subtype_id=self.activity_id.type_id.subtype_id.id)
-        self.activity_id.write({'state': 'realized', 'date': self.date, 'report': self.note})
+        self.activity_id.write({'state': 'done', 'date': self.date, 'report': self.note})
         return True
 
     @api.multi

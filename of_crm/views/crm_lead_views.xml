@@ -31,7 +31,7 @@
                         <group string="Description" colspan="4">
                             <field name="description" nolabel="1"/>
                         </group>
-                        <group string="Compte-rendu" colspan="4" attrs="{'invisible': [('state', '!=', 'realized')]}">
+                        <group string="Compte-rendu" colspan="4" attrs="{'invisible': [('state', '!=', 'done')]}">
                             <field name="report" nolabel="1"/>
                         </group>
                         <group string="Raison d'annulation" colspan="4" attrs="{'invisible': [('state', '!=', 'canceled')]}">
@@ -70,7 +70,7 @@
                         <group string="Description" colspan="4">
                             <field name="description" nolabel="1"/>
                         </group>
-                        <group string="Compte-rendu" colspan="4" attrs="{'invisible': [('state', '!=', 'realized')]}">
+                        <group string="Compte-rendu" colspan="4" attrs="{'invisible': [('state', '!=', 'done')]}">
                             <field name="report" nolabel="1"/>
                         </group>
                         <group string="Raison d'annulation" colspan="4" attrs="{'invisible': [('state', '!=', 'canceled')]}">
@@ -117,7 +117,7 @@
                 <field name="vendor_id"/>
                 <separator/>
                 <filter string="Planifiée" name="planned" domain="[('state', '=', 'planned')]"/>
-                <filter string="Réalisée" name="realized" domain="[('state', '=', 'realized')]"/>
+                <filter string="Réalisée" name="done" domain="[('state', '=', 'done')]"/>
                 <filter string="Annulée" name="canceled" domain="[('state', '=', 'canceled')]"/>
                 <separator/>
                 <filter string="Mes activités" name="my_activities"
@@ -821,7 +821,7 @@
                         <separator string="Automatisation de l'étape" colspan="4"/>
                         <group>
                             <field name="of_auto_model_name"/>
-                            <field name="of_auto_field_id" options="{'no_create': True, 'no_open': True}" domain="[('model', '=', of_auto_model_name)]"/>
+                            <field name="of_auto_field_id" options="{'no_create': True, 'no_open': True}" domain="[('model', '=', of_auto_model_name), ('store', '=', True)]"/>
                             <field name="of_auto_comparison_code"/>
                         </group>
                     </group>

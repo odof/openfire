@@ -111,7 +111,11 @@ class SaleOrder(models.Model):
         if values.get('state', False) == 'draft' and start_state == 'quotation':
             values.update(state='sent')
 
-        res = super(SaleOrder, self).write(values)
+        return super(SaleOrder, self).write(values)
+
+    @api.multi
+    def _write(self, values):
+        res = super(SaleOrder, self)._write(values)
 
         # CRM stages
         for rec in self:

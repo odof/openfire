@@ -34,8 +34,8 @@ class OfPlanningIntervention(models.Model):
         return res
 
     @api.multi
-    def write(self, values):
-        res = super(OfPlanningIntervention, self).write(values)
+    def _write(self, values):
+        res = super(OfPlanningIntervention, self)._write(values)
 
         # CRM stages
         for rec in self:

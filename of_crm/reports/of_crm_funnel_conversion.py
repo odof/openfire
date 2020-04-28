@@ -68,7 +68,7 @@ class OFCRMFunnelConversion(models.Model):
                     AND     SO2.state                                                                               = 'sale'
                 LEFT JOIN   of_crm_activity                                                                         CA
                     ON      CA.opportunity_id                                                                       = CL.id
-                    AND     CA.state                                                                                ='realized'
+                    AND     CA.state                                                                                ='done'
                 GROUP BY    CL.id
                 ,           SO2.amount_total
                 ,           SO1.project_id
@@ -184,7 +184,7 @@ class OFCRMFunnelConversion2(models.Model):
                             FROM        of_crm_activity                     CA
                             ,           crm_lead                            CL4
                             WHERE       CA.opportunity_id                   = CL4.id
-                            AND         CA.state                            ='realized'
+                            AND         CA.state                            ='done'
                         )                                                   AS T
                 GROUP BY    T.date
                 ,           T.company_id
