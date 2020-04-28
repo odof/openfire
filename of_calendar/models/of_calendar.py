@@ -5,6 +5,7 @@ from odoo.exceptions import UserError
 from odoo.addons.of_utils.models.of_utils import se_chevauchent, format_date
 from odoo.tools.float_utils import float_compare
 from datetime import datetime, timedelta
+from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
 import pytz
 from copy import deepcopy
 
@@ -899,24 +900,21 @@ class Meeting(models.Model):
     of_lieu_address_zip = fields.Char(string="Code postal")  # , compute="_compute_geo")
     of_lieu_address_country_id = fields.Many2one("res.country", string="Pays")  # , compute="_compute_geo")
     of_on_phone = fields.Boolean(u'Au téléphone', compute="_compute_on_phone")
-    of_color_partner_id = fields.Many2one("res.partner", "Partner whose color we will take", compute='_compute_color_partner', store=False)
-    of_geo_lat = fields.Float(string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo", store=False, search='_search_lat')
-    of_geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_geo", store=False, search='_search_lng')
-    of_precision = fields.Selection([
-        ('manual', "Manuel"),
-        ('very_high', u"Excellent"),
-        ('high', "Haut"),
-        ('medium', "Moyen"),
-        ('low', "Bas"),
-        ('no_address', u"--"),
-        ('unknown', u"Indéterminé"),
-        ('not_tried', u"Pas tenté"),
-        ], default='no_address', compute="_compute_geo", store=False, search='_search_precision',
-            help=u"Niveau de précision de la géolocalisation.\n"
-                u"bas: à la ville.\n"
-                u"moyen: au village\n"
-                u"haut: à la rue / au voisinage\n"
-                u"très haut: au numéro de rue\n")
+    of_color_partner_id = fields.Many2one(
+        "res.partner", "Partner whose color we will take", compute='_compute_color_partner', store=False)
+    of_geo_lat = fields.Float(
+        string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo",
+        store=False, search='_search_lat')
+    of_geo_lng = fields.Float(
+        string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_geo",
+        store=False, search='_search_lng')
+    of_precision = fields.Selection(
+        GEO_PRECISION, default='no_address', compute="_compute_geo", store=False, search='_search_precision',
+        help=u"Niveau de précision de la géolocalisation.\n"
+             u"bas: à la ville.\n"
+             u"moyen: au village\n"
+             u"haut: à la rue / au voisinage\n"
+             u"très haut: au numéro de rue\n")
 
     def _search_lat(self, operator, operand):
         partners = self.env['res.partner']

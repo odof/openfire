@@ -3,6 +3,7 @@
 from odoo import api, fields, models, tools
 from odoo.exceptions import UserError
 from difflib import SequenceMatcher
+from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
 import time
 import json
 import requests
@@ -257,20 +258,11 @@ class OFGeoWizardMonoLine(models.TransientModel):
             ('manual', u"Manuel")
         ], string=u"Géocoding")
     precision = fields.Selection(
-        [
-            ('manual', "Manuel"),
-            ('very_high', "Excellent"),
-            ('high', "Haut"),
-            ('medium', "Moyen"),
-            ('low', "Bas"),
-            ('no_address', u"--"),
-            ('unknown', u"Indéterminé"),
-        ], default='unknown',
-        help=u"Niveau de précision de la géolocalisation.\n"
-             u"bas: à la ville.\n"
-             u"moyen: au village\n"
-             u"haut: à la rue / au voisinage\n"
-             u"très haut: au numéro de rue\n")
+        GEO_PRECISION, default='unknown', help=u"Niveau de précision de la géolocalisation.\n"
+                                               u"bas: à la ville.\n"
+                                               u"moyen: au village\n"
+                                               u"haut: à la rue / au voisinage\n"
+                                               u"très haut: au numéro de rue\n")
     geocoding_response = fields.Text(string=u"Réponse géocodage", readonly=True)
     score = fields.Float(string="Score", digits=(1, 2), help=u"Nombre entre 0 et 1, \n0: aucun rapport, \n1: très bon")
 
@@ -858,21 +850,11 @@ class OFGeoWizardLine(models.TransientModel):
             ('manual', u"Manuel")
         ], string=u"Géocoding", readonly=True)
     precision = fields.Selection(
-        [
-            ('manual', "Manuel"),
-            ('very_high', "Excellent"),
-            ('high', "Haut"),
-            ('medium', "Moyen"),
-            ('low', "Bas"),
-            ('no_address', u"--"),
-            ('unknown', u"Indéterminé"),
-            ('not_tried', u"Pas tenté"),
-        ], default='not_tried', readonly=True,
-        help=u"Niveau de précision de la géolocalisation.\n"
-             u"bas: à la ville.\n"
-             u"moyen: au village\n"
-             u"haut: à la rue / au voisinage\n"
-             u"très haut: au numéro de rue\n")
+        GEO_PRECISION, default='not_tried', readonly=True, help=u"Niveau de précision de la géolocalisation.\n"
+                                                                u"bas: à la ville.\n"
+                                                                u"moyen: au village\n"
+                                                                u"haut: à la rue / au voisinage\n"
+                                                                u"très haut: au numéro de rue\n")
     geocoding_response = fields.Text(string=u"Réponse géocodage", readonly=True)
     score = fields.Float(string="Score", digits=(1, 2), help=u"Nombre entre 0 et 1, \n0: aucun rapport, \n1: très bon")
     sequence = fields.Integer(store=True, compute="_compute_sequence")

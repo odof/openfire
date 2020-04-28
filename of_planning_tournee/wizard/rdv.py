@@ -2,8 +2,10 @@
 
 from odoo import api, models, fields
 from datetime import datetime, timedelta, date
+from dateutil.relativedelta import relativedelta
 import pytz
 from odoo.exceptions import UserError
+from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
 
 import urllib, json, requests
 
@@ -123,7 +125,7 @@ class OfTourneeRdv(models.TransientModel):
         'of.service', string='À programmer', default=lambda x: x._default_service(),
         domain="[('partner_id', '=', partner_id)]")
     creer_recurrence = fields.Boolean(
-        string=u"Créer récurrence?", default=True,
+        string=u"Créer récurrence?",
         help=u"Si cette case est cochée et qu'il n'existe pas de service lié à cette intervention, en crééra un.")
     date_next = fields.Date(string=u'Prochaine intervention', help=u"Date à partir de laquelle programmer la prochaine intervention")
     date_fin_planif = fields.Date(string=u'expiration de prochaine planif',
@@ -180,7 +182,6 @@ class OfTourneeRdv(models.TransientModel):
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
         service_obj = self.env['of.service']
-        service = False
         vals = {'service_id': False}
         if self.tache_id:
             if self.service_id and self.service_id.tache_id.id == self.tache_id.id:
@@ -190,7 +191,11 @@ class OfTourneeRdv(models.TransientModel):
                                               ('tache_id', '=', self.tache_id.id)], limit=1)
                 if service:
                     vals['service_id'] = service
-            if not vals.get('service_id', False):
+
+            if vals.get('service_id', self.service_id):
+                vals['creer_recurrence'] = False
+            else:
+                # Si il n'y a pas d'a_programmer, on affecte creer_recurrence en fonction de la tâche
                 vals['creer_recurrence'] = self.tache_id.recurrence
 
             if self.tache_id.duree:
@@ -531,7 +536,8 @@ class OfTourneeRdv(models.TransientModel):
                 vals['date_fin_planif'] = self.service_id.get_fin_date(vals['date_next'])
             elif self.creer_recurrence:
                 vals['date_next'] = "%s-%02i-01" % (first_res_da.year + 1, first_res_da.month)
-                vals['date_fin_planif'] = self.service_id.get_fin_date(vals['date_next'])
+                date_fin_planif_da = fields.Date.from_string(vals['date_next']) + relativedelta(months=1, days=-1)
+                vals['date_fin_planif'] = fields.Date.to_string(date_fin_planif_da)
             else:
                 vals['date_next'] = False
 
@@ -553,6 +559,7 @@ class OfTourneeRdv(models.TransientModel):
 
     @api.multi
     def _get_service_data(self, mois):
+        u"""Renvois le dictionnaire de valeurs nécessaire à la création d'une intervention récurrentes"""
         return {
             'partner_id': self.partner_id.id,
             'address_id': self.partner_address_id.id,
@@ -563,6 +570,7 @@ class OfTourneeRdv(models.TransientModel):
             'note': self.description or '',
             'base_state': 'calculated',
             'duree': self.duree,
+            'recurrence': True,
         }
 
     @api.multi
@@ -614,8 +622,10 @@ class OfTourneeRdv(models.TransientModel):
         # Creation/mise à jour du service si creer_recurrence
         if self.date_next:
             if self.service_id:
-                self.service_id.write({'date_next': self.date_next})
-                self.service_id.write({'date_fin': self.date_fin_planif})
+                self.service_id.write({
+                    'date_next': self.date_next,
+                    'date_fin': self.date_fin_planif
+                })
             elif self.creer_recurrence:
                 res.service_id = service_obj.create(self._get_service_data(date_propos_dt.month))
         return {
@@ -796,22 +806,19 @@ class OfTourneeRdvLine(models.TransientModel):
     selected_hour = fields.Float(string='Heure du RDV', digits=(2, 2))
     selected_description = fields.Html(string="Description", related="wizard_id.description")
 
-    geo_lat = fields.Float(string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo", readonly=True)
-    geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_geo", readonly=True)
-    precision = fields.Selection([
-        ('manual', "Manuel"),
-        ('very_high', 'Excellent'),
-        ('high', "Haut"),
-        ('medium', "Moyen"),
-        ('low', "Bas"),
-        ('no_address', u"--"),
-        ('unknown', u"Indéterminé"),
-        ('not_tried', u"Pas tenté"),
-        ], default='not_tried', readonly=True, compute="_compute_geo", help=u"Niveau de précision de la géolocalisation.\n"
-                u"bas: à la ville.\n"
-                u"moyen: au village\n"
-                u"haut: à la rue / au voisinage\n"
-                u"très haut: au numéro de rue\n")
+    geo_lat = fields.Float(
+        string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo",
+        readonly=True)
+    geo_lng = fields.Float(
+        string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_geo",
+        readonly=True)
+    precision = fields.Selection(
+        GEO_PRECISION, default='not_tried', readonly=True, compute="_compute_geo",
+        help=u"Niveau de précision de la géolocalisation.\n"
+             u"bas: à la ville.\n"
+             u"moyen: au village\n"
+             u"haut: à la rue / au voisinage\n"
+             u"très haut: au numéro de rue\n")
 
     @api.multi
     @api.depends("intervention_id")
@@ -892,10 +899,6 @@ class OfTourneeRdvLine(models.TransientModel):
             'date_propos_hour': self.date_flo,
             'res_line_id'     : self.id,
         }
-        if self.wizard_id.service_id:
-            date_da = fields.Date.from_string(self.date)
-            wizard_vals['date_next'] = self.wizard_id.service_id.get_next_date(date_da.strftime('%Y-%m-%d'))
-            wizard_vals['date_fin_planif'] = self.wizard_id.service_id.get_fin_date(wizard_vals['date_next'])
         self.wizard_id.write(wizard_vals)
 
         return {'type': 'ir.actions.do_nothing'}

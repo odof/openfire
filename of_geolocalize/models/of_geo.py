@@ -2,6 +2,17 @@
 
 from odoo import api, fields, models
 
+GEO_PRECISION = [
+    ('manual', "Manuel"),
+    ('very_high', "Excellent"),
+    ('high', "Haut"),
+    ('medium', "Moyen"),
+    ('low', "Bas"),
+    ('no_address', u"--"),
+    ('unknown', u"Indéterminé"),
+    ('not_tried', u"Pas tenté"),
+]
+
 
 # Add geocoding fields to res.company model (all are related to partner_id)
 class ResCompany(models.Model):
@@ -9,8 +20,10 @@ class ResCompany(models.Model):
 
     geo_lat = fields.Float(string='Geo Lat', digits=(8, 8), related='partner_id.geo_lat', help="latitude field")
     geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), related='partner_id.geo_lng', help="longitude field")
-    date_last_localization = fields.Datetime(string='Last Geolocation Date', related='partner_id.date_last_localization', readonly=True)
-    geocoding_response = fields.Text(string=u"Réponse géocadage", related='partner_id.geocoding_response', readonly=True)
+    date_last_localization = fields.Datetime(
+        string='Last Geolocation Date', related='partner_id.date_last_localization', readonly=True)
+    geocoding_response = fields.Text(
+        string=u"Réponse géocadage", related='partner_id.geocoding_response', readonly=True)
     geocoding = fields.Selection(
         [
             ('not_tried', u"Pas tenté"),
@@ -37,16 +50,7 @@ class ResCompany(models.Model):
         ], default='unknown', readonly=True, related='partner_id.geocodeur',
         help=u"Champ définissant le géocodeur utilisé")
     precision = fields.Selection(
-        [
-            ('manual', "Manuel"),
-            ('very_high', "Excellent"),
-            ('high', "Haut"),
-            ('medium', "Moyen"),
-            ('low', "Bas"),
-            ('no_address', u"--"),
-            ('unknown', u"Indéterminé"),
-            ('not_tried', u"Pas tenté"),
-        ], default='not_tried', readonly=True, related='partner_id.precision',
+        GEO_PRECISION, default='not_tried', readonly=True, related='partner_id.precision',
         help=u"Niveau de précision de la géolocalisation.\n"
              u"bas: à la ville.\n"
              u"moyen: au village\n"
@@ -75,7 +79,8 @@ class ResPartner(models.Model):
             ('need_verif', u"Nécessite vérification"),
             ('failure', u"Échoué"),
             ('manual', u"Manuel"),
-        ], default='not_tried', readonly=True, help="field defining the state of the geocoding for this partner", required=True)
+        ], default='not_tried', readonly=True, help="field defining the state of the geocoding for this partner",
+        required=True)
     geocodeur = fields.Selection(
         [
             ('nominatim_openfire', u"OpenFire"),
@@ -87,21 +92,11 @@ class ResPartner(models.Model):
             ('unknown', u"Indéterminé"),
         ], default='unknown', readonly=True, help=u"Champ définissant le géocodeur utilisé")
     precision = fields.Selection(
-        [
-            ('manual', "Manuel"),
-            ('very_high', "Excellent"),
-            ('high', "Haut"),
-            ('medium', "Moyen"),
-            ('low', "Bas"),
-            ('no_address', u"--"),
-            ('unknown', u"Indéterminé"),
-            ('not_tried', u"Pas tenté"),
-        ], default='not_tried', readonly=True,
-        help=u"Niveau de précision de la géolocalisation.\n"
-             u"bas: à la ville.\n"
-             u"moyen: au village\n"
-             u"haut: à la rue / au voisinage\n"
-             u"très haut: au numéro de rue\n")
+        GEO_PRECISION, default='not_tried', readonly=True, help=u"Niveau de précision de la géolocalisation.\n"
+                                                                u"bas: à la ville.\n"
+                                                                u"moyen: au village\n"
+                                                                u"haut: à la rue / au voisinage\n"
+                                                                u"très haut: au numéro de rue\n")
     street_query = fields.Char(string=u"Adresse requête")
     street_response = fields.Char(string=u"Adresse réponse", readonly=True)
 

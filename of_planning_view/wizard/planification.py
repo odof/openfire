@@ -7,6 +7,7 @@ import pytz
 import json
 from odoo.exceptions import UserError
 from odoo.tools.float_utils import float_compare
+from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
 import urllib
 from math import asin, sin, cos, sqrt, radians
 import requests
@@ -434,15 +435,7 @@ class OfPlanifCreneau(models.TransientModel):
     country_suiv_id = fields.Many2one('res.country', compute="compute_prec_suiv_vals")
     geo_lat_suiv = fields.Float(compute="compute_prec_suiv_vals")
     geo_lng_suiv = fields.Float(compute="compute_prec_suiv_vals")
-    precision_suiv = fields.Selection([
-        ('manual', "Manuel"),
-        ('high', "Haut"),
-        ('medium', "Moyen"),
-        ('low', "Bas"),
-        ('no_address', u"--"),
-        ('unknown', u"Indéterminé"),
-        ('not_tried', u"Pas tenté"),
-        ], compute="compute_prec_suiv_vals")
+    precision_suiv = fields.Selection(GEO_PRECISION, compute="compute_prec_suiv_vals")
 
     street_prec = fields.Char(compute="compute_prec_suiv_vals")
     zip_prec = fields.Char(compute="compute_prec_suiv_vals")
@@ -450,15 +443,7 @@ class OfPlanifCreneau(models.TransientModel):
     country_prec_id = fields.Many2one('res.country', compute="compute_prec_suiv_vals")
     geo_lat_prec = fields.Float(compute="compute_prec_suiv_vals")
     geo_lng_prec = fields.Float(compute="compute_prec_suiv_vals")
-    precision_prec = fields.Selection([
-        ('manual', "Manuel"),
-        ('high', "Haut"),
-        ('medium', "Moyen"),
-        ('low', "Bas"),
-        ('no_address', u"--"),
-        ('unknown', u"Indéterminé"),
-        ('not_tried', u"Pas tenté"),
-        ], compute="compute_prec_suiv_vals")
+    precision_prec = fields.Selection(GEO_PRECISION, compute="compute_prec_suiv_vals")
     name = fields.Char(compute='_compute_name')
 
     @api.multi
