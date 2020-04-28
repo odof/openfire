@@ -147,8 +147,8 @@ class ResPartner(models.Model):
                 current_phone = rec.of_phone_number_ids.filtered(lambda p: p.type == number_type)
                 if current_phone:
                     rec.of_phone_number_ids = [(1, current_phone[0].id, {'number': number})]
-                # Sinon on crée le nouveau numéro
-                else:
+                # Sinon on crée le nouveau numéro si la valeur est non vide
+                elif number:
                     rec.of_phone_number_ids = [(0, 0, {'number': number, 'type': number_type})]
 
     @api.multi
