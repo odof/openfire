@@ -542,17 +542,26 @@ class OFPlanningIntervention(models.Model):
     @api.multi
     def sms_action(self):
         self.ensure_one()
-        default_mobile = self.env['of.sms.number'].search([])[0]
-        to_mobile = self.partner_id.mobile or self.address_id.mobile
-        return {
-            'name': u'Rédaction SMS',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'of.sms.compose',
-            'target': 'new',
-            'type': 'ir.actions.act_window',
-            'context': {'default_from_mobile_id': default_mobile.id,'default_to_number':to_mobile, 'default_record_id':self.id,'default_model':'of.planning.intervention'}
-        }
+        default_mobile = self.env['of.sms.number'].search([])
+        if default_mobile:
+            default_mobile = default_mobile[0]
+        else:
+            raise UserError(u"Erreur ! (#ED100)\n\nAucun émetteur SMS trouvé. Les émetteurs se configurent dans le "
+                            u"menu Configuration/SMS/Comptes émetteurs.")
+        mobile_numbers = self.partner_id.get_mobile_numbers() or self.address_id.get_mobile_numbers()
+        if mobile_numbers:
+            return {
+                'name': u'Rédaction SMS',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'of.sms.compose',
+                'target': 'new',
+                'type': 'ir.actions.act_window',
+                'context': {'default_from_mobile_id': default_mobile.id, 'default_to_number': ','.join(mobile_numbers),
+                            'default_record_id': self.id, 'default_model': 'of.planning.intervention'}
+            }
+        else:
+            raise UserError(u"Aucun numéro de mobile valide n'est défini pour ce partenaire !")
 
     # Appelé par cron journalier de rappel d'intervention
     @api.model
