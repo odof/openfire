@@ -167,10 +167,10 @@ class SaleOrder(models.Model):
     @api.depends('of_echeance_line_ids', 'amount_total')
     def _compute_of_echeances_modified(self):
         for order in self:
-            order.of_echeances_modified = bool(order.of_echeance_line_ids and
-                                               float_compare(order.amount_total,
-                                                             sum(order.of_echeance_line_ids.mapped('amount')),
-                                                             precision_rounding=.01))
+            order.of_echeances_modified = bool(order.of_echeance_line_ids
+                                               and float_compare(order.amount_total,
+                                                                 sum(order.of_echeance_line_ids.mapped('amount')),
+                                                                 precision_rounding=.01))
 
     @api.multi
     def of_get_taxes_values(self):
@@ -588,17 +588,19 @@ class OFInvoiceReportTotalGroup(models.Model):
     _description = "Impression des totaux de factures et commandes de vente"
 
     @api.multi
-    def filter_lines(self, lines):
+    def filter_lines(self, lines, invoices=None):
         self.ensure_one()
         if not self.is_group_paiements():
-            return super(OFInvoiceReportTotalGroup, self).filter_lines(lines)
+            return super(OFInvoiceReportTotalGroup, self).filter_lines(lines, invoices=invoices)
         # Retour des lignes dont l'article correspond à un groupe de rapport de facture
         #   et dont la ligne de commande associée a une date antérieure
         #   (seul un paiement d'une facture antérieure doit figurer sur une facture)
         if lines._name == 'account.invoice.line':
-            lines = lines.filtered(lambda l: ((l.product_id in self.product_ids or
-                                               l.product_id.categ_id in self.categ_ids) and
-                                              l.sale_line_ids and l.sale_line_ids[0].create_date < l.create_date))
+            allowed_order_lines = invoices.mapped('invoice_line_ids').mapped('sale_line_ids')
+            lines = lines.filtered(lambda l: ((l.product_id in self.product_ids
+                                               or l.product_id.categ_id in self.categ_ids)
+                                              and l.sale_line_ids
+                                              and l.sale_line_ids in allowed_order_lines))
             # Si une facture d'acompte possède plusieurs lignes, il est impératif de les gérer de la même façon
             invoices = lines.mapped('invoice_id')
             sale_lines = lines.mapped('sale_line_ids')
@@ -609,8 +611,8 @@ class OFInvoiceReportTotalGroup(models.Model):
                         lines |= sale_line2.invoice_lines.filtered(lambda l: l.invoice_id in invoices)
             return lines
         else:
-            return lines.filtered(lambda l: l.product_id in self.product_ids or
-                                            l.product_id.categ_id in self.categ_ids)
+            return lines.filtered(lambda l: (l.product_id in self.product_ids or
+                                             l.product_id.categ_id in self.categ_ids))
 
 
 class SaleOrderLine(models.Model):
@@ -640,8 +642,8 @@ class SaleOrderLine(models.Model):
         readonly=True)
 
     of_price_unit_ht = fields.Float(string='Unit Price excl', compute='_compute_of_price_unit', help="Unit price without taxes", store=True)
-    of_price_unit_ttc = fields.Float(string='Unit Price incl', compute='_compute_of_price_unit',
-                                    help="Unit price with taxes", store=True)
+    of_price_unit_ttc = fields.Float(
+        string='Unit Price incl', compute='_compute_of_price_unit', help="Unit price with taxes", store=True)
 
     @api.depends('price_unit', 'order_id.currency_id', 'order_id.partner_shipping_id', 'product_id',
                  'price_subtotal', 'product_uom_qty')
@@ -984,25 +986,29 @@ class OFSaleConfiguration(models.TransientModel):
     pdf_adresse_civilite = fields.Boolean(
         string=u"(OF) Civilités", required=True, default=False,
         help=u"Afficher la civilité dans les rapport PDF ?")
-    pdf_adresse_telephone = fields.Selection([
+    pdf_adresse_telephone = fields.Selection(
+        [
             (1, "Afficher dans l'encart d'adresse principal"),
             (2, u"Afficher dans une pastille d'informations complémentaires"),
             (3, u"Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
         ], string=u"(OF) Téléphone",
         help=u"Où afficher le numéro de téléphone dans les rapport PDF ? Ne rien mettre pour ne pas afficher.")
-    pdf_adresse_mobile = fields.Selection([
+    pdf_adresse_mobile = fields.Selection(
+        [
             (1, "Afficher dans l'encart d'adresse principal"),
             (2, u"Afficher dans une pastille d'informations complémentaires"),
             (3, u"Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
         ], string=u"(OF) Mobile",
         help=u"Où afficher le numéro de téléphone mobile dans les rapport PDF ? Ne rien mettre pour ne pas afficher.")
-    pdf_adresse_fax = fields.Selection([
+    pdf_adresse_fax = fields.Selection(
+        [
             (1, "Afficher dans l'encart d'adresse principal"),
             (2, u"Afficher dans une pastille d'informations complémentaires"),
             (3, u"Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
         ], string="(OF) Fax",
         help=u"Où afficher le fax dans les rapport PDF ? Ne rien mettre pour ne pas afficher.")
-    pdf_adresse_email = fields.Selection([
+    pdf_adresse_email = fields.Selection(
+        [
             (1, "Afficher dans l'encart d'adresse principal"),
             (2, u"Afficher dans une pastille d'informations complémentaires"),
             (3, u"Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
@@ -1075,8 +1081,8 @@ class OFSaleConfiguration(models.TransientModel):
         if view:
             view.write({'active': self.of_position_fiscale})
         return self.env['ir.values'].sudo().set_default(
-                'sale.config.settings', 'of_position_fiscale',
-                self.of_position_fiscale)
+            'sale.config.settings', 'of_position_fiscale',
+            self.of_position_fiscale)
 
 class AccountInvoice(models.Model):
     _name = 'account.invoice'
@@ -1201,16 +1207,28 @@ class AccountInvoice(models.Model):
         return action
 
     @api.multi
-    def _of_get_linked_invoices(self, lines):
+    def _of_get_linked_invoices(self):
         """ [IMPRESSION]
         Retourne les factures liées à la facture courante.
         Les factures liées sont celles dont une ligne est liée à la même ligne de commande qu'une ligne de lines.
         Toute facture liée à une facture liée est également retournée.
-        @param lines : Lignes de la facture courante sur lesquelles le lien est déterminé
         """
+        invoice_obj = self.env['account.invoice']
         self.ensure_one()
+        if self.type != 'out_invoice':
+            return self
+        group_paiements = self.env['of.invoice.report.total.group'].get_group_paiements()
+        if not (group_paiements and group_paiements.invoice):
+            # Le groupe des paiements n'est pas coniguré pour les factures.
+            return self
+
+        group_paiements_lines = group_paiements.filter_lines(self.invoice_line_ids, self)
+        if group_paiements_lines is False:
+            # Aucune ligne de la facture n'est à considérer comme un paiement.
+            return self
+
         invoices = self
-        to_check = lines.mapped('sale_line_ids').mapped('invoice_lines').mapped('invoice_id')
+        to_check = group_paiements_lines.mapped('sale_line_ids').mapped('invoice_lines').mapped('invoice_id')
         while to_check:
             invoices |= to_check
             to_check = (to_check
@@ -1218,28 +1236,48 @@ class AccountInvoice(models.Model):
                         .mapped('sale_line_ids')
                         .mapped('invoice_lines')
                         .mapped('invoice_id')) - invoices
-        return invoices.filtered(lambda i: i.type == self.type)
+
+        refunds = invoices.filtered(lambda inv: inv.type != self.type)
+        invoices -= refunds
+        for refund in refunds:
+            # On fait abstraction des factures annulées par des avoirs
+            move_ids = refund.payment_move_line_ids.mapped('move_id')
+            if len(move_ids) == 1:
+                invoice = invoices.filtered(
+                    lambda inv: inv.move_id == move_ids and inv.amount_total == refund.amount_total)
+                if invoice:
+                    if invoice == self:
+                        # La facture en cours est annulée par un avoir
+                        return self
+                    invoices -= invoice
+
+        # On ne garde que les factures antérieures à la facture courante
+        if self.state != 'draft':
+            invoices = invoices.filtered(lambda inv: (inv.date_invoice < self.date_invoice
+                                                      or inv.number <= self.number
+                                                      or inv == self))
+
+        # Tri dans l'ordre
+        invoices = invoice_obj.search([('id', 'in', invoices.ids)])
+        return invoices
 
     @api.multi
-    def _of_get_printable_payments(self, lines):
+    def _of_get_printable_payments(self):
         """ [IMPRESSION]
         Renvoie les lignes à afficher.
         """
         account_move_line_obj = self.env['account.move.line']
-        # Liste des factures et factures d'acompte
-        invoices = self._of_get_linked_invoices(lines)
 
         # Retour de tous les paiements des factures
         # On distingue les paiements de la facture principale de ceux des factures liées
         result_dict = {}
-        for invoice in invoices:
+        for invoice in self:
             widget = json.loads(invoice.payments_widget.replace("'", "\'"))
             if not widget:
                 continue
             for payment in widget.get('content', []):
-                # Les paiements sont classé dans l'ordre chronologique
+                # Les paiements sont classés dans l'ordre chronologique
                 sort_key = (payment['date'], invoice.date_invoice, invoice.number, payment['payment_id'])
-
                 move_line = account_move_line_obj.browse(payment['payment_id'])
                 name = self._of_get_payment_display(move_line)
                 result_dict[sort_key] = (name, payment['amount'])
@@ -1247,12 +1285,36 @@ class AccountInvoice(models.Model):
         return result
 
     @api.multi
-    def order_lines_layouted(self):
+    def _of_get_recap_taxes(self, invoices):
+        """ [IMPRESSION]
+        Retourne la liste des taxes à afficher dans le récapitulatif de la facture pdf.
         """
-        Retire les lignes de facture qui doivent êtres affichées dans les totaux.
-        """
-        report_pages_full = super(AccountInvoice, self).order_lines_layouted()
-        report_lines = self._of_get_printable_lines()
+        tax_vals = []
+        taxes = {}
+        round_curr = self.currency_id.round
+        inv_type = self.type
+        for inv in invoices:
+            sign = inv.type == inv_type or -1
+            for inv_tax in inv.tax_line_ids:
+                tax = inv_tax.tax_id
+                if tax in taxes:
+                    vals = taxes[tax]
+                    vals[1] += inv_tax.base * sign
+                    vals[2] += inv_tax.amount * sign
+                else:
+                    vals = [tax.description, inv_tax.base * sign, inv_tax.amount * sign]
+                    tax_vals.append(vals)
+                    taxes[tax] = vals
+        for vals in tax_vals:
+            vals[1] = round_curr(vals[1])
+            vals[2] = round_curr(vals[2])
+        return [vals for vals in tax_vals if vals[1]]
+
+    @api.multi
+    def of_get_printable_data(self):
+        result = super(AccountInvoice, self).of_get_printable_data()
+        report_pages_full = self.order_lines_layouted()
+        report_lines = result['lines']
         report_pages = []
         for page_full in report_pages_full:
             page = []
@@ -1263,7 +1325,8 @@ class AccountInvoice(models.Model):
                     page.append(group)
             if page:
                 report_pages.append(page)
-        return report_pages
+        result['lines_layouted'] = report_pages
+        return result
 
     @api.model
     def _refund_cleanup_lines(self, lines):

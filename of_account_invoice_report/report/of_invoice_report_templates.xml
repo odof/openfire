@@ -96,6 +96,8 @@
 
             <!-- Is there a discount on at least one line? -->
             <t t-set="display_discount" t-value="any([l.discount for l in o.invoice_line_ids])"/>
+            <!-- Calcul des données des lignes de facture, des totaux et du récapitulatif des taxes -->
+            <t t-set="invoice_data" t-value="o.of_get_printable_data()"/>
 
             <table class="table table-condensed">
                 <thead>
@@ -110,7 +112,7 @@
                     </tr>
                 </thead>
                 <tbody class="invoice_tbody">
-                    <tr t-foreach="o._of_get_printable_lines()" t-as="l">
+                    <tr t-foreach="invoice_data['lines']" t-as="l">
                         <td><span t-field="l.name"/></td>
                         <td class="hidden"><span t-field="l.origin"/></td>
                         <td class="text-right">
@@ -139,7 +141,7 @@
                 <div name="subdivision" class="col-xs-4 pull-right">
                     <table class="table table-condensed">
                         <!-- Affichage des paiements et autres groupes de sous-totaux -->
-                        <t t-set='totals_group' t-value="o._of_get_printable_totals()"/>
+                        <t t-set='totals_group' t-value="invoice_data['totals']"/>
                         <tr class="border-black">
                             <td><strong>Subtotal</strong></td>
                             <td class="text-right">
@@ -170,7 +172,8 @@
             </div>
 
             <!-- DO NOT REMOVE THIS TABLE. MANDATORY IN SOME COUNTRIES -->
-            <div class="row" t-if="len(o.tax_line_ids) > 0">
+            <t t-set='of_recap_taxes' t-value="invoice_data['taxes']"/>
+            <div class="row" name="of_recap_taxes" t-if="len(of_recap_taxes) > 0">
                 <div class="col-xs-6">
                     <table class="table table-condensed">
                         <thead>
@@ -181,13 +184,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr t-foreach="o.tax_line_ids" t-as="t">
-                                <td><span t-field="t.tax_id.description"/></td>
+                            <tr t-foreach="of_recap_taxes" t-as="t">
+                                <td><span t-esc="t[0]"/></td>
                                 <td class="text-right">
-                                    <span t-field="t.base" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                    <span t-esc="t[1]" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
                                 </td>
                                 <td class="text-right">
-                                    <span t-field="t.amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                    <span t-esc="t[2]" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
                                 </td>
                             </tr>
                         </tbody>

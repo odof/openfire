@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
+from odoo.tools.float_utils import float_compare
+from odoo.tools.misc import formatLang
 
 import json
 
@@ -29,13 +31,14 @@ class AccountInvoice(models.Model):
         return self.env['ir.values'].get_default('account.config.settings', 'pdf_adresse_email') or 0
 
     @api.multi
-    def _of_get_total_lines_by_group(self):
-        """
+    def _of_get_total_lines_by_group(self, invoices):
+        u"""
         Retourne les lignes de la facture, séparées en fonction du groupe dans lequel les afficher.
         Les groupes sont ceux définis par l'objet of.invoice.report.total, permettant de déplacer le rendu des
           lignes de facture sous le total TTC.
         Les groupes sont affichés dans leur ordre propre, puis les lignes dans l'ordre de leur apparition dans la facture.
-        @param return: Liste de couples (groupe, lignes de facture). Le premier élément vaut (False, Lignes non groupées).
+        :param invoices: Ensemble des factures à utiliser pour générer le document.
+        :return: Liste de couples (groupe, lignes de facture). Le premier élément vaut (False, Lignes non groupées).
         """
         self.ensure_one()
         group_obj = self.env['of.invoice.report.total.group']
@@ -51,9 +54,10 @@ class AccountInvoice(models.Model):
         result = []
         # Le groupe des paiements peut absorber des lignes d'autres groupes.
         # Il faut donc le traiter en priorité.
+        group_paiement_lines = lines.browse([])
         for group in groups:
             if group.is_group_paiements():
-                group_paiement_lines = group.filter_lines(lines)
+                group_paiement_lines = group.filter_lines(lines, invoices-self)
                 if group_paiement_lines is not False:
                     lines -= group_paiement_lines
                 break
@@ -79,23 +83,41 @@ class AccountInvoice(models.Model):
         return result
 
     @api.multi
-    def _of_get_printable_lines(self):
-        """ [IMPRESSION]
-        Renvoie les lignes à afficher
+    def of_get_printable_data(self):
+        u"""[IMPRESSION]
+        Fonction de calcul des données à imprimer dans la facture pdf.
+        Ces données incluent les lignes de facture, les totaux et le récapitulatif des taxes.
+        :return: Dictionnaire de données à imprimer dans la facture pdf.
         """
-        return self._of_get_total_lines_by_group()[0][1]
+        self.ensure_one()
+        invoices = self._of_get_linked_invoices()
+        group_lines = self._of_get_total_lines_by_group(invoices)
+        return {
+            'lines': group_lines[0][1],
+            'totals': self._of_get_printable_totals(invoices, group_lines),
+            'taxes': self._of_get_recap_taxes(invoices)
+        }
 
     @api.model
     def _of_get_payment_display(self, move_line):
-        """ [IMPRESSION]
-        Détermine le descriptif à afficher pour un paiement
+        u"""[IMPRESSION]
+        Détermine le descriptif à afficher pour un paiement.
+        Cette fonction a pour but d'être surchargée dans of_account_payment_mode.
+
+        :param move_line: Écriture comptable du paiement.
+        :return: Texte à afficher pour le paiement.
         """
         return _('<i>Paid on %s</i>') % (move_line.date)
 
     @api.multi
-    def _of_get_printable_payments(self, lines):
-        """ [IMPRESSION]
-        Renvoie les lignes à afficher
+    def _of_get_printable_payments(self):
+        u"""[IMPRESSION]
+        Cette fonction a pour but d'être surchargée dans of_sale pour récupérer tous les paiements
+          liés à la commande d'origine.
+
+        :param lines:
+        :return: Lignes de paiement à afficher dans la facture.
+        :rtype: Liste de tuples [(libellé: montant)]
         """
         account_move_line_obj = self.env['account.move.line']
         result = []
@@ -106,8 +128,53 @@ class AccountInvoice(models.Model):
         return result
 
     @api.multi
-    def _of_get_printable_totals(self):
-        """ [IMPRESSION]
+    def _of_get_tax_amount_by_group(self):
+        u""" [IMPRESSION]
+        Fonction identique à la fonction _get_tax_amount_by_group,
+        mais permet l'agglomération des taxes de plusieurs factures passées en paramètre.
+        """
+        res = {}
+        currency = self[0].currency_id or self[0].company_id.currency_id
+        inv_type = self[0].type
+        for invoice in self:
+            sign = invoice.type == inv_type or -1
+            for line in invoice.tax_line_ids:
+                res.setdefault(line.tax_id.tax_group_id, 0.0)
+                res[line.tax_id.tax_group_id] += line.amount * sign
+        res = sorted(res.items(), key=lambda l: l[0].sequence)
+        res = [(
+            r[0].name, r[1], formatLang(self.with_context(lang=self[0].partner_id.lang).env, r[1], currency_obj=currency)
+        ) for r in res]
+        return res
+
+    @api.multi
+    def _of_get_printable_taxes(self, total_amount):
+        u""" [IMPRESSION]
+        Renvoie les lignes à afficher.
+        Cette fonction a pour but d'être surchargée dans of_sale pour récupérer toutes les taxes
+          liées à la commande d'origine.
+        """
+        round_curr = self[0].currency_id.round
+        result = []
+        for tax in self._of_get_tax_amount_by_group():
+            result.append((tax[0], tax[1]))
+            total_amount += tax[1]
+        return [[result, (_("Total"), round_curr(total_amount))]]
+
+    @api.multi
+    def _of_get_linked_invoices(self):
+        u"""[IMPRESSION]
+        Retourne les factures liées à la facture courante.
+        Les factures liées sont celles dont une ligne est liée à la même ligne de commande qu'une ligne de lines.
+        Toute facture liée à une facture liée est également retournée.
+        :return: Factures associées à la facture courante (incluse) pour l'impression pdf.
+        """
+        self.ensure_one()
+        return self
+
+    @api.multi
+    def _of_get_printable_totals(self, invoices, group_lines):
+        u""" [IMPRESSION]
         Retourne un dictionnaire contenant les valeurs à afficher dans les totaux de la facture pdf.
         Dictionnaire de la forme :
         {
@@ -118,15 +185,14 @@ class AccountInvoice(models.Model):
         }
         Les listes untaxed, taxes et total pourraient être regroupés en une seule.
         Ce format pourra aider aux héritages (?).
+        :param invoices: Ensemble des factures à utiliser pour générer le document.
+        :param group_lines: Résultat de self._of_get_total_lines_by_group(invoices) afin d'éviter le recalcul.
+        :return: Valeurs à afficher dans les totaux de la facture pdf.
         """
         self.ensure_one()
-        tax_obj = self.env['account.tax']
         round_curr = self.currency_id.round
 
-        group_lines = self._of_get_total_lines_by_group()
-
-        result = {}
-        result['subtotal'] = sum(group_lines[0][1].mapped('price_subtotal'))
+        result = {'subtotal': sum(group_lines[0][1].mapped('price_subtotal'))}
         total_amount = result['subtotal']
 
         i = 1
@@ -146,30 +212,8 @@ class AccountInvoice(models.Model):
         result['untaxed'] = result_untaxed
 
         # --- Ajout des taxes ---
-        # Code copié depuis account.invoice.get_taxes_values()
-        tax_grouped = {}
-        for line in untaxed_lines:
-            price_unit = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-            taxes = line.invoice_line_tax_ids.compute_all(price_unit, self.currency_id, line.quantity, line.product_id, self.partner_id)['taxes']
-            for tax_val in taxes:
-                val = self._prepare_tax_line_vals(line, tax_val)
-                tax = tax_obj.browse(tax_val['id'])
-                key = tax.get_grouping_key(val)
-
-                if key not in tax_grouped:
-                    tax_grouped[key] = val
-                    tax_grouped[key]['name'] = tax.description or tax.name
-                    tax_grouped[key]['group'] = tax.tax_group_id
-                else:
-                    tax_grouped[key]['amount'] += val['amount']
-        # Taxes groupées par groupe de taxes (cf account.invoice._get_tax_amount_by_group())
-        tax_vals_dict = {}
-        for tax in sorted(tax_grouped.values(), key=lambda t: t['name']):
-            amount = round_curr(tax['amount'])
-            tax_vals_dict.setdefault(tax['group'], [tax['group'].name, 0])
-            tax_vals_dict[tax['group']][1] += amount
-            total_amount += amount
-        result['taxes'] = [[tax_vals_dict.values(), (_("Total"), round_curr(total_amount))]]
+        result['taxes'] = invoices._of_get_printable_taxes(total_amount)
+        total_amount = result['taxes'][0][1][1]
 
         # --- Sous-totaux TTC ---
         result_total = []
@@ -178,7 +222,7 @@ class AccountInvoice(models.Model):
             group, lines = group_lines[i]
             i += 1
             if group.is_group_paiements():
-                lines_vals = self._of_get_printable_payments(lines)
+                lines_vals = invoices._of_get_printable_payments()
                 if not lines_vals:
                     continue
                 for line in lines_vals:
@@ -193,6 +237,15 @@ class AccountInvoice(models.Model):
         result['total'] = result_total
 
         return result
+
+    @api.multi
+    def _of_get_recap_taxes(self, invoices):
+        u""" [IMPRESSION]
+        Retourne la liste des taxes à afficher dans le récapitulatif de la facture pdf.
+        """
+        self.ensure_one()
+        return [(t.tax_id.description, t.base, t.amount)
+                for t in self.tax_line_ids]
 
 
 class AccountInvoiceLine(models.Model):
@@ -254,25 +307,29 @@ class AccountConfigSettings(models.TransientModel):
     pdf_adresse_civilite = fields.Boolean(
         string=u"(OF) Civilités", required=True, default=False,
         help=u"Afficher la civilité dans les rapport PDF ?")
-    pdf_adresse_telephone = fields.Selection([
+    pdf_adresse_telephone = fields.Selection(
+        [
             (1, "Afficher dans l'encart d'adresse principal"),
             (2, "Afficher dans une pastille d'informations complémentaires"),
             (3, "Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
         ], string=u"(OF) Téléphone",
         help=u"Où afficher le numéro de téléphone dans les rapport PDF ? Ne rien mettre pour ne pas afficher.")
-    pdf_adresse_mobile = fields.Selection([
+    pdf_adresse_mobile = fields.Selection(
+        [
             (1, "Afficher dans l'encart d'adresse principal"),
             (2, "Afficher dans une pastille d'informations complémentaires"),
             (3, "Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
         ], string=u"(OF) Mobile",
         help=u"Où afficher le numéro de téléphone dans les rapport PDF ? Ne rien mettre pour ne pas afficher.")
-    pdf_adresse_fax = fields.Selection([
+    pdf_adresse_fax = fields.Selection(
+        [
             (1, "Afficher dans l'encart d'adresse principal"),
             (2, "Afficher dans une pastille d'informations complémentaires"),
             (3, "Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
         ], string="(OF) Fax",
         help=u"Où afficher le numéro de téléphone dans les rapport PDF ? Ne rien mettre pour ne pas afficher.")
-    pdf_adresse_email = fields.Selection([
+    pdf_adresse_email = fields.Selection(
+        [
             (1, "Afficher dans l'encart d'adresse principal"),
             (2, "Afficher dans une pastille d'informations complémentaires"),
             (3, "Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
@@ -338,13 +395,16 @@ class OFInvoiceReportTotalGroup(models.Model):
         return self == self.get_group_paiements()
 
     @api.multi
-    def filter_lines(self, lines):
+    def filter_lines(self, lines, invoices=None):
         """
         Filtre les lignes reçues en fonction des articles/catégories autorisés pour le groupe courant.
         """
         self.ensure_one()
         if self.is_group_paiements():
             # On n'autorise pas d'articles dans les paiements. (Voir module of_sale pour cette possibilité)
-            return lines.browse([])
+            return False
+        if self.position == '1-ttc':
+            # On n'autorise pas de ligne avec un montant de taxe dans les groupes ttc.
+            lines = lines.filtered(lambda l: float_compare(l.price_subtotal, l.price_total, 2) == 0)
         return lines.filtered(lambda l: (l.product_id in self.product_ids or
                                          l.product_id.categ_id in self.categ_ids)) or False

@@ -139,7 +139,8 @@ class OFAccountInvoice(models.Model):
 
     @api.model
     def _of_get_payment_display(self, move_line):
-        # Si le paiement n'a pas d'objet paiement (paiement par un avoir, paiement en saisie comptable manuelle, ...), on affiche  par défaut la référence de l'écriture ou de la pièce comptable.
+        # Si le paiement n'a pas d'objet paiement (paiement par un avoir, paiement en saisie comptable manuelle, ...),
+        #   on affiche  par défaut la référence de l'écriture ou de la pièce comptable.
         # Sinon, on affiche le texte du paiement.
         if not move_line.payment_id:
             result = move_line.ref or move_line.move_id.name
