@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, date
 import pytz, math, json, urllib, requests
 from math import cos
 from odoo.addons.of_planning_tournee.models.of_planning_tournee import distance_points
+from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
 from odoo.exceptions import UserError
 
 SEARCH_MODES = [
@@ -128,15 +129,19 @@ class OFRDVCommercial(models.TransientModel):
     creneau_ids = fields.One2many('of.rdv.commercial.line', 'wizard_id', string='Proposition de RDVs')
     date_propos = fields.Datetime(string=u'RDV Début')
     date_propos_hour = fields.Float(string=u'Heure de début', digits=(12, 5))
-    date_recherche_debut = fields.Date(string=u'À partir du', required=True, default=lambda *a: (date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
-    date_recherche_fin = fields.Date(string=u"Jusqu'au", required=True, default=lambda *a: (date.today() + timedelta(days=7)).strftime('%Y-%m-%d'))
+    date_recherche_debut = fields.Date(
+        string=u'À partir du', required=True,
+        default=lambda *a: (date.today() + timedelta(days=1)).strftime('%Y-%m-%d'))
+    date_recherche_fin = fields.Date(
+        string=u"Jusqu'au", required=True, default=lambda *a: (date.today() + timedelta(days=7)).strftime('%Y-%m-%d'))
     partner_id = fields.Many2one('res.partner', string='Client', required=True, readonly=True, default=_default_partner)
     partner_name = fields.Char(related='partner_id.name')
     partner_child_ids = fields.One2many(related="partner_id.child_ids", readonly=True)  # pour domain dans XML
     partner_address_id = fields.Many2one('res.partner', string="Adresse du RDV", default=_default_address,
                                          domain="['|', ('id', '=', partner_id), ('parent_id', '=', partner_id)]")
     date_display = fields.Char(string='Jour du RDV', size=64, readonly=True)
-    lead_id = fields.Many2one('crm.lead', string='Opportunité', default=_default_lead, domain="[('partner_id', '=', partner_id)]")
+    lead_id = fields.Many2one(
+        'crm.lead', string='Opportunité', default=_default_lead, domain="[('partner_id', '=', partner_id)]")
     mode_recherche = fields.Selection(SEARCH_MODES, string="Mode de recherche", required=True, default="distance")
     max_recherche = fields.Float(string="Maximum", digits=(12, 0))
     allday = fields.Boolean('All Day', default=False)
@@ -144,12 +149,15 @@ class OFRDVCommercial(models.TransientModel):
     hor_mf = fields.Float(string='Matin fin', required=True, digits=(12, 1), default=12)
     hor_ad = fields.Float(string=u'Après-midi début', required=True, digits=(12, 1), default=14)
     hor_af = fields.Float(string=u'Après-midi fin', required=True, digits=(12, 1), default=18)
-    jour_ids = fields.Many2many('of.jours', 'rdvcom_jours', 'rdvcom_id', 'jour_id', string='Jours travaillés', required=True, default=_get_default_jours)
-    tz = fields.Selection(_tz_get, string='Fuseau horaire', default=lambda self: self.env.user.tz or 'Europe/Paris', required=True,
-                          help="The Team's timezone, used to output proper date and time values "
-                               "inside printed reports. It is important to set a value for this field. "
-                               "You should use the same timezone that is otherwise used to pick and "
-                               "render date and time values: your computer's timezone.")
+    jour_ids = fields.Many2many(
+        'of.jours', 'rdvcom_jours', 'rdvcom_id', 'jour_id', string='Jours travaillés', required=True,
+        default=_get_default_jours)
+    tz = fields.Selection(
+        _tz_get, string='Fuseau horaire', default=lambda self: self.env.user.tz or 'Europe/Paris', required=True,
+        help="The Team's timezone, used to output proper date and time values "
+             "inside printed reports. It is important to set a value for this field. "
+             "You should use the same timezone that is otherwise used to pick and "
+             "render date and time values: your computer's timezone.")
     tz_offset = fields.Char(compute='_compute_tz_offset', string='Timezone offset')
 
     zero_result = fields.Boolean(string="Recherche infructueuse", default=False, help="Aucun résultat")
@@ -176,18 +184,14 @@ class OFRDVCommercial(models.TransientModel):
     lieu_address_country_id = fields.Many2one("res.country", string="Pays", compute="_compute_address")
 
     # champs ajoutés pour la vue map
-    geo_lat = fields.Float(string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_address", search='_search_lat')
-    geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_address", search='_search_lng')
-    precision = fields.Selection([
-        ('manual', "Manuel"),
-        ('very_high', 'Excellent'),
-        ('high', "Haut"),
-        ('medium', "Moyen"),
-        ('low', "Bas"),
-        ('no_address', u"--"),
-        ('unknown', u"Indéterminé"),
-        ('not_tried', u"Pas tenté"),
-        ], default='not_tried', compute="_compute_address", search='_search_precision',
+    geo_lat = fields.Float(
+        string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_address",
+        search='_search_lat')
+    geo_lng = fields.Float(
+        string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_address",
+        search='_search_lng')
+    precision = fields.Selection(
+        GEO_PRECISION, default='not_tried', compute="_compute_address", search='_search_precision',
         help=u"Niveau de précision de la géolocalisation.\n"
              u"bas: à la ville.\n"
              u"moyen: au village\n"
@@ -952,7 +956,8 @@ class OfRDVCommercialLine(models.TransientModel):
     user_partner_id = fields.Many2one('res.partner', string="user partner")
     partner_ids = fields.Many2many('res.partner', 'calendar_event_res_rdvcom_rel', string='Attendees')
     calendar_id = fields.Many2one('calendar.event', string="Planning")
-    categ_ids = fields.Many2many('calendar.event.type', 'rdvcom_meeting_category_rel', 'rdvcomline_id', 'type_id', 'Tags')
+    categ_ids = fields.Many2many(
+        'calendar.event.type', 'rdvcom_meeting_category_rel', 'rdvcomline_id', 'type_id', 'Tags')
     name = fields.Char(string="name", default="DISPONIBLE")
     distance = fields.Float(string='Dist.tot. (km)', help="distance prec + distance suiv", digits=(12, 1))
     dist_prec = fields.Float(string='Dist.Prec. (km)', digits=(12, 1))
@@ -972,18 +977,14 @@ class OfRDVCommercialLine(models.TransientModel):
     on_phone = fields.Boolean(u'Au téléphone', default=False)
 
     ignorer_geo = fields.Boolean(u"Ignorer données géographiques")
-    geo_lat = fields.Float(string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo", readonly=True, search='_search_lat')
-    geo_lng = fields.Float(string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_geo", readonly=True, search='_search_lng')
-    precision = fields.Selection([
-        ('manual', "Manuel"),
-        ('very_high', 'Excellent'),
-        ('high', "Haut"),
-        ('medium', "Moyen"),
-        ('low', "Bas"),
-        ('no_address', u"--"),
-        ('unknown', u"Indéterminé"),
-        ('not_tried', u"Pas tenté"),
-        ], default='not_tried', readonly=True, compute="_compute_geo", search='_search_precision',
+    geo_lat = fields.Float(
+        string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo",
+        readonly=True, search='_search_lat')
+    geo_lng = fields.Float(
+        string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_geo",
+        readonly=True, search='_search_lng')
+    precision = fields.Selection(
+        GEO_PRECISION, default='not_tried', readonly=True, compute="_compute_geo", search='_search_precision',
         help=u"Niveau de précision de la géolocalisation.\n"
              u"bas: à la ville.\n"
              u"moyen: au village\n"

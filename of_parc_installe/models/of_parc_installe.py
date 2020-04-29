@@ -2,6 +2,7 @@
 
 from datetime import timedelta
 from odoo import models, fields, api
+from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
 
 class OFParcInstalle(models.Model):
     """Parc installé"""
@@ -68,16 +69,8 @@ class OFParcInstalle(models.Model):
     # Champs ajoutés pour la vue map
     geo_lat = fields.Float('geo_lat', compute='_compute_geo', store=True)
     geo_lng = fields.Float('geo_lng', compute='_compute_geo', store=True)
-    precision = fields.Selection([
-        ('manual', "Manuel"),
-        ('very_high', 'Excellent'),
-        ('high', "Haut"),
-        ('medium', "Moyen"),
-        ('low', "Bas"),
-        ('no_address', u"--"),
-        ('unknown', u"Indéterminé"),
-        ('not_tried', u"Pas tenté"),
-        ], default='not_tried', string='precision', compute='_compute_geo', store=True,
+    precision = fields.Selection(
+        GEO_PRECISION, default='not_tried', string='precision', compute='_compute_geo', store=True,
         help=u"Niveau de précision de la géolocalisation.\n"
              u"bas: à la ville.\n"
              u"moyen: au village\n"
