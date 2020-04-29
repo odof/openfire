@@ -5,7 +5,8 @@ from odoo.tools.safe_eval import safe_eval
 
 
 class SaleOrder(models.Model):
-    _inherit = 'sale.order'
+    _name = 'sale.order'
+    _inherit = ['sale.order', 'of.crm.stage.auto.update']
 
     @api.model
     def _auto_init(self):
@@ -85,25 +86,7 @@ class SaleOrder(models.Model):
         else:
             vals.update(state='draft')
 
-        res = super(SaleOrder, self).create(vals)
-
-        # CRM stages
-        if res.opportunity_id:
-            stages = self.env['crm.stage'].search(
-                [('of_auto_model_name', '=', 'sale.order'),
-                 ('sequence', '>', res.opportunity_id.stage_id.sequence)], order='sequence desc')
-            for stage in stages:
-                if stage.of_auto_field_id.name in vals:
-                    value = vals.get(stage.of_auto_field_id.name)
-                    ctx = {'value': value,
-                           'fields': fields,
-                           'self': self.sudo()}
-                    code_res = safe_eval("value %s" % stage.of_auto_comparison_code, ctx)
-                    if code_res:
-                        res.with_context(crm_stage_auto_update=True).opportunity_id.write({'stage_id': stage.id})
-                        break
-
-        return res
+        return super(SaleOrder, self).create(vals)
 
     @api.multi
     def write(self, values):
@@ -112,29 +95,6 @@ class SaleOrder(models.Model):
             values.update(state='sent')
 
         return super(SaleOrder, self).write(values)
-
-    @api.multi
-    def _write(self, values):
-        res = super(SaleOrder, self)._write(values)
-
-        # CRM stages
-        for rec in self:
-            if rec.opportunity_id:
-                stages = self.env['crm.stage'].search(
-                    [('of_auto_model_name', '=', 'sale.order'),
-                     ('sequence', '>', rec.opportunity_id.stage_id.sequence)], order='sequence desc')
-                for stage in stages:
-                    if stage.of_auto_field_id.name in values:
-                        value = values.get(stage.of_auto_field_id.name)
-                        ctx = {'value': value,
-                               'fields': fields,
-                               'self': self.sudo()}
-                        code_res = safe_eval("value %s" % stage.of_auto_comparison_code, ctx)
-                        if code_res:
-                            rec.with_context(crm_stage_auto_update=True).opportunity_id.write({'stage_id': stage.id})
-                            break
-
-        return res
 
     @api.multi
     def action_confirm(self):
