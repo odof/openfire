@@ -28,7 +28,7 @@ class OfPlanningIntervention(models.Model):
                            'self': self.sudo()}
                     code_res = safe_eval("value %s" % stage.of_auto_comparison_code, ctx)
                     if code_res:
-                        res.opportunity_id.write({'stage_id': stage.id})
+                        res.with_context(crm_stage_auto_update=True).opportunity_id.write({'stage_id': stage.id})
                         break
 
         return res
@@ -51,7 +51,7 @@ class OfPlanningIntervention(models.Model):
                                'self': self.sudo()}
                         code_res = safe_eval("value %s" % stage.of_auto_comparison_code, ctx)
                         if code_res:
-                            rec.opportunity_id.write({'stage_id': stage.id})
+                            rec.with_context(crm_stage_auto_update=True).opportunity_id.write({'stage_id': stage.id})
                             break
 
         return res

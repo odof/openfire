@@ -824,6 +824,9 @@
                             <field name="of_auto_field_id" options="{'no_create': True, 'no_open': True}" domain="[('model', '=', of_auto_model_name), ('store', '=', True)]"/>
                             <field name="of_auto_comparison_code"/>
                         </group>
+                        <group>
+                            <field name="of_manual_activity_id"/>
+                        </group>
                     </group>
                 </field>
             </field>

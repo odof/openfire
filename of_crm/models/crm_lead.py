@@ -274,6 +274,21 @@ class CrmLead(models.Model):
         super(CrmLead, self).write(vals)
         if partner_vals:
             self.partner_id.write(partner_vals)
+        if vals.get('stage_id') and not self._context.get('crm_stage_auto_update'):
+            stage = self.env['crm.stage'].browse(vals.get('stage_id'))
+            if stage.of_manual_activity_id:
+                # Mise à jour de l'état manuelle -> création d'une activité
+                for rec in self:
+                    self.env['of.crm.activity'].create(
+                        {'opportunity_id': rec.id,
+                         'title': stage.of_manual_activity_id.name,
+                         'type_id': stage.of_manual_activity_id.id,
+                         'date': fields.Datetime.from_string(fields.Datetime.now()[:-2] + '00'),
+                         'user_id': self.env.user.id,
+                         'vendor_id': rec.user_id and rec.user_id.id or self.env.user.id,
+                         'state': 'planned'}
+                    )
+
         return True
 
     # Recherche du code postal en mode préfixe
@@ -361,7 +376,7 @@ class CrmLead(models.Model):
                     result['activity']['today'] += 1
                 if today <= date_action <= today + timedelta(days=7):
                     result['activity']['next_7_days'] += 1
-                if date_action < today:
+                if activity.is_late:
                     result['activity']['overdue'] += 1
 
         activities_done = self.env['of.crm.activity'].\
@@ -434,6 +449,8 @@ class CRMStage(models.Model):
     of_auto_field_id = fields.Many2one(
         comodel_name='ir.model.fields', string=u"Champ")
     of_auto_comparison_code = fields.Char(string=u"Code de comparaison")
+    of_manual_activity_id = fields.Many2one(
+        comodel_name='crm.activity', string=u"Activité à créer en cas de mise à jour manuelle")
 
 
 class OFCRMActivity(models.Model):
