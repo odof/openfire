@@ -295,6 +295,11 @@
                             <field name="pdf_date_validite_devis" class="oe_inline"/>
                             <span>Afficher la date de validité dans le rapport PDF des devis</span>
                         </div>
+                        <label for="pdf_vt_pastille"/>
+                        <div name="pdf_vt_pastille">
+                            <field name="pdf_vt_pastille" class="oe_inline"/>
+                            <span>Afficher la date de visite technique dans une pastille d'information dans le rapport PDF des devis</span>
+                        </div>
                         <label for="pdf_afficher_multi_echeances"/>
                         <div name="pdf_afficher_multi_echeances">
                             <field name="pdf_afficher_multi_echeances" class="oe_inline"/>
@@ -415,6 +420,13 @@
         <field name="model">account.config.settings</field>
         <field name="inherit_id" ref="of_account_invoice_report.of_view_account_config_settings"/>
         <field name="arch" type="xml">
+            <xpath expr="//div[@name='pdf_display_product_ref']" position="after">
+                <label for="pdf_vt_pastille"/>
+                <div name="pdf_vt_pastille">
+                    <field name="pdf_vt_pastille" class="oe_inline"/>
+                    <span>Afficher la date de visite technique dans une pastille d'information dans le rapport PDF des factures</span>
+                </div>
+            </xpath>
             <xpath expr="//field[@name='group_warning_account']" position="after">
                 <field name="of_validate_pickings" widget="radio" class="oe_inline"/>
             </xpath>
