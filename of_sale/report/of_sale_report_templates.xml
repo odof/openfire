@@ -331,6 +331,27 @@
         </div>
     </xpath>
 
+    <xpath expr="//p[@t-if='o.comment']" position="before">
+        <p t-if="o.of_date_vt and not pdf_vt_pastille">
+            <t t-set="date_vt" t-value="o.of_date_vt[8:10] + '/' + o.of_date_vt[5:7] + '/' + o.of_date_vt[0:4]"/>
+            Date de visite technique : <span t-esc="date_vt"/>
+        </p>
+    </xpath>
+</template>
+
+<!-- ATTENTION
+La vue suivante se positionne sur le champ date_echeance, qui est ajouté directement dans
+  account.report_invoice_document par le module of_account.
+On ne peut donc pas intégrer cette partie dans sale.report_invoice_document_inherit_sale plus haut dans ce fichier.
+Sinon :
+ - Lors de la mise à jour de account, le champ date_echeance est temporairement retiré de la vue.
+ - Puis lors de la mise à jour de sale, la vue sale.report_invoice_layouted est mise à jour.
+ - Pour tester la vue, le module applique toutes les vues xml des modules chargés, y compris celles du module sale.
+ - La vue sale.report_invoice_document_inherit_sale est alors analysée AVANT d'avoir pu être temporairement mise à jour
+     avec la version du module sale (sans le date_echeance)
+ - Cela provoque donc une erreur lors de la mise à jour.
+-->
+<template id="of_report_invoice_document_inherit_sale" inherit_id="account.report_invoice_document">
     <xpath expr="//div[@name='date_echeance']" position="before">
         <div name="pdf_vt_pastille" t-if="o.of_date_vt and pdf_vt_pastille"
              style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
@@ -338,13 +359,6 @@
             <p t-field="o.of_date_vt"/>
         </div>
         <div t-if="o.of_date_vt and pdf_vt_pastille" style="display: table-cell; width: 4px;"/>
-    </xpath>
-
-    <xpath expr="//p[@t-if='o.comment']" position="before">
-        <p t-if="o.of_date_vt and not pdf_vt_pastille">
-            <t t-set="date_vt" t-value="o.of_date_vt[8:10] + '/' + o.of_date_vt[5:7] + '/' + o.of_date_vt[0:4]"/>
-            Date de visite technique : <span t-esc="date_vt"/>
-        </p>
     </xpath>
 </template>
 
