@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- OF CRM Activity Action views -->
+
+    <record id="of_crm_activity_action_form_view" model="ir.ui.view">
+        <field name="name">of.crm.activity.action.form.view</field>
+        <field name="model">of.crm.activity.action</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="type" invisible="1"/>
+                <group>
+                    <field name="date" required="1" attrs="{'invisible': [('type', '!=', 'realize')]}"/>
+                </group>
+                <separator string="Compte-rendu" attrs="{'invisible': [('type', '!=', 'realize')]}"/>
+                <separator string="Raison d'annulation" attrs="{'invisible': [('type', '!=', 'cancel')]}"/>
+                <field name="note"/>
+                <footer>
+                    <button name="action_realize" string="Valider" type="object" class="btn btn-primary"
+                            attrs="{'invisible': [('type', '!=', 'realize')]}"/>
+                    <button name="action_cancel" string="Valider" type="object" class="btn btn-primary"
+                            attrs="{'invisible': [('type', '!=', 'cancel')]}"/>
+                    <button string="Annuler" class="btn btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_crm_activity_action_realize_action" model="ir.actions.act_window">
+        <field name="name">Réaliser une activité</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.crm.activity.action</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_crm_activity_action_form_view"/>
+        <field name="target">new</field>
+        <field name="context">{'default_type': 'realize'}</field>
+    </record>
+
+    <record id="of_crm_activity_action_cancel_action" model="ir.actions.act_window">
+        <field name="name">Annuler une activité</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.crm.activity.action</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_crm_activity_action_form_view"/>
+        <field name="target">new</field>
+        <field name="context">{'default_type': 'cancel'}</field>
+    </record>
+
+</odoo>

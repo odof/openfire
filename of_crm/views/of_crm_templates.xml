@@ -4,6 +4,7 @@
         <xpath expr="." position="inside">
             <link rel="stylesheet" href="/of_crm/static/src/less/of_crm.less"/>
             <script type="text/javascript" src="/of_crm/static/src/js/of_kanban_view.js"></script>
+            <script type="text/javascript" src="/of_crm/static/src/js/of_sales_team_dashboard.js"></script>
         </xpath>
     </template>
 </odoo>
