@@ -259,6 +259,22 @@ class ProcurementOrder(models.Model):
             sale_order = sale_comp and sale_comp.order_id or False
         return sale_order
 
+
+class StockPicking(models.Model):
+    _inherit = 'stock.picking'
+
+    @api.one
+    @api.depends('move_lines.procurement_id.sale_line_id.order_id',
+                 'move_lines.procurement_id.of_sale_comp_id.kit_id.order_line_id.order_id')
+    def _compute_sale_id(self):
+        for move in self.move_lines:
+            if move.procurement_id.sale_line_id:
+                self.sale_id = move.procurement_id.sale_line_id.order_id
+                return
+            elif move.procurement_id.of_sale_comp_id.kit_id.order_line_id:
+                self.sale_id = move.procurement_id.of_sale_comp_id.kit_id.order_line_id.order_id
+
+
 class StockMove(models.Model):
     _inherit = "stock.move"
 
@@ -277,3 +293,7 @@ class StockMove(models.Model):
             if qty_delivered != 0:
                 line.qty_delivered = qty_delivered
         return result
+
+    @api.model
+    def create(self, vals):
+        return super(StockMove, self).create(vals)

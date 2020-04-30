@@ -90,6 +90,9 @@ class ProcurementOrder(models.Model):
             move = self.move_dest_id
             sale_line = move and move.procurement_id and move.procurement_id.sale_line_id
         sale_order = sale_line and sale_line.order_id or False
+        if not sale_order:
+            sale_order = self.move_dest_id.picking_id.sale_id
+
         return sale_order
 
     @api.multi
@@ -145,7 +148,7 @@ class ProcurementOrder(models.Model):
 
                 vals = proc._prepare_purchase_order(partner)
                 po = self.env['purchase.order'].create(vals)
-                name = (procurement.group_id and (procurement.group_id.name + ":") or "") + (procurement.name != "/" and procurement.name or procurement.move_dest_id.raw_material_production_id and procurement.move_dest_id.raw_material_production_id.name or "")
+                name = (procurement.group_id and (procurement.group_id.name + ":") or "") + (procurement.name != "/" and procurement.name or "")
                 message = _("This purchase order has been created from: <a href=# data-oe-model=procurement.order data-oe-id=%d>%s</a>") % (procurement.id, name)
                 po.message_post(body=message)
                 cache[domain] = po
