@@ -1240,14 +1240,19 @@ class AccountInvoice(models.Model):
             return self
 
         invoices = self
-        to_check = group_paiements_lines.mapped('sale_line_ids').mapped('invoice_lines').mapped('invoice_id')
+        to_check = (group_paiements_lines
+                    .mapped('sale_line_ids')
+                    .mapped('invoice_lines')
+                    .mapped('invoice_id')
+                    .filtered(lambda i: i.state != 'cancel'))
         while to_check:
             invoices |= to_check
             to_check = (to_check
                         .mapped('invoice_line_ids')
                         .mapped('sale_line_ids')
                         .mapped('invoice_lines')
-                        .mapped('invoice_id')) - invoices
+                        .mapped('invoice_id')
+                        .filtered(lambda i: i.state != 'cancel')) - invoices
 
         refunds = invoices.filtered(lambda inv: inv.type != self.type)
         invoices -= refunds
