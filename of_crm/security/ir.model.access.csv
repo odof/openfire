@@ -14,3 +14,4 @@ access_of_crm_projet_attr_select_partner_manager,of.crm.projet.attr.select.partn
 access_of_crm_activity_user,access.of.crm.activity.user,model_of_crm_activity,base.group_user,1,1,1,0
 access_of_crm_activity_admin,access.of.crm.activity.admin,model_of_crm_activity,of_base.of_group_root_only,1,1,1,1
 access_of_crm_funnel_conversion_user,access.of.crm.funnel.conversion.user,model_of_crm_funnel_conversion,base.group_user,1,0,0,0
+access_of_crm_funnel_conversion2_user,access.of.crm.funnel.conversion2.user,model_of_crm_funnel_conversion2,base.group_user,1,0,0,0

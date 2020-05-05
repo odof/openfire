@@ -84,7 +84,8 @@
                         </t>
                         <t t-elif="o._name == 'sale.order'">
                             <!-- Si le document est de type devis -->
-                            <span t-if="o.state in ['draft','sent']">Devis</span>
+                            <span t-if="o.state == 'draft'">Estimation</span>
+                            <span t-if="o.state == 'sent'">Devis</span>
                             <span t-if="o.state not in ['draft','sent']">Bon de commande</span>
                             <br/>
                         </t>
