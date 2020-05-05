@@ -530,6 +530,8 @@ class OFCRMActivity(models.Model):
     def _onchange_type_id(self):
         if self.type_id and not self.title:
             self.title = self.type_id.name
+        if self.type_id and self.type_id.days:
+            self.date = fields.Datetime.to_string(datetime.now() + timedelta(days=self.type_id.days))
 
     @api.multi
     def _compute_custom_colors(self):
