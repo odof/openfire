@@ -41,6 +41,7 @@ def _tz_get(self):
 
 class HREmployee(models.Model):
     _inherit = "hr.employee"
+    _order = "sequence"
 
     def _default_of_tz(self):
         return self.env.user.tz or 'Europe/Paris'
