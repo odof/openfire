@@ -104,39 +104,6 @@
                             <field name="of_tz_offset" invisible="1"/>
                         </group>
                     </group>
-                    <group invisible="1" name="horaires_advanced" attrs="{'invisible': [('of_mode_horaires', '!=', 'advanced')]}">
-                        <group name="horaires">
-                            <separator string="Horaires de travail" colspan="2"/>
-                            <field name="of_segment_ids" nolabel="1" colspan="2">
-                                <tree>
-                                    <field name="date_deb"/>
-                                    <field name="date_fin"/>
-                                    <field name="creneau_ids" widget="many2many_tags"/>
-                                    <field name="permanent"/>
-                                </tree>
-                                <form>
-                                    <group>
-                                        <field name="date_deb"/>
-                                        <field name="date_fin"/>
-                                        <field name="permanent"/>
-                                        <field name="modele_id" readonly="0"
-                                               context="{'default_creneau_ids':creneau_ids}"/>
-                                    </group>
-                                    <field name="creneau_ids"/>
-                                </form>
-                            </field>
-                        </group>
-
-                    </group>
-                    <group invisible="1" name="horaires_easy" attrs="{'invisible': [('of_mode_horaires', '!=', 'easy')]}" col="4" colspan="4">
-                        <group name="horaires" string="Horaires" col="3" colspan="2">
-                            <field name="of_hor_md" string="Matin" widget="float_time" colspan="2" attrs="{'required': [('of_mode_horaires', '=', 'easy')]}"/>
-                            <field name="of_hor_mf" widget="float_time" colspan="1" nolabel="1" attrs="{'required': [('of_mode_horaires', '=', 'easy')]}"/>
-                            <field name="of_hor_ad" string="Après-midi" widget="float_time" colspan="2" attrs="{'required': [('of_mode_horaires', '=', 'easy')]}"/>
-                            <field name="of_hor_af" widget="float_time" colspan="1" nolabel="1" attrs="{'required': [('of_mode_horaires', '=', 'easy')]}"/>
-                            <field name="of_jour_ids" widget="many2many_tags" colspan="3" attrs="{'required': [('of_mode_horaires', '=', 'easy')]}"/>
-                        </group>
-                    </group>
                 </page>
             </xpath>
         </field>
