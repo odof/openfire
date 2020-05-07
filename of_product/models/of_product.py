@@ -3,6 +3,7 @@
 from odoo import api, models, fields
 import odoo.addons.decimal_precision as dp
 
+
 class ProductTemplate(models.Model):
     _inherit = "product.template"
 
@@ -33,9 +34,18 @@ class ProductTemplate(models.Model):
     of_seller_product_category_name = fields.Char(related="seller_ids.of_product_category_name")
     of_seller_delay = fields.Integer(related="seller_ids.delay")
 
-    of_tag_ids = fields.Many2many('of.product.template.tag', column1='product_id', column2='tag_id', string=u'Étiquettes')
+    of_tag_ids = fields.Many2many(
+        'of.product.template.tag', column1='product_id', column2='tag_id', string=u'Étiquettes')
 
     of_forbidden_discount = fields.Boolean(string=u"Remise interdite")
+
+    # Structure de prix
+    of_purchase_transport = fields.Float(string=u"Transport sur achat")
+    of_sale_transport = fields.Float(string=u"Transport sur vente")
+    of_sale_coeff = fields.Float(string=u"Coefficient de vente")
+    of_other_logistic_costs = fields.Float(string=u"Autres frais logistiques")
+    of_misc_taxes = fields.Float(string=u"Taxes divers")
+    of_misc_costs = fields.Float(string=u"Frais divers")
 
     @api.multi
     @api.depends('lst_price', 'standard_price')
@@ -60,6 +70,7 @@ class ProductTemplate(models.Model):
     def onchange_of_seller_price(self):
         if self.seller_ids:
             self.seller_ids[0].price = self.of_seller_price
+
 
 class ProductProduct(models.Model):
     _inherit = "product.product"
@@ -101,6 +112,7 @@ class ProductProduct(models.Model):
             self.of_propage_cout(cout)
         return True
 
+
 class ProductSupplierInfo(models.Model):
     _inherit = "product.supplierinfo"
 
@@ -127,6 +139,7 @@ class ProductSupplierInfo(models.Model):
             else:  # division par 0!
                 supinfo.remise = -100
 
+
 class ProductTemplateTag(models.Model):
     _name = "of.product.template.tag"
 
@@ -150,7 +163,8 @@ class ProductCategory(models.Model):
         if default is None:
             default = {}
         default['name'] = self.name + u" (Copie)"
-        default['property_account_creditor_price_difference_categ'] = self.property_account_creditor_price_difference_categ
+        default['property_account_creditor_price_difference_categ'] = \
+            self.property_account_creditor_price_difference_categ
         default['property_account_income_categ_id'] = self.property_account_income_categ_id
         default['property_account_expense_categ_id'] = self.property_account_expense_categ_id
         default['property_stock_account_input_categ_id'] = self.property_stock_account_input_categ_id
