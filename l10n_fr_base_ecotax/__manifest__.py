@@ -7,7 +7,11 @@
     'license': 'AGPL-3',
     'summary': "Ecotax for France",
     'author': "OpenFire",
-    'depends': ['account', 'sale'],
+    'depends': [
+        'account',
+        'sale',
+        'of_product',
+    ],
     'data': [
         'views/product_view.xml',
         'views/sale_order_report_templates.xml',

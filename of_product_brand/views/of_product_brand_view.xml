@@ -137,7 +137,7 @@
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_only_form_view"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='default_code']" position="after">
+            <xpath expr="//field[@name='default_code']" position="before">
                 <field name="of_previous_brand_id" invisible="1"/>
                 <field name="brand_id"/>
             </xpath>
@@ -148,7 +148,7 @@
         <field name="model">product.product</field>
         <field name="inherit_id" ref="product.product_normal_form_view"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='default_code']" position="after">
+            <xpath expr="//field[@name='default_code']" position="before">
                 <field name="of_previous_brand_id" invisible="1"/>
                 <field name="brand_id"/>
             </xpath>

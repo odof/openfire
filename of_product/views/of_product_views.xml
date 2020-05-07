@@ -10,6 +10,8 @@
             <field name="inherit_id" ref="product.product_template_form_view"/>
             <field name="priority" eval="1"/>
             <field name="arch" type="xml">
+                <xpath expr="//field[@name='sale_ok']/parent::div" position="replace"/>
+                <xpath expr="//field[@name='purchase_ok']/parent::div" position="replace"/>
                 <!-- étiquettes -->
                 <xpath expr="//field[@name='categ_id']" position="after">
                     <field name="of_tag_ids" widget="many2many_tags"/>
@@ -36,17 +38,20 @@
                         <field name="uom_po_id" groups="product.group_uom" options="{'no_create': True}"/>
                         <field name="of_uom_category_id" invisible="1"/>
                         <field name="currency_id" invisible="1"/>
+                        <separator string="Divers" colspan="2"/>
+                        <field name="sale_ok"/>
+                        <field name="purchase_ok"/>
                     </group>
                 </xpath>
                 <xpath expr="//group[@name='group_general']" position="attributes">
                     <attribute name="cols" eval="2"/>
                 </xpath>
                 <xpath expr="//group[@name='group_general']" position="inside">
-                    <field name="list_price" widget='monetary' options="{'currency_field': 'currency_id'}"/>
                     <label for="standard_price" groups="base.group_user"/>
                     <div name="standard_price_uom" groups="base.group_user">
                         <field name="standard_price" widget='monetary' options="{'currency_field': 'currency_id'}"/>
                     </div>
+                    <field name="list_price" widget='monetary' options="{'currency_field': 'currency_id'}"/>
                     <label for="marge"/>
                     <span><field name="marge" class="oe_inline"/>%</span>
                     <field name="of_forbidden_discount"/>
@@ -65,6 +70,42 @@
                 </xpath>
                 <xpath expr="//notebook//page[@name='notes']" position="before">
                     <page string="Technique" name="technique" invisible="1"/>
+                </xpath>
+                <xpath expr="//group[@name='email_template_and_project']" position="after">
+                    <group name="price_struct" string="Structure de prix">
+                        <field name="of_purchase_transport"/>
+                        <field name="of_sale_transport"/>
+                        <field name="of_sale_coeff"/>
+                        <field name="of_other_logistic_costs"/>
+                        <field name="of_misc_taxes"/>
+                        <field name="of_misc_costs"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Déplacement du champ Code barre -->
+        <record id="of_product_product_template_only_form_view" model="ir.ui.view">
+            <field name="name">of.product.product.template.only.form.view</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='barcode']" position="replace"/>
+                <xpath expr="//field[@name='route_ids']" position="before">
+                    <field name="barcode"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Déplacement du champ Code barre -->
+        <record id="of_product_product_normal_form_view" model="ir.ui.view">
+            <field name="name">of.product.product.normal.form.view</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='barcode']" position="replace"/>
+                <xpath expr="//field[@name='route_ids']" position="before">
+                    <field name="barcode"/>
                 </xpath>
             </field>
         </record>
