@@ -90,4 +90,4 @@ class GestionPrix(models.TransientModel):
     @api.multi
     def _appliquer(self, values):
         super(GestionPrix, self)._appliquer(values)
-        self.order_id.order_line._refresh_price_unit()
+        self.order_id.order_line.with_context(clear_cache='of_gestion_prix')._refresh_price_unit()

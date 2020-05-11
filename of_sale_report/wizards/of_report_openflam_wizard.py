@@ -927,12 +927,16 @@ class OFRapportOpenflamWizard(models.TransientModel):
                 for reconcile in reconciles:
                     affectations.append((reconcile.debit_move_id.move_id, reconcile.amount))
                     total += reconcile.amount
+                partner_account = payment.partner_id.with_context(force_company=company.id).property_account_receivable_id
 
                 # Vérification que le montant total lettré est égal au montant du paiement
                 if float_compare(total, payment.amount, 2) == 0:
                     # Calcul du montant affecté aux différents comptes de taxes
                     for invoice_move, amount in affectations:
-                        percent = amount / invoice_move.amount
+                        invoice_partner_debit = invoice_move.line_ids.filtered(lambda l: l.account_id.id == partner_account.id and l.debit)
+                        invoice_partner_credit = invoice_move.line_ids.filtered(lambda l: l.account_id.id == partner_account.id and l.credit)
+                        invoice_partner_amount = sum(invoice_partner_debit.mapped('debit')) - sum(invoice_partner_credit.mapped('credit'))
+                        percent = amount / invoice_partner_amount
                         if payment not in payments_dict:
                             payments_dict[payment] = {}
                         payment_dict = payments_dict[payment]
