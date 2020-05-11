@@ -26,6 +26,14 @@
             <button name="action_invoice_sent" position="attributes">
                 <attribute name="attrs">{'invisible':[('state','in',('cancel','draft'))]}</attribute>
             </button>
+            <field name="partner_id" position="after">
+                <label string="Coordonnées client"/>
+                <div>
+                    <field name="of_partner_phone" nolabel="1"/>
+                    <field name="of_partner_mobile" nolabel="1" style="margin-left:10px;"/><br/>
+                    <field name="of_partner_email" nolabel="1"/>
+                </div>
+            </field>
             <field name="fiscal_position_id" position="replace"/>
             <field name="date_invoice" position="after">
                 <field name="fiscal_position_id" options="{'no_open': True}"/>
