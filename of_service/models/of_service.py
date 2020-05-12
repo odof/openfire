@@ -11,6 +11,7 @@ from dateutil.rrule import (rrule,
                             DAILY)
 from odoo.tools.safe_eval import safe_eval
 from odoo.exceptions import UserError
+from odoo.addons.of_utils.models.of_utils import se_chevauchent
 
 import math
 
@@ -178,7 +179,14 @@ class OfService(models.Model):
 
     @api.multi
     def get_state_poncrec_date(self, date_eval=fields.Date.today(), to_plan_avance=False):
-        """Calcul l'état à une date donnée, est prévu pour être utilisé pour des dates futures"""
+        """
+        Calcule l'état d'une intervention à une date donnée, est prévu pour être utilisé pour des dates futures
+        (en raison du champ duree_restante)
+        On pourra créer une fonction get_durees_date pour faire fonctionner get_state_poncrec_date dans le passé
+        :param date_eval: Date à laquelle on veut connaître l'état des interventions
+        :param to_plan_avance: True pour considérer qu'une intervention est à 'to_plan' 1 mois avant sa date_next
+        :return: État de l'intervention à la date donnée
+        """
         self.ensure_one()
         un_mois = relativedelta(months=1)
         date_eval_da = fields.Date.from_string(date_eval)
@@ -195,9 +203,12 @@ class OfService(models.Model):
                           or date_next_da + relativedelta(days=13)
             if self.recurrence:
                 fin_contrat_da = self.date_fin_contrat and fields.Date.from_string(self.date_fin_contrat) or False
-                # prochaine planification à faire moins d'un mois après
+                # le service expire avant la date donnée ou avant la date de prochaine planif: terminé
+                if fin_contrat_da and (fin_contrat_da < date_next_da or fin_contrat_da < date_eval_da):
+                    service_state = 'done'
+                # chevauchement de la fourchette de planif de l'intervention et la ou les dates d'évaluations
                 # et pas de dernier RDV ou dernier RDV plus d'un mois avant: à planifier
-                if il_y_a_un_mois_da <= date_next_da <= fin_to_plan_da and \
+                elif se_chevauchent(date_next_da, date_fin_da, date_eval_da, fin_to_plan_da, strict=False) and \
                         (not date_last_da or date_last_da < il_y_a_un_mois_da):
                     service_state = 'to_plan'
                 # dernier RDV moins d'un mois avant: planifié récemment
@@ -209,9 +220,6 @@ class OfService(models.Model):
                 # fin de prochaine planification avant la date donnée: en retard
                 elif date_fin_da < date_eval_da:
                     service_state = 'late'
-                # le service expire avant la date donnée ou avant la date de prochaine planif: terminé
-                elif fin_contrat_da and (fin_contrat_da < date_next_da or fin_contrat_da < date_eval_da):
-                    service_state = 'done'
                 else:  # par défaut
                     service_state = 'progress'
             else:
