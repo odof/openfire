@@ -26,12 +26,7 @@ class OfService(models.Model):
         # Lors de la 1ère mise à jour après la refonte des planning (sept. 2019), on migre les données existantes.
         cr.execute("SELECT 1 FROM information_schema.columns WHERE table_name = 'of_service' AND column_name = 'recurrence'")
         existe_avant = bool(cr.fetchall())
-        # /* modifications champs date_next, date_next_fin, date_fin, date_fin_contrat
-        # à retirer dans quelques semaines
-        cr.execute(
-            "SELECT 1 FROM information_schema.columns WHERE table_name = 'of_service' AND column_name = 'date_fin_contrat'")
-        date_fin_contrat_avant = bool(cr.fetchall())
-        ### */
+
         res = super(OfService, self)._auto_init()
 
         # Interdiction pour les interventions d'avoir une durée nulle: on passe la durée à 1 et l'état à 'annulé'
@@ -55,7 +50,7 @@ class OfService(models.Model):
 
             # On demande la mise à jour du champ date_next des services
             cr.execute("INSERT INTO ir_config_parameter(key,value) "
-                       "VALUES ('of_service_compute_date_next', 'include_date_fin')")
+                       "VALUES ('of_service_compute_date_next', 'init_date_fin_contrat')")
         return res
 
     @api.model
@@ -64,35 +59,36 @@ class OfService(models.Model):
         cr.execute("SELECT value FROM ir_config_parameter WHERE key = 'of_service_compute_date_next'")
         values = cr.fetchall()
         if not values:
-            return
+            cr.execute("SELECT id FROM of_service WHERE date_fin IS NULL or date_next > date_fin LIMIT 1")
+            if not cr.fetchall():
+                # Tout est en ordre, pas d'incohérence dans les dates
+                return
         cr.execute("DELETE FROM ir_config_parameter WHERE key = 'of_service_compute_date_next'")
-        include_date_fin = values[0][0] == 'include_date_fin'
-
-        all_services = self.search([])
-        services = all_services.filtered(
-            lambda s: (s.recurrence
-                       and s.date_last
-                       and (not s.date_next
-                            or fields.Date.from_string(s.date_last) >= fields.Date.from_string(s.date_next))))
-
-        if include_date_fin:
+        # lors du passage au nouveau planning, il faut initialiser le champ date_fin_contrat
+        if values and values[0][0] == 'init_date_fin_contrat':
             # On peuple le champ date_fin_contrat des services recurrents avec le champ date_fin
             cr.execute("UPDATE of_service "
                        "SET date_fin_contrat = date_fin "
                        "WHERE recurrence = 't'")
 
-        for service in services:
+        all_services = self.search([])
+        services_avec_last = all_services.filtered(
+            lambda s: (s.recurrence
+                       and s.date_last
+                       and (not s.date_next
+                            or s.date_last >= s.date_next)))
+        for service in services_avec_last:
             date_next = service.get_next_date(service.date_last)
-            if include_date_fin:
-                cr.execute("UPDATE of_service "
-                           "SET date_fin = (%s::date + interval '1 month' - interval '1 day'), "
-                           "    date_next = %s "
-                           "WHERE recurrence = 't' AND id = %s", (date_next, date_next, service.id))
-            else:
-                cr.execute("UPDATE of_service "
-                           "SET date_next = %s "
-                           "WHERE recurrence = 't' AND id = %s "
-                           "  AND date_fin >= %s", (date_next, service.id, date_next))
+            cr.execute("UPDATE of_service "
+                       "SET date_fin = (%s::date + interval '1 month' - interval '1 day'), "
+                       "    date_next = %s "
+                       "WHERE id = %s", (date_next, date_next, service.id))
+
+        service_incoherence = all_services.filtered(lambda s: s.date_next > s.date_fin)
+        for service in service_incoherence:
+            cr.execute("UPDATE of_service "
+                       "SET date_fin = (%s::date + interval '1 month' - interval '1 day')"
+                       "WHERE id = %s", (service.date_next, service.id))
 
         # with_context pour bien récupérer les données en DB
         all_services.with_context(vide_cache=True)._compute_state_poncrec()
