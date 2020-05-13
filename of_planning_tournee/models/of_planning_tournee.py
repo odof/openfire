@@ -393,7 +393,7 @@ class HrEmployee(models.Model):
     of_tournee_ids = fields.One2many('of.planning.tournee', 'employee_id', string=u"Tournées")
 
 
-class OFHorairesSegment(models.Model):
+class OFHoraireSegment(models.Model):
     _inherit = 'of.horaire.segment'
 
     @api.model
@@ -412,7 +412,7 @@ class OFHorairesSegment(models.Model):
         employee_id = vals.get('employee_id')
         deb = vals.get('date_deb')
         fin = vals.get('date_fin')
-        res = super(OFHorairesSegment, self).create(vals)
+        res = super(OFHoraireSegment, self).create(vals)
         self.recompute_is_complet_tournee(employee_id, deb, fin)
         return res
 
@@ -421,7 +421,7 @@ class OFHorairesSegment(models.Model):
         employee_id = vals.get('employee_id') or self.employee_id and self.employee_id.id
         deb = min(vals.get('date_deb', self.date_deb), self.date_deb)
         fin = max(vals.get('date_fin', self.date_fin), self.date_fin)
-        res = super(OFHorairesSegment, self).write(vals)
+        res = super(OFHoraireSegment, self).write(vals)
         self.recompute_is_complet_tournee(employee_id, deb, fin)
         return res
 
@@ -430,6 +430,6 @@ class OFHorairesSegment(models.Model):
         employee_id = self.employee_id and self.employee_id.id
         deb = self.date_deb
         fin = self.date_fin
-        res = super(OFHorairesSegment, self).unlink()
+        res = super(OFHoraireSegment, self).unlink()
         self.recompute_is_complet_tournee(employee_id, deb, fin)
         return res

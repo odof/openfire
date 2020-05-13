@@ -33,13 +33,6 @@
         <field name="model">of.horaire.segment.wizard</field>
         <field name="arch" type="xml">
             <form>
-                <!--script>
-                    $(document).ready(function(){
-                        // Cacher les boutons "Sauvegarder" et "Annuler" quand on clique sur un créneau du calendrier
-                        var len = $(".modal-footer").length;
-                        $(".modal-footer").eq(len-1).hide();
-                    });
-                </script-->
                 <script>
                     $(document).ready(function(){
                         // élargir le pop-up
@@ -131,9 +124,19 @@
                         </group>
                         <!-- invisible si au moins un créneau -->
                         <group colspan="2">
-                            <i colspan="2" class="oe_grey" attrs="{'invisible': ['|', '&amp;', ('mode_horaires', '=', 'advanced'), ('creneau_ids', '!=', []),
-                            '&amp;', '|', ('mode_horaires', '=', 'easy'), ('hor_md', '!=', '_field_hor_mf'), ('hor_ad', '!=', '_field_hor_af')]}">
-                                Si vous ne choisissez aucun créneau, cela revient à dire que cet employé ne travaille pas entre les dates de début et de fin.
+                            <i colspan="2" class="oe_grey" attrs="{
+                                'invisible': [
+                                    '|',
+                                        '&amp;',
+                                            ('mode_horaires', '=', 'advanced'),
+                                            ('creneau_ids', '!=', []),
+                                        '&amp;',
+                                            '|',
+                                                ('mode_horaires', '=', 'easy'),
+                                                ('hor_md', '!=', '_field_hor_mf'),
+                                            ('hor_ad', '!=', '_field_hor_af')]}">
+                                Si vous ne choisissez aucun créneau, cela revient à dire que cet employé ne travaille
+                                pas entre les dates de début et de fin.
                             </i>
                         </group>
                     </group>
@@ -146,9 +149,6 @@
                 </group>
 
                 <footer>
-                    <!--attrs="{'invisible': ['|', ('mode', '!=', 'create'), ('result_recap', '=', False)]}"
-                    attrs="{'invisible': [('result_recap', '!=', False)]}"
-                    -->
                     <button name="button_create_edit" string="Créer horaires" class="btn btn-primary" type="object"
                       attrs="{'invisible': ['|', ('mode', '!=', 'create'), ('remplacement', '=', True)]}"/>
                     <button name="button_create_edit" string="Modifier horaires" class="btn btn-primary" type="object"
@@ -205,17 +205,5 @@
         target="new"
         groups="hr.group_hr_manager"
     />
-
-    <!--act_window
-        name="Résoudre un chevauchement de fiches horaires"
-        res_model="of.horaire.segment.choose.wizard"
-        view_mode="form"
-        view_id="of_horaire_segment_choose_form_view"
-        id="action_of_horaire_segment_choose_form_view"
-        target="new"
-        groups="hr.group_hr_manager"
-    /-->
-
-
 
 </odoo>

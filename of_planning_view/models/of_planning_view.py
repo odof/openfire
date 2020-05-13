@@ -192,7 +192,7 @@ class OfPlanningIntervention(models.Model):
 
         # On récupère les segments des employés s'ils ne sont pas fournis en paramètre
         if not horaires_list_dict:
-            horaires_list_dict = employees.get_horaires_list_dict(date_start, date_stop)
+            horaires_list_dict = employees.get_horaires(date_start, date_stop)
 
         # emp_info_force_min_date utilisé dans le fichier des tests
         date_today_str = self._context.get('emp_info_force_min_date', fields.Date.today())
