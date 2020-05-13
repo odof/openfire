@@ -23,11 +23,13 @@ var X2ManyCalendarView = CalendarView.extend({
 });
 
 var One2ManyCalendarView = X2ManyCalendarView.extend({
-    // Make modifications here about things that are both usable for calendar views of One2many fields. overwrites X2ManyCalendarView
+    // Make modifications here about things that are both usable for calendar views of One2many fields.
+    // Overwrites X2ManyCalendarView
 });
 
 var Many2ManyCalendarView = X2ManyCalendarView.extend({
-    // Make modifications here about things that are both usable for calendar views of Many2many and One2many fields. overwrites X2ManyCalendarView
+    // Make modifications here about things that are both usable for calendar views of Many2many and One2many fields.
+    // Overwrites X2ManyCalendarView
 });
 
 core.view_registry
