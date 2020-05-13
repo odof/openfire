@@ -2,8 +2,9 @@
 
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError
-from datetime import datetime, timedelta
+from datetime import timedelta
 from odoo.addons.of_utils.models.of_utils import se_chevauchent, format_date
+
 
 class OFHoraireSaveModeleWizard(models.TransientModel):
     _name = 'of.horaire.save.modele.wizard'
@@ -41,7 +42,7 @@ class OFHoraireSaveModeleWizard(models.TransientModel):
             'creneau_ids': [(6, 0, self.creneau_ids.ids)],
         })
         self.fait = True
-        return {'type': 'ir.actions.do_nothing'}  #self.env['of.horaire.modele'].search([('name', '=', 'BB')]).creneau_ids
+        return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
     def action_retour(self):
@@ -50,6 +51,7 @@ class OFHoraireSaveModeleWizard(models.TransientModel):
         action = self.env.ref('of_calendar.action_of_horaire_segment_' + self.mode + '_form_view').read()[0]
         action['res_id'] = self.wizard_id.id
         return action
+
 
 class OFHoraireSegmentWizard(models.TransientModel):
     _name = 'of.horaire.segment.wizard'
@@ -135,6 +137,109 @@ class OFHoraireSegmentWizard(models.TransientModel):
     # Pour la modification et la suppression
     segment_id = fields.Many2one('of.horaire.segment', string=u"Période concernée")#, domain=_get_segment_id_domain)
 
+    # @api.depends
+
+    @api.multi
+    @api.depends('creneau_ids', 'seg_exist_ids', 'date_deb', 'date_fin', 'permanent')
+    def _compute_horaires_recap(self):
+        lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
+
+        def format_date(date):
+            return fields.Date.from_string(date).strftime(lang.date_format)
+
+        def formate_creneaux(creneaux):
+            return u'<p>\n&nbsp;&nbsp;&nbsp;' + u'<br/>\n&nbsp;&nbsp;&nbsp;'.join(
+                creneaux.format_str_list()) + u'</p>\n'
+
+        for wizard in self:
+            if not self.seg_exist_ids or not self.date_deb or not self.date_fin or self.permanent:
+                self.seg_1_horaires_recap = False
+                self.seg_exist_recap = False
+                self.result_recap = False
+            else:
+                seg_exist_pluriel = len(self.seg_exist_ids) > 1
+                recap_1 = u'<div><i>Vous avez entré la période horaire suivante :</i></div>'
+                recap_1 += u'<div colspan="2" style="text-align: left;">'
+                recap_1 += u'<p><b style="color: deepskyblue;">Du ' + format_date(
+                    self.date_deb) + u' au ' + format_date(self.date_fin) + u'</b></p>'
+                recap_1 += u'<br/>\n&nbsp;&nbsp;&nbsp;'.join(self.creneau_ids.format_str_list()) + u'</div>\n'
+                wizard.seg_1_horaires_recap = recap_1
+                if seg_exist_pluriel:
+                    recap_2 = u'<div><i>Elle entre en conflit avec les périodes existantes suivantes :</i></div>'
+                else:
+                    recap_2 = u'<div><i>Elle entre en conflit avec la période existante suivante :</i></div>'
+                recap_2 += u'<table colspan="2" style="width: 100%; text-align: left;">'
+                for segment in self.seg_exist_ids:
+                    # recap_2 += '<tr><td style="min-widht: ' + str(pourcent) + '%; border:1px solid black;">'
+                    recap_2 += u'<tr><td>'
+                    recap_2 += u'<p><b style="color: blue">Du ' + format_date(segment.date_deb) + u' au ' + format_date(
+                        segment.date_fin) + u'</b></p>'
+                    recap_2 += formate_creneaux(segment.creneau_ids) + u'</td></tr>'
+                recap_2 += u'</table>'
+                wizard.seg_exist_recap = recap_2
+
+                un_jour = timedelta(days=1)
+                premier_fin_da = fields.Date.from_string(self.date_deb) - un_jour
+                premier_fin_str = fields.Date.to_string(premier_fin_da)
+                premier_seg = self.seg_exist_ids[0]
+                dernier_deb_da = fields.Date.from_string(self.date_fin) + un_jour
+                dernier_deb_str = fields.Date.to_string(dernier_deb_da)
+                dernier_seg = self.seg_exist_ids[-1]
+
+                if seg_exist_pluriel:
+                    recap_3 = u'<div><i>Si vous remplacez les périodes existantes, Le résultat sera le suivant : </i></div>'
+                else:
+                    recap_3 = u'<div><i>Si vous remplacez la période existante, Le résultat sera le suivant : </i></div>'
+                recap_3 += u'<table colspan="2" style="width: 100%; text-align: left">'
+
+                if premier_seg.date_deb <= premier_fin_str:
+                    recap_3 += u'</tr><td>'
+                    recap_3 += u'<p><b style="color: blue">Du ' + format_date(
+                        premier_seg.date_deb) + u' au <span style="color:red">' + \
+                               format_date(premier_fin_str) + u'</span></b></p>'
+                    recap_3 += formate_creneaux(premier_seg.creneau_ids) + u'</td></tr>'
+                recap_3 += u'<tr><td>'
+                recap_3 += u'<p><b style="color: deepskyblue">Du ' + format_date(self.date_deb) + u' au ' + format_date(
+                    self.date_fin) + u'</b></p>'
+                recap_3 += formate_creneaux(self.creneau_ids) + u'</td></tr>'
+                if dernier_deb_str <= dernier_seg.date_fin:
+                    recap_3 += u'<tr><td>'
+                    recap_3 += u'<p><b style="color: blue">Du <span style="color:red">' + format_date(
+                        dernier_deb_str) + u'</span> au ' + \
+                               format_date(dernier_seg.date_fin) + u'</b></p>'
+                    recap_3 += formate_creneaux(dernier_seg.creneau_ids) + u'</td></tr>'
+                recap_3 += u'</table>'
+                wizard.result_recap = recap_3
+
+    # @api.onchange
+
+    @api.multi
+    @api.onchange('date_deb')
+    def onchange_date_deb(self):
+        self.ensure_one()
+        self.remplacement = False
+        if self.date_deb and not self.permanent:
+            self.date_fin = self.date_deb
+
+    @api.multi
+    @api.depends('permanent')
+    def onchange_permanent(self):
+        for wizard in self:
+            if wizard.permanent and wizard.employee_id.of_segment_ids:
+                seg_exist = wizard.employee_id.of_segment_ids.filtered(lambda s: s.permanent)
+                wizard.premier_seg = not seg_exist
+            elif wizard.permanent:
+                wizard.premier_seg = True
+
+    @api.onchange('modele_id')
+    def onchange_modele_id(self):
+        self.ensure_one()
+        if self.modele_id:
+            self.creneau_ids = False  # car on ne peut pas utiliser de code 5 dans create() qui est appelé par clique sur bouton
+            self.creneau_ids = self.modele_id.creneau_ids.ids
+            self.mode_horaires = 'advanced'
+            self.modele_id = False
+
     @api.multi
     @api.onchange('hor_md', 'hor_mf', 'hor_ad', 'hor_af', 'mode_horaires')
     def onchange_hor_ma_df(self):
@@ -157,106 +262,7 @@ class OFHoraireSegmentWizard(models.TransientModel):
         if self.mode != 'create' and (self.segment_id and self.segment_id.date_deb or not self.segment_id):
             self.premier_seg = False
 
-    @api.multi
-    @api.onchange('date_deb')
-    def onchange_date_deb(self):
-        self.ensure_one()
-        self.remplacement = False
-        if self.date_deb and not self.permanent:
-            self.date_fin = self.date_deb
-
-    @api.multi
-    @api.onchange('motif')
-    def onchange_motif(self):
-        self.ensure_one()
-
-    @api.multi
-    @api.depends('permanent')
-    def onchange_permanent(self):
-        for wizard in self:
-            if wizard.permanent and wizard.employee_id.of_segment_ids:
-                seg_exist = wizard.employee_id.of_segment_ids.filtered(lambda s: s.permanent)
-                wizard.premier_seg = not seg_exist
-            elif wizard.permanent:
-                wizard.premier_seg = True
-
-    @api.onchange('modele_id')
-    def onchange_modele_id(self):
-        self.ensure_one()
-        if self.modele_id:
-            self.creneau_ids = False  # car on ne peut pas utiliser de code 5 dans create() qui est appelé par clique sur bouton
-            self.creneau_ids = self.modele_id.creneau_ids.ids
-            self.mode_horaires = 'advanced'
-            self.modele_id = False
-
-    @api.multi
-    @api.depends('creneau_ids', 'seg_exist_ids', 'date_deb', 'date_fin', 'permanent')
-    def _compute_horaires_recap(self):
-        lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
-        def format_date(date):
-            return fields.Date.from_string(date).strftime(lang.date_format)
-        def formate_creneaux(creneaux):
-            return u'<p>\n&nbsp;&nbsp;&nbsp;' + u'<br/>\n&nbsp;&nbsp;&nbsp;'.join(creneaux.format_str_list()) + u'</p>\n'
-        for wizard in self:
-            if not self.seg_exist_ids or not self.date_deb or not self.date_fin or self.permanent:
-                self.seg_1_horaires_recap = False
-                self.seg_exist_recap = False
-                self.result_recap = False
-            else:
-                seg_exist_pluriel = len(self.seg_exist_ids) > 1
-                recap_1 = u'<div><i>Vous avez entré la période horaire suivante :</i></div>'
-                recap_1 += u'<div colspan="2" style="text-align: left;">'
-                recap_1 += u'<p><b style="color: deepskyblue;">Du ' + format_date(self.date_deb) + u' au ' + format_date(self.date_fin) + u'</b></p>'
-                recap_1 += u'<br/>\n&nbsp;&nbsp;&nbsp;'.join(self.creneau_ids.format_str_list()) + u'</div>\n'
-                wizard.seg_1_horaires_recap = recap_1
-                pourcent = 100.0 / len(wizard.seg_exist_ids)
-                #recap_2 = '<table colspan="2" style="width: 100%"><tr col="' + str(len(wizard.seg_exist_ids)) + '" style="text-align: center">'
-                if seg_exist_pluriel:
-                    recap_2 = u'<div><i>Elle entre en conflit avec les périodes existantes suivantes :</i></div>'
-                else:
-                    recap_2 = u'<div><i>Elle entre en conflit avec la période existante suivante :</i></div>'
-                recap_2 += u'<table colspan="2" style="width: 100%; text-align: left;">'
-                for segment in self.seg_exist_ids:
-                    #recap_2 += '<tr><td style="min-widht: ' + str(pourcent) + '%; border:1px solid black;">'
-                    recap_2 += u'<tr><td>'
-                    recap_2 += u'<p><b style="color: blue">Du ' + format_date(segment.date_deb) + u' au ' + format_date(segment.date_fin) + u'</b></p>'
-                    recap_2 += formate_creneaux(segment.creneau_ids) + u'</td></tr>'
-                recap_2 += u'</table>'
-                wizard.seg_exist_recap = recap_2
-
-                un_jour = timedelta(days=1)
-                premier_fin_da = fields.Date.from_string(self.date_deb) - un_jour
-                premier_fin_str = fields.Date.to_string(premier_fin_da)
-                premier_seg = self.seg_exist_ids[0]
-                dernier_deb_da = fields.Date.from_string(self.date_fin) + un_jour
-                dernier_deb_str = fields.Date.to_string(dernier_deb_da)
-                dernier_seg = self.seg_exist_ids[-1]
-
-                #res_seg_nb = int(premier_seg.date_deb <= premier_fin_str) + int(dernier_deb_str <= dernier_seg.date_fin) + 1
-                #pourcent = 100.0 / res_seg_nb
-
-                #recap_3 = '<table colspan="2" style="width: 100%"><tr col="' + str(pourcent) + '" style="text-align: center">'
-                if seg_exist_pluriel:
-                    recap_3 = u'<div><i>Si vous remplacez les périodes existantes, Le résultat sera le suivant : </i></div>'
-                else:
-                    recap_3 = u'<div><i>Si vous remplacez la période existante, Le résultat sera le suivant : </i></div>'
-                recap_3 += u'<table colspan="2" style="width: 100%; text-align: left">'
-
-                if premier_seg.date_deb <= premier_fin_str:
-                    recap_3 += u'</tr><td>'
-                    recap_3 += u'<p><b style="color: blue">Du ' + format_date(premier_seg.date_deb) + u' au <span style="color:red">' + \
-                               format_date(premier_fin_str) + u'</span></b></p>'
-                    recap_3 += formate_creneaux(premier_seg.creneau_ids) + u'</td></tr>'
-                recap_3 += u'<tr><td>'
-                recap_3 += u'<p><b style="color: deepskyblue">Du ' + format_date(self.date_deb) + u' au ' + format_date(self.date_fin) + u'</b></p>'
-                recap_3 += formate_creneaux(self.creneau_ids) + u'</td></tr>'
-                if dernier_deb_str <= dernier_seg.date_fin:
-                    recap_3 += u'<tr><td>'
-                    recap_3 += u'<p><b style="color: blue">Du <span style="color:red">' + format_date(dernier_deb_str) + u'</span> au ' + \
-                               format_date(dernier_seg.date_fin) + u'</b></p>'
-                    recap_3 += formate_creneaux(dernier_seg.creneau_ids) + u'</td></tr>'
-                recap_3 += u'</table>'
-                wizard.result_recap = recap_3
+    # Actions
 
     @api.multi
     def button_save_modele(self):

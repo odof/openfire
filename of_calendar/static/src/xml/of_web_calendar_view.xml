@@ -16,16 +16,20 @@
                 </span>
             </t>
             <t t-if="!filters_value.custom_colors"><!-- copy of parent XML -->
-                <span t-attf-class="color_filter o_underline_color_#{filters_value.color}"><t t-esc="filters_value.label"/></span>
+                <span t-attf-class="color_filter o_underline_color_#{filters_value.color}">
+                    <t t-esc="filters_value.label"/>
+                </span>
             </t>
         </t>
         <!-- if radio filters -->
         <t t-jquery="input[name='selection']" t-operation="replace">
             <t t-if="filters_radio">
-                <input type="radio" name="selection" t-att-value="filters_value.value" t-att-checked="(filters_value.is_checked ? true : undefined)"/><span/>
+                <input type="radio" name="selection" t-att-value="filters_value.value"
+                       t-att-checked="(filters_value.is_checked ? true : undefined)"/><span/>
             </t>
             <t t-if="!filters_radio">
-                <input type="checkbox" name="selection" t-att-value="filters_value.value" t-att-checked="(filters_value.is_checked ? true : undefined)"/><span/>
+                <input type="checkbox" name="selection" t-att-value="filters_value.value"
+                       t-att-checked="(filters_value.is_checked ? true : undefined)"/><span/>
             </t>
         </t>
     </t>
@@ -56,7 +60,8 @@
                 <div class="of_sidebar_element">
                     <div><strong>Légende couleur</strong></div>
                     <t t-foreach="fil_value.captions" t-as="caption">
-                        <t t-if="caption_value.value || caption_value.value===0"><!-- don't display if no value given (or undefined) -->
+                        <!-- don't display if no value given (or undefined) -->
+                        <t t-if="caption_value.value || caption_value.value===0">
                             <span t-attf-style="
                                 color: #{caption_value.color_ft};
                                 background: #{caption_value.color_bg};
@@ -78,8 +83,11 @@
         <t t-if="captions">
             <!-- captions parameter given in SidebarCaption.render out model function 'get_state_int_map' -->
             <t t-foreach="captions" t-as="caption">
-                <t t-if="caption_value.value || caption_value.value===0"><!-- don't display if no value given (or undefined) -->
-                    <div t-attf-class="of_calendar_state_#{caption_value.value} of_calendar_caption"><t t-esc="caption_value.label"/></div>
+                <!-- don't display if no value given (or undefined) -->
+                <t t-if="caption_value.value || caption_value.value===0">
+                    <div t-attf-class="of_calendar_state_#{caption_value.value} of_calendar_caption">
+                        <t t-esc="caption_value.label"/>
+                    </div>
                 </t>
             </t>
         </t>

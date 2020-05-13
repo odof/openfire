@@ -527,9 +527,9 @@ class OfPlanningIntervention(models.Model):
                 date_stop_dt = date_locale_dt + une_semaine
                 date_stop_str = fields.Datetime.to_string(date_stop_dt).decode('utf-8')
                 # Récupérer le dictionnaire des segments horaires des employés
-                horaires_list_dict = employees.get_horaires_list_dict(date_locale_str, date_stop_str)
+                horaires_list_dict = employees.get_horaires(date_locale_str, date_stop_str)
                 # Récupérer la liste des segments de l'équipe (i.e. l'intersection des horaires des employés)
-                segments_equipe = employees.get_list_horaires_intersection(horaires_list_dict=horaires_list_dict)
+                segments_equipe = employees.get_horaires_intersection(horaires_list_dict=horaires_list_dict)
 
                 jour_courant = date_locale_dt.isoweekday()
 

@@ -27,24 +27,24 @@
                     <group>
                         <div>
                             <field name="of_horaire_recap"/>
-                            <button name="%(action_of_horaire_segment_create_form_view)d" string="Créer un horaire" type="action"
-                            context="{
-                                'default_employee_id': id,
-                                'default_mode': 'create',
-                                'default_mode_horaires': of_mode_horaires,
-                            }"/>
-                            <button name="%(action_of_horaire_segment_edit_form_view)d" string="Modifier un horaire" type="action"
-                            context="{
-                                'default_employee_id': id,
-                                'default_mode': 'edit',
-                                'default_mode_horaires': of_mode_horaires,
-                            }"/>
-                            <button name="%(action_of_horaire_segment_unlink_form_view)d" string="Supprimer un horaire" type="action"
-                            context="{
-                                'default_employee_id': id,
-                                'default_mode': 'unlink',
-                                'default_mode_horaires': 'advanced',
-                            }"/>
+                            <button name="%(action_of_horaire_segment_create_form_view)d" string="Créer un horaire"
+                                    context="{
+                                        'default_employee_id': id,
+                                        'default_mode': 'create',
+                                        'default_mode_horaires': of_mode_horaires,
+                                    }" type="action"/>
+                            <button name="%(action_of_horaire_segment_edit_form_view)d" string="Modifier un horaire"
+                                    context="{
+                                        'default_employee_id': id,
+                                        'default_mode': 'edit',
+                                        'default_mode_horaires': of_mode_horaires,
+                                    }" type="action"/>
+                            <button name="%(action_of_horaire_segment_unlink_form_view)d" string="Supprimer un horaire"
+                                    context="{
+                                        'default_employee_id': id,
+                                        'default_mode': 'unlink',
+                                        'default_mode_horaires': 'advanced',
+                                    }" type="action"/>
                         </div>
                         <div class="oe_grey">
                             <i>
@@ -55,7 +55,8 @@
                                     <li>
                                         Permanents: horaires standards de l'employé, À durée indéfinie.
                                         Un horaire permanent s'arrête quand le suivant commence.
-                                        Pour être pris en compte par les outils de planification, chaque intervenant doit avoir au moins un horaire permanent.
+                                        Pour être pris en compte par les outils de planification,
+                                        chaque intervenant doit avoir au moins un horaire permanent.
                                     </li>
                                     <li>
                                         Temporaires: horaires avec une date de début et une date de fin.
@@ -67,11 +68,13 @@
                                 ACTIONS:
                                 <ul>
                                     <li>
-                                        "Créer un horaire": Ajouter un horaire temporaire ou changer les horaires standards.
+                                        "Créer un horaire":
+                                        Ajouter un horaire temporaire ou changer les horaires standards.
                                         Les horaires passés sont conservés. À utiliser dans la majeure partie des cas.
                                     </li>
                                     <li>
-                                        "Modifier un horaire": Modifier un horaire existant, dont les anciennes valeurs sont perdues.
+                                        "Modifier un horaire": Modifier un horaire existant,
+                                        dont les anciennes valeurs sont perdues.
                                     </li>
                                     <li>
                                         "Supprimer un horaire": supprimer un horaire existant.
@@ -82,11 +85,13 @@
                                 MODES DE SÉLECTION:
                                 <ul>
                                     <li>
-                                        Facile: Entrer les heures de début et de fin du matin et de l'après-midi, puis choisir les jours travaillés.
+                                        Facile: Entrer les heures de début et de fin du matin et de l'après-midi,
+                                        puis choisir les jours travaillés.
                                         Utile pour un employé qui travaille tous les jours aux mêmes heures.
                                     </li>
                                     <li>
-                                        Avancé: Entrer un à un les créneaux travaillés. Utile pour personnaliser les horaires d'un employé.
+                                        Avancé: Entrer un à un les créneaux travaillés.
+                                        Utile pour personnaliser les horaires d'un employé.
                                     </li>
                                 </ul>
                             </p>
@@ -166,13 +171,13 @@
                 <filter domain="[('heure_fin','&lt;=',12)]" string="Matin"/>
                 <filter domain="[('heure_debut','&gt;=',12)]" string="Après-Midi"/>
                 <separator/>
-                <filter string="Lundi" name="lundi" domain="[('jour_id','=',1)]"/>
-                <filter string="Mardi" name="mardi" domain="[('jour_id','=',2)]"/>
-                <filter string="Mercredi" name="mercredi" domain="[('jour_id','=',3)]"/>
-                <filter string="Jeudi" name="jeudi" domain="[('jour_id','=',4)]"/>
-                <filter string="Vendredi" name="vendredi" domain="[('jour_id','=',5)]"/>
-                <filter string="Samedi" name="samedi" domain="[('jour_id','=',6)]"/>
-                <filter string="Dimanche" name="dimanche" domain="[('jour_id','=',7)]"/>
+                <filter string="Lundi" name="lundi" domain="[('jour_number','=',1)]"/>
+                <filter string="Mardi" name="mardi" domain="[('jour_number','=',2)]"/>
+                <filter string="Mercredi" name="mercredi" domain="[('jour_number','=',3)]"/>
+                <filter string="Jeudi" name="jeudi" domain="[('jour_number','=',4)]"/>
+                <filter string="Vendredi" name="vendredi" domain="[('jour_number','=',5)]"/>
+                <filter string="Samedi" name="samedi" domain="[('jour_number','=',6)]"/>
+                <filter string="Dimanche" name="dimanche" domain="[('jour_number','=',7)]"/>
                 <group expand="0" string="Grouper par">
                     <filter string="Jour" domain="[]" context="{'group_by':'jour_id'}"/>
                 </group>
@@ -248,19 +253,30 @@
                 <field name="alarm_ids" widget="many2many_tags"/>
             </xpath>
             <xpath expr="//field[@name='location']" position="before">
-                <!--field name="user_company_ids" invisible="1"/
-                <field name="of_lieu_address_state_id" class="o_address_state" options='{"no_open": True}' context="{'country_id': country_id, 'zip': zip}"/>
-                -->
                 <field name="of_lieu" widget="selection"/>
-                <field name="of_lieu_company_id" widget="selection" attrs="{'invisible': [('of_lieu', '!=', 'onsite')],'required': [('of_lieu', '=', 'onsite')]}"/>
-                <field name="of_lieu_rdv_id" options="{'no_open': True, 'no_create': True}" attrs="{'invisible': [('of_lieu', '!=', 'offsite')],'required': [('of_lieu', '=', 'offsite')]}"/>
-                <label for="of_lieu_address_street" string="Adresse: " colspan="2" style="margin-bottom: 4px" attrs="{'invisible': [('of_lieu', '=', 'phone')]}"/>
-                <div class="o_address_format oe_grey" colspan="2" attrs="{'invisible': [('of_lieu', '=', 'phone')],'readonly': [('of_lieu', 'in', ['offsite','onsite','phone'])]}"><i>
-                    <field name="of_lieu_address_street" placeholder="Street..." class="o_address_street" attrs="{'readonly': [('of_lieu', 'in', ['offsite','onsite','phone'])]}"/>
-                    <field name="of_lieu_address_street2" placeholder="Street 2..." class="o_address_street" attrs="{'readonly': [('of_lieu', 'in', ['offsite','onsite','phone'])]}"/>
-                    <field name="of_lieu_address_city" placeholder="City" class="o_address_city" attrs="{'readonly': [('of_lieu', 'in', ['offsite','onsite','phone'])]}"/>
-                    <field name="of_lieu_address_zip" placeholder="ZIP" class="o_address_zip" attrs="{'readonly': [('of_lieu', 'in', ['offsite','onsite','phone'])]}"/>
-                    <field name="of_lieu_address_country_id" placeholder="Country" class="o_address_country" options='{"no_open": True, "no_create": True}' attrs="{'readonly': [('of_lieu', 'in', ['offsite','onsite','phone'])]}"/></i>
+                <field name="of_lieu_company_id" widget="selection"
+                       attrs="{'invisible': [('of_lieu', '!=', 'onsite')],'required': [('of_lieu', '=', 'onsite')]}"/>
+                <field name="of_lieu_rdv_id" options="{'no_open': True, 'no_create': True}"
+                       attrs="{'invisible': [('of_lieu', '!=', 'offsite')],'required': [('of_lieu', '=', 'offsite')]}"/>
+                <label for="of_lieu_address_street" string="Adresse: " colspan="2" style="margin-bottom: 4px"
+                       attrs="{'invisible': [('of_lieu', '=', 'phone')]}"/>
+                <div class="o_address_format oe_grey" colspan="2"
+                     attrs="{
+                        'invisible': [('of_lieu', '=', 'phone')],
+                        'readonly': [('of_lieu', 'in', ['offsite','onsite','phone'])]}">
+                    <i>
+                        <field name="of_lieu_address_street" placeholder="Street..." class="o_address_street"
+                               attrs="{'readonly': [('of_lieu', 'in', ['offsite','onsite','phone'])]}"/>
+                        <field name="of_lieu_address_street2" placeholder="Street 2..." class="o_address_street"
+                               attrs="{'readonly': [('of_lieu', 'in', ['offsite','onsite','phone'])]}"/>
+                        <field name="of_lieu_address_city" placeholder="City" class="o_address_city"
+                               attrs="{'readonly': [('of_lieu', 'in', ['offsite','onsite','phone'])]}"/>
+                        <field name="of_lieu_address_zip" placeholder="ZIP" class="o_address_zip"
+                               attrs="{'readonly': [('of_lieu', 'in', ['offsite','onsite','phone'])]}"/>
+                        <field name="of_lieu_address_country_id" placeholder="Country" class="o_address_country"
+                               options='{"no_open": True, "no_create": True}'
+                               attrs="{'readonly': [('of_lieu', 'in', ['offsite','onsite','phone'])]}"/>
+                    </i>
                 </div>
             </xpath>
             <!-- rendre l'onglet 'divers' visible tout le temps -->
@@ -290,7 +306,8 @@
                 <field name="of_on_phone" icon="phone" position="right" invisible="1"/>
             </xpath>
             <!--xpath expr="//calendar" position="inside">
-                <!- - These fields would be necessary if use_contacts="0". See function event_data_transform in .js file - ->
+                <!- - These fields would be necessary if use_contacts="0".
+                    See function event_data_transform in .js file - ->
                 <field name="of_color_ft" invisible="1"/>
                 <field name="of_color_bg" invisible="1"/>
             </xpath-->

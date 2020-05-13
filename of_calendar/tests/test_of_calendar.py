@@ -2,7 +2,7 @@
 
 from odoo.tests import common
 
-# @tagged('-standard', 'OpenFire', 'of_calendar')
+
 @common.post_install(True)
 class OfTestEmployees(common.TransactionCase):
     u"""Test de la validité d'un calcul d'intersection entre les horaires de travail de deux employés
@@ -180,7 +180,7 @@ class OfTestEmployees(common.TransactionCase):
 
     def test_employees(self):
         emps = self.emp_1 | self.emp_2
-        intersec = emps.get_list_horaires_intersection('2019-01-01', '2019-12-31')
+        intersec = emps.get_horaires_intersection('2019-01-01', '2019-12-31')
 
         # Vérification du nombre d'intervalles trouvés
         self.assertEqual(len(intersec), 9, "Mauvais nombre d'intervalles : %s au lieu de 9" % len(intersec))

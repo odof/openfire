@@ -15,78 +15,60 @@ def _tz_get(self):
     # put POSIX 'Etc/*' entries at the end to avoid confusing users - see bug 1086728
     return [(tz, tz) for tz in sorted(pytz.all_timezones, key=lambda tz: tz if not tz.startswith('Etc/') else '_')]
 
-# def jour_abr_2_nb(str):
-#     u"""
-#     :param str: Chaîne de caractères correspondant à une abréviation de jour
-#     :return: Le numéro correspondant au jour entré, de 1 à 7
-#     """
-#     return {
-#         'lun.': 1,
-#         'mar.': 2,
-#         'mer.': 3,
-#         'jeu.': 4,
-#         'ven.': 5,
-#         'sam.': 6,
-#         'dim.': 7,
-#     }.get(str, str)
-
-# @TODO: revoir les nom des fonctions pour qu'ils soient plus explicites
-
 
 class HREmployee(models.Model):
     _inherit = "hr.employee"
     _order = "sequence"
 
-    def _default_of_tz(self):
-        return self.env.user.tz or 'Europe/Paris'
+    # Contraintes. @todo: À retirer après la mise à jour avec apply_sql
 
-    def _default_of_jours_ids(self):
-        # Lundi à vendredi comme valeurs par défaut
-        jours = self.env['of.jours'].search([('numero', 'in', (1, 2, 3, 4, 5))], order="numero")
-        res = [jour.id for jour in jours]
+    _sql_constraints = [
+        ('hor_md_constraint', 'CHECK ( name != NULL )',
+         _(u"Contrainte vide.")),
+        ('hor_md_mf_constraint', 'CHECK ( name != NULL )',
+         _(u"Contrainte vide.")),
+        ('hor_mf_ad_constraint', 'CHECK ( name != NULL )',
+         _(u"Contrainte vide.")),
+        ('hor_ad_af_constraint', 'CHECK ( name != NULL )',
+         _(u"Contrainte vide.")),
+        ('hor_af_constraint', 'CHECK ( name != NULL )',
+         _(u"Contrainte vide.")),
+        # Cette ligne a été commentée il y a un moment mais j'ai peur que la contrainte soit présente sur des base
+        ('of_creneau_temp_start_stop_constraint', 'CHECK ( name != NULL )',
+         _(u"Contrainte vide.")),
+    ]
+
+    # Defaults
+
+    @api.model
+    def default_get(self, fields=None):
+        res = super(HREmployee, self).default_get(fields)
+        res['of_tz'] = self.env.user.tz or 'Europe/Paris'
         return res
 
-    of_tz = fields.Selection(
-        _tz_get, string='Fuseau horaire', required=True, default=lambda self: self._default_of_tz(),
-        help=u"Le fuseau horaire de l'employé")
-    of_tz_offset = fields.Char(compute='_compute_of_tz_offset', string='Timezone offset', invisible=True)
-    u"""Création horaires avancés"""
+    # Champs
+
+    # Onglet "Informations publiques"
+    of_address_depart_id = fields.Many2one('res.partner', string=u'Adresse de départ')
+    of_address_retour_id = fields.Many2one('res.partner', string='Adresse de retour')
+    of_color_ft = fields.Char(string="Couleur de texte", help="Choisissez votre couleur", default="#0D0D0D",
+                              oldname="color_ft")
+    of_color_bg = fields.Char(string="Couleur de fond", help="Choisissez votre couleur", default="#F0F0F0",
+                              oldname="color_bg")
+    # Onglet "Horaires
     of_mode_horaires = fields.Selection([
         ("easy", "Facile"),
         ("advanced", u"Avancé")], string=u"Mode de sélection des horaires", required=True, default="easy")
     of_segment_ids = fields.One2many('of.horaire.segment', 'employee_id', string="Horaires de travail")
-
     of_horaire_recap = fields.Html(compute='_compute_of_horaire_recap', string="Horaires de travail")
-    of_hor_md = fields.Float(string=u'Matin début', digits=(12, 5), default=9)
-    of_hor_mf = fields.Float(string=u'Matin fin', digits=(12, 5), default=12)
-    of_hor_ad = fields.Float(string=u'Après-midi début', digits=(12, 5), default=14)
-    of_hor_af = fields.Float(string=u'Après-midi fin', digits=(12, 5), default=18)
-    of_jour_ids = fields.Many2many(
-        'of.jours', 'employee_jours_rel', 'employee_id', 'jour_id', string=u'Jours travaillés',
-        default=lambda self: self._default_of_jours_ids()
-    )
+    of_tz = fields.Selection(_tz_get, string='Fuseau horaire', required=True, help=u"Le fuseau horaire de l'employé")
+    of_tz_offset = fields.Char(compute='_compute_of_tz_offset', string='Timezone offset', invisible=True)
+
+    # Autres
     sequence = fields.Integer(string=u"Séquence d'affichage", help=u"""
         Champ pour définir l'ordre d'affichage des employés. Du plus petit au plus grand.""")
 
-    of_address_depart_id = fields.Many2one('res.partner', string=u'Adresse de départ')
-    of_address_retour_id = fields.Many2one('res.partner', string='Adresse de retour')
-
-    of_color_ft = fields.Char(string="Couleur de texte", help="Choisissez votre couleur", default="#0D0D0D", oldname="color_ft")
-    of_color_bg = fields.Char(string="Couleur de fond", help="Choisissez votre couleur", default="#F0F0F0", oldname="color_bg")
-
-    _sql_constraints = [
-        ('hor_md_constraint', 'CHECK ( of_hor_md >= 0 )', _(u"L'heure de début de matinée doit être supérieure ou égale à 0.")),
-        ('hor_md_mf_constraint', 'CHECK ( of_hor_md <= of_hor_mf )', _(u"L'heure de début de matinée doit être antérieure à l'heure de fin de matinée.")),
-        ('hor_mf_ad_constraint', 'CHECK ( of_hor_mf <= of_hor_ad )', _(u"L'heure de fin de matinée doit être antérieure à l'heure de début d'après-midi.")),
-        ('hor_ad_af_constraint', 'CHECK ( of_hor_ad <= of_hor_af )', _(u"L'heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi.")),
-        ('hor_af_constraint', 'CHECK ( of_hor_af <= 24 )', _(u"L'heure de fin d'après-midi doit être inférieure ou égale à 24.")),
-        # ('of_creneau_temp_start_stop_constraint', 'CHECK ( of_creneau_temp_start <= of_creneau_temp_stop )', _(u"La date de début de validité doit être antérieure ou égale à celle de fin.")),
-    ]
-
-    @api.depends('of_tz')
-    def _compute_of_tz_offset(self):
-        for employee in self:
-            employee.of_tz_offset = datetime.now(pytz.timezone(employee.of_tz or 'GMT')).strftime('%z')
+    # @api.depends
 
     @api.depends('of_segment_ids')
     def _compute_of_horaire_recap(self):
@@ -138,17 +120,18 @@ class HREmployee(models.Model):
                         recap += u"<h5>Le " + format_date(seg.date_deb)
                     else:
                         recap += u"<h5>du %s au %s" % (format_date(seg.date_deb),
-                                                      format_date(seg.date_fin))
+                                                       format_date(seg.date_fin))
                     if seg.motif:
                         recap += u" (%s)" % seg.motif
                     recap += u'</h5>\n<p>\n' + formate_segment(seg) + u'</p>\n'
             employee.of_horaire_recap = recap
 
-    @api.onchange('of_address_depart_id')
-    def _onchange_address_depart_id(self):
-        self.ensure_one()
-        if self.of_address_depart_id:
-            self.of_address_retour_id = self.of_address_depart_id
+    @api.depends('of_tz')
+    def _compute_of_tz_offset(self):
+        for employee in self:
+            employee.of_tz_offset = datetime.now(pytz.timezone(employee.of_tz or 'GMT')).strftime('%z')
+
+    # @api.onchange
 
     @api.onchange('user_id')
     def _onchange_user_id(self):
@@ -158,46 +141,35 @@ class HREmployee(models.Model):
             self.of_color_ft = self.user_id.of_color_ft
             self.of_color_bg = self.user_id.of_color_bg
 
-    @api.onchange('of_hor_md')
-    def _onchange_hor_md(self):
+    @api.onchange('of_address_depart_id')
+    def _onchange_address_depart_id(self):
         self.ensure_one()
-        if self.of_hor_md and self.of_hor_mf and self.of_hor_md > self.of_hor_mf:
-            raise UserError(u"L'heure de début de matinée doit être antérieure à l'heure de fin de matinée.")
+        if self.of_address_depart_id:
+            self.of_address_retour_id = self.of_address_depart_id
 
-    @api.onchange('of_hor_mf')
-    def _onchange_hor_mf(self):
-        self.ensure_one()
-        if self.of_hor_md and self.of_hor_mf and self.of_hor_md > self.of_hor_mf:
-            raise UserError(u"L'heure de début de matinée doit être antérieure à l'heure de fin de matinée.")
-        elif self.of_hor_mf and self.of_hor_ad and self.of_hor_mf > self.of_hor_ad:
-            raise UserError(u"L'heure de fin de matinée doit être antérieure à l'heure de début d'après-midi.")
-
-    @api.onchange('of_hor_ad')
-    def _onchange_hor_ad(self):
-        self.ensure_one()
-        if self.of_hor_ad and self.of_hor_af and self.of_hor_ad > self.of_hor_af:
-            raise UserError(u"L'heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi.")
-        elif self.of_hor_mf and self.of_hor_ad and self.of_hor_mf > self.of_hor_ad:
-            raise UserError(u"L'heure de fin de matinée doit être antérieure à l'heure de début d'après-midi.")
-
-    @api.onchange('of_hor_af')
-    def _onchange_hor_af(self):
-        self.ensure_one()
-        if self.of_hor_ad and self.of_hor_af and self.of_hor_ad > self.of_hor_af:
-            raise UserError(u"L'heure de début d'après-midi doit être antérieure à l'heure de fin d'après-midi.")
+    # Héritages
 
     @api.multi
-    def possede_creneau(self, creneau_id):
-        u"""vérifie que tous les employés présents dans self possèdent tel ou tel créneau.
-            Ne prend pas en compte les créneaux temporaires."""
-        if len(self._ids) == 0:
-            return None
-        for employee in self:
-            if len(employee.of_creneau_ids.filtered(lambda x: x.id == creneau_id)) > 0:
-                continue
-            else:
-                return False
-        return True
+    def write(self, vals):
+        res = super(HREmployee, self).write(vals)
+        user_ids = self.mapped('user_id')
+        if vals.get("of_color_ft", False) and not vals.get("no_rebounce", False):
+            user_ids.write({'of_color_ft': vals.get("of_color_ft", False), 'no_rebounce': True})
+        if vals.get("of_color_bg", False) and not vals.get("no_rebounce", False):
+            user_ids.write({'of_color_bg': vals.get("of_color_bg", False), 'no_rebounce': True})
+        return res
+
+    @api.model
+    def create(self, vals):
+        employee = super(HREmployee, self).create(vals)
+        if employee.user_id:
+            if vals.get("of_color_ft", False) and not vals.get("no_rebounce", False):
+                employee.user_id.write({'of_color_ft': vals.get("of_color_ft", False), 'no_rebounce': True})
+            if vals.get("of_color_bg", False) and not vals.get("no_rebounce", False):
+                employee.user_id.write({'of_color_bg': vals.get("of_color_bg", False), 'no_rebounce': True})
+        return employee
+
+    # Autres méthodes
 
     @api.multi
     def convert_segments_to_list(self, segments=False):
@@ -234,6 +206,8 @@ class HREmployee(models.Model):
     @api.multi
     def get_horaires_date(self, date_str, response_text=False):
         """Renvoie les horaires des employés à la date donnée en paramètre.
+        :param date_str: date d'évaluation
+        :param response_text: True si on veut le résultat sous forme de chaine de caractères
         :rtype: { employee_id :  [(h_deb, h_fin), (h_deb, h_fin), ..] ,  .. }"""
         segment_obj = self.env['of.horaire.segment']
         date_da = fields.Date.from_string(date_str)
@@ -266,15 +240,18 @@ class HREmployee(models.Model):
             else:
                 res_text += u"%s: %s" % (employee.name, ", ".join(
                     ["%s-%s" % (
-                        hours_to_strs(creneau.heure_debut)[0], hours_to_strs(creneau.heure_fin)[0]) for creneau in creneaux]))
+                        hours_to_strs(creneau.heure_debut)[0],
+                        hours_to_strs(creneau.heure_fin)[0]) for creneau in creneaux]))
         if response_text:
             return res_text
         return res
 
     @api.multi
-    def get_horaires_list_dict(self, date_start, date_stop):
-        """Renvoie le résultat de la fusion des archives horaires et archives horaires temporaires des employés
-        :rtype: dict { employee_id :  [(date_debut_da, date_fin_da, horaires_dict), ...] ,  ... }
+    def get_horaires(self, date_start, date_stop):
+        """Renvoie les horaires des employés de self entre 2 dates
+        :param date_start: date de début d'évaluation, incluse.
+        :param date_stop: date de fin d'évaluation, incluse.
+        :rtype: dict { employee_id :  [(date_debut, date_fin, horaires_dict), ...] ,  ... }
         """
         segment_obj = self.env['of.horaire.segment']
         if len(date_start) == 10:  # les paramètres sont des dates
@@ -374,35 +351,42 @@ class HREmployee(models.Model):
         return res
 
     @api.multi
-    def get_list_horaires_intersection(self, date_start=False, date_stop=False, horaires_list_dict=False):
-        """Renvoie l'intersection des horaires des employés donnés en paramètre
+    def get_horaires_intersection(self, date_start=False, date_stop=False, horaires_list_dict=False):
+        """Renvoie l'intersection des horaires des employés du self
         avec soit les dates connues, soit le horaires_list_dict
+        :param date_start: date de début d'évaluation, incluse.
+        :param date_stop: date de fin d'évaluation, incluse.
+        :param horaires_list_dict: dict horaires pour éviter de le recalculer si on le connait déjà
         :rtype: list [ (date_debut_da, date_fin_da, horaires_dict) , (date_debut_da, date_fin_da, horaires_dict) ,  ..]
         """
         res = []
         if len(self) == 0:
             return res
         if not horaires_list_dict:
-            horaires_list_dict = self.get_horaires_list_dict(date_start, date_stop)
+            horaires_list_dict = self.get_horaires(date_start, date_stop)
         if len(self) == 1:
             res = horaires_list_dict[self.id]
             return res
         emp_1_id = self[0].id
         res = horaires_list_dict[emp_1_id]
         for emp_2_id in self.ids[1:]:
-            res = self.get_intersection_horaires_segment(res, horaires_list_dict[emp_2_id])
+            res = self.get_intersection_segments(res, horaires_list_dict[emp_2_id])
         return res
 
     @api.model
-    def get_intersection_horaires_segment(self, segments_emp_1, segments_emp_2):
-        """Renvoie l'intersection des horaires des employés donnés en paramètre
-        résultat sous la forme [ (date_debut_da, date_fin_da, horaires_dict) ,  (date_debut_da, date_fin_da, horaires_dict) ,  ..]"""
+    def get_intersection_segments(self, segments_emp_1, segments_emp_2):
+        """Renvoie l'intersection des horaires de 2 segments
+        :param segments_emp_1: 1er segment horaires à fusionner.
+        :param segments_emp_2: 2ème segment horaires à fusionner.
+        :rtype: list [ (date_debut_da, date_fin_da, horaires_dict) ,  (date_debut_da, date_fin_da, horaires_dict) ,  ..]
+        """
         res = []
         if len(segments_emp_1) == 0 or len(segments_emp_2) == 0:
             return res
         un_jour = timedelta(days=1)
         pre_res = []
-        """Fusionner les listes de segments pour que les dates correspondent, en conservant les 2 horaires_dict à chaque fois"""
+        # Fusionner les listes de segments pour que les dates correspondent,
+        # en conservant les 2 horaires_dict à chaque fois
         while len(segments_emp_1) > 0 and len(segments_emp_2) > 0:
             date_fin_1_da = fields.Date.from_string(segments_emp_1[0][1])  # date de fin du premier segment de la liste
             date_fin_2_da = fields.Date.from_string(segments_emp_2[0][1])  # date de fin du premier segment de la liste
@@ -437,8 +421,11 @@ class HREmployee(models.Model):
     @api.model
     def get_intersection_heures_dict(self, dict1, dict2):
         """Fusionne 2 horaires_dict et renvoie leur intersection
-        résultat sous la forme { 1..7 :  [(h_debut, h_fin), (h_debut, h_fin)] }
-        exemple: dict1[1] = [(9, 12)], dict2 = [(11, 14)]; res[1] = [(11, 12)]"""
+        exemple: dict1[1] = [(9, 12)], dict2 = [(11, 14)]; res[1] = [(11, 12)]
+        :param dict1: 1er horaires_dict à fusionner.
+        :param dict1: 2ème horaires_dict à fusionner.
+        :rtype: dict { 1..7 :  [(h_debut, h_fin), (h_debut, h_fin)] }
+        """
         res = {}
         for i in xrange(1, 8):  # parcourir les jours de la semaine
             res[i] = []
@@ -449,7 +436,8 @@ class HREmployee(models.Model):
 
             while len(list1) > 0 and len(list2) > 0:
                 if se_chevauchent(list1[0][0], list1[0][1], list2[0][0], list2[0][1]):  # les 2 créneaux se chevauchent!
-                    res[i].append((max(list1[0][0], list2[0][0]), min(list1[0][1], list2[0][1])))  # intersection des 2 créneaux
+                    # intersection des 2 créneaux
+                    res[i].append((max(list1[0][0], list2[0][0]), min(list1[0][1], list2[0][1])))
                     # la nouvelle heure de début est l'heure de fin du créneau qui termine en premier
                     if list1[0][1] < list2[0][1]:  # le 1er créneau de list1 termine avant le premier créneau de list2
                         list1.pop(0)
@@ -465,28 +453,13 @@ class HREmployee(models.Model):
                         list2.pop(0)
         return res
 
-    # @api.model
-    # def get_horaires_effectif_date(self, date_str, horaires_list_dict):
-    #     """fonction qui utilise le résultat de get_horaires_list_dict pour trouver les horaires à une date donnée
-    #     résultat équivalent à celui de get_horaires_date
-    #     résultat sous forme { employee_id :  [(h_deb, h_fin), (h_deb, h_fin), ..] ,  .. }"""
-    #     res = {}
-    #     date_da = fields.Date.from_string(date_str)
-    #     num_jour = date_da.isoweekday()
-    #     for employee_id in horaires_list_dict:
-    #         segments = horaires_list_dict[employee_id]
-    #         for segment in segments:
-    #             if not segment[1]:  # segment sans date de fin
-    #                 res[employee_id] = num_jour in segment[2] and segment[2][num_jour] or []
-    #                 break
-    #             if se_chevauchent(date_str, date_str, segment[0], segment[1], False):  # la date demandée est sur ce segment d'horaires
-    #                 res[employee_id] = num_jour in segment[2] and segment[2][num_jour] or []
-    #                 break
-    #     return res
-
     @api.model
     def debut_sur_creneau(self, date_str, h_debut, list_segments):
-        """Renvoie l'indexe du créneau de début si l'heure et la date sont dans les horaires, -1 sinon"""
+        """Renvoie l'indexe du créneau de début si l'heure et la date sont dans les horaires, -1 sinon
+        :param date_str: date d'évaluation.
+        :param h_debut: heure d'évaluation.
+        :param list_segments: segments horaires d'évaluation.
+        """
         for segment in list_segments:
             if segment[0] <= date_str <= segment[1]:  # la date est sur ce segment
                 date_da = fields.Date.from_string(date_str)
@@ -501,53 +474,27 @@ class HREmployee(models.Model):
                 return -1
         return -1
 
-    @api.model
-    def get_min_max_time(self):
-        min_time = self.env['ir.values'].get_default('res.config.settings', 'calendar_min_time')
-        max_time = self.env['ir.values'].get_default('res.config.settings', 'calendar_max_time')
 
-        return min_time or 3.0, max_time or 21.0
-
-    @api.multi
-    def write(self, vals):
-        res = super(HREmployee, self).write(vals)
-        # if vals.get("of_creneau_ids", False) or vals.get("of_hor_md", False) or vals.get("of_hor_mf", False) or \
-        #    vals.get("of_hor_ad", False) or vals.get("of_hor_af", False) or vals.get("of_mode_horaires", False) or \
-        #    vals.get("of_jour_ids", False):
-        #     self.archiver_horaires()
-        # if vals.get("of_creneau_temp_start", False) or vals.get("of_creneau_temp_stop", False):
-        #     self.archiver_horaires_temp()
-        user_ids = self.mapped('user_id')
-        if vals.get("of_color_ft", False) and not vals.get("no_rebounce", False):
-            user_ids.write({'of_color_ft': vals.get("of_color_ft", False), 'no_rebounce': True})
-        if vals.get("of_color_bg", False) and not vals.get("no_rebounce", False):
-            user_ids.write({'of_color_bg': vals.get("of_color_bg", False), 'no_rebounce': True})
-        # self = self.filtered(lambda i: not i.of_archive_horaires)
-        # if self:
-        #     self.archiver_horaires()
-        return res
-
-    @api.model
-    def create(self, vals):
-        employee = super(HREmployee, self).create(vals)
-        # if vals.get("of_creneau_ids", False) or vals.get("of_hor_md", False) or vals.get("of_hor_mf", False) or \
-        #    vals.get("of_hor_ad", False) or vals.get("of_hor_af", False) or vals.get("of_mode_horaires", False) or \
-        #    vals.get("of_jour_ids", False):
-        #     employee.archiver_horaires()
-        # if vals.get("of_creneau_temp_start", False) or vals.get("of_creneau_temp_stop", False):
-        #     employee.archiver_horaires_temp()
-        if employee.user_id:
-            employee.user_id.write({
-                'of_color_ft': employee.of_color_ft,
-                'of_color_bg': employee.of_color_bg,
-                'no_rebounce': True,
-                })
-        return employee
-
-
-class OFHorairesSegment(models.Model):
+class OFHoraireSegment(models.Model):
     _name = 'of.horaire.segment'
-    _order = 'date_deb'
+    _order = 'employee_id, date_deb, permanent DESC'
+
+    # Contraintes
+
+    @api.constrains('creneau_ids')
+    def check_no_overlapping(self):
+        for segment in self:
+            for creneaux in segment.creneau_ids:
+                creneaux_len = len(creneaux)
+                for j in xrange(creneaux_len - 1):
+                    if creneaux[j].jour_id != creneaux[j + 1].jour_id:
+                        continue
+                    d1 = creneaux[j].heure_debut
+                    f1 = creneaux[j].heure_fin
+                    d2 = creneaux[j + 1].heure_debut
+                    f2 = creneaux[j + 1].heure_fin
+                    if se_chevauchent(d1, f1, d2, f2):
+                        raise UserError(u"Oups! Des créneaux se chevauchent")
 
     name = fields.Char(string=u"Période", compute="_compute_name")
 
@@ -566,17 +513,7 @@ class OFHorairesSegment(models.Model):
     active = fields.Boolean(string="Active", default=True)
     motif = fields.Char(string="Motif du changement")
 
-    @api.model
-    def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
-        if self._context.get("restrict_date", False):
-            order = 'date_deb DESC'
-        # On détourne la fonction search pour peupler la liste de documents (onglet infos supplémentaires) à l'amorce de l'affichage de la vue
-        res = super(OFHorairesSegment, self)._search(args, offset, limit, order, count, access_rights_uid)
-        if self._context.get("restrict_date", False):
-            today_str = fields.Date.today()
-            records = self.browse(res)
-            res = records.filtered(lambda s: s.date_fin >= today_str or not s.date_fin).ids
-        return res
+    # @api.depends
 
     @api.multi
     @api.depends('date_deb', 'date_fin', 'permanent', 'motif')
@@ -596,32 +533,29 @@ class OFHorairesSegment(models.Model):
                 name += u" (%s)" % segment.motif
             segment.name = name
 
-    @api.multi
-    def check_no_overlapping(self):
-        for employee in self:
-            for creneaux in (employee.creneau_ids):
-                creneaux_len = len(creneaux)
-                for j in xrange(creneaux_len - 1):
-                    if creneaux[j].jour_id != creneaux[j+1].jour_id:
-                        continue
-                    d1 = creneaux[j].heure_debut
-                    f1 = creneaux[j].heure_fin
-                    d2 = creneaux[j+1].heure_debut
-                    f2 = creneaux[j+1].heure_fin
-                    if se_chevauchent(d1, f1, d2, f2):
-                        # raise UserError(u"Oups! Des créneaux se chevauchent")
-                        return False
-        return True
-
-    _constraints = [
-        (check_no_overlapping, u'Vous ne pouvez pas sauvegarder tant que des créneaux se chevauchent.', []),
-    ]
+    # @api.onchange
 
     @api.onchange('modele_id')
     def _onchange_modele_id(self):
         if self.modele_id:
             self.creneau_ids = [(6, "ET OUIIIII", self.modele_id.creneau_ids.ids)]
             self.modele_id = False
+
+    # Héritages
+
+    @api.model
+    def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
+        if self._context.get("restrict_date", False):
+            order = 'date_deb DESC'
+        # On détourne la fonction search pour peupler la liste de documents (onglet infos supplémentaires) à l'amorce de l'affichage de la vue
+        res = super(OFHoraireSegment, self)._search(args, offset, limit, order, count, access_rights_uid)
+        if self._context.get("restrict_date", False):
+            today_str = fields.Date.today()
+            records = self.browse(res)
+            res = records.filtered(lambda s: s.date_fin >= today_str or not s.date_fin).ids
+        return res
+
+    # Autres méthodes
 
     @api.multi
     def format_str_list(self):
@@ -696,17 +630,20 @@ class OFHorairesCreneau(models.Model):
     _name = "of.horaire.creneau"
     _order = "jour_number, heure_debut"
 
+    _sql_constraints = [
+        ('name_uniq', 'unique(name)', u'Oups ! On dirait que ce créneau existe déjà.'),
+        ('heure_debut_fin_constraint', 'CHECK ( heure_debut <= heure_fin )',
+         _(u"L'heure de début doit être antérieure à l'heure de fin.")),
+        ('heures_sont_des_heures_constraint',
+         'CHECK ( heure_debut <= 24 AND heure_debut >= 0 AND heure_fin <= 24 AND heure_fin >= 0)',
+         _(u"Les horaires doivent se trouver entre 0 et 24."))
+    ]
+
     name = fields.Char(u"Créneau", compute="_compute_name", store=True)
     jour_id = fields.Many2one("of.jours", string="Jour", required=True)
     jour_number = fields.Integer(related="jour_id.numero", store=True)
     heure_debut = fields.Float(string=u"Heure de début", digits=(12, 5), required=True)
     heure_fin = fields.Float(string=u"Heure de fin", digits=(12, 5), required=True)
-
-    _sql_constraints = [
-        ('name_uniq', 'unique(name)', u'Oups ! On dirait que ce créneau existe déjà.'),
-        ('heure_debut_fin_constraint', 'CHECK ( heure_debut <= heure_fin )', _(u"L'heure de début doit être antérieure à l'heure de fin.")),
-        ('heures_sont_des_heures_constraint', 'CHECK ( heure_debut <= 24 AND heure_debut >= 0 AND heure_fin <= 24 AND heure_fin >= 0)', _(u"Les horaires doivent se trouver entre 0 et 24."))
-    ]
 
     @api.multi
     @api.depends("jour_id", "heure_debut", "heure_fin")
@@ -797,22 +734,24 @@ class OFHorairesCreneau(models.Model):
 class OFHorairesModele(models.Model):
     _name = "of.horaire.modele"
 
+    _sql_constraints = [
+        ('name_uniq', 'unique(name)', u"Le nom d'un modèle doit être unique."),
+    ]
+
     name = fields.Char(u"Nom du modèle")
     creneau_ids = fields.Many2many(
         'of.horaire.creneau', 'modele_creneaux', 'modele_id', 'creneau_id', string=u"Créneaux"
     )
     active = fields.Boolean(string="Actif", default=True)
 
-    _sql_constraints = [
-        ('name_uniq', 'unique(name)', u"Le nom d'un modèle doit être unique."),
-    ]
-
 
 class Users(models.Model):
     _inherit = 'res.users'
 
-    of_color_ft = fields.Char(string="Couleur de texte", help="Choisissez votre couleur", default="#0D0D0D", oldname="color_ft")
-    of_color_bg = fields.Char(string="Couleur de fond", help="Choisissez votre couleur", default="#F0F0F0", oldname="color_bg")
+    of_color_ft = fields.Char(string="Couleur de texte", help="Choisissez votre couleur", default="#0D0D0D",
+                              oldname="color_ft")
+    of_color_bg = fields.Char(string="Couleur de fond", help="Choisissez votre couleur", default="#F0F0F0",
+                              oldname="color_bg")
 
     @api.multi
     def write(self, vals):
@@ -830,13 +769,13 @@ class Users(models.Model):
     def create(self, vals):
         user = super(Users, self).create(vals)
         if user.employee_ids:
-            user.employee_ids.write({
-                'of_color_ft': user.of_color_ft,
-                'of_color_bg': user.of_color_bg,
-                'no_rebounce': True,
-                })
-        # Création automatique employee sur création utilisateur?
+            if vals.get("of_color_ft", False) and not vals.get("no_rebounce", False):
+                user.employee_ids.write({'of_color_ft': vals.get("of_color_ft", False), 'no_rebounce': True})
+            if vals.get("of_color_bg", False) and not vals.get("no_rebounce", False):
+                user.employee_ids.write({'of_color_bg': vals.get("of_color_bg", False), 'no_rebounce': True})
+        # Création automatique employee sur création utilisateur? -> non: utilisateurs portail
         return user
+
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'
@@ -871,43 +810,7 @@ class MeetingType(models.Model):
 class Meeting(models.Model):
     _inherit = "calendar.event"
 
-    # redefinition
-    description = fields.Html('Description', states={'done': [('readonly', True)]})
-    location = fields.Char('Location', compute="_compute_location", store=True, track_visibility='onchange', help="Location of Event")
-
-    of_lieu = fields.Selection([
-        ("onsite", "Dans les locaux"),
-        ("phone", u"Au téléphone"),
-        ("offsite", u"À l'exterieur"),
-        ("custom", "Adresse manuelle"),
-        ], string="Lieu du RDV", required=True, default="onsite")
-    # @TODO : Supprimer le code commenté
-    # user_company_ids = fields.Many2many('res.company', 'calendar_user_company_rel', 'calendar_id', 'company_id', u"sociétés du propriétaire",compute="_compute_user_company_ids")#,store=True)#related="user_id.company_ids", readonly=True)
-    # tentative de domain ratée
-    of_lieu_company_id = fields.Many2one("res.company", string=u"(Précisez)")  # ,domain="[('id', 'in', user_company_ids and user_company_ids._ids)]")
-    of_lieu_rdv_id = fields.Many2one("res.partner", string=u"(Précisez)")
-    of_lieu_address_street = fields.Char(string="Rue")  # , compute="_compute_geo")
-    of_lieu_address_street2 = fields.Char(string="Rue (2)")  # , compute="_compute_geo")
-    of_lieu_address_city = fields.Char(string="Ville")  # , compute="_compute_geo")
-    of_lieu_address_state_id = fields.Many2one("res.country.state", string=u"Région")  # , compute="_compute_geo")
-    of_lieu_address_zip = fields.Char(string="Code postal")  # , compute="_compute_geo")
-    of_lieu_address_country_id = fields.Many2one("res.country", string="Pays")  # , compute="_compute_geo")
-    of_on_phone = fields.Boolean(u'Au téléphone', compute="_compute_on_phone")
-    of_color_partner_id = fields.Many2one(
-        "res.partner", "Partner whose color we will take", compute='_compute_color_partner', store=False)
-    of_geo_lat = fields.Float(
-        string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo",
-        store=False, search='_search_lat')
-    of_geo_lng = fields.Float(
-        string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_geo",
-        store=False, search='_search_lng')
-    of_precision = fields.Selection(
-        GEO_PRECISION, default='no_address', compute="_compute_geo", store=False, search='_search_precision',
-        help=u"Niveau de précision de la géolocalisation.\n"
-             u"bas: à la ville.\n"
-             u"moyen: au village\n"
-             u"haut: à la rue / au voisinage\n"
-             u"très haut: au numéro de rue\n")
+    # Search
 
     def _search_lat(self, operator, operand):
         partners = self.env['res.partner']
@@ -924,9 +827,9 @@ class Meeting(models.Model):
         partners = partners.search([('id', 'in', partners._ids), ('geo_lat', operator, operand)])
         companies = companies.search([('id', 'in', companies._ids), ('partner_id.geo_lat', operator, operand)])
         return [('id', 'in', self.env['calendar.event'].search(['|', '&', ('of_lieu_company_id', 'in', companies.ids),
-                                                                          ('of_lieu', '=', 'onsite'),
-                                                                     '&', ('of_lieu_rdv_id', 'in', partners.ids),
-                                                                          ('of_lieu', '=', 'offsite')]).ids)]
+                                                                ('of_lieu', '=', 'onsite'),
+                                                                '&', ('of_lieu_rdv_id', 'in', partners.ids),
+                                                                ('of_lieu', '=', 'offsite')]).ids)]
 
     def _search_lng(self, operator, operand):
         partners = self.env['res.partner']
@@ -943,9 +846,9 @@ class Meeting(models.Model):
         partners = partners.search([('id', 'in', partners._ids), ('geo_lng', operator, operand)])
         companies = companies.search([('id', 'in', companies._ids), ('partner_id.geo_lng', operator, operand)])
         return [('id', 'in', self.env['calendar.event'].search(['|', '&', ('of_lieu_company_id', 'in', companies.ids),
-                                                                          ('of_lieu', '=', 'onsite'),
-                                                                     '&', ('of_lieu_rdv_id', 'in', partners.ids),
-                                                                          ('of_lieu', '=', 'offsite')]).ids)]
+                                                                ('of_lieu', '=', 'onsite'),
+                                                                '&', ('of_lieu_rdv_id', 'in', partners.ids),
+                                                                ('of_lieu', '=', 'offsite')]).ids)]
 
     def _search_precision(self, operator, operand):
         partners = self.env['res.partner']
@@ -962,9 +865,94 @@ class Meeting(models.Model):
         partners = partners.search([('id', 'in', partners._ids), ('precision', operator, operand)])
         companies = companies.search([('id', 'in', companies._ids), ('partner_id.precision', operator, operand)])
         return [('id', 'in', self.env['calendar.event'].search(['|', '&', ('of_lieu_company_id', 'in', companies.ids),
-                                                                          ('of_lieu', '=', 'onsite'),
-                                                                     '&', ('of_lieu_rdv_id', 'in', partners.ids),
-                                                                          ('of_lieu', '=', 'offsite')]).ids)]
+                                                                ('of_lieu', '=', 'onsite'),
+                                                                '&', ('of_lieu_rdv_id', 'in', partners.ids),
+                                                                ('of_lieu', '=', 'offsite')]).ids)]
+
+        # redefinition
+        description = fields.Html('Description', states={'done': [('readonly', True)]})
+        location = fields.Char('Location', compute="_compute_location", store=True, track_visibility='onchange',
+                               help="Location of Event")
+
+        of_lieu = fields.Selection([
+            ("onsite", "Dans les locaux"),
+            ("phone", u"Au téléphone"),
+            ("offsite", u"À l'exterieur"),
+            ("custom", "Adresse manuelle"),
+        ], string="Lieu du RDV", required=True, default="onsite")
+        of_lieu_company_id = fields.Many2one("res.company",
+                                             string=u"(Précisez)")
+        of_lieu_rdv_id = fields.Many2one("res.partner", string=u"(Précisez)")
+        of_lieu_address_street = fields.Char(string="Rue")
+        of_lieu_address_street2 = fields.Char(string="Rue (2)")
+        of_lieu_address_city = fields.Char(string="Ville")
+        of_lieu_address_state_id = fields.Many2one("res.country.state", string=u"Région")
+        of_lieu_address_zip = fields.Char(string="Code postal")
+        of_lieu_address_country_id = fields.Many2one("res.country", string="Pays")
+        of_on_phone = fields.Boolean(u'Au téléphone', compute="_compute_on_phone")
+        of_color_partner_id = fields.Many2one(
+            "res.partner", "Partner whose color we will take", compute='_compute_color_partner', store=False)
+        of_geo_lat = fields.Float(
+            string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo",
+            store=False, search='_search_lat')
+        of_geo_lng = fields.Float(
+            string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_geo",
+            store=False, search='_search_lng')
+        of_precision = fields.Selection(
+            GEO_PRECISION, default='no_address', compute="_compute_geo", store=False, search='_search_precision',
+            help=u"Niveau de précision de la géolocalisation.\n"
+                 u"bas: à la ville.\n"
+                 u"moyen: au village\n"
+                 u"haut: à la rue / au voisinage\n"
+                 u"très haut: au numéro de rue\n")
+
+    """
+    These fields would be necessary if use_contacts="0" in <calendar>. See event_data_transform function in .js file
+
+    of_color_ft = fields.Char(string="Couleur de texte", help="Couleur de texte de l'utilisateur",
+                              compute="_compute_of_color")
+    of_color_bg = fields.Char(string="Couleur de fond", help="Couleur de fond de l'utilisateur",
+                              compute="_compute_of_color")
+
+    @api.multi
+    @api.depends('of_color_partner_id')
+    def _compute_of_color(self):
+        for meeting in self:
+            meeting.of_color_bg = meeting.of_color_partner_id.of_color_bg
+            meeting.of_color_ft = meeting.of_color_partner_id.of_color_ft
+    """
+
+    # @api.depends
+
+    @api.multi
+    @api.depends("of_lieu", "of_lieu_company_id", "of_lieu_rdv_id", "of_precision", "of_lieu_address_street",
+                 "of_lieu_address_street2", "of_lieu_address_city", "of_lieu_address_state_id", "of_lieu_address_zip",
+                 "of_lieu_address_country_id")
+    def _compute_location(self):
+        for meeting in self:
+            if meeting.of_precision != "no_address":
+                le_tab = []
+                le_texte = ""
+                # On remplit le tableau puis on crée le texte
+                if meeting.of_lieu_address_street:
+                    le_tab.append(meeting.of_lieu_address_street)
+                if meeting.of_lieu_address_street2:
+                    le_tab.append(meeting.of_lieu_address_street2)
+                if meeting.of_lieu_address_city and meeting.of_lieu_address_zip:
+                    le_tab.append(meeting.of_lieu_address_zip + " " + meeting.of_lieu_address_city)
+                elif meeting.of_lieu_address_city:
+                    le_tab.append(meeting.of_lieu_address_city)
+                elif meeting.of_lieu_address_zip:
+                    le_tab.append(meeting.of_lieu_address_zip)
+                if meeting.of_lieu_address_state_id:
+                    le_tab.append(meeting.of_lieu_address_state_id.name)
+                if meeting.of_lieu_address_country_id:
+                    le_tab.append(meeting.of_lieu_address_country_id.name)
+                if len(le_tab) > 0:
+                    le_texte += le_tab[0]
+                for i in range(1, len(le_tab)):
+                    le_texte += ", " + le_tab[i]
+                meeting.location = le_texte
 
     @api.multi
     @api.depends("of_lieu")
@@ -972,6 +960,15 @@ class Meeting(models.Model):
         for meeting in self:
             if meeting.of_lieu and meeting.of_lieu == "phone":
                 meeting.of_on_phone = True
+
+    @api.multi
+    @api.depends('user_id')
+    def _compute_color_partner(self):
+        for meeting in self:
+            if meeting.user_id.partner_id in meeting.partner_ids:
+                meeting.color_partner_id = meeting.user_id.partner_id
+            else:
+                meeting.color_partner_id = (filter(lambda partner: partner.user_ids, meeting.partner_ids) or [False])[0]
 
     @api.multi
     @api.depends("of_lieu", "of_lieu_company_id", "of_lieu_rdv_id")
@@ -1013,48 +1010,7 @@ class Meeting(models.Model):
                 }
             meeting.update(vals)
 
-    @api.multi
-    @api.depends("of_lieu", "of_lieu_company_id", "of_lieu_rdv_id", "of_precision", "of_lieu_address_street", "of_lieu_address_street2",
-                 "of_lieu_address_city", "of_lieu_address_state_id", "of_lieu_address_zip", "of_lieu_address_country_id")
-    def _compute_location(self):
-        for meeting in self:
-            if meeting.of_precision != "no_address":
-                le_tab = []
-                le_texte = ""
-                """
-                On remplit le tableau puis on crée le texte
-                """
-                if meeting.of_lieu_address_street:
-                    le_tab.append(meeting.of_lieu_address_street)
-                if meeting.of_lieu_address_street2:
-                    le_tab.append(meeting.of_lieu_address_street2)
-                if meeting.of_lieu_address_city and meeting.of_lieu_address_zip:
-                    le_tab.append(meeting.of_lieu_address_zip + " " + meeting.of_lieu_address_city)
-                elif meeting.of_lieu_address_city:
-                    le_tab.append(meeting.of_lieu_address_city)
-                elif meeting.of_lieu_address_zip:
-                    le_tab.append(meeting.of_lieu_address_zip)
-                if meeting.of_lieu_address_state_id:
-                    le_tab.append(meeting.of_lieu_address_state_id.name)
-                if meeting.of_lieu_address_country_id:
-                    le_tab.append(meeting.of_lieu_address_country_id.name)
-                if len(le_tab) > 0:
-                    le_texte += le_tab[0]
-                for i in range(1, len(le_tab)):
-                    le_texte += ", " + le_tab[i]
-                meeting.location = le_texte
-
-    """tentative de domain ratée
-    @api.multi
-    @api.depends("user_id.company_ids")
-    def _compute_user_company_ids(self):
-        for meeting in self:
-            la_list = []
-            #meeting.user_company_ids = [(5,0,0)] + [(4,le_id,False) for le_id in meeting.user_id.company_ids._ids]
-            if meeting.user_id.id:
-                company_ids = meeting.user_id.company_ids
-                la_list = [x.id for x in company_ids]
-            meeting.user_company_ids = [(6,0,la_list)]"""
+    # @api.onchange
 
     @api.onchange('of_lieu')
     def _onchange_lieu(self):
@@ -1077,28 +1033,7 @@ class Meeting(models.Model):
             return
         self.of_lieu_rdv_id = self.of_lieu_company_id.partner_id.id
 
-    """
-    These fields would be necessary if use_contacts="0" in <calendar>. See event_data_transform function in .js file
-
-    of_color_ft = fields.Char(string="Couleur de texte", help="Couleur de texte de l'utilisateur", compute="_compute_of_color")
-    of_color_bg = fields.Char(string="Couleur de fond", help="Couleur de fond de l'utilisateur", compute="_compute_of_color")
-
-    @api.multi
-    @api.depends('of_color_partner_id')
-    def _compute_of_color(self):
-        for meeting in self:
-            meeting.of_color_bg = meeting.of_color_partner_id.of_color_bg
-            meeting.of_color_ft = meeting.of_color_partner_id.of_color_ft
-    """
-
-    @api.multi
-    @api.depends('user_id')
-    def _compute_color_partner(self):
-        for meeting in self:
-            if meeting.user_id.partner_id in meeting.partner_ids:
-                meeting.color_partner_id = meeting.user_id.partner_id
-            else:
-                meeting.color_partner_id = (filter(lambda partner: partner.user_ids, meeting.partner_ids) or [False])[0]
+    # Héritages
 
     @api.multi
     def write(self, vals):
@@ -1130,7 +1065,8 @@ class Meeting(models.Model):
     @api.model
     def create(self, vals):
         """
-        En cas de création par google agenda, le champs "location" peut etre renseigné, or dans ce module on transforme ce champ en champ calculé
+        En cas de création par google agenda, le champs "location" peut etre renseigné,
+        or dans ce module on transforme ce champ en champ calculé
         """
         lieu = vals.get('of_lieu', False)
         if not lieu:
