@@ -153,11 +153,17 @@ class OFSmsMessage(models.Model):
             # Mark it as sent to avoid it being sent again
             queued_sms.status_code = my_sms.delivary_state
 
+            # Commit intermédiaire pour éviter le renvoi d'un SMS en cas d'erreur
+            self._cr.commit()
+
             # Record the message in the communication log (RSE)
-            self.env[queued_sms.model_id.model].browse(queued_sms.record_id).message_post(
-                body=u"SMS envoyé au %s :<br/><br/>%s" %
-                     (queued_sms.to_mobile, queued_sms.sms_content.replace(u"\n", u"<br/>").encode('utf-8')),
-                subject="SMS")
+            try:
+                self.env[queued_sms.model_id.model].browse(queued_sms.record_id).message_post(
+                    body=u"SMS envoyé au %s :<br/><br/>%s" %
+                         (queued_sms.to_mobile, queued_sms.sms_content.replace(u"\n", u"<br/>")),
+                    subject="SMS")
+            except:
+                pass
 
 
 class OFSmsCompose(models.Model):
