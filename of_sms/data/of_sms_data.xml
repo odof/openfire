@@ -4,42 +4,43 @@
 <!--#############################################################################################################
     ####        I R . C R O N
     #############################################################################################################-->
+    <data noupdate="1">
+        <!-- Vérifier SMS reçu -->
+    <!--     <record id="of_cron_sms_check" model="ir.cron">
+            <field name="name">Vérifier SMS reçus</field>
+            <field name="model">of.sms.account</field>
+            <field name="function">check_all_messages</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+            <field name="active">true</field>
+            <field name="args">()</field>
+        </record> -->
 
-    <!-- Vérifier SMS reçu -->
-<!--     <record id="of_cron_sms_check" model="ir.cron">
-        <field name="name">Vérifier SMS reçus</field>
-        <field name="model">of.sms.account</field>
-        <field name="function">check_all_messages</field>
-        <field name="interval_number">1</field>
-        <field name="interval_type">hours</field>
-        <field name="numbercall">-1</field>
-        <field name="active">true</field>
-        <field name="args">()</field>
-    </record> -->
+        <!-- Vérifier file d'envoi de SMS (différé)-->
+        <record id="of_cron_sms_queue_check" model="ir.cron">
+            <field name="name">Envoyer file envoi SMS différés</field>
+            <field name="model">of.sms.message</field>
+            <field name="function">process_sms_queue</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>
+            <field name="active">true</field>
+            <field name="args">(20,)</field>
+        </record>
 
-    <!-- Vérifier file d'envoi de SMS (différé)-->
-    <record id="of_cron_sms_queue_check" model="ir.cron">
-        <field name="name">Envoyer file envoi SMS différés</field>
-        <field name="model">of.sms.message</field>
-        <field name="function">process_sms_queue</field>
-        <field name="interval_number">1</field>
-        <field name="interval_type">minutes</field>
-        <field name="numbercall">-1</field>
-        <field name="active">true</field>
-        <field name="args">(20,)</field>
-    </record>
-
-    <!-- Cron journalier de rappel d'intervention -->
-    <record id="of_cron_sms_notif_daily" model="ir.cron">
-        <field name="name">SMS rappel intervention</field>
-        <field name="model">of.planning.intervention</field>
-        <field name="function">sms_notif_daily</field>
-        <field name="interval_number">1</field>
-        <field name="interval_type">days</field>
-        <field name="numbercall">-1</field>
-        <field name="active">true</field>
-        <field name="args">()</field>
-    </record>
+        <!-- Cron journalier de rappel d'intervention -->
+        <record id="of_cron_sms_notif_daily" model="ir.cron">
+            <field name="name">SMS rappel intervention</field>
+            <field name="model">of.planning.intervention</field>
+            <field name="function">sms_notif_daily</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active">true</field>
+            <field name="args">()</field>
+        </record>
+    </data>
 
 <!--#############################################################################################################
     ####        M A I L . M E S S A G E . S U B T Y P E
