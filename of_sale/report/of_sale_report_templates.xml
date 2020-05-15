@@ -9,6 +9,7 @@
         <t t-set="pdf_email" t-value="doc.pdf_afficher_email()"/>
         <t t-set="pdf_vt_pastille" t-value="doc.pdf_vt_pastille()"/>
         <t t-set="client_info_pastille" t-value="(pdf_telephone &gt; 1 and doc.partner_id.phone) or (pdf_mobile &gt; 1 and doc.partner_id.mobile) or (pdf_fax &gt; 1 and doc.partner_id.fax) or (pdf_email &gt; 1 and doc.partner_id.email)"/>
+        <t t-set="pdf_hide_global_address_label" t-value="doc.pdf_hide_global_address_label()"/>
         <!--####################
             La vue d'origine est entièrement réécrite ici.
             ####################-->
@@ -34,7 +35,7 @@
                     </div>
                 </div>
                 <div name="adresse_facturation" class="col-xs-5 col-xs-offset-1" style="font-size: large">
-                    <strong name="libelle_adr_fact_livraison" t-if="doc.partner_shipping_id == doc.partner_invoice_id">Adresse de livraison et de facturation&amp;nbsp;:</strong>
+                    <strong name="libelle_adr_fact_livraison" t-if="doc.partner_shipping_id == doc.partner_invoice_id and not pdf_hide_global_address_label">Adresse de livraison et de facturation&amp;nbsp;:</strong>
                     <strong name="libelle_adr_facturation" t-if="doc.partner_shipping_id != doc.partner_invoice_id">Adresse de facturation&amp;nbsp;:</strong><br/>
                     <t t-set="the_address" t-value="doc.partner_invoice_id"/>
                     <t t-if="doc.pdf_afficher_nom_parent()">

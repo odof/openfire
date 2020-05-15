@@ -131,6 +131,9 @@ class SaleOrder(models.Model):
     def pdf_vt_pastille(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_vt_pastille')
 
+    def pdf_hide_global_address_label(self):
+        return self.env['ir.values'].get_default('sale.config.settings', 'pdf_hide_global_address_label')
+
     def get_color_section(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'of_color_bg_section')
 
@@ -1273,6 +1276,10 @@ class OFSaleConfiguration(models.TransientModel):
         help=u"Afficher la date de visite technique dans une pastille dans le rapport PDF des devis ?"
     )
 
+    pdf_hide_global_address_label = fields.Boolean(
+        string=u"(OF) Libellé adresse de livraison et facturation", required=True, default=False,
+        help=u'Masquer le libellé "Adresse de livraison et de facturation" dans le rapport PDF des devis ?')
+
     pdf_adresse_nom_parent = fields.Boolean(
         string=u"(OF) Nom parent contact", required=True, default=False,
         help=u"Afficher le nom du 'parent' du contact au lieu du nom du contact dans les rapport PDF ?"
@@ -1378,6 +1385,11 @@ class OFSaleConfiguration(models.TransientModel):
     def set_pdf_vt_pastille_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'pdf_vt_pastille', self.pdf_vt_pastille)
+
+    @api.multi
+    def set_pdf_hide_global_address_label_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_hide_global_address_label', self.pdf_hide_global_address_label)
 
     @api.multi
     def set_of_deposit_product_categ_id_defaults(self):

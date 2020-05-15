@@ -368,6 +368,11 @@
                             <field name="pdf_afficher_multi_echeances" class="oe_inline"/>
                             <span>Afficher les échéances multiples dans les rapports PDF</span>
                         </div>
+                        <label for="pdf_hide_global_address_label"/>
+                        <div name="pdf_hide_global_address_label">
+                            <field name="pdf_hide_global_address_label" class="oe_inline"/>
+                            <span>Masquer le libellé "Adresse de livraison et de facturation" dans le rapport PDF des devis</span>
+                        </div>
                         <label for="of_color_bg_section"/>
                         <div name="of_color_bg_section_setting">
                             <field name="of_color_bg_section" class="oe_inline" widget="color"/>
