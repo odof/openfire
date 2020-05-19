@@ -4,8 +4,10 @@ access_of_sms_account_system,access_of_sms_account,model_of_sms_account,base.gro
 access_of_sms_message_user,access_of_sms_message,model_of_sms_message,base.group_user,1,0,1,0
 access_of_sms_message_system,access_of_sms_message,model_of_sms_message,base.group_system,1,1,1,1
 access_of_sms_gateway,access_of_sms_gateway,model_of_sms_gateway,,1,0,0,0
+access_of_sms_gateway_system,access_of_sms_gateway,model_of_sms_gateway,base.group_system,1,1,1,1
 access_of_sms_number_system,access_of_sms_number_system,model_of_sms_number,base.group_system,1,1,1,1
 access_of_sms_number_user,access_of_sms_number_user,model_of_sms_number,base.group_user,1,0,0,0
 access_of_sms_template,access_of_sms_template,model_of_sms_template,,1,1,1,1
 access_of_sms_compose,access_of_sms_compose,model_of_sms_compose,,1,1,1,1
 access_of_sms_gateway_ovh,access_of_sms_gateway_ovh,model_of_sms_gateway_ovh,,1,0,0,0
+access_of_sms_gateway_ovh_system,access_of_sms_gateway_ovh,model_of_sms_gateway_ovh,base.group_system,1,1,1,1
