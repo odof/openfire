@@ -23,6 +23,7 @@ except ImportError:
 
 NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
 
+
 class OfDocumentsJoints(models.AbstractModel):
     """ Classe abstraite qui permet d'ajouter les documents joints.
     Elle doit être surchargée pour ajouter d'autres rapports dans la fonction _allowed_reports
@@ -846,6 +847,7 @@ class SaleOrderLine(models.Model):
             else:
                 line.qty_to_invoice = 0
 
+
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
@@ -1096,6 +1098,7 @@ class OFSaleConfiguration(models.TransientModel):
             'sale.config.settings', 'of_position_fiscale',
             self.of_position_fiscale)
 
+
 class AccountInvoice(models.Model):
     _name = 'account.invoice'
     _inherit = ["account.invoice", "of.documents.joints"]
@@ -1273,6 +1276,17 @@ class AccountInvoice(models.Model):
             invoices = invoices.filtered(lambda inv: (inv.date_invoice < self.date_invoice
                                                       or inv.number <= self.number
                                                       or inv == self))
+
+        # On ne garde que les factures dont toutes les lignes sont contrebalancées
+        order_lines = invoices.mapped('invoice_line_ids').mapped('sale_line_ids')
+        while order_lines:
+            invs_to_remove = invoice_obj
+            for order_line in order_lines:
+                invs = order_line.invoice_lines.mapped('invoice_id').filtered(lambda inv: inv in invoices)
+                if len(invs) == 1 and invs != self:
+                    invs_to_remove |= invs
+            invoices -= invs_to_remove
+            order_lines = invs_to_remove.mapped('invoice_line_ids').mapped('sale_line_ids')
 
         # Tri dans l'ordre
         invoices = invoice_obj.search([('id', 'in', invoices.ids)])

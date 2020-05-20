@@ -6,6 +6,7 @@ from odoo.tools.misc import formatLang
 
 import json
 
+
 class AccountInvoice(models.Model):
     _inherit = "account.invoice"
 
@@ -45,8 +46,8 @@ class AccountInvoice(models.Model):
 
         lines = self.invoice_line_ids
         products = lines.mapped('product_id')
-        product_ids = list(products._ids)
-        categ_ids = list(products.mapped('categ_id')._ids)
+        product_ids = products.ids
+        categ_ids = products.mapped('categ_id').ids
         groups = group_obj.search([('invoice', '=', True),
                                    '|', ('id', '=', group_obj.get_group_paiements().id),
                                    '|', ('product_ids', 'in', product_ids), ('categ_ids', 'in', categ_ids)])
@@ -75,11 +76,12 @@ class AccountInvoice(models.Model):
         if lines:
             result = [(False, lines)] + result
         else:
-            result = [(False, self.invoice_line_ids)]
+            result = [(False, self.invoice_line_ids - group_paiement_lines)]
             # On ajoute quand-même les paiements
             for group in groups:
                 if group.is_group_paiements():
-                    result.append((group, lines))  # lines est vide
+                    # Les lignes de paiements doivent rester dans le groupe des paiements.
+                    result.append((group, group_paiement_lines))
         return result
 
     @api.multi
