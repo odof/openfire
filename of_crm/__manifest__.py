@@ -59,6 +59,7 @@ Workflow CRM
         'views/partner_views.xml',
         'views/of_crm_projet_views.xml',
         'views/of_planning_intervention_views.xml',
+        'views/of_sale_objective_views.xml',
         'views/of_crm_templates.xml',
         'reports/of_crm_fiche_rdv_report_view.xml',
         'data/data.xml',
