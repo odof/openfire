@@ -15,3 +15,7 @@ access_of_crm_activity_user,access.of.crm.activity.user,model_of_crm_activity,ba
 access_of_crm_activity_admin,access.of.crm.activity.admin,model_of_crm_activity,of_base.of_group_root_only,1,1,1,1
 access_of_crm_funnel_conversion_user,access.of.crm.funnel.conversion.user,model_of_crm_funnel_conversion,base.group_user,1,0,0,0
 access_of_crm_funnel_conversion2_user,access.of.crm.funnel.conversion2.user,model_of_crm_funnel_conversion2,base.group_user,1,0,0,0
+access_of_sale_objective_user,of.sale.objective.user,model_of_sale_objective,base.group_user,1,0,0,0
+access_of_sale_objective_manager,of.sale.objective.manager,model_of_sale_objective,sales_team.group_sale_manager,1,1,1,1
+access_of_sale_objective_line_user,of.sale.objective.line.user,model_of_sale_objective_line,base.group_user,1,0,0,0
+access_of_sale_objective_line_manager,of.sale.objective.line.manager,model_of_sale_objective_line,sales_team.group_sale_manager,1,1,1,1
