@@ -81,8 +81,9 @@ class SaleOrder(models.Model):
     @api.model
     def create(self, vals):
         start_state = self.env['ir.values'].get_default('sale.config.settings', 'of_sale_order_start_state')
-        if vals.get('state', 'draft') == 'draft' and start_state == 'quotation':
-            vals.update(state='sent')
+        if start_state == 'quotation':
+            if vals.get('state', 'draft') == 'draft':
+                vals.update(state='sent')
         else:
             vals.update(state='draft')
 

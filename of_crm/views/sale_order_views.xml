@@ -61,6 +61,34 @@
             </field>
         </record>
 
+        <record id="of_crm_sale_order_search_view" model="ir.ui.view">
+            <field name="name">of.crm.sale.order.search.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.sale_order_view_search_inherit_quotation"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='draft']" position="replace">
+                    <filter string="Estimations" name="draft" domain="[('state', '=', 'draft')]"/>
+                    <filter string="Devis" name="quotation" domain="[('state', '=', 'sent')]"/>
+                </xpath>
+                <xpath expr="//filter[@name='sent']" position="replace">
+                    <filter string="Devis envoyés" name="sent" domain="[('state', '=', 'sent'), ('of_sent_quotation', '=', True)]"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_crm_quotation_sale_order_search_view" model="ir.ui.view">
+            <field name="name">of.crm.quotation.sale.order.quotation.form.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="of_crm.of_crm_sale_order_search_view"/>
+            <field name="groups_id" eval="[(4, ref('of_crm.group_quotation_sale_order_state'))]"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='draft']" position="replace">
+                    <filter string="Devis" name="draft" domain="[('state', '=', 'sent')]"/>
+                </xpath>
+                <xpath expr="//filter[@name='quotation']" position="replace"/>
+            </field>
+        </record>
+
         <!-- Sale config wizard -->
         <record id="of_cr_sale_config_settings_form_view" model="ir.ui.view">
             <field name="name">of.crm.sale.config.settings.form.view</field>
