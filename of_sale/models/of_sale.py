@@ -1271,12 +1271,6 @@ class AccountInvoice(models.Model):
                         return self
                     invoices -= invoice
 
-        # On ne garde que les factures antérieures à la facture courante
-        if self.state != 'draft':
-            invoices = invoices.filtered(lambda inv: (inv.date_invoice < self.date_invoice
-                                                      or inv.number <= self.number
-                                                      or inv == self))
-
         # On ne garde que les factures dont toutes les lignes sont contrebalancées
         order_lines = invoices.mapped('invoice_line_ids').mapped('sale_line_ids')
         while order_lines:
