@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="of_document.default_settings" model="muk_dms.settings">
+            <field name="name">Configuration des documents par défaut</field>
+        </record>
+
+        <record id="of_document.main_partner_directory" model="muk_dms.directory">
+            <field name="name">PARTENAIRES</field>
+            <field name="is_root_directory">True</field>
+            <field name="settings" eval="ref('of_document.default_settings')"/>
+        </record>
+
+        <function model="muk_dms.file" name="_init_files"/>
+
+    </data>
+</odoo>
