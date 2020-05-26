@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- DMS File Views -->
+
+    <record id="of_document_dms_file_form_view" model="ir.ui.view">
+        <field name="name">of.document.dms.file.form.view</field>
+        <field name="model">muk_dms.file</field>
+        <field name="inherit_id" ref="muk_dms.view_dms_file_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='locked']" position="before">
+                <field name="of_file_type" invisible="1"/>
+                <field name="of_related_model" invisible="1"/>
+                <field name="of_related_id" invisible="1"/>
+                <div class="oe_button_box" name="button_box">
+                    <button class="oe_stat_button" name="action_view_linked_record" type="object" icon="fa-external-link"
+                            attrs="{'invisible': [('of_file_type', '!=', 'related')]}">
+                        <label string="Objet lié"/>
+                    </button>
+                </div>
+            </xpath>
+            <xpath expr="//div[hasclass('oe_title')]/h1" position="after">
+                <h3>
+                    <field name="of_category_id" readonly="1" class="label label-info" options='{"no_open": True}'/>
+                </h3>
+                <label for="of_tag_ids" class="oe_edit_only"/>
+                <field name="of_tag_ids" widget="many2many_tags"/>
+            </xpath>
+            <xpath expr="//sheet" position="after">
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread" options='{"thread_level": 1}'/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_document_dms_file_tree_view" model="ir.ui.view">
+        <field name="name">of.document.dms.file.tree.view</field>
+        <field name="model">muk_dms.file</field>
+        <field name="inherit_id" ref="muk_dms.view_dms_file_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='path']" position="after">
+                <field name="of_category_id"/>
+                <field name="of_tag_ids"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_document_dms_file_search_view" model="ir.ui.view">
+        <field name="name">of.document.dms.file.search.view</field>
+        <field name="model">muk_dms.file</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="of_partner_id"/>
+                <field name="of_category_id"/>
+                <field name="of_tag_ids"/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Catégorie" domain="[]" context="{'group_by': 'of_category_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- File Tag Views -->
+
+    <record id="of_document_file_tag_tree_view" model="ir.ui.view">
+        <field name="name">of.document.file.tag.tree.view</field>
+        <field name="model">of.document.file.tag</field>
+        <field name="arch" type="xml">
+            <tree editable="top">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_document_file_tag_action" model="ir.actions.act_window">
+        <field name="name">Étiquettes</field>
+        <field name="res_model">of.document.file.tag</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <!-- DMS Menus -->
+
+    <record id="muk_dms.main_menu_muk_dms" model="ir.ui.menu">
+        <field name="sequence">5</field>
+    </record>
+
+    <record id="muk_dms.cat_menu_muk_dms_documents" model="ir.ui.menu">
+        <field name="name">Gestion documentaire</field>
+    </record>
+
+    <record id="muk_dms.menu_dms_tree_view" model="ir.ui.menu">
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="muk_dms.menu_dms_directory" model="ir.ui.menu">
+        <field name="name">Répertoires</field>
+        <field name="parent_id" ref="muk_dms.cat_menu_muk_dms_documents"/>
+        <field name="sequence">20</field>
+    </record>
+
+    <record id="muk_dms.menu_dms_file" model="ir.ui.menu">
+        <field name="name">Fichiers</field>
+        <field name="parent_id" ref="muk_dms.cat_menu_muk_dms_documents"/>
+        <field name="sequence">30</field>
+    </record>
+
+    <menuitem id="of_document_file_tag_menu" name="Étiquettes" parent="muk_dms.cat_menu_muk_dms_config"
+              sequence="10" action="of_document_file_tag_action"/>
+
+    <record id="muk_dms.menu_dms_settings" model="ir.ui.menu">
+        <field name="sequence">20</field>
+    </record>
+
+</odoo>

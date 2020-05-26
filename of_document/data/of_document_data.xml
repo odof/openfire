@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- DMS Settings -->
+        <record id="of_document.default_settings" model="muk_dms.settings">
+            <field name="name">Configuration des documents par défaut</field>
+        </record>
+
+        <!-- DMS Directories -->
+
+        <record id="of_document.main_partner_directory" model="muk_dms.directory">
+            <field name="name">PARTENAIRES</field>
+            <field name="is_root_directory">True</field>
+            <field name="settings" eval="ref('of_document.default_settings')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.a_partner_directory" model="muk_dms.directory">
+            <field name="name">A</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.b_partner_directory" model="muk_dms.directory">
+            <field name="name">B</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.c_partner_directory" model="muk_dms.directory">
+            <field name="name">C</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.d_partner_directory" model="muk_dms.directory">
+            <field name="name">D</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.e_partner_directory" model="muk_dms.directory">
+            <field name="name">E</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.f_partner_directory" model="muk_dms.directory">
+            <field name="name">F</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.g_partner_directory" model="muk_dms.directory">
+            <field name="name">G</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.h_partner_directory" model="muk_dms.directory">
+            <field name="name">H</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.i_partner_directory" model="muk_dms.directory">
+            <field name="name">I</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.j_partner_directory" model="muk_dms.directory">
+            <field name="name">J</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.k_partner_directory" model="muk_dms.directory">
+            <field name="name">K</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.l_partner_directory" model="muk_dms.directory">
+            <field name="name">L</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.m_partner_directory" model="muk_dms.directory">
+            <field name="name">M</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.n_partner_directory" model="muk_dms.directory">
+            <field name="name">N</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.o_partner_directory" model="muk_dms.directory">
+            <field name="name">O</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.p_partner_directory" model="muk_dms.directory">
+            <field name="name">P</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.q_partner_directory" model="muk_dms.directory">
+            <field name="name">Q</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.r_partner_directory" model="muk_dms.directory">
+            <field name="name">R</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.s_partner_directory" model="muk_dms.directory">
+            <field name="name">S</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.t_partner_directory" model="muk_dms.directory">
+            <field name="name">T</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.u_partner_directory" model="muk_dms.directory">
+            <field name="name">U</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.v_partner_directory" model="muk_dms.directory">
+            <field name="name">V</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.w_partner_directory" model="muk_dms.directory">
+            <field name="name">W</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.x_partner_directory" model="muk_dms.directory">
+            <field name="name">X</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.y_partner_directory" model="muk_dms.directory">
+            <field name="name">Y</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.z_partner_directory" model="muk_dms.directory">
+            <field name="name">Z</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <record id="of_document.other_partner_directory" model="muk_dms.directory">
+            <field name="name">Autres</field>
+            <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
+            <field name="of_is_protected">True</field>
+        </record>
+
+        <!-- File categories -->
+
+        <record id="of_document.res_partner_file_category" model="of.document.file.category">
+            <field name="name">Partenaire</field>
+        </record>
+
+        <record id="of_document.sale_order_file_category" model="of.document.file.category">
+            <field name="name">Commande de vente</field>
+        </record>
+
+        <record id="of_document.purchase_order_file_category" model="of.document.file.category">
+            <field name="name">Commande d'achat</field>
+        </record>
+
+        <record id="of_document.account_invoice_out_file_category" model="of.document.file.category">
+            <field name="name">Facture client</field>
+        </record>
+
+        <record id="of_document.account_invoice_in_file_category" model="of.document.file.category">
+            <field name="name">Facture fournisseur</field>
+        </record>
+
+        <record id="of_document.stock_picking_out_file_category" model="of.document.file.category">
+            <field name="name">Livraison</field>
+        </record>
+
+        <record id="of_document.stock_picking_in_file_category" model="of.document.file.category">
+            <field name="name">Réception</field>
+        </record>
+
+        <record id="of_document.crm_lead_file_category" model="of.document.file.category">
+            <field name="name">Opportunité</field>
+        </record>
+
+        <record id="of_document.project_issue_file_category" model="of.document.file.category">
+            <field name="name">SAV</field>
+        </record>
+
+        <record id="of_document.of_service_file_category" model="of.document.file.category">
+            <field name="name">Intervention</field>
+        </record>
+
+        <record id="of_document.of_planning_intervention_file_category" model="of.document.file.category">
+            <field name="name">RDV d'intervention</field>
+        </record>
+
+        <!-- File initialization at module installation -->
+        <function model="muk_dms.file" name="_init_files"/>
+
+    </data>
+</odoo>
