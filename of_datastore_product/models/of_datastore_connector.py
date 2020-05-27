@@ -14,6 +14,7 @@ except (ImportError, IOError) as err:
 
 # import socket # Ne pas supprimer cette ligne, voir fonction connect()
 
+
 class OfDatastoreConnector(models.AbstractModel):
     u"""
     Fonctions de communication avec le serveur.

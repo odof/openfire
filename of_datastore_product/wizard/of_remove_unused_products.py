@@ -2,6 +2,7 @@
 
 from odoo import models, api, registry, _
 
+
 class OfRemoveUnusedProducts(models.TransientModel):
     _name = "of.remove.unused.products"
 
