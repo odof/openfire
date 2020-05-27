@@ -760,19 +760,19 @@ class OfImport(models.Model):
                 # Si brand n'est pas défini, une exception sera automatiquement générée plus tard
                 # car la marque est un champ obligatoire pour l'import de tarif
 
+            supplier_categ = valeurs.get(
+                'of_seller_product_category_name',
+                res_objet and res_objet.of_seller_product_category_name or '')
             if 'categ_id' in champs_fichier and 'categ_id' not in valeurs:
                 # Si la catégorie d'article n'est pas renseignée, on prend la catégorie par défaut de la marque
-                valeurs['categ_id'] = brand.compute_product_categ(
-                    res_objet and res_objet.of_seller_product_category_name or '', product=res_objet).id
+                valeurs['categ_id'] = brand.compute_product_categ(supplier_categ, product=res_objet).id
 
             # Calcul des prix d'achat/vente en fonction des règles de calcul et du prix public ht
             if 'list_price' in valeurs and brand:
                 valeurs['of_seller_pp_ht'] = valeurs['list_price']
                 valeurs.update(brand.compute_product_price(
                     valeurs['list_price'],
-                    valeurs.get(
-                        'of_seller_product_category_name',
-                        res_objet and res_objet.of_seller_product_category_name or ''),
+                    supplier_categ,
                     uom_obj.browse(valeurs['uom_id']),
                     uom_obj.browse(valeurs['uom_po_id']),
                     product=res_objet,
@@ -1300,9 +1300,14 @@ class OfImport(models.Model):
 
         model_data = {
             'product.template': {
-                'nom_objet': u'article',             # Libellé pour affichage dans message information/erreur
-                'champ_primaire': 'default_code',    # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
-                'champ_reference': 'default_code',   # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
+                # Libellé pour affichage dans message information/erreur
+                'nom_objet': u'article',
+                # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour)
+                # ou inexistant (création)
+                'champ_primaire': 'default_code',
+                # Champ qui contient la référence ( ex : référence du produit, d'un client, ...)
+                # pour ajout du préfixe devant
+                'champ_reference': 'default_code',
             },
             'of.product.kit.line': {
                 'nom_objet': u'Composants de kits',
@@ -1313,27 +1318,50 @@ class OfImport(models.Model):
                 'champ_reference': '',
             },
             'res.partner': {
-                'nom_objet': u'partenaire',          # Libellé pour affichage dans message information/erreur
-                'champ_primaire': 'ref',             # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
-                'champ_reference': 'ref',            # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
-                # 2 champs suivants : on récupère les id des types de compte comptable payable et recevable pour création comptes comptables clients et fournisseurs (généralement 411 et 401).
-                'data_account_type_receivable_id': self.env['ir.model.data'].get_object_reference('account', 'data_account_type_receivable')[1],
-                'data_account_type_payable_id': self.env['ir.model.data'].get_object_reference('account', 'data_account_type_payable')[1],
+                # Libellé pour affichage dans message information/erreur
+                'nom_objet': u'partenaire',
+                # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour)
+                # ou inexistant (création)
+                'champ_primaire': 'ref',
+                # Champ qui contient la référence ( ex : référence du produit, d'un client, ...)
+                # pour ajout du préfixe devant
+                'champ_reference': 'ref',
+                # 2 champs suivants : on récupère les id des types de compte comptable payable et recevable
+                # pour création comptes comptables clients et fournisseurs (généralement 411 et 401).
+                'data_account_type_receivable_id':
+                    self.env['ir.model.data'].get_object_reference('account', 'data_account_type_receivable')[1],
+                'data_account_type_payable_id':
+                    self.env['ir.model.data'].get_object_reference('account', 'data_account_type_payable')[1],
             },
             'of.service': {
-                'nom_objet': u'service OpenFire',    # Libellé pour affichage dans message information/erreur
-                'champ_primaire': 'id',              # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
-                'champ_reference': '',               # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
+                # Libellé pour affichage dans message information/erreur
+                'nom_objet': u'service OpenFire',
+                # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour)
+                # ou inexistant (création)
+                'champ_primaire': 'id',
+                # Champ qui contient la référence ( ex : référence du produit, d'un client, ...)
+                # pour ajout du préfixe devant
+                'champ_reference': '',
             },
             'res.partner.bank': {
-                'nom_objet': u'Comptes en banque partenaire',  # Libellé pour affichage dans message information/erreur
-                'champ_primaire': 'acc_number',                # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
-                'champ_reference': '',                         # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
+                # Libellé pour affichage dans message information/erreur
+                'nom_objet': u'Comptes en banque partenaire',
+                # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour)
+                # ou inexistant (création)
+                'champ_primaire': 'acc_number',
+                # Champ qui contient la référence ( ex : référence du produit, d'un client, ...)
+                # pour ajout du préfixe devant
+                'champ_reference': '',
             },
             'crm.lead': {
-                'nom_objet': u'partenaire/opportunité',   # Libellé pour affichage dans message information/erreur
-                'champ_primaire': 'of_ref',               # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
-                'champ_reference': 'of_ref',              # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
+                # Libellé pour affichage dans message information/erreur
+                'nom_objet': u'partenaire/opportunité',
+                # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour)
+                # ou inexistant (création)
+                'champ_primaire': 'of_ref',
+                # Champ qui contient la référence ( ex : référence du produit, d'un client, ...)
+                # pour ajout du préfixe devant
+                'champ_reference': 'of_ref',
             },
         }[model]
         model_data['model'] = model
