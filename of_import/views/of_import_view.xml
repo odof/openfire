@@ -102,21 +102,9 @@ Cette action irréversible recalculera la catégorie, le prix d'achat et le prix
     </record>
 
 
-
-
-
+    <!-- ################## Vues article ##################-->
 
         <!-- ################## Vues import tarif ##################-->
-
-        <!-- Filtre -->
-<!--         <record id="of_import_search_view" model="ir.ui.view">
-            <field name="name">of.import.search</field>
-            <field name="model">of.importe</field>
-            <field name="type">search</field>
-            <field name="arch" type="xml">
-                ...
-            </field>
-        </record> -->
 
         <!-- Vue tree -->
         <record id="of_import_tree_view" model="ir.ui.view">
