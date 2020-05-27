@@ -8,6 +8,7 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
+
 class OfDatastoreUpdateProduct(models.TransientModel):
     _name = "of.datastore.update.product"
     _description = 'Import / update products'
