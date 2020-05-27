@@ -23,9 +23,12 @@ Module OpenFire pour la gestion électronique des documents
         'crm',
         'project',
         'of_service',
+        'of_base',
     ],
     'data': [
         'data/of_document_data.xml',
+        'views/dms_views.xml',
+        'views/partner_views.xml',
     ],
     'installable': True,
     'application': True,

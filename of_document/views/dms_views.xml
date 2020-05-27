@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- DMS File Views -->
+
+    <record id="of_document_dms_file_form_view" model="ir.ui.view">
+        <field name="name">of.document.dms.file.form.view</field>
+        <field name="model">muk_dms.file</field>
+        <field name="inherit_id" ref="muk_dms.view_dms_file_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='locked']" position="before">
+                <field name="of_file_type" invisible="1"/>
+                <field name="of_related_model" invisible="1"/>
+                <field name="of_related_id" invisible="1"/>
+                <div class="oe_button_box" name="button_box">
+                    <button class="oe_stat_button" name="action_view_linked_record" type="object" icon="fa-external-link"
+                            attrs="{'invisible': [('of_file_type', '!=', 'related')]}">
+                        <label string="Objet lié"/>
+                    </button>
+                </div>
+            </xpath>
+            <xpath expr="//sheet" position="after">
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread" options='{"thread_level": 1}'/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- DMS Menus -->
+
+    <record id="muk_dms.main_menu_muk_dms" model="ir.ui.menu">
+        <field name="sequence">5</field>
+    </record>
+
+    <record id="muk_dms.cat_menu_muk_dms_documents" model="ir.ui.menu">
+        <field name="name">Gestion documentaire</field>
+    </record>
+
+    <record id="muk_dms.menu_dms_tree_view" model="ir.ui.menu">
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="muk_dms.menu_dms_directory" model="ir.ui.menu">
+        <field name="name">Répertoires</field>
+        <field name="parent_id" ref="muk_dms.cat_menu_muk_dms_documents"/>
+        <field name="sequence">20</field>
+    </record>
+
+    <record id="muk_dms.menu_dms_file" model="ir.ui.menu">
+        <field name="name">Fichiers</field>
+        <field name="parent_id" ref="muk_dms.cat_menu_muk_dms_documents"/>
+        <field name="sequence">30</field>
+    </record>
+
+</odoo>
