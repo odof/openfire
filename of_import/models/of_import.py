@@ -243,7 +243,8 @@ class OFProductBrand(models.Model):
         return self.of_import_categ_id
 
     @api.multi
-    def compute_product_price(self, list_price, categ_name, uom, uom_po, product=None, price=None, remise=None):
+    def compute_product_price(self, list_price, categ_name, uom, uom_po, product=None, price=None, remise=None,
+                              based_on_price=False):
         """
         @param categ_name: Nom de la catégorie de produit telle que donnée par le fournisseur
         @param product: Objet product.template si existant sur la base actuellement
@@ -257,6 +258,7 @@ class OFProductBrand(models.Model):
         udm_ratio = uom_po._compute_price(1.0, uom) if uom_po else 1.0
         eval_dict = {
             'ppht': list_price,
+            'pa': price,
             'cumul': self.compute_remise,
             'udm_ratio': udm_ratio,
         }
@@ -270,9 +272,18 @@ class OFProductBrand(models.Model):
                 if obj and obj[config_field]:
                     value = safe_eval(obj[config_field], eval_dict)
                     if product_field == 'remise':
-                        # Une fois la remise calculée, on peut ajouter le prix d'achat au eval_dict pour le calcul
-                        # du coût final
-                        eval_dict['pa'] = list_price * (100.0 - value) / 100.0
+                        if based_on_price:
+                            # Prix de vente basé sur le prix d'achat
+                            if not price:
+                                # Lors d'un import il n'y a souvent qu'une colonne pour les deux valeurs
+                                # Le prix de vente devient alors le prix d'achat
+                                eval_dict['pa'] = list_price
+                                price = pp_ht
+                            eval_dict['ppht'] = price * 100.0 / (100.0 - value)
+                        else:
+                            # Une fois la remise calculée, on peut ajouter le prix d'achat au eval_dict
+                            # pour le calcul du coût final
+                            eval_dict['pa'] = pp_ht * (100.0 - value) / 100.0
                     else:
                         values[product_field] = value
                     break
@@ -285,7 +296,13 @@ class OFProductBrand(models.Model):
                         eval_dict['pa'] = price
                     elif remise is not None:
                         # La remise est renseignée au niveau de l'import
-                        eval_dict['pa'] = list_price * (100.0 - remise) / 100.0
+                        if based_on_price:
+                            # Prix de vente basé sur le prix d'achat
+                            eval_dict['ppht'] = price * 100.0 / (100.0 - remise)
+                        else:
+                            # Une fois la remise calculée, on peut ajouter le prix d'achat au eval_dict
+                            # pour le calcul du coût final
+                            eval_dict['pa'] = list_price * (100.0 - remise) / 100.0
                     elif product:
                         # L'article existe déjà, son prix d'achat est conservé
                         eval_dict['pa'] = product.of_seller_price
@@ -299,6 +316,7 @@ class OFProductBrand(models.Model):
                         u"Aucune formule n'est renseignée pour %s de cet article (marque à configurer : %s)."
                         % (text, self.name))
 
+        values['of_seller_pp_ht'] = eval_dict['ppht']
         values['of_seller_price'] = eval_dict['pa']
         values['list_price'] *= udm_ratio
         values['standard_price'] *= udm_ratio
@@ -306,7 +324,8 @@ class OFProductBrand(models.Model):
         return values
 
     @api.multi
-    def compute_product_values(self, list_price, categ_name, uom_id, uom_po_id, product=None, price=None, remise=None):
+    def compute_product_values(self, list_price, categ_name, uom_id, uom_po_id, product=None, price=None, remise=None,
+                               based_on_price=False):
         self.ensure_one()
 
         categ = self.compute_product_categ(categ_name, product=product)
@@ -314,7 +333,8 @@ class OFProductBrand(models.Model):
             raise UserError(u"Impossible de trouver la catégorie de produits correspondant à \"%s\"" % (categ_name, ))
 
         values = self.compute_product_price(
-            list_price, categ_name, uom_id, uom_po_id, product=product, price=price, remise=remise)
+            list_price, categ_name, uom_id, uom_po_id, product=product, price=price, remise=remise,
+            based_on_price=based_on_price)
         values['categ_id'] = categ.id
         return values
 
@@ -330,6 +350,13 @@ class OFProductBrand(models.Model):
 class ProductTemplate(models.Model):
     _name = 'product.template'
     _inherit = ('product.template', 'of.import.product.config.template')
+
+    of_is_net_price = fields.Boolean(
+        string="Basé sur prix net",
+        help="Si cette case est cochée, les prix de l'article sont calculés à partir d'un "
+             "prix d'achat donné par le fournisseur.\n"
+             "Sinon, ils sont pasés sur le prix public hors taxe."
+    )
 
     @api.multi
     def of_action_update_from_brand(self):
@@ -348,7 +375,9 @@ class ProductTemplate(models.Model):
                         seller.of_product_category_name,
                         product.uom_id,
                         product.uom_po_id,
-                        product
+                        product,
+                        seller.price,
+                        based_on_price=product.of_is_net_price,
                     )
                     values = {key: val for key, val in values.iteritems()
                               if self._fields[key].convert_to_write(product[key], product) != val}
@@ -777,7 +806,8 @@ class OfImport(models.Model):
                     uom_obj.browse(valeurs['uom_po_id']),
                     product=res_objet,
                     price=valeurs.get('of_seller_price'),
-                    remise=valeurs.get('of_seller_remise')))
+                    remise=valeurs.get('of_seller_remise'),
+                    based_on_price=valeurs.get('of_is_net_price')))
         elif self.type_import == 'of.product.kit.line':
             if 'product_uom_id' not in valeurs:
                 product_id = valeurs.get('product_id')

@@ -103,7 +103,16 @@ Cette action irréversible recalculera la catégorie, le prix d'achat et le prix
 
 
     <!-- ################## Vues article ##################-->
-
+    <record id="of_import_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.import.product.template.common.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="of_product.of_product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='purchase_ok']" position="after">
+                <field name="of_is_net_price" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
         <!-- ################## Vues import tarif ##################-->
 
         <!-- Vue tree -->
