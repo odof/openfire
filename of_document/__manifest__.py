@@ -27,6 +27,7 @@ Module OpenFire pour la gestion électronique des documents
     ],
     'data': [
         'data/of_document_data.xml',
+        'security/ir.model.access.csv',
         'views/dms_views.xml',
         'views/partner_views.xml',
         'views/of_document_templates.xml',
