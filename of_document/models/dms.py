@@ -15,7 +15,13 @@ class Directory(dms_base.DMSModel):
     @api.constrains('name')
     def _check_name(self):
         if not self.check_name(self.name):
-            raise ValidationError("The directory name is invalid.")
+            raise ValidationError(u"Le nom de répertoire n'est pas valide : %s" % self.name)
+
+    def _before_create(self, vals):
+        vals = super(Directory, self)._before_create(vals)
+        if 'name' in vals:
+            vals['name'] = vals['name'].replace('/', '|').lstrip()
+        return vals
 
 
 class File(dms_base.DMSModel):
@@ -55,6 +61,10 @@ class File(dms_base.DMSModel):
                     partner_dir = self.env['muk_dms.directory'].create({'name': top_partner.name,
                                                                         'parent_directory': parent_dir.id,
                                                                         'partner_id': top_partner.id})
+
+                # Get partner category
+                categ = self.env.ref('of_document.res_partner_file_category')
+
                 for attachment in attachments:
                     self.create({'name': attachment.name,
                                  'directory': partner_dir.id,
@@ -62,7 +72,8 @@ class File(dms_base.DMSModel):
                                  'of_related_model': 'res.partner',
                                  'of_related_id': partner.id,
                                  'of_attachment_id': attachment.id,
-                                 'size': attachment.file_size})
+                                 'size': attachment.file_size,
+                                 'of_category_id': categ.id})
             # Sale order attachments
             sale_orders = self.env['sale.order'].search([('partner_id', '=', partner.id)])
             for sale_order in sale_orders:
@@ -76,6 +87,10 @@ class File(dms_base.DMSModel):
                         partner_dir = self.env['muk_dms.directory'].create({'name': top_partner.name,
                                                                             'parent_directory': parent_dir.id,
                                                                             'partner_id': top_partner.id})
+
+                    # Get sale order category
+                    categ = self.env.ref('of_document.sale_order_file_category')
+
                     for attachment in attachments:
                         self.create({'name': attachment.name,
                                      'directory': partner_dir.id,
@@ -83,7 +98,8 @@ class File(dms_base.DMSModel):
                                      'of_related_model': 'sale.order',
                                      'of_related_id': sale_order.id,
                                      'of_attachment_id': attachment.id,
-                                     'size': attachment.file_size})
+                                     'size': attachment.file_size,
+                                     'of_category_id': categ.id})
             # Purchase order attachments
             purchase_orders = self.env['purchase.order'].search([('partner_id', '=', partner.id)])
             for purchase_order in purchase_orders:
@@ -97,6 +113,10 @@ class File(dms_base.DMSModel):
                         partner_dir = self.env['muk_dms.directory'].create({'name': top_partner.name,
                                                                             'parent_directory': parent_dir.id,
                                                                             'partner_id': top_partner.id})
+
+                    # Get purchase order category
+                    categ = self.env.ref('of_document.purchase_order_file_category')
+
                     for attachment in attachments:
                         self.create({'name': attachment.name,
                                      'directory': partner_dir.id,
@@ -104,7 +124,8 @@ class File(dms_base.DMSModel):
                                      'of_related_model': 'purchase.order',
                                      'of_related_id': purchase_order.id,
                                      'of_attachment_id': attachment.id,
-                                     'size': attachment.file_size})
+                                     'size': attachment.file_size,
+                                     'of_category_id': categ.id})
             # Invoice attachments
             invoices = self.env['account.invoice'].search([('partner_id', '=', partner.id)])
             for invoice in invoices:
@@ -118,6 +139,13 @@ class File(dms_base.DMSModel):
                         partner_dir = self.env['muk_dms.directory'].create({'name': top_partner.name,
                                                                             'parent_directory': parent_dir.id,
                                                                             'partner_id': top_partner.id})
+
+                    # Get invoice category
+                    if invoice.type in ('out_invoice', 'out_refund'):
+                        categ = self.env.ref('of_document.account_invoice_out_file_category')
+                    else:
+                        categ = self.env.ref('of_document.account_invoice_in_file_category')
+
                     for attachment in attachments:
                         self.create({'name': attachment.name,
                                      'directory': partner_dir.id,
@@ -125,10 +153,14 @@ class File(dms_base.DMSModel):
                                      'of_related_model': 'account.invoice',
                                      'of_related_id': invoice.id,
                                      'of_attachment_id': attachment.id,
-                                     'size': attachment.file_size})
+                                     'size': attachment.file_size,
+                                     'of_category_id': categ.id})
             # Picking attachments
             pickings = self.env['stock.picking'].search([('partner_id', '=', partner.id)])
             for picking in pickings:
+                if picking.picking_type_id.code not in ('outgoing', 'incoming'):
+                    continue
+
                 attachments = self.env['ir.attachment'].\
                     search([('res_model', '=', 'stock.picking'), ('res_id', '=', picking.id)])
                 if attachments:
@@ -139,6 +171,13 @@ class File(dms_base.DMSModel):
                         partner_dir = self.env['muk_dms.directory'].create({'name': top_partner.name,
                                                                             'parent_directory': parent_dir.id,
                                                                             'partner_id': top_partner.id})
+
+                    # Get picking category
+                    if picking.picking_type_id.code == 'outgoing':
+                        categ = self.env.ref('of_document.stock_picking_out_file_category')
+                    else:
+                        categ = self.env.ref('of_document.stock_picking_in_file_category')
+
                     for attachment in attachments:
                         self.create({'name': attachment.name,
                                      'directory': partner_dir.id,
@@ -146,7 +185,8 @@ class File(dms_base.DMSModel):
                                      'of_related_model': 'stock.picking',
                                      'of_related_id': picking.id,
                                      'of_attachment_id': attachment.id,
-                                     'size': attachment.file_size})
+                                     'size': attachment.file_size,
+                                     'of_category_id': categ.id})
             # Lead attachments
             leads = self.env['crm.lead'].search([('partner_id', '=', partner.id)])
             for lead in leads:
@@ -160,6 +200,10 @@ class File(dms_base.DMSModel):
                         partner_dir = self.env['muk_dms.directory'].create({'name': top_partner.name,
                                                                             'parent_directory': parent_dir.id,
                                                                             'partner_id': top_partner.id})
+
+                    # Get lead category
+                    categ = self.env.ref('of_document.crm_lead_file_category')
+
                     for attachment in attachments:
                         self.create({'name': attachment.name,
                                      'directory': partner_dir.id,
@@ -167,7 +211,8 @@ class File(dms_base.DMSModel):
                                      'of_related_model': 'crm.lead',
                                      'of_related_id': lead.id,
                                      'of_attachment_id': attachment.id,
-                                     'size': attachment.file_size})
+                                     'size': attachment.file_size,
+                                     'of_category_id': categ.id})
             # Project issue attachments
             issues = self.env['project.issue'].search([('partner_id', '=', partner.id)])
             for issue in issues:
@@ -181,6 +226,10 @@ class File(dms_base.DMSModel):
                         partner_dir = self.env['muk_dms.directory'].create({'name': top_partner.name,
                                                                             'parent_directory': parent_dir.id,
                                                                             'partner_id': top_partner.id})
+
+                    # Get project issue category
+                    categ = self.env.ref('of_document.project_issue_file_category')
+
                     for attachment in attachments:
                         self.create({'name': attachment.name,
                                      'directory': partner_dir.id,
@@ -188,7 +237,8 @@ class File(dms_base.DMSModel):
                                      'of_related_model': 'project.issue',
                                      'of_related_id': issue.id,
                                      'of_attachment_id': attachment.id,
-                                     'size': attachment.file_size})
+                                     'size': attachment.file_size,
+                                     'of_category_id': categ.id})
             # Service attachments
             services = self.env['of.service'].search([('partner_id', '=', partner.id)])
             for service in services:
@@ -202,6 +252,10 @@ class File(dms_base.DMSModel):
                         partner_dir = self.env['muk_dms.directory'].create({'name': top_partner.name,
                                                                             'parent_directory': parent_dir.id,
                                                                             'partner_id': top_partner.id})
+
+                    # Get service category
+                    categ = self.env.ref('of_document.of_service_file_category')
+
                     for attachment in attachments:
                         self.create({'name': attachment.name,
                                      'directory': partner_dir.id,
@@ -209,7 +263,8 @@ class File(dms_base.DMSModel):
                                      'of_related_model': 'of.service',
                                      'of_related_id': service.id,
                                      'of_attachment_id': attachment.id,
-                                     'size': attachment.file_size})
+                                     'size': attachment.file_size,
+                                     'of_category_id': categ.id})
             # Planning intervention attachments
             interventions = self.env['of.planning.intervention'].search([('partner_id', '=', partner.id)])
             for intervention in interventions:
@@ -223,6 +278,10 @@ class File(dms_base.DMSModel):
                         partner_dir = self.env['muk_dms.directory'].create({'name': top_partner.name,
                                                                             'parent_directory': parent_dir.id,
                                                                             'partner_id': top_partner.id})
+
+                    # Get planning intervention category
+                    categ = self.env.ref('of_document.of_planning_intervention_file_category')
+
                     for attachment in attachments:
                         self.create({'name': attachment.name,
                                      'directory': partner_dir.id,
@@ -230,7 +289,8 @@ class File(dms_base.DMSModel):
                                      'of_related_model': 'of.planning.intervention',
                                      'of_related_id': intervention.id,
                                      'of_attachment_id': attachment.id,
-                                     'size': attachment.file_size})
+                                     'size': attachment.file_size,
+                                     'of_category_id': categ.id})
 
     of_file_type = fields.Selection(
         selection=[('normal', u"Fichier normal"), ('related', u"Fichier lié")], string=u"Type de fichier",
@@ -238,6 +298,19 @@ class File(dms_base.DMSModel):
     of_related_model = fields.Char(string=u"Modèle de document concerné")
     of_related_id = fields.Integer(string=u"ID du document associé")
     of_attachment_id = fields.Many2one(comodel_name='ir.attachment', string=u"Pièce jointe associée")
+    of_category_id = fields.Many2one(comodel_name='of.document.file.category', string=u"Catégorie")
+    of_tag_ids = fields.Many2many(comodel_name='of.document.file.tag', string=u"Étiquettes")
+
+    @api.constrains('name')
+    def _check_name(self):
+        if not self.check_name(self.name):
+            raise ValidationError(u"Le nom de fichier n'est pas valide : %s" % self.name)
+
+    def _before_create(self, vals):
+        vals = super(File, self)._before_create(vals)
+        if 'name' in vals:
+            vals['name'] = vals['name'].replace('/', '|').lstrip()
+        return vals
 
     def _get_content(self):
         self.ensure_one()
@@ -289,7 +362,7 @@ class File(dms_base.DMSModel):
         # Automatically delete ir.attachment if related file
         attachment_ids_list = []
         for dms_file in self:
-            if dms_file.of_file_type == 'related':
+            if dms_file.of_file_type == 'related' and dms_file.of_attachment_id:
                 attachment_ids_list.append(dms_file.of_attachment_id.id)
 
         res = super(File, self).unlink()
@@ -304,3 +377,18 @@ class DatabaseDataModel(models.Model):
     _inherit = 'muk_dms.data_database'
 
     data = fields.Binary(string="Content", attachment=True)
+
+
+class FileCategory(models.Model):
+    _name = 'of.document.file.category'
+    _description = u"Catégorie de fichier"
+
+    name = fields.Char(string=u"Nom", required=True)
+
+
+class FileTag(models.Model):
+    _name = 'of.document.file.tag'
+    _description = u"Étiquette de fichier"
+    _order = 'name'
+
+    name = fields.Char(string=u"Nom", required=True)

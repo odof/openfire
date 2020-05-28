@@ -19,6 +19,12 @@
                     </button>
                 </div>
             </xpath>
+            <xpath expr="//div[hasclass('oe_title')]/h1" position="after">
+                <h3>
+                    <field name="of_category_id" readonly="1" class="label label-info" options='{"no_open": True}'/>
+                </h3>
+                <field name="of_tag_ids" widget="many2many_tags"/>
+            </xpath>
             <xpath expr="//sheet" position="after">
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers"/>
@@ -26,6 +32,40 @@
                 </div>
             </xpath>
         </field>
+    </record>
+
+    <record id="of_document_dms_file_search_view" model="ir.ui.view">
+        <field name="name">of.document.dms.file.search.view</field>
+        <field name="model">muk_dms.file</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="of_category_id"/>
+                <field name="of_tag_ids"/>
+                <group expand="0" string="Grouper par">
+                    <filter string="Catégorie" domain="[]" context="{'group_by': 'of_category_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- File Tag Views -->
+
+    <record id="of_document_file_tag_tree_view" model="ir.ui.view">
+        <field name="name">of.document.file.tag.tree.view</field>
+        <field name="model">of.document.file.tag</field>
+        <field name="arch" type="xml">
+            <tree editable="top">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_document_file_tag_action" model="ir.actions.act_window">
+        <field name="name">Étiquettes</field>
+        <field name="res_model">of.document.file.tag</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree</field>
     </record>
 
     <!-- DMS Menus -->
@@ -52,6 +92,13 @@
         <field name="name">Fichiers</field>
         <field name="parent_id" ref="muk_dms.cat_menu_muk_dms_documents"/>
         <field name="sequence">30</field>
+    </record>
+
+    <menuitem id="of_document_file_tag_menu" name="Étiquettes" parent="muk_dms.cat_menu_muk_dms_config"
+              sequence="10" action="of_document_file_tag_action"/>
+
+    <record id="muk_dms.menu_dms_settings" model="ir.ui.menu">
+        <field name="sequence">20</field>
     </record>
 
 </odoo>

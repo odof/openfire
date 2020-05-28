@@ -36,16 +36,27 @@ class IrAttachment(models.Model):
                     partner_dir = self.env['muk_dms.directory'].create({'name': top_partner.name,
                                                                         'parent_directory': parent_dir.id,
                                                                         'partner_id': top_partner.id})
+
+                # Get corresponding category
+                categ = self.env.ref('of_document.res_partner_file_category')
+
+                # Create DMS file
                 self.env['muk_dms.file'].create({'name': res.name,
                                                  'directory': partner_dir.id,
                                                  'of_file_type': 'related',
                                                  'of_related_model': 'res.partner',
                                                  'of_related_id': partner.id,
                                                  'of_attachment_id': res.id,
-                                                 'size': res.file_size})
+                                                 'size': res.file_size,
+                                                 'of_category_id': categ.id})
             elif res.res_model in ('sale.order', 'purchase.order', 'account.invoice', 'stock.picking', 'crm.lead',
                                    'project.issue', 'of.service', 'of.planning.intervention'):
                 record = self.env[res.res_model].browse(res.res_id)
+
+                if res.res_model == 'stock.picking':
+                    if record.picking_type_id.code not in ('outgoing', 'incoming'):
+                        return res
+
                 if record.partner_id:
                     # Check existence of partner directory
                     top_partner = record.partner_id
@@ -67,24 +78,47 @@ class IrAttachment(models.Model):
                         partner_dir = self.env['muk_dms.directory'].create({'name': top_partner.name,
                                                                             'parent_directory': parent_dir.id,
                                                                             'partner_id': top_partner.id})
+
+                    # Get corresponding category
+                    if res.res_model == 'account.invoice':
+                        if record.type in ('out_invoice', 'out_refund'):
+                            categ = self.env.ref('of_document.account_invoice_out_file_category')
+                        else:
+                            categ = self.env.ref('of_document.account_invoice_in_file_category')
+                    elif res.res_model == 'stock.piking':
+                        if record.picking_type_id.code == 'outgoing':
+                            categ = self.env.ref('of_document.stock_picking_out_file_category')
+                        else:
+                            categ = self.env.ref('of_document.stock_picking_in_file_category')
+                    else:
+                        categ = self.env.ref('of_document.' + res.res_model.replace('.', '_') + '_file_category')
+
+                    # Create DMS file
                     self.env['muk_dms.file'].create({'name': res.name,
                                                      'directory': partner_dir.id,
                                                      'of_file_type': 'related',
                                                      'of_related_model': res.res_model,
                                                      'of_related_id': res.res_id,
                                                      'of_attachment_id': res.id,
-                                                     'size': res.file_size})
+                                                     'size': res.file_size,
+                                                     'of_category_id': categ.id})
             return res
 
     @api.multi
     def unlink(self):
         # Automatically delete DMS file if partner related attachment
+        dms_files_to_delete = self.env['muk_dms.file']
         for attachment in self:
-            dms_file = self.env['muk_dms.file'].search([('of_attachment_id', '=', attachment.id)])
-            if dms_file:
+            dms_files_to_delete += self.env['muk_dms.file'].search([('of_attachment_id', '=', attachment.id)])
+
+        res = super(IrAttachment, self).unlink()
+
+        if dms_files_to_delete:
+            for dms_file in dms_files_to_delete:
                 dms_dir = dms_file.directory
                 dms_file.unlink()
                 # Delete DMS directory if no file left
                 if not dms_dir.files:
                     dms_dir.unlink()
-        return super(IrAttachment, self).unlink()
+
+        return res
