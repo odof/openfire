@@ -150,9 +150,6 @@
             <field name="parent_directory" eval="ref('of_document.main_partner_directory')"/>
         </record>
 
-        <!-- File initialization at module installation -->
-        <function model="muk_dms.file" name="_init_files"/>
-
         <!-- File categories -->
 
         <record id="of_document.res_partner_file_category" model="of.document.file.category">
@@ -198,6 +195,9 @@
         <record id="of_document.of_planning_intervention_file_category" model="of.document.file.category">
             <field name="name">RDV d'intervention</field>
         </record>
+
+        <!-- File initialization at module installation -->
+        <function model="muk_dms.file" name="_init_files"/>
 
     </data>
 </odoo>
