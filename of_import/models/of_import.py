@@ -122,6 +122,8 @@ Exemples :
                                           % (self._fields[field].string, code))
                 if field == 'of_import_price' and code.strip() == 'pv':
                     continue
+                if field == 'of_import_cout' and code.strip() == 'pr':
+                    continue
                 try:
                     value = safe_eval(code, eval_dict)
                 except Exception, e:
@@ -271,6 +273,9 @@ class OFProductBrand(models.Model):
                     if product_field == 'list_price' and obj[config_field].strip() == 'pv':
                         # On ne fait rien, le prix de vente est conservé
                         break
+                    if product_field == 'standard_price' and obj[config_field].strip() == 'pr':
+                        # On ne fait rien, le prix de revient est importé
+                        break
                     value = safe_eval(obj[config_field], eval_dict)
                     if product_field == 'remise':
                         if based_on_price:
@@ -319,7 +324,8 @@ class OFProductBrand(models.Model):
         values['of_seller_price'] = eval_dict['pa']
         if 'list_price' in values:
             values['list_price'] *= udm_ratio
-        values['standard_price'] *= udm_ratio
+        if 'standard_price' in values:
+            values['standard_price'] *= udm_ratio
 
         return values
 

@@ -894,7 +894,7 @@ class OfDatastoreCentralized(models.AbstractModel):
                 # Prix d'achat/vente
                 vals.update(brand.compute_product_price(vals['of_seller_pp_ht'], categ_name, obj_dict['uom_id'],
                                                         obj_dict['uom_po_id'], product=product,
-                                                        price=vals['standard_price'], remise=None,
+                                                        price=vals['of_seller_price'], remise=None,
                                                         based_on_price=vals['of_is_net_price']))
                 # Calcul de la marge et de la remise
                 if 'of_seller_remise' in fields_to_read:
