@@ -20,7 +20,7 @@ class IrAttachment(models.Model):
                 top_partner = partner
                 while top_partner.parent_id:
                     top_partner = top_partner.parent_id
-                partner_dir = self.env['muk_dms.directory'].search([('partner_id', '=', top_partner.id)])
+                partner_dir = self.env['muk_dms.directory'].search([('of_partner_id', '=', top_partner.id)])
                 if not partner_dir:
                     # Find parent directory
                     top_partner_first_char = (unidecode.unidecode(top_partner.name[0])).lower()
@@ -35,7 +35,7 @@ class IrAttachment(models.Model):
                     # Create partner directory
                     partner_dir = self.env['muk_dms.directory'].create({'name': top_partner.name,
                                                                         'parent_directory': parent_dir.id,
-                                                                        'partner_id': top_partner.id})
+                                                                        'of_partner_id': top_partner.id})
 
                 # Get corresponding category
                 categ = self.env.ref('of_document.res_partner_file_category')
@@ -62,7 +62,7 @@ class IrAttachment(models.Model):
                     top_partner = record.partner_id
                     while top_partner.parent_id:
                         top_partner = top_partner.parent_id
-                    partner_dir = self.env['muk_dms.directory'].search([('partner_id', '=', top_partner.id)])
+                    partner_dir = self.env['muk_dms.directory'].search([('of_partner_id', '=', top_partner.id)])
                     if not partner_dir:
                         # Find parent directory
                         top_partner_first_char = (unidecode.unidecode(top_partner.name[0])).lower()
@@ -77,7 +77,7 @@ class IrAttachment(models.Model):
                         # Create partner directory
                         partner_dir = self.env['muk_dms.directory'].create({'name': top_partner.name,
                                                                             'parent_directory': parent_dir.id,
-                                                                            'partner_id': top_partner.id})
+                                                                            'of_partner_id': top_partner.id})
 
                     # Get corresponding category
                     if res.res_model == 'account.invoice':

@@ -1,6 +1,9 @@
 odoo.define('of_document.documents', function (require) {
 "use strict";
 
+var core = require('web.core');
+var _t = core._t;
+
 var DocumentTreeView = require('muk_dms_views.documents');
 var PreviewHelper = require('muk_dms_preview_file.PreviewHelper');
 
@@ -122,6 +125,15 @@ DocumentTreeView.include({
                         'case_sensitive': false,
                         'show_only_matches': true,
                         'show_only_matches_children' : true,
+                    },
+                    'sort' : function (a, b) {
+                        if (this.get_text(a) === "Autres") {
+                            return 1;
+                        }
+                        else if (this.get_text(b) === "Autres") {
+                            return -1;
+                        }
+                        return this.get_text(a).toLowerCase() > this.get_text(b).toLowerCase() ? 1 : -1;
                     },
                     'contextmenu': {
                         items: context_menu_items

@@ -10,7 +10,8 @@ from odoo.addons.muk_dms.models import dms_base
 class Directory(dms_base.DMSModel):
     _inherit = 'muk_dms.directory'
 
-    partner_id = fields.Many2one(comodel_name='res.partner', string=u"Partenaire associé")
+    of_partner_id = fields.Many2one(comodel_name='res.partner', string=u"Partenaire associé")
+    of_is_protected = fields.Boolean(string=u"Répertoire protégé")
 
     @api.constrains('name')
     def _check_name(self):
@@ -55,12 +56,12 @@ class File(dms_base.DMSModel):
                 search([('res_model', '=', 'res.partner'), ('res_id', '=', partner.id)])
             if attachments:
                 # Check existence of top partner directory
-                partner_dir = self.env['muk_dms.directory'].search([('partner_id', '=', top_partner.id)])
+                partner_dir = self.env['muk_dms.directory'].search([('of_partner_id', '=', top_partner.id)])
                 if not partner_dir:
                     # Create partner directory
                     partner_dir = self.env['muk_dms.directory'].create({'name': top_partner.name,
                                                                         'parent_directory': parent_dir.id,
-                                                                        'partner_id': top_partner.id})
+                                                                        'of_partner_id': top_partner.id})
 
                 # Get partner category
                 categ = self.env.ref('of_document.res_partner_file_category')
@@ -81,12 +82,12 @@ class File(dms_base.DMSModel):
                     search([('res_model', '=', 'sale.order'), ('res_id', '=', sale_order.id)])
                 if attachments:
                     # Check existence of top partner directory
-                    partner_dir = self.env['muk_dms.directory'].search([('partner_id', '=', top_partner.id)])
+                    partner_dir = self.env['muk_dms.directory'].search([('of_partner_id', '=', top_partner.id)])
                     if not partner_dir:
                         # Create partner directory
                         partner_dir = self.env['muk_dms.directory'].create({'name': top_partner.name,
                                                                             'parent_directory': parent_dir.id,
-                                                                            'partner_id': top_partner.id})
+                                                                            'of_partner_id': top_partner.id})
 
                     # Get sale order category
                     categ = self.env.ref('of_document.sale_order_file_category')
@@ -107,12 +108,12 @@ class File(dms_base.DMSModel):
                     search([('res_model', '=', 'purchase.order'), ('res_id', '=', purchase_order.id)])
                 if attachments:
                     # Check existence of top partner directory
-                    partner_dir = self.env['muk_dms.directory'].search([('partner_id', '=', top_partner.id)])
+                    partner_dir = self.env['muk_dms.directory'].search([('of_partner_id', '=', top_partner.id)])
                     if not partner_dir:
                         # Create partner directory
                         partner_dir = self.env['muk_dms.directory'].create({'name': top_partner.name,
                                                                             'parent_directory': parent_dir.id,
-                                                                            'partner_id': top_partner.id})
+                                                                            'of_partner_id': top_partner.id})
 
                     # Get purchase order category
                     categ = self.env.ref('of_document.purchase_order_file_category')
@@ -133,12 +134,12 @@ class File(dms_base.DMSModel):
                     search([('res_model', '=', 'account.invoice'), ('res_id', '=', invoice.id)])
                 if attachments:
                     # Check existence of top partner directory
-                    partner_dir = self.env['muk_dms.directory'].search([('partner_id', '=', top_partner.id)])
+                    partner_dir = self.env['muk_dms.directory'].search([('of_partner_id', '=', top_partner.id)])
                     if not partner_dir:
                         # Create partner directory
                         partner_dir = self.env['muk_dms.directory'].create({'name': top_partner.name,
                                                                             'parent_directory': parent_dir.id,
-                                                                            'partner_id': top_partner.id})
+                                                                            'of_partner_id': top_partner.id})
 
                     # Get invoice category
                     if invoice.type in ('out_invoice', 'out_refund'):
@@ -165,12 +166,12 @@ class File(dms_base.DMSModel):
                     search([('res_model', '=', 'stock.picking'), ('res_id', '=', picking.id)])
                 if attachments:
                     # Check existence of top partner directory
-                    partner_dir = self.env['muk_dms.directory'].search([('partner_id', '=', top_partner.id)])
+                    partner_dir = self.env['muk_dms.directory'].search([('of_partner_id', '=', top_partner.id)])
                     if not partner_dir:
                         # Create partner directory
                         partner_dir = self.env['muk_dms.directory'].create({'name': top_partner.name,
                                                                             'parent_directory': parent_dir.id,
-                                                                            'partner_id': top_partner.id})
+                                                                            'of_partner_id': top_partner.id})
 
                     # Get picking category
                     if picking.picking_type_id.code == 'outgoing':
@@ -194,12 +195,12 @@ class File(dms_base.DMSModel):
                     search([('res_model', '=', 'crm.lead'), ('res_id', '=', lead.id)])
                 if attachments:
                     # Check existence of top partner directory
-                    partner_dir = self.env['muk_dms.directory'].search([('partner_id', '=', top_partner.id)])
+                    partner_dir = self.env['muk_dms.directory'].search([('of_partner_id', '=', top_partner.id)])
                     if not partner_dir:
                         # Create partner directory
                         partner_dir = self.env['muk_dms.directory'].create({'name': top_partner.name,
                                                                             'parent_directory': parent_dir.id,
-                                                                            'partner_id': top_partner.id})
+                                                                            'of_partner_id': top_partner.id})
 
                     # Get lead category
                     categ = self.env.ref('of_document.crm_lead_file_category')
@@ -220,12 +221,12 @@ class File(dms_base.DMSModel):
                     search([('res_model', '=', 'project.issue'), ('res_id', '=', issue.id)])
                 if attachments:
                     # Check existence of top partner directory
-                    partner_dir = self.env['muk_dms.directory'].search([('partner_id', '=', top_partner.id)])
+                    partner_dir = self.env['muk_dms.directory'].search([('of_partner_id', '=', top_partner.id)])
                     if not partner_dir:
                         # Create partner directory
                         partner_dir = self.env['muk_dms.directory'].create({'name': top_partner.name,
                                                                             'parent_directory': parent_dir.id,
-                                                                            'partner_id': top_partner.id})
+                                                                            'of_partner_id': top_partner.id})
 
                     # Get project issue category
                     categ = self.env.ref('of_document.project_issue_file_category')
@@ -246,12 +247,12 @@ class File(dms_base.DMSModel):
                     search([('res_model', '=', 'of.service'), ('res_id', '=', service.id)])
                 if attachments:
                     # Check existence of top partner directory
-                    partner_dir = self.env['muk_dms.directory'].search([('partner_id', '=', top_partner.id)])
+                    partner_dir = self.env['muk_dms.directory'].search([('of_partner_id', '=', top_partner.id)])
                     if not partner_dir:
                         # Create partner directory
                         partner_dir = self.env['muk_dms.directory'].create({'name': top_partner.name,
                                                                             'parent_directory': parent_dir.id,
-                                                                            'partner_id': top_partner.id})
+                                                                            'of_partner_id': top_partner.id})
 
                     # Get service category
                     categ = self.env.ref('of_document.of_service_file_category')
@@ -272,12 +273,12 @@ class File(dms_base.DMSModel):
                     search([('res_model', '=', 'of.planning.intervention'), ('res_id', '=', intervention.id)])
                 if attachments:
                     # Check existence of top partner directory
-                    partner_dir = self.env['muk_dms.directory'].search([('partner_id', '=', top_partner.id)])
+                    partner_dir = self.env['muk_dms.directory'].search([('of_partner_id', '=', top_partner.id)])
                     if not partner_dir:
                         # Create partner directory
                         partner_dir = self.env['muk_dms.directory'].create({'name': top_partner.name,
                                                                             'parent_directory': parent_dir.id,
-                                                                            'partner_id': top_partner.id})
+                                                                            'of_partner_id': top_partner.id})
 
                     # Get planning intervention category
                     categ = self.env.ref('of_document.of_planning_intervention_file_category')
@@ -300,6 +301,7 @@ class File(dms_base.DMSModel):
     of_attachment_id = fields.Many2one(comodel_name='ir.attachment', string=u"Pièce jointe associée")
     of_category_id = fields.Many2one(comodel_name='of.document.file.category', string=u"Catégorie")
     of_tag_ids = fields.Many2many(comodel_name='of.document.file.tag', string=u"Étiquettes")
+    of_partner_id = fields.Many2one(comodel_name='res.partner', related='directory.of_partner_id', readonly=True)
 
     @api.constrains('name')
     def _check_name(self):
@@ -392,3 +394,4 @@ class FileTag(models.Model):
     _order = 'name'
 
     name = fields.Char(string=u"Nom", required=True)
+    color = fields.Integer(string=u"Couleur")

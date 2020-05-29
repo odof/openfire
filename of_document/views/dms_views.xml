@@ -23,6 +23,7 @@
                 <h3>
                     <field name="of_category_id" readonly="1" class="label label-info" options='{"no_open": True}'/>
                 </h3>
+                <label for="of_tag_ids" class="oe_edit_only"/>
                 <field name="of_tag_ids" widget="many2many_tags"/>
             </xpath>
             <xpath expr="//sheet" position="after">
@@ -34,12 +35,25 @@
         </field>
     </record>
 
+    <record id="of_document_dms_file_tree_view" model="ir.ui.view">
+        <field name="name">of.document.dms.file.tree.view</field>
+        <field name="model">muk_dms.file</field>
+        <field name="inherit_id" ref="muk_dms.view_dms_file_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='path']" position="after">
+                <field name="of_category_id"/>
+                <field name="of_tag_ids"/>
+            </xpath>
+        </field>
+    </record>
+
     <record id="of_document_dms_file_search_view" model="ir.ui.view">
         <field name="name">of.document.dms.file.search.view</field>
         <field name="model">muk_dms.file</field>
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
+                <field name="of_partner_id"/>
                 <field name="of_category_id"/>
                 <field name="of_tag_ids"/>
                 <group expand="0" string="Grouper par">
