@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import unidecode
+import itertools
+from collections import defaultdict
 
-from odoo import models, fields, api
-from odoo.exceptions import ValidationError
+from odoo import models, fields, api, SUPERUSER_ID
+from odoo.exceptions import AccessError, ValidationError
 from odoo.addons.muk_dms.models import dms_base
 
 
@@ -373,6 +375,71 @@ class File(dms_base.DMSModel):
             self.env['ir.attachment'].browse(attachment_ids_list).unlink()
 
         return res
+
+    @api.multi
+    def read(self, fields=None, load='_classic_read'):
+        self.check_read()
+        return super(File, self).read(fields, load=load)
+
+    @api.model
+    def check_read(self):
+        """
+        Restricts the access to DMS file, according to related model.
+        """
+        # Collect the records to check (by model)
+        model_ids = defaultdict(set)
+        self._cr.execute('SELECT of_related_model, of_related_id FROM muk_dms_file WHERE id IN %s',
+                         [tuple(self.ids)])
+        for res_model, res_id in self._cr.fetchall():
+            if res_model:
+                model_ids[res_model].add(res_id)
+
+        # Check access rights on the records
+        for res_model, res_id in model_ids.iteritems():
+            record = self.env[res_model].browse(res_id).exists()
+            # For related models, check if we can write to the model, as unlinking
+            # and creating attachments can be seen as an update to the model
+            record.check_access_rights('read')
+            record.check_access_rule('read')
+
+    @api.model
+    def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
+        ids = super(File, self)._search(
+            args, offset=offset, limit=limit, order=order, count=False, access_rights_uid=access_rights_uid)
+        orig_ids = ids
+        ids = set(ids)
+        if self._uid != SUPERUSER_ID:
+            # For DMS files, the permissions of the document they are attached to
+            # apply, so we must remove attachments for which the user cannot access the linked document.
+            # Use pure SQL rather than read() as it is about 50% faster for large dbs (100k+ docs),
+            # and the permissions are checked in super() and below anyway.
+            model_attachments = defaultdict(lambda: defaultdict(set))  # {res_model: {res_id: set(ids)}}
+            self._cr.execute("""SELECT id, of_related_model, of_related_id FROM muk_dms_file WHERE id IN %s""",
+                             [tuple(ids)])
+            for row in self._cr.dictfetchall():
+                if not row['of_related_model']:
+                    continue
+                model_attachments[row['of_related_model']][row['of_related_id']].add(row['id'])
+
+            # To avoid multiple queries for each file found, checks are performed in batch as much as possible.
+            for res_model, targets in model_attachments.iteritems():
+                if res_model not in self.env:
+                    continue
+                if not self.env[res_model].check_access_rights('read', False):
+                    # Remove all corresponding attachment ids
+                    ids.difference_update(itertools.chain(*targets.itervalues()))
+                    continue
+                # Filter ids according to what access rules permit
+                target_ids = list(targets)
+                allowed = self.env[res_model].with_context(active_test=False).search([('id', 'in', target_ids)])
+                for res_id in set(target_ids).difference(allowed.ids):
+                    ids.difference_update(targets[res_id])
+
+            # Sort result according to the original sort ordering
+            result = [id for id in orig_ids if id in ids]
+            return len(result) if count else list(result)
+
+        return orig_ids
 
 
 class DatabaseDataModel(models.Model):

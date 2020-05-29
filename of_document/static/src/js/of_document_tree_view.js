@@ -2,10 +2,75 @@ odoo.define('of_document.documents', function (require) {
 "use strict";
 
 var core = require('web.core');
+var session = require('web.session');
+var framework = require('web.framework');
 var _t = core._t;
+
+var Dialog = require('web.Dialog');
 
 var DocumentTreeView = require('muk_dms_views.documents');
 var PreviewHelper = require('muk_dms_preview_file.PreviewHelper');
+
+var open = function(self, model, id) {
+    self.do_action({
+        type: 'ir.actions.act_window',
+        res_model: model,
+        res_id: id,
+        views: [[false, 'form']],
+        target: 'current',
+        context: session.user_context,
+    });
+}
+
+var edit = function(self, model, id) {
+    self.do_action({
+        type: 'ir.actions.act_window',
+        res_model: model,
+        res_id: id,
+        views: [[false, 'form']],
+        target: 'current',
+        flags: {'initial_mode': 'edit'},
+        context: session.user_context,
+    });
+}
+
+var download = function(self, filename, id) {
+    var download_url = session.url(
+        '/web/content', {
+            model: 'muk_dms.file',
+            filename: filename,
+            filename_field: 'name',
+            field: 'content',
+            id: id,
+            download: true
+    });
+
+    self.do_action({
+        type: 'ir.actions.act_url',
+        url: download_url,
+        target: 'self',
+    });
+}
+
+var create = function(self, model, parent) {
+    var context = {};
+    if(model == "muk_dms.file") {
+        context = $.extend(session.user_context, {
+            default_directory: parent
+        });
+    } else if(model == "muk_dms.directory") {
+        context = $.extend(session.user_context, {
+            default_parent_directory: parent
+        });
+    }
+    self.do_action({
+        type: 'ir.actions.act_window',
+        res_model: model,
+        views: [[false, 'form']],
+        target: 'current',
+        context: context,
+    });
+}
 
 var context_menu_items = function(node, cp) {
     var items = {}
@@ -47,24 +112,7 @@ var context_menu_items = function(node, cp) {
             action: function(data) {
                 var inst = $.jstree.reference(data.reference);
                 var obj = inst.get_node(data.reference);
-                $.ajax({
-                    url: obj.data.download_link,
-                    type: "GET",
-                    dataType: "binary",
-                    processData: false,
-                    beforeSend: function(xhr, settings) {
-                        framework.blockUI();
-                    },
-                    success: function(data, status, xhr){
-                        saveAs(data, obj.data.filename);
-                    },
-                    error:function(xhr, status, text) {
-                        self.do_warn(_t("Download..."), _t("An error occurred during download!"));
-                      },
-                    complete: function(xhr, status) {
-                        framework.unblockUI();
-                    },
-                });
+                download(inst.settings.widget, obj.data.filename, obj.data.odoo_id);
             }
         };
     } else if(node.data.odoo_model == "muk_dms.directory" && node.data.perm_create) {
