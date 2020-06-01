@@ -23,6 +23,7 @@
                     <field name="sales_total" type="measure"/>
                     <field name="ordered_turnover_objective" type="measure"/>
                     <field name="previous_sales_total" type="measure"/>
+                    <field name="sales_total_comparison" type="measure"/>
                 </pivot>
             </field>
         </record>
@@ -86,6 +87,7 @@
                     <field name="sales_total" type="measure"/>
                     <field name="ordered_turnover_objective" type="measure"/>
                     <field name="previous_sales_total" type="measure"/>
+                    <field name="sales_total_comparison" type="measure"/>
                 </pivot>
             </field>
         </record>

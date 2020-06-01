@@ -31,6 +31,8 @@ class OFCRMFunnelConversion(models.Model):
     sales_total = fields.Float(string=u"CA commandé", readonly=True)
     ordered_turnover_objective = fields.Float(string=u"Objectif CA commandé", readonly=True)
     previous_sales_total = fields.Float(string=u"CA commandé N-1", readonly=True)
+    sales_total_comparison = fields.Char(
+        string=u"Comparaison N-1 (%)", compute='_compute_sales_total_comparison', compute_sudo=True, readonly=True)
 
     def init(self):
         tools.drop_view_if_exists(self._cr, 'of_crm_funnel_conversion')
@@ -146,6 +148,29 @@ class OFCRMFunnelConversion(models.Model):
                     AND         RR.id                                                                                   = HR.resource_id
             )""")
 
+    @api.multi
+    def _compute_sales_total_comparison(self):
+        for rec in self:
+            if rec.previous_sales_total > 0:
+                rec.sales_total_comparison = '%.2f' % (100.0 * rec.sales_total / rec.previous_sales_total)
+            else:
+                rec.sales_total_comparison = "N/E"
+
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        res = super(OFCRMFunnelConversion, self).read_group(
+            domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
+        for line in res:
+            if 'sales_total_comparison' in fields:
+                if line['previous_sales_total'] > 0:
+                    line['sales_total_comparison'] = \
+                        ('%.2f' % (round(100.0 * line['sales_total'] / line['previous_sales_total'], 2))).\
+                        replace('.', ',')
+                else:
+                    line['sales_total_comparison'] = "N/E"
+
+        return res
+
 
 class OFCRMFunnelConversion2(models.Model):
     """Tunnel de conversion CRM 2"""
@@ -183,6 +208,8 @@ class OFCRMFunnelConversion2(models.Model):
     amount_untaxed = fields.Float(string=u"Total HT", readonly=True)
     ordered_turnover_objective = fields.Float(string=u"Objectif CA commandé", readonly=True)
     previous_sales_total = fields.Float(string=u"CA commandé N-1", readonly=True)
+    sales_total_comparison = fields.Char(
+        string=u"Comparaison N-1 (%)", compute='_compute_sales_total_comparison', compute_sudo=True, readonly=True)
 
     def init(self):
         tools.drop_view_if_exists(self._cr, 'of_crm_funnel_conversion2')
@@ -384,6 +411,14 @@ class OFCRMFunnelConversion2(models.Model):
             else:
                 rec.order_margin_percent = "N/E"
 
+    @api.multi
+    def _compute_sales_total_comparison(self):
+        for rec in self:
+            if rec.previous_sales_total > 0:
+                rec.sales_total_comparison = '%.2f' % (100.0 * rec.sales_total / rec.previous_sales_total)
+            else:
+                rec.sales_total_comparison = "N/E"
+
     @api.model
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
         res = super(OFCRMFunnelConversion2, self).read_group(
@@ -434,5 +469,12 @@ class OFCRMFunnelConversion2(models.Model):
                                 2))).replace('.', ',')
                 else:
                     line['order_margin_percent'] = "N/E"
+            if 'sales_total_comparison' in fields:
+                if line['previous_sales_total'] > 0:
+                    line['sales_total_comparison'] = \
+                        ('%.2f' % (round(100.0 * line['sales_total'] / line['previous_sales_total'], 2))).\
+                        replace('.', ',')
+                else:
+                    line['sales_total_comparison'] = "N/E"
 
         return res
