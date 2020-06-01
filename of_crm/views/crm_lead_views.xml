@@ -369,7 +369,6 @@
                             <!-- Prospect group -->
                             <group name='prospect'>
                                 <separator string="Prospect" colspan="2"/>
-                                <field name="of_ref"/>
                                 <field name="partner_id" domain="[('parent_id','=',False)]"/>
                                 <label for="contact_name" string="Nom du Client"/>
                                 <div>
@@ -399,9 +398,8 @@
                             <group name='suivi'>
                                 <separator string="Qualification et Suivi" colspan="2"/>
 
-                                <field name="of_date_prospection" string="Date de création"/>
-                                <field name="date_deadline" string="Date du projet"/>
-                                <field name="of_date_cloture"/>
+                                <field name="of_date_projet"/>
+                                <field name="date_deadline"/>
                                 <field name="company_id"/>
                                 <field name="priority" widget="priority"/>
                                 <field name="tag_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
@@ -425,32 +423,41 @@
                             </page>
 
                             <!-- Contact -->
-                            <page name="lead" string="Contact">
+                            <page name="lead" string="Marketing">
                                 <group>
-                                    <group string="Géolocalisation" name="geoloc">
+                                    <group string="Géolocalisation" name="geoloc" invisible="1">
                                         <field name="geo_lat"/>
                                         <field name="geo_lng"/>
                                     </group>
 
-                                    <group string="Options" name="options">
+                                    <group string="Options" name="options" invisible="1">
                                         <!-- option de retrait -->
                                         <field name="opt_out"/>
                                     </group>
 
-                                    <group string="Marketing">
+                                    <group string="Source" name="source">
                                         <field name="campaign_id" />
                                         <field name="medium_id" string="Canal"/>
                                         <field name="source_id" />
                                     </group>
 
-                                    <group string="Divers" name="Misc">
+                                    <group string="Parrainage" name="parrainage">
                                         <field name="of_referred_id" />
+                                    </group>
+
+                                    <group string="Dates" name="date">
+                                        <field name="of_date_prospection" string="Date de création" />
+                                        <field name="write_date" string="Dernières modifications" widget="date" readonly="1"/>
+                                    </group>
+
+                                    <group string="Divers" name="Misc">
+                                        <field name="of_ref"/>
                                     </group>
                                 </group>
                             </page>
 
                             <!-- Projet -->
-                            <page name="lead" string="Projet">
+                            <page name="project" string="Projet">
                                 <group>
                                     <field name="of_modele_id" string="Projet" widget="selection"/>
                                 </group>
@@ -599,7 +606,6 @@
                             <!-- Prospect group -->
                             <group name='prospect'>
                                 <separator string="Prospect" colspan="2"/>
-                                <field name="of_ref"/>
                                 <field name="partner_id" domain="[('parent_id','=',False)]"/>
                                 <label for="contact_name" string="Nom du Client"/>
                                 <div>
@@ -629,9 +635,8 @@
                             <group name='suivi'>
                                 <separator string="Qualification et Suivi" colspan="2"/>
 
-                                <field name="of_date_prospection" string="Date de création" />
-                                <field name="date_deadline" string="Date du projet"/>
-                                <field name="of_date_cloture"/>
+                                <field name="of_date_projet"/>
+                                <field name="date_deadline"/>
                                 <field name="company_id"/>
                                 <field name="priority" widget="priority"/>
                                 <field name="tag_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
@@ -672,33 +677,42 @@
                             </page>
 
                             <!-- Contact -->
-                            <page name="lead" string="Contact">
+                            <page name="lead" string="Marketing">
                                 <group>
-                                    <group string="Géolocalisation" name="geoloc">
+                                    <group string="Géolocalisation" name="geoloc" invisible="1">
                                         <field name="geo_lat"/>
                                         <field name="geo_lng"/>
                                         <field name="precision"/>
                                     </group>
 
-                                    <group string="Options" name="options">
+                                    <group string="Options" name="options" invisible="1">
                                         <!-- option de retrait -->
                                         <field name="opt_out"/>
                                     </group>
 
-                                    <group string="Marketing">
+                                    <group string="Source" name="source">
                                         <field name="campaign_id" />
                                         <field name="medium_id" string="Canal"/>
                                         <field name="source_id" />
                                     </group>
 
-                                    <group string="Divers" name="Misc">
+                                    <group string="Parrainage" name="parrainage">
                                         <field name="of_referred_id" />
+                                    </group>
+
+                                    <group string="Dates" name="date">
+                                        <field name="of_date_prospection" string="Date de création" />
+                                        <field name="write_date" string="Dernières modifications" widget="date" readonly="1"/>
+                                    </group>
+
+                                    <group string="Divers" name="Misc">
+                                        <field name="of_ref"/>
                                     </group>
                                 </group>
                             </page>
 
                             <!-- Projet -->
-                            <page name="lead" string="Projet">
+                            <page name="project" string="Projet">
                                 <group>
                                     <field name="of_modele_id" string="Projet" widget="selection"/>
                                 </group>
