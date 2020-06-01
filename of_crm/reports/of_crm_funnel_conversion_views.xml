@@ -22,6 +22,7 @@
                     <field name="order_margin" type="measure"/>
                     <field name="sales_total" type="measure"/>
                     <field name="ordered_turnover_objective" type="measure"/>
+                    <field name="sales_objective_comparison" type="measure"/>
                     <field name="previous_sales_total" type="measure"/>
                     <field name="sales_total_comparison" type="measure"/>
                 </pivot>
@@ -86,6 +87,7 @@
                     <field name="order_margin" type="measure"/>
                     <field name="sales_total" type="measure"/>
                     <field name="ordered_turnover_objective" type="measure"/>
+                    <field name="sales_objective_comparison" type="measure"/>
                     <field name="previous_sales_total" type="measure"/>
                     <field name="sales_total_comparison" type="measure"/>
                 </pivot>

@@ -30,6 +30,9 @@ class OFCRMFunnelConversion(models.Model):
     order_margin = fields.Float(string=u"Marge € commandé", readonly=True)
     sales_total = fields.Float(string=u"CA commandé", readonly=True)
     ordered_turnover_objective = fields.Float(string=u"Objectif CA commandé", readonly=True)
+    sales_objective_comparison = fields.Char(
+        string=u"Comparaison Objectif (%)", compute='_compute_sales_objective_comparison', compute_sudo=True,
+        readonly=True)
     previous_sales_total = fields.Float(string=u"CA commandé N-1", readonly=True)
     sales_total_comparison = fields.Char(
         string=u"Comparaison N-1 (%)", compute='_compute_sales_total_comparison', compute_sudo=True, readonly=True)
@@ -149,6 +152,14 @@ class OFCRMFunnelConversion(models.Model):
             )""")
 
     @api.multi
+    def _compute_sales_objective_comparison(self):
+        for rec in self:
+            if rec.ordered_turnover_objective > 0:
+                rec.sales_objective_comparison = '%.2f' % (100.0 * rec.sales_total / rec.ordered_turnover_objective)
+            else:
+                rec.sales_objective_comparison = "N/E"
+
+    @api.multi
     def _compute_sales_total_comparison(self):
         for rec in self:
             if rec.previous_sales_total > 0:
@@ -161,6 +172,14 @@ class OFCRMFunnelConversion(models.Model):
         res = super(OFCRMFunnelConversion, self).read_group(
             domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
         for line in res:
+            if 'sales_objective_comparison' in fields:
+                if line['ordered_turnover_objective'] > 0:
+                    line['sales_objective_comparison'] = \
+                        ('%.2f' % (round(100.0 * line['sales_total'] / line['ordered_turnover_objective'], 2))).\
+                        replace('.', ',')
+                else:
+                    line['sales_objective_comparison'] = "N/E"
+
             if 'sales_total_comparison' in fields:
                 if line['previous_sales_total'] > 0:
                     line['sales_total_comparison'] = \
@@ -207,6 +226,9 @@ class OFCRMFunnelConversion2(models.Model):
     sales_total = fields.Float(string=u"CA commandé", readonly=True)
     amount_untaxed = fields.Float(string=u"Total HT", readonly=True)
     ordered_turnover_objective = fields.Float(string=u"Objectif CA commandé", readonly=True)
+    sales_objective_comparison = fields.Char(
+        string=u"Comparaison Objectif (%)", compute='_compute_sales_objective_comparison', compute_sudo=True,
+        readonly=True)
     previous_sales_total = fields.Float(string=u"CA commandé N-1", readonly=True)
     sales_total_comparison = fields.Char(
         string=u"Comparaison N-1 (%)", compute='_compute_sales_total_comparison', compute_sudo=True, readonly=True)
@@ -412,6 +434,14 @@ class OFCRMFunnelConversion2(models.Model):
                 rec.order_margin_percent = "N/E"
 
     @api.multi
+    def _compute_sales_objective_comparison(self):
+        for rec in self:
+            if rec.ordered_turnover_objective > 0:
+                rec.sales_objective_comparison = '%.2f' % (100.0 * rec.sales_total / rec.ordered_turnover_objective)
+            else:
+                rec.sales_objective_comparison = "N/E"
+
+    @api.multi
     def _compute_sales_total_comparison(self):
         for rec in self:
             if rec.previous_sales_total > 0:
@@ -469,6 +499,13 @@ class OFCRMFunnelConversion2(models.Model):
                                 2))).replace('.', ',')
                 else:
                     line['order_margin_percent'] = "N/E"
+            if 'sales_objective_comparison' in fields:
+                if line['ordered_turnover_objective'] > 0:
+                    line['sales_objective_comparison'] = \
+                        ('%.2f' % (round(100.0 * line['sales_total'] / line['ordered_turnover_objective'], 2))).\
+                        replace('.', ',')
+                else:
+                    line['sales_objective_comparison'] = "N/E"
             if 'sales_total_comparison' in fields:
                 if line['previous_sales_total'] > 0:
                     line['sales_total_comparison'] = \
