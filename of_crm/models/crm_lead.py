@@ -36,7 +36,13 @@ class CrmLead(models.Model):
                        "INNER JOIN crm_lead_res_partner_category_rel rel ON rel.lead_id = lead.id "
                        "WHERE lead.partner_id IS NOT NULL "
                        "ON CONFLICT DO NOTHING")
+        cr = self._cr
+        cr.execute(
+            "SELECT * FROM information_schema.columns WHERE table_name = 'crm_lead' AND column_name = 'of_date_projet'")
+        of_date_projet = bool(cr.fetchall())
         res = super(CrmLead, self)._auto_init()
+        if not of_date_projet:
+            cr.execute("UPDATE crm_lead SET of_date_projet = date_deadline, date_deadline = of_date_cloture")
         return res
 
     @api.model
@@ -132,6 +138,8 @@ class CrmLead(models.Model):
     of_title_action = fields.Char(string=u"Libellé de la prochaine action", compute='_compute_of_action_info')
 
     of_check_duplications = fields.Boolean(string=u"Contrôle de doublons ?")
+
+    of_date_projet = fields.Date(string="Date du projet")
 
     @api.depends('description')
     def _compute_description_rapport(self):
