@@ -680,6 +680,14 @@ class OfDatastoreCentralized(models.AbstractModel):
             'description_sale',  # Description pour les devis
             'description_purchase',  # Description pour les fournisseurs
             'description_picking',  # Description pour le ramassage
+
+            # Champs de structure de prix
+            'of_purchase_transport',
+            'of_sale_transport',
+            'of_sale_coeff',
+            'of_other_logistic_costs',
+            'of_misc_taxes',
+            'of_misc_costs',
         ]
 
         # On ne veut pas non-plus les champs one2many ou many2many
