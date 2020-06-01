@@ -78,6 +78,12 @@ Cette action irréversible recalculera la catégorie, le prix d'achat et le prix
                                         <li><b>ppht</b>: Le prix public hors taxe, fourni par le fournisseur.</li>
                                         <li><b>pa</b>: Le prix d'achat</li>
                                         <li><b>cumul()</b> est une fonction qui sert à cumuler plusieurs remises. cumul(40.5,5) cumule une remise de 40.5% et une remise de 5% pour un total de 43.475% (Attention à la distinction entre point et virgule)</li>
+                                        <li><b>tr_a</b>: "Transport sur achat" renseigné dans la structure de prix de l'article</li>
+                                        <li><b>tr_v</b>: "Transport sur vente" renseigné dans la structure de prix de l'article</li>
+                                        <li><b>coef</b>: "Coefficient de vente" renseigné dans la structure de prix de l'article</li>
+                                        <li><b>fr_l</b>: "Autres frais logistiques" renseigné dans la structure de prix de l'article</li>
+                                        <li><b>taxe</b>: "Taxes divers" renseigné dans la structure de prix de l'article</li>
+                                        <li><b>fr_d</b>: "Frais divers" renseigné dans la structure de prix de l'article</li>
                                     </ul>
                                     <p>La remise est un champ optionnel qui peut donc être laissé vide, si par exemple vous importez votre propre tarif, avec un prix d'achat renseigné.</p>
                                 </div>

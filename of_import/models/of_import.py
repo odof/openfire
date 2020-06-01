@@ -104,6 +104,14 @@ Exemples :
             'ppht': 100,
             'cumul': self.env['of.product.brand'].compute_remise,
             'pa': 50,
+
+            # Structure de prix
+            'tr_a': 10,
+            'tr_v': 10,
+            'coef': 10,
+            'fr_l': 10,
+            'taxe': 10,
+            'fr_d': 10,
         }
 
         for record in self:
@@ -265,6 +273,14 @@ class OFProductBrand(models.Model):
             'pa': price,
             'cumul': self.compute_remise,
             'udm_ratio': udm_ratio,
+
+            # Structure de prix
+            'tr_a': product and product.of_purchase_transport or 0,
+            'tr_v': product and product.of_sale_transport or 0,
+            'coef': product and product.of_sale_coeff or 0,
+            'fr_l': product and product.of_other_logistic_costs or 0,
+            'taxe': product and product.of_misc_taxes or 0,
+            'fr_d': product and product.of_misc_costs or 0,
         }
 
         price_fields = (('of_import_remise', 'remise', 'la remise'),
