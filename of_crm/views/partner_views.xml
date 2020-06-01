@@ -19,6 +19,11 @@
                 <field name="user_id" position="after">
                     <field name="of_prospecteur_id"/>
                 </field>
+                <xpath expr="//notebook" position="inside">
+                    <page name="marketing" string="Marketing" invisible="1">
+                        <group/>
+                    </page>
+                </xpath>
             </field>
         </record>
 
