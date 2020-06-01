@@ -34,6 +34,17 @@ class PurchaseOrder(models.Model):
         values = super(PurchaseOrder, self)._prepare_picking()
         return isinstance(values, dict) and values.update({'of_customer_id': self.customer_id.id}) or values
 
+    @api.multi
+    def button_confirm(self):
+        procurement_obj = self.env['procurement.order']
+        super(PurchaseOrder, self).button_confirm()
+        if self.env['ir.values'].get_default('sale.config.settings', 'of_recalcul_pa'):
+            for line in self.order_line:
+                procurements = procurement_obj.search([('purchase_line_id', '=', line.id)])
+                moves = procurements.mapped('move_dest_id')
+                sale_lines = moves.mapped('procurement_id').mapped('sale_line_id')
+                sale_lines.write({'purchase_price': line.price_unit})
+
 
 class ProcurementOrder(models.Model):
     _inherit = 'procurement.order'
@@ -234,3 +245,14 @@ class ResPartner(models.Model):
         action = self.env.ref('of_purchase.of_purchase_open_picking').read()[0]
         action['domain'] = [('of_customer_id', 'in', self._ids)]
         return action
+
+
+class SaleConfigSettings(models.TransientModel):
+    _inherit = 'sale.config.settings'
+
+    of_recalcul_pa = fields.Boolean(string=u"(OF) Recalcul auto des prix d'achats sur lignes de commande")
+
+    @api.multi
+    def set_of_recalcul_pa_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+                'sale.config.settings', 'of_recalcul_pa', self.of_recalcul_pa)
