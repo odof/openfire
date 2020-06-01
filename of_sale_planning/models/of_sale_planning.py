@@ -14,13 +14,12 @@ class SaleOrder(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    of_intervention_line_ids = fields.One2many('of.planning.intervention.line', 'order_line_id')
     of_qty_planifiee = fields.Float(string=u"Qtés planifiées", compute="_compute_of_qty_planifiee", store=True)
 
     @api.depends('of_intervention_line_ids', 'of_intervention_line_ids.qty', 'of_intervention_line_ids.intervention_state')
     def _compute_of_qty_planifiee(self):
         for line in self:
-            lines = line.of_intervention_line_ids.filtered(lambda l: l.intervention_state in ('confirm', 'done'))
+            lines = line.of_intervention_line_ids.filtered(lambda l: l.intervention_state in ('done', ))
             line.of_qty_planifiee = sum(lines.mapped('qty'))
 
 

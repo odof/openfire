@@ -1189,8 +1189,8 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def button_import_order_line(self):
-        line_obj = self.env['of.planning.intervention.line']
         self.ensure_one()
+        line_obj = self.env['of.planning.intervention.line']
         if not self.order_id:
             raise UserError(u"Il n'y a pas de commande liée a l'intervention.")
         self.fiscal_position_id = self.order_id.fiscal_position_id
@@ -1205,6 +1205,28 @@ class OfPlanningIntervention(models.Model):
                 'name': line.name,
                 'taxe_ids': [(4, tax.id) for tax in line.tax_id]
                 })
+
+    @api.onchange('order_id')
+    def onchange_order_id(self):
+        self.ensure_one()
+        if not self.order_id:
+            return
+        self.fiscal_position_id = self.order_id.fiscal_position_id
+        for line in self.order_id.order_line.filtered(lambda l: float_compare(l.product_uom_qty, sum(l.of_intervention_line_ids.mapped('qty')), 2) > 0):
+            self.line_ids.new({
+                'order_line_id'  : line.id,
+                'intervention_id': self.id,
+                'product_id'     : line.product_id.id,
+                'qty'            : line.product_uom_qty - sum(line.of_intervention_line_ids.mapped('qty')),
+                'price_unit'     : line.price_unit,
+                'name'           : line.name,
+                'taxe_ids'       : [(4, tax.id) for tax in line.tax_id]
+                })
+
+    @api.multi
+    def button_update_lines(self):
+        self.ensure_one()
+        self.line_ids.update_vals()
 
     @api.multi
     def do_verif_dispo(self):
@@ -1482,6 +1504,19 @@ class OfPlanningInterventionLine(models.Model):
             'invoice_line_tax_ids': [(6, 0, taxes._ids)],
             }, ""
 
+    @api.multi
+    def update_vals(self):
+        for line in self:
+            order_line = line.order_line_id
+            line.update({
+                'order_line_id'  : order_line.id,
+                'product_id'     : order_line.product_id.id,
+                'qty'            : order_line.product_uom_qty,
+                'price_unit'     : order_line.price_unit,
+                'name'           : order_line.name,
+                'taxe_ids'       : [(5, )] + [(4, tax.id) for tax in order_line.tax_id]
+                })
+
 class OFInterventionConfiguration(models.TransientModel):
     u"""modèle défini ici, utilisé par of_planning_view"""
     _name = 'of.intervention.settings'
@@ -1668,3 +1703,9 @@ class OfMailTemplate(models.Model):
     @api.model
     def _get_allowed_models(self):
         return super(OfMailTemplate, self)._get_allowed_models() + ['of.planning.intervention']
+
+
+class SaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
+
+    of_intervention_line_ids = fields.One2many('of.planning.intervention.line', 'order_line_id')
