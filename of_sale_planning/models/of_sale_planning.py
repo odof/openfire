@@ -14,6 +14,9 @@ class SaleOrder(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
+    of_invoice_policy = fields.Selection(
+        selection_add=[('intervention', u'Quantités planifiées')])
+
     @api.depends('qty_invoiced', 'qty_delivered', 'product_uom_qty', 'order_id.state',
                  'order_id.of_invoice_policy', 'order_id.partner_id.of_invoice_policy',
                  'of_qty_planifiee')
@@ -23,9 +26,7 @@ class SaleOrderLine(models.Model):
         calculated from the ordered quantity. Otherwise, the quantity delivered is used.
         """
         for line in self:
-            invoice_policy = line.order_id.of_invoice_policy
-            if not invoice_policy:
-                invoice_policy = line.product_id.invoice_policy
+            invoice_policy = line.of_invoice_policy
             if line.order_id.state in ['sale', 'done']:
                 if invoice_policy == 'order':
                     line.qty_to_invoice = line.product_uom_qty - line.qty_invoiced
@@ -35,6 +36,17 @@ class SaleOrderLine(models.Model):
                     line.qty_to_invoice = line.of_qty_planifiee - line.qty_invoiced
             else:
                 line.qty_to_invoice = 0
+
+    @api.depends('of_invoice_policy',
+                 'order_id', 'order_id.of_invoice_date_prev',
+                 'of_intervention_line_ids', 'of_intervention_line_ids.intervention_id', 'of_intervention_line_ids.intervention_id.date')
+    def _compute_of_invoice_date_prev(self):
+        super(SaleOrderLine, self)._compute_of_invoice_date_prev()
+        for line in self:
+            if line.of_invoice_policy == 'intervention':
+                interventions = line.of_intervention_line_ids.mapped('intervention_id')
+                if interventions:
+                    line.of_invoice_date_prev = interventions[O].date_date
 
 
 class SaleConfiguration(models.TransientModel):

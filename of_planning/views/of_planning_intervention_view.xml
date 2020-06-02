@@ -288,6 +288,14 @@
                             <page name="facturation" string="Facturation">
                                 <field name="lien_commande" invisible="1"/>
                                 <field name="currency_id" invisible="1"/>
+                                <field name="update_required" invisible="1"/>
+                                <div class="oe_grey" attrs="{'invisible': [('update_required', '=', False)]}">
+                                    <i>
+                                        <p>
+                                            Mise à jour requise
+                                        </p>
+                                    </i>
+                                </div>
                                 <group>
                                     <group>
                                         <field name="fiscal_position_id" attrs="{'readonly': [('order_id', '!=', False)]}"/>
@@ -1052,6 +1060,9 @@
                         <field string="RDVs Tech" name="intervention_count" widget="statinfo"/>
                     </button>
                 </xpath>
+                <xpath expr="//field[@name='order_line']/tree" position="inside">
+                    <field name="of_intervention_state"/>
+                </xpath>
             </field>
         </record>
 
@@ -1064,5 +1075,27 @@
             <field name="view_mode">calendar,tree,form</field>
             <field name="view_id" ref="of_planning_intervention_view_calendar_with_jump"/>
         </record>
+
+    <record id="of_planning_sale_order_view_search_inherit_sale" model="ir.ui.view">
+        <field name="name">of.planning.sale.order.search.inherit.sale</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.sale_order_view_search_inherit_sale"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[3]" position="after">
+                <filter string="Planification restante" domain="[('of_planned', '=', False)]" name="planned"/>
+            </xpath>
+        </field>
+    </record>
+
+        <record id="of_planning_sale_order_line_tree" model="ir.ui.view">
+        <field name="name">of.planning.sale.order.line.tree</field>
+        <field name="model">sale.order.line</field>
+        <field name="inherit_id" ref="of_sale.of_sale_order_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_invoice_policy']" position="after">
+                <field name="of_intervention_state"/>
+            </xpath>
+        </field>
+    </record>
 
 </odoo>

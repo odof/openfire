@@ -485,6 +485,7 @@ class OfPlanningIntervention(models.Model):
     price_tax = fields.Monetary(compute='_compute_amount', string='Taxes', readonly=True)
     price_total = fields.Monetary(compute='_compute_amount', string='Sous-total TTC', readonly=True)
     product_ids = fields.Many2many('product.product', related='template_id.product_ids')
+    update_required = fields.Boolean(string=u"Mise à jour requise", compute="_compute_update_required")
 
     @api.depends('line_ids',
                  'line_ids.price_subtotal',
@@ -1398,6 +1399,28 @@ class OfPlanningIntervention(models.Model):
             'context'  : {'default_msg': msg}
         }
 
+    @api.depends('order_id', 'order_id.order_line',
+                 'line_ids')
+    def _compute_update_required(self):
+        def compare(order_line, intervention_line):
+            if not order_line.product_id == intervention_line.product_id:
+                return False
+            if float_compare(order_line.product_uom_qty, intervention_line.qty, 2):
+                return False
+            if float_compare(order_line.price_unit, intervention_line.price_unit, 2):
+                return False
+            if set([tax.id for tax in order_line.tax_id]) != set([tax.id for tax in intervention_line.taxe_ids]):
+                return False
+            return True
+        for rdv in self:
+            if not rdv.order_id.order_line == rdv.line_ids.mapped('order_line_id'):
+                rdv.update_required = True
+                continue
+            for line in rdv.line_ids:
+                if not compare(line.order_line_id, line):
+                    rdv.update_required = True
+                    break
+
 
 class OfPlanningInterventionLine(models.Model):
     _name = "of.planning.intervention.line"
@@ -1575,12 +1598,23 @@ class SaleOrder(models.Model):
     intervention_ids = fields.One2many("of.planning.intervention", "order_id", string="Interventions")
 
     intervention_count = fields.Integer(string='Interventions', compute='_compute_intervention_count')
+    of_planned = fields.Boolean(string=u"Planifiée", compute="_compute_planned", store=True)
 
     @api.depends('intervention_ids')
     @api.multi
     def _compute_intervention_count(self):
         for sale_order in self:
             sale_order.intervention_count = len(sale_order.intervention_ids)
+
+    @api.depends('order_line', 'order_line.of_intervention_state')
+    def _compute_planned(self):
+        for order in self:
+            for line in order.order_line:
+                if line.of_intervention_state not in ['confirm', 'done']:
+                    order.of_planned = False
+                    break
+            else:
+                order.of_planned = True
 
     @api.multi
     def action_view_interventions(self):
@@ -1712,9 +1746,26 @@ class SaleOrderLine(models.Model):
 
     of_intervention_line_ids = fields.One2many('of.planning.intervention.line', 'order_line_id')
     of_qty_planifiee = fields.Float(string=u"Qtés planifiées", compute="_compute_of_qty_planifiee", store=True)
+    of_intervention_state = fields.Selection([
+            ('todo', u'À planifier'),
+            ('confirm', u'Planifée'),
+            ('done', u'Réalisée'),
+            ], string=u"État de planification", compute="_compute_intervention_state", store=True)
 
     @api.depends('of_intervention_line_ids', 'of_intervention_line_ids.qty', 'of_intervention_line_ids.intervention_state')
     def _compute_of_qty_planifiee(self):
         for line in self:
             lines = line.of_intervention_line_ids.filtered(lambda l: l.intervention_state in ('done', ))
             line.of_qty_planifiee = sum(lines.mapped('qty'))
+
+    @api.depends('of_intervention_line_ids', 'of_intervention_line_ids.intervention_state')
+    def _compute_intervention_state(self):
+        for line in self:
+            state_done = [True if state == 'done' else False for state in line.of_intervention_line_ids.mapped('intervention_state')]
+            state_confirm = [True if state in ('confirm', 'done') else False for state in line.of_intervention_line_ids.mapped('intervention_state')]
+            if state_done and all(state_done):
+                line.of_intervention_state = 'done'
+            elif state_confirm and all(state_confirm):
+                line.of_intervention_state = 'confirm'
+            else:
+                line.of_intervention_state = 'todo'
