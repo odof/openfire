@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_res_partner_check_duplications_form_view" model="ir.ui.view">
+        <field name="name">of.res.partner.check.duplications.form.view</field>
+        <field name="model">of.res.partner.check.duplications</field>
+        <field name="arch" type="xml">
+            <form>
+                <separator string="Suspicion de doublons !"/>
+                <field name="new_partner_id" invisible="1"/>
+                <field name="display_list" invisible="1"/>
+                <field name="duplication_ids" readonly="1" nolabel="1" attrs="{'invisible': [('display_list', '=', False)]}">
+                    <tree>
+                        <field name="name"/>
+                        <field name="contact_address"/>
+                        <field name="email"/>
+                        <field name="company_id"/>
+                        <field name="create_date"/>
+                        <field name="of_last_order_date"/>
+                    </tree>
+                </field>
+                <field name="info_txt" readonly="1" nolabel="1"/>
+                <footer>
+                    <button string="OK" special="cancel" class="oe_highlight"/>
+                    <button name="action_merge_partners" string="Fusionner" type="object" class="oe_highlight"
+                            attrs="{'invisible': [('display_list', '=', False)]}"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

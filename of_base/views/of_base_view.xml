@@ -152,6 +152,10 @@
                 <field name="ref"/>
                 <field name="type"/>
             </xpath>
+            <xpath expr="//filter[@name='inactive']" position="before">
+                <filter string="Doublons potentiels" name="duplications" domain="[('of_potential_duplication', '=', True)]"/>
+                <separator/>
+            </xpath>
         </field>
     </record>
 

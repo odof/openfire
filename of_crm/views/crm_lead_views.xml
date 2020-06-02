@@ -375,6 +375,7 @@
                             <!-- Prospect group -->
                             <group name='prospect'>
                                 <separator string="Prospect" colspan="2"/>
+                                <field name="of_check_duplications" invisible="1"/>
                                 <field name="partner_id" domain="[('parent_id','=',False)]"/>
                                 <label for="contact_name" string="Nom du Client"/>
                                 <div>
@@ -612,6 +613,7 @@
                             <!-- Prospect group -->
                             <group name='prospect'>
                                 <separator string="Prospect" colspan="2"/>
+                                <field name="of_check_duplications" invisible="1"/>
                                 <field name="partner_id" domain="[('parent_id','=',False)]"/>
                                 <label for="contact_name" string="Nom du Client"/>
                                 <div>

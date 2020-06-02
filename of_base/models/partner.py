@@ -101,6 +101,12 @@ class ResPartner(models.Model):
                                              compute="_compute_parent_category")
     of_default_address = fields.Boolean(string=u"Adresse par défaut")
 
+    of_last_order_date = fields.Date(
+        string="Date du dernier devis", compute='_compute_of_last_order_date', compute_sudo=True)
+    of_potential_duplication = fields.Boolean(
+        string=u"Doublon potentiel ?", compute='_compute_of_potential_duplication',
+        search='_search_of_potential_duplication')
+
     @api.multi
     def _compute_old_phone_fields(self):
         user = self.env.user
@@ -126,6 +132,15 @@ class ResPartner(models.Model):
                 partners = self.search([('id', 'parent_of', partner.id)])
                 partners -= partner
                 partner.of_parent_category_id = partners.mapped('category_id')
+
+    @api.multi
+    def _compute_of_last_order_date(self):
+        for partner in self:
+            last_order = self.env['sale.order'].search([('partner_id', "=", partner.id)], order='id desc', limit=1)
+            if last_order:
+                partner.of_last_order_date = last_order.date_order
+            else:
+                partner.of_last_order_date = False
 
     @api.multi
     def _of_set_number(self, number_field, number_type):
@@ -296,6 +311,57 @@ class ResPartner(models.Model):
                 break
             cr.execute("SELECT id,parent_id FROM res_partner WHERE id IN %s", (tuple(ids),))
         return True
+
+    @api.multi
+    def _compute_of_potential_duplication(self):
+        # On teste l'existence de doublons potentiels basés sur l'email ou les numéros de téléphone
+        self = self.sudo()
+        for partner in self:
+            if partner.check_duplications():
+                partner.of_potential_duplication = True
+            else:
+                partner.of_potential_duplication = False
+
+    @api.model
+    def _search_of_potential_duplication(self, operator, value):
+        if operator == '=' and value:
+            self._cr.execute(
+                "   SELECT    DISTINCT RP.id"
+                "   FROM      res_partner RP"
+                "   WHERE     EXISTS      (   SELECT  1"
+                "                             FROM    res_partner RP2"
+                "                             WHERE   RP2.id      != RP.id"
+                "                             AND     RP2.email   = RP.email"
+                "                         )")
+            same_email_ids = [x[0] for x in self._cr.fetchall()]
+            self._cr.execute(
+                "   SELECT    DISTINCT ORPP.partner_id"
+                "   FROM      of_res_partner_phone      ORPP"
+                "   WHERE     EXISTS                    (   SELECT  1"
+                "                                           FROM    of_res_partner_phone    ORPP2"
+                "                                           WHERE   ORPP2.partner_id        != ORPP.partner_id"
+                "                                           AND     ORPP2.number            = ORPP.number"
+                "                                       )")
+            same_phone_ids = [x[0] for x in self._cr.fetchall()]
+            return [('id', 'in', same_email_ids + same_phone_ids)]
+
+    @api.one
+    def check_duplications(self):
+        # On teste l'existence de doublons potentiels basés sur l'email ou les numéros de téléphone
+        self = self.sudo()
+        same_email_ids = self.env['res.partner']
+        if self.email:
+            same_email_ids = self.search([('email', '=', self.email), ('id', '!=', self.id)])
+        same_phone_ids = self.env['res.partner']
+        if self.of_phone_number_ids:
+            numbers_list = self.of_phone_number_ids.mapped('number')
+            same_phone_ids = self.env['of.res.partner.phone'].\
+                search([('number', 'in', numbers_list), ('partner_id', '!=', self.id)]).mapped('partner_id')
+        duplication_ids = same_email_ids | same_phone_ids
+        if duplication_ids:
+            return duplication_ids.ids
+        else:
+            return False
 
     @api.model
     def create(self, vals):
