@@ -100,6 +100,10 @@ class ResPartner(models.Model):
     of_parent_category_id = fields.Many2many('res.partner.category', string=u"Étiquettes parent",
                                              compute="_compute_parent_category")
 
+    of_last_order_date = fields.Date(
+        string="Date du dernier devis", compute='_compute_of_last_order_date', compute_sudo=True)
+    of_potential_duplication = fields.Boolean(string=u"Doublon potentiel ?")
+
     @api.multi
     def _compute_old_phone_fields(self):
         user = self.env.user
@@ -128,6 +132,15 @@ class ResPartner(models.Model):
                 partners = self.search([('id', 'child_of', parent.id)])
                 partners -= partner
                 partner.of_parent_category_id = partners.mapped('category_id')
+
+    @api.multi
+    def _compute_of_last_order_date(self):
+        for partner in self:
+            last_order = self.env['sale.order'].search([('partner_id', "=", partner.id)], order='id desc', limit=1)
+            if last_order:
+                partner.of_last_order_date = last_order.date_order
+            else:
+                partner.of_last_order_date = False
 
     @api.multi
     def _of_set_number(self, number_field, number_type):
@@ -298,6 +311,26 @@ class ResPartner(models.Model):
                 break
             cr.execute("SELECT id,parent_id FROM res_partner WHERE id IN %s", (tuple(ids),))
         return True
+
+    @api.one
+    def check_duplications(self):
+        # On teste l'existence de doublons potentiels basés sur l'email ou les numéros de téléphone
+        self = self.sudo()
+        same_email_ids = self.env['res.partner']
+        if self.email:
+            same_email_ids = self.search([('email', '=', self.email), ('id', '!=', self.id)])
+        same_phone_ids = self.env['res.partner']
+        if self.of_phone_number_ids:
+            numbers_list = self.of_phone_number_ids.mapped('number')
+            same_phone_ids = self.env['of.res.partner.phone'].\
+                search([('number', 'in', numbers_list), ('partner_id', '!=', self.id)]).mapped('partner_id')
+        duplication_ids = same_email_ids | same_phone_ids
+        if duplication_ids:
+            self.write({'of_potential_duplication': True})
+            duplication_ids.write({'of_potential_duplication': True})
+            return duplication_ids.ids
+        else:
+            return False
 
     @api.model
     def create(self, vals):

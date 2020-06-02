@@ -131,6 +131,8 @@ class CrmLead(models.Model):
     of_date_action = fields.Datetime(string=u"Date de la prochaine action", compute='_compute_of_action_info')
     of_title_action = fields.Char(string=u"Libellé de la prochaine action", compute='_compute_of_action_info')
 
+    of_check_duplications = fields.Boolean(string=u"Contrôle de doublons ?")
+
     @api.depends('description')
     def _compute_description_rapport(self):
         for lead in self:
@@ -263,6 +265,7 @@ class CrmLead(models.Model):
             partner = self.env['res.partner'].create(partner_vals)
 #            vals['of_customer_state'] = partner.of_customer_state
             vals['partner_id'] = partner.id
+            vals['of_check_duplications'] = True
         lead = super(CrmLead, self).create(vals)
         return lead
 
