@@ -54,6 +54,7 @@ Ajout d'un modèle servant de log interne :
         'views/templates.xml',
         'wizard/wizard_change_active_product.xml',
         'wizard/of_popup_wizard_view.xml',
+        'wizard/of_res_partner_check_duplications_views.xml',
     ],
     'installable': True,
     'application': False,
