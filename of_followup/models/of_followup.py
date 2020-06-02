@@ -23,7 +23,11 @@ class OFFollowupProject(models.Model):
         comodel_name='of.followup.project.stage', string=u"Etape de suivi", required=True, readonly=True,
         group_expand='_read_group_stage_ids')
     state = fields.Selection(
-        [('in_progress', u'En cours'), ('late', u'En retard'), ('ready', u'Prêt'), ('done', u'Terminé')],
+        [('in_progress', u'En cours'),
+         ('late', u'En retard'),
+         ('ready', u'Prêt'),
+         ('done', u'Terminé'),
+         ('cancel', u'Annulé')],
         string=u"Etat du dossier", compute='_compute_state')
     is_done = fields.Boolean(string=u"Est terminé")
     order_id = fields.Many2one(comodel_name='sale.order', string=u"Commande", required=True, copy=False)
@@ -79,19 +83,24 @@ class OFFollowupProject(models.Model):
     @api.multi
     def _compute_state(self):
         for rec in self:
-            # Par défaut le projet est en cours
-            state = 'in_progress'
-            # Le projet a été marqué comme terminé
-            if rec.is_done:
-                state = 'done'
+            # Si commande annulée, le suivi est à l'état annulé également
+            if rec.order_id.state == 'cancel':
+                rec.state = 'cancel'
             else:
-                # Toutes les tâches sont terminées
-                if rec.task_ids and not rec.task_ids.filtered(lambda t: not t.is_done):
-                    state = 'ready'
-                # Au moins une tâche est en retard
-                elif rec.task_ids.filtered(lambda t: t.is_late):
-                    state = 'late'
-            rec.state = state
+                # Par défaut le projet est en cours
+                state = 'in_progress'
+                # Le projet a été marqué comme terminé
+                if rec.is_done:
+                    state = 'done'
+                else:
+                    # Toutes les tâches sont terminées (excepté les non traitées)
+                    if rec.task_ids and not rec.task_ids.filtered(lambda t: not t.is_not_processed).\
+                            filtered(lambda t: not t.is_done):
+                        state = 'ready'
+                    # Au moins une tâche est en retard
+                    elif rec.task_ids.filtered(lambda t: t.is_late):
+                        state = 'late'
+                rec.state = state
 
     @api.multi
     def _compute_laying_week(self):
@@ -114,6 +123,8 @@ class OFFollowupProject(models.Model):
                 color = '#bcffa8'
             elif state == 'done':
                 color = '#d7d7d7'
+            elif state == 'cancel':
+                color = '#eeeeee'
             else:
                 color = '#ffffff'
             rec.color = color
@@ -136,13 +147,13 @@ class OFFollowupProject(models.Model):
                             lambda i: i.tache_id.tache_categ_id.id in planif_planning_tache_categs.ids)
                         if interventions_to_schedule.filtered(lambda i: i.date_next > rec.reference_laying_date):
                             alerts |= self.env.ref('of_followup.of_followup_project_alert_date')
-                # Vérification BR
+                # Vérification BL
                 if rec.order_id.picking_ids:
                     late_delivery_pickings = rec.order_id.picking_ids.filtered(
                         lambda p: p.state != 'done' and p.min_date < fields.Datetime.now())
                     if late_delivery_pickings:
                         alerts |= self.env.ref('of_followup.of_followup_project_alert_bl')
-                # Vérification BL
+                # Vérification BR
                 if rec.order_id.purchase_ids.mapped('picking_ids'):
                     late_receipt_pickings = rec.order_id.purchase_ids.mapped('picking_ids').filtered(
                         lambda p: p.state != 'done' and p.min_date < fields.Datetime.now())
@@ -406,6 +417,23 @@ class OFFollowupTask(models.Model):
     force_state = fields.Boolean(string=u"Gestion manuelle de l'état")
     is_late = fields.Boolean(string=u"Tâche en retard", compute='_compute_is_late')
     is_done = fields.Boolean(string=u"Tâche terminée", compute='_compute_is_done')
+    is_not_processed = fields.Boolean(string=u"Tâche non traitée", compute='_compute_is_not_processed')
+    app_order_line_ids = fields.One2many(
+        comodel_name='sale.order.line', string=u"Lignes de commande appareils", compute='_compute_app_order_line_ids')
+    display_app_order_lines = fields.Boolean(
+        string=u"Afficher les lignes de commande appareils ?", compute='_compute_app_order_line_ids')
+    acc_order_line_ids = fields.One2many(
+        comodel_name='sale.order.line', string=u"Lignes de commande accessoires", compute='_compute_acc_order_line_ids')
+    display_acc_order_lines = fields.Boolean(
+        string=u"Afficher les lignes de commande accessoires ?", compute='_compute_acc_order_line_ids')
+    app_picking_line_ids = fields.One2many(
+        comodel_name='stock.move', string=u"Lignes de BL appareils", compute='_compute_app_picking_line_ids')
+    display_app_picking_lines = fields.Boolean(
+        string=u"Afficher les lignes de BL appareils ?", compute='_compute_app_picking_line_ids')
+    acc_picking_line_ids = fields.One2many(
+        comodel_name='stock.move', string=u"Lignes de BL accessoires", compute='_compute_acc_picking_line_ids')
+    display_acc_picking_lines = fields.Boolean(
+        string=u"Afficher les lignes de BL accessoires ?", compute='_compute_acc_picking_line_ids')
 
     @api.multi
     def _compute_predefined_state_id(self):
@@ -435,9 +463,7 @@ class OFFollowupTask(models.Model):
                     rec.predefined_state_id = self.env.ref('of_followup.of_followup_task_type_state_vt_02')
             # Appareils
             elif rec.type_id == self.env.ref('of_followup.of_followup_task_type_app'):
-                app_order_lines = rec.project_id.order_id.order_line.filtered(
-                    lambda l: l.product_id.categ_id.id in rec.type_id.product_categ_ids.ids and
-                    (l.product_id.type == 'product' or l.of_is_kit))
+                app_order_lines = rec.app_order_line_ids
                 po_validated = bool(app_order_lines)
                 receipt_validated = bool(app_order_lines)
                 # Non kit
@@ -481,17 +507,17 @@ class OFFollowupTask(models.Model):
                             else:
                                 po_validated = False
                                 break
-                if po_validated:
-                    if receipt_validated:
-                        rec.predefined_state_id = self.env.ref('of_followup.of_followup_task_type_state_app_03')
-                    else:
-                        rec.predefined_state_id = self.env.ref('of_followup.of_followup_task_type_state_app_02')
+                if not app_order_lines:
+                    rec.predefined_state_id = self.env.ref('of_followup.of_followup_task_type_state_np')
+                else:
+                    if po_validated:
+                        if receipt_validated:
+                            rec.predefined_state_id = self.env.ref('of_followup.of_followup_task_type_state_app_03')
+                        else:
+                            rec.predefined_state_id = self.env.ref('of_followup.of_followup_task_type_state_app_02')
             # Accessoires
             elif rec.type_id == self.env.ref('of_followup.of_followup_task_type_acc'):
-                product_categs = self.env.ref('of_followup.of_followup_task_type_app').product_categ_ids
-                acc_order_lines = rec.project_id.order_id.order_line.filtered(
-                    lambda l: l.product_id.categ_id.id not in product_categs.ids and
-                    (l.product_id.type == 'product' or l.of_is_kit))
+                acc_order_lines = rec.acc_order_line_ids
                 po_validated = bool(acc_order_lines)
                 receipt_validated = bool(acc_order_lines)
                 # Non kit
@@ -535,11 +561,78 @@ class OFFollowupTask(models.Model):
                             else:
                                 po_validated = False
                                 break
-                if po_validated:
-                    if receipt_validated:
-                        rec.predefined_state_id = self.env.ref('of_followup.of_followup_task_type_state_app_03')
-                    else:
-                        rec.predefined_state_id = self.env.ref('of_followup.of_followup_task_type_state_app_02')
+                if not acc_order_lines:
+                    rec.predefined_state_id = self.env.ref('of_followup.of_followup_task_type_state_np')
+                else:
+                    if po_validated:
+                        if receipt_validated:
+                            rec.predefined_state_id = self.env.ref('of_followup.of_followup_task_type_state_app_03')
+                        else:
+                            rec.predefined_state_id = self.env.ref('of_followup.of_followup_task_type_state_app_02')
+            # Appareils hors commande
+            elif rec.type_id == self.env.ref('of_followup.of_followup_task_type_out_app'):
+                app_picking_lines = rec.app_picking_line_ids
+                po_validated = bool(app_picking_lines)
+                receipt_validated = bool(app_picking_lines)
+                for app_picking_line in app_picking_lines:
+                    # On regarde d'abord si les articles sont déjà en stock/réservés
+                    qty = sum(self.env['stock.quant'].search([('reservation_id', '=', app_picking_line.id)]).
+                              mapped('qty'))
+                    if qty < app_picking_line.product_uom_qty:
+                        # On récupère la(les) ligne(s) de commande d'achat validée associée(s)
+                        purchase_procurement_orders = self.env['procurement.order'].search(
+                            [('move_dest_id', '=', app_picking_line.id)])
+                        validated_purchase_lines = purchase_procurement_orders.mapped('purchase_line_id').filtered(
+                            lambda l: l.order_id.state == 'purchase')
+                        # On contrôle que les quantités commandées correspondent
+                        if app_picking_line.product_uom_qty - qty <= sum(validated_purchase_lines.
+                                                                         mapped('product_qty')):
+                            receipts = validated_purchase_lines.mapped('order_id').mapped('picking_ids')
+                            if not receipts or receipts != receipts.filtered(lambda r: r.state == 'done'):
+                                receipt_validated = False
+                        else:
+                            po_validated = False
+                            break
+                if not app_picking_lines:
+                    rec.predefined_state_id = self.env.ref('of_followup.of_followup_task_type_state_np')
+                else:
+                    if po_validated:
+                        if receipt_validated:
+                            rec.predefined_state_id = self.env.ref('of_followup.of_followup_task_type_state_out_app_03')
+                        else:
+                            rec.predefined_state_id = self.env.ref('of_followup.of_followup_task_type_state_out_app_02')
+            # Accessoires hors commande
+            elif rec.type_id == self.env.ref('of_followup.of_followup_task_type_out_acc'):
+                acc_picking_lines = rec.acc_picking_line_ids
+                po_validated = bool(acc_picking_lines)
+                receipt_validated = bool(acc_picking_lines)
+                for acc_picking_line in acc_picking_lines:
+                    # On regarde d'abord si les articles sont déjà en stock/réservés
+                    qty = sum(self.env['stock.quant'].search([('reservation_id', '=', acc_picking_line.id)]).
+                              mapped('qty'))
+                    if qty < acc_picking_line.product_uom_qty:
+                        # On récupère la(les) ligne(s) de commande d'achat validée associée(s)
+                        purchase_procurement_orders = self.env['procurement.order'].search(
+                            [('move_dest_id', '=', acc_picking_line.id)])
+                        validated_purchase_lines = purchase_procurement_orders.mapped('purchase_line_id').filtered(
+                            lambda l: l.order_id.state == 'purchase')
+                        # On contrôle que les quantités commandées correspondent
+                        if acc_picking_line.product_uom_qty - qty <= sum(validated_purchase_lines.
+                                                                         mapped('product_qty')):
+                            receipts = validated_purchase_lines.mapped('order_id').mapped('picking_ids')
+                            if not receipts or receipts != receipts.filtered(lambda r: r.state == 'done'):
+                                receipt_validated = False
+                        else:
+                            po_validated = False
+                            break
+                if not acc_picking_lines:
+                    rec.predefined_state_id = self.env.ref('of_followup.of_followup_task_type_state_np')
+                else:
+                    if po_validated:
+                        if receipt_validated:
+                            rec.predefined_state_id = self.env.ref('of_followup.of_followup_task_type_state_out_acc_03')
+                        else:
+                            rec.predefined_state_id = self.env.ref('of_followup.of_followup_task_type_state_out_acc_02')
 
     @api.multi
     @api.depends('state_id', 'predefined_state_id', 'predefined_task', 'force_state')
@@ -552,27 +645,94 @@ class OFFollowupTask(models.Model):
 
     @api.multi
     def _compute_is_late(self):
+        not_processed_state = self.env.ref('of_followup.of_followup_task_type_state_np')
         for rec in self:
-            if rec.predefined_task and not rec.force_state:
-                late_stage = rec.predefined_state_id.stage_id
-            else:
-                late_stage = rec.state_id.stage_id
-            if late_stage and late_stage.sequence <= rec.project_id.stage_id.sequence:
-                rec.is_late = True
-            else:
+            if rec.predefined_task and not rec.force_state and rec.predefined_state_id == not_processed_state:
                 rec.is_late = False
+            else:
+                if rec.predefined_task and not rec.force_state:
+                    late_stage = rec.predefined_state_id.stage_id
+                else:
+                    late_stage = rec.state_id.stage_id
+                if late_stage and late_stage.sequence <= rec.project_id.stage_id.sequence:
+                    rec.is_late = True
+                else:
+                    rec.is_late = False
 
     @api.multi
     def _compute_is_done(self):
+        not_processed_state = self.env.ref('of_followup.of_followup_task_type_state_np')
         for rec in self:
-            if rec.predefined_task and not rec.force_state:
-                final_state = rec.predefined_state_id.final_state
-            else:
-                final_state = rec.state_id.final_state
-            if final_state:
-                rec.is_done = True
-            else:
+            if rec.predefined_task and not rec.force_state and rec.predefined_state_id == not_processed_state:
                 rec.is_done = False
+            else:
+                if rec.predefined_task and not rec.force_state:
+                    final_state = rec.predefined_state_id.final_state
+                else:
+                    final_state = rec.state_id.final_state
+                if final_state:
+                    rec.is_done = True
+                else:
+                    rec.is_done = False
+
+    @api.multi
+    def _compute_is_not_processed(self):
+        not_processed_state = self.env.ref('of_followup.of_followup_task_type_state_np')
+        for rec in self:
+            if rec.predefined_task and not rec.force_state and rec.predefined_state_id == not_processed_state:
+                rec.is_not_processed = True
+            else:
+                rec.is_not_processed = False
+
+    @api.multi
+    def _compute_app_order_line_ids(self):
+        for rec in self:
+            if rec.type_id == self.env.ref('of_followup.of_followup_task_type_app'):
+                rec.app_order_line_ids = rec.project_id.order_id.order_line.filtered(
+                    lambda l: l.product_id.categ_id.id in rec.type_id.product_categ_ids.ids and
+                    (l.product_id.type == 'product' or l.of_is_kit) and l.product_uom_qty > 0)
+                rec.display_app_order_lines = True
+            else:
+                rec.app_order_line_ids = False
+                rec.display_app_order_lines = False
+
+    @api.multi
+    def _compute_acc_order_line_ids(self):
+        for rec in self:
+            if rec.type_id == self.env.ref('of_followup.of_followup_task_type_acc'):
+                product_categs = self.env.ref('of_followup.of_followup_task_type_app').product_categ_ids
+                rec.acc_order_line_ids = rec.project_id.order_id.order_line.filtered(
+                    lambda l: l.product_id.categ_id.id not in product_categs.ids and
+                    (l.product_id.type == 'product' or l.of_is_kit) and l.product_uom_qty > 0)
+                rec.display_acc_order_lines = True
+            else:
+                rec.acc_order_line_ids = False
+                rec.display_acc_order_lines = False
+
+    @api.multi
+    def _compute_app_picking_line_ids(self):
+        for rec in self:
+            if rec.type_id == self.env.ref('of_followup.of_followup_task_type_out_app'):
+                rec.app_picking_line_ids = rec.project_id.order_id.picking_ids.mapped('move_lines').\
+                    filtered(lambda l: not l.procurement_id and
+                             l.product_id.categ_id.id in rec.type_id.product_categ_ids.ids and l.product_uom_qty > 0)
+                rec.display_app_picking_lines = True
+            else:
+                rec.app_picking_line_ids = False
+                rec.display_app_picking_lines = False
+
+    @api.multi
+    def _compute_acc_picking_line_ids(self):
+        for rec in self:
+            if rec.type_id == self.env.ref('of_followup.of_followup_task_type_out_acc'):
+                product_categs = self.env.ref('of_followup.of_followup_task_type_out_app').product_categ_ids
+                rec.acc_picking_line_ids = rec.project_id.order_id.picking_ids.mapped('move_lines'). \
+                    filtered(lambda l: not l.procurement_id and l.product_id.categ_id.id not in product_categs.ids and
+                             l.product_uom_qty > 0)
+                rec.display_acc_picking_lines = True
+            else:
+                rec.acc_picking_line_ids = False
+                rec.display_acc_picking_lines = False
 
     @api.onchange('type_id')
     def _onchange_type_id(self):
@@ -737,7 +897,7 @@ class OFFollowupProjectAlert(models.Model):
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    of_followup_project_id = fields.Many2one(comodel_name='of.followup.project', string=u"Suivi")
+    of_followup_project_id = fields.Many2one(comodel_name='of.followup.project', string=u"Suivi", copy=False)
     of_follow_count = fields.Integer(string=u"Nombre de suivi", compute='_compute_of_followup_count')
 
     @api.multi

@@ -179,6 +179,68 @@
                                                    ref('of_followup_task_type_state_acc_03')])]"/>
         </record>
 
+        <record id="of_followup_task_type_state_out_app_01" model="of.followup.task.type.state">
+            <field name="sequence">1</field>
+            <field name="name">A commander</field>
+            <field name="starting_state">True</field>
+            <field name="stage_id" eval="ref('of_followup_project_stage_s6')"/>
+        </record>
+
+        <record id="of_followup_task_type_state_out_app_02" model="of.followup.task.type.state">
+            <field name="sequence">2</field>
+            <field name="name">Commandé</field>
+            <field name="stage_id" eval="ref('of_followup_project_stage_s2')"/>
+        </record>
+
+        <record id="of_followup_task_type_state_out_app_03" model="of.followup.task.type.state">
+            <field name="sequence">3</field>
+            <field name="name">Reçu / En stock</field>
+            <field name="final_state">True</field>
+        </record>
+
+        <record id="of_followup_task_type_out_app" model="of.followup.task.type">
+            <field name="name">Appareil hors commande</field>
+            <field name="short_name">App. hors cmd</field>
+            <field name="predefined_task">True</field>
+            <field name="state_ids" eval="[(6, 0, [ref('of_followup_task_type_state_out_app_01'),
+                                                   ref('of_followup_task_type_state_out_app_02'),
+                                                   ref('of_followup_task_type_state_out_app_03')])]"/>
+        </record>
+
+        <record id="of_followup_task_type_state_out_acc_01" model="of.followup.task.type.state">
+            <field name="sequence">1</field>
+            <field name="name">A commander</field>
+            <field name="starting_state">True</field>
+            <field name="stage_id" eval="ref('of_followup_project_stage_s4')"/>
+        </record>
+
+        <record id="of_followup_task_type_state_out_acc_02" model="of.followup.task.type.state">
+            <field name="sequence">2</field>
+            <field name="name">Commandé</field>
+            <field name="stage_id" eval="ref('of_followup_project_stage_s2')"/>
+        </record>
+
+        <record id="of_followup_task_type_state_out_acc_03" model="of.followup.task.type.state">
+            <field name="sequence">3</field>
+            <field name="name">Reçu / En stock</field>
+            <field name="final_state">True</field>
+        </record>
+
+        <record id="of_followup_task_type_out_acc" model="of.followup.task.type">
+            <field name="name">Accessoires hors commande</field>
+            <field name="short_name">Acc. hors cmd</field>
+            <field name="predefined_task">True</field>
+            <field name="state_ids" eval="[(6, 0, [ref('of_followup_task_type_state_out_acc_01'),
+                                                   ref('of_followup_task_type_state_out_acc_02'),
+                                                   ref('of_followup_task_type_state_out_acc_03')])]"/>
+        </record>
+
+        <!-- État spécial non traité -->
+        <record id="of_followup_task_type_state_np" model="of.followup.task.type.state">
+            <field name="sequence">0</field>
+            <field name="name">Non traité</field>
+        </record>
+
         <!-- Modèles de suivi -->
 
         <record id="of_followup_project_template_complete" model="of.followup.project.template">
@@ -191,8 +253,12 @@
                                           (0, 0, {'sequence': 1,
                                                  'type_id': ref('of_followup_task_type_app')}),
                                           (0, 0, {'sequence': 1,
-                                                 'type_id': ref('of_followup_task_type_acc')})]"/>
-        </record>                               ref('of_followup_task_type_state_acc_03')])]"/>
+                                                 'type_id': ref('of_followup_task_type_acc')}),
+                                          (0, 0, {'sequence': 1,
+                                                 'type_id': ref('of_followup_task_type_out_app')}),
+                                          (0, 0, {'sequence': 1,
+                                                 'type_id': ref('of_followup_task_type_out_acc')})]"/>
+        </record>
 
         <!-- Alertes de suivi -->
 

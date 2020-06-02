@@ -64,9 +64,10 @@
                         </group>
                         <group col="4" colspan="4" string="Liste des tâches">
                             <field name="task_ids" nolabel="1">
-                                <tree decoration-danger="is_late" decoration-success="is_done">
+                                <tree decoration-danger="is_late" decoration-success="is_done" decoration-muted="is_not_processed">
                                     <field name="is_late" invisible="1"/>
                                     <field name="is_done" invisible="1"/>
+                                    <field name="is_not_processed" invisible="1"/>
                                     <field name="type_id" invisible="1"/>
                                     <field name="predefined_task" invisible="1"/>
                                     <field name="state_id" invisible="1"/>
@@ -227,6 +228,24 @@
                             <field name="force_state" attrs="{'invisible': [('predefined_task', '=', False)]}"/>
                         </group>
                     </group>
+                    <group>
+                        <field name="display_app_order_lines" invisible="1"/>
+                        <field name="display_acc_order_lines" invisible="1"/>
+                        <field name="display_app_picking_lines" invisible="1"/>
+                        <field name="display_acc_picking_lines" invisible="1"/>
+                        <group col="4" colspan="4" string="Lignes de commandes appareils" attrs="{'invisible': [('display_app_order_lines', '=', False)]}">
+                            <field name="app_order_line_ids" nolabel="1"/>
+                        </group>
+                        <group col="4" colspan="4" string="Lignes de commandes accessoires" attrs="{'invisible': [('display_acc_order_lines', '=', False)]}">
+                            <field name="acc_order_line_ids" nolabel="1"/>
+                        </group>
+                        <group col="4" colspan="4" string="Lignes de BL appareils" attrs="{'invisible': [('display_app_picking_lines', '=', False)]}">
+                            <field name="app_picking_line_ids" nolabel="1"/>
+                        </group>
+                        <group col="4" colspan="4" string="Lignes de BL accessoires" attrs="{'invisible': [('display_acc_picking_lines', '=', False)]}">
+                            <field name="acc_picking_line_ids" nolabel="1"/>
+                        </group>
+                    </group>
                 </sheet>
             </form>
         </field>
@@ -256,7 +275,7 @@
                             <field name="planning_tache_categ_ids" widget="many2many_tags"
                                    attrs="{'invisible': ['|', ('predefined_task', '=', False), ('id', 'not in', [%(of_followup.of_followup_task_type_planif)d, %(of_followup.of_followup_task_type_vt)d])]}"/>
                             <field name="product_categ_ids" widget="many2many_tags"
-                                   attrs="{'invisible': ['|', ('predefined_task', '=', False), ('id', 'not in', [%(of_followup.of_followup_task_type_app)d])]}"/>
+                                   attrs="{'invisible': ['|', ('predefined_task', '=', False), ('id', 'not in', [%(of_followup.of_followup_task_type_app)d, %(of_followup.of_followup_task_type_out_app)d])]}"/>
                         </group>
                         <group col="4" colspan="4" string="Etats">
                             <field name="state_ids" nolabel="1" attrs="{'readonly': [('predefined_task', '=', True)]}">
