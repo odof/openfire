@@ -46,7 +46,13 @@ class SaleOrderLine(models.Model):
             if line.of_invoice_policy == 'intervention':
                 interventions = line.of_intervention_line_ids.mapped('intervention_id')
                 if interventions:
-                    line.of_invoice_date_prev = interventions[O].date_date
+                    line.of_invoice_date_prev = interventions[0].date_date
+
+    @api.depends('product_id', 'product_id.invoice_policy',
+                 'order_id', 'order_id.of_invoice_policy',
+                 'order_partner_id', 'order_partner_id.of_invoice_policy')
+    def _compute_of_invoice_policy(self):
+        super(SaleOrderLine, self)._compute_of_invoice_policy()
 
 
 class SaleConfiguration(models.TransientModel):

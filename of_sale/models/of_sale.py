@@ -681,12 +681,17 @@ class SaleOrderLine(models.Model):
             line.of_price_unit_ttc = taxes['total_included']
 
     @api.depends('product_id', 'product_id.invoice_policy',
-                 'order_id', 'order_id.of_invoice_policy')
+                 'order_id', 'order_id.of_invoice_policy',
+                 'order_partner_id', 'order_partner_id.of_invoice_policy')
     def _compute_of_invoice_policy(self):
         for line in self:
             invoice_policy = line.order_id.of_invoice_policy
             if not invoice_policy:
+                invoice_policy = line.order_partner_id.of_invoice_policy
+            if not invoice_policy:
                 invoice_policy = line.product_id.invoice_policy
+            if not invoice_policy:
+                invoice_policy = self.env['ir.values'].get_default('product_template', 'invoice_policy')
             line.of_invoice_policy = invoice_policy
 
     @api.depends('of_invoice_policy',
