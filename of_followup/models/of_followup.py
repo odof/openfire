@@ -28,7 +28,7 @@ class OFFollowupProject(models.Model):
          ('ready', u'Prêt'),
          ('done', u'Terminé'),
          ('cancel', u'Annulé')],
-        string=u"Etat du dossier", compute='_compute_state')
+        string=u"Etat du dossier", compute='_compute_state', search='_search_state')
     is_done = fields.Boolean(string=u"Est terminé")
     order_id = fields.Many2one(comodel_name='sale.order', string=u"Commande", required=True, copy=False)
     partner_id = fields.Many2one(related='order_id.partner_id', string=u"Client", readonly=True)
@@ -101,6 +101,12 @@ class OFFollowupProject(models.Model):
                     elif rec.task_ids.filtered(lambda t: t.is_late):
                         state = 'late'
                 rec.state = state
+
+    @api.model
+    def _search_state(self, operator, value):
+        if operator == '=':
+            followups = self.search([]).filtered(lambda f: f.state == value)
+            return [('id', 'in', followups.ids)]
 
     @api.multi
     def _compute_laying_week(self):
@@ -418,6 +424,16 @@ class OFFollowupTask(models.Model):
     is_late = fields.Boolean(string=u"Tâche en retard", compute='_compute_is_late')
     is_done = fields.Boolean(string=u"Tâche terminée", compute='_compute_is_done')
     is_not_processed = fields.Boolean(string=u"Tâche non traitée", compute='_compute_is_not_processed')
+    planif_intervention_ids = fields.One2many(
+        comodel_name='of.planning.intervention', string=u"RDVs d'intervention planifiés",
+        compute='_compute_planif_intervention_ids')
+    display_planif_interventions = fields.Boolean(
+        string=u"Afficher les RDVs d'intervention planifiés ?", compute='_compute_planif_intervention_ids')
+    vt_intervention_ids = fields.One2many(
+        comodel_name='of.planning.intervention', string=u"RDVs visite technique",
+        compute='_compute_vt_intervention_ids')
+    display_vt_interventions = fields.Boolean(
+        string=u"Afficher les RDVs visite technique ?", compute='_compute_vt_intervention_ids')
     app_order_line_ids = fields.One2many(
         comodel_name='sale.order.line', string=u"Lignes de commande appareils", compute='_compute_app_order_line_ids')
     display_app_order_lines = fields.Boolean(
@@ -441,9 +457,7 @@ class OFFollowupTask(models.Model):
             rec.predefined_state_id = rec.type_id.state_ids.filtered(lambda s: s.starting_state)[0]
             # Planification
             if rec.type_id == self.env.ref('of_followup.of_followup_task_type_planif'):
-                planning_tache_categs = rec.type_id.planning_tache_categ_ids
-                interventions = rec.project_id.order_id.intervention_ids.filtered(
-                    lambda i: i.tache_id.tache_categ_id.id in planning_tache_categs.ids)
+                interventions = rec.planif_intervention_ids
                 # Il existe des RDV d'intervention et ils sont tous au statut 'Réalisé'
                 if interventions and not interventions.filtered(lambda i: i.state != 'done'):
                     rec.predefined_state_id = self.env.ref('of_followup.of_followup_task_type_state_planif_03')
@@ -452,9 +466,7 @@ class OFFollowupTask(models.Model):
                     rec.predefined_state_id = self.env.ref('of_followup.of_followup_task_type_state_planif_02')
             # Visite technique
             elif rec.type_id == self.env.ref('of_followup.of_followup_task_type_vt'):
-                planning_tache_categs = rec.type_id.planning_tache_categ_ids
-                interventions = rec.project_id.order_id.intervention_ids.filtered(
-                    lambda i: i.tache_id.tache_categ_id.id in planning_tache_categs.ids)
+                interventions = rec.vt_intervention_ids
                 # Il existe un RDV d'intervention de tâche "VT" au statut 'Réalisé'
                 if interventions.filtered(lambda i: i.state == 'done'):
                     rec.predefined_state_id = self.env.ref('of_followup.of_followup_task_type_state_vt_03')
@@ -685,37 +697,75 @@ class OFFollowupTask(models.Model):
                 rec.is_not_processed = False
 
     @api.multi
-    def _compute_app_order_line_ids(self):
+    def _compute_planif_intervention_ids(self):
+        planif_task_type = self.env.ref('of_followup.of_followup_task_type_planif')
+        planning_tache_categs = planif_task_type.planning_tache_categ_ids
         for rec in self:
-            if rec.type_id == self.env.ref('of_followup.of_followup_task_type_app'):
-                rec.app_order_line_ids = rec.project_id.order_id.order_line.filtered(
-                    lambda l: l.product_id.categ_id.id in rec.type_id.product_categ_ids.ids and
-                    (l.product_id.type == 'product' or l.of_is_kit) and l.product_uom_qty > 0)
+            if rec.type_id == planif_task_type:
+                rec.planif_intervention_ids = rec.project_id.order_id.intervention_ids.filtered(
+                    lambda i: i.tache_id.tache_categ_id.id in planning_tache_categs.ids)
+                rec.display_planif_interventions = True
+            else:
+                rec.planif_intervention_ids = False
+                rec.display_planif_interventions = False
+
+    @api.multi
+    def _compute_vt_intervention_ids(self):
+        vt_task_type = self.env.ref('of_followup.of_followup_task_type_vt')
+        planning_tache_categs = vt_task_type.planning_tache_categ_ids
+        for rec in self:
+            if rec.type_id == vt_task_type:
+                rec.vt_intervention_ids = rec.project_id.order_id.intervention_ids.filtered(
+                    lambda i: i.tache_id.tache_categ_id.id in planning_tache_categs.ids)
+                rec.display_vt_interventions = True
+            else:
+                rec.vt_intervention_ids = False
+                rec.display_vt_interventions = False
+
+    @api.multi
+    def _compute_app_order_line_ids(self):
+        app_task_type = self.env.ref('of_followup.of_followup_task_type_app')
+        product_categs = app_task_type.product_categ_ids
+        for rec in self:
+            if rec.type_id == app_task_type:
                 rec.display_app_order_lines = True
+                if rec.project_id.order_id.state == 'sale':
+                    rec.app_order_line_ids = rec.project_id.order_id.order_line.filtered(
+                        lambda l: l.product_id.categ_id.id in product_categs.ids and
+                        (l.product_id.type == 'product' or l.of_is_kit) and l.product_uom_qty > 0)
+                else:
+                    rec.app_order_line_ids = False
             else:
                 rec.app_order_line_ids = False
                 rec.display_app_order_lines = False
 
     @api.multi
     def _compute_acc_order_line_ids(self):
+        acc_task_type = self.env.ref('of_followup.of_followup_task_type_acc')
+        app_task_type = self.env.ref('of_followup.of_followup_task_type_app')
+        product_categs = app_task_type.product_categ_ids
         for rec in self:
-            if rec.type_id == self.env.ref('of_followup.of_followup_task_type_acc'):
-                product_categs = self.env.ref('of_followup.of_followup_task_type_app').product_categ_ids
-                rec.acc_order_line_ids = rec.project_id.order_id.order_line.filtered(
-                    lambda l: l.product_id.categ_id.id not in product_categs.ids and
-                    (l.product_id.type == 'product' or l.of_is_kit) and l.product_uom_qty > 0)
+            if rec.type_id == acc_task_type:
                 rec.display_acc_order_lines = True
+                if rec.project_id.order_id.state == 'sale':
+                    rec.acc_order_line_ids = rec.project_id.order_id.order_line.filtered(
+                        lambda l: l.product_id.categ_id.id not in product_categs.ids and
+                        (l.product_id.type == 'product' or l.of_is_kit) and l.product_uom_qty > 0)
+                else:
+                    rec.acc_order_line_ids = False
             else:
                 rec.acc_order_line_ids = False
                 rec.display_acc_order_lines = False
 
     @api.multi
     def _compute_app_picking_line_ids(self):
+        out_app_task_type = self.env.ref('of_followup.of_followup_task_type_out_app')
+        product_categs = out_app_task_type.product_categ_ids
         for rec in self:
-            if rec.type_id == self.env.ref('of_followup.of_followup_task_type_out_app'):
+            if rec.type_id == out_app_task_type:
                 rec.app_picking_line_ids = rec.project_id.order_id.picking_ids.mapped('move_lines').\
                     filtered(lambda l: not l.procurement_id and
-                             l.product_id.categ_id.id in rec.type_id.product_categ_ids.ids and l.product_uom_qty > 0)
+                             l.product_id.categ_id.id in product_categs.ids and l.product_uom_qty > 0)
                 rec.display_app_picking_lines = True
             else:
                 rec.app_picking_line_ids = False
@@ -723,9 +773,11 @@ class OFFollowupTask(models.Model):
 
     @api.multi
     def _compute_acc_picking_line_ids(self):
+        out_acc_task_type = self.env.ref('of_followup.of_followup_task_type_out_acc')
+        out_app_task_type = self.env.ref('of_followup.of_followup_task_type_out_app')
+        product_categs = out_app_task_type.product_categ_ids
         for rec in self:
-            if rec.type_id == self.env.ref('of_followup.of_followup_task_type_out_acc'):
-                product_categs = self.env.ref('of_followup.of_followup_task_type_out_app').product_categ_ids
+            if rec.type_id == out_acc_task_type:
                 rec.acc_picking_line_ids = rec.project_id.order_id.picking_ids.mapped('move_lines'). \
                     filtered(lambda l: not l.procurement_id and l.product_id.categ_id.id not in product_categs.ids and
                              l.product_uom_qty > 0)

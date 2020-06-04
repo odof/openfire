@@ -193,6 +193,11 @@
                 <field name="partner_id"/>
                 <field name="intervention_address_id"/>
                 <field name="reference_laying_date"/>
+                <filter name='in_progress' string="En cours" domain="[('state', '=', 'in_progress')]"/>
+                <filter name='late' string="En retard" domain="[('state', '=', 'late')]"/>
+                <filter name='ready' string="Prêts" domain="[('state', '=', 'ready')]"/>
+                <filter name='done' string="Terminés" domain="[('state', '=', 'done')]"/>
+                <filter name='cancel' string="Annulés" domain="[('state', '=', 'cancel')]"/>
             </search>
         </field>
     </record>
@@ -215,6 +220,7 @@
                         <group>
                             <field name="is_late" invisible="1"/>
                             <field name="is_done" invisible="1"/>
+                            <field name="is_not_processed" invisible="1"/>
                             <field name="type_id" widget="selection"/>
                             <field name="name"/>
                         </group>
@@ -229,15 +235,83 @@
                         </group>
                     </group>
                     <group>
+                        <field name="display_planif_interventions" invisible="1"/>
+                        <field name="display_vt_interventions" invisible="1"/>
                         <field name="display_app_order_lines" invisible="1"/>
                         <field name="display_acc_order_lines" invisible="1"/>
                         <field name="display_app_picking_lines" invisible="1"/>
                         <field name="display_acc_picking_lines" invisible="1"/>
+                        <group col="4" colspan="4" string="RDVs d'intervention planifiés" attrs="{'invisible': [('display_planif_interventions', '=', False)]}">
+                            <field name="planif_intervention_ids" nolabel="1"/>
+                        </group>
+                        <group col="4" colspan="4" string="RDVs visite technique" attrs="{'invisible': [('display_vt_interventions', '=', False)]}">
+                            <field name="vt_intervention_ids" nolabel="1"/>
+                        </group>
                         <group col="4" colspan="4" string="Lignes de commandes appareils" attrs="{'invisible': [('display_app_order_lines', '=', False)]}">
-                            <field name="app_order_line_ids" nolabel="1"/>
+                            <field name="app_order_line_ids" nolabel="1">
+                                <form>
+                                    <group>
+                                        <group>
+                                            <field name="product_id"/>
+                                            <field name="of_product_categ_id"/>
+                                            <label for="product_uom_qty" string="Quantité commandée"/>
+                                            <div>
+                                                <field name="product_uom_qty" class="oe_inline"/>
+                                                <field name="product_uom" class="oe_inline oe_no_button"/>
+                                            </div>
+                                            <field name="price_unit"/>
+                                            <field name="price_subtotal"/>
+                                            <field name="qty_delivered" string="Quantité livrée"/>
+                                            <field name="qty_invoiced" string="Quantité facturée"/>
+                                        </group>
+                                        <group>
+                                            <field name="order_partner_id"/>
+                                            <field name="date_order"/>
+                                            <field name="confirmation_date_order"/>
+                                            <field name="of_invoice_policy"/>
+                                            <field name="invoice_status"/>
+                                            <field name="of_invoice_date_prev"/>
+                                        </group>
+                                    </group>
+                                    <label for="name"/>
+                                    <field name="name"/>
+                                    <label for="procurement_ids"/>
+                                    <field name="procurement_ids"/>
+                                </form>
+                            </field>
                         </group>
                         <group col="4" colspan="4" string="Lignes de commandes accessoires" attrs="{'invisible': [('display_acc_order_lines', '=', False)]}">
-                            <field name="acc_order_line_ids" nolabel="1"/>
+                            <field name="acc_order_line_ids" nolabel="1">
+                                <form>
+                                    <group>
+                                        <group>
+                                            <field name="product_id"/>
+                                            <field name="of_product_categ_id"/>
+                                            <label for="product_uom_qty" string="Quantité commandée"/>
+                                            <div>
+                                                <field name="product_uom_qty" class="oe_inline"/>
+                                                <field name="product_uom" class="oe_inline oe_no_button"/>
+                                            </div>
+                                            <field name="price_unit"/>
+                                            <field name="price_subtotal"/>
+                                            <field name="qty_delivered" string="Quantité livrée"/>
+                                            <field name="qty_invoiced" string="Quantité facturée"/>
+                                        </group>
+                                        <group>
+                                            <field name="order_partner_id"/>
+                                            <field name="date_order"/>
+                                            <field name="confirmation_date_order"/>
+                                            <field name="of_invoice_policy"/>
+                                            <field name="invoice_status"/>
+                                            <field name="of_invoice_date_prev"/>
+                                        </group>
+                                    </group>
+                                    <label for="name"/>
+                                    <field name="name"/>
+                                    <label for="procurement_ids"/>
+                                    <field name="procurement_ids"/>
+                                </form>
+                            </field>
                         </group>
                         <group col="4" colspan="4" string="Lignes de BL appareils" attrs="{'invisible': [('display_app_picking_lines', '=', False)]}">
                             <field name="app_picking_line_ids" nolabel="1"/>

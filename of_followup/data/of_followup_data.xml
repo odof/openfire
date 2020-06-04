@@ -97,14 +97,14 @@
 
         <record id="of_followup_task_type_state_vt_01" model="of.followup.task.type.state">
             <field name="sequence">1</field>
-            <field name="name">A planifier</field>
+            <field name="name">A programmer</field>
             <field name="starting_state">True</field>
             <field name="stage_id" eval="ref('of_followup_project_stage_s6')"/>
         </record>
 
         <record id="of_followup_task_type_state_vt_02" model="of.followup.task.type.state">
             <field name="sequence">2</field>
-            <field name="name">Planifiée</field>
+            <field name="name">Programmée</field>
             <field name="stage_id" eval="ref('of_followup_project_stage_s4')"/>
         </record>
 
