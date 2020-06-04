@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <record id="of_parrainage_view_partner_form" model="ir.ui.view">
+        <field name="name">of.parrainage.view.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="referred" string="Parrainage">
+                    <group>
+                        <field name="of_referred_id" />
+                        <field name="of_referred_reward_id" widget="selection"/>
+                        <field name="of_referred_note"/>
+                        <field name="of_referred_reward_state"/>
+                        <field name="of_referred_reward_date"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
 
     <record id="of_parrainage_view_create_opportunity_simplified" model="ir.ui.view">
         <field name="name">of.parrainage.crm.lead.form.simple</field>
