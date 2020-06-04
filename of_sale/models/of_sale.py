@@ -695,16 +695,16 @@ class SaleOrderLine(models.Model):
             line.of_invoice_policy = invoice_policy
 
     @api.depends('of_invoice_policy',
-                 'order_id', 'order_id.of_invoice_date_prev')
+                 'order_id', 'order_id.of_invoice_date_prev',
+                 'procurement_ids', 'procurement_ids.move_ids', 'procurement_ids.move_ids.picking_id.min_date')
     def _compute_of_invoice_date_prev(self):
-        move_obj = self.env['stock.move']
         for line in self:
             if line.of_invoice_policy == 'order':
                 line.of_invoice_date_prev = line.order_id.of_invoice_date_prev
             elif line.of_invoice_policy == 'delivery':
-                move = move_obj.search([('procurement_id', 'in', line.procurement_ids.ids)], order="date_expected ASC", limit=1)
-                if move:
-                    line.of_invoice_date_prev = fields.Date.to_string(fields.Date.from_string(move.date_expected))
+                pickings = line.procurement_ids.mapped('move_ids').mapped('picking_id').sorted('min_date')
+                if pickings:
+                    line.of_invoice_date_prev = fields.Date.to_string(fields.Date.from_string(pickings.min_date))
 
     @api.model
     def _search_of_gb_partner_tag_id(self, operator, value):

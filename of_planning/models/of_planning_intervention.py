@@ -1208,23 +1208,6 @@ class OfPlanningIntervention(models.Model):
                 'taxe_ids': [(4, tax.id) for tax in line.tax_id]
                 })
 
-    @api.onchange('order_id')
-    def onchange_order_id(self):
-        self.ensure_one()
-        if not self.order_id:
-            return
-        self.fiscal_position_id = self.order_id.fiscal_position_id
-        for line in self.order_id.order_line.filtered(lambda l: float_compare(l.product_uom_qty, sum(l.of_intervention_line_ids.mapped('qty')), 2) > 0):
-            self.line_ids.new({
-                'order_line_id'  : line.id,
-                'intervention_id': self.id,
-                'product_id'     : line.product_id.id,
-                'qty'            : line.product_uom_qty - sum(line.of_intervention_line_ids.mapped('qty')),
-                'price_unit'     : line.price_unit,
-                'name'           : line.name,
-                'taxe_ids'       : [(4, tax.id) for tax in line.tax_id]
-                })
-
     @api.multi
     def button_update_lines(self):
         self.ensure_one()
@@ -1745,7 +1728,7 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     of_intervention_line_ids = fields.One2many('of.planning.intervention.line', 'order_line_id')
-    of_qty_planifiee = fields.Float(string=u"Qtés planifiées", compute="_compute_of_qty_planifiee", store=True)
+    of_qty_planifiee = fields.Float(string=u"Planifiées", compute="_compute_of_qty_planifiee", store=True)
     of_intervention_state = fields.Selection([
             ('todo', u'À planifier'),
             ('confirm', u'Planifée'),

@@ -1060,6 +1060,9 @@
                         <field string="RDVs Tech" name="intervention_count" widget="statinfo"/>
                     </button>
                 </xpath>
+                <xpath expr="//field[@name='order_line']/tree/field[@name='qty_invoiced']" position="before">
+                    <field name="of_qty_planifiee" invisible="context.get('hide_sale')"/>
+                </xpath>
                 <xpath expr="//field[@name='order_line']/tree" position="inside">
                     <field name="of_intervention_state"/>
                 </xpath>
