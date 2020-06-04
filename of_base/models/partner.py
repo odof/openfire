@@ -102,7 +102,9 @@ class ResPartner(models.Model):
 
     of_last_order_date = fields.Date(
         string="Date du dernier devis", compute='_compute_of_last_order_date', compute_sudo=True)
-    of_potential_duplication = fields.Boolean(string=u"Doublon potentiel ?")
+    of_potential_duplication = fields.Boolean(
+        string=u"Doublon potentiel ?", compute='_compute_of_potential_duplication',
+        search='_search_of_potential_duplication')
 
     @api.multi
     def _compute_old_phone_fields(self):
@@ -311,6 +313,47 @@ class ResPartner(models.Model):
                 break
             cr.execute("SELECT id,parent_id FROM res_partner WHERE id IN %s", (tuple(ids),))
         return True
+
+    @api.multi
+    def _compute_of_potential_duplication(self):
+        # On teste l'existence de doublons potentiels basés sur l'email ou les numéros de téléphone
+        self = self.sudo()
+        for partner in self:
+            same_email_ids = self.env['res.partner']
+            if partner.email:
+                same_email_ids = self.search([('email', '=', partner.email), ('id', '!=', partner.id)])
+            same_phone_ids = self.env['res.partner']
+            if partner.of_phone_number_ids:
+                numbers_list = partner.of_phone_number_ids.mapped('number')
+                same_phone_ids = self.env['of.res.partner.phone']. \
+                    search([('number', 'in', numbers_list), ('partner_id', '!=', partner.id)]).mapped('partner_id')
+            if same_email_ids or same_phone_ids:
+                partner.of_potential_duplication = True
+            else:
+                partner.of_potential_duplication = False
+
+    @api.model
+    def _search_of_potential_duplication(self, operator, value):
+        if operator == '=' and value:
+            self._cr.execute(
+                "   SELECT    DISTINCT RP.id"
+                "   FROM      res_partner RP"
+                "   WHERE     EXISTS      (   SELECT  1"
+                "                             FROM    res_partner RP2"
+                "                             WHERE   RP2.id      != RP.id"
+                "                             AND     RP2.email   = RP.email"
+                "                         )")
+            same_email_ids = [x[0] for x in self._cr.fetchall()]
+            self._cr.execute(
+                "   SELECT    DISTINCT ORPP.partner_id"
+                "   FROM      of_res_partner_phone      ORPP"
+                "   WHERE     EXISTS                    (   SELECT  1"
+                "                                           FROM    of_res_partner_phone    ORPP2"
+                "                                           WHERE   ORPP2.partner_id        != ORPP.partner_id"
+                "                                           AND     ORPP2.number            = ORPP.number"
+                "                                       )")
+            same_phone_ids = [x[0] for x in self._cr.fetchall()]
+            return [('id', 'in', same_email_ids + same_phone_ids)]
 
     @api.one
     def check_duplications(self):

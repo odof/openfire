@@ -44,7 +44,8 @@ FormView.include({
                                 view_type: 'form',
                                 views: [[false,'form']],
                                 target: 'new',
-                                context: {'default_duplication_ids': res[0]},
+                                context: {'default_duplication_ids': res[0],
+                                          'default_new_partner_id': self.datarecord.id},
                             });
                         }
                     });
@@ -61,7 +62,8 @@ FormView.include({
                                 view_type: 'form',
                                 views: [[false,'form']],
                                 target: 'new',
-                                context: {'default_duplication_ids': res[0]},
+                                context: {'default_duplication_ids': res[0],
+                                          'default_new_partner_id': self.datarecord.partner_id[0]},
                             });
                         }
                     });
@@ -114,7 +116,8 @@ form_common.FormViewDialog.include({
                                                     view_type: 'form',
                                                     views: [[false,'form']],
                                                     target: 'new',
-                                                    context: {'default_duplication_ids': res[0]},
+                                                    context: {'default_duplication_ids': res[0],
+                                                              'default_new_partner_id': self.view_form.datarecord.id},
                                                 });
                                             }
                                         });
@@ -131,7 +134,8 @@ form_common.FormViewDialog.include({
                                                     view_type: 'form',
                                                     views: [[false,'form']],
                                                     target: 'new',
-                                                    context: {'default_duplication_ids': res[0]},
+                                                    context: {'default_duplication_ids': res[0],
+                                                              'default_new_partner_id': self.view_form.datarecord.partner_id[0]},
                                                 });
                                             }
                                         });
@@ -164,7 +168,8 @@ form_common.FormViewDialog.include({
                                                 view_type: 'form',
                                                 views: [[false,'form']],
                                                 target: 'new',
-                                                context: {'default_duplication_ids': res[0]},
+                                                context: {'default_duplication_ids': res[0],
+                                                          'default_new_partner_id': self.view_form.datarecord.id},
                                             });
                                         }
                                     });
@@ -181,7 +186,8 @@ form_common.FormViewDialog.include({
                                                 view_type: 'form',
                                                 views: [[false,'form']],
                                                 target: 'new',
-                                                context: {'default_duplication_ids': res[0]},
+                                                context: {'default_duplication_ids': res[0],
+                                                          'default_new_partner_id': self.view_form.datarecord.partner_id[0]},
                                             });
                                         }
                                     });
@@ -231,7 +237,8 @@ form_widgets.WidgetButton.include({
                             view_type: 'form',
                             views: [[false,'form']],
                             target: 'new',
-                            context: {'default_duplication_ids': res[0]},
+                            context: {'default_duplication_ids': res[0],
+                                      'default_new_partner_id': self.view.datarecord.id},
                         });
                     }
                 });
@@ -248,7 +255,8 @@ form_widgets.WidgetButton.include({
                             view_type: 'form',
                             views: [[false,'form']],
                             target: 'new',
-                            context: {'default_duplication_ids': res[0]},
+                            context: {'default_duplication_ids': res[0],
+                                      'default_new_partner_id': self.view.datarecord.partner_id[0]},
                         });
                     }
                 });
