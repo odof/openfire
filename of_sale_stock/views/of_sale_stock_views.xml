@@ -120,6 +120,9 @@
             <xpath expr="//field[@name='picking_type_id']" position="after">
                 <field name="client_order_ref" string="Référence commande client"/>
             </xpath>
+            <xpath expr="//field[@name='move_lines']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', 'in', ('cancel', 'done'))]}</attribute>
+            </xpath>
         </field>
     </record>
 
