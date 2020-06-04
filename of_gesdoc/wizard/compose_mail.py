@@ -3,7 +3,6 @@
 from odoo import models, fields, api, tools
 from odoo.exceptions import UserError
 from odoo.addons.mail.models.mail_template import format_date, format_tz, format_amount
-from odoo.tools.safe_eval import safe_eval
 
 import dateutil.relativedelta as relativedelta
 import datetime
@@ -161,9 +160,9 @@ class OfComposeMail(models.TransientModel):
     def _get_objects(self, o):
         partner_obj = self.env['res.partner']
 
-        partner = o if o._name == 'res.partner' else o.partner_id
-        order = False
-        invoice = False
+        partner = o if o._name == 'res.partner' else getattr(o, 'partner_id', partner_obj)
+        order = self.env['sale.order']
+        invoice = self.env['account.invoice']
 
         if o._name == 'sale.order':
             order = o
@@ -179,9 +178,11 @@ class OfComposeMail(models.TransientModel):
                     break
 
         addresses = partner.address_get(adr_pref=['contact', 'delivery'])
-        address = addresses['contact'] and partner_obj.browse(addresses['contact'])
-        address_pose = addresses['delivery'] and partner_obj.browse(addresses['delivery'])
-        cal_event = partner and self.env['calendar.event'].search([('partner_ids', 'in', [partner.id])], order='start DESC', limit=1)
+        address = addresses['contact'] and partner_obj.browse(addresses['contact']) or partner_obj
+        address_pose = addresses['delivery'] and partner_obj.browse(addresses['delivery']) or partner_obj
+        cal_event = self.env['calendar.event']
+        if partner:
+            cal_event = cal_event.search([('partner_ids', 'in', [partner.id])], order='start DESC', limit=1)
 
         result = {
             'address_pose': address_pose,
@@ -199,12 +200,12 @@ class OfComposeMail(models.TransientModel):
             return {}
         lang_obj = self.env['res.lang']
 
-        order = objects.get('order', False)
-        invoice = objects.get('invoice', False)
-        partner = objects.get('partner', False)
-        address = objects.get('address', False)
-        address_pose = objects.get('address_pose', False)
-        cal_event = objects.get('cal_event', False)
+        order = objects['order']
+        invoice = objects['invoice']
+        partner = objects['partner']
+        address = objects['address']
+        address_pose = objects['address_pose']
+        cal_event = objects['cal_event']
 
         lang_code = self._context.get('lang', partner.lang)
         lang = lang_obj.search([('code', '=', lang_code or 'fr_FR')])
@@ -234,22 +235,22 @@ class OfComposeMail(models.TransientModel):
 
         date_format = lang.date_format.encode('utf-8')
         res.update({
-            'c_title'                   : address and address.title.name or 'Madame, Monsieur',
-            'c_name'                    : address and address.name or (address.parent_id and address.parent_id.name) or '',
-            'c_note'                    : partner and partner.comment,
-            'c_street'                  : address and address.street or '',
-            'c_street2'                 : address and address.street2 or '',
-            'c_zip'                     : address and address.zip or '',
-            'c_city'                    : address and address.city or '',
-            'c_phone'                   : address and address.phone or '',
-            'c_mobile'                  : address and address.mobile or '',
-            'c_fax'                     : address and address.fax or '',
-            'c_email'                   : address and address.email or '',
-            'c_adr_intervention_name'   : address_pose and address_pose.name or (address_pose.parent_id and address_pose.parent_id.name) or '',
-            'c_adr_intervention_street' : address_pose and address_pose.street or '',
-            'c_adr_intervention_street2': address_pose and address_pose.street2 or '',
-            'c_adr_intervention_city'   : address_pose and address_pose.city or '',
-            'c_adr_intervention_zip'    : address_pose and address_pose.zip or '',
+            'c_title'                   : address.title.name or 'Madame, Monsieur',
+            'c_name'                    : address.name or (address.parent_id and address.parent_id.name) or '',
+            'c_note'                    : partner.comment,
+            'c_street'                  : address.street or '',
+            'c_street2'                 : address.street2 or '',
+            'c_zip'                     : address.zip or '',
+            'c_city'                    : address.city or '',
+            'c_phone'                   : address.phone or '',
+            'c_mobile'                  : address.mobile or '',
+            'c_fax'                     : address.fax or '',
+            'c_email'                   : address.email or '',
+            'c_adr_intervention_name'   : address_pose.name or address_pose.parent_id.name or '',
+            'c_adr_intervention_street' : address_pose.street or '',
+            'c_adr_intervention_street2': address_pose.street2 or '',
+            'c_adr_intervention_city'   : address_pose.city or '',
+            'c_adr_intervention_zip'    : address_pose.zip or '',
             'c_rdv_date'                : cal_event and date_event.strftime(date_format) or '',
             'c_rdv_heure'               : cal_event and date_event.strftime('%H:%M') or '',
             'date'                      : time.strftime(date_format),
@@ -308,6 +309,8 @@ class OfComposeMail(models.TransientModel):
         for o in obj.browse(data['ids']):
             # information of customer
             partner = o if data['model'] == 'res.partner' else o.partner_id
+            if not partner:
+                continue
             if partner.child_ids:
                 partner = partner.child_ids[0]
 
