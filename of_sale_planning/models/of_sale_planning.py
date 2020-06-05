@@ -17,6 +17,9 @@ class SaleOrderLine(models.Model):
     of_invoice_policy = fields.Selection(
         selection_add=[('intervention', u'Quantités planifiées')])
 
+    of_fixed_policy = fields.Selection(
+            selection_add=[('intervention', u'Quantités planifiées')])
+
     @api.depends('qty_invoiced', 'qty_delivered', 'product_uom_qty', 'order_id.state',
                  'order_id.of_invoice_policy', 'order_id.partner_id.of_invoice_policy',
                  'of_qty_planifiee')
@@ -43,16 +46,16 @@ class SaleOrderLine(models.Model):
     def _compute_of_invoice_date_prev(self):
         super(SaleOrderLine, self)._compute_of_invoice_date_prev()
         for line in self:
-            if line.of_invoice_policy == 'intervention':
+            if not line.of_fixed_invoice_date and line.of_invoice_policy == 'intervention':
                 interventions = line.of_intervention_line_ids.mapped('intervention_id')
                 if interventions:
                     line.of_invoice_date_prev = interventions[0].date_date
 
-    @api.depends('product_id', 'product_id.invoice_policy',
-                 'order_id', 'order_id.of_invoice_policy',
-                 'order_partner_id', 'order_partner_id.of_invoice_policy')
-    def _compute_of_invoice_policy(self):
-        super(SaleOrderLine, self)._compute_of_invoice_policy()
+    # @api.depends('product_id', 'product_id.invoice_policy',
+    #              'order_id', 'order_id.of_invoice_policy',
+    #              'order_partner_id', 'order_partner_id.of_invoice_policy')
+    # def _compute_of_invoice_policy(self):
+    #     super(SaleOrderLine, self)._compute_of_invoice_policy()
 
 
 class SaleConfiguration(models.TransientModel):

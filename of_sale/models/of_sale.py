@@ -664,8 +664,15 @@ class SaleOrderLine(models.Model):
     of_confirmation_date = fields.Datetime(string="Date de confirmation", related="order_id.confirmation_date", store=True)
     of_invoice_policy = fields.Selection([('order', u'Quantités commandées'), ('delivery', u'Quantités livrées')],
                                          string="Politique de facturation",
-                                         compute="_compute_of_invoice_policy", store=True)
-    of_invoice_date_prev = fields.Date(string=u"Date de facturation prévisionnelle", compute="_compute_of_invoice_date_prev", store=True)
+                                         compute="_compute_of_invoice_policy",
+                                         inverse="_inverse_of_invoice_policy", store=True)  # TODO inverse
+    of_fixed_policy = fields.Selection([('order', u'Quantités commandées'), ('delivery', u'Quantités livrées')],
+                                       string="Politique de facturation")
+    of_invoice_date_prev = fields.Date(string=u"Date de facturation prévisionnelle",
+                                       compute="_compute_of_invoice_date_prev",
+                                       inverse="_inverse_of_invoice_date_prev",
+                                       store=True)
+    of_fixed_invoice_date = fields.Date(string=u"Date de facturation prévisionnelle")
 
     @api.depends('price_unit', 'order_id.currency_id', 'order_id.partner_shipping_id', 'product_id',
                  'price_subtotal', 'product_uom_qty')
@@ -680,31 +687,38 @@ class SaleOrderLine(models.Model):
             line.of_price_unit_ht = taxes['total_excluded']
             line.of_price_unit_ttc = taxes['total_included']
 
-    @api.depends('product_id', 'product_id.invoice_policy',
+    @api.depends('of_fixed_policy',
+                 'product_id', 'product_id.invoice_policy',
                  'order_id', 'order_id.of_invoice_policy',
                  'order_partner_id', 'order_partner_id.of_invoice_policy')
     def _compute_of_invoice_policy(self):
         for line in self:
-            invoice_policy = line.order_id.of_invoice_policy
-            if not invoice_policy:
-                invoice_policy = line.order_partner_id.of_invoice_policy
-            if not invoice_policy:
-                invoice_policy = line.product_id.invoice_policy
-            if not invoice_policy:
-                invoice_policy = self.env['ir.values'].get_default('product_template', 'invoice_policy')
+            invoice_policy = line.of_fixed_policy or line.order_id.of_invoice_policy \
+                             or line.order_partner_id.of_invoice_policy or line.product_id.invoice_policy \
+                             or self.env['ir.values'].get_default('product_template', 'invoice_policy')
             line.of_invoice_policy = invoice_policy
 
-    @api.depends('of_invoice_policy',
+    def _inverse_of_invoice_policy(self):
+        for line in self:
+            line.of_fixed_policy = line.of_invoice_policy
+
+    @api.depends('of_invoice_policy', 'of_fixed_invoice_date',
                  'order_id', 'order_id.of_invoice_date_prev',
                  'procurement_ids', 'procurement_ids.move_ids', 'procurement_ids.move_ids.picking_id.min_date')
     def _compute_of_invoice_date_prev(self):
         for line in self:
-            if line.of_invoice_policy == 'order':
+            if line.of_fixed_invoice_date:
+                line.of_invoice_date_prev = line.of_fixed_invoice_date
+            elif line.of_invoice_policy == 'order':
                 line.of_invoice_date_prev = line.order_id.of_invoice_date_prev
             elif line.of_invoice_policy == 'delivery':
                 pickings = line.procurement_ids.mapped('move_ids').mapped('picking_id').sorted('min_date')
                 if pickings:
                     line.of_invoice_date_prev = fields.Date.to_string(fields.Date.from_string(pickings.min_date))
+
+    def _inverse_of_invoice_date_prev(self):
+        for line in self:
+            line.of_fixed_invoice_date = line.of_invoice_date_prev
 
     @api.model
     def _search_of_gb_partner_tag_id(self, operator, value):
