@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_supplier_edi_user,access.of.supplier.edi.user,model_of_supplier_edi,base.group_user,1,0,0,0
+access_of_supplier_edi_admin,access.of.supplier.edi.admin,model_of_supplier_edi,of_base.of_group_root_only,1,1,1,1
