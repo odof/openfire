@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_supplier_edi_purchase_order_form_view" model="ir.ui.view">
+        <field name="name">of.supplier.edi.purchase.order.form.view</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="of_purchase.of_purchase_order_customer_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_view_picking']" position="after">
+                <field name="of_supplier_edi" invisible="1"/>
+                <field name="of_edi" invisible="1"/>
+                <button name="action_send_edi" string="Commande directe" type="object"
+                        attrs="{'invisible': ['|', '|', ('of_supplier_edi', '=', False), ('of_edi', '!=', False), ('state', 'not in', ['draft', 'sent', 'purchase'])]}"/>
+            </xpath>
+            <xpath expr="//field[@name='of_sent']" position="after">
+                <field name="of_edi_state" attrs="{'invisible': [('of_edi', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_supplier_edi_purchase_config_settings_form_view" model="ir.ui.view">
+        <field name="name">of.supplier.edi.purchase.config.settings.form.view</field>
+        <field name="model">purchase.config.settings</field>
+        <field name="inherit_id" ref="purchase.view_purchase_configuration"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/group[last()]" position="after">
+                <group string="EDI" name="edi"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
