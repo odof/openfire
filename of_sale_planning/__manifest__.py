@@ -22,7 +22,9 @@
     'description': u"""
 
 Module OpenFire / Ventes - planning
-========================
+===================================
+
+Module de lien entre of_sale et of_planning permettant la facturation sur quantités plafiniées depuis une commande.
 
 """,
     'depends' : [
@@ -33,7 +35,6 @@ Module OpenFire / Ventes - planning
         'python': ['pdfminer', 'pypdftk', 'pyPdf'],
     },
     'data' : [
-        'views/of_sale_planning_views.xml',
     ],
     'installable': True,
     'application': False,

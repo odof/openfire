@@ -354,23 +354,6 @@
                                                     <span t-field="line.price_subtotal"/>
                                                 </td>
                                             </tr>
-                                            <!-- Afficher les composants du kit -->
-<!--                                            <t t-if="l.of_is_kit">-->
-<!--                                                <t t-foreach="l.kit_id.kit_line_ids" t-as="comp">-->
-<!--                                                    <tr>-->
-<!--                                                        <td>-->
-<!--                                                            <span style="padding: 0 8px;">-&gt;</span><span t-field="comp.name"/>-->
-<!--                                                        </td>-->
-<!--                                                        <td class="text-right">-->
-<!--                                                            <span t-field="comp.qty_total"/>-->
-<!--                                                            <span t-field="comp.product_uom_id" groups="product.group_uom"/>-->
-<!--                                                        </td>-->
-<!--                                                        <td>-->
-<!--                                                            <span class="text-right"> </span>-->
-<!--                                                        </td>-->
-<!--                                                    </tr>-->
-<!--                                                </t>-->
-<!--                                            </t>-->
                                         </t>
                                     </tbody>
                                 </table>

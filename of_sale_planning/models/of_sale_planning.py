@@ -51,12 +51,6 @@ class SaleOrderLine(models.Model):
                 if interventions:
                     line.of_invoice_date_prev = interventions[0].date_date
 
-    # @api.depends('product_id', 'product_id.invoice_policy',
-    #              'order_id', 'order_id.of_invoice_policy',
-    #              'order_partner_id', 'order_partner_id.of_invoice_policy')
-    # def _compute_of_invoice_policy(self):
-    #     super(SaleOrderLine, self)._compute_of_invoice_policy()
-
 
 class SaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'

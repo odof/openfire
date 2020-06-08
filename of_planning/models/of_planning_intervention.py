@@ -201,11 +201,11 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
         partner = intervention.partner_id
         if not intervention.fiscal_position_id and not partner.property_account_position_id:
             return {}, u"Veuillez définir une position fiscale pour l'intervention %s" % self.name
-        fiscal_position_id = intervention.fiscal_position_id.id or partner.property_account_position_id.id
+        fiscal_position = intervention.fiscal_position_id or partner.property_account_position_id
         taxes = product.taxes_id
         if partner.company_id:
             taxes = taxes.filtered(lambda r: r.company_id == partner.company_id)
-        taxes = self.env['account.fiscal.position'].browse(fiscal_position_id).map_tax(taxes, product, partner)
+        taxes = fiscal_position and fiscal_position.map_tax(taxes, product, partner) or []
 
         line_account = product.property_account_income_id or product.categ_id.property_account_income_categ_id
         if not line_account:
@@ -1476,12 +1476,12 @@ class OfPlanningInterventionLine(models.Model):
         partner = self.partner_id
         if not self.intervention_id.fiscal_position_id:
             return {}, u"Veuillez définir une position fiscale pour l'intervention %s" % self.name
-        fiscal_position_id = self.intervention_id.fiscal_position_id.id
+        fiscal_position = self.intervention_id.fiscal_position_id
         taxes = self.taxe_ids
         if partner.company_id and taxes:
             taxes = taxes.filtered(lambda r: r.company_id == partner.company_id)
-        elif not taxes:
-            taxes = self.env['account.fiscal.position'].browse(fiscal_position_id).map_tax(taxes, product, partner)
+        elif not taxes and fiscal_position:
+            taxes = fiscal_position.map_tax(taxes, product, partner)
 
         line_account = product.property_account_income_id or product.categ_id.property_account_income_categ_id
         if not line_account:

@@ -85,11 +85,12 @@ class OfPlanningIntervention(models.Model):
     @api.multi
     def write(self, vals):
         res = super(OfPlanningIntervention, self).write(vals)
-        if self.state == "done":
-            if self.parc_installe_id:
-                self.parc_installe_id.write({'notes_suiv': self.notes_suiv})
-            if self.service_id:
-                self.service_id.write({'notes_suiv': self.notes_suiv})
+        for rdv in self:
+            if rdv.state == "done":
+                if rdv.parc_installe_id:
+                    rdv.parc_installe_id.write({'notes_suiv': rdv.notes_suiv})
+                if rdv.service_id:
+                    rdv.service_id.write({'notes_suiv': rdv.notes_suiv})
         return res
 
 class OfParcInstalle(models.Model):
