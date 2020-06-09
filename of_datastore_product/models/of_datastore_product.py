@@ -1289,7 +1289,10 @@ class ProductProduct(models.Model):
 
         fields_to_read = self.of_datastore_get_import_fields()
         result = self.browse()
-        for product_data in self._of_read_datastore(fields_to_read, create_mode=True):
+        for product_data in sorted(self._of_read_datastore(fields_to_read, create_mode=True),
+                                   key=lambda vals: vals['of_is_kit']):
+            # Les kits sont ajoutés en dernier pour éviter d'importer des composants après qu'ils aient été
+            # importés par le kit.
             result += self_obj.create(product_data)
         return result
 
