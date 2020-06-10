@@ -164,23 +164,66 @@
             </field>
         </record>
 
-        <!-- Ajout onglet "Paramètres avancés" dans la fiche société -->
+        <!-- Réorganisation de la fiche société -->
         <record id="of_base_view_company_form" model="ir.ui.view">
             <field name="name">of.base.company.form</field>
             <field name="model">res.company</field>
-            <field name="inherit_id" ref="base.view_company_form" />
+            <field name="inherit_id" ref="base_vat.company_form_vat"/>
             <field name="arch" type="xml">
+                <xpath expr="//notebook/page[1]/group[1]/group[1]" position="before">
+                    <separator string="Identification" colspan="4"/>
+                </xpath>
+                <xpath expr="//field[@name='phone']" position="replace"/>
+                <xpath expr="//field[@name='fax']" position="replace"/>
+                <xpath expr="//field[@name='email']" position="replace"/>
+                <xpath expr="//field[@name='vat']" position="replace"/>
+                <xpath expr="//field[@name='vat_check_vies']" position="replace"/>
+                <xpath expr="//field[@name='currency_id']" position="replace"/>
+                <xpath expr="//field[@name='website']" position="after">
+                    <field name="phone"/>
+                    <field name="fax"/>
+                    <field name="email"/>
+                </xpath>
+                <xpath expr="//field[@name='company_registry']" position="before">
+                    <field name="of_juridique"/>
+                    <field name="of_capital"/>
+                </xpath>
+                <xpath expr="//field[@name='company_registry']" position="after">
+                    <field name="vat"/>
+                </xpath>
+                <xpath expr="//notebook/page[1]/group[1]" position="inside">
+                    <group string="Divers">
+                        <field name="of_general_id"/>
+                        <field name="of_accounting_id"/>
+                        <field name="vat_check_vies"/>
+                        <field name="currency_id" options="{'no_create': True}" id="company_currency"/>
+                        <label for="id"/>
+                        <p class="text-muted">
+                            Activer <a href="" type="action" name="%(base.action_currency_form_company)d">ici</a> une nouvelle devise avant la création d'une nouvelle société.
+                        </p>
+                    </group>
+                    <group string="Assurance &amp; Qualification">
+                        <field name="of_assu_dec"/>
+                        <field name="of_assu_multi"/>
+                        <field name="of_qualif"/>
+                    </group>
+                </xpath>
                 <notebook position="inside">
                     <page string="Paramètres avancés" name="advanced_settings" invisible="1">
                         <group name="advanced_settings_group_1" col="4"></group>
                         <group name="advanced_settings_group_2" col="4"></group>
                     </page>
                 </notebook>
-                <xpath expr="//field[@name='company_registry']" position="after">
-                    <field name="of_juridique"/>
-                    <field name="of_capital"/>
-                    <field name="of_assu_dec"/>
-                </xpath>
+            </field>
+        </record>
+
+        <record id="of_base_action_view_company_form_link_2_currencies" model="ir.ui.view">
+            <field name="name">of.base.action.view.company.form.link.2.currencies</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.action_view_company_form_link_2_currencies"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook/page[1]/group[1]/group[2]/label" position="replace"/>
+                <xpath expr="//notebook/page[1]/group[1]/group[2]/p" position="replace"/>
             </field>
         </record>
 
