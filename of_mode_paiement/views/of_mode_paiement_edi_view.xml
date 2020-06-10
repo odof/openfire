@@ -46,9 +46,9 @@
     <record id="of_paiement_edi_company" model="ir.ui.view">
         <field name="name">of.paiement.edi.company</field>
         <field name="model">res.company</field>
-        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="inherit_id" ref="of_base.of_base_view_company_form"/>
         <field name="arch" type="xml">
-            <field name="company_registry" position="after">
+            <field name="of_accounting_id" position="after">
                 <field name="of_num_nne"/>
                 <field name="of_num_ics"/>
             </field>
