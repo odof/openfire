@@ -43,7 +43,7 @@ class PurchaseOrder(models.Model):
                 procurements = procurement_obj.search([('purchase_line_id', '=', line.id)])
                 moves = procurements.mapped('move_dest_id')
                 sale_lines = moves.mapped('procurement_id').mapped('sale_line_id')
-                sale_lines.write({'purchase_price': line.price_unit})
+                sale_lines.write({'purchase_price': line.price_unit * line.product_id.of_purchase_coeff})
 
 
 class ProcurementOrder(models.Model):
@@ -256,3 +256,17 @@ class SaleConfigSettings(models.TransientModel):
     def set_of_recalcul_pa_defaults(self):
         return self.env['ir.values'].sudo().set_default(
                 'sale.config.settings', 'of_recalcul_pa', self.of_recalcul_pa)
+
+
+class ProductTemplate(models.Model):
+    _inherit = 'product.template'
+
+    of_purchase_coeff = fields.Float(string="Coefficient d'achat", compute="_compute_of_purchase_coeff", store=True)
+
+    @api.depends('of_seller_price', 'list_price')
+    def _compute_of_purchase_coeff(self):
+        for product in self:
+            product.of_purchase_coeff = product.standard_price and product.of_seller_price\
+                                        and product.standard_price / product.of_seller_price\
+                                        or 1
+
