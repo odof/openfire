@@ -267,6 +267,10 @@ class ResCompany(models.Model):
     of_juridique = fields.Char(string="Forme juridique")
     of_capital = fields.Char(string="Capital social")
     of_assu_dec = fields.Char(string=u"Assurance décennale")
+    of_assu_multi = fields.Char(string=u"Assurance multirisques")
+    of_qualif = fields.Char(string=u"Qualifications")
+    of_general_id = fields.Char(string=u"ID général")
+    of_accounting_id = fields.Char(string=u"ID comptable")
 
 
 class BaseConfigSettings(models.TransientModel):
