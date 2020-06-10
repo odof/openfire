@@ -167,7 +167,10 @@ class SaleOrder(models.Model):
              u"(e.g. une ligne a été supprimée dans la facture).")
     of_invoice_policy = fields.Selection(
         [('order', u'Quantités commandées'), ('delivery', u'Quantités livrées')], string="Politique de facturation")
-    of_invoice_date_prev = fields.Date(string=u"Date de facturation prévisonnelle")
+    of_fixed_invoice_date = fields.Date(string="Date de facturation fixe")
+    of_invoice_date_prev = fields.Date(string=u"Date de facturation prévisonnelle",
+                                           compute="_compute_of_invoice_date_prev",
+                                           inverse="_inverse_of_invoice_date_prev", store=True)
     of_delivered = fields.Boolean(string=u"Livrée", compute="_compute_delivered", store=True)
 
     @api.depends('of_echeance_line_ids', 'amount_total')
@@ -187,6 +190,26 @@ class SaleOrder(models.Model):
                     break
             else:
                 order.of_delivered = True
+
+    @api.depends('of_fixed_invoice_date', 'of_invoice_policy',
+                 'order_line', 'order_line.of_invoice_date_prev',
+                 'order_line.procurement_ids', 'order_line.procurement_ids.move_ids',
+                 'order_line.procurement_ids.move_ids.picking_id.min_date')
+    def _compute_of_invoice_date_prev(self):
+        for order in self:
+            if order.of_fixed_invoice_date or order.of_invoice_policy == 'order':
+                order.of_invoice_date_prev = order.of_fixed_invoice_date
+            elif order.of_invoice_policy == 'delivery':
+                pickings = order.order_line.mapped('procurement_ids')\
+                                           .mapped('move_ids')\
+                                           .mapped('picking_id')\
+                                           .sorted('min_date')
+                if pickings:
+                    order.of_invoice_date_prev = fields.Date.to_string(fields.Date.from_string(pickings[0].min_date))
+
+    def _inverse_of_invoice_date_prev(self):
+        for order in self:
+            order.of_fixed_invoice_date = order.of_invoice_date_prev
 
     @api.multi
     def of_get_taxes_values(self):
@@ -672,7 +695,7 @@ class SaleOrderLine(models.Model):
                                        compute="_compute_of_invoice_date_prev",
                                        inverse="_inverse_of_invoice_date_prev",
                                        store=True)
-    of_fixed_invoice_date = fields.Date(string=u"Date de facturation prévisionnelle")
+    of_fixed_invoice_date = fields.Date(string="Date de facturation fixe")
 
     @api.depends('price_unit', 'order_id.currency_id', 'order_id.partner_shipping_id', 'product_id',
                  'price_subtotal', 'product_uom_qty')
@@ -703,8 +726,8 @@ class SaleOrderLine(models.Model):
             line.of_fixed_policy = line.of_invoice_policy
 
     @api.depends('of_invoice_policy', 'of_fixed_invoice_date',
-                 'order_id', 'order_id.of_invoice_date_prev',
-                 'procurement_ids', 'procurement_ids.move_ids', 'procurement_ids.move_ids.picking_id.min_date')
+                 'order_id', 'order_id.of_fixed_invoice_date',
+                 'procurement_ids', 'procurement_ids.move_ids', 'procurement_ids.move_ids')
     def _compute_of_invoice_date_prev(self):
         for line in self:
             if line.of_fixed_invoice_date:
@@ -712,9 +735,9 @@ class SaleOrderLine(models.Model):
             elif line.of_invoice_policy == 'order':
                 line.of_invoice_date_prev = line.order_id.of_invoice_date_prev
             elif line.of_invoice_policy == 'delivery':
-                pickings = line.procurement_ids.mapped('move_ids').mapped('picking_id').sorted('min_date')
-                if pickings:
-                    line.of_invoice_date_prev = fields.Date.to_string(fields.Date.from_string(pickings.min_date))
+                moves = line.procurement_ids.mapped('move_ids').sorted('date_expected')
+                if moves:
+                    line.of_invoice_date_prev = fields.Date.to_string(fields.Date.from_string(moves[0].date_expected))
 
     def _inverse_of_invoice_date_prev(self):
         for line in self:

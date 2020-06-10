@@ -56,7 +56,7 @@
                 </field>
                 <xpath expr="//group[@name='sale_pay']" position="inside">
                     <field name="of_invoice_policy" groups="account.group_account_invoice"/>
-                    <field name="of_invoice_date_prev"/>
+                    <field name="of_invoice_date_prev" attrs="{'readonly': [('of_invoice_policy', '!=', 'order')]}"/>
                 </xpath>
                 <field name="fiscal_position_id" position="attributes">
                     <attribute name="domain">[('tax_ids.tax_src_id.type_tax_use', '=', 'sale')]</attribute>
@@ -94,6 +94,24 @@
                 <xpath expr="//field[@name='order_line']/form/group/group[2]" position="inside">
                     <field name="of_invoice_policy" groups="sales_team.group_sale_manager"/>
                     <field name="of_invoice_date_prev" groups="sales_team.group_sale_manager"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='product_uom_qty']" position="attributes">
+                    <attribute name="string">Qté(s) commandée(s)</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form//label[1]" position="attributes">
+                    <attribute name="string">Qté(s) commandée(s)</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='qty_delivered']" position="attributes">
+                    <attribute name="string">Qté(s) livrée(s)</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form//label[2]" position="attributes">
+                    <attribute name="string">Qté(s) livrée(s)</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='qty_invoiced']" position="attributes">
+                    <attribute name="string">Qté(s) facturée(s)</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form//label[3]" position="attributes">
+                    <attribute name="string">Qté(s) facturée(s)</attribute>
                 </xpath>
                 <!-- Ajout onglet Notes : client, facture, intervention -->
                 <xpath expr="//notebook" position="inside">
@@ -561,9 +579,9 @@ Tous les articles seront considérés comme disponibles et marqués comme livré
                 <field name="order_partner_id"/>
                 <field name="of_confirmation_date"/>
                 <field name="product_id"/>
-                <field name="product_uom_qty"/>
-                <field name="qty_delivered"/>
-                <field name="qty_invoiced"/>
+                <field name="product_uom_qty" string="Qté(s) commandée(s)"/>
+                <field name="qty_delivered" string="Qté(s) livrée(s)"/>
+                <field name="qty_invoiced" string="Qté(s) facturée(s)"/>
                 <field name="price_subtotal"/>
                 <field name="of_invoice_policy"/>
                 <field name="invoice_status"/>

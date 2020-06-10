@@ -485,7 +485,6 @@ class OfPlanningIntervention(models.Model):
     price_tax = fields.Monetary(compute='_compute_amount', string='Taxes', readonly=True)
     price_total = fields.Monetary(compute='_compute_amount', string='Sous-total TTC', readonly=True)
     product_ids = fields.Many2many('product.product', related='template_id.product_ids')
-    update_required = fields.Boolean(string=u"Mise à jour requise", compute="_compute_update_required")
 
     @api.depends('line_ids',
                  'line_ids.price_subtotal',
@@ -1137,12 +1136,23 @@ class OfPlanningIntervention(models.Model):
                 val = getattr(self.address_id, field)
                 if val:
                     name.append(val)
+            self.fiscal_position_id = self.address_id.commercial_partner_id.property_account_position_id
         self.name = name and " ".join(name) or "Intervention"
 
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
-        if self.tache_id and self.tache_id.duree:
-            self.duree = self.tache_id.duree
+        if self.tache_id:
+            if self.tache_id.duree:
+                self.duree = self.tache_id.duree
+            if self.tache_id.product_id:
+                self.line_ids.new({
+                    'intervention_id': self.id,
+                    'product_id'     : self.tache_id.product_id.id,
+                    'qty'            : 1,
+                    'price_unit'     : self.tache_id.product_id.lst_price,
+                    'name'           : self.tache_id.product_id.name,
+                    })
+                self.line_ids.compute_taxes()
 
     @api.onchange('forcer_dates')
     def _onchange_forcer_dates(self):
@@ -1336,7 +1346,7 @@ class OfPlanningIntervention(models.Model):
             return (False,
                     msg_erreur % (self.name, u"Vous devez définir un journal des ventes pour cette société (%s)." % company.name))
         invoice_data = {
-            'origin': 'Intervention',
+            'origin': self.number or 'Intervention',
             'type': 'out_invoice',
             'account_id': partner.property_account_receivable_id.id,
             'partner_id': partner.id,
@@ -1381,28 +1391,6 @@ class OfPlanningIntervention(models.Model):
             'target'   : 'new',
             'context'  : {'default_msg': msg}
         }
-
-    @api.depends('order_id', 'order_id.order_line',
-                 'line_ids')
-    def _compute_update_required(self):
-        def compare(order_line, intervention_line):
-            if not order_line.product_id == intervention_line.product_id:
-                return False
-            if float_compare(order_line.product_uom_qty, intervention_line.qty, 2):
-                return False
-            if float_compare(order_line.price_unit, intervention_line.price_unit, 2):
-                return False
-            if set([tax.id for tax in order_line.tax_id]) != set([tax.id for tax in intervention_line.taxe_ids]):
-                return False
-            return True
-        for rdv in self:
-            if not rdv.order_id.order_line == rdv.line_ids.mapped('order_line_id'):
-                rdv.update_required = True
-                continue
-            for line in rdv.line_ids:
-                if not compare(line.order_line_id, line):
-                    rdv.update_required = True
-                    break
 
 
 class OfPlanningInterventionLine(models.Model):
@@ -1491,20 +1479,11 @@ class OfPlanningInterventionLine(models.Model):
         for tax in taxes:
             line_account = tax.map_account(line_account)
 
-        pricelist = partner.property_product_pricelist
-        company = self.intervention_id._get_invoicing_company(partner)
-
-        if pricelist.discount_policy == 'without_discount':
-            from_currency = company.currency_id
-            price_unit = from_currency.compute(product.lst_price, pricelist.currency_id)
-        else:
-            price_unit = product.with_context(pricelist=pricelist.id).price
-        price_unit = self.env['account.tax']._fix_tax_included_price(price_unit, product.taxes_id, taxes)
         return {
             'name'                : product.name_get()[0][1],
             'account_id'          : line_account.id,
-            'price_unit'          : price_unit,
-            'quantity'            : 1.0,
+            'price_unit'          : self.price_unit,
+            'quantity'            : self.qty,
             'discount'            : 0.0,
             'uom_id'              : product.uom_id.id,
             'product_id'          : product.id,
@@ -1514,6 +1493,8 @@ class OfPlanningInterventionLine(models.Model):
     @api.multi
     def update_vals(self):
         for line in self:
+            if not line.order_line_id:
+                continue
             order_line = line.order_line_id
             line.update({
                 'order_line_id'  : order_line.id,
@@ -1524,10 +1505,12 @@ class OfPlanningInterventionLine(models.Model):
                 'taxe_ids'       : [(5, )] + [(4, tax.id) for tax in order_line.tax_id]
                 })
 
+
 class OFInterventionConfiguration(models.TransientModel):
     u"""modèle défini ici, utilisé par of_planning_view"""
     _name = 'of.intervention.settings'
     _inherit = 'res.config.settings'
+
 
 class ResPartner(models.Model):
     _inherit = "res.partner"
@@ -1728,7 +1711,7 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     of_intervention_line_ids = fields.One2many('of.planning.intervention.line', 'order_line_id')
-    of_qty_planifiee = fields.Float(string=u"Planifiées", compute="_compute_of_qty_planifiee", store=True)
+    of_qty_planifiee = fields.Float(string=u" Qté(s) planifiée(s)", compute="_compute_of_qty_planifiee", store=True)
     of_intervention_state = fields.Selection([
             ('todo', u'À planifier'),
             ('confirm', u'Planifée'),
@@ -1752,3 +1735,5 @@ class SaleOrderLine(models.Model):
                 line.of_intervention_state = 'confirm'
             else:
                 line.of_intervention_state = 'todo'
+
+

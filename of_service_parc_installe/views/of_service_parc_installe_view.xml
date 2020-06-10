@@ -20,10 +20,6 @@
                         <field name="parc_installe_note"/>
                 </group>
             </xpath>
-            <xpath expr="//group[@name='notes']" position="inside">
-                <separator string="Notes de prochaine intervention" attrs="{'invisible': [('recurrence', '=', False)]}"/>
-                <field name="notes_suiv" nolabel="1" attrs="{'invisible': [('recurrence', '=', False)]}"/>
-            </xpath>
         </field>
     </record>
 
@@ -58,11 +54,7 @@
             <xpath expr="//group[@name='liens']" position="inside">
                 <field name="parc_installe_id" groups="project.group_project_user"/>
             </xpath>
-            <xpath expr="//field[@name='description']" position="before">
-                <separator string="Notes de prochaine intervention"/>
-                <field name="notes_suiv" nolabel="1"/>
-                <separator string="Description"/>
-            </xpath>
+
         </field>
     </record>
 
@@ -78,9 +70,6 @@
             </xpath>
             <xpath expr="//group[@name='produit_installe']" position="inside">
                 <field name="id" invisible="1"/>
-            </xpath>
-            <xpath expr="//group[@name='note']" position="inside">
-                <field name="notes_suiv"/>
             </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button class="oe_stat_button" name="action_view_service" type="object" icon="fa-home">

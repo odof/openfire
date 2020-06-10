@@ -35,6 +35,7 @@ Module de lien entre of_sale et of_planning permettant la facturation sur quanti
         'python': ['pdfminer', 'pypdftk', 'pyPdf'],
     },
     'data' : [
+        'views/of_sale_planning_views.xml'
     ],
     'installable': True,
     'application': False,

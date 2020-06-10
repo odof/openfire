@@ -10,6 +10,20 @@ class SaleOrder(models.Model):
     of_invoice_policy = fields.Selection(
             selection_add=[('intervention', u'Quantités planifiées')])
 
+    @api.depends('of_fixed_invoice_date', 'of_invoice_policy',
+                 'order_line', 'order_line.of_invoice_date_prev',
+                 'order_line.procurement_ids', 'order_line.procurement_ids.move_ids',
+                 'order_line.procurement_ids.move_ids.picking_id.min_date',
+                 'order_line.of_intervention_line_ids', 'order_line.of_intervention_line_ids.intervention_id',
+                 'order_line.of_intervention_line_ids.intervention_id.date')
+    def _compute_of_invoice_date_prev(self):
+        super(SaleOrder, self)._compute_of_invoice_date_prev()
+        for order in self:
+            if not order.of_fixed_invoice_date and order.of_invoice_policy == 'intervention':
+                interventions = order.order_line.mapped('of_intervention_line_ids').mapped('intervention_id')
+                if interventions:
+                    order.of_invoice_date_prev = interventions[0].date_date
+
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
@@ -41,7 +55,7 @@ class SaleOrderLine(models.Model):
                 line.qty_to_invoice = 0
 
     @api.depends('of_invoice_policy',
-                 'order_id', 'order_id.of_invoice_date_prev',
+                 'order_id', 'order_id.of_fixed_invoice_date',
                  'of_intervention_line_ids', 'of_intervention_line_ids.intervention_id', 'of_intervention_line_ids.intervention_id.date')
     def _compute_of_invoice_date_prev(self):
         super(SaleOrderLine, self)._compute_of_invoice_date_prev()
