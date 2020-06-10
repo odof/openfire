@@ -339,4 +339,5 @@ class PurchaseOrder(models.Model):
                 procurements = procurement_obj.search([('purchase_line_id', '=', line.id)])
                 moves = procurements.mapped('move_dest_id')
                 kit_sale_lines = moves.mapped('procurement_id').mapped('of_sale_comp_id')
-                kit_sale_lines.write({'cost_unit': line.price_unit})
+                kit_sale_lines.write({'cost_unit': line.price_unit * line.product_id.of_purchase_coeff})
+                kit_sale_lines.mapped('kit_id').mapped('order_line_id').refresh_cost_comps()
