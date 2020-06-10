@@ -36,6 +36,7 @@ Fonctionnalités
     'depends' : [
         'purchase',
         'sale',
+        'of_product',
     ],
     'data' : [
         'report/purchase_report_templates.xml',
