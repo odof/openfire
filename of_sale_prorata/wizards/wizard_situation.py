@@ -132,7 +132,7 @@ class OfWizardSituation(models.TransientModel):
                 raise UserError(u"Le total des situations ne doit pas dépasser 100%%.\n\n%s" % line.order_line_id.name)
 
         # --- Création de la facture ---
-        invoice = self.env['account.invoice'].create({
+        invoice = self.env['account.invoice'].with_context(company_id=order.company_id.id).create({
             'origin': order.name,
             'type': 'out_invoice',
             'reference': False,
@@ -142,6 +142,7 @@ class OfWizardSituation(models.TransientModel):
             'currency_id': order.pricelist_id.currency_id.id,
             # La position fiscale a peu d'intérêt, la taxe sera forcée par ligne. Mais on ne sait jamais.
             'fiscal_position_id': order.fiscal_position_id.id or order.partner_id.property_account_position_id.id,
+            'company_id': order.company_id.id,
             'team_id': order.team_id.id,
             'user_id': order.user_id.id,
             'comment': order.note,
