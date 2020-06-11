@@ -5,6 +5,7 @@
         <field name="name">of.document.res.partner.form.view</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="of_base.of_base_partner_form"/>
+        <field name="groups_id" eval="[(4, ref('muk_dms.group_dms_user'))]"/>
         <field name="arch" type="xml">
             <xpath expr="//form//div[@name='button_box']" position="inside">
                 <button class="oe_stat_button" name="action_view_dms_files" type="object" icon="fa-file">
