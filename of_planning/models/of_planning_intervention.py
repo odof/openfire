@@ -1208,15 +1208,19 @@ class OfPlanningIntervention(models.Model):
         self.fiscal_position_id = self.order_id.fiscal_position_id
         in_use = self.line_ids.mapped('order_line_id')._ids
         for line in self.order_id.order_line.filtered(lambda l: l.id not in in_use):
-            line_obj.create({
-                'order_line_id': line.id,
-                'intervention_id': self.id,
-                'product_id': line.product_id.id,
-                'qty': line.product_uom_qty,
-                'price_unit': line.price_unit,
-                'name': line.name,
-                'taxe_ids': [(4, tax.id) for tax in line.tax_id]
-                })
+            qty = line.product_uom_qty - sum(line.of_intervention_line_ids\
+                                             .filtered(lambda r: r.intervention_id.state not in ('cancel','postponed'))\
+                                             .mapped('qty'))
+            if qty > 0.0:
+                line_obj.create({
+                    'order_line_id': line.id,
+                    'intervention_id': self.id,
+                    'product_id': line.product_id.id,
+                    'qty': qty,
+                    'price_unit': line.price_unit,
+                    'name': line.name,
+                    'taxe_ids': [(4, tax.id) for tax in line.tax_id]
+                    })
 
     @api.multi
     def button_update_lines(self):
@@ -1711,7 +1715,7 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     of_intervention_line_ids = fields.One2many('of.planning.intervention.line', 'order_line_id')
-    of_qty_planifiee = fields.Float(string=u" Qté(s) planifiée(s)", compute="_compute_of_qty_planifiee", store=True)
+    of_qty_planifiee = fields.Float(string=u" Qté(s) réalisée(s)", compute="_compute_of_qty_planifiee", store=True)
     of_intervention_state = fields.Selection([
             ('todo', u'À planifier'),
             ('confirm', u'Planifée'),
@@ -1727,8 +1731,10 @@ class SaleOrderLine(models.Model):
     @api.depends('of_intervention_line_ids', 'of_intervention_line_ids.intervention_state')
     def _compute_intervention_state(self):
         for line in self:
-            state_done = [True if state == 'done' else False for state in line.of_intervention_line_ids.mapped('intervention_state')]
-            state_confirm = [True if state in ('confirm', 'done') else False for state in line.of_intervention_line_ids.mapped('intervention_state')]
+            state_done = [True if state == 'done' else False
+                          for state in line.of_intervention_line_ids.mapped('intervention_state')]
+            state_confirm = [True if state in ('draft', 'confirm', 'done') else False
+                             for state in line.of_intervention_line_ids.mapped('intervention_state')]
             if state_done and all(state_done):
                 line.of_intervention_state = 'done'
             elif state_confirm and all(state_confirm):
