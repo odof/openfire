@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name': "OpenFire / Gestion électronique des documents",
+    'name': u"OpenFire / Gestion électronique des documents",
     'version': "10.0.1.0.0",
     'author': "OpenFire",
     'website': "http://www.openfire.fr",
-    'category': 'Gestion électronique des documents',
+    'category': u"Gestion électronique des documents",
     'description': u"""
 Module OpenFire pour la gestion électronique des documents
 ==========================================================
 
 Module basé sur les modules Muk DMS avec les ajouts/modifications suivantes :
----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
 
 - Modification du système de stockage pour utiliser le filestore standard Odoo
 - Centralisation des pièces jointes liées aux objets suivants dans un répertoire unique par partenaire :
