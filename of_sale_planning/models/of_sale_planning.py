@@ -10,8 +10,7 @@ class SaleOrder(models.Model):
     of_invoice_policy = fields.Selection(
             selection_add=[('intervention', u'Quantités planifiées')])
 
-    @api.depends('of_fixed_invoice_date', 'of_invoice_policy',
-                 'order_line', 'order_line.of_invoice_date_prev',
+    @api.depends('of_invoice_policy', 'order_line', 'order_line.of_invoice_date_prev',
                  'order_line.procurement_ids', 'order_line.procurement_ids.move_ids',
                  'order_line.procurement_ids.move_ids.picking_id.min_date',
                  'order_line.of_intervention_line_ids', 'order_line.of_intervention_line_ids.intervention_id',
@@ -19,7 +18,7 @@ class SaleOrder(models.Model):
     def _compute_of_invoice_date_prev(self):
         super(SaleOrder, self)._compute_of_invoice_date_prev()
         for order in self:
-            if not order.of_fixed_invoice_date and order.of_invoice_policy == 'intervention':
+            if order.of_invoice_policy == 'intervention':
                 interventions = order.order_line.mapped('of_intervention_line_ids').mapped('intervention_id')
                 if interventions:
                     order.of_invoice_date_prev = interventions[0].date_date
@@ -30,9 +29,6 @@ class SaleOrderLine(models.Model):
 
     of_invoice_policy = fields.Selection(
         selection_add=[('intervention', u'Quantités planifiées')])
-
-    of_fixed_policy = fields.Selection(
-            selection_add=[('intervention', u'Quantités planifiées')])
 
     @api.depends('qty_invoiced', 'qty_delivered', 'product_uom_qty', 'order_id.state',
                  'order_id.of_invoice_policy', 'order_id.partner_id.of_invoice_policy',
@@ -56,11 +52,12 @@ class SaleOrderLine(models.Model):
 
     @api.depends('of_invoice_policy',
                  'order_id', 'order_id.of_fixed_invoice_date',
-                 'of_intervention_line_ids', 'of_intervention_line_ids.intervention_id', 'of_intervention_line_ids.intervention_id.date')
+                 'of_intervention_line_ids', 'of_intervention_line_ids.intervention_id',
+                 'of_intervention_line_ids.intervention_id.date')
     def _compute_of_invoice_date_prev(self):
         super(SaleOrderLine, self)._compute_of_invoice_date_prev()
         for line in self:
-            if not line.of_fixed_invoice_date and line.of_invoice_policy == 'intervention':
+            if line.of_invoice_policy == 'intervention':
                 interventions = line.of_intervention_line_ids.mapped('intervention_id')
                 if interventions:
                     line.of_invoice_date_prev = interventions[0].date_date

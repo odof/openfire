@@ -1715,7 +1715,7 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     of_intervention_line_ids = fields.One2many('of.planning.intervention.line', 'order_line_id')
-    of_qty_planifiee = fields.Float(string=u" Qté(s) réalisée(s)", compute="_compute_of_qty_planifiee", store=True)
+    of_qty_planifiee = fields.Float(string=u"Qté(s) réalisée(s)", compute="_compute_of_qty_planifiee", store=True)
     of_intervention_state = fields.Selection([
             ('todo', u'À planifier'),
             ('confirm', u'Planifée'),
