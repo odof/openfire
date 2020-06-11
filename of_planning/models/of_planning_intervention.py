@@ -1458,8 +1458,9 @@ class OfPlanningInterventionLine(models.Model):
             taxes = product.taxes_id
             if partner.company_id:
                 taxes = taxes.filtered(lambda r: r.company_id == partner.company_id)
-            taxes = fiscal_position.map_tax(taxes, product, partner)
-            line.taxe_ids = taxes
+            if fiscal_position:
+                taxes = fiscal_position.map_tax(taxes, product, partner)
+                line.taxe_ids = taxes
 
     @api.multi
     def _prepare_invoice_line(self):
@@ -1500,10 +1501,15 @@ class OfPlanningInterventionLine(models.Model):
             if not line.order_line_id:
                 continue
             order_line = line.order_line_id
+            planned = sum(order_line.of_intervention_line_ids
+                          .filtered(lambda r: r.intervention_id.state not in ('cancel', 'postponed')
+                                              and r.id != line.id)
+                          .mapped('qty'))
+            qty = order_line.product_uom_qty - planned
             line.update({
                 'order_line_id'  : order_line.id,
                 'product_id'     : order_line.product_id.id,
-                'qty'            : order_line.product_uom_qty,
+                'qty'            : qty,
                 'price_unit'     : order_line.price_unit,
                 'name'           : order_line.name,
                 'taxe_ids'       : [(5, )] + [(4, tax.id) for tax in order_line.tax_id]
@@ -1715,7 +1721,7 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     of_intervention_line_ids = fields.One2many('of.planning.intervention.line', 'order_line_id')
-    of_qty_planifiee = fields.Float(string=u" Qté(s) réalisée(s)", compute="_compute_of_qty_planifiee", store=True)
+    of_qty_planifiee = fields.Float(string=u"Qté(s) réalisée(s)", compute="_compute_of_qty_planifiee", store=True)
     of_intervention_state = fields.Selection([
             ('todo', u'À planifier'),
             ('confirm', u'Planifée'),
