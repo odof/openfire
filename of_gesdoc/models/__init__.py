@@ -2,3 +2,4 @@
 
 from . import mail_template
 from . import ir_actions
+from . import report
