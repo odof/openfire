@@ -22,7 +22,7 @@
             <div name="addresses" class="row mt8">
                 <div class="col-xs-6">
                     <div name="adresse_livraison" t-if="doc.partner_shipping_id != doc.partner_invoice_id">
-                        <strong>Adresse de livraison&amp;nbsp;:</strong><br/>
+                        <strong name="libelle_adr_livraison">Adresse de livraison&amp;nbsp;:</strong><br/>
                         <t t-set="the_shipping_address" t-value="doc.partner_shipping_id"/>
                         <t t-if="doc.pdf_afficher_nom_parent()">
                             <t t-if="the_shipping_address.parent_id"><t t-set="the_shipping_address" t-value="the_shipping_address.parent_id"/></t>
@@ -250,7 +250,7 @@
                                     <span class="pull-right text-right"><t t-esc="total_line[1]" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/></span>
                                 </td>
                             </tr>
-                            <tr class="border-black">
+                            <tr name="total_ttc" class="border-black">
                                 <td><strong><t t-esc="total_group[1][0]"/></strong></td>
                                 <td class="text-right">
                                     <span t-esc="total_group[1][1]" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
