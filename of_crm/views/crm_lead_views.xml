@@ -789,6 +789,13 @@
                     <field name="name" string="Marque" filter_domain="[('of_projet_line_ids','ilike','Marque:'+self)]"/>
                     <field name="company_id"/>
                 </field>
+                <xpath expr="//filter[@name='message_needaction']" position="before">
+                    <filter string="Créé cette semaine" name="create_this_week"
+                            domain="[('create_date', '>=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                    <filter string="Modifié cette semaine" name="write_this_week"
+                            domain="[('write_date', '>=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                    <separator/>
+                </xpath>
             </field>
         </record>
 
