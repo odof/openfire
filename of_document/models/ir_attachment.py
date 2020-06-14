@@ -12,34 +12,11 @@ class IrAttachment(models.Model):
         if res.res_model and not res.res_field:
             # Automatically create DMS file if partner related attachment
             record = self.env[res.res_model].browse(res.res_id)
-            partner = False
-            if res.res_model == 'res.partner':
-                partner = record
-            elif res.res_model in ('sale.order', 'purchase.order', 'account.invoice', 'stock.picking', 'crm.lead',
-                                   'project.issue', 'of.service', 'of.planning.intervention'):
-                if res.res_model == 'stock.picking':
-                    if record.picking_type_id.code not in ('outgoing', 'incoming'):
-                        return res
-
-                partner = record.partner_id
+            partner, categ = self.env['muk_dms.file'].of_get_object_partner_and_category(record)
             if not partner:
                 return res
 
             partner_dir = self.env['muk_dms.directory'].sudo().of_get_partner_directory(partner)
-
-            # Get corresponding category
-            if res.res_model == 'account.invoice':
-                if record.type in ('out_invoice', 'out_refund'):
-                    categ = self.env.ref('of_document.account_invoice_out_file_category')
-                else:
-                    categ = self.env.ref('of_document.account_invoice_in_file_category')
-            elif res.res_model == 'stock.piking':
-                if record.picking_type_id.code == 'outgoing':
-                    categ = self.env.ref('of_document.stock_picking_out_file_category')
-                else:
-                    categ = self.env.ref('of_document.stock_picking_in_file_category')
-            else:
-                categ = self.env.ref('of_document.' + res.res_model.replace('.', '_') + '_file_category')
 
             # Create DMS file
             self.env['muk_dms.file'].sudo().create({

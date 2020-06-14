@@ -315,5 +315,10 @@ Vous en souhaitant bonne réception.<br/>
 ]]></field>
         </record>
 
+        <!-- Ajout d'une catégorie pour la gestion des documents -->
+        <record id="of_followup_project_file_category" model="of.document.file.category">
+            <field name="name">Commande de vente</field>
+        </record>
+
     </data>
 </odoo>
