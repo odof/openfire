@@ -789,6 +789,8 @@ class SaleOrderLine(models.Model):
         # Remise interdite
         if self.product_id and self.product_id.of_forbidden_discount and self.of_discount_formula:
             self.of_discount_formula = False
+        if self.product_id and self.product_id.categ_id:
+            self.of_article_principal = self.product_id.categ_id.of_article_principal
 
         return res
 
@@ -1531,3 +1533,11 @@ class ResPartner(models.Model):
     of_invoice_policy = fields.Selection(
         [('order', u'Quantités commandées'), ('delivery', u'Quantités livrées')],
         string="Politique de facturation")
+
+
+class ProductCategory(models.Model):
+    _inherit = 'product.category'
+
+    of_article_principal = fields.Boolean(string="Article principal",
+                                          help=u"Les articles de cette catégorie seront considérés comme articles"
+                                               u" principaux sur les commandes / factures clients")
