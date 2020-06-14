@@ -177,6 +177,7 @@ class ResPartner(models.Model):
     of_revendeur = fields.Boolean('Revendeur', help="Cocher cette case si ce partenaire est un revendeur.")
     of_installateur = fields.Boolean('Installateur', help="Cocher cette case si ce partenaire est un installateur.")
     of_parc_installe_count = fields.Integer(string=u"Parc installé", compute='_compute_of_parc_installe_count')
+    of_parc_installe_ids = fields.One2many('of.parc.installe', 'client_id', string=u"Parc installé")
 
     @api.multi
     def _compute_of_parc_installe_count(self):
