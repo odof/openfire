@@ -409,6 +409,18 @@ class OfPlanningIntervention(models.Model):
         'of.planning.intervention', compute="_compute_interventions_before_after", store=True)
     before_to_this = fields.Float(compute="_compute_interval", store=True, digits=(12, 5))
 
+    line_ids = fields.One2many('of.planning.intervention.line', 'intervention_id', string='Lignes de facturation')
+    lien_commande = fields.Boolean(string='Facturation sur commande', compute='_compute_lien_commande')
+    fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale")
+    currency_id = fields.Many2one('res.currency', string='Currency', readonly=True, related="company_id.currency_id")
+
+    price_subtotal = fields.Monetary(compute='_compute_amount', string='Sous-total HT', readonly=True)
+    price_tax = fields.Monetary(compute='_compute_amount', string='Taxes', readonly=True)
+    price_total = fields.Monetary(compute='_compute_amount', string='Sous-total TTC', readonly=True)
+    product_ids = fields.Many2many('product.product', related='template_id.product_ids')
+    invoice_ids = fields.One2many('account.invoice', string="Factures", compute="_compute_invoice_ids")
+    invoice_count = fields.Integer(string="Nombre de factures", compute="_compute_invoice_ids")
+
     # Compute
 
     @api.multi
@@ -692,6 +704,30 @@ class OfPlanningIntervention(models.Model):
             if res and res.get('routes'):
                 interv.before_to_this = (float(res['routes'].pop(0)['duration']) / 60.0) / 60.0
 
+    @api.depends('line_ids', 'line_ids.order_line_id')
+    def _compute_lien_commande(self):
+        for intervention in self:
+            if intervention.line_ids.filtered('order_line_id'):
+                intervention.lien_commande = True
+
+    @api.depends('line_ids',
+                 'line_ids.price_subtotal',
+                 'line_ids.price_tax',
+                 'line_ids.price_total',
+                 )
+    def _compute_amount(self):
+        for intervention in self:
+            intervention.price_subtotal = sum(intervention.line_ids.mapped('price_subtotal'))
+            intervention.price_tax = sum(intervention.line_ids.mapped('price_tax'))
+            intervention.price_total = sum(intervention.line_ids.mapped('price_total'))
+
+    @api.depends('line_ids', 'line_ids.invoice_line_ids')
+    def _compute_invoice_ids(self):
+        for rdv in self:
+            invoices = rdv.line_ids.mapped('invoice_line_ids').mapped('invoice_id')
+            rdv.invoice_count = len(invoices)
+            rdv.invoice_ids = invoices
+
     @api.depends('state')
     def _compute_state_int(self):
         for interv in self:
@@ -935,6 +971,19 @@ class OfPlanningIntervention(models.Model):
         }
 
     @api.multi
+    def action_view_invoice(self):
+        invoices = self.mapped('invoice_ids')
+        action = self.env.ref('account.action_invoice_tree1').read()[0]
+        if len(invoices) > 1:
+            action['domain'] = [('id', 'in', invoices.ids)]
+        elif len(invoices) == 1:
+            action['views'] = [(self.env.ref('account.invoice_form').id, 'form')]
+            action['res_id'] = invoices.ids[0]
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
+        return action
+
+    @api.multi
     def button_confirm(self):
         return self.write({'state': 'confirm'})
 
@@ -1167,6 +1216,7 @@ class OfPlanningInterventionLine(models.Model):
     price_total = fields.Monetary(compute='_compute_amount', string='Sous-total TTC', readonly=True, store=True)
 
     intervention_state = fields.Selection(related="intervention_id.state", store=True)
+    invoice_line_ids = fields.One2many('account.invoice.line', 'of_intervention_line_id', string=u"Ligne de facturation")
 
     @api.depends('qty', 'price_unit', 'taxe_ids')
     def _compute_amount(self):
@@ -1234,14 +1284,15 @@ class OfPlanningInterventionLine(models.Model):
             line_account = tax.map_account(line_account)
 
         return {
-            'name'                : product.name_get()[0][1],
-            'account_id'          : line_account.id,
-            'price_unit'          : self.price_unit,
-            'quantity'            : self.qty,
-            'discount'            : 0.0,
-            'uom_id'              : product.uom_id.id,
-            'product_id'          : product.id,
-            'invoice_line_tax_ids': [(6, 0, taxes._ids)],
+            'name'                   : product.name_get()[0][1],
+            'account_id'             : line_account.id,
+            'price_unit'             : self.price_unit,
+            'quantity'               : self.qty,
+            'discount'               : 0.0,
+            'uom_id'                 : product.uom_id.id,
+            'product_id'             : product.id,
+            'invoice_line_tax_ids'   : [(6, 0, taxes._ids)],
+            'of_intervention_line_id': self.id,
             }, ""
 
     @api.multi
@@ -1498,3 +1549,7 @@ class SaleOrderLine(models.Model):
                 line.of_intervention_state = 'todo'
 
 
+class AccountInvoiceLine(models.Model):
+    _inherit = 'account.invoice.line'
+
+    of_intervention_line_id = fields.Many2one('of.planning.intervention.line', string=u"Ligne planifiée")
