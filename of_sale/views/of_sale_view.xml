@@ -559,6 +559,10 @@ Tous les articles seront considérés comme disponibles et marqués comme livré
         </field>
     </record>
 
+<!--##############################################################################-->
+<!--###################### ______ Lignes de commande ______ ######################-->
+<!--##############################################################################-->
+
     <record id="of_sale_order_line_pivot" model="ir.ui.view">
         <field name="name">of.sale.order.line.pivot</field>
         <field name="model">sale.order.line</field>
@@ -601,5 +605,20 @@ Tous les articles seront considérés comme disponibles et marqués comme livré
 
     <menuitem id="menu_sale_order_line_test" parent="sale.menu_sale_invoicing" action="action_sale_order_line_tree_all"
               sequence="30"/>
+
+<!--##############################################################################-->
+<!--##################### ______ Catégorie d'article ______ ######################-->
+<!--##############################################################################-->
+
+    <record id="of_sale_product_category_form_view" model="ir.ui.view">
+        <field name="name">of.sale.product.category.form.view</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="product.product_category_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='first']" position="inside">
+                <field name="of_article_principal"/>
+            </xpath>
+        </field>
+    </record>
 
 </odoo>
