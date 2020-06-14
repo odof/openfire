@@ -4,6 +4,7 @@ from datetime import datetime, date
 import json
 
 from odoo import api, fields, models
+from odoo.addons.muk_dms.models import dms_base
 
 AVAILABLE_PRIORITIES = [
     ('0', u'Normal'),
@@ -1042,3 +1043,23 @@ class SaleOrder(models.Model):
         else:
             action = {'type': 'ir.actions.act_window_close'}
         return action
+
+
+class File(dms_base.DMSModel):
+    _inherit = 'muk_dms.file'
+
+    @api.model
+    def of_get_object_partner_and_category(self, obj):
+        if obj._name == 'of.followup.project':
+            partner = obj.partner_id
+            categ = self.env.ref('of_followup.of_followup_project_file_category')
+        else:
+            partner, categ = super(File, self).of_get_object_partner_and_category(obj)
+        return partner, categ
+
+    @api.multi
+    def action_view_linked_record(self):
+        result = super(File, self).action_view_linked_record()
+        if self.of_file_type == 'related' and self.of_related_model == 'of.followup.project':
+            result['view_id'] = self.env.ref('of_followup.of_followup_project_form_view').id
+        return result
