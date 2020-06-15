@@ -355,7 +355,7 @@ class SaleOrderLine(models.Model):
     @api.model
     def create(self, vals):
         if vals.get("sale_kits_to_unlink"):
-            self.env["of.saleorder.kit"].search([("to_unlink", "=", True)]).unlink()
+            self.sudo().env["of.saleorder.kit"].search([("to_unlink", "=", True)]).unlink()
             vals.pop("sale_kits_to_unlink")
         line = super(SaleOrderLine, self).create(vals)
         sale_kit_vals = {'order_line_id': line.id, 'name': line.name, 'of_pricing': line.of_pricing}
@@ -367,7 +367,7 @@ class SaleOrderLine(models.Model):
     @api.multi
     def write(self, vals):
         if vals.get("sale_kits_to_unlink") or self.sale_kits_to_unlink:
-            self.env["of.saleorder.kit"].search([("to_unlink", "=", True)]).unlink()
+            self.sudo().env["of.saleorder.kit"].search([("to_unlink", "=", True)]).unlink()
             vals["sale_kits_to_unlink"] = False
         update_ol_id = False
         if len(self) == 1 and vals.get("kit_id") and not self.kit_id:

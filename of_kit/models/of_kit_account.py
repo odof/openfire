@@ -222,7 +222,7 @@ class AccountInvoiceLine(models.Model):
         # from_so_line key added in vals in case of creation from a sale order
         from_so_line = vals.pop("from_so_line", False)
         if vals.get("invoice_kits_to_unlink"):
-            self.env["of.invoice.kit"].search([("to_unlink", "=", True)]).unlink()
+            self.sudo().env["of.invoice.kit"].search([("to_unlink", "=", True)]).unlink()
             vals.pop("invoice_kits_to_unlink")
         line = super(AccountInvoiceLine, self).create(vals)
         if line.of_is_kit and not from_so_line:
@@ -239,7 +239,7 @@ class AccountInvoiceLine(models.Model):
             if self.of_pricing == 'computed' and not float_compare(self.price_unit, self.price_comps, 2):
                 vals['price_unit'] = self.price_comps
             if vals.get("invoice_kits_to_unlink") or self.invoice_kits_to_unlink:
-                self.env["of.invoice.kit"].search([("to_unlink", "=", True)]).unlink()
+                self.sudo().env["of.invoice.kit"].search([("to_unlink", "=", True)]).unlink()
                 vals["invoice_kits_to_unlink"] = False
             if vals.get("kit_id") and not self.kit_id:
                 # a account_invoice_kit was added
