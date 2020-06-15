@@ -45,7 +45,7 @@
             </table>
         </xpath>
 
-        <xpath expr="//table[@name='invoice_line_layouted']" position="replace"/>
+        <xpath expr="//table[@name='invoice_lines_layouted']" position="replace"/>
 
     </template>
 

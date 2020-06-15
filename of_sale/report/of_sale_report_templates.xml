@@ -373,7 +373,7 @@
         <div name="addresses" class="row mt8" groups="sale.group_delivery_invoice_address">
             <div class="col-xs-6">
                 <div name="adresse_livraison" t-if="o.partner_shipping_id and o.partner_shipping_id != o.partner_id">
-                    <strong>Adresse de livraison</strong><br/>
+                    <strong name="libelle_adr_livraison">Adresse de livraison</strong><br/>
                     <t t-set="the_shipping_address" t-value="o.partner_shipping_id"/>
                     <t t-if="o.pdf_afficher_nom_parent()">
                         <t t-if="the_shipping_address.parent_id"><t t-set="the_shipping_address" t-value="the_shipping_address.parent_id"/></t>
@@ -390,7 +390,7 @@
                 </div>
             </div>
             <div name="adresse_facturation" class="col-xs-5 col-xs-offset-1" style="font-size: large">
-                <strong t-if="o.partner_shipping_id and o.partner_shipping_id != o.partner_id">Adresse de facturation</strong><br/>
+                <strong name="libelle_adr_facturation" t-if="o.partner_shipping_id and o.partner_shipping_id != o.partner_id">Adresse de facturation</strong><br/>
                 <t t-set="the_address" t-value="o.partner_id"/>
                 <t t-if="o.pdf_afficher_nom_parent()">
                     <t t-if="the_address.parent_id"><t t-set="the_address" t-value="the_address.parent_id"/></t>
@@ -481,7 +481,7 @@ Sinon :
 
     <xpath expr="//table" position="after">
         <t groups="sale.group_sale_layout" t-foreach="invoice_data['lines_layouted']" t-as="page">
-            <table name="invoice_line_layouted" class="table table-condensed">
+            <table name="invoice_lines_layouted" class="table table-condensed">
                 <thead>
                     <tr>
                         <th name="descr" style="width: 60%">Description</th>

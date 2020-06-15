@@ -144,7 +144,7 @@
                     <table class="table table-condensed">
                         <!-- Affichage des paiements et autres groupes de sous-totaux -->
                         <t t-set='totals_group' t-value="invoice_data['totals']"/>
-                        <tr class="border-black">
+                        <tr name="total_ht" class="border-black">
                             <td><strong>Subtotal</strong></td>
                             <td class="text-right">
                                 <span><t t-esc="totals_group['subtotal']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></span>
@@ -162,7 +162,7 @@
                                     <span class="pull-right text-right"><t t-esc="total_line[1]" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></span>
                                 </td>
                             </tr>
-                            <tr class="border-black">
+                            <tr name="total_ttc" class="border-black">
                                 <td><strong><t t-esc="total_group[1][0]"/></strong></td>
                                 <td class="text-right">
                                     <span t-esc="total_group[1][1]" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
