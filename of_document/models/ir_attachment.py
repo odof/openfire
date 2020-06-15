@@ -9,7 +9,7 @@ class IrAttachment(models.Model):
     @api.model
     def create(self, values):
         res = super(IrAttachment, self).create(values)
-        if not res.res_field:
+        if res.res_model and not res.res_field:
             # Automatically create DMS file if partner related attachment
             record = self.env[res.res_model].browse(res.res_id)
             partner = False
@@ -54,7 +54,7 @@ class IrAttachment(models.Model):
                 'of_category_id': categ.id,
             })
 
-            return res
+        return res
 
     @api.multi
     def unlink(self):
