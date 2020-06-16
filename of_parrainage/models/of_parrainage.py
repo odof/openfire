@@ -27,12 +27,17 @@ class ResPartner(models.Model):
     of_referred_note = fields.Text(string="Notes")
     of_referred_reward_state = fields.Boolean(string="Clos")
     of_referred_reward_date = fields.Date(string=u"Date de récompense")
+    of_referred_date = fields.Date(string="Date de parrainage")
 
     @api.onchange('of_referred_reward_id')
     def onchange_referred_reward(self):
         if self.of_referred_reward_id and not self.of_referred_reward_date:
             self.of_referred_reward_date = fields.Date.today()
 
+    @api.onchange('of_referred_id')
+    def onchange_referred_date(self):
+        if self.of_referred_id and not self.of_referred_date:
+            self.of_referred_date = fields.Date.today()
 
 class CrmLead(models.Model):
     _inherit = 'crm.lead'
@@ -46,11 +51,17 @@ class CrmLead(models.Model):
                                               readonly=False)
     of_referred_reward_date = fields.Date(string=u"Date de récompense", related="partner_id.of_referred_reward_date",
                                           readonly=False)
+    of_referred_date = fields.Date(string="Date de parrainage", related="partner_id.of_referred_date", readonly=False)
 
     @api.onchange('of_referred_reward_id')
     def onchange_referred_reward(self):
         if self.of_referred_reward_id and not self.of_referred_reward_date:
             self.of_referred_reward_date = fields.Date.today()
+
+    @api.onchange('of_referred_id')
+    def onchange_referred_date(self):
+        if self.of_referred_id and not self.of_referred_date:
+            self.of_referred_date = fields.Date.today()
 
 
 class OfReferredReward(models.Model):
