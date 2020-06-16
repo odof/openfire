@@ -969,7 +969,7 @@ class SaleOrder(models.Model):
                 rec.of_follow_count = 0
 
     @api.multi
-    def button_followup_project(self):
+    def action_followup_project(self):
         self.ensure_one()
         followup_project_obj = self.env['of.followup.project']
         followup_project = followup_project_obj.search([('order_id', '=', self.id)])
@@ -1000,22 +1000,36 @@ class SaleOrder(models.Model):
 
             self.of_followup_project_id = followup_project.id
 
-            return {
-                'type': 'ir.actions.act_window',
-                'view_mode': 'form',
-                'res_model': 'of.followup.project',
-                'res_id': followup_project.id,
-                'target': 'current',
-                'flags': {'initial_mode': 'edit', 'form': {'action_buttons': True, 'options': {'mode': 'edit'}}},
-            }
+            if self._context.get('auto_followup'):
+                return True
+            else:
+                return {
+                    'type': 'ir.actions.act_window',
+                    'view_mode': 'form',
+                    'res_model': 'of.followup.project',
+                    'res_id': followup_project.id,
+                    'target': 'current',
+                    'flags': {'initial_mode': 'edit', 'form': {'action_buttons': True, 'options': {'mode': 'edit'}}},
+                }
         else:
-            return {
-                'type': 'ir.actions.act_window',
-                'view_mode': 'form',
-                'res_model': 'of.followup.project',
-                'res_id': followup_project.id,
-                'target': 'current',
-            }
+
+            if self._context.get('auto_followup'):
+                return True
+            else:
+                return {
+                    'type': 'ir.actions.act_window',
+                    'view_mode': 'form',
+                    'res_model': 'of.followup.project',
+                    'res_id': followup_project.id,
+                    'target': 'current',
+                }
+
+    @api.multi
+    def action_confirm(self):
+        super(SaleOrder, self).action_confirm()
+        for order in self:
+            order.with_context(auto_followup=True).action_followup_project()
+        return True
 
     @api.multi
     def action_view_followup(self):
