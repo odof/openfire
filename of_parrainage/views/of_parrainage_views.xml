@@ -12,6 +12,7 @@
             <xpath expr="//page[@name='marketing']/group" position="inside">
                 <group name="referred" string="Parrainage">
                     <field name="of_referred_id" />
+                    <field name="of_referred_date"/>
                     <field name="of_referred_reward_id" widget="selection"/>
                     <field name="of_referred_note"/>
                     <field name="of_referred_reward_state"/>
