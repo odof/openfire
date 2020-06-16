@@ -648,6 +648,7 @@ class SaleOrderLine(models.Model):
     of_price_unit_ht = fields.Float(string='Unit Price excl', compute='_compute_of_price_unit', help="Unit price without taxes", store=True)
     of_price_unit_ttc = fields.Float(
         string='Unit Price incl', compute='_compute_of_price_unit', help="Unit price with taxes", store=True)
+    of_product_default_code = fields.Char(related='product_id.default_code', string=u"Référence article", readonly=True)
 
     @api.depends('price_unit', 'order_id.currency_id', 'order_id.partner_shipping_id', 'product_id',
                  'price_subtotal', 'product_uom_qty')
