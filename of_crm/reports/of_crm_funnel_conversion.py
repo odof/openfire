@@ -34,6 +34,8 @@ class OFCRMFunnelConversion(models.Model):
         string=u"Comparaison Objectif (%)", compute='_compute_sales_objective_comparison', compute_sudo=True,
         readonly=True)
     previous_sales_total = fields.Float(string=u"CA commandé N-1", readonly=True)
+    order_amount_rate = fields.Char(
+        string=u"Taux de concrétisation € (%)", compute='_compute_order_amount_rate', compute_sudo=True, readonly=True)
     sales_total_comparison = fields.Char(
         string=u"Comparaison N-1 (%)", compute='_compute_sales_total_comparison', compute_sudo=True, readonly=True)
 
@@ -75,7 +77,7 @@ class OFCRMFunnelConversion(models.Model):
                                     WHEN COUNT(DISTINCT SO3.opportunity_id) = 0 THEN
                                         0
                                     ELSE
-                                        COALESCE(SUM(SO3.amount_total), 0)
+                                        COALESCE(AVG(SO3.amount_total), 0)
                                 END                                                                                     AS quotation_amount
                     ,           CASE
                                     WHEN COUNT(DISTINCT SO2.opportunity_id) = 0 THEN
@@ -102,7 +104,7 @@ class OFCRMFunnelConversion(models.Model):
                         AND     SO2.state                                                                               = 'sale'
                     LEFT JOIN   sale_order                                                                              SO3
                         ON      SO1.id                                                                                  = SO3.id
-                        AND     SO3.state                                                                               in ('draft', 'sent')
+                        AND     SO3.state                                                                               != 'cancel'
                     LEFT JOIN   of_crm_activity                                                                         CA
                         ON      CA.opportunity_id                                                                       = CL.id
                         AND     CA.state                                                                                ='done'
@@ -167,6 +169,14 @@ class OFCRMFunnelConversion(models.Model):
             else:
                 rec.sales_total_comparison = "N/E"
 
+    @api.multi
+    def _compute_order_amount_rate(self):
+        for rec in self:
+            if rec.quotation_amount > 0:
+                rec.order_amount_rate = '%.2f' % (100.0 * rec.sales_total / rec.quotation_amount)
+            else:
+                rec.order_amount_rate = "N/E"
+
     @api.model
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
         res = super(OFCRMFunnelConversion, self).read_group(
@@ -179,7 +189,6 @@ class OFCRMFunnelConversion(models.Model):
                         replace('.', ',')
                 else:
                     line['sales_objective_comparison'] = "N/E"
-
             if 'sales_total_comparison' in fields:
                 if line['previous_sales_total'] > 0:
                     line['sales_total_comparison'] = \
@@ -187,6 +196,12 @@ class OFCRMFunnelConversion(models.Model):
                         replace('.', ',')
                 else:
                     line['sales_total_comparison'] = "N/E"
+            if 'order_amount_rate' in fields:
+                if line['quotation_amount'] > 0:
+                    line['order_amount_rate'] = \
+                        ('%.2f' % (round(100.0 * line['sales_total'] / line['quotation_amount'], 2))).replace('.', ',')
+                else:
+                    line['order_amount_rate'] = "N/E"
 
         return res
 
@@ -224,6 +239,8 @@ class OFCRMFunnelConversion2(models.Model):
         string=u"Marge % commandé", compute='_compute_order_margin_percent', compute_sudo=True, readonly=True)
     order_margin = fields.Float(string=u"Marge € commandé", readonly=True)
     sales_total = fields.Float(string=u"CA commandé", readonly=True)
+    order_amount_rate = fields.Char(
+        string=u"Taux de concrétisation € (%)", compute='_compute_order_amount_rate', compute_sudo=True, readonly=True)
     amount_untaxed = fields.Float(string=u"Total HT", readonly=True)
     ordered_turnover_objective = fields.Float(string=u"Objectif CA commandé", readonly=True)
     sales_objective_comparison = fields.Char(
@@ -281,7 +298,7 @@ class OFCRMFunnelConversion2(models.Model):
                             ,           0                                   AS order_nb
                             ,           0                                   AS cart
                             ,           0                                   AS activity_nb
-                            ,           SUM(SO1.amount_total)               AS quotation_amount
+                            ,           AVG(SO1.amount_total)               AS quotation_amount
                             ,           0                                   AS order_margin
                             ,           0                                   AS amount_untaxed
                             ,           0                                   AS ordered_turnover_objective
@@ -289,7 +306,7 @@ class OFCRMFunnelConversion2(models.Model):
                             FROM        sale_order                          SO
                             LEFT JOIN   sale_order                          SO1
                                 ON      SO.id                               = SO1.id
-                                AND     SO1.state                           in ('draft', 'sent')
+                                AND     SO1.state                           != 'cancel'
                             ,           crm_lead                            CL2
                             WHERE       SO.opportunity_id                   IS NOT NULL
                             AND         CL2.id                              = SO.opportunity_id
@@ -434,6 +451,14 @@ class OFCRMFunnelConversion2(models.Model):
                 rec.order_margin_percent = "N/E"
 
     @api.multi
+    def _compute_order_amount_rate(self):
+        for rec in self:
+            if rec.quotation_amount > 0:
+                rec.order_amount_rate = '%.2f' % (100.0 * rec.sales_total / rec.quotation_amount)
+            else:
+                rec.order_amount_rate = "N/E"
+
+    @api.multi
     def _compute_sales_objective_comparison(self):
         for rec in self:
             if rec.ordered_turnover_objective > 0:
@@ -499,6 +524,12 @@ class OFCRMFunnelConversion2(models.Model):
                                 2))).replace('.', ',')
                 else:
                     line['order_margin_percent'] = "N/E"
+            if 'order_amount_rate' in fields:
+                if line['quotation_amount'] > 0:
+                    line['order_amount_rate'] = \
+                        ('%.2f' % (round(100.0 * line['sales_total'] / line['quotation_amount'], 2))).replace('.', ',')
+                else:
+                    line['order_amount_rate'] = "N/E"
             if 'sales_objective_comparison' in fields:
                 if line['ordered_turnover_objective'] > 0:
                     line['sales_objective_comparison'] = \

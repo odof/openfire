@@ -846,8 +846,12 @@
                         <separator string="Automatisation de l'étape" colspan="4"/>
                         <group>
                             <field name="of_auto_model_name"/>
-                            <field name="of_auto_field_id" options="{'no_create': True, 'no_open': True}" domain="[('model', '=', of_auto_model_name), ('store', '=', True)]"/>
-                            <field name="of_auto_comparison_code"/>
+                            <field name="of_auto_field_id" options="{'no_create': True, 'no_open': True}"
+                                   domain="[('model', '=', of_auto_model_name), ('store', '=', True)]"
+                                   attrs="{'required': [('of_auto_model_name', '!=', False)]}"
+                            />
+                            <field name="of_auto_comparison_code"
+                                   attrs="{'required': [('of_auto_model_name', '!=', False)]}"/>
                         </group>
                         <group>
                             <field name="of_manual_activity_id"/>
