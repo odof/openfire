@@ -6,8 +6,13 @@
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="of_purchase.of_purchase_order_customer_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='of_sent']" position="after">
+            <xpath expr="//button[@name='action_view_picking']" position="after">
+                <field name="of_supplier_edi" invisible="1"/>
                 <field name="of_edi" invisible="1"/>
+                <button name="action_send_edi" string="Commande directe" type="object"
+                        attrs="{'invisible': ['|', '|', ('of_supplier_edi', '=', False), ('of_edi', '!=', False), ('state', 'not in', ['draft', 'sent', 'purchase'])]}"/>
+            </xpath>
+            <xpath expr="//field[@name='of_sent']" position="after">
                 <field name="of_edi_state" attrs="{'invisible': [('of_edi', '=', False)]}"/>
             </xpath>
         </field>
