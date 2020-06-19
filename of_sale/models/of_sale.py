@@ -55,7 +55,12 @@ class OfDocumentsJoints(models.AbstractModel):
         compose_mail_obj = self.env['of.compose.mail']
         attachment_obj = self.env['ir.attachment']
         data = []
-        for mail_template in self.of_mail_template_ids:
+        force_of_mail_template_ids = self._context.get('force_of_mail_template_ids')
+        if force_of_mail_template_ids or force_of_mail_template_ids == []:
+            of_mail_template_ids = self.env['of.mail.template'].browse(force_of_mail_template_ids)
+        else:
+            of_mail_template_ids = self.of_mail_template_ids
+        for mail_template in of_mail_template_ids:
             if mail_template.file:
                 # Utilisation des documents pdf fournis
                 if not mail_template.chp_ids:
@@ -560,7 +565,7 @@ class Report(models.Model):
         allowed_reports = self.env['of.documents.joints']._allowed_reports()
         if report_name in allowed_reports:
             # On ajoute au besoin les documents joint
-            model = self.env[allowed_reports[report_name]].browse(docids)[0]
+            model = self.env[allowed_reports[report_name]].browse(docids)[0].with_context(data)
             mails_data = model._detect_doc_joint()
             if mails_data:
                 fd, order_pdf = tempfile.mkstemp()
@@ -584,6 +589,24 @@ class Report(models.Model):
                     os.remove(result_file_path)
                 except Exception:
                     pass
+        nb_copies = data.get('nb_copies', 1)
+        if nb_copies > 1:
+            file_paths = []
+            for i in range(nb_copies):
+                fd, order_pdf = tempfile.mkstemp()
+                os.write(fd, result)
+                os.close(fd)
+                file_paths.append(order_pdf)
+            result_file_path = self.env['report']._merge_pdf(file_paths)
+            try:
+                result_file = file(result_file_path, "rb")
+                result = result_file.read()
+                result_file.close()
+                for file_path in file_paths:
+                    os.remove(file_path)
+                os.remove(result_file_path)
+            except Exception:
+                pass
         return result
 
 
