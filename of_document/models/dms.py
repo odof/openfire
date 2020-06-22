@@ -141,6 +141,7 @@ class File(dms_base.DMSModel):
     @api.model
     def of_get_object_partner_and_category(self, obj):
         partner = False
+        categ_ref = False
         if obj._name == 'res.partner':
             partner = obj
             categ_ref = 'res_partner_file_category'
