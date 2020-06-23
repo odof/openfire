@@ -4,6 +4,13 @@
         .o-flex-display();
         position: relative;
         min-height: 140px;
+
+        .o_kanban_tags {
+            max-height: 15px;
+            .o_tag {
+                height: 15px;
+            }
+        }
     }
 
     .o_kanban_card_content {
@@ -55,7 +62,7 @@
 
     .of_followup_kanban_main {
         .o-flex(0, 0, auto);
-        width: 70%; // for IE11 overflow issue
+        width: 65%; // for IE11 overflow issue
 
         .o_kanban_card_content {
             font-size: 12px;
@@ -66,6 +73,7 @@
     }
 
     .of_alert_tag {
+        font-size: 11px;
         display: inline;
         color: white;
         border-radius: 5px;
@@ -75,7 +83,7 @@
     }
 
     .of_followup_kanban_boxes {
-        width: 30%;
+        width: 35%;
         .o-flex(0, 0, auto);
 
         .o-flex-display();
