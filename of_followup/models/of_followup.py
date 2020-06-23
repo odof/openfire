@@ -21,7 +21,7 @@ class OFFollowupProject(models.Model):
     _order = "priority desc, reference_laying_date, id desc"
 
     stage_id = fields.Many2one(
-        comodel_name='of.followup.project.stage', string=u"Etape de suivi", required=True, readonly=True,
+        compute='_compute_stage_id', comodel_name='of.followup.project.stage', string=u"Etape de suivi", store=True,
         group_expand='_read_group_stage_ids')
     state = fields.Selection(
         [('in_progress', u'En cours'),
@@ -37,8 +37,11 @@ class OFFollowupProject(models.Model):
         related='order_id.partner_shipping_id', string=u"Adresse d'intervention", readonly=True)
     invoice_status = fields.Selection(related='order_id.invoice_status', string=u"État de facturation", readonly=True)
     user_id = fields.Many2one(comodel_name='res.users', string=u"Responsable", default=lambda self: self.env.user)
-    reference_laying_date = fields.Date(string=u"Date de pose de référence")
-    laying_week = fields.Char(string=u"Semaine de pose", compute='_compute_laying_week')
+    reference_laying_date = fields.Date(
+        compute='_compute_reference_laying_date', string=u"Date de pose de référence", store=True)
+    force_laying_date = fields.Boolean(string=u"Forcer la date de pose")
+    manual_laying_date = fields.Date(string=u"Date de pose (manuelle)")
+    laying_week = fields.Char(compute='_compute_reference_laying_date', string=u"Semaine de pose", store=True)
     task_ids = fields.One2many(comodel_name='of.followup.task', inverse_name='project_id', string=u"Tâches")
     predefined_task_ids = fields.One2many(
         comodel_name='of.followup.task', inverse_name='project_id', string=u"Tâches pré-définies",
@@ -88,6 +91,23 @@ class OFFollowupProject(models.Model):
         return stage_ids
 
     @api.multi
+    @api.depends('reference_laying_date')
+    def _compute_stage_id(self):
+        for rec in self:
+            laying_date = rec.reference_laying_date
+            if laying_date:
+                laying_date = datetime.strptime(laying_date, "%Y-%m-%d").date()
+                today = date.today()
+                if laying_date < today:
+                    rec.stage_id = self.env['of.followup.project.stage'].search([('code', '=', 's+')], limit=1)
+                else:
+                    week_diff = laying_date.isocalendar()[1] - today.isocalendar()[1]
+                    rec.stage_id = self.env['of.followup.project.stage'].search(
+                        [('week_diff_min', '<=', week_diff), ('week_diff_max', '>=', week_diff)], limit=1)
+            else:
+                rec.stage_id = self.env['of.followup.project.stage'].search([('code', '=', 'new')], limit=1)
+
+    @api.multi
     def _compute_state(self):
         for rec in self:
             # Si commande annulée, le suivi est à l'état annulé également
@@ -116,13 +136,34 @@ class OFFollowupProject(models.Model):
             return [('id', 'in', followups.ids)]
 
     @api.multi
-    def _compute_laying_week(self):
+    @api.depends('force_laying_date', 'manual_laying_date', 'order_id', 'order_id.intervention_ids',
+                 'order_id.intervention_ids.date', 'order_id.intervention_ids.tache_id',
+                 'order_id.intervention_ids.tache_id.tache_categ_id')
+    def _compute_reference_laying_date(self):
         for rec in self:
-            if rec.reference_laying_date:
-                laying_week = datetime.strptime(rec.reference_laying_date, "%Y-%m-%d").date().isocalendar()[1]
+            laying_date = False
+            if rec.force_laying_date:
+                laying_date = rec.manual_laying_date
+            elif rec.order_id and rec.order_id.intervention_ids:
+                planif_task_type = self.env.ref('of_followup.of_followup_task_type_planif')
+                if planif_task_type:
+                    planif_planning_tache_categs = planif_task_type.planning_tache_categ_ids
+                    interventions = rec.order_id.intervention_ids.filtered(
+                        lambda i: i.tache_id.tache_categ_id.id in planif_planning_tache_categs.ids and
+                        i.date > fields.Datetime.now())
+                    if interventions:
+                        laying_date = interventions[0].date_date
+                    else:
+                        interventions = rec.order_id.intervention_ids.filtered(
+                            lambda i: i.tache_id.tache_categ_id.id in planif_planning_tache_categs.ids)
+                        if interventions:
+                            laying_date = interventions[-1].date_date
+            rec.reference_laying_date = laying_date
+            if laying_date:
+                laying_week = datetime.strptime(laying_date, "%Y-%m-%d").date().isocalendar()[1]
                 rec.laying_week = "%02d" % laying_week
             else:
-                rec.laying_week = "Non programmé"
+                rec.laying_week = "Non programmée"
 
     @api.multi
     def _compute_color(self):
@@ -149,17 +190,22 @@ class OFFollowupProject(models.Model):
                 alerts = self.env['of.followup.project.alert']
                 # Vérification des dates
                 planif_task_type = self.env.ref('of_followup.of_followup_task_type_planif')
-                if planif_task_type and rec.reference_laying_date:
+                if planif_task_type and rec.force_laying_date:
                     planif_planning_tache_categs = planif_task_type.planning_tache_categ_ids
                     interventions = rec.order_id.intervention_ids.filtered(
-                        lambda i: i.tache_id.tache_categ_id.id in planif_planning_tache_categs.ids)
-                    if interventions.filtered(lambda i: i.date_date > rec.reference_laying_date):
-                        alerts |= self.env.ref('of_followup.of_followup_project_alert_date')
-                    else:
-                        interventions_to_schedule = rec.order_id.of_a_programmer_ids.filtered(
-                            lambda i: i.tache_id.tache_categ_id.id in planif_planning_tache_categs.ids)
-                        if interventions_to_schedule.filtered(lambda i: i.date_next > rec.reference_laying_date):
+                        lambda i: i.tache_id.tache_categ_id.id in planif_planning_tache_categs.ids and
+                        i.date > fields.Datetime.now())
+                    if interventions:
+                        intervention = interventions[0]
+                        if intervention.date_date != rec.manual_laying_date:
                             alerts |= self.env.ref('of_followup.of_followup_project_alert_date')
+                    else:
+                        interventions = rec.order_id.intervention_ids.filtered(
+                            lambda i: i.tache_id.tache_categ_id.id in planif_planning_tache_categs.ids)
+                        if interventions:
+                            intervention = interventions[-1]
+                            if intervention.date_date != rec.manual_laying_date:
+                                alerts |= self.env.ref('of_followup.of_followup_project_alert_date')
                 # Vérification BL
                 if rec.order_id.picking_ids:
                     late_delivery_pickings = rec.order_id.picking_ids.filtered(
@@ -233,53 +279,6 @@ class OFFollowupProject(models.Model):
         else:
             return 0
 
-    def get_stage(self, laying_date):
-        if laying_date:
-            laying_date = datetime.strptime(laying_date, "%Y-%m-%d").date()
-            today = date.today()
-            if laying_date < today:
-                return self.env['of.followup.project.stage'].search([('code', '=', 's+')], limit=1)
-            else:
-                week_diff = laying_date.isocalendar()[1] - today.isocalendar()[1]
-                return self.env['of.followup.project.stage'].search(
-                    [('week_diff_min', '<=', week_diff), ('week_diff_max', '>=', week_diff)], limit=1)
-        else:
-            return self.env['of.followup.project.stage'].search([('code', '=', 'coming')], limit=1)
-
-    def get_reference_laying_date(self):
-        if self.order_id:
-            planif_task_type = self.env.ref('of_followup.of_followup_task_type_planif')
-            if planif_task_type:
-                planif_planning_tache_categs = planif_task_type.planning_tache_categ_ids
-                interventions = self.order_id.intervention_ids.filtered(
-                    lambda i: i.tache_id.tache_categ_id.id in planif_planning_tache_categs.ids)
-                if interventions:
-                    intervention = interventions[0]
-                    return intervention.date
-                else:
-                    interventions_to_schedule = self.order_id.of_a_programmer_ids.filtered(
-                        lambda i: i.tache_id.tache_categ_id.id in planif_planning_tache_categs.ids)
-                    if interventions_to_schedule:
-                        intervention_to_schedule = interventions_to_schedule[0]
-                        return intervention_to_schedule.date_next
-        return False
-
-    @api.model
-    def create(self, vals):
-        if 'reference_laying_date' in vals:
-            reference_laying_date = vals.get('reference_laying_date', False)
-            stage = self.get_stage(reference_laying_date)
-            vals.update({'stage_id': stage.id})
-        return super(OFFollowupProject, self).create(vals)
-
-    @api.multi
-    def write(self, vals):
-        if 'reference_laying_date' in vals:
-            reference_laying_date = vals.get('reference_laying_date', False)
-            stage = self.get_stage(reference_laying_date)
-            vals.update({'stage_id': stage.id})
-        return super(OFFollowupProject, self).write(vals)
-
     @api.multi
     def set_to_done(self):
         self.ensure_one()
@@ -322,22 +321,6 @@ class OFFollowupProject(models.Model):
             'context': ctx,
         }
 
-    @api.multi
-    def update_laying_date(self):
-        self.ensure_one()
-        new_laying_date = self.get_reference_laying_date()
-        if new_laying_date:
-            self.reference_laying_date = new_laying_date
-
-    @api.model
-    def cron_move_project(self):
-        for project in self.search([]):
-            project.write({'stage_id': self.get_stage(project.reference_laying_date).id})
-
-    @api.onchange('order_id')
-    def onchange_order_id(self):
-        self.reference_laying_date = self.get_reference_laying_date()
-
     @api.onchange('template_id')
     def onchange_template_id(self):
         if not self.template_id:
@@ -354,6 +337,10 @@ class OFFollowupProject(models.Model):
                     vals.update({'state_id': state.id})
             new_tasks += [(0, 0, vals)]
         return {'value': {'task_ids': new_tasks}}
+
+    @api.onchange('force_laying_date')
+    def onchange_force_laying_date(self):
+        self.manual_laying_date = False
 
     @api.multi
     def action_view_invoice(self):
@@ -899,7 +886,7 @@ class OFFollowupTaskTypeState(models.Model):
     final_state = fields.Boolean(string=u"Etat final")
     stage_id = fields.Many2one(
         comodel_name='of.followup.project.stage', string=u"En retard à partir de la période",
-        domain=[('code', 'not in', ['coming', 's+'])])
+        domain=[('code', 'not in', ['new', 'coming', 's+'])])
 
     @api.model
     def create(self, vals):
@@ -975,15 +962,12 @@ class SaleOrder(models.Model):
         followup_project_obj = self.env['of.followup.project']
         followup_project = followup_project_obj.search([('order_id', '=', self.id)])
         if not followup_project:
-            coming_stage = self.env['of.followup.project.stage'].search([('code', '=', 'coming')])
             template = self.env['of.followup.project.template'].search([('default', '=', True)])
             values = {
-                'stage_id': coming_stage.id,
                 'order_id': self.id,
                 'template_id': template and template[0].id or False
             }
             followup_project = followup_project_obj.create(values)
-            followup_project.reference_laying_date = followup_project.get_reference_laying_date()
 
             if followup_project.template_id:
                 new_tasks = []

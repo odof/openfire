@@ -15,7 +15,6 @@
                     <button string="Remettre en cours" type="object" name="set_to_in_progress"
                         attrs="{'invisible': [('is_done', '=', False)]}"/>
                     <button name="action_send_email" type="object" string="Envoyer un email"/>
-                    <button name="update_laying_date" type="object" string="Actualiser date de pose"/>
                     <field name="state" widget="statusbar" statusbar_visible="in_progress,late,ready,done"/>
                 </header>
                 <sheet>
@@ -57,7 +56,9 @@
                             <field name="invoice_status"/>
                         </group>
                         <group>
-                            <field name="reference_laying_date"/>
+                            <field name="reference_laying_date" attrs="{'invisible': [('force_laying_date', '!=', False)]}"/>
+                            <field name="manual_laying_date" attrs="{'invisible': [('force_laying_date', '=', False)]}"/>
+                            <field name="force_laying_date"/>
                             <field name="user_id"/>
                             <field name="template_id" options="{'no_create': True, 'no_open': True}"/>
                             <field name="info"/>
@@ -152,7 +153,7 @@
                                         <h4>
                                             <b><field name="order_id"/></b> - <field name="partner_id"/><br/>
                                         </h4>
-                                        <span><b>Semaine de pose : <field name="laying_week"/></b>
+                                        <span><b>Sem. de pose : <field name="laying_week"/></b>
                                         <t t-value="JSON.parse(record.date_alert_display.raw_value)[0]" t-set="date_alert"/>
                                         <span t-if="date_alert" class="of_alert_tag"><t t-esc="date_alert"/></span>
                                         </span>
@@ -497,17 +498,19 @@
         <field name="view_mode">tree,form</field>
     </record>
 
-    <!-- crm.lead.tag views -->
+    <!-- Followup Project Tag Views -->
 
     <record id="of_followup_project_tag_form_view" model="ir.ui.view">
         <field name="name">of.followup.project.tag.form.view</field>
         <field name="model">of.followup.project.tag</field>
         <field name="arch" type="xml">
             <form string="Étiquette de suivi">
-                <group>
-                    <field name="name"/>
-                    <field name="color" groups="base.group_no_one"/>
-                </group>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="color" groups="base.group_no_one"/>
+                    </group>
+                </sheet>
             </form>
         </field>
     </record>
@@ -525,6 +528,43 @@
     <record id="of_followup_project_tag_action" model="ir.actions.act_window">
         <field name="name">Étiquettes</field>
         <field name="res_model">of.followup.project.tag</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Followup Project Stage Views -->
+
+    <record id="of_followup_project_stage_form_view" model="ir.ui.view">
+        <field name="name">of.followup.project.stage.form.view</field>
+        <field name="model">of.followup.project.stage</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="fold"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_followup_project_stage_list_view" model="ir.ui.view">
+        <field name="name">of.followup.project.stage.list.view</field>
+        <field name="model">of.followup.project.stage</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_followup_project_stage_action" model="ir.actions.act_window">
+        <field name="name">Étapes du suivi</field>
+        <field name="res_model">of.followup.project.stage</field>
         <field name="view_mode">tree,form</field>
     </record>
 
