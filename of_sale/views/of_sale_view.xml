@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- Ajout du champ of_mail_template_ids pour ir.actions.report.xml -->
+    <record id="of_sale_ir_actions_report_xml_form_view" model="ir.ui.view">
+        <field name="name">of.sale.ir.actions.report.xml.form.view</field>
+        <field name="model">ir.actions.report.xml</field>
+        <field name="inherit_id" ref="base.act_report_xml_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='report_type']" position="after">
+                <field name="of_mail_template_ids" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+
 <!--##############################################################################-->
 <!--############################ ______ Ventes ______ ############################-->
 <!--##############################################################################-->
