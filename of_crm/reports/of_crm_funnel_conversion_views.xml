@@ -1,6 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+        <!-- Modification du groupe pour accéder aux tunnels de conversion -->
+        <menuitem id="sales_team.menu_sale_report"
+                  name="Reports"
+                  parent="sales_team.menu_base_partner"
+                  sequence="99"
+                  groups="sales_team.group_sale_salesman"/>
+
+        <!-- Modification des groupes pour que les menus ne soient visibles qu'avec l'ancien groupe
+             du menu sales_team.menu_sale_report-->
+        <menuitem name="Sales"
+                  action="sale.action_order_report_all"
+                  id="sale.menu_report_product_all"
+                  parent="sales_team.menu_sale_report"
+                  sequence="10"
+                  groups="sales_team.group_sale_manager"/>
+        <menuitem id="crm.crm_opportunity_report_menu"
+                  name="Pipeline"
+                  parent="sales_team.menu_sale_report"
+                  action="crm.crm_opportunity_report_action"
+                  sequence="5"
+                  groups="sales_team.group_sale_manager"/>
+
+
         <record id="of_crm_funnel_conversion_pivot_view" model="ir.ui.view">
             <field name="name">of.crm.funnel.conversion.pivot.view</field>
             <field name="model">of.crm.funnel.conversion</field>
@@ -62,10 +85,20 @@
         <menuitem
             id="of_crm_funnel_conversion_menu"
             name="Tunnel quali"
-            groups="sales_team.group_sale_manager"
+            groups="sales_team.group_sale_salesman"
             parent="sales_team.menu_sale_report"
             action="of_crm_funnel_conversion_action"
             sequence="7"/>
+
+        <record id="of_crm_funnel_conversion_rule" model="ir.rule">
+            <field name="name">Opportunitées du vendeur</field>
+            <field ref="model_of_crm_funnel_conversion" name="model_id"/>
+            <field name="domain_force">[('vendor_id','=',user.id)]</field>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="groups" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+        </record>
 
         <record id="of_crm_funnel_conversion2_pivot_view" model="ir.ui.view">
             <field name="name">of.crm.funnel.conversion2.pivot.view</field>
@@ -128,9 +161,19 @@
         <menuitem
             id="of_crm_funnel_conversion2_menu"
             name="Tunnel quanti"
-            groups="sales_team.group_sale_manager"
+            groups="sales_team.group_sale_salesman"
             parent="sales_team.menu_sale_report"
             action="of_crm_funnel_conversion2_action"
             sequence="8"/>
+
+        <record id="of_crm_funnel_conversion2_rule" model="ir.rule">
+            <field name="name">Opportunitées du vendeur</field>
+            <field ref="model_of_crm_funnel_conversion2" name="model_id"/>
+            <field name="domain_force">[('vendor_id','=',user.id)]</field>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="groups" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+        </record>
 
 </odoo>

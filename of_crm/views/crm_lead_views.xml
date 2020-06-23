@@ -309,6 +309,12 @@
                         <span class="oe_kanban_status oe_kanban_status_grey"/>
                     </a>
                 </xpath>
+                <xpath expr="//kanban//field[@name='company_currency']" position="after">
+                    <field name="user_id"/>
+                </xpath>
+                <xpath expr="//kanban/templates//field[@name='name']/parent::node()" position="after">
+                    <span t-if="record.user_id"> - </span><field name="user_id"/>
+                </xpath>
             </field>
         </record>
 
