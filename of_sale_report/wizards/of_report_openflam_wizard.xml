@@ -81,6 +81,10 @@
             view_id="of_rapport_openflam_view_form"
             target="new"/>
 
-    <menuitem name="Rapport de gestion" action="action_of_rapport_openflam" id="menu_rapport_openflam" parent="sales_team.menu_sale_report"/>
+    <menuitem name="Rapport de gestion"
+              action="action_of_rapport_openflam"
+              id="menu_rapport_openflam"
+              parent="sales_team.menu_sale_report"
+              groups="sales_team.group_sale_manager"/>
 
 </odoo>

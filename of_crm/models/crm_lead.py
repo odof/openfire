@@ -466,6 +466,7 @@ class CRMStage(models.Model):
 
 class OFCRMActivity(models.Model):
     _name = 'of.crm.activity'
+    _inherit = ['mail.thread']
     _description = "OF Activité de CRM"
     _rec_name = 'title'
     _order = 'date desc'
@@ -496,20 +497,21 @@ class OFCRMActivity(models.Model):
         return res
 
     active = fields.Boolean(string='Actif', default=True)
-    title = fields.Char(string=u"Résumé", required=True)
+    title = fields.Char(string=u"Résumé", required=True, track_visibility="always")
     opportunity_id = fields.Many2one(comodel_name='crm.lead', string=u"Opportunité", required=True, ondelete='cascade')
     type_id = fields.Many2one(comodel_name='crm.activity', string=u"Activité", required=True)
-    date = fields.Datetime(string=u"Date", required=True)
+    date = fields.Datetime(string=u"Date", required=True, track_visibility="always")
     state = fields.Selection(
         selection=[('planned', u"Planifiée"),
                    ('done', u"Réalisée"),
-                   ('canceled', u"Annulée")], string=u"État", required=True, default='planned')
+                   ('canceled', u"Annulée")], string=u"État", required=True, default='planned',
+        track_visibility="onchange")
     user_id = fields.Many2one(
         comodel_name='res.users', string=u"Auteur", required=True, default=lambda self: self.env.user)
     vendor_id = fields.Many2one(comodel_name='res.users', string=u"Commercial", required=True)
     description = fields.Text(string=u"Description")
-    report = fields.Text(string=u"Compte-rendu")
-    cancel_reason = fields.Text(string=u"Raison d'annulation")
+    report = fields.Text(string=u"Compte-rendu", track_visibility="onchange")
+    cancel_reason = fields.Text(string=u"Raison d'annulation", track_visibility="onchange")
     partner_id = fields.Many2one(related='opportunity_id.partner_id', string=u"Client", readonly=True)
     phone = fields.Char(related='opportunity_id.phone', string=u"Téléphone", readonly=True)
     mobile = fields.Char(related='opportunity_id.mobile', string=u"Mobile", readonly=True)
@@ -557,6 +559,23 @@ class OFCRMActivity(models.Model):
             else:
                 activity.of_color_ft = "#0D0D0D"
                 activity.of_color_bg = "#F0F0F0"
+
+    @api.multi
+    def message_track(self, tracked_fields, initial_values):
+        return super(OFCRMActivity, self.with_context(to_lead=True)).message_track(tracked_fields, initial_values)
+
+    @api.multi
+    def message_post(self, body='', subject=None, message_type='notification',
+                     subtype=None, parent_id=False, attachments=None,
+                     content_subtype='html', **kwargs):
+        self.ensure_one()
+        if self.opportunity_id and self._context.get("to_lead"):
+            self.opportunity_id.message_post(body=body, subject=subject, message_type=message_type,
+                                             subtype=subtype, parent_id=parent_id, attachments=attachments,
+                                             content_subtype=content_subtype, **kwargs)
+        return super(OFCRMActivity, self).message_post(body=body, subject=subject, message_type=message_type,
+                                                       subtype=subtype, parent_id=parent_id, attachments=attachments,
+                                                       content_subtype=content_subtype, **kwargs)
 
 
 class CalendarEvent(models.Model):
