@@ -73,7 +73,12 @@ class OfDocumentsJoints(models.AbstractModel):
         compose_mail_obj = self.env['of.compose.mail']
         attachment_obj = self.env['ir.attachment']
         data = []
-        for mail_template in self.of_mail_template_ids:
+        force_of_mail_template_ids = self._context.get('force_of_mail_template_ids')
+        if force_of_mail_template_ids:
+            of_mail_template_ids = self.env['of.mail.template'].browse(force_of_mail_template_ids)
+        else:
+            of_mail_template_ids = self.of_mail_template_ids
+        for mail_template in of_mail_template_ids:
             if mail_template.file:
                 # Utilisation des documents pdf fournis
                 if not mail_template.chp_ids:
@@ -630,7 +635,13 @@ class Report(models.Model):
         if report_name in allowed_reports:
             # On ajoute au besoin les documents joint
             model = self.env[allowed_reports[report_name]].browse(docids)[0]
-            mails_data = model._detect_doc_joint()
+            report_id = self._get_report_from_name(report_name)
+            if report_id.of_mail_template_ids:
+                # le rapport possède des documents joints, ils prennent le pas sur ceux de l'enregistrement
+                mails_data = model.with_context(force_of_mail_template_ids=report_id.of_mail_template_ids._ids).\
+                    _detect_doc_joint()
+            else:
+                mails_data = model._detect_doc_joint()
             if mails_data:
                 fd, order_pdf = tempfile.mkstemp()
                 os.write(fd, result)
@@ -654,6 +665,11 @@ class Report(models.Model):
                 except Exception:
                     pass
         return result
+
+
+class IrActionsReportXml(models.Model):
+    _name = 'ir.actions.report.xml'
+    _inherit = ['ir.actions.report.xml', 'of.documents.joints']
 
 
 class OFInvoiceReportTotalGroup(models.Model):
