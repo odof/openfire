@@ -565,7 +565,7 @@ class Report(models.Model):
         allowed_reports = self.env['of.documents.joints']._allowed_reports()
         if report_name in allowed_reports:
             # On ajoute au besoin les documents joint
-            model = self.env[allowed_reports[report_name]].browse(docids)[0].with_context(data)
+            model = self.env[allowed_reports[report_name]].browse(docids)[0]
             mails_data = model._detect_doc_joint()
             if mails_data:
                 fd, order_pdf = tempfile.mkstemp()
@@ -589,24 +589,6 @@ class Report(models.Model):
                     os.remove(result_file_path)
                 except Exception:
                     pass
-        nb_copies = data.get('nb_copies', 1)
-        if nb_copies > 1:
-            file_paths = []
-            for i in range(nb_copies):
-                fd, order_pdf = tempfile.mkstemp()
-                os.write(fd, result)
-                os.close(fd)
-                file_paths.append(order_pdf)
-            result_file_path = self.env['report']._merge_pdf(file_paths)
-            try:
-                result_file = file(result_file_path, "rb")
-                result = result_file.read()
-                result_file.close()
-                for file_path in file_paths:
-                    os.remove(file_path)
-                os.remove(result_file_path)
-            except Exception:
-                pass
         return result
 
 
