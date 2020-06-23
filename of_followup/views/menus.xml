@@ -7,5 +7,6 @@
     <menuitem id="of_followup_project_config_template" name="Modèles de suivi" parent="of_followup_project_config_menu" sequence="10" action="of_followup_project_template_action"/>
     <menuitem id="of_followup_project_config_task_type" name="Types de tâches" parent="of_followup_project_config_menu" sequence="20" action="of_followup_task_type_action"/>
     <menuitem id="of_followup_project_config_tag" name="Étiquettes" parent="of_followup_project_config_menu" sequence="30" action="of_followup_project_tag_action"/>
+    <menuitem id="of_followup_project_config_stage" name="Étapes du suivi" parent="of_followup_project_config_menu" sequence="40" action="of_followup_project_stage_action"/>
 
 </odoo>
