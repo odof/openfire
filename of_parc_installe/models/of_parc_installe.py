@@ -68,8 +68,7 @@ class OFParcInstalle(models.Model):
              u"moyen: au village\n"
              u"haut: à la rue / au voisinage\n"
              u"très haut: au numéro de rue\n")
-
-    _sql_constraints = [('no_serie_uniq', 'unique(name)', u"Ce numéro de série est déjà utilisé et doit être unique.")]
+    lot_id = fields.Many2one('stock.production.lot', string="Lot d'origine")
 
     # @api.depends
 
@@ -355,3 +354,68 @@ class AccountInvoice(models.Model):
     def _compute_parc_count(self):
         for invoice in self:
             invoice.of_parc_count = len(invoice.of_parc_installe_ids)
+
+
+class StockPicking(models.Model):
+    _inherit = 'stock.picking'
+
+    @api.multi
+    def do_transfer(self):
+        u"""
+        Créé automatiquement un parc installé pour le client si param de config et type BL
+        """
+        res = super(StockPicking, self).do_transfer()
+        if len(self) == 1 and res and self.user_has_groups('stock.group_production_lot') and \
+                self.picking_type_id.code == 'outgoing' and\
+                self.env['ir.values'].get_default('stock.config.settings', 'of_parc_installe_auto'):
+            lots = self.pack_operation_product_ids.mapped('pack_lot_ids').mapped('lot_id')
+            if lots:
+                lots.sudo().creer_parc_installe(self)
+        return res
+
+
+class StockProductionLot(models.Model):
+    _inherit = "stock.production.lot"
+
+    of_parc_installe_id = fields.Many2one('of.parc.installe', string=u"Parc installé")
+
+    @api.multi
+    def creer_parc_installe(self, picking):
+        u"""
+        Appelée au moment de valider un BL pour créer automatiquement un parc installé au client
+        :param picking: BL validé
+        """
+        parc_installe_obj = self.env['of.parc.installe']
+        partner = picking.partner_id
+        if not partner:
+            return
+        for lot in self:
+            product = lot.product_id
+            parc_installe_obj.create({
+                'name': "%s - %s" % (lot.name, partner.name),
+                'client_id': partner.id,
+                'site_adresse_id': partner.id,
+                'product_id': product.id,
+                'brand_id': product.brand_id.id,
+                'product_category_id': product.categ_id.id,
+                'date_installation': fields.Date.today(),
+                'date_service': picking.sale_id and fields.Date.to_string(
+                    fields.Date.from_string(picking.sale_id.confirmation_date)),
+                'lot_id': lot.id
+            })
+
+
+class StockSettings(models.TransientModel):
+    _inherit = 'stock.config.settings'
+
+    of_parc_installe_auto = fields.Boolean(
+        string=u"(OF) Création automatique du parc installé",
+        help=u"Créer automatiquement le parc installé lors de la confirmation du BL si un numéro de série est renseigné.")
+
+    @api.multi
+    def set_of_parc_installe_auto_defaults(self):
+        if not bool(self.group_stock_production_lot):
+            return self.env['ir.values'].sudo().set_default('stock.config.settings', 'of_parc_installe_auto', False)
+        else:
+            return self.env['ir.values'].sudo().set_default('stock.config.settings', 'of_parc_installe_auto',
+                                                            self.of_parc_installe_auto)
