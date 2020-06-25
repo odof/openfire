@@ -402,6 +402,16 @@
             </field>
         </record>
 
+    <record id="of_service_pivot" model="ir.ui.view">
+        <field name="name">of.service.pivot</field>
+        <field name="model">of.service</field>
+        <field name="arch" type="xml">
+            <pivot string="Interventions" disable_linking="True">
+                <field name="date_next" interval="month" type="row"/>
+            </pivot>
+        </field>
+    </record>
+
 <!--##########################################################################################################################-->
 <!--#################################################________Actions_________#################################################-->
 <!--##########################################################################################################################-->
@@ -447,7 +457,7 @@
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">of.service</field>
             <field name="view_type">form</field>
-            <field name="view_mode">tree,map,form</field>
+            <field name="view_mode">tree,map,form,pivot</field>
             <field name="search_view_id" ref="view_of_service_rec_filter"/>
             <field name="context">{
                 'search_default_filter_rec': 1,
@@ -518,7 +528,7 @@
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">of.service</field>
             <field name="view_type">form</field>
-            <field name="view_mode">tree,map,form</field>
+            <field name="view_mode">tree,map,form,pivot</field>
             <field name="search_view_id" ref="view_of_service_rec_filter"/>
             <field name="context">{
                 'search_default_filter_ponc': 1,
@@ -553,7 +563,7 @@
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">of.service</field>
             <field name="view_type">form</field>
-            <field name="view_mode">tree,map,form</field>
+            <field name="view_mode">tree,map,form,pivot</field>
             <field name="search_view_id" ref="view_of_service_rec_filter"/>
             <field name="context">{
                 'search_default_this_week': 1,

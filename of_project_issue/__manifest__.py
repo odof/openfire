@@ -44,6 +44,7 @@
     ],
     'data' : [
         'security/ir.model.access.csv',
+        'report/of_project_issue_fiche_intervention.xml',
         'views/of_project_issue.xml',
         'data/of_project_issue_canal_data.xml',
         'data/of_project_issue_sequence.xml',
