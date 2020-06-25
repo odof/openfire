@@ -44,6 +44,18 @@
             <field name="implied_ids" eval="[(4, ref('of_group_planning_intervention_modification_siens'))]"/>
         </record>
 
+        <record id="of_group_planning_intervention_responsible" model="res.groups">
+            <field name="name">Responsable</field>
+            <field name="category_id" ref="of_planning_intervention_modification_category"/>
+            <field name="implied_ids" eval="[(4, ref('of_group_planning_intervention_modification_tout'))]"/>
+        </record>
+
+        <record id="of_group_planning_intervention_manager" model="res.groups">
+            <field name="name">Gestionnaire</field>
+            <field name="category_id" ref="of_planning_intervention_modification_category"/>
+            <field name="implied_ids" eval="[(4, ref('of_group_planning_intervention_responsible'))]"/>
+        </record>
+
         <!-- Règles droit lecture -->
         <record id="of_planning_intervention_lecture_siens_rule" model="ir.rule">
             <field name="name">Lire propres rendez-vous</field>
@@ -78,6 +90,23 @@
             <field name="domain_force">[(1,'=',1)]</field>
             <field name="perm_read" eval="False"/>
             <field name="groups" eval="[(4, ref('of_planning.of_group_planning_intervention_modification_tout'))]"/>
+        </record>
+
+    </data>
+
+    <data noupdate="1">
+
+        <!-- Règle multi-company -->
+        <record id="of_planning_intervention_comp_rule" model="ir.rule">
+            <field name="name">RDV d'intervention multi-company</field>
+            <field name="model_id" ref="model_of_planning_intervention"/>
+            <field name="global" eval="True"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False),
+                                             ('company_id', 'child_of', [user.company_id.id])]</field>
         </record>
 
     </data>
