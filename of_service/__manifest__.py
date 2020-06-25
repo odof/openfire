@@ -19,6 +19,7 @@
     'demo_xml': [],
     'data': [
         'security/ir.model.access.csv',
+        'security/of_service_security.xml',
         'views/of_service_view.xml',
         'data/of_service_data.xml',
     ],

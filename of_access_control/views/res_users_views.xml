@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Res Users Views -->
+
+    <record id="of_access_control_res_users_form_view" model="ir.ui.view">
+        <field name="name">of.access.control.res.users.form.view</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="mode">primary</field>
+        <field name="priority">10</field>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="of_user_profile_id" widget="selection"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="base.action_res_users" model="ir.actions.act_window">
+        <field name="domain" eval="[('of_is_user_profile', '=', False)]"/>
+    </record>
+
+    <record id="base.action_res_users_view2" model="ir.actions.act_window.view">
+        <field name="view_id" ref="of_access_control_res_users_form_view"/>
+    </record>
+
+    <record id="of_access_control_res_users_tree_view" model="ir.ui.view">
+        <field name="name">of.access.control.res.users.tree.view</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_tree"/>
+        <field name="arch" type="xml">
+            <field name="login" position="after">
+                <field name="of_user_profile_id" invisible="context.get('of_is_user_profile')"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Res Users Profile Views -->
+
+    <record id="of_access_control_res_users_profile_form_view" model="ir.ui.view">
+        <field name="name">of.access.control.res.users.profile.form.view</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="mode">primary</field>
+        <field name="priority">10</field>
+        <field name="arch" type="xml">
+            <field name="name" position="attributes">
+                <attribute name="placeholder">Profil...</attribute>
+            </field>
+            <notebook position="inside">
+                <page string="Configuration">
+                    <separator string="Utilisateurs associés" colspan="4"/>
+                    <field name="of_user_ids" nolabel="1" colspan="4" widget="many2many" context="{'form_view_ref': 'base.view_users_form'}"/>
+                    <separator string="Champs à mettre à jour pour les utilisateurs associés" colspan="4"/>
+                    <field name="of_field_ids" nolabel="1" colspan="4"/>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+    <record id="of_access_control_res_users_profile_action" model="ir.actions.act_window">
+        <field name="name">Profils utilisateurs</field>
+        <field name="res_model">res.users</field>
+        <field name="view_type">form</field>
+        <field name="view_id" ref="base.view_users_tree"/>
+        <field name="search_view_id" ref="base.view_users_search"/>
+        <field name="domain">[('of_user_profile', '=', True)]</field>
+        <field name="domain" eval="[('of_is_user_profile', '=', True)]"/>
+        <field name="context">{'active_test': False, 'default_active': False, 'default_of_is_user_profile': True, 'of_is_user_profile': True}</field>
+    </record>
+
+    <record id="of_access_control_res_users_profile_action_tree_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="base.view_users_tree"/>
+        <field name="act_window_id" ref="of_access_control_res_users_profile_action"/>
+    </record>
+
+    <record id="of_access_control_res_users_profile_action_form_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_access_control_res_users_profile_form_view"/>
+        <field name="act_window_id" ref="of_access_control_res_users_profile_action"/>
+    </record>
+
+    <menuitem id="of_access_control_res_users_profile_menu" action="of_access_control_res_users_profile_action"
+              parent="base.menu_users" sequence="1"/>
+
+</odoo>

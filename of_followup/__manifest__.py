@@ -13,6 +13,7 @@ Mise en place d'un workflow de suivi de l'avancé des dossiers une fois le bon d
 """,
     'website': "www.openfire.fr",
     'depends': [
+        'of_access_control',
         'of_document',
         'of_planning',
         'of_sale',
