@@ -47,11 +47,11 @@
     </record>
 
     <record id="of_planning.action_of_planning_intervention_calendar" model="ir.actions.act_window">
-        <field name="view_mode">calendar,planning,tree,form</field>
+        <field name="view_mode">calendar,planning,tree,form,pivot</field>
     </record>
 
     <record id="of_planning.of_sale_order_open_interventions" model="ir.actions.act_window">
-        <field name="view_mode">calendar,planning,tree,form</field>
+        <field name="view_mode">calendar,planning,tree,form,pivot</field>
     </record>
 
 </odoo>
