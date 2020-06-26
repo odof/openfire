@@ -54,7 +54,6 @@
                                         </t>
                                     </div>
                                 </div>
-                                <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
                             </div>
                             <div style="display: table-cell; width: 50%; border-left: 1px solid lightgray">
                                 <div class="h5" style="padding: 0px 16px;">
@@ -70,20 +69,6 @@
                                     <div>
                                         <span>Type d'installation :</span>
                                         <span t-field="o.parc_installe_id.installation"/>
-                                    </div>
-                                </div>
-                                <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
-                                <div class="h5" style="padding: 0px 16px;">
-                                    <div>
-                                        <span>Type de conduit :</span>
-                                        <span t-field="o.parc_installe_id.type_conduit"/>
-                                    </div>
-                                </div>
-                                <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
-                                <div class="h5" style="padding: 0px 16px;">
-                                    <div>
-                                        <span>Type d'arrivée d'air :</span>
-                                        <span t-field="o.parc_installe_id.type_air"/>
                                     </div>
                                 </div>
                                 <div style="margin-bottom: 8px; border-top: 1px solid lightgray;"/>
