@@ -55,12 +55,7 @@ class OfDocumentsJoints(models.AbstractModel):
         compose_mail_obj = self.env['of.compose.mail']
         attachment_obj = self.env['ir.attachment']
         data = []
-        force_of_mail_template_ids = self._context.get('force_of_mail_template_ids')
-        if force_of_mail_template_ids or force_of_mail_template_ids == []:
-            of_mail_template_ids = self.env['of.mail.template'].browse(force_of_mail_template_ids)
-        else:
-            of_mail_template_ids = self.of_mail_template_ids
-        for mail_template in of_mail_template_ids:
+        for mail_template in self.of_mail_template_ids:
             if mail_template.file:
                 # Utilisation des documents pdf fournis
                 if not mail_template.chp_ids:
