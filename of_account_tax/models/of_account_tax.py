@@ -2,6 +2,115 @@
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
+from odoo.addons.account.models.chart_template import AccountChartTemplate
+
+
+@api.multi
+def _load_template(self, company, code_digits=None, transfer_account_id=None, account_ref=None, taxes_ref=None):
+    """ Generate all the objects from the templates
+
+        :param company: company the wizard is running for
+        :param code_digits: number of digits the accounts code should have in the COA
+        :param transfer_account_id: reference to the account template that will be used as intermediary account for transfers between 2 liquidity accounts
+        :param acc_ref: Mapping between ids of account templates and real accounts created from them
+        :param taxes_ref: Mapping between ids of tax templates and real taxes created from them
+        :returns: tuple with a dictionary containing
+            * the mapping between the account template ids and the ids of the real accounts that have been generated
+              from them, as first item,
+            * a similar dictionary for mapping the tax templates and taxes, as second item,
+        :rtype: tuple(dict, dict, dict)
+    """
+    self.ensure_one()
+    if account_ref is None:
+        account_ref = {}
+    if taxes_ref is None:
+        taxes_ref = {}
+    if not code_digits:
+        code_digits = self.code_digits
+    if not transfer_account_id:
+        transfer_account_id = self.transfer_account_id
+    AccountTaxObj = self.env['account.tax']
+
+    # Generate taxes from templates.
+    generated_tax_res = self.tax_template_ids._generate_tax(company)
+    taxes_ref.update(generated_tax_res['tax_template_to_tax'])
+
+    # Generating Accounts from templates.
+    account_template_ref = self.generate_account(taxes_ref, account_ref, code_digits, company)
+    account_ref.update(account_template_ref)
+
+    # writing tax values after creation of taxes and accounts
+    for key, value in taxes_ref.items():
+        tax_tmpl = self.env['account.tax.template'].browse(key)
+        if tax_tmpl.account_ids:
+            self.env['account.tax'].browse(value).write({
+                'account_ids': [(0, 0, dict({'account_src_id': account_template_ref[t.account_src_id.id],
+                                             'account_dest_id': account_template_ref[t.account_dest_id.id]}))
+                                for t in tax_tmpl.account_ids]
+            })
+
+    # writing account values after creation of accounts
+    company.transfer_account_id = account_template_ref[transfer_account_id.id]
+    for key, value in generated_tax_res['account_dict'].items():
+        if value['refund_account_id'] or value['account_id']:
+            AccountTaxObj.browse(key).write({
+                'refund_account_id': account_ref.get(value['refund_account_id'], False),
+                'account_id': account_ref.get(value['account_id'], False),
+            })
+
+    # Create Journals - Only done for root chart template
+    if not self.parent_id:
+        self.generate_journals(account_ref, company)
+
+    # generate properties function
+    self.generate_properties(account_ref, company)
+
+    # Generate Fiscal Position , Fiscal Position Accounts and Fiscal Position Taxes from templates
+    self.generate_fiscal_position(taxes_ref, account_ref, company)
+
+    # Generate account operation template templates
+    self.generate_account_reconcile_model(taxes_ref, account_ref, company)
+
+    return account_ref, taxes_ref
+
+
+@api.multi
+def generate_fiscal_position(self, tax_template_ref, acc_template_ref, company):
+    """ This method generate Fiscal Position, Fiscal Position Accounts and Fiscal Position Taxes from templates.
+
+        :param chart_temp_id: Chart Template Id.
+        :param taxes_ids: Taxes templates reference for generating account.fiscal.position.tax.
+        :param acc_template_ref: Account templates reference for generating account.fiscal.position.account.
+        :param company_id: company_id selected from wizard.multi.charts.accounts.
+        :returns: True
+    """
+    self.ensure_one()
+    positions = self.env['account.fiscal.position.template'].search([('chart_template_id', '=', self.id)])
+    for position in positions:
+        new_fp = self.create_record_with_xmlid(
+            company, position, 'account.fiscal.position',
+            {'company_id': company.id,
+             'name': position.name,
+             'note': position.note,
+             'default_tax_ids': [(6, 0, [tax_template_ref[t.id] for t in position.default_tax_ids])]})
+        for tax in position.tax_ids:
+            self.create_record_with_xmlid(company, tax, 'account.fiscal.position.tax', {
+                'tax_src_id': tax_template_ref[tax.tax_src_id.id],
+                'tax_dest_id': tax.tax_dest_id and tax_template_ref[tax.tax_dest_id.id] or False,
+                'position_id': new_fp
+            })
+        for acc in position.account_ids:
+            self.create_record_with_xmlid(company, acc, 'account.fiscal.position.account', {
+                'account_src_id': acc_template_ref[acc.account_src_id.id],
+                'account_dest_id': acc_template_ref[acc.account_dest_id.id],
+                'position_id': new_fp
+            })
+    return True
+
+
+AccountChartTemplate._load_template = _load_template
+AccountChartTemplate.generate_fiscal_position = generate_fiscal_position
+
 
 class AccountTax(models.Model):
     _inherit = 'account.tax'
@@ -64,6 +173,40 @@ class AccountFiscalPosition(models.Model):
 
         fpos = self.search(base_domain + null_country_dom, limit=1)
         return fpos or False
+
+
+class OfAccountTaxAccountTemplate(models.Model):
+    _name = 'of.account.tax.account.template'
+    _description = 'Modèle de comptes de taxes'
+    _rec_name = 'template_tax_id'
+
+    template_tax_id = fields.Many2one(
+        'account.tax.template', string='Modèle de taxe', required=True, ondelete='cascade')
+    account_src_id = fields.Many2one(
+        'account.account.template', string="Compte de l'article", domain=[('deprecated', '=', False)], required=True)
+    account_dest_id = fields.Many2one(
+        'account.account.template', string=u"Compte à utiliser à la place", domain=[('deprecated', '=', False)],
+        required=True)
+
+    _sql_constraints = [
+        ('of_account_src_dest_uniq',
+         'unique (template_tax_id, account_src_id, account_dest_id)',
+         'Vous ne pouvez créer deux correspondances de comptes identiques sur une même taxe.')
+    ]
+
+
+class AccountTaxTemplate(models.Model):
+    _inherit = 'account.tax.template'
+
+    account_ids = fields.One2many(
+        'of.account.tax.account.template', 'template_tax_id', string='Correspondance de comptes')
+
+
+class AccountFiscalPositionTemplate(models.Model):
+    _inherit = 'account.fiscal.position.template'
+
+    default_tax_ids = fields.Many2many('account.tax.template')
+
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
