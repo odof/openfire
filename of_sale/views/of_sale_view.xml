@@ -57,8 +57,8 @@
                     <attribute name="widget">date</attribute>
                 </field>
                 <xpath expr="//group[@name='sale_pay']" position="inside">
-                    <field name="of_invoice_policy" groups="account.group_account_invoice"/>
-                    <field name="of_invoice_date_prev" attrs="{'readonly': [('of_invoice_policy', '!=', 'order')]}"/>
+                    <field name="of_invoice_policy" invisible="context.get('hide_sale')" groups="account.group_account_invoice"/>
+                    <field name="of_invoice_date_prev" invisible="context.get('hide_sale')" attrs="{'readonly': [('of_invoice_policy', '!=', 'order')]}"/>
                 </xpath>
                 <field name="fiscal_position_id" position="attributes">
                     <attribute name="domain">[('tax_ids.tax_src_id.type_tax_use', '=', 'sale')]</attribute>
@@ -94,8 +94,8 @@
                       attrs="{'invisible': [('of_price_unit_ht', '=', '_field_price_unit')]}"/>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/form/group/group[2]" position="inside">
-                    <field name="of_invoice_policy" groups="sales_team.group_sale_manager"/>
-                    <field name="of_invoice_date_prev" groups="sales_team.group_sale_manager"/>
+                    <field name="of_invoice_policy" invisible="context.get('hide_sale')" groups="sales_team.group_sale_manager"/>
+                    <field name="of_invoice_date_prev" invisible="context.get('hide_sale')" groups="sales_team.group_sale_manager"/>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/tree//field[@name='product_uom_qty']" position="attributes">
                     <attribute name="string">Qté(s) commandée(s)</attribute>
