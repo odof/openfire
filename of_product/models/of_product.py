@@ -143,6 +143,7 @@ class ProductCategory(models.Model):
     route_ids = fields.Many2many(
             'stock.location.route', 'stock_location_route_categ', 'categ_id', 'route_id', 'Routes',
             domain=[('product_categ_selectable', '=', True)], copy=True)
+    of_layout_id = fields.Many2one('sale.layout_category', string="Section")
 
     @api.multi
     def copy_data(self, default=None):

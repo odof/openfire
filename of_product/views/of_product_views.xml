@@ -206,4 +206,19 @@
 
     <menuitem id="menu_of_product_tag" name="Étiquettes" action="of_product_tag_action" parent="sale.prod_config_main" sequence="3"/>
 
+<!--##############################################################################-->
+<!--##################### ______ Catégories d'articles______ #####################-->
+<!--##############################################################################-->
+
+    <record id="of_product_product_category_form_view" model="ir.ui.view">
+        <field name="name">of.product.product.category.form.view</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="product.product_category_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='first']" position="inside">
+                <field name="of_layout_id" groups="sale.group_sale_layout"/>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
