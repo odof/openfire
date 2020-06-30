@@ -731,6 +731,7 @@ class OfTourneeRdv(models.TransientModel):
                             vals['duree_suiv'] = legs[i]['duration'] / 60
                             vals['distance'] = vals['dist_prec'] + vals['dist_suiv']
                             vals['duree'] = vals['duree_prec'] + vals['duree_suiv']
+                            duree_dispo = sum([c.date_flo_deadline - c.date_flo for c in crens])
 
                             if crens[0].disponible:
                                 if mode_recherche == 'distance' and vals['distance'] > maxi:
@@ -738,13 +739,13 @@ class OfTourneeRdv(models.TransientModel):
                                     vals['name'] = "TROP LOIN"
                                     vals['disponible'] = False
                                 # Créneau plus loin que la recherche accepte
-                                elif crens[0].disponible and mode_recherche == 'duree' and vals['duree'] > maxi:
+                                elif mode_recherche == 'duree' and vals['duree'] > maxi:
                                     vals['force_color'] = "#FF0000"
                                     vals['name'] = "TROP LOIN"
                                     vals['disponible'] = False
                                 # Trajet aller-retour plus long que la durée de l'intervention
-                                elif crens[0].disponible and vals['duree'] > self.duree * 60:
-                                    # note: On vérifie si la durée de transport est inférieure à la durée de la tâche.
+                                elif vals['duree'] > duree_dispo * 60:
+                                    # note: On vérifie si la durée de transport est inférieure à la durée du créneau.
                                     #   Cela a peu de sens si on ignore la durée réelle nécessaire pour l'intervention.
                                     #     (par exemple si le temps de trajet laisse 5 minutes pour l'intervention)
                                     #   Idéalement, la durée de la tâche ne devrait plus inclure le temps de transport

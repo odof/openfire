@@ -1410,10 +1410,10 @@ var PlanningCreneauDispo = Widget.extend({
         var action_id = "of_planning_view.action_view_of_planning_intervention_form_wizard"
         var la_date = new Date(self.date + " " + self.heure_debut_str + ":00" + self.row.tz_offset);
 
-        var additional_context = {
+        var additional_context = _.extend(self.view.dataset.context, {
             "default_employee_ids": [[6, 0, [self.row.res_id]]],
             "default_date": moment.utc(la_date.toUTCString()).format('YYYY-MM-DD HH:mm:ss'),
-        };
+        });
         return data_manager.load_action(action_id, pyeval.eval('context', additional_context)).then(function(result) {
                 var options = {
                     'additional_context': pyeval.eval('context', additional_context),  // pour une raison inconnue le additional_context n'est pas pris en compte avant
