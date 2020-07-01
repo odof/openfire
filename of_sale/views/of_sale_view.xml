@@ -151,6 +151,10 @@
                     <group string="Documents joints" name="docs">
                         <field name="of_mail_template_ids" widget="many2many_tags" nolabel="1"/>
                     </group>
+                    <group string="Impression spécifique" name="specific">
+                        <field name="of_specific_title"/>
+                        <field name="of_specific_date"/>
+                    </group>
                 </xpath>
                 <xpath expr="//field[@name='confirmation_date']" position="after">
                     <field name="of_date_vt"/>
