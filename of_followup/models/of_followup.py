@@ -1026,7 +1026,7 @@ class SaleOrder(models.Model):
     def action_confirm(self):
         super(SaleOrder, self).action_confirm()
         for order in self:
-            order.with_context(auto_followup=True).action_followup_project()
+            order.with_context(auto_followup=True).sudo().action_followup_project()
         return True
 
     @api.multi
