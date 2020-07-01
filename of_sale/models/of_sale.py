@@ -204,6 +204,9 @@ class SaleOrder(models.Model):
                                        inverse="_inverse_of_invoice_date_prev", store=True)
     of_delivered = fields.Boolean(string=u"Livrée", compute="_compute_delivered", store=True)
 
+    of_specific_title = fields.Char(string=u"Titre spécifique")
+    of_specific_date = fields.Date(string=u"Date spécifique")
+
     @api.depends('of_echeance_line_ids', 'amount_total')
     def _compute_of_echeances_modified(self):
         for order in self:
