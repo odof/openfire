@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- OF Delivery Division Wizard Form View -->
+    <record id="of_delivery_division_wizard_form_view" model="ir.ui.view">
+        <field name="name">of.delivery.division.wizard.form.view</field>
+        <field name="model">of.delivery.division.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="line_ids" nolabel="1" colspan="4">
+                        <tree delete="false" create="false" editable="bottom">
+                            <field name="product_id" options="{'no_open': True}"/>
+                            <field name="product_uom_qty"/>
+                            <field name="qty_to_divide"/>
+                        </tree>
+                    </field>
+                </group>
+                <footer>
+                    <button string="Diviser" name="action_delivery_division" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

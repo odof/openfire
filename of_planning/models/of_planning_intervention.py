@@ -465,6 +465,11 @@ class OfPlanningIntervention(models.Model):
     invoice_ids = fields.One2many('account.invoice', string="Factures", compute="_compute_invoice_ids")
     invoice_count = fields.Integer(string="Nombre de factures", compute="_compute_invoice_ids")
 
+    picking_id = fields.Many2one(
+        comodel_name='stock.picking', string=u"BL associé",
+        domain="[('id', 'in', picking_domain and picking_domain[0] and picking_domain[0][2] or False)]")
+    picking_domain = fields.Many2many(comodel_name='stock.picking', compute='_compute_picking_domain')
+
     # Compute
 
     @api.multi
@@ -810,6 +815,14 @@ class OfPlanningIntervention(models.Model):
             rdv.invoice_count = len(invoices)
             rdv.invoice_ids = invoices
 
+    @api.one
+    @api.depends('order_id')
+    def _compute_picking_domain(self):
+        picking_list = []
+        if self.order_id:
+            picking_list = self.order_id.picking_ids.ids
+        self.picking_domain = picking_list
+
     @api.depends('state')
     def _compute_state_int(self):
         for interv in self:
@@ -962,6 +975,17 @@ class OfPlanningIntervention(models.Model):
             self.date_deadline_forcee = fields.Datetime.to_string(
                 fields.Datetime.from_string(self.date) + relativedelta(hours=heures, minutes=minutes))
 
+    @api.onchange('order_id')
+    def onchange_order_id(self):
+        picking_list = []
+        if self.order_id:
+            picking_list = self.order_id.picking_ids.ids
+        self.picking_domain = picking_list
+        if self.picking_id and self.picking_id.id not in picking_list:
+            self.picking_id = False
+        res = {'domain': {'picking_id': [('id', 'in', picking_list)]}}
+        return res
+
     # Héritages
 
     @api.multi
@@ -994,6 +1018,11 @@ class OfPlanningIntervention(models.Model):
         res = super(OfPlanningIntervention, self).create(vals)
         res.do_verif_dispo()
         res._affect_number()
+        # Si BL associé, on met à jour la date du BL en fonction de la date d'intervention
+        if 'picking_id' in vals and 'date' in vals:
+            if res.picking_id:
+                res.picking_id.min_date = res.date
+
         return res
 
     @api.multi
@@ -1023,6 +1052,12 @@ class OfPlanningIntervention(models.Model):
         super(OfPlanningIntervention, self).write(vals)
         self.do_verif_dispo()
         self._affect_number()
+        # Si BL associé, on met à jour la date du BL en fonction de la date d'intervention
+        if 'picking_id' in vals or 'date' in vals:
+            for rdv in self:
+                if rdv.picking_id:
+                    rdv.picking_id.min_date = rdv.date
+
         return True
 
     @api.model
@@ -1686,3 +1721,36 @@ class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
     of_intervention_line_id = fields.Many2one('of.planning.intervention.line', string=u"Ligne planifiée")
+
+
+class StockPicking(models.Model):
+    _inherit = 'stock.picking'
+
+    of_intervention_ids = fields.One2many(
+        comodel_name='of.planning.intervention', inverse_name='picking_id', string=u"RDVs d'intervention liés")
+    of_intervention_count = fields.Integer(
+        string=u"Nb de RDVs d'intervention liés", compute='_compute_of_intervention_count')
+
+    @api.multi
+    def _compute_of_intervention_count(self):
+        for picking in self:
+            picking.of_intervention_count = len(picking.of_intervention_ids)
+
+    @api.multi
+    def action_view_interventions(self):
+        action = self.env.ref('of_planning.of_sale_order_open_interventions').read()[0]
+        if len(self._ids) == 1:
+            context = safe_eval(action['context'])
+            order = self.move_lines and self.move_lines[0] and self.move_lines[0].procurement_id and \
+                self.move_lines[0].procurement_id.sale_line_id and \
+                self.move_lines[0].procurement_id.sale_line_id.order_id or False
+            context.update({
+                'default_address_id': self.partner_id and self.partner_id.id or False,
+                'default_order_id': order and order.id or False,
+                'default_picking_id': self.id,
+            })
+            if self.of_intervention_ids:
+                context['force_date_start'] = self.of_intervention_ids[-1].date_date
+                context['search_default_picking_id'] = self.id
+            action['context'] = str(context)
+        return action
