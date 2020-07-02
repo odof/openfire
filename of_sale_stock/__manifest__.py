@@ -31,6 +31,7 @@ Paramètres de ventes
     ],
     "category": "OpenFire",
     "data": [
+        'wizard/of_delivery_division_wizard_views.xml',
         'views/of_sale_stock_views.xml',
         'report/of_report_stockinventory_valued.xml',
         'report/of_sale_stock_report_templates.xml',

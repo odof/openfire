@@ -155,6 +155,7 @@
                     <field name="employee_ids"/>
                     <field name="address_id"/>
                     <field name="order_id"/>
+                    <field name="picking_id"/>
                     <field name="company_id" widget="selection"/>
                 </group>
                 <newline/>
@@ -270,6 +271,11 @@
                         <group name="liens">
                             <separator string="Documents liés" colspan="2"/>
                             <field name="order_id"
+                                   groups="sales_team.group_sale_salesman,
+                                           account.group_account_invoice,
+                                           stock.group_stock_user"/>
+                            <field name="picking_domain" invisible="1"/>
+                            <field name="picking_id"
                                    groups="sales_team.group_sale_salesman,
                                            account.group_account_invoice,
                                            stock.group_stock_user"/>
@@ -1112,6 +1118,22 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='of_invoice_policy']" position="after">
                 <field name="of_intervention_state"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Stock Picking Form View -->
+    <record id="of_planning_stock_picking_form_view" model="ir.ui.view">
+        <field name="name">of.planning.stock.picking.form.view</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <!-- Bouton RDV Techs -->
+                <button class="oe_stat_button" name="action_view_interventions" type="object" icon="fa-calendar"
+                        attrs="{'invisible': [('picking_type_code', '!=', 'outgoing')]}">
+                    <field string="RDV(s) Tech" name="of_intervention_count" widget="statinfo"/>
+                </button>
             </xpath>
         </field>
     </record>
