@@ -144,7 +144,7 @@ class File(dms_base.DMSModel):
         categ_ref = False
         if obj._name == 'res.partner':
             partner = obj
-            categ_ref = 'res_partner_file_category'
+            categ_ref = 'res_partner'
         elif obj._name in ('sale.order', 'purchase.order', 'account.invoice', 'stock.picking', 'crm.lead',
                            'project.issue', 'of.service', 'of.planning.intervention'):
             partner = obj.partner_id
