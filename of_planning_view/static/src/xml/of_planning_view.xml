@@ -212,8 +212,8 @@
                 border-bottom: 1px solid #{record.color_ft};">
             <t t-set="attendees" t-value="record.attendee_other_ids"/>
             <t t-foreach="attendees">
-                <i t-if="record.view.rows[attendees_value] != undefined" class="of_calendar_attendee_box_flat"
-                   t-attf-style="background: #{record.view.rows[attendees_value].color_bg}; border: 1px solid #0D0D0D; float: right; margin-left: 2px; margin-top: -3px;"/>
+                <i t-if="record.view.rows[record.view.rows_ids_indexes[attendees_value]] != undefined" class="of_calendar_attendee_box_flat"
+                   t-attf-style="background: #{record.view.rows[record.view.rows_ids_indexes[attendees_value]].color_bg}; border: 1px solid #0D0D0D; float: right; margin-left: 2px; margin-top: -3px;"/>
                 <i t-else="" class="of_calendar_attendee_box_flat"
                    t-attf-style="background: grey; border: 1px solid #0D0D0D; float: right; margin-left: 2px; margin-top: -3px;"/>
             </t>
@@ -267,8 +267,8 @@
         <div>
             <t t-set="attendees" t-value="record.attendee_other_ids"/>
             <t t-foreach="attendees">
-                <i t-if="record.view.rows[attendees_value] != undefined" class="of_calendar_attendee_box_flat"
-                   t-attf-style="background: #{record.view.rows[attendees_value].color_bg}; border: 1px solid #0D0D0D; float: right; margin-left: 2px; margin-top: -3px;"/>
+                <i t-if="record.view.rows[record.view.rows_ids_indexes[attendees_value]] != undefined" class="of_calendar_attendee_box_flat"
+                   t-attf-style="background: #{record.view.rows[record.view.rows_ids_indexes[attendees_value]].color_bg}; border: 1px solid #0D0D0D; float: right; margin-left: 2px; margin-top: -3px;"/>
                 <i t-else="" class="of_calendar_attendee_box_flat"
                    t-attf-style="background: grey; border: 1px solid #0D0D0D; float: right; margin-left: 2px; margin-top: -3px;"/>
             </t>
