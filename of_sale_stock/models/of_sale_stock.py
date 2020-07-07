@@ -62,6 +62,9 @@ class SaleOrder(models.Model):
         compute=lambda x: False, search='_search_of_picking_date_done', string="Date transfert bon de livraison")
     of_route_id = fields.Many2one('stock.location.route', string="Route")
 
+    of_invoice_policy = fields.Selection(
+        selection_add=[('ordered_delivery', u'Quantités commandées à date de livraison')])
+
     @api.onchange('of_route_id')
     def onchange_route(self):
         """ Permet de modifier la route utilisée des lignes de commande depuis le devis """
@@ -95,9 +98,35 @@ class SaleOrder(models.Model):
             order_ids = [row[0] for row in self._cr.fetchall()]
         return [('id', 'in', order_ids)]
 
+    @api.depends('of_invoice_policy', 'order_line', 'order_line.of_invoice_date_prev',
+                 'order_line.procurement_ids', 'order_line.procurement_ids.move_ids',
+                 'order_line.procurement_ids.move_ids.picking_id',
+                 'order_line.procurement_ids.move_ids.picking_id.min_date',
+                 'order_line.procurement_ids.move_ids.picking_id.state')
+    def _compute_of_invoice_date_prev(self):
+        super(SaleOrder, self)._compute_of_invoice_date_prev()
+        for order in self:
+            if order.of_invoice_policy == 'ordered_delivery':
+                pickings = order.order_line.mapped('procurement_ids') \
+                    .mapped('move_ids') \
+                    .mapped('picking_id') \
+                    .filtered(lambda p: p.state != 'cancel') \
+                    .sorted('min_date')
+                if pickings:
+                    to_process_pickings = pickings.filtered(lambda p: p.state != 'done')
+                    if to_process_pickings:
+                        order.of_invoice_date_prev = fields.Date.to_string(
+                            fields.Date.from_string(to_process_pickings[0].min_date))
+                    else:
+                        order.of_invoice_date_prev = fields.Date.to_string(
+                            fields.Date.from_string(pickings[-1].min_date))
+
 
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
+
+    of_invoice_policy = fields.Selection(
+        selection_add=[('ordered_delivery', u'Quantités commandées à date de livraison')])
 
     @api.onchange('route_id')
     def _get_route_id(self):
@@ -118,6 +147,46 @@ class SaleOrderLine(models.Model):
         if afficher_warning:
             return super(SaleOrderLine, self)._onchange_product_id_check_availability()
 
+    @api.depends('qty_invoiced', 'product_uom_qty', 'order_id.state', 'order_id.of_invoice_policy',
+                 'order_id.partner_id.of_invoice_policy', 'procurement_ids', 'procurement_ids.move_ids',
+                 'procurement_ids.move_ids.of_ordered_qty', 'procurement_ids.move_ids.picking_id',
+                 'procurement_ids.move_ids.picking_id.state')
+    def _get_to_invoice_qty(self):
+        for line in self.filtered(lambda l: l.of_invoice_policy == 'ordered_delivery'):
+            if line.order_id.state in ['sale', 'done']:
+                moves = line.procurement_ids.mapped('move_ids')
+                # On filtre les mouvements :
+                #     - On ne prend pas les 'extra moves'
+                #     - Le BL doit être validé ou il doit s'agir d'un reliquat annulé
+                moves = moves.filtered(
+                    lambda m: m.origin and
+                    (m.picking_id.state == 'done' or (m.picking_id.state == 'cancel' and m.picking_id.backorder_id))
+                )
+                line.qty_to_invoice = sum(moves.mapped('of_ordered_qty')) - line.qty_invoiced
+            else:
+                line.qty_to_invoice = 0
+        super(SaleOrderLine, self.filtered(lambda l: l.of_invoice_policy != 'ordered_delivery'))._get_to_invoice_qty()
+
+    @api.depends('of_invoice_policy',
+                 'order_id', 'order_id.of_fixed_invoice_date',
+                 'procurement_ids', 'procurement_ids.move_ids', 'procurement_ids.move_ids.picking_id',
+                 'procurement_ids.move_ids.picking_id.min_date', 'procurement_ids.move_ids.picking_id.state')
+    def _compute_of_invoice_date_prev(self):
+        super(SaleOrderLine, self)._compute_of_invoice_date_prev()
+        for line in self:
+            if line.of_invoice_policy == 'ordered_delivery':
+                moves = line.procurement_ids.mapped('move_ids')
+                moves = moves.filtered(lambda m: m.picking_id.state != 'cancel').sorted('date_expected')
+
+                if moves:
+                    to_process_moves = moves.filtered(lambda m: m.picking_id.state != 'done')
+                    if to_process_moves:
+                        line.of_invoice_date_prev = fields.Date.to_string(
+                            fields.Date.from_string(to_process_moves[0].date_expected))
+                    else:
+                        line.of_invoice_date_prev = fields.Date.to_string(
+                            fields.Date.from_string(moves[-1].date_expected))
+
 
 class SaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'
@@ -125,6 +194,9 @@ class SaleConfiguration(models.TransientModel):
     of_stock_warning_setting = fields.Boolean(
         string="(OF) Avertissements de stock", required=True, default=False,
         help="Afficher les messages d'avertissement de stock ?")
+
+    default_invoice_policy = fields.Selection(
+        selection_add=[('ordered_delivery', u"Facturer les quantités commandées à date de livraison")])
 
     @api.multi
     def set_stock_warning_defaults(self):
@@ -227,6 +299,8 @@ class ProductTemplate(models.Model):
 
     of_qty_unreserved = fields.Float(string=u'Qté non réservée', compute='_compute_of_qty_unreserved')
 
+    invoice_policy = fields.Selection(selection_add=[('ordered_delivery', u'Quantités commandées à date de livraison')])
+
     @api.depends('product_variant_ids')
     def _compute_of_qty_unreserved(self):
         quant_obj = self.env['stock.quant']
@@ -263,6 +337,16 @@ class ProcurementOrder(models.Model):
 
 class StockMove(models.Model):
     _inherit = 'stock.move'
+
+    of_ordered_qty = fields.Float(string=u"(OF) Quantité commandée", digits=dp.get_precision('Product Unit of Measure'))
+
+    @api.model
+    def create(self, vals):
+        vals['of_ordered_qty'] = vals.get('product_uom_qty')
+        if vals.get('split_from'):
+            origin_move = self.browse(vals.get('split_from'))
+            origin_move.of_ordered_qty = origin_move.of_ordered_qty - vals['of_ordered_qty']
+        return super(StockMove, self).create(vals)
 
     @api.multi
     def action_assign(self, no_prepare=False):
@@ -368,3 +452,10 @@ class StockMove(models.Model):
             moves_to_assign.write({'state': 'assigned'})
         if not no_prepare:
             self.check_recompute_pack_op()
+
+
+class ResPartner(models.Model):
+    _inherit = 'res.partner'
+
+    of_invoice_policy = fields.Selection(
+        selection_add=[('ordered_delivery', u'Quantités commandées à date de livraison')])

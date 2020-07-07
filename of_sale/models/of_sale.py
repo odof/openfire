@@ -229,9 +229,16 @@ class SaleOrder(models.Model):
                 pickings = order.order_line.mapped('procurement_ids')\
                                            .mapped('move_ids')\
                                            .mapped('picking_id')\
+                                           .filtered(lambda p: p.state != 'cancel')\
                                            .sorted('min_date')
                 if pickings:
-                    order.of_invoice_date_prev = fields.Date.to_string(fields.Date.from_string(pickings[0].min_date))
+                    to_process_pickings = pickings.filtered(lambda p: p.state != 'done')
+                    if to_process_pickings:
+                        order.of_invoice_date_prev = fields.Date.to_string(
+                            fields.Date.from_string(to_process_pickings[0].min_date))
+                    else:
+                        order.of_invoice_date_prev = fields.Date.to_string(
+                            fields.Date.from_string(pickings[-1].min_date))
 
     def _inverse_of_invoice_date_prev(self):
         for order in self:
@@ -989,13 +996,11 @@ class SaleOrderLine(models.Model):
         calculated from the ordered quantity. Otherwise, the quantity delivered is used.
         """
         for line in self:
-            invoice_policy = line.order_id.of_invoice_policy
-            if not invoice_policy:
-                invoice_policy = line.product_id.invoice_policy
+            invoice_policy = line.of_invoice_policy
             if line.order_id.state in ['sale', 'done']:
                 if invoice_policy == 'order':
                     line.qty_to_invoice = line.product_uom_qty - line.qty_invoiced
-                else:
+                elif invoice_policy == 'delivery':
                     line.qty_to_invoice = line.qty_delivered - line.qty_invoiced
             else:
                 line.qty_to_invoice = 0

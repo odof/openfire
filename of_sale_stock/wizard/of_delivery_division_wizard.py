@@ -40,11 +40,13 @@ class OFDeliveryDivisionWizard(models.TransientModel):
                         line_to_divide.move_id.unlink()
                     else:
                         # On diminue les quantités de la ligne d'origine
-                        line_to_divide.move_id.product_uom_qty = initial_qty
+                        line_to_divide.move_id.write({'product_uom_qty': initial_qty,
+                                                      'of_ordered_qty': initial_qty})
                         # On diminue les quantités de la nouvelle ligne
                         new_delivery.move_lines.filtered(
                             lambda line: line.procurement_id == line_to_divide.move_id.procurement_id).\
-                            product_uom_qty = initial_qty
+                            write({'product_uom_qty': line_to_divide.qty_to_divide,
+                                   'of_ordered_qty': line_to_divide.qty_to_divide})
 
             self.picking_id.action_assign()
             new_delivery.action_assign()
