@@ -170,6 +170,12 @@ var PlanningView = View.extend({
             .order_by(['sequence'])
             .all();  // récupérer tous les employés qui sont des intervenants
         var ir_values_model = new Model("ir.values");
+        // doit-on laisser la taille des events auto?
+        var hauteur_fixe_def = ir_values_model.call("get_default",
+                                                    ["of.intervention.settings", "planningview_px_fix"]);
+        // combien de pixel / heure ?
+        var duree_to_px_def = ir_values_model.call("get_default",
+                                                   ["of.intervention.settings", "planningview_h2px"]);
         // récupérer l'info pour savoir si afficher le planning Tech, Com, ou les deux
         var attendee_mode_def = ir_values_model.call("get_default",
                                                      ["of.intervention.settings", "attendee_mode", false]);
@@ -181,9 +187,11 @@ var PlanningView = View.extend({
         var creneaux_dispo_data_def = self.set_creneaux_dispo_data();
 
         return $.when(write_def, create_def, excluded_ids_def, intervenants_ids_def, attendee_mode_def,
-                      company_filters_def, company_filter_def, rendered_prom, creneaux_dispo_data_def, this._super())
+                      company_filters_def, company_filter_def, hauteur_fixe_def, duree_to_px_def, rendered_prom,
+                      creneaux_dispo_data_def, this._super())
         .then(
-            function (write, create, excluded, emp_ids, attendee_mode, company_filters, now_company_id) {
+            function (write, create, excluded, emp_ids, attendee_mode, company_filters, now_company_id, hauteur_fixe,
+              duree_to_px) {
                 self.write_right = write;
                 self.create_right = create;
                 // affecter le mode de planning (com, tech ou comtech)
@@ -220,6 +228,9 @@ var PlanningView = View.extend({
                         self.now_company_name = company_fil.name;
                     }
                 }
+
+                self.hauteur_fixe = hauteur_fixe;
+                self.duree_to_px = duree_to_px;
 
                 return $.when(all_filters_def);
         });
@@ -384,7 +395,11 @@ var PlanningView = View.extend({
 
             // Add show/hide button and possibly hide the sidebar
             this.$sidebar_container.append($('<i>').addClass('of_planning_sidebar_toggler fa'));
-            this.toggle_sidebar((local_storage.getItem('planning_view_full_width') !== 'true'));
+            var lateral_droit = new Model("ir.values").call("get_default",
+                                                            ["of.intervention.settings", "lateral_droit", false])
+                .then(function (res) {
+                    self.toggle_sidebar(res);
+                });
         }
         return $.when.apply($, defs)
         .then(function () {
@@ -412,9 +427,15 @@ var PlanningView = View.extend({
         return $.when();
     },
     toggle_full_width: function () {
-        var full_width = (local_storage.getItem('planning_view_full_width') !== 'true');
-        local_storage.setItem('planning_view_full_width', full_width);
-        this.toggle_sidebar(!full_width);
+        var self = this;
+        var ir_value_model = new Model("ir.values")
+        ir_value_model.call("get_default", ["of.intervention.settings", "lateral_droit", false])
+        .then(function (lateral_droit) {
+            lateral_droit = !lateral_droit;
+            ir_value_model.call("set_default", ["of.intervention.settings", "lateral_droit", lateral_droit, false]);
+            self.toggle_sidebar(lateral_droit);
+        });
+
     },
     toggle_sidebar: function (display) {
         this.sidebar.do_toggle(display);
@@ -1334,6 +1355,8 @@ var PlanningCreneauDispo = Widget.extend({
     events: {
         'click .of_planning_creneau_action': 'on_planning_creneau_action_clicked',
         'click .of_planning_creneau_secteur_action': 'on_planning_creneau_secteur_action_clicked',
+        'mouseover': 'on_mouseover',
+        'mouseout': 'on_mouseout',
     },
     init: function(row, view, record, options) {
         this._super(row);
@@ -1351,6 +1374,11 @@ var PlanningCreneauDispo = Widget.extend({
         this.record = record;
         this.heure_debut = record.heure_debut;
         this.heure_fin = record.heure_fin;
+        if (this.view.hauteur_fixe) {
+            this.hauteur = ((this.heure_fin - this.heure_debut) * this.view.duree_to_px).toString() + "px";
+        }else{
+            this.hauteur = "auto";
+        }
         var descript_ft = {type: "float_time"};
         this.heure_debut_str = formats.format_value(record.heure_debut,descript_ft);
         this.heure_fin_str = formats.format_value(record.heure_fin,descript_ft);
@@ -1428,6 +1456,29 @@ var PlanningCreneauDispo = Widget.extend({
     },
     reload_column: function () {
         this.view.on_reload_column(this.row.res_id, this.col_offset);
+    },
+    /**
+     *  Vérifie si la div est trop petite pour son contenu
+     */
+    isOverflown: function() {
+        var el = this.$el.find('.of_planning_creneau_dispo')[0];
+        return el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth;
+    },
+    /**
+     *  agrandi la div si besoin
+     */
+    on_mouseover: function (ev) {
+        ev.preventDefault();
+        if (this.isOverflown()) {
+            this.$el.find('.of_planning_creneau_dispo').height('auto');
+        }
+    },
+    /**
+     *  remet la div à sa taille originelle
+     */
+    on_mouseout: function (ev) {
+        ev.preventDefault();
+        this.$el.find('.of_planning_creneau_dispo').outerHeight(this.hauteur);
     },
     /**
      *  Ouvre le pop-up de sélection de secteur
@@ -1528,6 +1579,10 @@ var PlanningRecord = Widget.extend({
     /**
      *  Widget de créneau d'intervention
      */
+     events: {
+         'mouseover': 'on_mouseover',
+         'mouseout': 'on_mouseout',
+     },
     init: function(row, view, record, options) {
         //console.log('MapRecord.init arguments: ',arguments);
         this.id = record.id;
@@ -1556,6 +1611,12 @@ var PlanningRecord = Widget.extend({
 
         var self= this;
         this.record = record;
+        if (this.view.hauteur_fixe) {
+            this.hauteur = (record.duree_debut_fin * this.view.duree_to_px).toString() + "px";
+        }else{
+            this.hauteur = "auto";
+        }
+
         var descript_dt = {type: "datetime"};
         var descript_ft = {type: "float_time"};
         this.heure_debut_str = formats.format_value(record.date,descript_dt).substring(11, 16);
@@ -1649,6 +1710,29 @@ var PlanningRecord = Widget.extend({
                 }
 
             });
+    },
+    /**
+     *  Vérifie si la div est trop petite pour son contenu
+     */
+    isOverflown: function() {
+        var el = this.$el.find('.of_planning_record_global_click')[0];
+        return el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth;
+    },
+    /**
+     *  agrandi la div si besoin
+     */
+    on_mouseover: function (ev) {
+        ev.preventDefault();
+        if (this.isOverflown()) {
+            this.$el.find('.of_planning_record_global_click').height('auto');
+        }
+    },
+    /**
+     *  remet la div à sa taille originelle
+     */
+    on_mouseout: function (ev) {
+        ev.preventDefault();
+        this.$el.find('.of_planning_record_global_click').outerHeight(this.hauteur);
     },
     on_global_click: function (ev) {
        //console.log("CLICLICLICLICLIC",ev);

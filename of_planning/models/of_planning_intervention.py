@@ -410,6 +410,9 @@ class OfPlanningIntervention(models.Model):
     forcer_dates = fields.Boolean("Forcer les dates", default=False, help=u"/!\\")
     date_deadline_forcee = fields.Datetime(string=u"Date fin (forcée)")
     duree = fields.Float(string=u'Durée intervention', required=True, digits=(12, 5), track_visibility='always')
+    duree_debut_fin = fields.Float(string=u"Durée entre le début et la fin",
+                                   compute="_compute_duree_debut_fin", store=True,
+                                   help=u"Prend en compte le temp de pause au milieu du RDV")
     alert_hors_creneau = fields.Boolean(string="RDV hors des créneaux", compute="_compute_date_deadline")
     alert_coherence_date = fields.Boolean(string=u"Incohérence dans les dates", compute="_compute_alert_coherence_date")
     user_id = fields.Many2one('res.users', string='Utilisateur', default=lambda self: self.env.uid)
@@ -522,6 +525,14 @@ class OfPlanningIntervention(models.Model):
             intervention.price_subtotal = sum(intervention.line_ids.mapped('price_subtotal'))
             intervention.price_tax = sum(intervention.line_ids.mapped('price_tax'))
             intervention.price_total = sum(intervention.line_ids.mapped('price_total'))
+
+    @api.depends('date', 'date_deadline')
+    def _compute_duree_debut_fin(self):
+        """Ne fonctionne que pour les RDVs sur une seule journée"""
+        for intervention in self:
+            date_dt = fields.Datetime.from_string(intervention.date)
+            date_deadline_dt = fields.Datetime.from_string(intervention.date_deadline)
+            intervention.duree_debut_fin = (date_deadline_dt - date_dt).seconds / 3600.0
 
     def compare_date(self, date1, date2, compare="==", isdatetime=False):
         if not date1 or not date2:

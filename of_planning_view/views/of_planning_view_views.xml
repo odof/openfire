@@ -32,6 +32,16 @@
                         <field name="planningview_employee_exclu_ids" class="oe_inline" widget="many2many_tags"/>
                         <span>Intervenants à NE PAS montrer en vue planning</span>
                     </div>
+                    <label for="planningview_px_fix"/>
+                    <div name="planningview_px_fix">
+                        <field name="planningview_px_fix" class="oe_inline"/>
+                        <span>proportionnelle à leur durée</span>
+                    </div>
+                    <label for="planningview_h2px" attrs="{'invisible': [('planningview_px_fix', '=', False)]}"/>
+                    <div name="planningview_h2px" attrs="{'invisible': [('planningview_px_fix', '=', False)]}">
+                        <field name="planningview_h2px" class="oe_inline"/>
+                        <span>px</span>
+                    </div>
                 </group>
 
             </xpath>
@@ -48,6 +58,7 @@
                 <field name="date" class="of_planning_info_heures of_planning_subinfo_heure_debut"/>
                 <field name="date_deadline" class="of_planning_info_heures of_planning_subinfo_heure_fin"/>
                 <field name="duree" class="of_planning_info_heures of_planning_subinfo_duree"/>
+                <field name="duree_debut_fin"/>
                 <field name="tache_name" class="of_planning_info_tache_name"/>
                 <field name="partner_name" class="of_planning_info_partner_name"/>
                 <field name="address_zip" class="of_planning_info_lieu of_planning_subinfo_zip"/>
