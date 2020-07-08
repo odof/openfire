@@ -7,7 +7,7 @@ from odoo import api, fields, models
 from odoo.addons.muk_dms.models import dms_base
 
 AVAILABLE_PRIORITIES = [
-    ('0', u'Normal'),
+    ('0', u'Normale'),
     ('1', u'Basse'),
     ('2', u'Haute'),
     ('3', u'Très haute'),
@@ -51,7 +51,7 @@ class OFFollowupProject(models.Model):
         domain=[('predefined_task', '=', False)])
     template_id = fields.Many2one(comodel_name='of.followup.project.template', string=u"Modèle")
     color = fields.Char(string=u"Couleur", compute="_compute_color")
-    priority = fields.Selection(AVAILABLE_PRIORITIES, string='Rating', index=True, default=AVAILABLE_PRIORITIES[0][0])
+    priority = fields.Selection(AVAILABLE_PRIORITIES, string=u'Priorité', index=True, default=AVAILABLE_PRIORITIES[0][0])
     info = fields.Text(string=u"Infos")
     notes = fields.Text(string=u"Notes")
     tag_ids = fields.Many2many(comodel_name='of.followup.project.tag', string=u"Étiquettes")
@@ -194,14 +194,15 @@ class OFFollowupProject(models.Model):
                     planif_planning_tache_categs = planif_task_type.planning_tache_categ_ids
                     interventions = rec.order_id.intervention_ids.filtered(
                         lambda i: i.tache_id.tache_categ_id.id in planif_planning_tache_categs.ids and
-                        i.date > fields.Datetime.now())
+                        i.date > fields.Datetime.now() and i.state != 'cancel')
                     if interventions:
                         intervention = interventions[0]
                         if intervention.date_date != rec.manual_laying_date:
                             alerts |= self.env.ref('of_followup.of_followup_project_alert_date')
                     else:
                         interventions = rec.order_id.intervention_ids.filtered(
-                            lambda i: i.tache_id.tache_categ_id.id in planif_planning_tache_categs.ids)
+                            lambda i: i.tache_id.tache_categ_id.id in planif_planning_tache_categs.ids
+                                and i.state != 'cancel')
                         if interventions:
                             intervention = interventions[-1]
                             if intervention.date_date != rec.manual_laying_date:
@@ -209,13 +210,13 @@ class OFFollowupProject(models.Model):
                 # Vérification BL
                 if rec.order_id.picking_ids:
                     late_delivery_pickings = rec.order_id.picking_ids.filtered(
-                        lambda p: p.state != 'done' and p.min_date < fields.Datetime.now())
+                        lambda p: p.state not in ['done', 'cancel'] and p.min_date < fields.Datetime.now())
                     if late_delivery_pickings:
                         alerts |= self.env.ref('of_followup.of_followup_project_alert_bl')
                 # Vérification BR
                 if rec.order_id.purchase_ids.mapped('picking_ids'):
                     late_receipt_pickings = rec.order_id.purchase_ids.mapped('picking_ids').filtered(
-                        lambda p: p.state != 'done' and p.min_date < fields.Datetime.now())
+                        lambda p: p.state not in ['done', 'cancel'] and p.min_date < fields.Datetime.now())
                     if late_receipt_pickings:
                         alerts |= self.env.ref('of_followup.of_followup_project_alert_br')
                 rec.alert_ids = alerts
@@ -253,12 +254,13 @@ class OFFollowupProject(models.Model):
 
     @api.multi
     def _compute_alert_display(self):
+        alert_date = self.env.ref('of_followup.of_followup_project_alert_date')
         for rec in self:
             date_alert = []
             picking_alert = []
             if rec.alert_ids:
                 for alert in rec.alert_ids:
-                    if alert == self.env.ref('of_followup.of_followup_project_alert_date'):
+                    if alert == alert_date:
                         date_alert.append(alert.name)
                     else:
                         picking_alert.append(alert.name)
@@ -325,7 +327,8 @@ class OFFollowupProject(models.Model):
     def onchange_template_id(self):
         if not self.template_id:
             return
-        new_tasks = []
+        predefined_new_tasks = []
+        other_new_tasks = []
         for task in self.template_id.task_ids:
             vals = {'sequence': task.sequence, 'type_id': task.type_id.id, 'name': task.name}
             state = self.env['of.followup.task.type.state'].search(
@@ -333,10 +336,11 @@ class OFFollowupProject(models.Model):
             if state:
                 if task.predefined_task:
                     vals.update({'predefined_state_id': state.id})
+                    predefined_new_tasks += [(0, 0, vals)]
                 else:
                     vals.update({'state_id': state.id})
-            new_tasks += [(0, 0, vals)]
-        return {'value': {'task_ids': new_tasks}}
+                    other_new_tasks += [(0, 0, vals)]
+        return {'value': {'predefined_task_ids': predefined_new_tasks, 'other_task_ids': other_new_tasks}}
 
     @api.onchange('force_laying_date')
     def onchange_force_laying_date(self):
@@ -382,6 +386,12 @@ class OFFollowupProject(models.Model):
             result['views'] = [(res and res.id or False, 'form')]
             result['res_id'] = pick_ids and pick_ids[0] or False
         return result
+
+    @api.model
+    def create(self, vals):
+        res = super(OFFollowupProject, self).create(vals)
+        res.order_id.write({'of_followup_project_id': res.id})
+        return res
 
 
 class OFFollowupProjectStage(models.Model):
@@ -455,7 +465,7 @@ class OFFollowupTask(models.Model):
             if rec.type_id == self.env.ref('of_followup.of_followup_task_type_planif'):
                 interventions = rec.planif_intervention_ids
                 # Il existe des RDV d'intervention et ils sont tous au statut 'Réalisé'
-                if interventions and not interventions.filtered(lambda i: i.state != 'done'):
+                if interventions and not interventions.filtered(lambda i: i.state not in ['done', 'cancel']):
                     rec.predefined_state_id = self.env.ref('of_followup.of_followup_task_type_state_planif_03')
                 #  Il existe au moins un RDV d'intervention au statut 'Confirmé'
                 elif interventions.filtered(lambda i: i.state == 'confirm'):
@@ -982,8 +992,6 @@ class SaleOrder(models.Model):
                             vals.update({'state_id': state.id})
                     new_tasks += [(0, 0, vals)]
                 followup_project.task_ids = new_tasks
-
-            self.of_followup_project_id = followup_project.id
 
             if self._context.get('auto_followup'):
                 return True
