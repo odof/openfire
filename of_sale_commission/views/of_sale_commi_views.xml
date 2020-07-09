@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Profils de commission -->
+    <record id="view_of_sale_profcommi_form" model="ir.ui.view">
+        <field name="name">of.sale.profcommi.form</field>
+        <field name="model">of.sale.profcommi</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="taux_commi"/>
+                    <field name="taux_acompte"/>
+                    <field name="taux_solde"/>
+                </group>
+                <notebook>
+                    <page string="Commissions">
+                        <field name="profcommi_line_ids">
+                            <tree string="Taux par catégorie de produits" editable="bottom">
+                                <field name="sequence" string="Séquence"/>
+                                <field name="name" string="Libellé"/>
+                                <field name="regcommi_id" string="Règle"/>
+                                <field name="taux_commi" string="Pourcentage"/>
+                                <field name="type" string="Type"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <page string="Utilisateurs">
+                        <field name="user_ids"/>
+                    </page>
+                </notebook>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_of_sale_profcommi_tree" model="ir.ui.view">
+        <field name="name">of.sale.profcommi.tree</field>
+        <field name="model">of.sale.profcommi</field>
+        <field name="arch" type="xml">
+            <tree string="Profil Commissions" >
+                <field name="name"/>
+                <field name="taux_commi"/>
+                <field name="taux_acompte"/>
+                <field name="taux_solde"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Règles de commission -->
+    <record id="view_of_sale_regcommi_form" model="ir.ui.view">
+        <field name="name">of.sale.regcommi.form</field>
+        <field name="model">of.sale.regcommi</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="code"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_of_sale_regcommi_tree" model="ir.ui.view">
+        <field name="name">of.sale.regcommi.tree</field>
+        <field name="model">of.sale.regcommi</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Commissions -->
+    <record id="of_sale_commi_filter" model="ir.ui.view">
+        <field name="name">of.sale.commi.filter</field>
+        <field name="model">of.sale.commi</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="user_id"/>
+                <field name="type"/>
+                <filter string="Brouillon" name="state_draft" domain="[('state','=','draft')]" />
+                <filter string="À payer" name="state_to_pay" domain="[('state','in',('to_pay','to_cancel'))]" />
+                <filter string="Payé" name="state_paid" domain="[('state','in',('paid','paid_cancel'))]" />
+                <filter string="Annulé" name="state_cancel" domain="[('state','in',('cancel','paid_cancel'))]" />
+                <separator/>
+                <filter string="Acompte" name="type_acompte" domain="[('type','=','acompte')]" />
+                <filter string="Règlement" name="type_solde" domain="[('type','=','solde')]" />
+                <filter string="Avoir client" name="type_avoir" domain="[('type','=','avoir')]" />
+                <group expand="0" string="Regrouper par...">
+                   <filter string="Commercial" domain="[]" context="{'group_by': 'user_id'}" />
+                   <filter string="État" domain="[]" context="{'group_by': 'state'}" />
+                </group>
+             </search>
+        </field>
+    </record>
+
+    <record id="of_sale_commi_view_form" model="ir.ui.view">
+        <field name="name">of.sale.commi.form</field>
+        <field name="model">of.sale.commi</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_cancel" states="paid" string="Annuler" type="object"
+                            help="Génère une annulation de commission"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" invisible="1"/>
+                            <field name="user_id" widget="selection"
+                                   attrs="{'readonly':[('state','in',('paid','to_cancel','paid_cancel'))]}" />
+                            <field name="partner_id" readonly="1" />
+                            <field name="order_id" attrs="{'invisible':[('type','!=','acompte')]}" />
+                            <field name="invoice_id" attrs="{'invisible':[('type','!=','solde')]}"
+                                   context="{'form_view_ref' : 'account.invoice_form'}"/>
+                            <field name="date_valid" attrs="{'readonly':[('state','in',('paid','to_cancel','paid_cancel'))]}"/>
+                            <!-- widget="many2many_tags" est nécessaire ici,
+                             sans quoi le lien ne se fera pas lors d'une création de commission depuis une facture -->
+                            <field name="order_commi_ids" widget="many2many_tags" invisible="1"/>
+                            <field name="inv_commi_id" invisible="1"/>
+                            <field name="compl_du" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="type" readonly="1" />
+                            <field name="state" readonly="1" />
+                            <field name="date_paiement" readonly="1"/>
+                        </group>
+                    </group>
+                    <field name="commi_line_ids" colspan="6" nolabel="1" mode="tree"
+                           attrs="{'readonly':['|',('user_id','=',False),('state','in',('paid','to_cancel','paid_cancel'))]}"
+                           context="{'commi_type': type}"/>
+                    <group class="oe_subtotal_footer oe_right">
+                        <field name="total_vente" invisible="1" />
+                        <field name="total_commi" invisible="1" attrs="{'readonly':[('state','in',('paid','to_cancel','paid_cancel'))]}"/>
+                        <field name="total_du" widget="monetary"
+                               attrs="{'invisible':[('type','!=','acompte')],'readonly':[('state','in',('paid','to_cancel','paid_cancel'))]}"/>
+                        <field name="total_du_b" widget="monetary"
+                               attrs="{'invisible':[('type','=','acompte')]}"/>
+                    </group>
+                    <br/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_sale_commi_view_tree" model="ir.ui.view">
+        <field name="name">of.sale.commi.tree</field>
+        <field name="model">of.sale.commi</field>
+        <field name="arch" type="xml">
+            <tree string="Commissions">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="user_id"/>
+                <field name="state"/>
+                <field name="type"/>
+                <field name="date_valid"/>
+                <field name="date_paiement"/>
+                <field name="total_vente"/>
+                <field name="total_commi" sum="Total commissions" readonly="False"/>
+                <field name="compl_du" sum="Total commissions déjà versées"/>
+                <field name="total_du" sum="Commissions dues" attrs="{'readonly':[('type','=','solde')]}"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Lignes de commission -->
+    <record id="of_sale_commi_line_view_form" model="ir.ui.view">
+        <field name="name">of.sale.commi.line.form</field>
+        <field name="model">of.sale.commi.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="product_id"/>
+                <field name="qty"/>
+                <field name="prix_vente"/>
+                <field name="taux_commi"/>
+                <field name="px_commi"/>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_sale_commi_line_view_tree" model="ir.ui.view">
+        <field name="name">of.sale.commi.line.tree</field>
+        <field name="model">of.sale.commi.line</field>
+        <field name="arch" type="xml">
+            <tree string="Liste des ventes" editable="bottom" create="false">
+                <field name="type" invisible="1"/>
+                <field name="order_line_id" invisible="context.get('commi_type') in ('solde', 'avoir')"/>
+                <field name="invoice_line_id" invisible="context.get('commi_type') == 'acompte'"/>
+                <field name="product_id" invisible="1"/>
+                <field name="qty"/>
+                <field name="prix_vente" sum="Total Ventes HT"/>
+                <field name="taux_commi"/>
+                <field name="px_commi" sum="Total Commissions"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Res Users -->
+
+    <record id="view_of_sale_profcommi_user" model="ir.ui.view">
+        <field name="name">of.res.user.profcommi.tree</field>
+        <field name="model">res.users</field>
+        <field name="priority" eval="20"/>
+        <field name="arch" type="xml">
+             <tree string="Profils de commission" editable="bottom">
+                <field name="name"/>
+                <field name="of_profcommi_id" options='{"no_create": True}'/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Sale Order -->
+    <record id="of_sale_commi_view_order_form" model="ir.ui.view">
+        <field name="name">of.sale.commi.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']/button[@name='action_view_invoice']" position="after">
+                <button class="oe_stat_button" name="action_view_commissions" type="object" icon="fa-money"
+                    attrs="{'invisible': [('state', 'in', ('draft', 'sent'))]}">
+                    <field string="Commissions" name="of_nb_commis" widget="statinfo"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Account Invoice -->
+    <record id="of_sale_commi_view_invoice_form" model="ir.ui.view">
+        <field name="name">of.sale.commi.invoice.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="of_account.of_account_invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" name="action_view_commissions" type="object" icon="fa-money">
+                    <field string="Commissions" name="of_nb_commis" widget="statinfo"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_of_sale_regcommi_tree" model="ir.actions.act_window">
+        <field name="name">Règles de commission</field>
+        <field name="res_model">of.sale.regcommi</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <record id="action_of_sale_profcommi_tree" model="ir.actions.act_window">
+        <field name="name">Profils de commissions</field>
+        <field name="res_model">of.sale.profcommi</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <record id="action_of_sale_commi_tree" model="ir.actions.act_window">
+        <field name="name">Commissions</field>
+        <field name="res_model">of.sale.commi</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <record id="action_res_users_tree" model="ir.actions.act_window">
+        <field name="name">Attribution de profils</field>
+        <field name="res_model">res.users</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_of_sale_profcommi_user"/>
+    </record>
+
+    <!-- Menus -->
+    <menuitem name="Commissions" id="menu_of_sale_commi" parent="sales_team.menu_sale_report"
+              sequence="50" action="action_of_sale_commi_tree"/>
+    <menuitem name="Commissions" id="menu_of_sale_commi_inv" parent="account.menu_finance_receivables"
+              sequence="90" action="action_of_sale_commi_tree"/>
+
+
+    <menuitem name="Commissions" id="menu_of_sale_commi_configuration" parent="sales_team.menu_sale_config"
+              sequence="7"/>
+    <menuitem name="Règles" action="action_of_sale_regcommi_tree" id="menu_of_sale_regcommi_tree"
+              parent="menu_of_sale_commi_configuration" sequence="1"/>
+    <menuitem name="Profils" action="action_of_sale_profcommi_tree" id="menu_of_sale_profcommi_tree"
+              parent="menu_of_sale_commi_configuration" sequence="2"/>
+    <menuitem name="Attribution de profils" action="action_res_users_tree" id="menu_of_sale_profcommi_user"
+              parent="menu_of_sale_commi_configuration" sequence="3"/>
+
+
+
+    <menuitem action="base.action_partner_category_form" id="sales_team.menu_partner_category_form"
+              name="Contact Tags" sequence="1" parent="sales_team.menu_config_address_book"
+              groups="-base.group_no_one"/>
+
+
+</odoo>

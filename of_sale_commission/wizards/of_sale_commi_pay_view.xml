@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Profils de commission -->
+    <record id="view_of_sale_commi_pay_form" model="ir.ui.view">
+        <field name="name">of.sale.commi.pay.form</field>
+        <field name="model">of.sale.commi.pay</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="draft" invisible="1"/>
+                <field name="cancel" invisible="1"/>
+                <field name="paid" invisible="1"/>
+                <div>
+                    <b>Confirmer le paiement des commissions</b>
+                </div>
+                <div attrs="{'invisible':[('draft', '=', False)]}">
+                    Attention! Vous avez sélectionné au moins une commission encore en brouillon.
+                    Confirmez-vous le paiement?
+                </div>
+                <div attrs="{'invisible':[('cancel', '=', False)]}">
+                    Attention! Vous avez sélectionné au moins une commission annulée.
+                    Si vous continuez ces commissions ne seront pas traitées.
+                </div>
+                <div attrs="{'invisible':[('paid', '=', False)]}">
+                    Attention! Vous avez sélectionné au moins une commission déjà payée.
+                    Si vous continuez ces commissions ne seront pas traitées.
+                </div>
+                <group>
+                    <field name="date"/>
+                </group>
+                <footer>
+                    <button string="Confirmer Paiement" name="confirmer_paiement" type="object" class="btn-primary"/>
+                    <button string="Annuler" class="btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window
+        id="action_commi_paiement_confirm"
+        multi="True"
+        key2="client_action_multi" name="Confirmer le paiement des commissions"
+        res_model="of.sale.commi.pay" src_model="of.sale.commi"
+        view_mode="form" target="new" view_type="form" />
+
+</odoo>
