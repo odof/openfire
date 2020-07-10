@@ -478,7 +478,7 @@ class OfPlanningIntervention(models.Model):
 ######################## debut de verifier / refaire
     interv_before_id = fields.Many2one('of.planning.intervention', compute="_compute_interventions_before_after", store=True)
     interv_after_id = fields.Many2one('of.planning.intervention', compute="_compute_interventions_before_after", store=True)
-    before_to_this = fields.Float(compute="_compute_interval", store=True, digits=(12, 5))
+    before_to_this = fields.Float()#compute="_compute_interval", store=True, digits=(12, 5))
 
     line_ids = fields.One2many('of.planning.intervention.line', 'intervention_id', string='Lignes de facturation')
     lien_commande = fields.Boolean(string='Facturation sur commande', compute='_compute_lien_commande')

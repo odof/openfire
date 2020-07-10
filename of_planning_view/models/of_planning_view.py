@@ -6,7 +6,7 @@ from odoo.tools.float_utils import float_compare
 from odoo import models, fields, api
 import json
 from odoo.addons.of_planning_tournee.wizard.rdv import hours_to_strs
-from odoo.addons.of_utils.models.of_utils import se_chevauchent
+from odoo.addons.of_utils.models.of_utils import float_2_heures_minutes
 
 import pytz
 from datetime import datetime, timedelta
@@ -94,6 +94,8 @@ class OfPlanningIntervention(models.Model):
         lieu_retour = employee.of_address_retour_id and employee.of_address_retour_id.get_infos_lieu() or False
         tournee = self.env['of.planning.tournee'].search([('date', '=', date), ('employee_id', '=', employee_id)],
                                                          limit=1)
+        date_da = fields.Date.from_string(date)
+        tz = pytz.timezone(self._context.get('tz', 'Europe/Paris'))
         if tournee:
             secteur = tournee.secteur_id
             # les lieux de départ et de retour d'une tournée priment sur ceux de l'employé
@@ -143,13 +145,21 @@ class OfPlanningIntervention(models.Model):
                 #    ou quand deux interventions se suivent sur un créneau
                 creneaux_reels = [creneau_reel for creneau_reel in creneaux_reels
                                   if float_compare(creneau_reel[0], creneau_reel[1], compare_precision) == -1]
-                if creneaux_reels:
+                for cren in creneaux_reels:
+                    date_deb_locale_dt = datetime.combine(date_da, datetime.min.time()) + timedelta(
+                        hours=cren[0])
+                    date_deb_utc_dt = tz.localize(date_deb_locale_dt, is_dst=None).astimezone(pytz.utc)
+                    date_fin_locale_dt = datetime.combine(date_da, datetime.min.time()) + timedelta(
+                        hours=cren[1])
+                    date_fin_utc_dt = tz.localize(date_fin_locale_dt, is_dst=None).astimezone(pytz.utc)
                     creneaux.append({
-                        'heure_debut': heure_debut,
-                        'heure_fin': creneaux_reels[-1][1],
+                        'date_prompt': fields.Datetime.to_string(date_deb_utc_dt),
+                        'date_deadline_prompt': fields.Datetime.to_string(date_fin_utc_dt),
+                        'heure_debut': cren[0],
+                        'heure_fin': cren[1],
                         'lieu_debut': lieu_depart,
                         'lieu_fin': lieu_fin,
-                        'duree': sum(hor[1] - hor[0] for hor in creneaux_reels),
+                        'duree': cren[1] - cren[0],#sum(hor[1] - hor[0] for hor in creneaux_reels),
                         'creneaux_reels': creneaux_reels,
                         'secteur_id': secteur and secteur.id or False,
                         'secteur_str': secteur_str,
@@ -191,11 +201,11 @@ class OfPlanningIntervention(models.Model):
 
     @api.model
     def get_emp_horaires_info(self, employee_ids, date_start, date_stop, horaires_list_dict=False):
-        intervention_obj = self.env['of.planning.intervention']
         employee_obj = self.env['hr.employee']
         employees = employee_obj.browse(employee_ids)
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')
+        intervention_obj = self.env['of.planning.intervention'].with_context(tz=self._context.get('tz'))
         tz = pytz.timezone(self._context['tz'])
         tz_offset = datetime.now(tz).strftime('%z')
         compare_precision = 5

@@ -30,6 +30,7 @@ CalendarView.include({
             this.$calendar.fullCalendar('refetchEvents');
         },
         'filters_rendered': 'on_filters_rendered',
+        'res_horaires_calc': 'on_res_horaires_calc',
     },
 
     init: function () {
@@ -123,12 +124,68 @@ CalendarView.include({
             return $.when();
         });
     },
+    set_res_horaires_data: function(res_ids=false, start=false, end=false, get_segments=false) {
+        var self = this;
+        var dfd = $.Deferred();
+        var p = dfd.promise()
+        res_ids = res_ids || self.view_res_ids;
+        start = start || self.range_start;
+        end = moment(start).endOf(this.mode || "week")._d;
+        console.log(this.mode);
+        console.log("start/range_start",start,self.range_start);
+        console.log("end/range_stop",end,self.range_stop);
+
+        var Planning = new Model(self.model);
+        Planning.call('get_emp_horaires_info', [res_ids, start, end, get_segments])
+        .then(function (result) {
+            if (isNullOrUndef(self.res_horaires_info)) {
+                self.res_horaires_info = result;
+            }else{
+                for (var i=0; i<res_ids.length; i++) {
+                    self.res_horaires_info[res_ids[i]] = result[res_ids[i]];
+                }
+            }
+
+            dfd.resolve();
+        });
+        return $.when(p).then(function() {
+            //console.log("créneaux dispo",self.res_horaires_info);
+            self.events_dispo = [];
+            var attendee_data, creneaux_dispo_jour, creneau_dispo;
+            for (var k in self.res_horaires_info) {
+                //console.log("k",k);
+                attendee_data = self.res_horaires_info[k];
+                for (var i=0; i<attendee_data.creneaux_dispo.length; i++) {
+                    //console.log("i",i);
+                    creneaux_dispo_jour = attendee_data.creneaux_dispo[i];
+                    for (var j=0; j<creneaux_dispo_jour.length; j++) {
+                        creneau_dispo = creneaux_dispo_jour[j];
+                        creneau_dispo["calendar_name"] = "Dispo";
+                        creneau_dispo["color_filter_id"] = k;
+                        //creneau_dispo["date_prompt"] = "Dispo";
+                        //creneau_dispo["date_deadline_prompt"] = "Dispo";
+                        creneau_dispo["employee_ids"] = [k];
+                        creneau_dispo["id"] = -1;
+                        creneau_dispo["of_color_bg"] = "#FFFFFF";
+                        creneau_dispo["of_color_ft"] = "#000000";
+                        creneau_dispo["state"] = "Dispo";
+                        creneau_dispo["state_int"] = 0;
+                        creneau_dispo["disponible"] = true;
+                        self.events_dispo.push(creneau_dispo)
+                        //console.log("j",j);
+                    }
+                }
+            }
+            return $.when();
+        });
+    },
     /**
      * override copy of parent function. Sets up first event to be displayed. Handles radio filters
      */
     _do_search: function (domain, context, _group_by) {
         var self = this;
         self.dfd_filters_rendered = $.Deferred(); // asynchronicity event colors. we need filteres to be rendered to know what color to put on events
+        self.dfd_res_horaires_calc = $.Deferred();
         if (! self.all_filters) {
             self.all_filters = {};
         }
@@ -138,6 +195,7 @@ CalendarView.include({
         }
         this.event_source = {
             events: function(start, end, callback) {
+                self.dfd_res_horaires_calc = $.Deferred();
                 // catch invalid dates (start/end dates not parseable yet)
                 // => ignore request
                 if (isNaN(start) || isNaN(end)) {
@@ -340,6 +398,13 @@ CalendarView.include({
                             console.log("OUPSY NO SIDEBAR")
                         }
                     }
+                    self.set_res_horaires_data(self.now_filter_ids, start, end).then(function(){
+                        //console.log("events",events);
+                        //console.log("self.events_dispo",self.events_dispo);
+                        //events += self.events_dispo;
+                        self.dfd_res_horaires_calc.resolve()
+                    });
+                    
 
                     var all_attendees = $.map(events, function (e) { return e[self.attendee_people]; });
                     all_attendees = _.chain(all_attendees).flatten().uniq().value();
@@ -351,7 +416,18 @@ CalendarView.include({
                                 self.all_attendees[item.id] = item.name;
                             });
                         }).done(function() {
-                            return $.when(self.dfd_filters_rendered).then(function() {return self.perform_necessary_name_gets(events).then(callback)});
+                            return $.when(self.dfd_filters_rendered, self.dfd_res_horaires_calc)
+                            .then(function() {
+                                return self.perform_necessary_name_gets(events)
+                            })
+                            .then(function(){
+                                for (var i=0; i<self.events_dispo.length; i++) {
+                                    events.push(self.events_dispo[i]);
+                                }
+                                //console.log(events);
+                                return events;
+                            })
+                            .then(callback);
                             //return self.perform_necessary_name_gets(events).then(callback);
                         });
                     }
@@ -360,7 +436,18 @@ CalendarView.include({
                                 self.all_attendees[item] = '';
                         });
                         //return self.perform_necessary_name_gets(events).then(callback)
-                        return $.when(self.dfd_filters_rendered).then(function() {return self.perform_necessary_name_gets(events).then(callback)});//, 100);  // ici
+                        return $.when(self.dfd_filters_rendered, self.dfd_res_horaires_calc)
+                            .then(function() {
+                                return self.perform_necessary_name_gets(events)
+                            })
+                            .then(function(){
+                                for (var i=0; i<self.events_dispo.length; i++) {
+                                    events.push(self.events_dispo[i]);
+                                }
+                                //console.log(events);
+                                return events;
+                            })
+                            .then(callback);//, 100);  // ici
                     }
                     //////////////////////////////////////////////////////////////////////////////////
                 });
@@ -427,6 +514,9 @@ CalendarView.include({
     },
     on_filters_rendered: function() {
         this.dfd_filters_rendered.resolve();
+    },
+    on_res_horaires_calc: function() {
+        this.dfd_res_horaires_calc.resolve();
     },
     /**
      *  called by CalendarView.get_all_filters_ordered if custom_colors set to true
@@ -601,7 +691,7 @@ CalendarView.include({
             var the_title_avatar = '';
 
             if (! _.isUndefined(this.attendee_people)) {
-                var MAX_ATTENDEES = 3;
+                var MAX_ATTENDEES = 10;
                 var attendee_showed = 0;
                 var attendee_other = '';
                 var found = false;
@@ -622,7 +712,7 @@ CalendarView.include({
                                                 ? self.all_filters[the_attendee_people].color
                                                 : (self.all_filters[-1] ? self.all_filters[-1].color : 1);
                                     the_title_avatar += '<i class="fa fa-user o_attendee_head o_underline_color_'+tempColor+'" title="' + _.escape(self.all_attendees[the_attendee_people]) + '" ></i>';
-                                }else if (self.attendee_multiple) {
+                                }else if (self.attendee_multiple && isNullOrUndef(evt["disponible"])) {
                                     var tempColorFT, tempColorBG;
                                     var now_id;
 
@@ -642,7 +732,16 @@ CalendarView.include({
                                             'style="background: ' + tempColorBG + '; border: 1px solid #0D0D0D; position: absolute; right: ' + icon_offset_px + 'px;" ></i>';
                                         icon_offset_px += 15;
                                     }
-                                }//else don't add myself
+                                }else if (evt["disponible"]){
+                                    var tempColorFT, tempColorBG;
+                                    var now_id;
+
+                                    now_id = the_attendee_people;
+                                    tempColorFT = self.all_filters[now_id].color_ft;
+                                    tempColorBG = self.all_filters[now_id].color_bg;
+                                    the_title_avatar += '<i class="of_calendar_evt_top of_calendar_attendee_box" title="' + _.escape(self.all_attendees[the_attendee_people]) + '"' +
+                                                'style="background: ' + tempColorBG + '; border: 1px solid #0D0D0D; position: absolute; right: ' + icon_offset_px + 'px;" ></i>';
+                                }
                             }
                         }
                         else {
@@ -688,8 +787,15 @@ CalendarView.include({
                 r.textColor = self.all_filters[index]['color_ft'];
             }else if (self.attendee_multiple) {  // multiple attendees
                 if (!isNullOrUndef(evt["color_filter_id"])) {
-                    r.backgroundColor = self.all_filters[ evt["color_filter_id"] ]['color_bg'];
-                    r.textColor = self.all_filters[ evt["color_filter_id"] ]['color_ft'];
+                    if (evt["disponible"]) {
+                        //console.log("DISPO");
+                        r.backgroundColor = "rgba(127,255,0,0.2)"//"#7FFF00";//
+                        r.textColor = "rgba(12,12,12,0.5)";//"#0C0C0C";//
+                    }else{
+                        //console.log("pas dispo...");
+                        r.backgroundColor = self.all_filters[ evt["color_filter_id"] ]['color_bg'];
+                        r.textColor = self.all_filters[ evt["color_filter_id"] ]['color_ft'];
+                    }
                 }else{
                     console.log("oups! something went wrong with multiple attendees colors");
                 }
