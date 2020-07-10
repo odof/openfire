@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import json
 
 from odoo import api, fields, models
@@ -29,7 +29,7 @@ class OFFollowupProject(models.Model):
          ('ready', u'Prêt'),
          ('done', u'Terminé'),
          ('cancel', u'Annulé')],
-        string=u"Etat du dossier", compute='_compute_state', search='_search_state')
+        string=u"Etat du dossier", compute='_compute_state', store=True)
     is_done = fields.Boolean(string=u"Est terminé")
     order_id = fields.Many2one(comodel_name='sale.order', string=u"Commande", required=True, copy=False)
     partner_id = fields.Many2one(related='order_id.partner_id', string=u"Client", readonly=True)
@@ -91,23 +91,30 @@ class OFFollowupProject(models.Model):
         return stage_ids
 
     @api.multi
-    @api.depends('reference_laying_date')
+    @api.depends('reference_laying_date', 'state')
     def _compute_stage_id(self):
         for rec in self:
-            laying_date = rec.reference_laying_date
-            if laying_date:
-                laying_date = datetime.strptime(laying_date, "%Y-%m-%d").date()
-                today = date.today()
-                if laying_date < today:
-                    rec.stage_id = self.env['of.followup.project.stage'].search([('code', '=', 's+')], limit=1)
-                else:
-                    week_diff = laying_date.isocalendar()[1] - today.isocalendar()[1]
-                    rec.stage_id = self.env['of.followup.project.stage'].search(
-                        [('week_diff_min', '<=', week_diff), ('week_diff_max', '>=', week_diff)], limit=1)
+            if rec.state == 'done':
+                rec.stage_id = self.env['of.followup.project.stage'].search([('code', '=', 'done')], limit=1)
             else:
-                rec.stage_id = self.env['of.followup.project.stage'].search([('code', '=', 'new')], limit=1)
+                laying_date = rec.reference_laying_date
+                if laying_date:
+                    laying_date = datetime.strptime(laying_date, "%Y-%m-%d").date()
+                    today = date.today()
+                    if laying_date < today:
+                        rec.stage_id = self.env['of.followup.project.stage'].search([('code', '=', 's+')], limit=1)
+                    else:
+                        monday1 = (laying_date - timedelta(days=laying_date.weekday()))
+                        monday2 = (today - timedelta(days=today.weekday()))
+                        week_diff = (monday1 - monday2).days / 7
+                        rec.stage_id = self.env['of.followup.project.stage'].search(
+                            [('week_diff_min', '<=', week_diff), ('week_diff_max', '>=', week_diff)], limit=1)
+                else:
+                    rec.stage_id = self.env['of.followup.project.stage'].search([('code', '=', 'new')], limit=1)
 
     @api.multi
+    @api.depends('order_id', 'order_id.state', 'is_done', 'task_ids', 'task_ids.is_not_processed', 'task_ids.is_done',
+                 'task_ids.is_late')
     def _compute_state(self):
         for rec in self:
             # Si commande annulée, le suivi est à l'état annulé également
@@ -121,19 +128,12 @@ class OFFollowupProject(models.Model):
                     state = 'done'
                 else:
                     # Toutes les tâches sont terminées (excepté les non traitées)
-                    if rec.task_ids and not rec.task_ids.filtered(lambda t: not t.is_not_processed).\
-                            filtered(lambda t: not t.is_done):
+                    if rec.task_ids and not rec.task_ids.filtered(lambda t: not t.is_not_processed and not t.is_done):
                         state = 'ready'
                     # Au moins une tâche est en retard
                     elif rec.task_ids.filtered(lambda t: t.is_late):
                         state = 'late'
                 rec.state = state
-
-    @api.model
-    def _search_state(self, operator, value):
-        if operator == '=':
-            followups = self.search([]).filtered(lambda f: f.state == value)
-            return [('id', 'in', followups.ids)]
 
     @api.multi
     @api.depends('force_laying_date', 'manual_laying_date', 'order_id', 'order_id.intervention_ids',
@@ -392,6 +392,11 @@ class OFFollowupProject(models.Model):
         res = super(OFFollowupProject, self).create(vals)
         res.order_id.write({'of_followup_project_id': res.id})
         return res
+
+    @api.model
+    def cron_move_project(self):
+        for project in self.search([]):
+            project._compute_stage_id()
 
 
 class OFFollowupProjectStage(models.Model):

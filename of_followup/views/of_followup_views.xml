@@ -227,6 +227,8 @@
                 <filter name='ready' string="Prêts" domain="[('state', '=', 'ready')]"/>
                 <filter name='done' string="Terminés" domain="[('state', '=', 'done')]"/>
                 <filter name='cancel' string="Annulés" domain="[('state', '=', 'cancel')]"/>
+                <separator/>
+                <filter name='not_done' string="Non terminés" domain="[('state', '!=', 'done')]"/>
             </search>
         </field>
     </record>
@@ -235,6 +237,7 @@
         <field name="name">Suivi des projets</field>
         <field name="res_model">of.followup.project</field>
         <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{'search_default_not_done': 1}</field>
     </record>
 
     <!-- Followup Task Views -->
