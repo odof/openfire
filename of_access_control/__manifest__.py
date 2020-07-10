@@ -14,12 +14,13 @@ Module de gestion des contrôles d'accès
 """,
     'website': "www.openfire.fr",
     'depends': [
-        'crm',
+        'of_crm',
     ],
     'data': [
         'security/of_access_control_security.xml',
         'security/ir.model.access.csv',
         'views/res_users_views.xml',
+        'views/menus.xml',
     ],
     'qweb': [
     ],
