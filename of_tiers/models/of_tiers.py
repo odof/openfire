@@ -3,6 +3,7 @@
 from odoo import models, fields, api
 from odoo.tools.safe_eval import safe_eval
 
+
 class ResCompany(models.Model):
     _inherit = "res.company"
 
@@ -37,111 +38,84 @@ class ResCompany(models.Model):
     def set_of_code_client_defaults(self):
         return self.env['ir.values'].sudo().set_default('res.company', '', self.pdf_adresse_nom_parent)
 
+
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
     @api.multi
-    def _update_account(self):
+    def update_account(self):
         """
         Création / Mise à jour du compte de tiers des clients.
         """
-        partner_obj = self.env['res.partner']
-        # Ce verrou est normalement inutile car les appels _update_account() se font après les appels super() dans create et write
-        if self._context.get('of_no_update_partner_account'):
-            return
-        # On se place en mode sudo pour pouvoir créer des comptes dans toutes les sociétés
-        self = self.sudo().with_context(of_no_update_partner_account=True)
-        companies = self.env['res.company'].search([('chart_template_id', '!=', False)])
-
         # Pas de création de compte de tiers pour les contacts, mais uniquement pour les vrais partenaires
-        partners = self.search([('id', 'in', self._ids), '|', ('is_company', '=', True), ('parent_id', '=', False)])
+        partners = self.mapped('commercial_partner_id')
         if not partners:
             return
 
-        for company in companies:
-            partners = partners.with_context(force_company=company.id)
-            self = self.with_context(force_company=company.id)
+        # On se place en sudo pour pouvoir générer les comptes, mais il faut forcer la société de l'utilisateur
+        company = self.env.user.company_id
+        self = self.sudo().with_context(force_company=company.id)
+        partners = partners.with_context(force_company=company.id)
 
-            data_obj = self.env['ir.model.data']
-            ac_obj = self.env['account.account']
+        data_obj = self.env['ir.model.data']
+        ac_obj = self.env['account.account']
 
-            default_account_receivable = self.env['ir.property'].get('property_account_receivable_id', self._name)
-            default_account_payable = self.env['ir.property'].get('property_account_payable_id', self._name)
+        default_account_receivable = self.env['ir.property'].get('property_account_receivable_id', self._name)
+        default_account_payable = self.env['ir.property'].get('property_account_payable_id', self._name)
 
-            if not (default_account_payable and default_account_receivable):
-                # La comptabilité de la société n'est pas configurée
-                continue
+        if not (default_account_payable and default_account_receivable):
+            # La comptabilité de la société n'est pas configurée
+            return
 
-            for partner in partners:
-                data = {}
-                # Si est un client
-                if partner.customer and company.of_code_client:
-                    # Création du compte de tiers
-                    code, name = safe_eval(company.of_code_client, {'partner': partner, 'company': company})
-                    if (partner.property_account_receivable_id or default_account_receivable) == default_account_receivable:
-                        account = ac_obj.search([('code', '=', code), ('company_id', '=', company.id)], limit=1)
-                        if account:
-                            data['property_account_receivable_id'] = account.id
-                            account.name = code
-                        else:
-                            type_id = data_obj.get_object_reference('account', 'data_account_type_receivable')[1]
-                            account_data = {
-                                'internal_type': 'receivable',
-                                'user_type_id': type_id,
-                                'code': code,
-                                'name': name,
-                                'reconcile': True,
-                                # Avec le module of_base_multicompany, il est utile de forcer la société à la même que celle du compte par défaut
-                                # et non celle de l'utilisateur (compte au niveau de la société, pas du magasin)
-                                'company_id': default_account_receivable.company_id.id
-                            }
-                            data['property_account_receivable_id'] = ac_obj.create(account_data)
-                    elif partner.property_account_receivable_id.name != name:
-                        # Mise à jour du libellé du compte de tiers
-                        account = partner.property_account_receivable_id
-                        account_partners = partner_obj.search([('property_account_receivable_id', '=', account.id)])
-                        for account_partner in account_partners:
-                            if account_partner.commercial_partner_id != partner.commercial_partner_id:
-                                name = account.code
-                                break
-                        if account.name != name:
-                            account.name = name
+        for partner in partners:
+            data = {}
+            # Si est un client
+            if partner.customer and company.of_code_client:
+                # Création du compte de tiers
+                code, name = safe_eval(company.of_code_client, {'partner': partner, 'company': company})
+                if (partner.property_account_receivable_id or default_account_receivable) == default_account_receivable:
+                    account = ac_obj.search([('code', '=', code), ('company_id', '=', company.id)], limit=1)
+                    if account:
+                        data['property_account_receivable_id'] = account.id
+                        account.name = code
+                    else:
+                        type_id = data_obj.get_object_reference('account', 'data_account_type_receivable')[1]
+                        account_data = {
+                            'internal_type': 'receivable',
+                            'user_type_id': type_id,
+                            'code': code,
+                            'name': name,
+                            'reconcile': True,
+                            # Avec le module of_base_multicompany, il est utile de forcer la société à la même que celle du compte par défaut
+                            # et non celle de l'utilisateur (compte au niveau de la société, pas du magasin)
+                            'company_id': default_account_receivable.company_id.id
+                        }
+                        data['property_account_receivable_id'] = ac_obj.create(account_data)
 
-                # Si est un fournisseur
-                if partner.supplier and company.of_code_fournisseur:
-                    # Création du compte de tiers
-                    code, name = safe_eval(company.of_code_fournisseur, {'partner': partner, 'company': company})
-                    if (partner.property_account_payable_id or default_account_payable) == default_account_payable:
-                        account = ac_obj.search([('code', '=', code), ('company_id', '=', company.id)], limit=1)
-                        if account:
-                            data['property_account_payable_id'] = account.id
-                            account.name = code
-                        else:
-                            type_id = data_obj.get_object_reference('account', 'data_account_type_payable')[1]
-                            account = {
-                                'internal_type': 'payable',
-                                'user_type_id': type_id,
-                                'code': code,
-                                'name': name,
-                                'reconcile': True,
-                                # Avec le module of_base_multicompany, il est utile de forcer la société à la même que celle du compte par défaut
-                                # et non celle de l'utilisateur (compte au niveau de la société, pas du magasin)
-                                'company_id': default_account_payable.company_id.id
-                            }
-                            data['property_account_payable_id'] = ac_obj.create(account)
-                    elif partner.property_account_payable_id.name != name:
-                        # Mise à jour du libellé du compte de tiers
-                        account = partner.property_account_payable_id
-                        account_partners = partner_obj.search([('property_account_payable_id', '=', account.id)])
-                        for account_partner in account_partners:
-                            if account_partner.commercial_partner_id != partner.commercial_partner_id:
-                                name = account.code
-                                break
-                        if account.name != name:
-                            account.name = name
-
-                if data:
-                    partner.write(data)
+            # Si est un fournisseur
+            if partner.supplier and company.of_code_fournisseur:
+                # Création du compte de tiers
+                code, name = safe_eval(company.of_code_fournisseur, {'partner': partner, 'company': company})
+                if (partner.property_account_payable_id or default_account_payable) == default_account_payable:
+                    account = ac_obj.search([('code', '=', code), ('company_id', '=', company.id)], limit=1)
+                    if account:
+                        data['property_account_payable_id'] = account.id
+                        account.name = code
+                    else:
+                        type_id = data_obj.get_object_reference('account', 'data_account_type_payable')[1]
+                        account = {
+                            'internal_type': 'payable',
+                            'user_type_id': type_id,
+                            'code': code,
+                            'name': name,
+                            'reconcile': True,
+                            # Avec le module of_base_multicompany, il est utile de forcer la société à la même que celle du compte par défaut
+                            # et non celle de l'utilisateur (compte au niveau de la société, pas du magasin)
+                            'company_id': default_account_payable.company_id.id
+                        }
+                        data['property_account_payable_id'] = ac_obj.create(account)
+            if data:
+                partner.write(data)
 
     @api.model
     def create(self, vals):
@@ -151,17 +125,7 @@ class ResPartner(models.Model):
         if partner.company_id.of_client_id_ref:
             if not partner.ref:
                 partner.ref = str(partner.id)
-
-        # Création des comptes comptables clients/fournisseurs
-        partner._update_account()
         return partner
-
-    @api.multi
-    def write(self, vals):
-        super(ResPartner, self).write(vals)
-        for partner in self:
-            partner._update_account()
-        return True
 
     @api.multi
     def unlink(self):
@@ -198,6 +162,7 @@ class ResPartner(models.Model):
             account_obj.browse(account_ids).unlink()
         return True
 
+
 class AccountConfigSettings(models.TransientModel):
     _inherit = 'account.config.settings'
 
@@ -206,3 +171,48 @@ class AccountConfigSettings(models.TransientModel):
     of_client_id_ref = fields.Boolean(
         related='company_id.of_client_id_ref', string=u"Utiliser les comptes de tiers comme références clients *",
         help=u"Affectation automatique de la partie variable du compte de tiers dans la référence du partenaire nouvellement créé")
+
+
+class AccountInvoice(models.Model):
+    _inherit = 'account.invoice'
+
+    @api.model
+    def create(self, vals):
+        partner_id = vals.get('partner_id')
+        if partner_id:
+            inv_type = vals.get('type') or self.default_get(['type'])['type']
+            field_name = (inv_type in ('out_invoice', 'out_refund')
+                          and 'property_account_receivable_id'
+                          or 'property_account_payable_id')
+            partner = self.env['res.partner'].browse(partner_id)
+            old_account = partner[field_name]
+            if old_account.id == vals.get('account_id'):
+                partner.update_account()
+                vals['account_id'] = partner[field_name].id
+        return super(AccountInvoice, self).create(vals)
+
+    @api.onchange('partner_id', 'company_id')
+    def _onchange_partner_id(self):
+        if self.partner_id:
+            self.partner_id.update_account()
+        return super(AccountInvoice, self)._onchange_partner_id()
+
+
+class AccountPayment(models.Model):
+    _inherit = 'account.payment'
+
+    @api.depends('invoice_ids', 'payment_type', 'partner_type', 'partner_id')
+    def _compute_destination_account_id(self):
+        if not self .invoice_ids and self.payment_type != 'transfer' and self.partner_id:
+            self.partner_id.update_account()
+        return super(AccountPayment, self)._compute_destination_account_id()
+
+
+class AccountMoveLine(models.Model):
+    _inherit = 'account.move.line'
+
+    @api.onchange('partner_id')
+    def _onchange_partner_id(self):
+        if self.partner_id:
+            self.partner_id.update_account()
+        return super(AccountMoveLine, self)._onchange_partner_id()
