@@ -38,3 +38,6 @@ access_project_issue_responsible,project.issue.responsible,project_issue.model_p
 base.access_res_company_group_erp_manager,res_company group_erp_manager,base.model_res_company,base.group_system,1,1,1,1
 
 base.access_res_users_group_erp_manager,res_users group_erp_manager,base.model_res_users,base.group_system,1,1,1,1
+
+of_crm.access_of_sale_objective_manager,of.sale.objective.manager,of_crm.model_of_sale_objective,of_group_project_responsible,1,1,1,1
+of_crm.access_of_sale_objective_line_manager,of.sale.objective.line.manager,of_crm.model_of_sale_objective_line,of_group_project_responsible,1,1,1,1
