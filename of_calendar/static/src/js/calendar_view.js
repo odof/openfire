@@ -393,7 +393,7 @@ CalendarView.include({
         fc.timeFormat = fc.timeFormat.replace(':ss', '');
         // callback
         fc.eventAfterAllRender = function(view) {
-            if (!isNullOrUndef(self.first_evt)) {
+            if (!isNullOrUndef(self.first_evt) && !!self.jump_to) {
                 self.on_event_after_all_render();
             }
         };
