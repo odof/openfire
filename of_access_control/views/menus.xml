@@ -13,4 +13,10 @@
         <field name="groups_id" eval="[(6, 0, [ref('stock.group_stock_manager')])]"/>
     </record>
 
+    <record id="of_crm.of_crm_of_sale_objective_menu" model="ir.ui.menu">
+        <field name="parent_id" ref="sales_team.menu_sales"/>
+        <field name="sequence" eval="110"/>
+        <field name="groups_id" eval="[(6, 0, [ref('of_group_project_responsible')])]"/>
+    </record>
+
 </odoo>
