@@ -74,6 +74,13 @@
             <field name="fold">True</field>
         </record>
 
+        <record id="of_followup_project_stage_done" model="of.followup.project.stage">
+            <field name="name">Terminé(s)</field>
+            <field name="code">done</field>
+            <field name="sequence">80</field>
+            <field name="fold">True</field>
+        </record>
+
         <!-- Types de tâches pré-définis -->
 
         <record id="of_followup_task_type_state_planif_01" model="of.followup.task.type.state">
@@ -281,6 +288,21 @@
 
         <record id="of_followup_project_alert_br" model="of.followup.project.alert">
             <field name="name">Vérifier BR</field>
+        </record>
+
+        <!-- Cron d'avancement des projets dans le workflow -->
+
+        <record id="of_followup_cron_move_projects" model="ir.cron">
+            <field name="name">Suivi des projets - Avancement</field>
+            <field name="model">of.followup.project</field>
+            <field name="function">cron_move_project</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">weeks</field>
+            <field name="nextcall"
+               eval="(datetime.now() + timedelta(days=(0 - datetime.now().weekday() + 7)%7)).strftime('%Y-%m-%d 02:00:00')"/>
+            <field name="numbercall">-1</field>
+            <field name="active">true</field>
+            <field name="args">()</field>
         </record>
 
         <!-- Modèle de mail -->
