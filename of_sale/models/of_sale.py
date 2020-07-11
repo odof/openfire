@@ -726,6 +726,9 @@ class SaleOrderLine(models.Model):
         # Remise interdite
         if self.product_id and self.product_id.of_forbidden_discount and self.of_discount_formula:
             self.of_discount_formula = False
+        if self.env.user.has_group('sale.group_sale_layout'):
+            if self.product_id and self.product_id.categ_id.of_layout_id:
+                self.layout_category_id = self.product_id.categ_id.of_layout_id
 
         return res
 
@@ -848,13 +851,6 @@ class SaleOrderLine(models.Model):
                     line.qty_to_invoice = line.qty_delivered - line.qty_invoiced
             else:
                 line.qty_to_invoice = 0
-
-    @api.onchange('product_id')
-    def product_id_change(self):
-        super(SaleOrderLine, self).product_id_change()
-        if self.env.user.has_group('sale.group_sale_layout'):
-            if self.product_id and self.product_id.categ_id.of_layout_id:
-                self.layout_category_id = self.product_id.categ_id.of_layout_id
 
 
 class AccountInvoiceLine(models.Model):
