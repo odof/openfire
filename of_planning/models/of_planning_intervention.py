@@ -32,7 +32,7 @@ class HREmployee(models.Model):
     of_toutes_taches = fields.Boolean(string=u'Apte à toutes les taches')
     of_equipe_ids = fields.Many2many('of.planning.equipe', 'of_planning_employee_rel', 'employee_id', 'equipe_id', u'Équipes')
     of_changed_intervention_id = fields.Many2one('of.planning.intervention', string=u"Dernière intervention modifiée")  # api.depends dans of.planning.intervention
-    of_est_intervenant = fields.Boolean(string=u"Est intervenant ?", default=False)
+    of_est_intervenant = fields.Boolean(string=u"Est intervenant", default=False)
 
     @api.multi
     def peut_faire(self, tache_id, all_required=False):
