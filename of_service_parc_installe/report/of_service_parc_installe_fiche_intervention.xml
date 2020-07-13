@@ -5,7 +5,7 @@
     <template id="of_parc_installe_extension_fiche_intervention_report" inherit_id="of_planning.of_fiche_intervention_report_template">
         <xpath expr="//t[@t-if='o.description and o.cleantext_description']" position="before">
             <t t-if="o.parc_installe_id">
-                <div style="page-break-inside: avoid;">
+                <div>
                     <div class="row h4 mb4">
                         <div class="col-xs-12"><strong>Parc installé</strong></div>
                     </div>

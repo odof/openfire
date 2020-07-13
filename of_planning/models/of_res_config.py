@@ -32,6 +32,8 @@ class OfInterventionSettings(models.TransientModel):
     color_ft_creneaux_indispo = fields.Char(string=u"(OF) Crenéaux indispo couleur texte", default="#0C0C0C",
                                           help=u"Choisissez un couleur de texte pour les créneaux dispos",)
 
+    fiche_intervention_cacher_montant = fields.Boolean(string=u"(OF) Cacher montant restant")
+
     @api.multi
     def set_calendar_min_time_defaults(self):
         if not 0 <= self.calendar_min_time < 24:
@@ -63,4 +65,10 @@ class OfInterventionSettings(models.TransientModel):
     @api.multi
     def set_color_ft_creneaux_indispo_defaults(self):
         return self.env['ir.values'].sudo().set_default('of.intervention.settings', 'color_ft_creneaux_indispo', self.color_ft_creneaux_indispo)
+
+    @api.multi
+    def set_fiche_intervention_cacher_montant_defaults(self):
+        return self.env['ir.values'].sudo().set_default('of.intervention.settings',
+                                                        'fiche_intervention_cacher_montant',
+                                                        self.fiche_intervention_cacher_montant)
 

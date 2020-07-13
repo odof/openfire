@@ -1373,6 +1373,10 @@ class SaleOrder(models.Model):
             action['context'] = str(context)
         return action
 
+    def fiche_intervention_cacher_montant(self):
+        return self.env['ir.values'].get_default('of.intervention.settings', 'fiche_intervention_cacher_montant')
+
+
 class OfPlanningInterventionTemplate(models.Model):
     _name = 'of.planning.intervention.template'
 
