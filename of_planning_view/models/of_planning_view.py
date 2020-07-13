@@ -11,6 +11,32 @@ from datetime import datetime, timedelta
 PLANNING_VIEW = ('planning', 'Planning')
 
 
+class HREmployee(models.Model):
+    _inherit = 'hr.employee'
+
+    of_est_commercial = fields.Boolean(string=u"Est commercial")
+
+
+class ResCompany(models.Model):
+    _inherit = "res.company"
+
+    @api.model
+    def get_company_filter_ids(self):
+        company_id = self.env.user.company_id.id
+        companies = self.env['res.company'].search([
+            '|',
+            ('id', '=', company_id),
+            ('parent_id', 'child_of', company_id),
+        ])
+        filters = []
+        for company in companies:
+            fil = {'id': company.id, 'name': company.name}
+            if company_id == company.id:
+                fil['current'] = True
+            filters.append(fil)
+        return filters
+
+
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
