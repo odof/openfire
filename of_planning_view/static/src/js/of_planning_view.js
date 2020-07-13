@@ -1,4 +1,4 @@
-odoo.define('of_timeline.TimelineView', function (require) {
+odoo.define('of_planning_view.PlanningView', function (require) {
 "use strict";
 
 var core = require('web.core');
@@ -18,6 +18,18 @@ var CompoundDomain = data.CompoundDomain;
 var _t = core._t;
 var _lt = core._lt;
 var qweb = core.qweb;
+
+var MODE_COLUMN_NBS = {
+    "day": 1,
+    "week": 7,
+    "month": 7,
+};
+
+var ATTENDEE_MODES = {
+    "tech": "Technique",
+    "com": "Commercial",
+    "comtech": "Technique & Commercial",
+};
 
 function hh_mm_to_float(hh_mm) {
     var heures = parseFloat(hh_mm.substring(0,2));
@@ -43,12 +55,6 @@ function hexToRgb(hex, mod) {
   }
   return result;
 }
-
-var MODE_COLUMN_NBS = {
-    "day": 1,
-    "week": 7,
-    "month": 7,
-};
 
 var PlanningView = View.extend({
     template: 'PlanningView',
@@ -129,8 +135,11 @@ var PlanningView = View.extend({
         // récupérer les employés à ne pas montrer en vue planning
         var excluded_ids_def = new Model("ir.values").call(
             "get_default", ["of.intervention.settings", "planningview_employee_exclu_ids"]);
-        var intervenants_ids_def = new Model("hr.employee").query(['id']) // retrieve ids from db
-            .filter([['of_est_intervenant', '=', true]]) // seulement les intervenants
+        var intervenants_ids_def = new Model("hr.employee").query(['id'])
+            .filter([
+                '|',
+                ['of_est_intervenant', '=', true],
+                ['of_est_commercial', '=', true]]) // seulement les intervenants / commerciaux
             .order_by(['sequence'])
             .all();  // récupérer tous les employés qui sont des intervenants
         var ir_values_model = new Model("ir.values");
@@ -146,17 +155,29 @@ var PlanningView = View.extend({
                                                  ["of.intervention.settings", "planningview_max_time"]);
         var time_line_def = ir_values_model.call("get_default",
                                                  ["of.intervention.settings", "planningview_time_line"]);
+        // récupérer l'info pour savoir si afficher le planning Tech, Com, ou les deux
+        var attendee_mode_def = ir_values_model.call("get_default",
+                                                     ["of.intervention.settings", "attendee_mode", false]);
+        // récupérer les info pour l'affichage du bouton de filtrage par société
+        var company_filters_def = new Model("res.company").call("get_company_filter_ids", []);
+        var company_filter_def = ir_values_model.call("get_default",
+                                                      ["of.intervention.settings", "company_filter_id", false]);
 
         // initialiser les couleurs des créneaux dispo et leur durée minimale
         var creneaux_dispo_data_def = self.set_creneaux_dispo_data();
 
         return $.when(
             write_def, create_def, excluded_ids_def, intervenants_ids_def, mode_calendar_def, duree_to_px_def,
-            heure_min_def, heure_max_def, time_line_def, rendered_prom, creneaux_dispo_data_def, this._super()
+            heure_min_def, heure_max_def, time_line_def, attendee_mode_def, company_filters_def, company_filter_def,
+            rendered_prom, creneaux_dispo_data_def, this._super()
         ).then(
-            function (write, create, excluded, emp_ids, mode_calendar, duree_to_px, min_time, max_time, time_line) {
+            function (write, create, excluded, emp_ids, mode_calendar, duree_to_px, min_time, max_time, time_line,
+            attendee_mode, company_filters, now_company_id) {
                 self.write_right = write;
                 self.create_right = create;
+                // affecter le mode de planning (com, tech ou comtech)
+                self.attendee_mode = attendee_mode || "comtech";
+                self.attendee_mode_name = ATTENDEE_MODES[self.attendee_mode];
                 // retirer les intervenants à ne pas montrer en vue planning
                 var excluded_ids = [], to_show_ids = [];
                 if (!!excluded) {
@@ -181,6 +202,27 @@ var PlanningView = View.extend({
                     time_line = "[]";
                 }
                 self.time_line = JSON.parse(time_line)
+
+                self.company_filters = company_filters;
+                self.now_company_id = now_company_id || 0;
+
+                self.company_ids_indexes = {}
+                var company_fil,current_comp_j;
+                self.company_filters.push({id: 0, name: "Toutes"})
+                for (var j=0; j<self.company_filters.length; j++) {
+                    company_fil = self.company_filters[j];
+                    self.company_ids_indexes[company_fil.id] = j;
+                    if (company_fil.id == self.now_company_id) {
+                        self.now_company_name = company_fil.name;
+                    }
+                    if (company_fil['current']) {
+                        current_comp_j = j;
+                    }
+                }
+                if (isNullOrUndef(self.now_company_name)){
+                    self.now_company_name = self.company_filters[current_comp_j].name;
+                    self.now_company_id = self.company_filters[current_comp_j].id;
+                }
 
                 return $.when(all_filters_def);
         });
@@ -217,8 +259,11 @@ var PlanningView = View.extend({
         var p = dfd.promise();
         var model_name = self.fields[self.resource].relation;
         var Attendees = new Model(model_name);
+        self.actual_res_ids = []
 
-        Attendees.query(['id', self.color_ft, self.color_bg, 'name', 'sequence']) // retrieve colors from db
+        // récupérer les infos des employés pour générer les filtres de droite
+        Attendees.query(['id', self.color_ft, self.color_bg, 'name', 'sequence', 'of_est_intervenant',
+                         'of_est_commercial', 'company_id'])
             .filter([['id', 'in', self.view_res_ids || []]]) // id
             .order_by(['sequence'])
             .all()
@@ -228,16 +273,31 @@ var PlanningView = View.extend({
                 // pour accéder facilement à l'indexe du filtre à partir de l'id de l'attendee
                 self.res_ids_indexes = {}
                 var a, filter_item;
+                var all_company_ids = _.pluck(self.company_filters, 'id');
                 for (var i=0; i<attendees.length; i++) {
                     a = attendees[i];
                     filter_item = {
                         label: a['name'],
                         color_bg: a[self.color_bg],
                         color_ft: a[self.color_ft],
+                        est_intervenant: a['of_est_intervenant'],
+                        est_commercial: a['of_est_commercial'],
+                        company_id: a['company_id'],
                         value: a['id'],
                         input_id: a['id'] + "_input",
                         is_checked: true,
+                        is_visible: false,
                         sequence: a['sequence'],
+                    }
+                    // ne montrer que les filtres (à droite) qui passent le filtrage par société et type de planning
+                    if (self.attendee_mode == 'tech' && a['of_est_intervenant'] ||
+                      self.attendee_mode == 'com' && a['of_est_commercial'] || self.attendee_mode == 'comtech') {
+                        if (!a['company_id']
+                          || !self.now_company_id && _.contains(all_company_ids, a['company_id'][0])
+                          || a['company_id'][0] == self.now_company_id) {
+                            self.actual_res_ids.push(a['id']);
+                            filter_item.is_visible = true;
+                        }
                     }
                     self.all_filters[i] = filter_item;
                     self.res_ids_indexes[a['id']] = i;
@@ -416,6 +476,10 @@ var PlanningView = View.extend({
         // Création des lignes
         for (var i in self.view_res_ids) {
             emp_id = self.view_res_ids[i];
+            if (!self.actual_res_ids.includes(emp_id)){
+                continue;
+            }
+
             row_options = {
                 "res_id": emp_id,
                 "auto_render": false,
@@ -461,12 +525,12 @@ var PlanningView = View.extend({
                         "col_offset_stop": col_offset_stop,
                         "day_span": day_span,
                     }
-                    // ajouter lévènement aux lignes de ressource concernées
+                    // ajouter l'évènement aux lignes de ressource concernées
                     for (var j in event_res_ids) {
                         res_id = event_res_ids[j];
                         row_index = self.rows_ids_indexes[res_id]
                         // Ajouter l'évènement seulement aux lignes à afficher
-                        if (_.contains(self.view_res_ids, res_id)) {
+                        if (_.contains(self.actual_res_ids, res_id)) {
                             planning_record = new PlanningRecord(self.rows[row_index],self,event,record_options);
                             self.rows[row_index]["records_to_add"].push(planning_record);
                         }
@@ -559,7 +623,9 @@ var PlanningView = View.extend({
         return $.when(rendered_prom)
             .then(function () {  // rendre les lignes
                 _.each(self.rows, function(row) {
-                    row.render();
+                    if (!isNullOrUndef(row)) {
+                        row.render();
+                    }
                 });
             });
     },
@@ -582,6 +648,9 @@ var PlanningView = View.extend({
         this.$buttons.find(".of_planning_button_prev").click(this.proxy(self.on_prev_clicked));
         this.$buttons.find(".of_planning_button_today").click(this.proxy(self.on_today_clicked));
         this.$buttons.find(".of_planning_button_next").click(this.proxy(self.on_next_clicked));
+        // boutons de filtrage par société et type de planning
+        this.$buttons.find(".of_company_filter").click(this.proxy(self.on_company_filter_clicked));
+        this.$buttons.find(".of_attendee_mode_filter").click(this.proxy(self.on_attendee_mode_clicked));
 
         if ($node) {
             this.$buttons.appendTo($node);
@@ -616,6 +685,60 @@ var PlanningView = View.extend({
         this.$small_calendar.datepicker("setDate",moment(this.range_start).format("MM/DD/YYYY"));
         this.do_search(this.domain,this.context,this.group_by);
     },
+    /**
+     *  Gestionnaire pour le clique sur un filtre de société
+     */
+    on_company_filter_clicked: function(ev) {
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+        this.now_company_id = parseInt(ev.currentTarget.id.substring(15), 10);
+        this.now_company_name = this.company_filters[this.company_ids_indexes[this.now_company_id]].name;
+
+        var ir_values_model = new Model("ir.values");
+        ir_values_model.call("set_default",
+                             ["of.intervention.settings", "company_filter_id", this.now_company_id, false]);
+        this.$buttons.find("#now_company_name").text(this.now_company_name);
+        this.apply_extra_filters();
+    },
+    /**
+     *  Gestionnaire pour le clique sur un mode de planning
+     */
+    on_attendee_mode_clicked: function(ev) {
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+        this.attendee_mode = ev.currentTarget.id.substring(14);
+        this.attendee_mode_name = ATTENDEE_MODES[this.attendee_mode];
+
+        var ir_values_model = new Model("ir.values");
+        ir_values_model.call("set_default", ["of.intervention.settings", "attendee_mode", this.attendee_mode, false]);
+        this.$buttons.find("#now_attendee_mode_name").text(this.attendee_mode_name);
+        this.apply_extra_filters();
+    },
+    /**
+     *  Méthode pour appliquer le filtrage par société et mode de planning
+     *  Relance une recherche (qui lancera un re-rendu des filtres de droite)
+     */
+    apply_extra_filters: function() {
+        this.actual_res_ids = [];
+        var all_company_ids = _.pluck(this.company_filters, 'id');
+        for (var i in this.all_filters) {
+            this.all_filters[i].is_visible = false;
+
+            if (!this.all_filters[i].company_id
+                || !this.now_company_id && _.contains(all_company_ids, this.all_filters[i].company_id[0])
+                || this.all_filters[i].company_id[0] == this.now_company_id) {
+                if (this.attendee_mode == "tech" && this.all_filters[i].est_intervenant
+                  || this.attendee_mode == "com" && this.all_filters[i].est_commercial
+                  || this.attendee_mode == "comtech") {
+                    this.actual_res_ids.push(this.all_filters[i].value);
+                    this.all_filters[i].is_visible = true;
+                }
+            }
+        }
+        this.do_search(this.domain,this.context,this.group_by);
+        $(':focus').blur();
+    },
+
     /**
      *  Handles signal that all rows are rendered
      *  Applique les filtres d'affichage des informations sur les évènements
@@ -807,7 +930,7 @@ var PlanningView = View.extend({
      */
     get_range_domain: function(domain, start, end, res_ids) {
         var format = time.datetime_to_str;
-        res_ids = res_ids || this.view_res_ids;
+        res_ids = res_ids || this.actual_res_ids;
         var extend_domain = [[this.date_start, '<=', format(end)]];
         if (this.date_stop) {
             extend_domain.push([this.date_stop, '>=', format(start)]);
@@ -1867,8 +1990,8 @@ PlanningView.SidebarResoFilter = Widget.extend({
      */
     render: function() {
         var self = this;
-        self.$('.of_planning_contacts').html(qweb.render('PlanningView.sidebar.contacts',
-                                                         { filters: self.view.all_filters }));
+        return self.$('.of_planning_contacts')
+            .html(qweb.render('PlanningView.sidebar.contacts', { filters: self.view.all_filters }))
     },
     on_click: function(e) {
         var ir_values_model = new Model('ir.values');

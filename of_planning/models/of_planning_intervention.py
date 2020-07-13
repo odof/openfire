@@ -33,7 +33,7 @@ class HREmployee(models.Model):
         'of.planning.equipe', 'of_planning_employee_rel', 'employee_id', 'equipe_id', u"Équipes")
     # api.depends dans of.planning.intervention
     of_changed_intervention_id = fields.Many2one('of.planning.intervention', string=u"Dernier RDV modifié")
-    of_est_intervenant = fields.Boolean(string=u"Est intervenant ?", default=False)
+    of_est_intervenant = fields.Boolean(string=u"Est intervenant", default=False)
 
     @api.multi
     def peut_faire(self, tache_id, all_required=False):

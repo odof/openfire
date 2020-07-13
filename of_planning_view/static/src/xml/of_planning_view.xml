@@ -18,6 +18,52 @@
             <button class="btn btn-primary of_planning_button_next">
                 <span class="fa fa-chevron-right"/>
             </button>
+            <!-- Bouton de filtrage par société -->
+            <div class="btn-group btn-group-sm" name="company_fil_container">
+                <button class="o_dropdown_toggler_btn btn btn-sm dropdown-toggle" data-toggle="dropdown">
+                    <span class="fa fa-filter"/>
+                    <span id="now_company_name">
+                        <t t-esc="widget.now_company_name"/>
+                    </span>
+                    <span class="caret"/>
+                </button>
+                <ul class="dropdown-menu of_filters_menu" role="menu">
+                    <li t-foreach="widget.company_filters" t-as="company_filter"
+                        t-att-data-index="filter_index" class="of_company_filter"
+                        t-attf-id="company_filter_#{company_filter.id}">
+                        <a href="#">
+                            <t t-esc="company_filter.name"/>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <!-- Bouton de filtrage par type d'employé -->
+            <div class="btn-group btn-group-sm" name="attendee_mode_container">
+                <button class="o_dropdown_toggler_btn btn btn-sm dropdown-toggle" data-toggle="dropdown">
+                    <span class="fa fa-filter"/>
+                    <span id="now_attendee_mode_name">
+                        <t t-esc="widget.attendee_mode_name"/>
+                    </span>
+                    <span class="caret"/>
+                </button>
+                <ul class="dropdown-menu of_filters_menu" role="menu">
+                    <li class="of_attendee_mode_filter" id="attendee_mode_tech">
+                        <a href="#">
+                            Technique
+                        </a>
+                    </li>
+                    <li class="of_attendee_mode_filter" id="attendee_mode_com">
+                        <a href="#">
+                            Commercial
+                        </a>
+                    </li>
+                    <li class="of_attendee_mode_filter" id="attendee_mode_comtech">
+                        <a href="#">
+                            Technique et Commercial
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </t>
 

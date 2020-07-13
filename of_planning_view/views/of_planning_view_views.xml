@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- Employee -->
+    <record id="view_of_employee_form_planningview" model="ir.ui.view">
+        <field name="name">of.hr.employee.form.planningview</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="of_planning.view_of_employee_form_intervention"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='job_id']" position="after">
+                <field name="of_est_commercial"/>
+            </xpath>
+            <xpath expr="//page[@name='interventions']" position="attributes">
+                <attribute name="attrs">{
+                    'invisible': [
+                        ('of_est_intervenant','=', False),
+                        ('of_est_commercial','=', False),
+                    ]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
     <!-- Config des interventions -->
     <record id="view_of_intervention_settings_planning_view" model="ir.ui.view">
         <field name="name">paramètres interventions vue planning</field>
