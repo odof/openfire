@@ -485,8 +485,10 @@ class OfPlanningIntervention(models.Model):
                 req = requests.get(full_query)
                 res = req.json()
             except Exception as e:
-                raise UserError(
-                    u"Impossible de contacter le serveur de routage. Assurez-vous que votre connexion internet est opérationnelle et que l'URL est définie (%s)." % e)
+                interv.before_to_this = -1.0
+                error = u"\n%s: Impossible de contacter le serveur de routage. (%s)." % (fields.Date.today(), e)
+                interv.message_post(body=error, subtype_id=self.env.ref('mail.mt_note').id)
+                continue
 
             if res and res.get('routes'):
                 interv.before_to_this = (float(res['routes'].pop(0)['duration']) / 60.0) / 60.0

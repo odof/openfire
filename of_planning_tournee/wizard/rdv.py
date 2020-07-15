@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 import pytz
 from odoo.exceptions import UserError
 from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
+from odoo.addons.of_utils.models.of_utils import voloiseau
 
 import urllib, json, requests
 
@@ -146,6 +147,7 @@ class OfTourneeRdv(models.TransientModel):
     partner_name = fields.Char(related='partner_id.name')
     geocode_retry = fields.Boolean(u"Geocodage retenté", compute="_compute_geocode_retry")
     ignorer_geo = fields.Boolean(u"Ignorer données géographiques")
+    orthodromique = fields.Boolean(string=u"Distances à vol d'oiseau")
 
     @api.depends('partner_address_id', 'partner_address_id.geocoding', 'partner_address_id.precision')
     def _compute_geocode_retry(self):
@@ -273,6 +275,7 @@ class OfTourneeRdv(models.TransientModel):
         """
         #TODO: finir de commenter
         self.ensure_one()
+
         compare_precision = 5
 
         if not self._context.get('tz'):
@@ -503,6 +506,17 @@ class OfTourneeRdv(models.TransientModel):
         date_debut_da = avant_recherche_da + un_jour
         date_fin_da = apres_recherche_da - un_jour
         if not self.ignorer_geo:
+            # Tester si le serveur de routage fonctionne
+            query = ROUTING_BASE_URL + "nearest/" + ROUTING_VERSION + "/" + ROUTING_PROFILE + \
+                "/-1,72323900,48,17292300.json?number=1"
+            query_send = urllib.quote(query.strip().encode('utf8')).replace('%3A', ':')
+            try:
+                req = requests.get(query_send)
+                res = req.json()
+                if res:
+                    self.orthodromique = False
+            except Exception as e:
+                self.orthodromique = True
             self.calc_distances_dates_employees(date_debut_da, date_fin_da, employees)
 
         nb, nb_dispo, first_res = wizard_line_obj.get_nb_dispo(self)
@@ -651,7 +665,7 @@ class OfTourneeRdv(models.TransientModel):
         un_jour = timedelta(days=1)
         date_courante = date_debut
         while date_courante <= date_fin:
-            mode_recherche = self.mode_recherche
+            mode_recherche = self.orthodromique and "distance" or self.mode_recherche
             maxi = self.max_recherche
             for employee in employees:
                 creneaux = wizard_line_obj.search([('wizard_id', '=', self.id),
@@ -688,6 +702,7 @@ class OfTourneeRdv(models.TransientModel):
                 # Listes de coordonnées : ATTENTION OSRM prend ses coordonnées sous form (lng, lat)
                 # Point de départ
                 coords_str = str(origine.geo_lng) + "," + str(origine.geo_lat)
+                coords = [{'lat': origine.geo_lat, 'lng': origine.geo_lng}]
 
                 # Créneaux et interventions
                 non_loc = False
@@ -696,23 +711,33 @@ class OfTourneeRdv(models.TransientModel):
                         non_loc = True
                         break
                     coords_str += ";" + str(line.geo_lng) + "," + str(line.geo_lat)
+                    coords.append({'lat': line.geo_lat, 'lng': line.geo_lng})
                 if non_loc:
                     continue
 
                 # Point d'arrivée
                 coords_str += ";" + str(arrivee.geo_lng) + "," + str(arrivee.geo_lat)
+                coords.append({'lat': arrivee.geo_lat, 'lng': arrivee.geo_lng})
 
-                query_send = urllib.quote(query.strip().encode('utf8')).replace('%3A', ':')
-                full_query = query_send + coords_str + "?"
-                try:
-                    req = requests.get(full_query)
-                    res = req.json()
-                except Exception as e:
-                    raise UserError(u"Impossible de contacter le serveur de routage. Assurez-vous que votre connexion internet est opérationnelle et que l'URL est définie (%s)" % e)
+                legs = []
+                res = {}
+                if self.orthodromique:
+                    for i in range(len(coords) - 1):
+                        # Coords[i+1] existe toujours
+                        dist = voloiseau(coords[i]['lat'], coords[i]['lng'], coords[i + 1]['lat'], coords[i + 1]['lng'])
+                        legs.append({'distance': dist, 'duration': -1})
+                else:
+                    query_send = urllib.quote(query.strip().encode('utf8')).replace('%3A', ':')
+                    full_query = query_send + coords_str + "?"
+                    try:
+                        req = requests.get(full_query)
+                        res = req.json()
+                    except Exception as e:
+                        res = {}
 
-                if res and res.get('routes'):
-                    legs = res['routes'][0]['legs']
-                    if len(creneaux) == len(res['routes'][0]['legs']) - 1:  # depart -> creneau -> arrivee : 2 routes 1 creneau
+                if res and res.get('routes') or legs:
+                    legs = legs or res['routes'][0]['legs']
+                    if len(creneaux) == len(legs) - 1:  # depart -> creneau -> arrivee : 2 routes 1 creneau
                         i = 0
                         l = len(creneaux)
                         while i < l:
@@ -795,6 +820,9 @@ class OfTourneeRdvLine(models.TransientModel):
     distance = fields.Float(string='Dist.tot. (km)', digits=(12, 0), help="distance prec + distance suiv")
     dist_prec = fields.Float(string='Dist.Prec. (km)', digits=(12, 0))
     dist_suiv = fields.Float(string='Dist.Suiv. (km)', digits=(12, 0))
+    dist_ortho = fields.Float(string='Dist.tot. (km)', digits=(12, 0), help="distance prec + distance suiv")
+    dist_ortho_prec = fields.Float(string='Dist.tot. (km)', digits=(12, 0), help="distance prec + distance suiv")
+    dist_ortho_suiv = fields.Float(string='Dist.tot. (km)', digits=(12, 0), help="distance prec + distance suiv")
     duree = fields.Float(string=u'Durée.tot. (min)', default=-1, digits=(12, 0), help=u"durée prec + durée suiv")
     duree_prec = fields.Float(string=u'Durée.Prec. (min)', digits=(12, 0))
     duree_suiv = fields.Float(string=u'Durée.Suiv. (min)', digits=(12, 0))

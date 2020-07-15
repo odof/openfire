@@ -1,7 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields
+from math import asin, sin, cos, sqrt, radians
 
+def voloiseau(lat1, lng1, lat2, lng2):
+    u"""
+    Retourne la distance entre deux points en Km, à vol d'oiseau
+    @param *: Coordonnées gps en degrés
+    """
+    lat1, lng1, lat2, lng2 = [radians(v) for v in (lat1, lng1, lat2, lng2)]
+    return 2 * asin(sqrt((sin((lat1 - lat2) / 2)) ** 2 + cos(lat1) * cos(lat2) * (sin((lng1 - lng2) / 2)) ** 2)) * 6366
 
 def format_date(date, lang):
     return fields.Date.from_string(date).strftime(lang.date_format)

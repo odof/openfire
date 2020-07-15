@@ -182,8 +182,7 @@ class OfPlanifCreneauProp(models.TransientModel):
                 req = requests.get(full_query)
                 res = req.json()
             except Exception as e:
-                raise UserError(
-                    u"Impossible de contacter le serveur de routage. Assurez-vous que votre connexion internet est opérationnelle et que l'URL est définie (%s)" % e)
+                res = {}
 
             if res and res.get('routes'):
                 legs = res['routes'][0]['legs']
