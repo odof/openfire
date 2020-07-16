@@ -366,7 +366,7 @@ class SaleOrderLine(models.Model):
 
     @api.multi
     def write(self, vals):
-        if vals.get("sale_kits_to_unlink") or self.sale_kits_to_unlink:
+        if vals.get("sale_kits_to_unlink") or self.filtered(lambda l: l.sale_kits_to_unlink):
             self.sudo().env["of.saleorder.kit"].search([("to_unlink", "=", True)]).unlink()
             vals["sale_kits_to_unlink"] = False
         update_ol_id = False
