@@ -879,13 +879,17 @@ MapView.Map = Widget.extend({
             });
         }else{
             if (this.cmptry<40) {
-                //console.log("cmptry: "+this.cmptry);
                 this.cmptry++;
                 setTimeout(function(){
                     return $.when().then(self.attach_to_container(container_id,tile_server_addr));
                 },40);
-            }else{
-                console.log('container not found after '+cmptry+' try.');
+            }else if (this.cmptry<100) {
+                 this.cmptry++;
+                 setTimeout(function(){
+                     return $.when().then(self.attach_to_container(container_id,tile_server_addr));
+                 },100);
+             }else{
+                console.log('container not found after '+this.cmptry+' try.');
                 return false;
             }
         }
