@@ -849,10 +849,11 @@ class AccountInvoice(models.Model):
         return result
 
     @api.multi
-    def confirm_paid(self):
-        super(AccountInvoice, self).confirm_paid()
+    def action_invoice_open(self):
+        res = super(AccountInvoice, self).action_invoice_open()
         draft_commis = self.mapped('of_commi_ids').filtered(lambda commi: commi.state == 'draft')
         draft_commis.action_to_pay()
+        return res
 
     @api.multi
     def action_cancel(self):
