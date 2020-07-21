@@ -6,6 +6,7 @@ import pytz, math, json, urllib, requests
 from math import cos
 from odoo.addons.of_planning_tournee.models.of_planning_tournee import distance_points
 from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
+from odoo.tools import config
 from odoo.exceptions import UserError
 
 SEARCH_MODES = [
@@ -13,7 +14,6 @@ SEARCH_MODES = [
     ('duree', u'Durée (min)'),
 ]
 
-ROUTING_BASE_URL = u"http://s-hotel.openfire.fr:5000/"
 ROUTING_VERSION = u"v1"
 ROUTING_PROFILE = u"driving"
 
@@ -860,7 +860,8 @@ class OfRDVCommercialLine(models.TransientModel):
 
             coords_str = u""
             coords = []
-            query = ROUTING_BASE_URL + u"route/" + ROUTING_VERSION + u"/" + ROUTING_PROFILE + u"/"
+            routing_base_url = config.get("of_routing_base_url", "")
+            query = routing_base_url + u"route/" + ROUTING_VERSION + u"/" + ROUTING_PROFILE + u"/"
 
             # coordonnées du point de départ
             coords_str += str(origine.geo_lng) + u"," + str(origine.geo_lat)
