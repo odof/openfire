@@ -399,8 +399,9 @@ class OFInterventionConfiguration(models.TransientModel):
     _inherit = 'of.intervention.settings'
 
     planningview_employee_exclu_ids = fields.Many2many(
-        'hr.employee', string=u"(OF) Exculsion d'intervenants", help=u"Intervenants à NE PAS montrer en vue planning",
-        domain=[('of_est_intervenant', '=', True)])
+        'hr.employee', string=u"(OF) Exculsion d'intervenants", help=u"Employés à NE PAS montrer en vue planning",
+        domain=['|', ('of_est_intervenant', '=', True), ('of_est_commercial', '=', True)]
+    )
 
     @api.multi
     def set_planningview_employee_exclu_ids_defaults(self):
