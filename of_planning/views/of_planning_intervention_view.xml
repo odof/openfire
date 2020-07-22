@@ -14,6 +14,7 @@
             <!-- Ajout filtre Intervenants -->
             <xpath expr="//filter[@name='inactive']" position="after">
                 <filter name="intervenants" string="Intervenants" domain="[('of_est_intervenant', '=', True)]"/>
+                <filter name="commerciaux" string="Commerciaux" domain="[('of_est_commercial', '=', True)]"/>
             </xpath>
         </field>
     </record>
@@ -27,10 +28,12 @@
             <!-- Ajout champ of_est_intervenant -->
             <xpath expr="//field[@name='job_id']" position="after">
                 <field name="of_est_intervenant"/>
+                <field name="of_est_commercial"/>
             </xpath>
             <!-- Ajout onglet interventions -->
             <xpath expr="//notebook" position="inside">
-                <page name="interventions" string="Interventions" attrs="{'invisible': [('of_est_intervenant','=', False)]}">
+                <page name="interventions" string="Interventions"
+                      attrs="{'invisible': [('of_est_intervenant', '=', False), ('of_est_commercial', '=', False)]}">
                     <group>
                         <group name="gauche_1">
                             <field name="of_equipe_ids" widget="many2many_tags"/>

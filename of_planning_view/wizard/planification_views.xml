@@ -41,7 +41,11 @@
                             <field name="heure_debut_rdv" widget="float_time"/>
                             <field name="duree_rdv" widget="float_time"/>
                             <field name="employee_other_ids" widget="many2many_tags" options="{'no_create': True}"
-                              domain="[('of_est_intervenant', '=', True), ('id', '!=', employee_id)]"/>
+                              domain="[
+                                        '|',
+                                            ('of_est_intervenant', '=', True),
+                                            ('of_est_commercial', '=', True),
+                                        ('id', '!=', employee_id)]"/>
                         </group>
                     </group>
                     <group colspan="3" string="Description" attrs="{'invisible':[('proposition_ids', '=', [])]}">
