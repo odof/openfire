@@ -6,7 +6,10 @@
     'category': 'Ventes',
     'description': u"""Module OpenFire pour la gestion des nomenclatures de produits.
 """,
-    'depends': ['sale', 'account'],
+    'depends': ['sale',
+                'account',
+                'of_product',
+                'sale_stock'],
     "data" : [
         'views/of_product_nomenclature_view.xml',
         'security/ir.model.access.csv',

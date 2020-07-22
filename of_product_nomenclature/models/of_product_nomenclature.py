@@ -12,6 +12,7 @@ class of_product_nomenclature(models.Model):
     name = fields.Char("Nom", size=64, required=True, translate=True)
     of_product_nomenclature_line = fields.One2many('of.product.nomenclature.line', 'nomenclature_id', 'Produits nomenclature', copy=True)
     sequence = fields.Integer('Séquence', help="Définit l'ordre d'affichage des nomenclatures dans les listes (plus petit au début)")
+    is_specific = fields.Boolean(string=u"Nomenclature spécifique")
 
     _order = 'name'
     _sql_constraints = [('number_uniq', 'unique(name)', 'Il existe déjà un enregistrement avec le même nom. (#100)')]
@@ -283,3 +284,72 @@ class account_invoice(models.Model):
             'target': 'new',
             'context': self._context
         }
+
+
+class ResPartner(models.Model):
+    _inherit = 'res.partner'
+
+    of_specific_nomenclature_ids = fields.Many2many(
+        comodel_name='of.product.nomenclature', string=u"Nomenclatures restreintes")
+
+
+class ProductTemplate(models.Model):
+    _inherit = 'product.template'
+
+    of_is_custom_made = fields.Boolean(string=u"Article sur mesure")
+    of_custom_made_file = fields.Binary(string=u"Fichier explicatif")
+    of_custom_made_filename = fields.Char(string=u"Nom du fichier explicatif")
+    of_custom_made_parameter_ids = fields.One2many(
+        comodel_name='of.product.custom.made.parameter', inverse_name='product_tmpl_id', string=u"Liste des mesures")
+
+    of_color_chart_file = fields.Binary(string=u"Fichier nuancier")
+    of_color_chart_filename = fields.Char(string=u"Nom du fichier nuancier")
+
+    of_bloc_option = fields.Boolean(
+        string=u"Option de bloc", help=u"Indique que cet article ne peut pas être sélectionné seul dans son bloc")
+    of_incompatible_product_ids = fields.Many2many(
+        comodel_name='product.template', rel='of_incompatible_product_tmpl_rel', id1='product_tmpl_id',
+        id2='incompatible_product_tmpl_id', string=u"Produits incompatibles",
+        help=u"Permet d'indiquer une liste de produits incompatibles au sein d'une nomenclature")
+
+    of_shipping_costs_to_define = fields.Boolean(string=u"Frais de port à préciser")
+
+
+class OFProductCustomMadeParameter(models.Model):
+    _name = 'of.product.custom.made.parameter'
+    _order = 'sequence'
+
+    product_tmpl_id = fields.Many2one(comodel_name='product.template', string=u"Article")
+    sequence = fields.Integer(string=u"Séquence")
+    name = fields.Char(string=u"Nom", required=True)
+    unit = fields.Char(string=u"Unité de mesure", required=True)
+    min_value = fields.Integer(string=u"Valeur minimale", required=True)
+    max_value = fields.Integer(string=u"Valeur maximale", required=True)
+
+
+class SaleConfiguration(models.TransientModel):
+    _inherit = 'sale.config.settings'
+
+    def _auto_init(self, cr, context=None):
+        res = super(SaleConfiguration, self)._auto_init(cr, context=context)
+        if self.pool.get('ir.values').get_default(cr, 1, 'sale.config.settings', 'of_forbidden_delivery_weeks') is None:
+            self.pool.get('ir.values').set_default(cr, 1, 'sale.config.settings', 'of_forbidden_delivery_weeks',
+                                                   "19,31,32,33,52")
+        return res
+
+    of_forbidden_delivery_weeks = fields.Char(string=u"(OF) Semaines de livraison interdites")
+
+    @api.model
+    def get_default_sale_config(self, fields):
+        res = super(SaleConfiguration, self).get_default_sale_config(fields)
+        if 'of_forbidden_delivery_weeks' in fields:
+            res['of_forbidden_delivery_weeks'] = self.env['ir.values'].get_default(
+                'sale.config.settings', 'of_forbidden_delivery_weeks')
+        return res
+
+    @api.multi
+    def set_sale_defaults(self):
+        res = super(SaleConfiguration, self).set_sale_defaults()
+        self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'of_forbidden_delivery_weeks', self.of_forbidden_delivery_weeks)
+        return res

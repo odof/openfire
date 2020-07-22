@@ -41,6 +41,7 @@
                     </div>
                     <group>
                         <field name="sequence"/>
+                        <field name="is_specific"/>
                     </group>
                     <field name="of_product_nomenclature_line" colspan="4">
                         <tree editable="bottom">
@@ -130,6 +131,106 @@
                 <button name="invoice_open" position="before">
                     <button name="action_wizard_nomenclature" string="Insérer une nomenclature" type="object" states="draft"/>
                 </button>
+            </field>
+        </record>
+
+        <!-- Ajout d'un onglet pour les nomenclatures restreintes du partenaire -->
+        <record id="of_product_nomenclature_res_partner_form_view" model="ir.ui.view">
+            <field name="name">of.product.nomenclature.res.partner.form.view</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page string="Nomenclatures" name="nomenclature">
+                        <group string="Liste des nomenclatures restreintes">
+                            <field name="of_specific_nomenclature_ids" nolabel="1">
+                                <tree>
+                                    <field name="name"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Gestion des articles sur mesure -->
+        <record id="of_product_nomenclature_product_template_form_view" model="ir.ui.view">
+            <field name="name">of.product.nomenclature.product.template.form.view</field>
+            <field name="model">product.template</field>
+            <field name="priority">20</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+                <div name="options" position="inside">
+                    <div>
+                        <field name="of_is_custom_made"/>
+                        <label for="of_is_custom_made"/>
+                    </div>
+                </div>
+                <notebook position="inside">
+                    <page string="Nomenclature">
+                        <group>
+                            <group string="Incompatibilités">
+                                <field name="of_bloc_option"/>
+                                <field name="of_incompatible_product_ids" widget="many2many_tags"/>
+                            </group>
+                            <group string="Sur mesure" colspan="4" attrs="{'invisible': [('of_is_custom_made', '=', False)]}">
+                                <field name="of_custom_made_filename" invisible="1"/>
+                                <field name="of_custom_made_file" filename="of_custom_made_filename"/>
+                                <field name="of_custom_made_parameter_ids">
+                                    <tree editable="bottom">
+                                        <field name="sequence"/>
+                                        <field name="name"/>
+                                        <field name="unit"/>
+                                        <field name="min_value"/>
+                                        <field name="max_value"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </group>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+
+        <!-- Ajout frais de port à préciser et fichier nuancier -->
+        <record id="of_product_nomenclature_product_template_only_form_view" model="ir.ui.view">
+            <field name="name">of.product.nomenclature.product.template.only.form.view</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="of_product.of_product_template_form_view"/>
+            <field name="arch" type="xml">
+                <field name="of_frais_port" position="after">
+                    <field name="of_shipping_costs_to_define"/>
+                </field>
+                <field name="attribute_line_ids" position="before">
+                    <group>
+                        <field name="of_color_chart_filename" invisible="1"/>
+                        <field name="of_color_chart_file" filename="of_color_chart_filename"/>
+                    </group>
+                </field>
+            </field>
+        </record>
+
+        <!-- Ajout frais de port à préciser -->
+        <record id="of_product_nomenclature_product_product_form_view" model="ir.ui.view">
+            <field name="name">of.product.nomenclature.product.product.form.view</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="of_product.of_product_product_form_view"/>
+            <field name="arch" type="xml">
+                <field name="of_frais_port" position="after">
+                    <field name="of_shipping_costs_to_define"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="of_product_nomenclature_sales_config_settings_form_view" model="ir.ui.view">
+            <field name="name">of.product.nomenclature.sales.config.settings.form.view</field>
+            <field name="model">sale.config.settings</field>
+            <field name="inherit_id" ref="sale_stock.view_sales_config_inherit_sale_stock"/>
+            <field name="arch" type="xml">
+                <field name="default_picking_policy" position="after">
+                    <field name="of_forbidden_delivery_weeks"/>
+                </field>
             </field>
         </record>
 
