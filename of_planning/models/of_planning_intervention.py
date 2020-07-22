@@ -33,6 +33,7 @@ class HREmployee(models.Model):
     of_equipe_ids = fields.Many2many('of.planning.equipe', 'of_planning_employee_rel', 'employee_id', 'equipe_id', u'Équipes')
     of_changed_intervention_id = fields.Many2one('of.planning.intervention', string=u"Dernière intervention modifiée")  # api.depends dans of.planning.intervention
     of_est_intervenant = fields.Boolean(string=u"Est intervenant", default=False)
+    of_est_commercial = fields.Boolean(string=u"Est commercial", default=False)
 
     @api.multi
     def peut_faire(self, tache_id, all_required=False):
@@ -115,7 +116,7 @@ class OfPlanningTache(models.Model):
 
     @api.model
     def _get_employee_ids_domain(self):
-        return [('of_est_intervenant', '=', True)]
+        return ['|', ('of_est_intervenant', '=', True), ('of_est_commercial', '=', True)]
 
     name = fields.Char(u'Libellé', size=64, required=True)
     description = fields.Text('Description')
@@ -151,7 +152,10 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
 
     @api.multi
     def _compute_employee_ids(self):
-        intervenants = self.env['hr.employee'].search([('of_est_intervenant', '=', True)])
+        intervenants = self.env['hr.employee'].search([
+                                                        '|',
+                                                            ('of_est_intervenant', '=', True),
+                                                            ('of_est_commercial', '=', True)])
         for tache in self:
             tache.employee_ids = intervenants.filtered(lambda i: i.of_toutes_taches or tache.id in i.of_tache_ids.ids)
 
@@ -242,7 +246,7 @@ class OfPlanningEquipe(models.Model):
 
     @api.model
     def _get_employee_ids_domain(self):
-        return [('of_est_intervenant', '=', True)]
+        return ['|', ('of_est_intervenant', '=', True), ('of_est_commercial', '=', True)]
 
     @api.multi
     def check_no_overlapping(self):
@@ -390,7 +394,7 @@ class OfPlanningIntervention(models.Model):
 
     @api.model
     def _get_employee_ids_domain(self):
-        return [('of_est_intervenant', '=', True)]
+        return ['|', ('of_est_intervenant', '=', True), ('of_est_commercial', '=', True)]
 
     @api.depends('tz')
     def _compute_tz_offset(self):
