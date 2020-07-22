@@ -20,7 +20,9 @@ class PlanningImpressionWizard(models.TransientModel):
         ('week2', u"Général semaine"),
     ], string="Type", required=True, default='day')
     date_start = fields.Date("Date", required=True)
-    employee_ids = fields.Many2many('hr.employee', string=u"Employés", domain="[('of_est_intervenant', '=', True)]")
+    employee_ids = fields.Many2many(
+        'hr.employee', string=u"Employés",
+        domain="['|', ('of_est_intervenant', '=', True), ('of_est_commercial', '=', True)]")
 
     @api.onchange('type')
     def check_change(self):
