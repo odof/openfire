@@ -34,6 +34,7 @@ class HREmployee(models.Model):
     # api.depends dans of.planning.intervention
     of_changed_intervention_id = fields.Many2one('of.planning.intervention', string=u"Dernier RDV modifié")
     of_est_intervenant = fields.Boolean(string=u"Est intervenant", default=False)
+    of_est_commercial = fields.Boolean(string=u"Est commercial", default=False)
 
     @api.multi
     def peut_faire(self, tache_id, all_required=False):
@@ -174,7 +175,8 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
 
     @api.multi
     def _compute_employee_ids(self):
-        intervenants = self.env['hr.employee'].search([('of_est_intervenant', '=', True)])
+        intervenants = self.env['hr.employee'].search(
+            ['|', ('of_est_intervenant', '=', True), ('of_est_commercial', '=', True)])
         for tache in self:
             tache.employee_ids = intervenants.filtered(lambda i: i.of_toutes_taches or tache.id in i.of_tache_ids.ids)
 
@@ -277,7 +279,7 @@ class OfPlanningEquipe(models.Model):
 
     @api.model
     def _domain_employee_ids(self):
-        return [('of_est_intervenant', '=', True)]
+        return ['|', ('of_est_intervenant', '=', True), ('of_est_commercial', '=', True)]
 
     def _default_tz(self):
         return self.env.user.tz or 'Europe/Paris'
@@ -330,7 +332,7 @@ class OfPlanningIntervention(models.Model):
 
     @api.model
     def _domain_employee_ids(self):
-        return [('of_est_intervenant', '=', True)]
+        return ['|', ('of_est_intervenant', '=', True), ('of_est_commercial', '=', True)]
 
     # Default #
 

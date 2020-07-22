@@ -232,7 +232,7 @@ class OfPlanningTournee(models.Model):
     employee_id = fields.Many2one('hr.employee', string=u'Intervenant', required=True, ondelete='cascade')
     employee_other_ids = fields.Many2many(
         'hr.employee', 'tournee_employee_other_rel', 'tournee_id', 'employee_id', string=u'Équipiers', required=True,
-        domain="[('of_est_intervenant', '=', True)]")
+        domain="['|', ('of_est_intervenant', '=', True), ('of_est_commercial', '=', True)]")
     secteur_id = fields.Many2one('of.secteur', string='Secteur', domain="[('type', 'in', ['tech', 'tech_com'])]")
     epi_lat = fields.Float(string=u'Épicentre Lat', digits=(12, 12))
     epi_lon = fields.Float(string=u'Épicentre Lon', digits=(12, 12))

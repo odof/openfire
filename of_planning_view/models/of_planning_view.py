@@ -436,8 +436,8 @@ class OFInterventionConfiguration(models.TransientModel):
     _inherit = 'of.intervention.settings'
 
     planningview_employee_exclu_ids = fields.Many2many(
-        'hr.employee', string=u"(OF) Exculsion d'intervenants", help=u"Intervenants à NE PAS montrer en vue planning",
-        domain=[('of_est_intervenant', '=', True)])
+        'hr.employee', string=u"(OF) Exculsion d'intervenants", help=u"Employés à NE PAS montrer en vue planning",
+        domain=['|', ('of_est_intervenant', '=', True), ('of_est_commercial', '=', True)])
     planningview_calendar = fields.Boolean(
         string=u"(OF) affichage", help=u"Cocher pour que les évènements soit disposés comme ceux de la vue calendrier.")
     planningview_h2px = fields.Integer(string=u"(OF) 1 heure = ")
