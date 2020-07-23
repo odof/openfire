@@ -6,7 +6,7 @@
         <xpath expr="//t[@t-if='o.parc_installe_id']" position="after">
             <t t-set="lines" t-value="o.question_ids and o._filter_answers_category(o.question_ids.filtered(lambda q: q.type == 'intervention'))"/>
             <t t-if="lines">
-                <div style="page-break-inside: avoid;">
+                <div>
                     <div class="row h4 mb4">
                         <div class="col-xs-12"><strong>Questionnaire</strong></div>
                     </div>
