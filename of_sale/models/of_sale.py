@@ -164,7 +164,8 @@ class SaleOrder(models.Model):
         ], string=u"Forcer état de facturation",
         help=u"Permet de forcer l'état de facturation de la commande.\n"
              u"Utile pour les commandes facturées qui refusent de changer d'état "
-             u"(e.g. une ligne a été supprimée dans la facture).")
+             u"(e.g. une ligne a été supprimée dans la facture).",
+        copy=False)
     of_invoice_policy = fields.Selection(
         [('order', u'Quantités commandées'), ('delivery', u'Quantités livrées')], string="Politique de facturation")
 
