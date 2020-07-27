@@ -151,6 +151,7 @@ CalendarView.include({
         return $.when(p).then(function() {
             //console.log("créneaux dispo",self.res_horaires_info);
             self.events_dispo = [];
+            var cmpt_events = 0;
             var attendee_data, creneaux_dispo_jour, creneau_dispo;
             for (var k in self.res_horaires_info) {
                 //console.log("k",k);
@@ -171,6 +172,8 @@ CalendarView.include({
                         creneau_dispo["state"] = "Dispo";
                         creneau_dispo["state_int"] = 0;
                         creneau_dispo["disponible"] = true;
+                        creneau_dispo["index"] = cmpt_events;
+                        cmpt_events++;
                         self.events_dispo.push(creneau_dispo)
                         //console.log("j",j);
                     }
@@ -496,7 +499,9 @@ CalendarView.include({
                 });
                 self.open_quick_create(data_template);
             }
-        }
+        };
+        fc.eventClick = function (event) { console.log("click event",event)
+                                            self.open_event(event); };
         return fc;
     },
     /**
@@ -608,6 +613,63 @@ CalendarView.include({
             i++;
         }
         return res;
+    },
+    open_event: function(event) {
+        var self = this;
+        var id = event._id;
+        var title = event.title;
+        if (! this.open_popup_action) {
+            var index = this.dataset.get_id_index(event._id);
+            this.dataset.index = index;
+            /*for (var k in context) {
+                console.log(context[k]);
+                this.dataset.context[k] = context[k];
+            }*/
+            console.log("this.dataset.context",this.dataset.context);
+            if (this.create_right && id == -1) {
+                var data_template = self.get_event_data({
+                    start: event.start,
+                    end: event.end,
+                    allDay: event.allDay,
+                });
+                for (var k in event.defaults) {
+                    data_template[k] = event.defaults[k];
+                }
+                //data_template["employee_ids"] = event["context"]["default_employee_ids"];
+                console.log("HAHA",event["attendees"]);
+                self.open_quick_create(data_template);
+                //this.do_switch_view('form', { mode: "create" });
+            }
+            else if (this.write_right) {
+                this.do_switch_view('form', { mode: "edit" });
+            } else {
+                this.do_switch_view('form', { mode: "view" });
+            }
+        }
+        else {
+            var res_id = parseInt(id).toString() === id ? parseInt(id) : id;
+            new form_common.FormViewDialog(this, {
+                res_model: this.model,
+                res_id: res_id,
+                context: this.dataset.get_context(),
+                title: title,
+                view_id: +this.open_popup_action,
+                readonly: true,
+                buttons: [
+                    {text: _t("Edit"), classes: 'btn-primary', close: true, click: function() {
+                        self.dataset.index = self.dataset.get_id_index(id);
+                        self.do_switch_view('form', { mode: "edit" });
+                    }},
+
+                    {text: _t("Delete"), close: true, click: function() {
+                        self.remove_event(res_id);
+                    }},
+
+                    {text: _t("Close"), close: true}
+                ]
+            }).open();
+        }
+        return false;
     },
     /**
      * Override copy of parent function. Add custom colors and suffix
@@ -834,6 +896,12 @@ CalendarView.include({
                 r.borderColor = "rgba( 0, 0, 0, 0.0)"; // border to represent state
             }else{
                 r.borderColor = "rgba( 0, 0, 0, 0.7)";
+            }
+
+            // events dispos
+            if (evt["disponible"]) {
+                r.defaults = evt["defaults"];
+                r.className.push("of_calendar_dispo_" + evt["index"]);
             }
         }else{ // debug of odoo code
             var color_key = evt[this.color_field];

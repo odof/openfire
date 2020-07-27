@@ -152,7 +152,7 @@ class OfPlanningIntervention(models.Model):
                     date_fin_locale_dt = datetime.combine(date_da, datetime.min.time()) + timedelta(
                         hours=cren[1])
                     date_fin_utc_dt = tz.localize(date_fin_locale_dt, is_dst=None).astimezone(pytz.utc)
-                    creneaux.append({
+                    to_append = {
                         'date_prompt': fields.Datetime.to_string(date_deb_utc_dt),
                         'date_deadline_prompt': fields.Datetime.to_string(date_fin_utc_dt),
                         'heure_debut': cren[0],
@@ -165,7 +165,11 @@ class OfPlanningIntervention(models.Model):
                         'secteur_str': secteur_str,
                         'display_secteur': display_secteur,
                         'warning_horaires': intervention_forcee,
-                    })
+                    }
+                    to_append["defaults"] = {
+                        'employee_ids': [employee_id],
+                    }
+                    creneaux.append(to_append)
                 break
 
             heure_debut = interv_fin
