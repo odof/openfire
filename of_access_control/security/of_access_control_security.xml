@@ -23,6 +23,15 @@
         <field name="implied_ids" eval="[(4, ref('of_group_project_responsible'))]"/>
     </record>
 
+    <record id="of_group_erp_user" model="res.groups">
+        <field name="name">Utilisateurs</field>
+        <field name="category_id" ref="base.module_category_administration"/>
+    </record>
+
+    <record id="base.group_erp_manager" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('of_group_erp_user'))]"/>
+    </record>
+
     <data noupdate="1">
 
         <!-- CRM Lead -->
