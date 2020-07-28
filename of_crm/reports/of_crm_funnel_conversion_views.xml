@@ -67,8 +67,11 @@
                     <filter string="Mois précédent" name="previous_month"
                             domain="[('date', u'&gt;=', (context_today() - relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
                                      ('date', u'&lt;', context_today().strftime('%Y-%m-01'))]"/>
-                    <filter string="Cumul à date" name="cumul"
+                    <filter string="Cumul à date - Annuel" name="cumul"
                             domain="[('date', u'&gt;=', context_today().strftime('%Y-01-01')),
+                                     ('date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                    <filter string="Cumul à date - Mensuel" name="cumul"
+                            domain="[('date', u'&gt;=', context_today().strftime('%Y-%m-01')),
                                      ('date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
                 </search>
             </field>
@@ -160,8 +163,11 @@
                     <filter string="Mois précédent" name="previous_month"
                             domain="[('date', u'&gt;=', (context_today() - relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
                                      ('date', u'&lt;', context_today().strftime('%Y-%m-01'))]"/>
-                    <filter string="Cumul à date" name="cumul"
+                    <filter string="Cumul à date - Annuel" name="cumul"
                             domain="[('date', u'&gt;=', context_today().strftime('%Y-01-01')),
+                                     ('date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                    <filter string="Cumul à date - Mensuel" name="cumul"
+                            domain="[('date', u'&gt;=', context_today().strftime('%Y-%m-01')),
                                      ('date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
                 </search>
             </field>
