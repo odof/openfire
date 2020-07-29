@@ -126,7 +126,7 @@ class OfPlanningIntervention(models.Model):
                     raise ValidationError(u'Un des intervenants a déjà une tournée bloquée sur ce créneau')
 
                 intervention_retires_ids = intervention_obj.search([('employee_ids', 'in', list(retire_ids))])
-                intervention_obj.remove_tournees(intervention.date, intervention_retires_ids)
+                intervention_obj.sudo().remove_tournees(intervention.date, intervention_retires_ids)
 
         super(OfPlanningIntervention, self).write(vals)
 
@@ -144,7 +144,7 @@ class OfPlanningIntervention(models.Model):
             interventions.append((date_jour, intervention.employee_ids))
         super(OfPlanningIntervention, self).unlink()
         for date, employee_ids in interventions:
-            self.remove_tournees(date, employee_ids)
+            self.sudo().remove_tournees(date, employee_ids)
         return True
 
     @api.multi
