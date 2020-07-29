@@ -58,6 +58,8 @@ class ProjectIssue(models.Model):
     of_partner_id_mobile = fields.Char(u"Mobile", related='partner_id.mobile', readonly=True)
     of_partner_id_function = fields.Char(u"Fonction", related='partner_id.function', readonly=True)
 
+    company_id = fields.Many2one(default=False)
+
     # @api.onchange
 
     @api.onchange('partner_id')

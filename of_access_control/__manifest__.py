@@ -15,6 +15,7 @@ Module de gestion des contrôles d'accès
     'website': "www.openfire.fr",
     'depends': [
         'of_crm',
+        'of_planning',
     ],
     'data': [
         'security/of_access_control_security.xml',
