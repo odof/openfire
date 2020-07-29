@@ -152,6 +152,8 @@ class ProjectIssue(models.Model):
     of_partner_id_mobile = fields.Char(u'Mobile', related='partner_id.mobile', readonly=True)
     of_partner_id_function = fields.Char(u'Fonction', related='partner_id.function', readonly=True)
 
+    company_id = fields.Many2one(default=False)
+
     _defaults = {
         'date' : lambda *a: time.strftime('%Y-%m-%d %H:%M:00'),
         # Migration 'show_partner_shop' : False,
@@ -264,6 +266,9 @@ class ProjectIssue(models.Model):
             docs.append((0, 0, i))
 
         self.doc_ids = docs
+
+        if self.partner_id:
+            self.company_id = self.partner_id.company_id
 
         # Migration of_magasin pas encore migré
         #         if partner_id:

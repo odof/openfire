@@ -78,6 +78,8 @@ class OFParcInstalle(models.Model):
              u"très haut: au numéro de rue\n")
     lot_id = fields.Many2one('stock.production.lot', string="Lot d'origine")
 
+    company_id = fields.Many2one(comodel_name='res.company', string=u"Société")
+
     @api.depends('sale_order_ids', 'account_invoice_ids')
     def _compute_links(self):
         for parc in self:
@@ -107,6 +109,7 @@ class OFParcInstalle(models.Model):
         self.ensure_one()
         if self.client_id:
             self.site_adresse_id = self.client_id
+            self.company_id = self.client_id.company_id
 
     @api.multi
     @api.depends('client_id', 'client_id.geo_lat', 'client_id.geo_lng', 'client_id.precision',

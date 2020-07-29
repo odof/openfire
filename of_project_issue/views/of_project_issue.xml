@@ -111,6 +111,7 @@
                     <field name="date_deadline"/>
                 </field>
                 <field name="email_from" position="after">
+                    <field name="company_id"/>
                     <field name="of_canal_id"/>
                 </field>
                 <field name="project_id" position="attributes">
