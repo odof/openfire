@@ -5,6 +5,8 @@ odoo.define('of_calendar.calendar_view', function (require) {
  *---------------------------------------------------------*/
 
 var core = require('web.core');
+var data_manager = require('web.data_manager');
+var pyeval = require('web.pyeval');
 var CalendarView = require('web_calendar.CalendarView');
 var Dialog = require('web.Dialog');
 var widgets = require('web_calendar.widgets');
@@ -483,9 +485,7 @@ CalendarView.include({
         fc.timeFormat = fc.timeFormat.replace(':ss', '');
         // callback
         fc.eventAfterAllRender = function(view) {
-            if (!isNullOrUndef(self.first_evt) && !!self.jump_to) {
-                self.on_event_after_all_render();
-            }
+            self.on_event_after_all_render();
         };
         fc.select = function (start_date, end_date, all_day, _js_event, _view) {
             if (self.options.action.context.inhiber_create) {
@@ -500,8 +500,8 @@ CalendarView.include({
                 self.open_quick_create(data_template);
             }
         };
-        fc.eventClick = function (event) { console.log("click event",event)
-                                            self.open_event(event); };
+        fc.eventClick = function (event, ev) { console.log("click event",event,ev)
+                                            self.on_click(event, ev); };
         return fc;
     },
     /**
@@ -509,13 +509,78 @@ CalendarView.include({
      */
     on_event_after_all_render: function() {
         var self = this;
-        if (!isNullOrUndef(self.first_evt) && !self.first_jump) { // only jump once, else we can't navigate through the calendar
+        // only jump once, else we can't navigate through the calendar
+        if (!!self.jump_to && !isNullOrUndef(self.first_evt) && !self.first_jump) {
             self.first_jump = true;
             var date_tmp = moment(self.first_evt[self.date_start])._d;
             if (!isNaN(date_tmp.getTime())) {
                 self.$calendar.fullCalendar('gotoDate', date_tmp);
             }
         }
+        var el_style = "float: right; top: 0px; height: 50%; width: 100%; background-color: rgba(0, 0, 0, 0.4)";
+        var el_attrs = {
+            style: el_style,
+            class: "of_calendar_search",
+        };
+        var el = self.make("div", el_attrs);
+        $(".of_calendar_dispo").find('.fc-event-bg').append(el);
+        console.log("after render calendar search", $(".of_calendar_search").length);
+        $(".of_calendar_dispo").mouseover(self.on_dispo_mouseover);
+    },
+    /**
+     *  event est le créneau, ev est l'évènement javascript
+     */
+    on_click: function (event, ev) {
+        var self = this;
+        if ($(ev.target).hasClass("of_calendar_search")) {
+            console.log("CLICK DISPO",ev);
+            var creneau_dispo = self.events_dispo[event.index_dispo];
+            var action_id = "of_planning_view.action_view_of_planif_wizard"
+            var additional_context = {
+                "default_heure_debut_creneau": creneau_dispo.heure_debut,
+                "default_heure_debut_rdv": creneau_dispo.heure_debut,
+                "default_heure_fin_creneau": creneau_dispo.heure_fin,
+                "default_lieu_prec_id": creneau_dispo.lieu_debut.id || false,
+                "default_lieu_suiv_id": creneau_dispo.lieu_fin.id || false,
+                "default_date_creneau": creneau_dispo.date,
+                "default_duree_creneau": creneau_dispo.duree,
+                "default_employee_id": creneau_dispo.color_filter_id,
+                "default_secteur_id": creneau_dispo.secteur_id,
+                "default_creneaux_reels": creneau_dispo.creneaux_reels.length > 0 ? creneau_dispo.creneaux_reels : false,
+                "default_warning_horaires": creneau_dispo.warning_horaires,
+            };
+
+            return data_manager.load_action(action_id, pyeval.eval('context', additional_context)).then(function(result) {
+                    var options = {
+                        'additional_context': pyeval.eval('context', additional_context),  // pour une raison inconnue le additional_context n'est pas pris en compte avant
+                        'on_close': function () {self.reload_events();},
+                    };
+                    return self.ViewManager.action_manager.do_action(result,options);
+                }).then(function(){
+                    $(".o_form_buttons_edit").eq(0).hide();  // cacher les boutons "Sauvergarder" et "Annuler"
+                });
+        }else{
+            self.open_event(event);
+        }
+    },
+    on_click_dispo: function(ev) {
+        console.log("CLICK DISPO",ev);
+    },
+    on_dispo_mouseover: function(ev) {
+        /*console.log("HAHA",ev, _.contains(ev.target.classList, "of_calendar_dispo_mouseover"));
+        var self = this;
+        var el_style = "float: right; top: 0px; height: 50%; width: 100%; background-color: rgba(0, 0, 0, 0.4)";
+        var el_attrs = {
+            style: el_style,
+            class: "of_calendar_dispo_mouseover",
+        };
+        var el = self.make("div", el_attrs);
+        if (!$(ev.target).hasClass("of_calendar_dispo_mouseover") && !$(ev.target).siblings(".of_calendar_dispo_mouseover").length) {
+            ev.target.append(el);
+        }else{
+            console.log("ah...");
+        }*/
+        
     },
     on_filters_rendered: function() {
         this.dfd_filters_rendered.resolve();
@@ -801,8 +866,14 @@ CalendarView.include({
                                     now_id = the_attendee_people;
                                     tempColorFT = self.all_filters[now_id].color_ft;
                                     tempColorBG = self.all_filters[now_id].color_bg;
-                                    the_title_avatar += '<i class="of_calendar_evt_top of_calendar_attendee_box" title="' + _.escape(self.all_attendees[the_attendee_people]) + '"' +
-                                                'style="background: ' + tempColorBG + '; border: 1px solid #0D0D0D; position: absolute; right: ' + icon_offset_px + 'px;" ></i>';
+                                    the_title_avatar += '<i class="fa fa-search fa-lg of_calendar_evt_top of_calendar_search of_calendar_search_' + evt["index"] + '" ' +
+                                                'title="' + _.escape(self.all_attendees[the_attendee_people]) + '"' +
+                                                'style="background: ' + tempColorBG + ';color: ' + tempColorFT + 
+                                                '; border: 1px solid #0D0D0D; position: absolute; right: ' + icon_offset_px + 
+                                                'px; padding: 1px; z-index: 1000;" ></i>';
+                                    /*icon_offset_px += 15;
+                                    the_title_avatar += '<i class="fa fa-lg fa-search fa-border of_calendar_evt_top of_calendar_dispo_' + evt["index"] + '" title="Rechercher une intervention"' +
+                                            'style="color: ' + tempColorBG + '; position: absolute; right: ' + icon_offset_px + 'px;" ></i>';*/
                                 }
                             }
                         }
@@ -901,7 +972,9 @@ CalendarView.include({
             // events dispos
             if (evt["disponible"]) {
                 r.defaults = evt["defaults"];
+                r.index_dispo = evt["index"];
                 r.className.push("of_calendar_dispo_" + evt["index"]);
+                r.className.push("of_calendar_dispo");
             }
         }else{ // debug of odoo code
             var color_key = evt[this.color_field];
