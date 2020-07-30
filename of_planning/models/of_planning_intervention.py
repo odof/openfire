@@ -486,8 +486,10 @@ class OfPlanningIntervention(models.Model):
                 res = req.json()
             except Exception as e:
                 interv.before_to_this = -1.0
-                error = u"\n%s: Impossible de contacter le serveur de routage. (%s)." % (fields.Date.today(), e)
-                interv.message_post(body=error, subtype_id=self.env.ref('mail.mt_note').id)
+                # TODO: Dans certains cas le code ci-dessous provoque une erreur.
+                #  On commente donc le code avant de trouver une meilleure solution
+                # error = u"\n%s: Impossible de contacter le serveur de routage. (%s)." % (fields.Date.today(), e)
+                # interv.sudo().message_post(body=error, subtype_id=self.env.ref('mail.mt_note').id)
                 continue
 
             if res and res.get('routes'):
