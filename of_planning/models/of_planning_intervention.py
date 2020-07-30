@@ -4,7 +4,7 @@ from __builtin__ import False
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
-from odoo.addons.of_planning_tournee.wizard.rdv import ROUTING_BASE_URL, ROUTING_VERSION, ROUTING_PROFILE
+from odoo.tools import config
 from odoo.addons.of_utils.models.of_utils import se_chevauchent, float_2_heures_minutes, heures_minutes_2_float
 import urllib
 import requests
@@ -473,7 +473,13 @@ class OfPlanningIntervention(models.Model):
                 continue
             origine = interv.interv_before_id.address_id
             arrivee = interv.address_id
-            query = ROUTING_BASE_URL + "route/" + ROUTING_VERSION + "/" + ROUTING_PROFILE + "/"
+            routing_base_url = config.get("of_routing_base_url", "")
+            routing_version = config.get("of_routing_version", "")
+            routing_profile = config.get("of_routing_profile", "")
+            if not (routing_base_url and routing_version and routing_profile):
+                query = "null"
+            else:
+                query = routing_base_url + "route/" + routing_version + "/" + routing_profile + "/"
 
             # Listes de coordonnées : ATTENTION OSRM prend ses coordonnées sous form (lng, lat)
             coords_str = str(origine.geo_lng) + "," + str(origine.geo_lat)

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, models, tools
+from odoo import api, fields, models
 from odoo.exceptions import UserError
+from odoo.tools import config
 from difflib import SequenceMatcher
 from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
 import time
@@ -161,7 +162,7 @@ class OFGeoWizardMono(models.TransientModel):
     # Géocodage avec OSM
     def geo_mapbox(self):
         # récupérer le token
-        server_token = tools.config.get("of_token_mapbox", "")
+        server_token = config.get("of_token_mapbox", "")
         if not server_token:
             raise UserError(u"MapBox n'est pas correctement configuré.")
 
@@ -463,7 +464,7 @@ class OFGeoWizard(models.TransientModel):
     # Géocodage avec Mapbox
     def geo_mapbox(self, partner):
         # récupérer le token
-        server_token = tools.config.get("of_token_mapbox", "")
+        server_token = config.get("of_token_mapbox", "")
         if not server_token:
             raise UserError(u"MapBox n'est pas correctement configuré.")
 
