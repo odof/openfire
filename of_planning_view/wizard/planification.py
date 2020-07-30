@@ -13,8 +13,6 @@ import urllib
 from math import asin, sin, cos, sqrt, radians
 import requests
 
-ROUTING_VERSION = "v1"
-ROUTING_PROFILE = "driving"
 
 def hours_to_strs(*hours):
     """ Convertit une liste d'heures sous forme de floats en liste de str de type '13h37'
@@ -169,7 +167,12 @@ class OfPlanifCreneauProp(models.TransientModel):
             #a_planifier.dummy_field = True
             #compteur += 1
             routing_base_url = config.get("of_routing_base_url", "")
-            query = routing_base_url + "route/" + ROUTING_VERSION + "/" + ROUTING_PROFILE + "/"
+            routing_version = config.get("of_routing_version", "")
+            routing_profile = config.get("of_routing_profile", "")
+            if not (routing_base_url and routing_version and routing_profile):
+                query = "null"
+            else:
+                query = routing_base_url + "route/" + routing_version + "/" + routing_profile + "/"
             # Listes de coordonnées : ATTENTION OSRM prend ses coordonnées sous form (lng, lat)
             # lieu précédent
             coords_str = str(geo_lng_prec) + "," + str(geo_lat_prec)

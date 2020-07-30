@@ -18,8 +18,6 @@ SEARCH_MODES = [
     ('duree', u'Durée (min)'),
 ]
 
-ROUTING_VERSION = "v1"
-ROUTING_PROFILE = "driving"
 """
 bug description quand changement de tache ou service lié puis changé?
 # refonte employés et équipes: dans un premier temp, on limite la prise de rdv aux tache à 1 intervenant
@@ -508,8 +506,13 @@ class OfTourneeRdv(models.TransientModel):
         if not self.ignorer_geo:
             # Tester si le serveur de routage fonctionne
             routing_base_url = config.get("of_routing_base_url", "")
-            query = routing_base_url + "nearest/" + ROUTING_VERSION + "/" + ROUTING_PROFILE + \
-                "/-1.72323900,48.17292300.json?number=1"
+            routing_version = config.get("of_routing_version", "")
+            routing_profile = config.get("of_routing_profile", "")
+            if not (routing_base_url and routing_version and routing_profile):
+                query = "null"
+            else:
+                query = routing_base_url + "nearest/" + routing_version + "/" + routing_profile + \
+                    "/-1.72323900,48.17292300.json?number=1"
             query_send = urllib.quote(query.strip().encode('utf8')).replace('%3A', ':')
             try:
                 req = requests.get(query_send)
@@ -698,8 +701,13 @@ class OfTourneeRdv(models.TransientModel):
                     raise UserError(u"L'adresse de retour de l'intervenant \"%s\" n'est pas géolocalisée.\nDate : %s" %
                                     (employee.name, date_courante.strftime(lang.date_format)))
 
-                routing_base_url = config.get("of_routing_base_url", ROUTING_BASE_URL)
-                query = routing_base_url + "route/" + ROUTING_VERSION + "/" + ROUTING_PROFILE + "/"
+                routing_base_url = config.get("of_routing_base_url", "")
+                routing_version = config.get("of_routing_version", "")
+                routing_profile = config.get("of_routing_profile", "")
+                if not (routing_base_url and routing_version and routing_profile):
+                    query = "null"
+                else:
+                    query = routing_base_url + "route/" + routing_version + "/" + routing_profile + "/"
 
                 # Listes de coordonnées : ATTENTION OSRM prend ses coordonnées sous form (lng, lat)
                 # Point de départ
