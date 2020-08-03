@@ -1,81 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Action "Envoyer SMS" dans vue formulaire partenaires et prospects (res.partner) -->
-    <record id="of_sms_partner_more_menu_server_action" model="ir.actions.server">
-        <field name="name">Envoyer SMS</field>
-        <field name="model_id" ref="model_res_partner"/>
-        <field name="condition">True</field>
-        <field name="state">code</field>
-        <field name="code">action = record.sms_action()</field>
-    </record>
-    <record id="of_sms_partner_more_menu_client_action" model="ir.values">
-        <field name="name">SMS Partner</field>
-        <field name="model" eval="'res.partner'"/>
-        <field name="key2" eval="'client_action_multi'" />
-        <field name="value" eval="'ir.actions.server,%d'%of_sms_partner_more_menu_server_action"/>
-    </record>
-
-    <!-- Action "Envoyer SMS" dans vue formulaire opportunités/pipeline (crm.lead) -->
-    <record id="of_sms_lead_more_menu_server_action" model="ir.actions.server">
-        <field name="name">Envoyer SMS</field>
-        <field name="model_id" ref="model_crm_lead"/>
-        <field name="condition">True</field>
-        <field name="state">code</field>
-        <field name="code">action = record.sms_action()</field>
-    </record>
-    <record id="of_sms_lead_more_menu_client_action" model="ir.values">
-        <field name="name">SMS Partner</field>
-        <field name="model" eval="'crm.lead'"/>
-        <field name="key2" eval="'client_action_multi'" />
-        <field name="value" eval="'ir.actions.server,%d'%of_sms_lead_more_menu_server_action"/>
-    </record>
-
-    <!-- Action "Envoyer SMS" dans planning intervention -->
-    <record id="of_sms_intervention_more_menu_server_action" model="ir.actions.server">
-        <field name="name">Envoyer SMS</field>
-        <field name="model_id" ref="model_of_planning_intervention"/>
-        <field name="condition">True</field>
-        <field name="state">code</field>
-        <field name="code">action = record.sms_action()</field>
-    </record>
-    <record id="of_sms_intervention_more_menu_client_action" model="ir.values">
-        <field name="name">SMS Partner</field>
-        <field name="model" eval="'of.planning.intervention'"/>
-        <field name="key2" eval="'client_action_multi'" />
-        <field name="value" eval="'ir.actions.server,%d'%of_sms_intervention_more_menu_server_action"/>
-    </record>
-
-    <!-- Action "Envoyer SMS" pour le modèle sale.order -->
-    <record id="of_sms_sale_order_more_menu_server_action" model="ir.actions.server">
-        <field name="name">Envoyer SMS</field>
-        <field name="model_id" ref="model_sale_order"/>
-        <field name="condition">True</field>
-        <field name="state">code</field>
-        <field name="code">action = record.sms_action()</field>
-    </record>
-    <record id="of_sms_sale_order_more_menu_client_action" model="ir.values">
-        <field name="name">SMS Partner</field>
-        <field name="model" eval="'sale.order'"/>
-        <field name="key2" eval="'client_action_multi'" />
-        <field name="value" eval="'ir.actions.server,%d'%of_sms_sale_order_more_menu_server_action"/>
-    </record>
-
-    <!-- Action "Envoyer SMS" pour le modèle account.invoice -->
-    <record id="of_sms_account_invoice_more_menu_server_action" model="ir.actions.server">
-        <field name="name">Envoyer SMS</field>
-        <field name="model_id" ref="model_account_invoice"/>
-        <field name="condition">True</field>
-        <field name="state">code</field>
-        <field name="code">action = record.sms_action()</field>
-    </record>
-    <record id="of_sms_account_invoice_more_menu_client_action" model="ir.values">
-        <field name="name">SMS Partner</field>
-        <field name="model" eval="'account.invoice'"/>
-        <field name="key2" eval="'client_action_multi'" />
-        <field name="value" eval="'ir.actions.server,%d'%of_sms_account_invoice_more_menu_server_action"/>
-    </record>
-
     <!-- Vue partenaire formulaire : ajouter exemple de paramètre (placeholder) pour le champ mobile format international -->
     <record id="of_view_partner_form_inherit_of_sms" model="ir.ui.view">
         <field name="name">E.164 mobile placeholder</field>
@@ -395,35 +320,6 @@
                         </t>
                     </templates>
             </kanban>
-        </field>
-    </record>
-
-    <!-- ######################################################################################################################### -->
-    <!-- #############################                COMPOSE                  ################################################### -->
-    <!-- ######################################################################################################################### -->
-
-    <record id="of_sms_compose_view_form" model="ir.ui.view">
-        <field name="name">of.sms.compose.view.form</field>
-        <field name="model">of.sms.compose</field>
-        <field name="arch" type="xml">
-            <form>
-                <span style="color:red;font-size:20px;">
-                    <field name="error_message"/>
-                </span>
-                <group>
-                    <field name="record_id" invisible="1"/>
-                    <field name="model" invisible="1"/>
-                    <field name="sms_template_id" domain="[('model_id.model','=',model)]" />
-                    <field name="from_mobile_id"/>
-                    <field name="to_number" />
-                    <field name="sms_content"/>
-                    <field name="delivery_time"/>
-                    <field name="is_commercial"/>
-                </group>
-                <footer>
-                    <button type="object" name="send_entity" string="Envoyer SMS"/>
-                </footer>
-            </form>
         </field>
     </record>
 

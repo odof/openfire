@@ -24,7 +24,8 @@ Module de SMS OpenFire
     'data': [
         'security/ir.model.access.csv',
         'data/of_sms_data.xml',
-        'views/of_sms_views.xml'
+        'views/of_sms_views.xml',
+        'wizard/of_sms_compose_views.xml',
     ],
     'installable': True,
 }
