@@ -16,6 +16,7 @@ Module Parc installé : spécial cheministe.
 """,
     'depends': [
         'of_parc_installe',
+        'of_service_parc_installe',
     ],
     'data': [
         'views/of_parc_cheministe_view.xml',
