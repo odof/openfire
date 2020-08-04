@@ -251,7 +251,7 @@ class SaleOrderLine(models.Model):
 
     @api.onchange('product_id')
     def product_id_change(self):
-        super(SaleOrderLine, self).product_id_change()
+        result = super(SaleOrderLine, self).product_id_change()
         name = self.name
         if self.product_id.brand_id.use_brand_description_sale:
             # Recalcul du libelllé de la ligne
@@ -270,6 +270,7 @@ class SaleOrderLine(models.Model):
             else:
                 name = brand_code + name
         self.name = name
+        return result
 
     def _write(self, vals):
         for field in vals:
