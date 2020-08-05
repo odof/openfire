@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 from odoo.tools import config
 import requests
 import urllib
+import re
+import pytz
 
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError, ValidationError
@@ -12,6 +14,7 @@ from odoo.tools.safe_eval import safe_eval
 from odoo.tools.float_utils import float_compare
 from odoo.addons.of_utils.models.of_utils import se_chevauchent, float_2_heures_minutes, heures_minutes_2_float, \
     compare_date
+
 
 @api.model
 def _tz_get(self):
@@ -1291,14 +1294,14 @@ class ResPartner(models.Model):
     _inherit = "res.partner"
 
     intervention_partner_ids = fields.One2many(
-        'of.planning.intervention', string="RDVs Tech client", compute="_compute_rdvtech")
+        'of.planning.intervention', string="RDVs Tech client", compute="_compute_intervention")
     intervention_address_ids = fields.One2many(
-        'of.planning.intervention', string="RDVs Tech adresse", compute="_compute_rdvtech")
-    intervention_ids = fields.Many2many('of.planning.intervention', string=u"RDVs Tech", compute="_compute_rdvtech")
-    intervention_count = fields.Integer(string='Nombre RDVs Tech', compute='_compute_rdvtech')
+        'of.planning.intervention', string="RDVs Tech adresse", compute="_compute_intervention")
+    intervention_ids = fields.Many2many('of.planning.intervention', string=u"RDVs Tech", compute="_compute_intervention")
+    intervention_count = fields.Integer(string='Nombre RDVs Tech', compute='_compute_intervention')
 
     @api.multi
-    def _compute_rdvtech(self):
+    def _compute_intervention(self):
         rdv_obj = self.sudo().env['of.planning.intervention']
         for partner in self:
             partner.intervention_partner_ids = rdv_obj.search([('partner_id', '=', partner.id)])
@@ -1312,18 +1315,18 @@ class ResPartner(models.Model):
             partner.intervention_count = len(intervention_ids)
 
     @api.multi
-    def action_view_rdvtech(self):
+    def action_view_intervention(self):
         action = self.env.ref('of_planning.of_sale_order_open_interventions').read()[0]
 
         action['domain'] = ['|', ('partner_id', 'child_of', self.ids), ('partner_id', 'child_of', self.ids)]
         if len(self._ids) == 1:
             context = safe_eval(action['context'])
-            action['context'] = str(self._get_action_view_rdvtech_context(context))
+            action['context'] = str(self._get_action_view_intervention_context(context))
 
         return action
 
     @api.multi
-    def _get_action_view_rdvtech_context(self, context={}):
+    def _get_action_view_intervention_context(self, context={}):
         context.update({
             'default_partner_id': self.id,
             'default_address_id': self.id,
@@ -1338,16 +1341,16 @@ class SaleOrder(models.Model):
     # Utilisé pour ajouter bouton Interventions à Devis (see order_id many2one field above)
     intervention_ids = fields.One2many("of.planning.intervention", "order_id", string="RDVs Tech")
 
-    intervention_count = fields.Integer(string='Nb de RDVs Tech', compute='_compute_rdvtech_count')
+    intervention_count = fields.Integer(string='Nb de RDVs Tech', compute='_compute_intervention_count')
 
     @api.depends('intervention_ids')
     @api.multi
-    def _compute_rdvtech_count(self):
+    def _compute_intervention_count(self):
         for sale_order in self:
             sale_order.intervention_count = len(sale_order.intervention_ids)
 
     @api.multi
-    def action_view_rdvtech(self):
+    def action_view_intervention(self):
         action = self.env.ref('of_planning.of_sale_order_open_interventions').read()[0]
 
         if len(self._ids) == 1:

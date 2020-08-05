@@ -61,8 +61,8 @@ class OfService(models.Model):
             return ""
 
     @api.multi
-    def get_action_view_rdvtech_context(self, context={}):
-        context = super(OfService, self).get_action_view_rdvtech_context(context)
+    def get_action_view_intervention_context(self, context={}):
+        context = super(OfService, self).get_action_view_intervention_context(context)
         context['default_parc_installe_id'] = self.parc_installe_id and self.parc_installe_id.id or False
         return context
 
@@ -98,11 +98,11 @@ class OfParcInstalle(models.Model):
     _inherit = "of.parc.installe"
 
     intervention_ids = fields.One2many('of.planning.intervention', 'parc_installe_id', string="Interventions")
-    service_count = fields.Integer(compute="_get_service_count")
-    a_programmer_count = fields.Integer(compute="_get_service_count")
+    service_count = fields.Integer(compute="_compute_service_count")
+    a_programmer_count = fields.Integer(compute="_compute_service_count")
 
     @api.multi
-    def _get_service_count(self):
+    def _compute_service_count(self):
         """Smart button vue parc installé : renvoi le nombre de service lié à la machine installée"""
         service_obj = self.env['of.service']
         for parc in self:
@@ -116,12 +116,12 @@ class OfParcInstalle(models.Model):
         action = self.env.ref('of_service_parc_installe.of_service_parc_installe_open_service').read()[0]
         action['domain'] = [('parc_installe_id', '=', self.id), ('recurrence', '=', True)]
         action['context'] = {
-        'default_partner_id': self.client_id.id,
-        'default_address_id': self.site_adresse_id.id,
-        'default_recurrence': True,
-        'default_date_next': fields.Date.today(),
-        'default_parc_installe_id': self.id,
-        'default_origin': u"[parc installé] " + (self.name or ''),
+            'default_partner_id': self.client_id.id,
+            'default_address_id': self.site_adresse_id.id,
+            'default_recurrence': True,
+            'default_date_next': fields.Date.today(),
+            'default_parc_installe_id': self.id,
+            'default_origin': u"[parc installé] " + (self.name or ''),
         }
         return action
 
@@ -130,12 +130,12 @@ class OfParcInstalle(models.Model):
         action = self.env.ref('of_service_parc_installe.of_service_parc_installe_open_a_programmer').read()[0]
         action['domain'] = [('parc_installe_id', '=', self.id), ('recurrence', '=', False)]
         action['context'] = {
-        'default_partner_id': self.client_id.id,
-        'default_address_id': self.site_adresse_id.id,
-        'default_recurrence': False,
-        'default_date_next': fields.Date.today(),
-        'default_parc_installe_id': self.id,
-        'default_origin': u"[parc installé] " + (self.name or ''),
+            'default_partner_id': self.client_id.id,
+            'default_address_id': self.site_adresse_id.id,
+            'default_recurrence': False,
+            'default_date_next': fields.Date.today(),
+            'default_parc_installe_id': self.id,
+            'default_origin': u"[parc installé] " + (self.name or ''),
         }
         return action
 
@@ -150,12 +150,12 @@ class OfParcInstalle(models.Model):
         action['views'] = False
         action['target'] = "new"
         action['context'] = {
-        'default_partner_id': self.client_id.id,
-        'default_address_id': self.site_adresse_id.id,
-        'default_recurrence': False,
-        'default_date_next': fields.Date.today(),
-        'default_parc_installe_id': self.id,
-        'default_origin': u"[Parc installé] " + (self.name or ''),
+            'default_partner_id': self.client_id.id,
+            'default_address_id': self.site_adresse_id.id,
+            'default_recurrence': False,
+            'default_date_next': fields.Date.today(),
+            'default_parc_installe_id': self.id,
+            'default_origin': u"[Parc installé] " + (self.name or ''),
         }
         return action
 
@@ -163,10 +163,10 @@ class OfParcInstalle(models.Model):
 class ProjectIssue(models.Model):
     _inherit = 'project.issue'
 
-    of_a_programmer_count = fields.Integer(compute="_get_of_a_programmer_count")
+    of_a_programmer_count = fields.Integer(compute="_compute_of_a_programmer_count")
 
     @api.multi
-    def _get_of_a_programmer_count(self):
+    def _compute_of_a_programmer_count(self):
         """Smart button vue SAV : renvoi le nombre d'interventions à programmer liées à la machine installée"""
         service_obj = self.env['of.service']
         for sav in self:
@@ -178,13 +178,13 @@ class ProjectIssue(models.Model):
         action = self.env.ref('of_service_parc_installe.of_service_parc_installe_open_a_programmer').read()[0]
         action['domain'] = [('sav_id', '=', self.id), ('recurrence', '=', False)]
         action['context'] = {
-        'default_partner_id': self.of_parc_installe_client_id.id,
-        'default_address_id': self.of_parc_installe_lieu_id.id,
-        'default_recurrence': False,
-        'default_date_next': fields.Date.today(),
-        'default_sav_id': self.id,
-        'default_parc_installe_id': self.of_produit_installe_id.id,
-        'default_origin': u"[SAV] " + self.name,
+            'default_partner_id': self.of_parc_installe_client_id.id,
+            'default_address_id': self.of_parc_installe_lieu_id.id,
+            'default_recurrence': False,
+            'default_date_next': fields.Date.today(),
+            'default_sav_id': self.id,
+            'default_parc_installe_id': self.of_produit_installe_id.id,
+            'default_origin': u"[SAV] " + self.name,
         }
         return action
 
@@ -199,12 +199,12 @@ class ProjectIssue(models.Model):
         action['views'] = False
         action['target'] = "new"
         action['context'] = {
-        'default_partner_id': self.of_parc_installe_client_id.id,
-        'default_address_id': self.of_parc_installe_lieu_id.id,
-        'default_recurrence': False,
-        'default_date_next': fields.Date.today(),
-        'default_sav_id': self.id,
-        'default_parc_installe_id': self.of_produit_installe_id.id,
-        'default_origin': u"[SAV] " + self.name,
+            'default_partner_id': self.of_parc_installe_client_id.id,
+            'default_address_id': self.of_parc_installe_lieu_id.id,
+            'default_recurrence': False,
+            'default_date_next': fields.Date.today(),
+            'default_sav_id': self.id,
+            'default_parc_installe_id': self.of_produit_installe_id.id,
+            'default_origin': u"[SAV] " + self.name,
         }
         return action

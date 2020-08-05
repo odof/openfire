@@ -2,11 +2,10 @@
 
 from odoo import models, fields
 from odoo.tools.safe_eval import safe_eval
-from math import asin, sin, cos, sqrt, radians, ceil
+from math import asin, sin, cos, sqrt, radians
 
 
-
-def round_a_cinq(val, mult):
+def arrondi_sup(val, mult):
     """
     Arrondi au multiple supérieur
     :param val: Valeur à arrondir

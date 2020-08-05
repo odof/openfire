@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 import pytz
 from odoo.exceptions import UserError
 from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
-from odoo.addons.of_utils.models.of_utils import voloiseau, hours_to_strs
+from odoo.addons.of_utils.models.of_utils import distance_points, hours_to_strs
 
 
 import urllib
@@ -34,7 +34,7 @@ class OfTourneeRdv(models.TransientModel):
     def default_get(self, fields=None):
         res = super(OfTourneeRdv, self).default_get(fields)
         # Suivant que la prise de rdv se fait depuis la fiche client ou une intervention à programmer
-        a_programmer_obj = self.env['of.service']
+        service_obj = self.env['of.service']
         partner_obj = self.env['res.partner']
         active_model = self._context.get('active_model', '')
         service_id = False
@@ -43,22 +43,22 @@ class OfTourneeRdv(models.TransientModel):
         if active_model == 'res.partner':
             partner_id = self._context['active_ids'][0]
             partner = partner_obj.browse(partner_id)
-            service = a_programmer_obj.search([('partner_id', '=', partner.id), ('recurrence', '=', True)],
+            service = service_obj.search([('partner_id', '=', partner.id), ('recurrence', '=', True)],
                                                     limit=1)
             service_id = service and service.id or False
             address = partner_obj.browse(partner.address_get(['delivery'])['delivery'])
         elif active_model == 'of.service':
             service_id = self._context['active_ids'][0]
-            service = a_programmer_obj.browse(service_id)
+            service = service_obj.browse(service_id)
             partner_id = service.partner_id.id
             address = service.address_id
         elif active_model == 'sale.order':
             order_id = self._context['active_ids'][0]
             order = self.env['sale.order'].browse(order_id)
             partner_id = order.partner_id.id
-            service = a_programmer_obj.search([('order_id', '=', order_id)], limit=1)
+            service = service_obj.search([('order_id', '=', order_id)], limit=1)
             if not service:
-                service = a_programmer_obj.search([('partner_id', '=', partner_id)], limit=1)
+                service = service_obj.search([('partner_id', '=', partner_id)], limit=1)
             service_id = service and service.id or False
             address = order.partner_shipping_id or order.partner_id
 
@@ -724,7 +724,7 @@ class OfTourneeRdv(models.TransientModel):
                 if self.orthodromique:
                     for i in range(len(coords) - 1):
                         # Coords[i+1] existe toujours
-                        dist = voloiseau(coords[i]['lat'], coords[i]['lng'], coords[i + 1]['lat'], coords[i + 1]['lng'])
+                        dist = distance_points(coords[i]['lat'], coords[i]['lng'], coords[i + 1]['lat'], coords[i + 1]['lng'])
                         legs.append({'distance': dist, 'duration': -1})
                 else:
                     query_send = urllib.quote(query.strip().encode('utf8')).replace('%3A', ':')

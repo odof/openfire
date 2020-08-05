@@ -18,12 +18,12 @@ class OfPlanningIntervention(models.Model):
     @api.depends('employee_ids', 'date', 'tournee_ids.date', 'tournee_ids.employee_id', 'state')
     def _compute_tournee_ids(self):
         tournee_obj = self.env['of.planning.tournee']
-        for rdvtech in self:
-            if rdvtech.employee_ids and rdvtech.date and rdvtech.state in ('draft', 'confirm', 'done', 'unfinished'):
+        for intervention in self:
+            if intervention.employee_ids and intervention.date and intervention.state in ('draft', 'confirm', 'done', 'unfinished'):
                 tournees = tournee_obj.search([
-                    ('employee_id', 'in', rdvtech.employee_ids.ids),
-                    ('date', '=', rdvtech.date[:10])])
-                rdvtech.tournee_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in tournees._ids]
+                    ('employee_id', 'in', intervention.employee_ids.ids),
+                    ('date', '=', intervention.date[:10])])
+                intervention.tournee_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in tournees._ids]
 
     # @api.onchange
 
@@ -79,11 +79,11 @@ class OfPlanningIntervention(models.Model):
         if bloque_ids:
             raise ValidationError(u'Un des intervenants a déjà une tournée bloquée à cette date.')
 
-        rdvtech = super(OfPlanningIntervention, self).create(vals)
+        intervention = super(OfPlanningIntervention, self).create(vals)
         if len(planning_tournee_ids) != len(employee_ids):  # Une ou plusieurs tournées n'ont pas encore été créées.
-            rdvtech.create_tournees()
-            rdvtech._recompute_todo(self._fields['tournee_ids'])
-        return rdvtech
+            intervention.create_tournees()
+            intervention._recompute_todo(self._fields['tournee_ids'])
+        return intervention
 
     @api.multi
     def write(self, vals):
@@ -129,9 +129,9 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def unlink(self):
-        rdvtechzz = [(rdvtech.date_date, rdvtech.employee_ids.ids) for rdvtech in rdvtechzz]
+        interventionzz = [(intervention.date_date, intervention.employee_ids.ids) for intervention in interventionzz]
         super(OfPlanningIntervention, self).unlink()
-        for date, employee_ids in rdvtechzz:
+        for date, employee_ids in interventionzz:
             # la vérif de nécessité de suppression de tournée est faite directement dans la fonction remove_tournee
             self.sudo().remove_tournees(date, employee_ids)
         return True
@@ -150,15 +150,15 @@ class OfPlanningIntervention(models.Model):
         if self.state in ('cancel', 'postponed'):
             return res
         tournee_obj = self.env['of.planning.tournee']
-        date_rdvtech = self.date_date
+        date_intervention = self.date_date
         address = self.address_id
         ville = address
 
         for employee in self.employee_ids:
-            tournee = tournee_obj.search([('date', '=', date_rdvtech), ('employee_id', '=', employee.id)], limit=1)
+            tournee = tournee_obj.search([('date', '=', date_intervention), ('employee_id', '=', employee.id)], limit=1)
             if not tournee:
                 tournee_data = {
-                    'date'       : date_rdvtech,
+                    'date'       : date_intervention,
                     'employee_id': employee.id,
                     'epi_lat'    : ville.geo_lat,
                     'epi_lon'    : ville.geo_lng,
