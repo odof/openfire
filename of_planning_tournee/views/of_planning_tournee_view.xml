@@ -55,6 +55,7 @@
                 <field name="address_retour_id"/>
                 <field name="is_complet"/>
                 <field name="is_confirme"/>
+                <field name="is_bloque" invisible="1"/>
                 <field name="intervention_ids" widget="many2many_tags" readonly="1"/>
             </tree>
         </field>

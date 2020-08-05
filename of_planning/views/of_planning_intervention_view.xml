@@ -57,7 +57,7 @@
         <field name="arch" type="xml">
             <!-- Ajout smart button RDVs Tech -->
             <xpath expr="//form//div[@name='button_box']" position="inside">
-                <button class="oe_stat_button" name="action_view_rdvtech" type="object" icon="fa-calendar"
+                <button class="oe_stat_button" name="action_view_intervention" type="object" icon="fa-calendar"
                   groups="of_planning.of_group_planning_intervention_lecture_tout">
                     <field string="RDVs Tech" name="intervention_count" widget="statinfo"/>
                 </button>
@@ -958,7 +958,7 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="/form/sheet/div[@name='button_box']/button[@name='action_view_invoice']" position="after">
-                <button class="oe_stat_button" name="action_view_rdvtech" type="object" icon="fa-calendar">
+                <button class="oe_stat_button" name="action_view_intervention" type="object" icon="fa-calendar">
                     <field string="RDVs Tech" name="intervention_count" widget="statinfo"/>
                 </button>
             </xpath>
