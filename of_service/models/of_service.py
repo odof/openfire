@@ -151,9 +151,9 @@ class OfService(models.Model):
 
     @api.constrains('date_next', 'date_fin')
     def check_alert_dates(self):
-        for intervention in self:
-            if intervention.alert_dates:
-                raise UserError(_(u'Intervention (%s): Inchohérence dans les dates' % intervention.name))
+        for service in self:
+            if service.alert_dates:
+                raise UserError(_(u'Intervention (%s): Inchohérence dans les dates' % service.name))
 
     _sql_constraints = [
         ('duree_non_nulle_constraint',
@@ -330,9 +330,9 @@ class OfService(models.Model):
 
     @api.depends('date_next', 'date_fin')
     def _compute_alert_dates(self):
-        for intervention in self:
-            intervention.alert_dates = intervention.date_next and intervention.date_fin \
-                                       and intervention.date_next > intervention.date_fin
+        for service in self:
+            service.alert_dates = service.date_next and service.date_fin \
+                                       and service.date_next > service.date_fin
 
     @api.multi
     @api.depends('state')
@@ -410,12 +410,12 @@ class OfService(models.Model):
     # Actions
 
     @api.multi
-    def action_view_rdvtech(self):
+    def action_view_intervention(self):
         action = self.env.ref('of_planning.of_sale_order_open_interventions').read()[0]
 
         if len(self._ids) == 1:
             context = safe_eval(action['context'])
-            action['context'] = str(self.get_action_view_rdvtech_context(context))
+            action['context'] = str(self.get_action_view_intervention_context(context))
 
         return action
 
@@ -878,17 +878,17 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     # Utilisé pour ajouter bouton Interventions à Devis (see order_id many2one field above)
-    of_a_programmer_ids = fields.One2many("of.service", "order_id", string=u"À programmer")
-    of_a_programmer_count = fields.Integer(string=u"Nb à programmer", compute='_compute_of_a_programmer_count')
+    of_service_ids = fields.One2many("of.service", "order_id", string=u"À programmer", oldname="of_a_programmer_ids")
+    of_service_count = fields.Integer(string=u"Nb à programmer", compute='_compute_of_service_count')
 
     # @api.depends
 
-    @api.depends('of_a_programmer_ids')
+    @api.depends('of_service_ids')
     @api.multi
-    def _compute_of_a_programmer_count(self):
+    def _compute_of_service_count(self):
         for sale_order in self:
-            a_programmer = sale_order.of_a_programmer_ids.filtered(lambda s: s.state != 'cancel')
-            sale_order.of_a_programmer_count = len(a_programmer)
+            services = sale_order.of_service_ids.filtered(lambda s: s.state != 'cancel')
+            sale_order.of_service_count = len(services)
 
     # Actions
 

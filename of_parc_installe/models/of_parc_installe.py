@@ -42,7 +42,7 @@ class OFParcInstalle(models.Model):
     no_piece = fields.Char(u'N° pièce', size=64, required=False)
     project_issue_ids = fields.One2many('project.issue', 'of_produit_installe_id', 'SAV')
     active = fields.Boolean(string=u'Actif', default=True)
-brand_id = fields.Many2one('of.product.brand', string="Marque")
+    brand_id = fields.Many2one('of.product.brand', string="Marque")
     modele = fields.Char(u'Modèle')
     installation = fields.Char(u"Type d'installation")
     conforme = fields.Boolean('Conforme', default=True)
@@ -224,7 +224,7 @@ class ProjectIssue(models.Model):
         'of.parc.installe', u'Produit installé', ondelete='restrict', readonly=False)
     product_name_id = fields.Many2one('product.product', u'Désignation', ondelete='restrict')
     product_category_id = fields.Many2one(
-        'product.category', string=u'Famille', related="product_name_id.categ_id.name", readonly=True, store=True)
+        'product.category', string=u'Famille', related="product_name_id.categ_id", readonly=True, store=True)
     of_parc_installe_client_nom = fields.Char(
         u'Client produit installé', related="of_produit_installe_id.client_id.name", readonly=True)
     of_parc_installe_client_adresse = fields.Char(

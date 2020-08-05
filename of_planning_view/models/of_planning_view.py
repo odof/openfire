@@ -185,7 +185,7 @@ class OfPlanningIntervention(models.Model):
         :param horaires_list_dict: [Dict] segments des employés
         :return: [Dict] de la forme {employee_id: {valeurs}, ..}
         """
-        rdvtech_obj = self.env['of.planning.intervention']
+        intervention_obj = self.env['of.planning.intervention']
         employee_obj = self.env['hr.employee']
         employees = employee_obj.browse(employee_ids)
         if not self._context.get('tz'):
@@ -280,7 +280,7 @@ class OfPlanningIntervention(models.Model):
 
                 date_current_str = fields.Date.to_string(date_current_da)
                 # récupérer tous les rdvs de la journée
-                interventions = rdvtech_obj.sudo().search([('employee_ids', 'in', employee_id),
+                interventions = intervention_obj.sudo().search([('employee_ids', 'in', employee_id),
                                                                 ('date', '<=', date_current_str),
                                                                 ('date_deadline', '>=', date_current_str),
                                                                 ('state', 'in', ('draft', 'confirm', 'done')),
@@ -293,7 +293,7 @@ class OfPlanningIntervention(models.Model):
                     fillerbarzz.append(fillerbar)
                     # Ne pas calculer les créneaux dispos dans le passé
                     if date_current_str >= date_today_str:
-                        creneaux_dispo = rdvtech_obj.get_creneaux_dispo(employee_id, date_current_str,
+                        creneaux_dispo = intervention_obj.get_creneaux_dispo(employee_id, date_current_str,
                                                                              intervention_liste, horaires_du_jour,
                                                                              duree_min, False)
                     else:
@@ -332,7 +332,7 @@ class OfPlanningIntervention(models.Model):
                         intervention_heures[1] = journee_debut
                     if intervention_heures[2] >= 23.75:
                         intervention_heures[2] = journee_fin
-                    temps_pause = rdvtech_obj.pause_interv((intervention_heures[1], intervention_heures[2]),
+                    temps_pause = intervention_obj.pause_interv((intervention_heures[1], intervention_heures[2]),
                                                            horaires_du_jour)
                     nb_heures_occupees += round(intervention_heures[2] - intervention_heures[1] - temps_pause, 5)
                     intervention_liste.append(intervention_heures)
@@ -351,7 +351,7 @@ class OfPlanningIntervention(models.Model):
                 intervention_forcee = len(interventions.filtered(lambda i: i.forcer_dates)) > 0
                 # Ne pas calculer les créneaux dispos dans le passé
                 if date_current_str >= date_today_str:
-                    creneaux_dispo = rdvtech_obj.get_creneaux_dispo(employee_id, date_current_str,
+                    creneaux_dispo = intervention_obj.get_creneaux_dispo(employee_id, date_current_str,
                                                                     intervention_liste,
                                                                     horaires_du_jour, duree_min, intervention_forcee)
                 else:

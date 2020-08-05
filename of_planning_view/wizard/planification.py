@@ -9,7 +9,7 @@ from odoo.exceptions import UserError
 from odoo.tools.float_utils import float_compare
 from odoo.tools import config
 from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
-from odoo.addons.of_utils.models.of_utils import hours_to_strs, distance_points as voloiseau, round_a_cinq
+from odoo.addons.of_utils.models.of_utils import hours_to_strs, distance_points as voloiseau, arrondi_sup
 import urllib
 import requests
 
@@ -469,7 +469,6 @@ class OfPlanifCreneau(models.TransientModel):
 
             vals = {
                 'priorite': priorite,
-                # 'distance_order': 12345,
                 'service_id': service.id,
                 'date_next': service.date_next,
                 'date_fin': service.date_fin,
@@ -717,6 +716,9 @@ class OfPlanifCreneauProp(models.TransientModel):
         geo_lat_suiv = lieu_suiv.geo_lat
         geo_lng_suiv = lieu_suiv.geo_lng
         compteur = 0
+        routing_base_url = config.get("of_routing_base_url", "")
+        routing_version = config.get("of_routing_version", "")
+        routing_profile = config.get("of_routing_profile", "")
 
         for indice in range(len(self)):
             a_planifier = self[indice]
@@ -725,11 +727,9 @@ class OfPlanifCreneauProp(models.TransientModel):
                 continue
             if compteur >= 25:  # Ne pas calculer plus de 25 d'un coup pour éviter les lenteurs
                 break
-            routing_base_url = config.get("of_routing_base_url", "")
-            routing_version = config.get("of_routing_version", "")
-            routing_profile = config.get("of_routing_profile", "")
+
             if not (routing_base_url and routing_version and routing_profile):
-                query = "null"
+                continue
             else:
                 query = routing_base_url + "route/" + routing_version + "/" + routing_profile + "/"
             # Listes de coordonnées : ATTENTION OSRM prend ses coordonnées sous form (lng, lat)
@@ -755,7 +755,7 @@ class OfPlanifCreneauProp(models.TransientModel):
                 a_planifier.distance_reelle_suiv = dist_suiv
                 a_planifier.distance_reelle_tota = dist_prec + dist_suiv
                 a_planifier.distance_order = dist_prec + dist_suiv
-                a_planifier.distance_arrondi_order = round_a_cinq(dist_prec + dist_suiv)
+                a_planifier.distance_arrondi_order = arrondi_sup(dist_prec + dist_suiv, 5)
                 a_planifier.osrm_response = legs
                 a_planifier.fait = True
             else:
