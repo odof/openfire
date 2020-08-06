@@ -849,9 +849,9 @@ class AccountInvoice(models.Model):
         return result
 
     @api.multi
-    def action_invoice_open(self):
-        res = super(AccountInvoice, self).action_invoice_open()
-        draft_commis = self.mapped('of_commi_ids').filtered(lambda commi: commi.state == 'draft')
+    def action_invoice_paid(self):
+        res = super(AccountInvoice, self).action_invoice_paid()
+        draft_commis = self.sudo().mapped('of_commi_ids').filtered(lambda commi: commi.state == 'draft')
         draft_commis.action_to_pay()
         return res
 
