@@ -12,7 +12,7 @@ import urllib
 from math import asin, sin, cos, sqrt, radians
 import requests
 
-ROUTING_BASE_URL = "http://s-hotel.openfire.fr:5000/"
+ROUTING_BASE_URL = "http://s-lima.openfire.fr:5000/"
 ROUTING_VERSION = "v1"
 ROUTING_PROFILE = "driving"
 

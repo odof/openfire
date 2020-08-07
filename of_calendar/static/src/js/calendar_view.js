@@ -517,14 +517,33 @@ CalendarView.include({
                 self.$calendar.fullCalendar('gotoDate', date_tmp);
             }
         }
-        var el_style = "float: right; top: 0px; height: 50%; width: 100%; background-color: rgba(0, 0, 0, 0.4)";
-        var el_attrs = {
-            style: el_style,
-            class: "of_calendar_search",
-        };
-        var el = self.make("div", el_attrs);
-        $(".of_calendar_dispo").find('.fc-event-bg').append(el);
-        console.log("after render calendar search", $(".of_calendar_search").length);
+        //var el_style = "float: right; top: 0px; height: 50%; width: 100%; background-color: rgba(0, 0, 0, 0.4)";
+        var el, el_style, el_attrs, filter;
+        var tempColorFT, tempColorBG;
+        console.log("self after render",self);
+        for (var k in self.all_filters) {
+            filter = self.all_filters[k]
+            if (filter.is_checked) {
+                tempColorFT = filter.color_ft;
+                tempColorBG = filter.color_bg;
+                el_style = 'border: 1px solid #0D0D0D; position: absolute; right: 2px; padding: 1px; z-index: 1000;' + 
+                           'background: ' + tempColorBG + '; color: ' + tempColorFT + ';';
+                el_attrs = {
+                    style: el_style,
+                    class: "fa fa-search fa-lg of_calendar_evt_top of_calendar_search",
+                };
+                el = self.make("div", el_attrs);
+                console.log("after render calendar search", $(".of_calendar_dispo .of_calendar_attendee_"+k.toString()), $(".of_calendar_dispo .of_calendar_attendee_"+k.toString()).length);
+                $(".of_calendar_dispo .of_calendar_attendee_"+k.toString()).find('.fc-event-bg').append(el);
+            }  
+        }
+        /*
+        '<i class="fa fa-search fa-lg of_calendar_evt_top of_calendar_search of_calendar_search_' + evt["index"] + '" ' +
+                                                'title="' + _.escape(self.all_attendees[the_attendee_people]) + '"' +
+                                                'style="background: ' + tempColorBG + ';color: ' + tempColorFT + 
+                                                '; border: 1px solid #0D0D0D; position: absolute; right: ' + icon_offset_px + 
+                                                'px; padding: 1px; z-index: 1000;" ></i>';*/
+        
         $(".of_calendar_dispo").mouseover(self.on_dispo_mouseover);
     },
     /**
@@ -542,9 +561,9 @@ CalendarView.include({
                 "default_heure_fin_creneau": creneau_dispo.heure_fin,
                 "default_lieu_prec_id": creneau_dispo.lieu_debut.id || false,
                 "default_lieu_suiv_id": creneau_dispo.lieu_fin.id || false,
-                "default_date_creneau": creneau_dispo.date,
+                "default_date_creneau": creneau_dispo.date_prompt,
                 "default_duree_creneau": creneau_dispo.duree,
-                "default_employee_id": creneau_dispo.color_filter_id,
+                "default_employee_id": parseInt(creneau_dispo.color_filter_id),
                 "default_secteur_id": creneau_dispo.secteur_id,
                 "default_creneaux_reels": creneau_dispo.creneaux_reels.length > 0 ? creneau_dispo.creneaux_reels : false,
                 "default_warning_horaires": creneau_dispo.warning_horaires,
@@ -553,12 +572,47 @@ CalendarView.include({
             return data_manager.load_action(action_id, pyeval.eval('context', additional_context)).then(function(result) {
                     var options = {
                         'additional_context': pyeval.eval('context', additional_context),  // pour une raison inconnue le additional_context n'est pas pris en compte avant
-                        'on_close': function () {self.reload_events();},
+                        'on_close': function () {self.trigger_up('reload_events');},
                     };
                     return self.ViewManager.action_manager.do_action(result,options);
                 }).then(function(){
                     $(".o_form_buttons_edit").eq(0).hide();  // cacher les boutons "Sauvergarder" et "Annuler"
                 });
+        }else if (!isNullOrUndef(event["index_dispo"]) && !$(ev.target).hasClass("of_calendar_create")){
+            var elem = 
+            "<div class='of_calendar_choosing' style='display: table; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.9)' col='1'>" +
+            "    <div class='of_calendar_search' style='display: table-row; width: 100%; height: 50%; background-color: rgba(0, 0, 0, 0.9)' colspan='1'>" +
+            "        <i class='fa fa-lg fa-search of_calendar_search text-center' style='display: table-cell; vertical-align: middle; color: rgba(255, 255, 255, 0.9)'/>" +
+            "    </div>" +
+            //"    <div class='of_calendar_choosing' style='display: table-row; width: 100%; padding-top; 1px; background-color: rgba(255, 255, 255, 0.8)'>" +
+            "    <div class='of_calendar_create' style='display: table-row; width: 100%; height: 50%; background-color: rgba(0, 0, 0, 0.9); border-top: 1px solid white;' colspan='1'>" +
+            "        <i class='fa fa-lg fa-edit of_calendar_create text-center' style='display: table-cell; vertical-align: middle; color: rgba(255, 255, 255, 0.9)'/>" +
+            "    </div>" +
+            "</div>"
+            /*var el_style = "float: right; top: 0px; height: 50%; width: 100%; background-color: rgba(0, 0, 0, 0.6)";
+            var el_attrs = {
+                    style: el_style,
+                    class: "of_calendar_search",
+                };
+            var el = self.make("div", el_attrs);
+            var el_style = "color: rgba(255, 255, 255, 0.6)";
+            var el_attrs = {
+                    style: el_style,
+                    class: "fa fa-search",
+                };
+            $(el).append(self.make("i", el_attrs))
+            //console.log("click dispo", $(".of_calendar_dispo .of_calendar_attendee_"+k.toString()), $(".of_calendar_dispo .of_calendar_attendee_"+k.toString()).length);
+            //$(".of_calendar_dispo .of_calendar_attendee_"+k.toString()).find('.fc-event-bg').append(el);
+            $(ev.target).append(el)
+            var el_style = "float: right; top: 0px; height: 50%; width: 100%; background-color: rgba(0, 0, 0, 0.6)";
+            var el_attrs = {
+                    style: el_style,
+                    class: "of_calendar_create",
+                };
+            var el = self.make("div", el_attrs);
+            //console.log("click dispo", $(".of_calendar_dispo .of_calendar_attendee_"+k.toString()), $(".of_calendar_dispo .of_calendar_attendee_"+k.toString()).length);
+            //$(".of_calendar_dispo .of_calendar_attendee_"+k.toString()).find('.fc-event-bg').append(el);*/
+            $(ev.target).append(elem)
         }else{
             self.open_event(event);
         }
