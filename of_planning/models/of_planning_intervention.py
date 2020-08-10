@@ -433,6 +433,8 @@ class OfPlanningIntervention(models.Model):
 ######################## debut de verifier / refaire
     interv_before_id = fields.Many2one('of.planning.intervention', compute="_compute_interventions_before_after", store=True)
     interv_after_id = fields.Many2one('of.planning.intervention', compute="_compute_interventions_before_after", store=True)
+    need_calc_duration = fields.Boolean(
+        string=u"Nécessite un recalcul durée du précédent", compute="_compute_interventions_before_after", store=True)
     before_to_this = fields.Float(compute="_compute_interval", store=True, digits=(12, 5))
 
     def compare_date(self, date1, date2, compare="==", isdatetime=False):
@@ -447,7 +449,8 @@ class OfPlanningIntervention(models.Model):
     def _compute_interventions_before_after(self):
         intervention_obj = self.env['of.planning.intervention']
         for interv in self:
-            if interv.compare_date(interv.date, fields.Datetime.now(), compare=">") or not interv.compare_date(interv.date, interv.employee_main_id.of_changed_intervention_id.date):
+            if interv.compare_date(interv.date, fields.Datetime.now(), compare="<") or not interv.compare_date(interv.date, interv.employee_main_id.of_changed_intervention_id.date):
+                interv.need_calc_duration = False
                 continue
             if interv.interv_before_id and interv.interv_before_id == interv.employee_main_id.of_changed_intervention_id:
                 limit_date = fields.Datetime.to_string(fields.Datetime.from_string(interv.date) + relativedelta(hour=0, minute=0, second=0))
@@ -465,11 +468,14 @@ class OfPlanningIntervention(models.Model):
                 res = intervention_obj.search([('date', '>=', interv.date_deadline), ('date', '<=', limit_date), ('employee_main_id', '=', interv.employee_main_id.id)], order='date ASC', limit=1)
                 if res:
                     interv.interv_after_id = res
+            interv.need_calc_duration = True
 
-    @api.depends('interv_before_id')
+    @api.depends('interv_before_id', 'need_calc_duration')
     def _compute_interval(self):
+        recomputed_ids = []
         for interv in self:
-            if not interv.interv_before_id or not interv.interv_before_id.address_id or not interv.address_id:
+            if not interv.interv_before_id or not interv.interv_before_id.address_id or not interv.address_id \
+                    or not interv.need_calc_duration:
                 continue
             origine = interv.interv_before_id.address_id
             arrivee = interv.address_id
@@ -500,6 +506,13 @@ class OfPlanningIntervention(models.Model):
 
             if res and res.get('routes'):
                 interv.before_to_this = (float(res['routes'].pop(0)['duration']) / 60.0) / 60.0
+                recomputed_ids.append(interv.id)
+        if recomputed_ids:
+            ids_str = str(tuple(recomputed_ids))
+            if len(recomputed_ids) == 1:  # Retirer la virgule en trop pour les tuples de longueur 1
+                ids_str = ids_str[:-2] + ids_str[-1:]
+            self.sudo().env.cr.execute(
+                "UPDATE of_planning_intervention SET need_calc_duration = 'f' WHERE id in %s" % ids_str)
 ######################### fin de vérifier / refaire
 
     @api.multi
