@@ -84,6 +84,9 @@ class SaleQuoteLine(models.Model):
             self.name = name
             self.price_unit = self.product_id.lst_price
             self.product_uom_id = self.product_id.uom_id.id
+            if self.env.user.has_group('sale.group_sale_layout'):
+                if self.product_id.categ_id.of_layout_id:
+                    self.layout_category_id = self.product_id.categ_id.of_layout_id
             domain = {'product_uom_id': [('category_id', '=', self.product_id.uom_id.category_id.id)]}
         return {'domain': domain}
 
@@ -170,7 +173,11 @@ class SaleOrder(models.Model):
                 data = self._get_data_from_template(line, price, discount)
                 if self.pricelist_id:
                     data.update(self.env['sale.order.line']._get_purchase_price(self.pricelist_id, line.product_id, line.product_uom_id, fields.Date.context_today(self)))
-                order_lines += order_line_obj.new(data)
+                new_line = order_line_obj.new(data)
+                if self.env.user.has_group('sale.group_sale_layout'):
+                    if not new_line.layout_category_id and new_line.product_id.categ_id.of_layout_id:
+                        new_line.layout_category_id = new_line.product_id.categ_id.of_layout_id
+                order_lines += new_line
 
         self.order_line = order_lines
         self._compute_prices_from_template()
