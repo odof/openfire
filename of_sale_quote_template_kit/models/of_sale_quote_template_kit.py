@@ -13,6 +13,8 @@ class OfSaleorderKit(models.Model):
     quote_line_id = fields.Many2one('sale.quote.line', string='quote line')
 
 
+
+
 class SaleQuoteLine(models.Model):
     _inherit = "sale.quote.line"
     _description = u"Lignes de modèle de devis"
@@ -80,7 +82,7 @@ class SaleQuoteLine(models.Model):
                     'product_id': self.product_id.id,
                     'name': self.product_id.name_get()[0][1] or self.product_id.name,
                     'qty_per_kit': 1,
-                    'product_uom_id': self.product_uom.id or self.product_id.uom_id.id,
+                    'product_uom_id': self.product_uom_id.id or self.product_id.uom_id.id,
                     'price_unit': self.product_id.list_price,
                     'cost_unit': self.product_id.standard_price,
                     'customer_lead': self.product_id.sale_delay,
@@ -192,6 +194,30 @@ class SaleQuoteLine(models.Model):
         if self.product_id and self.product_uom_id:
             self._refresh_price_unit()
 
+    def get_saleorder_kit_data(self):
+        self.ensure_one()
+        if not self.of_is_kit:
+            return {}
+        res = {'of_pricing': self.of_pricing}
+        lines = [(5,)]
+        comp_vals = {}
+        if self.of_pricing == 'fixed':
+            comp_vals["hide_prices"] = True
+        kit = self.kit_id
+        for line in kit.kit_line_ids:
+            comp_vals = comp_vals.copy()
+            comp_vals["product_id"] = line.product_id.id
+            comp_vals["product_uom_id"] = line.product_uom_id.id
+            comp_vals["qty_per_kit"] = line.qty_per_kit
+            comp_vals["sequence"] = line.sequence
+            comp_vals["name"] = line.product_id.name_get()[0][1] or line.product_id.name
+            comp_vals["price_unit"] = line.product_id.list_price
+            comp_vals["cost_unit"] = line.product_id.standard_price
+            comp_vals["customer_lead"] = line.product_id.sale_delay
+            lines.append((0, 0, comp_vals))
+        res["kit_line_ids"] = lines
+        return res
+
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
@@ -199,7 +225,7 @@ class SaleOrder(models.Model):
         """ Permet d'ajouter les données liées aux kits dnas les lignes de commande
         """
         data = super(SaleOrder, self)._get_data_from_template(line, price, discount)
-        sale_kit_vals = line.product_id.get_saleorder_kit_data()
+        sale_kit_vals = line.get_saleorder_kit_data()
         sale_kit_vals["qty_order_line"] = line.product_uom_qty
         new_vals = self.env["of.saleorder.kit"].create(sale_kit_vals)
         data.update({

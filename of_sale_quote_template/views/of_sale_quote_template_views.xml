@@ -35,8 +35,8 @@
                     </div>
                     <group>
                         <group>
-                            <field name="of_fiscal_position_id"/>
-                            <field name="of_payment_term_id"/>
+                            <field name="property_of_fiscal_position_id" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="of_payment_term_id" options="{'no_create': True, 'no_open': True}"/>
                         </group>
                     </group>
                     <notebook>

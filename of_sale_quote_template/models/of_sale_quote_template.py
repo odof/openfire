@@ -14,6 +14,28 @@ class SaleQuoteTemplate(models.Model):
     _name = "sale.quote.template"
     _description = u"Modèle de devis"
 
+    @api.model_cr_context
+    def _auto_init(self):
+        # A SUPRIMER
+        cr = self._cr
+        update_fiscal_position = False
+        if self._auto:
+            cr.execute(
+                    "SELECT id FROM ir_model_fields WHERE model = 'sale.quote.template' AND name = 'property_of_fiscal_position_id'")
+            update_fiscal_position = not bool(cr.fetchall())
+
+        super(SaleQuoteTemplate, self)._auto_init()
+        if update_fiscal_position:
+            cr.execute(
+                    "SELECT id FROM ir_model_fields WHERE model = 'sale.quote.template' AND name = 'property_of_fiscal_position_id'")
+            field_id = cr.fetchall()
+            cr.execute("INSERT INTO ir_property (value_reference, res_id,company_id, name, type, fields_id)"
+                       "SELECT CONCAT('account.fiscal.position,', qt.of_fiscal_position_id), "
+                       "CONCAT('sale.quote.template,', qt.id), "
+                       "afp.company_id, 'property_of_fiscal_position_id', 'many2one', %s "
+                       "FROM sale_quote_template AS qt "
+                       "JOIN account_fiscal_position afp ON afp.id=qt.of_fiscal_position_id" % field_id[0][0])
+
     name = fields.Char(u'Nom du modèle', required=True)
     quote_line = fields.One2many('sale.quote.line', 'quote_id', u'Lignes du modèle', copy=True, help=u"Une ligne rouge signifie que l'article utilisé ne peut pas être vendu ou qu'il est désactivé.")
     note = fields.Text('Notes')
@@ -23,7 +45,7 @@ class SaleQuoteTemplate(models.Model):
     of_comment_template2_id = fields.Many2one("base.comment.template", string=u"Utiliser un modèle")
     of_note1 = fields.Html('Commentaire du haut')
     of_note2 = fields.Html('Commentaire du bas')
-    of_fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale")
+    property_of_fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale", company_dependent=True)
     of_payment_term_id = fields.Many2one('account.payment.term', string="Conditions de règlement")
 
     @api.onchange('of_comment_template1_id')
@@ -188,8 +210,8 @@ class SaleOrder(models.Model):
             self.note1 = template.of_note1
         if template.of_note2:
             self.note2 = template.of_note2
-        if template.of_fiscal_position_id and not self.fiscal_position_id:
-            self.fiscal_position_id = template.of_fiscal_position_id.id
+        if template.property_of_fiscal_position_id and not self.fiscal_position_id:
+            self.fiscal_position_id = template.property_of_fiscal_position_id.id
         if template.of_payment_term_id and not self.payment_term_id:
             self.payment_term_id = template.of_payment_term_id.id
 
