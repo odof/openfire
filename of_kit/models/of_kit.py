@@ -4,11 +4,14 @@
 from odoo import api, fields, models, _
 from odoo.addons import decimal_precision as dp
 
+
 class ProductTemplate(models.Model):
     _inherit = "product.template"
 
     of_is_kit = fields.Boolean(string="Is a kit")
-    is_kit_comp = fields.Boolean(string="Is a comp", compute="_compute_is_kit_comp", store=True, help="is a component of a kit")  # store=True for domain searches and _sq_constraint
+    # store=True for domain searches and _sq_constraint
+    is_kit_comp = fields.Boolean(
+        string="Is a comp", compute="_compute_is_kit_comp", store=True, help="is a component of a kit")
     kit_line_ids = fields.One2many('of.product.kit.line', 'kit_id', string='Components', copy=True)
 
     price_comps = fields.Monetary(
@@ -20,7 +23,8 @@ class ProductTemplate(models.Model):
 
     of_price_used = fields.Monetary(
         string='Used Price', digits=dp.get_precision('Product Price'), compute='_compute_of_price_used',
-        help="Price that will be taken into account in sale orders and invoices. Either list price or the price of its components, dependant on the pricing.")
+        help="Price that will be taken into account in sale orders and invoices."
+             "Either list price or the price of its components, dependant on the pricing.")
 
     of_pricing = fields.Selection(
         [
@@ -35,7 +39,9 @@ class ProductTemplate(models.Model):
     comp_count = fields.Integer('# Comps', compute='_compute_comp_count')
 
     _sql_constraints = [
-        ('kit_n_comp_constraint', 'CHECK ( NOT(of_is_kit AND is_kit_comp) )', _('A product can not be a kit and a kit component at the same time !'))
+        ('kit_n_comp_constraint',
+         'CHECK ( NOT(of_is_kit AND is_kit_comp) )',
+         _('A product can not be a kit and a kit component at the same time !'))
     ]
 
     def get_invoice_kit_data(self):
@@ -86,8 +92,10 @@ class ProductTemplate(models.Model):
             price = cost = 0.0
             if product_tmpl.of_is_kit:
                 for line in product_tmpl.kit_line_ids:
-                    price += line.product_id.uom_id._compute_price(line.product_id.list_price, line.product_uom_id) * line.product_qty
-                    cost += line.product_id.uom_id._compute_price(line.product_id.standard_price, line.product_uom_id) * line.product_qty
+                    price += line.product_id.uom_id._compute_price(line.product_id.list_price,
+                                                                   line.product_uom_id) * line.product_qty
+                    cost += line.product_id.uom_id._compute_price(line.product_id.standard_price,
+                                                                  line.product_uom_id) * line.product_qty
             product_tmpl.price_comps = price
             product_tmpl.cost_comps = cost
 
@@ -144,7 +152,8 @@ class ProductTemplate(models.Model):
             for variant in product_tmpl.product_variant_ids:
                 kit_count += variant.kit_count
             product_tmpl.kit_count = kit_count
-            if (not product_tmpl.is_kit_comp and kit_count > 0) or (product_tmpl.is_kit_comp and kit_count == 0):  # product_tmpl needs its is_kit_comp field updated
+            # product_tmpl needs its is_kit_comp field updated
+            if (not product_tmpl.is_kit_comp and kit_count > 0) or (product_tmpl.is_kit_comp and kit_count == 0):
                 templates |= product_tmpl
         if len(templates) > 0:
             templates._compute_is_kit_comp()
@@ -155,14 +164,18 @@ class ProductTemplate(models.Model):
         action['domain'] = [('kit_line_ids.product_id.product_tmpl_id', 'in', [self.ids])]
         return action
 
+
 class ProductProduct(models.Model):
     _inherit = "product.product"
 
     kit_count = fields.Integer('# Kits', compute='_compute_kit_count')
-    is_kit_comp = fields.Boolean(string="Is a comp", compute="_compute_is_kit_comp", store=True, help="is a component of a kit")  # store=True for domain searches and _sq_constraint
+    # store=True for domain searches and _sq_constraint
+    is_kit_comp = fields.Boolean(
+        string="Is a comp", compute="_compute_is_kit_comp", store=True, help="is a component of a kit")
 
     def _compute_kit_count(self):
-        read_group_res = self.env['of.product.kit.line'].read_group([('product_id', 'in', self.ids)], ['product_id'], ['product_id'])
+        read_group_res = self.env['of.product.kit.line']\
+            .read_group([('product_id', 'in', self.ids)], ['product_id'], ['product_id'])
         mapped_data = dict([(data['product_id'][0], data['product_id_count']) for data in read_group_res])
         for product in self:
             kit_count = mapped_data.get(product.id, 0)
@@ -177,8 +190,10 @@ class ProductProduct(models.Model):
         return self.product_tmpl_id.get_invoice_kit_data()
 
     def _compute_is_kit_comp(self):
-        # this method will be called upon creation or change of a kit_line for its related product (workaround store=True)
-        read_group_res = self.env['of.product.kit.line'].read_group([('product_id', 'in', self.ids)], ['product_id'], ['product_id'])
+        # this method will be called upon creation or change of a kit_line for its related product
+        # (workaround store=True)
+        read_group_res = self.env['of.product.kit.line']\
+            .read_group([('product_id', 'in', self.ids)], ['product_id'], ['product_id'])
         mapped_data = dict([(data['product_id'][0], data['product_id_count']) for data in read_group_res])
         for product in self:
             product.is_kit_comp = mapped_data.get(product.id, 0) > 0
@@ -197,7 +212,9 @@ class OfProductKitLine(models.Model):
         string='Qty / Kit', digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0,
         help="Quantity per kit unit.")
     product_uom_categ_id = fields.Many2one(related='product_id.uom_id.category_id', readonly=True)
-    product_uom_id = fields.Many2one('product.uom', string='UoM', domain="[('category_id', '=', product_uom_categ_id)]", required=True)
+    product_uom_id = fields.Many2one(
+        'product.uom', string='UoM', domain="[('category_id', '=', product_uom_categ_id)]", required=True
+    )
     product_price = fields.Float(related='product_id.list_price', readonly=True)
     product_cost = fields.Float(related='product_id.standard_price', readonly=True)
     sequence = fields.Integer(string=u'Sequence', default=10)
@@ -242,6 +259,7 @@ class OfProductKitLine(models.Model):
         super(OfProductKitLine, self).unlink()
         products._compute_is_kit_comp()
 
+
 class ProcurementOrder(models.Model):
     _inherit = 'procurement.order'
 
@@ -273,6 +291,7 @@ class StockPicking(models.Model):
                 return
             elif move.procurement_id.of_sale_comp_id.kit_id.order_line_id:
                 self.sale_id = move.procurement_id.of_sale_comp_id.kit_id.order_line_id.order_id
+                return
 
 
 class StockMove(models.Model):
@@ -283,7 +302,8 @@ class StockMove(models.Model):
         # Update delivered quantities on sale order lines that are not kits
         result = super(StockMove, self).action_done()
         # Update delivered quantities on sale order line components
-        sale_order_components = self.filtered(lambda move: move.product_id.expense_policy == 'no').mapped('procurement_id.of_sale_comp_id')  # bug mal initialisé of_sale_comp_id?
+        sale_order_components = self.filtered(lambda move: move.product_id.expense_policy == 'no')\
+            .mapped('procurement_id.of_sale_comp_id')  # bug mal initialisé of_sale_comp_id?
         for comp in sale_order_components:
             comp.qty_delivered = comp._get_delivered_qty()
         lines = sale_order_components.mapped('kit_id.order_line_id')
@@ -293,7 +313,3 @@ class StockMove(models.Model):
             if qty_delivered != 0:
                 line.qty_delivered = qty_delivered
         return result
-
-    @api.model
-    def create(self, vals):
-        return super(StockMove, self).create(vals)
