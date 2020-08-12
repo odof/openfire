@@ -90,6 +90,9 @@ class ProcurementOrder(models.Model):
             move = self.move_dest_id
             sale_line = move and move.procurement_id and move.procurement_id.sale_line_id
         sale_order = sale_line and sale_line.order_id or False
+        if not sale_order:
+            sale_order = self.move_dest_id.picking_id.sale_id
+
         return sale_order
 
     @api.multi
