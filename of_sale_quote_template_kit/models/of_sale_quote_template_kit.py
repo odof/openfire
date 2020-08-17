@@ -12,7 +12,14 @@ class OfSaleorderKit(models.Model):
     # Ajout du champ pour permettre l'utilisation des kits dans les sale.quote.line
     quote_line_id = fields.Many2one('sale.quote.line', string='quote line')
 
-
+    @api.model
+    def _clear_db(self):
+        not_linked = self.search([('order_line_id', '=', False), ('quote_line_id', '=', False)])
+        kits_to_link = self.env['sale.order.line'].search([('kit_id', 'in', not_linked._ids)])
+        for kit in kits_to_link:
+            kit.kit_id.order_line_id = kit.id
+            not_linked -= kit.kit_id
+        not_linked.unlink()
 
 
 class SaleQuoteLine(models.Model):
