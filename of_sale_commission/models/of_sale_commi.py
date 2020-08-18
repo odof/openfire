@@ -163,7 +163,7 @@ class OFSaleCommi(models.Model):
     def _compute_total_commi(self):
         for commi in self:
             if commi.cancel_commi_id:
-                # Sur une commission d'annulation de commission sir acompte, le montant total est
+                # Sur une commission d'annulation de commission sur acompte, le montant total est
                 commi.total_commi = -sum(round(line.px_commi, 2) for line in commi.cancel_commi_id.commi_line_ids)
             else:
                 commi.total_commi = sum(round(line.px_commi, 2) for line in commi.commi_line_ids)
@@ -209,7 +209,7 @@ class OFSaleCommi(models.Model):
     def get_total_du(self):
         self.ensure_one()
         if self.type == 'solde':
-            # On verse la totalite de la commission, moins ce qui a deja ete verse
+            # On verse la totalité de la commission, moins ce qui a déjà été versé
             return self.total_commi - (self.compl_du or 0)
         if type == 'avoir':
             return self.total_commi
@@ -413,7 +413,6 @@ class OFSaleCommi(models.Model):
             orders = invoice.invoice_line_ids.mapped('sale_line_ids').mapped('order_id')
 
             order_commis = self.env['of.sale.commi']
-            commi_lines = commi_line_obj
             compl_du = 0
 
             for order in orders:
@@ -435,9 +434,9 @@ class OFSaleCommi(models.Model):
                     'commi_line_ids': self.make_commi_invoice_lines_from_old(False, invoice, profil),
                 })
         else:
-            # Normalement les commissions sur avoirs sont créés d'origine, ce cas ne devrait se produire
+            # Normalement les commissions sur avoirs sont créées d'origine, ce cas ne devrait se produire
             # que très rarement (erreur de manipulation).
-            # Il n'est pas évident de récupérer la facture associee, on va donc directement recalculer les lignes
+            # Il n'est pas évident de récupérer la facture associée, on va donc directement recalculer les lignes
             invoice = self.invoice_id
             self.update({
                 'compl_du': 0,
@@ -451,7 +450,7 @@ class OFSaleCommi(models.Model):
 
     @api.multi
     def copy_data(self, default=None):
-        # Desactivation de la creation de commission par copie
+        # Désactivation de la création de commission par copie
         return False
 
     @api.model
@@ -507,7 +506,7 @@ class OFSaleCommiLine(models.Model):
 
     commi_id = fields.Many2one('of.sale.commi', string='Commission', required=True, ondelete='cascade')
     product_id = fields.Many2one('product.product', compute='_compute_product_id', string="Article")
-    qty = fields.Float(compute="_compute_qty", string="Quantite")
+    qty = fields.Float(compute="_compute_qty", string=u"Quantité")
     prix_vente = fields.Float(compute='_compute_prix_vente', string="Prix de vente")
     taux_commi = fields.Float(string='Taux Commission')
     px_commi = fields.Float(string='Commission Totale')
@@ -623,7 +622,7 @@ class SaleOrder(models.Model):
 
     @api.multi
     def write(self, vals):
-        # En cas de modification de l'échéancier, recalcul des commissions
+        # En cas de modification des lignes de commande ou de l'échéancier, recalcul des commissions
         result = super(SaleOrder, self).write(vals)
         orders = self.sudo()
         if 'order_line' in vals:
@@ -634,11 +633,12 @@ class SaleOrder(models.Model):
                     continue
                 if commi.state not in ('paid', 'to_cancel', 'cancel'):
                     commi.update_commi()
+            orders.of_verif_acomptes()
         if 'of_echeance_line_ids' in vals:
             # Recalcul du montant dû des commissions
-            for order in orders:
-                for commi in self.mapped('of_commi_ids'):
-                    commi.total_du = commi.get_total_du()
+            for commi in orders.mapped('of_commi_ids'):
+                commi.total_du = commi.get_total_du()
+            orders.of_verif_acomptes()
         if vals.get('state') == 'done':
             orders.filtered(lambda o: o.state == 'draft').action_to_pay()
         return result
