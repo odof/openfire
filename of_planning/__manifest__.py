@@ -12,10 +12,10 @@
 ##############################################################################
 
 {
-    'name' : "OpenFire / Planning",
-    'version' : "10.0.1.0.0",
-    'author' : "OpenFire",
-    'website' : "www.openfire.fr",
+    'name': "OpenFire / Planning",
+    'version': "10.0.1.0.0",
+    'author': "OpenFire",
+    'website': "www.openfire.fr",
     'category': "Generic Modules",
     'summary': u"Gestion des interventions",
     'description': u"""
@@ -26,7 +26,7 @@ Module OpenFire des plannings d'intervention.
 Inclut la gestion des équipes d'intervention.
 
 """,
-    'depends' : [
+    'depends': [
         #'hr',  # par of_calendar
         'product',
         'sale',
@@ -38,7 +38,7 @@ Inclut la gestion des équipes d'intervention.
         'of_utils',
         'of_base_location',  # secteurs
     ],
-    'data' : [
+    'data': [
         'security/of_planning_security.xml',
         'security/ir.model.access.csv',
         'wizard/message_invoice.xml',
@@ -48,7 +48,7 @@ Inclut la gestion des équipes d'intervention.
         'report/of_planning_fiche_intervention_view.xml',
         'report/of_planning_report_templates.xml',
     ],
-    'css' : [
+    'css': [
         'static/src/css/of_planning.css',
     ],
     'installable': True,

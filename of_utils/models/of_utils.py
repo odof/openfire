@@ -45,7 +45,7 @@ def se_chevauchent(min_1, max_1, min_2, max_2, strict=True):
 def hours_to_strs(*hours):
     """ Convertit une liste d'heures sous forme de floats en liste de str de type '00h00'
     """
-    return tuple("%dh%02d" % (hour, round((hour % 1) * 60)) if hour % 1 else "%dh" % (hour) for hour in hours)
+    return tuple("%dh%02d" % (hour, round((hour % 1) * 60)) if hour % 1 else "%dh" % hour for hour in hours)
 
 
 def float_2_heures_minutes(flo):
@@ -63,8 +63,9 @@ def compare_date(date1, date2, compare="==", isdatetime=False):
         return False
     date1 = fields.Datetime.from_string(date1)
     date2 = fields.Datetime.from_string(date2)
-    return safe_eval("date1 " + compare + " date2", {'date1': date1.strftime("%d/%m/%Y %H:%M:%S") if isdatetime else date1.strftime("%d/%m/%Y"),
-                                                     'date2': date2.strftime("%d/%m/%Y %H:%M:%S") if isdatetime else date2.strftime("%d/%m/%Y")})
+    return safe_eval("date1 " + compare + " date2",
+                     {'date1': date1.strftime("%d/%m/%Y %H:%M:%S") if isdatetime else date1.strftime("%d/%m/%Y"),
+                      'date2': date2.strftime("%d/%m/%Y %H:%M:%S") if isdatetime else date2.strftime("%d/%m/%Y")})
 
 
 class BigInteger(fields.Integer):
