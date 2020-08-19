@@ -112,7 +112,6 @@
 
             <page name="extra_info" position="inside">
                 <group string="Liste de documents">
-                    <field name="invoice_ids" nolabel="1" colspan="4" invisible="1"/>
                     <field name="doc_ids" nolabel="1" colspan="4" readonly="1">
                         <tree string="Documents" editable="bottom">
                             <field name="date"/>
@@ -129,18 +128,18 @@
                             <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
                         </tree>
                         <form string="Documents">
-                            <field name="number"/>
-                            <field name="partner_id"/>
-                            <field name="date"/>
-                            <field name="date_due"/>
-                            <field name="user_id"/>
-                            <field name="origin"/>
-                            <field name="residual"/>
-                            <field name="amount_untaxed"/>
-                            <field name="amount_total"/>
-                            <field name="state"/>
-                            <field name="doc_objet" invisible="1"/>
-                            <group colspan="4" col="4">
+                            <group>
+                                <field name="number"/>
+                                <field name="partner_id"/>
+                                <field name="date"/>
+                                <field name="date_due"/>
+                                <field name="user_id"/>
+                                <field name="origin"/>
+                                <field name="residual"/>
+                                <field name="amount_untaxed"/>
+                                <field name="amount_total"/>
+                                <field name="state"/>
+                                <field name="doc_objet" invisible="1"/>
                                 <field name="invoice_id" attrs="{'invisible': [('doc_objet', '!=', 'account.invoice')]}"/>
                                 <field name="sale_order_id" attrs="{'invisible': [('doc_objet', '!=', 'sale.order')]}"/>
                                 <field name="purchase_order_id" attrs="{'invisible': [('doc_objet', '!=', 'purchase.order')]}"/>
