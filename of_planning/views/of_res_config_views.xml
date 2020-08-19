@@ -82,8 +82,4 @@
     <menuitem id="menu_intervention_general_settings" name="Configuration" parent="of_planning.menu_of_planning_configuration"
                 sequence="0" action="of_planning.action_intervention_settings" groups="of_planning.of_group_planning_intervention_modification_tout"/>
 
-    <!-- Refonte droits accès/modification planning intervention 02 sept. 2019 -->
-    <!-- Lors de la 1ère mise à jour, affecter les nouveaux droits planning aux utilisateurs. -->
-    <function model="of.planning.intervention" name="_modifier_droits_existants_utilisateurs"/>
-
 </odoo>

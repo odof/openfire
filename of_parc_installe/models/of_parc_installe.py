@@ -72,6 +72,7 @@ class OFParcInstalle(models.Model):
     _sql_constraints = [('no_serie_uniq', 'unique(name)', u"Ce numéro de série est déjà utilisé et doit être unique.")]
 
     # @api.depends
+
     @api.depends('sale_order_ids', 'account_invoice_ids')
     def _compute_links(self):
         for parc in self:
@@ -128,11 +129,11 @@ class OFParcInstalle(models.Model):
         du contact en premier précédées d'une puce."""
         if self._context.get('partner_id_no_serie_puce'):
             client_id = self._context.get('partner_id_no_serie_puce')
-            res = super(OFParcInstalle, self).name_search(name, [['client_id', '=', client_id]], operator, limit) or []
+            res = super(OFParcInstalle, self).name_search(name, [('client_id', '=', client_id)], operator, limit) or []
             limit = limit - len(res)
             res = [(parc[0], "-> " + parc[1]) for parc in res]
-            res += super(OFParcInstalle, self).name_search(name, [['client_id', '!=', client_id]], operator,
-                                                           limit) or []
+            res += super(OFParcInstalle, self).name_search(
+                name, [('client_id', '!=', client_id)], operator, limit) or []
             return res
         return super(OFParcInstalle, self).name_search(name, args, operator, limit)
 
@@ -188,7 +189,7 @@ class ProjectIssue(models.Model):
     _inherit = ['project.issue', 'of.map.view.mixin']
 
     def _search_of_parc_installe_site_adresse(self, operator, value):
-        "Permet la recherche sur l'adresse d'installation de la machine depuis un SAV"
+        """Permet la recherche sur l'adresse d'installation de la machine depuis un SAV"""
         # Deux cas :
         # - Rechercher tous les SAV qui ont une machine installée mais dont l'adresse d'installation
         #   n'est soit pas renseignée, soit vide (1er cas du if)
@@ -198,7 +199,6 @@ class ProjectIssue(models.Model):
         if value == '' and operator == '=':
             # Si l'opérateur est = et value vide, c'est qu'on vient du filtre personnalisé
             # -> rechercher les adresses d'installation non renseignées ou vides.
-            value = '%%%s%%' % value
             cr.execute(
                 "SELECT project_issue.id AS id\n"
                 "FROM project_issue\n"
@@ -276,11 +276,14 @@ class ProjectIssue(models.Model):
             color = 'gray'
             if issue.date_deadline:
                 date_deadline = fields.Date.from_string(issue.date_deadline)
-                if date_deadline > date_today + timedelta(days=15):  # deadline dans plus de 2 semaines
+                if date_deadline > date_today + timedelta(days=15):
+                    # deadline dans plus de 2 semaines
                     color = "blue"
-                elif date_deadline >= date_today:  # deadline dans moins de 2 semaines
+                elif date_deadline >= date_today:
+                    # deadline dans moins de 2 semaines
                     color = "orange"
-                else:  # deadline passée
+                else:
+                    # deadline passée
                     color = "red"
             issue.of_color_map = color
 

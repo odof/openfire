@@ -273,7 +273,7 @@
     />
 
     <act_window
-        name="Créer RDV Tech"
+        name="Créer intervention"
         res_model="of.planning.intervention"
         src_model="of.planning.intervention"
         view_mode="form"

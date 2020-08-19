@@ -92,107 +92,39 @@ class OfService(models.Model):
         # with_context pour bien récupérer les données en DB
         all_services.with_context(vide_cache=True)._compute_state_poncrec()
 
-    # Default
-
-    def _default_jours(self):
-        # Lundi à vendredi comme valeurs par défaut
-        jours = self.env['of.jours'].search([('numero', 'in', (1, 2, 3, 4, 5))], order="numero")
-        res = [jour.id for jour in jours]
-        return res
-
-    # Search
-
-    def _search_state_ponc(self, operator, operand):
-        services = self.search([])
-        res = safe_eval("services.filtered(lambda s: s.state_ponc %s %s)" % (operator, operand), {'services': services})
-        return [('id', 'in', res.ids)]
-
-    def _search_secteur_tech_id(self, operator, operand):
-        services = self.search([])
-        res = safe_eval("services.filtered(lambda s: s.secteur_tech_id %s %.2f)" % (operator, operand),
-                        {'services': services})
-        return [('id', 'in', res.ids)]
-
-    def _search_duree_restante(self, operator, operand):
-        services = self.search([])
-        res = safe_eval("services.filtered(lambda s: s.duree_restante %s %.2f)" % (operator, operand),
-                        {'services': services})
-        return [('id', 'in', res.ids)]
-
-    @api.model
-    def _search_last_date(self, operator, operand):
-        cr = self._cr
-
-        query = ("SELECT s.id\n"
-                 "FROM of_service AS s\n"
-                 "LEFT JOIN of_planning_intervention AS p\n"
-                 "  ON p.address_id = s.address_id\n"
-                 "  AND p.tache_id = s.tache_id\n")
-
-        if operand:
-            if len(operand) == 10:
-                # Copié depuis osv/expression.py
-                if operator in ('>', '<='):
-                    operand += ' 23:59:59'
-                else:
-                    operand += ' 00:00:00'
-            query += ("GROUP BY s.id\n"
-                      "HAVING MAX(p.date) %s '%s'" % (operator, operand))
-        else:
-            if operator == '=':
-                query += "WHERE p.id IS NULL"
-            else:
-                query += "WHERE p.id IS NOT NULL"
-        cr.execute(query)
-        rows = cr.fetchall()
-        return [('id', 'in', rows and zip(*rows)[0])]
-
-    # Constraints
-
-    @api.constrains('date_next', 'date_fin')
-    def check_alert_dates(self):
-        for service in self:
-            if service.alert_dates:
-                raise UserError(_(u'Intervention (%s): Inchohérence dans les dates' % service.name))
-
-    _sql_constraints = [
-        ('duree_non_nulle_constraint',
-         'CHECK ( duree > 0 )',
-         _(u'La durée de l\'intervention doit ëtre supérieure à 0!')),
-    ]
-
     # Champs
 
     # Titre
     name = fields.Char(u"Libellé", compute="_compute_name", store=True)
     active = fields.Boolean(string="Active", default=True)
-    base_state = fields.Selection([
-        ('draft', u'Brouillon'),  # état par défaut
-        ('calculated', u'Calculé'),  # équivalent a state=False mais utile en XML
-        ('cancel', u'Annulé'),  # manuellement décidé
-    ], u'État de calcul', default="draft", required=True)
-    state = fields.Selection([
-        ('draft', u'Brouillon'),  # état par défaut
-        ('to_plan', u'À planifier prochainement'),  # prochaine intervention dans moins d'un mois
-        ('planned', u'Planifiée récemment'),  # dernière intervention il y a moins d'un mois
-        ('planned_soon', u'Planifiée prochainement'),  # planifié pour dans moins d'un mois
-        ('progress', u'En cours'),  # par défaut
-        ('late', u'En retard de planification'),  # date de prochaine planification il y a plus d'un mois
-        # date de fin <= date du jour || de prochaine planif (rec) // durée restante == 0 et date de fin dépassée (ponc)
-        ('done', u'Terminée'),
-        ('part_planned', u'Partiellement planifiée'),  # intervention(s) et durée restante supérieure à 0
-        ('all_planned', u'Entièrement planifiée'),  # intervention(s) et durée restante == 0
-        ('cancel', u'Annulée'),  # manuellement décidé
-    ], u'État de planification', compute="_compute_state_poncrec", store=True)
-    state_ponc = fields.Selection([
-        ('draft', u'Brouillon'),  # état par défaut
-        ('to_plan', u'À planifier'),  # pas d'intervention
-        ('part_planned', u'Partiellement planifiée'),  # intervention(s) et durée restante supérieure à 0
-        ('all_planned', u'Entièrement planifiée'),  # intervention(s) et durée restante == 0
-        ('late', u'En retard de planification'),  # date de prochaine planification il y a plus d'un mois
-        ('done', u'Fait'),  # intervention(s) et durée restante == 0 et date de fin dépassée
-        ('cancel', u'Annulée'),  # manuellement décidé
-    ], u'État', compute="_compute_state_poncrec", search="_search_state_ponc")
+    base_state = fields.Selection(
+        [('draft', u'Brouillon'),  # état par défaut
+         ('calculated', u'Calculé'),  # équivalent a state=False mais utile en XML
+         ('cancel', u'Annulé')],  # manuellement décidé,
+        u"État de calcul", default="draft", required=True)
+    state = fields.Selection(
+        [('draft', u'Brouillon'),  # état par défaut
+         ('to_plan', u'À planifier prochainement'),  # prochaine intervention dans moins d'un mois
+         ('planned', u'Planifiée récemment'),  # dernière intervention il y a moins d'un mois
+         ('planned_soon', u'Planifiée prochainement'),  # planifié pour dans moins d'un mois
+         ('progress', u'En cours'),  # par défaut
+         ('late', u'En retard de planification'),  # date de prochaine planification il y a plus d'un mois
+         # date de fin <= date du jour || de prochaine planif (rec)
+         # // durée restante == 0 et date de fin dépassée (ponc)
+         ('done', u'Terminée'),
+         ('part_planned', u'Partiellement planifiée'),  # intervention(s) et durée restante supérieure à 0
+         ('all_planned', u'Entièrement planifiée'),  # intervention(s) et durée restante == 0
+         ('cancel', u'Annulée')],  # manuellement décidé
+        u'État de planification', compute="_compute_state_poncrec", store=True)
+    state_ponc = fields.Selection(
+        [('draft', u'Brouillon'),  # état par défaut
+         ('to_plan', u'À planifier'),  # pas d'intervention
+         ('part_planned', u'Partiellement planifiée'),  # intervention(s) et durée restante supérieure à 0
+         ('all_planned', u'Entièrement planifiée'),  # intervention(s) et durée restante == 0
+         ('late', u'En retard de planification'),  # date de prochaine planification il y a plus d'un mois
+         ('done', u'Fait'),  # intervention(s) et durée restante == 0 et date de fin dépassée
+         ('cancel', u'Annulée')],  # manuellement décidé
+         u'État', compute="_compute_state_poncrec", search="_search_state_ponc")
     intervention_ids = fields.One2many('of.planning.intervention', 'service_id', string="RDVs Tech")
     intervention_count = fields.Integer(string='Nombre de RDVs', compute='_compute_intervention_count')
 
@@ -202,8 +134,8 @@ class OfService(models.Model):
     address_address = fields.Char('Adresse', related='address_id.contact_address', readonly=True)
     address_zip = fields.Char('Code Postal', size=24, related='address_id.zip', oldname="partner_zip")
     address_city = fields.Char('Ville', related='address_id.city', oldname="partner_city")
-    secteur_tech_id = fields.Many2one(related='address_id.of_secteur_tech_id', readonly=True,
-                                      search="_search_secteur_tech_id")
+    secteur_tech_id = fields.Many2one(
+        related='address_id.of_secteur_tech_id', readonly=True, search="_search_secteur_tech_id")
     tag_ids = fields.Many2many('of.service.tag', string=u"Étiquettes")
     company_id = fields.Many2one('res.company', string=u"Société")
 
@@ -217,22 +149,26 @@ class OfService(models.Model):
     duree = fields.Float(string=u"Durée estimée")
     duree_planif = fields.Float(string=u"Durée planifiée", compute="_compute_durees")
     duree_restante = fields.Float(string=u"Durée restante", compute="_compute_durees", search='_search_duree_restante')
-    date_next = fields.Date(string="Prochaine planif", help=u"Date à partir de laquelle programmer le prochain RDV",
-                            required=True)
+    date_next = fields.Date(
+        string="Prochaine planif", help=u"Date à partir de laquelle programmer le prochain RDV", required=True)
     date_next_last = fields.Date('Prochaine planif (svg)', help=u"Champ pour conserver une possibilité de rollback")
-    date_fin = fields.Date(string=u"Date de fin de planification",
-                           help=u"Date à partir de laquelle l'intervention devient en retard de planifiaction")
+    date_fin = fields.Date(
+        string=u"Date de fin de planification",
+        help=u"Date à partir de laquelle l'intervention devient en retard de planifiaction")
     date_fin_contrat = fields.Date(u"Date de fin de contrat")
-    jour_ids = fields.Many2many('of.jours', 'service_jours', 'service_id', 'jour_id', string='Jours',
-                                default=_default_jours, help=u"Jours de disponibilité du client.")
+    jour_ids = fields.Many2many(
+        'of.jours', 'service_jours', 'service_id', 'jour_id', string='Jours',
+        default=lambda self: self._default_jours(), help=u"Jours de disponibilité du client.")
     recurrence = fields.Boolean(string=u"Est récurrente", default=True)
-    mois_ids = fields.Many2many('of.mois', 'service_mois', 'service_id', 'mois_id', string='Mois',
-                                help=u"Mois de référence pour la planification.")
-    recurring_rule_type = fields.Selection([
-        ('monthly', 'Mois'),
-        ('yearly', u'Année(s)'),
-    ], string=u'Récurrence', default='yearly',
-        help=u"Spécifier l'intervalle pour le calcul automatique de date de prochaine planification dans les interventions.")
+    mois_ids = fields.Many2many(
+        'of.mois', 'service_mois', 'service_id', 'mois_id', string='Mois',
+        help=u"Mois de référence pour la planification.")
+    recurring_rule_type = fields.Selection(
+        [('monthly', 'Mois'),
+         ('yearly', u'Année(s)')],
+        string=u'Récurrence', default='yearly',
+        help=u"Spécifier l'intervalle pour le calcul automatique de la date de prochaine planification"
+             u" dans les interventions.")
     recurring_interval = fields.Integer(string=u'Répéter chaque', default=1, help=u"Répéter (Mois/Années)")
 
     # Rubrique Description
@@ -260,7 +196,29 @@ class OfService(models.Model):
     date_fin_max = fields.Date(string=u"Date échéance max", compute='lambda *a, **k:{}')
     date_controle = fields.Date(string=u"Date de contrôle", compute='lambda *a, **k:{}')
 
-    # @api.depends
+    # Constraints
+
+    @api.constrains('date_next', 'date_fin')
+    def check_alert_dates(self):
+        for service in self:
+            if service.alert_dates:
+                raise UserError(_(u'Intervention (%s): Inchohérence dans les dates' % service.name))
+
+    _sql_constraints = [
+        ('duree_non_nulle_constraint',
+         'CHECK ( duree > 0 )',
+         _(u"La durée de l'intervention doit être supérieure à 0!")),
+    ]
+
+    # Default
+
+    def _default_jours(self):
+        # Lundi à vendredi comme valeurs par défaut
+        jours = self.env['of.jours'].search([('numero', 'in', (1, 2, 3, 4, 5))], order="numero")
+        res = [jour.id for jour in jours]
+        return res
+
+    # Compute/search methods
 
     @api.multi
     @api.depends('address_id', 'partner_id', 'tache_id')
@@ -280,12 +238,23 @@ class OfService(models.Model):
                 service.state_ponc = service_state
             service.state = service_state
 
+    def _search_state_ponc(self, operator, operand):
+        services = self.search([])
+        res = safe_eval("services.filtered(lambda s: s.state_ponc %s %s)" % (operator, operand), {'services': services})
+        return [('id', 'in', res.ids)]
+
     @api.depends('intervention_ids')
     @api.multi
     def _compute_intervention_count(self):
         for service in self:
             service.intervention_count = len(service.intervention_ids.filtered(
                 lambda r: r.state in ('draft', 'confirm', 'done')))
+
+    def _search_secteur_tech_id(self, operator, operand):
+        services = self.search([])
+        res = safe_eval("services.filtered(lambda s: s.secteur_tech_id %s %.2f)" % (operator, operand),
+                        {'services': services})
+        return [('id', 'in', res.ids)]
 
     @api.multi
     @api.depends('duree', 'intervention_ids', 'recurrence', 'intervention_ids.state', 'date_next')
@@ -299,7 +268,8 @@ class OfService(models.Model):
                 service.date_last = False
 
             if service.recurrence and service.date_next:
-                # On cherche la durée planifiée pour l'occurence en cours. Il nous faut savoir quelle est l'occurrence en cours
+                # On cherche la durée planifiée pour l'occurence en cours.
+                # Il nous faut savoir quelle est l'occurrence en cours
                 date_next_ref_str = service.get_date_proche(fields.Date.today())  # début d'occurence en cours
                 date_fin_ref_str = service.get_fin_date(date_next_ref_str)  # fin d'occurence en cours
                 date_next_ref_da = fields.Date.from_string(date_next_ref_str)
@@ -328,6 +298,12 @@ class OfService(models.Model):
             service.duree_planif = sum(plannings.mapped('duree'))
             service.duree_restante = service.duree > service.duree_planif and service.duree - service.duree_planif or 0
 
+    def _search_duree_restante(self, operator, operand):
+        services = self.search([])
+        res = safe_eval("services.filtered(lambda s: s.duree_restante %s %.2f)" % (operator, operand),
+                        {'services': services})
+        return [('id', 'in', res.ids)]
+
     @api.depends('date_next', 'date_fin')
     def _compute_alert_dates(self):
         for service in self:
@@ -352,6 +328,34 @@ class OfService(models.Model):
                 service.color = 'red'
             else:
                 service.color = 'gray'
+
+    @api.model
+    def _search_last_date(self, operator, operand):
+        cr = self._cr
+
+        query = ("SELECT s.id\n"
+                 "FROM of_service AS s\n"
+                 "LEFT JOIN of_planning_intervention AS p\n"
+                 "  ON p.address_id = s.address_id\n"
+                 "  AND p.tache_id = s.tache_id\n")
+
+        if operand:
+            if len(operand) == 10:
+                # Copié depuis osv/expression.py
+                if operator in ('>', '<='):
+                    operand += ' 23:59:59'
+                else:
+                    operand += ' 00:00:00'
+            query += ("GROUP BY s.id\n"
+                      "HAVING MAX(p.date) %s '%s'" % (operator, operand))
+        else:
+            if operator == '=':
+                query += "WHERE p.id IS NULL"
+            else:
+                query += "WHERE p.id IS NOT NULL"
+        cr.execute(query)
+        rows = cr.fetchall()
+        return [('id', 'in', rows and zip(*rows)[0])]
 
     # @api.onchange
 
@@ -386,6 +390,16 @@ class OfService(models.Model):
         if self.date_next:
             self.date_fin = self.get_fin_date()
 
+    # CRUD
+
+    @api.model
+    def create(self, vals):
+        if vals.get('address_id') and not vals.get('partner_id'):
+            address = self.env['res.partner'].browse(vals['address_id'])
+            partner = address.parent_id or address
+            vals['partner_id'] = partner.id
+        return super(OfService, self).create(vals)
+
     # Héritages
 
     @api.model
@@ -398,14 +412,6 @@ class OfService(models.Model):
         v1 = {'label': u'À planifier', 'value': 'orange'}
         v2 = {'label': u'En retard', 'value': 'red'}
         return {"title": title, "values": (v0, v1, v2)}
-
-    @api.model
-    def create(self, vals):
-        if vals.get('address_id') and not vals.get('partner_id'):
-            address = self.env['res.partner'].browse(vals['address_id'])
-            partner = address.parent_id or address
-            vals['partner_id'] = partner.id
-        return super(OfService, self).create(vals)
 
     # Actions
 
@@ -657,8 +663,9 @@ class OfService(models.Model):
                 if self.recurrence:
                     # un mois par défaut pour les ramonages et entretiens
                     date_fin += relativedelta(months=1)
-                elif self.sav_id:
+                elif getattr(self, 'sav_id', False):
                     # une semaine par défaut pour les SAV
+                    # Utilisation de getattr() pour permettre un fonctionnement sans installation du module des sav
                     date_fin += relativedelta(weeks=1)
                 else:
                     # 2 semaines par défaut
@@ -695,7 +702,8 @@ class OfService(models.Model):
             action_context['force_date_start'] = self.intervention_ids[-1].date_date
             action_context['search_default_service_id'] = self.id
         elif self.base_state != 'calculated' or self.state == 'done':
-            # inhiber la création en vue calendrier si l'intervention n'est pas planifiable (brouillon, annulée, terminée)
+            # inhiber la création en vue calendrier si l'intervention n'est pas planifiable
+            # (brouillon, annulée, terminée)
             action_context['inhiber_create'] = True
             if self.state == 'done':
                 param = u"terminée"
@@ -722,11 +730,12 @@ class OFPlanningTache(models.Model):
     service_count = fields.Integer(compute='_compute_service_count')
 
     recurrence = fields.Boolean(u"Tâche récurrente?")
-    recurring_rule_type = fields.Selection([
-        ('monthly', 'Mois'),
-        ('yearly', u'Année(s)'),
-        ], string=u'Récurrence', default='yearly',
-        help=u"Spécifier l'intervalle pour le calcul automatique de date de prochaine planification dans les interventions récurrentes.")
+    recurring_rule_type = fields.Selection(
+        [('monthly', 'Mois'),
+         ('yearly', u'Année(s)')],
+        string=u'Récurrence', default='yearly',
+        help=u"Spécifier l'intervalle pour le calcul automatique de la date de prochaine planification dans les"
+             u" interventions récurrentes.")
     recurring_interval = fields.Integer(string=u'Répéter chaque', default=1, help=u"Répéter (Mois/Années)")
     recurrence_display = fields.Char(string=u"Récurrence", compute="_compute_recurrence_display")  # pour la vue liste
 

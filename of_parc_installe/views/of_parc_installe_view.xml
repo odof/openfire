@@ -23,6 +23,14 @@
                     <filter string="Revendeur" icon="terp-personal" context="{'group_by': 'revendeur_id'}"/>
                     <filter string="Code postal" icon="terp-personal" context="{'group_by': 'zip_site_id'}"/>
                 </group>
+                <separator/>
+                <filter string="Conforme" name="conforme" domain="[('conforme', '=', True)]"/>
+                <filter string="Non conforme" name="non_conforme" domain="[('conforme', '=', False)]"/>
+                <separator/>
+                <filter string="Neuf" name="neuf" domain="[('state', '=', 'neuf')]"/>
+                <filter string="Bon" name="bon" domain="[('state', '=', 'bon')]"/>
+                <filter string="Usagé" name="usage" domain="[('state', '=', 'usage')]"/>
+                <filter string="À remplacer" name="remplacer" domain="[('state', '=', 'remplacer')]"/>
             </search>
         </field>
     </record>
@@ -55,12 +63,21 @@
                         <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
                             <field name="active" widget="boolean_button" options="{&quot;terminology&quot;: &quot;archive&quot;}"/>
                         </button>
+                        <button name="action_view_orders" type="object" class="oe_stat_button" icon="fa-usd">
+                            <field name="sale_order_amount" string="Commandes" widget="statinfo"/>
+                        </button>
+                        <button name="action_view_invoices" type="object" class="oe_stat_button" icon="fa-pencil-square-o">
+                            <field name="account_invoice_amount" string="Factures" widget="statinfo"/>
+                        </button>
                     </div>
                     <separator string="Produit installé"/>
                     <group name="produit_installe">
                         <field name="name" placeholder="No de série ..." colspan="2"/>
                         <field name="product_id" placeholder="Article ..."/>
+                        <field name="brand_id"/>
                         <field name="product_category_id"/>
+                        <field name="modele"/>
+                        <field name="state" required="1"/>
                     </group>
                     <group>
                         <group name="client" string="Client">
@@ -77,8 +94,10 @@
                             <label for="tel_site_id" string=" "/>
                             <field name="tel_site_id" nolabel="1"/>
                         </group>
-                        <group name="pose" string="Pose">
-                               <field name="revendeur_id"/>
+                        <group name="pose" string="Installation">
+                            <field name="installation"/>
+                            <field name="conforme"/>
+                            <field name="revendeur_id"/>
                             <field name="installateur_id"/>
                         </group>
                     </group>
@@ -292,7 +311,78 @@
     </record>
 
 <!-- *************************************************** -->
-<!-- ********** VUE PARTENAIRES (res.partner) ********** -->
+<!-- ************* PARTENAIRE (res.partner) ************ -->
+<!-- *************************************************** -->
+
+    <!-- Mettre revendeur, installateur, payeur dans formulaire partenaires -->
+    <record id="of_res_partner_form_pi" model="ir.ui.view">
+        <field name="name">of.res.partner.form.pi</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="groups_id" eval="[(4, ref('project.group_project_user'))]"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button" type="action"
+                    attrs="{'invisible': [('customer', '=', False)]}"
+                    name="%(action_view_of_parc_installe_sale)d"
+                    icon="fa-home"
+                    context="{'search_default_client_id': active_id}">
+                    <field string="Parc Installé" name="of_parc_installe_count" widget="statinfo"/>
+                </button>
+            </div>
+            <field name="user_id" position="after">
+                <field name="of_revendeur"/>
+                <field name="of_installateur"/>
+            </field>
+        </field>
+    </record>
+
+<!-- *************************************************** -->
+<!-- *********** DEVIS/COMMANDE (sale.order) *********** -->
+<!-- *************************************************** -->
+
+<record id="of_parc_installe_order_form_view" model="ir.ui.view">
+    <field name="name">of.parc.installe.order.form.view</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="//div[@name='button_box']" position="inside">
+            <button class="oe_stat_button" name="action_view_parc_installe" type="object" icon="fa-home" attrs="{'invisible': [('of_parc_count', '=', 0)]}">
+                <field string="Parc installé" name="of_parc_count" widget="statinfo"/>
+            </button>
+        </xpath>
+    </field>
+</record>
+
+<!-- *************************************************** -->
+<!-- ************ FACTURES (account.invoice) *********** -->
+<!-- *************************************************** -->
+
+<record id="of_parc_installe_invoice_form_view" model="ir.ui.view">
+    <field name="name">of.parc.installe.invoice.form.view</field>
+    <field name="model">account.invoice</field>
+    <field name="inherit_id" ref="of_account.of_account_invoice_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="//div[@name='button_box']" position="inside">
+            <button class="oe_stat_button" name="action_view_parc_installe" type="object" icon="fa-home" attrs="{'invisible': [('of_parc_count', '=', 0)]}">
+                <field string="Parc installé" name="of_parc_count" widget="statinfo"/>
+            </button>
+        </xpath>
+    </field>
+</record>
+
+<!-- *************************************************** -->
+<!-- ********************** MENUS  ********************* -->
+<!-- *************************************************** -->
+
+    <!-- Menu parc installé -->
+    <menuitem id="menu_of_parc_installe" action="action_view_of_parc_installe_sale" name="Parc installé"
+         parent="sales_team.menu_sales" groups="project.group_project_user" sequence="100"/>
+    <menuitem id="menu_of_parc_installe_planning" action="action_view_of_parc_installe_planning" name="Parc installé"
+        parent="of_planning.menu_of_planning_clients" groups="project.group_project_user" sequence="20"/>
+
+<!-- *************************************************** -->
+<!-- ********************* ACTIONS ********************* -->
 <!-- *************************************************** -->
 
     <!-- Action vue parc installé -->
@@ -323,44 +413,6 @@
     <record id="of_project_issue.action_of_project_issue_view_planning" model="ir.actions.act_window">
         <field name="view_mode">tree,kanban,map,form,pivot,graph</field>
     </record>
-
-    <!-- Mettre revendeur, installateur, payeur dans formulaire partenaires -->
-    <record id="of_res_partner_form_pi" model="ir.ui.view">
-        <field name="name">of.res.partner.form.pi</field>
-        <field name="model">res.partner</field>
-        <field name="inherit_id" ref="base.view_partner_form"/>
-        <field name="groups_id" eval="[(4, ref('project.group_project_user'))]"/>
-        <field name="arch" type="xml">
-            <div name="button_box" position="inside">
-                <button class="oe_stat_button" type="action"
-                    attrs="{'invisible': [('customer', '=', False)]}"
-                    name="%(action_view_of_parc_installe_sale)d"
-                    icon="fa-home"
-                    context="{'search_default_client_id': active_id}">
-                    <field string="Parc Installé" name="of_parc_installe_count" widget="statinfo"/>
-                </button>
-            </div>
-            <field name="user_id" position="after">
-                <field name="of_revendeur"/>
-                <field name="of_installateur"/>
-            </field>
-        </field>
-    </record>
-
-
-<!-- *************************************************** -->
-<!-- ********************** MENUS ********************** -->
-<!-- *************************************************** -->
-
-    <!-- Menu parc installé -->
-    <menuitem id="menu_of_parc_installe" action="action_view_of_parc_installe_sale" name="Parc installé"
-         parent="sales_team.menu_sales" groups="project.group_project_user" sequence="100"/>
-    <menuitem id="menu_of_parc_installe_planning" action="action_view_of_parc_installe_planning" name="Parc installé"
-        parent="of_planning.menu_of_planning_clients" groups="project.group_project_user" sequence="20"/>
-
-<!-- *************************************************** -->
-<!-- ********************* ACTIONS ********************* -->
-<!-- *************************************************** -->
 
     <!-- Lien pour action créer SAV depuis parc installé -->
     <record id="of_action_pi_open_creer_sav" model="ir.actions.server">

@@ -37,47 +37,42 @@ class OfTourneeRdv(models.TransientModel):
         service_obj = self.env['of.service']
         partner_obj = self.env['res.partner']
         active_model = self._context.get('active_model', '')
-        service_id = False
-        partner_id = False
+        service = False
+        partner = False
         address = False
         if active_model == 'res.partner':
             partner_id = self._context['active_ids'][0]
             partner = partner_obj.browse(partner_id)
-            service = service_obj.search([('partner_id', '=', partner.id), ('recurrence', '=', True)],
-                                                    limit=1)
-            service_id = service and service.id or False
+            service = service_obj.search([('partner_id', '=', partner.id), ('recurrence', '=', True)], limit=1)
             address = partner_obj.browse(partner.address_get(['delivery'])['delivery'])
         elif active_model == 'of.service':
             service_id = self._context['active_ids'][0]
             service = service_obj.browse(service_id)
-            partner_id = service.partner_id.id
+            partner = service.partner_id
             address = service.address_id
         elif active_model == 'sale.order':
             order_id = self._context['active_ids'][0]
             order = self.env['sale.order'].browse(order_id)
-            partner_id = order.partner_id.id
+            partner = order.partner_id
             service = service_obj.search([('order_id', '=', order_id)], limit=1)
             if not service:
-                service = service_obj.search([('partner_id', '=', partner_id)], limit=1)
-            service_id = service and service.id or False
+                service = service_obj.search([('partner_id', '=', partner.id)], limit=1)
             address = order.partner_shipping_id or order.partner_id
 
         if address and not (address.geo_lat or address.geo_lng):
             address = partner_obj.search(['|', ('id', '=', partner.id), ('parent_id', '=', partner.id),
                                           '|', ('geo_lat', '!=', 0), ('geo_lng', '!=', 0)],
                                          limit=1) or address
-        address_id = address and address.id or False
 
-        res['partner_id'] = partner_id
-        res['partner_address_id'] = address_id
-        res['service_id'] = service_id
-
+        res['partner_id'] = partner and partner.id or False
+        res['partner_address_id'] = address and address.id or False
+        res['service_id'] = service and service.id or False
         return res
 
     # Champs de recherche
 
     partner_id = fields.Many2one(
-        'res.partner', string='Client', required=True, readonly=True)
+        'res.partner', string="Client", required=True, readonly=True)
     partner_address_id = fields.Many2one(
         'res.partner', string="Adresse d'intervention", required=True,
         domain="['|', ('id', '=', partner_id), ('parent_id', '=', partner_id)]")
@@ -92,16 +87,16 @@ class OfTourneeRdv(models.TransientModel):
     partner_address_state_id = fields.Many2one(related="partner_address_id.state_id", readonly=True)
     partner_address_zip = fields.Char(related="partner_address_id.zip", readonly=True)
     partner_address_country_id = fields.Many2one(related="partner_address_id.country_id", readonly=True)
-    service_id = fields.Many2one('of.service', string=u'À programmer', domain="[('partner_id', '=', partner_id)]")
-    tache_id = fields.Many2one('of.planning.tache', string=u'Tâche', required=True)
+    service_id = fields.Many2one('of.service', string=u"À programmer", domain="[('partner_id', '=', partner_id)]")
+    tache_id = fields.Many2one('of.planning.tache', string=u"Tâche", required=True)
     creer_recurrence = fields.Boolean(
         string=u"Créer récurrence?",
-        help=u"Si cette case est cochée et qu'il n'existe pas d'intervention récurrente lié à ce RDV, en crééra un.")
+        help=u"Créera une intervention récurrente s'il n'en existe pas déjà une associée à ce RDV.")
     duree = fields.Float(string=u'Durée', required=True, digits=(12, 5))
     pre_employee_ids = fields.Many2many(
         'hr.employee', string=u"Pré-sélection d'intervenants",
         domain="['|', ('of_tache_ids', 'in', tache_id), ('of_toutes_taches', '=', True)]",
-        help=u"pré-sélection des intervenants")
+        help=u"Pré-sélection des intervenants")
 
     date_recherche_debut = fields.Date(
         string=u"À partir du", required=True,
@@ -124,17 +119,18 @@ class OfTourneeRdv(models.TransientModel):
         domain=[('intervention_id', '=', False), ('allday', '=', False)])
     res_line_id = fields.Many2one("of.tournee.rdv.line", string=u"Créneau Sélectionné")
 
-    name = fields.Char(string=u'Libellé', size=64, required=False)
-    description = fields.Html(string='Description')
+    name = fields.Char(string=u"Libellé", size=64, required=False)
+    description = fields.Html(string="Description")
     employee_id = fields.Many2one('hr.employee', string=u"Intervenant")
-    date_propos = fields.Datetime(string=u'RDV Début')
-    date_propos_hour = fields.Float(string=u'Heure de début', digits=(12, 5))
-    date_display = fields.Char(string='Jour du RDV', size=64, readonly=True)
+    date_propos = fields.Datetime(string=u"RDV Début")
+    date_propos_hour = fields.Float(string=u"Heure de début", digits=(12, 5))
+    date_display = fields.Char(string="Jour du RDV", size=64, readonly=True)
 
     # champs pour la création ou mise à jour d'interventions récurrentes
-    date_next = fields.Date(string=u'Prochaine intervention', help=u"Date à partir de laquelle programmer la prochaine intervention")
-    date_fin_planif = fields.Date(string=u'expiration de prochaine planif',
-                            help=u"Date à partir de laquelle l'intervention devient en retard")
+    date_next = fields.Date(
+        string=u'Prochaine intervention', help=u"Date à partir de laquelle programmer la prochaine intervention")
+    date_fin_planif = fields.Date(
+        string=u'expiration de prochaine planif', help=u"Date à partir de laquelle l'intervention devient en retard")
 
     # @api.depends
 
@@ -154,7 +150,7 @@ class OfTourneeRdv(models.TransientModel):
 
     @api.onchange('service_id')
     def _onchange_service(self):
-        """Affecter la tâche, la description et l'adresse"""
+        """Affecte la tâche, la description et l'adresse"""
         if not self.service_id:
             return
 
@@ -172,7 +168,7 @@ class OfTourneeRdv(models.TransientModel):
 
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
-        """Affecter creer_recurrence, duree et pre_employee_ids"""
+        """Affecte creer_recurrence, duree et pre_employee_ids"""
         service_obj = self.env['of.service']
         vals = {'service_id': False}
         if self.tache_id:
@@ -202,7 +198,7 @@ class OfTourneeRdv(models.TransientModel):
 
     @api.onchange('date_recherche_debut')
     def _onchange_date_recherche_debut(self):
-        """Affecter date_recherche_fin"""
+        """Affecte date_recherche_fin"""
         self.ensure_one()
         if self.date_recherche_debut:
             date_deb = fields.Date.from_string(self.date_recherche_debut)
@@ -211,14 +207,14 @@ class OfTourneeRdv(models.TransientModel):
 
     @api.onchange('date_recherche_fin')
     def _onchange_date_recherche_fin(self):
-        """Vérifier cohérence des dates de recherche"""
+        """Vérifie la cohérence des dates de recherche"""
         self.ensure_one()
         if self.date_recherche_fin and self.date_recherche_fin < self.date_recherche_debut:
             raise UserError(u"La date de fin de recherche doit être postérieure à la date de début de recherche")
 
     @api.onchange('mode_recherche')
     def _onchange_mode_recherche(self):
-        """Affecter max_recherche"""
+        """Affecte max_recherche"""
         self.ensure_one()
         if self.mode_recherche:
             self.max_recherche = self.mode_recherche == 'distance' and 50 or 60
@@ -227,7 +223,7 @@ class OfTourneeRdv(models.TransientModel):
 
     @api.multi
     def button_geocode(self):
-        """Géocoder le partenaire"""
+        """Géocode le partenaire"""
         self.ensure_one()
         if self.geocode_retry:
             raise UserError("Votre géocodeur par défaut n'a pas réussi a géocoder cette adresse")
@@ -260,8 +256,8 @@ class OfTourneeRdv(models.TransientModel):
     @api.multi
     def button_confirm(self):
         """
-        Créé un RDV d'intervention puis l'ouvre en vue form.
-        Créé aussi une intervention récurrente si besoin
+        Crée un RDV d'intervention puis l'ouvre en vue form.
+        Crée aussi une intervention récurrente si besoin.
         """
         self.ensure_one()
         if not self._context.get('tz'):
@@ -315,7 +311,7 @@ class OfTourneeRdv(models.TransientModel):
     @api.multi
     def compute(self):
         u"""
-        Remplis le champ planning_ids avec les créneaux non travaillés et les RDV tech.
+        Remplit le champ planning_ids avec les créneaux non travaillés et les RDV tech.
         Lance le calcul des distances et sélectionne un résultat si il y en a
         """
         self.ensure_one()
@@ -422,7 +418,8 @@ class OfTourneeRdv(models.TransientModel):
                 intervention_dates = [intervention]
                 for intervention_date in (intervention.date, intervention.date_deadline):
                     # Conversion des dates de début et de fin en nombre flottant et à l'heure locale
-                    date_intervention_locale_dt = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(intervention_date))
+                    date_intervention_locale_dt = fields.Datetime.context_timestamp(
+                        self, fields.Datetime.from_string(intervention_date))
 
                     # Comme on n'affiche que les heures, il faut s'assurer de rester dans le bon jour
                     #   (pour les interventions étalées sur plusieurs jours)
@@ -435,7 +432,7 @@ class OfTourneeRdv(models.TransientModel):
 
                 for employee_id in intervention.employee_ids.ids:
                     if employee_id in employees_dispo:
-                        employee_intervention_dates[employee_id].append(intervention_dates)  # (intervention_id, flo_debut, flo_fin)
+                        employee_intervention_dates[employee_id].append(intervention_dates)
 
             # Calcul des créneaux dispos
             for employee in employee_obj.browse(employees_dispo):
@@ -454,7 +451,8 @@ class OfTourneeRdv(models.TransientModel):
                             # Un trou dans le planning, suffisant pour un créneau?
                             duree = 0.0
                             creneaux_temp = []
-                            while float_compare(fin, intervention_deb, compare_precision) != 1:   # fin <= intervention_deb
+                            while float_compare(fin, intervention_deb, compare_precision) != 1:
+                                # fin <= intervention_deb
                                 # Le temps disponible est éclaté avec des temps de pause
                                 duree += fin - deb
                                 creneaux_temp.append((deb, fin))
@@ -491,9 +489,11 @@ class OfTourneeRdv(models.TransientModel):
                     for intervention_deb, intervention_fin in creneaux:
                         description = "%s-%s" % tuple(hours_to_strs(intervention_deb, intervention_fin))
 
-                        date_debut_dt = datetime.combine(date_recherche_da, datetime.min.time()) + timedelta(hours=intervention_deb)
+                        date_debut_dt = datetime.combine(date_recherche_da, datetime.min.time())\
+                                        + timedelta(hours=intervention_deb)
                         date_debut_dt = tz.localize(date_debut_dt, is_dst=None).astimezone(pytz.utc)
-                        date_fin_dt = datetime.combine(date_recherche_da, datetime.min.time()) + timedelta(hours=intervention_fin)
+                        date_fin_dt = datetime.combine(date_recherche_da, datetime.min.time())\
+                                      + timedelta(hours=intervention_fin)
                         date_fin_dt = tz.localize(date_fin_dt, is_dst=None).astimezone(pytz.utc)
 
                         wizard_line_obj.create({
@@ -568,7 +568,7 @@ class OfTourneeRdv(models.TransientModel):
             vals = {
                 'date_display'    : first_res.date,
                 'name'            : name,
-                'employee_id'       : first_res.employee_id.id,
+                'employee_id'     : first_res.employee_id.id,
                 'date_propos'     : date_propos_dt,  # datetime utc
                 'date_propos_hour': first_res.date_flo,
                 'res_line_id'     : first_res.id,
@@ -593,7 +593,7 @@ class OfTourneeRdv(models.TransientModel):
 
         else:
             vals = {
-                'display_res' : True,
+                'display_res': True,
                 'zero_result': True,
                 'zero_dispo': False,
             }
@@ -724,7 +724,8 @@ class OfTourneeRdv(models.TransientModel):
                 if self.orthodromique:
                     for i in range(len(coords) - 1):
                         # Coords[i+1] existe toujours
-                        dist = distance_points(coords[i]['lat'], coords[i]['lng'], coords[i + 1]['lat'], coords[i + 1]['lng'])
+                        dist = distance_points(coords[i]['lat'], coords[i]['lng'],
+                                               coords[i + 1]['lat'], coords[i + 1]['lng'])
                         legs.append({'distance': dist, 'duration': -1})
                 else:
                     query_send = urllib.quote(query.strip().encode('utf8')).replace('%3A', ':')
@@ -732,7 +733,7 @@ class OfTourneeRdv(models.TransientModel):
                     try:
                         req = requests.get(full_query)
                         res = req.json()
-                    except Exception as e:
+                    except Exception:
                         res = {}
 
                 if res and res.get('routes') or legs:
@@ -937,4 +938,4 @@ class OfTourneeRdvLine(models.TransientModel):
         v1 = {'label': u'Confirmé', 'value': 1}
         v2 = {'label': u'Réalisé', 'value': 2}
         v3 = {'label': u'Disponibilité', 'value': 3}
-        return (v0, v1, v2, v3)
+        return v0, v1, v2, v3

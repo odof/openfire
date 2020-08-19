@@ -11,12 +11,6 @@ from datetime import datetime, timedelta
 PLANNING_VIEW = ('planning', 'Planning')
 
 
-@api.model
-def _tz_get(self):
-    # put POSIX 'Etc/*' entries at the end to avoid confusing users - see bug 1086728
-    return [(tz, tz) for tz in sorted(pytz.all_timezones, key=lambda tz: tz if not tz.startswith('Etc/') else '_')]
-
-
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
@@ -142,9 +136,9 @@ class OfPlanningIntervention(models.Model):
     @api.model
     def pause_interv(self, heures_interv, creneaux):
         """
-        Renvois la durée de pause entre le début et la fin d'un RDV Tech.
-        Ne fonctionne pas pour les RDV sur plusieurs jours à l'heure actuelle.
-        Principe: On trouve le créneau de début du RDV ainsi que celui de fin.
+        Renvoie la durée de pause entre le début et la fin d'une intervention.
+        Ne fonctionne pas pour les interventions sur plusieurs jours à l'heure actuelle.
+        Principe: On trouve le créneau de début de l'intervention ainsi que celui de fin.
         Puis on fait la somme des pauses entre ces créneaux.
         :param heures_interv: Tuple (heure_debut, heure_fin)
         :param creneaux: liste des créneaux travaillés de la journée exemple: [(8, 12), (14, 18)]
@@ -177,7 +171,7 @@ class OfPlanningIntervention(models.Model):
     def get_emp_horaires_info(self, employee_ids, date_start, date_stop, horaires_list_dict=False):
         """
         Fonction appelée par le javascript de la vue Planning.
-        Renvois toutes les informations nécessaires à l'affichage de la vue Planning:
+        Renvoie toutes les informations nécessaires à l'affichage de la vue Planning:
         Les segments horaires, les infos de fillerbars, les infos de créneaux dispos
         :param employee_ids: [List] d'id des employés à évaluer
         :param date_start: [String] Date de début d'évaluation (incluse)
@@ -196,7 +190,7 @@ class OfPlanningIntervention(models.Model):
         # durée minimale pour qu'un créneau libre soit consiféré comme disponible
         duree_min = self.env['ir.values'].get_default("of.intervention.settings", "duree_min_creneaux_dispo") or 0.5
 
-        # Récupérer les segments des employés s'ils ne sont pas fournis en paramètre
+        # On récupère les segments des employés s'ils ne sont pas fournis en paramètre
         if not horaires_list_dict:
             horaires_list_dict = employees.get_horaires_list_dict(date_start, date_stop)
 
@@ -226,13 +220,13 @@ class OfPlanningIntervention(models.Model):
             res[employee_id]['tz_offset'] = tz_offset
             res[employee_id]['color_bg'] = employee.of_color_bg
             res[employee_id]['color_ft'] = employee.of_color_ft
-            # liste d'indexe qui a une colonne associe un indexe de segment horaire
+            # liste d'index qui a une colonne associe un index de segment horaire
             # exemple: Une semaine à évaluer dont les 2 premiers jours sont sur un segment et le reste sur le suivant
             # res[employee_id]['col_offset_to_segment'] = [x, x, x+1, x+1, x+1, x+1, x+1]
             res[employee_id]['col_offset_to_segment'] = []
             segments_horaires = res[employee_id]['segments']
-            index_courant = 0  # indexe du segment courant
-            i_col_offset_to_segment = 0  # indexe qui à un col_offset associe un indexe de segment horaires
+            index_courant = 0  # index du segment courant
+            i_col_offset_to_segment = 0  # index qui à un col_offset associe un index de segment horaires
             segment_courant = segments_horaires and segments_horaires[index_courant] or False
             if not segment_courant:  # foolproofing
                 continue
@@ -240,7 +234,7 @@ class OfPlanningIntervention(models.Model):
             creneaux_dispozz = []  # liste de liste pour les créneaux dispos. Une sous-liste par jour
             date_current_da = date_start_da
 
-            # Parcourir toutes les dates à évaluer
+            # Parcours de toutes les dates à évaluer
             while date_current_da <= date_stop_da:
                 res[employee_id]['col_offset_to_segment'].append(i_col_offset_to_segment)
                 num_jour = date_current_da.isoweekday()
@@ -257,7 +251,8 @@ class OfPlanningIntervention(models.Model):
                 }
 
                 horaires_du_jour = segment_courant[2].get(num_jour, False)  # [ [h_debut, h_fin] ,  .. ]
-                if not horaires_du_jour:  # ne travaille pas ce jour ci
+                if not horaires_du_jour:
+                    # L'employé ne travaille pas ce jour ci
                     fillerbarzz.append(fillerbar)
                     creneaux_dispozz.append([])
                     date_current_da += un_jour
@@ -279,12 +274,13 @@ class OfPlanningIntervention(models.Model):
                 journee_fin = horaires_du_jour[-1][1]
 
                 date_current_str = fields.Date.to_string(date_current_da)
-                # récupérer tous les rdvs de la journée
-                interventions = intervention_obj.sudo().search([('employee_ids', 'in', employee_id),
-                                                                ('date', '<=', date_current_str),
-                                                                ('date_deadline', '>=', date_current_str),
-                                                                ('state', 'in', ('draft', 'confirm', 'done')),
-                                                                ], order='date')
+                # On récupère tous les rdvs de la journée
+                interventions = intervention_obj.sudo().search(
+                    [('employee_ids', 'in', employee_id),
+                     ('date', '<=', date_current_str),
+                     ('date_deadline', '>=', date_current_str),
+                     ('state', 'in', ('draft', 'confirm', 'done'))],
+                    order='date')
                 intervention_liste = []
                 # Journée entièrement libre
                 if not interventions:
@@ -293,9 +289,8 @@ class OfPlanningIntervention(models.Model):
                     fillerbarzz.append(fillerbar)
                     # Ne pas calculer les créneaux dispos dans le passé
                     if date_current_str >= date_today_str:
-                        creneaux_dispo = intervention_obj.get_creneaux_dispo(employee_id, date_current_str,
-                                                                             intervention_liste, horaires_du_jour,
-                                                                             duree_min, False)
+                        creneaux_dispo = intervention_obj.get_creneaux_dispo(
+                            employee_id, date_current_str, intervention_liste, horaires_du_jour, duree_min, False)
                     else:
                         creneaux_dispo = []
                     creneaux_dispozz.append(creneaux_dispo)
@@ -316,15 +311,16 @@ class OfPlanningIntervention(models.Model):
                     intervention_heures = [intervention]
                     for intervention_heure in (intervention.date, intervention.date_deadline):
                         # Conversion des dates de début et de fin en nombres flottants et à l'heure locale
-                        intervention_locale_dt = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(intervention_heure))
+                        intervention_locale_dt = fields.Datetime.context_timestamp(
+                            self, fields.Datetime.from_string(intervention_heure))
 
                         # Comme on n'affiche que les heures, il faut s'assurer de rester dans le bon jour
                         #   (pour les RDVs étalées sur plusieurs jours)
                         intervention_locale_dt = max(intervention_locale_dt, jour_deb_dt)
                         intervention_locale_dt = min(intervention_locale_dt, jour_fin_dt)
                         date_intervention_locale_flo = round(intervention_locale_dt.hour +
-                                                          intervention_locale_dt.minute / 60.0 +
-                                                          intervention_locale_dt.second / 3600.0, 5)
+                                                             intervention_locale_dt.minute / 60.0 +
+                                                             intervention_locale_dt.second / 3600.0, 5)
                         intervention_heures.append(date_intervention_locale_flo)
                     # remplacer minuit dans les heures de début et de fin par les heures de début et fin de journée
                     # pour les RDVs sur plusieurs jours
@@ -333,7 +329,7 @@ class OfPlanningIntervention(models.Model):
                     if intervention_heures[2] >= 23.75:
                         intervention_heures[2] = journee_fin
                     temps_pause = intervention_obj.pause_interv((intervention_heures[1], intervention_heures[2]),
-                                                           horaires_du_jour)
+                                                                horaires_du_jour)
                     nb_heures_occupees += round(intervention_heures[2] - intervention_heures[1] - temps_pause, 5)
                     intervention_liste.append(intervention_heures)
                 # remplissage de la fillerbar du jour
@@ -345,15 +341,16 @@ class OfPlanningIntervention(models.Model):
                     fillerbar['nb_heures_disponibles'] = 0.0
                     fillerbar['pct_disponible'] = 0.0
                 else:
-                    fillerbar['pct_disponible'] = fillerbar['nb_heures_disponibles'] * 100 / fillerbar['nb_heures_travaillees']
+                    fillerbar['pct_disponible'] = (fillerbar['nb_heures_disponibles']
+                                                   * 100 / fillerbar['nb_heures_travaillees'])
 
                 fillerbarzz.append(fillerbar)
                 intervention_forcee = len(interventions.filtered(lambda i: i.forcer_dates)) > 0
                 # Ne pas calculer les créneaux dispos dans le passé
                 if date_current_str >= date_today_str:
-                    creneaux_dispo = intervention_obj.get_creneaux_dispo(employee_id, date_current_str,
-                                                                    intervention_liste,
-                                                                    horaires_du_jour, duree_min, intervention_forcee)
+                    creneaux_dispo = intervention_obj.get_creneaux_dispo(
+                        employee_id, date_current_str, intervention_liste, horaires_du_jour, duree_min,
+                        intervention_forcee)
                 else:
                     creneaux_dispo = []
                 creneaux_dispozz.append(creneaux_dispo)
@@ -362,7 +359,8 @@ class OfPlanningIntervention(models.Model):
                 date_current_str = fields.Date.to_string(date_current_da)
                 # segment_courant[1] == False quand segment sans date de fin
                 if segment_courant[1] and segment_courant[1] < date_current_str:
-                    if len(segments_horaires) > index_courant + 1:  # changement de segment horaires
+                    if len(segments_horaires) > index_courant + 1:
+                        # changement de segment horaires
                         index_courant += 1
                         segment_courant = segments_horaires[index_courant]
                         i_col_offset_to_segment = index_courant
@@ -374,9 +372,9 @@ class OfPlanningIntervention(models.Model):
 class OFInterventionConfiguration(models.TransientModel):
     _inherit = 'of.intervention.settings'
 
-    planningview_employee_exclu_ids = fields.Many2many('hr.employee', string=u"(OF) Exculsion d'intervenants",
-                                                       help=u"Intervenants à NE PAS montrer en vue planning",
-                                                       domain=[('of_est_intervenant', '=', True)])
+    planningview_employee_exclu_ids = fields.Many2many(
+        'hr.employee', string=u"(OF) Exculsion d'intervenants", help=u"Intervenants à NE PAS montrer en vue planning",
+        domain=[('of_est_intervenant', '=', True)])
 
     @api.multi
     def set_planningview_employee_exclu_ids_defaults(self):
@@ -400,7 +398,8 @@ class IrUIView(models.Model):
             modifiers = {}
             # Tous ces champs peuvent être définis comme attributs de la balise <planning>
             # et n'ont pas besoin d'être rajoutés dans l'architecture de la vue
-            for additional_field in ('date_start', 'date_delay', 'date_stop', 'all_day', 'resource', 'color_bg', 'color_ft'):
+            for additional_field in ('date_start', 'date_delay', 'date_stop', 'all_day', 'resource',
+                                     'color_bg', 'color_ft'):
                 if node.get(additional_field):
                     fields[node.get(additional_field)] = {}
 
