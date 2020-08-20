@@ -20,6 +20,8 @@ Extension OpenFire du module stock
     ],
     "data": [
         'views/of_stock_views.xml',
+        'wizards/of_specific_delivery_report_wizard_views.xml',
+        'reports/of_specific_delivery_report.xml',
     ],
     'installable': True,
     'application': False,
