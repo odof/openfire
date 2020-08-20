@@ -13,11 +13,12 @@
                 </tr>
             </xpath>
             <xpath expr="//table[3]" position="after">
-                <t t-if="o.of_note_operations">
+                <t t-if="o.note or o.of_note_operations">
                     <div style="border-bottom: 1px solid black; padding-bottom: 6px; margin-top: 8px;">
                         <strong style="padding-left: 6px;">Notes</strong>
                     </div>
-                    <div style="padding-left: 6px; padding-top: 6px" t-field="o.of_note_operations"/>
+                    <div t-if="o.note" style="padding-left: 6px; padding-top: 6px" t-field="o.note"/>
+                    <div t-if="o.of_note_operations" style="padding-left: 6px; padding-top: 6px" t-field="o.of_note_operations"/>
                 </t>
             </xpath>
         </template>
