@@ -6,7 +6,7 @@
         <!-- Modifications de l'affichage des adresses -->
         <xpath expr="//div[@class='row'][1]" position="replace">
             <div name="addresses" class="row">
-                <div class="col-xs-6">
+                <div class="col-xs-6" name="adresse_livraison">
                     <strong>Adresse de livraison&amp;nbsp;:</strong>
                     <div t-if="o.dest_address_id">
                         <span t-field="o.dest_address_id.name"/>
@@ -32,7 +32,7 @@
         </xpath>
         <!-- Modifications des cadres références -->
         <xpath expr="//div[@class='row mt32 mb32']" position="replace">
-            <div class="row mt32 mb32">
+            <div class="row mt32 mb32" name="references">
                 <div class="col-xs-12">
                     <div><strong>Nos références&amp;nbsp;: </strong></div>
                     <div name="refs" class="mt8" id="informations" style="display: table">
@@ -55,6 +55,11 @@
                         <div t-if="o.delivery_expected" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                             <strong>Livraison attendue&amp;nbsp;:</strong>
                             <p t-field="o.delivery_expected"/>
+                        </div>
+                        <div t-if="o.date_planned" style="display: table-cell; width: 4px;"/>
+                        <div t-if="o.date_planned" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                            <strong>Date prévue :</strong>
+                            <p t-field="o.date_planned"/>
                         </div>
                     </div>
                 </div>
@@ -80,7 +85,7 @@
         <!-- Modifications de l'affichage des adresses -->
         <xpath expr="//div[@class='row mt32 mb32'][1]" position="replace">
             <div name="addresses" class="row">
-                <div class="col-xs-6">
+                <div class="col-xs-6" name="adresse_livraison">
                     <strong>Adresse de livraison&amp;nbsp;:</strong>
                     <div t-if="o.dest_address_id">
                         <span t-field="o.dest_address_id.name"/>
@@ -99,21 +104,55 @@
             </div>
             <br/>
         </xpath>
+        <!-- Ajout des cadres références -->
+        <xpath expr="//h2" position="after">
+            <div class="row mt32 mb32" name="references">
+                <div class="col-xs-12">
+                    <div><strong>Nos références&amp;nbsp;: </strong></div>
+                    <div name="refs" class="mt8" id="informations" style="display: table">
+                        <div t-if="o.sale_order_id" style="display: table-cell; width: 4px;"/>
+                        <div t-if="o.sale_order_id" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                            <strong>Réf. commande client&amp;nbsp;:</strong>
+                            <p t-field="o.sale_order_id"/>
+                        </div>
+                        <div t-if="o.partner_ref" style="display: table-cell; width: 4px;"/>
+                        <div t-if="o.partner_ref" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                            <strong>Réf. fournisseur&amp;nbsp;:</strong>
+                            <p t-field="o.partner_ref"/>
+                        </div>
+                        <div t-if="o.customer_id" style="display: table-cell; width: 4px;"/>
+                        <div t-if="o.customer_id" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                            <strong>Contremarque&amp;nbsp;:</strong>
+                            <p t-field="o.customer_id"/>
+                        </div>
+                        <div t-if="o.delivery_expected" style="display: table-cell; width: 4px;"/>
+                        <div t-if="o.delivery_expected" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                            <strong>Livraison attendue&amp;nbsp;:</strong>
+                            <p t-field="o.delivery_expected"/>
+                        </div>
+                        <div t-if="o.date_planned" style="display: table-cell; width: 4px;"/>
+                        <div t-if="o.date_planned" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                            <strong>Date prévue :</strong>
+                            <p t-field="o.date_planned"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
         <!-- Rendre invisible les titres h2 -->
         <xpath expr="//h2" position="attributes">
             <attribute name="style">display: none</attribute>
         </xpath>
+        <!-- Retrait de dates souhaitées des lignes (info présente au niveau de la commande) -->
+        <xpath expr="//table/thead/tr/th[2]" position="replace"/>
+        <xpath expr="//table/tbody/tr/td[2]" position="replace"/>
     </template>
 
     <!-- Modifications commande fournisseur sans prix -->
     <template id="of_report_purchaseorder_sans_prix_document" inherit_id="purchase.report_purchaseorder_document">
-        <!-- Retrait de dates souhaitées si la livraison souhaitée est renseignée -->
-        <xpath expr="//table/thead/tr/th[3]" position="attributes">
-            <attribute name="t-if">not o.delivery_expected</attribute>
-        </xpath>
-        <xpath expr="//table/tbody/tr/td[3]" position="attributes">
-            <attribute name="t-if">not o.delivery_expected</attribute>
-        </xpath>
+        <!-- Retrait de dates souhaitées des lignes (info présente au niveau de la commande) -->
+        <xpath expr="//table/thead/tr/th[3]" position="replace"/>
+        <xpath expr="//table/tbody/tr/td[3]" position="replace"/>
         <!-- Retrait des prix pour la commande sans prix (interroger docs et non o, car le context de o a été écrasé dans la vue parente) -->
         <!-- Titres du tableau -->
         <xpath expr="//table/thead/tr/th[2]" position="attributes">
@@ -143,7 +182,25 @@
 
     <template id="of_report_purchaseorder_sans_prix">
         <t t-call="report.html_container">
-            <t t-set="docs" t-value="docs.with_context(of_sans_prix=True)"/>
+            <t t-set="docs" t-value="docs.with_context(of_sans_prix=True, of_report_name='Bon de commande')"/>
+            <t t-foreach="docs" t-as="o">
+                <t t-call="purchase.report_purchaseorder_document" t-lang="o.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="purchase.report_purchasequotation">
+        <t t-call="report.html_container">
+            <t t-set="docs" t-value="docs.with_context(of_report_name='Demande de prix')"/>
+            <t t-foreach="docs" t-as="o">
+                <t t-call="purchase.report_purchasequotation_document" t-lang="o.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="purchase.report_purchaseorder">
+        <t t-call="report.html_container">
+            <t t-set="docs" t-value="docs.with_context(of_report_name='Bon de commande')"/>
             <t t-foreach="docs" t-as="o">
                 <t t-call="purchase.report_purchaseorder_document" t-lang="o.partner_id.lang"/>
             </t>
