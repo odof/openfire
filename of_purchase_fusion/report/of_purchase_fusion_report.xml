@@ -1,22 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Retire le champ contremarque des informations de la commande fournisseur -->
+    <!-- Retire le champ Réf. fournisseur des informations de la commande fournisseur -->
     <template id="of_report_purchaseorder_fusion_document2" inherit_id="of_purchase.of_report_purchaseorder_document">
-        <!-- Pour une raison que j'ignore, il faut la position finale de l'élément. -->
-        <!-- Ici en prenant en compte l'héritage le champ contremarque est la 4ème div de son groupe-->
         <xpath expr="//div[@class='col-xs-12']/div[2]/div[@t-if='o.partner_ref']" position="replace"/>
         <xpath expr="//div[@class='col-xs-12']/div[2]/div[@t-if='o.partner_ref']" position="replace"/>
     </template>
 
-    <!-- Ajoute le champ contremarque sur les lignes de l'impression commande fournisseur -->
+    <!-- Ajoute le champ contremarque sur les lignes de l'impression commande fournisseur et commande sans prix -->
     <template id="of_report_purchaseorder_fusion_document" inherit_id="purchase.report_purchaseorder_document" priority="100">
         <xpath expr="//table/thead/tr/th[last()]" position="after">
-            <th><strong>Contremarque</strong></th>
+            <th t-if="not o.customer_id"><strong>Contremarque</strong></th>
         </xpath>
         <xpath expr="//tr[@t-as='line']" position="inside">
-            <td>
+            <td t-if="not o.customer_id">
                 <span t-field="line.of_customer_id.name"/>
+            </td>
+        </xpath>
+    </template>
+
+    <!-- Ajoute le champ contremarque sur les lignes de l'impression demande de prix -->
+    <template id="of_report_purchasequotation_fusion_document" inherit_id="purchase.report_purchasequotation_document" priority="100">
+        <xpath expr="//table/thead/tr/th[last()]" position="after">
+            <th t-if="not o.customer_id"><strong>Contremarque</strong></th>
+        </xpath>
+        <xpath expr="//tr[@t-as='order_line']" position="inside">
+            <td t-if="not o.customer_id">
+                <span t-field="order_line.of_customer_id.name"/>
             </td>
         </xpath>
     </template>
