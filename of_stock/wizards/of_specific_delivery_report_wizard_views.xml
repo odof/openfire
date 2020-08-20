@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- OF Specific Delivery Report Wizard Form View -->
+    <record id="of_specific_delivery_report_wizard_form_view" model="ir.ui.view">
+        <field name="name">of.specific.delivery.report.wizard.form.view</field>
+        <field name="model">of.specific.delivery.report.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="line_ids" nolabel="1" colspan="4">
+                        <tree delete="false" create="false" editable="bottom">
+                            <field name="product_id" options="{'no_open': True}"/>
+                            <field name="selected"/>
+                        </tree>
+                    </field>
+                </group>
+                <footer>
+                    <button string="Imprimer" name="print_specific_report" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window id="of_specific_delivery_report_wizard_action"
+                name="Bon de livraison spécifique"
+                res_model="of.specific.delivery.report.wizard"
+                src_model="stock.picking"
+                view_mode="form"
+                key2="client_print_multi"
+                view_id="of_specific_delivery_report_wizard_form_view"
+                target="new"
+    />
+
+</odoo>
