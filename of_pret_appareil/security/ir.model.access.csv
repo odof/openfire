@@ -1,3 +1,0 @@
-"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
-"access_of_pret_appareil","of.pret.appareil","model_of_pret_appareil","project.group_project_user",1,1,1,1
-"access_of_pret_appareil_line","of.pret.appareil.line","model_of_pret_appareil_line","project.group_project_user",1,1,1,1

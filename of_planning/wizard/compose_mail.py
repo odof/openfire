@@ -3,6 +3,7 @@
 from odoo import models, fields, api
 import re
 
+
 def remove_html_balise(text):
     regex_remove = re.compile("<.*?>")  # permet de chercher toute chaine de charactère commançant par '<' et se terminant par '>'
     regex_replace = re.compile("</p>|</br>|</li>")  # liste des expression a remplacer par '\n'
@@ -10,6 +11,7 @@ def remove_html_balise(text):
     text = regex_replace.sub('\n', text)
     text = regex_remove.sub('', text)
     return text
+
 
 class OfComposeMail(models.TransientModel):
     _inherit = 'of.compose.mail'
@@ -19,20 +21,20 @@ class OfComposeMail(models.TransientModel):
         result = super(OfComposeMail, self)._get_objects(o)
         if o._name == 'of.planning.intervention':
             result.update({
-                'interventions': [o],
-                'partner'      : o.partner_id or False,
-                'address'      : o.address_id or False,
-                'address_pose' : o.address_id or False,
+                'interventions': o,
+                'partner'      : o.partner_id,
+                'address'      : o.address_id,
+                'address_pose' : o.address_id,
                 'shop'         : o.company_id,
-                # order_id et invoice_id ne seront définis que dans of_sales, mais getattr gère l'exception si le module n'est pas installé
-                'order'        : getattr(o, 'order_id', False),
-                'invoice'      : getattr(o, 'invoice_id', False),
+                # order_id et invoice_id ne seront définis que dans of_sales,
+                # mais getattr gère l'exception si le module n'est pas installé
+                'order'        : getattr(o, 'order_id', self.env['sale.order']),
+                'invoice'      : getattr(o, 'invoice_id', self.env['account.invoice']),
             })
         elif o._name == 'res.partner':
             result['interventions'] = o.intervention_partner_ids
         else:
-            # interventions_liees ne sera défini que dans of_sales, mais getattr gère l'exception si le module n'est pas installé
-            result['interventions'] = getattr(o, 'intervention_ids', [])
+            result['interventions'] = getattr(o, 'intervention_ids', self.env['of.planning.intervention'])
         return result
 
     @api.model
@@ -47,7 +49,7 @@ class OfComposeMail(models.TransientModel):
 
         for intervention in objects['interventions']:
             for employee in intervention.employee_ids:
-                if not employee.name in employees:
+                if employee.name not in employees:
                     employees.append(employee.name)
             date_interv_da = fields.Datetime.from_string(intervention.date)
             date_interv_da = fields.Datetime.context_timestamp(self, date_interv_da)
