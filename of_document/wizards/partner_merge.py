@@ -13,7 +13,7 @@ class MergePartnerAutomatic(models.TransientModel):
         dms_file_obj = self.env['muk_dms.file'].sudo()
         if dms_dir_obj.search([('of_partner_id', 'in', src_partners.ids)]) or \
                 dms_file_obj.search([('of_attachment_partner_id', 'in', src_partners.ids)]):
-            top_partner_dir = dms_dir_obj.get_partner_directory(dst_partner)
+            top_partner_dir = dms_dir_obj.of_get_partner_directory(dst_partner)
             for src_partner in src_partners:
                 src_partner_dir = dms_dir_obj.search([('of_partner_id', '=', src_partner.id)])
                 if src_partner_dir:
