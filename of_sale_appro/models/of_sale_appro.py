@@ -54,6 +54,16 @@ class StockMove(models.Model):
                     moves_to_restart |= move
         moves_to_restart.write({'state': 'confirmed'})
 
+    @api.multi
+    def action_reset(self):
+        for move in self:
+            if move.state not in ['waiting', 'assigned']:
+                raise UserError(
+                    u"Seul un mouvement en attente d'un autre mouvement ou disponible peut être réinitialisé.")
+            move.linked_move_operation_ids.mapped('operation_id').unlink()
+            move.quants_unreserve()
+            move.write({'state': 'confirmed'})
+
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'

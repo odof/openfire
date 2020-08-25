@@ -12,6 +12,7 @@
                 <xpath expr="//tree" position="inside">
                     <button name="button_create_procurement" type="object" states="confirmed" icon="fa-cogs" help="Approvisionner la ligne"/>
                     <button name="force_assign" type="object" states="confirmed,waiting" icon="fa-check" help="Forcer la disponibilité. En forçant la disponibilité de cet article, vous le rendrez disponible à la livraison sans tenir compte des états de stocks réels ni des approvisionnements éventuellement déjà générés."/>
+                    <button name="action_reset" type="object" states="waiting,assigned" icon="fa-undo" help="Réinitialiser la ligne"/>
                     <button name="action_cancel" type="object" states="confirmed,waiting,assigned" icon="fa-close" help="Annuler la ligne"/>
                 </xpath>
             </field>
