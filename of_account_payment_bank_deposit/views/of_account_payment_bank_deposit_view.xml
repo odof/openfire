@@ -142,6 +142,7 @@
             <field name="arch" type="xml">
                 <field name="outbound_payment_method_ids" position="after">
                     <field name="of_allow_bank_deposit" attrs="{'invisible': [('type', 'not in', ['cash', 'bank'])]}"/>
+                    <field name="of_bank_deposit_group_move" attrs="{'invisible': [('of_allow_bank_deposit', '=', False)]}"/>
                 </field>
              </field>
         </record>

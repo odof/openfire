@@ -3,6 +3,7 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
+
 class OfAccountPaymentBankDeposit(models.Model):
     _name = 'of.account.payment.bank.deposit'
     _description = 'Payment bank deposit'
@@ -12,7 +13,8 @@ class OfAccountPaymentBankDeposit(models.Model):
         res = []
         if self._context.get('active_model', '') == 'account.payment':
             # Allow only payments that have not been already deposited
-            payments = self.env['account.payment'].search([('id', 'in', self._context['active_ids']), ('of_deposit_id', '=', False)])
+            payments = self.env['account.payment'].search(
+                [('id', 'in', self._context['active_ids']), ('of_deposit_id', '=', False)])
             res = [(4, payment.id) for payment in payments]
         return res
 
@@ -78,31 +80,47 @@ class OfAccountPaymentBankDeposit(models.Model):
 
             move_data = {
                 'journal_id': journal.id,
-                'date'      : rec.date,
+                'date': rec.date,
                 'company_id': journal.company_id.id,
             }
             move = move_obj.create(move_data)
 
             move_line_obj.create({
-                'move_id'   : move.id,
-                'name'      : _('Deposit %s') % (name,),
+                'move_id': move.id,
+                'name': _('Deposit %s') % (name,),
                 'account_id': debit_account.id,
-                'debit'     : amount_total > 0 and amount_total,
-                'credit'    : amount_total < 0 and -amount_total,
+                'debit': amount_total > 0 and amount_total,
+                'credit': amount_total < 0 and -amount_total,
             })
 
             for account, move_lines in move_lines_dict.iteritems():
-                amount = sum(move_line.debit - move_line.credit for move_line in move_lines)
-                if amount:
-                    move_line = move_line_obj.create({
-                        'move_id'   : move.id,
-                        'name'      : _('Deposit %s') % (name,),
-                        'account_id': account.id,
-                        'credit'    : amount > 0 and amount,
-                        'debit'     : amount < 0 and -amount,
-                    })
+                if journal.of_bank_deposit_group_move:
+                    amount = sum(move_line.debit - move_line.credit for move_line in move_lines)
+                    if amount:
+                        move_line = move_line_obj.create({
+                            'move_id': move.id,
+                            'name': _('Deposit %s') % (name,),
+                            'account_id': account.id,
+                            'credit': amount > 0 and amount,
+                            'debit': amount < 0 and -amount,
+                        })
 
-                    move_line_ids = [ml.id for ml in move_lines] + [move_line.id]
+                        move_line_ids = [ml.id for ml in move_lines] + [move_line.id]
+                        move_lines = move_line_obj.browse(move_line_ids)
+                else:
+                    move_line_ids = []
+                    for move_line in move_lines:
+                        amount = move_line.debit - move_line.credit
+                        if amount:
+                            new_move_line = move_line_obj.create({
+                                'move_id': move.id,
+                                'name': _('Deposit %s') % (name,),
+                                'account_id': account.id,
+                                'credit': amount > 0 and amount,
+                                'debit': amount < 0 and -amount,
+                            })
+
+                            move_line_ids += [move_line.id, new_move_line.id]
                     move_lines = move_line_obj.browse(move_line_ids)
                 move_lines.reconcile()
                 move_lines.compute_full_after_batch_reconcile()
@@ -152,7 +170,6 @@ class OfAccountPaymentBankDeposit(models.Model):
         self._check_payment_ids(vals.get('payment_ids', False))
         return super(OfAccountPaymentBankDeposit, self).create(vals)
 
-
 #    Uncomment this method to have an error message at the opening of the wizard when a payment is already deposited
 #    The main drawback is that the user loses his selection of payments, so we prefer an error at the deposit creation
 
@@ -164,6 +181,7 @@ class OfAccountPaymentBankDeposit(models.Model):
 #             if payment.of_deposit_id:
 #                 raise UserError(_('Payment %s has already been deposited') % payment.name)
 #         return super(OfAccountPaymentBankDeposit, self).default_get(fields_list)
+
 
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
@@ -191,6 +209,8 @@ class AccountJournal(models.Model):
                        "WHERE type = 'bank'" % (self._table, ))
         return res
 
+    of_bank_deposit_group_move = fields.Boolean(
+        string=u"Grouper les écritures par compte lors d'une remise en banque", default=True)
     of_allow_bank_deposit = fields.Boolean(string=u"Autoriser les remises en banque")
 
     @api.onchange('type')
