@@ -225,4 +225,17 @@
         </field>
     </record>
 
+    <!-- Account Payment Form View -->
+    <record id="of_account_payment_form_view" model="ir.ui.view">
+        <field name="name">of.account.payment.form.view</field>
+        <field name="model">account.payment</field>
+        <field name="priority">20</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <field name="payment_date" position="after">
+                <field name="of_expected_deposit_date"/>
+            </field>
+        </field>
+    </record>
+
 </odoo>

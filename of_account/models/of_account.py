@@ -377,8 +377,11 @@ class AccountMove(models.Model):
             if move:
                 self.date = move.date
 
+
 class AccountPayment(models.Model):
     _inherit = "account.payment"
+
+    of_expected_deposit_date = fields.Date(string=u"Date de remise prévue")
 
     @api.multi
     def button_invoices(self):
