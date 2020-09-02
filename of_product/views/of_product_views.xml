@@ -69,6 +69,21 @@
             </field>
         </record>
 
+        <record id="of_product_template_property_form_view" model="ir.ui.view">
+            <field name="name">of.product.template.property.form.view</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="stock.view_template_property_form"/>
+            <field name="arch" type="xml">
+                <!-- Garantie -->
+                <xpath expr="//group[@name='sale_condition']/label[1]" position="attributes">
+                    <attribute name="groups"/>
+                </xpath>
+                <xpath expr="//group[@name='sale_condition']/div[1]" position="attributes">
+                    <attribute name="groups"/>
+                </xpath>
+            </field>
+        </record>
+
         <!-- Ajout des étiquettes sur la vue kanban -->
         <record id="of_product_template_kanban_view" model="ir.ui.view">
             <field name="name">of.product.template.product.kanban</field>
