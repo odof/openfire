@@ -193,8 +193,8 @@ class ResPartner(models.Model):
         # Get config paramenter geocoding on write
         res_geocoding_on_write = self.env['ir.config_parameter'].get_param('geocoding_on_write') == 'yes'
 
-        # Determine if geocoding was manual and write geodata for it.
-        do_geocoding_auto = False
+        # Partenaires à géocoder.
+        to_geocode = self.env['res.partner']
 
         # Change coordinates but not geocoding (geo data manual entry)
         if ('geo_lat' in vals or 'geo_lng' in vals) and 'geocoding' not in vals:
@@ -207,7 +207,18 @@ class ResPartner(models.Model):
             not any(field in vals for field in ('geocoding', 'geocodeur', 'date_last_localization', 'precision'))
         ):
             if res_geocoding_on_write:  # Do geocoding automatic
-                do_geocoding_auto = True
+                for partner in self:
+                    for key in ('street', 'street2', 'zip', 'city'):
+                        # au moins un champ d'adresse a effectivement été modifié
+                        if key in vals and partner[key] != vals[key]:
+                            to_geocode |= partner
+                            break
+                    else:
+                        # Champs M2O
+                        for key in ('state_id', 'country_id'):
+                            if key in vals and partner[key].id != vals[key]:
+                                to_geocode |= partner
+                                break
             else:  # if config gecoding on write False, set as not tried
                 vals['geocoding'] = "not_tried"
                 vals['geocodeur'] = "unknown"
@@ -219,8 +230,8 @@ class ResPartner(models.Model):
         result = super(ResPartner, self).write(vals)
 
         # DO GEOCODING AUTOMATIC (through wizard)
-        if do_geocoding_auto:
-            self.geo_code()
+        if to_geocode:
+            to_geocode.geo_code()
         return result
 
 
