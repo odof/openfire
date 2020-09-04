@@ -4,6 +4,7 @@ from odoo import models, api, fields
 
 from odoo.exceptions import UserError
 
+
 class StockMove(models.Model):
     _inherit = 'stock.move'
 
@@ -26,6 +27,27 @@ class StockMove(models.Model):
     # Ici ce ne doit pas être le cas car les quantités doivent êtres lues dans la société de l'utilisateur
     of_qty_available_stock = fields.Float(string=u"Qté stock", related="product_id.qty_available", related_sudo=False)
     of_qty_virtual_stock = fields.Float(string=u"Qté stock", related="product_id.virtual_available", related_sudo=False)
+
+    @api.multi
+    def action_assign(self, no_prepare=False):
+        super(StockMove, self).action_assign(no_prepare=no_prepare)
+        waiting_moves = self.filtered(lambda m: m.state in ['waiting'])
+        moves_to_restart = self.env['stock.move']
+        if waiting_moves:
+            for move in waiting_moves:
+                ancestors = move.find_move_ancestors()
+                found = False
+                for ancestor in ancestors:
+                    for quant in ancestor.quant_ids:
+                        if move.id in quant.history_ids.ids or quant.location_id.id == ancestor.location_dest_id.id:
+                            found = True
+                            break
+                    if found:
+                        break
+                if not found:
+                    moves_to_restart |= move
+        moves_to_restart.write({'state': 'confirmed'})
+
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
