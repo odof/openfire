@@ -53,26 +53,27 @@ CODE_IMPORT_AVERT = -2
 CODE_IMPORT_CREATION = 0
 CODE_IMPORT_MODIFICATION = 1
 
-# class OfImportError(Exception):
-#     def __init__(self, msg):
-#         self.msg = msg
+
 class OfImportError(except_orm):
     def __init__(self, msg):
         super(OfImportError, self).__init__(msg)
+
 
 class OfImportProductConfigTemplate(models.AbstractModel):
     _name = 'of.import.product.config.template'
     _description = u"Classe regroupant les paramètres personnalisables dans la configuration d'import de tarifs"
 
-    of_import_price = fields.Char(string='Prix de vente HT',
-                                  help=u"""Modification à appliquer sur le prix public hors taxe pour calculer le prix de vente.
+    of_import_price = fields.Char(
+        string='Prix de vente HT',
+        help=u"""Modification à appliquer sur le prix public hors taxe pour calculer le prix de vente.
 
 Exemples :
  ppht : Conserve le prix de vente conseillé (prix public hors taxe)
  ppht * 1.05 + 10 : Augmente le prix de vente de 5%, plus 10€
  pa * 100 / 60 : Vend l'article pour obtenir une marge de 40% sur le prix d'achat (et non sur le prix de revient!)""")
-    of_import_remise = fields.Char(string="Remise",
-                                   help=u"""Remise à appliquer sur les articles de ce fournisseur.
+    of_import_remise = fields.Char(
+        string="Remise",
+        help=u"""Remise à appliquer sur les articles de ce fournisseur.
 La remise est appliquée sur le prix public pour calculer le prix d'achat.
 
 Exemples :
@@ -80,8 +81,9 @@ Exemples :
  cumul(10,5) : Appliquer la remise conseillée, puis une remise de 10%, puis une remise de 5%
  cumul(14.5) : Équivalent à la ligne précedente, une remise de 10% puis 5% fait 14.5% au total
 """)
-    of_import_cout = fields.Char(string='Prix de revient',
-                                 help=u"""Permet le calcul du prix de revient en fonction du prix d'achat
+    of_import_cout = fields.Char(
+        string='Prix de revient',
+        help=u"""Permet le calcul du prix de revient en fonction du prix d'achat
 
 Exemples :
  pa : Conserve le prix d'achat calculé à partir du prix des formules du prix de vente et de la remise
@@ -99,9 +101,9 @@ Exemples :
         """
         # Jeu de valeurs pour tester la validité des formules saisies
         eval_dict = {
-            'ppht' : 100,
+            'ppht': 100,
             'cumul': self.env['of.product.brand'].compute_remise,
-            'pa'   : 50,
+            'pa': 50,
         }
 
         for record in self:
@@ -114,16 +116,22 @@ Exemples :
                 if not code:
                     continue
                 if not code.strip():
-                    raise ValidationError(u"Une formule ne doit pas être constituée uniquement d'espaces.\n\n"
-                                          u"Vous devez vider le champ, ou le renseigner avec une formule correcte s'il est obligatoire : (champ \"%s\", formule \"%s\")" % (self._fields[field].string, code))
+                    raise ValidationError(
+                        u"Une formule ne doit pas être constituée uniquement d'espaces.\n\n"
+                        u"Vous devez vider le champ, ou le renseigner avec une formule correcte s'il est obligatoire :"
+                        u" (champ \"%s\", formule \"%s\")" % (self._fields[field].string, code))
                 try:
                     value = safe_eval(code, eval_dict)
                 except Exception, e:
-                    raise ValidationError(u"Une erreur s'est produite à la validation de la formule : (champ \"%s\", formule \"%s\")\n\n"
-                                          u"Erreur :\n%s" % (self._fields[field].string, code, e))
+                    raise ValidationError(
+                        u"Une erreur s'est produite à la validation de la formule : (champ \"%s\", formule \"%s\")\n\n"
+                        u"Erreur :\n%s" % (self._fields[field].string, code, e))
                 if value and not isinstance(value, (int, long, float)):
-                    raise ValidationError(u"Le format de retour de la fonction n'est pas celui attendu : (champ \"%s\", formule \"%s\")\n\n"
-                                          u"Cette erreur peut se produire si vous avez utilisé une virgule au lieu d'un point comme séparateur de décimales." % (self._fields[field].string, code))
+                    raise ValidationError(
+                        u"Le format de retour de la fonction n'est pas celui attendu :"
+                        u" (champ \"%s\", formule \"%s\")\n\n"
+                        u"Cette erreur peut se produire si vous avez utilisé une virgule au lieu d'un point comme"
+                        u" séparateur de décimales." % (self._fields[field].string, code))
 
     @api.model
     def get_config_field_list(self):
@@ -133,6 +141,7 @@ Exemples :
             'of_import_cout',
             'of_import_categ_id',
         ]
+
 
 class OfImportProductCategConfig(models.Model):
     _name = 'of.import.product.categ.config'
@@ -147,10 +156,13 @@ class OfImportProductCategConfig(models.Model):
     def _compute_product_ids(self):
         product_obj = self.env['product.template']
         for categ in self:
-            categ.product_ids = product_obj.search([('brand_id', '=', categ.brand_id.id), ('seller_ids.of_product_category_name', '=', categ.categ_origin)])
+            categ.product_ids = product_obj.search(
+                [('brand_id', '=', categ.brand_id.id),
+                 ('seller_ids.of_product_category_name', '=', categ.categ_origin)])
 
     _sql_constraints = [
-        ('categ_origin_uniq', 'unique(brand_id, categ_origin)', u"Une catégorie de produits ne peut être renseignée qu'une fois"),
+        ('categ_origin_uniq', 'unique(brand_id, categ_origin)',
+         u"Une catégorie de produits ne peut être renseignée qu'une fois"),
     ]
 
     @api.multi
@@ -161,30 +173,32 @@ class OfImportProductCategConfig(models.Model):
         """
         self.mapped('product_ids').of_action_update_from_brand()
 
+
 class OFProductBrand(models.Model):
     _name = 'of.product.brand'
     _inherit = ('of.product.brand', 'of.import.product.config.template')
 
     categ_ids = fields.One2many('of.import.product.categ.config', 'brand_id', string="Catégories")
-    product_config_ids = fields.One2many('product.template', string="Articles", compute="_compute_product_config_ids",
-                                         inverse="_inverse_product_config_ids", domain="[('brand_id', '=', id)]")
+    product_config_ids = fields.One2many(
+        'product.template', string="Articles", compute="_compute_product_config_ids",
+        inverse="_inverse_product_config_ids", domain="[('brand_id', '=', id)]")
 
     of_import_price = fields.Char(required=True, default='ppht')
     of_import_cout = fields.Char(required=True, default="pa")
     of_import_categ_id = fields.Many2one(required=True)
 
-    @api.depends('product_ids.of_import_price', 'product_ids.of_import_remise', 'product_ids.of_import_categ_id')  # , 'product_ids.of_import_price_extra'
+    @api.depends('product_ids.of_import_price', 'product_ids.of_import_remise', 'product_ids.of_import_categ_id')
     def _compute_product_config_ids(self):
         product_obj = self.env['product.template']
-        fields = self.get_config_field_list()
-        domain = ['|'] * (len(fields) - 1) + [(field, '!=', False) for field in fields]
+        fields_list = self.get_config_field_list()
+        domain = ['|'] * (len(fields_list) - 1) + [(field, '!=', False) for field in fields_list]
         for brand in self:
             brand.product_config_ids = product_obj.search([('brand_id', '=', brand.id)] + domain)
 
     @api.multi
     def _inverse_product_config_ids(self):
         product_obj = self.env['product.template']
-        fields = self.get_config_field_list()
+        fields_list = self.get_config_field_list()
         deleted = product_obj.browse()
         for brand in self:
             for line in brand.product_config_ids:
@@ -196,12 +210,13 @@ class OFProductBrand(models.Model):
                     deleted |= line[1]
                 if line[0] == 1:
                     # Ajout ou modification d'une ligne = définition des ègles de calcul
-                    product_obj.browse(line[1]).write({field: line[2][field] for field in fields if field in line[2]})
+                    product_obj.browse(line[1]).write(
+                        {field: line[2][field] for field in fields_list if field in line[2]})
                 if line[0] == 0:
                     # Qui irait créer un article depuis cet endroit?
                     pass
         if deleted:
-            deleted.write(dict.fromkeys(fields, False))
+            deleted.write(dict.fromkeys(fields_list, False))
 
     @api.model
     def compute_remise(self, *remises):
@@ -219,7 +234,8 @@ class OFProductBrand(models.Model):
             return product.of_import_categ_id
 
         # Configuration de la catégorie dans la marque pour ce nom de catégorie fournisseur
-        categ_config = self.env['of.import.product.categ.config'].search([('brand_id', '=', self.id), ('categ_origin', '=', categ_name)])
+        categ_config = self.env['of.import.product.categ.config'].search(
+            [('brand_id', '=', self.id), ('categ_origin', '=', categ_name)])
         if categ_config and categ_config.of_import_categ_id:
             return categ_config.of_import_categ_id
 
@@ -235,25 +251,27 @@ class OFProductBrand(models.Model):
         """
         self.ensure_one()
 
-        categ_config = self.env['of.import.product.categ.config'].search([('brand_id', '=', self.id), ('categ_origin', '=', categ_name)])
+        categ_config = self.env['of.import.product.categ.config'].search(
+            [('brand_id', '=', self.id), ('categ_origin', '=', categ_name)])
 
         udm_ratio = uom_po._compute_price(1.0, uom) if uom_po else 1.0
         eval_dict = {
-            'ppht' : list_price,
+            'ppht': list_price,
             'cumul': self.compute_remise,
             'udm_ratio': udm_ratio,
         }
 
-        fields = (('of_import_remise', 'remise', 'la remise'),
-                  ('of_import_price', 'list_price', 'le prix de vente HT'),
-                  ('of_import_cout', 'standard_price', u'le coût'))
+        price_fields = (('of_import_remise', 'remise', 'la remise'),
+                        ('of_import_price', 'list_price', 'le prix de vente HT'),
+                        ('of_import_cout', 'standard_price', u'le coût'))
         values = {}
-        for config_field, product_field, text in fields:
+        for config_field, product_field, text in price_fields:
             for obj in (product, categ_config, self):
                 if obj and obj[config_field]:
                     value = safe_eval(obj[config_field], eval_dict)
                     if product_field == 'remise':
-                        # Une fois la remise calculée, on peut ajouter le prix d'achat au eval_dict pour le calcul du coût final
+                        # Une fois la remise calculée, on peut ajouter le prix d'achat au eval_dict pour le calcul
+                        # du coût final
                         eval_dict['pa'] = list_price * (100.0 - value) / 100.0
                     else:
                         values[product_field] = value
@@ -273,9 +291,13 @@ class OFProductBrand(models.Model):
                         eval_dict['pa'] = product.of_seller_price
                     else:
                         # La formule n'est pas renseignée et aucune valeur ne peut être déduite
-                        raise OfImportError(u"Aucune formule n'est renseignée pour %s de cet article (marque à configurer : %s)." % (text, self.name))
+                        raise OfImportError(
+                            u"Aucune formule n'est renseignée pour %s de cet article (marque à configurer : %s)."
+                            % (text, self.name))
                 else:
-                    raise OfImportError(u"Aucune formule n'est renseignée pour %s de cet article (marque à configurer : %s)." % (text, self.name))
+                    raise OfImportError(
+                        u"Aucune formule n'est renseignée pour %s de cet article (marque à configurer : %s)."
+                        % (text, self.name))
 
         values['of_seller_price'] = eval_dict['pa']
         values['list_price'] *= udm_ratio
@@ -291,7 +313,8 @@ class OFProductBrand(models.Model):
         if not categ:
             raise UserError(u"Impossible de trouver la catégorie de produits correspondant à \"%s\"" % (categ_name, ))
 
-        values = self.compute_product_price(list_price, categ_name, uom_id, uom_po_id, product=product, price=price, remise=remise)
+        values = self.compute_product_price(
+            list_price, categ_name, uom_id, uom_po_id, product=product, price=price, remise=remise)
         values['categ_id'] = categ.id
         return values
 
@@ -302,6 +325,7 @@ class OFProductBrand(models.Model):
         et des paramètres d'import de l'article (dans product_supplierinfo)
         """
         self.mapped('product_ids').of_action_update_from_brand()
+
 
 class ProductTemplate(models.Model):
     _name = 'product.template'
@@ -326,10 +350,12 @@ class ProductTemplate(models.Model):
                         product.uom_po_id,
                         product
                     )
-                    values = {key: val for key, val in values.iteritems() if self._fields[key].convert_to_write(product[key], product) != val}
+                    values = {key: val for key, val in values.iteritems()
+                              if self._fields[key].convert_to_write(product[key], product) != val}
                     if values:
                         product.write(values)
                     break
+
 
 class OfImport(models.Model):
     _name = 'of.import'
@@ -345,11 +371,20 @@ class OfImport(models.Model):
     user_id = fields.Many2one('res.users', u'Utilisateur', readonly=True, default=lambda self: self._uid)
 
     name = fields.Char(u'Nom', size=64, required=True)
-    type_import = fields.Selection([('product.template', u'Articles'), ('res.partner', u'Partenaires'), ('crm.lead', u'Pistes/opportunités'), ('res.partner.bank', u'Comptes en banques partenaire'), ('of.service', u'Services OpenFire')], string=u"Type d'import", required=True)
+    type_import = fields.Selection(
+        [
+            ('product.template', u'Articles'),
+            ('res.partner', u'Partenaires'),
+            ('crm.lead', u'Pistes/opportunités'),
+            ('res.partner.bank', u'Comptes en banques partenaire'),
+            ('of.service', u'Services OpenFire'),
+        ], string=u"Type d'import", required=True)
     lang_id = fields.Many2one('res.lang', string="Langue principale", default=lambda self: self._default_lang_id())
     show_lang = fields.Boolean(compute='_compute_show_lang', string="Afficher la langue principale")
 
-    date = fields.Datetime('Date', required=True, default=lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'), help=u"Date qui sera affectée aux imports comme date de valeur.")
+    date = fields.Datetime(
+        'Date', required=True, default=lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'),
+        help=u"Date qui sera affectée aux imports comme date de valeur.")
     date_debut_import = fields.Datetime(u'Début', readonly=True)
     date_fin_import = fields.Datetime(u'Fin', readonly=True)
     time_lapse = fields.Char(string=u'Importé en', compute="_compute_time_lapse")
@@ -360,11 +395,20 @@ class OfImport(models.Model):
     file_size = fields.Char(u'Taille du fichier', compute="_compute_file_size")
     file_encoding = fields.Char(u'Encodage')
 
-    separateur = fields.Char(u'Séparateur champs', help=u"Caractère séparateur des champs dans le fichier d'import.\nSi non renseigné, le système essaye de le déterminer lui même.\nMettre \\t pour tabulation.")
+    separateur = fields.Char(
+        u'Séparateur champs',
+        help=u"Caractère séparateur des champs dans le fichier d'import.\n"
+             u"Si non renseigné, le système essaye de le déterminer lui même.\n"
+             u"Mettre \\t pour tabulation.")
 
     prefixe = fields.Char(u'Préfixe référence', size=10, help=u"Texte qui précèdera la référence.")
 
-    state = fields.Selection([('brouillon', u'Brouillon'), ('importe', u'Importé'), ('annule', u'Annulé')], u'État', default='brouillon', readonly=True)
+    state = fields.Selection(
+        [
+            ('brouillon', u'Brouillon'),
+            ('importe', u'Importé'),
+            ('annule', u'Annulé'),
+        ], u'État', default='brouillon', readonly=True)
 
     nb_total = fields.Integer(u'Nombre total', readonly=True)
     nb_ajout = fields.Integer(u'Ajoutés', readonly=True)
@@ -374,12 +418,15 @@ class OfImport(models.Model):
 
     sortie_note = fields.Text(u'Note', compute='_compute_sortie_note', readonly=True)
 
-    import_success_ids = fields.One2many(comodel_name='of.import.message', inverse_name='import_id',
-                                      string=u"Infos", domain=[('type', '=', 'info')], readonly=True)
-    import_warning_ids = fields.One2many(comodel_name='of.import.message', inverse_name='import_id',
-                                         string=u"Avertissements", domain=[('type', '=', 'warning')], readonly=True)
-    import_error_ids = fields.One2many(comodel_name='of.import.message', inverse_name='import_id',
-                                       string=u"Erreurs", domain=[('type', '=', 'error')], readonly=True)
+    import_success_ids = fields.One2many(
+        comodel_name='of.import.message', inverse_name='import_id', string=u"Infos", readonly=True,
+        domain=[('type', '=', 'info')])
+    import_warning_ids = fields.One2many(
+        comodel_name='of.import.message', inverse_name='import_id', string=u"Avertissements", readonly=True,
+        domain=[('type', '=', 'warning')])
+    import_error_ids = fields.One2many(
+        comodel_name='of.import.message', inverse_name='import_id', string=u"Erreurs", readonly=True,
+        domain=[('type', '=', 'error')])
 
     @api.multi
     @api.depends('lang_id')
@@ -443,11 +490,12 @@ class OfImport(models.Model):
 
     @api.depends('type_import', 'lang_id')
     def _compute_sortie_note(self):
-        "Met à jour la liste des champs Odoo disponibles pour l'import dans le champ note"
+        """Met à jour la liste des champs Odoo disponibles pour l'import dans le champ note"""
         for imp in self:
             sortie_note = ''
-            for champ, valeur in sorted(self.get_champs_odoo(imp.type_import, imp.lang_id.code or self.env.lang).items(),
-                                        key=lambda v: (v[1]['description'], v[0])):
+            for champ, valeur in sorted(
+                    self.get_champs_odoo(imp.type_import, imp.lang_id.code or self.env.lang).items(),
+                    key=lambda v: (v[1]['description'], v[0])):
                 if champ in ('tz', 'lang'):  # Champs qui plantent lors de l'import, on les ignore.
                     continue
                 sortie_note += "- " + (valeur['description'] or '') + " : " + champ
@@ -470,7 +518,8 @@ class OfImport(models.Model):
     def _read_csv(self):
         # Lecture du fichier d'import par la bibliothèque csv de python
         csv_data = base64.decodestring(self.file)
-        dialect = csv.Sniffer().sniff(csv_data)   # Deviner automatiquement les paramètres : caractère séparateur, type de saut de ligne,...
+        # Deviner automatiquement les paramètres : caractère séparateur, type de saut de ligne,...
+        dialect = csv.Sniffer().sniff(csv_data)
         file_encoding = self._compute_encoding(csv_data)
         self.file_encoding = file_encoding
 
@@ -563,7 +612,8 @@ class OfImport(models.Model):
 
     @api.model
     def get_champs_odoo(self, model='', lang=False):
-        "Renvoie un dictionnaire contenant les caractéristiques des champs Odoo en fonction du type d'import sélectionné (champ type_import)"
+        """Renvoie un dictionnaire contenant les caractéristiques des champs Odoo en fonction du type d'import
+        sélectionné (champ type_import)"""
 
         if not model:
             return {}
@@ -578,7 +628,8 @@ class OfImport(models.Model):
             langues = [langue for langue in langues if langue != 'en_US' and langue != lang]
 
         # On récupère la liste des champs depuis fields_get.
-        obj = self.env[model].fields_get(attributes=['field_description', 'required', 'type', 'relation', 'relation_field', 'translate', 'string'])
+        obj = self.env[model].fields_get(
+            attributes=['field_description', 'required', 'type', 'relation', 'relation_field', 'translate', 'string'])
         for champ in obj:
             field = self.env[model]._fields[champ]
             if (field.compute or not field.store) and not field.inverse:
@@ -605,13 +656,15 @@ class OfImport(models.Model):
                         'traduit': False
                     }
 
-        # Des champs qui sont obligatoires peuvent avoir une valeur par défaut (donc in fine pas d'obligation de les renseigner).
+        # Des champs qui sont obligatoires peuvent avoir une valeur par défaut
+        # (donc in fine pas d'obligation de les renseigner).
         # On récupère les champs qui ont une valeur par défaut et on indique qu'ils ne sont pas obligatoires.
         champs_requis = [key for key, vals in champs_odoo.iteritems() if vals['requis']]
         for key, val in self.env[model].default_get(champs_requis).iteritems():
             champs_odoo[key]['requis'] = val is False
 
-        # On ne rend pas obligatoire manuellement un champ qui est marqué comme obligatoire car créé par la fonction create d'Odoo.
+        # On ne rend pas obligatoire manuellement un champ qui est marqué comme obligatoire car créé
+        # par la fonction create d'Odoo.
         if model == 'product.template':
             if 'product_variant_ids' in champs_odoo:
                 champs_odoo['product_variant_ids']['requis'] = False
@@ -621,7 +674,8 @@ class OfImport(models.Model):
                 champs_odoo['brand_id']['requis'] = True
 
             if 'categ_id' in champs_odoo:
-                # Le champ categ_id importé est la catégorie du fournisseur. Le vrai categ_id sera calculé en fonction de la marque
+                # Le champ categ_id importé est la catégorie du fournisseur.
+                # Le vrai categ_id sera calculé en fonction de la marque
                 champs_odoo['categ_id']['requis'] = False
 
         return champs_odoo
@@ -693,18 +747,22 @@ class OfImport(models.Model):
 
             if 'categ_id' in champs_fichier and 'categ_id' not in valeurs:
                 # Si la catégorie d'article n'est pas renseignée, on prend la catégorie par défaut de la marque
-                valeurs['categ_id'] = brand.compute_product_categ(res_objet and res_objet.of_seller_product_category_name or '', product=res_objet).id
+                valeurs['categ_id'] = brand.compute_product_categ(
+                    res_objet and res_objet.of_seller_product_category_name or '', product=res_objet).id
 
             # Calcul des prix d'achat/vente en fonction des règles de calcul et du prix public ht
             if 'list_price' in valeurs and brand:
                 valeurs['of_seller_pp_ht'] = valeurs['list_price']
-                valeurs.update(brand.compute_product_price(valeurs['list_price'],
-                                                           valeurs.get('of_seller_product_category_name', res_objet and res_objet.of_seller_product_category_name or ''),
-                                                           uom_obj.browse(valeurs['uom_id']),
-                                                           uom_obj.browse(valeurs['uom_po_id']),
-                                                           product=res_objet,
-                                                           price=valeurs.get('of_seller_price'),
-                                                           remise=valeurs.get('of_seller_remise')))
+                valeurs.update(brand.compute_product_price(
+                    valeurs['list_price'],
+                    valeurs.get(
+                        'of_seller_product_category_name',
+                        res_objet and res_objet.of_seller_product_category_name or ''),
+                    uom_obj.browse(valeurs['uom_id']),
+                    uom_obj.browse(valeurs['uom_po_id']),
+                    product=res_objet,
+                    price=valeurs.get('of_seller_price'),
+                    remise=valeurs.get('of_seller_remise')))
 
     @api.multi
     def _importer_ligne(self, ligne, champs_fichier, champs_odoo, i, model_data, doublons, simuler):
@@ -713,13 +771,14 @@ class OfImport(models.Model):
         Lors de l'import d'articles, la marque est un élément obligatoire qui peut être déduit du préfixe d'import ou
             calculé ligne par ligne dans une colonne dédiée du fichier importé.
         Le calcul de la marque doit être réalisé avant toute chose.
-        En effet, il conditionne le préfixe ajouté à la référence de l'article, laquelle permet d'identifier un article déjà
-            existant en DB, lequel pouvant définir des paramètres d'import pour forcer la catégorie de produit.
+        En effet, il conditionne le préfixe ajouté à la référence de l'article, laquelle permet d'identifier un article
+            déjà existant en DB, lequel pouvant définir des paramètres d'import pour forcer la catégorie de produit.
 
 
         L'ordre logique du processus d'import est donc
         1 - Détection de la marque
-        2 - Mise à jour de la référence de l'article avec le préfixe de la marque (si non déjà inclus, par exemple avec export+import)
+        2 - Mise à jour de la référence de l'article avec le préfixe de la marque
+            (si non déjà inclus, par exemple avec export+import)
         3 - Détection d'article existant, impliquant une mise à jour et non une création de nouvel article
         4 - Import des éléments du fichier
 
@@ -758,7 +817,9 @@ class OfImport(models.Model):
         libelle_ref = u"réf. " + ligne.get(model_data['champ_reference'] or model_data['champ_primaire'] or 'name', '')
 
         # PARCOURS DE TOUS LES CHAMPS DE L'ENREGISTREMENT
-        valeurs = self._pre_calcule_ligne(champs_fichier, ligne, model_data)  # Champs à importer (pour envoi à fonction create ou write)
+
+        # Champs à importer (pour envoi à fonction create ou write)
+        valeurs = self._pre_calcule_ligne(champs_fichier, ligne, model_data)
 
         # Parcours de tous les champs de la ligne
         for champ_fichier in champs_fichier:
@@ -772,9 +833,12 @@ class OfImport(models.Model):
                 continue
 
             # Si le nom du champ contient un champ relation c'est à dire se terminant par /nom_du_champ on l'enlève.
-            champ_fichier_sansrel = champ_fichier[0:champ_fichier.rfind('/') if champ_fichier.rfind('/') != -1 else len(champ_fichier)].strip()
+            champ_fichier_sansrel = champ_fichier[
+                0:champ_fichier.rfind('/') if champ_fichier.rfind('/') != -1 else len(champ_fichier)].strip()
 
-            if champ_fichier_sansrel in champs_odoo:  # On ne récupère que les champs du fichier d'import qui sont des champs de l'objet (on ignore les champs inconnus du fichier d'import).
+            # On ne récupère que les champs du fichier d'import qui sont des champs de l'objet
+            # (on ignore les champs inconnus du fichier d'import).
+            if champ_fichier_sansrel in champs_odoo:
                 if ligne[champ_fichier].lower() == "#vide":
                     ligne[champ_fichier] = "#vide"
 
@@ -783,16 +847,23 @@ class OfImport(models.Model):
     # POUR LES CRITÈRES QUI NE DÉPENDENT PAS DU TYPE DU CHAMP
     #
 
-                # si le champs est requis, vérification qu'il est renseigné
-                if champs_odoo[champ_fichier_sansrel]['requis'] and (ligne[champ_fichier] == "#vide" or (ligne[champ_fichier] == "" and not valeurs.get(champ_fichier_sansrel))):
-                    erreur(u"Ligne %s : champ %s (%s) vide alors que requis. %s non importé." % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, model_data['nom_objet'].capitalize()))
+                # si le champ est requis, vérification qu'il est renseigné
+                if champs_odoo[champ_fichier_sansrel]['requis'] and \
+                        (ligne[champ_fichier] == "#vide" or
+                         (ligne[champ_fichier] == "" and not valeurs.get(champ_fichier_sansrel))):
+                    erreur(u"Ligne %s : champ %s (%s) vide alors que requis. %s non importé."
+                           % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier,
+                              model_data['nom_objet'].capitalize()))
 
                 # Si le champ relation est un id, vérification qu'est un entier
                 if champs_odoo[champ_fichier_sansrel]['relation_champ'] == 'id':
                     try:
                         int(ligne[champ_fichier])
                     except ValueError:
-                        erreur(u"Ligne %s : champ %s (%s) n'est pas un id (nombre entier) alors que le champ relation (après le /) est un id. %s non importé." % (i,  champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, model_data['nom_objet'].capitalize()))
+                        erreur(u"Ligne %s : champ %s (%s) n'est pas un id (nombre entier) alors que le champ relation "
+                               u"(après le /) est un id. %s non importé."
+                               % (i,  champs_odoo[champ_fichier_sansrel]['description'], champ_fichier,
+                                  model_data['nom_objet'].capitalize()))
 
     #
     # FORMATAGE ET VÉRIFICATION DE L'INTÉGRITÉ DE LA VALEUR DES CHAMPS
@@ -806,13 +877,17 @@ class OfImport(models.Model):
                         try:
                             valeurs[champ_fichier_sansrel] = float(ligne[champ_fichier])
                         except ValueError:
-                            erreur(u"Ligne %s : champ %s (%s) n'est pas un nombre. %s non importé." % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier_sansrel, model_data['nom_objet'].capitalize()))
+                            erreur(u"Ligne %s : champ %s (%s) n'est pas un nombre. %s non importé."
+                                   % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier_sansrel,
+                                      model_data['nom_objet'].capitalize()))
 
                 # Si est un field selection
                 elif champs_odoo[champ_fichier_sansrel]['type'] == 'selection':
                     # C'est un champ sélection. On vérifie que les données sont autorisées.
                     if ligne[champ_fichier] not in dict(self.env[model]._fields[champ_fichier].selection):
-                        erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" non autorisée. %s non importé." % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], model_data['nom_objet'].capitalize()))
+                        erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" non autorisée. %s non importé."
+                               % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier,
+                                  ligne[champ_fichier], model_data['nom_objet'].capitalize()))
                     else:
                         valeurs[champ_fichier_sansrel] = ligne[champ_fichier]
 
@@ -823,31 +898,42 @@ class OfImport(models.Model):
                     elif ligne[champ_fichier].upper() in ('0', "FALSE", "FAUX"):
                         valeurs[champ_fichier] = False
                     else:
-                        erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" non autorisée (admis 0, 1, True, False, vrai, faux). %s non importé." % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], model_data['nom_objet'].capitalize()))
+                        erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" non autorisée "
+                               u"(admis 0, 1, True, False, vrai, faux). %s non importé."
+                               % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier,
+                                  ligne[champ_fichier], model_data['nom_objet'].capitalize()))
 
                 # si est un many2one
                 elif champs_odoo[champ_fichier_sansrel]['type'] == 'many2one':
                     if model == 'product.template' and champ_fichier == 'categ_id':
                         valeurs['of_seller_product_category_name'] = ligne[champ_fichier]
                         if ligne[champ_fichier] == '#vide':
-                            # Avoir une catégorie non renseignée côté fournisseur n'empêche pas de calculer celle du distributeur grâce à la marque
+                            # Avoir une catégorie non renseignée côté fournisseur n'empêche pas de calculer celle
+                            # du distributeur grâce à la marque
                             ligne[champ_fichier] = '.'
                             valeurs['of_seller_product_category_name'] = ''
                         elif ligne[champ_fichier] == '':
-                            # A chaque import les informations fournisseur sont supprimées et regénérées. Il faut dans ce cas les récupérer
+                            # A chaque import les informations fournisseur sont supprimées et regénérées.
+                            # Il faut dans ce cas les récupérer
                             if res_objet:
                                 ligne[champ_fichier] = '.'
-                                valeurs['of_seller_product_category_name'] = res_objet.of_seller_product_category_name or ''
+                                valeurs['of_seller_product_category_name'] =\
+                                    res_objet.of_seller_product_category_name or ''
                     if ligne[champ_fichier] == "#vide" and not champs_odoo[champ_fichier_sansrel]['requis']:
                         # Si le champ n'est pas obligatoire et qu'il est vide, on met une valeur vide.
                         valeurs[champ_fichier_sansrel] = ""
                     elif ligne[champ_fichier] != "":
                         recherche = False
-                        # Si import partenaires et si c'est le compte comptable client ou fournisseur, on regarde si pointe sur un compte comptable existant
+                        # Si import partenaires et si c'est le compte comptable client ou fournisseur,
+                        # on regarde si pointe sur un compte comptable existant
                         if model == 'res.partner' and champ_fichier == 'property_account_receivable_id':
-                            res_ids = self.env[champs_odoo[champ_fichier_sansrel]['relation']].with_context(active_test=False).search([('code', '=', ligne[champ_fichier]), ('internal_type', '=', 'receivable')])
+                            res_ids = self.env[champs_odoo[champ_fichier_sansrel]['relation']]\
+                                .with_context(active_test=False)\
+                                .search([('code', '=', ligne[champ_fichier]), ('internal_type', '=', 'receivable')])
                         elif model == 'res.partner' and champ_fichier == 'property_account_payable_id':
-                            res_ids = self.env[champs_odoo[champ_fichier_sansrel]['relation']].with_context(active_test=False).search([('code', '=', ligne[champ_fichier]), ('internal_type', '=', 'payable')])
+                            res_ids = self.env[champs_odoo[champ_fichier_sansrel]['relation']]\
+                                .with_context(active_test=False)\
+                                .search([('code', '=', ligne[champ_fichier]), ('internal_type', '=', 'payable')])
                         # Si import de produit, la catégorie de produit peut avoir une correspondance
                         elif model == 'product.template' and champ_fichier == 'categ_id':
                             # Sauvegarde de la catégorie donnée par le fournisseur
@@ -858,8 +944,10 @@ class OfImport(models.Model):
                                 brand = res_objet.brand_id
 
                             if brand and simuler:
-                                # Lors d'une simulation, les catégories manquantes sont ajoutées à la configuration de la marque
-                                if not product_categ_config_obj.search([('brand_id', '=', brand.id), ('categ_origin', '=', ligne[champ_fichier])]):
+                                # Lors d'une simulation, les catégories manquantes sont ajoutées à la configuration
+                                # de la marque
+                                if not product_categ_config_obj.search(
+                                        [('brand_id', '=', brand.id), ('categ_origin', '=', ligne[champ_fichier])]):
                                     categ = product_categ_obj.search([('name', '=', ligne[champ_fichier])])
                                     product_categ_config_obj.create({
                                         'brand_id': brand.id,
@@ -880,31 +968,59 @@ class OfImport(models.Model):
                             if ligne[champ_fichier] == "#vide":
                                 res_ids = ""
                             else:
-                                res_ids = self.env[champs_odoo[champ_fichier_sansrel]['relation']].with_context(active_test=False).search([(champs_odoo[champ_fichier_sansrel]['relation_champ'] or 'name', '=', ligne[champ_fichier])])
+                                res_ids = self.env[champs_odoo[champ_fichier_sansrel]['relation']]\
+                                    .with_context(active_test=False)\
+                                    .search([(champs_odoo[champ_fichier_sansrel]['relation_champ'] or 'name',
+                                              '=', ligne[champ_fichier])])
 
                         if len(res_ids) == 1:
                             valeurs[champ_fichier_sansrel] = res_ids.id
                             if model == 'product.template' and champ_fichier_sansrel == 'brand_id':
-                                if res_ids.partner_id:  # Le fournisseur est devenu un champ obligatoire de la marque. Cette vérification pourra être retirée.
+                                if res_ids.partner_id:
+                                    # Le fournisseur est devenu un champ obligatoire de la marque.
+                                    # Cette vérification pourra être retirée.
                                     valeurs['seller_ids'] = [(5, ), (0, 0, {'name': res_ids.partner_id.id})]
                         elif len(res_ids) > 1:
-                            erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" a plusieurs correspondances. %s non importé." % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], model_data['nom_objet'].capitalize()))
+                            erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" a plusieurs correspondances."
+                                   u" %s non importé."
+                                   % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier,
+                                      ligne[champ_fichier], model_data['nom_objet'].capitalize()))
                         else:
                             # Si import de partenaires et champ compte comptable (client et fournisseur), on le crée.
-                            if model == 'res.partner' and champ_fichier == 'property_account_receivable_id' and 'name' in ligne:
+                            if model == 'res.partner' and champ_fichier == 'property_account_receivable_id'\
+                                    and 'name' in ligne:
                                 if not simuler:
-                                    valeurs[champ_fichier_sansrel] = self.env[champs_odoo[champ_fichier_sansrel]['relation']].create({'name': ligne['name'], 'code': ligne[champ_fichier], 'reconcile': True, 'user_type_id': model_data['data_account_type_receivable_id']})
-                            elif model == 'res.partner' and champ_fichier == 'property_account_payable_id' and 'name' in ligne:
+                                    valeurs[champ_fichier_sansrel] =\
+                                        self.env[champs_odoo[champ_fichier_sansrel]['relation']].create(
+                                            {
+                                                'name': ligne['name'],
+                                                'code': ligne[champ_fichier],
+                                                'reconcile': True,
+                                                'user_type_id': model_data['data_account_type_receivable_id']
+                                            })
+                            elif model == 'res.partner' and champ_fichier == 'property_account_payable_id'\
+                                    and 'name' in ligne:
                                 if not simuler:
-                                    valeurs[champ_fichier_sansrel] = self.env[champs_odoo[champ_fichier_sansrel]['relation']].create({'name': ligne['name'], 'code': ligne[champ_fichier], 'reconcile': True, 'user_type_id': model_data['data_account_type_payable_id']})
+                                    valeurs[champ_fichier_sansrel] =\
+                                        self.env[champs_odoo[champ_fichier_sansrel]['relation']].create(
+                                            {
+                                                'name': ligne['name'],
+                                                'code': ligne[champ_fichier],
+                                                'reconcile': True,
+                                                'user_type_id': model_data['data_account_type_payable_id']
+                                            })
                             elif ligne[champ_fichier] == "#vide":
                                 valeurs[champ_fichier_sansrel] = ''
                             else:
-                                erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" n'a pas de correspondance. %s non importé." % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], model_data['nom_objet'].capitalize()))
+                                erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" n'a pas de correspondance."
+                                       u" %s non importé."
+                                       % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier,
+                                          ligne[champ_fichier], model_data['nom_objet'].capitalize()))
 
                 # Si est un one2many
                 elif champs_odoo[champ_fichier_sansrel]['type'] == 'one2many':
-                    # Cas des fournisseurs pour les produits. Il y a un objet intermédiaire avec un enregistrement pour chaque produit.
+                    # Cas des fournisseurs pour les produits. Il y a un objet intermédiaire avec un enregistrement
+                    # pour chaque produit.
                     # On crée le fournisseur dans cet objet en renseignant le prix d'achat
                     if model == 'product.template' and champ_fichier == 'seller_ids' and valeurs.get('brand_id'):
                         if not ligne[champ_fichier]:
@@ -913,16 +1029,27 @@ class OfImport(models.Model):
                         brand = self.env['of.product.brand'].browse(valeurs['brand_id'])
                         if brand.partner_id:
                             if brand.partner_id.name.strip() != ligne[champ_fichier]:
-                                erreur(u"Ligne %s : champ %s (%s) Le fournisseur choisi (%s) ne correspond pas à celui de la marque %s (%s). %s non importé." % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], brand.name, brand.partner_id.name, model_data['nom_objet'].capitalize()))
+                                erreur(u"Ligne %s : champ %s (%s) Le fournisseur choisi (%s) ne correspond pas à"
+                                       u" celui de la marque %s (%s). %s non importé."
+                                       % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier,
+                                          ligne[champ_fichier], brand.name, brand.partner_id.name,
+                                          model_data['nom_objet'].capitalize()))
                         else:
-                            res_ids = self.env['res.partner'].search([('name', '=', ligne[champ_fichier]), ('supplier', '=', True)])
+                            res_ids = self.env['res.partner'].search(
+                                [('name', '=', ligne[champ_fichier]), ('supplier', '=', True)])
 
                             if len(res_ids) == 1:
                                 valeurs[champ_fichier_sansrel] = [(5, ), (0, 0, {'name': res_ids.id})]
                             elif len(res_ids) > 1:
-                                erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" a plusieurs correspondances. %s non importé." % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], model_data['nom_objet'].capitalize()))
+                                erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" a plusieurs correspondances."
+                                       u" %s non importé."
+                                       % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier,
+                                          ligne[champ_fichier], model_data['nom_objet'].capitalize()))
                             else:
-                                erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" n'a pas de correspondance. %s non importé." % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, ligne[champ_fichier], model_data['nom_objet'].capitalize()))
+                                erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" n'a pas de correspondance."
+                                       u" %s non importé."
+                                       % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier,
+                                          ligne[champ_fichier], model_data['nom_objet'].capitalize()))
 
                 # Si est un many2many
                 elif champs_odoo[champ_fichier_sansrel]['type'] == 'many2many':
@@ -930,17 +1057,28 @@ class OfImport(models.Model):
                     # Ça équivaut à des étiquettes. On peut en importer plusieurs en les séparant par des virgules.
                     # Ex : étiquette1, étiquette2, étiquette3
                     tag_ids = []
-                    if ligne[champ_fichier] and ligne[champ_fichier] != "#vide":  # S'il y a des données dans le champ d'import
-                        ligne[champ_fichier] = ligne[champ_fichier].split(',')  # On sépare les étiquettes quand il y a une virgule
-                        for tag in ligne[champ_fichier]:  # On parcourt les étiquettes à importer
-                            # On regarde si elle existe.
-                            res_ids = self.env[champs_odoo[champ_fichier_sansrel]['relation']].with_context(active_test=False).search([(champs_odoo[champ_fichier_sansrel]['relation_champ'] or 'name', '=', tag)])
+                    if ligne[champ_fichier] and ligne[champ_fichier] != "#vide":
+                        # Il y a des données dans le champ d'import
+
+                        # On sépare les étiquettes quand il y a une virgule, puis on les parcourt
+                        ligne[champ_fichier] = ligne[champ_fichier].split(',')
+                        for tag in ligne[champ_fichier]:
+                            # On regarde si l'étiquette existe.
+                            res_ids = self.env[champs_odoo[champ_fichier_sansrel]['relation']]\
+                                .with_context(active_test=False)\
+                                .search([(champs_odoo[champ_fichier_sansrel]['relation_champ'] or 'name', '=', tag)])
                             if len(res_ids) == 1:
                                 tag_ids.append(res_ids.id)
                             elif len(res_ids) > 1:
-                                erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" a plusieurs correspondances. %s non importé." % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, tag, model_data['nom_objet'].capitalize()))
+                                erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" a plusieurs correspondances."
+                                       u" %s non importé."
+                                       % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, tag,
+                                          model_data['nom_objet'].capitalize()))
                             else:
-                                erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" n'a pas de correspondance. %s non importé." % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, tag, model_data['nom_objet'].capitalize()))
+                                erreur(u"Ligne %s : champ %s (%s) valeur \"%s\" n'a pas de correspondance."
+                                       u" %s non importé."
+                                       % (i, champs_odoo[champ_fichier_sansrel]['description'], champ_fichier, tag,
+                                          model_data['nom_objet'].capitalize()))
                     if not import_error:
                         if ligne[champ_fichier] == "#vide":
                             valeurs[champ_fichier_sansrel] = [(5,)]
@@ -956,21 +1094,24 @@ class OfImport(models.Model):
                         lang = self.lang_id.code or 'en_US'
                         if lang != 'en_US':
                             vals_trad = valeurs_trad.setdefault(lang, {})
-                            vals_trad[champ_fichier_sansrel] = '' if ligne[champ_fichier] == "#vide" else ligne[champ_fichier]
+                            vals_trad[champ_fichier_sansrel] = \
+                                '' if ligne[champ_fichier] == "#vide" else ligne[champ_fichier]
                     if champs_odoo[champ_fichier_sansrel]['langue']:
                         if ligne[champ_fichier] != '':
                             lang = champs_odoo[champ_fichier_sansrel]['langue']
                             vals_trad = valeurs_trad.setdefault(lang, {})
-                            vals_trad[champ_fichier_sansrel[len(lang) + 2:]] = '' if ligne[champ_fichier] == "#vide" else ligne[champ_fichier]
+                            vals_trad[champ_fichier_sansrel[len(lang) + 2:]] = \
+                                '' if ligne[champ_fichier] == "#vide" else ligne[champ_fichier]
                     elif ligne[champ_fichier] == "#vide":
                         valeurs[champ_fichier_sansrel] = ''
                     elif ligne[champ_fichier] != '':
                         valeur = ligne[champ_fichier]
                         if champ_fichier == model_data['champ_reference']:
                             if model == 'product.template':
-                                # On ajoute (ou retire) à la référence d'un article le préfixe défini dans la marque associée
-                                # Cette opération doit être réalisée après la détection de la marque mais avant la
-                                #  détection du produit associé (la combinaison préfixe+référence est la clef de recherche)
+                                # On ajoute (ou retire) à la référence d'un article le préfixe défini dans la marque
+                                # associée. Cette opération doit être réalisée après la détection de la marque mais
+                                # avant la détection du produit associé (la combinaison préfixe+référence est la clef
+                                # de recherche)
                                 brand_id = valeurs.get('brand_id')
                                 if brand_id:
                                     brand = self.env['of.product.brand'].browse(brand_id)
@@ -980,7 +1121,8 @@ class OfImport(models.Model):
                                 if brand:
                                     prefixe = brand.code + '_'
                                     if brand.use_prefix:
-                                        # Le préfixe n'est ajouté que s'il n'est pas déjà appliqué (e.g. avec un export/import)
+                                        # Le préfixe n'est ajouté que s'il n'est pas déjà appliqué
+                                        # (e.g. avec un export/import)
                                         if not valeur.startswith(prefixe):
                                             valeur = prefixe + valeur
                                     else:
@@ -998,7 +1140,8 @@ class OfImport(models.Model):
                         valeurs[champ_fichier_sansrel] = valeur
 
             if champ_fichier and champ_fichier == model_data['champ_primaire']:
-                # Récupération si possible de la valeur finale (par ex. si préfixe ajouté), sinon de la valeur dans le fichier (si champ non importable)
+                # Récupération si possible de la valeur finale (par ex. si préfixe ajouté),
+                # sinon de la valeur dans le fichier (si champ non importable)
                 valeur = valeurs.get(model_data['champ_primaire'], ligne[model_data['champ_primaire']])
 
                 # Si la référence est un champ vide, on ne s'arrête pas, ça sera une création,
@@ -1012,7 +1155,8 @@ class OfImport(models.Model):
                 domain = [(model_data['champ_primaire'], '=', valeur)]
                 if model == 'product.template':
                     # Pour un article, la clef est le champ primaire ET la marque.
-                    # Un article sans marque (créé avant l'installation du module of_product_brand) est également valide.
+                    # Un article sans marque (créé avant l'installation du module of_product_brand)
+                    # est également valide.
                     if valeurs.get('brand_id'):
                         domain += ['|', ('brand_id', '=', False), ('brand_id', '=', valeurs['brand_id'])]
                     else:
@@ -1024,14 +1168,20 @@ class OfImport(models.Model):
                     res_objet = res_objet.filtered(lambda o: o.brand_id.id == valeurs.get('brand_id')) or res_objet
 
                 if len(res_objet) > 1:
-                    # Il existe plusieurs articles dans la base avec cette référence. On ne sait pas lequel mettre à jour. On passe au suivant en générant une erreur.
-                    erreur(u"Ligne %s %s %s en plusieurs exemplaires dans la base, on ne sait pas lequel mettre à jour. %s non importé." % (i, model_data['nom_objet'], libelle_ref, model_data['nom_objet'].capitalize()))
-                    # Afin de continuer la simulation d'import correctement, on prend arbitrairement un des objets disponibles
-                    # Evite notamment des erreurs pour la simulation d'import d'articles, car l'objet contient des paramètres d'import
+                    # Il existe plusieurs articles dans la base avec cette référence.
+                    # On ne sait pas lequel mettre à jour. On passe au suivant en générant une erreur.
+                    erreur(u"Ligne %s %s %s en plusieurs exemplaires dans la base, on ne sait pas lequel mettre à jour."
+                           u" %s non importé."
+                           % (i, model_data['nom_objet'], libelle_ref, model_data['nom_objet'].capitalize()))
+                    # Afin de continuer la simulation d'import correctement,
+                    # on prend arbitrairement un des objets disponibles
+                    # Evite notamment des erreurs pour la simulation d'import d'articles,
+                    # car l'objet contient des paramètres d'import
                     res_objet = res_objet[0]
 
         try:
-            self._post_calcule_ligne(champs_fichier, ligne, model_data, res_objet, valeurs)  # Champs à importer (pour envoi à fonction create ou write)
+            # Champs à importer (pour envoi à fonction create ou write)
+            self._post_calcule_ligne(champs_fichier, ligne, model_data, res_objet, valeurs)
         except OfImportError, e:
             erreur(u"Ligne %s : %s %s non importé." % (i, e.name, model_data['nom_objet'].capitalize()))
 
@@ -1039,7 +1189,9 @@ class OfImport(models.Model):
             # En cas de création, on doit vérifier que tous les champs Odoo requis ont bien été renseignés.
             for cle in champs_odoo:
                 if champs_odoo[cle]['requis'] is True and cle not in valeurs:
-                    erreur(u"Ligne %s : champ %s (%s) obligatoire mais non présent dans le fichier d'import. %s non importé." % (i, champs_odoo[cle]['description'], cle, model_data['nom_objet'].capitalize()))
+                    erreur(u"Ligne %s : champ %s (%s) obligatoire mais non présent dans le fichier d'import."
+                           u" %s non importé."
+                           % (i, champs_odoo[cle]['description'], cle, model_data['nom_objet'].capitalize()))
 
         message = import_error
         if message:
@@ -1142,7 +1294,9 @@ class OfImport(models.Model):
         model_data['model'] = model
 
         # Initialisation variables
-        champs_odoo = self.get_champs_odoo(model, self.lang_id.code or self.env.lang)  # On récupère la liste des champs de l'objet (depuis ir.model.fields)
+
+        # On récupère la liste des champs de l'objet (depuis ir.model.fields)
+        champs_odoo = self.get_champs_odoo(model, self.lang_id.code or self.env.lang)
         date_debut = time.strftime('%Y-%m-%d %H:%M:%S')
 
         self.import_success_ids.unlink()
@@ -1168,13 +1322,15 @@ class OfImport(models.Model):
         # LECTURE DU FICHIER D'IMPORT SELON EXTENSION (CHOISIR READER)
         # Le reader doit :
         # - Au premier appel, retourner la liste des noms des colonnes
-        # - Aux appels suivants, retourner un dictionnaire clef:valeur de la prochaine ligne non vide ou lever une exception de type StopIteration
+        # - Aux appels suivants, retourner un dictionnaire clef:valeur de la prochaine ligne non vide
+        #   ou lever une exception de type StopIteration
         # - S'assurer que chacune des valeurs retournées a subi un strip()
         reader = self._choisir_reader()
 
         # ANALYSE DES CHAMPS DU FICHIER D'IMPORT
 
-        # On récupère la 1ère ligne du fichier (liste des champs) pour vérifier si des champs existent en plusieurs exemplaires
+        # On récupère la 1ère ligne du fichier (liste des champs) pour vérifier si des champs existent en
+        # plusieurs exemplaires
         champs_fichier = reader.next()
 
         if model == 'product.template':
@@ -1230,16 +1386,18 @@ class OfImport(models.Model):
                                                 u"le fichier d'import." %
                                                 (model_data['nom_objet'], model_data['champ_primaire'])})]
 
-        # Vérification si il y a des champs du fichier d'import qui sont en plusieurs exemplaires et détection champ relation (id, id externe, nom)
+        # Vérification si il y a des champs du fichier d'import qui sont en plusieurs exemplaires et détection
+        # champ relation (id, id externe, nom)
         doublons = {}
 
         for champ_fichier in champs_fichier:
 
             # Récupération du champ relation si est indiqué (dans le nom du champ après un /)
-            champ_relation = champ_fichier[champ_fichier.rfind('/')+1 or len(champ_fichier):].strip()  # On le récupère.
+            champ_relation = champ_fichier[champ_fichier.rfind('/')+1 or len(champ_fichier):].strip()
 
-            if champ_relation:  # Si est défini, on le retire du nom du champ.
-                champ_fichier = champ_fichier[0:champ_fichier.rfind('/') if champ_fichier.rfind('/') != -1 else len(champ_fichier)].strip()
+            if champ_relation:
+                # On le retire du nom du champ.
+                champ_fichier = champ_fichier[:-len(champ_relation)-1]
 
             if champ_fichier in doublons:
                 doublons[champ_fichier] = doublons[champ_fichier] + 1
@@ -1253,7 +1411,8 @@ class OfImport(models.Model):
                                                       u"Ignorée lors de l'import." % champ_fichier})]
             else:
                 # Vérification que le champ relation (si est indiqué) est correct.
-                if champ_relation and champs_odoo[champ_fichier]['type'] in ('many2one', ) and not champs_odoo[champ_fichier]['relation_champ']:
+                if champ_relation and champs_odoo[champ_fichier]['type'] in ('many2one', )\
+                        and not champs_odoo[champ_fichier]['relation_champ']:
                     if not self.env['ir.model.fields'].search([('model', '=', champs_odoo[champ_fichier]['relation']),
                                                                ('name', '=', champ_relation)]):
                         import_error += [(0, 0, {'type': 'error',
@@ -1270,7 +1429,8 @@ class OfImport(models.Model):
                     erreur = 1
 
         for champ_fichier in doublons:
-            # On affiche un message d'avertissement si le champ existe en plusieurs exemplaires et si c'est un champ connu à importer
+            # On affiche un message d'avertissement si le champ existe en plusieurs exemplaires et si c'est un champ
+            # connu à importer
             if champ_fichier in champs_odoo and doublons[champ_fichier] > 1:
                 import_error += [(0, 0, {'type': 'error',
                                          'message': u"La colonne \"%s\" dans le fichier d'import existe en %s "
@@ -1309,7 +1469,8 @@ class OfImport(models.Model):
 
             if (nb_total + 1) % frequence_commit == 0:
                 if model == 'product.template':
-                    product_categ_configs = product_categ_config_obj.search([('id', 'not in', product_categ_config_ids)], order='brand_id, categ_origin')
+                    product_categ_configs = product_categ_config_obj.search(
+                        [('id', 'not in', product_categ_config_ids)], order='brand_id, categ_origin')
                     if product_categ_configs:
                         for config in product_categ_configs:
                             import_warning += [(0, 0, {'type': 'warning',
@@ -1333,7 +1494,8 @@ class OfImport(models.Model):
             nb_total += 1
 
             try:
-                code, message = self._importer_ligne(ligne, champs_fichier, champs_odoo, i, model_data, doublons, simuler)
+                code, message = self._importer_ligne(
+                    ligne, champs_fichier, champs_odoo, i, model_data, doublons, simuler)
 
                 if message:
                     if code == CODE_IMPORT_ERREUR:
@@ -1369,7 +1531,8 @@ class OfImport(models.Model):
 
         # On enregistre les dernières lignes qui ne l'auraient pas été.
         if model == 'product.template':
-            product_categ_configs = product_categ_config_obj.search([('id', 'not in', product_categ_config_ids)], order='brand_id, categ_origin')
+            product_categ_configs = product_categ_config_obj.search(
+                [('id', 'not in', product_categ_config_ids)], order='brand_id, categ_origin')
             if product_categ_configs:
                 for config in product_categ_configs:
                     import_warning += [(0, 0, {'type': 'warning',
