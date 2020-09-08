@@ -368,6 +368,7 @@
                 <field name="kit_line_ids" attrs="{'readonly': [('state', 'in', ('done','cancel'))]}"
                   context="{'hide_sale': context.get('hide_sale')}">
                     <tree editable="bottom">
+                        <field name="sequence" widget="handle"/>
                         <field name="product_id" attrs="{'readonly': ['|', ('invoiced', '=', True), ('procurement_ids', '!=', [])]}"/>
                         <field name="name"/>
                         <field name="qty_per_kit"/>

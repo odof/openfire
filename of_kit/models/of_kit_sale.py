@@ -528,7 +528,7 @@ class OfSaleOrderKit(models.Model):
 
 class OfSaleOrderKitLine(models.Model):
     _name = 'of.saleorder.kit.line'
-    _order = "kit_id, sequence"
+    _order = "kit_id, sequence, id"
 
     kit_id = fields.Many2one('of.saleorder.kit', string="Kit", ondelete="cascade")
     order_id = fields.Many2one('sale.order', string="Order", related="kit_id.order_line_id.order_id")

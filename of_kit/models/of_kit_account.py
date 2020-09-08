@@ -335,7 +335,7 @@ class OfAccountInvoiceKit(models.Model):
 
 class OfAccountInvoiceKitLine(models.Model):
     _name = 'of.invoice.kit.line'
-    _order = "kit_id, sequence"
+    _order = "kit_id, sequence, id"
 
     kit_id = fields.Many2one('of.invoice.kit', string="Kit", ondelete="cascade")
     invoice_id = fields.Many2one('account.invoice', string="Invoice", related="kit_id.invoice_line_id.invoice_id")
