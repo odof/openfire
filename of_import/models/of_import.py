@@ -371,14 +371,7 @@ class OfImport(models.Model):
     user_id = fields.Many2one('res.users', u'Utilisateur', readonly=True, default=lambda self: self._uid)
 
     name = fields.Char(u'Nom', size=64, required=True)
-    type_import = fields.Selection(
-        [
-            ('product.template', u'Articles'),
-            ('res.partner', u'Partenaires'),
-            ('crm.lead', u'Pistes/opportunités'),
-            ('res.partner.bank', u'Comptes en banques partenaire'),
-            ('of.service', u'Services OpenFire'),
-        ], string=u"Type d'import", required=True)
+    type_import = fields.Selection(lambda s: s._selection_type_import(), string=u"Type d'import", required=True)
     lang_id = fields.Many2one('res.lang', string="Langue principale", default=lambda self: self._default_lang_id())
     show_lang = fields.Boolean(compute='_compute_show_lang', string="Afficher la langue principale")
 
@@ -427,6 +420,24 @@ class OfImport(models.Model):
     import_error_ids = fields.One2many(
         comodel_name='of.import.message', inverse_name='import_id', string=u"Erreurs", readonly=True,
         domain=[('type', '=', 'error')])
+
+    @api.model
+    def _selection_type_import(self):
+        """
+        Fonction de calcul de la sélection disponible pour le type d'import.
+        En effet, certains objets (of.product.kit.line, of.service) proviennent de modules qui
+          ne sont pas dans les dépendances du module of_import.
+        """
+        selection = [
+            ('product.template', u'Articles'),
+            ('of.product.kit.line', u'Composants de kits'),
+            ('res.partner', u'Partenaires'),
+            ('crm.lead', u'Pistes/opportunités'),
+            ('res.partner.bank', u'Comptes en banques partenaire'),
+            ('of.service', u'Services OpenFire'),
+        ]
+        selection = [s for s in selection if s[0] in self.env]
+        return selection
 
     @api.multi
     @api.depends('lang_id')
@@ -678,6 +689,10 @@ class OfImport(models.Model):
                 # Le vrai categ_id sera calculé en fonction de la marque
                 champs_odoo['categ_id']['requis'] = False
 
+        if model == 'of.product.kit.line':
+            if 'product_uom_id' in champs_odoo:
+                # L'unité de mesure est par défaut celle du composant.
+                champs_odoo['product_uom_id']['requis'] = False
         return champs_odoo
 
     @api.multi
@@ -763,6 +778,14 @@ class OfImport(models.Model):
                     product=res_objet,
                     price=valeurs.get('of_seller_price'),
                     remise=valeurs.get('of_seller_remise')))
+        elif self.type_import == 'of.product.kit.line':
+            if 'product_uom_id' not in valeurs:
+                product_id = valeurs.get('product_id')
+                product = self.env['product.product']
+                if product_id:
+                    product = product.browse(product_id)
+                    # Si kit_id n'est pas défini, une exception sera automatiquement générée plus tard
+                    valeurs['product_uom_id'] = product.uom_id.id
 
     @api.multi
     def _importer_ligne(self, ligne, champs_fichier, champs_odoo, i, model_data, doublons, simuler):
@@ -1139,14 +1162,18 @@ class OfImport(models.Model):
 
                         valeurs[champ_fichier_sansrel] = valeur
 
-            if champ_fichier and champ_fichier == model_data['champ_primaire']:
+            if champ_fichier and champ_fichier_sansrel == model_data['champ_primaire']:
                 # Récupération si possible de la valeur finale (par ex. si préfixe ajouté),
                 # sinon de la valeur dans le fichier (si champ non importable)
-                valeur = valeurs.get(model_data['champ_primaire'], ligne[model_data['champ_primaire']])
+                valeur = valeurs.get(champ_fichier_sansrel, ligne[champ_fichier])
 
                 # Si la référence est un champ vide, on ne s'arrête pas, ça sera une création,
                 #   mais on garde une copie des lignes pour faire un message d'avertissement.
                 if valeur and valeur in doublons:
+                    if model == 'of.product.kit.line':
+                        # L'import des composants de ce kit a déjà commencé.
+                        # Les doublons sont les composants additionnels, ils ne génèrent pas d'erreur.
+                        continue
                     code = CODE_IMPORT_AVERT
                     if not simuler:
                         break
@@ -1162,6 +1189,16 @@ class OfImport(models.Model):
                     else:
                         domain += [('brand_id', '=', False)]
                 res_objet = model_obj.with_context(active_test=False).search(domain)
+
+                if model == 'of.product.kit.line' and res_objet:
+                    if not simuler:
+                        # On est en train d'importer le premier composant de ce kit, mais certains composants
+                        # étaient déjà renseignés : on les supprime
+                        res_objet.unlink()
+                    # Dans tous les cas on vide res_objet pour ne pas considérer qu'il s'agit d'une mise à jour
+                    # mais bien d'une création de ligne de composants.
+                    res_objet = model_obj
+                    continue
 
                 if model == 'product.template' and len(res_objet) > 1:
                     # Plusieurs articles trouvés, recherche sur la marque
@@ -1266,6 +1303,14 @@ class OfImport(models.Model):
                 'nom_objet': u'article',             # Libellé pour affichage dans message information/erreur
                 'champ_primaire': 'default_code',    # Champ sur lequel on se base pour détecter si enregistrement déjà existant (alors mise à jour) ou inexistant (création)
                 'champ_reference': 'default_code',   # Champ qui contient la référence ( ex : référence du produit, d'un client, ...) pour ajout du préfixe devant
+            },
+            'of.product.kit.line': {
+                'nom_objet': u'Composants de kits',
+                # Dans le cas des composants de kits, le champ primaire est le kit.
+                # Cela permet de détourner la gestion des doublons : la première fois que la
+                # clef primaire est détectée, on vide les anciens composants du kit.
+                'champ_primaire': 'kit_id',
+                'champ_reference': '',
             },
             'res.partner': {
                 'nom_objet': u'partenaire',          # Libellé pour affichage dans message information/erreur
@@ -1375,11 +1420,12 @@ class OfImport(models.Model):
             # Définition de l'ordre de lecture des champs. La marque doit être lue en premier
             champs_fichier = sorted(champs_fichier,
                                     key=lambda champ: ((champ == model_data['champ_reference'] and 10) or
-                                                       (champ == model_data['champ_primaire'] and 20) or
+                                                       (champ.split('/')[0] == model_data['champ_primaire'] and 20) or
                                                        30))
 
         # Vérification si le champ primaire est bien dans le fichier d'import (si le champ primaire est défini)
-        if model_data['champ_primaire'] and model_data['champ_primaire'] not in champs_fichier:
+        champs_fichier_racine = [champ.split('/')[0] for champ in champs_fichier]
+        if model_data['champ_primaire'] and model_data['champ_primaire'] not in champs_fichier_racine:
             erreur = 1
             import_error += [(0, 0, {'type': 'error',
                                      'message': u"Le champ référence qui permet d'identifier un %s (%s) n'est pas dans "
@@ -1397,7 +1443,7 @@ class OfImport(models.Model):
 
             if champ_relation:
                 # On le retire du nom du champ.
-                champ_fichier = champ_fichier[:-len(champ_relation)-1]
+                champ_fichier = champ_fichier[:-len(champ_relation)-1].strip()
 
             if champ_fichier in doublons:
                 doublons[champ_fichier] = doublons[champ_fichier] + 1
@@ -1514,6 +1560,11 @@ class OfImport(models.Model):
                 nb_ajout += 1
             elif code == CODE_IMPORT_MODIFICATION:
                 nb_maj += 1
+
+        if model == 'of.product.kit.line':
+            # Les "doublons" ne génèrent pas de warning pour les kits car il s'agit de différents
+            # composants d'un même kit.
+            doublons = {}
 
         # On affiche les enregistrements qui étaient en plusieurs exemplaires dans le fichier d'import.
         for cle in doublons:
