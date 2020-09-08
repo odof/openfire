@@ -11,29 +11,36 @@ class ProductTemplate(models.Model):
     of_is_kit = fields.Boolean(string="Is a kit")
     # store=True for domain searches and _sq_constraint
     is_kit_comp = fields.Boolean(
-        string="Is a comp", compute="_compute_is_kit_comp", store=True, help="is a component of a kit")
+        string="Is a comp", compute="_compute_is_kit_comp", store=True, help="is a component of a kit"
+    )
     kit_line_ids = fields.One2many('of.product.kit.line', 'kit_id', string='Components', copy=True)
 
     price_comps = fields.Monetary(
         string='Compo Price/Kit', digits=dp.get_precision('Product Price'), compute='_compute_compo_price_n_cost',
-        help="Sum of the prices of all components necessary for 1 unit of this kit")
+        help="Sum of the prices of all components necessary for 1 unit of this kit"
+    )
     cost_comps = fields.Monetary(
         string='Compo Cost/Kit', digits=dp.get_precision('Product Price'), compute='_compute_compo_price_n_cost',
-        help="Sum of the costs of all components necessary for 1 unit of this kit")
+        help="Sum of the costs of all components necessary for 1 unit of this kit"
+    )
 
     of_price_used = fields.Monetary(
         string='Used Price', digits=dp.get_precision('Product Price'), compute='_compute_of_price_used',
         help="Price that will be taken into account in sale orders and invoices."
-             "Either list price or the price of its components, dependant on the pricing.")
+             "Either list price or the price of its components, dependant on the pricing."
+    )
 
     of_pricing = fields.Selection(
         [
             ('fixed', 'Fixed'),
             ('computed', 'Computed'),
         ], string="Pricing", required=True, default='fixed',
-        help="This field is only relevant if the product is a kit. It represents the way the price should be computed.\n"
-             "if set to 'fixed', the price of it's components won't be taken into account and the price will be the one of the kit.\n"
-             "if set to 'computed', the price will be computed according to the components of the kit.")
+        help="This field is only relevant if the product is a kit."
+             "It represents the way the price should be computed.\n"
+             "if set to 'fixed', the price of it's components won't be taken into account"
+             "and the price will be the one of the kit.\n"
+             "if set to 'computed', the price will be computed according to the components of the kit."
+    )
 
     kit_count = fields.Integer('# Kits', compute='_compute_kit_count')
     comp_count = fields.Integer('# Comps', compute='_compute_comp_count')
@@ -171,7 +178,8 @@ class ProductProduct(models.Model):
     kit_count = fields.Integer('# Kits', compute='_compute_kit_count')
     # store=True for domain searches and _sq_constraint
     is_kit_comp = fields.Boolean(
-        string="Is a comp", compute="_compute_is_kit_comp", store=True, help="is a component of a kit")
+        string="Is a comp", compute="_compute_is_kit_comp", store=True, help="is a component of a kit"
+    )
 
     def _compute_kit_count(self):
         read_group_res = self.env['of.product.kit.line']\
@@ -198,19 +206,23 @@ class ProductProduct(models.Model):
         for product in self:
             product.is_kit_comp = mapped_data.get(product.id, 0) > 0
 
+
 class OfProductKitLine(models.Model):
     _name = "of.product.kit.line"
     _order = 'kit_id, sequence'
 
     kit_id = fields.Many2one(
         "product.template", string="Kit",  domain="[('is_kit_comp', '=', False)]",
-        help="Kit containing this as component", ondelete="cascade")
+        help="Kit containing this as component", ondelete="cascade"
+    )
     product_id = fields.Many2one(
         "product.product", string="Product", domain="[('of_is_kit', '=', False)]", required=True,
-        help="Product this line references")
+        help="Product this line references"
+    )
     product_qty = fields.Float(
         string='Qty / Kit', digits=dp.get_precision('Product Unit of Measure'), required=True, default=1.0,
-        help="Quantity per kit unit.")
+        help="Quantity per kit unit."
+    )
     product_uom_categ_id = fields.Many2one(related='product_id.uom_id.category_id', readonly=True)
     product_uom_id = fields.Many2one(
         'product.uom', string='UoM', domain="[('category_id', '=', product_uom_categ_id)]", required=True

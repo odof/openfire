@@ -6,6 +6,7 @@ from odoo.tools import float_is_zero, float_compare, DEFAULT_SERVER_DATETIME_FOR
 
 import odoo.addons.decimal_precision as dp
 
+
 class OfSaleorderKit(models.Model):
     _inherit = 'of.saleorder.kit'
 
@@ -31,7 +32,7 @@ class SaleQuoteLine(models.Model):
     of_is_kit = fields.Boolean(string='Est un kit')
 
     price_comps = fields.Float(
-        string='Prix comp/Kit', compute='_compute_price_comps',  # digits=dp.get_precision('Product Price'),
+        string='Prix comp/Kit', compute='_compute_price_comps',
         help="Sum of the prices of all components necessary for 1 unit of this kit",)
 
     of_pricing = fields.Selection(
@@ -39,11 +40,17 @@ class SaleQuoteLine(models.Model):
             ('fixed', u'Fixé'),
             ('computed', u'Calculé'),
         ], string="Tarification", required=True, default='fixed',
-        help="This field is only relevant if the product is a kit. It represents the way the price should be computed.\n"
-             "if set to 'fixed', the price of it's components won't be taken into account and the price will be the one of the kit.\n"
-             "if set to 'computed', the price will be computed according to the components of the kit.")
+        help="This field is only relevant if the product is a kit."
+             "It represents the way the price should be computed.\n"
+             "if set to 'fixed', the price of it's components won't be taken into account"
+             "and the price will be the one of the kit.\n"
+             "if set to 'computed', the price will be computed according to the components of the kit."
+    )
 
-    sale_kits_to_unlink = fields.Boolean(string="sale kits to unlink?", default=False, help="True if at least 1 sale kit needs to be deleted from database")
+    sale_kits_to_unlink = fields.Boolean(
+        string="sale kits to unlink?", default=False,
+        help="True if at least 1 sale kit needs to be deleted from database"
+    )
 
     @api.depends('kit_id.kit_line_ids')
     def _compute_price_comps(self):
@@ -150,8 +157,10 @@ class SaleQuoteLine(models.Model):
             update_ol_id = True
         elif 'of_pricing' in vals:
             update_ol_id = True
-        if len(self) == 1 and ((self.of_pricing == 'computed' and not vals.get('of_pricing')) or vals.get('of_pricing') == 'computed'):
-            vals['price_unit'] = vals.get('price_comps', self.price_comps)  # price_unit is equal to price_comps if pricing is computed
+        if len(self) == 1 and (
+                (self.of_pricing == 'computed' and not vals.get('of_pricing')) or vals.get('of_pricing') == 'computed'):
+            # price_unit is equal to price_comps if pricing is computed
+            vals['price_unit'] = vals.get('price_comps', self.price_comps)
         super(SaleQuoteLine, self).write(vals)
         if update_ol_id:
             sale_kit_vals = {'quote_line_id': self.id}
@@ -224,6 +233,7 @@ class SaleQuoteLine(models.Model):
             lines.append((0, 0, comp_vals))
         res["kit_line_ids"] = lines
         return res
+
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
