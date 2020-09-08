@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 {
-    "name" : "OpenFire / OpenImport",
-    "author" : "OpenFire",
-    "website" : "openfire.fr",
-    "category" : "'Extra Tools'",
-    "description": """
+    "name": "OpenFire / OpenImport",
+    "author": "OpenFire",
+    "website": "openfire.fr",
+    "category": "'Extra Tools'",
+    "description": u"""
 Module d'import OpenFire
 ========================
 
@@ -39,10 +39,10 @@ Ces différentes valeurs peuvent être configurées par marque et par catégorie
 La configuration d'une formule pour la remise n'est pas obligatoire. Si elle n'est pas renseignée, le fichier d'import devra
 contenir une colonne renseignant soit le prix d'achat ('of_seller_price'), soit la remise accordée par le fournisseur ('of_seller_remise')
 """,
-    "depends" : [
+    "depends": [
         'of_product_brand',
     ],
-    "demo_xml" : [],
+    "demo_xml": [],
     'data': [
         'security/ir.model.access.csv',
         'wizards/of_import_update_product_brand_products.xml',
