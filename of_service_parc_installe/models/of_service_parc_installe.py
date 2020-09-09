@@ -1,27 +1,32 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
-from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 
 
 class OfService(models.Model):
     _inherit = "of.service"
 
-    parc_installe_id = fields.Many2one('of.parc.installe', string=u"No de série",
-        domain="partner_id and [('client_id', '=', partner_id), '|', ('site_adresse_id', '=', False), ('site_adresse_id', '=', address_id)] or "
-               "address_id and [('client_id', 'parent_of', address_id), '|', ('site_adresse_id', '=', False), ('site_adresse_id', '=', address_id)] or []")
-
-    parc_installe_product_id = fields.Many2one('product.product', string=u"Désignation", related="parc_installe_id.product_id", readonly=True)
-    parc_installe_site_adresse_id = fields.Many2one('res.partner', string=u"Adresse de pose", related="parc_installe_id.site_adresse_id", readonly=True)
+    parc_installe_id = fields.Many2one(
+        'of.parc.installe', string=u"No de série",
+        domain="partner_id and [('client_id', '=', partner_id), '|', ('site_adresse_id', '=', False), "
+               "('site_adresse_id', '=', address_id)] or address_id and [('client_id', 'parent_of', address_id), '|', "
+               "('site_adresse_id', '=', False), ('site_adresse_id', '=', address_id)] or []")
+    parc_installe_product_id = fields.Many2one(
+        'product.product', string=u"Désignation", related="parc_installe_id.product_id", readonly=True)
+    parc_installe_site_adresse_id = fields.Many2one(
+        'res.partner', string=u"Adresse de pose", related="parc_installe_id.site_adresse_id", readonly=True)
     parc_installe_note = fields.Text(string=u"Note", related="parc_installe_id.note", readonly=True)
-    sav_id = fields.Many2one("project.issue", string="SAV", domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', address_id)]")
+    sav_id = fields.Many2one(
+        "project.issue", string="SAV", domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', address_id)]")
 
     @api.onchange('address_id')
     def _onchange_address_id(self):
         self.ensure_one()
         if self.address_id:
             parc_obj = self.env['of.parc.installe']
-            if not parc_obj.check_access_rights('read', raise_exception=False):  # ne pas tenter le onchange si n'a pas les droits
+            if not parc_obj.check_access_rights('read', raise_exception=False):
+                # ne pas tenter le onchange si n'a pas les droits
                 return
             parc_installe = parc_obj.search([('site_adresse_id', '=', self.address_id.id)], limit=1)
             if not parc_installe:
@@ -40,7 +45,7 @@ class OfService(models.Model):
     @api.multi
     def get_fin_date(self, date_str=False):
         """
-        :param date_str: Date de prochaine planif à utuliser pour le calcul, sous format string
+        :param date_str: Date de prochaine planif à utiliser pour le calcul, sous format string
         :return: Date à partir de laquelle l'intervention passe à l'état 'en retard'
         :rtype string
         """
@@ -70,8 +75,10 @@ class OfService(models.Model):
 class OfPlanningIntervention(models.Model):
     _inherit = "of.planning.intervention"
 
-    parc_installe_id = fields.Many2one('of.parc.installe', string=u"Parc installé",
-        domain="['|', '|', ('client_id', '=', partner_id), ('client_id', '=', address_id), ('site_adresse_id', '=', address_id)]")
+    parc_installe_id = fields.Many2one(
+        'of.parc.installe', string=u"Parc installé",
+        domain="['|', '|', ('client_id', '=', partner_id), ('client_id', '=', address_id), "
+               "('site_adresse_id', '=', address_id)]")
 
     @api.model
     def create(self, vals):
