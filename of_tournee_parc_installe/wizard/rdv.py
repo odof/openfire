@@ -46,8 +46,9 @@ class OfTourneeRdv(models.TransientModel):
         res['service_id'] = service and service.id or False
         return res
 
-    sav_id = fields.Many2one('project.issue', string='SAV',
-                             domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', partner_address_id)]")
+    sav_id = fields.Many2one(
+        'project.issue', string='SAV',
+        domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', partner_address_id)]")
 
     @api.multi
     def get_values_intervention_create(self):
