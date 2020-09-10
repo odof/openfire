@@ -135,6 +135,8 @@ class OfPlanningTache(models.Model):
     description = fields.Text("Description")
     verr = fields.Boolean(u"Verrouillé")
     product_id = fields.Many2one('product.product', "Produit")
+    fiscal_position_id = fields.Many2one(
+        comodel_name='account.fiscal.position', string="Position fiscale", company_dependent=True)
     active = fields.Boolean("Actif", default=True)
     imp_detail = fields.Boolean(u'Imprimer Détail', help=u"""Impression du détail des tâches dans le planning semaine
 Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée dans la journée apparaîtra""", default=True)
@@ -834,7 +836,7 @@ class OfPlanningIntervention(models.Model):
         template = self.template_id
         if self.state == "draft" and template:
             self.tache_id = template.tache_id
-            if not self.lien_commande:
+            if not self.lien_commande and not self.fiscal_position_id:
                 self.fiscal_position_id = template.fiscal_position_id
             if self.line_ids:
                 new_lines = self.line_ids
@@ -861,6 +863,8 @@ class OfPlanningIntervention(models.Model):
                     'name'           : self.tache_id.product_id.name,
                     })
                 self.line_ids.compute_taxes()
+            if self.tache_id.fiscal_position_id and not self.fiscal_position_id:
+                self.fiscal_position_id = self.tache_id.fiscal_position_id
 
     @api.onchange('forcer_dates')
     def _onchange_forcer_dates(self):
@@ -1415,7 +1419,7 @@ class OfPlanningInterventionTemplate(models.Model):
     code = fields.Char(string="Code", compute="_compute_code", inverse="_inverse_code", store=True, required=True)
     sequence_id = fields.Many2one('ir.sequence', string=u"Séquence", readonly=True)
     tache_id = fields.Many2one('of.planning.tache', string=u"Tâche")
-    fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale")
+    fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale", company_dependent=True)
     line_ids = fields.One2many('of.planning.intervention.template.line', 'template_id', string="Lignes de facturation")
     product_ids = fields.Many2many('product.product')
 
