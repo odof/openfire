@@ -59,25 +59,25 @@ class OFCRMFunnelConversion(models.Model):
                                         100 * COUNT(DISTINCT SO2.opportunity_id) / COUNT(DISTINCT SO1.opportunity_id)
                                 END                                                                                     AS order_rate1
                     ,           100 * COUNT(DISTINCT SO2.opportunity_id) / COUNT(DISTINCT CL.id)                        AS order_rate2
-                    ,           COALESCE(SO2.amount_total, 0)                                                           AS opportunity_cart
+                    ,           COALESCE(SO2.amount_untaxed, 0)                                                         AS opportunity_cart
                     ,           CASE
                                     WHEN COUNT(DISTINCT SO1.opportunity_id) = 0 THEN
                                         NULL
                                     ELSE
-                                        COALESCE(SO2.amount_total, 0)
+                                        COALESCE(SO2.amount_untaxed, 0)
                                 END                                                                                     AS quotation_cart
                     ,           CASE
                                     WHEN COUNT(DISTINCT SO2.opportunity_id) = 0 THEN
                                         NULL
                                     ELSE
-                                        COALESCE(SO2.amount_total, 0)
+                                        COALESCE(SO2.amount_untaxed, 0)
                                 END                                                                                     AS order_cart
                     ,           COUNT(DISTINCT CA.id)                                                                   AS activity_nb
                     ,           CASE
                                     WHEN COUNT(DISTINCT SO3.opportunity_id) = 0 THEN
                                         0
                                     ELSE
-                                        COALESCE(AVG(SO3.amount_total), 0)
+                                        COALESCE(AVG(SO3.amount_untaxed), 0)
                                 END                                                                                     AS quotation_amount
                     ,           CASE
                                     WHEN COUNT(DISTINCT SO2.opportunity_id) = 0 THEN
@@ -93,7 +93,7 @@ class OFCRMFunnelConversion(models.Model):
                                     ELSE
                                         COALESCE(SO2.margin, 0)
                                 END                                                                                     AS order_margin
-                    ,           COALESCE(SO2.amount_total, 0)                                                           AS sales_total
+                    ,           COALESCE(SO2.amount_untaxed, 0)                                                         AS sales_total
                     ,           0                                                                                       AS ordered_turnover_objective
                     ,           0                                                                                       AS previous_sales_total
                     FROM        crm_lead                                                                                CL
@@ -109,7 +109,6 @@ class OFCRMFunnelConversion(models.Model):
                         ON      CA.opportunity_id                                                                       = CL.id
                         AND     CA.state                                                                                ='done'
                     GROUP BY    CL.id
-                    ,           SO2.amount_total
                     ,           SO2.amount_untaxed
                     ,           SO2.margin
                     ,           SO1.project_id
@@ -135,7 +134,7 @@ class OFCRMFunnelConversion(models.Model):
                     ,           0                                                                                       AS order_margin
                     ,           0                                                                                       AS sales_total
                     ,           OSOL.ordered_turnover                                                                   AS ordered_turnover_objective
-                    ,           (   SELECT  SUM(SO.amount_total)
+                    ,           (   SELECT  SUM(SO.amount_untaxed)
                                     FROM    sale_order                                      SO
                                     ,       crm_lead                                        CL2
                                     WHERE   SO.user_id                                      = RR.user_id
@@ -241,7 +240,6 @@ class OFCRMFunnelConversion2(models.Model):
     sales_total = fields.Float(string=u"CA commandé", readonly=True)
     order_amount_rate = fields.Char(
         string=u"Taux de concrétisation € (%)", compute='_compute_order_amount_rate', compute_sudo=True, readonly=True)
-    amount_untaxed = fields.Float(string=u"Total HT", readonly=True)
     ordered_turnover_objective = fields.Float(string=u"Objectif CA commandé", readonly=True)
     sales_objective_comparison = fields.Char(
         string=u"Comparaison Objectif (%)", compute='_compute_sales_objective_comparison', compute_sudo=True,
@@ -266,7 +264,6 @@ class OFCRMFunnelConversion2(models.Model):
                 ,           SUM(T.activity_nb)                              AS activity_nb
                 ,           SUM(T.quotation_amount)                         AS quotation_amount
                 ,           SUM(T.order_margin)                             AS order_margin
-                ,           SUM(T.amount_untaxed)                           AS amount_untaxed
                 ,           SUM(T.ordered_turnover_objective)               AS ordered_turnover_objective
                 ,           SUM(T.previous_sales_total)                     AS previous_sales_total
                 FROM
@@ -282,7 +279,6 @@ class OFCRMFunnelConversion2(models.Model):
                             ,           0                                   AS activity_nb
                             ,           0                                   AS quotation_amount
                             ,           0                                   AS order_margin
-                            ,           0                                   AS amount_untaxed
                             ,           0                                   AS ordered_turnover_objective
                             ,           0                                   AS previous_sales_total
                             FROM        crm_lead                            CL
@@ -298,9 +294,8 @@ class OFCRMFunnelConversion2(models.Model):
                             ,           0                                   AS order_nb
                             ,           0                                   AS cart
                             ,           0                                   AS activity_nb
-                            ,           AVG(SO1.amount_total)               AS quotation_amount
+                            ,           AVG(SO1.amount_untaxed)             AS quotation_amount
                             ,           0                                   AS order_margin
-                            ,           0                                   AS amount_untaxed
                             ,           0                                   AS ordered_turnover_objective
                             ,           0                                   AS previous_sales_total
                             FROM        sale_order                          SO
@@ -322,11 +317,10 @@ class OFCRMFunnelConversion2(models.Model):
                             ,           0                                   AS opportunity_nb
                             ,           0                                   AS quotation_nb
                             ,           1                                   AS order_nb
-                            ,           AVG(SO2.amount_total)               AS cart
+                            ,           AVG(SO2.amount_untaxed)             AS cart
                             ,           0                                   AS activity_nb
                             ,           0                                   AS quotation_amount
                             ,           AVG(SO2.margin)                     AS order_margin
-                            ,           AVG(SO2.amount_untaxed)             AS amount_untaxed
                             ,           0                                   AS ordered_turnover_objective
                             ,           0                                   AS previous_sales_total
                             FROM        sale_order                          SO2
@@ -350,7 +344,6 @@ class OFCRMFunnelConversion2(models.Model):
                             ,           1                                   AS activity_nb
                             ,           0                                   AS quotation_amount
                             ,           0                                   AS order_margin
-                            ,           0                                   AS amount_untaxed
                             ,           0                                   AS ordered_turnover_objective
                             ,           0                                   AS previous_sales_total
                             FROM        of_crm_activity                     CA
@@ -370,9 +363,8 @@ class OFCRMFunnelConversion2(models.Model):
                             ,           0                                           AS activity_nb
                             ,           0                                           AS quotation_amount
                             ,           0                                           AS order_margin
-                            ,           0                                           AS amount_untaxed
                             ,           OSOL.ordered_turnover                       AS ordered_turnover_objective
-                            ,           (   SELECT  SUM(SO3.amount_total)
+                            ,           (   SELECT  SUM(SO3.amount_untaxed)
                                             FROM    sale_order                                  SO3
                                             WHERE   SO3.user_id                                 = RR.user_id
                                             AND     EXTRACT(MONTH FROM SO3.confirmation_date)   = TO_NUMBER(OSO.month, '99')
@@ -444,9 +436,9 @@ class OFCRMFunnelConversion2(models.Model):
     @api.multi
     def _compute_order_margin_percent(self):
         for rec in self:
-            if rec.amount_untaxed > 0:
+            if rec.sales_total > 0:
                 rec.order_margin_percent = '%.2f' % \
-                                           (100 * (1 - (rec.amount_untaxed - rec.order_margin) / rec.amount_untaxed))
+                                           (100 * (1 - (rec.sales_total - rec.order_margin) / rec.sales_total))
             else:
                 rec.order_margin_percent = "N/E"
 
@@ -477,7 +469,7 @@ class OFCRMFunnelConversion2(models.Model):
     @api.model
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
         res = super(OFCRMFunnelConversion2, self).read_group(
-            domain, fields.extend(['sales_total', 'amount_untaxed']), groupby, offset=offset, limit=limit,
+            domain, fields.extend(['sales_total']), groupby, offset=offset, limit=limit,
             orderby=orderby, lazy=lazy)
         for line in res:
             if 'quotation_rate' in fields:
@@ -517,10 +509,10 @@ class OFCRMFunnelConversion2(models.Model):
                 else:
                     line['order_cart'] = "N/E"
             if 'order_margin_percent' in fields:
-                if line['amount_untaxed'] > 0:
+                if line['sales_total'] > 0:
                     line['order_margin_percent'] = \
                         ('%.2f' %
-                         (round(100 * (1 - (line['amount_untaxed'] - line['order_margin']) / line['amount_untaxed']),
+                         (round(100 * (1 - (line['sales_total'] - line['order_margin']) / line['sales_total']),
                                 2))).replace('.', ',')
                 else:
                     line['order_margin_percent'] = "N/E"
