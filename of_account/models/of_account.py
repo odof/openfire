@@ -91,7 +91,7 @@ class AccountInvoiceLine(models.Model):
 
     of_product_categ_id = fields.Many2one(
         'product.category', related='product_id.categ_id', string=u"Catégorie d'article",
-        store=True, index=True
+        readonly=True, store=True, index=True
     )
     date_invoice = fields.Date(
         related='invoice_id.date_invoice', string="Date de facturation",
