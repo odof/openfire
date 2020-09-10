@@ -173,6 +173,12 @@ class OfService(models.Model):
              u" dans les interventions.")
     recurring_interval = fields.Integer(string=u'Répéter chaque', default=1, help=u"Répéter (Mois/Années)")
 
+    # Rubrique divers @todo: déplacer dans zz aasgard?
+    commitment_type = fields.Selection(
+        selection=[('renewal', u"Renouvellement"), ('sale', u"Vente")], string=u"Type d'engagement")
+    technician_id = fields.Many2one(
+        comodel_name='hr.employee', string=u"Technicien", domain=[('of_est_intervenant', '=', True)])
+
     # Rubrique Description
     note = fields.Text('Notes')
 
