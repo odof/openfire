@@ -405,6 +405,11 @@ class OfService(models.Model):
     # Alertes
     alert_dates = fields.Boolean(string=u"Incohérence dans les dates", compute="_compute_alert_dates")
 
+    commitment_type = fields.Selection(
+        selection=[('renewal', u"Renouvellement"), ('sale', u"Vente")], string=u"Type d'engagement")
+    technician_id = fields.Many2one(
+        comodel_name='hr.employee', string=u"Technicien", domain=[('of_est_intervenant', '=', True)])
+
     def _search_state_ponc(self, operator, operand):
         services = self.search([])
         res = safe_eval("services.filtered(lambda s: s.state_ponc %s %s)" % (operator, operand), {'services': services})

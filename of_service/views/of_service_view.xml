@@ -162,6 +162,10 @@
                                     </group>
 
                                 </group>
+                                <group colspan="2" name="misc" string="Divers" attrs="{'invisible': [('recurrence', '=', False)]}">
+                                    <field name="commitment_type"/>
+                                    <field name="technician_id"/>
+                                </group>
                             </group>
 
                             <group name="notes" string="Description">
