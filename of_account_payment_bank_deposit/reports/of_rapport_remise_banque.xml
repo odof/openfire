@@ -58,6 +58,7 @@
                                                 <th>Numéro</th>
                                                 <th t-if="print_categ">Catégorie</th>
                                                 <th>Client</th>
+                                                <th>Code comptable</th>
                                                 <th class="text-right">Montant</th>
                                             </tr>
                                         </thead>
@@ -71,6 +72,7 @@
                                                         <span t-esc="'-'.join(p.of_tag_ids.mapped('name'))"/>
                                                     </td>
                                                     <td><span t-field="p.partner_id"/></td>
+                                                    <td><span t-esc="p.partner_id.with_context(force_company=p.company_id.id).property_account_receivable_id.code"/></td>
                                                     <td class="text-right"><span t-field="p.amount"/></td>
                                                 </tr>
                                             </t>
