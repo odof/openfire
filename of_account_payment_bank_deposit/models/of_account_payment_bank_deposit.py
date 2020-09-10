@@ -82,6 +82,7 @@ class OfAccountPaymentBankDeposit(models.Model):
                 'journal_id': journal.id,
                 'date': rec.date,
                 'company_id': journal.company_id.id,
+                'ref': _('Deposit %s') % (name,),
             }
             move = move_obj.create(move_data)
 
@@ -114,10 +115,15 @@ class OfAccountPaymentBankDeposit(models.Model):
                         if amount:
                             new_move_line = move_line_obj.create({
                                 'move_id': move.id,
-                                'name': _('Deposit %s') % (name,),
+                                'name': _('Deposit %s - %s / %s') %
+                                (name,
+                                 move_line.partner_id.name,
+                                 move_line.partner_id.with_context(force_company=move_line.payment_id.company_id.id).
+                                 property_account_receivable_id.code),
                                 'account_id': account.id,
                                 'credit': amount > 0 and amount,
                                 'debit': amount < 0 and -amount,
+                                'partner_id': move_line.partner_id.id,
                             })
 
                             move_line_ids += [move_line.id, new_move_line.id]
