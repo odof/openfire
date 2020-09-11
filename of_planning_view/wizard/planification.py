@@ -159,34 +159,37 @@ class OfPlanifCreneauProp(models.TransientModel):
         for indice in range(len(self)):
         #for a_planifier in self[:25]:
             a_planifier = self[indice]
-
+            orthodromique = self[0].creneau_id.orthodromique
             if a_planifier.fait:
                 continue
-            if compteur >= 25:
-                break
             #a_planifier.dummy_field = True
             #compteur += 1
-            routing_base_url = config.get("of_routing_base_url", "")
-            routing_version = config.get("of_routing_version", "")
-            routing_profile = config.get("of_routing_profile", "")
-            if not (routing_base_url and routing_version and routing_profile):
-                query = "null"
-            else:
-                query = routing_base_url + "route/" + routing_version + "/" + routing_profile + "/"
-            # Listes de coordonnées : ATTENTION OSRM prend ses coordonnées sous form (lng, lat)
-            # lieu précédent
-            coords_str = str(geo_lng_prec) + "," + str(geo_lat_prec)
-            # lieu de l'intervention à programmer
-            coords_str += ";" + str(a_planifier.geo_lng) + "," + str(a_planifier.geo_lat)
-            # lieu suivant
-            coords_str += ";" + str(geo_lng_suiv) + "," + str(geo_lat_suiv)
-            query_send = urllib.quote(query.strip().encode('utf8')).replace('%3A', ':')
-            full_query = query_send + coords_str + "?"
-            try:
-                req = requests.get(full_query)
-                res = req.json()
-            except Exception as e:
-                res = {}
+            res = {}
+            if not orthodromique:
+                if compteur >= 25:
+                    break
+                routing_base_url = config.get("of_routing_base_url", "")
+                routing_version = config.get("of_routing_version", "")
+                routing_profile = config.get("of_routing_profile", "")
+                if not (routing_base_url and routing_version and routing_profile):
+                    query = "null"
+                else:
+                    query = routing_base_url + "route/" + routing_version + "/" + routing_profile + "/"
+                # Listes de coordonnées : ATTENTION OSRM prend ses coordonnées sous form (lng, lat)
+                # lieu précédent
+                coords_str = str(geo_lng_prec) + "," + str(geo_lat_prec)
+                # lieu de l'intervention à programmer
+                coords_str += ";" + str(a_planifier.geo_lng) + "," + str(a_planifier.geo_lat)
+                # lieu suivant
+                coords_str += ";" + str(geo_lng_suiv) + "," + str(geo_lat_suiv)
+                query_send = urllib.quote(query.strip().encode('utf8')).replace('%3A', ':')
+                full_query = query_send + coords_str + "?"
+                try:
+                    req = requests.get(full_query)
+                    res = req.json()
+                except Exception as e:
+                    res = {}
+                    orthodromique = True
 
             if res and res.get('routes'):
                 legs = res['routes'][0]['legs']
@@ -200,11 +203,12 @@ class OfPlanifCreneauProp(models.TransientModel):
                 a_planifier.osrm_response = legs
                 a_planifier.fait = True
             else:
-                a_planifier.distance_reelle_prec = -1
-                a_planifier.distance_reelle_suiv = -1
-                a_planifier.distance_reelle_tota = -1
-                a_planifier.distance_order = 99999
-                a_planifier.distance_arrondi_order = 99999
+                distance_oiseau = a_planifier.distance_oiseau_prec + a_planifier.distance_oiseau_suiv
+                a_planifier.distance_reelle_prec = orthodromique and a_planifier.distance_oiseau_prec or -1
+                a_planifier.distance_reelle_suiv = orthodromique and a_planifier.distance_oiseau_suiv or -1
+                a_planifier.distance_reelle_tota = orthodromique and distance_oiseau or -1
+                a_planifier.distance_order = orthodromique and distance_oiseau or 99999
+                a_planifier.distance_arrondi_order = orthodromique and round_a_cinq(distance_oiseau) or 99999
                 a_planifier.osrm_response = res
                 a_planifier.fait = True
             compteur += 1
@@ -288,32 +292,9 @@ class OfPlanifCreneauProp(models.TransientModel):
         while not propositions:
             self.compute_distance_reelle()
             propositions = self.filtered(lambda p: p.distance_order < 99000)
-        for prop in propositions:
-            if not min_prop:  # initialisation min_prop
-                min_prop = prop
-            elif prop.priorite < min_prop.priorite:
-            #elif prop.distance_reelle_tota < min_prop.distance_reelle_tota and prop.distance_order < 99000:  # nouveau min!
-                min_prop = prop
-            elif prop.priorite > min_prop.priorite:
-                continue
-            elif prop.distance_arrondi_order < min_prop.distance_arrondi_order:
-                min_prop = prop
-            elif prop.distance_arrondi_order > min_prop.distance_arrondi_order:
-                continue
-            elif prop.date_next < min_prop.date_next:
-                min_prop = prop
-            elif prop.date_next > min_prop.date_next:
-                continue
-            elif prop.date_fin < min_prop.date_fin:
-                min_prop = prop
-            elif prop.date_fin > min_prop.date_fin:
-                continue
-            elif prop.distance_order < min_prop.distance_order:
-                min_prop = prop
-            elif prop.distance_order > min_prop.distance_order:
-                continue
-
-        return min_prop
+        # au moment de l'appel à get_closer_one, la proposition sélectionnée a déjà été dé-sélectionnée
+        # on peut donc se servir du _order des propositions
+        return propositions.sorted()[0]
 
     @api.multi
     def button_select(self):
@@ -448,6 +429,7 @@ class OfPlanifCreneau(models.TransientModel):
     geo_lng_prec = fields.Float(compute="compute_prec_suiv_vals")
     precision_prec = fields.Selection(GEO_PRECISION, compute="compute_prec_suiv_vals")
     name = fields.Char(compute='_compute_name')
+    orthodromique = fields.Boolean(string=u"Utiliser la distance orthodromique?")
 
     @api.multi
     @api.depends('employee_id', 'heure_debut_creneau', 'heure_fin_creneau')
@@ -784,6 +766,23 @@ class OfPlanifCreneau(models.TransientModel):
 
     @api.multi
     def button_search(self):
+        # Tester si le serveur de routage fonctionne
+        routing_base_url = config.get("of_routing_base_url", "")
+        routing_version = config.get("of_routing_version", "")
+        routing_profile = config.get("of_routing_profile", "")
+        if not (routing_base_url and routing_version and routing_profile):
+            query = "null"
+        else:
+            query = routing_base_url + "nearest/" + routing_version + "/" + routing_profile + \
+                    "/-1.72323900,48.17292300.json?number=1"
+        query_send = urllib.quote(query.strip().encode('utf8')).replace('%3A', ':')
+        try:
+            req = requests.get(query_send, timeout=10)
+            res = req.json()
+            if res:
+                self.orthodromique = False
+        except Exception as e:
+            self.orthodromique = True
         self.set_proposition_ids()
         self.set_selected_id()
         return {'type': 'ir.actions.do_nothing'}

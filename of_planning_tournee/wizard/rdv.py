@@ -515,7 +515,7 @@ class OfTourneeRdv(models.TransientModel):
                     "/-1.72323900,48.17292300.json?number=1"
             query_send = urllib.quote(query.strip().encode('utf8')).replace('%3A', ':')
             try:
-                req = requests.get(query_send)
+                req = requests.get(query_send, timeout=10)
                 res = req.json()
                 if res:
                     self.orthodromique = False
