@@ -115,11 +115,11 @@ class OfAccountPaymentBankDeposit(models.Model):
                         if amount:
                             new_move_line = move_line_obj.create({
                                 'move_id': move.id,
-                                'name': _('Deposit %s - %s / %s') %
-                                (name,
-                                 move_line.partner_id.name,
+                                'name': _('%s / %s - Deposit %s') %
+                                (move_line.partner_id.name,
                                  move_line.partner_id.with_context(force_company=move_line.payment_id.company_id.id).
-                                 property_account_receivable_id.code),
+                                 property_account_receivable_id.code,
+                                 name),
                                 'account_id': account.id,
                                 'credit': amount > 0 and amount,
                                 'debit': amount < 0 and -amount,

@@ -65,8 +65,8 @@ msgstr "Remise %s"
 #. module: of_account_payment_bank_deposit
 #: code:addons/of_account_payment_bank_deposit/models/of_account_payment_bank_deposit.py:102
 #, python-format
-msgid "Deposit %s - %s / %s"
-msgstr "Remise %s - %s / %s"
+msgid "%s / %s - Deposit %s"
+msgstr "%s / %s - Remise %s"
 
 #. module: of_account_payment_bank_deposit
 #: model:ir.model.fields,field_description:of_account_payment_bank_deposit.field_of_account_payment_bank_deposit_name
