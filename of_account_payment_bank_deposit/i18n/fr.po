@@ -192,3 +192,9 @@ msgstr "Vous ne pouvez pas définir un paiement sur plusieurs remises en banque"
 #: model:ir.ui.view,arch_db:of_account_payment_bank_deposit.of_view_account_payment_bank_deposit_search
 msgid "date"
 msgstr "date"
+
+#. module: of_account_payment_bank_deposit
+#: code:addons/of_account_payment_bank_deposit/models/of_account_payment_bank_deposit.py:41
+#, python-format
+msgid "You cannot validate a deposit including different payment method!"
+msgstr "Vous ne pouvez pas valider une remise en banque conprenant différents modes de paiement !"
