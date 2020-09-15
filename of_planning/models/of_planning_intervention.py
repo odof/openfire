@@ -532,9 +532,9 @@ class OfPlanningIntervention(models.Model):
     origin_interface = fields.Char(string=u"Origine création", default=u"Manuelle")
     cleantext_intervention = fields.Text(compute='_compute_cleantext_intervention', store=True)
     interv_before_id = fields.Many2one(
-        'of.planning.intervention', compute="_compute_interventions_before_after", store=True)
+        'of.planning.intervention', compute="_compute_interventions_before_after", store=True, compute_sudo=True)
     interv_after_id = fields.Many2one(
-        'of.planning.intervention', compute="_compute_interventions_before_after", store=True)
+        'of.planning.intervention', compute="_compute_interventions_before_after", store=True, compute_sudo=True)
     before_to_this = fields.Float(compute="_compute_interval", store=True, digits=(12, 5))
 
     line_ids = fields.One2many('of.planning.intervention.line', 'intervention_id', string='Lignes de facturation')
