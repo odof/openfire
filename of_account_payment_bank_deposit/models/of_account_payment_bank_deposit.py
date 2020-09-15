@@ -52,6 +52,9 @@ class OfAccountPaymentBankDeposit(models.Model):
         move_line_obj = self.env['account.move.line'].with_context(check_move_validity=False)
 
         for rec in self:
+            # On contrôle qu'il n'y ait pas différents modes de paiement dans la remise
+            if len(rec.payment_ids.mapped('of_payment_mode_id')) > 1:
+                raise UserError(_("You cannot validate a deposit including different payment method!"))
             name = rec.name
             journal = rec.journal_id
             debit_account = journal.default_debit_account_id
