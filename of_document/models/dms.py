@@ -14,6 +14,8 @@ class Directory(dms_base.DMSModel):
 
     of_partner_id = fields.Many2one(comodel_name='res.partner', string=u"Partenaire associé")
     of_is_protected = fields.Boolean(string=u"Répertoire protégé")
+    # Correction d'erreur sur le recalcul de relational_path sur plusieurs niveaux
+    relational_path = fields.Text(recursive=True)
 
     @api.constrains('name')
     def _check_name(self):
