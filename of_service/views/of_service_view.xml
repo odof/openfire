@@ -345,7 +345,7 @@
                         invisible="1"/>
                 <separator/>
                 <filter string="Planification restante" name="filter_plan"
-                        domain="[('duree_restante', '>', 0)]"/>
+                        domain="[('duree_restante', '>', 0), ('state', 'in', ('to_plan', 'part_planned', 'late'))]"/>
                 <separator/>
                 <filter string="Actif" name="filter_active" domain="[('active', '=', True)]"/>
                 <filter string="Archivé" name="filter_inactive" domain="[('active', '=', False)]"/>
