@@ -38,11 +38,11 @@
             <xpath expr="//field[@name='timesheet_ids']/form/group/field[@name='date']" position="after">
                 <field name="task_id"/>
             </xpath>
-            <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='name']" position="after">
-                <field name="of_categ_id"/>
+            <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='project_id']" position="after">
+                <field name="of_partner_id"/>
             </xpath>
-            <xpath expr="//field[@name='timesheet_ids']/form/group/field[@name='name']" position="after">
-                <field name="of_categ_id"/>
+            <xpath expr="//field[@name='timesheet_ids']/form/group/field[@name='project_id']" position="after">
+                <field name="of_partner_id"/>
             </xpath>
         </field>
     </record>

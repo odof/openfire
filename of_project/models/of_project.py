@@ -259,6 +259,11 @@ class ProjectTask(models.Model):
     of_planned_dev_hours = fields.Float(string=u"Heures de développement")
     of_planned_review_hours = fields.Float(string=u"Heures de revue")
     project_id = fields.Many2one(required=True)
+    categ_id = fields.Many2one(string=u"Catégorie", required=True)
+    of_ticket_ids = fields.Many2one(
+        comodel_name='website.support.ticket', string=u"Tickets supports", compute='_compute_of_tickets')
+    of_ticket_count = fields.Integer(string=u"Nombre de tickets", compute='_compute_of_tickets')
+    of_review_description = fields.Html(string=u"Revue")
 
     @api.depends('of_periode_time_ids', 'planned_hours')
     def _compute_temps_restant(self):
@@ -279,6 +284,12 @@ class ProjectTask(models.Model):
             task.of_planned_review_hours = 0
 
     @api.multi
+    def _compute_of_tickets(self):
+        for task in self:
+            task.of_ticket_ids = self.env['website.support.ticket'].search([('of_task_id', '=', task.id)])
+            task.of_ticket_count = len(task.of_ticket_ids)
+
+    @api.multi
     def name_get(self):
         result = []
         for task in self:
@@ -291,8 +302,8 @@ class ProjectTask(models.Model):
         domain = []
         if name:
             domain = ['|', ('name', operator, name), ('code', operator, name)]
-        picks = self.search(domain + args, limit=limit)
-        return picks.name_get()
+        tasks = self.search(domain + args, limit=limit)
+        return tasks.name_get()
 
     def _get_infos_on_periode(self, periode, user):
         """ Récupère les informations des périodes en fonction de l'utilisateur
@@ -378,3 +389,38 @@ class ProjectTask(models.Model):
             review_period_time = self.of_periode_time_ids.filtered(
                 lambda t: t.periode_id in self.of_periode_ids and t.user_id == self.of_user_id) + to_add
         self.of_periode_time_ids = dev_period_time + review_period_time
+
+    @api.multi
+    def action_view_tickets(self):
+        action = self.env.ref('website_support.website_support_ticket_action_partner').read()[0]
+        if len(self._ids) == 1:
+            context = {
+                'default_of_task_id': self.id,
+            }
+            action['context'] = str(context)
+        action['domain'] = [('of_task_id', 'in', self._ids)]
+        action['view_mode'] = 'tree,form'
+        action['views'] = [(False, u'tree'), (False, u'form')]
+        return action
+
+
+class WebsiteSupportTicket(models.Model):
+    _inherit = 'website.support.ticket'
+
+    of_task_id = fields.Many2one(comodel_name='project.task', string=u"Tâche associée")
+
+    @api.multi
+    def name_get(self):
+        result = []
+        for ticket in self:
+            result.append((ticket.id, "%s - %s" % (ticket.ticket_number, ticket.subject)))
+        return result
+
+    @api.model
+    def name_search(self, name, args=None, operator='ilike', limit=100):
+        args = args or []
+        domain = []
+        if name:
+            domain = ['|', ('subject', operator, name), ('ticket_number', operator, name)]
+        tickets = self.search(domain + args, limit=limit)
+        return tickets.name_get()

@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api
 
+
 # Catégories activités feuilles de temps (module hr_timesheet)
 class OFHrTimesheetCateg(models.Model):
     _name = "of.hr.timesheet.categ"
@@ -29,20 +30,37 @@ class OFHrTimesheetCateg(models.Model):
             res.append((record.id, name))
         return res
 
+
 class AccountAnalyticLine(models.Model):
     _inherit = 'account.analytic.line'
 
     of_categ_id = fields.Many2one('of.hr.timesheet.categ', u'Catégorie', ondelete='restrict')
+    of_partner_id = fields.Many2one(comodel_name='res.partner', string=u"Client")
+
+    @api.onchange('project_id')
+    def onchange_project_id(self):
+        res = super(AccountAnalyticLine, self).onchange_project_id()
+        if self.project_id and self.project_id.partner_id and not self.of_partner_id:
+            self.of_partner_id = self.project_id.partner_id
+        return res
+
+    def eval_date(self, vals):
+        if vals.get('date_time') and not vals.get('date'):
+            vals['date'] = fields.Date.from_string(vals['date_time'])
+        return vals
+
 
 class AccountAnalyticAccount(models.Model):
     _inherit = 'account.analytic.account'
 
     of_categ_id = fields.Many2one('of.hr.timesheet.categ', u'Catégorie', ondelete='restrict')
 
+
 class ProjectTask(models.Model):
     _inherit = 'project.task'
 
     of_categ_id = fields.Many2one('of.hr.timesheet.categ', u'Catégorie', readonly=True)
+
 
 class ReportProjectTaskUser(models.Model):
     _inherit = "report.project.task.user"

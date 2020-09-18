@@ -13,10 +13,10 @@
 ##############################################################################
 
 {
-    'name' : "OpenFire Projets",
-    'version' : "0.1.0.0",
-    'author' : "OpenFire",
-    'website' : "www.openfire.fr",
+    'name': "OpenFire Projets",
+    'version': "0.1.0.0",
+    'author': "OpenFire",
+    'website': "www.openfire.fr",
     'category': "projet",
     'summary': u"OpenFire Projets",
     'description': u"""
@@ -35,14 +35,15 @@ Fonctionnalités
     - Définir le temps de travail de l'utilisateur et la répartition de ce temps de travail
  - Possibilité de répartir le temps prévu de la tache sur plusieurs périodes
 """,
-    'depends' : [
+    'depends': [
         'project',
         'project_timeline',
         'project_task_category',
         'hr_timesheet',
         'of_base',
+        'website_support',
         ],
-    'data' : [
+    'data': [
         'views/of_project_views.xml',
         'security/ir.model.access.csv',
     ],
