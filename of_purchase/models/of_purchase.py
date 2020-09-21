@@ -169,26 +169,29 @@ class ProcurementOrder(models.Model):
 
             # Create Line
             po_line = False
-            for line in po.order_line:
-                if line.product_id == procurement.product_id and line.product_uom == procurement.product_id.uom_po_id:
-                    procurement_uom_po_qty = procurement.product_uom._compute_quantity(procurement.product_qty, procurement.product_id.uom_po_id)
-                    seller = procurement.product_id._select_seller(
-                        partner_id=partner,
-                        quantity=line.product_qty + procurement_uom_po_qty,
-                        date=po.date_order and po.date_order[:10],
-                        uom_id=procurement.product_id.uom_po_id)
+            separate_lines = self.env['ir.values'].sudo().get_default(
+                    'purchase.config.settings', 'of_description_as_order_setting')
+            if not separate_lines:
+                for line in po.order_line:
+                    if line.product_id == procurement.product_id and line.product_uom == procurement.product_id.uom_po_id:
+                        procurement_uom_po_qty = procurement.product_uom._compute_quantity(procurement.product_qty, procurement.product_id.uom_po_id)
+                        seller = procurement.product_id._select_seller(
+                            partner_id=partner,
+                            quantity=line.product_qty + procurement_uom_po_qty,
+                            date=po.date_order and po.date_order[:10],
+                            uom_id=procurement.product_id.uom_po_id)
 
-                    price_unit = self.env['account.tax']._fix_tax_included_price(seller.price, line.product_id.supplier_taxes_id, line.taxes_id) if seller else 0.0
-                    if price_unit and seller and po.currency_id and seller.currency_id != po.currency_id:
-                        price_unit = seller.currency_id.compute(price_unit, po.currency_id)
+                        price_unit = self.env['account.tax']._fix_tax_included_price(seller.price, line.product_id.supplier_taxes_id, line.taxes_id) if seller else 0.0
+                        if price_unit and seller and po.currency_id and seller.currency_id != po.currency_id:
+                            price_unit = seller.currency_id.compute(price_unit, po.currency_id)
 
-                    po_line = line.write({
-                        'name': line.name,
-                        'product_qty': line.product_qty + procurement_uom_po_qty,
-                        'price_unit': price_unit,
-                        'procurement_ids': [(4, procurement.id)]
-                    })
-                    break
+                        po_line = line.write({
+                            'name': line.name,
+                            'product_qty': line.product_qty + procurement_uom_po_qty,
+                            'price_unit': price_unit,
+                            'procurement_ids': [(4, procurement.id)]
+                        })
+                        break
             if not po_line:
                 vals = procurement._prepare_purchase_order_line(po, supplier)
                 self.env['purchase.order.line'].create(vals)
