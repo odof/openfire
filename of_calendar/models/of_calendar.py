@@ -869,42 +869,42 @@ class Meeting(models.Model):
                                                                 '&', ('of_lieu_rdv_id', 'in', partners.ids),
                                                                 ('of_lieu', '=', 'offsite')]).ids)]
 
-        # redefinition
-        description = fields.Html('Description', states={'done': [('readonly', True)]})
-        location = fields.Char('Location', compute="_compute_location", store=True, track_visibility='onchange',
-                               help="Location of Event")
+    # redefinition
+    description = fields.Html('Description', states={'done': [('readonly', True)]})
+    location = fields.Char('Location', compute="_compute_location", store=True, track_visibility='onchange',
+                           help="Location of Event")
 
-        of_lieu = fields.Selection([
-            ("onsite", "Dans les locaux"),
-            ("phone", u"Au téléphone"),
-            ("offsite", u"À l'exterieur"),
-            ("custom", "Adresse manuelle"),
-        ], string="Lieu du RDV", required=True, default="onsite")
-        of_lieu_company_id = fields.Many2one("res.company",
-                                             string=u"(Précisez)")
-        of_lieu_rdv_id = fields.Many2one("res.partner", string=u"(Précisez)")
-        of_lieu_address_street = fields.Char(string="Rue")
-        of_lieu_address_street2 = fields.Char(string="Rue (2)")
-        of_lieu_address_city = fields.Char(string="Ville")
-        of_lieu_address_state_id = fields.Many2one("res.country.state", string=u"Région")
-        of_lieu_address_zip = fields.Char(string="Code postal")
-        of_lieu_address_country_id = fields.Many2one("res.country", string="Pays")
-        of_on_phone = fields.Boolean(u'Au téléphone', compute="_compute_on_phone")
-        of_color_partner_id = fields.Many2one(
-            "res.partner", "Partner whose color we will take", compute='_compute_color_partner', store=False)
-        of_geo_lat = fields.Float(
-            string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo",
-            store=False, search='_search_lat')
-        of_geo_lng = fields.Float(
-            string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_geo",
-            store=False, search='_search_lng')
-        of_precision = fields.Selection(
-            GEO_PRECISION, default='no_address', compute="_compute_geo", store=False, search='_search_precision',
-            help=u"Niveau de précision de la géolocalisation.\n"
-                 u"bas: à la ville.\n"
-                 u"moyen: au village\n"
-                 u"haut: à la rue / au voisinage\n"
-                 u"très haut: au numéro de rue\n")
+    of_lieu = fields.Selection([
+        ("onsite", "Dans les locaux"),
+        ("phone", u"Au téléphone"),
+        ("offsite", u"À l'exterieur"),
+        ("custom", "Adresse manuelle"),
+    ], string="Lieu du RDV", required=True, default="onsite")
+    of_lieu_company_id = fields.Many2one("res.company",
+                                         string=u"(Précisez)")
+    of_lieu_rdv_id = fields.Many2one("res.partner", string=u"(Précisez)")
+    of_lieu_address_street = fields.Char(string="Rue")
+    of_lieu_address_street2 = fields.Char(string="Rue (2)")
+    of_lieu_address_city = fields.Char(string="Ville")
+    of_lieu_address_state_id = fields.Many2one("res.country.state", string=u"Région")
+    of_lieu_address_zip = fields.Char(string="Code postal")
+    of_lieu_address_country_id = fields.Many2one("res.country", string="Pays")
+    of_on_phone = fields.Boolean(u'Au téléphone', compute="_compute_on_phone")
+    of_color_partner_id = fields.Many2one(
+        "res.partner", "Partner whose color we will take", compute='_compute_color_partner', store=False)
+    of_geo_lat = fields.Float(
+        string='Geo Lat', digits=(8, 8), group_operator=False, help="latitude field", compute="_compute_geo",
+        store=False, search='_search_lat')
+    of_geo_lng = fields.Float(
+        string='Geo Lng', digits=(8, 8), group_operator=False, help="longitude field", compute="_compute_geo",
+        store=False, search='_search_lng')
+    of_precision = fields.Selection(
+        GEO_PRECISION, default='no_address', compute="_compute_geo", store=False, search='_search_precision',
+        help=u"Niveau de précision de la géolocalisation.\n"
+             u"bas: à la ville.\n"
+             u"moyen: au village\n"
+             u"haut: à la rue / au voisinage\n"
+             u"très haut: au numéro de rue\n")
 
     """
     These fields would be necessary if use_contacts="0" in <calendar>. See event_data_transform function in .js file

@@ -104,12 +104,15 @@ class HREmployee(models.Model):
 class OfPlanningTacheCateg(models.Model):
     _name = "of.planning.tache.categ"
     _description = u"Planning OpenFire : Catégories de tâches"
+    _order = "sequence, id"
 
     name = fields.Char(u"Libellé", size=64, required=True)
     description = fields.Text("Description")
     tache_ids = fields.One2many('of.planning.tache', 'tache_categ_id', string=u"Tâches")
     active = fields.Boolean("Actif", default=True)
     sequence = fields.Integer(u"Séquence", help=u"Ordre d'affichage (plus petit en premier)")
+    color_ft = fields.Char(string="Couleur de texte", help="Choisissez votre couleur", default="#0D0D0D")
+    color_bg = fields.Char(string="Couleur de fond", help="Choisissez votre couleur", default="#F0F0F0")
 
     fourchette_planif = fields.Selection(
         [
@@ -125,6 +128,19 @@ de calculer la date de fin une fois la date de début saisie. par défaut :\n
   * Pour un SAV (quand le champ SAV est rempli), la granularité de planification est la semaine\n
   * Pour un entretien (intervention récurrente), la granularité de planification est le mois\n
 """)
+
+    @api.model
+    def get_caption_data(self):
+        data = {}
+        categs = self.search([])
+        for categ in categs:
+            data[categ.id] = {
+                'value': categ.id,
+                'label': categ.name,
+                'color_bg': categ.color_bg,
+                'color_ft': categ.color_ft,
+            }
+        return data
 
 
 class OfPlanningTache(models.Model):
@@ -149,8 +165,6 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
         'hr.employee', string=u"Employés qualifiés", compute="_compute_employee_ids", search="_search_employee_ids")
     category_id = fields.Many2one('hr.employee.category', string=u"Catégorie d'employés")
     fourchette_planif = fields.Selection(related="tache_categ_id.fourchette_planif", readonly=True)
-    color_ft = fields.Char(string="Couleur de texte", help="Choisissez votre couleur", default="#0D0D0D")
-    color_bg = fields.Char(string="Couleur de fond", help="Choisissez votre couleur", default="#F0F0F0")
 
     @api.multi
     def _compute_employee_ids(self):
@@ -248,19 +262,6 @@ Si cette option n'est pas cochée, seule la tâche la plus souvent effectuée da
                    'product_id'          : product.id,
                    'invoice_line_tax_ids': [(6, 0, taxes._ids)],
                    }, ""
-
-    @api.model
-    def get_caption_data(self):
-        data = {}
-        taches = self.search([])
-        for tache in taches:
-            data[tache.id] = {
-                'value': tache.id,
-                'label': tache.name,
-                'color_bg': tache.color_bg,
-                'color_ft': tache.color_ft,
-            }
-        return data
 
 
 class OfPlanningEquipe(models.Model):
@@ -1309,13 +1310,13 @@ class OfPlanningIntervention(models.Model):
             'color_bg_field': u'of_color_bg',
             'catpions': False,
         }
-        res['tache'] = {
-            'is_checked': default_filter == u'tache',
-            'label': u'Tâche',
-            'field': u'tache_id',
+        res['tache_categ'] = {
+            'is_checked': default_filter == u'tache_categ',
+            'label': u'Catégorie de tâche',
+            'field': u'tache_categ_id',
             'color_ft_field': u'color_ft',
             'color_bg_field': u'color_bg',
-            'captions': self.env['of.planning.tache'].get_caption_data(),
+            'captions': self.env['of.planning.tache.categ'].get_caption_data(),
         }
 
         return res

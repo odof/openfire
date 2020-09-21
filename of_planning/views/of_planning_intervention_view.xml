@@ -408,6 +408,7 @@
                 <field name="calendar_name"/>
                 <field name="state" invisible="1"/>
                 <field name="tache_id" invisible="1"/>
+                <field name="tache_categ_id" invisible="1"/>
                 <field name="state_int" invisible="1"/>
                 <field name="of_color_ft" invisible="1"/>
                 <field name="of_color_bg" invisible="1"/>
@@ -425,6 +426,8 @@
                       color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1"
                       color_is_attendee="1" jump_to="last">
                 <field name="calendar_name"/>
+                <field name="tache_id" invisible="1"/>
+                <field name="tache_categ_id" invisible="1"/>
                 <field name="state" invisible="1"/>
                 <field name="state_int" invisible="1"/>
                 <field name="of_color_ft" invisible="1"/>
@@ -587,8 +590,6 @@
                         <group>
                             <field name="is_crm"/>
                             <field name="imp_detail"/>
-                            <field name="color_ft" widget="color"/>
-                            <field name="color_bg" widget="color"/>
                         </group>
                         <group colspan="2">
                             <field name="description" attrs="{'readonly':[('verr', '=', True)]}"/>
@@ -624,6 +625,8 @@
                     <group>
                         <group>
                             <field name="fourchette_planif"/>
+                            <field name="color_ft" widget="color"/>
+                            <field name="color_bg" widget="color"/>
                         </group>
                         <group>
                             <field name="sequence"/>
@@ -643,8 +646,9 @@
         <field name="model">of.planning.tache.categ</field>
         <field name="arch" type="xml" >
             <tree string="Liste des catégories de tâches" >
-                <field name="sequence" wdiget="handle"/>
+                <field name="sequence" widget="handle"/>
                 <field name="name" string="Libellé"/>
+                <field name="color_bg" string="couleur" widget="color"/>
                 <field name="tache_ids"/>
                 <field name="description"/>
             </tree>
@@ -657,7 +661,6 @@
         <field name="arch" type="xml" >
             <tree string="Liste des tâches" >
                 <field name="name" string="Libellé"/>
-                <field name="color_bg" string="couleur" widget="color"/>
                 <field name="tache_categ_id" string="Catégorie"/>
                 <field name="product_id"/>
                 <field name="category_id"/>
