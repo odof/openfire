@@ -890,7 +890,7 @@ class OfRDVCommercialLine(models.TransientModel):
                 req = requests.get(full_query)
                 res = req.json()
             except Exception as e:
-                raise UserError(u"Impossible de contacter le serveur de routing. Assurez-vous que votre connexion Internet est opérationnelle et que l'URL est définie (%s)" % e)
+                res = {}
 
             if res and res.get(u"routes", False):
                 legs = res[u"routes"][0][u"legs"]
