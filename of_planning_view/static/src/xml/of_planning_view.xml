@@ -159,7 +159,7 @@
     <t t-name="PlanningView.table">
         <table class="of_planning_table">
             <thead>
-                <tr>
+                <tr class="of_sticky_top">
                     <th class="of_planning_column_head">
                         <span t-esc="table.head_column.text"/>
                     </th>
