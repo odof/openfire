@@ -31,6 +31,7 @@
                 <field name="duree"/>
                 <field name="tache_name"/>
                 <field name="tache_id"/>
+                <field name="tache_categ_id"/>
                 <field name="partner_name"/>
                 <field name="address_zip"/>
                 <field name="address_city"/>
