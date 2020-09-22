@@ -23,7 +23,7 @@
 
     <!-- Table -->
     <t t-name="PlanningView.table">
-        <table class="of_planning_table">
+        <table class="of_planning_table of_table_fix_head">
             <thead>
                 <tr>
                     <th class="of_planning_column_head">
@@ -34,7 +34,7 @@
                             <span t-esc="column.text"/>
                         </th>
                     </t>
-                    <th class="of_planning_column_foot"></th>
+                    <th class="of_planning_column_foot"/>
                 </tr>
             </thead>
             <tbody class="of_planning_table_tbody">
