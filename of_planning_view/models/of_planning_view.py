@@ -375,6 +375,15 @@ class OFInterventionConfiguration(models.TransientModel):
     planningview_employee_exclu_ids = fields.Many2many(
         'hr.employee', string=u"(OF) Exculsion d'intervenants", help=u"Intervenants à NE PAS montrer en vue planning",
         domain=[('of_est_intervenant', '=', True)])
+    planningview_px_fix = fields.Boolean(string=u"(OF) taille des RDVs",
+                                         help=u"Cocher pour que la tailles des évènements"
+                                              u"soit proportionnelle à leur durée.")
+    planningview_h2px = fields.Integer(string=u"(OF) 1 heure = ")
+
+    @api.onchange('planningview_px_fix')
+    def _onchange_planningview_px_fix(self):
+        if self.planningview_px_fix and not self.planningview_h2px:
+            self.planningview_h2px = 30
 
     @api.multi
     def set_planningview_employee_exclu_ids_defaults(self):
@@ -382,6 +391,22 @@ class OFInterventionConfiguration(models.TransientModel):
             'of.intervention.settings',
             'planningview_employee_exclu_ids',
             [(6, 0, self.planningview_employee_exclu_ids.ids)],
+        )
+
+    @api.multi
+    def set_planningview_px_fix_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings',
+            'planningview_px_fix',
+            self.planningview_px_fix,
+        )
+
+    @api.multi
+    def set_planningview_h2px_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings',
+            'planningview_h2px',
+            self.planningview_h2px,
         )
 
 
