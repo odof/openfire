@@ -64,11 +64,9 @@ class IrAttachment(models.Model):
         res = super(IrAttachment, self).unlink()
 
         if dms_files_to_delete:
-            for dms_file in dms_files_to_delete:
-                dms_dir = dms_file.directory
-                dms_file.unlink()
-                # Delete DMS directory if no file left
-                if not dms_dir.files:
-                    dms_dir.unlink()
+            dms_dirs = dms_files_to_delete.mapped('directory')
+            dms_files_to_delete.unlink()
+            # Delete DMS directory if no file left
+            dms_dirs.filtered(lambda directory: not directory.files).unlink()
 
         return res
