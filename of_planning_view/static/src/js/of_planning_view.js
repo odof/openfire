@@ -133,11 +133,21 @@ var PlanningView = View.extend({
             .order_by(['sequence'])
             .all();  // récupérer tous les employés qui sont des intervenants
         var ir_values_model = new Model("ir.values");
+        // doit-on laisser la taille des events auto?
+        var hauteur_fixe_def = ir_values_model.call("get_default",
+                                                    ["of.intervention.settings", "planningview_px_fix"]);
+        // combien de pixel / heure ?
+        var duree_to_px_def = ir_values_model.call("get_default",
+                                                   ["of.intervention.settings", "planningview_h2px"]);
+
         // initialiser les couleurs des créneaux dispo et leur durée minimale
         var creneaux_dispo_data_def = self.set_creneaux_dispo_data();
 
-        return $.when(write_def, create_def, excluded_ids_def, intervenants_ids_def, rendered_prom, creneaux_dispo_data_def, this._super()).then(
-            function (write, create, excluded, emp_ids) {
+        return $.when(
+            write_def, create_def, excluded_ids_def, intervenants_ids_def, hauteur_fixe_def, duree_to_px_def,
+            rendered_prom, creneaux_dispo_data_def, this._super()
+        ).then(
+            function (write, create, excluded, emp_ids, hauteur_fixe, duree_to_px) {
                 self.write_right = write;
                 self.create_right = create;
                 // retirer les intervenants à ne pas montrer en vue planning
@@ -153,6 +163,9 @@ var PlanningView = View.extend({
                 self.view_res_ids = to_show_ids;
                 // initialiser les filtres grâce à la liste des intervenants à montrer en vue planning
                 var all_filters_def = self._set_all_custom_colors();
+
+                self.hauteur_fixe = hauteur_fixe;
+                self.duree_to_px = duree_to_px;
 
                 return $.when(all_filters_def);
         });
@@ -297,7 +310,12 @@ var PlanningView = View.extend({
 
             // Add show/hide button and possibly hide the sidebar
             this.$sidebar_container.append($('<i>').addClass('of_planning_sidebar_toggler fa'));
-            this.toggle_sidebar((local_storage.getItem('planning_view_full_width') !== 'true'));
+            var lateral_droit = new Model("ir.values").call("get_default",
+                                                            ["of.intervention.settings", "lateral_droit", false])
+            .then(function (res) {
+                self.toggle_sidebar(res);
+            });
+
         }
         return $.when.apply($, defs)
         .then(function () {
@@ -328,9 +346,14 @@ var PlanningView = View.extend({
      *  Handler pour le click sur la petite croix / le chevron du panneau latéral droit
      */
     toggle_full_width: function () {
-        var full_width = (local_storage.getItem('planning_view_full_width') !== 'true');
-        local_storage.setItem('planning_view_full_width', full_width);
-        this.toggle_sidebar(!full_width);
+        var self = this;
+        var ir_value_model = new Model("ir.values")
+        ir_value_model.call("get_default", ["of.intervention.settings", "lateral_droit", false])
+        .then(function (lateral_droit) {
+            lateral_droit = !lateral_droit;
+            ir_value_model.call("set_default", ["of.intervention.settings", "lateral_droit", lateral_droit, false]);
+            self.toggle_sidebar(lateral_droit);
+        });
     },
     /**
      *  Appelé par init_table et toggle_full_width. Montre / Cache le panneau latéral droit
@@ -1118,6 +1141,8 @@ var PlanningCreneauDispo = Widget.extend({
     events: {
         'click .of_planning_creneau_action': 'on_planning_creneau_action_clicked',
         'click .of_planning_creneau_secteur_action': 'on_planning_creneau_secteur_action_clicked',
+        'mouseover': 'on_mouseover',
+        'mouseout': 'on_mouseout',
     },
     init: function(row, view, record, options) {
         this._super(row);
@@ -1157,6 +1182,12 @@ var PlanningCreneauDispo = Widget.extend({
         this.date = moment(this.view.range_start).add(self.col_offset, 'days').format('YYYY-MM-DD'),
         this.lieu_debut = record.lieu_debut;
         this.lieu_fin = record.lieu_fin;
+
+        if (this.view.hauteur_fixe) {
+            this.hauteur = ((this.heure_fin - this.heure_debut) * this.view.duree_to_px).toString() + "px";
+        }else{
+            this.hauteur = "auto";
+        }
 
         // inhiber double-clique
         this.on_planning_creneau_secteur_action_clicked = _.debounce(this.on_planning_creneau_secteur_action_clicked, 300, true);
@@ -1207,6 +1238,29 @@ var PlanningCreneauDispo = Widget.extend({
     },
     reload_column: function () {
         this.view.on_reload_column(this.row.res_id, this.col_offset);
+    },
+    /**
+     *  Vérifie si la div est trop petite pour son contenu
+     */
+    isOverflown: function() {
+        var el = this.$el.find('.of_planning_creneau_dispo')[0];
+        return el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth;
+    },
+    /**
+     *  agrandi la div si besoin
+     */
+    on_mouseover: function (ev) {
+        ev.preventDefault();
+        if (this.isOverflown()) {
+            this.$el.find('.of_planning_creneau_dispo').height('auto');
+        }
+    },
+    /**
+     *  remet la div à sa taille originelle
+     */
+    on_mouseout: function (ev) {
+        ev.preventDefault();
+        this.$el.find('.of_planning_creneau_dispo').outerHeight(this.hauteur);
     },
     /**
      *  Ouvre le pop-up de sélection de secteur
@@ -1302,6 +1356,10 @@ var PlanningRecord = Widget.extend({
     /**
      *  Widget de RDV d'intervention
      */
+    events: {
+        'mouseover': 'on_mouseover',
+        'mouseout': 'on_mouseout',
+    },
     init: function(row, view, record, options) {
         this.id = record.id;
         this._super(row);
@@ -1323,6 +1381,11 @@ var PlanningRecord = Widget.extend({
 
         var self= this;
         this.record = record;
+        if (this.view.hauteur_fixe) {
+            this.hauteur = (record.duree_debut_fin * this.view.duree_to_px).toString() + "px";
+        }else{
+            this.hauteur = "auto";
+        }
         // formattage des heures et durées
         var descript_dt = {type: "datetime"};
         var descript_ft = {type: "float_time"};
@@ -1426,6 +1489,29 @@ var PlanningRecord = Widget.extend({
                 }
 
             });
+    },
+    /**
+     *  Vérifie si la div est trop petite pour son contenu
+     */
+    isOverflown: function() {
+        var el = this.$el.find('.of_planning_record_global_click')[0];
+        return el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth;
+    },
+    /**
+     *  agrandi la div si besoin
+     */
+    on_mouseover: function (ev) {
+        ev.preventDefault();
+        if (this.isOverflown()) {
+            this.$el.find('.of_planning_record_global_click').height('auto');
+        }
+    },
+    /**
+     *  remet la div à sa taille originelle
+     */
+    on_mouseout: function (ev) {
+        ev.preventDefault();
+        this.$el.find('.of_planning_record_global_click').outerHeight(this.hauteur);
     },
     /**
      *  méthode reprise de KanbanView

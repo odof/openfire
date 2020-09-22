@@ -113,11 +113,12 @@
     </t>
 
     <!-- Évènement (RDV d'intervention) -->
-    <div t-name="PlanningView.record"
-         class="of_planning_record_global_click">  <!-- variables données par le javascript: record et col_index -->
+    <div t-name="PlanningView.record" class="of_planning_record_global_click"
+         t-attf-style="height: #{record.hauteur}; overflow: hidden;">
+        <!-- variables données par le javascript: record et col_index -->
         <div t-att-class="record.class"
              t-attf-style="color: #{record.color_ft}; background-color: #{record.color_bg}; border-top: 1px solid #{record.color_ft};
-                border-bottom: 1px solid #{record.color_ft};">
+                border-bottom: 1px solid #{record.color_ft}; height: 100%">
             <t t-set="attendees" t-value="record.attendee_other_ids"/>
             <t t-foreach="attendees">
                 <i t-if="record.view.rows[record.view.rows_ids_indexes[attendees_value]] != undefined" class="of_calendar_attendee_box_flat"
@@ -275,12 +276,22 @@
 
     <!-- Créneaux disponibles -->
     <div t-name="PlanningView.creneau_dispo" class="of_planning_creneau_dispo"
-         t-attf-style="color: #{creneau.color_ft}; background-color: #{creneau.color_bg}; border: 1px solid #{creneau.color_ft};">  <!-- variable donnée par le javascript: creneau et col_index -->
-        <div>
+         t-attf-style="color: #{creneau.color_ft}; background-color: #{creneau.color_bg};
+          border: 1px solid #{creneau.color_ft}; height: #{creneau.hauteur}; overflow: hidden;">
+        <!-- variable donnée par le javascript: creneau et col_index -->
+        <div style="height: 100%;">
             <i t-if="creneau.warning_horaires" class="fa fa-warning of_warning_horaires"
                style="float: right; padding-top: 4px;"/>
             <i class="fa fa-calendar-o of_ws"/>
-            <span>Dispo (<t t-esc="creneau.duree_str"/>) :
+            <span>Dispo</span>
+            <span class="of_planning_subinfo of_planning_subinfo_heure_debut">
+                <t t-raw="creneau.heure_debut_str"/>
+            </span>
+            <span class="of_planning_subinfo of_planning_subinfo_heure_fin">-&gt;</span>
+            <span class="of_planning_subinfo of_planning_subinfo_heure_fin">
+                <t t-raw="creneau.heure_fin_str"/>
+            </span>
+            <span class="of_planning_subinfo of_planning_subinfo_duree">(<t t-raw="creneau.duree_str"/>)
             </span>
             <br/>
             <a name="%(of_planning_view.action_view_of_planif_wizard)d" type="action"
