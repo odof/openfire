@@ -14,8 +14,17 @@
                         <field name="planningview_employee_exclu_ids" class="oe_inline" widget="many2many_tags"/>
                         <span>Intervenants à NE PAS montrer en vue planning</span>
                     </div>
+                    <label for="planningview_px_fix"/>
+                    <div name="planningview_px_fix">
+                        <field name="planningview_px_fix" class="oe_inline"/>
+                        <span>proportionnelle à leur durée</span>
+                    </div>
+                    <label for="planningview_h2px" attrs="{'invisible': [('planningview_px_fix', '=', False)]}"/>
+                    <div name="planningview_h2px" attrs="{'invisible': [('planningview_px_fix', '=', False)]}">
+                        <field name="planningview_h2px" class="oe_inline"/>
+                        <span>px</span>
+                    </div>
                 </group>
-
             </xpath>
         </field>
     </record>
@@ -29,6 +38,7 @@
                       string="Interventions" color_ft="of_color_ft" color_bg="of_color_bg"
                       resource="employee_ids" color_multiple="1">
                 <field name="duree"/>
+                <field name="duree_debut_fin"/>
                 <field name="tache_name"/>
                 <field name="tache_id"/>
                 <field name="tache_categ_id"/>

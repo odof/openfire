@@ -379,6 +379,9 @@ class OfPlanningIntervention(models.Model):
     date_date = fields.Date(
         string="Jour intervention", compute='_compute_date_date', search='_search_date_date', readonly=True)
     duree = fields.Float(string=u"Durée intervention", required=True, digits=(12, 5), track_visibility='always')
+    duree_debut_fin = fields.Float(
+        string=u"Durée entre le début et la fin", compute="_compute_duree_debut_fin", store=True,
+        help=u"Prend en compte le temp de pause au milieu du RDV")
     jour_fin = fields.Char("Jour fin", compute="_compute_jour")
     date_deadline = fields.Datetime(
         compute="_compute_date_deadline", string="Date fin", store=True, track_visibility='always')
@@ -497,6 +500,18 @@ class OfPlanningIntervention(models.Model):
     def _compute_date_date(self):
         for interv in self:
             interv.date_date = interv.date
+
+    @api.depends('date', 'date_deadline')
+    def _compute_duree_debut_fin(self):
+        """Ne fonctionne que pour les RDVs sur une seule journée"""
+        for intervention in self:
+            date_dt = fields.Datetime.from_string(intervention.date)
+            date_deadline_dt = fields.Datetime.from_string(intervention.date_deadline)
+            # workaround
+            if not date_deadline_dt or date_dt.date() != date_deadline_dt.date():
+                intervention.duree_debut_fin = intervention.duree
+            else:
+                intervention.duree_debut_fin = (date_deadline_dt - date_dt).seconds / 3600.0
 
     @api.depends('date', 'duree', 'employee_ids', 'forcer_dates', 'date_deadline_forcee')
     def _compute_date_deadline(self):
