@@ -38,20 +38,27 @@ class GestionPrix(models.TransientModel):
 
     order_id = fields.Many2one('sale.order', string='Devis/commande', required=True, ondelete='cascade')
     methode_remise = fields.Selection(
-        selection=_get_selection_mode_calcul,
-        default='prix_ttc_cible',
-        string=u"Mode de calcul",
-        help=u"Détermine comment est calculée la remise sur les lignes sélectionnées du devis")
-    line_ids = fields.One2many('of.sale.order.gestion.prix.line', 'wizard_id', string=u'Lignes impactées', readonly=True)
+        selection=_get_selection_mode_calcul, default='prix_ttc_cible', string=u"Mode de calcul",
+        help=u"Détermine comment est calculée la remise sur les lignes sélectionnées du devis"
+    )
+    line_ids = fields.One2many(
+        'of.sale.order.gestion.prix.line', 'wizard_id', string=u'Lignes impactées', readonly=True
+    )
     valeur = fields.Float(string='Valeur', digits=dp.get_precision('Sale Price'))
 
     marge_initiale = fields.Monetary(string='marge initiale', related='order_id.margin', related_sudo=False)
     pc_marge_initiale = fields.Float(string='% marge initiale', related='order_id.of_marge_pc', related_sudo=False)
-    montant_total_ttc_initial = fields.Monetary(string='Total TTC initial', related='order_id.amount_total', readonly=True)
+    montant_total_ttc_initial = fields.Monetary(
+        string='Total TTC initial', related='order_id.amount_total', readonly=True
+    )
 
     currency_id = fields.Many2one(related='order_id.currency_id')
-    marge_simul = fields.Monetary(string=u'marge simulée', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul')
-    pc_marge_simul = fields.Float(string=u'% marge simulée', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul')
+    marge_simul = fields.Monetary(
+        string=u'marge simulée', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul'
+    )
+    pc_marge_simul = fields.Float(
+        string=u'% marge simulée', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul'
+    )
     montant_total_ttc_simul = fields.Monetary(
         string=u'Total TTC simulé', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul')
     afficher_remise = fields.Boolean(
@@ -86,7 +93,8 @@ class GestionPrix(models.TransientModel):
 
     @api.multi
     def name_get(self):
-        return [(record.id, "Gestion prix %s %s" % (record.order_id.state == 'draft' and 'devis' or 'commande', record.order_id.name))
+        return [(record.id, "Gestion prix %s %s" % (record.order_id.state == 'draft' and 'devis' or 'commande',
+                                                    record.order_id.name))
                 for record in self]
 
     def bouton_simuler(self):
@@ -129,9 +137,10 @@ class GestionPrix(models.TransientModel):
 
             # Ces deux lignes sont copiées depuis la fonction sale_order_line._compute_amount() d module sale
             price = price_unit * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
-            taxes = taxes.with_context(base_values=(price, price, price)).compute_all(price, currency, order_line.product_uom_qty,
-                                                                                      product=order_line.product_id,
-                                                                                      partner=order_line.order_id.partner_id)
+            taxes = taxes.with_context(base_values=(price, price, price)).compute_all(
+                price, currency, order_line.product_uom_qty, product=order_line.product_id,
+                partner=order_line.order_id.partner_id
+            )
 
             if line_rounding:
                 # On arrondit les montants par ligne
@@ -162,8 +171,8 @@ class GestionPrix(models.TransientModel):
         if line_rounding:
             price = price_unit * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
             taxes = order_line.tax_id.with_context(base_values=(price, price, price), round=False)
-            taxes = taxes.compute_all(price, order_line.currency_id, order_line.product_uom_qty, product=order_line.product_id,
-                                      partner=order_line.order_id.partner_id)
+            taxes = taxes.compute_all(price, order_line.currency_id, order_line.product_uom_qty,
+                                      product=order_line.product_id, partner=order_line.order_id.partner_id)
 
             # On arrondit les montants par ligne
             montant = taxes[line_rounding['field']]
@@ -174,8 +183,8 @@ class GestionPrix(models.TransientModel):
         # Calcul des taxes pour l'affichage de la simulation
         price = price_unit * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
         taxes = order_line.tax_id.with_context(base_values=(price, price, price))
-        taxes = taxes.compute_all(price, order_line.currency_id, order_line.product_uom_qty, product=order_line.product_id,
-                                  partner=order_line.order_id.partner_id)
+        taxes = taxes.compute_all(price, order_line.currency_id, order_line.product_uom_qty,
+                                  product=order_line.product_id, partner=order_line.order_id.partner_id)
         return {order_line: {'price_unit': price_unit}}, taxes
 
     @api.model
@@ -233,10 +242,14 @@ class GestionPrix(models.TransientModel):
             if not self.valeur:
                 raise UserError(u"(Erreur #RG115)\nVous devez saisir un montant TTC à déduire.")
             if self.valeur > self.montant_total_ttc_initial:
-                raise UserError(u"(Erreur #RG120)\nLe montant TTC à déduire est supérieur au montant total TTC des articles sur lesquels s'appliquent la remise.")
+                raise UserError(
+                    u"(Erreur #RG120)\n"
+                    u"Le montant TTC à déduire est supérieur au montant total TTC des articles"
+                    u"sur lesquels s'appliquent la remise.")
         elif self.methode_remise == 'pc':
             if not 0 < self.valeur <= 100:
-                raise UserError(u"(Erreur #RG125)\nLe pourcentage de remise doit être supérieur à 0 et inférieur ou égal à 100.")
+                raise UserError(
+                    u"(Erreur #RG125)\nLe pourcentage de remise doit être supérieur à 0 et inférieur ou égal à 100.")
         elif self.methode_remise == 'pc_marge':
             if self.valeur >= 100:
                 raise UserError(u"(Erreur #RG130)\nLe pourcentage de marge doit être inférieur à 100.")
@@ -286,7 +299,8 @@ class GestionPrix(models.TransientModel):
                                                        to_distribute,
                                                        total_select,
                                                        currency=cur,
-                                                       rounding=line != lines_select[-1],  # On arrondit toutes les lignes sauf la dernière
+                                                       # On arrondit toutes les lignes sauf la dernière
+                                                       rounding=line != lines_select[-1],
                                                        line_rounding=line_rounding)
             # Recalcul de 'total_excluded' et 'total_included' sans les arrondis
             if not round_tax:
@@ -337,6 +351,7 @@ class GestionPrix(models.TransientModel):
         """
         self.of_client_view = not self.of_client_view
 
+
 class GestionPrixLine(models.TransientModel):
     """Liste des lignes dans le wizard"""
     _name = 'of.sale.order.gestion.prix.line'
@@ -346,16 +361,25 @@ class GestionPrixLine(models.TransientModel):
     is_selected = fields.Boolean(string='Est sélectionné')
     text_selected = fields.Char(string=u"État", compute='_compute_text_selected')
     wizard_id = fields.Many2one('of.sale.order.gestion.prix', required=True, ondelete='cascade')
-    order_line_id = fields.Many2one('sale.order.line', string="Article", required=True, readonly=True, ondelete='cascade')
+    order_line_id = fields.Many2one(
+        'sale.order.line', string="Article", required=True, readonly=True, ondelete='cascade'
+    )
     currency_id = fields.Many2one(related='order_line_id.currency_id')
-#    prix_unit_achat = fields.Monetary(string='Prix achat', related='order_line_id.of_standard_price', readonly=True)
     quantity = fields.Float(string=u"Quantité", related='order_line_id.product_uom_qty', readonly=True)
 
     cout = fields.Monetary(u'Coût', compute='_compute_cout')
-    prix_unit_ht = fields.Monetary(string='Prix unit. HT initial', related='order_line_id.price_reduce_taxexcl', readonly=True)
-    prix_unit_ttc = fields.Monetary(string='Prix unit. TTC initial', related='order_line_id.price_reduce_taxinc', readonly=True)
-    prix_total_ht = fields.Monetary(string='Prix total HT initial', related='order_line_id.price_subtotal', readonly=True)
-    prix_total_ttc = fields.Monetary(string='Prix total TTC initial', related='order_line_id.price_total', readonly=True)
+    prix_unit_ht = fields.Monetary(
+        string='Prix unit. HT initial', related='order_line_id.price_reduce_taxexcl', readonly=True
+    )
+    prix_unit_ttc = fields.Monetary(
+        string='Prix unit. TTC initial', related='order_line_id.price_reduce_taxinc', readonly=True
+    )
+    prix_total_ht = fields.Monetary(
+        string='Prix total HT initial', related='order_line_id.price_subtotal', readonly=True
+    )
+    prix_total_ttc = fields.Monetary(
+        string='Prix total TTC initial', related='order_line_id.price_total', readonly=True
+    )
     remise = fields.Float(related='order_line_id.discount', readonly=True)
 
     prix_total_ttc_simul = fields.Float(string=u"Prix total TTC simulé", readonly=True)
@@ -393,6 +417,7 @@ class GestionPrixLine(models.TransientModel):
         for line in self:
             line.is_selected = not line.is_selected
 
+
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
@@ -406,7 +431,8 @@ class SaleOrder(models.Model):
         for line in self.order_line:
             values = {
                 'order_line_id': line.id,
-                'is_selected': not line.of_product_forbidden_discount and bool(line.product_uom_qty and line.price_unit),
+                'is_selected': not line.of_product_forbidden_discount
+                               and bool(line.product_uom_qty and line.price_unit),
                 'prix_total_ht_simul': line.price_subtotal,
                 'prix_total_ttc_simul': line.price_total,
             }
