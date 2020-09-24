@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record model="ir.rule" id="of_followup_project_comp_rule">
+            <field name="name">Suivi de projet multi-company</field>
+            <field name="model_id" ref="model_of_followup_project"/>
+            <field name="global" eval="True"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+            <field name="domain_force">['|', ('order_id.company_id', '=', False),
+                                             ('order_id.company_id', 'child_of', [user.company_id.id])]</field>
+        </record>
+
+        <!-- Droits de suppression sur les types de tâche pré-définies -->
+
+        <record id="of_followup_task_type_del_rule_user" model="ir.rule">
+            <field name="name">OF Followup Task Type user delete rule</field>
+            <field name="model_id" ref="model_of_followup_task_type"/>
+            <field name="global" eval="False"/>
+            <field name="groups" eval="[(6, 0, [ref('base.group_user')])]"/>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="True"/>
+            <field name="domain_force">[('predefined_task', '=', False)]</field>
+        </record>
+
+    </data>
+</odoo>

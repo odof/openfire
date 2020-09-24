@@ -138,6 +138,32 @@ class File(dms_base.DMSModel):
         elif self.of_file_type == 'related':
             return self.of_attachment_id.datas if self.of_attachment_id else None
 
+    @api.model
+    def of_get_object_partner_and_category(self, obj):
+        partner = False
+        if obj._name == 'res.partner':
+            partner = obj
+            categ_ref = 'res_partner_file_category'
+        elif obj._name in ('sale.order', 'purchase.order', 'account.invoice', 'stock.picking', 'crm.lead',
+                           'project.issue', 'of.service', 'of.planning.intervention'):
+            partner = obj.partner_id
+            categ_ref = obj._name.replace('.', '_')
+
+            if obj._name == 'account.invoice':
+                if obj.type in ('out_invoice', 'out_refund'):
+                    categ_ref += '_out'
+                else:
+                    categ_ref += '_in'
+            elif obj._name == 'stock.picking':
+                if obj.picking_type_id.code == 'outgoing':
+                    categ_ref += '_out'
+                elif obj.picking_type_id.code == 'incoming':
+                    categ_ref += '_in'
+                else:
+                    partner = categ_ref = False
+        categ = categ_ref and self.env.ref('of_document.' + categ_ref + '_file_category')
+        return partner, categ
+
     @api.multi
     def action_view_linked_record(self):
         self.ensure_one()
