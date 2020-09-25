@@ -6,3 +6,4 @@ from . import of_crm_projet
 from . import partner
 from . import sale_order
 from . import of_planning_intervention
+from . import of_sale_objective
