@@ -300,9 +300,7 @@
                                             <field name="order_partner_id"/>
                                             <field name="date_order"/>
                                             <field name="confirmation_date_order"/>
-                                            <field name="of_invoice_policy"/>
                                             <field name="invoice_status"/>
-                                            <field name="of_invoice_date_prev"/>
                                         </group>
                                     </group>
                                     <label for="name"/>
@@ -333,9 +331,7 @@
                                             <field name="order_partner_id"/>
                                             <field name="date_order"/>
                                             <field name="confirmation_date_order"/>
-                                            <field name="of_invoice_policy"/>
                                             <field name="invoice_status"/>
-                                            <field name="of_invoice_date_prev"/>
                                         </group>
                                     </group>
                                     <label for="name"/>
