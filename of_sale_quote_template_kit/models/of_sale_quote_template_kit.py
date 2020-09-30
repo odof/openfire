@@ -6,11 +6,17 @@ from odoo.tools import float_is_zero, float_compare, DEFAULT_SERVER_DATETIME_FOR
 
 import odoo.addons.decimal_precision as dp
 
+
 class OfSaleorderKit(models.Model):
     _inherit = 'of.saleorder.kit'
 
     # Ajout du champ pour permettre l'utilisation des kits dans les sale.quote.line
     quote_line_id = fields.Many2one('sale.quote.line', string='quote line')
+    no_update = fields.Boolean(
+        string=u"Ignorer les mises à jour", related="quote_line_id.no_update", readonly=True, help=u"""
+        Cocher cette case empêchera les mises à jour article d'affecter ce kit.
+        """
+    )
 
     @api.model
     def _clear_db(self):
@@ -22,16 +28,58 @@ class OfSaleorderKit(models.Model):
         not_linked.unlink()
 
 
+class OfSaleorderKitLine(models.Model):
+    _inherit = 'of.saleorder.kit.line'
+
+    # Ajout du champ pour permettre l'utilisation des kits dans les sale.quote.line
+    quote_line_id = fields.Many2one('sale.quote.line', related="kit_id.quote_line_id", readonly=True)
+
+
 class SaleQuoteLine(models.Model):
     _inherit = "sale.quote.line"
     _description = u"Lignes de modèle de devis"
     _order = 'sequence, id'
 
+    @api.model
+    def _auto_init(self):
+        # code à supprimer prochainement
+        super(SaleQuoteLine, self)._auto_init()
+        quote_line_kit = self.search([('of_is_kit', '=', True), ('no_update', '=', False), ('kit_id', '!=', False)])
+        to_unlink = self.env['of.saleorder.kit']
+        for line in quote_line_kit:
+            if not line.product_id.of_is_kit:
+                # kit d'un seul composant qui est le même que le même que l'article de la ligne
+                if len(line.kit_id.kit_line_ids) == 1 and line.kit_id.kit_line_ids[0].product_id == line.product_id:
+                    to_unlink |= line.kit_id
+                    line.write({'of_is_kit': False})
+                continue
+            product_compzz = line.product_id.product_tmpl_id.kit_line_ids
+            quote_line_compzz = line.kit_id.kit_line_ids
+            if len(product_compzz) != len(quote_line_compzz):
+                continue
+            for product_comp in product_compzz:
+                quote_line_comp = quote_line_compzz.filtered(lambda c: c.product_id == product_comp.product_id)
+                # une différence dans les composant de kit -> kit à conserver
+                if not quote_line_comp or product_comp.product_qty != quote_line_comp.qty_per_kit:
+                    break
+            else:
+                # toutes les lignes de kit sont présentes des 2 cotés avec les mêmes quantités -> kit à supprimer
+                to_unlink |= line.kit_id
+        to_no_update = quote_line_kit.mapped('kit_id') - to_unlink
+        to_no_update.mapped('quote_line_id').write({'no_update': True})
+        to_unlink.unlink()
+
     kit_id = fields.Many2one('of.saleorder.kit', string="Composants", copy=True)
     of_is_kit = fields.Boolean(string='Est un kit')
+    no_update = fields.Boolean(
+            string=u"Personnalisé",
+            help=u"Vous permet de modifier les composants.\n"
+                 u"Un kit personnalisé dans le modèle de devis ne sera pas mis à jour "
+                 u"lors de modifications de l'article d'origine.")
+
 
     price_comps = fields.Float(
-        string='Prix comp/Kit', compute='_compute_price_comps',  # digits=dp.get_precision('Product Price'),
+        string='Prix comp/Kit', compute='_compute_price_comps',
         help="Sum of the prices of all components necessary for 1 unit of this kit",)
 
     of_pricing = fields.Selection(
@@ -39,11 +87,19 @@ class SaleQuoteLine(models.Model):
             ('fixed', u'Fixé'),
             ('computed', u'Calculé'),
         ], string="Tarification", required=True, default='fixed',
-        help="This field is only relevant if the product is a kit. It represents the way the price should be computed.\n"
-             "if set to 'fixed', the price of it's components won't be taken into account and the price will be the one of the kit.\n"
-             "if set to 'computed', the price will be computed according to the components of the kit.")
+        help="This field is only relevant if the product is a kit."
+             "It represents the way the price should be computed.\n"
+             "if set to 'fixed', the price of it's components won't be taken into account"
+             "and the price will be the one of the kit.\n"
+             "if set to 'computed', the price will be computed according to the components of the kit."
+    )
 
-    sale_kits_to_unlink = fields.Boolean(string="sale kits to unlink?", default=False, help="True if at least 1 sale kit needs to be deleted from database")
+    sale_kits_to_unlink = fields.Boolean(
+        string="sale kits to unlink?", default=False,
+        help="True if at least 1 sale kit needs to be deleted from database"
+    )
+
+    product_is_kit = fields.Boolean(string="L'article d'origine est un kit", compute="_compute_product_is_kit")
 
     @api.depends('kit_id.kit_line_ids')
     def _compute_price_comps(self):
@@ -53,6 +109,11 @@ class SaleQuoteLine(models.Model):
             if line.kit_id:
                 line.price_comps = line.kit_id.price_comps
                 line.cost_comps = line.kit_id.cost_comps
+
+    @api.depends('product_id')
+    def _compute_product_is_kit(self):
+        for line in self:
+            line.product_is_kit = line.product_id.of_is_kit
 
     @api.onchange('price_comps', 'of_pricing', 'product_id')
     def _refresh_price_unit(self):
@@ -101,16 +162,34 @@ class SaleQuoteLine(models.Model):
                     }
                 new_vals["kit_id"] = self.env["of.saleorder.kit"].create(sale_kit_vals)
                 new_vals["of_pricing"] = "computed"
+                new_vals["no_update"] = True
             else:  # can happen if uncheck then recheck a kit
                 new_vals['of_pricing'] = self.product_id.of_pricing
-                sale_kit_vals = self.product_id.get_saleorder_kit_data()
-                new_vals["kit_id"] = self.env["of.saleorder.kit"].create(sale_kit_vals)
+                new_vals["no_update"] = False
 
         else:  # a product that was a kit is not anymore, we unlink its components
             new_vals["of_pricing"] = 'fixed'
             new_vals["price_unit"] = self.product_id.list_price
+            new_vals["no_update"] = self.product_id.of_is_kit
         self.update(new_vals)
         self._refresh_price_unit()
+
+    @api.onchange('no_update')
+    def _onchange_no_update(self):
+        # supprimer le of.saleorder.kit
+        new_vals = {}
+        if not self.no_update and self.kit_id:
+            self.kit_id.write({"to_unlink": True})
+            new_vals["kit_id"] = False
+            new_vals["sale_kits_to_unlink"] = True
+            self.update(new_vals)
+            self._refresh_price_unit()
+        if self.no_update and self.product_id.of_is_kit:
+            new_vals['of_pricing'] = self.product_id.of_pricing
+            sale_kit_vals = self.product_id.get_saleorder_kit_data()
+            new_vals["kit_id"] = self.env["of.saleorder.kit"].create(sale_kit_vals)
+            self.update(new_vals)
+            self._refresh_price_unit()
 
     @api.onchange('kit_id')
     def _onchange_kit_id(self):
@@ -138,7 +217,7 @@ class SaleQuoteLine(models.Model):
     def write(self, vals):
         """ À voir avec Cédric pour confirmer l'effet
         """
-        if vals.get("sale_kits_to_unlink") or self.sale_kits_to_unlink:
+        if vals.get("sale_kits_to_unlink") or len(self) == 1 and self.sale_kits_to_unlink:
             self.env["of.saleorder.kit"].search([("to_unlink", "=", True)]).unlink()
             vals["sale_kits_to_unlink"] = False
         update_ol_id = False
@@ -150,8 +229,10 @@ class SaleQuoteLine(models.Model):
             update_ol_id = True
         elif 'of_pricing' in vals:
             update_ol_id = True
-        if len(self) == 1 and ((self.of_pricing == 'computed' and not vals.get('of_pricing')) or vals.get('of_pricing') == 'computed'):
-            vals['price_unit'] = vals.get('price_comps', self.price_comps)  # price_unit is equal to price_comps if pricing is computed
+        if len(self) == 1 and (
+                (self.of_pricing == 'computed' and not vals.get('of_pricing')) or vals.get('of_pricing') == 'computed'):
+            # price_unit is equal to price_comps if pricing is computed
+            vals['price_unit'] = vals.get('price_comps', self.price_comps)
         super(SaleQuoteLine, self).write(vals)
         if update_ol_id:
             sale_kit_vals = {'quote_line_id': self.id}
@@ -207,23 +288,38 @@ class SaleQuoteLine(models.Model):
             return {}
         res = {'of_pricing': self.of_pricing}
         lines = [(5,)]
-        comp_vals = {}
+        base_vals = {}
         if self.of_pricing == 'fixed':
-            comp_vals["hide_prices"] = True
-        kit = self.kit_id
-        for line in kit.kit_line_ids:
-            comp_vals = comp_vals.copy()
-            comp_vals["product_id"] = line.product_id.id
-            comp_vals["product_uom_id"] = line.product_uom_id.id
-            comp_vals["qty_per_kit"] = line.qty_per_kit
-            comp_vals["sequence"] = line.sequence
-            comp_vals["name"] = line.product_id.name_get()[0][1] or line.product_id.name
-            comp_vals["price_unit"] = line.product_id.list_price
-            comp_vals["cost_unit"] = line.product_id.standard_price
-            comp_vals["customer_lead"] = line.product_id.sale_delay
-            lines.append((0, 0, comp_vals))
+            base_vals["hide_prices"] = True
+        if self.no_update:
+            kit = self.kit_id
+            for line in kit.kit_line_ids:
+                comp_vals = base_vals.copy()
+                comp_vals["product_id"] = line.product_id.id
+                comp_vals["product_uom_id"] = line.product_uom_id.id
+                comp_vals["qty_per_kit"] = line.qty_per_kit
+                comp_vals["sequence"] = line.sequence
+                comp_vals["name"] = line.product_id.name_get()[0][1] or line.product_id.name
+                comp_vals["price_unit"] = line.product_id.list_price
+                comp_vals["cost_unit"] = line.product_id.standard_price
+                comp_vals["customer_lead"] = line.product_id.sale_delay
+                lines.append((0, 0, comp_vals))
+        else:
+            kit = self.product_id.product_tmpl_id
+            for line in kit.kit_line_ids:
+                comp_vals = base_vals.copy()
+                comp_vals["product_id"] = line.product_id.id
+                comp_vals["product_uom_id"] = line.product_uom_id.id
+                comp_vals["qty_per_kit"] = line.product_qty
+                comp_vals["sequence"] = line.sequence
+                comp_vals["name"] = line.product_id.name_get()[0][1] or line.product_id.name
+                comp_vals["price_unit"] = line.product_id.list_price
+                comp_vals["cost_unit"] = line.product_id.standard_price
+                comp_vals["customer_lead"] = line.product_id.sale_delay
+                lines.append((0, 0, comp_vals))
         res["kit_line_ids"] = lines
         return res
+
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -249,3 +345,69 @@ class SaleOrder(models.Model):
         """
         super(SaleOrder, self)._compute_prices_from_template()
         self.order_line._refresh_price_unit()
+
+
+class ProductTemplate(models.Model):
+    _inherit = 'product.template'
+
+    @api.multi
+    def write(self, vals):
+        kit_no_more_ids = []
+        # Au moins un article est passé de kit à pas kit
+        if 'of_is_kit' in vals and not vals['of_is_kit'] and True in self.mapped('of_is_kit'):
+            kit_no_more_ids = self.filtered(lambda p: p.of_is_kit).ids
+        res = super(ProductTemplate, self).write(vals)
+        # Pas besoin de vérifier d'autres champs, un kit non personnalisé sur les modèles de devis utilise
+        # les informations de l'article et non de la ligne de modèle pour générer la ligne de devis
+        if 'of_is_kit' in vals:
+            self.affecter_kits_sale_quote(kit_no_more_ids)
+        return res
+
+    @api.multi
+    def affecter_kits_sale_quote(self, kit_no_more_ids=[]):
+        for product_tmpl in self:
+            # l'article est un kit ou était un kit
+            if product_tmpl.of_is_kit or product_tmpl.id in kit_no_more_ids:
+                quote_lines = self.env['sale.quote.line'].search(
+                    [
+                        ('product_id', 'in', product_tmpl.product_variant_ids.ids),
+                        ('no_update', '=', False),
+                    ])
+                for line in quote_lines:
+                    line._onchange_product_id()
+                    line._onchange_of_is_kit()
+                    line._onchange_kit_id()
+                    line._onchange_of_pricing()
+
+
+class ProductProduct(models.Model):
+    _inherit = 'product.product'
+
+    @api.multi
+    def write(self, vals):
+        kit_no_more_ids = []
+        # Au moins un article est passé de kit à pas kit
+        if 'of_is_kit' in vals and not vals['of_is_kit'] and True in self.mapped('of_is_kit'):
+            kit_no_more_ids = self.filtered(lambda p: p.of_is_kit).ids
+        res = super(ProductProduct, self).write(vals)
+        # Pas besoin de vérifier d'autres champs, un kit non personnalisé sur les modèles de devis utilise
+        # les informations de l'article et non de la ligne de modèle pour générer la ligne de devis
+        if 'of_is_kit' in vals:
+            self.affecter_kits_sale_quote(kit_no_more_ids)
+        return res
+
+    @api.multi
+    def affecter_kits_sale_quote(self, kit_no_more_ids=[]):
+        for product in self:
+            # l'article est un kit ou était un kit
+            if product.of_is_kit or product.id in kit_no_more_ids:
+                quote_lines = self.env['sale.quote.line'].search(
+                    [
+                        ('product_id', '=', product.id),
+                        ('no_update', '=', False),
+                    ])
+                for line in quote_lines:
+                    line._onchange_product_id()
+                    line._onchange_of_is_kit()
+                    line._onchange_kit_id()
+                    line._onchange_of_pricing()

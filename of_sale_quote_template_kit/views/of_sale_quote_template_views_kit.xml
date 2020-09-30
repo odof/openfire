@@ -9,14 +9,66 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='quote_line']/form/group/group/field[@name='product_id']" position="after">
                 <field name="sale_kits_to_unlink" invisible="1"/>
-                <field name="of_is_kit"/>
-                <field name="of_pricing" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
-                <field name="kit_id" widget="one2one" options="{'text_empty': 'Créer Composants', 'text_nonempty': 'Voir Composants'}"
-                  attrs="{'invisible': [('of_is_kit', '=', False)]}"
-                  context="{'hide_sale': context.get('hide_sale')}"/>
+                <label for="of_is_kit"/>
+                <div>
+                    <field name="of_is_kit" attrs="{'invisible': [('product_is_kit', '!=', False)]}"/>
+                    <span attrs="{'invisible': [('product_is_kit', '=', False)]}">Vrai</span>
+                </div>
+                <field name="product_is_kit" invisible="1"/>
+                <label for="no_update" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
+                <div attrs="{'invisible': [('of_is_kit', '=', False)]}">
+                    <field name="no_update" attrs="{'invisible': [('product_is_kit', '=', False)]}"/>
+                    <span attrs="{'invisible': [('product_is_kit', '!=', False)]}">Vrai</span>
+                </div>
+                <field name="of_pricing" attrs="{
+                                                    'invisible': [('of_is_kit', '=', False)],
+                                                    'readonly': [('no_update', '=', False)]
+                                                }"/>
+                <field name="kit_id" widget="one2one"
+                       options="{'text_empty': 'Créer Composants', 'text_nonempty': 'Voir Composants'}"
+                       attrs="{'invisible': ['|', ('of_is_kit', '=', False), ('no_update', '=', False)]}"
+                       context="{'hide_sale': context.get('hide_sale'), 'hide_prices': True}"/>
             </xpath>
             <xpath expr="//field[@name='quote_line']/form/group/group/field[@name='price_unit']" position="after">
                 <field name="price_comps" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_quote_kit_view_form" model="ir.ui.view">
+        <field name="name">of.saleorder.kit.view.form</field>
+        <field name="model">of.saleorder.kit</field>
+        <field name="inherit_id" ref="of_kit.of_sale_order_kit_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="field[@name='kit_line_ids']" position="before">
+                <field name="quote_line_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//div[@name='hide_prices_message']" position="attributes">
+                <attribute name="invisible">context.get('hide_prices')</attribute>
+            </xpath>
+            <xpath expr="//div[@name='hide_prices_message']" position="after">
+                <div name="hide_prices_message_quote_template" class="mb8 mt8"
+                     invisible="not context.get('hide_prices')"
+                     attrs="{'invisible': [('of_pricing', '=', 'fixed')]}">
+                    <i>
+                        Les prix des composants seront calculés au moment de sélectionner ce modèle dans un devis.
+                    </i>
+                </div>
+            </xpath>
+            <xpath expr="field[@name='kit_line_ids']//field[@name='price_unit_display']" position="before">
+                <field name="quote_line_id" invisible="1"/>
+            </xpath>
+            <xpath expr="field[@name='kit_line_ids']//field[@name='qty_delivered']" position="attributes">
+                <attribute name="invisible">context.get('hide_prices') or context.get('hide_sale')</attribute>
+            </xpath>
+            <xpath expr="field[@name='kit_line_ids']//field[@name='price_unit_display']" position="attributes">
+                <attribute name="invisible">context.get('hide_prices')</attribute>
+            </xpath>
+            <xpath expr="field[@name='kit_line_ids']//field[@name='price_per_kit']" position="attributes">
+                <attribute name="invisible">context.get('hide_prices')</attribute>
+            </xpath>
+            <xpath expr="//field[@name='price_comps']" position="attributes">
+                <attribute name="invisible">context.get('hide_prices')</attribute>
             </xpath>
         </field>
     </record>
