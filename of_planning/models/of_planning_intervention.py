@@ -993,6 +993,23 @@ class OfPlanningIntervention(models.Model):
         if 'date' in vals:
             # Tronqué à la minute
             vals['date'] = vals['date'][:17] + '00'
+        # Correspond soit au drag & drop soit au redimensionnage
+        # -> ignorer les horaires de travail et les interventions superposées
+        if self._context.get('from_ui'):
+            vals['verif_dispo'] = False
+            vals['forcer_dates'] = True
+            if vals.get('date_deadline'):
+                vals['date_deadline_forcee'] = vals['date_deadline'][:17] + '00'
+                date_deadline_dt = fields.Datetime.from_string(vals['date_deadline_forcee'])
+                del vals['date_deadline']
+                # date et date_deadline modifiées -> drag n drop
+                if vals.get('date'):
+                    date_dt = fields.Datetime.from_string(vals.get('date'))
+                # seulement date_deadline modifiée -> redimensionnage
+                else:
+                    # len(self) == 1 car drag n drop ou redimensionnage
+                    date_dt = fields.Datetime.from_string(self[0].date)
+                vals['duree'] = (date_deadline_dt - date_dt).total_seconds() / 3600
         super(OfPlanningIntervention, self).write(vals)
         self._affect_number()
 
