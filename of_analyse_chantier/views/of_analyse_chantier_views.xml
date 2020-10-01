@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_view_sale_order_analyse" model="ir.actions.act_window">
+        <field name="name">Devis / Commandes</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="sale.view_quotation_tree"/>
+        <field name="context">{'form_view_ref': 'sale.view_order_form'}</field>
+    </record>
+
+    <record id="action_view_account_invoice_analyse" model="ir.actions.act_window">
+        <field name="name">Factures</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.invoice</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="account.invoice_tree"/>
+        <field name="context">{'form_view_ref': 'account.invoice_form', 'active_test':False}</field>
+    </record>
+
+    <record id="action_view_stock_picking_analyse" model="ir.actions.act_window">
+        <field name="name">Bons de livraisons</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="stock.vpicktree"/>
+        <field name="context">{'form_view_ref': 'stock.view_picking_form', 'active_test':False}</field>
+    </record>
+
+    <record id="of_analyse_chantier_filter" model="ir.ui.view">
+        <field name="name">of.analyse.chantier.filter</field>
+        <field name="model">of.analyse.chantier</field>
+        <field name="arch" type="xml">
+            <search string="Recherche">
+             </search>
+        </field>
+    </record>
+
+    <record id="of_analyse_chantier_view_form" model="ir.ui.view" >
+        <field name="name">of.analyse.chantier.form</field>
+        <field name="model">of.analyse.chantier</field>
+        <field name="context">{'active_test':False}</field>
+        <field name="arch" type="xml" >
+            <form string="Analyse de chantier">
+                <header>
+                    <button name="synchroniser" string="Synchroniser" type="object"
+                            confirm="Toutes modifications apportées manuellement à des lignes liées avec une commande/facture seront écrasées. Continuer ?"/>
+                    <button name="button_deliver_all" string="Livrer tout" type="object"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
+                    <button name="action_done" string="Valider" type="object" groups="of_analyse_chantier.of_group_analyse_chantier_manager"/>
+                    <button name="recuperer_facture_liees" string="Lier factures" type="object" groups="of_analyse_chantier.of_group_analyse_chantier_manager"
+                            confirm="Cette action va récupérer les factures liés aux commandes. Voulez-vous continuer ?"/>
+                    <button name="recuperer_commande_client_liees" string="Lier commandes" type="object" groups="of_analyse_chantier.of_group_analyse_chantier_manager"
+                            confirm="Cette action va récupérer les commandes liés aux factures. Voulez-vous continuer ?"/>
+                    <button name="button_dummy" type="object" class="oe_stat_button" string="Recalculer"/>
+
+                </header>
+                <sheet>
+                    <group>
+                        <div class="oe_title">
+                            <h1><field name="name" placeholder="Nom de l'analyse"/></h1>
+                        </div>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="toggle_view_qty" type="object" class="oe_stat_button" icon="fa-pencil-square-o" groups="of_sale.of_group_sale_marge_manager">
+                                <field name="view_qty" widget="boolean_button"
+                                       options="{'terminology': {'string_true': 'Qté visible',
+                                                                 'hover_true': 'Masquer qté',
+                                                                 'string_false': 'Qté masquées',
+                                                                 'hover_false': 'Voir qté' }}"/>
+                            </button>
+                            <button class="oe_stat_button" name="action_view_orders" type="object" icon="fa-usd" string="Commandes"/>
+                            <button class="oe_stat_button" name="action_view_invoices" type="object" icon="fa-pencil-square-o" string="Factures"/>
+                            <button class="oe_stat_button" name="action_view_pickings" type="object" icon="fa-truck" string="Livraisons"/>
+                        </div>
+                    </group>
+
+                    <group col="2">
+                        <separator string="Identification" colspan="2"/>
+                        <field name="partner_id"/>
+                        <field name="order_ids" widget="many2many_tags" options="{'not_delete':True, 'no_create': True}"
+                               domain="[('partner_id', partner_id and 'child_of' or 'like', partner_id or ''), ('of_analyse_id', '=', False)]"
+                               attrs="{'readonly':[('state','=','done')]}"/>
+                        <field name="invoice_ids" widget="many2many_tags" options="{'not_delete':True, 'no_create': True}"
+                               domain="[('partner_id', partner_id and 'child_of' or 'like', partner_id or ''), ('of_analyse_id', '=', False)]"
+                               attrs="{'readonly':[('state','=','done')]}"/>
+                    </group>
+
+                    <group name="methode">
+                        <field name="methode_cout" colspan="2" attrs="{'readonly':[('state','=','done')]}"/>
+                    </group>
+
+<!--                    <separator string="Général"/>-->
+<!--                    <group name="general" col="10">-->
+<!--                        <group colspan="2">-->
+<!--                            <field name="cout_chantier"/>-->
+<!--                            <field name="vente_chantier"/>-->
+<!--                        </group>-->
+<!--                        <group colspan="2">-->
+<!--                            <field name="cout_produit"/>-->
+<!--                            <field name="cout_produit_additionnels"/>-->
+<!--                            <field name="cout_produit_total"/>-->
+<!--                        </group>-->
+<!--                        <group colspan="2">-->
+<!--                            <field name="vente_produit"/>-->
+<!--                            <field name="vente_produit_additionnels"/>-->
+<!--                            <field name="vente_produit_total"/>-->
+<!--                        </group>-->
+<!--                        <group colspan="2">-->
+<!--                            <field name="cout_service"/>-->
+<!--                            <field name="cout_service_additionnels"/>-->
+<!--                            <field name="cout_service_total"/>-->
+<!--                        </group>-->
+<!--                        <group colspan="2">-->
+<!--                            <field name="vente_service"/>-->
+<!--                            <field name="vente_service_additionnels"/>-->
+<!--                            <field name="vente_service_total"/>-->
+<!--                        </group>-->
+<!--                    </group>-->
+                    <group name="separators" col="8">
+                        <separator string="Général" colspan="2"/>
+                        <separator string="Marge brute" colspan="2"/>
+                        <separator string="Marge semi-nette" colspan="2"/>
+                        <separator string="Marge nette" colspan="2"/>
+                    </group>
+                    <group name="marge" col="8">
+                        <group colspan="2" name="chantier">
+                            <field name="cout_chantier"/>
+                            <field name="vente_chantier"/>
+                        </group>
+                        <group name="marge_brute" colspan="2">
+                            <field name="marge_brute"/>
+                            <label for="marge_brute_pc"/>
+                            <div name="marge_brute_pc">
+                                <field name="marge_brute_pc" class="oe_inline"/> %
+                            </div>
+                        </group>
+                        <group name="marge_semi_nette" colspan="2">
+                            <field name="marge_semi_nette"/>
+                            <label for="marge_semi_nette_pc"/>
+                            <div name="marge_semi_nette_pc">
+                                <field name="marge_semi_nette_pc" class="oe_inline"/> %
+                            </div>
+                        </group>
+                        <group name="marge_nette" colspan="2">
+                            <field name="marge_nette"/>
+                            <label for="marge_nette_pc"/>
+                            <div name="marge_nette_pc">
+                                <field name="marge_nette_pc" class="oe_inline"/> %
+                            </div>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="products" string="Produits">
+                            <group name="products" col="4">
+                                <separator string="Produits" colspan="4"/>
+                                <field name="product_line_ids" nolabel="1" colspan="4"
+                                       context="{'default_methode_cout': methode_cout,
+                                                 'tree_view_ref': view_qty and 'of_analyse_chantier.of_analyse_chantier_line_view_tree' or
+                                                                  'of_analyse_chantier.of_analyse_chantier_line_view_tree_hide'}"
+                                       attrs="{'readonly':[('state','=','done')]}"
+                                       options="{'reload_on_button': True}">
+                                </field>
+<!--                                <separator string="Général"/>-->
+                                <group colspan="2">
+                                    <field name="cout_produit"/>
+                                    <field name="cout_produit_additionnels"/>
+                                    <field name="cout_produit_total"/>
+                                </group>
+                                <group colspan="2">
+                                    <field name="vente_produit"/>
+                                    <field name="vente_produit_additionnels"/>
+                                    <field name="vente_produit_total"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page name="services" string="Services/Interventions">
+                            <group name="services" col="4">
+                                <separator string="Services" colspan="4"/>
+                                <field name="service_line_ids" nolabel="1" colspan="4"
+                                       context="{'default_methode_cout': methode_cout,
+                                                 'tree_view_ref': view_qty and 'of_analyse_chantier.of_analyse_chantier_line_view_tree' or
+                                                                  'of_analyse_chantier.of_analyse_chantier_line_view_tree_hide'}"
+                                       attrs="{'readonly':[('state','=','done')]}"
+                                       options="{'reload_on_button': True}"/>
+                                <separator string="Poses liées" colspan="4"/>
+                                <field name="intervention_ids" nolabel="1" colspan="4" options="{'reload_on_button': True}">
+                                    <tree colors="green:in_use==True;grey:in_use==False">
+                                        <field name="name"/>
+                                        <field name="date"/>
+                                        <field name="duree" widget="float_time" sum="total"/>
+                                        <field name="cout_equipe_heure"/>
+                                        <field name="cout_theorique" sum="Total"/>
+                                        <field name="cout_moyen_equipe_heure"/>
+                                        <field name="cout_moyen_theorique" sum="Total"/>
+                                        <field name="in_use" invisible="1"/>
+                                        <button name="toggle_use" type="object" icon="fa-refresh"/>
+                                    </tree>
+                                </field>
+<!--                                <separator string="Général"/>-->
+                                <group colspan="2">
+                                    <field name="cout_service"/>
+                                    <field name="cout_service_additionnels"/>
+                                    <field name="cout_service_total"/>
+                                </group>
+                                <group colspan="2">
+                                    <field name="vente_service"/>
+                                    <field name="vente_service_additionnels"/>
+                                    <field name="vente_service_total"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page name="remises" string="Remises">
+                            <group name="remises">
+                                <separator string="Remises" colspan="2"/>
+                                <field name="remise_ids" nolabel="1" colspan="2"
+                                context="{'tree_view_ref': view_qty and 'of_analyse_chantier.of_analyse_chantier_remise_view_tree' or
+                                'of_analyse_chantier.of_analyse_chantier_remise_view_tree_hide',
+                                'active_test':False}"
+                                options="{'reload_on_button': True}"/>
+                        </group>
+                        </page>
+                    </notebook>
+
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_analyse_chantier_view_tree" model="ir.ui.view" >
+        <field name="name">of.analyse.chantier.tree</field>
+        <field name="model">of.analyse.chantier</field>
+        <field name="arch" type="xml" >
+            <tree string="Analyse de chantier">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_analyse_chantier_line_view_tree" model="ir.ui.view" >
+        <field name="name">of.analyse.chantier.line.tree</field>
+        <field name="model">of.analyse.chantier.line</field>
+        <field name="arch" type="xml" >
+            <tree editable="bottom" colors="green:in_use==True;grey:in_use==False" default_order='subtotal desc'>
+                <field name="invoice_line_ids" invisible="1"/>
+                <field name="order_line_ids" invisible="1"/>
+                <field name="saleorder_kit_line_ids" invisible="1"/>
+                <field name="invoice_kit_line_ids" invisible="1"/>
+                <field name="name"/>
+                <field name="product_name" invisible="1"/>
+                <field name="product_id"/>
+                <field name="qty_ordered"/>
+                <field name="qty_delivered"/>
+                <field name="qty_invoiced"/>
+                <field name="methode_cout"/>
+                <field name="purchase_price" invisible="1"/>
+                <field name="purchase_price_compute" attrs="{'readonly': [('methode_cout', '!=', 'ana')]}" sum="Total"/>
+                <field name="price_unit"/>
+                <field name="subtotal" invisible="1"/>
+                <field name="subtotal_compute" sum="Total"/>
+                <field name="margin" sum="Total"/>
+                <field name="margin_pc"/>
+<!--                <field name="chantier_id" invisible="1"/>-->
+                <field name="in_use" invisible="1"/>
+                <button name="toggle_use" type="object" icon="fa-refresh"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_analyse_chantier_line_view_tree_hide" model="ir.ui.view" >
+        <field name="name">of.analyse.chantier.line.tree.hide</field>
+        <field name="model">of.analyse.chantier.line</field>
+        <field name="arch" type="xml" >
+            <tree editable="bottom" colors="green:in_use==True;grey:in_use==False" default_order='subtotal desc'>
+                <field name="invoice_line_ids" invisible="1"/>
+                <field name="order_line_ids" invisible="1"/>
+                <field name="saleorder_kit_line_ids" invisible="1"/>
+                <field name="invoice_kit_line_ids" invisible="1"/>
+                <field name="name"/>
+                <field name="product_name" invisible="1"/>
+                <field name="product_id"/>
+                <field name="qty_ordered" invisible="1"/>
+                <field name="qty_delivered" invisible="1"/>
+                <field name="qty_invoiced" invisible="1"/>
+                <field name="methode_cout"/>
+                <field name="purchase_price" invisible="1"/>
+                <field name="purchase_price_compute" attrs="{'readonly': [('methode_cout', '!=', 'ana')]}" sum="Total"/>
+                <field name="price_unit" invisible="1"/>
+                <field name="subtotal" sum="Total"/>
+                <field name="margin" sum="Total"/>
+                <field name="margin_pc"/>
+<!--                <field name="chantier_id" invisible="1"/>-->
+                <field name="in_use" invisible="1"/>
+                <button name="toggle_use" type="object" icon="fa-refresh"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_analyse_chantier_remise_view_tree" model="ir.ui.view" >
+        <field name="name">of.analyse.chantier.remise.tree</field>
+        <field name="model">of.analyse.chantier.remise</field>
+        <field name="context">{'active_test':False}</field>
+        <field name="arch" type="xml" >
+            <tree editable="bottom" colors="green:active==True;grey:active==False">
+                <field name="active" invisible="1"/>
+                <field name="name"/>
+                <field name="product_id"/>
+                <field name="affectation" readonly="1"/>
+                <field name="qty_ordered"/>
+                <field name="qty_invoiced"/>
+                <field name="subtotal" sum="Total"/>
+                <button name="change_use" type="object" icon="fa-cogs"/>
+                <button name="toggle_active" type="object" icon="fa-refresh"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_analyse_chantier_remise_view_tree_hide" model="ir.ui.view" >
+        <field name="name">of.analyse.chantier.remise.tree.hide</field>
+        <field name="model">of.analyse.chantier.remise</field>
+        <field name="context">{'active_test':False}</field>
+        <field name="arch" type="xml" >
+            <tree editable="bottom" colors="grey:active==False">
+                <field name="active" invisible="1"/>
+                <field name="name"/>
+                <field name="product_id" />
+                <field name="affectation"/>
+                <field name="qty_ordered" invisible="1"/>
+                <field name="qty_invoiced" invisible="1"/>
+                <field name="subtotal" sum="Total"/>
+                <button name="change_use" type="object" icon="fa-cogs"/>
+                <button name="toggle_active" type="object" icon="fa-refresh"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_analyse_chantier_tree" model="ir.actions.act_window">
+        <field name="name">Analyse de chantier</field>
+        <field name="res_model">of.analyse.chantier</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form,tree</field>
+        <field name="view_id" ref="of_analyse_chantier_view_tree"/>
+        <field name="search_view_id" ref="of_analyse_chantier_filter"/>
+    </record>
+
+    <menuitem name="Analyse de chantier" action="action_of_analyse_chantier_tree" id="menu_rapport_analyse_chantier_sale" parent="sales_team.menu_sale_report"/>
+    <menuitem name="Analyse de chantier" action="action_of_analyse_chantier_tree" id="menu_rapport_analyse_chantier_account" parent="account.menu_finance_reports"/>
+
+    <record id="of_analyse_chantier_view_employee_form" model="ir.ui.view">
+        <field name="name">of.analyse.chantier.view.employee.form</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='hr_settings']/group/group[@name='active_group']" position="inside">
+                <field name="of_cout_horaire" groups="hr.group_hr_manager"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_sale_order_analyse_chantier" model="ir.actions.act_window">
+        <field name="name">Analyse de chantier</field>
+        <field name="res_model">of.analyse.chantier</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_analyse_chantier.of_analyse_chantier_view_form"/>
+        <field name="domain">[]</field>
+    </record>
+
+    <record id="of_analyse_chantier_view_order_form" model="ir.ui.view">
+        <field name="name">of.analyse.chantier.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" name="action_view_analyse_chantier" type="object" icon="fa-usd" attrs="{'invisible': [('of_analyse_id', '=', False)]}" string="Analyse">
+                    <field name="of_analyse_id" string="Analyse" invisible="1"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_analyse_chantier_view_sale_config_settings" model="ir.ui.view">
+        <field name="name">of_analyse_chantier_view_sale_config_settings</field>
+        <field name="model">sale.config.settings</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_sale_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_deposit_product_categ_id_setting']" position="after">
+                <field name="of_discount_product_categ_ids_setting" class="oe_inline" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
