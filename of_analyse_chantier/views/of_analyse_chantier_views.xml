@@ -93,33 +93,6 @@
                         <field name="methode_cout" colspan="2" attrs="{'readonly':[('state','=','done')]}"/>
                     </group>
 
-<!--                    <separator string="Général"/>-->
-<!--                    <group name="general" col="10">-->
-<!--                        <group colspan="2">-->
-<!--                            <field name="cout_chantier"/>-->
-<!--                            <field name="vente_chantier"/>-->
-<!--                        </group>-->
-<!--                        <group colspan="2">-->
-<!--                            <field name="cout_produit"/>-->
-<!--                            <field name="cout_produit_additionnels"/>-->
-<!--                            <field name="cout_produit_total"/>-->
-<!--                        </group>-->
-<!--                        <group colspan="2">-->
-<!--                            <field name="vente_produit"/>-->
-<!--                            <field name="vente_produit_additionnels"/>-->
-<!--                            <field name="vente_produit_total"/>-->
-<!--                        </group>-->
-<!--                        <group colspan="2">-->
-<!--                            <field name="cout_service"/>-->
-<!--                            <field name="cout_service_additionnels"/>-->
-<!--                            <field name="cout_service_total"/>-->
-<!--                        </group>-->
-<!--                        <group colspan="2">-->
-<!--                            <field name="vente_service"/>-->
-<!--                            <field name="vente_service_additionnels"/>-->
-<!--                            <field name="vente_service_total"/>-->
-<!--                        </group>-->
-<!--                    </group>-->
                     <group name="separators" col="8">
                         <separator string="Général" colspan="2"/>
                         <separator string="Marge brute" colspan="2"/>
@@ -164,7 +137,6 @@
                                        attrs="{'readonly':[('state','=','done')]}"
                                        options="{'reload_on_button': True}">
                                 </field>
-<!--                                <separator string="Général"/>-->
                                 <group colspan="2">
                                     <field name="cout_produit"/>
                                     <field name="cout_produit_additionnels"/>
@@ -200,7 +172,6 @@
                                         <button name="toggle_use" type="object" icon="fa-refresh"/>
                                     </tree>
                                 </field>
-<!--                                <separator string="Général"/>-->
                                 <group colspan="2">
                                     <field name="cout_service"/>
                                     <field name="cout_service_additionnels"/>
@@ -264,7 +235,6 @@
                 <field name="subtotal_compute" sum="Total"/>
                 <field name="margin" sum="Total"/>
                 <field name="margin_pc"/>
-<!--                <field name="chantier_id" invisible="1"/>-->
                 <field name="in_use" invisible="1"/>
                 <button name="toggle_use" type="object" icon="fa-refresh"/>
             </tree>
@@ -293,7 +263,6 @@
                 <field name="subtotal" sum="Total"/>
                 <field name="margin" sum="Total"/>
                 <field name="margin_pc"/>
-<!--                <field name="chantier_id" invisible="1"/>-->
                 <field name="in_use" invisible="1"/>
                 <button name="toggle_use" type="object" icon="fa-refresh"/>
             </tree>
@@ -376,9 +345,8 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button class="oe_stat_button" name="action_view_analyse_chantier" type="object" icon="fa-usd" attrs="{'invisible': [('of_analyse_id', '=', False)]}" string="Analyse">
-                    <field name="of_analyse_id" string="Analyse" invisible="1"/>
-                </button>
+                <field name="of_analyse_id" string="Analyse" invisible="1"/>
+                <button class="oe_stat_button" name="action_view_analyse_chantier" type="object" icon="fa-usd" attrs="{'invisible': [('of_analyse_id', '=', False)]}" string="Analyse"/>
             </xpath>
         </field>
     </record>
