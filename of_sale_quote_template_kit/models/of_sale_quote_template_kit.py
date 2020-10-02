@@ -6,10 +6,6 @@ from odoo.tools import float_is_zero, float_compare, DEFAULT_SERVER_DATETIME_FOR
 
 import odoo.addons.decimal_precision as dp
 
-import logging
-
-_logger = logging.getLogger(__name__)
-
 
 class OfSaleorderKit(models.Model):
     _inherit = 'of.saleorder.kit'
@@ -57,27 +53,10 @@ class SaleQuoteLine(models.Model):
                     to_unlink |= line.kit_id
                     line.write({'of_is_kit': False})
                 continue
-            product_compzz = line.product_id.product_tmpl_id.kit_line_ids
-            quote_line_compzz = line.kit_id.kit_line_ids
-            if len(product_compzz) != len(quote_line_compzz):
-                continue
-            products = product_compzz.mapped('product_id')
-            for product in products:
-                quote_lines = quote_line_compzz.filtered(lambda c: c.product_id.id == product.id)
-                product_lines = product_compzz.filtered(lambda c: c.product_id.id == product.id)
-                if len(quote_lines) != len(product_lines):
-                    break
-                breaker = False
-                for quote_line in quote_lines:
-                    corresponding_product_lines = product_lines.filtered(lambda pl: pl.product_qty == quote_line.qty_per_kit)
-                    if not corresponding_product_lines:
-                        breaker = True
-                        break
-                    # On ne retire qu'une proposition
-                    product_lines -= corresponding_product_lines[0]
-                if breaker:
-                    break
-            else:
+            list1 = line.product_id.product_tmpl_id.kit_line_ids.mapped(
+                lambda rec: [rec.product_id.id, rec.product_qty])
+            list2 = line.kit_id.kit_line_ids.mapped(lambda rec: [rec.product_id.id, rec.qty_per_kit])
+            if list1.sort() == list2.sort():
                 # toutes les lignes de kit sont présentes des 2 cotés avec les mêmes quantités -> kit à supprimer
                 to_unlink |= line.kit_id
 
