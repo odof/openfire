@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api, _
 import odoo.addons.decimal_precision as dp
+from odoo.addons.sale.models.sale import SaleOrderLine as SOL
 from odoo.tools import float_compare, float_is_zero
 from odoo.exceptions import UserError
 from odoo.models import regex_order
@@ -22,6 +23,20 @@ except ImportError:
     pypdftk = None
 
 NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
+
+
+@api.onchange('product_uom', 'product_uom_qty')
+def product_uom_change(self):
+    u"""Copie de la fonction parente avec retrait de l'affectation du prix unitaire"""
+    if not self.product_uom or not self.product_id:
+        self.price_unit = 0.0
+        return
+    if self.order_id.pricelist_id.of_is_quantity_dependent(self.product_id.id, self.order_id.date_order) \
+            and self.order_id.partner_id \
+            and (not self.price_unit or float_compare(self.price_unit, self.product_id.list_price, 2) != 0):
+        self.price_unit = self.of_get_price_unit()
+
+SOL.product_uom_change = product_uom_change
 
 
 class OfDocumentsJoints(models.AbstractModel):
@@ -868,6 +883,22 @@ class SaleOrderLine(models.Model):
             else:
                 line.qty_to_invoice = 0
 
+    def of_get_price_unit(self):
+        """Renvoi le prix unitaire type."""
+        self.ensure_one()
+        product = self.product_id.with_context(
+            lang=self.order_id.partner_id.lang,
+            partner=self.order_id.partner_id.id,
+            quantity=self.product_uom_qty,
+            date=self.order_id.date_order,
+            pricelist=self.order_id.pricelist_id.id,
+            uom=self.product_uom.id,
+            fiscal_position=self.env.context.get('fiscal_position')
+        )
+        return self.env['account.tax']._fix_tax_included_price_company(self._get_display_price(product),
+                                                                       product.taxes_id, self.tax_id,
+                                                                       self.company_id)
+
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
@@ -1515,3 +1546,38 @@ class ResPartner(models.Model):
     of_invoice_policy = fields.Selection(
         [('order', u'Quantités commandées'), ('delivery', u'Quantités livrées')],
         string="Politique de facturation")
+
+
+class ProductPricelist(models.Model):
+    _inherit = 'product.pricelist'
+
+    @api.multi
+    def of_is_quantity_dependent(self, product_id, date_eval=fields.Date.today()):
+        u"""
+            :param: product_id Produit évalué
+            :param: date_eval Date d'évaluation de la liste de prix
+            :return: True si le produit évalué est contenu dans cette liste et que son prix dépend de la quantité
+        """
+        self.ensure_one()
+        product = self.env['product.product'].browse(product_id)
+        for item in self.item_ids:
+            if item.min_quantity and item.min_quantity > 1:
+                # une date de début pour cet item et la date d'évaluation antérieure à cette date de début
+                if item.date_start and date_eval < item.date_start:
+                    continue
+                # une date de fin pour cet item et la date d'évaluation postérieure à cette date de fin
+                if item.date_end and date_eval > item.date_end:
+                    continue
+                # l'item s'applique sur une catégorie d'article différente de celle de l'article évalué
+                if item.applied_on == '2_product_category' and item.categ_id \
+                        and item.categ_id != product.product_tmpl_id.categ_id:
+                    continue
+                # l'item s'applique sur un article différent de l'article évalué
+                if item.applied_on == '1_product' and item.product_tmpl_id \
+                        and item.product_tmpl_id != product.product_tmpl_id:
+                    continue
+                # l'item s'applique sur une variante différente de la variante évaluée
+                if item.applied_on == '0_product_variant' and item.product_id and item.product_id != product:
+                    continue
+                return True
+        return False
