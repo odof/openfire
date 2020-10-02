@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api, _
 import odoo.addons.decimal_precision as dp
+from odoo.addons.sale.models.sale import SaleOrderLine as SOL
 from odoo.tools import float_compare, float_is_zero
 from odoo.exceptions import UserError
 from odoo.models import regex_order
@@ -24,6 +25,20 @@ except ImportError:
 NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
 
 
+@api.onchange('product_uom', 'product_uom_qty')
+def product_uom_change(self):
+    u"""Copie de la fonction parente avec retrait de l'affectation du prix unitaire"""
+    if not self.product_uom or not self.product_id:
+        self.price_unit = 0.0
+        return
+    if self.order_id.pricelist_id.of_is_quantity_dependent(self.product_id.id, self.order_id.date_order) \
+            and self.order_id.partner_id \
+            and (not self.price_unit or float_compare(self.price_unit, self.product_id.list_price, 2) != 0):
+        self.price_unit = self.of_get_price_unit()
+
+SOL.product_uom_change = product_uom_change
+
+
 class OfDocumentsJoints(models.AbstractModel):
     """ Classe abstraite qui permet d'ajouter les documents joints.
     Elle doit être surchargée pour ajouter d'autres rapports dans la fonction _allowed_reports
@@ -31,7 +46,10 @@ class OfDocumentsJoints(models.AbstractModel):
     """
     _name = 'of.documents.joints'
 
-    of_mail_template_ids = fields.Many2many("of.mail.template", string="Documents joints", help=u"Intégrer des documents pdf au devis/bon de commande (exemple : CGV)")
+    of_mail_template_ids = fields.Many2many(
+        "of.mail.template", string="Documents joints",
+        help=u"Intégrer des documents pdf au devis/bon de commande (exemple : CGV)"
+    )
 
     @api.model
     def _allowed_reports(self):
@@ -134,15 +152,18 @@ class SaleOrder(models.Model):
     @api.depends('order_line.price_total')
     def _amount_all(self):
         """Compute the total amounts of the SO."""
-        # Le calcul standard diffère du calcul utilisé dans les factures, ce qui peut mener à des écarts dans certains cas
-        # (quand l'option d'arrondi global de la tva est utilisée et que la commande contient plusieurs lignes avec des taxes différentes).
+        # Le calcul standard diffère du calcul utilisé dans les factures, cela peut mener à des écarts dans certains cas
+        # (quand l'option d'arrondi global de la tva est utilisée
+        # et que la commande contient plusieurs lignes avec des taxes différentes).
         # On uniformise le calcul du montant des devis/commandes avec celui des factures.
         for order in self:
             order.amount_untaxed = sum(line.price_subtotal for line in order.order_line)
             order.amount_tax = sum(tax['amount'] for tax in order.of_get_taxes_values().itervalues())
             order.amount_total = order.amount_untaxed + order.amount_tax
 
-    of_to_invoice = fields.Boolean(u"Entièrement facturable", compute='_compute_of_to_invoice', search='_search_of_to_invoice')
+    of_to_invoice = fields.Boolean(
+        u"Entièrement facturable", compute='_compute_of_to_invoice', search='_search_of_to_invoice'
+    )
     of_notes_facture = fields.Html(string="Notes facture", oldname="of_notes_factures")
     of_notes_intervention = fields.Html(string="Notes intervention")
     of_notes_client = fields.Text(related='partner_id.comment', string="Notes client", readonly=True)
@@ -150,24 +171,28 @@ class SaleOrder(models.Model):
     of_total_cout = fields.Monetary(compute='_compute_of_marge', string='Prix de revient')
     of_marge_pc = fields.Float(compute='_compute_of_marge', string='Marge %')
 
-    of_etiquette_partenaire_ids = fields.Many2many('res.partner.category', related='partner_id.category_id', string=u"Étiquettes client")
+    of_etiquette_partenaire_ids = fields.Many2many(
+        'res.partner.category', related='partner_id.category_id', string=u"Étiquettes client")
     of_client_view = fields.Boolean(string='Vue client/vendeur')
 
-    of_date_vt = fields.Date(string="Date visite technique", help=u"Si renseignée apparaîtra sur le devis / Bon de commande")
-
+    of_date_vt = fields.Date(
+        string="Date visite technique", help=u"Si renseignée apparaîtra sur le devis / Bon de commande"
+    )
     of_echeance_line_ids = fields.One2many('of.sale.echeance', 'order_id', string=u"Échéances")
 
-    of_echeances_modified = fields.Boolean(u"Les échéances ont besoin d'être recalculées", compute="_compute_of_echeances_modified")
+    of_echeances_modified = fields.Boolean(
+        u"Les échéances ont besoin d'être recalculées", compute="_compute_of_echeances_modified")
     of_force_invoice_status = fields.Selection([
         ('invoiced', 'Fully Invoiced'),
         ('no', 'Nothing to Invoice')
         ], string=u"Forcer état de facturation",
         help=u"Permet de forcer l'état de facturation de la commande.\n"
              u"Utile pour les commandes facturées qui refusent de changer d'état "
-             u"(e.g. une ligne a été supprimée dans la facture).",
-        copy=False)
+             u"(e.g. une ligne a été supprimée dans la facture).", copy=False
+    )
     of_invoice_policy = fields.Selection(
-        [('order', u'Quantités commandées'), ('delivery', u'Quantités livrées')], string="Politique de facturation")
+        [('order', u'Quantités commandées'), ('delivery', u'Quantités livrées')], string="Politique de facturation"
+    )
 
     @api.depends('of_echeance_line_ids', 'amount_total')
     def _compute_of_echeances_modified(self):
@@ -340,8 +365,8 @@ class SaleOrder(models.Model):
         Retourne les lignes de la commande, séparées en fonction du groupe dans lequel les afficher.
         Les groupes sont ceux définis par l'objet of.invoice.report.total, permettant de déplacer le rendu des
           lignes de commande sous le total hors taxe ou TTC.
-        Les groupes sont affichés dans leur ordre propre, puis les lignes dans l'ordre de leur apparition dans la commande.
-        @param return: Liste de couples (groupe, lignes de commande). Le premier élément vaut (False, Lignes non groupées).
+        Les groupes sont affichés dans leur ordre propre, puis les lignes dans l'ordre d'apparition dans la commande.
+        @param return: Liste de couples (groupe, lignes de commande). Le 1er élément vaut (False, Lignes non groupées).
         """
         self.ensure_one()
         group_obj = self.env['of.invoice.report.total.group']
@@ -372,7 +397,8 @@ class SaleOrder(models.Model):
                     group_lines_2 = group_lines.filtered(lambda l: l.price_subtotal)
                     if group_lines_2:
                         result.append((group, group_lines_2))
-                    lines -= group_lines  # On enlève quand même toutes les lignes du groupe pour ne pas qu'elle s'affichent
+                    # On enlève quand même toutes les lignes du groupe pour ne pas qu'elle s'affichent
+                    lines -= group_lines
         if lines:
             result = [(False, lines)] + result
         else:
@@ -452,7 +478,8 @@ class SaleOrder(models.Model):
         tax_grouped = {}
         for line in untaxed_lines:
             price_unit = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-            taxes = line.tax_id.compute_all(price_unit, self.currency_id, line.product_uom_qty, line.product_id, self.partner_id)['taxes']
+            taxes = line.tax_id.compute_all(price_unit, self.currency_id, line.product_uom_qty, line.product_id,
+                                            self.partner_id)['taxes']
             for tax_val in taxes:
                 val = self._prepare_tax_line_vals(line, tax_val)
                 tax = tax_obj.browse(tax_val['id'])
@@ -629,26 +656,28 @@ class SaleOrderLine(models.Model):
     À entrer HT ou TTC suivant la TVA de la ligne de commande.
     """)
     of_client_view = fields.Boolean(string="Vue client/vendeur", related="order_id.of_client_view")
-    of_article_principal = fields.Boolean(string="Article principal", help="Cet article est l'article principal de la commande")
-    of_product_categ_id = fields.Many2one(
-        'product.category', related='product_id.categ_id', string=u"Catégorie d'article",
-        store=True, index=True
+    of_article_principal = fields.Boolean(
+        string="Article principal", help="Cet article est l'article principal de la commande"
     )
+    of_product_categ_id = fields.Many2one(
+        'product.category', related='product_id.categ_id', string=u"Catégorie d'article", store=True, index=True)
     date_order = fields.Datetime(related='order_id.date_order', string="Date de commande", store=True, index=True)
     confirmation_date_order = fields.Datetime(
         related='order_id.confirmation_date', string="Date de confirmation de commande", store=True, index=True)
     of_gb_partner_tag_id = fields.Many2one(
         'res.partner.category', compute=lambda *a, **k: {}, search='_search_of_gb_partner_tag_id',
-        string="Étiquette client", of_custom_groupby=True)
-
+        string="Étiquette client", of_custom_groupby=True
+    )
     of_price_unit_display = fields.Float(related='product_id.list_price', string=u"Prix unitaire", readonly=True)
     of_product_forbidden_discount = fields.Boolean(
-        related='product_id.of_forbidden_discount', string=u"Remise interdite pour ce produit",
-        readonly=True)
+        related='product_id.of_forbidden_discount', string=u"Remise interdite pour ce produit", readonly=True)
 
-    of_price_unit_ht = fields.Float(string='Unit Price excl', compute='_compute_of_price_unit', help="Unit price without taxes", store=True)
+    of_price_unit_ht = fields.Float(
+        string='Unit Price excl', compute='_compute_of_price_unit', help="Unit price without taxes", store=True
+    )
     of_price_unit_ttc = fields.Float(
-        string='Unit Price incl', compute='_compute_of_price_unit', help="Unit price with taxes", store=True)
+        string='Unit Price incl', compute='_compute_of_price_unit', help="Unit price with taxes", store=True
+    )
     of_product_default_code = fields.Char(related='product_id.default_code', string=u"Référence article", readonly=True)
 
     @api.depends('price_unit', 'order_id.currency_id', 'order_id.partner_shipping_id', 'product_id',
@@ -763,7 +792,8 @@ class SaleOrderLine(models.Model):
         Ne pas autoriser la suppression de ligne de commandes si la ligne est déjà présente sur une facture qui n'est
         pas une facture annulée n'ayant jamais été validée.
         """
-        locked_invoice_lines = self.mapped('invoice_lines').filtered(lambda l: l.invoice_id.state != 'cancel' or l.invoice_id.move_name)
+        locked_invoice_lines = self.mapped('invoice_lines').filtered(
+            lambda l: l.invoice_id.state != 'cancel' or l.invoice_id.move_name)
         if locked_invoice_lines:
             raise UserError(u"""Vous ne pouvez supprimer une ligne d'article liée à une facture.\n"""
                             u"""Veuillez annuler vos modifications.""")
@@ -778,7 +808,8 @@ class SaleOrderLine(models.Model):
         TODO: Permettre de modifier le montant si modification viens de la facture d'acompte
         """
         force = self._context.get('force_price')
-        blocked = [x for x in ('price_unit', 'product_uom_qty', 'product_uom', 'discount', 'of_discount_formula') if x in vals.keys()]
+        blocked = [x for x in ('price_unit', 'product_uom_qty', 'product_uom', 'discount', 'of_discount_formula')
+                   if x in vals.keys()]
         for line in self:
             locked_invoice_lines = line.mapped('invoice_lines').filtered(lambda l: l.of_is_locked)
             if locked_invoice_lines and blocked and not force:
@@ -851,6 +882,22 @@ class SaleOrderLine(models.Model):
                     line.qty_to_invoice = line.qty_delivered - line.qty_invoiced
             else:
                 line.qty_to_invoice = 0
+
+    def of_get_price_unit(self):
+        """Renvoi le prix unitaire type."""
+        self.ensure_one()
+        product = self.product_id.with_context(
+            lang=self.order_id.partner_id.lang,
+            partner=self.order_id.partner_id.id,
+            quantity=self.product_uom_qty,
+            date=self.order_id.date_order,
+            pricelist=self.order_id.pricelist_id.id,
+            uom=self.product_uom.id,
+            fiscal_position=self.env.context.get('fiscal_position')
+        )
+        return self.env['account.tax']._fix_tax_included_price_company(self._get_display_price(product),
+                                                                       product.taxes_id, self.tax_id,
+                                                                       self.company_id)
 
 
 class AccountInvoiceLine(models.Model):
@@ -951,7 +998,8 @@ class OFSaleConfiguration(models.TransientModel):
         Cette fonction est appelée à chaque mise à jour mais ne fait quelque chose que la première fois qu'elle est appelée.
         """
         set_value = False
-        if not self.env['ir.values'].get_default('sale.config.settings', 'bool_vers_selection_fait'):  # Cette fonction n'a encore jamais été appelée
+        # Cette fonction n'a encore jamais été appelée
+        if not self.env['ir.values'].get_default('sale.config.settings', 'bool_vers_selection_fait'):
             set_value = True
         super(OFSaleConfiguration, self)._auto_init()
         if set_value:
@@ -976,90 +1024,109 @@ class OFSaleConfiguration(models.TransientModel):
     of_deposit_product_categ_id_setting = fields.Many2one(
         'product.category',
         string=u"(OF) Catégorie des acomptes",
-        help=u"Catégorie des articles utilisés pour les acomptes")
+        help=u"Catégorie des articles utilisés pour les acomptes"
+    )
 
     stock_warning_setting = fields.Boolean(
         string="(OF) Stock", required=True, default=False,
-        help="Afficher les messages d'avertissement de stock ?")
+        help=u"Afficher les messages d'avertissement de stock ?"
+    )
 
     pdf_display_product_ref_setting = fields.Boolean(
         string=u"(OF) Réf. produits", required=True, default=False,
-        help=u"Afficher les références produits dans les rapports PDF ?")
+        help=u"Afficher les références produits dans les rapports PDF ?"
+    )
 
     pdf_date_validite_devis = fields.Boolean(
         string=u"(OF) Date validité devis", required=True, default=False,
-        help=u"Afficher la date de validité dans le rapport PDF des devis ?")
+        help=u"Afficher la date de validité dans le rapport PDF des devis ?"
+    )
 
     pdf_vt_pastille = fields.Boolean(
         string=u"(OF) Date VT pastille", required=True, default=False,
-        help=u"Afficher la date de visite technique dans une pastille dans le rapport PDF des devis ?")
+        help=u"Afficher la date de visite technique dans une pastille dans le rapport PDF des devis ?"
+    )
 
     pdf_adresse_nom_parent = fields.Boolean(
         string=u"(OF) Nom parent contact", required=True, default=False,
-        help=u"Afficher le nom du 'parent' du contact au lieu du nom du contact dans les rapport PDF ?")
+        help=u"Afficher le nom du 'parent' du contact au lieu du nom du contact dans les rapport PDF ?"
+    )
     pdf_adresse_civilite = fields.Boolean(
         string=u"(OF) Civilités", required=True, default=False,
-        help=u"Afficher la civilité dans les rapport PDF ?")
+        help=u"Afficher la civilité dans les rapport PDF ?"
+    )
     pdf_adresse_telephone = fields.Selection(
         [
-            (1, "Afficher dans l'encart d'adresse principal"),
+            (1, u"Afficher dans l'encart d'adresse principal"),
             (2, u"Afficher dans une pastille d'informations complémentaires"),
             (3, u"Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
         ], string=u"(OF) Téléphone",
-        help=u"Où afficher le numéro de téléphone dans les rapport PDF ? Ne rien mettre pour ne pas afficher.")
+        help=u"Où afficher le numéro de téléphone dans les rapport PDF ? Ne rien mettre pour ne pas afficher."
+    )
     pdf_adresse_mobile = fields.Selection(
         [
-            (1, "Afficher dans l'encart d'adresse principal"),
+            (1, u"Afficher dans l'encart d'adresse principal"),
             (2, u"Afficher dans une pastille d'informations complémentaires"),
             (3, u"Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
         ], string=u"(OF) Mobile",
-        help=u"Où afficher le numéro de téléphone mobile dans les rapport PDF ? Ne rien mettre pour ne pas afficher.")
+        help=u"Où afficher le numéro de téléphone mobile dans les rapport PDF ? Ne rien mettre pour ne pas afficher."
+    )
     pdf_adresse_fax = fields.Selection(
         [
-            (1, "Afficher dans l'encart d'adresse principal"),
+            (1, u"Afficher dans l'encart d'adresse principal"),
             (2, u"Afficher dans une pastille d'informations complémentaires"),
             (3, u"Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
         ], string="(OF) Fax",
-        help=u"Où afficher le fax dans les rapport PDF ? Ne rien mettre pour ne pas afficher.")
+        help=u"Où afficher le fax dans les rapport PDF ? Ne rien mettre pour ne pas afficher."
+    )
     pdf_adresse_email = fields.Selection(
         [
-            (1, "Afficher dans l'encart d'adresse principal"),
+            (1, u"Afficher dans l'encart d'adresse principal"),
             (2, u"Afficher dans une pastille d'informations complémentaires"),
             (3, u"Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
         ], string="(OF) E-mail",
-        help=u"Où afficher l'adresse email dans les rapport PDF ? Ne rien mettre pour ne pas afficher.")
+        help=u"Où afficher l'adresse email dans les rapport PDF ? Ne rien mettre pour ne pas afficher."
+    )
     pdf_afficher_multi_echeances = fields.Boolean(
         string=u"(OF) Multi-échéances", required=True, default=False,
-        help=u"Afficher les échéances multiples dans les rapports PDF ?")
+        help=u"Afficher les échéances multiples dans les rapports PDF ?"
+    )
     of_color_bg_section = fields.Char(
         string="(OF) Couleur fond titres section",
-        help=u"Choisissez un couleur de fond pour les titres de section", default="#F0F0F0")
+        help=u"Choisissez un couleur de fond pour les titres de section", default="#F0F0F0"
+    )
 
     of_position_fiscale = fields.Boolean(string="(OF) Position fiscale")
 
     @api.multi
     def set_pdf_adresse_nom_parent_defaults(self):
-        return self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_nom_parent', self.pdf_adresse_nom_parent)
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_adresse_nom_parent', self.pdf_adresse_nom_parent)
 
     @api.multi
     def set_pdf_adresse_civilite_defaults(self):
-        return self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_civilite', self.pdf_adresse_civilite)
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_adresse_civilite', self.pdf_adresse_civilite)
 
     @api.multi
     def set_pdf_adresse_telephone_defaults(self):
-        return self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_telephone', self.pdf_adresse_telephone)
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_adresse_telephone', self.pdf_adresse_telephone)
 
     @api.multi
     def set_pdf_adresse_mobile_defaults(self):
-        return self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_mobile', self.pdf_adresse_mobile)
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_adresse_mobile', self.pdf_adresse_mobile)
 
     @api.multi
     def set_pdf_adresse_fax_defaults(self):
-        return self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_fax', self.pdf_adresse_fax)
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_adresse_fax', self.pdf_adresse_fax)
 
     @api.multi
     def set_pdf_adresse_email_defaults(self):
-        return self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_adresse_email', self.pdf_adresse_email)
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_adresse_email', self.pdf_adresse_email)
 
     @api.multi
     def set_stock_warning_defaults(self):
@@ -1088,11 +1155,13 @@ class OFSaleConfiguration(models.TransientModel):
 
     @api.multi
     def set_of_color_bg_section_defaults(self):
-        return self.env['ir.values'].sudo().set_default('sale.config.settings', 'of_color_bg_section', self.of_color_bg_section)
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'of_color_bg_section', self.of_color_bg_section)
 
     @api.multi
     def set_pdf_afficher_multi_echeances_defaults(self):
-        return self.env['ir.values'].sudo().set_default('sale.config.settings', 'pdf_afficher_multi_echeances', self.pdf_afficher_multi_echeances)
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'pdf_afficher_multi_echeances', self.pdf_afficher_multi_echeances)
 
     @api.multi
     def set_of_position_fiscale(self):
@@ -1122,7 +1191,9 @@ class AccountInvoice(models.Model):
 
     of_date_vt = fields.Date(string="Date visite technique")
     of_sale_order_ids = fields.Many2many('sale.order', compute="_compute_of_sale_order_ids", string="Bons de commande")
-    of_residual = fields.Float(string=u"Somme du montant non payé des factures d'acompte et de la facture finale", compute="_compute_of_residual")
+    of_residual = fields.Float(
+        string=u"Somme du montant non payé des factures d'acompte et de la facture finale",
+        compute="_compute_of_residual")
     of_residual_equal = fields.Boolean(compute="_compute_of_residual")
     of_suivi_interne = fields.Char(string="Suivi interne")
     of_is_locked = fields.Boolean(compute="_compute_of_is_locked")
@@ -1158,7 +1229,8 @@ class AccountInvoice(models.Model):
             order_lines = lines.mapped('sale_line_ids')
             invoices = invoice | order_lines.mapped('invoice_lines').mapped('invoice_id')
             invoice.of_residual = sum(invoices.mapped('residual'))
-            invoice.of_residual_equal = invoice.state == 'draft' or float_compare(invoice.of_residual, invoice.residual, 2) == 0
+            invoice.of_residual_equal = invoice.state == 'draft' or \
+                                        float_compare(invoice.of_residual, invoice.residual, 2) == 0
 
     @api.depends('invoice_line_ids', 'invoice_line_ids.of_is_locked')
     def _compute_of_is_locked(self):
@@ -1398,7 +1470,8 @@ class AccountConfigSettings(models.TransientModel):
 
     @api.multi
     def set_of_color_bg_section_defaults(self):
-        return self.env['ir.values'].sudo().set_default('account.config.settings', 'of_color_bg_section', self.of_color_bg_section)
+        return self.env['ir.values'].sudo().set_default(
+            'account.config.settings', 'of_color_bg_section', self.of_color_bg_section)
 
     @api.multi
     def set_of_validate_pickings(self):
@@ -1473,3 +1546,38 @@ class ResPartner(models.Model):
     of_invoice_policy = fields.Selection(
         [('order', u'Quantités commandées'), ('delivery', u'Quantités livrées')],
         string="Politique de facturation")
+
+
+class ProductPricelist(models.Model):
+    _inherit = 'product.pricelist'
+
+    @api.multi
+    def of_is_quantity_dependent(self, product_id, date_eval=fields.Date.today()):
+        u"""
+            :param: product_id Produit évalué
+            :param: date_eval Date d'évaluation de la liste de prix
+            :return: True si le produit évalué est contenu dans cette liste et que son prix dépend de la quantité
+        """
+        self.ensure_one()
+        product = self.env['product.product'].browse(product_id)
+        for item in self.item_ids:
+            if item.min_quantity and item.min_quantity > 1:
+                # une date de début pour cet item et la date d'évaluation antérieure à cette date de début
+                if item.date_start and date_eval < item.date_start:
+                    continue
+                # une date de fin pour cet item et la date d'évaluation postérieure à cette date de fin
+                if item.date_end and date_eval > item.date_end:
+                    continue
+                # l'item s'applique sur une catégorie d'article différente de celle de l'article évalué
+                if item.applied_on == '2_product_category' and item.categ_id \
+                        and item.categ_id != product.product_tmpl_id.categ_id:
+                    continue
+                # l'item s'applique sur un article différent de l'article évalué
+                if item.applied_on == '1_product' and item.product_tmpl_id \
+                        and item.product_tmpl_id != product.product_tmpl_id:
+                    continue
+                # l'item s'applique sur une variante différente de la variante évaluée
+                if item.applied_on == '0_product_variant' and item.product_id and item.product_id != product:
+                    continue
+                return True
+        return False
