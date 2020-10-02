@@ -31,6 +31,9 @@ class AccountInvoice(models.Model):
     def pdf_afficher_email(self):
         return self.env['ir.values'].get_default('account.config.settings', 'pdf_adresse_email') or 0
 
+    def pdf_mention_legale(self):
+        return self.env['ir.values'].get_default('account.config.settings', 'pdf_mention_legale') or ""
+
     @api.multi
     def _of_get_total_lines_by_group(self, invoices):
         u"""
@@ -341,6 +344,10 @@ class AccountConfigSettings(models.TransientModel):
         string="(OF) Réf. produits", required=True, default=False,
         help="Afficher les références produits dans les rapports PDF ?")
 
+    pdf_mention_legale = fields.Text(
+        string=u"(OF) Mentions légales", help=u"Sera affiché dans les factures sous les commentaires du bas"
+    )
+
     @api.multi
     def set_pdf_adresse_nom_parent_defaults(self):
         return self.env['ir.values'].sudo().set_default('account.config.settings', 'pdf_adresse_nom_parent', self.pdf_adresse_nom_parent)
@@ -368,6 +375,12 @@ class AccountConfigSettings(models.TransientModel):
     @api.multi
     def set_pdf_display_product_ref_defaults(self):
         return self.env['ir.values'].sudo().set_default('account.config.settings', 'pdf_display_product_ref', self.pdf_display_product_ref)
+
+    @api.multi
+    def set_pdf_mention_legale_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'account.config.settings', 'pdf_mention_legale', self.pdf_mention_legale
+        )
 
 
 class OFInvoiceReportTotalGroup(models.Model):
