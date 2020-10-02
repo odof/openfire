@@ -40,7 +40,8 @@ class AccountInvoice(models.Model):
         Retourne les lignes de la facture, séparées en fonction du groupe dans lequel les afficher.
         Les groupes sont ceux définis par l'objet of.invoice.report.total, permettant de déplacer le rendu des
           lignes de facture sous le total TTC.
-        Les groupes sont affichés dans leur ordre propre, puis les lignes dans l'ordre de leur apparition dans la facture.
+        Les groupes sont affichés dans leur ordre propre,
+        puis les lignes dans l'ordre de leur apparition dans la facture.
         :param invoices: Ensemble des factures à utiliser pour générer le document.
         :return: Liste de couples (groupe, lignes de facture). Le premier élément vaut (False, Lignes non groupées).
         """
@@ -148,7 +149,9 @@ class AccountInvoice(models.Model):
                 res[line.tax_id.tax_group_id] += line.amount * sign
         res = sorted(res.items(), key=lambda l: l[0].sequence)
         res = [(
-            r[0].name, r[1], formatLang(self.with_context(lang=self[0].partner_id.lang).env, r[1], currency_obj=currency)
+            r[0].name,
+            r[1],
+            formatLang(self.with_context(lang=self[0].partner_id.lang).env, r[1], currency_obj=currency)
         ) for r in res]
         return res
 
@@ -281,10 +284,11 @@ class AccountConfigSettings(models.TransientModel):
     def _auto_init(self):
         """
         Certain paramètres d'affichage sont passés de Booléen à Sélection.
-        Cette fonction est appelée à chaque mise à jour mais ne fait quelque chose que la première fois qu'elle est appelée.
+        Cette fonction est appelée à chaque mise à jour mais ne fait quelque chose qu'à la première mise à jour.
         """
         set_value = False
-        if not self.env['ir.values'].get_default('account.config.settings', 'bool_vers_selection_fait'):  # Cette fonction n'a encore jamais été appelée
+        # Cette fonction n'a encore jamais été appelée
+        if not self.env['ir.values'].get_default('account.config.settings', 'bool_vers_selection_fait'):
             set_value = True
         super(AccountConfigSettings, self)._auto_init()
         if set_value:
@@ -350,31 +354,45 @@ class AccountConfigSettings(models.TransientModel):
 
     @api.multi
     def set_pdf_adresse_nom_parent_defaults(self):
-        return self.env['ir.values'].sudo().set_default('account.config.settings', 'pdf_adresse_nom_parent', self.pdf_adresse_nom_parent)
+        return self.env['ir.values'].sudo().set_default(
+            'account.config.settings', 'pdf_adresse_nom_parent', self.pdf_adresse_nom_parent
+        )
 
     @api.multi
     def set_pdf_adresse_civilite_defaults(self):
-        return self.env['ir.values'].sudo().set_default('account.config.settings', 'pdf_adresse_civilite', self.pdf_adresse_civilite)
+        return self.env['ir.values'].sudo().set_default(
+            'account.config.settings', 'pdf_adresse_civilite', self.pdf_adresse_civilite
+        )
 
     @api.multi
     def set_pdf_adresse_telephone_defaults(self):
-        return self.env['ir.values'].sudo().set_default('account.config.settings', 'pdf_adresse_telephone', self.pdf_adresse_telephone)
+        return self.env['ir.values'].sudo().set_default(
+            'account.config.settings', 'pdf_adresse_telephone', self.pdf_adresse_telephone
+        )
 
     @api.multi
     def set_pdf_adresse_mobile_defaults(self):
-        return self.env['ir.values'].sudo().set_default('account.config.settings', 'pdf_adresse_mobile', self.pdf_adresse_mobile)
+        return self.env['ir.values'].sudo().set_default(
+            'account.config.settings', 'pdf_adresse_mobile', self.pdf_adresse_mobile
+        )
 
     @api.multi
     def set_pdf_adresse_fax_defaults(self):
-        return self.env['ir.values'].sudo().set_default('account.config.settings', 'pdf_adresse_fax', self.pdf_adresse_fax)
+        return self.env['ir.values'].sudo().set_default(
+            'account.config.settings', 'pdf_adresse_fax', self.pdf_adresse_fax
+        )
 
     @api.multi
     def set_pdf_adresse_email_defaults(self):
-        return self.env['ir.values'].sudo().set_default('account.config.settings', 'pdf_adresse_email', self.pdf_adresse_email)
+        return self.env['ir.values'].sudo().set_default(
+            'account.config.settings', 'pdf_adresse_email', self.pdf_adresse_email
+        )
 
     @api.multi
     def set_pdf_display_product_ref_defaults(self):
-        return self.env['ir.values'].sudo().set_default('account.config.settings', 'pdf_display_product_ref', self.pdf_display_product_ref)
+        return self.env['ir.values'].sudo().set_default(
+            'account.config.settings', 'pdf_display_product_ref', self.pdf_display_product_ref
+        )
 
     @api.multi
     def set_pdf_mention_legale_defaults(self):
