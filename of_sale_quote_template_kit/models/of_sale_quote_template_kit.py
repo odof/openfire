@@ -6,6 +6,10 @@ from odoo.tools import float_is_zero, float_compare, DEFAULT_SERVER_DATETIME_FOR
 
 import odoo.addons.decimal_precision as dp
 
+import logging
+
+_logger = logging.getLogger(__name__)
+
 
 class OfSaleorderKit(models.Model):
     _inherit = 'of.saleorder.kit'
@@ -57,14 +61,26 @@ class SaleQuoteLine(models.Model):
             quote_line_compzz = line.kit_id.kit_line_ids
             if len(product_compzz) != len(quote_line_compzz):
                 continue
-            for product_comp in product_compzz:
-                quote_line_comp = quote_line_compzz.filtered(lambda c: c.product_id == product_comp.product_id)
-                # une différence dans les composant de kit -> kit à conserver
-                if not quote_line_comp or product_comp.product_qty != quote_line_comp.qty_per_kit:
+            products = product_compzz.mapped('product_id')
+            for product in products:
+                quote_lines = quote_line_compzz.filtered(lambda c: c.product_id.id == product.id)
+                product_lines = product_compzz.filtered(lambda c: c.product_id.id == product.id)
+                if len(quote_lines) != len(product_lines):
+                    break
+                breaker = False
+                for quote_line in quote_lines:
+                    corresponding_product_lines = product_lines.filtered(lambda pl: pl.product_qty == quote_line.qty_per_kit)
+                    if not corresponding_product_lines:
+                        breaker = True
+                        break
+                    # On ne retire qu'une proposition
+                    product_lines -= corresponding_product_lines[0]
+                if breaker:
                     break
             else:
                 # toutes les lignes de kit sont présentes des 2 cotés avec les mêmes quantités -> kit à supprimer
                 to_unlink |= line.kit_id
+
         to_no_update = quote_line_kit.mapped('kit_id') - to_unlink
         to_no_update.mapped('quote_line_id').write({'no_update': True})
         to_unlink.unlink()
