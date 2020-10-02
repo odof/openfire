@@ -99,6 +99,7 @@
                     <field name="pdf_display_product_ref" class="oe_inline"/>
                     <span>Afficher les références produits dans les rapports PDF</span>
                 </div>
+                <field name="pdf_mention_legale"/>
             </xpath>
         </field>
     </record>

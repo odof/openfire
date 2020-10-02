@@ -8,6 +8,7 @@
         <t t-set="pdf_mobile" t-value="o.pdf_afficher_mobile()"/>
         <t t-set="pdf_fax" t-value="o.pdf_afficher_fax()"/>
         <t t-set="pdf_email" t-value="o.pdf_afficher_email()"/>
+        <t t-set="pdf_mention_legale" t-value="o.pdf_mention_legale()"/>
         <t t-set="client_info_pastille" t-value="(pdf_telephone &gt; 1 and o.partner_id.phone) or (pdf_mobile &gt; 1 and o.partner_id.mobile) or (pdf_fax &gt; 1 and o.partner_id.fax) or (pdf_email &gt; 1 and o.partner_id.email)"/>
         <!--####################
             La vue d'origine est entièrement réécrite ici.
@@ -209,6 +210,17 @@
             <p t-if="o.fiscal_position_id.note">
                 <strong>Fiscal Position Remark:</strong>
                 <span t-field="o.fiscal_position_id.note"/>
+            </p>
+            <p t-if="pdf_mention_legale" style="font-size: small; color: grey;">
+                <t t-set="mention_lines" t-value="pdf_mention_legale.split('\n')"/>
+                <i>
+                    <span>Mentions légales</span>
+                    <br/>
+                    <t t-foreach="mention_lines" t-as="mention_line">
+                        <span t-esc="mention_line"/>
+                        <br/>
+                    </t>
+                </i>
             </p>
         </div>
     </t>
