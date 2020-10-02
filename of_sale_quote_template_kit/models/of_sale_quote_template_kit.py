@@ -53,18 +53,13 @@ class SaleQuoteLine(models.Model):
                     to_unlink |= line.kit_id
                     line.write({'of_is_kit': False})
                 continue
-            product_compzz = line.product_id.product_tmpl_id.kit_line_ids
-            quote_line_compzz = line.kit_id.kit_line_ids
-            if len(product_compzz) != len(quote_line_compzz):
-                continue
-            for product_comp in product_compzz:
-                quote_line_comp = quote_line_compzz.filtered(lambda c: c.product_id == product_comp.product_id)
-                # une différence dans les composant de kit -> kit à conserver
-                if not quote_line_comp or product_comp.product_qty != quote_line_comp.qty_per_kit:
-                    break
-            else:
+            list1 = line.product_id.product_tmpl_id.kit_line_ids.mapped(
+                lambda rec: [rec.product_id.id, rec.product_qty])
+            list2 = line.kit_id.kit_line_ids.mapped(lambda rec: [rec.product_id.id, rec.qty_per_kit])
+            if list1.sort() == list2.sort():
                 # toutes les lignes de kit sont présentes des 2 cotés avec les mêmes quantités -> kit à supprimer
                 to_unlink |= line.kit_id
+
         to_no_update = quote_line_kit.mapped('kit_id') - to_unlink
         to_no_update.mapped('quote_line_id').write({'no_update': True})
         to_unlink.unlink()
