@@ -1332,7 +1332,7 @@ class OfPlanningIntervention(models.Model):
     def get_color_filter_data(self):
         res = {}
         default_filter = self.env['ir.values'].get_default('of.intervention.settings',
-                                                           'planningview_color_filter',
+                                                           'of_event_color_filter',
                                                            for_all_users=False)
         res['intervenant'] = {
             'is_checked': not default_filter or default_filter == u'intervenant',

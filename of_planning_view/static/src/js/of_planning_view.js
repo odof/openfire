@@ -231,7 +231,7 @@ var PlanningView = View.extend({
                 // récupérer la sélection (coché/décoché) des filtres de la dernière utilisation de la vue planning
                 // par l'utilisateur. Les filtres cochés sont dans la variable filter_attendee_ids
                 ir_values_model.call("get_default",
-                                     ["of.intervention.settings", "planningview_filter_intervenant_ids", false])
+                                     ["of.intervention.settings", "of_filter_attendee_ids", false])
                 .then(function (attendee_ids) {
                     if (typeof attendee_ids == "string") {  // transformer en tableau si besoin
                         attendee_ids = JSON.parse(attendee_ids)
@@ -1659,7 +1659,7 @@ PlanningView.SidebarResoFilter = Widget.extend({
             this.view.filter_attendee_ids.push(parseInt(e.target.value));
             ir_values_model.call("set_default",
                 ["of.intervention.settings",
-                "planningview_filter_intervenant_ids",
+                "of_filter_attendee_ids",
                 this.view.filter_attendee_ids, false]);
         }else{
             // Retire l'id des filtres sélectionnés et sauvegarde la sélection
@@ -1670,7 +1670,7 @@ PlanningView.SidebarResoFilter = Widget.extend({
             }
             ir_values_model.call("set_default",
                 ["of.intervention.settings",
-                "planningview_filter_intervenant_ids",
+                "of_filter_attendee_ids",
                 this.view.filter_attendee_ids, false]);
         }
         // Affiche / Cache la ligne
@@ -2087,7 +2087,7 @@ var SidebarColorFilter = Widget.extend({
                 this.color_filter_data[key].is_checked = e.target.checked;
                 this.current_radio_key = key;
                 ir_values_model.call("set_default", ["of.intervention.settings",
-                                                     "planningview_color_filter",
+                                                     "of_event_color_filter",
                                                      key, false]);
             }else{
                 this.color_filter_data[key].is_checked = false;

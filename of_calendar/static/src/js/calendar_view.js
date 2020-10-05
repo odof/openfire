@@ -57,6 +57,9 @@ CalendarView.include({
                                "need to define both 'color_ft_field' and 'color_bg_field' attributes."));
         }
         this.attendee_model = attrs.attendee_model;
+        // pour montrer tous les participants à droite au lieu de seulement ceux qui ont au moins un event
+        this.show_all_attendees = !isNullOrUndef(attrs.show_all_attendees) && _.str.toBool(attrs.show_all_attendees);
+        this.config_model = attrs.config_model || false;
         if (isNullOrUndef(this.avatar_title) && !isNullOrUndef(this.attendee_model)) {
             this.avatar_title = this.attendee_model;
         }
@@ -96,6 +99,7 @@ CalendarView.include({
         }
 
         this.on_event_after_all_render = _.debounce(this.on_event_after_all_render, 300, true);
+        this.res_ids_indexes = {}; // dictionnaire qui contient les indexes des filtres en fonction de leur id
     },
     /**
      *  go to system parameters to see if we should allow drag and drop. Sets minTime and maxTime if needed
@@ -107,8 +111,15 @@ CalendarView.include({
         var dnd_dfd = ir_config_model.call('get_param',['Calendar_Drag_And_Drop']);
         var mintime_dfd = ir_values_model.call("get_default", ["of.intervention.settings", "calendar_min_time"]);
         var maxtime_dfd = ir_values_model.call("get_default", ["of.intervention.settings", "calendar_max_time"]);
+        var all_filters_dfd = $.Deferred();
+        var all_filters_prom = all_filters_dfd.promise();
+        if (self.attendee_model && self.show_all_attendees && !self.useContacts) {
+            all_filters_prom = self._init_all_filters();
+        }else{
+            all_filters_dfd.resolve()
+        }
 
-        return $.when(dnd_dfd, mintime_dfd, maxtime_dfd, this._super())
+        return $.when(dnd_dfd, mintime_dfd, maxtime_dfd, all_filters_prom, this._super())
         .then(function () {
             // privilégier l'attribut draggable de la vue XML si présent: exemple rdv_view.xml
             self.draggable = !isNullOrUndef(self.draggable) && self.draggable || _.str.toBool(arguments[0]);
@@ -124,8 +135,91 @@ CalendarView.include({
             }else if (max_time) {
                 self.maxTime = max_time + ":00:00"
             }
+
             return $.when();
         });
+    },
+    /**
+     *  Quand l'attribut "show_all_attendees" est à 1, on charge tous les filtres au chargement de la vue
+     *  plutôt que de les charger à chaque search
+     */
+    _init_all_filters: function () {
+        var self = this;
+
+        if (!self.config_model) {
+            throw new Error("Attribut 'config_model' manquant dans la définition de la vue XML");
+        }
+
+        var dfd = $.Deferred();
+        var p = dfd.promise();
+        var Attendees = new Model(self.attendee_model);
+
+        Attendees.query(['id', self.color_ft_field, self.color_bg_field, 'name', 'sequence']) // retrieve colors from db
+            .order_by(['sequence'])
+            .all()
+            .then(function (attendees){
+                self.all_filters = new Array(attendees.length);  // Array pour conserver l'ordre
+                // dictionnaire de la forme {id: index_filtre}
+                // pour accéder facilement à l'indexe du filtre à partir de l'id de l'attendee
+                self.res_ids_indexes = {}
+                var a, filter_item;
+                for (var i=0; i<attendees.length; i++) {
+                    a = attendees[i];
+                    filter_item = {
+                        label: a['name'],
+                        color_bg: a[self.color_bg_field],
+                        color_ft: a[self.color_ft_field],
+                        value: a['id'],
+                        input_id: a['id'] + "_input",
+                        is_checked: true,
+                        sequence: a['sequence'],
+                        custom_colors: true,
+                    }
+                    self.all_filters[i] = filter_item;
+                    self.res_ids_indexes[a['id']] = i;
+                };
+                var ir_values_model = new Model("ir.values");
+                // récupérer la sélection (coché/décoché) des filtres de la dernière utilisation de la vue planning
+                // par l'utilisateur. Les filtres cochés sont dans la variable filter_attendee_ids
+                ir_values_model.call("get_default",
+                                     [self.config_model, "of_filter_attendee_ids", false])
+                .then(function (attendee_ids) {
+                    if (typeof attendee_ids == "string") {  // transformer en tableau si besoin
+                        attendee_ids = JSON.parse(attendee_ids)
+                    }
+                    // tout cocher si tout était décoché
+                    if (isNullOrUndef(attendee_ids) || attendee_ids.length == 0) {
+                        self.filter_attendee_ids = []
+                        for (var j in self.all_filters) {
+                            self.filter_attendee_ids.push(self.all_filters[j].value);
+                        };
+                    // code 6: [ (6, 0 [ids]) ]
+                    }else if (attendee_ids[0].length == 3 && attendee_ids[0][0] == 6 && !attendee_ids[0][1]) {
+                        self.filter_attendee_ids = attendee_ids[0][2];
+                    // liste d'identifiants
+                    }else{
+                        self.filter_attendee_ids = attendee_ids;
+                        var idf, found;
+                        // décocher les filtres qui ne sont pas dans attendee_ids
+                        for (var k in self.all_filters) {
+                            found = false;
+                            idf = self.all_filters[k].value;
+                            for (var l in attendee_ids) {
+                                if (attendee_ids[l] == idf) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (!found) {
+                                self.all_filters[k].is_checked = false;
+                            }
+                        };
+                    }
+                    dfd.resolve();
+                });
+            });
+
+        return $.when(p);
     },
     /**
      * override copy of parent function. Sets up first event to be displayed. Handles radio filters
@@ -255,73 +349,86 @@ CalendarView.include({
                         var color_field = self.fields[self.color_field];
                         ////////////////////////////////////////////////////////////////////////////////////////////////
                         // this part is modified /*
-                        var all_filters_temp = _.clone(self.all_filters);
-                        var new_filter_added = false;
-                        _.each(events, function (e) {
-                            var key,val = null;
 
-                            if (self.attendee_multiple) {
-                                _.each(e[self.color_field], function (a) {
-                                    key = a;
-                                    if (!all_filters_temp[key]) {
+                        if (!self.show_all_attendees) {
+                            var all_filters_temp = [];
+                            var new_filter_added = false;
+                            self.res_ids_indexes = {};
+                            _.each(events, function (e) {
+                                var key,val = null;
+
+                                if (self.attendee_multiple) {
+                                    _.each(e[self.color_field], function (a) {
+                                        key = a;
+                                        if (!self.res_ids_indexes[key]) {
+                                            filter_item = {
+                                                value: key,
+                                                label: 'oupsy',
+                                                color: self.get_color(key),
+                                                avatar_model: (utils.toBoolElse(self.avatar_filter, true)
+                                                               ? self.avatar_filter : false ),
+                                                is_checked: true
+                                            };
+                                            all_filters_temp.push(filter_item);
+                                            self.res_ids_indexes[key] = all_filters_temp.length - 1;
+                                            new_filter_added = true
+                                        }
+                                        if (! _.contains(self.now_filter_ids, key)) {
+                                            self.now_filter_ids.push(key);
+                                        }
+                                    });
+                                }else{
+                                    if (color_field.type == "selection") {
+                                        key = e[self.color_field];
+                                        val = _.find(color_field.selection, function(name){ return name[0] === key;});
+                                    } else {
+                                        key = e[self.color_field][0];
+                                        val = e[self.color_field];
+                                    }
+                                    if (!self.res_ids_indexes[key]) {
                                         filter_item = {
                                             value: key,
-                                            label: 'oupsy',
+                                            label: val[1],
                                             color: self.get_color(key),
                                             avatar_model: (utils.toBoolElse(self.avatar_filter, true)
                                                            ? self.avatar_filter : false ),
                                             is_checked: true
                                         };
-                                        all_filters_temp[key] = filter_item;
+                                        all_filters_temp.push(filter_item);
+                                        self.res_ids_indexes[key] = all_filters_temp.length - 1;
                                         new_filter_added = true
                                     }
                                     if (! _.contains(self.now_filter_ids, key)) {
                                         self.now_filter_ids.push(key);
                                     }
-                                });
-                            }else{
-                                if (color_field.type == "selection") {
-                                    key = e[self.color_field];
-                                    val = _.find(color_field.selection, function(name){ return name[0] === key;});
-                                } else {
-                                    key = e[self.color_field][0];
-                                    val = e[self.color_field];
                                 }
-                                if (!all_filters_temp[key]) {
-                                    filter_item = {
-                                        value: key,
-                                        label: val[1],
-                                        color: self.get_color(key),
-                                        avatar_model: (utils.toBoolElse(self.avatar_filter, true)
-                                                       ? self.avatar_filter : false ),
-                                        is_checked: true
-                                    };
-                                    all_filters_temp[key] = filter_item;
-                                    new_filter_added = true
-                                }
-                                if (! _.contains(self.now_filter_ids, key)) {
-                                    self.now_filter_ids.push(key);
-                                }
-                            }
-                        });
-                        // uncheck all but one filter if a new filter has been added
-                        if (self.filters_radio && new_filter_added) {
-                            var la_key;
-                            if (!isNullOrUndef(self.first_evt)) {
-                                la_key = self.first_evt[self.color_field][0];
-                            }else{
-                                la_key = _.min(_.keys(all_filters_temp));
-                            }
-                            self.current_radio_key = la_key;
-                            for(var key in all_filters_temp){
-                                if (key == la_key) {
-                                    all_filters_temp[key].is_checked = true;
+                            });
+
+                            // uncheck all but one filter if a new filter has been added
+                            if (self.filters_radio && new_filter_added) {
+                                var la_key;
+                                if (!isNullOrUndef(self.first_evt)) {
+                                    la_key = self.first_evt[self.color_field][0];
                                 }else{
-                                    all_filters_temp[key].is_checked = false;
+                                    la_key = _.min(_.keys(self.res_ids_indexes));
                                 }
-                            };
+                                self.current_radio_key = la_key;
+                                for(var key in self.res_ids_indexes){
+                                    if (key == la_key) {
+                                        all_filters_temp[self.res_ids_indexes[key]].is_checked = true;
+                                    }else{
+                                        all_filters_temp[self.res_ids_indexes[key]].is_checked = false;
+                                    }
+                                };
+                            }
+                            self.all_filters = all_filters_temp;
+                        }else{
+                            for (var ii=0; ii<self.all_filters.length; ii++) {
+                                if (self.all_filters[ii].is_checked) {
+                                    self.now_filter_ids.push(self.all_filters[ii].value);
+                                }
+                            }
                         }
-                        self.all_filters = all_filters_temp;
 
                         if (self.sidebar) {
                             self.sidebar.filter.render();
@@ -332,7 +439,7 @@ CalendarView.include({
                                     var key;
                                     for (var i in keys) {
                                         key = keys[i];
-                                        if (_.contains(self.now_filter_ids, key) &&  self.all_filters[key].is_checked) {
+                                        if (_.contains(self.now_filter_ids, key) &&  self.all_filters[self.res_ids_indexes[key]].is_checked) {
                                             // at least one of the attendees of this events is checked in the filters
                                             return e;
                                         }
@@ -340,7 +447,7 @@ CalendarView.include({
                                 }else{
                                     var key = color_field.type == "selection"
                                         ? e[self.color_field] : e[self.color_field][0];
-                                    if (_.contains(self.now_filter_ids, key) &&  self.all_filters[key].is_checked) {
+                                    if (_.contains(self.now_filter_ids, key) &&  self.all_filters[self.res_ids_indexes[key]].is_checked) {
                                         return e;
                                     }
                                 }
@@ -459,7 +566,15 @@ CalendarView.include({
      */
     _set_all_custom_colors: function() {
         var self = this;
-        var ids = _.reject(_.keys(self.all_filters),function(num){ return num == 'undefined'; });
+        if (self.show_all_attendees) {
+            return $.when();
+        }
+        if (self.useContacts) {  // dans le calendrier standard self.all_filters est un dictionnaire et non une liste
+            for (var k in self.all_filters) {
+                self.res_ids_indexes[k] = k;
+            }
+        }
+        var ids = _.reject(_.keys(self.res_ids_indexes), function(key){ return key == "-1" || key == -1; });
 
         var dfd = $.Deferred();
         var p = dfd.promise({target: kays});
@@ -479,10 +594,10 @@ CalendarView.include({
                     var a = attendees[i];
                     var key = a.id;
                     kays.push(key);
-                    self.all_filters[key]['color_bg'] = a[self.color_bg_field];
-                    self.all_filters[key]['color_ft'] = a[self.color_ft_field];
-                    self.all_filters[key]['custom_colors'] = true;
-                    self.all_filters[key]['label'] = a['name'];
+                    self.all_filters[self.res_ids_indexes[key]]['color_bg'] = a[self.color_bg_field];
+                    self.all_filters[self.res_ids_indexes[key]]['color_ft'] = a[self.color_ft_field];
+                    self.all_filters[self.res_ids_indexes[key]]['custom_colors'] = true;
+                    self.all_filters[self.res_ids_indexes[key]]['label'] = a['name'];
                 };
                 if (self.useContacts) {
                     self.all_filters[-1]['color_bg'] = '#C0FFE8';
@@ -632,8 +747,8 @@ CalendarView.include({
                             }else{
                                 if (!self.attendee_multiple && (!self.colorIsAttendee ||
                                     the_attendee_people != evt[self.color_field])) {
-                                    var tempColor = (self.all_filters[the_attendee_people] !== undefined) 
-                                                ? self.all_filters[the_attendee_people].color
+                                    var tempColor = (self.all_filters[self.res_ids_indexes[the_attendee_people]] !== undefined)
+                                                ? self.all_filters[self.res_ids_indexes[the_attendee_people]].color
                                                 : (self.all_filters[-1] ? self.all_filters[-1].color : 1);
                                     the_title_avatar += '<i class="fa fa-user o_attendee_head o_underline_color_' +
                                                         tempColor+'" title="' +
@@ -643,10 +758,10 @@ CalendarView.include({
                                     var now_id;
 
                                     now_id = the_attendee_people;
-                                    tempColorFT = self.all_filters[now_id].color_ft;
-                                    tempColorBG = self.all_filters[now_id].color_bg;
+                                    tempColorFT = self.all_filters[self.res_ids_indexes[now_id]].color_ft;
+                                    tempColorBG = self.all_filters[self.res_ids_indexes[now_id]].color_bg;
                                     // this will be the main color of the event
-                                    if (self.all_filters[now_id].is_checked && !found) {
+                                    if (self.all_filters[self.res_ids_indexes[now_id]].is_checked && !found) {
                                         evt["color_filter_id"] = now_id;
                                         found = true;
                                         if (!self.colorIsAttendee || color_captions) {
@@ -711,12 +826,12 @@ CalendarView.include({
             // utilisation de calendar.contact
             }else if (self.useContacts) {
                 var index = self.get_custom_color_index(r.attendees);
-                r.backgroundColor = self.all_filters[index]['color_bg'];
-                r.textColor = self.all_filters[index]['color_ft'];
+                r.backgroundColor = self.all_filters[self.res_ids_indexes[index]]['color_bg'];
+                r.textColor = self.all_filters[self.res_ids_indexes[index]]['color_ft'];
             }else if (self.attendee_multiple) {  // multiple attendees
                 if (!isNullOrUndef(evt["color_filter_id"])) {
-                    r.backgroundColor = self.all_filters[ evt["color_filter_id"] ]['color_bg'];
-                    r.textColor = self.all_filters[ evt["color_filter_id"] ]['color_ft'];
+                    r.backgroundColor = self.all_filters[ self.res_ids_indexes[evt["color_filter_id"]] ]['color_bg'];
+                    r.textColor = self.all_filters[ self.res_ids_indexes[evt["color_filter_id"]] ]['color_ft'];
                 }else{
                     console.log("oups! something went wrong with multiple attendees colors");
                 }
@@ -751,7 +866,7 @@ CalendarView.include({
             if (typeof color_key === "object") {
                 color_key = color_key[0];
             }
-            if (!self.useContacts || self.all_filters[color_key] !== undefined) {
+            if (!self.useContacts || self.all_filters[self.res_ids_indexes[color_key]] !== undefined) {
                 if (color_key) {
                     r.className = 'o_calendar_color_'+ this.get_color(color_key);
                 }
@@ -808,16 +923,22 @@ SidebarFilter.include({
      */
     render: function() {
         var self = this;
-
-        var fil = self.view.get_all_filters_ordered()
-        //async
-        $.when(fil).then(function(){ // fil is a promise
-            var filters = fil.target;
+        if (this.view.show_all_attendees) {
             var filters_radio = self.filters_radio || false;
             return $.when(self.$('.o_calendar_contacts').html(QWeb.render('CalendarView.sidebar.contacts',
-                                                              { filters: filters, filters_radio: filters_radio })))
+                                                              { filters: this.view.all_filters, filters_radio: filters_radio })))
                 .then(function(){return self.trigger_up('filters_rendered')});
-        });
+        }else{
+            var fil = self.view.get_all_filters_ordered()
+            //async
+            $.when(fil).then(function(){ // fil is a promise
+                var filters = fil.target;
+                var filters_radio = self.filters_radio || false;
+                return $.when(self.$('.o_calendar_contacts').html(QWeb.render('CalendarView.sidebar.contacts',
+                                                                  { filters: filters, filters_radio: filters_radio })))
+                    .then(function(){return self.trigger_up('filters_rendered')});
+            });
+        }
     },
     /**
      *  Override of parent function. handles radio filters.
@@ -828,17 +949,31 @@ SidebarFilter.include({
             return;
         }
         var all_filters = this.view.all_filters;
+        this.view.now_filter_ids = [];
         if (this.filters_radio) {
-            for(var key in all_filters){
-                if (all_filters[key].value == e.target.value) {
-                    all_filters[key].is_checked = e.target.checked;
-                    this.current_radio_key = key;
+            for(var i in all_filters){
+                if (all_filters[i].value == e.target.value) {
+                    all_filters[i].is_checked = e.target.checked;
+                    this.current_radio_key = all_filters[i].value;
+                    this.view.now_filter_ids.push(this.current_radio_key);
                 }else{
-                    all_filters[key].is_checked = false;
+                    all_filters[i].is_checked = false;
                 }
             };
         }else{
-            all_filters[e.target.value].is_checked = e.target.checked;
+            all_filters[this.view.res_ids_indexes[e.target.value]].is_checked = e.target.checked;
+            for(var i in all_filters) {
+                if (all_filters[i].is_checked) {
+                    this.view.now_filter_ids.push(all_filters[i].value);
+                }
+            }
+        }
+        if (this.view.config_model) {
+            var ir_values_model = new Model("ir.values");
+            ir_values_model.call("set_default",
+                    [this.view.config_model,
+                    "of_filter_attendee_ids",
+                    this.view.now_filter_ids, false]);
         }
         this.trigger_up('reload_events');
     },
@@ -913,10 +1048,12 @@ var SidebarColorFilter = Widget.extend({
             if (this.color_filter_data[key].field == e.target.value) {
                 this.color_filter_data[key].is_checked = e.target.checked;
                 this.current_radio_key = key;
-                // Conserver le choix de colorisation des évènements
-                ir_values_model.call("set_default", ["of.intervention.settings",
-                                                     "planningview_color_filter",
-                                                     key, false]);
+                if (this.view.config_model) {
+                    // Conserver le choix de colorisation des évènements
+                    ir_values_model.call("set_default", [this.view.config_model,
+                                                         "of_event_color_filter",
+                                                         key, false]);
+                }
             }else{
                 this.color_filter_data[key].is_checked = false;
             }
