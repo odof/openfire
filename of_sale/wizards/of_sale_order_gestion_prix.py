@@ -346,6 +346,50 @@ class GestionPrix(models.TransientModel):
         """
         self.of_client_view = not self.of_client_view
 
+    @api.multi
+    def imprimer_gestion_prix(self):
+        return self.env['report'].get_action(self, 'of_sale.of_report_saleorder_gestion_prix')
+
+    @api.multi
+    def get_lines(self):
+        self.ensure_one()
+        return self.line_ids.filtered('is_selected')
+
+    @api.model
+    def of_get_report_name(self, docs):
+        return 'Feuille de marge'
+
+    @api.model
+    def of_get_report_number(self, docs):
+        return ' / '.join(docs.mapped('order_id').mapped('name'))
+
+    @api.model
+    def of_get_report_date(self, docs):
+        return ' / '.join([
+            fields.Date.to_string(fields.Date.from_string(gestion.order_id.confirmation_date)) or
+            fields.Date.to_string(fields.Date.from_string(gestion.order_id.date_order)) for gestion in docs
+            ])
+
+    def get_recap(self):
+        order_lines = self.line_ids.filtered('is_selected').mapped('order_line_id')
+        order_lines_product = order_lines.filtered(lambda l: l.product_id.type != 'service')
+        order_lines_service = order_lines.filtered(lambda l: l.product_id.type == 'service')
+        currency_symbol = self.currency_id.symbol
+        res = []
+        for name, lines in [
+                ('Produits', order_lines_product),
+                ('Services', order_lines_service),
+                ('Total', order_lines)]:
+            lines_dict = {'name': name}
+            total_achat = sum(lines.mapped('purchase_price'))
+            total_vente = sum(lines.mapped('price_subtotal'))
+            lines_dict['cout'] = "%0.2f %s" % (total_achat, currency_symbol)
+            lines_dict['vente'] = "%0.2f %s" % (total_vente, currency_symbol)
+            lines_dict['marge'] = "%0.2f %s" % (total_vente - total_achat, currency_symbol)
+            lines_dict['marge_pc'] = ("%0.2f %%" % (100 * (1 - total_achat / total_vente))) if total_vente else "- %"
+            res.append(lines_dict)
+        return res
+
 
 class GestionPrixLine(models.TransientModel):
     """Liste des lignes dans le wizard"""

@@ -11,6 +11,7 @@
                     <button name="bouton_simuler" class="oe_highlight" string="Simuler" type="object" invisible="context.get('invoice_status') == 'invoiced'"/>
                     <button name="bouton_valider" class="oe_highlight" string="Appliquer au devis/bon de commande (non réversible)" type="object" confirm="Confirmez-vous l'application des nouveaux prix calculés au devis/bon de commande (non réversible) ?" invisible="context.get('invoice_status') == 'invoiced'"/>
                     <button name="bouton_annuler" string="Retour à la commande" type="object"/>
+                    <button name="imprimer_gestion_prix" string="Imprimer" type="object"/>
                 </header>
                 <div class="oe_button_box" name="button_box">
                     <button name="toggle_view" type="object" class="oe_stat_button" icon="fa-pencil-square-o" groups="of_sale.of_group_sale_marge_manager">

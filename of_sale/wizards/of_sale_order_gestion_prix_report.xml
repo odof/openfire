@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="of_report_saleorder_gestion_prix">
+        <t t-foreach="docs" t-as="doc">
+            <t t-call="report.internal_layout">
+                <div class="page">
+                    <div class="oe_structure"/>
+                    <div class="col-xs-6" style="font-size: large; margin-bottom: 30px; width: 100%; margin-top: 20px">
+                        <div class="row">
+                            <div class="col-xs-12" style="display: table; padding: 0px;">
+                                <div style="display: table-cell; width: 50%;">
+                                    <t style="display: inline-block;">
+                                        <strong>Nom&amp;nbsp;du&amp;nbsp;client&amp;nbsp;:&amp;nbsp;</strong>
+                                        <span t-field="doc.order_id.partner_id.name"/><br/>
+                                    </t>
+                                    <t style="display: inline-block;">
+                                        <strong>Nom&amp;nbsp;du&amp;nbsp;vendeur&amp;nbsp;:&amp;nbsp;</strong>
+                                        <span t-field="doc.order_id.user_id.name"/><br/>
+                                    </t>
+                                    <t style="display: inline-block;">
+                                        <strong>Société&amp;nbsp;/&amp;nbsp;magasin&amp;nbsp;:&amp;nbsp;</strong>
+                                        <span t-field="doc.order_id.company_id.name"/><br/>
+                                    </t>
+                                </div>
+                                <div style="display: table-cell; width: 50%; vertical-align: middle;">
+                                    <t style="display: inline-block;">
+                                    <strong>N°&amp;nbsp;commande&amp;nbsp;:&amp;nbsp;</strong>
+                                        <span t-field="doc.order_id.name"/><br/>
+                                    </t>
+                                    <t style="display: inline-block;">
+                                        <strong>État&amp;nbsp;de&amp;nbsp;la&amp;nbsp;commande&amp;nbsp;:&amp;nbsp;</strong>
+                                        <span t-field="doc.order_id.state"/><br/>
+                                    </t>
+                                    <t style="display: inline-block;">
+                                        <strong>Date&amp;nbsp;de&amp;nbsp;confirmation&amp;nbsp;:&amp;nbsp;</strong>
+                                        <span t-if="doc.order_id.confirmation_date"
+                                              t-field="doc.order_id.confirmation_date"
+                                              t-options="{'widget': 'date'}"/><br/>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <table name="order_lines_layouted" class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <!-- Article, Qté, PU HT, Cout, PV HT, PV TTC, Marge, Marge % -->
+                                <th name="descr" style="width: 50%">Article</th>
+                                <th name="quant" class="text-right">Qté</th>
+                                <th name="price_unit_ht" class="text-right">Prix/U&amp;nbsp;HT</th>
+                                <th name="cost" class="text-right">Coût</th>
+                                <th name="price_total_ht" class="text-right">Prix&amp;nbsp;total&amp;nbsp;HT</th>
+                                <th name="price_total_ttc" class="text-right">Prix&amp;nbsp;total&amp;nbsp;TTC</th>
+                                <th name="marge_ht" class="text-right">Marge&amp;nbsp;</th>
+                                <th name="parge_pc" class="text-right">Marge&amp;nbsp;%</th>
+                            </tr>
+                       </thead>
+                       <tbody class="sale_tbody">
+                            <t t-foreach="doc.get_lines()" t-as="line">
+                                <tr>
+                                    <td name="descr">
+                                        <span t-field="line.order_line_id.product_id.name"/>
+                                    </td>
+                                    <td class="text-right" name="qty">
+                                        <span t-esc="(str(line.order_line_id.product_uom_qty)).rstrip('0').rstrip('.').replace('.', ',')"/>
+                                        <span t-field="line.order_line_id.product_uom" groups="product.group_uom"/>
+                                    </td>
+                                    <td class="text-right" name="pu_ht">
+                                        <span t-field="line.order_line_id.price_unit"
+                                              t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                    </td>
+                                    <td class="text-right" name="cout">
+                                        <span t-field="line.cout" t-options='{"widget": "monetary",
+                                                        "display_currency": doc.currency_id}'/>
+                                    </td>
+                                    <td class="text-right" name="pt_ht">
+                                        <span t-field="line.prix_total_ht"
+                                              t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                    </td>
+                                    <td class="text-right" name="pt_ttc">
+                                        <span t-field="line.prix_total_ttc"
+                                              t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                    </td>
+                                    <td class="text-right" name="m_ht">
+                                        <span t-field="line.marge"
+                                              t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                    </td>
+                                    <td class="text-right" name="m_pc">
+                                         <t t-set="marge_pc" t-value="'%0.2f' % line.pc_marge"/>
+                                        <span t-esc="marge_pc" /> %
+                                    </td>
+                                </tr>
+                            </t>
+                       </tbody>
+                    </table>
+
+                    <table style="width: 60%; page-break-inside: avoid" class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th class="text-right">Coût</th>
+                                <th class="text-right">Vente</th>
+                                <th class="text-right">Marge</th>
+                                <th class="text-right">Marge %</th>
+                            </tr>
+                        </thead>
+                        <tbody class="sale_tbody">
+                            <t t-foreach="doc.get_recap()" t-as="recap_line">
+                                <tr>
+                                    <td name="recap_line_name">
+                                        <t t-set="line_name" t-value="recap_line['name']"/>
+                                        <span t-esc="line_name"/>
+                                    </td>
+                                    <td class="text-right" name="recap_line_cout">
+                                        <t t-set="line_cout" t-value="recap_line['cout']"/>
+                                        <span t-esc="line_cout" />
+                                    </td>
+                                    <td class="text-right" name="recap_line_vente">
+                                        <t t-set="line_vente" t-value="recap_line['vente']"/>
+                                        <span t-esc="line_vente" />
+                                    </td>
+                                    <td class="text-right" name="recap_line_marge">
+                                        <t t-set="line_marge" t-value="recap_line['marge']"/>
+                                        <span t-esc="line_marge" />
+                                    </td>
+                                    <td class="text-right" name="recap_line_marge_pc">
+                                        <t t-set="line_marge_pc" t-value="recap_line['marge_pc']"/>
+                                        <span t-esc="line_marge_pc" />
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <report
+        id="of_report_sale_order_gestion_prix"
+        string="Feuille de marge"
+        model="of.sale.order.gestion.prix"
+        report_type="qweb-pdf"
+        file="of_sale.of_report_saleorder_gestion_prix"
+        name="of_sale.of_report_saleorder_gestion_prix"
+        multi="True"
+        paperformat="of_base.paperformat_euro_internal_landscape"
+    />
+
+</odoo>
