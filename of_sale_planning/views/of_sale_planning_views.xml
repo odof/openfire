@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_planning_sale_order_form_view" model="ir.ui.view">
+        <field name="name">of.sale.planning.sale.order.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale_report.of_sale_report_view_order_form_inherit_sale_stock"/>
+        <field name="arch" type="xml">
+            <!-- Ajout du temps de pose prévisionnel sur les lignes de commande -->
+            <xpath expr="//field[@name='order_line']/form/group/group[2]" position="inside">
+                <label for="of_duration"/>
+                <div>
+                    <field name="of_duration" class="oe_inline" widget="float_time"/>
+                    <span> h</span>
+                </div>
+            </xpath>
+            <!-- Ajout onglet Chantier -->
+            <xpath expr="//field[@name='of_date_de_pose']" position="replace"/>
+            <xpath expr="//page[@name='notes']/separator[last()]" position="replace"/>
+            <xpath expr="//page[@name='notes']/field[@name='of_notes_intervention']" position="replace"/>
+            <xpath expr="//page[@name='notes']/div[last()]" position="replace"/>
+            <xpath expr="//notebook" position="inside">
+                <page name="chantier" string="Chantier">
+                    <group>
+                        <group>
+                            <separator string="Planification" colspan="2"/>
+                            <label for="of_duration"/>
+                            <div>
+                                <field name="of_duration" class="oe_inline" widget="float_time"/>
+                                <span> h</span>
+                            </div>
+                            <field name="of_date_de_pose"/>
+                        </group>
+                        <separator string="Notes intervention" colspan="2"/>
+                        <field name="of_notes_intervention"  nolabel="1" widget="html"
+                            help="Ces notes sont visualisées dans planning d'intervention et imprimées dans la fiche d'intervention."/>
+                        <div class="oe_edit_only" colspan="4">
+                            * Les données saisies dans ce champ seront visualisées dans planning d'intervention et imprimées dans la fiche d'intervention.
+                        </div>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_planning_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.sale.planning.product.template.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="of_sale.of_sale_product_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='uom_po_id']" position="after">
+                <label for="of_duration_per_unit"/>
+                <div >
+                    <field name="of_duration_per_unit" class="oe_inline" widget="float_time"/>
+                    <span> h / <field name="of_uom_po_id_display" class="oe_inline"/></span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
