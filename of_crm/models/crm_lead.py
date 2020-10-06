@@ -499,6 +499,9 @@ class OFCRMActivity(models.Model):
     report = fields.Text(string=u"Compte-rendu")
     cancel_reason = fields.Text(string=u"Raison d'annulation")
     partner_id = fields.Many2one(related='opportunity_id.partner_id', string=u"Client", readonly=True)
+    phone = fields.Char(related='opportunity_id.phone', string=u"Téléphone", readonly=True)
+    mobile = fields.Char(related='opportunity_id.mobile', string=u"Mobile", readonly=True)
+    email = fields.Char(related='opportunity_id.email_from', string=u"Courriel", readonly=True)
     is_late = fields.Boolean(string=u"Activité en retard", compute="_compute_is_late", search="_search_is_late")
     # Couleurs
     of_color_ft = fields.Char(string=u"Couleur de texte", compute='_compute_custom_colors')

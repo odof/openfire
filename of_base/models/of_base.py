@@ -286,3 +286,15 @@ class BaseConfigSettings(models.TransientModel):
     @api.multi
     def set_of_affichage_ville_defaults(self):
         return self.env['ir.values'].sudo().set_default('base.config.settings', 'of_affichage_ville', self.of_affichage_ville)
+
+    @api.model
+    def get_default_company_share_partner(self, fields):
+        return {
+            'company_share_partner': not self.env.ref('of_base.of_base_res_partner_rule').active
+        }
+
+    @api.multi
+    def set_default_company_share_partner(self):
+        partner_rule = self.env.ref('of_base.of_base_res_partner_rule')
+        for config in self:
+            partner_rule.write({'active': not config.company_share_partner})
