@@ -161,13 +161,8 @@ class GestionPrix(models.TransientModel):
 
     @api.model
     def _calcule_reset_vals_ligne(self, order_line, line_rounding):
-        # On utilise la méthode product_uom_change() définie dans le module sale pour recalculer le prix de vente
-        # Pour cela on crée une copie temporaire (et partielle) de order_line
-        line_vals = order_line.read(['order_id', 'product_id', 'product_uom', 'product_uom_qty'])[0]
-        line = order_line.new(line_vals)
-        line.product_uom_change()
-
-        price_unit = line.price_unit
+        # Appel à of_get_price_unit() pour recalculer le prix unitaire
+        price_unit = order_line.of_get_price_unit()
         if line_rounding:
             price = price_unit * (1 - (order_line.discount or 0.0) / 100.0) * order_line.product_uom_qty
             taxes = order_line.tax_id.with_context(base_values=(price, price, price), round=False)
