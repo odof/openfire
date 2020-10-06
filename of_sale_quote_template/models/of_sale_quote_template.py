@@ -173,7 +173,7 @@ class SaleOrder(models.Model):
                 data = self._get_data_from_template(line, price, discount)
                 if self.pricelist_id:
                     data.update(self.env['sale.order.line']._get_purchase_price(self.pricelist_id, line.product_id, line.product_uom_id, fields.Date.context_today(self)))
-                new_line = order_line_obj.new(data)
+                new_line = order_line_obj._new_line_for_template(data)
                 if self.env.user.has_group('sale.group_sale_layout'):
                     if not new_line.layout_category_id and new_line.product_id.categ_id.of_layout_id:
                         new_line.layout_category_id = new_line.product_id.categ_id.of_layout_id
@@ -199,6 +199,20 @@ class SaleOrder(models.Model):
         self.of_mail_template_ids = docs
         if inactif:  # @TODO : voir si peut être fait avec une fenêtre en javascript.
             self.of_note_insertion = u"Un ou plusieurs articles du modèle ne sont plus utilisés ou ne peuvent être vendus et n'ont donc pas été importés."
+
+
+class SaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
+
+    @api.model
+    def _new_line_for_template(self, data):
+        """
+        Fonction à surcharger pour faire appel à des fonctions avant d'ajouter la nouvelle ligne au bon de commande
+        :param data: dictionnaire de valeurs
+        :return: sale.order.line(<newId>)
+        """
+        return self.new(data)
+
 
 class OFSaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'

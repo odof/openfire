@@ -31,6 +31,7 @@ Module de lien entre of_sale et of_planning :
     'depends': [
         'of_sale',
         'of_sale_report',
+        'of_sale_quote_template_kit',
         'of_planning',
     ],
     'data': [
