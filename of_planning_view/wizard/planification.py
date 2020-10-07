@@ -774,7 +774,7 @@ class OfPlanifCreneauProp(models.TransientModel):
                 query_send = urllib.quote(query.strip().encode('utf8')).replace('%3A', ':')
                 full_query = query_send + coords_str + "?"
                 try:
-                    req = requests.get(full_query)
+                    req = requests.get(full_query, timeout=10)
                     res = req.json()
                 except Exception as e:
                     res = {}
@@ -820,7 +820,7 @@ class OfPlanifCreneauProp(models.TransientModel):
             propositions = self.filtered(lambda p: p.distance_order < 99000)
             # au moment de l'appel à get_closer_one, la proposition sélectionnée a déjà été dé-sélectionnée
             # on peut donc se servir du _order des propositions
-            return propositions.sorted()[0]
+        return propositions.sorted()[0]
 
 
 class OfPlanifCreneauSecteur(models.TransientModel):
