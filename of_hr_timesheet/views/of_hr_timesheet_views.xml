@@ -74,6 +74,9 @@
                 <filter string="Aujourd'hui" name="today" domain="[(u'date', u'=', current_date)]"/>
                 <filter string="Hier" name="yesterday" domain="[(u'date', u'=', (context_today() - datetime.timedelta(days=context_today().weekday()==0 and 3 or 1)).strftime('%Y-%m-%d'))]"/>
                 <filter string="Cette semaine" name="this_week" domain="[(u'date', u'>=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                <filter string="Semaine dernière" name="last_week"
+                        domain="[(u'date', u'>=', (context_today() - datetime.timedelta(days=context_today().weekday()+7)).strftime('%Y-%m-%d')),
+                                 (u'date', u'&lt;', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d'))]"/>
                 <filter string="Ce mois" name="this_month" domain="[(u'date', u'>=', context_today().strftime('%Y-%m-01'))]"/>
                 <filter string="Cette année" name="this_year" domain="[(u'date', u'>=', context_today().strftime('%Y-01-01'))]"/>
             </xpath>
