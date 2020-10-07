@@ -37,7 +37,7 @@ class OfPlanningIntervention(models.Model):
 
     @api.model
     def get_creneaux_dispo(self, employee_id, date, intervention_heures, creneaux_travailles,
-                           duree_min, intervention_forcee):
+                           duree_min, intervention_forcee, fusion_creneaux=True):
         """
         Similaire au calcul de créneaux dispo de rdv.py.
         L'idée ici est de fusionner les créneaux dispos consécutifs.
@@ -48,6 +48,7 @@ class OfPlanningIntervention(models.Model):
         :param creneaux_travailles: listes de tuples (heure_debut, heure_fin)
         :param duree_min: durée minimale pour qu'un créneau soit considéré comme dispo
         :param intervention_forcee: True si au moins un RDV a ses dates forcées
+        :param fusion_creneaux: True si on veut fusionner les créneaux libres qui se succèdent sans intervention
         :return: liste de créneaux dispos fusionnés
         """
         if not creneaux_travailles:
@@ -59,6 +60,9 @@ class OfPlanningIntervention(models.Model):
         lieu_retour = employee.of_address_retour_id and employee.of_address_retour_id.get_infos_lieu() or False
         tournee = self.env['of.planning.tournee'].search([('date', '=', date), ('employee_id', '=', employee_id)],
                                                          limit=1)
+        date_da = fields.Date.from_string(date)
+        tz = pytz.timezone(self._context.get('tz', 'Europe/Paris'))
+
         if tournee:
             secteur = tournee.secteur_id
             # les lieux de départ et de retour d'une tournée priment sur ceux de l'employé
@@ -110,7 +114,9 @@ class OfPlanningIntervention(models.Model):
                                   if float_compare(creneau_reel[0], creneau_reel[1], compare_precision) == -1]
                 duree_creneau = sum(hor[1] - hor[0] for hor in creneaux_reels)
                 # Ajouter le créneau seulement si sa durée est au moins égale à la durée min autorisée
-                if creneaux_reels and float_compare(duree_creneau, duree_min, compare_precision) != -1:
+
+                if fusion_creneaux and creneaux_reels and \
+                        float_compare(duree_creneau, duree_min, compare_precision) != -1:
                     creneaux.append({
                         'heure_debut': heure_debut,
                         'heure_fin': creneaux_reels[-1][1],
@@ -123,6 +129,32 @@ class OfPlanningIntervention(models.Model):
                         'display_secteur': display_secteur,
                         'warning_horaires': intervention_forcee,
                     })
+                else:
+                    for cren in creneaux_reels:
+                        date_deb_locale_dt = datetime.combine(date_da, datetime.min.time()) + timedelta(
+                            hours=cren[0])
+                        date_deb_utc_dt = tz.localize(date_deb_locale_dt, is_dst=None).astimezone(pytz.utc)
+                        date_fin_locale_dt = datetime.combine(date_da, datetime.min.time()) + timedelta(
+                            hours=cren[1])
+                        date_fin_utc_dt = tz.localize(date_fin_locale_dt, is_dst=None).astimezone(pytz.utc)
+                        to_append = {
+                            'date': fields.Datetime.to_string(date_deb_utc_dt),
+                            'date_deadline': fields.Datetime.to_string(date_fin_utc_dt),
+                            'heure_debut': cren[0],
+                            'heure_fin': cren[1],
+                            'lieu_debut': lieu_depart,
+                            'lieu_fin': lieu_fin,
+                            'duree': cren[1] - cren[0],
+                            'creneaux_reels': creneaux_reels,
+                            'secteur_id': secteur and secteur.id or False,
+                            'secteur_str': secteur_str,
+                            'display_secteur': display_secteur,
+                            'warning_horaires': intervention_forcee,
+                        }
+                        to_append["defaults"] = {
+                            'employee_ids': [employee_id],
+                        }
+                        creneaux.append(to_append)
                 break
 
             heure_debut = interv_fin
@@ -168,7 +200,8 @@ class OfPlanningIntervention(models.Model):
         return temps_chevauche
 
     @api.model
-    def get_emp_horaires_info(self, employee_ids, date_start, date_stop, horaires_list_dict=False):
+    def get_emp_horaires_info(
+            self, employee_ids, date_start, date_stop, horaires_list_dict=False, fusion_creneaux=True):
         """
         Fonction appelée par le javascript de la vue Planning.
         Renvoie toutes les informations nécessaires à l'affichage de la vue Planning:
@@ -177,13 +210,14 @@ class OfPlanningIntervention(models.Model):
         :param date_start: [String] Date de début d'évaluation (incluse)
         :param date_stop: [String] Date de fin d'évaluation (incluse)
         :param horaires_list_dict: [Dict] segments des employés
+        :param fusion_creneaux: True si on veut fusionner les créneaux libres qui se succèdent sans intervention
         :return: [Dict] de la forme {employee_id: {valeurs}, ..}
         """
-        intervention_obj = self.env['of.planning.intervention']
         employee_obj = self.env['hr.employee']
         employees = employee_obj.browse(employee_ids)
         if not self._context.get('tz'):
             self = self.with_context(tz='Europe/Paris')
+        intervention_obj = self.env['of.planning.intervention'].with_context(tz=self._context.get('tz'))
         tz = pytz.timezone(self._context['tz'])
         tz_offset = datetime.now(tz).strftime('%z')
 
@@ -290,7 +324,8 @@ class OfPlanningIntervention(models.Model):
                     # Ne pas calculer les créneaux dispos dans le passé
                     if date_current_str >= date_today_str:
                         creneaux_dispo = intervention_obj.get_creneaux_dispo(
-                            employee_id, date_current_str, intervention_liste, horaires_du_jour, duree_min, False)
+                            employee_id, date_current_str, intervention_liste, horaires_du_jour, duree_min, False,
+                            fusion_creneaux)
                     else:
                         creneaux_dispo = []
                     creneaux_dispozz.append(creneaux_dispo)
@@ -350,7 +385,7 @@ class OfPlanningIntervention(models.Model):
                 if date_current_str >= date_today_str:
                     creneaux_dispo = intervention_obj.get_creneaux_dispo(
                         employee_id, date_current_str, intervention_liste, horaires_du_jour, duree_min,
-                        intervention_forcee)
+                        intervention_forcee, fusion_creneaux)
                 else:
                     creneaux_dispo = []
                 creneaux_dispozz.append(creneaux_dispo)

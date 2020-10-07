@@ -432,7 +432,7 @@ class OfPlanningIntervention(models.Model):
         for interv in self:
             interv.date_date = interv.date
 
-    @api.depends('date', 'date_deadline')
+    @api.depends('date', 'date_deadline', 'duree')
     def _compute_duree_debut_fin(self):
         """Ne fonctionne que pour les RDVs sur une seule journée"""
         for intervention in self:
