@@ -30,6 +30,7 @@ Personnalisation des fonctions de base Odoo :
     'category': "OpenFire",
     'data': [
         'data/report_paperformat.xml',
+        'security/of_base_security.xml',
         'security/of_group_intranet_security.xml',
         'security/ir.model.access.csv',
         'views/of_base_view.xml',

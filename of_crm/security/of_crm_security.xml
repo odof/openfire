@@ -15,4 +15,30 @@
 
     <function name="_init_sale_order_state_group" model="sale.config.settings"/>
 
+    <data noupdate="1">
+
+        <record id="of_crm_crm_lead_comp_rule" model="ir.rule">
+            <field name="name">CRM Leads multi-company</field>
+            <field name="model_id" ref="model_crm_lead"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'child_of', [user.company_id.id])]</field>
+        </record>
+
+        <record id="of_crm_of_crm_activity_comp_rule" model="ir.rule">
+            <field name="name">OF CRM Activities multi-company</field>
+            <field name="model_id" ref="model_of_crm_activity"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', '|', ('opportunity_id', '=', False), ('opportunity_id.company_id', '=', False), ('opportunity_id.company_id', 'child_of', [user.company_id.id])]</field>
+        </record>
+
+        <record id="of_crm_of_crm_activity_user_rule" model="ir.rule">
+            <field name="name">OF CRM Activities (user)</field>
+            <field name="model_id" ref="model_of_crm_activity"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['&amp;', '|', ('user_id', '=', False), ('user_id.company_ids', 'child_of', [user.company_id.id]),
+                                                 '|', ('vendor_id', '=', False), ('vendor_id.company_ids', 'child_of', [user.company_id.id])]</field>
+        </record>
+
+    </data>
+
 </odoo>
