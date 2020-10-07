@@ -79,6 +79,21 @@
         </t>
     </t>
 
+    <t t-name="CalendarView.sidebar.creneau_dispo_filter">
+        <div class="of_sidebar_element">
+            <div class="of_creneau_dispo_filter">
+                <div class="o_checkbox">
+                    <input type="checkbox" name="selection" t-att-checked="(filter_is_checked ? true : undefined)"/>
+                    <span/>
+                </div>
+                <span t-attf-style="padding: 0px 8px;"
+                      t-attf-class="of_calendar_creneau_dispo_filter">
+                    Afficher les créneaux dispos
+                </span>
+            </div>
+        </div>
+    </t>
+
     <t t-name="CalendarView.sidebar.captions">
         <t t-if="captions">
             <!-- captions parameter given in SidebarCaption.render out model function 'get_state_int_map' -->

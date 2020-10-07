@@ -24,6 +24,24 @@ function isNullOrUndef(value) {
     return _.isUndefined(value) || _.isNull(value);
 }
 
+/**
+ *  convertis une chaine de caractères de la forme #000000 en son tuple RGB équivalent
+ */
+function hexToRgb(hex, mod) {
+  var parsed = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  var result = parsed ? {
+    r: parseInt(parsed[1], 16),
+    g: parseInt(parsed[2], 16),
+    b: parseInt(parsed[3], 16)
+  } : null;
+  if (!isNullOrUndef(mod) && !isNullOrUndef(parsed)) {
+    result["r"] = mod < 0 ? Math.max(0, result["r"] + mod) : Math.min(255, result["r"] + mod);
+    result["g"] = mod < 0 ? Math.max(0, result["g"] + mod) : Math.min(255, result["g"] + mod);
+    result["b"] = mod < 0 ? Math.max(0, result["b"] + mod) : Math.min(255, result["b"] + mod);
+  }
+  return result;
+}
+
 CalendarView.include({
     custom_events: {
         reload_events: function () {
@@ -118,8 +136,10 @@ CalendarView.include({
         }else{
             all_filters_dfd.resolve()
         }
+        // initialiser les couleurs des créneaux dispo et leur durée minimale
+        var creneau_dispo_data_def = self.set_creneau_dispo_opt();
 
-        return $.when(dnd_dfd, mintime_dfd, maxtime_dfd, all_filters_prom, this._super())
+        return $.when(dnd_dfd, mintime_dfd, maxtime_dfd, all_filters_prom, creneau_dispo_data_def, this._super())
         .then(function () {
             // privilégier l'attribut draggable de la vue XML si présent: exemple rdv_view.xml
             self.draggable = !isNullOrUndef(self.draggable) && self.draggable || _.str.toBool(arguments[0]);
@@ -135,9 +155,35 @@ CalendarView.include({
             }else if (max_time) {
                 self.maxTime = max_time + ":00:00"
             }
-
             return $.when();
         });
+    },
+    /**
+     *  initialise les couleurs des créneaux dispos.
+     *  Ainsi que la durée minimale pour qu'un créneau libre soit considéré comme disponible
+     */
+    set_creneau_dispo_opt: function () {
+        var self = this;
+        var ir_values_model = new Model("ir.values")
+        var bg_def = ir_values_model.call("get_default", ["of.intervention.settings", "color_bg_creneaux_dispo"]);
+        var ft_def = ir_values_model.call("get_default", ["of.intervention.settings", "color_ft_creneaux_dispo"]);
+        var dureemin_def = ir_values_model.call("get_default", ["of.intervention.settings", "duree_min_creneaux_dispo"]);
+        return $.when(bg_def, ft_def, dureemin_def)
+        .then(function (bg, ft, duree) {
+            self.creneau_dispo_opt = {
+                'color_bg': bg,
+                'color_ft': ft,
+                'duree_min': duree,
+            }
+            return $.when();
+        });
+    },
+    /**
+     *  Hérité dans of_planning_view. Créé des évènements virtuels pour voir les créneaux dispo
+     */
+    set_res_horaires_data: function(res_ids=false, start=false, end=false, get_segments=false) {
+        this.events_dispo = [];
+        return $.when();
     },
     /**
      *  Quand l'attribut "show_all_attendees" est à 1, on charge tous les filtres au chargement de la vue
@@ -360,7 +406,7 @@ CalendarView.include({
                                 if (self.attendee_multiple) {
                                     _.each(e[self.color_field], function (a) {
                                         key = a;
-                                        if (!self.res_ids_indexes[key]) {
+                                        if (isNullOrUndef(self.res_ids_indexes[key])) {
                                             filter_item = {
                                                 value: key,
                                                 label: 'oupsy',
@@ -385,7 +431,7 @@ CalendarView.include({
                                         key = e[self.color_field][0];
                                         val = e[self.color_field];
                                     }
-                                    if (!self.res_ids_indexes[key]) {
+                                    if (isNullOrUndef(self.res_ids_indexes[key])) {
                                         filter_item = {
                                             value: key,
                                             label: val[1],
@@ -431,34 +477,50 @@ CalendarView.include({
                         }
 
                         if (self.sidebar) {
+                            // ne conserver que les events qui ont au moins un attendee coché dans les filtres
                             self.sidebar.filter.render();
-
-                            events = $.map(events, function (e) {
+                            self.event_ids_attendees = {};
+                            var events_temp = [], e;
+                            for (var ie=0; ie<events.length; ie++) {
+                                e = events[ie];
+                                self.event_ids_attendees[e["id"]] = [];
                                 if (self.attendee_multiple) {
                                     var keys = e[self.color_field];
                                     var key;
                                     for (var i in keys) {
                                         key = keys[i];
-                                        if (_.contains(self.now_filter_ids, key) &&  self.all_filters[self.res_ids_indexes[key]].is_checked) {
+                                        if (_.contains(self.now_filter_ids, key) &&
+                                            self.all_filters[self.res_ids_indexes[key]].is_checked) {
                                             // at least one of the attendees of this events is checked in the filters
-                                            return e;
+                                            events_temp.push(e);
+                                            // quand on montre les créneaux dispo,
+                                            // on dupplique les events pour conserver l'alignement des des colonnes
+                                            if (!self.show_creneau_dispo) {
+                                                break;
+                                            }
                                         }
                                     }
                                 }else{
                                     var key = color_field.type == "selection"
                                         ? e[self.color_field] : e[self.color_field][0];
-                                    if (_.contains(self.now_filter_ids, key) &&  self.all_filters[self.res_ids_indexes[key]].is_checked) {
-                                        return e;
+                                    if (_.contains(self.now_filter_ids, key) &&
+                                        self.all_filters[self.res_ids_indexes[key]].is_checked) {
+                                        events_temp.push(e);
                                     }
                                 }
-                                return null;
-                            });
+                            }
+                            events = events_temp;
                         }else{
                             self.dfd_filters_rendered.resolve()
                         }
                     }else{
                         self.dfd_filters_rendered.resolve()
                     }
+                    // calculer les créneaux dispo
+                    self.dfd_res_horaires_calc = $.Deferred();
+                    self.set_res_horaires_data(self.now_filter_ids, start, end).then(function(){
+                        self.dfd_res_horaires_calc.resolve()
+                    });
 
                     var all_attendees = $.map(events, function (e) { return e[self.attendee_people]; });
                     all_attendees = _.chain(all_attendees).flatten().uniq().value();
@@ -473,19 +535,35 @@ CalendarView.include({
                                 _.each(result, function(item) {
                                     self.all_attendees[item.id] = item.name;
                                 });
-                            }).done(function() {
-                            return $.when(self.dfd_filters_rendered)
+                            })
+                            .done(function() {
+                                return $.when(self.dfd_filters_rendered, self.dfd_res_horaires_calc)
                             .then(function() {
-                                return self.perform_necessary_name_gets(events).then(callback)});
+                                return self.perform_necessary_name_gets(events)
+                            })
+                            .then(function(){
+                                for (var i=0; i<self.events_dispo.length; i++) {
+                                    events.push(self.events_dispo[i]);
+                                }
+                                return events;
+                            })
+                            .then(callback);
                         });
-                    }
-                    else {
+                    }else{
                         _.each(all_attendees,function(item){
                                 self.all_attendees[item] = '';
                         });
-                        return $.when(self.dfd_filters_rendered)
+                        return $.when(self.dfd_filters_rendered, self.dfd_res_horaires_calc)
                         .then(function() {
-                            return self.perform_necessary_name_gets(events).then(callback)});
+                            return self.perform_necessary_name_gets(events)
+                        })
+                        .then(function(){
+                            for (var i=0; i<self.events_dispo.length; i++) {
+                                events.push(self.events_dispo[i]);
+                            }
+                            return events;
+                        })
+                        .then(callback);
                     }
                     //////////////////////////////////////////////////////////////////////////////////////////////////*/
                 });
@@ -505,6 +583,9 @@ CalendarView.include({
         if (this.color_multiple) {
             this.sidebar.color_filter.render();
         }
+        if (this.model == "of.planning.intervention") {
+            this.sidebar.creneau_dispo_filter.render();
+        }
         if (this.display_states) {
             this.sidebar.caption.render();
         }
@@ -518,6 +599,7 @@ CalendarView.include({
         fc.editable = this.draggable;
         fc.minTime = this.minTime;
         fc.maxTime = this.maxTime;
+        fc.slotEventOverlap = false;
         fc.timeFormat = fc.timeFormat.replace(':ss', '');
         // callback
         fc.eventAfterAllRender = function(view) {
@@ -538,6 +620,46 @@ CalendarView.include({
                 self.open_quick_create(data_template);
             }
         }
+        fc.eventDrop = function (event, _day_delta, _minute_delta, _all_day, _revertFunc) {
+            // inhiber drag and drop quand on montre les créneaux dispo
+            if (self.show_creneau_dispo) {
+                Dialog.alert(
+                    self.$el,
+                    "Le drag and drop (glisser/déposer) n'est pas possible lorsqu'on affiche les créneaux dispos"
+                );
+                _revertFunc();
+                return
+            }
+            // copie du code odoo car héritage impossible
+            var data = self.get_event_data(event);
+            self.proxy('update_record')(event._id, data); // we don't revert the event, but update it.
+            // en cas de drag n drop on ne repasse pas par do_search,
+            // il faut donc réinitialiser self.event_ids_attendees[event["id"]]
+            if (isNullOrUndef(self.event_ids_attendees)) {
+                self.event_ids_attendees = {};
+            }
+            self.event_ids_attendees[event["id"]] = [];
+        }
+        fc.eventResize = function (event, _day_delta, _minute_delta, _revertFunc) {
+            if (self.show_creneau_dispo) {
+                Dialog.alert(
+                    self.$el,
+                    "Il n'est pas possible de redimensionner un évènement lorsqu'on affiche les créneaux dispos"
+                );
+                _revertFunc();
+                return
+            }
+            // copie du code odoo car héritage impossible
+            var data = self.get_event_data(event);
+            self.proxy('update_record')(event._id, data);
+            // en cas de redimensionnage on ne repasse pas par do_search,
+            // il faut donc réinitialiser self.event_ids_attendees[event["id"]]
+            if (isNullOrUndef(self.event_ids_attendees)) {
+                self.event_ids_attendees = {};
+            }
+            self.event_ids_attendees[event["id"]] = [];
+        }
+        fc.eventClick = function (event) { self.open_event(event); };
         return fc;
     },
     /**
@@ -574,7 +696,7 @@ CalendarView.include({
                 self.res_ids_indexes[k] = k;
             }
         }
-        var ids = _.reject(_.keys(self.res_ids_indexes), function(key){ return key == "-1" || key == -1; });
+        var ids = _.keys(self.res_ids_indexes)
 
         var dfd = $.Deferred();
         var p = dfd.promise({target: kays});
@@ -642,6 +764,53 @@ CalendarView.include({
             i++;
         }
         return res;
+    },
+    open_event: function(event) {
+        var self = this;
+        var id = event._id;
+        var title = event.title;
+        if (! this.open_popup_action) {
+            var index = this.dataset.get_id_index(event._id);
+            this.dataset.index = index;
+            if (this.create_right && id <= -1) {
+                var data_template = self.get_event_data({
+                    start: event.start,
+                    end: event.end,
+                    allDay: event.allDay,
+                });
+                for (var k in event.defaults) {
+                    data_template[k] = event.defaults[k];
+                }
+                self.open_quick_create(data_template);
+            }else if (this.write_right) {
+                this.do_switch_view('form', { mode: "edit" });
+            }else{
+                this.do_switch_view('form', { mode: "view" });
+            }
+        }else{
+            var res_id = parseInt(id).toString() === id ? parseInt(id) : id;
+            new form_common.FormViewDialog(this, {
+                res_model: this.model,
+                res_id: res_id,
+                context: this.dataset.get_context(),
+                title: title,
+                view_id: +this.open_popup_action,
+                readonly: true,
+                buttons: [
+                    {text: _t("Edit"), classes: 'btn-primary', close: true, click: function() {
+                        self.dataset.index = self.dataset.get_id_index(id);
+                        self.do_switch_view('form', { mode: "edit" });
+                    }},
+
+                    {text: _t("Delete"), close: true, click: function() {
+                        self.remove_event(res_id);
+                    }},
+
+                    {text: _t("Close"), close: true}
+                ]
+            }).open();
+        }
+        return false;
     },
     /**
      * Override copy of parent function. Add custom colors, multiple colors, forced colors, suffix
@@ -728,7 +897,7 @@ CalendarView.include({
             var the_title_avatar = '';
 
             if (! _.isUndefined(this.attendee_people)) {
-                var MAX_ATTENDEES = 3;
+                var MAX_ATTENDEES = 10;
                 var attendee_showed = 0;
                 var attendee_other = '';
                 var found = false;
@@ -753,7 +922,7 @@ CalendarView.include({
                                     the_title_avatar += '<i class="fa fa-user o_attendee_head o_underline_color_' +
                                                         tempColor+'" title="' +
                                                         _.escape(self.all_attendees[the_attendee_people]) + '" ></i>';
-                                }else if (self.attendee_multiple) {
+                                }else if (self.attendee_multiple && isNullOrUndef(evt["virtuel"])) {
                                     var tempColorFT, tempColorBG;
                                     var now_id;
 
@@ -761,8 +930,14 @@ CalendarView.include({
                                     tempColorFT = self.all_filters[self.res_ids_indexes[now_id]].color_ft;
                                     tempColorBG = self.all_filters[self.res_ids_indexes[now_id]].color_bg;
                                     // this will be the main color of the event
-                                    if (self.all_filters[self.res_ids_indexes[now_id]].is_checked && !found) {
+                                    if (self.all_filters[self.res_ids_indexes[now_id]].is_checked && !found &&
+                                        !isNullOrUndef(self.event_ids_attendees[evt["id"]]) &&
+                                        !_.contains(self.event_ids_attendees[evt["id"]], now_id)) {
+                                        // quand on montre les créneaux dispo,
+                                        // on duplique les events à plusieurs attendees pour avoir un bel alignement
+                                        // il faut donc leur donner chacun une couleur différente
                                         evt["color_filter_id"] = now_id;
+                                        self.event_ids_attendees[evt["id"]].push(now_id);
                                         found = true;
                                         if (!self.colorIsAttendee || color_captions) {
                                             the_title_avatar +=
@@ -782,13 +957,30 @@ CalendarView.include({
                                             icon_offset_px + 'px;" ></i>';
                                         icon_offset_px += 15;
                                     }
-                                }//else don't add myself
+                                }else if (evt["virtuel"]){
+                                    var tempColorFT, tempColorBG;
+                                    var now_id;
+
+                                    now_id = the_attendee_people;
+                                    tempColorFT = self.all_filters[self.res_ids_indexes[now_id]].color_ft;
+                                    tempColorBG = self.all_filters[self.res_ids_indexes[now_id]].color_bg;
+                                    the_title_avatar +=
+                                        '<i class="of_calendar_evt_top of_calendar_attendee_box" title="' +
+                                        _.escape(self.all_attendees[the_attendee_people]) + '"' +
+                                        'style="background: ' + tempColorBG +
+                                        '; border: 1px solid #0D0D0D; position: absolute; right: ' + icon_offset_px +
+                                        'px;" ></i>';
+                                }
                             }
                         }else{
                             attendee_other += _.escape(self.all_attendees[the_attendee_people]) +", ";
                         }
                     }
                 );
+                if (evt["color_filter_id"] && attendees.length > 1) {
+                    // placer le color_filter_id en premier dans la liste pour le tri par fullcalendar
+                    attendees.splice(0, 0, evt["color_filter_id"]);
+                }
                 if (attendee_other.length>2) {
                     the_title_avatar += '<span class="o_attendee_head" title="' + attendee_other.slice(0, -2) +
                                         '">+</span>';
@@ -821,8 +1013,8 @@ CalendarView.include({
                 r.textColor = "#0C0C0C";
             // evt dispo
             }else if (evt[self.dispo_field]) {  // evt is phantom
-                r.backgroundColor = "#7FFF00";
-                r.textColor = "#0C0C0C";
+                r.backgroundColor = self.creneau_dispo_opt['color_bg'];
+                r.textColor = self.creneau_dispo_opt['color_ft'];
             // utilisation de calendar.contact
             }else if (self.useContacts) {
                 var index = self.get_custom_color_index(r.attendees);
@@ -830,10 +1022,17 @@ CalendarView.include({
                 r.textColor = self.all_filters[self.res_ids_indexes[index]]['color_ft'];
             }else if (self.attendee_multiple) {  // multiple attendees
                 if (!isNullOrUndef(evt["color_filter_id"])) {
-                    r.backgroundColor = self.all_filters[ self.res_ids_indexes[evt["color_filter_id"]] ]['color_bg'];
-                    r.textColor = self.all_filters[ self.res_ids_indexes[evt["color_filter_id"]] ]['color_ft'];
+                    if (evt["virtuel"]) {
+                        var rgb_bg = hexToRgb(self.creneau_dispo_opt['color_bg']);
+                        var rgb_ft = hexToRgb(self.creneau_dispo_opt['color_ft']);
+                        r.backgroundColor = "rgba(" + rgb_bg.r + "," + rgb_bg.g + "," + rgb_bg.b + ",0.2);";
+                        r.textColor = "rgba(" + rgb_ft.r + "," + rgb_ft.g + "," + rgb_ft.b + ",0.5)";
+                    }else{
+                        r.backgroundColor = self.all_filters[ self.res_ids_indexes[evt["color_filter_id"]] ]['color_bg'];
+                        r.textColor = self.all_filters[ self.res_ids_indexes[evt["color_filter_id"]] ]['color_ft'];
+                    }
                 }else{
-                    console.log("oups! something went wrong with multiple attendees colors");
+                    console.log("oups! something went wrong with multiple attendees colors for evt",evt);
                 }
             }else if (evt[self.color_ft_field] && evt[self.color_bg_field]) {
                 r.textColor = evt[self.color_ft_field];
@@ -860,6 +1059,11 @@ CalendarView.include({
             }else{
                 r.borderColor = "rgba( 0, 0, 0, 0.7)";
             }
+
+            // events virtuels -> faire passer des infos de valeur par défaut de champs au moment du click
+            if (evt["virtuel"]) {
+                r.defaults = evt["defaults"];
+            }
         }else{ // debug of odoo code
             var color_key = evt[this.color_field];
             // make sure color_key is an integer before testing self.all_filters[color_key]
@@ -875,7 +1079,7 @@ CalendarView.include({
             }
         };
         // color_captions  == false -> la couleur de l'evt est celle des attendees et donc déjà initialisée
-        if (color_captions) {
+        if (color_captions && !evt["virtuel"]) {
             var caption_key = evt[current_filter.field]
             // make sure caption_key is an integer before testing captions[caption_key]
             if (typeof caption_key === "object") {
@@ -883,6 +1087,9 @@ CalendarView.include({
             }
             r.textColor = color_captions[caption_key]["color_ft"];
             r.backgroundColor = color_captions[caption_key]["color_bg"];
+        }
+        if (evt["virtuel"]) {
+            r.className.push("of_calendar_virtuel");
         }
         return r;
     },
@@ -903,6 +1110,9 @@ Sidebar.include({
         this.caption = new SidebarCaption(this, this.view);
         if (this.view.color_multiple) {
             this.color_filter = new SidebarColorFilter(this, this.getParent());
+        }
+        if (this.view.model == "of.planning.intervention") {
+            this.creneau_dispo_filter = new SidebarCreneauDispoFilter(this, this.getParent());
         }
         return $.when(this._super(), this.caption.appendTo(this.$el))
     },
@@ -990,7 +1200,9 @@ SidebarFilter.include({
         }
     },
 });
-
+/**
+ *  Widget pour permettre un choix dans la colorisation des events
+ */
 var SidebarColorFilter = Widget.extend({
     events: {
         'click .of_color_filter': 'on_click',
@@ -1002,8 +1214,8 @@ var SidebarColorFilter = Widget.extend({
         this._super(parent,view);
         this.filters_radio = true;
         this.view = view;
-        this.willStart();
         this.ready_to_render = $.Deferred();
+        this.willStart();
     },
     willStart: function () {
         var self = this;
@@ -1058,6 +1270,68 @@ var SidebarColorFilter = Widget.extend({
                 this.color_filter_data[key].is_checked = false;
             }
         };
+        this.render();
+        this.trigger_up('reload_events');
+    },
+});
+
+
+var SidebarCreneauDispoFilter = Widget.extend({
+    events: {
+        'click .of_creneau_dispo_filter': 'on_click',
+    },
+    /**
+     *  called by Sidebar.start
+     */
+    init: function(parent, view) {
+        this._super(parent,view);
+        this.view = view;
+        this.ready_to_render = $.Deferred();
+        this.willStart();
+    },
+    willStart: function () {
+        var self = this;
+        var ir_values_model = new Model("ir.values");
+        this.dfd_filter_is_checked = ir_values_model.call("get_default", [this.view.config_model,
+                                                                          "of_show_creneau_dispo",
+                                                                          false]);
+        return $.when(this.dfd_filter_is_checked, this._super()).then(function (filter_is_checked) {
+            self.filter_is_checked = filter_is_checked || false;
+            self.view.show_creneau_dispo = self.filter_is_checked;
+            self.ready_to_render.resolve()
+        });
+    },
+    /**
+     *  called by CalendarView._do_show_init
+     */
+    render: function () {
+        var self = this;
+        $.when(this.ready_to_render)
+        .then(function (){
+            return self.$el.html(QWeb.render('CalendarView.sidebar.creneau_dispo_filter',
+                                             {widget: self,
+                                              filter_is_checked: self.filter_is_checked})).promise();
+        }).then(function() {
+            return self.$el.insertAfter($(".o_calendar_filter"))
+        });
+    },
+    /**
+     *  Override of parent function. handles radio filters.
+     */
+    on_click: function(e) {
+        var ir_values_model = new Model('ir.values');
+        if (e.target.tagName !== 'INPUT') {
+            $(e.currentTarget).find('input').click();
+            return;
+        }
+        this.filter_is_checked = e.target.checked;
+        this.view.show_creneau_dispo = this.filter_is_checked;
+        if (this.view.config_model) {
+            // Conserver le choix de colorisation des évènements
+            ir_values_model.call("set_default", [this.view.config_model,
+                                                 "of_show_creneau_dispo",
+                                                 this.filter_is_checked, false]);
+        }
         this.render();
         this.trigger_up('reload_events');
     },

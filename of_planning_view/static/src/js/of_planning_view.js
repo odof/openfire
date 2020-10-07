@@ -513,7 +513,7 @@ var PlanningView = View.extend({
         end = end || self.range_stop;
 
         var Planning = new Model(self.model);
-        Planning.call('get_emp_horaires_info', [res_ids, start, end, segments])
+        Planning.call('get_emp_horaires_info', [res_ids, start, end, segments, true])
         .then(function (result) {
             if (isNullOrUndef(self.res_horaires_info)) {
                 self.res_horaires_info = result;
