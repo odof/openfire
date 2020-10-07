@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Correction de la valeur par défaut du champ 'available_in_pos' -->
+        <!-- Rappel: Une fonction en noupdate n'est lancée qu'à l'installation du module (elle n'a pas d'existence dans ir_model_data) -->
+        <function id="set_available_in_pos_to_false" model="product.template" name="write">
+            <function model="product.template" name="search">
+                <value eval="[]"/>
+            </function>
+            <value eval="{'available_in_pos': False}"/>
+        </function>
+
+    </data>
+</odoo>
