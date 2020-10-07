@@ -30,7 +30,7 @@ class SaleOrderLine(models.Model):
                 qty = kit_line.qty_per_kit
                 product_duration = kit_line.product_id.of_duration_per_unit
                 total_duration += (product_duration * current_uom._compute_quantity(qty, original_uom, round=False))
-            self.of_duration = total_duration
+            self.of_duration = total_duration * self.product_uom_qty
         elif self.product_id:
             original_uom = self.product_id.uom_id
             current_uom = self.product_uom
@@ -56,7 +56,7 @@ class SaleOrderLine(models.Model):
 
     @api.onchange('kit_id')
     def _onchange_kit_id(self):
-        super(SaleOrderLine, self)._onchange_of_is_kit()
+        super(SaleOrderLine, self)._onchange_kit_id()
         self.calculate_duration()
 
     @api.model
