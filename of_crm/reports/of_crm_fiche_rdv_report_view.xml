@@ -66,11 +66,12 @@
 
     <template id="of_fiche_rdv_report_template">
         <t t-call="report.html_container">
-            <t t-foreach="docs" t-as="o">
-                <t t-call="of_crm.of_internal_layout">
-                    <div class="page">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="of_crm.of_internal_layout">
+                <div class="page">
 
-                        <!-- Prospect -->
+                    <!-- Prospect -->
+                    <div name="prospect">
                         <div class="row h4 mb4">
                             <div class="col-xs-12"><strong>Prospect</strong></div>
                         </div>
@@ -99,8 +100,8 @@
                                             <span t-field="o.partner_id" t-field-options="{'widget': 'contact', 'fields': ['phone', 'mobile', 'email']}"/>
                                         </div>
                                         </t>
-                                     </div>
-                                 </div>
+                                    </div>
+                                </div>
 
                              <div style="display: table-cell; width: 50%; border-left: 1px solid lightgray">
                                  <div>
@@ -155,10 +156,12 @@
                                      </div>
                                  </div>
                              </div>
-                             </div>
-                         </div>
+                            </div>
+                        </div>
+                    </div>
 
-                        <!-- Projet -->
+                    <!-- Projet -->
+                    <div name="projet">
                         <div class="row h4 mt28 mb4">
                             <div class="col-xs-12"><strong>Projet</strong></div>
                         </div>
@@ -219,8 +222,10 @@
                                  </div>
                              </div>
                         </div>
+                    </div>
 
-                        <!-- Reunions -->
+                    <!-- Reunions -->
+                    <div name="reunions">
                         <div class="row h4 mt28 mb4">
                             <div class="col-xs-12"><strong>Rendez-vous</strong></div>
                         </div>
@@ -253,8 +258,10 @@
                                 Aucun rendez-vous planifié.
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Suivi -->
+                    <!-- Suivi -->
+                    <div name="suivi">
                         <div class="row h4 mt28 mb4">
                             <div class="col-xs-12"><strong>Suivi</strong></div>
                         </div>
@@ -274,12 +281,14 @@
                                 </t>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="row h5 mb0" style="text-align: center">
-                            <div colspan="12">· · · · ·</div>
-                        </div>
+                    <div name="separation" class="row h5 mb0" style="text-align: center">
+                        <div colspan="12">· · · · ·</div>
+                    </div>
 
-                        <!-- Compte Rendu de RDV -->
+                    <!-- Compte Rendu de RDV -->
+                    <div name="compte-rendu" style="page-break-inside: avoid">
                         <div class="row h4 mt28 mb4">
                             <div class="col-xs-12"><strong>Compte rendu</strong></div>
                         </div>
@@ -322,8 +331,10 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Actions suivantes -->
+                    <!-- Actions suivantes -->
+                    <div name="actions-suivantes" style="page-break-inside: avoid">
                         <div class="row h4 mt28 mb4">
                             <div class="col-xs-12"><strong>Actions suivantes</strong></div>
                         </div>
@@ -357,8 +368,10 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Commentaires -->
+                    <!-- Commentaires -->
+                    <div name="commentaires">
                         <div class="row h4 mt28 mb4">
                             <div class="col-xs-12"><strong>Commentaires</strong></div>
                         </div>
@@ -369,8 +382,9 @@
                             <div>&#160;</div>
                         </div>
                     </div>
-                </t>
+                </div>
             </t>
+        </t>
         </t>
     </template>
 
