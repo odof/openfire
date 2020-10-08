@@ -25,8 +25,14 @@ class StockMove(models.Model):
 
     # Par défaut les champs relationnels sont lus en tant qu'admin.
     # Ici ce ne doit pas être le cas car les quantités doivent êtres lues dans la société de l'utilisateur
-    of_qty_available_stock = fields.Float(string=u"Qté stock", related="product_id.qty_available", related_sudo=False)
-    of_qty_virtual_stock = fields.Float(string=u"Qté stock", related="product_id.virtual_available", related_sudo=False)
+    of_qty_available_stock = fields.Float(string=u"Qté stock", compute="_compute_of_qty_stock")
+    of_qty_virtual_stock = fields.Float(string=u"Qté prévisionnelle", compute="_compute_of_qty_stock")
+
+    @api.depends('product_id')
+    def _compute_of_qty_stock(self):
+        for move in self:
+            move.of_qty_available_stock = move.with_context(location=move.location_id.id).product_id.qty_available
+            move.of_qty_virtual_stock = move.with_context(location=move.location_id.id).product_id.virtual_available
 
     @api.multi
     def action_assign(self, no_prepare=False):
