@@ -16,6 +16,12 @@
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button"
+                                   options="{&quot;terminology&quot;: &quot;archive&quot;}"/>
+                        </button>
+                    </div>
                     <group>
                         <group>
                             <field name="type_id"/>
@@ -60,6 +66,12 @@
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button"
+                                   options="{&quot;terminology&quot;: &quot;archive&quot;}"/>
+                        </button>
+                    </div>
                     <group>
                         <field name="opportunity_id" invisible="1"/>
                         <field name="is_late" invisible="1"/>
@@ -184,8 +196,8 @@
         <field name="view_mode">tree,form,calendar</field>
         <field name="view_id" ref="of_crm_activity_tree_view"/>
         <field name="search_view_id" ref="of_crm_activity_search_view"/>
-        <field name="context">{'form_view_ref':'of_crm.of_crm_activity_form_view'}</field>
         <field name="context">{
+                'form_view_ref':'of_crm.of_crm_activity_form_view',
                 'default_vendor_id': uid,
                 'search_default_my_activities': 1,
                 'search_default_planned': 1
@@ -642,8 +654,9 @@
                                 <field name="of_activity_ids"
                                        context="{'default_opportunity_id': active_id,
                                                  'form_view_ref':'of_crm.of_crm_activity_from_opportunity_form_view'}">
-                                    <tree decoration-muted="state=='canceled'" decoration-danger="is_late">
+                                    <tree decoration-muted="state=='canceled' or not active" decoration-danger="is_late">
                                         <field name="is_late" invisible="1"/>
+                                        <field name="active" invisible="1"/>
                                         <field name="title"/>
                                         <field name="type_id"/>
                                         <field name="date"/>
