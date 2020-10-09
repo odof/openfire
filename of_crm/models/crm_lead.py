@@ -120,7 +120,8 @@ class CrmLead(models.Model):
     of_color_map = fields.Char(string="Couleur du marqueur", compute="_compute_of_color_map")
 
     of_activity_ids = fields.One2many(
-        comodel_name='of.crm.activity', inverse_name='opportunity_id', string=u"Activités")
+        comodel_name='of.crm.activity', inverse_name='opportunity_id', string=u"Activités",
+        context={'active_test': False})
     of_intervention_ids = fields.One2many(
         comodel_name='of.planning.intervention', inverse_name='opportunity_id', string=u"RDVs d'intervention")
     of_intervention_count = fields.Integer(
@@ -288,6 +289,8 @@ class CrmLead(models.Model):
                          'vendor_id': rec.user_id and rec.user_id.id or self.env.user.id,
                          'state': 'planned'}
                     )
+        if 'active' in vals:
+            self.mapped('of_activity_ids').write({'active': vals['active']})
 
         return True
 
@@ -484,6 +487,7 @@ class OFCRMActivity(models.Model):
                              'state': 'planned'})
         return res
 
+    active = fields.Boolean(string='Actif', default=True)
     title = fields.Char(string=u"Résumé", required=True)
     opportunity_id = fields.Many2one(comodel_name='crm.lead', string=u"Opportunité", required=True)
     type_id = fields.Many2one(comodel_name='crm.activity', string=u"Activité", required=True)
