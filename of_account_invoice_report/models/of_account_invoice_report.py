@@ -127,7 +127,8 @@ class AccountInvoice(models.Model):
         """
         account_move_line_obj = self.env['account.move.line']
         result = []
-        for payment in json.loads(self.payments_widget.replace("'", "\'")).get('content', []):
+        payments = json.loads(self.payments_widget.replace("'", "\'"))
+        for payment in payments and payments.get('content') or []:
             move_line = account_move_line_obj.browse(payment['payment_id'])
             name = self._of_get_payment_display(move_line)
             result.append((name, payment['amount']))
