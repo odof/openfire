@@ -1287,6 +1287,10 @@ class ProductProduct(models.Model):
             if result:
                 return result
 
+        # L'import d'articles via le tarif centralisé fait abstraction des droits de l'utilisateur.
+        # En effets, les articles distants sont utilisables comme si ils étaient déjà présents sur la base.
+        self_obj = self_obj.sudo()
+
         fields_to_read = self.of_datastore_get_import_fields()
         result = self.browse()
         for product_data in sorted(self._of_read_datastore(fields_to_read, create_mode=True),
