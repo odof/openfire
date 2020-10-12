@@ -578,6 +578,12 @@ class SaleOrder(models.Model):
         invoice_vals["of_date_vt"] = self.of_date_vt
         return invoice_vals
 
+    @api.multi
+    def copy(self, default=None):
+        res = super(SaleOrder, self).copy(default=default)
+        res._onchange_payment_term_id()
+        return res
+
 
 class Report(models.Model):
     _inherit = "report"
