@@ -118,6 +118,7 @@ class OfPlanningIntervention(models.Model):
                 if fusion_creneaux and creneaux_reels and \
                         float_compare(duree_creneau, duree_min, compare_precision) != -1:
                     creneaux.append({
+                        'attendee_name': employee.name,
                         'heure_debut': heure_debut,
                         'heure_fin': creneaux_reels[-1][1],
                         'lieu_debut': lieu_depart,
@@ -138,6 +139,7 @@ class OfPlanningIntervention(models.Model):
                             hours=cren[1])
                         date_fin_utc_dt = tz.localize(date_fin_locale_dt, is_dst=None).astimezone(pytz.utc)
                         to_append = {
+                            'attendee_name': employee.name,
                             'date': fields.Datetime.to_string(date_deb_utc_dt),
                             'date_deadline': fields.Datetime.to_string(date_fin_utc_dt),
                             'heure_debut': cren[0],

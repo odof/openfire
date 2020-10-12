@@ -483,6 +483,7 @@ CalendarView.include({
                             var events_temp = [], e;
                             for (var ie=0; ie<events.length; ie++) {
                                 e = events[ie];
+                                e.view = self;
                                 self.event_ids_attendees[e["id"]] = [];
                                 if (self.attendee_multiple) {
                                     var keys = e[self.color_field];
@@ -543,8 +544,10 @@ CalendarView.include({
                             })
                             .then(function(){
                                 for (var i=0; i<self.events_dispo.length; i++) {
+                                    self.events_dispo[i].view = self;
                                     events.push(self.events_dispo[i]);
                                 }
+                                self.events = events;
                                 return events;
                             })
                             .then(callback);
@@ -559,8 +562,10 @@ CalendarView.include({
                         })
                         .then(function(){
                             for (var i=0; i<self.events_dispo.length; i++) {
+                                self.events_dispo[i].view = self;
                                 events.push(self.events_dispo[i]);
                             }
+                            self.events = events;
                             return events;
                         })
                         .then(callback);
@@ -603,9 +608,7 @@ CalendarView.include({
         fc.timeFormat = fc.timeFormat.replace(':ss', '');
         // callback
         fc.eventAfterAllRender = function(view) {
-            if (!isNullOrUndef(self.first_evt) && !!self.jump_to) {
-                self.on_event_after_all_render();
-            }
+            self.on_event_after_all_render();
         };
         fc.select = function (start_date, end_date, all_day, _js_event, _view) {
             if (self.options.action.context.inhiber_create) {
@@ -639,6 +642,8 @@ CalendarView.include({
                 self.event_ids_attendees = {};
             }
             self.event_ids_attendees[event["id"]] = [];
+            var view_event = self.get_view_event_by_id(event["id"]);
+            self.add_tooltip(view_event);
         }
         fc.eventResize = function (event, _day_delta, _minute_delta, _revertFunc) {
             if (self.show_creneau_dispo) {
@@ -658,9 +663,21 @@ CalendarView.include({
                 self.event_ids_attendees = {};
             }
             self.event_ids_attendees[event["id"]] = [];
+            var view_event = self.get_view_event_by_id(event["id"]);
+            self.add_tooltip(view_event);
         }
         fc.eventClick = function (event) { self.open_event(event); };
         return fc;
+    },
+    get_view_event_by_id: function(id) {
+        var event;
+        for (var i=0; i<this.events.length; i++) {
+            event = this.events[i];
+            if (event.id == id) {
+                return event;
+            }
+        }
+        return false;
     },
     /**
      *  Jumps to first event rather than current day
@@ -668,13 +685,25 @@ CalendarView.include({
     on_event_after_all_render: function() {
         var self = this;
         // only jump once, else we can't navigate through the calendar
-        if (!isNullOrUndef(self.first_evt) && !self.first_jump) {
+        if (!isNullOrUndef(self.first_evt) && !self.first_jump && !!self.jump_to) {
             self.first_jump = true;
             var date_tmp = moment(self.first_evt[self.date_start])._d;
             if (!isNaN(date_tmp.getTime())) {
                 self.$calendar.fullCalendar('gotoDate', date_tmp);
             }
         }
+        for (var i=0; i<self.events.length; i++) {
+            event = self.events[i];
+            self.add_tooltip(event);
+        }
+    },
+    add_tooltip: function(event) {
+        var $ev, self=this;
+        $ev = $(".of_event_" + event.id);
+        $ev.tooltip({
+                        delay: { show: 501, hide: 0 },
+                        title: QWeb.render('CalendarView.record.tooltip', {"record": event}),
+                    })
     },
     /**
      *  Handler pour le signal 'filters rendered' envoyé par SidebarFilter
@@ -979,7 +1008,13 @@ CalendarView.include({
                 );
                 if (evt["color_filter_id"] && attendees.length > 1) {
                     // placer le color_filter_id en premier dans la liste pour le tri par fullcalendar
-                    attendees.splice(0, 0, evt["color_filter_id"]);
+                    var attendees_temp = [evt["color_filter_id"]];
+                    for (var ai=0; ai<attendees.length; ai++) {
+                        if (attendees[ai] != evt["color_filter_id"]) {
+                            attendees_temp.push(attendees[ai]);
+                        }
+                    }
+                    attendees = attendees_temp;
                 }
                 if (attendee_other.length>2) {
                     the_title_avatar += '<span class="o_attendee_head" title="' + attendee_other.slice(0, -2) +
@@ -1059,6 +1094,8 @@ CalendarView.include({
             }else{
                 r.borderColor = "rgba( 0, 0, 0, 0.7)";
             }
+            // ajout d'une classe pour lier l'élement HTML à l'objet javascript
+            r.className.push("of_event_" + evt.id);
 
             // events virtuels -> faire passer des infos de valeur par défaut de champs au moment du click
             if (evt["virtuel"]) {
@@ -1091,6 +1128,25 @@ CalendarView.include({
         if (evt["virtuel"]) {
             r.className.push("of_calendar_virtuel");
         }
+        // formatage des heures pour affichage dans tooltip
+        var descript_ft = {type: "float_time"};
+        if (evt["virtuel"]) {
+            r["heure_debut_str"] = formats.format_value(evt.heure_debut,descript_ft);
+            r["heure_fin_str"] = formats.format_value(evt.heure_fin,descript_ft);
+            var heures = Math.trunc(evt.duree);
+            var minutes = (evt.duree - heures) * 60;
+            if (!heures) {
+                r.duree_str = minutes + "min";  // exple: 45min
+            }else if (!minutes) {
+                r.duree_str = heures + "h"  // exple: 2h
+            }else{
+                r.duree_str = formats.format_value(evt.duree,descript_ft).replace(":", "h");
+                if (r.duree_str[0] == "0") {
+                    r.duree_str = r.duree_str.substring(1);  // exple: 2h45
+                }
+            }
+        }
+        evt.r = r;
         return r;
     },
 });
