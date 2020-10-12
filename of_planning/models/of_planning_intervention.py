@@ -387,6 +387,8 @@ class OfPlanningIntervention(models.Model):
         compute="_compute_date_deadline", string="Date fin", store=True, track_visibility='always')
     jour_fin_force = fields.Char(u"Jour fin forcé", compute="_compute_jour")
     date_deadline_forcee = fields.Datetime(string=u"Date fin (forcée)")
+    heure_debut_str = fields.Char(string=u"Heure de début", compute="_compute_heure_debut_fin_str")
+    heure_fin_str = fields.Char(string=u"Heure de fin", compute="_compute_heure_debut_fin_str")
     horaire_du_jour = fields.Text(string=u"Horaires du jour", compute="_compute_horaire_du_jour")
     verif_dispo = fields.Boolean(
         string=u"Vérif chevauchement", default=True,
@@ -614,6 +616,19 @@ class OfPlanningIntervention(models.Model):
                 date_deadline_str = date_deadline_utc_dt.strftime("%Y-%m-%d %H:%M:%S")
                 interv.date_deadline = date_deadline_str
                 interv.alert_hors_creneau = False
+
+    @api.depends('date', 'date_deadline')
+    def _compute_heure_debut_fin_str(self):
+        for intervention in self:
+            # Conversion des dates de début et de fin à l'heure locale
+            debut_locale_dt = fields.Datetime.context_timestamp(
+                self, fields.Datetime.from_string(intervention.date))
+            debut_locale_str = fields.Datetime.to_string(debut_locale_dt)
+            intervention.heure_debut_str = debut_locale_str[10:16]
+            fin_locale_dt = fields.Datetime.context_timestamp(
+                self, fields.Datetime.from_string(intervention.date_deadline))
+            fin_locale_str = fields.Datetime.to_string(fin_locale_dt)
+            intervention.heure_fin_str = fin_locale_str[10:16]
 
     @api.depends('employee_ids', 'date_date')
     def _compute_horaire_du_jour(self):

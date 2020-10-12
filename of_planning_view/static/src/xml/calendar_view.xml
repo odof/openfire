@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+
+    <!-- Info-bulle d'évènement (RDV d'intervention) -->
+    <t t-extend="CalendarView.record.tooltip">  <!-- variables données par le javascript: record -->
+        <t t-jquery="div[name='virtuel']" t-operation="after">
+            <div t-if="record.view.model == 'of.planning.intervention' &amp;&amp; !record.virtuel">
+                <div>
+                    <i class="fa fa-clock-o"/>
+                    <span class="of_ws"/>
+                    <span>
+                        <t t-raw="record.heure_debut_str"/>
+                    </span>
+                    <span>-&gt;</span>
+                    <span>
+                        <t t-raw="record.heure_fin_str"/>
+                    </span>
+                    <span>(<t t-raw="record.r.duree_str"/>)
+                    </span>
+                </div>
+
+                <div t-if="record.tache_name">
+                    <i class="fa fa-cogs"/>
+                    <span class="of_ws"/>
+                    <t t-raw="record.tache_name"/>
+                </div>
+
+                <div t-if="record.partner_name">
+                    <i class="fa fa-user"/>
+                    <span class="of_ws"/>
+                    <t t-raw="record.partner_name"/>
+                </div>
+
+                <div>
+                    <i t-if="record.address_zip || record.address_city || record.secteur_name"
+                       class="fa fa-map-marker"/>
+                    <span t-if="record.address_zip || record.address_city" class="of_ws"/>
+
+                    <span t-if="record.address_zip">
+                        <t t-raw="record.address_zip"/>
+                    </span>
+
+                    <span t-if="record.address_zip &amp;&amp; record.address_city" class="of_ws"/>
+                    <span t-if="record.address_city">
+                        <t t-raw="record.address_city"/>
+                    </span>
+
+                    <span t-if="record.address_zip || record.address_city" class="of_ws"/>
+                    <span t-if="record.secteur_name">
+                        <t t-raw="record.secteur_name"/>
+                    </span>
+                </div>
+            </div>
+        </t>
+    </t>
+
+</templates>

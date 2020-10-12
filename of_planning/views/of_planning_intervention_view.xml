@@ -412,6 +412,14 @@
                 <field name="state_int" invisible="1"/>
                 <field name="of_color_ft" invisible="1"/>
                 <field name="of_color_bg" invisible="1"/>
+                <field name="duree" invisible="1"/>
+                <field name="heure_debut_str" invisible="1"/>
+                <field name="heure_fin_str" invisible="1"/>
+                <field name="tache_name" invisible="1"/>
+                <field name="partner_name" invisible="1"/>
+                <field name="address_zip" invisible="1"/>
+                <field name="address_city" invisible="1"/>
+                <field name="secteur_id" invisible="1"/>
             </calendar>
         </field>
     </record>

@@ -1,5 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates>
+
+    <!-- Info-bulle d'évènement -->
+    <div t-name="CalendarView.record.tooltip"
+         class="of_planning_record_tooltip">  <!-- variables données par le javascript: record -->
+        <div>
+            <t t-set="attendees" t-value="record.r.attendees"/>
+            <t t-foreach="attendees" t-as="a">
+                <i t-if="record.view.all_filters[record.view.res_ids_indexes[a_value]] != undefined"
+                   class="of_calendar_attendee_box_flat"
+                   t-attf-style="
+                        background: #{record.view.all_filters[record.view.res_ids_indexes[a_value]].color_bg};
+                        border: 1px solid #{record.view.all_filters[record.view.res_ids_indexes[a_value]].color_ft};
+                        float: right; margin-left: 2px; margin-top: -3px;"/>
+                <i t-else="" class="of_calendar_attendee_box_flat"
+                   t-attf-style="
+                        background: grey; border: 1px solid #0D0D0D; float: right; margin-left: 2px;
+                        margin-top: -3px;"/>
+            </t>
+            <div t-if="record.virtuel" name="virtuel">
+                <div>Dispo</div>
+                <div><t t-esc="record.attendee_name"/></div>
+                <i class="fa fa-clock-o"/>
+                <span class="of_ws"/>
+                <span>
+                    <t t-raw="record.r.heure_debut_str"/>
+                </span>
+                <span>-&gt;</span>
+                <span>
+                    <t t-raw="record.r.heure_fin_str"/>
+                </span>
+                <span>(<t t-raw="record.r.duree_str"/>)
+                </span>
+            </div>
+        </div>
+    </div>
+
     <t t-extend="CalendarView.sidebar.contacts">
         <t t-jquery="span[t-attf-class='color_filter o_underline_color_#{filters_value.color}']" t-operation="replace">
             <!-- if custom colors -->

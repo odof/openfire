@@ -6,6 +6,7 @@ odoo.define('of_planning_view.calendar_view', function (require) {
 
 var CalendarView = require('web_calendar.CalendarView');
 var Model = require('web.DataModel');
+var formats = require("web.formats");
 
 function isNullOrUndef(value) {
     return _.isUndefined(value) || _.isNull(value);
@@ -64,6 +65,28 @@ CalendarView.include({
             });
         }
         return $.when();
+    },
+    event_data_transform: function(evt) {
+        var r = this._super.apply(this,arguments);
+        if (!evt.virtuel && this.model == 'of.planning.intervention') {
+            evt.secteur_name = evt.secteur_id && evt.secteur_id[1] || false;
+            // formatage des heures pour affichage dans tooltip
+            var descript_ft = {type: "float_time"};
+            var heures = Math.trunc(evt.duree);
+            var minutes = (evt.duree - heures) * 60;
+            if (!heures) {
+                r.duree_str = minutes + "min";  // exple: 45min
+            }else if (!minutes) {
+                r.duree_str = heures + "h"  // exple: 2h
+            }else{
+                r.duree_str = formats.format_value(evt.duree,descript_ft).replace(":", "h");
+                if (r.duree_str[0] == "0") {
+                    r.duree_str = r.duree_str.substring(1);  // exple: 2h45
+                }
+            }
+            evt.r = r;
+        }
+        return r
     },
 });
 });
