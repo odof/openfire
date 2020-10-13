@@ -726,7 +726,7 @@ class OfTourneeRdv(models.TransientModel):
                         # Coords[i+1] existe toujours
                         dist = distance_points(coords[i]['lat'], coords[i]['lng'],
                                                coords[i + 1]['lat'], coords[i + 1]['lng'])
-                        legs.append({'distance': dist, 'duration': -1})
+                        legs.append({'distance': dist * 1000, 'duration': -1})
                 else:
                     query_send = urllib.quote(query.strip().encode('utf8')).replace('%3A', ':')
                     full_query = query_send + coords_str + "?"
