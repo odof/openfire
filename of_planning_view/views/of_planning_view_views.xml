@@ -14,15 +14,39 @@
                         <field name="planningview_employee_exclu_ids" class="oe_inline" widget="many2many_tags"/>
                         <span>Intervenants à NE PAS montrer en vue planning</span>
                     </div>
-                    <label for="planningview_px_fix"/>
-                    <div name="planningview_px_fix">
-                        <field name="planningview_px_fix" class="oe_inline"/>
-                        <span>proportionnelle à leur durée</span>
+                    <label for="planningview_calendar"/>
+                    <div name="planningview_calendar">
+                        <field name="planningview_calendar" class="oe_inline"/>
+                        <span>comme en vue calendrier</span>
                     </div>
-                    <label for="planningview_h2px" attrs="{'invisible': [('planningview_px_fix', '=', False)]}"/>
-                    <div name="planningview_h2px" attrs="{'invisible': [('planningview_px_fix', '=', False)]}">
+                    <label for="planningview_h2px" attrs="{'invisible': [('planningview_calendar', '=', False)]}"/>
+                    <div name="planningview_h2px" attrs="{'invisible': [('planningview_calendar', '=', False)]}">
                         <field name="planningview_h2px" class="oe_inline"/>
                         <span>px</span>
+                    </div>
+                    <label for="planningview_min_time" string="(OF) heure min"
+                           attrs="{'invisible': [('planningview_calendar', '=', False)]}"/>
+                    <div name="planningview_min_time" attrs="{'invisible': [('planningview_calendar', '=', False)]}">
+                        <field name="planningview_min_time" class="oe_inline"/>
+                        <span>h.
+                            <i>(Pour ne pas afficher les premières heures de la journée)</i>
+                        </span>
+                    </div>
+                    <label for="planningview_max_time" string="(OF) heure max"
+                           attrs="{'invisible': [('planningview_calendar', '=', False)]}"/>
+                    <div name="planningview_max_time" attrs="{'invisible': [('planningview_calendar', '=', False)]}">
+                        <field name="planningview_max_time" class="oe_inline"/>
+                        <span>h.
+                            <i>(Pour ne pas afficher les dernières heures de la journée)</i>
+                        </span>
+                    </div>
+                    <label for="planningview_time_line" string="(OF) lignes d'heures"
+                           attrs="{'invisible': [('planningview_calendar', '=', False)]}"/>
+                    <div name="planningview_time_line" attrs="{'invisible': [('planningview_calendar', '=', False)]}">
+                        <field name="planningview_time_line" class="oe_inline"/>
+                        <span>
+                            <i>(entrez les heures voulues séparées par des virgules)</i>
+                        </span>
                     </div>
                 </group>
             </xpath>

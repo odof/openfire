@@ -64,7 +64,8 @@
                 <t t-set="la_fillerbar" t-value="row.fillerbars[col_index]"/>
                 <td t-attf-id="of_planning_td_#{row.res_id}_#{col_index}"
                     t-attf-style="background: #{col_index == row.col_offset_today and row.color_bg_rgba_today or row.color_bg_rgba}">
-                    <div t-attf-id="of_planning_fillerbar_#{row.res_id}_#{col_index}" class="of_planning_fillerbar">
+                    <div t-attf-id="of_planning_fillerbar_#{row.res_id}_#{col_index}" class="of_planning_fillerbar"
+                        style="position:relative">
                         <div t-if="la_fillerbar.pct_occupe > 0" class="of_planning_fillerbar_occupe"
                              t-attf-style="width: #{la_fillerbar.pct_occupe}% !important; background: #{row.color_bg}; ">
                             <i t-if="la_fillerbar.pct_occupe > 100"
@@ -73,6 +74,7 @@
                         <div t-if="la_fillerbar.pct_disponible > 0" class="of_planning_fillerbar_disponible"
                              t-attf-style="background-color: #{row.fillerbar_color_dispo}">
                         </div>
+
                     </div>
                 </td>
             </t>
@@ -83,13 +85,15 @@
             </td>
         </t>
         <td t-attf-style="
-                    color: #{row.color_ft};
+                    color: #{row.color_ft_rgba};
                     background: #{row.color_bg};
                     padding: 2px 8px 4px;
                     border-radius: 5px;
                     width: 4px;
                     opacity: 1 !important;
                     vertical-align: middle;">
+            <div t-attf-id="of_planning_end_col_#{row.res_id}"
+                 style="position:relative; top:0; display:table; height: 100%; left: 0; color: #{row.color_ft_rgba};"/>
         </td>
     </t>
 
@@ -113,7 +117,8 @@
     </t>
 
     <!-- Évènement (RDV d'intervention) -->
-    <div t-name="PlanningView.record" class="of_planning_record_global_click"
+    <div t-name="PlanningView.record"
+         t-attf-class="of_planning_record_global_click #{record.annule_reporte and 'of_planning_info_annule_reporte' or ''}"
          t-attf-style="height: #{record.hauteur}; overflow: hidden;">
         <!-- variables données par le javascript: record et col_index -->
         <div t-att-class="record.class"
@@ -322,6 +327,15 @@
                     </a>
                 </t>
             </t>
+        </div>
+    </div>
+
+    <!-- Créneaux indisponibles -->
+    <div t-name="PlanningView.creneau_indispo" class="of_planning_creneau_indispo"
+         t-attf-style="height: #{creneau.hauteur};">
+        <!-- variable donnée par le javascript: creneau -->
+        <div style="height: 100%;">
+            <span></span>
         </div>
     </div>
 
