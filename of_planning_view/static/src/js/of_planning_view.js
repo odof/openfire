@@ -127,27 +127,34 @@ var PlanningView = View.extend({
         var create_def = this.dataset.call("check_access_rights", ["create", false]);  // vérifier droits de lecture
         var rendered_prom = this.$el.html(qweb.render(this.template, this)).promise();
         // récupérer les employés à ne pas montrer en vue planning
-        var excluded_ids_def = new Model("ir.values").call("get_default", ["of.intervention.settings", "planningview_employee_exclu_ids"]);
+        var excluded_ids_def = new Model("ir.values").call(
+            "get_default", ["of.intervention.settings", "planningview_employee_exclu_ids"]);
         var intervenants_ids_def = new Model("hr.employee").query(['id']) // retrieve ids from db
             .filter([['of_est_intervenant', '=', true]]) // seulement les intervenants
             .order_by(['sequence'])
             .all();  // récupérer tous les employés qui sont des intervenants
         var ir_values_model = new Model("ir.values");
         // doit-on laisser la taille des events auto?
-        var hauteur_fixe_def = ir_values_model.call("get_default",
-                                                    ["of.intervention.settings", "planningview_px_fix"]);
+        var mode_calendar_def = ir_values_model.call("get_default",
+                                                    ["of.intervention.settings", "planningview_calendar"]);
         // combien de pixel / heure ?
         var duree_to_px_def = ir_values_model.call("get_default",
                                                    ["of.intervention.settings", "planningview_h2px"]);
+        var heure_min_def = ir_values_model.call("get_default",
+                                                 ["of.intervention.settings", "planningview_min_time"]);
+        var heure_max_def = ir_values_model.call("get_default",
+                                                 ["of.intervention.settings", "planningview_max_time"]);
+        var time_line_def = ir_values_model.call("get_default",
+                                                 ["of.intervention.settings", "planningview_time_line"]);
 
         // initialiser les couleurs des créneaux dispo et leur durée minimale
         var creneaux_dispo_data_def = self.set_creneaux_dispo_data();
 
         return $.when(
-            write_def, create_def, excluded_ids_def, intervenants_ids_def, hauteur_fixe_def, duree_to_px_def,
-            rendered_prom, creneaux_dispo_data_def, this._super()
+            write_def, create_def, excluded_ids_def, intervenants_ids_def, mode_calendar_def, duree_to_px_def,
+            heure_min_def, heure_max_def, time_line_def, rendered_prom, creneaux_dispo_data_def, this._super()
         ).then(
-            function (write, create, excluded, emp_ids, hauteur_fixe, duree_to_px) {
+            function (write, create, excluded, emp_ids, mode_calendar, duree_to_px, min_time, max_time, time_line) {
                 self.write_right = write;
                 self.create_right = create;
                 // retirer les intervenants à ne pas montrer en vue planning
@@ -164,8 +171,16 @@ var PlanningView = View.extend({
                 // initialiser les filtres grâce à la liste des intervenants à montrer en vue planning
                 var all_filters_def = self._set_all_custom_colors();
 
-                self.hauteur_fixe = hauteur_fixe;
+                self.mode_calendar = mode_calendar;
                 self.duree_to_px = duree_to_px;
+                self.min_time = min_time;
+                self.max_time = max_time;
+                if (time_line) {
+                    time_line = "[" + time_line + "]";
+                }else{
+                    time_line = "[]";
+                }
+                self.time_line = JSON.parse(time_line)
 
                 return $.when(all_filters_def);
         });
@@ -474,7 +489,7 @@ var PlanningView = View.extend({
                             }
                         }
                     }
-                    var rgb, rgb_today, key;
+                    var bg_rgb, ft_rgb, rgb_today, key;
                     // Affecter les valeurs reçues par set_res_horaires_data aux lignes
                     for (var row_index in self.rows) {
                         key = self.rows[row_index].res_id;
@@ -486,12 +501,18 @@ var PlanningView = View.extend({
                         self.rows[row_index].color_ft = self.res_horaires_info[key]['color_ft'];
                         self.rows[row_index].tz = self.res_horaires_info[key]['tz'];
                         self.rows[row_index].tz_offset = self.res_horaires_info[key]['tz_offset'];
-                        rgb = hexToRgb(self.res_horaires_info[key]['color_bg']);
-                        self.rows[row_index].color_bg_rgba = "rgba(" + rgb.r + "," + rgb.g + "," + rgb.b + ",0.3);";
-                        self.rows[row_index].col_offset_today = isNullOrUndef(self.col_offset_today) ? -1 : self.col_offset_today;
+                        bg_rgb = hexToRgb(self.res_horaires_info[key]['color_bg']);
+                        self.rows[row_index].color_bg_rgba = "rgba(" + bg_rgb.r + "," + bg_rgb.g + "," + bg_rgb.b +
+                            ",0.3);";
+                        ft_rgb = hexToRgb(self.res_horaires_info[key]['color_ft']);
+                        self.rows[row_index].color_ft_rgba = "rgba(" + ft_rgb.r + "," + ft_rgb.g + "," + ft_rgb.b +
+                            ",0.8);";
+                        self.rows[row_index].col_offset_today = isNullOrUndef(self.col_offset_today) ?
+                            -1 : self.col_offset_today;
                         if (self.rows[row_index].col_offset_today != -1) {
                             rgb_today = hexToRgb(self.res_horaires_info[key]['color_bg'], -30);
-                            self.rows[row_index].color_bg_rgba_today = "rgba(" + rgb_today.r + "," + rgb_today.g + "," + rgb_today.b + ",0.4);";
+                            self.rows[row_index].color_bg_rgba_today = "rgba(" + rgb_today.r + "," + rgb_today.g + "," +
+                                rgb_today.b + ",0.4);";
                         }
                     }
 
@@ -513,7 +534,7 @@ var PlanningView = View.extend({
         end = end || self.range_stop;
 
         var Planning = new Model(self.model);
-        Planning.call('get_emp_horaires_info', [res_ids, start, end, segments, true])
+        Planning.call('get_emp_horaires_info', [res_ids, start, end, segments, !self.mode_calendar])
         .then(function (result) {
             if (isNullOrUndef(self.res_horaires_info)) {
                 self.res_horaires_info = result;
@@ -897,6 +918,7 @@ PlanningView.Row = Widget.extend({
                 self.zero_horaire = true;
             }else{  // ajouter les créneaux dispos aux colonnes
                 self.zero_horaire = false;
+                var max_time = self.view.max_time, event, record;
                 for (var i=0; i<self.column_nb; i++) {  // parcourir les colonnes
                     options = {col_offset: i};
                     if (isNullOrUndef(col_index) || i==col_index) {
@@ -918,6 +940,26 @@ PlanningView.Row = Widget.extend({
                                 return heure_debut_a - heure_debut_b;
                             }
                             self.columns[i].sort(compareFunction);  // ordonner les enregistrements de la colonne
+                        }
+                        if (self.view.mode_calendar) {
+                            var current_max = self.view.min_time;
+                            for (var ic=0; ic<self.columns[i].length; ic++) {
+                                event = self.columns[i][ic];
+                                if (event.heure_debut > current_max) {
+                                    record = {heure_debut: current_max, heure_fin: event.heure_debut}
+                                    le_creneau = new PlanningCreneauIndispo(self, self.view, record, options);
+                                    self.columns[i].splice(ic, 0, le_creneau);
+                                    ic++;
+                                }else{
+
+                                }
+                                current_max = event.heure_fin;
+                            }
+                            if (current_max < max_time) {
+                                record = {heure_debut: current_max, heure_fin: max_time}
+                                le_creneau = new PlanningCreneauIndispo(self, self.view, record, options);
+                                self.columns[i].push(le_creneau);
+                            }
                         }
                     }
                 }
@@ -957,7 +999,8 @@ PlanningView.Row = Widget.extend({
                         }else{
                             fil_title = "Horaires du jour: " + fillerbar["creneaux_du_jour"] + "<br/>"
                             + fillerbar["heures_occupees_str"] + " occupées sur "
-                            + fillerbar["heures_travaillees_str"] + " travaillées (" + fillerbar["pct_occupe"].toFixed(2) + "%)"
+                            + fillerbar["heures_travaillees_str"] + " travaillées ("
+                            + fillerbar["pct_occupe"].toFixed(2) + "%)"
                         }
                         tooltip_options = {
                             delay: { show: 501, hide: 0 },
@@ -975,6 +1018,34 @@ PlanningView.Row = Widget.extend({
                 if (isNullOrUndef(col_index) || col_index==i) {
                     for (var j=0; j<self.columns[i].length; j++) {
                         self.columns[i][j].render(i);
+                    }
+                }
+            }
+            if (self.view.mode_calendar) {
+                // ajout des lignes d'heure
+                var fillerbar_height = $("#of_planning_fillerbar_"+self.res_id+"_"+0).outerHeight(true);
+                var elem, hauteur;
+                var duree_min_midi = 12.0 - self.view.min_time;
+
+                var duree_debut_line, line_hour;
+
+                for (var il=0; il<self.view.time_line.length; il++) {
+                    line_hour = Math.round(self.view.time_line[il]);
+                    if (self.view.min_time <= line_hour && line_hour <= self.view.max_time) {
+                        for (var ic=0; ic<self.column_nb; ic++) {
+                            duree_debut_line = line_hour - self.view.min_time;
+                            hauteur = duree_debut_line * self.view.duree_to_px + 2;  // + 2 pour le margin
+                            elem = "<span style='position: absolute; left: 0; z-index: 500; bottom: -" + hauteur +
+                                "px; height: 1px; border-bottom: 1px dotted " + self.color_ft_rgba +
+                                "; width: 100%; display: block;'/>"
+                            $("#of_planning_fillerbar_"+self.res_id+"_"+ic).append(elem);
+                        }
+                        // nombres sur le coté droit
+                        hauteur = duree_debut_line * self.view.duree_to_px + fillerbar_height - 8;
+                        elem = "<span style='position: absolute; left: -8px; z-index: 500; top: " + hauteur +
+                            "px; width: 100%; display: block;'>" +
+                            line_hour + "</span>";
+                        $("#of_planning_end_col_" + self.res_id).append(elem);
                     }
                 }
             }
@@ -1179,18 +1250,19 @@ var PlanningCreneauDispo = Widget.extend({
             }
         }
 
-        this.date = moment(this.view.range_start).add(self.col_offset, 'days').format('YYYY-MM-DD'),
+        this.date = moment(this.view.range_start).add(self.col_offset, 'days').format('YYYY-MM-DD');
         this.lieu_debut = record.lieu_debut;
         this.lieu_fin = record.lieu_fin;
 
-        if (this.view.hauteur_fixe) {
+        if (this.view.mode_calendar) {
             this.hauteur = ((this.heure_fin - this.heure_debut) * this.view.duree_to_px).toString() + "px";
         }else{
             this.hauteur = "auto";
         }
 
         // inhiber double-clique
-        this.on_planning_creneau_secteur_action_clicked = _.debounce(this.on_planning_creneau_secteur_action_clicked, 300, true);
+        this.on_planning_creneau_secteur_action_clicked = _.debounce(
+            this.on_planning_creneau_secteur_action_clicked, 300, true);
         this.on_planning_creneau_action_clicked = _.debounce(this.on_planning_creneau_action_clicked, 300, true);
     },
     /**
@@ -1321,7 +1393,8 @@ var PlanningCreneauDispo = Widget.extend({
 
         return data_manager.load_action(action_id, pyeval.eval('context', additional_context)).then(function(result) {
                 var options = {
-                    'additional_context': pyeval.eval('context', additional_context),  // pour une raison inconnue le additional_context n'est pas pris en compte avant
+                    // pour une raison inconnue le additional_context n'est pas pris en compte avant
+                    'additional_context': pyeval.eval('context', additional_context),
                     'on_close': function () {self.reload_events();},
                 };
                 return self.view.ViewManager.action_manager.do_action(result,options);
@@ -1343,11 +1416,69 @@ var PlanningCreneauDispo = Widget.extend({
         });
         return data_manager.load_action(action_id, pyeval.eval('context', additional_context)).then(function(result) {
                 var options = {
-                    'additional_context': pyeval.eval('context', additional_context),  // pour une raison inconnue le additional_context n'est pas pris en compte avant
+                    // pour une raison inconnue le additional_context n'est pas pris en compte avant
+                    'additional_context': pyeval.eval('context', additional_context),
                     'on_close': function () {self.reload_events();},
                 };
                 return self.view.ViewManager.action_manager.do_action(result,options);
             });
+    },
+});
+
+
+var PlanningCreneauIndispo = Widget.extend({
+    /**
+     *  Widget de créneau indisponible
+     */
+    init: function(row, view, record, options) {
+        this._super(row);
+        this.row = row;
+        this.view = view;
+        this.options = options;
+        this.col_offset = options.col_offset;
+
+        var self= this;
+        this.record = record;
+        this.heure_debut = record.heure_debut;
+        this.heure_fin = record.heure_fin;
+        var descript_ft = {type: "float_time"};
+        this.heure_debut_str = formats.format_value(record.heure_debut,descript_ft);
+        this.heure_fin_str = formats.format_value(record.heure_fin,descript_ft);
+        this.duree = this.heure_fin - this.heure_debut;
+        var heures = Math.trunc(this.duree);
+        var minutes = (this.duree - heures) * 60;
+        if (!heures) {
+            this.duree_str = minutes + "min";  // exple: 45min
+        }else if (!minutes) {
+            this.duree_str = heures + "h"  // exple: 2h
+        }else{
+            this.duree_str = formats.format_value(this.duree,descript_ft).replace(":", "h");
+            if (this.duree_str[0] == "0") {
+                this.duree_str = this.duree_str.substring(1);  // exple: 2h45
+            }
+        }
+
+        this.date = moment(this.view.range_start).add(self.col_offset, 'days').format('YYYY-MM-DD');
+
+        if (this.view.mode_calendar) {
+            this.hauteur = ((this.heure_fin - this.heure_debut) * this.view.duree_to_px).toString() + "px";
+        }else{
+            this.hauteur = "auto";
+        }
+    },
+    /**
+     *  génère le rendu visuel du créneau et l'attache à la colonne correspondante
+     */
+    render: function(col_index) {
+        var self = this;
+        if (isNullOrUndef(col_index)) {
+            col_index = self.col_offset;
+        }
+        return self.$el.html(qweb.render('PlanningView.creneau_indispo', {"creneau": self, "col_index": col_index})).promise()
+            .then(function (){
+                var td_id = "of_planning_td_" + self.row.res_id + "_" + col_index;
+                self.$el.appendTo("#" + td_id);
+            })
     },
 });
 
@@ -1371,7 +1502,12 @@ var PlanningRecord = Widget.extend({
         this.class ="of_planning_record of_planning_record_" + this.id;
         if (!isNullOrUndef(record.state_int)) this.class += " of_calendar_state_" + record["state_int"];
         if (this.day_span > 1) this.class += " of_planning_record_multiple";
-        if (record.state_int == 3) this.class += " of_planning_info_annule_reporte";
+        if (record.state_int == 3) {
+            this.class += " of_planning_info_annule_reporte";
+            this.annule_reporte = true;
+        }else{
+            this.annule_reporte = false;
+        }
         this.col_offset_start = options.col_offset_start;
         this.col_offset_stop = options.col_offset_stop;
         this.read_only_mode = options.read_only_mode || true; // current implementation solo readonly
@@ -1381,7 +1517,7 @@ var PlanningRecord = Widget.extend({
 
         var self= this;
         this.record = record;
-        if (this.view.hauteur_fixe) {
+        if (this.view.mode_calendar) {
             this.hauteur = (record.duree_debut_fin * this.view.duree_to_px).toString() + "px";
         }else{
             this.hauteur = "auto";

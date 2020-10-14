@@ -412,15 +412,25 @@ class OFInterventionConfiguration(models.TransientModel):
     planningview_employee_exclu_ids = fields.Many2many(
         'hr.employee', string=u"(OF) Exculsion d'intervenants", help=u"Intervenants à NE PAS montrer en vue planning",
         domain=[('of_est_intervenant', '=', True)])
-    planningview_px_fix = fields.Boolean(string=u"(OF) taille des RDVs",
-                                         help=u"Cocher pour que la tailles des évènements"
-                                              u"soit proportionnelle à leur durée.")
+    planningview_calendar = fields.Boolean(
+        string=u"(OF) affichage", help=u"Cocher pour que les évènements soit disposés comme ceux de la vue calendrier.")
     planningview_h2px = fields.Integer(string=u"(OF) 1 heure = ")
+    planningview_min_time = fields.Integer(string='(OF) Heure min', help=u"Heure minimale affichée")
+    planningview_max_time = fields.Integer(string='(OF) Heure max', help=u"Heure maximale affichée")
+    planningview_time_line = fields.Char(
+        string="(OF) lignes d'heures", help=u"Entrez les heures sous forme d'entiers séparées par des virgules")
 
-    @api.onchange('planningview_px_fix')
-    def _onchange_planningview_px_fix(self):
-        if self.planningview_px_fix and not self.planningview_h2px:
-            self.planningview_h2px = 30
+    @api.onchange('planningview_calendar')
+    def _onchange_planningview_calendar(self):
+        if self.planningview_calendar:
+            if not self.planningview_h2px:
+                self.planningview_h2px = 30
+            if not self.planningview_min_time:
+                self.planningview_min_time = 7
+            if not self.planningview_max_time:
+                self.planningview_max_time = 20
+            if not self.planningview_time_line:
+                self.planningview_time_line = "12"
 
     @api.multi
     def set_planningview_employee_exclu_ids_defaults(self):
@@ -431,11 +441,11 @@ class OFInterventionConfiguration(models.TransientModel):
         )
 
     @api.multi
-    def set_planningview_px_fix_defaults(self):
+    def set_planningview_calendar_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'of.intervention.settings',
-            'planningview_px_fix',
-            self.planningview_px_fix,
+            'planningview_calendar',
+            self.planningview_calendar,
         )
 
     @api.multi
@@ -445,6 +455,25 @@ class OFInterventionConfiguration(models.TransientModel):
             'planningview_h2px',
             self.planningview_h2px,
         )
+
+    @api.multi
+    def set_planningview_min_time_defaults(self):
+        if not 0 <= self.planningview_min_time < 24:
+            raise ValidationError(u"l'heure minimale doit être entre 0 et 24! (et idéalement pas 24...)")
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings', 'planningview_min_time', self.planningview_min_time)
+
+    @api.multi
+    def set_planningview_max_time_defaults(self):
+        if not 0 <= self.planningview_max_time <= 24:
+            raise ValidationError(u"l'heure maximale doit être entre 0 et 24! (et idéalement pas 0...)")
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings', 'planningview_max_time', self.planningview_max_time)
+
+    @api.multi
+    def set_planningview_time_line_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings', 'planningview_time_line', self.planningview_time_line)
 
 
 class IrUIView(models.Model):
