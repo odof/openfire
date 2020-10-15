@@ -19,7 +19,7 @@ class AccountPayment(models.Model):
             journal = self.env['account.journal'].browse(values.get('journal_id'))
             if journal.journal_user:
                 corresponding_payment_mode_id = journal.of_pos_payment_mode_ids.filtered(
-                    lambda pm: pm.company_id == self.env.user_id.company_id)
+                    lambda pm: pm.company_id == self.env.user.company_id)
                 if corresponding_payment_mode_id and corresponding_payment_mode_id[0]:
                     values.update({'of_payment_mode_id': corresponding_payment_mode_id[0].id})
         return super(AccountPayment, self).create(values)
