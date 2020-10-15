@@ -18,7 +18,13 @@ class OfAccountPaymentBankDeposit(models.Model):
 
     name = fields.Char('Deposit code', required=True, help='Deposit code')
     date = fields.Date('Date', required=True, default=fields.Date.context_today)
-    payment_ids = fields.One2many('account.payment', 'of_deposit_id', 'Payments', copy=False, default=_get_default_payments)
+    payment_ids = fields.One2many(
+        'account.payment', 'of_deposit_id', 'Payments', copy=False, default=_get_default_payments)
+    payment_count = fields.Integer(string=u"Nombre de paiements", compute='_compute_payment_count')
+    payment_total = fields.Float(string=u"Montant total des paiements", compute='_compute_payment_total')
+    currency_id = fields.Many2one(
+        comodel_name='res.currency', string='Devise', required=True,
+        default=lambda self: self.env.user.company_id.currency_id)
     move_id = fields.Many2one('account.move', 'Account move', readonly=True, ondelete='restrict')
     state = fields.Selection([('draft', 'Unposted'), ('posted', 'Posted')], string='Status',
                              required=True, readonly=True, copy=False, default='draft')
@@ -27,6 +33,16 @@ class OfAccountPaymentBankDeposit(models.Model):
         domain="[('type', 'in', ('cash', 'bank')), ('of_allow_bank_deposit', '=', True)]")
 
     _order = 'date DESC'
+
+    @api.depends('payment_ids')
+    def _compute_payment_count(self):
+        for rec in self:
+            rec.payment_count = len(rec.payment_ids)
+
+    @api.depends('payment_ids', 'payment_ids.amount')
+    def _compute_payment_total(self):
+        for rec in self:
+            rec.payment_total = sum(rec.payment_ids.mapped('amount'))
 
     @api.multi
     def post(self):

@@ -3,8 +3,8 @@
 from odoo import api, models, fields
 from odoo.osv import expression
 import time
-import base64
-from odoo.exceptions import UserError
+from datetime import datetime
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class ProjectIssue(models.Model):
@@ -66,6 +66,28 @@ class ProjectIssue(models.Model):
     of_partner_id_phone = fields.Char(u"Téléphone", related='partner_id.phone', readonly=True)
     of_partner_id_mobile = fields.Char(u"Mobile", related='partner_id.mobile', readonly=True)
     of_partner_id_function = fields.Char(u"Fonction", related='partner_id.function', readonly=True)
+
+    of_create_date_formatted = fields.Char(
+        string=u"Date de création formatée", compute='_compute_of_create_date_formatted')
+    of_planification_date = fields.Datetime(string=u"Date de planification", compute='_compute_of_planification_date')
+
+    # @api.depends
+
+    @api.depends('create_date')
+    def _compute_of_create_date_formatted(self):
+        for rec in self:
+            rec.of_create_date_formatted = datetime.strptime(rec.create_date, DEFAULT_SERVER_DATETIME_FORMAT). \
+                strftime('%d/%m/%Y') if rec.create_date else None
+
+    @api.depends('interventions_liees', 'interventions_liees.date')
+    def _compute_of_planification_date(self):
+        for rec in self:
+            if rec.interventions_liees:
+                rdvs = rec.interventions_liees.filtered(lambda rdv: rdv.date > fields.Datetime.now())
+                if rdvs:
+                    rec.of_planification_date = rdvs[0].date
+                else:
+                    rec.of_planification_date = rec.interventions_liees[-1].date
 
     # @api.onchange
 

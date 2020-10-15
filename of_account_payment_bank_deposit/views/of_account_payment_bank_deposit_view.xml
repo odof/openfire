@@ -39,6 +39,7 @@
                             <field name="journal_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                             <field name="date" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                             <field name="move_id" attrs="{'invisible': [('move_id', '=', False)]}"/>
+                            <field name="payment_count"/>
                         </group>
                         <group name="paiements">
                             <separator name="payments" string="Payments"/>
@@ -61,7 +62,10 @@
                     <field name="journal_id"/>
                     <field name="date"/>
                     <field name="move_id" attrs="{'invisible': [('move_id', '=', False)]}"/>
+                    <field name="payment_count"/>
+                    <field name="payment_total" sum="Montant total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                     <field name="state"/>
+                    <field name="currency_id" invisible="1"/>
                 </tree>
             </field>
         </record>
