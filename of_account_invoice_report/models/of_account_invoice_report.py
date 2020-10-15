@@ -168,7 +168,7 @@ class AccountInvoice(models.Model):
         for tax in self._of_get_tax_amount_by_group():
             result.append((tax[0], tax[1]))
             total_amount += tax[1]
-        return [[result, (_("Total"), round_curr(total_amount))]]
+        return [[result, (_("Total TTC"), round_curr(total_amount))]]
 
     @api.multi
     def _of_get_linked_invoices(self):
