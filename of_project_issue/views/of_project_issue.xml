@@ -41,13 +41,15 @@
                 <field name="partner_id" string="Partenaire"/>
             </field>
             <field name="priority" position="replace"/>
-            <field name="project_id" position="replace"/>
-            <field name="create_date" position="replace">
-                <field name="date"/>
-            </field>
-            <field name="date" position="after">
-                <field name="date_deadline"/>
-            </field>
+
+                <field name="project_id" position="replace"/>
+                <field name="create_date" position="replace">
+                    <field name="date"/>
+                </field>
+                <field name="date" position="after">
+                    <field name="date_deadline"/>
+                    <field name="of_planification_date"/>
+                </field>
             <field name="user_id" position="replace">
                 <field name="user_id" string="Responsable"/>
                 <field name="priority"/>
@@ -142,9 +144,11 @@
                                 <field name="amount_total"/>
                                 <field name="state"/>
                                 <field name="doc_objet" invisible="1"/>
-                                <field name="invoice_id" attrs="{'invisible': [('doc_objet', '!=', 'account.invoice')]}"/>
-                                <field name="sale_order_id" attrs="{'invisible': [('doc_objet', '!=', 'sale.order')]}"/>
-                                <field name="purchase_order_id" attrs="{'invisible': [('doc_objet', '!=', 'purchase.order')]}"/>
+                                <group colspan="4" col="4">
+                                    <field name="invoice_id" attrs="{'invisible': [('doc_objet', '!=', 'account.invoice')]}"/>
+                                    <field name="sale_order_id" attrs="{'invisible': [('doc_objet', '!=', 'sale.order')]}"/>
+                                    <field name="purchase_order_id" attrs="{'invisible': [('doc_objet', '!=', 'purchase.order')]}"/>
+                                </group>
                             </group>
                         </form>
                     </field>
@@ -168,6 +172,21 @@
                     <field name="partner_note" colspan="4" nolabel="1"/>
                 </group>
             </page>
+        </field>
+    </record>
+
+    <record id="of_view_project_issue_filter" model="ir.ui.view">
+        <field name="name">of.view.project.issue.filter</field>
+        <field name="model">project.issue</field>
+        <field name="inherit_id" ref="project_issue.project_issue_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='color']" position="after">
+                <field name="of_create_date_formatted"/>
+            </xpath>
+            <xpath expr="//div[@class='oe_kanban_content']/div[1]" position="inside">
+                <t t-set="date" t-value="record.of_create_date_formatted.raw_value"/>
+                <span>Date de création : </span><t t-esc="date"/><br/>
+            </xpath>
         </field>
     </record>
 
