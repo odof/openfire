@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="wizard_select_template" model="ir.ui.view">
+        <field name="name">Select Move Template</field>
+        <field name="model">wizard.select.move.template</field>
+        <field name="inherit_id"  ref="account_move_template.wizard_select_template"/>
+        <field name="arch" type="xml">
+            <xpath expr="//separator" position="before">
+                <group attrs="{'invisible':[('state','!=','template_selected')]}">
+                    <field name="of_date_start" string="Date"/>
+                    <field name="of_recurring"/>
+               </group>
+                <group attrs="{'invisible':[('of_recurring','!=',True)]}">
+                    <group>
+                        <label for="of_rec_interval" string="Répéter tous les"/>
+                        <div>
+                            <field name="of_rec_interval" class="oe_inline"
+                                   style="width: 50px !important; margin-right: 10px;"/>
+                            <field name="of_rec_interval_type" class="oe_inline"/>
+                        </div>
+                        <field name="of_rec_number" string="Nombre de pièces"/>
+                        <field name="of_prorata" attrs="{'invisible':[('of_rec_interval_type','!=','months')]}"/>
+                        <field name="of_extourne"/>
+                    </group>
+                    <group>
+
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>
