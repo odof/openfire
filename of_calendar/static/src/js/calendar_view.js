@@ -339,6 +339,8 @@ CalendarView.include({
                             self.dfd_filters_rendered.resolve()
                             console.log("OUPSY NO SIDEBAR")
                         }
+                    }else{
+                        self.dfd_filters_rendered.resolve()
                     }
 
                     var all_attendees = $.map(events, function (e) { return e[self.attendee_people]; });
