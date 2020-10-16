@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="of_wizard_select_template" model="ir.ui.view">
+        <field name="name">OF Select Move Template</field>
+        <field name="model">wizard.select.move.template</field>
+        <field name="inherit_id"  ref="account_move_template.wizard_select_template"/>
+        <field name="arch" type="xml">
+            <!-- Modifications pour les modèles multiples -->
+            <xpath expr="//field[@name='template_id']" position="before">
+                <field name="of_template_ids" invisible="1"/>
+            </xpath>
+            <xpath expr="//footer/button[@name='load_template']" position="attributes">
+                <attribute name="name">load_templates</attribute>
+            </xpath>
+            <!-- Ajout des champs pour les écritures récurrentes -->
+            <xpath expr="//separator" position="before">
+                <group attrs="{'invisible':[('state','!=','template_selected')]}">
+                    <field name="of_date_start" string="Date"/>
+                    <field name="of_recurring"/>
+               </group>
+                <group attrs="{'invisible':[('of_recurring','!=',True)]}">
+                    <group>
+                        <label for="of_rec_interval" string="Répéter tous les"/>
+                        <div>
+                            <field name="of_rec_interval" class="oe_inline"
+                                   style="width: 50px !important; margin-right: 10px;"/>
+                            <field name="of_rec_interval_type" class="oe_inline"/>
+                        </div>
+                        <field name="of_rec_number" string="Nombre de pièces"/>
+                        <field name="of_prorata" attrs="{'invisible':[('of_rec_interval_type','!=','months')]}"/>
+                    </group>
+                    <group>
+                        <field name="of_extourne"/>
+                        <field name="of_extourne_date" attrs="{'invisible':[('of_extourne', '!=', 'custom')]}"/>
+                    </group>
+                </group>
+            </xpath>
+            <xpath expr="//separator" position="attributes">
+                <attribute name="attrs">{'invisible':[('line_ids','=',[])]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']" position="attributes">
+                <attribute name="attrs">{'invisible':[('line_ids','=',[])]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_wizard_select_template_multi" model="ir.ui.view">
+        <field name="name">OF Select Move Template Multi</field>
+        <field name="model">wizard.select.move.template</field>
+        <field name="arch" type="xml">
+            <form string="Move Template" >
+                <field name="template_id" invisible="1"/>
+                <field name="of_template_ids" invisible="1"/>
+                <group>
+                    <group>
+                        <field name="of_date_start" string="Date"/>
+                    </group>
+                    <group>
+                        <field name="partner_id"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="load_templates" class="btn-primary" string="Charger" type="object"/>
+                    <button special="cancel" string="Annuler" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_account_move_template_generate_moves_view_action" model="ir.actions.server">
+        <field name="name">Générer des pièces comptables</field>
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="model_id" ref="account_move_template.model_account_move_template" />
+        <field name="code">
+action = env.ref('account_move_template.action_wizard_select_template').read()[0]
+action['context'] = env.context
+if len(records) > 1:
+    view_id = env.ref('of_account_move_template.of_wizard_select_template_multi').id
+    action['views'] = [(view_id, u'form')]
+    action['view_id'] = (view_id, action['view_id'][1])
+        </field>
+    </record>
+
+    <record id="of_account_move_template_generate_moves_view_action_value" model="ir.values">
+        <field name="name">Générer des pièces comptables</field>
+        <field name="key">action</field>
+        <field name="key2">client_action_multi</field>
+        <field name="model">account.move.template</field>
+        <field name="value"
+               eval="'ir.actions.server,%d'
+                     % ref('of_account_move_template.of_account_move_template_generate_moves_view_action')" />
+    </record>
+</odoo>
