@@ -24,6 +24,10 @@ function isNullOrUndef(value) {
     return _.isUndefined(value) || _.isNull(value);
 }
 
+function is_virtual_id(id) {
+    return typeof id === "string" && id.indexOf('-') >= 0;
+}
+
 /**
  *  convertis une chaine de caractères de la forme #000000 en son tuple RGB équivalent
  */
@@ -624,11 +628,11 @@ CalendarView.include({
             }
         }
         fc.eventDrop = function (event, _day_delta, _minute_delta, _all_day, _revertFunc) {
-            // inhiber drag and drop quand on montre les créneaux dispo
-            if (self.show_creneau_dispo) {
+            // inhiber drag and drop pour les les créneaux dispo
+            if (event["id"] < 0) {
                 Dialog.alert(
                     self.$el,
-                    "Le drag and drop (glisser/déposer) n'est pas possible lorsqu'on affiche les créneaux dispos"
+                    "Le drag and drop (glisser/déposer) n'est pas possible pour les créneaux dispos"
                 );
                 _revertFunc();
                 return
@@ -636,20 +640,20 @@ CalendarView.include({
             // copie du code odoo car héritage impossible
             var data = self.get_event_data(event);
             self.proxy('update_record')(event._id, data); // we don't revert the event, but update it.
+
             // en cas de drag n drop on ne repasse pas par do_search,
             // il faut donc réinitialiser self.event_ids_attendees[event["id"]]
             if (isNullOrUndef(self.event_ids_attendees)) {
                 self.event_ids_attendees = {};
             }
+
             self.event_ids_attendees[event["id"]] = [];
-            var view_event = self.get_view_event_by_id(event["id"]);
-            self.add_tooltip(view_event);
         }
         fc.eventResize = function (event, _day_delta, _minute_delta, _revertFunc) {
-            if (self.show_creneau_dispo) {
+            if (event["id"] < 0) {
                 Dialog.alert(
                     self.$el,
-                    "Il n'est pas possible de redimensionner un évènement lorsqu'on affiche les créneaux dispos"
+                    "Il n'est pas possible de redimensionner un créneau dispo"
                 );
                 _revertFunc();
                 return
@@ -663,8 +667,6 @@ CalendarView.include({
                 self.event_ids_attendees = {};
             }
             self.event_ids_attendees[event["id"]] = [];
-            var view_event = self.get_view_event_by_id(event["id"]);
-            self.add_tooltip(view_event);
         }
         fc.eventClick = function (event) { self.open_event(event); };
         return fc;
@@ -838,6 +840,36 @@ CalendarView.include({
                     {text: _t("Close"), close: true}
                 ]
             }).open();
+        }
+        return false;
+    },
+    /**
+     * Surcharge de la fonction parente car elle n'est pas héritable.
+     * Updates record identified by ``id`` with values in object ``data``
+     */
+    update_record: function(id, data) {
+        var self = this;
+        var event_id;
+        delete(data.name); // Cannot modify actual name yet
+        var index = this.dataset.get_id_index(id);
+        if (index !== null) {
+            event_id = this.dataset.ids[index];
+            this.dataset.write(event_id, data, {context: {from_ui: true}}).always(function() {
+                if (self.show_creneau_dispo) {
+                    self.$calendar.fullCalendar('refetchEvents');
+                }else{
+                    if (is_virtual_id(event_id)) {
+                        // this is a virtual ID and so this will create a new event
+                        // with an unknown id for us.
+                        self.$calendar.fullCalendar('refetchEvents');
+                    } else {
+                        // classical event that we can refresh
+                        self.refresh_event(event_id);
+                        var view_event = self.get_view_event_by_id(id);
+                        self.add_tooltip(view_event);
+                    }
+                }
+            });
         }
         return false;
     },
