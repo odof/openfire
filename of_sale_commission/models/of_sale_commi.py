@@ -98,7 +98,10 @@ class OFSaleCommi(models.Model):
     type = fields.Selection(
         [('acompte', "Acompte"), ('solde', "Solde"), ('avoir', "Avoir")], string="Type"
     )
-    user_id = fields.Many2one('res.users', string="Commercial", required=True)
+    user_id = fields.Many2one(
+        'res.users', string="Commercial", required=True,
+        domain="[('of_profcommi_id', '!=', False)]"
+    )
     partner_id = fields.Many2one('res.partner', string="Client", compute="_compute_partner_id", store=True)
     company_id = fields.Many2one('res.company', string=u"Société", compute="_compute_company_id", store=True)
     date_valid = fields.Date(string="Date de validation")
@@ -767,26 +770,24 @@ class AccountInvoice(models.Model):
 
         commi_obj = self.env['of.sale.commi'].sudo()
         commi_line_obj = self.env['of.sale.commi.line']
-        new_invoice = self.browse(result)
 
         for commi_orig in self.sudo().of_commi_ids:
             if commi_orig.state in ('draft', 'to_pay', 'paid'):
                 commi = commi_obj.create({
-                    'name': new_invoice.reference,
+                    'name': result.reference,
                     'state': 'draft',
                     'user_id': commi_orig.user_id.id,
                     'type': commi_orig.type,
-                    'invoice_id': new_invoice.id,
+                    'invoice_id': result.id,
                 })
 
-                commi_lines_data = commi.make_commi_invoice_lines_from_old(commi_orig, new_invoice,
-                                                                           commi.user_id.of_profcommi_id,
-                                                                           commi.type, False)
+                commi_lines_data = commi.make_commi_invoice_lines_from_old(
+                    commi_orig, result, commi.user_id.of_profcommi_id, commi.type, False)
                 for commi_line_data in commi_lines_data:
                     commi_line_obj.create(commi_line_data)
 
                 # Ne va créer aucune ligne, mais mettra à jour les totaux
-                commi.create_lines(new_invoice.invoice_line_ids)
+                commi.create_lines(result.invoice_line_ids)
         return result
 
     @api.model
