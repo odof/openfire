@@ -198,6 +198,14 @@ class SaleOrder(models.Model):
                                        compute="_compute_of_invoice_date_prev",
                                        inverse="_inverse_of_invoice_date_prev", store=True)
     of_delivered = fields.Boolean(string=u"Livrée", compute="_compute_delivered", store=True)
+    of_allow_quote_addition = fields.Boolean(
+        string=u"Permet l'ajout de devis complémentaires", compute='_compute_of_allow_quote_addition')
+
+    @api.depends('company_id')
+    def _compute_of_allow_quote_addition(self):
+        option = self.env['ir.values'].get_default('sale.config.settings', 'of_allow_quote_addition')
+        for order in self:
+            order.of_allow_quote_addition = option
 
     @api.depends('of_echeance_line_ids', 'amount_total')
     def _compute_of_echeances_modified(self):
@@ -662,6 +670,26 @@ class SaleOrder(models.Model):
                         self.env['account.invoice.line'].create(vals)
 
         return invoice_ids
+
+    @api.multi
+    def action_add_quote(self):
+        self.ensure_one()
+
+        if self.state != 'sale':
+            raise UserError(u"Vous ne pouvez pas ajouter un devis complémentaire à une commande non validée.")
+
+        wizard = self.env['of.sale.order.add.quote.wizard'].create({
+            'order_id': self.id,
+        })
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': "Ajouter un devis complémentaire",
+            'view_mode': 'form',
+            'res_model': 'of.sale.order.add.quote.wizard',
+            'res_id': wizard.id,
+            'target': 'new',
+        }
 
 
 class Report(models.Model):
@@ -1255,6 +1283,7 @@ class OFSaleConfiguration(models.TransientModel):
     )
 
     of_position_fiscale = fields.Boolean(string="(OF) Position fiscale")
+    of_allow_quote_addition = fields.Boolean(string=u"(OF) Devis complémentaires")
 
     group_of_order_line_option = fields.Boolean(
         string=u"(OF) Options de ligne de commande", implied_group='of_sale.group_of_order_line_option',
@@ -1333,6 +1362,11 @@ class OFSaleConfiguration(models.TransientModel):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_position_fiscale',
             self.of_position_fiscale)
+
+    @api.multi
+    def set_of_allow_quote_addition_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'of_allow_quote_addition', self.of_allow_quote_addition)
 
 
 class AccountInvoice(models.Model):

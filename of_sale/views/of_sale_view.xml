@@ -40,6 +40,8 @@
                 </button>
                 <xpath expr="//header" position="inside">
                     <button name="button_gestion_prix" type="object" string="Gestion prix"/>
+                    <field name="of_allow_quote_addition" invisible="1"/>
+                    <button name="action_add_quote" string="Ajout devis" type="object" attrs="{'invisible': ['|', ('state', '!=', 'sale'), ('of_allow_quote_addition', '=', False)]}"/>
                 </xpath>
                 <xpath expr="//div[@name='button_box']" position="inside">
                     <!-- Ajout d'un bouton pour switcher entre vue client et vue vendeur' -->
@@ -349,6 +351,15 @@
                         <field name="stock_warning_setting" class="oe_inline"/>
                         <span>Afficher les messages d'avertissement de stock</span>
                     </div>
+                </xpath>
+                <xpath expr="//group[last()]" position="after">
+                    <group name="temp_parameters" string="Paramètres temporaires">
+                        <label for="of_allow_quote_addition"/>
+                        <div name="of_allow_quote_addition">
+                            <field name="of_allow_quote_addition" class="oe_inline"/>
+                            <span>Autoriser l'ajout de devis complémentaire aux bons de commandes</span>
+                        </div>
+                    </group>
                 </xpath>
             </field>
         </record>

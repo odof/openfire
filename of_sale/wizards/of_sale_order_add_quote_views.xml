@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- OF Sale Order Add Quote Wizard Form View -->
+    <record id="of_sale_order_add_quote_wizard_form_view" model="ir.ui.view">
+        <field name="name">of.sale.order.add.quote.wizard.form.view</field>
+        <field name="model">of.sale.order.add.quote.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="order_id" invisible="1"/>
+                    <field name="addable_quote_ids" invisible="1"/>
+                    <field name="quote_id" options="{'no_create_edit': True}" required="True"
+                           domain="[('id', 'in', addable_quote_ids and addable_quote_ids[0] and addable_quote_ids[0][2] or False)]"/>
+                </group>
+                <footer>
+                    <button string="Ajouter" name="add_quote" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
