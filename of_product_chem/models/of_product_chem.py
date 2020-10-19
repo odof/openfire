@@ -25,8 +25,11 @@ Norme : ${object.norme_id.name or ""}
 % if object.of_flamme_verte:
 ${object.of_flamme_verte}${'\u2605'}
 % endif
+% if object.of_equivalence_flamme_verte:
+Équivalence flamme verte : ${object.of_equivalence_flamme_verte}${'\u2605'}
+% endif
 % if object.of_eco_label:
-Eco-label : ${object.of_eco_label}
+Éco-label : ${object.of_eco_label}
 % endif
 % if object.of_puissance_nom:
 Puissance nominale : ${object.of_puissance_nom} kW
@@ -35,10 +38,13 @@ Puissance nominale : ${object.of_puissance_nom} kW
 Rendement : ${object.of_rendement} %
 % endif
 % if object.of_emission_co:
-Emission CO : ${object.of_emission_co} % à 13% d'O2
+Émission CO : ${object.of_emission_co} % à 13% d'O2
 % endif
 % if object.of_emission_poussiere:
-Emission de poussière : ${object.of_emission_poussiere} mg/Nm3 à 13% d'O2
+Émission de poussière : ${object.of_emission_poussiere} mg/Nm3 à 13% d'O2
+% endif
+% if object.of_emission_nox:
+Émission de NOx : ${object.of_emission_nox} mg/Nm3 à 13% d'O2
 % endif
 % if object.of_indice_i:
 Indice I : ${object.of_indice_i}
@@ -50,11 +56,13 @@ ${'\\n' + object.description_sale}
         return res
 
     of_flamme_verte = fields.Char(string=u"Flamme verte", help=u"Exprimé en nombre d'étoiles")
-    of_eco_label = fields.Char(string=u"Eco-label")
+    of_equivalence_flamme_verte = fields.Char(string=u"Équivalence flamme verte", help=u"Exprimé en nombre d'étoiles")
+    of_eco_label = fields.Char(string=u"Éco-label")
     of_puissance_nom = fields.Char(string=u"Puissance nominale", help=u"Exprimé en kW")
     of_rendement = fields.Char(string=u"Rendement", help=u"Exprimé en %")
-    of_emission_co = fields.Char(string=u"Emission de CO", help=u"Exprimé en % à 13% d'O2")
-    of_emission_poussiere = fields.Char(string=u"Emission de poussière", help=u"Exprimé en mg/Nm3 à 13% d'O2")
+    of_emission_co = fields.Char(string=u"Émission de CO", help=u"Exprimé en % à 13% d'O2")
+    of_emission_poussiere = fields.Char(string=u"Émission de poussière", help=u"Exprimé en mg/Nm3 à 13% d'O2")
+    of_emission_nox = fields.Char(string=u"Émission de NOx", help=u"Exprimé en mg/Nm3 à 13% d'O2")
     of_indice_i = fields.Char(string=u"Indice I")
 
 
@@ -67,8 +75,11 @@ Norme : ${object.norme_id.name or ""}
 % if object.of_flamme_verte:
 ${object.of_flamme_verte}${'\u2605'}
 % endif
+% if object.of_equivalence_flamme_verte:
+Équivalence flamme verte : ${object.of_equivalence_flamme_verte}${'\u2605'}
+% endif
 % if object.of_eco_label:
-Eco-label : ${object.of_eco_label}
+Éco-label : ${object.of_eco_label}
 % endif
 % if object.of_puissance_nom:
 Puissance nominale : ${object.of_puissance_nom} kW
@@ -77,10 +88,13 @@ Puissance nominale : ${object.of_puissance_nom} kW
 Rendement : ${object.of_rendement} %
 % endif
 % if object.of_emission_co:
-Emission CO : ${object.of_emission_co} % à 13% d'O2
+Émission CO : ${object.of_emission_co} % à 13% d'O2
 % endif
 % if object.of_emission_poussiere:
-Emission de poussière : ${object.of_emission_poussiere} mg/Nm3 à 13% d'O2
+Émission de poussière : ${object.of_emission_poussiere} mg/Nm3 à 13% d'O2
+% endif
+% if object.of_emission_nox:
+Émission de NOx : ${object.of_emission_nox} mg/Nm3 à 13% d'O2
 % endif
 % if object.of_indice_i:
 Indice I : ${object.of_indice_i}
