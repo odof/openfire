@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Ajout des champs pour l'impression spécifique -->
+    <record id="of_sale_external_view_order_form" model="ir.ui.view">
+        <field name="name">of.sale.external.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='docs']" position="after">
+                <group string="Impression spécifique" name="specific">
+                    <field name="of_specific_title"/>
+                    <field name="of_specific_date"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
