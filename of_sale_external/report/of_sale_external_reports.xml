@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Rapport Impression spécifique -->
+
+    <template id="saleorder_specific_external_layout_header" inherit_id="report.external_layout_header" primary="True">
+        <xpath expr="//div[@name='doc_title']" position="replace">
+            <div name="doc_title" style="font-size: large; text-align: center; padding: 4px 0px;">
+                <strong>
+                    <span t-field="o.of_specific_title"/>
+                </strong>
+            </div>
+        </xpath>
+        <xpath expr="//div[@name='champ_date']" position="replace">
+            <div name="champ_date" style="text-align: right; float: right; display: inline-block;">
+                <strong>
+                    <span t-field="o.of_specific_date"/>
+                </strong>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="saleorder_specific_external_layout" inherit_id="report.external_layout" primary="True">
+        <xpath expr="//t[@t-call='report.external_layout_header']" position="attributes">
+            <attribute name="t-call">of_sale_external.saleorder_specific_external_layout_header</attribute>
+        </xpath>
+    </template>
+
+    <template id="report_saleorder_specific_document" inherit_id="sale.report_saleorder_document" primary="True">
+        <xpath expr="//t[@t-call='report.external_layout']" position="attributes">
+            <attribute name="t-call">of_sale_external.saleorder_specific_external_layout</attribute>
+        </xpath>
+    </template>
+
+    <template id="report_saleorder_specific">
+        <t t-call="report.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="of_sale_external.report_saleorder_specific_document" t-lang="doc.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <report
+        id="of_sale_saleorder_specific_report"
+        string="Impression spécifique"
+        model="sale.order"
+        report_type="qweb-pdf"
+        file="of_sale_external.report_saleorder_specific"
+        name="of_sale_external.report_saleorder_specific"
+    />
+
+</odoo>
