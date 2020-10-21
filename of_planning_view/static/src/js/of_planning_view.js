@@ -1525,18 +1525,19 @@ var PlanningRecord = Widget.extend({
         // formattage des heures et durées
         var descript_dt = {type: "datetime"};
         var descript_ft = {type: "float_time"};
-        this.heure_debut_str = formats.format_value(record.date,descript_dt).substring(11, 16);
-        this.heure_fin_str = formats.format_value(record.date_deadline,descript_dt).substring(11, 16);
+        this.heure_debut_str = formats.format_value(this.date_start, descript_dt).substring(11, 16);
+        this.heure_fin_str = formats.format_value(this.date_stop, descript_dt).substring(11, 16);
         this.heure_debut = hh_mm_to_float(this.heure_debut_str)
         this.heure_fin = hh_mm_to_float(this.heure_fin_str)
-        var heures = Math.trunc(record.duree);
-        var minutes = (record.duree - heures) * 60;
+        this.duree = record.duree_prompt
+        var heures = Math.trunc(this.duree);
+        var minutes = (this.duree - heures) * 60;
         if (!heures) {
             this.duree_str = minutes + "min";  // exple: 45min
         }else if (!minutes) {
             this.duree_str = heures + "h"  // exple: 2h
         }else{
-            this.duree_str = formats.format_value(record.duree,descript_ft).replace(":", "h");
+            this.duree_str = formats.format_value(this.duree,descript_ft).replace(":", "h");
             if (this.duree_str[0] == "0") {
                 this.duree_str = this.duree_str.substring(1);  // exple: 2h45
             }
@@ -1554,6 +1555,9 @@ var PlanningRecord = Widget.extend({
             this.attendee_other_ids = []
         }
         this.on_global_click = _.debounce(this.on_global_click, 300, true);
+        if (this.id == 2568) {
+            console.log(this);
+        }
     },
     /**
      *  Génère le rendu de l'enregistrement. associe les events js.

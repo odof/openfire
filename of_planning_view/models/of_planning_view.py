@@ -140,8 +140,8 @@ class OfPlanningIntervention(models.Model):
                         date_fin_utc_dt = tz.localize(date_fin_locale_dt, is_dst=None).astimezone(pytz.utc)
                         to_append = {
                             'attendee_name': employee.name,
-                            'date': fields.Datetime.to_string(date_deb_utc_dt),
-                            'date_deadline': fields.Datetime.to_string(date_fin_utc_dt),
+                            'date_prompt': fields.Datetime.to_string(date_deb_utc_dt),
+                            'date_deadline_prompt': fields.Datetime.to_string(date_fin_utc_dt),
                             'heure_debut': cren[0],
                             'heure_fin': cren[1],
                             'lieu_debut': lieu_depart,
@@ -313,8 +313,8 @@ class OfPlanningIntervention(models.Model):
                 # On récupère tous les rdvs de la journée
                 interventions = intervention_obj.sudo().search(
                     [('employee_ids', 'in', employee_id),
-                     ('date', '<=', date_current_str),
-                     ('date_deadline', '>=', date_current_str),
+                     ('date_prompt', '<=', date_current_str),
+                     ('date_deadline_prompt', '>=', date_current_str),
                      ('state', 'in', ('draft', 'confirm', 'done'))],
                     order='date')
                 intervention_liste = []
@@ -346,7 +346,7 @@ class OfPlanningIntervention(models.Model):
                 jour_fin_dt = tz.localize(datetime.strptime(date_current_str+" 23:59:00", "%Y-%m-%d %H:%M:%S"))
                 for intervention in interventions:
                     intervention_heures = [intervention]
-                    for intervention_heure in (intervention.date, intervention.date_deadline):
+                    for intervention_heure in (intervention.date_prompt, intervention.date_deadline_prompt):
                         # Conversion des dates de début et de fin en nombres flottants et à l'heure locale
                         intervention_locale_dt = fields.Datetime.context_timestamp(
                             self, fields.Datetime.from_string(intervention_heure))
