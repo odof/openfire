@@ -401,8 +401,8 @@
         <field name="name">of.planning.intervention.calendar</field>
         <field name="model">of.planning.intervention</field>
         <field name="arch" type="xml">
-            <calendar string="Calendrier" date_start="date" color="employee_ids" attendee="employee_ids"
-                      date_stop="date_deadline" display_states="1" quick_add="0" attendee_model="hr.employee"
+            <calendar string="Calendrier" date_start="date_prompt" color="employee_ids" attendee="employee_ids"
+                      date_stop="date_deadline_prompt" display_states="1" quick_add="0" attendee_model="hr.employee"
                       color_ft_field="of_color_ft" color_bg_field="of_color_bg" custom_colors="1" color_is_attendee="1"
                       color_multiple="1" show_all_attendees="1" config_model="of.intervention.settings">
                 <field name="calendar_name"/>

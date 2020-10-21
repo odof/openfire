@@ -335,6 +335,14 @@ class OfPlanningIntervention(models.Model):
             return self.env['res.company']._company_default_get('of.planning.intervention')
         return False
 
+    @api.model
+    def default_get(self, fields_list):
+        if 'default_date_prompt' in self._context:
+            self = self.with_context(default_date=self._context['default_date_prompt'])
+        if 'default_date_deadline_prompt' in self._context:
+            self = self.with_context(default_date_deadline=self._context['default_date_deadline_prompt'])
+        return super(OfPlanningIntervention, self).default_get(fields_list)
+
     # Champs #
 
     # Header
@@ -387,6 +395,14 @@ class OfPlanningIntervention(models.Model):
         compute="_compute_date_deadline", string="Date fin", store=True, track_visibility='always')
     jour_fin_force = fields.Char(u"Jour fin forcé", compute="_compute_jour")
     date_deadline_forcee = fields.Datetime(string=u"Date fin (forcée)")
+    # les fonctions de calcul et de recherche des 2 champs suivants sont héritées dans of_mobile
+    date_prompt = fields.Datetime(string=u"Date de début", compute="_compute_date_prompt", search="_search_date_prompt")
+    date_deadline_prompt = fields.Datetime(
+        string="Date de fin", compute="_compute_date_prompt", search="_search_date_deadline_prompt"
+    )
+    duree_prompt = fields.Float(
+        string=u"Durée affichée", compute="_compute_duree_prompt", search="_search_duree_prompt"
+    )
     heure_debut_str = fields.Char(string=u"Heure de début", compute="_compute_heure_debut_fin_str")
     heure_fin_str = fields.Char(string=u"Heure de fin", compute="_compute_heure_debut_fin_str")
     horaire_du_jour = fields.Text(string=u"Horaires du jour", compute="_compute_horaire_du_jour")
@@ -618,15 +634,27 @@ class OfPlanningIntervention(models.Model):
                 interv.alert_hors_creneau = False
 
     @api.depends('date', 'date_deadline')
+    def _compute_date_prompt(self):
+        for intervention in self:
+            intervention.date_prompt = intervention.date
+            intervention.date_deadline_prompt = intervention.date_deadline
+            intervention.duree_prompt = intervention.duree
+
+    @api.depends('duree')
+    def _compute_duree_prompt(self):
+        for intervention in self:
+            intervention.duree_prompt = intervention.duree
+
+    @api.depends('date', 'date_deadline')
     def _compute_heure_debut_fin_str(self):
         for intervention in self:
             # Conversion des dates de début et de fin à l'heure locale
             debut_locale_dt = fields.Datetime.context_timestamp(
-                self, fields.Datetime.from_string(intervention.date))
+                intervention, fields.Datetime.from_string(intervention.date))
             debut_locale_str = fields.Datetime.to_string(debut_locale_dt)
             intervention.heure_debut_str = debut_locale_str[10:16]
             fin_locale_dt = fields.Datetime.context_timestamp(
-                self, fields.Datetime.from_string(intervention.date_deadline))
+                intervention, fields.Datetime.from_string(intervention.date_deadline))
             fin_locale_str = fields.Datetime.to_string(fin_locale_dt)
             intervention.heure_fin_str = fin_locale_str[10:16]
 
@@ -849,6 +877,18 @@ class OfPlanningIntervention(models.Model):
                 domain = [('date_deadline', operator, value)]
         return domain
 
+    @api.model
+    def _search_date_prompt(self, operator, operand):
+        return [('date', operator, operand)]
+
+    @api.model
+    def _search_date_deadline_prompt(self, operator, operand):
+        return [('date_deadline', operator, operand)]
+
+    @api.model
+    def _search_duree_prompt(self, operator, operand):
+        return [('duree', operator, operand)]
+
     def _search_gb_employee_id(self, operator, value):
         return [('employee_ids', operator, value)]
 
@@ -1013,6 +1053,8 @@ class OfPlanningIntervention(models.Model):
         if self._context.get('from_ui'):
             vals['verif_dispo'] = False
             vals['forcer_dates'] = True
+            vals['date'] = vals.get('date', vals.get('date_prompt', False))
+            vals['date_deadline'] = vals.get('date_deadline', vals.get('date_deadline_prompt', False))
             if vals.get('date_deadline'):
                 vals['date_deadline_forcee'] = vals['date_deadline'][:17] + '00'
                 date_deadline_dt = fields.Datetime.from_string(vals['date_deadline_forcee'])

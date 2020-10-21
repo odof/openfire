@@ -58,10 +58,10 @@
         <field name="name">of.planning.intervention.timeline</field>
         <field name="model">of.planning.intervention</field>
         <field name="arch" type="xml">
-            <planning date_start="date" date_stop="date_deadline"
+            <planning date_start="date_prompt" date_stop="date_deadline_prompt"
                       string="Interventions" color_ft="of_color_ft" color_bg="of_color_bg"
                       resource="employee_ids" color_multiple="1">
-                <field name="duree"/>
+                <field name="duree_prompt"/>
                 <field name="duree_debut_fin"/>
                 <field name="tache_name"/>
                 <field name="tache_id"/>
