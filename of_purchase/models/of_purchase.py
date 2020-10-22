@@ -258,15 +258,106 @@ class SaleConfigSettings(models.TransientModel):
                 'sale.config.settings', 'of_recalcul_pa', self.of_recalcul_pa)
 
 
-class ProductTemplate(models.Model):
-    _inherit = 'product.template'
+class ProductProduct(models.Model):
+    _inherit = 'product.product'
 
-    of_purchase_coeff = fields.Float(string="Coefficient d'achat", compute="_compute_of_purchase_coeff", store=True)
+    @api.model_cr_context
+    def _auto_init(self):
+        model = self.env['ir.model'].search([('model', '=', self._name)])
+        fields_obj = self.env['ir.model.fields']
+        standard_price_field = fields_obj.search([('model_id', '=', model.id), ('name', '=', 'standard_price')])
+        purchase_coeff_field = fields_obj.search([('model_id', '=', model.id), ('name', '=', 'of_purchase_coeff')])
+        test = self.env['ir.config_parameter'].get_param('of_purchase_coeff_generated', False)
 
-    @api.depends('of_seller_price', 'list_price')
-    def _compute_of_purchase_coeff(self):
-        for product in self:
-            product.of_purchase_coeff = product.standard_price and product.of_seller_price\
-                                        and product.standard_price / product.of_seller_price\
+        res = super(ProductProduct, self)._auto_init()
+        if not test:
+            if not purchase_coeff_field:
+                purchase_coeff_field = fields_obj.search([('model_id', '=', model.id), ('name', '=', 'of_purchase_coeff')])
+            if purchase_coeff_field:
+                self.env['ir.config_parameter'].set_param('of_purchase_coeff_generated', 'True')
+                self.env.cr.execute("DELETE FROM ir_property WHERE name = 'standard_price' AND res_id LIKE 'product.product,%' AND SUBSTRING(res_id FROM 17)::integer NOT IN (SELECT id FROM product_product);")
+                self.env.cr.execute("""INSERT INTO ir_property ("""
+                                    """    create_uid,"""
+                                    """    create_date,"""
+                                    """    write_uid,"""
+                                    """    write_date,"""
+                                    """    name,"""
+                                    """    value_float,"""
+                                    """    res_id,"""
+                                    """    company_id,"""
+                                    """    fields_id,"""
+                                    """    type"""
+                                    """)"""
+                                    """("""
+                                    """    SELECT  1"""
+                                    """    ,       now()"""
+                                    """    ,       1"""
+                                    """    ,       now()"""
+                                    """    ,       'of_purchase_coeff'"""
+                                    """    ,       CASE WHEN IP.value_float = 0 THEN"""
+                                    """                1"""
+                                    """            ELSE"""
+                                    """                (IP.value_float / COALESCE( (   SELECT      PS.price"""
+                                    """                                                FROM        product_supplierinfo    PS"""
+                                    """                                                ,           product_product         PP"""
+                                    """                                                WHERE       PP.id                   = CAST(SUBSTRING(res_id FROM POSITION(',' IN res_id) + 1) AS INT)"""
+                                    """                                                AND         PS.product_tmpl_id      = PP.product_tmpl_id"""
+                                    """                                                AND         PS.price                > 0"""
+                                    """                                                ORDER BY    PS.sequence"""
+                                    """                                                ,           PS.min_qty DESC"""
+                                    """                                                ,           PS.price"""
+                                    """                                                LIMIT 1"""
+                                    """                                            ), IP.value_float)"""
+                                    """                )"""
+                                    """            END"""
+                                    """    ,       IP.res_id"""
+                                    """    ,       IP.company_id"""
+                                    """    ,       %s"""
+                                    """    ,       'float'"""
+                                    """    FROM    ir_property IP"""
+                                    """    WHERE   IP.name = 'standard_price'"""
+                                    """    AND     IP.fields_id = %s"""
+                                    """)"""
+                                    """;""", (purchase_coeff_field.id, standard_price_field.id))
+        return res
+
+    of_purchase_coeff = fields.Float(string="Coefficient d'achat", store=True, company_dependent=True)
+
+
+    @api.multi
+    def write(self, vals):
+        if 'standard_price' in vals:
+            standard_price = vals['standard_price']
+            vals['of_purchase_coeff'] = standard_price and self.of_seller_price\
+                                        and standard_price / self.of_seller_price\
                                         or 1
+        return super(ProductProduct, self).write(vals)
 
+
+class ProductSupplierinfo(models.Model):
+    _inherit = "product.supplierinfo"
+
+    @api.multi
+    def write(self, vals):
+        if 'price' in vals:
+            price = vals['price']
+            product_tmpl_id = vals.get('product_tmpl_id', self.product_tmpl_id.id)
+            product_id = vals.get('product_id', self.product_id.id)
+            products_done = self.env['product.product']
+
+            if product_tmpl_id:
+                product_tmpl = self.env['product.template'].browse(product_tmpl_id)
+                if product_tmpl.seller_ids and product_tmpl.seller_ids[0].id == self.id:
+                    for product in product_tmpl.product_variant_ids:
+                        product.of_purchase_coeff = product.standard_price and price \
+                                                    and product.standard_price / price \
+                                                    or 1
+                        products_done |= product
+
+            if product_id and (not products_done or product_id not in products_done.ids):
+                product = self.env['product.product'].browse(product_id)
+                if product.seller_ids and product.seller_ids[0].id == self.id:
+                    product.of_purchase_coeff = product.standard_price and price \
+                                                and product.standard_price / price \
+                                                or 1
+        return super(ProductSupplierinfo, self).write(vals)
