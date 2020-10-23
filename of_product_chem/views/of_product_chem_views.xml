@@ -29,6 +29,7 @@
                         <field name="of_emission_poussiere"/>
                         <field name="of_emission_nox"/>
                         <field name="of_indice_i"/>
+                        <field name="of_fonds_air_bois"/>
                     </group>
                 </group>
             </xpath>

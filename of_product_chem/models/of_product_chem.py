@@ -49,6 +49,9 @@ Rendement : ${object.of_rendement} %
 % if object.of_indice_i:
 Indice I : ${object.of_indice_i}
 % endif
+% if object.of_fonds_air_bois:
+Éligible Fonds Air Bois
+% endif
 % endif
 % if object.description_sale
 ${'\\n' + object.description_sale}
@@ -64,6 +67,7 @@ ${'\\n' + object.description_sale}
     of_emission_poussiere = fields.Char(string=u"Émission de poussière", help=u"Exprimé en mg/Nm3 à 13% d'O2")
     of_emission_nox = fields.Char(string=u"Émission de NOx", help=u"Exprimé en mg/Nm3 à 13% d'O2")
     of_indice_i = fields.Char(string=u"Indice I")
+    of_fonds_air_bois = fields.Boolean(string=u"Éligible Fonds Air Bois ?")
 
 
 class OfProductBrand(models.Model):
@@ -98,6 +102,9 @@ Rendement : ${object.of_rendement} %
 % endif
 % if object.of_indice_i:
 Indice I : ${object.of_indice_i}
+% endif
+% if object.of_fonds_air_bois:
+Éligible Fonds Air Bois
 % endif
 % endif
 % if object.description_sale
