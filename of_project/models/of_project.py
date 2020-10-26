@@ -26,7 +26,7 @@ class OfPeriodePlanifiee(models.Model):
 
     type = fields.Selection([('mois', 'Mois'), ('semaine', 'Semaine')], string=u"Type de période", required=True)
     premier_jour = fields.Date(string="Premier jour", required=True)
-    dernier_jour = fields.Date(string="Dernier jour", compute="_compute_duree")
+    dernier_jour = fields.Date(string="Dernier jour", compute="_compute_duree", store=True)
     name = fields.Char(string="Nom", compute="_compute_name", search="_search_name")
     active = fields.Boolean(string="Actif", default=True)
     technicien_ids = fields.One2many('of.periode.planifiee.technicien', 'periode_id', copy=True)
@@ -106,7 +106,7 @@ class OfPeriodePlanifiee(models.Model):
                 elif periode.type == 'semaine':
                     date -= relativedelta(days=date.weekday())
                     periode.premier_jour = date.strftime('%Y-%m-%d')
-                    periode.dernier_jour = (date + relativedelta(days=6)).strftime('%Y-%m-%d') 
+                    periode.dernier_jour = (date + relativedelta(days=6)).strftime('%Y-%m-%d')
 
     @api.depends('premier_jour')
     def _compute_name(self):
@@ -250,7 +250,8 @@ class OfAffectationTache(models.Model):
 
 
 class ProjectTask(models.Model):
-    _inherit = "project.task"
+    _name = 'project.task'
+    _inherit = ['project.task', 'of.readgroup']
 
     of_periode_ids = fields.Many2many('of.periode.planifiee', string=u"Période(s)")
     of_periode_time_ids = fields.One2many('of.affectation.tache', 'tache_id', string=u"Temps par période")
@@ -260,10 +261,16 @@ class ProjectTask(models.Model):
     of_planned_review_hours = fields.Float(string=u"Heures de revue")
     project_id = fields.Many2one(required=True)
     categ_id = fields.Many2one(string=u"Catégorie", required=True)
-    of_ticket_ids = fields.Many2one(
+    of_ticket_ids = fields.One2many(
         comodel_name='website.support.ticket', string=u"Tickets supports", compute='_compute_of_tickets')
     of_ticket_count = fields.Integer(string=u"Nombre de tickets", compute='_compute_of_tickets')
     of_review_description = fields.Html(string=u"Revue")
+    of_gb_period_id = fields.Many2one(
+        comodel_name='of.periode.planifiee', compute='lambda *a, **k:{}', search='_search_of_gb_period_id',
+        string=u"Période", of_custom_groupby=True)
+
+    def _search_of_gb_period_id(self, operator, value):
+        return [('of_periode_ids', operator, value)]
 
     @api.depends('of_periode_time_ids', 'planned_hours')
     def _compute_temps_restant(self):
@@ -304,6 +311,29 @@ class ProjectTask(models.Model):
             domain = ['|', ('name', operator, name), ('code', operator, name)]
         tasks = self.search(domain + args, limit=limit)
         return tasks.name_get()
+
+    @api.model
+    def _read_group_process_groupby(self, gb, query):
+        """Ajout de la possibilité de regrouper par période"""
+        if gb != 'of_gb_period_id':
+            return super(ProjectTask, self)._read_group_process_groupby(gb, query)
+
+        alias, _ = query.add_join(
+            (self._table, 'of_periode_planifiee_project_task_rel', 'id', 'project_task_id', 'of_periode_planifiee_id'),
+            implicit=False, outer=True,
+        )
+
+        field_name = 'of_periode_planifiee_id'
+
+        return {
+            'field': gb,
+            'groupby': gb,
+            'type': 'many2one',
+            'display_format': None,
+            'interval': None,
+            'tz_convert': False,
+            'qualified_field': '"%s".%s' % (alias, field_name)
+        }
 
     def _get_infos_on_periode(self, periode, user):
         """ Récupère les informations des périodes en fonction de l'utilisateur
