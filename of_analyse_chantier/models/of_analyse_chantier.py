@@ -543,12 +543,12 @@ class OfAnalyseChantier(models.Model):
             if analyse.order_ids:
                 partner = analyse.order_ids.mapped('partner_id')
                 if len(partner) > 1:
-                    pass
+                    continue
                 analyse.partner_id = partner
             elif analyse.invoice_ids:
                 partner = analyse.invoice_ids.mapped('partner_id')
                 if len(partner) > 1:
-                    pass
+                    continue
                 analyse.partner_id = partner
 
     @api.multi
@@ -710,7 +710,7 @@ class OfAnalyseChantier(models.Model):
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    of_analyse_id = fields.Many2one('of.analyse.chantier', string="Analyse de chantier")
+    of_analyse_id = fields.Many2one('of.analyse.chantier', string="Analyse de chantier", copy=False)
 
     @api.multi
     def action_view_analyse_chantier(self):
@@ -739,7 +739,7 @@ class SaleOrder(models.Model):
 class AccountInvoice(models.Model):
     _inherit = "account.invoice"
 
-    of_analyse_id = fields.Many2one('of.analyse.chantier', string="Analyse de chantier")
+    of_analyse_id = fields.Many2one('of.analyse.chantier', string="Analyse de chantier", copy=False)
 
 
 class AccountInvoiceLine(models.Model):
@@ -808,4 +808,4 @@ class OfPlanningIntervention(models.Model):
 class StockPicking(models.Model):
     _inherit = "stock.picking"
 
-    of_analyse_id = fields.Many2one('of.analyse.chantier', string="Analyse de chantier")
+    of_analyse_id = fields.Many2one('of.analyse.chantier', string="Analyse de chantier", copy=False)
