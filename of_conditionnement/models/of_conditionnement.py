@@ -27,7 +27,7 @@ class SaleOrderLine(models.Model):
     def _compute_of_packaging_unit(self):
         for rec in self:
             if rec.product_id and rec.product_id.of_packaging_unit and rec.product_uom_qty:
-                required_units = int(math.ceil(rec.product_uom_qty / rec.product_id.of_packaging_unit))
+                required_units = int(math.ceil(round(rec.product_uom_qty / rec.product_id.of_packaging_unit, 3)))
                 packaging_unit_str = formatLang(self.env, rec.product_id.of_packaging_unit, 2)
 
                 required_units_str = str(required_units)
@@ -55,7 +55,7 @@ class SaleOrderLine(models.Model):
     def _onchange_product_uom_qty(self):
         res = super(SaleOrderLine, self)._onchange_product_uom_qty()
         if self.product_id and self.product_id.of_packaging_unit and self.product_uom_qty:
-            required_units = int(math.ceil(self.product_uom_qty / self.product_id.of_packaging_unit))
+            required_units = int(math.ceil(round(self.product_uom_qty / self.product_id.of_packaging_unit, 3)))
             self.of_display_required_units = True
             if not self.of_force_qty:
                 self.product_uom_qty = required_units * self.product_id.of_packaging_unit
