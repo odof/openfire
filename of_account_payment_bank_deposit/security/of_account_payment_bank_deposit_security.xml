@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data noupdate="1">
+
+        <record id="of_account_payment_bank_deposit_comp_rule" model="ir.rule">
+            <field name="name">Bank Deposits multi-company</field>
+            <field name="model_id" ref="model_of_account_payment_bank_deposit"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('journal_id.company_id', '=', False), ('journal_id.company_id', 'child_of', [user.company_id.id])]</field>
+        </record>
+
+    </data>
+
+</odoo>
