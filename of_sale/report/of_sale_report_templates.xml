@@ -404,7 +404,7 @@ Sinon :
 
     <xpath expr="//table" position="after">
         <t groups="sale.group_sale_layout" t-foreach="invoice_data['lines_layouted']" t-as="page">
-            <table class="table table-condensed">
+            <table name="invoice_line_layouted" class="table table-condensed">
                 <thead>
                     <tr>
                         <th name="descr" style="width: 60%">Description</th>

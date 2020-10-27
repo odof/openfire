@@ -100,7 +100,7 @@
             <!-- Calcul des données des lignes de facture, des totaux et du récapitulatif des taxes -->
             <t t-set="invoice_data" t-value="o.of_get_printable_data()"/>
 
-            <table class="table table-condensed">
+            <table name="invoice_line" class="table table-condensed">
                 <thead>
                     <tr>
                         <th style="width: 60%">Description</th>
