@@ -140,7 +140,8 @@
             <xpath expr="//field[@name='partner_shipping_id']" position="after">
                 <field name="of_template_id" context="{'company_id': company_id}"
                     options="{'no_create': True, 'no_open': True}"/>
-                <field name="of_note_insertion" nolabel="1" readonly="1" attrs="{'invisible': [('of_note_insertion', '=', False)]}"/>
+                <field name="of_note_insertion" nolabel="1" colspan="2" readonly="1"
+                       attrs="{'invisible': [('of_note_insertion', '=', False)]}"/>
             </xpath>
         </field>
     </record>
