@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="of_wizard_select_template" model="ir.ui.view">
-        <field name="name">OF Select Move Template</field>
-        <field name="model">wizard.select.move.template</field>
-        <field name="inherit_id"  ref="account_move_template.wizard_select_template"/>
+
+    <record id="of_view_move_template_form" model="ir.ui.view">
+        <field name="name">of.account.move.template.form</field>
+        <field name="model">account.move.template</field>
+        <field name="inherit_id"  ref="account_move_template.view_move_template_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//separator" position="before">
-                <group attrs="{'invisible':[('state','!=','template_selected')]}">
-                    <field name="of_date_start" string="Date"/>
-                    <field name="of_recurring"/>
-               </group>
+            <xpath expr="//field[@name='company_id']" position="after">
+                <field name="of_recurring"/>
+            </xpath>
+            <xpath expr="//field[@name='template_line_ids']" position="before">
                 <group attrs="{'invisible':[('of_recurring','!=',True)]}">
                     <group>
                         <label for="of_rec_interval" string="Répéter tous les"/>
@@ -27,12 +27,7 @@
                     </group>
                 </group>
             </xpath>
-            <xpath expr="//separator" position="attributes">
-                <attribute name="attrs">{'invisible':[('line_ids','=',[])]}</attribute>
-            </xpath>
-            <xpath expr="//field[@name='line_ids']" position="attributes">
-                <attribute name="attrs">{'invisible':[('line_ids','=',[])]}</attribute>
-            </xpath>
         </field>
     </record>
+
 </odoo>

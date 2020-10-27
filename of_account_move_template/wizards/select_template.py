@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from datetime import date as dt_date
 from dateutil.relativedelta import relativedelta
 import calendar
 
@@ -26,9 +27,54 @@ class WizardSelectMoveTemplate(models.TransientModel):
             ('none', u"Pas d'extourne"),
             ('first', u"Date de départ"),
             ('last', u"Date de fin"),
+            ('custom', u"Date choisie"),
         ],
         string=u"Extourner", default='none', required=True
     )
+    of_extourne_date = fields.Date(string="Date extourne")
+
+    @api.multi
+    def load_lines(self):
+        # Réécriture de la fonction pour ne pas générer automatiquement les pièces comptables
+        # quand il n'y a pas de ligne à montant "manuel" et que le modèle indique une récurrence.
+        self.ensure_one()
+        lines = self.template_id.template_line_ids
+        for line in lines.filtered(lambda l: l.type == 'input'):
+            self.env['wizard.select.move.template.line'].create({
+                'template_id': self.id,
+                'sequence': line.sequence,
+                'name': line.name,
+                'amount': 0.0,
+                'account_id': line.account_id.id,
+                'move_line_type': line.move_line_type,
+            })
+        if not self.line_ids and not self.template_id.of_recurring:
+            return self.load_template()
+
+        data = self.template_id.read(
+            ['of_recurring', 'of_rec_interval', 'of_rec_interval_type', 'of_rec_number', 'of_prorata',
+             'of_extourne', 'of_extourne_date'])[0]
+        if data['of_extourne_date']:
+            extourne_date = fields.Date.from_string(data['of_extourne_date'])
+            month_start = dt_date.today() + relativedelta(day=1)
+            extourne_date += relativedelta(year=month_start.year)
+            if extourne_date < month_start:
+                extourne_date += relativedelta(years=1)
+            data['of_extourne_date'] = extourne_date
+        data['state'] = 'template_selected'
+        self.write(data)
+
+        view_rec = self.env.ref('account_move_template.wizard_select_template')
+        return {
+            'view_type': 'form',
+            'view_id': [view_rec.id],
+            'view_mode': 'form',
+            'res_model': 'wizard.select.move.template',
+            'res_id': self.id,
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': self.env.context,
+        }
 
     @api.multi
     def load_template(self):
@@ -74,10 +120,12 @@ class WizardSelectMoveTemplate(models.TransientModel):
                     if i == 0 and of_prorata:
                         ratio = float(month_last_day - date_start_da.day + 1) / month_last_day
                         date_amounts = {sequence: amount * ratio for sequence, amount in date_amounts.iteritems()}
+                        amt0 = date_amounts
                     elif i == imax and of_prorata:
-                        date_da = fields.Date.from_string(date)
-                        ratio = float(date_da.day - 1) / calendar.monthrange(date_da.year, date_da.month)[1]
-                        date_amounts = {sequence: amount * ratio for sequence, amount in date_amounts.iteritems()}
+                        date_amounts = {
+                            sequence: amount - amt0[sequence]
+                            for sequence, amount in date_amounts.iteritems()
+                        }
 
                 for sequence, amount in date_amounts.iteritems():
                     totals[sequence] += amount
@@ -91,8 +139,11 @@ class WizardSelectMoveTemplate(models.TransientModel):
             if self.of_extourne != 'none':
                 if self.of_extourne == 'first':
                     date = self.of_date_start
-                else:
+                elif self.of_extourne == 'last':
                     date = moves[-1].date
+                else:
+                    # Date custom
+                    date = self.of_extourne_date
                 lines = []
                 move = self._create_move(name, journal.id, partner, date)
                 moves += move

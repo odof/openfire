@@ -19,6 +19,7 @@ Permet de charger un modèle de pièce comptable de façon récurrente sur une p
     ],
     'demo_xml': [],
     'data': [
+        'views/account_move_template.xml',
         'wizards/select_template.xml',
     ],
     'installable': True,
