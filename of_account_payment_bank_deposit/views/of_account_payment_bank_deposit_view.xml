@@ -130,5 +130,17 @@
             target="new"
             />
 
+        <!-- Journal Form View -->
+        <record id="of_account_payment_bank_deposit_journal_form_view" model="ir.ui.view">
+            <field name="name">of.account.payment.bank.deposit.journal.form.view</field>
+            <field name="model">account.journal</field>
+            <field name="inherit_id" ref="account.view_account_journal_form"/>
+            <field name="arch" type="xml">
+                <field name="outbound_payment_method_ids" position="after">
+                    <field name="of_allow_bank_deposit" attrs="{'invisible': [('type', 'not in', ['cash', 'bank'])]}"/>
+                </field>
+             </field>
+        </record>
+
     </data>
 </odoo>

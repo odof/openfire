@@ -22,7 +22,9 @@ class OfAccountPaymentBankDeposit(models.Model):
     move_id = fields.Many2one('account.move', 'Account move', readonly=True, ondelete='restrict')
     state = fields.Selection([('draft', 'Unposted'), ('posted', 'Posted')], string='Status',
                              required=True, readonly=True, copy=False, default='draft')
-    journal_id = fields.Many2one('account.journal', 'Journal', required=True, domain="[('type', 'in', ('cash', 'bank'))]")
+    journal_id = fields.Many2one(
+        'account.journal', 'Journal', required=True,
+        domain="[('type', 'in', ('cash', 'bank')), ('of_allow_bank_deposit', '=', True)]")
 
     _order = 'date DESC'
 
@@ -151,3 +153,34 @@ class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
     of_deposit_id = fields.Many2one('of.account.payment.bank.deposit', 'Bank deposit', readonly=True, copy=False)
+
+
+class AccountJournal(models.Model):
+    _inherit = 'account.journal'
+
+    @api.model_cr_context
+    def _auto_init(self):
+        cr = self._cr
+        init = False
+        if self._auto:
+            cr.execute(
+                "SELECT * FROM information_schema.columns "
+                "WHERE table_name = '%s' AND column_name = 'of_allow_bank_deposit'" % (self._table,))
+            init = not bool(cr.fetchall())
+
+        res = super(AccountJournal, self)._auto_init()
+        if init:
+            cr.execute("UPDATE %s "
+                       "SET of_allow_bank_deposit = True "
+                       "WHERE type = 'bank'" % (self._table, ))
+        return res
+
+    of_allow_bank_deposit = fields.Boolean(string=u"Autoriser les remises en banque")
+
+    @api.onchange('type')
+    def _onchange_type(self):
+        super(AccountJournal, self)._onchange_type()
+        if self.type == 'bank':
+            self.of_allow_bank_deposit = True
+        else:
+            self.of_allow_bank_deposit = False
