@@ -23,6 +23,7 @@ Fonctionnalités
     'data' : [
         'views/of_account_payment_bank_deposit_view.xml',
         'security/ir.model.access.csv',
+        'security/of_account_payment_bank_deposit_security.xml',
         'reports/of_rapport_remise_banque.xml',
     ],
     'installable': True,
