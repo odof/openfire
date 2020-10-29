@@ -221,7 +221,8 @@
                             <field name="address_id" domain="[('customer','=',True)]" colspan="2"/>
                             <field name="secteur_id"/>
                             <field name="user_id"/>
-                            <field name="company_id" options="{'no_create': True, 'no_edit': True}"/>
+                            <field name="company_id" options="{'no_create': True, 'no_edit': True}"
+                                   context="{'of_filter_magasin':True}"/>
                             <field name="name" string="Libellé"/>
                             <field name="tag_ids" widget="many2many_tags"/>
                         </group>

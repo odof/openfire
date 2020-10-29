@@ -296,7 +296,8 @@ class OfPlanningIntervention(models.Model):
     secteur_id = fields.Many2one(related='address_id.of_secteur_tech_id', readonly=True)
     user_id = fields.Many2one('res.users', string="Utilisateur", default=lambda self: self.env.uid)
     company_id = fields.Many2one(
-        'res.company', string="Magasin", required=True, default=lambda self: self.env.user.company_id.id)
+        'res.company', string='Magasin', required=True,
+        default=lambda self: self.env['res.company']._company_default_get('of.planning.intervention'))
     name = fields.Char(string=u"Libellé", required=True)
     tag_ids = fields.Many2many('of.planning.tag', column1='intervention_id', column2='tag_id', string=u"Étiquettes")
 
