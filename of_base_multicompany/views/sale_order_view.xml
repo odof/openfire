@@ -6,6 +6,7 @@
     <record id="of_multicompany_view_order_form" model="ir.ui.view">
         <field name="name">sale order</field>
         <field name="model">sale.order</field>
+        <field name="priority" eval="100"/>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='order_line']/form/group/group[2]/field[@name='tax_id']" position="attributes">
@@ -14,8 +15,11 @@
             <xpath expr="//field[@name='order_line']/tree/field[@name='tax_id']" position="attributes">
                 <attribute name="domain">[('type_tax_use','=','sale'),('company_id','=',parent.accounting_company_id)]</attribute>
             </xpath>
-            <xpath expr="//notebook/page[2]//field[@name='company_id']" position="after">
+            <!-- Déplacement du champ société dans la partie haute du formulaire -->
+            <xpath expr="//field[@name='company_id']" position="replace"/>
+            <xpath expr="//field[@name='partner_shipping_id']" position="after">
                 <field name="accounting_company_id" invisible="1"/>
+                <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
             </xpath>
         </field>
     </record>

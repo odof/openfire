@@ -19,12 +19,13 @@ Personnalisation multi-sociétés :
     'depends': [
         'account',
         'account_reversal',
-        'sale',
+        'sale_stock',
     ],
     'category': "OpenFire",
     'data': [
         'security/of_base_multicompany_security.xml',
         'views/account_invoice_view.xml',
+        'views/res_company_view.xml',
         'views/sale_order_view.xml',
     ],
     'installable': True,
