@@ -178,6 +178,14 @@ class OFCRMFunnelConversion(models.Model):
 
     @api.model
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        if 'sales_total' not in fields:
+            fields.append('sales_total')
+        if 'ordered_turnover_objective' not in fields:
+            fields.append('ordered_turnover_objective')
+        if 'previous_sales_total' not in fields:
+            fields.append('previous_sales_total')
+        if 'quotation_amount' not in fields:
+            fields.append('quotation_amount')
         res = super(OFCRMFunnelConversion, self).read_group(
             domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
         for line in res:
@@ -468,6 +476,22 @@ class OFCRMFunnelConversion2(models.Model):
 
     @api.model
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        if 'quotation_nb' not in fields:
+            fields.append('quotation_nb')
+        if 'opportunity_nb' not in fields:
+            fields.append('opportunity_nb')
+        if 'order_nb' not in fields:
+            fields.append('order_nb')
+        if 'sales_total' not in fields:
+            fields.append('sales_total')
+        if 'order_margin' not in fields:
+            fields.append('order_margin')
+        if 'quotation_amount' not in fields:
+            fields.append('quotation_amount')
+        if 'ordered_turnover_objective' not in fields:
+            fields.append('ordered_turnover_objective')
+        if 'previous_sales_total' not in fields:
+            fields.append('previous_sales_total')
         res = super(OFCRMFunnelConversion2, self).read_group(
             domain, fields.extend(['sales_total']), groupby, offset=offset, limit=limit,
             orderby=orderby, lazy=lazy)
