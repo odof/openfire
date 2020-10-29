@@ -133,6 +133,12 @@ class OFSaleMarginRegulator(models.Model):
 
     @api.model
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        if 'delivered_ordered_margin_gap' not in fields:
+            fields.append('delivered_ordered_margin_gap')
+        if 'ordered_margin' not in fields:
+            fields.append('ordered_margin')
+        if 'invoiced_ordered_margin_gap' not in fields:
+            fields.append('invoiced_ordered_margin_gap')
         res = super(OFSaleMarginRegulator, self).read_group(
             domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
         for line in res:
