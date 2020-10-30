@@ -45,6 +45,10 @@ class OFSaleMarginRegulator(models.Model):
     invoiced_ordered_margin_gap_perc = fields.Char(
         string=u"Écart de marge facturé / commandé (%)", compute='_compute_invoiced_ordered_margin_gap_perc',
         compute_sudo=True, readonly=True)
+    ordered_delivered_margin_regulator = fields.Float(string=u"Régule de marge commandé / livré", readonly=True)
+    ordered_delivered_margin_regulator_perc = fields.Char(
+        string=u"Régule de marge commandé / livré (%)", compute='_compute_ordered_delivered_margin_regulator_perc',
+        compute_sudo=True, readonly=True)
 
     def init(self):
         tools.drop_view_if_exists(self._cr, 'of_sale_margin_regulator')
@@ -105,6 +109,9 @@ class OFSaleMarginRegulator(models.Model):
                                     -
                                     (SOL.product_uom_qty * SOL.purchase_price)
                                 )                                               AS invoiced_ordered_margin_gap
+                    ,           (SOL.product_uom_qty * SOL.purchase_price)
+                                -
+                                (SOL.qty_delivered * SOL.purchase_price)        AS ordered_delivered_margin_regulator
                     FROM        sale_order_line                                 SOL
                     ,           sale_order                                      SO
                     ,           product_product                                 PP
@@ -131,30 +138,51 @@ class OFSaleMarginRegulator(models.Model):
             else:
                 rec.invoiced_ordered_margin_gap_perc = "N/E"
 
+    @api.multi
+    def _compute_ordered_delivered_margin_regulator_perc(self):
+        for rec in self:
+            if rec.ordered_total != 0:
+                rec.ordered_delivered_margin_regulator_perc = \
+                    '%.2f' % (100.0 * rec.ordered_delivered_margin_regulator / rec.ordered_total)
+            else:
+                rec.ordered_delivered_margin_regulator_perc = "N/E"
+
     @api.model
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
-        if 'delivered_ordered_margin_gap' not in fields:
-            fields.append('delivered_ordered_margin_gap')
         if 'ordered_margin' not in fields:
             fields.append('ordered_margin')
+        if 'delivered_ordered_margin_gap' not in fields:
+            fields.append('delivered_ordered_margin_gap')
         if 'invoiced_ordered_margin_gap' not in fields:
             fields.append('invoiced_ordered_margin_gap')
+        if 'ordered_total' not in fields:
+            fields.append('ordered_total')
+        if 'ordered_delivered_margin_regulator' not in fields:
+            fields.append('ordered_delivered_margin_regulator')
         res = super(OFSaleMarginRegulator, self).read_group(
             domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
         for line in res:
             if 'delivered_ordered_margin_gap_perc' in fields:
-                if line['ordered_margin'] != 0:
+                if line['ordered_margin']:
                     line['delivered_ordered_margin_gap_perc'] = \
                         ('%.2f' % (round(100.0 * line['delivered_ordered_margin_gap'] / line['ordered_margin'], 2))).\
                         replace('.', ',')
                 else:
                     line['delivered_ordered_margin_gap_perc'] = "N/E"
             if 'invoiced_ordered_margin_gap_perc' in fields:
-                if line['ordered_margin'] != 0:
+                if line['ordered_margin']:
                     line['invoiced_ordered_margin_gap_perc'] = \
                         ('%.2f' % (round(100.0 * line['invoiced_ordered_margin_gap'] / line['ordered_margin'], 2))).\
                         replace('.', ',')
                 else:
                     line['invoiced_ordered_margin_gap_perc'] = "N/E"
+            if 'ordered_delivered_margin_regulator_perc' in fields:
+                if line['ordered_total']:
+                    line['ordered_delivered_margin_regulator_perc'] = \
+                        ('%.2f' %
+                         (round(100.0 * line['ordered_delivered_margin_regulator'] / line['ordered_total'], 2))).\
+                        replace('.', ',')
+                else:
+                    line['ordered_delivered_margin_regulator_perc'] = "N/E"
 
         return res

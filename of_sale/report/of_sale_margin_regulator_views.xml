@@ -23,6 +23,8 @@
                     <field name="delivered_ordered_margin_gap_perc" type="measure"/>
                     <field name="invoiced_ordered_margin_gap" type="measure"/>
                     <field name="invoiced_ordered_margin_gap_perc" type="measure"/>
+                    <field name="ordered_delivered_margin_regulator" type="measure"/>
+                    <field name="ordered_delivered_margin_regulator_perc" type="measure"/>
                 </pivot>
             </field>
         </record>
