@@ -331,18 +331,38 @@ class OFFormReadonly(models.AbstractModel):
             doc = etree.XML(res['arch'])
             if view_type == 'form':  # Applies only for form view
                 for node in doc.xpath("//field"):  # All the view fields to readonly
+                    modifiers = node.get('modifiers', {})
+                    if modifiers and isinstance(modifiers, str) or isinstance(modifiers, unicode):
+                        modifiers = json.loads(modifiers)
+                    if modifiers and isinstance(modifiers, dict) and 'readonly' in modifiers and isinstance(
+                            modifiers.get('readonly', None), bool):
+                        continue
+                    elif modifiers and isinstance(modifiers, dict) and 'readonly' in modifiers and not isinstance(modifiers.get('readonly', None), bool):
+                        modifiers['readonly'] = ['|'] + modifiers['readonly'] + safe_eval(read_only_domain)
+                    elif isinstance(modifiers, dict):
+                        modifiers['readonly'] = safe_eval(read_only_domain)
+
                     attrs = node.get('attrs', {})
                     if attrs and isinstance(attrs, str) or isinstance(attrs, unicode):
                         attrs = safe_eval(attrs)
                     if attrs and isinstance(attrs, dict) and attrs.get('form_readonly_exception', False):
                         continue
-                    if isinstance(attrs, dict):
+                    if attrs and isinstance(attrs, dict) and 'readonly' in attrs and isinstance(
+                            attrs.get('readonly', None), bool):
+                        continue
+                    elif attrs and isinstance(attrs, dict) and 'readonly' in attrs and not isinstance(
+                            attrs.get('readonly', None), bool):
+                        attrs['readonly'] = ['|'] + attrs['readonly'] + safe_eval(read_only_domain)
+                    elif isinstance(modifiers, dict):
                         attrs['readonly'] = safe_eval(read_only_domain)
-                    modifiers = node.get('modifiers', {})
-                    if modifiers and isinstance(modifiers, str) or isinstance(modifiers, unicode):
-                        modifiers = json.loads(modifiers)
-                    if isinstance(modifiers, dict):
-                        modifiers['readonly'] = safe_eval(read_only_domain)
+
+                    # attrs = node.get('attrs', {})
+                    # if attrs and isinstance(attrs, str) or isinstance(attrs, unicode):
+                    #     attrs = safe_eval(attrs)
+                    # if attrs and isinstance(attrs, dict) and attrs.get('form_readonly_exception', False):
+                    #     continue
+                    # if isinstance(attrs, dict):
+                    #     attrs['readonly'] = safe_eval(read_only_domain)
                     node.set('attrs', json.dumps(attrs))
                     node.set('modifiers', json.dumps(modifiers))
                 res['arch'] = etree.tostring(doc)
