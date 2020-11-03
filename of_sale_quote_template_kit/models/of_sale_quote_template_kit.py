@@ -204,6 +204,8 @@ class SaleQuoteLine(models.Model):
             self.env["of.saleorder.kit"].search([("to_unlink", "=", True)]).unlink()
             vals.pop("sale_kits_to_unlink")
         line = super(SaleQuoteLine, self).create(vals)
+        if line.of_is_kit and not line.no_update:
+            line.of_pricing = line.product_id.of_pricing
         sale_kit_vals = {'quote_line_id': line.id, 'name': line.name, 'of_pricing': line.of_pricing}
         line.kit_id.write(sale_kit_vals)
         return line
@@ -229,6 +231,8 @@ class SaleQuoteLine(models.Model):
             # price_unit is equal to price_comps if pricing is computed
             vals['price_unit'] = vals.get('price_comps', self.price_comps)
         super(SaleQuoteLine, self).write(vals)
+        if len(self) == 1 and vals.get("product_id") and self.of_is_kit and not self.no_update:
+            self.of_pricing = self.product_id.of_pricing
         if update_ol_id:
             sale_kit_vals = {'quote_line_id': self.id}
             if vals.get("name"):

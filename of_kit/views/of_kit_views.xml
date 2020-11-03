@@ -333,7 +333,7 @@
                 <field name="of_pricing" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
                 <field name="kit_id" widget="one2one" options="{'text_empty': 'Créer Composants', 'text_nonempty': 'Voir Composants'}"
                   attrs="{'invisible': [('of_is_kit', '=', False)], 'readonly': [('state', 'in', ('done','cancel'))]}"
-                  context="{'hide_sale': context.get('hide_sale')}"/>
+                  context="{'hide_sale': context.get('hide_sale'), 'current_of_pricing': of_pricing}"/>
             </xpath>
             <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="after">
                 <field name="price_comps" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>

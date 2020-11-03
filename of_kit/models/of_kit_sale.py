@@ -431,7 +431,8 @@ class SaleOrderLine(models.Model):
                  'kit_id.kit_line_ids.qty_per_kit')
     def _compute_of_difference(self):
         for line in self:
-            if line.kit_id and line.of_pricing == 'computed':
+            kit_pricing = self._context.get('current_of_pricing', line.of_pricing)
+            if line.kit_id and kit_pricing == 'computed':
                 line.of_difference = float_compare(line.kit_id.price_comps, line.price_unit, 2)
             else:
                 line.of_difference = False
