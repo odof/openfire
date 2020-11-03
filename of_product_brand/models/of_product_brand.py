@@ -246,7 +246,7 @@ class SaleOrderLine(models.Model):
 
     of_product_brand_id = fields.Many2one(
         'of.product.brand', related='product_id.brand_id', string='Marque',
-        store=True, index=True
+        store=True, index=True, readonly=True
     )
 
     @api.onchange('product_id')
@@ -286,7 +286,7 @@ class AccountInvoiceLine(models.Model):
 
     of_product_brand_id = fields.Many2one(
         'of.product.brand', related='product_id.brand_id', string='Marque',
-        store=True, index=True
+        store=True, index=True, readonly=True
     )
 
     @api.onchange('product_id')
