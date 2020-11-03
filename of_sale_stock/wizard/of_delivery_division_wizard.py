@@ -15,6 +15,7 @@ class OFDeliveryDivisionWizard(models.TransientModel):
     @api.multi
     def action_delivery_division(self):
         self.ensure_one()
+        self = self.sudo()
 
         # On vérifie qu'il y ait des quantités à diviser
         lines_to_divide = self.line_ids.filtered(lambda line: line.qty_to_divide > 0)
