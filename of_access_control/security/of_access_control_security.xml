@@ -32,6 +32,16 @@
         <field name="implied_ids" eval="[(4, ref('of_group_erp_user'))]"/>
     </record>
 
+    <record id="of_group_stock_responsible" model="res.groups">
+        <field name="name">Responsable</field>
+        <field name="category_id" ref="base.module_category_warehouse_management"/>
+        <field name="implied_ids" eval="[(4, ref('stock.group_stock_user'))]"/>
+    </record>
+
+    <record id="stock.group_stock_manager" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('of_group_stock_responsible'))]"/>
+    </record>
+
     <data noupdate="1">
 
         <!-- CRM Lead -->

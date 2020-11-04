@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="of_access_control_stock_picking_form_view" model="ir.ui.view">
+        <field name="name">of.access.control.stock.picking.form.view</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='force_assign']" position="attributes">
+                <attribute name="groups">of_access_control.of_group_stock_responsible</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_access_control_stock_inventory_form_view" model="ir.ui.view">
+        <field name="name">of.access.control.stock.inventory.form.view</field>
+        <field name="model">stock.inventory</field>
+        <field name="inherit_id" ref="stock.view_inventory_form"/>
+        <field name="arch" type="xml">
+            <button name="action_done" position="attributes">
+                <attribute name="groups">of_access_control.of_group_stock_responsible</attribute>
+            </button>
+        </field>
+    </record>
+
+</odoo>
