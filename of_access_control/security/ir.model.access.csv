@@ -5,6 +5,10 @@ crm.access_res_partner_category,res.partner.category.crm.user,base.model_res_par
 crm.access_res_partner_category_manager,res.partner.category.crm.manager,base.model_res_partner_category,sales_team.group_sale_manager,1,1,1,1
 
 stock.access_product_product_stock_user,product_product_stock_user,product.model_product_product,stock.group_stock_user,1,0,0,0
+stock.access_product_template_stock_user,product.template stock user,product.model_product_template,stock.group_stock_user,1,0,0,0
+access_product_product_stock_responsible,access.product.product.stock.responsible,product.model_product_product,of_group_stock_responsible,1,1,1,0
+access_product_template_stock_responsible,access.product.template.stock.responsible,product.model_product_template,of_group_stock_responsible,1,1,1,0
+stock.access_stock_move_manager,stock.move manager,stock.model_stock_move,of_group_stock_responsible,1,1,1,1
 
 access_crm_lead_responsible,crm.lead.responsible,crm.model_crm_lead,of_group_sale_responsible,1,1,1,1
 
