@@ -175,8 +175,8 @@
         </field>
     </record>
 
-    <record id="of_view_project_issue_filter" model="ir.ui.view">
-        <field name="name">of.view.project.issue.filter</field>
+    <record id="of_view_project_issue_kanban" model="ir.ui.view">
+        <field name="name">of.view.project.issue.kanban</field>
         <field name="model">project.issue</field>
         <field name="inherit_id" ref="project_issue.project_issue_kanban_view"/>
         <field name="arch" type="xml">
