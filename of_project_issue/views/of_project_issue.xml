@@ -42,14 +42,14 @@
             </field>
             <field name="priority" position="replace"/>
 
-                <field name="project_id" position="replace"/>
-                <field name="create_date" position="replace">
-                    <field name="date"/>
-                </field>
-                <field name="date" position="after">
-                    <field name="date_deadline"/>
-                    <field name="of_planification_date"/>
-                </field>
+            <field name="project_id" position="replace"/>
+            <field name="create_date" position="replace">
+                <field name="date"/>
+            </field>
+            <field name="date" position="after">
+                <field name="date_deadline"/>
+                <field name="of_planification_date"/>
+            </field>
             <field name="user_id" position="replace">
                 <field name="user_id" string="Responsable"/>
                 <field name="priority"/>

@@ -13,6 +13,7 @@ from odoo.tools import config, DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.tools.float_utils import float_compare
 from odoo.tools.safe_eval import safe_eval
 
+import odoo.addons.decimal_precision as dp
 from odoo.addons.of_utils.models.of_utils import se_chevauchent, float_2_heures_minutes, heures_minutes_2_float, \
     compare_date
 

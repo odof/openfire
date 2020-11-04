@@ -182,6 +182,7 @@ class OfParcInstalle(models.Model):
             ('date', '<', intervention.date)
             ], order="date DESC", limit=3)
 
+
 class ProjectIssue(models.Model):
     _inherit = 'project.issue'
 

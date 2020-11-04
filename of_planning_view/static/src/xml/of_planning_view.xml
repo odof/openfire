@@ -402,7 +402,8 @@
     <!-- filtres de ressources (Attendees) -->
     <t t-name="PlanningView.sidebar.contacts">
         <div t-foreach="filters" class="of_planning_contact">
-            <t t-if="filters_value.value"><!-- foolproofing: don't display if no value given (or undefined) -->
+            <!-- foolproofing: don't display if no value given (or undefined) -->
+            <t t-if="filters_value.value &amp;&amp; filters_value.is_visible">
                 <div class="o_checkbox">
                     <input type="checkbox" name="selection"
                         t-att-value="filters_value.value" t-att-id="filters_value.input_id"
@@ -422,7 +423,6 @@
                     <t t-esc="filters_value.label"/>
                 </span>
             </t>
-            <t t-else="">Une erreur s'est produite au niveau de l'affichage des filtres</t>
         </div>
     </t>
 

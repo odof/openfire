@@ -3,8 +3,6 @@
 from odoo import api, models, fields
 from odoo.osv import expression
 import time
-import base64
-from odoo.exceptions import UserError
 from datetime import datetime
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
@@ -44,6 +42,8 @@ class ProjectIssue(models.Model):
 
     of_code = fields.Char("Code", required=True, readonly=True, default='Nouveau')
     partner_note = fields.Text("Note client", related='partner_id.comment', readonly=False)
+    invoice_ids = fields.One2many(
+        'account.invoice', compute='_get_partner_invoices', string='Factures du client', method=True, readonly=True)
     of_categorie_id = fields.Many2one('of.project.issue.categorie', string=u"Catégorie", ondelete='restrict')
     of_categorie_mere_id = fields.Many2one(related="of_categorie_id.pparent_id", string=u"Catégorie mère", store=True)
     of_canal_id = fields.Many2one('of.project.issue.canal', string=u"Canal", required=False, ondelete='restrict')
@@ -67,6 +67,17 @@ class ProjectIssue(models.Model):
     of_planification_date = fields.Datetime(string=u"Date de planification", compute='_compute_of_planification_date')
 
     # @api.depends
+
+    @api.depends
+    def _get_partner_invoices(self):
+        invoice_obj = self.env['account.invoice']
+        tre = {}
+        for h in self:
+            if h.partner_id:
+                tre[h.id] = invoice_obj.search([('partner_id', '=', h.partner_id.id)])
+            else:
+                tre[h.id] = []
+        return tre
 
     @api.depends('create_date')
     def _compute_of_create_date_formatted(self):
