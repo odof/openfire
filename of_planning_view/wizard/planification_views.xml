@@ -13,21 +13,8 @@
                         $(".modal-dialog").width('80%');
                         $(".o_form_button_view").hide();
                         $(".o_form_button_edit").hide();
-                        //var len = $(".modal-footer").length;
-                        //$(".modal-footer").eq(len-1).hide();
-                        //$(".o_cp_pager").hide();
                     });
-                </script><!-- -->
-                <!--header>
-                    <button name="button_search" string="Rechercher" type="object" class="btn btn-primary" style="margin-right: 4px!important"
-                            attrs="{'invisible': [('pre_a_programmer_id', '!=', False)]}"/>
-                    <button name="button_confirm" string="Confirmer" type="object" style="margin-right: 4px!important"
-                            class="btn btn-primary" attrs="{'invisible': [('proposition_ids', '=', []), ('pre_a_programmer_id', '=', False)]}"/>
-                    <button name="button_confirm_next" string="Confirmer &amp; Suivant" type="object" style="margin-right: 4px!important"
-                            class="btn btn-primary" attrs="{'invisible': [('proposition_ids', '=', [])]}"
-                            context="{'next': 1}"/>
-                    <button name="button_close" string="Annuler" type="object" class="btn-default" style="margin-right: 4px!important"/>
-                </header-->
+                </script>
                 <group colspan="2" col="8" name="invisblez" style="display: none">
                     <field name="creneau_fini" invisible="1"/>
                     <field name="aucun_res" invisible="1"/>
@@ -48,7 +35,7 @@
                 </group>
                 <group attrs="{'invisible': [('creneau_fini', '=', True)]}" col="6" colspan="2">
                     <group colspan="3"
-                           attrs="{'invisible': [('pre_a_programmer_id', '=', False), ('proposition_ids', '=', [])]}">
+                           attrs="{'invisible': [('proposition_ids', '=', [])]}">
                         <group col="2" colspan="2">
                             <separator string="RDV à créer" colspan="2"/>
                             <field name="heure_debut_rdv" widget="float_time"/>
@@ -57,12 +44,12 @@
                               domain="[('of_est_intervenant', '=', True), ('id', '!=', employee_id)]"/>
                         </group>
                     </group>
-                    <group colspan="3" string="Description" attrs="{'invisible':[('pre_a_programmer_id', '=', False), ('proposition_ids', '=', [])]}">
+                    <group colspan="3" string="Description" attrs="{'invisible':[('proposition_ids', '=', [])]}">
                         <label for="description_rdv" style="font-weight: bold!important"/>
                         <field name="description_rdv" nolabel="1" colspan="2" widget="html"/>
                     </group>
                     <group colspan="6" col="1" name="propositions" string="Propositions"
-                      attrs="{'invisible': ['|',('proposition_ids', '=', []),('pre_a_programmer_id', '!=', False)]}">
+                      attrs="{'invisible': [('proposition_ids', '=', [])]}">
                         <field name="proposition_ids" mode="tree" nolabel="1"
                            options="{'reload_on_button': True}">
                             <tree limit="10" colors="blue: selected==True; grey: fait==False;" create="0" options="{'reload_on_button': True}">
@@ -116,7 +103,9 @@
                             </i>
                             <field name="lieu_prec_id" attrs="{'invisible': [('lieu_prec_depart', '=', False)]}"
                               options="{'no_create': True, 'no_open': True}"/>
-                            <field name="lieu_prec_readonly_id" attrs="{'invisible': [('lieu_prec_depart', '=', True)]}"/>
+                            <field name="lieu_prec_readonly_id"
+                                   attrs="{'invisible': ['|', ('lieu_prec_depart', '=', True),
+                                                              ('lieu_prec_readonly_id', '=', False)]}"/>
                             <i colspan="2"><field name="lieu_prec_message" attrs="{'invisible': [('lieu_prec_message', '=', False)]}"
                                                   class="oe_grey" nolabel="1"/></i>
                             <field name="lieu_prec_manual_id" attrs="{'invisible': [('lieu_prec_id', '!=', False), ('geo_lat_prec', '!=', False)]}"/>
@@ -133,8 +122,9 @@
                             </i>
                             <field name="lieu_suiv_id" attrs="{'invisible': [('lieu_suiv_arrivee', '=', False)]}"
                               options="{'no_create': True, 'no_open': True}"/>
-                            <field name="lieu_suiv_readonly_id" attrs="{'invisible': [('lieu_suiv_arrivee', '=', True)]}"/>
-
+                            <field name="lieu_suiv_readonly_id"
+                                   attrs="{'invisible': ['|', ('lieu_suiv_arrivee', '=', True),
+                                                              ('lieu_suiv_readonly_id', '=', False)]}"/>
                             <i colspan="2"><field name="lieu_suiv_message" attrs="{'invisible': [('lieu_suiv_message', '=', False)]}"
                                    class="oe_grey" nolabel="1"/></i>
                             <field name="lieu_suiv_manual_id" attrs="{'invisible': [('lieu_suiv_id', '!=', False), ('geo_lat_suiv', '!=', False)]}"/>
@@ -146,27 +136,18 @@
                             </div>
                         </group>
                     </group>
-                    <group colspan="2"><!--  widget="localizable" options="{'geo_lat_field': 'geo_lat_prec'}" widget="localizable" options="{'geo_lat_field': 'geo_lat_suiv'}" -->
+                    <group colspan="2">
                         <separator string="Recherche" colspan="2"/>
-                        <group col="2" colspan="2" attrs="{'invisible': [('pre_a_programmer_id', '!=', False)]}">
+                        <group col="2" colspan="2">
                             <field name="distance_max"/>
                             <field name="secteur_id" widget="selection"/>
                             <field name="pre_tache_categ_ids" widget="many2many_tags" options="{'no_create': True}"/>
                             <field name="pre_tache_ids" widget="many2many_tags" options="{'no_create': True}"/>
                             <field name="ignorer_duree"/>
                         </group>
-                        <group col="2" colspan="2">
-                            <field name="pre_a_programmer_id" options="{'no_create': True, 'no_open': True}"/>
-                        </group>
-                        <group col="2" colspan="2" attrs="{'invisible': [('pre_a_programmer_id', '=', False)]}">
-                            <field name="pre_a_programmer_address_id"/>
-                            <field name="pre_a_programmer_zip"/>
-                            <field name="pre_a_programmer_city"/>
-                            <field name="pre_a_programmer_telephones"/>
-                        </group>
                     </group>
 
-                    <group col="2" colspan="6" attrs="{'invisible': ['|', ('aucun_res', '=', False), ('pre_a_programmer_id', '!=', False)]}">
+                    <group col="2" colspan="6" attrs="{'invisible': [('aucun_res', '=', False)]}">
                         <separator string="Aucun résultat" colspan="2"/>
                         <div colspan="2" style="color: red">
                             <i>
@@ -180,20 +161,19 @@
                     </group>
                 </group>
                 <footer>
-                    <button name="button_search" string="Rechercher" type="object" class="btn btn-primary" style="margin-right: 4px!important"
-                            attrs="{'invisible': [('pre_a_programmer_id', '!=', False)]}"/>
+                    <button name="button_search" string="Rechercher" type="object" class="btn btn-primary"
+                            style="margin-right: 4px!important"/>
                     <button name="button_confirm" string="Confirmer" type="object" style="margin-right: 4px!important"
-                            class="btn btn-primary" attrs="{'invisible': [('proposition_ids', '=', []), ('pre_a_programmer_id', '=', False)]}"/>
+                            class="btn btn-primary" attrs="{'invisible': [('proposition_ids', '=', [])]}"/>
                     <button name="button_confirm_next" string="Confirmer &amp; Suivant" type="object" style="margin-right: 4px!important"
                             class="btn btn-primary" attrs="{'invisible': [('proposition_ids', '=', [])]}"
                             context="{'next': 1}"/>
                     <button name="button_close" string="Fermer" type="object" class="btn-default" style="margin-right: 4px!important"/>
                     <button name="button_compute_more" type="object" class="btn btn-default oe_grey"
                         attrs="{'invisible': [
-                            '|', '|',
+                            '|',
                                 ('tout_calcule', '!=', False),
-                                ('proposition_ids', '=', []),
-                                ('pre_a_programmer_id', '!=', False)]}">
+                                ('proposition_ids', '=', [])]}">
                         <span>Calculer plus de résultats (déjà fait </span><field name="calcule_nb" nolabel="1" class="oe_inline"/>
                         <span>/</span><field name="prop_nb" nolabel="1" class="oe_inline"/><span>)</span>
                     </button>
@@ -242,9 +222,18 @@
                             <field name="date_next" readonly="1"/>
                             <field name="date_fin" readonly="1"/>
                             <field name="origin" readonly="1"/>
-                            <field name="distance_reelle_prec" readonly="1"/>
-                            <field name="distance_reelle_suiv" readonly="1"/>
-                            <field name="distance_reelle_tota" readonly="1"/>
+                            <label for="distance_reelle_prec" string="Distances"/>
+                            <div>
+                                <field name="distance_reelle_prec" nolabel="1" class="oe_inline" readonly="1"/>km
+                                <i class="oe_grey oe_inline"> (précédente),
+                                </i>
+                                <field name="distance_reelle_suiv" nolabel="1" class="oe_inline" readonly="1"/>km
+                                <i class="oe_grey oe_inline"> (suivante),
+                                </i>
+                                <field name="distance_reelle_tota" nolabel="1" class="oe_inline" readonly="1"/>km
+                                <i class="oe_grey oe_inline"> (totale).
+                                </i>
+                            </div>
                         </group>
                     </group>
                     <group name="planif" string="Planification" attrs="{'invisible':[('selected','!=',True)]}">
@@ -284,7 +273,7 @@
     />
 
     <act_window
-        name="Créer RDV Tech"
+        name="Créer intervention"
         res_model="of.planning.intervention"
         src_model="of.planning.intervention"
         view_mode="form"

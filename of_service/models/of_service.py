@@ -4,27 +4,27 @@ from odoo import api, models, fields, _
 from datetime import date
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
-from dateutil.rrule import (rrule,
-                            YEARLY,
-                            MONTHLY,
-                            WEEKLY,
-                            DAILY)
+from dateutil.rrule import WEEKLY
 from odoo.tools.safe_eval import safe_eval
 from odoo.exceptions import UserError
 from odoo.addons.of_utils.models.of_utils import se_chevauchent
 
 import math
 
+
 class OfService(models.Model):
     _name = "of.service"
     _inherit = "of.map.view.mixin"
-    _description = "Service"
+    _description = "Intervention à programmer"
+
+    # Init
 
     @api.model_cr_context
     def _auto_init(self):
         cr = self._cr
         # Lors de la 1ère mise à jour après la refonte des planning (sept. 2019), on migre les données existantes.
-        cr.execute("SELECT 1 FROM information_schema.columns WHERE table_name = 'of_service' AND column_name = 'recurrence'")
+        cr.execute("SELECT 1 FROM information_schema.columns "
+                   "WHERE table_name = 'of_service' AND column_name = 'recurrence'")
         existe_avant = bool(cr.fetchall())
 
         res = super(OfService, self)._auto_init()
@@ -35,7 +35,8 @@ class OfService(models.Model):
         cr.execute("UPDATE of_service SET duree = 1, base_state = 'cancel' "
                    "WHERE duree = 0")
 
-        cr.execute("SELECT 1 FROM information_schema.columns WHERE table_name = 'of_service' AND column_name = 'recurrence'")
+        cr.execute("SELECT 1 FROM information_schema.columns "
+                   "WHERE table_name = 'of_service' AND column_name = 'recurrence'")
         existe_apres = bool(cr.fetchall())
         # Si le champ recurrence n'existe pas avant et l'est après la mise à jour,
         # c'est qu'on est à la 1ère mise à jour après la refonte du planning, on doit faire la migration des données.
@@ -93,17 +94,169 @@ class OfService(models.Model):
         # with_context pour bien récupérer les données en DB
         all_services.with_context(vide_cache=True)._compute_state_poncrec()
 
+    # Champs
+
+    # Titre
+    name = fields.Char(u"Libellé", compute="_compute_name", store=True)
+    active = fields.Boolean(string="Active", default=True)
+    base_state = fields.Selection(
+        [('draft', u'Brouillon'),  # état par défaut
+         ('calculated', u'Calculé'),  # équivalent a state=False mais utile en XML
+         ('cancel', u'Annulé')],  # manuellement décidé,
+        u"État de calcul", default="draft", required=True)
+    state = fields.Selection(
+        [('draft', u'Brouillon'),  # état par défaut
+         ('to_plan', u'À planifier prochainement'),  # prochaine intervention dans moins d'un mois
+         ('planned', u'Planifiée récemment'),  # dernière intervention il y a moins d'un mois
+         ('planned_soon', u'Planifiée prochainement'),  # planifié pour dans moins d'un mois
+         ('progress', u'En cours'),  # par défaut
+         ('late', u'En retard de planification'),  # date de prochaine planification il y a plus d'un mois
+         # date de fin <= date du jour || de prochaine planif (rec)
+         # // durée restante == 0 et date de fin dépassée (ponc)
+         ('done', u'Terminée'),
+         ('part_planned', u'Partiellement planifiée'),  # intervention(s) et durée restante supérieure à 0
+         ('all_planned', u'Entièrement planifiée'),  # intervention(s) et durée restante == 0
+         ('cancel', u'Annulée')],  # manuellement décidé
+        u'État de planification', compute="_compute_state_poncrec", store=True)
+    state_ponc = fields.Selection(
+        [('draft', u'Brouillon'),  # état par défaut
+         ('to_plan', u'À planifier'),  # pas d'intervention
+         ('part_planned', u'Partiellement planifiée'),  # intervention(s) et durée restante supérieure à 0
+         ('all_planned', u'Entièrement planifiée'),  # intervention(s) et durée restante == 0
+         ('late', u'En retard de planification'),  # date de prochaine planification il y a plus d'un mois
+         ('done', u'Fait'),  # intervention(s) et durée restante == 0 et date de fin dépassée
+         ('cancel', u'Annulée')],  # manuellement décidé
+        u'État', compute="_compute_state_poncrec", search="_search_state_ponc")
+    intervention_ids = fields.One2many('of.planning.intervention', 'service_id', string="RDVs Tech")
+    intervention_count = fields.Integer(string='Nombre de RDVs', compute='_compute_intervention_count')
+
+    # Rubrique Références
+    partner_id = fields.Many2one('res.partner', string='Partenaire', required=True, ondelete='restrict')
+    address_id = fields.Many2one('res.partner', string=u"Adresse d'intervention", ondelete='restrict')
+    address_address = fields.Char('Adresse', related='address_id.contact_address', readonly=True)
+    address_zip = fields.Char('Code Postal', size=24, related='address_id.zip', oldname="partner_zip")
+    address_city = fields.Char('Ville', related='address_id.city', oldname="partner_city")
+    secteur_tech_id = fields.Many2one(
+        related='address_id.of_secteur_tech_id', readonly=True, search="_search_secteur_tech_id")
+    tag_ids = fields.Many2many('of.service.tag', string=u"Étiquettes")
+    company_id = fields.Many2one('res.company', string=u"Société")
+
+    # Rubrique Origine
+    origin = fields.Char(string="Origine")
+    order_id = fields.Many2one('sale.order', string="Commande client")
+
+    # Rubrique Planification
+    tache_id = fields.Many2one('of.planning.tache', string=u'Tâche', required=True)
+    tache_categ_id = fields.Many2one(related="tache_id.tache_categ_id", readonly=True)
+    duree = fields.Float(string=u"Durée estimée")
+    duree_planif = fields.Float(string=u"Durée planifiée", compute="_compute_durees")
+    duree_restante = fields.Float(string=u"Durée restante", compute="_compute_durees", search='_search_duree_restante')
+    date_next = fields.Date(
+        string="Prochaine planif", help=u"Date à partir de laquelle programmer le prochain RDV", required=True)
+    date_next_last = fields.Date('Prochaine planif (svg)', help=u"Champ pour conserver une possibilité de rollback")
+    date_fin = fields.Date(
+        string=u"Date de fin de planification",
+        help=u"Date à partir de laquelle l'intervention devient en retard de planifiaction")
+    date_fin_contrat = fields.Date(u"Date de fin de contrat")
+    jour_ids = fields.Many2many(
+        'of.jours', 'service_jours', 'service_id', 'jour_id', string='Jours',
+        default=lambda self: self._default_jours(), help=u"Jours de disponibilité du client.")
+    recurrence = fields.Boolean(string=u"Est récurrente", default=True)
+    mois_ids = fields.Many2many(
+        'of.mois', 'service_mois', 'service_id', 'mois_id', string='Mois',
+        help=u"Mois de référence pour la planification.")
+    recurring_rule_type = fields.Selection(
+        [('monthly', 'Mois'),
+         ('yearly', u'Année(s)')],
+        string=u'Récurrence', default='yearly',
+        help=u"Spécifier l'intervalle pour le calcul automatique de la date de prochaine planification"
+             u" dans les interventions.")
+    recurring_interval = fields.Integer(string=u'Répéter chaque', default=1, help=u"Répéter (Mois/Années)")
+
+    # Rubrique Description
+    note = fields.Text('Notes')
+
+    # Alertes
+    recurrence_tache = fields.Boolean(related='tache_id.recurrence', string=u"Récurrence tâche", readonly=True)
+    alert_dates = fields.Boolean(string=u"Incohérence dans les dates", compute="_compute_alert_dates")
+
+    # Vue Calendar / Planning / Map / Liste
+    geo_lat = fields.Float(related='address_id.geo_lat')  # Vue Map
+    geo_lng = fields.Float(related='address_id.geo_lng')  # Vue Map
+    precision = fields.Selection(related='address_id.precision')  # Vue Map
+    partner_name = fields.Char(related='partner_id.name')  # Vue Map
+    partner_mobile = fields.Char(related='partner_id.mobile')  # Vue Map
+    partner_phone = fields.Char(related='partner_id.phone')  # Vue Map
+    tache_name = fields.Char(related="tache_id.name", readonly=True)  # Vue Map
+    color = fields.Char(compute='_compute_color', string='Couleur', store=False)  # Vue Map, Liste
+    date_last = fields.Date(
+        string=u'Dernier RDV', compute='_compute_durees', search='_search_last_date',
+        help=u"Date du dernier RDV en date. Ne prend pas en compte les RDVs annulés ni reportés")  # Vue liste
+
+    # Champs de recherche
+    date_fin_min = fields.Date(string=u"Date échéance min", compute='lambda *a, **k:{}')
+    date_fin_max = fields.Date(string=u"Date échéance max", compute='lambda *a, **k:{}')
+    date_controle = fields.Date(string=u"Date de contrôle", compute='lambda *a, **k:{}')
+
+    # Constraints
+
     @api.constrains('date_next', 'date_fin')
     def check_alert_dates(self):
-        for intervention in self:
-            if intervention.alert_dates:
-                raise UserError(_(u'Intervention (%s): Inchohérence dans les dates' % intervention.name))
+        for service in self:
+            if service.alert_dates:
+                raise UserError(_(u'Intervention (%s): Inchohérence dans les dates' % service.name))
+
+    _sql_constraints = [
+        ('duree_non_nulle_constraint',
+         'CHECK ( duree > 0 )',
+         _(u"La durée de l'intervention doit être supérieure à 0!")),
+    ]
+
+    # Default
 
     def _default_jours(self):
         # Lundi à vendredi comme valeurs par défaut
         jours = self.env['of.jours'].search([('numero', 'in', (1, 2, 3, 4, 5))], order="numero")
         res = [jour.id for jour in jours]
         return res
+
+    # Compute/search methods
+
+    @api.multi
+    @api.depends('address_id', 'partner_id', 'tache_id')
+    def _compute_name(self):
+        for service in self:
+            partner_name = service.partner_id.name or u''
+            address_zip = service.address_id.zip or u''
+            tache_name = service.tache_id.name or u''
+            service.name = tache_name + " " + partner_name + " " + address_zip
+
+    @api.multi
+    @api.depends('date_next', 'date_fin_contrat', 'duree', 'base_state', 'recurrence', 'intervention_ids')
+    def _compute_state_poncrec(self):
+        for service in self:
+            service_state = service.get_state_poncrec_date(fields.Date.context_today(self), to_plan_avance=True)
+            if not service.recurrence:
+                service.state_ponc = service_state
+            service.state = service_state
+
+    def _search_state_ponc(self, operator, operand):
+        services = self.search([])
+        res = safe_eval("services.filtered(lambda s: s.state_ponc %s %s)" % (operator, operand), {'services': services})
+        return [('id', 'in', res.ids)]
+
+    @api.depends('intervention_ids')
+    @api.multi
+    def _compute_intervention_count(self):
+        for service in self:
+            service.intervention_count = len(service.intervention_ids.filtered(
+                lambda r: r.state in ('draft', 'confirm', 'done')))
+
+    def _search_secteur_tech_id(self, operator, operand):
+        services = self.search([])
+        res = safe_eval("services.filtered(lambda s: s.secteur_tech_id %s %.2f)" % (operator, operand),
+                        {'services': services})
+        return [('id', 'in', res.ids)]
 
     @api.multi
     @api.depends('duree', 'intervention_ids', 'recurrence', 'intervention_ids.state', 'date_next')
@@ -117,7 +270,8 @@ class OfService(models.Model):
                 service.date_last = False
 
             if service.recurrence and service.date_next:
-                # On cherche la durée planifiée pour l'occurence en cours. Il nous faut savoir quelle est l'occurrence en cours
+                # On cherche la durée planifiée pour l'occurence en cours.
+                # Il nous faut savoir quelle est l'occurrence en cours
                 date_next_ref_str = service.get_date_proche(fields.Date.today())  # début d'occurence en cours
                 date_fin_ref_str = service.get_fin_date(date_next_ref_str)  # fin d'occurence en cours
                 date_next_ref_da = fields.Date.from_string(date_next_ref_str)
@@ -146,8 +300,154 @@ class OfService(models.Model):
             service.duree_planif = sum(plannings.mapped('duree'))
             service.duree_restante = service.duree > service.duree_planif and service.duree - service.duree_planif or 0
 
+    def _search_duree_restante(self, operator, operand):
+        services = self.search([])
+        res = safe_eval("services.filtered(lambda s: s.duree_restante %s %.2f)" % (operator, operand),
+                        {'services': services})
+        return [('id', 'in', res.ids)]
+
+    @api.depends('date_next', 'date_fin')
+    def _compute_alert_dates(self):
+        for service in self:
+            service.alert_dates = service.date_next and service.date_fin \
+                                       and service.date_next > service.date_fin
+
+    @api.multi
+    @api.depends('state')
+    def _compute_color(self):
+        u""" COULEURS :
+        Gris  : service dont l'adresse n'a pas de coordonnées GPS, ou service inactif
+        Orange: service à planifier ou partiellement planifié
+        Rouge : service en retard de planification
+        Noir  : autres services
+        """
+        for service in self:
+            if service.state in ('planned', 'planned_soon', 'progress', 'done', 'all_planned'):
+                service.color = 'black'
+            elif service.state in ('to_plan', 'part_planned'):
+                service.color = 'orange'
+            elif service.state == 'late':
+                service.color = 'red'
+            else:
+                service.color = 'gray'
+
+    @api.model
+    def _search_last_date(self, operator, operand):
+        cr = self._cr
+
+        query = ("SELECT s.id\n"
+                 "FROM of_service AS s\n"
+                 "LEFT JOIN of_planning_intervention AS p\n"
+                 "  ON p.address_id = s.address_id\n"
+                 "  AND p.tache_id = s.tache_id\n")
+
+        if operand:
+            if len(operand) == 10:
+                # Copié depuis osv/expression.py
+                if operator in ('>', '<='):
+                    operand += ' 23:59:59'
+                else:
+                    operand += ' 00:00:00'
+            query += ("GROUP BY s.id\n"
+                      "HAVING MAX(p.date) %s '%s'" % (operator, operand))
+        else:
+            if operator == '=':
+                query += "WHERE p.id IS NULL"
+            else:
+                query += "WHERE p.id IS NOT NULL"
+        cr.execute(query)
+        rows = cr.fetchall()
+        return [('id', 'in', rows and zip(*rows)[0])]
+
+    # @api.onchange
+
+    @api.onchange('partner_id')
+    def _onchange_partner_id(self):
+        self.ensure_one()
+        if self.partner_id:
+            self.address_id = self.partner_id
+            self.company_id = self.partner_id.company_id
+
+    @api.onchange('tache_id')
+    def _onchange_tache_id(self):
+        self.ensure_one()
+        if self.tache_id and self.tache_id.recurrence == self.recurrence:
+            self.recurring_rule_type = self.tache_id.recurring_rule_type
+            self.recurring_interval = self.tache_id.recurring_interval
+        self.duree = self.tache_id.duree
+        self.date_fin = self.get_fin_date()
+
+    @api.onchange('date_next')
+    def _onchange_date_next(self):
+        # Remplissage automatique du mois en fonction de la date de prochaine intervention choisie
+        # /!\ Un simple clic sur le champ date appelle cette fonction, et génère le mois avec la date courante
+        #       avant que l'utilisateur ait confirmé son choix.
+        #     Cette fonction doit donc être autorisée à écraser le mois déjà saisi
+        #     Pour éviter les ennuis, elle est donc restreinte à un usage en mode création de nouveau service uniquement
+        if self.date_next and not self._origin:  # <- signifie mode creation
+            mois = self.env['of.mois'].search([('numero', '=', int(self.date_next[5:7]))])
+            mois_id = mois[0] and mois[0].id or False
+            if mois_id:
+                self.mois_ids = [(4, mois_id, 0)]
+        if self.date_next:
+            self.date_fin = self.get_fin_date()
+
+    # CRUD
+
+    @api.model
+    def create(self, vals):
+        if vals.get('address_id') and not vals.get('partner_id'):
+            address = self.env['res.partner'].browse(vals['address_id'])
+            partner = address.parent_id or address
+            vals['partner_id'] = partner.id
+        return super(OfService, self).create(vals)
+
+    # Héritages
+
+    @api.model
+    def get_color_map(self):
+        u"""
+        fonction pour la légende de la vue map
+        """
+        title = "Prochaine Planification"
+        v0 = {'label': u"Planifié", 'value': 'black'}
+        v1 = {'label': u'À planifier', 'value': 'orange'}
+        v2 = {'label': u'En retard', 'value': 'red'}
+        return {"title": title, "values": (v0, v1, v2)}
+
+    # Actions
+
+    @api.multi
+    def action_view_intervention(self):
+        action = self.env.ref('of_planning.of_sale_order_open_interventions').read()[0]
+
+        if len(self._ids) == 1:
+            context = safe_eval(action['context'])
+            action['context'] = str(self.get_action_view_intervention_context(context))
+
+        return action
+
+    @api.multi
+    def button_valider(self):
+        # laisser le système calculer l'état
+        return self.write({'base_state': 'calculated'})
+
+    @api.multi
+    def button_annuler(self):
+        return self.write({'base_state': 'cancel'})
+
+    @api.multi
+    def button_brouillon(self):
+        return self.write({'base_state': 'draft'})
+
+    # Autres
+
     @api.model
     def compute_state_poncrec_daily(self):
+        """
+        Force le recalcul de l'état des interventions à programmer.
+        Est lancé tous les matins, pour que le changement de date du jour soit pris en compte.
+        """
         services = self.search([('base_state', '=', False)])
         for service in services:
             service.base_state = 'calculated'
@@ -155,17 +455,13 @@ class OfService(models.Model):
         services._compute_state_poncrec()
 
     @api.multi
-    @api.depends('date_next', 'date_fin_contrat', 'duree', 'base_state', 'recurrence', 'intervention_ids')
-    def _compute_state_poncrec(self):
-        for service in self:
-            service_state = service.get_state_poncrec_date(fields.Date.context_today(self))
-            if not service.recurrence:
-                service.state_ponc = service_state
-            service.state = service_state
-
-    @api.multi
     def filter_state_poncrec_date(self, date_eval=fields.Date.today(), state_list=('to_plan', 'part_planned', 'late')):
-        """Permet de calculer l'état d'un service à une date donnée"""
+        """
+        Permet de filtrer les interventions du self à une date donnée
+        :param date_eval: Date à laquelle on veut connaitre l'état des interventions
+        :param state_list: Liste des états autorisés par le filtre
+        :return: env['of.service'] contenant les interventions filtrées
+        """
         services_pass = self.env['of.service']
         for service in self:
             service_state = service.get_state_poncrec_date(date_eval=date_eval, to_plan_avance=False)
@@ -196,7 +492,7 @@ class OfService(models.Model):
             date_next_da = fields.Date.from_string(self.date_next)
             date_last_da = self.date_last and fields.Date.from_string(self.date_last) or False
             date_fin_da = self.date_fin and fields.Date.from_string(self.date_fin) \
-                          or date_next_da + relativedelta(days=13)
+                or date_next_da + relativedelta(days=13)
             if self.recurrence:
                 fin_contrat_da = self.date_fin_contrat and fields.Date.from_string(self.date_fin_contrat) or False
                 # le service expire avant la date donnée ou avant la date de prochaine planif: terminé
@@ -236,248 +532,10 @@ class OfService(models.Model):
             service_state = self.base_state
         return service_state
 
-    @api.model
-    def _search_last_date(self, operator, operand):
-        cr = self._cr
-
-        query = ("SELECT s.id\n"
-                 "FROM of_service AS s\n"
-                 "LEFT JOIN of_planning_intervention AS p\n"
-                 "  ON p.address_id = s.address_id\n"
-                 "  AND p.tache_id = s.tache_id\n")
-
-        if operand:
-            if len(operand) == 10:
-                # Copié depuis osv/expression.py
-                if operator in ('>', '<='):
-                    operand += ' 23:59:59'
-                else:
-                    operand += ' 00:00:00'
-            query += ("GROUP BY s.id\n"
-                      "HAVING MAX(p.date) %s '%s'" % (operator, operand))
-        else:
-            if operator == '=':
-                query += "WHERE p.id IS NULL"
-            else:
-                query += "WHERE p.id IS NOT NULL"
-        cr.execute(query)
-        rows = cr.fetchall()
-        return [('id', 'in', rows and zip(*rows)[0])]
-
-    @api.multi
-    @api.depends('state')
-    def _compute_color(self):
-        u""" COULEURS :
-        Gris  : service dont l'adresse n'a pas de coordonnées GPS, ou service inactif
-        Orange: service dont la date de prochaine intervention est dans moins d'un mois
-        Rouge : service dont la date de prochaine intervention est inférieure à la date courante (ou à self._context.get('date_next_max'))
-        Noir  : autres services
-        """
-
-        for service in self:
-            if service.state in ('planned', 'planned_soon', 'progress', 'done', 'all_planned'):
-                service.color = 'black'
-            elif service.state in ('to_plan', 'part_planned'):
-                service.color = 'orange'
-            elif service.state == 'late':
-                service.color = 'red'
-            else:
-                service.color = 'gray'
-
-    @api.model
-    def get_color_map(self):
-        u"""
-        fonction pour la légende de la vue map
-        """
-        title = "Prochaine Planification"
-        v0 = {'label': "Plus d'un mois", 'value': 'black'}
-        v1 = {'label': u'Ce mois-ci', 'value': 'orange'}
-        v2 = {'label': u'En retard', 'value': 'red'}
-        return {"title": title, "values": (v0, v1, v2)}
-
-    _sql_constraints = [
-        ('duree_non_nulle_constraint',
-         'CHECK ( duree != 0 )',
-         _(u'La durée de l\'intervention ne peut pas être nulle!')),
-    ]
-
-    # template_id = fields.Many2one('of.mail.template', string='Contrat')
-    partner_id = fields.Many2one('res.partner', string='Partenaire', required=True, ondelete='restrict')
-    address_id = fields.Many2one('res.partner', string="Adresse d'intervention", ondelete='restrict')
-    secteur_tech_id = fields.Many2one(related='address_id.of_secteur_tech_id', readonly=True,
-                                      search="_search_secteur_tech_id")
-    company_id = fields.Many2one('res.company', string=u"Société")
-
-    # Champs ajoutés pour la vue map
-    geo_lat = fields.Float(related='address_id.geo_lat')
-    geo_lng = fields.Float(related='address_id.geo_lng')
-    precision = fields.Selection(related='address_id.precision')
-    partner_name = fields.Char(related='partner_id.name')
-    partner_mobile = fields.Char(related='partner_id.mobile')
-    partner_phone = fields.Char(related='partner_id.phone')
-
-    tache_id = fields.Many2one('of.planning.tache', string=u'Tâche', required=True)
-    tache_categ_id = fields.Many2one(related="tache_id.tache_categ_id", readonly=True)
-    name = fields.Char(u"Libellé", compute="_compute_name", store=True)
-    tag_ids = fields.Many2many('of.service.tag', string=u"Étiquettes")
-    tache_name = fields.Char(related="tache_id.name", readonly=True)
-    duree = fields.Float(string=u"Durée estimée")
-    duree_planif = fields.Float(string=u"Durée planifiée", compute="_compute_durees")
-    duree_restante = fields.Float(string=u"Durée restante", compute="_compute_durees", search='_search_duree_restante')
-
-    origin = fields.Char(string="Origine")
-    order_id = fields.Many2one('sale.order', string="Commande client")
-    sav_id = fields.Many2one("project.issue", string="SAV",
-                             domain="['|', ('partner_id', '=', partner_id), ('partner_id', '=', address_id)]")
-
-    mois_ids = fields.Many2many('of.mois', 'service_mois', 'service_id', 'mois_id', string='Mois',
-                                help=u"Mois préférés du client.")
-    jour_ids = fields.Many2many('of.jours', 'service_jours', 'service_id', 'jour_id', string='Jours',
-                                default=_default_jours, help=u"Jours de disponibilité du client.")
-
-    note = fields.Text('Notes')
-    date_next = fields.Date(string="Prochaine planif", help=u"Date à partir de laquelle programmer le prochain RDV",
-                            required=True)
-    date_next_last = fields.Date('Prochaine planif (svg)', help=u"Champ pour conserver une possibilité de rollback")
-    date_fin = fields.Date(string=u"Date de fin de planification",
-                           help=u"Date à partir de laquelle l'intervention devient en retard de planification")
-    date_fin_contrat = fields.Date(u"Date de fin de contrat")
-
-    # Partner-related fields
-    address_address = fields.Char('Adresse', related='address_id.contact_address', readonly=True)
-    address_zip = fields.Char('Code Postal', size=24, related='address_id.zip', oldname="partner_zip")
-    address_city = fields.Char('Ville', related='address_id.city', oldname="partner_city")
-
-    recurrence = fields.Boolean(string=u"Est récurrente", default=True)
-    recurring_rule_type = fields.Selection([
-        ('weekly', 'Semaine(s)'),
-        ('monthly', 'Mois'),
-        ('yearly', u'Année(s)'),
-        ], string=u'Récurrence', default='yearly', help=u"Spécifier l'intervalle pour le calcul automatique de date de prochaine intervention dans les services.")
-    recurring_interval = fields.Integer(string=u'Répéter chaque', default=1, help=u"Répéter (Mois/Années)")
-
-    state_ponc = fields.Selection([
-        ('draft', u'Brouillon'),  # état par défaut
-        ('to_plan', u'À planifier'),  # pas d'intervention
-        ('part_planned', u'Partiellement planifiée'),  # intervention(s) et durée restante supérieure à 0
-        ('all_planned', u'Entièrement planifiée'),  # intervention(s) et durée restante == 0
-        ('late', u'En retard de planification'),  # date de prochaine planification il y a plus d'un mois
-        ('done', u'Fait'),  # intervention(s) et durée restante == 0 et date de fin dépassée
-        ('cancel', u'Annulée'),  # manuellement décidé
-    ], u'État', compute="_compute_state_poncrec", search="_search_state_ponc")
-
-    state = fields.Selection([
-        ('draft', u'Brouillon'),  # état par défaut
-        ('to_plan', u'À planifier prochainement'),  # prochaine intervention dans moins d'un mois
-        ('planned', u'Planifiée récemment'),  # dernière intervention il y a moins d'un mois
-        ('planned_soon', u'Planifiée prochainement'),  # planifié pour dans moins d'un mois
-        ('progress', u'En cours'),  # par défaut
-        ('late', u'En retard de planification'),  # date de prochaine planification il y a plus d'un mois
-        ('done', u'Terminée'),  # date de fin <= date du jour (rec) / durée restante == 0 et date de fin dépassée (ponc)
-        ('part_planned', u'Partiellement planifiée'),  # intervention(s) et durée restante supérieure à 0
-        ('all_planned', u'Entièrement planifiée'),  # intervention(s) et durée restante == 0
-        ('cancel', u'Annulée'),  # manuellement décidé
-        ], u'État de planification', compute="_compute_state_poncrec", store=True)
-
-    base_state = fields.Selection([
-        ('draft', u'Brouillon'),  # état par défaut
-        ('calculated', u'Calculé'),  # équivalent a state=False mais utile en XML
-        ('cancel', u'Annulé'),  # manuellement décidé
-        ], u'État de calcul', default="draft", required=True)
-
-    active = fields.Boolean(string="Active", default=True)
-
-    intervention_ids = fields.One2many('of.planning.intervention', 'service_id', string="RDVs Tech", order="date DESC")
-    intervention_count = fields.Integer(string='nombre de RDVs', compute='_compute_intervention_count')
-    date_last = fields.Date(
-        string=u'Dernier RDV', compute='_compute_durees', search='_search_last_date',
-        help=u"Date du dernier RDV")
-
-    # Champs de recherche
-    date_fin_min = fields.Date(string=u"Date échéance min", compute='lambda *a, **k:{}')
-    date_fin_max = fields.Date(string=u"Date échéance max", compute='lambda *a, **k:{}')
-    date_controle = fields.Date(string=u"Date de contrôle", compute='lambda *a, **k:{}')
-
-    # Couleur de contrôle
-    color = fields.Char(compute='_compute_color', string='Couleur', store=False)
-    recurrence_tache = fields.Boolean(related='tache_id.recurrence', string=u"Récurrence tâche", readonly=True)
-
-    # Alertes
-    alert_dates = fields.Boolean(string=u"Incohérence dans les dates", compute="_compute_alert_dates")
-
-    def _search_state_ponc(self, operator, operand):
-        services = self.search([])
-        res = safe_eval("services.filtered(lambda s: s.state_ponc %s %s)" % (operator, operand), {'services': services})
-        return [('id', 'in', res.ids)]
-
-    def _search_secteur_tech_id(self, operator, operand):
-        services = self.search([])
-        res = safe_eval("services.filtered(lambda s: s.secteur_tech_id %s %.2f)" % (operator, operand), {'services': services})
-        return [('id', 'in', res.ids)]
-
-    def _search_duree_restante(self, operator, operand):
-        services = self.search([])
-        res = safe_eval("services.filtered(lambda s: s.duree_restante %s %.2f)" % (operator, operand), {'services': services})
-        return [('id', 'in', res.ids)]
-
-    @api.depends('date_next', 'date_fin')
-    def _compute_alert_dates(self):
-        for service in self:
-            service.alert_dates = service.date_next and service.date_fin \
-                                  and service.date_next > service.date_fin
-
-    @api.multi
-    @api.depends('address_id', 'partner_id', 'tache_id')
-    def _compute_name(self):
-        for service in self:
-            partner_name = service.partner_id.name or u''
-            address_zip = service.address_id.zip or u''
-            tache_name = service.tache_id.name or u''
-            service.name = tache_name + " " + partner_name + " " + address_zip
-
-    @api.depends('intervention_ids')
-    @api.multi
-    def _compute_intervention_count(self):
-        for service in self:
-            service.intervention_count = len(service.intervention_ids.filtered(
-                lambda r: r.state in ('draft', 'confirm', 'done')))
-
-    @api.onchange('partner_id')
-    def _onchange_partner_id(self):
-        self.ensure_one()
-        if self.partner_id:
-            self.address_id = self.partner_id
-            self.company_id = self.partner_id.company_id
-
-    @api.onchange('tache_id')
-    def _onchange_tache_id(self):
-        self.ensure_one()
-        if self.tache_id and self.tache_id.recurrence == self.recurrence:
-            if not self._context.get(u"bloquer_recurrence"):
-                self.recurring_rule_type = self.tache_id.recurring_rule_type
-                self.recurring_interval = self.tache_id.recurring_interval
-        self.duree = self.tache_id.duree
-        self.date_fin = self.get_fin_date()
-
-    @api.onchange('date_next')
-    def _onchange_date_next(self):
-        # Remplissage automatique du mois en fonction de la date de prochaine intervention choisie
-        # /!\ Un simple clic sur le champ date appelle cette fonction, et génère le mois avec la date courante
-        #       avant que l'utilisateur ait confirmé son choix.
-        #     Cette fonction doit donc être autorisée à écraser le mois déjà saisi
-        #     Pour éviter les ennuis, elle est donc restreinte à un usage en mode création de nouveau service uniquement
-        if self.date_next and not self._origin:  # <- signifie mode creation
-            mois = self.env['of.mois'].search([('numero', '=', int(self.date_next[5:7]))])
-            mois_id = mois[0] and mois[0].id or False
-            if mois_id:
-                self.mois_ids = [(4, mois_id, 0)]
-        if self.date_next:
-            self.date_fin = self.get_fin_date()
-
     @api.multi
     def get_date_proche(self, date_eval, return_string=True):
         """
-        retrouve l'occurrence la plus proche de la date étudiée, dans le passé ou le futur
+        Retrouve l'occurrence la plus proche de la date étudiée, dans le passé ou le futur
         :param date_eval: Date à placer sur un mois autorisé
         :param return_string: Vrai si date à retourner en String, Faux en Date
         :return: date de début de fourchette de planif de l'occurence la plus proche
@@ -531,7 +589,7 @@ class OfService(models.Model):
     @api.multi
     def get_next_date(self, date_str, forward=True):
         """
-        retrouve la date de prochaine planif de l'occurence suivante/précédente suivant le mode
+        Retrouve la date de prochaine planif de l'occurence suivante/précédente suivant le mode
         :param date_str: Date de l'occurrence à étudier
         :param forward: chercher la prochaine si True, la dernière sinon
         :return: date de début de fourchette de planif de l'occurence suivante/précédente
@@ -558,7 +616,7 @@ class OfService(models.Model):
                 date_to_mois_int = date_to_da.month
                 # générer les mois de l'année suivante pour faciliter calcul du mois et de l'année du résultat
                 mois_int_temp = mois_ints + [m + 12 for m in mois_ints]
-                res_mois_int = min(mois_int_temp, key=lambda m: (abs(m - date_to_mois_int), m))
+                res_mois_int = min(mois_int_temp, key=lambda mois: (abs(mois - date_to_mois_int), mois))
                 if res_mois_int > 12:
                     res_next_year = True
                     res_mois_int -= 12
@@ -570,7 +628,7 @@ class OfService(models.Model):
                 date_to_mois_int = date_to_da.month
                 # générer les mois de l'année précédente pour faciliter calcul du mois et de l'année du résultat
                 mois_int_temp = mois_ints + [m - 12 for m in mois_ints]
-                res_mois_int = min(mois_int_temp, key=lambda m: (abs(m - date_to_mois_int), m))
+                res_mois_int = min(mois_int_temp, key=lambda mois: (abs(mois - date_to_mois_int), mois))
                 if res_mois_int < 1:
                     res_last_year = True
                     res_mois_int += 12
@@ -585,7 +643,7 @@ class OfService(models.Model):
     @api.multi
     def get_fin_date(self, date_str=False):
         """
-        :param date_str: Date de prochaine planif à utuliser pour le calcul, sous format string
+        :param date_str: Date de prochaine planif à utiliser pour le calcul, sous format string
         :return: Date à partir de laquelle l'intervention passe à l'état 'en retard'
         :rtype string
         """
@@ -607,9 +665,6 @@ class OfService(models.Model):
                 if self.recurrence:
                     # un mois par défaut pour les ramonages et entretiens
                     date_fin += relativedelta(months=1)
-                elif self.sav_id:
-                    # une semaine par défaut pour les SAV
-                    date_fin += relativedelta(weeks=1)
                 else:
                     # 2 semaines par défaut
                     date_fin += relativedelta(weeks=2)
@@ -624,28 +679,29 @@ class OfService(models.Model):
         if recurring_rule_type == 'weekly':
             return relativedelta(weeks=interval)
         elif recurring_rule_type == 'monthly':
-            return relativedelta(months=interval, day=1)
+            return relativedelta(months=interval, day=1)  # 1er du mois
         else:
-            return relativedelta(years=interval, day=1)
+            return relativedelta(years=interval, day=1)  # 1er du mois
 
     @api.multi
-    def get_action_view_interventions_context(self, action_context={}):
+    def get_action_view_intervention_context(self, action_context={}):
         action_context.update({
-            'default_partner_id' : self.partner_id.id,
-            'default_address_id' : self.address_id and self.address_id.id or self.partner_id.id,
-            'default_tache_id'   : self.tache_id and self.tache_id.id or False,
-            'default_duree'      : self.duree,
+            'default_partner_id': self.partner_id.id,
+            'default_address_id': self.address_id and self.address_id.id or self.partner_id.id,
+            'default_tache_id': self.tache_id and self.tache_id.id or False,
+            'default_duree': self.duree,
             'default_description': self.note,
-            'default_service_id' : self.id,
-            'create'             : self.base_state == 'calculated',
-            'edit'               : self.base_state == 'calculated',
-            'default_order_id'   : self.order_id and self.order_id.id or False,
+            'default_service_id': self.id,
+            'create': self.base_state == 'calculated',
+            'edit': self.base_state == 'calculated',
+            'default_order_id': self.order_id and self.order_id.id or False,
             })
         if self.intervention_ids:
             action_context['force_date_start'] = self.intervention_ids[-1].date_date
             action_context['search_default_service_id'] = self.id
         elif self.base_state != 'calculated' or self.state == 'done':
-            # inhiber la création en vue calendrier si l'intervention n'est pas planifiable (brouillon, annulée, terminée)
+            # inhiber la création en vue calendrier si l'intervention n'est pas planifiable
+            # (brouillon, annulée, terminée)
             action_context['inhiber_create'] = True
             if self.state == 'done':
                 param = u"terminée"
@@ -654,47 +710,6 @@ class OfService(models.Model):
             action_context['inhiber_message'] = u"Vous ne pouvez pas créer de RDV pour une intervention %s." % param
 
         return action_context
-
-    @api.multi
-    def action_view_interventions(self):
-        action = self.env.ref('of_planning.of_sale_order_open_interventions').read()[0]
-
-        if len(self._ids) == 1:
-            action_context = safe_eval(action['context'])
-            action['context'] = str(self.get_action_view_interventions_context(action_context))
-
-        return action
-
-    @api.model
-    def create(self, vals):
-        if vals.get('address_id') and not vals.get('partner_id'):
-            address = self.env['res.partner'].browse(vals['address_id'])
-            partner = address.parent_id or address
-            vals['partner_id'] = partner.id
-        return super(OfService, self).create(vals)
-
-    @api.model
-    def search(self, args, offset=0, limit=None, order=None, count=False):
-        res = super(OfService, self).search(args, offset, limit, order, count)
-        return res
-
-    @api.multi
-    def read(self, fields=None, load='_classic_read'):
-        res = super(OfService, self).read(fields, load)
-        return res
-
-    @api.multi
-    def button_valider(self):
-        # laisser le système calculer l'état
-        return self.write({'base_state': 'calculated'})
-
-    @api.multi
-    def button_annuler(self):
-        return self.write({'base_state': 'cancel'})
-
-    @api.multi
-    def button_brouillon(self):
-        return self.write({'base_state': 'draft'})
 
 
 class OFServiceTag(models.Model):
@@ -713,13 +728,16 @@ class OFPlanningTache(models.Model):
     service_count = fields.Integer(compute='_compute_service_count')
 
     recurrence = fields.Boolean(u"Tâche récurrente?")
-    recurring_rule_type = fields.Selection([
-        ('weekly', 'Semaine(s)'),
-        ('monthly', 'Mois'),
-        ('yearly', u'Année(s)'),
-        ], string=u'Récurrence', default='monthly', help=u"Spécifier l'intervalle pour le calcul automatique de date de prochaine intervention dans les services.")
-    recurring_interval = fields.Integer(string=u'Répéter chaque', default=1, help=u"Répéter (Jours/Semaines/Mois/Années)")
-    recurrence_display = fields.Char(string=u"Récurrence", compute="_compute_recurrence_display")
+    recurring_rule_type = fields.Selection(
+        [('monthly', 'Mois'),
+         ('yearly', u'Année(s)')],
+        string=u'Récurrence', default='yearly',
+        help=u"Spécifier l'intervalle pour le calcul automatique de la date de prochaine planification dans les"
+             u" interventions récurrentes.")
+    recurring_interval = fields.Integer(string=u'Répéter chaque', default=1, help=u"Répéter (Mois/Années)")
+    recurrence_display = fields.Char(string=u"Récurrence", compute="_compute_recurrence_display")  # pour la vue liste
+
+    # @api.depends
 
     @api.multi
     @api.depends('service_ids')
@@ -733,37 +751,28 @@ class OFPlanningTache(models.Model):
         for tache in self:
             display = False
             if tache.recurrence:
-                if tache.recurring_rule_type and tache.recurring_rule_type == 'weekly' :  # Féminin
-                    display = u"Toutes les "
-                else:
-                    display = u"Tous les "
+                display = u"Tous les "
+                # éviter d'afficher "tous les 1 ans"
                 if tache.recurring_interval and tache.recurring_interval != 1:
-                    display += chr(tache.recurring_interval) + u" "
-                elif tache.recurring_rule_type == 'weekly':
-                    display += u"semaines"
-                elif tache.recurring_rule_type == 'monthly':
+                    display += str(tache.recurring_interval) + u" "
+                if tache.recurring_rule_type == 'monthly':
                     display += u"mois"
                 elif tache.recurring_rule_type == 'yearly':
                     display += u"ans"
             tache.recurrence_display = display
 
-    @api.model
-    def get_relative_delta(self, recurring_rule_type, interval):
-        if recurring_rule_type == 'weekly':
-            return relativedelta(weeks=interval)
-        elif recurring_rule_type == 'monthly':
-            return relativedelta(months=interval)
-        else:
-            return relativedelta(years=interval)
+    # Héritages
 
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
         """permet d'afficher les tache recurrentes en premier en fonction du contexte"""
         rec_first = self._context.get('show_rec_icon_first', -1)
         if rec_first != -1:
-            res = super(OFPlanningTache, self).name_search(name, args + [['recurrence', '=', rec_first]], operator, limit) or []
+            res = super(OFPlanningTache, self).name_search(
+                name, args + [['recurrence', '=', rec_first]], operator, limit) or []
             limit = limit - len(res)
-            res += super(OFPlanningTache, self).name_search(name, [['recurrence', '!=', rec_first]], operator, limit) or []
+            res += super(OFPlanningTache, self).name_search(
+                name, [['recurrence', '!=', rec_first]], operator, limit) or []
             return res
         return super(OFPlanningTache, self).name_search(name, args, operator, limit)
 
@@ -773,7 +782,9 @@ class OFPlanningIntervention(models.Model):
 
     service_id = fields.Many2one(
         'of.service', string=u"À programmer",
-        domain="address_id and ['|', ('address_id', '=', address_id), ('partner_id', '=', address_id)] or []") #,('tache_id','=','tache_id')
+        domain="address_id and ['|', ('address_id', '=', address_id), ('partner_id', '=', address_id)] or []")
+
+    # @api.onchange
 
     @api.onchange('address_id', 'tache_id')
     def _onchange_address_id(self):
@@ -791,11 +802,15 @@ class OFPlanningIntervention(models.Model):
             self.tache_id = self.service_id.tache_id
             self.address_id = self.service_id.address_id or self.service_id.partner_id
 
+    # Héritages
+
     @api.multi
     def write(self, vals):
         state_interv = vals.get('state', False)
-        planif_avant = state_interv in ('unfinished', 'cancel', 'postponed') and self.filtered(lambda i: i.state in ('draft', 'confirm', 'done')) or False
-        pas_planif_avant = state_interv in ('draft', 'confirm') and self.filtered(lambda i: i.state in ('unfinished', 'cancel', 'postponed')) or False
+        planif_avant = state_interv in ('unfinished', 'cancel', 'postponed') and \
+            self.filtered(lambda i: i.state in ('draft', 'confirm', 'done')) or False
+        pas_planif_avant = state_interv in ('draft', 'confirm') and \
+            self.filtered(lambda i: i.state in ('unfinished', 'cancel', 'postponed')) or False
         fait = state_interv == 'done'
         # vérif si modification de date -> champ date deadline qui prend en compte le forçage de date
         date_deadline_avant = {rdv.id: rdv.date_deadline for rdv in self}
@@ -817,7 +832,8 @@ class OFPlanningIntervention(models.Model):
                     # calculer et affecter la nouvelle date de prochaine planification
                     date_next = service.get_next_date(intervention.date_date)
                 # l'intervention est marquée comme faite
-                elif fait and service.date_next_last <= intervention.date_date:  # mettre à jour l'ancienne date de prochaine planification
+                elif fait and service.date_next_last <= intervention.date_date:
+                    # mettre à jour l'ancienne date de prochaine planification
                     service.date_next_last = service.date_next
                     date_next = service.get_next_date(intervention.date_date)
                 # aucun des cas précédent mais la date de fin a changé: màj date_next
@@ -840,9 +856,10 @@ class OFPlanningIntervention(models.Model):
         intervention = super(OFPlanningIntervention, self).create(vals)
         state_interv = vals.get('state', 'draft')
         service = intervention.service_id
-        if service and service.recurrence:  # intervention d'un service récurrent
+        if service and service.recurrence:  # RDV Tech d'une intervention récurrente
             # ne pas calculer la date de prochaine planification si la durée restante du service n'est pas nulle
-            if state_interv in ('draft', 'confirm', 'done') and not service.duree_restante:  # calculer date de prochaine intervention
+            if state_interv in ('draft', 'confirm', 'done') and not service.duree_restante:
+                # calculer date de prochaine planification
                 if state_interv == 'done':  # mettre à jour l'ancienne date de prochaine intervention avant tout
                     service.date_next_last = service.date_next
                 date_next = service.get_next_date(intervention.date_date)
@@ -860,7 +877,8 @@ class OFPlanningIntervention(models.Model):
             if not service or not service.recurrence or not service.intervention_ids:
                 continue
             service_last_rdv = service.intervention_ids.sorted('date', reverse=True)[0]
-            if intervention == service_last_rdv:  # était la dernière intervention planifiée pour ce service -> rollback!
+            if intervention == service_last_rdv:
+                # était la dernière intervention planifiée pour ce service -> rollback!
                 date_next = service.get_date_proche(service.date_next_last or intervention.date_date)
                 service.write({
                     'date_next': date_next,
@@ -874,15 +892,19 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     # Utilisé pour ajouter bouton Interventions à Devis (see order_id many2one field above)
-    of_a_programmer_ids = fields.One2many("of.service", "order_id", string=u"À programmer")
+    of_service_ids = fields.One2many("of.service", "order_id", string=u"À programmer", oldname="of_a_programmer_ids")
+    of_service_count = fields.Integer(string=u"Nb à programmer", compute='_compute_of_service_count')
 
-    of_a_programmer_count = fields.Integer(string=u"À programmer", compute='_compute_of_a_programmer_count')
+    # @api.depends
 
-    @api.depends('of_a_programmer_ids')
+    @api.depends('of_service_ids')
     @api.multi
-    def _compute_of_a_programmer_count(self):
+    def _compute_of_service_count(self):
         for sale_order in self:
-            sale_order.of_a_programmer_count = len(sale_order.of_a_programmer_ids)
+            services = sale_order.of_service_ids.filtered(lambda s: s.state != 'cancel')
+            sale_order.of_service_count = len(services)
+
+    # Actions
 
     @api.multi
     def action_view_a_programmer(self):
@@ -921,7 +943,6 @@ class SaleOrder(models.Model):
             'default_date_fin': deux_semaines_str,
             'default_origin': u"[Commande] " + self.name,
             'default_order_id': self.id,
-            'bloquer_recurrence': True,
             'hide_bouton_planif': True,
         }
         return action
@@ -930,14 +951,18 @@ class SaleOrder(models.Model):
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    service_address_ids = fields.One2many('of.service', 'address_id', string='Services', context={'active_test': False})
+    service_address_ids = fields.One2many('of.service', 'address_id', string=u'Interventions récurrentes',
+                                          context={'active_test': False})
     service_partner_ids = fields.One2many(
-        'of.service', 'partner_id', string='Services du partenaire', context={'active_test': False},
-        help=u"Services liés au partenaire, incluant les services des contacts associés")
+        'of.service', 'partner_id', string=u'Interventions récurrentes du partenaire', context={'active_test': False},
+        help=u"Interventions récurrentes liées au partenaire, incluant les interventions récurrentes des contacts "
+             u"associés")
     a_programmer_ids = fields.Many2many('of.service', string=u"À programmer", compute="compute_a_programmer")
-    a_programmer_count = fields.Integer(string='Nombre à programmer', compute='compute_a_programmer')
+    a_programmer_count = fields.Integer(string=u'Nombre à programmer', compute='compute_a_programmer')
     recurrent_ids = fields.Many2many('of.service', string=u"Récurrents", compute="compute_a_programmer")
-    recurrent_count = fields.Integer(string='Nombre recurrents', compute='compute_a_programmer')
+    recurrent_count = fields.Integer(string=u'Nombre récurrents', compute='compute_a_programmer')
+
+    # @api.depends
 
     @api.multi
     def compute_a_programmer(self):
@@ -945,22 +970,22 @@ class ResPartner(models.Model):
         for partner in self:
             service_ids = service_obj.search([
                 '|',
-                    ('partner_id', 'child_of', partner.id),
-                    ('address_id', 'child_of', partner.id),
+                ('partner_id', 'child_of', partner.id),
+                ('address_id', 'child_of', partner.id),
             ])
-            partner.a_programmer_ids = service_ids.filtered(lambda s: s.state in ('draft', 'to_plan', 'part_planned', 'late'))
+            partner.a_programmer_ids = service_ids.filtered(
+                lambda s: s.state in ('draft', 'to_plan', 'part_planned', 'late'))
             partner.a_programmer_count = len(partner.a_programmer_ids)
-            partner.recurrent_ids = service_ids.filtered(lambda s: s.recurrence and s.state not in ('draft', 'done', 'cancel'))
+            partner.recurrent_ids = service_ids.filtered(
+                lambda s: s.recurrence and s.state not in ('draft', 'done', 'cancel'))
             partner.recurrent_count = len(partner.recurrent_ids)
+
+    # Actions
 
     @api.multi
     def action_prevoir_intervention(self):
         self.ensure_one()
         action = self.env.ref('of_service.action_of_service_prog_form_planning').read()[0]
-        today_str = fields.Date.today()
-        today_da = fields.Date.from_string(today_str)
-        deux_semaines_da = today_da + timedelta(days=14)
-        deux_semaines_str = fields.Date.to_string(deux_semaines_da)
         action['name'] = u"Prévoir une intervention"
         action['view_mode'] = "form"
         action['view_ids'] = False
@@ -971,31 +996,11 @@ class ResPartner(models.Model):
             'default_partner_id': self.id,
             'default_address_id': self.address_get(adr_pref=['delivery']) or self.id,
             'default_recurrence': False,
-            'default_date_next': today_str,
-            'default_date_fin': deux_semaines_str,
+            'default_date_next': fields.Date.today(),
             'default_origin': u"[Partenaire] " + self.name,
-            'bloquer_recurrence': True,
             'hide_bouton_planif': True,
         }
         return action
-
-    @api.multi
-    def _get_action_view_a_programmer_context(self):
-        today_str = fields.Date.today()
-        today_da = fields.Date.from_string(today_str)
-        deux_semaines_da = today_da + timedelta(days=14)
-        deux_semaines_str = fields.Date.to_string(deux_semaines_da)
-        context = {
-            'default_partner_id': self.id,
-            'default_address_id': self.address_get(adr_pref=['delivery']) or self.id,
-            'default_recurrence': False,
-            'default_date_next': today_str,
-            'default_date_fin': deux_semaines_str,
-            'default_origin': u"[Partenaire] " + self.name,
-            'bloquer_recurrence': True,
-            'hide_bouton_planif': True,
-        }
-        return context
 
     @api.multi
     def action_view_a_programmer(self):
@@ -1008,27 +1013,9 @@ class ResPartner(models.Model):
             '|',
             ('partner_id', 'child_of', self.ids),
             ('address_id', 'child_of', self.ids),
-            ('state', 'in', ('draft', 'to_plan', 'part_planned', 'late')),
         ]
 
         return action
-
-    @api.multi
-    def _get_action_view_recurrent_context(self):
-        today_str = fields.Date.today()
-        today_da = fields.Date.from_string(today_str)
-        deux_semaines_da = today_da + timedelta(days=14)
-        deux_semaines_str = fields.Date.to_string(deux_semaines_da)
-        context = {
-            'default_partner_id': self.id,
-            'default_address_id': self.address_get(adr_pref=['delivery']) or self.id,
-            'default_recurrence': True,
-            'default_date_next': today_str,
-            'default_origin': u"[Partenaire] " + self.name,
-            'hide_bouton_planif': True,
-            'bloquer_recurrence': True,
-        }
-        return context
 
     @api.multi
     def action_view_recurrent(self):
@@ -1039,13 +1026,47 @@ class ResPartner(models.Model):
 
         action['domain'] = [
             '|',
-                ('partner_id', 'child_of', self.ids),
-                ('address_id', 'child_of', self.ids),
+            ('partner_id', 'child_of', self.ids),
+            ('address_id', 'child_of', self.ids),
             ('recurrence', '=', True),
-            ('state', 'not in', ('draft', 'done', 'cancel', 'late')),
         ]
 
         return action
+
+    # Autres
+
+    @api.multi
+    def _get_action_view_a_programmer_context(self, context={}):
+        context.update({
+            'default_partner_id': self.id,
+            'default_address_id': self.address_get(adr_pref=['delivery']) or self.id,
+            'default_recurrence': False,
+            'default_date_next': fields.Date.today(),
+            'default_origin': u"[Partenaire] " + self.name,
+            'search_default_filter_draft': True,
+            'search_default_filter_to_plan': True,
+            'search_default_filter_part_planned': True,
+            'search_default_filter_late': True,
+            'hide_bouton_planif': True,
+        })
+        return context
+
+    @api.multi
+    def _get_action_view_recurrent_context(self, context={}):
+        context.update({
+            'default_partner_id': self.id,
+            'default_address_id': self.address_get(adr_pref=['delivery']) or self.id,
+            'default_recurrence': True,
+            'default_date_next': fields.Date.today(),
+            'default_origin': u"[Partenaire] " + self.name,
+            'search_default_filter_to_plan': True,
+            'search_default_filter_planned': True,
+            'search_default_filter_planned_soone': True,
+            'search_default_filter_late': True,
+            'search_default_filter_progress': True,
+            'hide_bouton_planif': True,
+            })
+        return context
 
 
 class DateRangeGenerator(models.TransientModel):
@@ -1054,11 +1075,11 @@ class DateRangeGenerator(models.TransientModel):
     @api.model
     def auto_genere_quinzaines(self, date_start_str=False):
         dr_type_obj = self.env['date.range.type']
-        type = dr_type_obj.search([('name', '=', 'Quinzaine civile')], limit=1)
-        if not type:
-            type = dr_type_obj.create({'name': 'Quinzaine civile', 'company_id': False, 'allow_overlap': False})
+        dr_type = dr_type_obj.search([('name', '=', 'Quinzaine civile')], limit=1)
+        if not dr_type:
+            dr_type = dr_type_obj.create({'name': 'Quinzaine civile', 'company_id': False, 'allow_overlap': False})
         if not date_start_str:
-            dr = self.env['date.range'].search([('type_id', '=', type.id)], order="date_start DESC", limit=1)
+            dr = self.env['date.range'].search([('type_id', '=', dr_type.id)], order="date_start DESC", limit=1)
             if not dr:
                 year_int = fields.Date.from_string(fields.Date.today()).year
                 date_start_str = fields.Date.to_string(date(year_int, 1, 1))
@@ -1077,7 +1098,7 @@ class DateRangeGenerator(models.TransientModel):
         vals = {
             'name_prefix': name_prefix,
             'date_start': fields.Date.to_string(date_start_dt),
-            'type_id': type.id,
+            'type_id': dr_type.id,
             'company_id': False,
             'unit_of_time': WEEKLY,
             'duration_count': 2,
@@ -1086,10 +1107,12 @@ class DateRangeGenerator(models.TransientModel):
         dr_gen = self.create(vals)
         date_ranges = dr_gen._compute_date_ranges()
         if date_ranges:
-            # replacer la date de début de la première période sur le premier de l'an pour eviter les chevauchements de périodes
+            # replacer la date de début de la première période sur le premier de l'an
+            # pour eviter les chevauchements de périodes
             dr_first_debut_da = date(year_int, 1, 1)
             date_ranges[0]['date_start'] = fields.Date.to_string(dr_first_debut_da)
-            # replacer la date de fin de la dernière période sur le 31 décembre pour eviter les chevauchements de périodes
+            # replacer la date de fin de la dernière période sur le 31 décembre
+            # pour eviter les chevauchements de périodes
             dr_last_fin_da = date(year_int, 12, 31)
             date_ranges[-1]['date_end'] = fields.Date.to_string(dr_last_fin_da)
             for dr in date_ranges:

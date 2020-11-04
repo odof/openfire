@@ -5,428 +5,428 @@
 <!-- ****************** PARC INSTALLÉ ****************** -->
 <!-- *************************************************** -->
 
-        <!-- Parc installé filtre -->
-        <record id="of_parc_installe_search_view" model="ir.ui.view">
-            <field name="name">of.parc.installe.search</field>
-            <field name="model">of.parc.installe</field>
-            <field name="arch" type="xml">
-                <search string="Parc installé">
-                    <field name="name"/>
-                    <field name="product_id"/>
-                    <field name="client_id"/>
-                    <field name="tel_site_id"/>
-                    <field name="date_service"/>
-                    <field name="revendeur_id"/>
-                    <group expand="0" string="Regrouper par">
-                        <filter string="Client" icon="terp-personal" context="{'group_by': 'client_id'}"/>
-                        <filter string="Produit" icon="terp-personal" context="{'group_by': 'product_id'}"/>
-                        <filter string="Revendeur" icon="terp-personal" context="{'group_by': 'revendeur_id'}"/>
-                        <filter string="Code postal" icon="terp-personal" context="{'group_by': 'zip_site_id'}"/>
+    <!-- Parc installé filtre -->
+    <record id="of_parc_installe_search_view" model="ir.ui.view">
+        <field name="name">of.parc.installe.search</field>
+        <field name="model">of.parc.installe</field>
+        <field name="arch" type="xml">
+            <search string="Parc installé">
+                <field name="name"/>
+                <field name="product_id"/>
+                <field name="client_id"/>
+                <field name="tel_site_id"/>
+                <field name="date_service"/>
+                <field name="revendeur_id"/>
+                <group expand="0" string="Regrouper par">
+                    <filter string="Client" icon="terp-personal" context="{'group_by': 'client_id'}"/>
+                    <filter string="Produit" icon="terp-personal" context="{'group_by': 'product_id'}"/>
+                    <filter string="Revendeur" icon="terp-personal" context="{'group_by': 'revendeur_id'}"/>
+                    <filter string="Code postal" icon="terp-personal" context="{'group_by': 'zip_site_id'}"/>
+                </group>
+                <separator/>
+                <filter string="Conforme" name="conforme" domain="[('conforme', '=', True)]"/>
+                <filter string="Non conforme" name="non_conforme" domain="[('conforme', '=', False)]"/>
+                <separator/>
+                <filter string="Neuf" name="neuf" domain="[('state', '=', 'neuf')]"/>
+                <filter string="Bon" name="bon" domain="[('state', '=', 'bon')]"/>
+                <filter string="Usagé" name="usage" domain="[('state', '=', 'usage')]"/>
+                <filter string="À remplacer" name="remplacer" domain="[('state', '=', 'remplacer')]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Parc installé tree -->
+    <record id="of_parc_installe_tree_view" model="ir.ui.view">
+        <field name="name">of.parc.installe.tree</field>
+        <field name="model">of.parc.installe</field>
+        <field name="arch" type="xml">
+            <tree string="Parc installé">
+                <field name="client_id"/>
+                <field name="product_id"/>
+                <field name="name"/>
+                <field name="site_adresse_id"/>
+                <field name="revendeur_id"/>
+                <field name="installateur_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Parc installé form -->
+    <record id="of_parc_installe_form_view" model="ir.ui.view">
+        <field name="name">of.parc.installe.form</field>
+        <field name="model">of.parc.installe</field>
+        <field name="arch" type="xml">
+            <form>
+                <header/>
+                <sheet string="Parc installé" name="parc_installe">
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{&quot;terminology&quot;: &quot;archive&quot;}"/>
+                        </button>
+                        <button name="action_view_orders" type="object" class="oe_stat_button" icon="fa-usd">
+                            <field name="sale_order_amount" string="Commandes" widget="statinfo"/>
+                        </button>
+                        <button name="action_view_invoices" type="object" class="oe_stat_button" icon="fa-pencil-square-o">
+                            <field name="account_invoice_amount" string="Factures" widget="statinfo"/>
+                        </button>
+                    </div>
+                    <separator string="Produit installé"/>
+                    <group name="produit_installe">
+                        <field name="name" placeholder="No de série ..." colspan="2"/>
+                        <field name="product_id" placeholder="Article ..."/>
+                        <field name="brand_id"/>
+                        <field name="product_category_id"/>
+                        <field name="modele"/>
+                        <field name="state" required="1"/>
                     </group>
-                    <separator/>
-                    <filter string="Conforme" name="conforme" domain="[('conforme', '=', True)]"/>
-                    <filter string="Non conforme" name="non_conforme" domain="[('conforme', '=', False)]"/>
-                    <separator/>
-                    <filter string="Neuf" name="neuf" domain="[('state', '=', 'neuf')]"/>
-                    <filter string="Bon" name="bon" domain="[('state', '=', 'bon')]"/>
-                    <filter string="Usagé" name="usage" domain="[('state', '=', 'usage')]"/>
-                    <filter string="À remplacer" name="remplacer" domain="[('state', '=', 'remplacer')]"/>
-                </search>
-            </field>
-        </record>
+                    <group>
+                        <group name="client" string="Client">
+                            <field name="client_id"/>
+                            <field name="site_adresse_id" context="{'show_address': True}"/>
+                            <label for="street_site_id" string=" " class=""/>
+                            <div class="o_address_format">
+                                <field name="street_site_id" class="o_address_street" nolabel="1"/>
+                                <field name="street2_site_id" class="o_address_street" nolabel="1"/>
+                                <field name="zip_site_id" class="o_address_zip" style="width: 20%" nolabel="1"/>
+                                <field name="city_site_id" class="o_address_city" style="width: 40%" nolabel="1"/>
+                                <field name="country_site_id" class="o_address_country" nolabel="1"/>
+                            </div>
+                            <label for="tel_site_id" string=" "/>
+                            <field name="tel_site_id" nolabel="1"/>
+                        </group>
+                        <group name="pose" string="Installation">
+                            <field name="installation"/>
+                            <field name="conforme"/>
+                            <field name="revendeur_id"/>
+                            <field name="installateur_id"/>
+                        </group>
+                    </group>
+                    <group name="produit_installe" string="Produit installé">
+                        <group name="produit">
+                            <field name="date_service"/>
+                            <field name="date_installation"/>
+                        </group>
+                    </group>
+                    <group name="note">
+                        <field name="note"/>
+                    </group>
+                    <notebook>
+                        <page string="Historique SAV">
+                            <group name="sav">
+                                <field name="project_issue_ids" nolabel="1" context="{'default_partner_id': client_id, 'default_of_produit_installe_id': id}">
+                                    <tree string="SAV">
+                                        <field name="of_code" string="Dossier"/>
+                                        <field name="date"/>
+                                        <field name="name" string="Requête"/>
+                                        <field name="of_categorie_id" string="Famille"/>
+                                        <field name="of_produit_installe_id" string="S/N"/>
+                                        <field name="user_id" string="Responsable"/>
+                                        <field name="stage_id"/>
+                                        <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
 
-        <!-- Parc installé tree -->
-        <record id="of_parc_installe_tree_view" model="ir.ui.view">
-            <field name="name">of.parc.installe.tree</field>
-            <field name="model">of.parc.installe</field>
-            <field name="arch" type="xml">
-                <tree string="Parc installé">
-                    <field name="client_id"/>
-                    <field name="product_id"/>
-                    <field name="name"/>
-                    <field name="site_adresse_id"/>
-                    <field name="revendeur_id"/>
-                    <field name="installateur_id"/>
-                </tree>
-            </field>
-        </record>
-
-        <!-- Parc installé form -->
-        <record id="of_parc_installe_form_view" model="ir.ui.view">
-            <field name="name">of.parc.installe.form</field>
-            <field name="model">of.parc.installe</field>
-            <field name="arch" type="xml">
-                <form>
-                    <header/>
-                    <sheet string="Parc installé" name="parc_installe">
-                        <div class="oe_button_box" name="button_box">
-                            <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
-                                <field name="active" widget="boolean_button" options="{&quot;terminology&quot;: &quot;archive&quot;}"/>
-                            </button>
-                            <button name="action_view_orders" type="object" class="oe_stat_button" icon="fa-usd">
-                                <field name="sale_order_amount" string="Commandes" widget="statinfo"/>
-                            </button>
-                            <button name="action_view_invoices" type="object" class="oe_stat_button" icon="fa-pencil-square-o">
-                                <field name="account_invoice_amount" string="Factures" widget="statinfo"/>
-                            </button>
+    <!-- Parc Installé Map View -->
+    <record id="of_parc_installe_map_view" model="ir.ui.view">
+        <field name="name">of.parc.installe.map</field>
+        <field name="model">of.parc.installe</field>
+        <field name="arch" type="xml">
+            <map string="Map" class="of_map_parc_installé" latitude_field="geo_lat" longitude_field="geo_lng">
+                <field name="active" invisible="1"/>
+                <field name="geo_lat" required="1"/>
+                <field name="geo_lng" required="1"/>
+                <field name="precision" required="1"/>
+                <field name="id"/>
+                <field name="client_name"/>
+                <field name="zip_site_id"/>
+                <field name="city_site_id"/>
+                <field name="client_mobile"/>
+                <field name="name"/>
+                <templates>
+                    <t t-name="of_map_record_box">
+                        <div t-attf-class="of_map_record_global_click">
+                            <div class="of_map_record_buttons">
+                                <i class="of_map_record_close fa fa-lg fa-times"/>
+                                <!--i class="of_map_record_min fa fa-lg fa-minus"/>  later implementation...
+                                <i class="of_map_record_max fa fa-lg fa-square"/-->
+                            </div>
+                            <div name="content" class="of_map_record_content">
+                                <t t-if="record.client_name.raw_value">
+                                    <i class="of_map_record_main fa fa-user"/><span class="of_ws"/><strong><field name="client_name"/></strong><br/>
+                                </t>
+                                <t t-if="record.zip_site_id.raw_value">
+                                    <i class="of_map_record_main fa fa-map-marker"/><span class="of_ws"/><field name="zip_site_id"/><span class="of_ws"/><field name="city_site_id"/><br/>
+                                </t>
+                                <t t-if="record.client_mobile.raw_value">
+                                    <i class="of_map_record_main fa fa-phone"/><span class="of_ws"/><field name="client_mobile"/><br/>
+                                </t>
+                                <t t-if="record.name.raw_value">
+                                    <i class="of_map_record_main fa fa-hashtag"/><span class="of_ws"/><field name="name"/><br/>
+                                </t>
+                                <t t-if="record.date_service.raw_value">
+                                    <i class="of_map_record_main fa fa-calendar-o"/><span class="of_ws"/>Vente:<span class="of_ws"/><field name="date_service"/><br/>
+                                </t>
+                                <t t-if="record.date_installation.raw_value">
+                                    <i class="of_map_record_main fa fa-calendar-check-o"/><span class="of_ws"/>Instal:<span class="of_ws"/><field name="date_installation"/><br/>
+                                </t>
+                                <t t-if="record.date_fin_garantie.raw_value">
+                                    <i class="of_map_record_main fa fa-calendar-times-o"/><span class="of_ws"/>Garantie:<span class="of_ws"/><field name="date_fin_garantie"/><br/>
+                                </t>
+                            </div>
                         </div>
-                        <separator string="Produit installé"/>
-                        <group name="produit_installe">
-                            <field name="name" placeholder="No de série ..." colspan="2"/>
-                            <field name="product_id" placeholder="Article ..."/>
-                            <field name="brand_id"/>
-                            <field name="product_category_id"/>
-                            <field name="modele"/>
-                            <field name="state" required="1"/>
-                        </group>
-                        <group>
-                            <group name="client" string="Client">
-                                <field name="client_id"/>
-                                <field name="site_adresse_id" context="{'show_address': True}"/>
-                                <label for="street_site_id" string=" " class=""/>
-                                <div class="o_address_format">
-                                    <field name="street_site_id" class="o_address_street" nolabel="1"/>
-                                    <field name="street2_site_id" class="o_address_street" nolabel="1"/>
-                                    <field name="zip_site_id" class="o_address_zip" style="width: 20%" nolabel="1"/>
-                                    <field name="city_site_id" class="o_address_city" style="width: 40%" nolabel="1"/>
-                                    <field name="country_site_id" class="o_address_country" nolabel="1"/>
-                                </div>
-                                <label for="tel_site_id" string=" "/>
-                                <field name="tel_site_id" nolabel="1"/>
-                            </group>
-                            <group name="pose" string="Installation">
-                                <field name="installation"/>
-                                <field name="conforme"/>
-                                <field name="revendeur_id"/>
-                                <field name="installateur_id"/>
-                            </group>
-                        </group>
-                        <group name="produit_installe" string="Produit installé">
-                            <group name="produit">
-                                <field name="date_service"/>
-                                <field name="date_installation"/>
-                            </group>
-                        </group>
-                        <group name="note">
-                            <field name="note"/>
-                        </group>
-                        <notebook>
-                            <page string="Historique SAV">
-                                <group name="sav">
-                                    <field name="project_issue_ids" nolabel="1" context="{'default_partner_id': client_id, 'default_of_produit_installe_id': id}">
-                                        <tree string="SAV">
-                                            <field name="of_code" string="Dossier"/>
-                                            <field name="date"/>
-                                            <field name="name" string="Requête"/>
-                                            <field name="of_categorie_id" string="Famille"/>
-                                            <field name="of_produit_installe_id" string="S/N"/>
-                                            <field name="user_id" string="Responsable"/>
-                                            <field name="stage_id"/>
-                                            <button name="button_open_of_sav" class="oe_link" type="object" string="Ouvrir"/>
-                                        </tree>
-                                    </field>
-                                </group>
-                            </page>
-                        </notebook>
-                    </sheet>
-                </form>
-            </field>
-        </record>
-
-        <!-- Parc Installé Map View -->
-        <record id="of_parc_installe_map_view" model="ir.ui.view">
-            <field name="name">of.parc.installe.map</field>
-            <field name="model">of.parc.installe</field>
-            <field name="arch" type="xml">
-                <map string="Map" class="of_map_parc_installé" latitude_field="geo_lat" longitude_field="geo_lng">
-                    <field name="active" invisible="1"/>
-                    <field name="geo_lat" required="1"/>
-                    <field name="geo_lng" required="1"/>
-                    <field name="precision" required="1"/>
-                    <field name="id"/>
-                    <field name="client_name"/>
-                    <field name="zip_site_id"/>
-                    <field name="city_site_id"/>
-                    <field name="client_mobile"/>
-                    <field name="name"/>
-                    <templates>
-                        <t t-name="of_map_record_box">
-                            <div t-attf-class="of_map_record_global_click">
-                                <div class="of_map_record_buttons">
-                                    <i class="of_map_record_close fa fa-lg fa-times"/>
-                                    <!--i class="of_map_record_min fa fa-lg fa-minus"/>  later implementation...
-                                    <i class="of_map_record_max fa fa-lg fa-square"/-->
-                                </div>
-                                <div name="content" class="of_map_record_content">
-                                    <t t-if="record.client_name.raw_value">
-                                        <i class="of_map_record_main fa fa-user"/><span class="of_ws"/><strong><field name="client_name"/></strong><br/>
-                                    </t>
-                                    <t t-if="record.zip_site_id.raw_value">
-                                        <i class="of_map_record_main fa fa-map-marker"/><span class="of_ws"/><field name="zip_site_id"/><span class="of_ws"/><field name="city_site_id"/><br/>
-                                    </t>
-                                    <t t-if="record.client_mobile.raw_value">
-                                        <i class="of_map_record_main fa fa-phone"/><span class="of_ws"/><field name="client_mobile"/><br/>
-                                    </t>
-                                    <t t-if="record.name.raw_value">
-                                        <i class="of_map_record_main fa fa-hashtag"/><span class="of_ws"/><field name="name"/><br/>
-                                    </t>
-                                    <t t-if="record.date_service.raw_value">
-                                        <i class="of_map_record_main fa fa-calendar-o"/><span class="of_ws"/>Vente:<span class="of_ws"/><field name="date_service"/><br/>
-                                    </t>
-                                    <t t-if="record.date_installation.raw_value">
-                                        <i class="of_map_record_main fa fa-calendar-check-o"/><span class="of_ws"/>Instal:<span class="of_ws"/><field name="date_installation"/><br/>
-                                    </t>
-                                    <t t-if="record.date_fin_garantie.raw_value">
-                                        <i class="of_map_record_main fa fa-calendar-times-o"/><span class="of_ws"/>Garantie:<span class="of_ws"/><field name="date_fin_garantie"/><br/>
-                                    </t>
-                                </div>
-                            </div>
-                        </t>
-                        <t t-name="of_map_marker_tooltip">
-                            <div name="marker_tooltip">
-                                <i class="fa fa-user"/><span class="of_ws"/>
-                                <field name="client_name"/><br/>
-                                Précision:
-                                <t t-if='["manual","high","medium","low"].includes(record.precision.raw_value)'>
-                                    <field name="precision"/>
-                                </t>
-                                <t t-else="">
-                                    <span class="of_ws"/>
-                                    Indeterminée
-                                </t>
-                            </div>
-                        </t>
-                    </templates>
-                </map>
-            </field>
-        </record>
+                    </t>
+                    <t t-name="of_map_marker_tooltip">
+                        <div name="marker_tooltip">
+                            <i class="fa fa-user"/><span class="of_ws"/>
+                            <field name="client_name"/><br/>
+                            Précision:
+                            <t t-if='["manual","high","medium","low"].includes(record.precision.raw_value)'>
+                                <field name="precision"/>
+                            </t>
+                            <t t-else="">
+                                <span class="of_ws"/>
+                                Indeterminée
+                            </t>
+                        </div>
+                    </t>
+                </templates>
+            </map>
+        </field>
+    </record>
 
 <!-- *************************************************** -->
 <!-- *************** SAV (project.issue) *************** -->
 <!-- *************************************************** -->
 
-        <!-- Ajout recherche par no de série de la machine installée -->
-        <record id="of_view_project_issue_filter_pi" model="ir.ui.view">
-            <field name="name">of.view.project.issue.filter.pi</field>
-            <field name="model">project.issue</field>
-            <field name="inherit_id" ref="project_issue.view_project_issue_filter"/>
-            <field name="arch" type="xml">
-                <filter name="unassigned" position="after">
-                    <filter string="Lieu ou adresse installation non défini" name="adresseinstallnondef" domain="[('of_parc_installe_site_adresse','=','')]"/>
-                </filter>
-                <field name="partner_id" position="after">
-                    <field name="of_parc_installe_site_adresse"/>
-                    <field name="of_produit_installe_id" string="No série"/>
-                </field>
-                <filter name="project" position="after">
-                    <filter string="Famille" icon="terp-personal" context="{'group_by': 'product_category_id'}"/>
-                </filter>
-            </field>
-        </record>
-
-        <!-- insertion Produit installé lié et champs supplémentaires dans SAV -->
-        <record id="of_produit_installe_sav_lie" model="ir.ui.view" >
-            <field name="name">of.produit_installe.sav.lie</field>
-            <field name="model">project.issue</field>
-            <field name="inherit_id" ref="project_issue.project_issue_form_view"/>
-            <field name="arch" type="xml">
-                <xpath expr="//notebook/page[1]" position="before">
-                    <page string="Produit installé">
-                        <group colspan="4">
-                            <field name="of_produit_installe_id" string="No de série" context="{'default_client_id': partner_id, 'partner_id_no_serie_puce': partner_id}"/>
-                            <field name="product_name_id"/>
-                            <field name="product_category_id"/>
-                            <field name="of_parc_installe_site_nom"/>
-                            <field name="of_parc_installe_site_adresse"/>
-                            <field name="of_parc_installe_fin_garantie"/>
-                            <field name="of_parc_installe_note"/>
-                        </group>
-                    </page>
-                </xpath>
-            </field>
-        </record>
-
-        <!-- SAV Map View -->
-        <record id="of_project_issue_map_view" model="ir.ui.view">
-            <field name="name">of.project.issue.map</field>
-            <field name="model">project.issue</field>
-            <field name="arch" type="xml">
-                <map string="Map" class="of_map_parc_installé" latitude_field="of_geo_lat" longitude_field="of_geo_lng" color_field="of_color_map">
-                    <field name="active" invisible="1"/>
-                    <field name="of_geo_lat" required="1"/>
-                    <field name="of_geo_lng" required="1"/>
-                    <field name="of_precision" required="1"/>
-                    <field name="of_color_map" required="1"/>
-                    <field name="id"/>
-                    <field name="of_parc_installe_client_nom"/>
-                    <field name="of_parc_installe_site_zip"/>
-                    <field name="of_parc_installe_site_city"/>
-                    <field name="of_partner_id_mobile"/>
-                    <field name="name"/>
-                    <field name="date_deadline"/>
-                    <templates>
-                        <t t-name="of_map_record_box">
-                            <div t-attf-class="of_map_record_global_click">
-                                <div class="of_map_record_buttons">
-                                    <i class="of_map_record_close fa fa-lg fa-times"/>
-                                    <!--i class="of_map_record_min fa fa-lg fa-minus"/>  later implementation...
-                                    <i class="of_map_record_max fa fa-lg fa-square"/-->
-                                </div>
-                                <div name="content" class="of_map_record_content">
-                                    <t t-if="record.of_parc_installe_client_nom.raw_value">
-                                        <i class="of_map_record_main fa fa-user"/><span class="of_ws"/><strong><field name="of_parc_installe_client_nom"/></strong><br/>
-                                    </t>
-                                    <t t-if="record.of_parc_installe_site_zip.raw_value">
-                                        <i class="of_map_record_main fa fa-map-marker"/><span class="of_ws"/><field name="of_parc_installe_site_zip"/><span class="of_ws"/><field name="of_parc_installe_site_city"/><br/>
-                                    </t>
-                                    <t t-if="record.of_partner_id_mobile.raw_value">
-                                        <i class="of_map_record_main fa fa-phone"/><span class="of_ws"/><field name="of_partner_id_mobile"/><br/>
-                                    </t>
-                                    <t t-if="record.name.raw_value">
-                                        <i class="of_map_record_main fa fa-bug"/><span class="of_ws"/><field name="name"/><br/>
-                                    </t>
-                                    <t t-if="record.date_deadline.raw_value">
-                                        <i class="of_map_record_main fa fa-calendar-o"/><span class="of_ws"/><field name="date_deadline"/><br/>
-                                    </t>
-                                </div>
-                            </div>
-                        </t>
-                        <t t-name="of_map_marker_tooltip">
-                            <div name="marker_tooltip">
-                                <i class="fa fa-user"/><span class="of_ws"/>
-                                <field name="of_parc_installe_client_nom"/><br/>
-                                Précision:
-                                <t t-if='["manual","high","medium","low"].includes(record.of_precision.raw_value)'>
-                                    <field name="of_precision"/>
-                                </t>
-                                <t t-else="">
-                                    <span class="of_ws"/>
-                                    Indeterminée
-                                </t>
-                            </div>
-                        </t>
-                    </templates>
-                </map>
-            </field>
-        </record>
-
-<!-- *************************************************** -->
-<!-- ********** VUE PARTENAIRES (res.partner) ********** -->
-<!-- *************************************************** -->
-
-        <!-- Action vue parc installé -->
-        <record id="action_view_of_parc_installe_sale" model="ir.actions.act_window">
-             <field name="name">Parc installé</field>
-             <field name="type">ir.actions.act_window</field>
-             <field name="res_model">of.parc.installe</field>
-             <field name="view_type">form</field>
-             <field name="view_mode">tree,form,map</field>
-             <field name="search_view_id" ref="of_parc_installe_search_view"/>
-             <field name="help">Parc des produits installés</field>
-        </record>
-
-        <record id="action_view_of_parc_installe_planning" model="ir.actions.act_window">
-             <field name="name">Parc installé</field>
-             <field name="type">ir.actions.act_window</field>
-             <field name="res_model">of.parc.installe</field>
-             <field name="view_type">form</field>
-             <field name="view_mode">tree,form,map</field>
-             <field name="search_view_id" ref="of_parc_installe_search_view"/>
-             <field name="help">Parc des produits installés</field>
-        </record>
-
-        <!-- Action vue SAV -->
-        <record id="of_project_issue.action_of_project_issue_view_sale" model="ir.actions.act_window">
-            <field name="view_mode">tree,kanban,map,form,pivot,graph</field>
-        </record>
-        <record id="of_project_issue.action_of_project_issue_view_planning" model="ir.actions.act_window">
-            <field name="view_mode">tree,kanban,map,form,pivot,graph</field>
-        </record>
-
-        <!-- Mettre revendeur, installateur, payeur dans formulaire partenaires -->
-        <record id="of_res_partner_form_pi" model="ir.ui.view">
-            <field name="name">of.res.partner.form.pi</field>
-            <field name="model">res.partner</field>
-            <field name="inherit_id" ref="base.view_partner_form"/>
-            <field name="groups_id" eval="[(4, ref('project.group_project_user'))]"/>
-            <field name="arch" type="xml">
-                <div name="button_box" position="inside">
-                    <button class="oe_stat_button" type="action"
-                        attrs="{'invisible': [('customer', '=', False)]}"
-                        name="%(action_view_of_parc_installe_sale)d"
-                        icon="fa-home"
-                        context="{'search_default_client_id': active_id}">
-                        <field string="Parc Installé" name="of_parc_installe_count" widget="statinfo"/>
-                    </button>
-                </div>
-                <field name="user_id" position="after">
-                    <field name="of_revendeur"/>
-                    <field name="of_installateur"/>
-                </field>
-            </field>
-        </record>
-
-<!-- *************************************************** -->
-<!-- ********** VUE PARTENAIRES (res.partner) ********** -->
-<!-- *************************************************** -->
-
-    <record id="of_parc_installe_order_form_view" model="ir.ui.view">
-        <field name="name">of.parc.installe.order.form.view</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_form"/>
+    <!-- Ajout recherche par no de série de la machine installée -->
+    <record id="of_view_project_issue_filter_pi" model="ir.ui.view">
+        <field name="name">of.view.project.issue.filter.pi</field>
+        <field name="model">project.issue</field>
+        <field name="inherit_id" ref="project_issue.view_project_issue_filter"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[@name='button_box']" position="inside">
-                <button class="oe_stat_button" name="action_view_parc_installe" type="object" icon="fa-home" attrs="{'invisible': [('of_parc_count', '=', 0)]}">
-                    <field string="Parc installé" name="of_parc_count" widget="statinfo"/>
-                </button>
+            <filter name="unassigned" position="after">
+                <filter string="Lieu ou adresse installation non défini" name="adresseinstallnondef" domain="[('of_parc_installe_site_adresse','=','')]"/>
+            </filter>
+            <field name="partner_id" position="after">
+                <field name="of_parc_installe_site_adresse"/>
+                <field name="of_produit_installe_id" string="No série"/>
+            </field>
+            <filter name="project" position="after">
+                <filter string="Famille" icon="terp-personal" context="{'group_by': 'product_category_id'}"/>
+            </filter>
+        </field>
+    </record>
+
+    <!-- insertion Produit installé lié et champs supplémentaires dans SAV -->
+    <record id="of_produit_installe_sav_lie" model="ir.ui.view" >
+        <field name="name">of.produit_installe.sav.lie</field>
+        <field name="model">project.issue</field>
+        <field name="inherit_id" ref="project_issue.project_issue_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[1]" position="before">
+                <page string="Produit installé">
+                    <group colspan="4">
+                        <field name="of_produit_installe_id" string="No de série" context="{'default_client_id': partner_id, 'partner_id_no_serie_puce': partner_id}"/>
+                        <field name="product_name_id"/>
+                        <field name="product_category_id"/>
+                        <field name="of_parc_installe_site_nom"/>
+                        <field name="of_parc_installe_site_adresse"/>
+                        <field name="of_parc_installe_fin_garantie"/>
+                        <field name="of_parc_installe_note"/>
+                    </group>
+                </page>
             </xpath>
         </field>
     </record>
 
-<!-- *************************************************** -->
-<!-- ********** VUE PARTENAIRES (res.partner) ********** -->
-<!-- *************************************************** -->
-
-    <record id="of_parc_installe_invoice_form_view" model="ir.ui.view">
-        <field name="name">of.parc.installe.invoice.form.view</field>
-        <field name="model">account.invoice</field>
-        <field name="inherit_id" ref="of_account.of_account_invoice_form"/>
+    <!-- SAV Map View -->
+    <record id="of_project_issue_map_view" model="ir.ui.view">
+        <field name="name">of.project.issue.map</field>
+        <field name="model">project.issue</field>
         <field name="arch" type="xml">
-            <xpath expr="//div[@name='button_box']" position="inside">
-                <button class="oe_stat_button" name="action_view_parc_installe" type="object" icon="fa-home" attrs="{'invisible': [('of_parc_count', '=', 0)]}">
-                    <field string="Parc installé" name="of_parc_count" widget="statinfo"/>
-                </button>
-            </xpath>
+            <map string="Map" class="of_map_parc_installé" latitude_field="of_geo_lat" longitude_field="of_geo_lng" color_field="of_color_map">
+                <field name="active" invisible="1"/>
+                <field name="of_geo_lat" required="1"/>
+                <field name="of_geo_lng" required="1"/>
+                <field name="of_precision" required="1"/>
+                <field name="of_color_map" required="1"/>
+                <field name="id"/>
+                <field name="of_parc_installe_client_nom"/>
+                <field name="of_parc_installe_site_zip"/>
+                <field name="of_parc_installe_site_city"/>
+                <field name="of_partner_id_mobile"/>
+                <field name="name"/>
+                <field name="date_deadline"/>
+                <templates>
+                    <t t-name="of_map_record_box">
+                        <div t-attf-class="of_map_record_global_click">
+                            <div class="of_map_record_buttons">
+                                <i class="of_map_record_close fa fa-lg fa-times"/>
+                                <!--i class="of_map_record_min fa fa-lg fa-minus"/>  later implementation...
+                                <i class="of_map_record_max fa fa-lg fa-square"/-->
+                            </div>
+                            <div name="content" class="of_map_record_content">
+                                <t t-if="record.of_parc_installe_client_nom.raw_value">
+                                    <i class="of_map_record_main fa fa-user"/><span class="of_ws"/><strong><field name="of_parc_installe_client_nom"/></strong><br/>
+                                </t>
+                                <t t-if="record.of_parc_installe_site_zip.raw_value">
+                                    <i class="of_map_record_main fa fa-map-marker"/><span class="of_ws"/><field name="of_parc_installe_site_zip"/><span class="of_ws"/><field name="of_parc_installe_site_city"/><br/>
+                                </t>
+                                <t t-if="record.of_partner_id_mobile.raw_value">
+                                    <i class="of_map_record_main fa fa-phone"/><span class="of_ws"/><field name="of_partner_id_mobile"/><br/>
+                                </t>
+                                <t t-if="record.name.raw_value">
+                                    <i class="of_map_record_main fa fa-bug"/><span class="of_ws"/><field name="name"/><br/>
+                                </t>
+                                <t t-if="record.date_deadline.raw_value">
+                                    <i class="of_map_record_main fa fa-calendar-o"/><span class="of_ws"/><field name="date_deadline"/><br/>
+                                </t>
+                            </div>
+                        </div>
+                    </t>
+                    <t t-name="of_map_marker_tooltip">
+                        <div name="marker_tooltip">
+                            <i class="fa fa-user"/><span class="of_ws"/>
+                            <field name="of_parc_installe_client_nom"/><br/>
+                            Précision:
+                            <t t-if='["manual","high","medium","low"].includes(record.of_precision.raw_value)'>
+                                <field name="of_precision"/>
+                            </t>
+                            <t t-else="">
+                                <span class="of_ws"/>
+                                Indeterminée
+                            </t>
+                        </div>
+                    </t>
+                </templates>
+            </map>
         </field>
     </record>
 
 <!-- *************************************************** -->
-<!-- ********************** MENUS ********************** -->
+<!-- ************* PARTENAIRE (res.partner) ************ -->
 <!-- *************************************************** -->
 
-        <!-- Menu parc installé -->
-        <menuitem id="menu_of_parc_installe" action="action_view_of_parc_installe_sale" name="Parc installé"
-             parent="sales_team.menu_sales" groups="project.group_project_user" sequence="100"/>
-        <menuitem id="menu_of_parc_installe_planning" action="action_view_of_parc_installe_planning" name="Parc installé"
-            parent="of_planning.menu_of_planning_clients" groups="project.group_project_user" sequence="20"/>
+    <!-- Mettre revendeur, installateur, payeur dans formulaire partenaires -->
+    <record id="of_res_partner_form_pi" model="ir.ui.view">
+        <field name="name">of.res.partner.form.pi</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="groups_id" eval="[(4, ref('project.group_project_user'))]"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button" type="action"
+                    attrs="{'invisible': [('customer', '=', False)]}"
+                    name="%(action_view_of_parc_installe_sale)d"
+                    icon="fa-home"
+                    context="{'search_default_client_id': active_id}">
+                    <field string="Parc Installé" name="of_parc_installe_count" widget="statinfo"/>
+                </button>
+            </div>
+            <field name="user_id" position="after">
+                <field name="of_revendeur"/>
+                <field name="of_installateur"/>
+            </field>
+        </field>
+    </record>
+
+<!-- *************************************************** -->
+<!-- *********** DEVIS/COMMANDE (sale.order) *********** -->
+<!-- *************************************************** -->
+
+<record id="of_parc_installe_order_form_view" model="ir.ui.view">
+    <field name="name">of.parc.installe.order.form.view</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="//div[@name='button_box']" position="inside">
+            <button class="oe_stat_button" name="action_view_parc_installe" type="object" icon="fa-home" attrs="{'invisible': [('of_parc_count', '=', 0)]}">
+                <field string="Parc installé" name="of_parc_count" widget="statinfo"/>
+            </button>
+        </xpath>
+    </field>
+</record>
+
+<!-- *************************************************** -->
+<!-- ************ FACTURES (account.invoice) *********** -->
+<!-- *************************************************** -->
+
+<record id="of_parc_installe_invoice_form_view" model="ir.ui.view">
+    <field name="name">of.parc.installe.invoice.form.view</field>
+    <field name="model">account.invoice</field>
+    <field name="inherit_id" ref="of_account.of_account_invoice_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="//div[@name='button_box']" position="inside">
+            <button class="oe_stat_button" name="action_view_parc_installe" type="object" icon="fa-home" attrs="{'invisible': [('of_parc_count', '=', 0)]}">
+                <field string="Parc installé" name="of_parc_count" widget="statinfo"/>
+            </button>
+        </xpath>
+    </field>
+</record>
+
+<!-- *************************************************** -->
+<!-- ********************** MENUS  ********************* -->
+<!-- *************************************************** -->
+
+    <!-- Menu parc installé -->
+    <menuitem id="menu_of_parc_installe" action="action_view_of_parc_installe_sale" name="Parc installé"
+         parent="sales_team.menu_sales" groups="project.group_project_user" sequence="100"/>
+    <menuitem id="menu_of_parc_installe_planning" action="action_view_of_parc_installe_planning" name="Parc installé"
+        parent="of_planning.menu_of_planning_clients" groups="project.group_project_user" sequence="20"/>
 
 <!-- *************************************************** -->
 <!-- ********************* ACTIONS ********************* -->
 <!-- *************************************************** -->
 
-        <!-- Lien pour action créer SAV depuis parc installé -->
-        <record id="of_action_pi_open_creer_sav" model="ir.actions.server">
-            <field name="name">Créer un SAV</field>
-            <field name="model_id" ref="project_issue.model_project_issue"/>
-            <field name="state">code</field>
-            <field name="code">action = env['of.parc.installe'].action_creer_sav()</field>
-        </record>
+    <!-- Action vue parc installé -->
+    <record id="action_view_of_parc_installe_sale" model="ir.actions.act_window">
+         <field name="name">Parc installé</field>
+         <field name="type">ir.actions.act_window</field>
+         <field name="res_model">of.parc.installe</field>
+         <field name="view_type">form</field>
+         <field name="view_mode">tree,form,map</field>
+         <field name="search_view_id" ref="of_parc_installe_search_view"/>
+         <field name="help">Parc des produits installés</field>
+    </record>
 
-        <record id="of_action_pi_creer_sav" model="ir.values">
-            <field name="name">Créer un SAV</field>
-            <field name="key2">client_action_multi</field>
-            <field name="model">of.parc.installe</field>
-            <field name="value" eval="'ir.actions.server,%d'%of_action_pi_open_creer_sav"/>
-        </record>
+    <record id="action_view_of_parc_installe_planning" model="ir.actions.act_window">
+         <field name="name">Parc installé</field>
+         <field name="type">ir.actions.act_window</field>
+         <field name="res_model">of.parc.installe</field>
+         <field name="view_type">form</field>
+         <field name="view_mode">tree,form,map</field>
+         <field name="search_view_id" ref="of_parc_installe_search_view"/>
+         <field name="help">Parc des produits installés</field>
+    </record>
+
+    <!-- Action vue SAV -->
+    <record id="of_project_issue.action_of_project_issue_view_sale" model="ir.actions.act_window">
+        <field name="view_mode">tree,kanban,map,form,pivot,graph</field>
+    </record>
+    <record id="of_project_issue.action_of_project_issue_view_planning" model="ir.actions.act_window">
+        <field name="view_mode">tree,kanban,map,form,pivot,graph</field>
+    </record>
+
+    <!-- Lien pour action créer SAV depuis parc installé -->
+    <record id="of_action_pi_open_creer_sav" model="ir.actions.server">
+        <field name="name">Créer un SAV</field>
+        <field name="model_id" ref="project_issue.model_project_issue"/>
+        <field name="state">code</field>
+        <field name="code">action = env['of.parc.installe'].action_creer_sav()</field>
+    </record>
+
+    <record id="of_action_pi_creer_sav" model="ir.values">
+        <field name="name">Créer un SAV</field>
+        <field name="key2">client_action_multi</field>
+        <field name="model">of.parc.installe</field>
+        <field name="value" eval="'ir.actions.server,%d'%of_action_pi_open_creer_sav"/>
+    </record>
 
 </odoo>

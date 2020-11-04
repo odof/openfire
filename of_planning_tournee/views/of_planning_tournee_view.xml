@@ -11,109 +11,108 @@
         </field>
     </record>
 
-        <record id="of_planning_tournee_view_form" model="ir.ui.view">
-            <field name="name">of.planning.tournee.form</field>
-            <field name="model">of.planning.tournee</field>
-            <field name="arch" type="xml">
-                <form string="Tournées">
-                    <group colspan="2" col="4">
-                        <separator string="Info" colspan="4"/>
-                        <field name="date_jour"/>
-                        <field name="date"/>
-                        <field name="employee_id"/>
-                        <field name="secteur_id"/>
-                        <field name="address_depart_id"/>
-                        <field name="address_retour_id"/>
-                        <field name="distance" attrs="{'required': [('is_bloque', '=', False)]}"/>
-                        <group colspan="4" col="8">
-                            <field name="is_complet"/>
-                            <field name="is_bloque"/>
-                            <field name="is_confirme"/>
-                        </group>
-                        <separator string="Epicentre" colspan="4" col="4"/>
-                        <field name="zip_id"/>
-                        <separator colspan="4"/>
-                        <field name="epi_lat" attrs="{'required': [('is_bloque', '=', False)]}"/>
-                        <field name="epi_lon" attrs="{'required': [('is_bloque', '=', False)]}"/>
-                        <separator colspan="4" string="Documents"/>
-                    </group>
-                </form>
-            </field>
-        </record>
-
-        <record id="of_planning_tournee_view_tree" model="ir.ui.view">
-            <field name="name">of.planning.tournee.tree</field>
-            <field name="model">of.planning.tournee</field>
-            <field name="arch" type="xml">
-                <tree editable="top" colors="red:(is_complet==True) or (is_bloque==True);grey:(is_confirme==False)">
+    <record id="of_planning_tournee_view_form" model="ir.ui.view">
+        <field name="name">of.planning.tournee.form</field>
+        <field name="model">of.planning.tournee</field>
+        <field name="arch" type="xml">
+            <form string="Tournées">
+                <group colspan="2" col="4">
+                    <separator string="Info" colspan="4"/>
                     <field name="date_jour"/>
                     <field name="date"/>
                     <field name="employee_id"/>
                     <field name="secteur_id"/>
-                    <field name="zip_id"/>
                     <field name="address_depart_id"/>
                     <field name="address_retour_id"/>
-                    <field name="is_complet"/>
-                    <field name="is_bloque"/>
-                    <field name="is_confirme"/>
-                    <field name="intervention_ids" widget="many2many_tags" readonly="1"/>
-                </tree>
-            </field>
-        </record>
-
-        <record id="of_planning_tournee_view_filter" model="ir.ui.view">
-            <field name="name">of.planning.tournee.filter</field>
-            <field name="model">of.planning.tournee</field>
-            <field name="arch" type="xml">
-                <search string="Recherche">
-                    <group>
-                        <filter name="filter_incomplet" string="Incomplet" icon="terp-accessories-archiver" domain="[('is_complet', '=', False)]"/>
-                        <filter name="filter_nonbloque" string="Non Bloqué" icon="terp-accessories-archiver" domain="[('is_bloque', '=', False)]"/>
-                        <field name="date_min" filter_domain="[('date','&gt;=',self)]"/>
-                        <field name="date_max" filter_domain="[('date','&lt;=',self)]"/>
-                        <field name="employee_id"/>
-                        <field name="secteur_id"/>
-                        <field name="zip_id"/>
+                    <field name="distance" attrs="{'required': [('is_bloque', '=', False)]}"/>
+                    <group colspan="4" col="8">
+                        <field name="is_complet"/>
+                        <field name="is_bloque"/>
+                        <field name="is_confirme"/>
                     </group>
-                 </search>
-            </field>
-        </record>
+                    <separator string="Epicentre" colspan="4" col="4"/>
+                    <field name="zip_id"/>
+                    <separator colspan="4"/>
+                    <field name="epi_lat" attrs="{'required': [('is_bloque', '=', False)]}"/>
+                    <field name="epi_lon" attrs="{'required': [('is_bloque', '=', False)]}"/>
+                    <separator colspan="4" string="Documents"/>
+                </group>
+            </form>
+        </field>
+    </record>
 
-        <record id="action_of_planning_tournee_tree" model="ir.actions.act_window">
-            <field name="name">Préparation des tournées</field>
-            <field name="res_model">of.planning.tournee</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-            <field name="view_id" ref="of_planning_tournee.of_planning_tournee_view_tree"/>
-            <field name="context">{'search_default_filter_incomplet':1}</field>
-        </record>
+    <record id="of_planning_tournee_view_tree" model="ir.ui.view">
+        <field name="name">of.planning.tournee.tree</field>
+        <field name="model">of.planning.tournee</field>
+        <field name="arch" type="xml">
+            <tree editable="top" colors="red:(is_complet==True) or (is_bloque==True);grey:(is_confirme==False)">
+                <field name="date_jour"/>
+                <field name="date"/>
+                <field name="employee_id"/>
+                <field name="secteur_id"/>
+                <field name="zip_id"/>
+                <field name="address_depart_id"/>
+                <field name="address_retour_id"/>
+                <field name="is_complet"/>
+                <field name="is_confirme"/>
+                <field name="is_bloque" invisible="1"/>
+                <field name="intervention_ids" widget="many2many_tags" readonly="1"/>
+            </tree>
+        </field>
+    </record>
 
-        <menuitem name="Tournées" id="menu_of_planning_tournee_tree" parent="of_planning.menu_of_planning_intervention" sequence="75"
-                  action="action_of_planning_tournee_tree"/>
+    <record id="of_planning_tournee_view_filter" model="ir.ui.view">
+        <field name="name">of.planning.tournee.filter</field>
+        <field name="model">of.planning.tournee</field>
+        <field name="arch" type="xml">
+            <search string="Recherche">
+                <group>
+                    <filter name="filter_incomplet" string="Incomplet" icon="terp-accessories-archiver" domain="[('is_complet', '=', False)]"/>
+                    <field name="date_min" filter_domain="[('date','&gt;=',self)]"/>
+                    <field name="date_max" filter_domain="[('date','&lt;=',self)]"/>
+                    <field name="employee_id"/>
+                    <field name="secteur_id"/>
+                    <field name="zip_id"/>
+                </group>
+             </search>
+        </field>
+    </record>
 
-        <!-- vue map des services -->
-        <record id="of_planning_tournee_service_map_view" model="ir.ui.view">
-            <field name="name">of.planning.tournee.service.view.map</field>
-            <field name="model">of.service</field>
-            <field name="inherit_id" ref="of_service.of_service_map_view"/>
-            <field name="arch" type="xml">
-                <!-- ajout champs nécessaires -->
-                <xpath expr="//map//field[@name='date_next']" position="after">
-                    <field name="partner_id"/>
-                    <field name="address_id"/>
-                </xpath>
-                <!-- ajout action "planifier une intervention" -->
-                <xpath expr="//map//templates//div[@name='content']" position="inside">
-                    <t t-set="service_id" t-value="record.id.raw_value"/>
-                    <t t-set="address_id" t-value="record.address_id.raw_value[0]"/> <!-- dans le contexte d'une vue map, address_id n'est jamais undefined -->
-                    <t t-set="partner_id" t-value="record.partner_id.raw_value[0] || address_id"/>
-                    <a name="%(of_planning_tournee.action_view_rdv_intervention_wizard_service)d" type="action"
-                      t-attf-data-context="{'default_partner_id': {{partner_id}}, 'default_service_id': {{service_id}}, 'default_address_id': {{address_id}},}">
-                        <i class="fa fa-calendar-o"/><span class="of_ws"/>
-                        <span>Planifier une intervention</span><br/>
-                    </a>
-                </xpath>
-            </field>
-        </record>
+    <record id="action_of_planning_tournee_tree" model="ir.actions.act_window">
+        <field name="name">Préparation des tournées</field>
+        <field name="res_model">of.planning.tournee</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_planning_tournee.of_planning_tournee_view_tree"/>
+        <field name="context">{'search_default_filter_incomplet':1}</field>
+    </record>
+
+    <menuitem name="Tournées" id="menu_of_planning_tournee_tree" parent="of_planning.menu_of_planning_intervention" sequence="75"
+              action="action_of_planning_tournee_tree"/>
+
+    <!-- vue map des services -->
+    <record id="of_planning_tournee_service_map_view" model="ir.ui.view">
+        <field name="name">of.planning.tournee.service.view.map</field>
+        <field name="model">of.service</field>
+        <field name="inherit_id" ref="of_service.of_service_map_view"/>
+        <field name="arch" type="xml">
+            <!-- ajout champs nécessaires -->
+            <xpath expr="//map//field[@name='date_next']" position="after">
+                <field name="partner_id"/>
+                <field name="address_id"/>
+            </xpath>
+            <!-- ajout action "planifier une intervention" -->
+            <xpath expr="//map//templates//div[@name='content']" position="inside">
+                <t t-set="service_id" t-value="record.id.raw_value"/>
+                <t t-set="address_id" t-value="record.address_id.raw_value[0]"/> <!-- dans le contexte d'une vue map, address_id n'est jamais undefined -->
+                <t t-set="partner_id" t-value="record.partner_id.raw_value[0] || address_id"/>
+                <a name="%(of_planning_tournee.action_view_rdv_intervention_wizard_service)d" type="action"
+                  t-attf-data-context="{'default_partner_id': {{partner_id}}, 'default_service_id': {{service_id}}, 'default_address_id': {{address_id}},}">
+                    <i class="fa fa-calendar-o"/><span class="of_ws"/>
+                    <span>Planifier une intervention</span><br/>
+                </a>
+            </xpath>
+        </field>
+    </record>
 
 </odoo>

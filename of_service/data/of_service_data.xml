@@ -4,21 +4,21 @@
 <!--#############################################################################################################
     ####        I R . C R O N
     #############################################################################################################-->
-<data noupdate="1">
-    <!-- Cron journalier de calcul d'état des services -->
-    <record id="of_cron_service_state_daily" model="ir.cron">
-        <field name="name">Recalcul états des services</field>
-        <field name="model">of.service</field>
-        <field name="function">compute_state_poncrec_daily</field>
-        <field name="interval_number">1</field>
-        <field name="interval_type">days</field>
-        <field name="nextcall">2019-10-18 5:30:00</field>
-        <field name="numbercall">-1</field>
-        <field name="doall">true</field>
-        <field name="active">true</field>
-        <field name="args">()</field>
-    </record>
-</data>
+    <data noupdate="1">
+        <!-- Cron journalier de calcul d'état des services -->
+        <record id="of_cron_service_state_daily" model="ir.cron">
+            <field name="name">Recalcul états des services</field>
+            <field name="model">of.service</field>
+            <field name="function">compute_state_poncrec_daily</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="nextcall">2019-10-18 5:30:00</field>
+            <field name="numbercall">-1</field>
+            <field name="doall">true</field>
+            <field name="active">true</field>
+            <field name="args">()</field>
+        </record>
+    </data>
 
  <!--#############################################################################################################
     ####        D A T E . R A N G E . T Y P E

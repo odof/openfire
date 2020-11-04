@@ -2,10 +2,12 @@
 
 from odoo import api, models, fields
 
+
 class OfMailTemplate(models.Model):
     _inherit = "of.mail.template"
 
     type = fields.Selection(selection_add=[('contrat', 'Contrat')])
+
 
 class OFService(models.Model):
     _inherit = "of.service"

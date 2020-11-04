@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api
 
+
 class OfSaleorderLineToParcInstalleWizard(models.TransientModel):
     _name = "of.saleorder.line.to.parc.installe.wizard"
 
@@ -47,7 +48,8 @@ class OfSaleorderLineToParcInstalleWizard(models.TransientModel):
     client_id = fields.Many2one('res.partner', string="Client", default=_get_client_id_default)
     site_adresse_id = fields.Many2one('res.partner', string='Site installation', domain=_get_domain_site)
     revendeur_id = fields.Many2one('res.partner', string="Revendeur", default=_get_revendeur_installateur_id_default)
-    installateur_id = fields.Many2one('res.partner', string="Installateur", default=_get_revendeur_installateur_id_default)
+    installateur_id = fields.Many2one(
+        'res.partner', string="Installateur", default=_get_revendeur_installateur_id_default)
     date_service = fields.Date(string="Date vente", default=_get_date_service_default)
     order_id = fields.Many2one('sale.order', default=lambda w: w._context.get('active_id'))
 

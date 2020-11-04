@@ -2,6 +2,7 @@
 
 from odoo import api, models, fields
 
+
 class OfTourneeRdv(models.TransientModel):
     _inherit = 'of.tournee.rdv'
 

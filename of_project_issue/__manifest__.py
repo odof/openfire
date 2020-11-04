@@ -21,12 +21,12 @@
 ##############################################################################
 
 {
-    'name' : "OpenFire / SAV",
-    'version' : "10.0",
-    'author' : "OpenFire",
-    'website' : "http://www.openfire.fr",
-    'category' : "Generic Modules/Sales & Purchases",
-    'description': """ Modification OpenFire sur le module Odoo project_issue pour la gestion des SAV
+    'name': "OpenFire / SAV",
+    'version': "10.0.1.0.0",
+    'author': "OpenFire",
+    'website': "http://www.openfire.fr",
+    'category': 'OpenFire modules',
+    'description': u"""Modification OpenFire sur le module Odoo project_issue pour la gestion des SAV
      - Ajout du rapport SAV
      - Ajout des notes client
      - Suppression des secondes dans la date SAV
@@ -38,11 +38,11 @@
     """,
     # Modules sale, purchase nécessaires pour historique documents
     # of_base nécessaire pour onglet historique dans vue partenaire
-    'depends' : ['project_issue', 'sale', 'purchase', 'of_base', 'of_planning', 'of_gesdoc'],  # Migration , 'of_appro'],
-    'css' : [
+    'depends': ['project_issue', 'sale', 'purchase', 'of_base', 'of_planning', 'of_gesdoc'],
+    'css': [
         "static/src/css/of_project_issue.css",
     ],
-    'data' : [
+    'data': [
         'security/ir.model.access.csv',
         'report/of_project_issue_fiche_intervention.xml',
         'views/of_project_issue.xml',
