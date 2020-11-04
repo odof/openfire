@@ -21,6 +21,7 @@ Module de gestion des contrôles d'accès
         'security/of_access_control_security.xml',
         'security/ir.model.access.csv',
         'views/res_users_views.xml',
+        'views/stock_views.xml',
         'views/menus.xml',
     ],
     'qweb': [
