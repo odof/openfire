@@ -782,8 +782,7 @@ class SaleOrderLine(models.Model):
         string="Étiquette client", of_custom_groupby=True
     )
     of_price_unit_display = fields.Float(related='product_id.list_price', string=u"Prix unitaire", readonly=True)
-    of_product_forbidden_discount = fields.Boolean(
-        related='product_id.of_forbidden_discount', string=u"Remise interdite pour ce produit", readonly=True)
+    of_product_forbidden_discount = fields.Boolean(string=u"Remise interdite pour cet article")
 
     of_price_unit_ht = fields.Float(
         string='Unit Price excl', compute='_compute_of_price_unit', help="Unit price without taxes", store=True
@@ -968,6 +967,7 @@ class SaleOrderLine(models.Model):
         # Remise interdite
 
         if self.product_id:
+            self.of_product_forbidden_discount = self.product_id.of_forbidden_discount
             if self.product_id.of_forbidden_discount and self.of_discount_formula:
                 self.of_discount_formula = False
             if self.product_id.categ_id:
@@ -1043,6 +1043,11 @@ class SaleOrderLine(models.Model):
                 self.name = self.name.replace(self.of_order_line_option_id.description_update, '')
             self.of_order_line_option_id = False
             self.of_reset_option = False
+
+    @api.onchange('of_product_forbidden_discount')
+    def _onchange_of_product_forbidden_discount(self):
+        if self.of_product_forbidden_discount and self.product_id:
+            self.price_unit = self.product_id.list_price
 
     def of_get_line_name(self):
         self.ensure_one()

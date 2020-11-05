@@ -4,6 +4,17 @@
     <record id="of_access_control_sale_order_form_view" model="ir.ui.view">
         <field name="name">of.access.control.sale.order.form.view</field>
         <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_product_forbidden_discount']" position="attributes">
+                <attribute name="groups">of_access_control.of_group_sale_responsible</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_access_control_sale_order2_form_view" model="ir.ui.view">
+        <field name="name">of.access.control.sale.order2.form.view</field>
+        <field name="model">sale.order</field>
         <field name="inherit_id" ref="of_sale.of_sale_margin_sale_order_line"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='order_line']/form//field[@name='of_seller_price']" position="attributes">
@@ -12,8 +23,8 @@
         </field>
     </record>
 
-    <record id="of_access_control_sale_order2_form_view" model="ir.ui.view">
-        <field name="name">of.access.control.sale.order2.form.view</field>
+    <record id="of_access_control_sale_order3_form_view" model="ir.ui.view">
+        <field name="name">of.access.control.sale.order3.form.view</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="of_sale.of_sale_margin_sale_order_line_form"/>
         <field name="arch" type="xml">
@@ -23,8 +34,8 @@
         </field>
     </record>
 
-    <record id="of_access_control_sale_order3_form_view" model="ir.ui.view">
-        <field name="name">of.access.control.sale.order3.form.view</field>
+    <record id="of_access_control_sale_order4_form_view" model="ir.ui.view">
+        <field name="name">of.access.control.sale.order4.form.view</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="of_sale_stock.of_sale_stock_view_order_form"/>
         <field name="arch" type="xml">

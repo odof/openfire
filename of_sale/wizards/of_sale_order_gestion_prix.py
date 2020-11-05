@@ -318,7 +318,8 @@ class GestionPrixLine(models.TransientModel):
     of_client_view = fields.Boolean(string='Vue client/vendeur', related="wizard_id.of_client_view")
 
     product_forbidden_discount = fields.Boolean(
-        related='order_line_id.product_id.of_forbidden_discount', string=u"Remise interdite pour ce produit")
+        related='order_line_id.of_product_forbidden_discount', string=u"Remise interdite pour cet article",
+        readonly=True)
 
     @api.depends('order_line_id')
     def _compute_cout(self):
