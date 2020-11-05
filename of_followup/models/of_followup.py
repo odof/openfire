@@ -63,7 +63,7 @@ class OFFollowupProject(models.Model):
     intervention_count = fields.Integer(
         string=u"Nombre d'interventions", related='order_id.intervention_count', readonly=True)
     to_schedule_count = fields.Integer(
-        string=u"Nombre d'interventions à programmer", related='order_id.of_a_programmer_count', readonly=True)
+        string=u"Nombre d'interventions à programmer", related='order_id.of_service_count', readonly=True)
     delivery_count = fields.Integer(string=u"Nombre de livraisons", related='order_id.delivery_count', readonly=True)
     picking_count = fields.Integer(string=u"Nombre de réceptions", compute='_compute_picking_count')
 
