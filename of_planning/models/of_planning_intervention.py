@@ -1775,9 +1775,9 @@ class StockPicking(models.Model):
         action = self.env.ref('of_planning.of_sale_order_open_interventions').read()[0]
         if len(self._ids) == 1:
             context = safe_eval(action['context'])
-            order = self.move_lines and self.move_lines[0] and self.move_lines[0].procurement_id and \
-                self.move_lines[0].procurement_id.sale_line_id and \
-                self.move_lines[0].procurement_id.sale_line_id.order_id or False
+            order = self.move_lines.mapped('procurement_id').mapped('sale_line_id').mapped('order_id')
+            if order and len(order) > 1:
+                order = order[0]
             context.update({
                 'default_address_id': self.partner_id and self.partner_id.id or False,
                 'default_order_id': order and order.id or False,
