@@ -16,12 +16,14 @@ Module de gestion des contrôles d'accès
     'depends': [
         'of_crm',
         'of_planning',
+        'of_sale',
     ],
     'data': [
         'security/of_access_control_security.xml',
         'security/ir.model.access.csv',
         'views/res_users_views.xml',
         'views/stock_views.xml',
+        'views/sale_views.xml',
         'views/menus.xml',
     ],
     'qweb': [

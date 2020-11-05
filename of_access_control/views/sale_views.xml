@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="of_access_control_sale_order_form_view" model="ir.ui.view">
+        <field name="name">of.access.control.sale.order.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_product_forbidden_discount']" position="attributes">
+                <attribute name="groups">of_access_control.of_group_sale_responsible</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
