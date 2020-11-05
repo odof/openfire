@@ -11,6 +11,7 @@ from odoo.exceptions import UserError
 class WizardSelectMoveTemplate(models.TransientModel):
     _inherit = "wizard.select.move.template"
 
+    of_template_ids = fields.Many2many('account.move.template', string=u"Modèles")
     of_recurring = fields.Boolean(string=u"Récurrent")
     of_rec_interval = fields.Integer(string=u"Intervalle", default=1, required=True)
     of_rec_interval_type = fields.Selection(
@@ -32,6 +33,24 @@ class WizardSelectMoveTemplate(models.TransientModel):
         string=u"Extourner", default='none', required=True
     )
     of_extourne_date = fields.Date(string="Date extourne")
+
+    @api.model
+    def default_get(self, fields_list):
+        result = super(WizardSelectMoveTemplate, self).default_get(fields_list)
+        if 'of_template_ids' in fields_list and 'template_id' in fields_list:
+            if self._context.get('active_model') == 'account.move.template':
+                template_ids = self._context['active_ids'] or []
+                if len(template_ids) > 1:
+                    # La génération depuis des modèles multiples n'est autorisée que si ils sont entièrement calculés
+                    templates = self.env['account.move.template'].browse(template_ids)\
+                        .filtered(lambda t: t.template_line_ids.filtered(lambda l: l.type == 'input'))
+                    if templates:
+                        raise UserError(
+                            u"La génération depuis plusieurs modèles simultanément nécessite qu'ils n'aient pas de "
+                            u"montants en saisie manuelle.\nModèle en erreur: %s" % (templates[0].name, ))
+                result['of_template_ids'] = template_ids
+                result['template_id'] = template_ids and template_ids[0] or False
+        return result
 
     @api.multi
     def load_lines(self):
@@ -77,14 +96,10 @@ class WizardSelectMoveTemplate(models.TransientModel):
         }
 
     @api.multi
-    def load_template(self):
-        self.ensure_one()
-        input_lines = {}
-        for template_line in self.line_ids:
-            input_lines[template_line.sequence] = template_line.amount
-        amounts = self.template_id.compute_lines(input_lines)
+    def load_template(self, input_lines, params, template):
+        amounts = template.compute_lines(input_lines)
         totals = {sequence: 0 for sequence in amounts}
-        name = self.template_id.name
+        name = template.name
         partner = self.partner_id.id
         moves = self.env['account.move']
         date_start_da = fields.Date.from_string(self.of_date_start)
@@ -93,30 +108,30 @@ class WizardSelectMoveTemplate(models.TransientModel):
 
         # Calcul des dates des pièces comptables.
         dates = [self.of_date_start]
-        if self.of_recurring:
-            if self.of_rec_interval < 1:
+        if params.of_recurring:
+            if params.of_rec_interval < 1:
                 raise UserError(u"L'intervalle entre deux pièces doit être au moins égal à 1.")
-            if self.of_rec_number < 2:
+            if params.of_rec_number < 2:
                 raise UserError(u"Pour une écriture récurrente, vous devez demander au moins 2 pièces.")
             delta = relativedelta()
-            if self.of_rec_interval_type == 'months' and date_start_da.day == month_last_day:
+            if params.of_rec_interval_type == 'months' and date_start_da.day == month_last_day:
                 # Les écritures seront au dernier jour du mois pour tous les mois de la récurrence.
                 delta = relativedelta(day=31)
-            for _ in xrange(self.of_rec_number - 1):
+            for _ in xrange(params.of_rec_number - 1):
                 setattr(
                     delta,
-                    self.of_rec_interval_type,
-                    getattr(delta, self.of_rec_interval_type) + self.of_rec_interval)
+                    params.of_rec_interval_type,
+                    getattr(delta, params.of_rec_interval_type) + params.of_rec_interval)
                 dates.append(fields.Date.to_string(date_start_da + delta))
 
         # Génération des pièces
         imax = len(dates) - 1
-        for journal in self.template_id.template_line_ids.mapped('journal_id'):
-            template_lines = self.template_id.template_line_ids.filtered(lambda j: j.journal_id == journal)
+        for journal in template.template_line_ids.mapped('journal_id'):
+            template_lines = template.template_line_ids.filtered(lambda j: j.journal_id == journal)
 
             for i, date in enumerate(dates):
                 date_amounts = amounts
-                if self.of_recurring:
+                if params.of_recurring:
                     if i == 0 and of_prorata:
                         ratio = float(month_last_day - date_start_da.day + 1) / month_last_day
                         date_amounts = {sequence: amount * ratio for sequence, amount in date_amounts.iteritems()}
@@ -131,31 +146,46 @@ class WizardSelectMoveTemplate(models.TransientModel):
                     totals[sequence] += amount
 
                 lines = []
-                move = self._create_move(name, journal.id, partner, date)
+                move = self._create_move(name, journal.id, partner, template.id, date)
                 moves += move
                 for line in template_lines:
                     lines.append((0, 0, self._prepare_line(line, date_amounts, partner)))
                 move.write({'line_ids': lines})
-            if self.of_extourne != 'none':
-                if self.of_extourne == 'first':
+            if params.of_recurring and params.of_extourne != 'none':
+                if params.of_extourne == 'first':
                     date = self.of_date_start
-                elif self.of_extourne == 'last':
+                elif params.of_extourne == 'last':
                     date = moves[-1].date
                 else:
                     # Date custom
-                    date = self.of_extourne_date
+                    date = params.of_extourne_date
                 lines = []
-                move = self._create_move(name, journal.id, partner, date)
+                move = self._create_move(name, journal.id, partner, template.id, date)
                 moves += move
                 for line in template_lines:
                     line_data = self._prepare_line(line, totals, partner)
                     line_data['credit'], line_data['debit'] = line_data['debit'], line_data['credit']
                     lines.append((0, 0, line_data))
                 move.write({'line_ids': lines})
+        return moves
 
+    @api.multi
+    def load_templates(self):
+        self.ensure_one()
+        moves = self.env['account.move']
+        input_lines = {}
+        name = ""
+        if len(self.of_template_ids) > 1:
+            for template in self.of_template_ids:
+                moves += self.load_template(input_lines, template, template)
+        else:
+            for template_line in self.line_ids:
+                input_lines[template_line.sequence] = template_line.amount
+            name = " : " + self.template_id.name
+            moves = self.load_template(input_lines, self, self.template_id)
         return {
             'domain': [('id', 'in', moves.ids)],
-            'name': 'Entries from template: %s' % name,
+            'name': u"Pièces générées depuis le modèle%s" % name,
             'view_type': 'form',
             'view_mode': 'tree,form',
             'res_model': 'account.move',
@@ -164,11 +194,14 @@ class WizardSelectMoveTemplate(models.TransientModel):
         }
 
     @api.model
-    def _create_move(self, ref, journal_id, partner_id, date=None):
-        # Choix de la date dans la pièce comptable
+    def _create_move(self, ref, journal_id, partner_id, template_id, date=None):
         move = super(WizardSelectMoveTemplate, self)._create_move(ref, journal_id, partner_id)
+        move_data = {
+            'of_template_id': template_id
+        }
         if date:
-            move.date = date
+            move_data['date'] = date
+        move.write(move_data)
         return move
 
     @api.model
