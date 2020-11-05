@@ -429,13 +429,13 @@ class OfPlanningIntervention(models.Model):
         domain="[('id', 'in', picking_domain and picking_domain[0] and picking_domain[0][2] or False)]")
     picking_domain = fields.Many2many(comodel_name='stock.picking', compute='_compute_picking_domain')
 
-    @api.one
     @api.depends('order_id')
     def _compute_picking_domain(self):
-        picking_list = []
-        if self.order_id:
-            picking_list = self.order_id.picking_ids.ids
-        self.picking_domain = picking_list
+        for intervention in self:
+            picking_list = []
+            if intervention.order_id:
+                picking_list = intervention.order_id.picking_ids.ids
+            intervention.picking_domain = picking_list
 
     @api.onchange('order_id')
     def onchange_order_id(self):
@@ -1615,9 +1615,9 @@ class StockPicking(models.Model):
         action = self.env.ref('of_planning.of_sale_order_open_interventions').read()[0]
         if len(self._ids) == 1:
             context = safe_eval(action['context'])
-            order = self.move_lines and self.move_lines[0] and self.move_lines[0].procurement_id and \
-                self.move_lines[0].procurement_id.sale_line_id and \
-                self.move_lines[0].procurement_id.sale_line_id.order_id or False
+            order = self.move_lines.mapped('procurement_id').mapped('sale_line_id').mapped('order_id')
+            if order and len(order) > 1:
+                order = order[0]
             context.update({
                 'default_address_id': self.partner_id and self.partner_id.id or False,
                 'default_order_id': order and order.id or False,
