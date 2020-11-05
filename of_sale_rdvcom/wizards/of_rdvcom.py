@@ -4,7 +4,6 @@ from odoo import api, models, fields
 from datetime import datetime, timedelta, date
 import pytz, math, json, urllib, requests
 from math import cos
-from odoo.addons.of_planning_tournee.models.of_planning_tournee import distance_points
 from odoo.addons.of_geolocalize.models.of_geo import GEO_PRECISION
 from odoo.tools import config
 from odoo.exceptions import UserError
