@@ -17,9 +17,12 @@ class OFDeliveryDivisionWizard(models.TransientModel):
         self.ensure_one()
 
         # On vérifie qu'il y ait des quantités à diviser
-        lines_to_divide = self.line_ids.filtered(lambda line: line.qty_to_divide > 0)
-        if not lines_to_divide:
+        if not self.line_ids.filtered(lambda line: line.qty_to_divide > 0):
             raise Warning(u"Vous n'avez saisi aucune quantité à diviser !")
+        elif self.line_ids.filtered(lambda line: line.qty_to_divide > line.product_uom_qty):
+            raise Warning(u"Vous avez saisi trop de quantité à diviser par rapport à la quantité initiale !")
+        elif self.line_ids.filtered(lambda line: line.qty_to_divide < 0):
+            raise Warning(u"Vous avez saisi des quantités négatives !")
         else:
             # On copie le BL
             new_delivery = self.picking_id.copy()
