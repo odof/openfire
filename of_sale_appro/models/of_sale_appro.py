@@ -29,6 +29,16 @@ class StockMove(models.Model):
     of_qty_virtual_stock = fields.Float(string=u"Qté stock", related="product_id.virtual_available", related_sudo=False)
 
     @api.multi
+    def action_reset(self):
+        for move in self:
+            if move.state not in ['waiting', 'assigned']:
+                raise UserError(
+                    u"Seul un mouvement en attente d'un autre mouvement ou disponible peut être réinitialisé.")
+            move.linked_move_operation_ids.mapped('operation_id').unlink()
+            move.quants_unreserve()
+            move.write({'state': 'confirmed'})
+
+    @api.multi
     def action_assign(self, no_prepare=False):
         super(StockMove, self).action_assign(no_prepare=no_prepare)
         waiting_moves = self.filtered(lambda m: m.state in ['waiting'])
