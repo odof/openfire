@@ -37,6 +37,11 @@
             <xpath expr="//notebook//page[1]" position="inside">
                 <field name="of_note_operations" placeholder="Ajouter une note qui figurera sur le bon de livraison" class="oe_inline"/>
             </xpath>
+            <!-- wizard de division -->
+            <xpath expr="//field[@name='state']" position="before">
+                <button name="action_delivery_division" string="Diviser" type="object"
+                        attrs="{'invisible': ['|', ('picking_type_code', '!=', 'outgoing'), ('state', 'in', ['cancel', 'done'])]}"/>
+            </xpath>
         </field>
     </record>
 
