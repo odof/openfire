@@ -18,6 +18,8 @@
                 <footer>
                     <button string="Imprimer" name="print_specific_report" type="object" class="btn-primary"/>
                     <button string="Annuler" special="cancel" class="btn-default"/>
+                    <button name="button_select_all" type="object" string="Tout sélectionner"/>
+                    <button name="button_unselect_all" type="object" string="Tout désélectionner"/>
                 </footer>
             </form>
         </field>

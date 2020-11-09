@@ -29,6 +29,16 @@ class OFSpecificDeliveryReportWizard(models.TransientModel):
         # Impression du BL spécifique
         return self.env['report'].get_action(self, 'of_stock.of_specific_delivery_report')
 
+    @api.multi
+    def button_select_all(self, select=True):
+        self.ensure_one()
+        self.line_ids.write({'selected': select})
+        return {"type": "ir.actions.do_nothing"}
+
+    @api.multi
+    def button_unselect_all(self):
+        return self.button_select_all(select=False)
+
 
 class OFDeliveryDivisionWizardLine(models.TransientModel):
     _name = 'of.specific.delivery.report.wizard.line'
