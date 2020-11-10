@@ -12,11 +12,13 @@ Utilisation de comptes de tiers
 """,
     'category': 'Accounting',
     'depends': [
+        'account_financial_report_qweb',
         'of_account',
-        'of_utils'
+        'of_utils',
     ],
     'data': [
         'views/of_tiers_view.xml',
+        'wizards/trial_balance_wizard_view.xml',
         'security/ir.model.access.csv',
     ],
     'demo': [],
