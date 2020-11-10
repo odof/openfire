@@ -7,4 +7,12 @@
         <field name="groups_id" eval="[(6, 0, [ref('of_group_project_responsible')])]"/>
     </record>
 
+    <record id="stock.menu_warehouse_report" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('of_group_stock_responsible')])]"/>
+    </record>
+
+    <record id="stock.menu_stock_procurement_action" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('of_group_stock_responsible')])]"/>
+    </record>
+
 </odoo>
