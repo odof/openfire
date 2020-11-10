@@ -11,9 +11,13 @@ OpenFire / Comptes de tiers
 Utilisation de comptes de tiers
 """,
     'category': 'Accounting',
-    'depends': ['of_account'],
+    'depends': [
+        'of_account',
+        'account_financial_report_qweb',
+    ],
     'data': [
         'views/of_tiers_view.xml',
+        'wizards/trial_balance_wizard_view.xml',
         'security/ir.model.access.csv',
     ],
     'demo': [],
