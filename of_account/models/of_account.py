@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, models, _
+from odoo import api, fields, models, _, SUPERUSER_ID
 from odoo.exceptions import UserError,  ValidationError
 from odoo.models import regex_order
 from odoo.tools.float_utils import float_compare
@@ -12,6 +12,18 @@ class AccountAccount(models.Model):
     _inherit = "account.account"
 
     of_account_counterpart_id = fields.Many2one('account.account', string="Compte de contrepartie")
+
+    @api.multi
+    def write(self, vals):
+        # Interdiction de modifier le code d'un compte comprenant des écritures, sauf pour l'admin.
+        if 'code' in vals and self._uid != SUPERUSER_ID:
+            move_line_obj = self.env['account.move.line'].sudo()
+            for account in self:
+                if move_line_obj.search([('account_id', '=', account.id)]):
+                    raise UserError(
+                        u"Vous ne pouvez pas changer le code d'un compte ayant déjà des écritures. : %s"
+                        % account.code)
+        return super(AccountAccount, self).write(vals)
 
 
 class AccountConfigSettings(models.TransientModel):
