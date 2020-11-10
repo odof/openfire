@@ -16,8 +16,9 @@ Ce module apporte une personnalisation des points de ventes
         'of_account_payment_mode',
     ],
     'data': [
-        'data/data.xml',
         'views/account_views.xml',
+        'views/product_views.xml',
+        'views/templates.xml',
     ],
     'installable': True,
     'application': True,
