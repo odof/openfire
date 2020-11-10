@@ -315,8 +315,9 @@ class ProductProduct(models.Model):
 
     @api.multi
     def _need_procurement(self):
+        inclure_service = self.env['ir.values'].get_default('sale.config.settings', 'of_inclure_service_bl')
         for product in self:
-            if product.type == 'service':
+            if inclure_service and product.type == 'service':
                 return True
         return super(ProductProduct, self)._need_procurement()
 
@@ -459,3 +460,16 @@ class ResPartner(models.Model):
 
     of_invoice_policy = fields.Selection(
         selection_add=[('ordered_delivery', u'Quantités commandées à date de livraison')])
+
+
+class OFSaleConfiguration(models.TransientModel):
+    _inherit = 'sale.config.settings'
+
+    of_inclure_service_bl = fields.Boolean(
+        string="(OF) Bons de Livraison", help=u"Inclure les articles de type 'service' dans les bons de livraison"
+    )
+
+    @api.multi
+    def set_of_inclure_service_bl(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'of_inclure_service_bl', self.of_inclure_service_bl)

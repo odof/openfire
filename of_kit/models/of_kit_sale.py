@@ -310,8 +310,9 @@ class SaleOrderLine(models.Model):
         self.ensure_one()
         components = self.kit_id.kit_line_ids or []
         precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
+        inclure_service = self.env['ir.values'].get_default('sale.config.settings', 'of_inclure_service_bl')
         for comp in components:
-            if comp.product_id.type == "service":
+            if not inclure_service and comp.product_id.type == "service":
                 continue
             if comp.qty_delivered < comp.qty_total \
                     and not float_is_zero(comp.qty_delivered - comp.qty_total, precision_digits=precision):
