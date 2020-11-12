@@ -182,7 +182,6 @@ class ProcurementOrder(models.Model):
         res['of_project_id'] = sale_order.project_id.id
         if sale_order.of_user_id:
             res['of_user_id'] = sale_order.of_user_id.id
-
         return res
 
     @api.multi
@@ -315,7 +314,8 @@ class ProcurementOrder(models.Model):
                     if line.product_id == procurement.product_id\
                             and line.product_uom == procurement.product_id.uom_po_id:
                         procurement_uom_po_qty = procurement.product_uom._compute_quantity(
-                            procurement.product_qty, procurement.product_id.uom_po_id)
+                            procurement.product_qty,
+                            procurement.product_id.uom_po_id)
                         seller = procurement.product_id._select_seller(
                             partner_id=partner,
                             quantity=line.product_qty + procurement_uom_po_qty,
@@ -323,7 +323,10 @@ class ProcurementOrder(models.Model):
                             uom_id=procurement.product_id.uom_po_id)
 
                         price_unit = self.env['account.tax']._fix_tax_included_price(
-                            seller.price, line.product_id.supplier_taxes_id, line.taxes_id) if seller else 0.0
+                            seller.price,
+                            line.product_id.supplier_taxes_id,
+                            line.taxes_id
+                        ) if seller else 0.0
                         if price_unit and seller and po.currency_id and seller.currency_id != po.currency_id:
                             price_unit = seller.currency_id.compute(price_unit, po.currency_id)
 
@@ -345,8 +348,8 @@ class OFPurchaseConfiguration(models.TransientModel):
     _inherit = 'purchase.config.settings'
 
     of_description_as_order_setting = fields.Selection(
-        [(0, 'Description article telle que saisie dans le catalogue'),
-         (1, 'Description article telle que saisie dans le devis')],
+        [(0, "Description article telle que saisie dans le catalogue"),
+         (1, "Description article telle que saisie dans le devis")],
         string="(OF) Description articles",
         help=u"Choisissez le type de description affiché dans la commande fournisseur.\n"
              u"Cela affecte également les documents imprimables.")
@@ -397,9 +400,9 @@ class StockMove(models.Model):
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
-    of_br_count = fields.Integer(string=u"Réceptions", compute="compute_br_count")
+    of_br_count = fields.Integer(string=u"Réceptions", compute="_compute_of_br_count")
 
-    def compute_br_count(self):
+    def _compute_of_br_count(self):
         picking_obj = self.env['stock.picking']
         for partner in self:
             partner.of_br_count = picking_obj.search_count(
