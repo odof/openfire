@@ -144,6 +144,9 @@
             <xpath expr="//field[@name='tax_ids']" position="after">
                 <field name="of_account_counterpart_id"/>
             </xpath>
+            <xpath expr="//field[@name='internal_type']" position="after">
+                <field name="of_accept_entries"/>
+            </xpath>
         </field>
     </record>
 
