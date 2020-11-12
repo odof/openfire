@@ -392,7 +392,8 @@
                                     <field name="do_deliveries" invisible="1"/>
                                     <field name="warehouse_id" attrs="{'invisible': [('do_deliveries', '=', False)]}" options="{'no_create': True, 'no_open': True}"/>
                                     <field name="invoice_policy"/>
-                                    <field name="fiscal_position_id" attrs="{'readonly': [('lien_commande', '!=', False)]}" options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="fiscal_position_id" attrs="{'readonly': [('lien_commande', '!=', False)]}" options="{'no_create': True, 'no_open': True}"
+                                           domain="[('of_is_sale', '=', True)]"/>
                                 </group>
                                 <div class="oe_button_box">
                                     <button name="button_import_order_line" string="Importer"
