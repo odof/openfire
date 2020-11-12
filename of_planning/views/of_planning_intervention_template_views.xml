@@ -39,7 +39,7 @@
                         <page name="facturation" string="Facturation">
                             <group>
                                 <group>
-                                    <field name="fiscal_position_id"/>
+                                    <field name="fiscal_position_id" domain="[('of_is_sale', '=', True)]"/>
                                 </group>
                                 <group>
                                 </group>

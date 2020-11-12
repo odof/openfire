@@ -30,7 +30,8 @@ class SaleQuoteTemplate(models.Model):
     of_note1 = fields.Html('Commentaire du haut')
     of_note2 = fields.Html('Commentaire du bas')
     property_of_fiscal_position_id = fields.Many2one(
-        'account.fiscal.position', string="Position fiscale", company_dependent=True)
+        'account.fiscal.position', string="Position fiscale", company_dependent=True,
+        domain="[('of_is_sale','=',True)]")
     of_payment_term_id = fields.Many2one('account.payment.term', string="Conditions de règlement")
     of_sale_quote_tmpl_activity_ids = fields.One2many(
         comodel_name='of.sale.quote.tmpl.activity', inverse_name='template_id', string='Activities')

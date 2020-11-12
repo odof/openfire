@@ -331,7 +331,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
         comodel_name='of.service.line', inverse_name='service_id', string=u"Lignes de facturation")
     fiscal_position_id = fields.Many2one(
         comodel_name='account.fiscal.position', string=u"Position fiscale",
-        domain="[('tax_ids.tax_src_id.type_tax_use','=','sale')]")
+        domain="[('of_is_sale','=',True)]")
     currency_id = fields.Many2one(
         comodel_name='res.currency', string=u"Currency", readonly=True, related='company_id.currency_id')
 

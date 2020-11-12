@@ -169,6 +169,51 @@ class AccountConfigSettings(models.TransientModel):
         return self.env['ir.values'].sudo().set_default('account.config.settings', 'of_date_due', self.of_date_due)
 
 
+class AccountFiscalPosition(models.Model):
+    _inherit = 'account.fiscal.position'
+
+    of_is_purchase = fields.Boolean(
+        string="Pos. fiscale d'achat",
+        compute='_compute_of_is_purchase',
+        search='_search_of_is_purchase',
+    )
+    of_is_sale = fields.Boolean(
+        string="Pos. fiscale de vente",
+        compute='_compute_of_is_sale',
+        search='_search_of_is_sale',
+    )
+
+    @api.multi
+    def _compute_of_is_purchase(self):
+        for fpos in self:
+            fpos.of_is_purchase = 'purchase' in self.of_get_related_taxes.mapped('type_tax_use')
+
+    @api.model
+    def _search_of_is_purchase(self, operator, value):
+        domain = [('tax_ids.tax_src_id.type_tax_use', '=', 'purchase')]
+        if (operator == '=') == bool(value):
+            return domain
+        purchase_fpos = self.search(domain)
+        return [('id', 'not in', purchase_fpos)]
+
+    @api.multi
+    def _compute_of_is_sale(self):
+        for fpos in self:
+            fpos.of_is_purchase = 'sale' in self.of_get_related_taxes.mapped('type_tax_use')
+
+    @api.model
+    def _search_of_is_sale(self, operator, value):
+        domain = [('tax_ids.tax_src_id.type_tax_use', '=', 'sale')]
+        if (operator == '=') == bool(value):
+            return domain
+        sale_fpos = self.search(domain)
+        return [('id', 'not in', sale_fpos)]
+
+    @api.multi
+    def of_get_related_taxes(self):
+        return self.mapped('tax_ids').mapped('tax_src_id')
+
+
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
@@ -253,6 +298,34 @@ class AccountInvoice(models.Model):
         return res
 
     @api.multi
+    def of_check_fiscal_position(self):
+        for invoice in self:
+            if invoice.fiscal_position_id:
+                tax_type = invoice.type in ('out_invoice', 'out_refund') and 'sale' or 'purchase'
+                taxes = invoice.fiscal_position_id.of_get_related_taxes()
+                if tax_type not in taxes.mapped('type_tax_use'):
+                    raise UserError(
+                        u"Seules les positions fiscales %s sont autorisées pour %s.\nPosition fiscale : %s" % (
+                            {
+                                'sale': "de vente",
+                                'purchase': "d'achat"
+                            }[tax_type],
+                            {
+                                'out_invoice': 'une facture client',
+                                'out_refund': 'un avoir client',
+                                'in_invoice': 'une facture fournisseur',
+                                'in_refund': 'un avoir fournisseur',
+                            }[invoice.type],
+                            invoice.fiscal_position_id.name,
+                        ))
+
+    @api.model
+    def create(self, vals):
+        invoice = super(AccountInvoice, self).create(vals)
+        invoice.of_check_fiscal_position()
+        return invoice
+
+    @api.multi
     def write(self, vals):
         if 'tax_line_ids' in vals:
             # Lorsque les lignes de taxes sont changées / ajoutés sur une facture elles doivent toutes être
@@ -263,7 +336,9 @@ class AccountInvoice(models.Model):
                     lines_to_keep.append(line)
             if lines_to_keep:
                 vals['tax_line_ids'] = [(5, )] + lines_to_keep
-        return super(AccountInvoice, self).write(vals)
+        result = super(AccountInvoice, self).write(vals)
+        self.of_check_fiscal_position()
+        return result
 
     @api.onchange('company_id')
     def _onchange_company_id(self):

@@ -153,6 +153,33 @@ class AccountFiscalPosition(models.Model):
         'account.tax', string=u"Taxes par défaut",
         help=u"Taxes utilisées quand aucun compte de taxes n'est défini dans l'article")
 
+    @api.model
+    def _search_of_is_purchase(self, operator, value):
+        domain = [
+            '|',
+            ('tax_ids.tax_src_id.type_tax_use', '=', 'purchase'),
+            ('default_tax_ids.type_tax_use', '=', 'purchase')]
+        if (operator == '=') == bool(value):
+            return domain
+        purchase_fpos = self.search(domain)
+        return [('id', 'not in', purchase_fpos)]
+
+    @api.model
+    def _search_of_is_sale(self, operator, value):
+        domain = [
+            '|',
+            ('tax_ids.tax_src_id.type_tax_use', '=', 'sale'),
+            ('default_tax_ids.type_tax_use', '=', 'sale')]
+        if (operator == '=') == bool(value):
+            return domain
+        sale_fpos = self.search(domain)
+        return [('id', 'not in', sale_fpos)]
+
+    @api.multi
+    def of_get_related_taxes(self):
+        taxes = super(AccountFiscalPosition, self).of_get_related_taxes()
+        return taxes | self.mapped('default_tax_ids')
+
     @api.multi
     def map_tax(self, taxes, product=None, partner=None):
         if not self:

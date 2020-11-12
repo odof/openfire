@@ -25,6 +25,10 @@
                 <xpath expr="//field[@name='partner_ref']" position="after">
                     <field name="of_user_id"/>
                 </xpath>
+                <xpath expr="//field[@name='fiscal_position_id']" position="attributes">
+                    <attribute name="domain">[('of_is_purchase', '=', True)]</attribute>
+                    <attribute name="options">{'no_open': True}</attribute>
+                </xpath>
                 <xpath expr="//notebook/page[2]//field[@name='date_planned']" position="replace">
                     <field name="of_delivery_force" class="oe_edit_only" attrs="{'readonly': [('state', 'not in', ('draft', 'sent'))]}"/>
                 </xpath>

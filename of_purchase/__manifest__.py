@@ -31,11 +31,12 @@ Fonctionnalités
 - Ajout de l'impression de la commande fournisseur sans prix
 - Ajout option pour afficher la description telle que saisie dans le devis dans la commande fournisseur et les documents imprimables associés
 - Ajoute un smart button vers les commandes fournisseurs liées depuis le bon de commande
-
+- Limite les positions fiscales disponibles dans les bons de commande fournisseur aux positions fiscales d'achat.
 """,
     'depends': [
         'purchase',
         'sale',
+        'of_account',
         'of_product',
         'of_external',
         'of_sale',

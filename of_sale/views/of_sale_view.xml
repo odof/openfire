@@ -97,7 +97,7 @@
                     <field name="of_invoice_date_prev" invisible="context.get('hide_sale')" attrs="{'readonly': [('of_invoice_policy', '!=', 'order')]}"/>
                 </xpath>
                 <field name="fiscal_position_id" position="attributes">
-                    <attribute name="domain">[('tax_ids.tax_src_id.type_tax_use', '=', 'sale')]</attribute>
+                    <attribute name="domain">[('of_is_sale', '=', True)]</attribute>
                     <attribute name="options">{'no_open': True}</attribute>
                 </field>
                 <xpath expr="//field[@name='date_order']" position="attributes">
