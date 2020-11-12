@@ -12,10 +12,10 @@
 ##############################################################################
 
 {
-    'name' : u"OpenFire / Achats",
-    'version' : "10.0.1.0.0",
-    'author' : "OpenFire",
-    'website' : "www.openfire.fr",
+    'name': u"OpenFire / Achats",
+    'version': "10.0.1.0.0",
+    'author': "OpenFire",
+    'website': "www.openfire.fr",
     'category': "Purchases",
     'summary': u"OpenFire Purchases",
     'description': u"""
@@ -33,11 +33,11 @@ Fonctionnalités
 - Ajoute un smart button vers les commandes fournisseurs liées depuis le bon de commande
 
 """,
-    'depends' : [
+    'depends': [
         'purchase',
         'sale',
     ],
-    'data' : [
+    'data': [
         'report/purchase_report_templates.xml',
         'report/purchase_reports.xml',
         'views/of_purchase_view.xml',
