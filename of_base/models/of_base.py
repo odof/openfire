@@ -269,6 +269,7 @@ class ResCompany(models.Model):
     of_assu_dec = fields.Char(string=u"Assurance décennale")
     of_assu_multi = fields.Char(string=u"Assurance multirisques")
     of_qualif = fields.Char(string=u"Qualifications")
+    of_kitchen_certif = fields.Char(string=u"Qualification cuisine")
     of_general_id = fields.Char(string=u"ID général")
     of_accounting_id = fields.Char(string=u"ID comptable")
 

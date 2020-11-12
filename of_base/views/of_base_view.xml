@@ -206,6 +206,7 @@
                         <field name="of_assu_dec"/>
                         <field name="of_assu_multi"/>
                         <field name="of_qualif"/>
+                        <field name="of_kitchen_certif"/>
                     </group>
                 </xpath>
                 <notebook position="inside">
