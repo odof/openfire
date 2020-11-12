@@ -14,7 +14,7 @@ Le système de taxes OpenFire ajoute une taxe par défaut dans les positions fis
 
 Une table de correspondance de comptes comptables est également ajoutée au niveau des taxes et est utilisée au niveau des lignes de factures.
 """,
-    'depends': ['account', 'sale', 'purchase'],
+    'depends': ['of_account', 'sale', 'purchase'],
     'data': [
         'views/of_account_tax_view.xml',
         'security/ir.model.access.csv',
