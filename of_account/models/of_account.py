@@ -12,6 +12,7 @@ class AccountAccount(models.Model):
     _inherit = "account.account"
 
     of_account_counterpart_id = fields.Many2one('account.account', string="Compte de contrepartie")
+    of_accept_entries = fields.Boolean(string=u"Accepter les écritures", default=True)
 
     @api.multi
     def write(self, vals):
@@ -336,9 +337,23 @@ class AccountMoveLine(models.Model):
                 # Pour un journal d'achat on prend le compte de tiers fournisseur.
                 self.account_id = self.partner_id.property_account_payable_id
 
+    @api.model
+    def create(self, vals):
+        # Vérification que le compte accepte les écritures
+        account = self.env['account.account'].sudo().browse(vals['account_id'])
+        if not account.of_accept_entries:
+            raise UserError(u"Ce compte n'accepte pas les écritures comptables : " + account.name_get()[0][1])
+        return super(AccountMoveLine, self).create(vals)
+
     @api.multi
     def write(self, vals):
         if 'account_id' in vals:
+            # Vérification que le compte accepte les écritures
+            account = self.env['account.account'].sudo().browse(vals['account_id'])
+            if not account.of_accept_entries:
+                raise UserError(u"Ce compte n'accepte pas les écritures comptables : " + account.name_get()[0][1])
+
+            # Synchronisation avec la facture
             for line in self:
                 if not line.invoice_id:
                     continue
