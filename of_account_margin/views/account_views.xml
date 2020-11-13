@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_account_margin_account_invoice_form_view" model="ir.ui.view">
+        <field name="name">of.account.margin.account.invoice.form.view</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='comment']" position="before">
+                <group attrs="{'invisible': [('type', 'not in', ['out_invoice', 'out_refund'])]}">
+                    <field name="of_margin" groups="of_sale.of_group_sale_marge_manager" widget="monetary"/>
+                    <field name="of_margin_perc" groups="of_sale.of_group_sale_marge_manager"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
