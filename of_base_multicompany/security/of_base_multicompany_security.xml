@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo>
-
-<data noupdate="1">
+<odoo noupdate="1">
 
     <!-- Désactivation des règles -->
     <!-- Rappel: Une fonction en noupdate n'est lancée qu'à l'installation du module (elle n'a pas d'existence dans ir_model_data) -->
@@ -16,6 +14,7 @@
 'account.account_move_comp_rule',
 'account.account_move_line_comp_rule',
 'account.account_payment_comp_rule',
+'analytic.analytic_comp_rule',
 )], {'active':False})"/>
 
     <!-- Ajout des règles Multi-société OpenFire-->
@@ -127,5 +126,20 @@
         <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.accounting_company_id.id])]</field>
     </record>
 
-</data>
+    <record id="of_analytic_comp_rule_read" model="ir.rule">
+        <field name="name">OF Analytic multi company rule Read</field>
+        <field name="model_id" ref="analytic.model_account_analytic_account"/>
+        <field name="global" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="domain_force">['|','|',('company_id','=',False),('company_id','child_of',[user.company_id.id]),('company_id','parent_of',[user.company_id.id])]</field>
+    </record>
+    <record id="of_analytic_comp_rule_write" model="ir.rule">
+        <field name="name">OF Analytic multi company rule Write</field>
+        <field name="model_id" ref="analytic.model_account_analytic_account"/>
+        <field name="global" eval="True"/>
+        <field name="perm_read" eval="False"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+    </record>
 </odoo>
