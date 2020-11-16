@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_contract_indice_view_form" model="ir.ui.view">
+        <field name="name">Appliquer des indices</field>
+        <field name="model">of.contract.indice.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Appliquer des indices">
+<!--                <group>-->
+                    <group>
+                        <field name="contract_ids" widget="many2many_tags"/>
+                        <field name="indice_ids" widget="many2many_tags"/>
+                        <field name="date_execution"/>
+                    </group>
+                    <group>
+                        <div class="oe_grey" colspan="4">
+                            Appliquer les indices sélectionnés va mettre à jour le prix unitaire des articles en fonction des indices sélectionnés.
+                            ATTENTION : le prix unitaire ne sera pas mit à jour si la catégorie d'article n'est liée à aucun des indices sélectionnés.
+                            Si le contrat/ligne de contrat n'utilise pas les indices, le prix unitaires des articles ne sera également pas mit à jour.
+                         </div>
+                    </group>
+<!--                </group>-->
+                <footer>
+                    <button string="Appliquer les indices" name="button_apply" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window id="action_index_contract"
+            key2="client_action_multi"
+            name="Appliquer les indices"
+            res_model="of.contract.indice.wizard"
+            src_model="of.contract"
+            view_mode="form"
+            view_type="form"
+            view_id="of_contract_indice_view_form"
+            target="new"/>
+
+</odoo>
