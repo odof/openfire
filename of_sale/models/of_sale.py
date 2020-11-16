@@ -999,8 +999,8 @@ class OFSaleConfiguration(models.TransientModel):
 
     @api.model
     def _auto_init(self):
-        """
-        Certain paramètres d'affichage sont passés de Booléen à Sélection.
+        u"""
+        Certains paramètres d'affichage sont passés de Booléen à Sélection.
         Cette fonction est appelée à chaque mise à jour mais ne fait quelque chose que la première fois qu'elle est appelée.
         """
         set_value = False
@@ -1103,6 +1103,7 @@ class OFSaleConfiguration(models.TransientModel):
     )
 
     of_position_fiscale = fields.Boolean(string="(OF) Position fiscale")
+    of_tax_mandatory = fields.Boolean(string="(OF) Taxes")
 
     @api.multi
     def set_pdf_adresse_nom_parent_defaults(self):
@@ -1177,6 +1178,19 @@ class OFSaleConfiguration(models.TransientModel):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_position_fiscale',
             self.of_position_fiscale)
+
+    @api.multi
+    def set_of_tax_mandatory(self):
+        for view in (
+            self.env.ref('of_sale.of_sale_order_form_tax_required'),
+            self.env.ref('of_sale.of_invoice_form_tax_required'),
+            self.env.ref('of_sale.of_invoice_line_form_tax_required'),
+        ):
+            if view:
+                view.write({'active': self.of_tax_mandatory})
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'of_tax_mandatory',
+            self.of_tax_mandatory)
 
 
 class AccountInvoice(models.Model):
