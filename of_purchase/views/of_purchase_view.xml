@@ -127,6 +127,11 @@
             <field name="arch" type="xml">
                 <xpath expr="//form//field[@name='group_warning_purchase']" position="after">
                     <field name="of_description_as_order_setting" widget="radio"/>
+                    <label for="of_tax_mandatory"/>
+                    <div name="of_tax_mandatory">
+                        <field name="of_tax_mandatory" class="oe_inline"/>
+                        <span>Forcer l'utilisation de taxes dans les lignes de commandes/factures fournisseur</span>
+                    </div>
                     <label for="group_purchase_order_line_display_stock_info"/>
                     <div name="group_purchase_order_line_display_stock_info">
                         <field name="group_purchase_order_line_display_stock_info" class="oe_inline"/>
@@ -290,4 +295,34 @@
         </field>
     </record>
 
+<!-- Vues induites par des paramètres de configuration -->
+<data noupdate="1">
+    <!-- Taxe obligatoire dans les lignes de commandes fournisseur -->
+    <record id="of_purchase_order_form_tax_required" model="ir.ui.view">
+        <field name="name">of.purchase.order.form.tax.required</field>
+        <field name="model">purchase.order</field>
+        <field name="active">False</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/tree/field[@name='taxes_id']" position="attributes">
+                <attribute name="required">True</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Taxe obligatoire dans les lignes de factures fournisseur -->
+    <record id="of_invoice_supplier_form_tax_required" model="ir.ui.view">
+        <field name="name">of.account.invoice.supplier.form.tax.required</field>
+        <field name="model">account.invoice</field>
+        <field name="active">False</field>
+        <field name="inherit_id" ref="account.invoice_supplier_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='invoice_line_tax_ids']"
+                   position="attributes">
+                <attribute name="required">True</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</data>
 </odoo>

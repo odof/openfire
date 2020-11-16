@@ -19,6 +19,7 @@ class OFSaleConfiguration(models.TransientModel):
     )
 
     of_position_fiscale = fields.Boolean(string="(OF) Position fiscale")
+    of_tax_mandatory = fields.Boolean(string="(OF) Taxes")
     of_allow_quote_addition = fields.Boolean(string=u"(OF) Devis complémentaires")
 
     group_of_afficher_total_ttc = fields.Boolean(
@@ -91,6 +92,19 @@ class OFSaleConfiguration(models.TransientModel):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_position_fiscale',
             self.of_position_fiscale)
+
+    @api.multi
+    def set_of_tax_mandatory(self):
+        for view in (
+            self.env.ref('of_sale.of_sale_order_form_tax_required'),
+            self.env.ref('of_sale.of_invoice_form_tax_required'),
+            self.env.ref('of_sale.of_invoice_line_form_tax_required'),
+        ):
+            if view:
+                view.write({'active': self.of_tax_mandatory})
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'of_tax_mandatory',
+            self.of_tax_mandatory)
 
     @api.multi
     def set_of_allow_quote_addition_defaults(self):

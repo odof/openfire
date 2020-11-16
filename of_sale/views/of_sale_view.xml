@@ -577,20 +577,6 @@
         <menuitem name="Secteurs" id="of_secteur_sale_menu" parent="sales_team.menu_localisation" action="action_of_secteur_tree_sale" sequence="10"/>
         <!--menuitem name="CP des Secteurs" id="of_secteur_zip_sale_menu" parent="sales_team.menu_localisation" action="action_of_secteur_zip_tree_sale" sequence="11"/-->
 
-        <data noupdate="1">
-            <record model="ir.ui.view" id="of_sale_order_form_fiscal_position_required">
-                <field name="name">of.sale.order.form.fiscal.position.required</field>
-                <field name="model">sale.order</field>
-                <field name="active">False</field>
-                <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
-                <field name="arch" type="xml">
-                    <xpath expr="//field[@name='fiscal_position_id']" position="attributes">
-                        <attribute name="required">True</attribute>
-                    </xpath>
-                </field>
-            </record>
-        </data>
-
 <!--##############################################################################-->
 <!--########################### ______ Compta ______ #############################-->
 <!--##############################################################################-->
@@ -925,4 +911,63 @@ Tous les articles seront considérés comme disponibles et marqués comme livré
         </field>
     </record>
 
+<!-- Vues induites par des paramètres de configuration -->
+<data noupdate="1">
+    <!-- Position fiscale obligatoire dans les commandes client -->
+    <record model="ir.ui.view" id="of_sale_order_form_fiscal_position_required">
+        <field name="name">of.sale.order.form.fiscal.position.required</field>
+        <field name="model">sale.order</field>
+        <field name="active">False</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='fiscal_position_id']" position="attributes">
+                <attribute name="required">True</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Taxe obligatoire dans les lignes de commandes client -->
+    <record model="ir.ui.view" id="of_sale_order_form_tax_required">
+        <field name="name">of.sale.order.form.tax.required</field>
+        <field name="model">sale.order</field>
+        <field name="active">False</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/tree/field[@name='tax_id']" position="attributes">
+                <attribute name="required">True</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='tax_id']" position="attributes">
+                <attribute name="required">True</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Taxe obligatoire dans les lignes de factures client -->
+    <record id="of_invoice_form_tax_required" model="ir.ui.view">
+        <field name="name">of.account.invoice.tax.required.form</field>
+        <field name="model">account.invoice</field>
+        <field name="active">False</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='invoice_line_tax_ids']"
+                   position="attributes">
+                <attribute name="required">True</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Normalement la vue formulaire des lignes de factures n'est utilisée en édition que dans les factures client-->
+    <record id="of_invoice_line_form_tax_required" model="ir.ui.view">
+        <field name="name">of.account.invoice.line.tax.required.form</field>
+        <field name="model">account.invoice.line</field>
+        <field name="active">False</field>
+        <field name="inherit_id" ref="account.view_invoice_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_tax_ids']" position="attributes">
+                <attribute name="required">True</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</data>
 </odoo>
