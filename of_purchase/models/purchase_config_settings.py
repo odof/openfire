@@ -23,6 +23,8 @@ class OFPurchaseConfiguration(models.TransientModel):
         (0, 'Standard'),
         (1, 'Date du jour')], string="(OF) Date des commandes fournisseur")
 
+    of_tax_mandatory = fields.Boolean(string="(OF) Taxes")
+
     @api.multi
     def set_description_as_order_defaults(self):
         return self.env['ir.values'].sudo().set_default(
@@ -32,3 +34,15 @@ class OFPurchaseConfiguration(models.TransientModel):
     def set_of_date_purchase_order_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'purchase.config.settings', 'of_date_purchase_order', self.of_date_purchase_order)
+
+    @api.multi
+    def set_of_tax_mandatory(self):
+        for view in (
+            self.env.ref('of_purchase.of_purchase_order_form_tax_required'),
+            self.env.ref('of_purchase.of_invoice_supplier_form_tax_required'),
+        ):
+            if view:
+                view.write({'active': self.of_tax_mandatory})
+        return self.env['ir.values'].sudo().set_default(
+            'purchase.config.settings', 'of_tax_mandatory',
+            self.of_tax_mandatory)
