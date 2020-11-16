@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- nextcall est écrit en heure serveur donc ajouter 2 heures en été et 1 en hiver -->
+        <record id="of_contract_custom_generate_invoices" model="ir.cron">
+            <field name="name">Création automatique des factures</field>
+            <field name="model">of.contract</field>
+            <field name="function">generate_invoices</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="nextcall">2020-10-14 07:00:00</field>
+            <field name="active">false</field>
+            <field name="args">()</field>
+        </record>
+
+        <record id="of_contract_custom_date_range_type" model="date.range.type">
+            <field name="name">Année contractuelle</field>
+            <!-- On ne veut pas de société, si  -->
+            <field name="company_id"></field>
+        </record>
+
+<!--        <function model="date.range" name="generate_contract_date_range" />-->
+
+<!--        <record id="of_contract_custom_generate_date_ranges" model="ir.cron">-->
+<!--            <field name="name">Création automatique des années contractuelles</field>-->
+<!--            <field name="model">date.range</field>-->
+<!--            <field name="function">generate_contract_date_range</field>-->
+<!--            <field name="interval_number">12</field>-->
+<!--            <field name="interval_type">months</field>-->
+<!--            <field name="numbercall">-1</field>-->
+<!--            <field name="nextcall">2020-01-01 03:00:00</field>-->
+<!--            <field name="active">true</field>-->
+<!--            <field name="args">()</field>-->
+<!--        </record>-->
+
+        <record id="of_contract_custom_sequence" model="ir.sequence">
+            <field name="name">Séquence de ligne de contrat</field>
+            <field name="padding">6</field>
+        </record>
+
+<!--        <record id="of_contract_custom_verify_states" model="ir.cron">-->
+<!--            <field name="name">Modification des états des lignes de contrats</field>-->
+<!--            <field name="model">of.service</field>-->
+<!--            <field name="function">verify_state</field>-->
+<!--            <field name="interval_number">1</field>-->
+<!--            <field name="interval_type">days</field>-->
+<!--            <field name="numbercall">-1</field>-->
+<!--            <field name="nextcall">2020-10-14 06:00:00</field>-->
+<!--            <field name="active">false</field>-->
+<!--            <field name="args">()</field>-->
+<!--        </record>-->
+
+    </data>
+
+</odoo>
