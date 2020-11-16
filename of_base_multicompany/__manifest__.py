@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name': "OpenFire / Base multi-sociétés",
+    'name': u"OpenFire / Base multi-sociétés",
     'version': "10.0.1.0.0",
     'author': "OpenFire",
     'complexity': "easy",

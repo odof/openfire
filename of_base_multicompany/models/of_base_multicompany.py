@@ -4,6 +4,7 @@ from odoo import api, models, fields, _
 from odoo.addons.account.models.account_invoice import TYPE2JOURNAL
 from odoo.exceptions import UserError
 
+
 # @todo: Certains paramètres de la société (e.g. méthode d'arrondi des taxes) devraient être communs à la société
 
 class Company(models.Model):
@@ -39,6 +40,7 @@ class Company(models.Model):
         accounting_company = self.accounting_company_id
         return taxes.filtered(lambda tax: tax.company_id.accounting_company_id == accounting_company)
 
+
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
@@ -62,9 +64,17 @@ class AccountInvoice(models.Model):
 
     accounting_company_id = fields.Many2one(
         'res.company', related='company_id.accounting_company_id', string=u"Société comptable")
-    journal_id = fields.Many2one('account.journal',
+    journal_id = fields.Many2one(
+        'account.journal',
         default=lambda self: self._default_journal(),
-        domain="[('type', 'in', {'out_invoice': ['sale'], 'out_refund': ['sale'], 'in_refund': ['purchase'], 'in_invoice': ['purchase']}.get(type, [])), ('company_id', 'in', (company_id, accounting_company_id))]")
+        domain="[('type', 'in', {"
+               "     'out_invoice': ['sale'],"
+               "     'out_refund': ['sale'],"
+               "     'in_refund': ['purchase'],"
+               "     'in_invoice': ['purchase']"
+               "   }.get(type, [])),"
+               " ('company_id', 'in', (company_id, accounting_company_id))]")
+
 
 class AccountAccount(models.Model):
     _inherit = 'account.account'
@@ -75,11 +85,14 @@ class AccountAccount(models.Model):
             vals['company_id'] = self.env['res.company'].browse(vals['company_id']).accounting_company_id.id
         return super(AccountAccount, self).create(vals)
 
+
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
     # La société de la pièce comptable doit être la même que celle des écritures (voir account.move._post_validate())
-    company_id = fields.Many2one('res.company', related='journal_id.company_id.accounting_company_id', string='Company', store=True, readonly=True,
+    company_id = fields.Many2one(
+        'res.company', related='journal_id.company_id.accounting_company_id',
+        string='Company', store=True, readonly=True,
         default=lambda self: self.env.user.company_id.accounting_company_id)
 
     @api.model
@@ -110,13 +123,15 @@ class AccountMove(models.Model):
         })
         return move
 
+
 class Property(models.Model):
     _inherit = 'ir.property'
 
     def _get_domain(self, prop_name, model):
         res = super(Property, self)._get_domain(prop_name, model)
         if res:
-            # Part du principe que _get_domain renvoie un domaine de la forme [(...), ('company_id', 'in', [company_id, False])]
+            # Part du principe que _get_domain renvoie un domaine de la forme :
+            # [(...), ('company_id', 'in', [company_id, False])]
             company = self.env['res.company'].browse(res[1][2][0])
             res[1][2][0] = company.accounting_company_id.id
         return res
@@ -126,10 +141,12 @@ class Property(models.Model):
         # retrieve the properties corresponding to the given record ids
         self._cr.execute("SELECT id FROM ir_model_fields WHERE name=%s AND model=%s", (name, model))
         field_id = self._cr.fetchone()[0]
-        company_id = self.env.context.get('force_company') or self.env['res.company']._company_default_get(model, field_id).id
+        company_id = self.env.context.get('force_company')\
+            or self.env['res.company']._company_default_get(model, field_id).id
         company = self.env['res.company'].browse(company_id)
         self = self.with_context(force_company=company.accounting_company_id.id)
         return super(Property, self).set_multi(name, model, values, default_value=default_value)
+
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
