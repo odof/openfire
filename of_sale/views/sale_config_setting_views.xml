@@ -20,6 +20,11 @@
                     <field name="of_position_fiscale" class="oe_inline"/>
                     <span>Forcer l'utilisation des positions fiscales dans les devis/commandes</span>
                 </div>
+                <label for="of_tax_mandatory"/>
+                <div name="of_tax_mandatory">
+                    <field name="of_tax_mandatory" class="oe_inline"/>
+                    <span>Forcer l'utilisation de taxes dans les lignes de devis/commandes/factures client</span>
+                </div>
                 <label for="group_of_order_line_option"/>
                 <div name="group_of_order_line_option">
                     <field name="group_of_order_line_option" class="oe_inline"/>

@@ -359,6 +359,7 @@ class OFPurchaseConfiguration(models.TransientModel):
         string="(OF) Description articles",
         help=u"Choisissez le type de description affiché dans la commande fournisseur.\n"
              u"Cela affecte également les documents imprimables.")
+    of_tax_mandatory = fields.Boolean(string="(OF) Taxes")
 
     group_purchase_order_line_display_stock_info = fields.Boolean(
         string=u"(OF) Informations de stock",
@@ -375,6 +376,18 @@ class OFPurchaseConfiguration(models.TransientModel):
     def set_description_as_order_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'purchase.config.settings', 'of_description_as_order_setting', self.of_description_as_order_setting)
+
+    @api.multi
+    def set_of_tax_mandatory(self):
+        for view in (
+            self.env.ref('of_purchase.of_purchase_order_form_tax_required'),
+            self.env.ref('of_purchase.of_invoice_supplier_form_tax_required'),
+        ):
+            if view:
+                view.write({'active': self.of_tax_mandatory})
+        return self.env['ir.values'].sudo().set_default(
+            'purchase.config.settings', 'of_tax_mandatory',
+            self.of_tax_mandatory)
 
     @api.multi
     def set_of_date_purchase_order_defaults(self):
