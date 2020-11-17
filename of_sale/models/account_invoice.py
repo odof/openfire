@@ -243,15 +243,15 @@ class AccountInvoice(models.Model):
         for inv in invoices:
             sign = inv.type == inv_type or -1
             for inv_tax in inv.tax_line_ids:
-                tax = inv_tax.tax_id
-                if tax in taxes:
-                    vals = taxes[tax]
+                tax_desc = inv_tax.tax_id.description
+                if tax_desc in taxes:
+                    vals = taxes[tax_desc]
                     vals[1] += inv_tax.base * sign
                     vals[2] += inv_tax.amount * sign
                 else:
-                    vals = [tax.description, inv_tax.base * sign, inv_tax.amount * sign]
+                    vals = [tax_desc, inv_tax.base * sign, inv_tax.amount * sign]
                     tax_vals.append(vals)
-                    taxes[tax] = vals
+                    taxes[tax_desc] = vals
         for vals in tax_vals:
             vals[1] = round_curr(vals[1])
             vals[2] = round_curr(vals[2])

@@ -297,8 +297,18 @@ class AccountInvoice(models.Model):
         Retourne la liste des taxes à afficher dans le récapitulatif de la facture pdf.
         """
         self.ensure_one()
-        return [(t.tax_id.description, t.base, t.amount)
-                for t in self.tax_line_ids]
+        tax_pos = {}
+        result = []
+        for inv_tax in self.tax_line_ids:
+            desc = inv_tax.tax_id.description
+            if desc in tax_pos:
+                pos = tax_pos[desc]
+                vals = result[pos]
+                result[pos] = (vals[0], vals[1] + inv_tax.base, vals[2] + inv_tax.amount)
+            else:
+                tax_pos[desc] = len(result)
+                result.append((desc, inv_tax.base, inv_tax.amount))
+        return result
 
     @api.multi
     def _of_compute_echeances(self):
