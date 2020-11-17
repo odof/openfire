@@ -38,6 +38,7 @@ class OFFollowupProject(models.Model):
         related='order_id.partner_shipping_id', string=u"Adresse d'intervention", readonly=True)
     invoice_status = fields.Selection(related='order_id.invoice_status', string=u"État de facturation", readonly=True)
     user_id = fields.Many2one(comodel_name='res.users', string=u"Responsable", default=lambda self: self.env.user)
+    vendor_id = fields.Many2one(related='order_id.user_id', string=u"Vendeur", readonly=True)
     reference_laying_date = fields.Date(
         compute='_compute_reference_laying_date', string=u"Date de pose de référence", store=True)
     force_laying_date = fields.Boolean(string=u"Forcer la date de pose")
@@ -52,7 +53,11 @@ class OFFollowupProject(models.Model):
         domain=[('predefined_task', '=', False)])
     template_id = fields.Many2one(comodel_name='of.followup.project.template', string=u"Modèle")
     color = fields.Char(string=u"Couleur", compute="_compute_color")
-    priority = fields.Selection(AVAILABLE_PRIORITIES, string=u'Priorité', index=True, default=AVAILABLE_PRIORITIES[0][0])
+    priority = fields.Selection(
+        AVAILABLE_PRIORITIES, string=u'Priorité', index=True, default=AVAILABLE_PRIORITIES[0][0])
+    main_product_brand_id = fields.Many2one(
+        comodel_name='of.product.brand', compute='_compute_main_product_brand_id',
+        string=u"Marque de l'article principal", store=True)
     info = fields.Text(string=u"Infos")
     notes = fields.Text(string=u"Notes")
     tag_ids = fields.Many2many(comodel_name='of.followup.project.tag', string=u"Étiquettes")
@@ -183,6 +188,15 @@ class OFFollowupProject(models.Model):
             else:
                 color = '#ffffff'
             rec.color = color
+
+    @api.multi
+    @api.depends('order_id', 'order_id.order_line', 'order_id.order_line.of_article_principal',
+                 'order_id.order_line.product_id', 'order_id.order_line.product_id.brand_id')
+    def _compute_main_product_brand_id(self):
+        for rec in self:
+            main_product_lines = rec.order_id.order_line.filtered(lambda l: l.of_article_principal)
+            if main_product_lines:
+                rec.main_product_brand_id = main_product_lines[0].product_id.brand_id
 
     @api.multi
     def _compute_alert_ids(self):
@@ -1000,6 +1014,7 @@ class SaleOrder(models.Model):
                 followup_project.task_ids = new_tasks
 
             if self._context.get('auto_followup'):
+                followup_project.user_id = self._context.get('followup_creator_id')
                 return True
             else:
                 return {
@@ -1027,7 +1042,8 @@ class SaleOrder(models.Model):
     def action_confirm(self):
         super(SaleOrder, self).action_confirm()
         for order in self:
-            order.with_context(auto_followup=True).action_followup_project()
+            order.with_context(auto_followup=True, followup_creator_id=self.env.user.id).sudo().\
+                action_followup_project()
         return True
 
     @api.multi
