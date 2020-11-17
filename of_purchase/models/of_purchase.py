@@ -41,10 +41,19 @@ class PurchaseOrder(models.Model):
 
     @api.multi
     def button_confirm(self):
-        procurement_obj = self.env['procurement.order']
         super(PurchaseOrder, self).button_confirm()
         if self.env['ir.values'].get_default('sale.config.settings', 'of_recalcul_pa'):
-            for line in self.order_line:
+            self._update_purchase_price()
+
+    @api.multi
+    def button_update_purchase_price(self):
+        self._update_purchase_price()
+
+    @api.multi
+    def _update_purchase_price(self):
+        procurement_obj = self.env['procurement.order']
+        for order in self:
+            for line in order.order_line:
                 procurements = procurement_obj.search([('purchase_line_id', '=', line.id)])
                 moves = procurements.mapped('move_dest_id')
                 sale_lines = moves.mapped('procurement_id').mapped('sale_line_id')
