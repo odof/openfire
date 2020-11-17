@@ -331,11 +331,11 @@ class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
     @api.multi
-    def button_confirm(self):
+    def _update_purchase_price(self):
+        super(PurchaseOrder, self)._update_purchase_price()
         procurement_obj = self.env['procurement.order']
-        super(PurchaseOrder, self).button_confirm()
-        if self.env['ir.values'].get_default('sale.config.settings', 'of_recalcul_pa'):
-            for line in self.order_line:
+        for order in self:
+            for line in order.order_line:
                 procurements = procurement_obj.search([('purchase_line_id', '=', line.id)])
                 moves = procurements.mapped('move_dest_id')
                 kit_sale_lines = moves.mapped('procurement_id').mapped('of_sale_comp_id')
