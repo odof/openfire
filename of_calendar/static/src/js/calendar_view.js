@@ -1154,8 +1154,18 @@ CalendarView.include({
             if (typeof caption_key === "object") {
                 caption_key = caption_key[0];
             }
-            r.textColor = color_captions[caption_key]["color_ft"];
-            r.backgroundColor = color_captions[caption_key]["color_bg"];
+            if (isNullOrUndef(color_captions[caption_key])) {
+                if (!isNullOrUndef(color_captions[-1])) {
+                    r.textColor = color_captions[-1]["color_ft"];
+                    r.backgroundColor = color_captions[-1]["color_bg"];
+                }else{
+                    r.textColor = "#0D0D0D";
+                    r.backgroundColor = "#F0F0F0";
+                }
+            }else{
+                r.textColor = color_captions[caption_key]["color_ft"];
+                r.backgroundColor = color_captions[caption_key]["color_bg"];
+            }
         }
         if (evt["virtuel"]) {
             r.className.push("of_calendar_virtuel");

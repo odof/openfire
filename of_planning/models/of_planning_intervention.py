@@ -140,6 +140,12 @@ de calculer la date de fin une fois la date de début saisie. par défaut :\n
                 'color_bg': categ.color_bg,
                 'color_ft': categ.color_ft,
             }
+        data[-1] = {
+            'value': -1,
+            'label': u"Sans catégorie",
+            'color_bg': u"#F0F0F0",
+            'color_ft': u"#0D0D0D",
+        }
         return data
 
 
