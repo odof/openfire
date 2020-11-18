@@ -1141,7 +1141,6 @@ class OfPlanningIntervention(models.Model):
                     date_dt = fields.Datetime.from_string(self[0].date)
                 vals['duree'] = (date_deadline_dt - date_dt).total_seconds() / 3600
         super(OfPlanningIntervention, self).write(vals)
-        self.do_verif_dispo()
         self._affect_number()
         # Si BL associé, on met à jour la date du BL en fonction de la date d'intervention
         if 'picking_id' in vals or 'date' in vals:
@@ -1150,6 +1149,12 @@ class OfPlanningIntervention(models.Model):
                     rdv.picking_id.min_date = rdv.date
 
         return True
+
+    @api.multi
+    def _write(self, vals):
+        if vals.get('employee_ids') or vals.get('date') or vals.get('date_deadline') or vals.get('verif_dispo'):
+            self.do_verif_dispo()
+        return super(OfPlanningIntervention, self)._write(vals)
 
     @api.multi
     def unlink(self):

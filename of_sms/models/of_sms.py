@@ -378,6 +378,12 @@ class OFSMSGatewayOVH(models.Model):
             acc_name = sms_account.account_name
             login = sms_account.account_login
             psswrd = sms_account.account_password
+            if not login and not psswrd:
+                raise UserError("Le compte passerelle sms n'a pas d'identifiant ni de mot de passe.")
+            elif not login:
+                raise UserError("Le compte passerelle sms n'a pas d'identifiant.")
+            elif not psswrd:
+                raise UserError("Le compte passerelle sms n'a pas de mot de passe.")
 
             req = api_url + u"&account=" + acc_name + u"&login=" + login + u"&password=" + psswrd\
                 + u"&from=" + format_from + u"&to=" + format_to\
@@ -388,6 +394,7 @@ class OFSMSGatewayOVH(models.Model):
             response = requests.get(query_send)
             response_json = response.json()
             response_string = response.text
+            to_number_body = isinstance(to_number, basestring) and to_number or ','.join(to_number)
             # Réponse json en cas de succès : {"status": 100, "smsIds": [u'id_du_message']}
             # En cas d'échec : {"status": 200 (ou supérieur), "message": u"motif de l'échec"}
             # Analyse the reponse string and determine if the sms was sent successfully,
@@ -396,14 +403,14 @@ class OFSMSGatewayOVH(models.Model):
                 delivery_state = "successful"
                 human_read_error = ""
                 sms_gateway_message_id = response_json["smsIds"] and response_json["smsIds"][0]
-                body = u"SMS envoyé au %s :<br/><br/>%s" % (','.join(to_number), sms_content.replace(u"\n", u"<br/>"))
+                body = u"SMS envoyé au %s :<br/><br/>%s" % (to_number_body, sms_content.replace(u"\n", u"<br/>"))
                 subject = u"SMS envoyé"
             else:
                 delivery_state = "failed"
                 human_read_error = response_json["message"]
                 sms_gateway_message_id = ""
                 body = u"Echec d'envoi de SMS au %s :<br/><br/>%s" % \
-                       (','.join(to_number), sms_content.replace(u"\n", u"<br/>"))
+                       (to_number_body, sms_content.replace(u"\n", u"<br/>"))
                 subject = u"Echec d'envoi de SMS: %s" % human_read_error
         else:
             delivery_state = "failed"
