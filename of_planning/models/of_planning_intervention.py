@@ -806,9 +806,14 @@ class OfPlanningIntervention(models.Model):
             # Tronqué à la minute
             vals['date'] = vals['date'][:17] + '00'
         super(OfPlanningIntervention, self).write(vals)
-        self.do_verif_dispo()
         self._affect_number()
         return True
+
+    @api.multi
+    def _write(self, vals):
+        if vals.get('employee_ids') or vals.get('date') or vals.get('date_deadline') or vals.get('verif_dispo'):
+            self.do_verif_dispo()
+        return super(OfPlanningIntervention, self)._write(vals)
 
     @api.model
     def _read_group_process_groupby(self, gb, query):

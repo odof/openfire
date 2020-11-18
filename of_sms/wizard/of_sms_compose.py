@@ -180,15 +180,22 @@ class OFSmsCompose(models.TransientModel):
                     'by_partner_id': self.env.user.partner_id.id,
                     'is_commercial': self.is_commercial
                 })
-            except Exception:
+            except Exception as e:
                 if status_dict.get('exception'):
                     status_dict['exception'] += 1
                 else:
                     status_dict['exception'] = 1
-                if error_dict.get(u"Erreur de rendu du contenu du sms"):
-                    error_dict[u"Erreur de rendu du contenu du sms"] += 1
+                e_name = getattr(e, 'name', False)
+                if e_name:
+                    if error_dict.get(e_name):
+                        error_dict[e_name] += 1
+                    else:
+                        error_dict[e_name] = 1
                 else:
-                    error_dict[u"Erreur de rendu du contenu du sms"] = 1
+                    if error_dict.get(u"Erreur de rendu du contenu du sms"):
+                        error_dict[u"Erreur de rendu du contenu du sms"] += 1
+                    else:
+                        error_dict[u"Erreur de rendu du contenu du sms"] = 1
                 records_failed |= record
                 continue
 
@@ -222,6 +229,7 @@ class OFSmsCompose(models.TransientModel):
         if records_failed:
             context['default_record_id'] = records_failed[0].id
             context['default_record_ids'] = json.dumps(records_failed.ids)
+            context['default_partner_field'] = self.partner_field or False
             context['default_partner_ids'] = self.partner_ids and records_failed.ids or False
             context['default_lead_ids'] = self.lead_ids and records_failed.ids or False
             context['default_intervention_ids'] = self.intervention_ids and records_failed.ids or False
