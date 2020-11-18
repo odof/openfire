@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
-from dateutil.relativedelta import relativedelta
 
 
 class OFContractIndiceWizard(models.TransientModel):
@@ -25,7 +24,7 @@ class OFContractIndiceWizard(models.TransientModel):
         date_execution = self.date_execution
         products_done = 0
         for contract in contracts:
-            contract_lines = contract.line_ids.filtered(lambda l: l.use_index and l.next_date)
+            contract_lines = contract.line_ids.filtered(lambda l: l.use_index and l.next_date and l.state == 'validated')
             for contract_line in contract_lines:
                 product_lines = contract_line.contract_product_ids
                 for product_line in product_lines:

@@ -402,7 +402,8 @@ class OfContract(models.Model):
             for line in lines_grouped:
                 lines += line._add_invoice_lines()
             if lines:
-                invoice = invoice_vals['invoice_line_ids'] = lines
+                invoice_vals['invoice_line_ids'] = lines
+                invoice = self.env['account.invoice'].create(invoice_vals)
                 invoice.compute_taxes()
                 invoices |= invoice
         if single_lines:
@@ -633,7 +634,7 @@ class OfContractLine(models.Model):
         ], string="Type de contrat", related="contract_id.type", readonly=True)
     contract_renewal = fields.Boolean(string="Renouveler", related="contract_id.renewal", readonly=True)
     use_index = fields.Boolean(string="Indexer", default=True)
-    date_indexed = fields.Date(string=u"Dernière indexation")
+    date_indexed = fields.Date(string=u"Dernière indexation", compute="_compute_date_indexed", store=True)
     last_invoicing_date = fields.Date(
             string=u"Date de dernière facturation", copy=False, compute="_compute_last_invoicing_date", store=True)
     afficher_facturation = fields.Boolean(string=u"Détails facturation")
@@ -848,6 +849,14 @@ class OfContractLine(models.Model):
             if line.invoice_line_ids:
                 invoices = line.invoice_line_ids.mapped('invoice_id')
                 line.last_invoicing_date = invoices[-1].date_invoice
+
+    @api.depends('contract_product_ids', 'contract_product_ids.date_indexed')
+    def _compute_date_indexed(self):
+        for line in self:
+            products = line.contract_product_ids.filtered('date_indexed').sorted('date_indexed')
+            if products:
+                line.date_indexed = products[-1].date_indexed
+            pass
 
     @api.depends()
     def _compute_warning_planif(self):
@@ -1211,6 +1220,7 @@ class OfContractProduct(models.Model):
         comodel_name='of.contract.product', string="Produit sur ligne d'origine", copy=False)
     next_product_id = fields.Many2one(
         comodel_name='of.contract.product', string="Produit sur ligne d'avenant", compute="_compute_next_product_id")
+    date_indexed = fields.Date(string=u"Dernière indexation")
 
     @api.depends('quantity', 'discount', 'price_unit', 'tax_ids', 'qty_to_invoice',
                  'line_id', 'line_id.is_invoiceable')
