@@ -23,6 +23,7 @@ class OFContractIndiceWizard(models.TransientModel):
         contracts = self.contract_ids.filtered('use_index')
         indices = self.indice_ids
         date_execution = self.date_execution
+        products_done = 0
         for contract in contracts:
             contract_lines = contract.line_ids.filtered(lambda l: l.use_index and l.next_date)
             for contract_line in contract_lines:
@@ -40,5 +41,6 @@ class OFContractIndiceWizard(models.TransientModel):
                     if not additionnal_prices:
                         continue
                     new_price = previous_price + sum(additionnal_prices)
-                    product_line.write({'price_unit': new_price, 'price_unit_prec': previous_price})
-        return
+                    product_line.write({'price_unit': new_price, 'price_unit_prec': previous_price, 'date_indexed': fields.Date.today()})
+                    products_done += 1
+        return self.env['of.popup.wizard'].popup_return(message=u"%s articles ont été indéxés." % products_done, titre="Indexation")

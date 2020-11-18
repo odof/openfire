@@ -296,8 +296,10 @@ class OfContract(models.Model):
     def faire_revision(self):
         """ Ouvre un wizard pour faire une révision à date """
         self.ensure_one()
+        if not self.period_ids.filtered(lambda p: p.has_invoices):
+            return self.env['of.popup.wizard'].popup_return(message=u"Aucune période ne pouvant être revue.")
         view_id = self.env.ref('of_contract_custom.of_contract_revision_view_form').id
-        wizard = self.env['of.contract.revision.wizard'].create({'contract_id': self.id})
+        wizard = self.env['of.contract.revision.wizard'].create({'contract_id': self.id, 'period_id': self.period_ids[0].id})
         return {
             'name'     : 'Avenant',
             'type'     : 'ir.actions.act_window',
@@ -631,6 +633,7 @@ class OfContractLine(models.Model):
         ], string="Type de contrat", related="contract_id.type", readonly=True)
     contract_renewal = fields.Boolean(string="Renouveler", related="contract_id.renewal", readonly=True)
     use_index = fields.Boolean(string="Indexer", default=True)
+    date_indexed = fields.Date(string=u"Dernière indexation")
     last_invoicing_date = fields.Date(
             string=u"Date de dernière facturation", copy=False, compute="_compute_last_invoicing_date", store=True)
     afficher_facturation = fields.Boolean(string=u"Détails facturation")
@@ -796,7 +799,8 @@ class OfContractLine(models.Model):
     @api.depends('contract_product_ids',
                  'contract_product_ids.product_id',
                  'contract_product_ids.price_unit',
-                 'contract_product_ids.quantity',
+                 'contract_product_ids.amount_subtotal',
+                 'contract_product_ids.amount_taxes',
                  'frequency_type',
                  'fiscal_position_id')
     def _compute_prices(self):
