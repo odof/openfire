@@ -395,18 +395,24 @@ class OfContract(models.Model):
             invoice_vals = self._prepare_invoice(do_raise=do_raise)
             if not invoice_vals:
                 return invoices
-            invoice = self.env['account.invoice'].create(invoice_vals)
+            # invoice = self.env['account.invoice'].create(invoice_vals)
+            lines = []
             for line in lines_grouped:
-                line._add_invoice_lines(invoice.id)
-            invoice.compute_taxes()
-            invoices |= invoice
+                lines += line._add_invoice_lines()
+            if lines:
+                invoice = invoice_vals['invoice_line_ids'] = lines
+                invoice.compute_taxes()
+                invoices |= invoice
         if single_lines:
             for line in single_lines:
                 invoice_vals = self._prepare_invoice(do_raise=do_raise)
                 if not invoice_vals:
                     continue
+                lines = line._add_invoice_lines()
+                if not lines:
+                    continue
+                invoice_vals['invoice_line_ids'] = lines
                 invoice = self.env['account.invoice'].create(invoice_vals)
-                line._add_invoice_lines(invoice.id)
                 invoice.compute_taxes()
                 invoices |= invoice
         self.line_ids._auto_cancel()
@@ -1002,20 +1008,23 @@ class OfContractLine(models.Model):
     #     self.ensure_one()
 
     @api.multi
-    def _add_invoice_lines(self, invoice_id):
+    def _add_invoice_lines(self):
         """
         Récupère un dictionnaire de valeurs pour chaque ligne de produit et créer une ligne de facture par article
         :param invoice_id: id de la facture sur laquelle les lignes seront ajoutées
         """
         self.ensure_one()
-        invoice_line_obj = self.env['account.invoice.line']
+        # invoice_line_obj = self.env['account.invoice.line']
+        lines = []
         for product_line in self.contract_product_ids:
             invoice_line_vals = product_line._prepare_invoice_line()
             invoice_line_vals.update({
-                'invoice_id': invoice_id,
+                # 'invoice_id': invoice_id,
                 'of_contract_line_id': self.id,
                 })
-            invoice_line_obj.create(invoice_line_vals)
+            lines.append((0, 0, invoice_line_vals))
+            # invoice_line_obj.create(invoice_line_vals)
+        return lines
 
     @api.multi
     def _auto_cancel(self):
@@ -1038,7 +1047,7 @@ class OfContractLine(models.Model):
             for i in xrange(0, nbr_intervs):
                 month = months[int(i/ratio)]
                 num_mois = month.numero
-                date_service = fields.Date.to_string(date_start + relativedelta(month=num_mois, day=1))
+                date_service = fields.Date.to_string(date_start + relativedelta(years=int(date_start.month > num_mois), month=num_mois, day=1))
 
                 if date_service < line.date_contract_start:
                     continue
