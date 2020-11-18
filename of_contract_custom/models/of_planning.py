@@ -1,15 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
-from datetime import datetime, date
-from dateutil.relativedelta import relativedelta
-from odoo.tools.safe_eval import safe_eval
-from odoo.addons import decimal_precision as dp
 from odoo.exceptions import UserError
-from odoo.exceptions import ValidationError
-from odoo.tools.translate import _
-from lxml import etree
-import simplejson
 from odoo.addons.of_utils.models.of_utils import format_date
 
 fo = {'daily': 'Jour(s)',
@@ -41,7 +33,8 @@ class OfService(models.Model):
     _inherit = 'of.service'
 
     contract_id = fields.Many2one(comodel_name='of.contract', string="Contrat")
-    contract_line_id = fields.Many2one(comodel_name='of.contract.line', string="Contrat")
+    contract_line_id = fields.Many2one(
+        comodel_name='of.contract.line', string="Contrat")
     spec_date = fields.Char(string="Date", compute="_compute_spec_date")
 
     @api.depends()
@@ -86,5 +79,9 @@ class OfService(models.Model):
 class OfPlanningIntervention(models.Model):
     _inherit = 'of.planning.intervention'
 
-    contract_line_id = fields.Many2one(comodel_name='of.contract.line', string="Ligne de contrat")
+    contract_line_id = fields.Many2one(
+        comodel_name='of.contract.line', string="Ligne de contrat",
+        domain="service_id and [('service_ids', '=', service_id)] or "
+               "address_id and [('address_id', '=', address_id)] or "
+               "[]")
 

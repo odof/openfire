@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api
 
+
 class OFPlanningContractWizard(models.TransientModel):
     _name = 'of.contract.planning.wizard'
 
