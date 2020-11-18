@@ -1579,8 +1579,18 @@ var PlanningRecord = Widget.extend({
             if (typeof caption_key === "object") { // make sure caption_key is an integer before testing captions[caption_key]
                 caption_key = caption_key[0];
             }
-            self.color_ft = color_captions[caption_key]["color_ft"];
-            self.color_bg = color_captions[caption_key]["color_bg"];
+            if (isNullOrUndef(color_captions[caption_key])) {
+                if (!isNullOrUndef(color_captions[-1])) {
+                    self.color_ft = color_captions[-1]["color_ft"];
+                    self.color_bg = color_captions[-1]["color_bg"];
+                }else{
+                    self.color_ft = "#0D0D0D";
+                    self.color_bg = "#F0F0F0";
+                }
+            }else{
+                self.color_ft = color_captions[caption_key]["color_ft"];
+                self.color_bg = color_captions[caption_key]["color_bg"];
+            }
         }else{
             self.color_bg = self.row.color_bg;
             self.color_ft = self.row.color_ft;
