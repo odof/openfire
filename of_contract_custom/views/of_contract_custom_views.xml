@@ -308,7 +308,7 @@
     <record id="of_contract_view_of_service_rec_filter" model="ir.ui.view">
         <field name="name">of.contract.view.of.service.rec.filter</field>
         <field name="model">of.service</field>
-        <field name="inherit_id" ref="of_service.view_of_service_rec_filter"/>
+        <field name="inherit_id" ref="of_service.view_of_service_filter"/>
         <field name="arch" type="xml">
             <xpath expr="//search" position="inside">
                 <field name="contract_line_id"/>
