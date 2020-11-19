@@ -498,7 +498,7 @@ class SaleOrder(models.Model):
             tax_vals_dict.setdefault(tax['group'], [tax['group'].name, 0])
             tax_vals_dict[tax['group']][1] += amount
             total_amount += amount
-        result['taxes'] = [[tax_vals_dict.values(), (_("Total"), round_curr(total_amount))]]
+        result['taxes'] = [[tax_vals_dict.values(), (_("Total TTC"), round_curr(total_amount))]]
 
         # --- Sous-totaux TTC ---
         result_total = []
