@@ -172,7 +172,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
                                 # Plusieurs fournisseurs sans possibilité de choisir... on en crée un autre !
                                 sellers.append(seller)
                     else:
-                        raise ValidationError(_("Mise à jour de tarif : type de renvoi de fournisseur non prévu\ncode: %s") % (old_sellers, ))
+                        raise ValidationError(_(u"Mise à jour de tarif : type de renvoi de fournisseur non prévu\ncode: %s") % (old_sellers, ))
             if ds_product_data:
                 # L'appel write() est reporté après tous les calculs.
                 # En effet, write() vide certaines données en cache

@@ -1290,6 +1290,9 @@ class ProductProduct(models.Model):
     _inherit = ['product.product', 'of.datastore.centralized']
 
     of_tmpl_datastore_res_id = fields.Integer(related='product_tmpl_id.of_datastore_res_id')
+    # Champ related pour permettre l'import de l'image du modèle d'article.
+    # En effet, le champ image est surchargé dans product.product pour être de type compute.
+    of_template_image = fields.Binary(related='product_tmpl_id.image', string=u"Image du modèle")
 
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
