@@ -328,7 +328,7 @@ class OfContract(models.Model):
     @api.multi
     def valider_lignes_contrat(self):
         """ Valide toutes les lignes de contrat en brouillon """
-        self.line_ids.filtered(lambda s: s.state == 'draft').bouton_valider()
+        return self.line_ids.filtered(lambda s: s.state == 'draft').bouton_valider()
 
     @api.multi
     def _prepare_invoice(self, do_raise=True):
@@ -917,6 +917,12 @@ class OfContractLine(models.Model):
     def unlink(self):
         if any([state != 'draft' for state in self.mapped('state')]):
             raise UserError("Vous ne pouvez supprimer que des lignes en brouillon.")
+        for line in self:
+            if line.line_origine_id:
+                line.line_origine_id.write({
+                    'line_avenant_id': False,
+                    'date_end'       : False,
+                })
         return super(OfContractLine, self).unlink()
 
     @api.multi
@@ -930,7 +936,14 @@ class OfContractLine(models.Model):
     @api.multi
     def bouton_valider(self):
         """ Valide la ligne de contrat """
-        self.write({'state': 'validated'})
+        no_product = False
+        for line in self:
+            if not line.contract_product_ids:
+                no_product = True
+                continue
+            line.write({'state': 'validated'})
+        if no_product:
+            return self.env['of.popup.wizard'].popup_return(message=u"Vous ne pouvez valider une ligne sans article.")
 
     @api.multi
     def faire_avenant(self):
@@ -1320,6 +1333,11 @@ class OfContractProduct(models.Model):
             self.price_unit = product.list_price
             self.uom_id = product.uom_id
             self._compute_tax_id()
+
+    @api.multi
+    def unlink(self):
+        res = super(OfContractProduct, self).unlink()
+        return res
 
     @api.multi
     def _prepare_invoice_line(self):
