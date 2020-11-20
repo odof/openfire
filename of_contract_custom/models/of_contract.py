@@ -283,7 +283,7 @@ class OfContract(models.Model):
     @api.multi
     def action_view_services(self):
         self.ensure_one()
-        action = self.env.ref('of_service.action_of_service_ponc_form_planning').read()[0]
+        action = self.env.ref('of_contract_custom.action_of_contract_service_form_planning').read()[0]
         action['context'] = {
             'search_default_filter_ponc'  : 1,
             'search_default_contract_id'  : self.id,
@@ -601,7 +601,7 @@ class OfContractLine(models.Model):
         'account.invoice.line', 'of_contract_line_id', string="Lignes de factures", readonly=True)
     invoice_count = fields.Integer(string="Nombre de factures", compute='_compute_invoice_count')
     contract_product_ids = fields.One2many(
-        comodel_name="of.contract.product", inverse_name='line_id', string="Articles", copy=False, ondelete='cascade')
+        comodel_name="of.contract.product", inverse_name='line_id', string="Articles", copy=False)
     fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale")
     amount_subtotal = fields.Float(
         string="Sous-total", compute='_compute_prices', digits=dp.get_precision('Account'), store=True, copy=False)
@@ -996,7 +996,7 @@ class OfContractLine(models.Model):
     @api.multi
     def action_view_services(self):
         self.ensure_one()
-        action = self.env.ref('of_service.action_of_service_ponc_form_planning').read()[0]
+        action = self.env.ref('of_contract_custom.action_of_contract_service_form_planning').read()[0]
         action['context'] = {
             'search_default_filter_ponc': 1,
             'search_default_contract_line_id': self.id,
@@ -1205,7 +1205,8 @@ class OfContractProduct(models.Model):
     _order = 'sequence'
 
     sequence = fields.Integer(string=u"Séquence", default=10, help=u"Séquence")
-    line_id = fields.Many2one(comodel_name='of.contract.line', string="Ligne de contrat", required=True)
+    line_id = fields.Many2one(
+        comodel_name='of.contract.line', string="Ligne de contrat", required=True, ondelete='cascade')
     product_id = fields.Many2one('product.product', string="Article", required=True)
     price_unit = fields.Float(string="Prix unitaire")
     price_unit_prec = fields.Float(string=u"Prix unitaire précédent")
