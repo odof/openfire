@@ -4,15 +4,136 @@ odoo.define('of_planning_view.calendar_view', function (require) {
  * OpenFire calendar - créneaux dispos
  *---------------------------------------------------------*/
 
+var core = require('web.core');
 var CalendarView = require('web_calendar.CalendarView');
 var Model = require('web.DataModel');
 var formats = require("web.formats");
+
+var QWeb = core.qweb;
+
+var ATTENDEE_MODES = {
+    "tech": "Technique",
+    "com": "Commercial",
+    "comtech": "Technique & Commercial",
+};
 
 function isNullOrUndef(value) {
     return _.isUndefined(value) || _.isNull(value);
 }
 
 CalendarView.include({
+    willStart: function() {
+        var self = this;
+        var ir_values_model = new Model('ir.values');
+        var attendee_mode_def = ir_values_model.call("get_default",
+                                                     ["of.intervention.settings", "attendee_mode", false]);
+
+        return $.when(attendee_mode_def,  this._super())
+        .then(function (attendee_mode) {
+            // affecter le mode de planning (com, tech ou comtech)
+            self.attendee_mode = attendee_mode || "comtech";
+            self.attendee_mode_name = ATTENDEE_MODES[self.attendee_mode];
+            // initialiser l'attendee_mode du view_manager
+            self.view_manager.attendee_mode = self.attendee_mode;
+            return $.when();
+        });
+    },
+    /**
+     *  Quand l'attribut "show_all_attendees" est à 1, on charge tous les filtres au chargement de la vue
+     *  plutôt que de les charger à chaque search
+     */
+    _init_all_filters: function () {
+        var self = this;
+        if (this.model != 'of.planning.intervention'){
+            return this._super();
+        }
+
+        if (!self.config_model) {
+            throw new Error("Attribut 'config_model' manquant dans la définition de la vue XML");
+        }
+
+        var dfd = $.Deferred();
+        var p = dfd.promise();
+        var Attendees = new Model(self.attendee_model);
+
+        Attendees.query(
+                ['id', self.color_ft_field, self.color_bg_field, 'of_est_intervenant', 'of_est_commercial',
+                 'name', 'sequence']) // retrieve colors from db
+            .order_by(['sequence'])
+            .all()
+            .then(function (attendees){
+                self.all_filters = new Array(attendees.length);  // Array pour conserver l'ordre
+                // dictionnaire de la forme {id: index_filtre}
+                // pour accéder facilement à l'indexe du filtre à partir de l'id de l'attendee
+                self.res_ids_indexes = {}
+                var a, filter_item;
+                for (var i=0; i<attendees.length; i++) {
+                    a = attendees[i];
+                    filter_item = {
+                        label: a['name'],
+                        color_bg: a[self.color_bg_field],
+                        color_ft: a[self.color_ft_field],
+                        est_intervenant: a['of_est_intervenant'],
+                        est_commercial: a['of_est_commercial'],
+                        value: a['id'],
+                        input_id: a['id'] + "_input",
+                        is_checked: true,
+                        is_visible: false,
+                        sequence: a['sequence'],
+                        custom_colors: true,
+                    }
+                    self.all_filters[i] = filter_item;
+                    self.res_ids_indexes[a['id']] = i;
+                    // ne montrer que les filtres (à droite) qui passent le filtrage par société et type de planning
+                    if (self.attendee_mode == 'tech' && a['of_est_intervenant'] ||
+                      self.attendee_mode == 'com' && a['of_est_commercial'] || self.attendee_mode == 'comtech') {
+                            //self.now_filter_ids.push(a['id']);
+                            filter_item.is_visible = true;
+                    }
+                };
+                var ir_values_model = new Model("ir.values");
+                // récupérer la sélection (coché/décoché) des filtres de la dernière utilisation de la vue planning
+                // par l'utilisateur. Les filtres cochés sont dans la variable filter_attendee_ids
+                ir_values_model.call("get_default",
+                                     [self.config_model, "of_filter_attendee_ids", false])
+                .then(function (attendee_ids) {
+                    if (typeof attendee_ids == "string") {  // transformer en tableau si besoin
+                        attendee_ids = JSON.parse(attendee_ids)
+                    }
+                    // tout cocher si tout était décoché
+                    if (isNullOrUndef(attendee_ids) || attendee_ids.length == 0) {
+                        self.filter_attendee_ids = []
+                        for (var j in self.all_filters) {
+                            self.filter_attendee_ids.push(self.all_filters[j].value);
+                        };
+                    // code 6: [ (6, 0 [ids]) ]
+                    }else if (attendee_ids[0].length == 3 && attendee_ids[0][0] == 6 && !attendee_ids[0][1]) {
+                        self.filter_attendee_ids = attendee_ids[0][2];
+                    // liste d'identifiants
+                    }else{
+                        self.filter_attendee_ids = attendee_ids;
+                        var idf, found;
+                        // décocher les filtres qui ne sont pas dans attendee_ids
+                        for (var k in self.all_filters) {
+                            found = false;
+                            idf = self.all_filters[k].value;
+                            for (var l in attendee_ids) {
+                                if (attendee_ids[l] == idf) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (!found) {
+                                self.all_filters[k].is_checked = false;
+                            }
+                        };
+                    }
+                    dfd.resolve();
+                });
+            });
+
+        return $.when(p);
+    },
     set_res_horaires_data: function(res_ids=false, start=false, end=false, get_segments=false) {
         var self = this;
         this._super.apply(this,arguments);
@@ -66,6 +187,56 @@ CalendarView.include({
         }
         return $.when();
     },
+    /**
+     *  Gestionnaire pour le clique sur un mode de planning
+     */
+    on_attendee_mode_clicked: function(ev) {
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+        this.attendee_mode = ev.currentTarget.id.substring(14);
+        this.attendee_mode_name = ATTENDEE_MODES[this.attendee_mode];
+        // actualiser l'attendee_mode du view_manager
+        this.view_manager.attendee_mode = this.attendee_mode
+
+        var ir_values_model = new Model("ir.values");
+        ir_values_model.call("set_default", ["of.intervention.settings", "attendee_mode", this.attendee_mode, false]);
+        this.$buttons.find("#now_attendee_mode_name").text(this.attendee_mode_name);
+        this.apply_extra_filters();
+    },
+    reload_extra_buttons: function () {
+        var self = this;
+        var ir_values_model = new Model("ir.values");
+        var attendee_mode_def = ir_values_model.call("get_default",
+                                                     ["of.intervention.settings", "attendee_mode", false]);
+
+        return $.when(attendee_mode_def)
+        .then(function(attendee_mode) {
+            self.attendee_mode = attendee_mode;
+            self.attendee_mode_name = ATTENDEE_MODES[self.attendee_mode];
+            self.$buttons.find("#now_attendee_mode_name").text(self.attendee_mode_name);
+            self.apply_extra_filters();
+            return $.when();
+        })
+    },
+    /**
+     *  Méthode pour appliquer le filtrage par société et mode de planning
+     *  Relance une recherche (qui lancera un re-rendu des filtres de droite)
+     */
+    apply_extra_filters: function() {
+        for (var i in this.all_filters) {
+            this.all_filters[i].is_visible = false;
+            this.now_filter_ids = []
+
+            if (this.attendee_mode == "tech" && this.all_filters[i].est_intervenant
+              || this.attendee_mode == "com" && this.all_filters[i].est_commercial
+              || this.attendee_mode == "comtech") {
+                this.now_filter_ids.push(this.all_filters[i].value);
+                this.all_filters[i].is_visible = true;
+            }
+        }
+        this.$calendar.fullCalendar('refetchEvents');
+        $(':focus').blur();
+    },
     event_data_transform: function(evt) {
         var r = this._super.apply(this,arguments);
         if (!evt.virtuel && this.model == 'of.planning.intervention') {
@@ -87,6 +258,49 @@ CalendarView.include({
             evt.r = r;
         }
         return r
+    },
+    /**
+     *  Redéfinition totale
+     *  Simplement hériter cette méthode fonctionne mal. les boutons se retrouvent au mauvais endroit
+     *  peut-être dû à l'héritage du template qweb qui rend l'action un tout petit peut plus lente + asynchronicité
+     *  pourrait être FIX en ajoutant un template 'extra_buttons' plutôt que d'hériter 'CalendarView.buttons' peut-être
+     */
+    render_buttons: function($node) {
+        var self = this;
+        this.$buttons = $(QWeb.render("CalendarView.buttons", {'widget': this}));
+        this.$buttons.on('click', 'button.o_calendar_button_new', function () {
+            self.dataset.index = null;
+            self.do_switch_view('form');
+        });
+
+        var bindCalendarButton = function(selector, arg1, arg2) {
+            self.$buttons.on('click', selector, _.bind(self.$calendar.fullCalendar, self.$calendar, arg1, arg2));
+        };
+        bindCalendarButton('.o_calendar_button_prev', 'prev');
+        bindCalendarButton('.o_calendar_button_today', 'today');
+        bindCalendarButton('.o_calendar_button_next', 'next');
+        bindCalendarButton('.o_calendar_button_day', 'changeView', 'agendaDay');
+        bindCalendarButton('.o_calendar_button_week', 'changeView', 'agendaWeek');
+        bindCalendarButton('.o_calendar_button_month', 'changeView', 'month');
+
+        this.$buttons.find('.o_calendar_button_' + this.mode).addClass('active');
+        this.$buttons.find(".of_attendee_mode_filter").click(self.proxy(self.on_attendee_mode_clicked));
+        if ($node) {
+            this.$buttons.appendTo($node);
+        } else {
+            $('.o_cp_buttons').append(this.$buttons);
+        }
+    },
+    do_push_state: function(state) {
+        if (this.getParent() && this.getParent().do_push_state) {
+            this.getParent().do_push_state(state);
+            // l'attendee mode a changé depuis l'intialisation (changement de vue après avoir changé l'attendee_mode)
+            // il faut recharger le bouton de filtrage supplémentaire
+            if (this.view_inited && this.view_manager.attendee_mode != this.attendee_mode) {
+                this.reload_extra_buttons();
+            }
+
+        }
     },
 });
 });

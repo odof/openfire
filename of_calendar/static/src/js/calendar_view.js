@@ -58,6 +58,7 @@ CalendarView.include({
     init: function () {
         var self = this;
         this._super.apply(this, arguments);
+        this.view_manager = this.getParent();
 
         var attrs = this.fields_view.arch.attrs;
         this.filters_radio = !isNullOrUndef(attrs.filters_radio) && _.str.toBool(attrs.filters_radio);
@@ -134,17 +135,11 @@ CalendarView.include({
         var dnd_dfd = ir_config_model.call('get_param',['Calendar_Drag_And_Drop']);
         var mintime_dfd = ir_values_model.call("get_default", ["of.intervention.settings", "calendar_min_time"]);
         var maxtime_dfd = ir_values_model.call("get_default", ["of.intervention.settings", "calendar_max_time"]);
-        var all_filters_dfd = $.Deferred();
-        var all_filters_prom = all_filters_dfd.promise();
-        if (self.attendee_model && self.show_all_attendees && !self.useContacts) {
-            all_filters_prom = self._init_all_filters();
-        }else{
-            all_filters_dfd.resolve()
-        }
+
         // initialiser les couleurs des créneaux dispo et leur durée minimale
         var creneau_dispo_data_def = self.set_creneau_dispo_opt();
 
-        return $.when(dnd_dfd, mintime_dfd, maxtime_dfd, all_filters_prom, creneau_dispo_data_def, this._super())
+        return $.when(dnd_dfd, mintime_dfd, maxtime_dfd, creneau_dispo_data_def, this._super())
         .then(function () {
             // privilégier l'attribut draggable de la vue XML si présent: exemple rdv_view.xml
             self.draggable = !isNullOrUndef(self.draggable) && self.draggable || _.str.toBool(arguments[0]);
@@ -162,6 +157,23 @@ CalendarView.include({
             }
             return $.when();
         });
+    },
+    /**
+     * initialiser les filtres avant le start mais après tous les willStart hérités
+     *
+     * @returns {jQuery.Deferred or any}
+     */
+    start: function() {
+        var self = this;
+        //return self._super.apply(self, arguments)
+        var all_filters_dfd = $.Deferred();
+        var all_filters_prom = all_filters_dfd.promise();
+        if (self.attendee_model && self.show_all_attendees && !self.useContacts) {
+            all_filters_prom = self._init_all_filters();
+        }else{
+            all_filters_dfd.resolve()
+        }
+        return $.when(all_filters_prom, this._super());
     },
     /**
      *  initialise les couleurs des créneaux dispos.
@@ -223,6 +235,7 @@ CalendarView.include({
                         value: a['id'],
                         input_id: a['id'] + "_input",
                         is_checked: true,
+                        is_visible: true,
                         sequence: a['sequence'],
                         custom_colors: true,
                     }
@@ -271,6 +284,16 @@ CalendarView.include({
             });
 
         return $.when(p);
+    },
+    do_search: function (domain, context, _group_by) {
+        var self = this;
+        this.domain = domain;
+        this.context = context;
+        this.group_by = _group_by;
+
+        this.shown.done(function () {
+            self._do_search(domain, context, _group_by);
+        });
     },
     /**
      * override copy of parent function. Sets up first event to be displayed. Handles radio filters
@@ -407,6 +430,7 @@ CalendarView.include({
                             var new_filter_added = false;
                             _.each(events, function (e) {
                                 var key,val = null;
+                                var is_visible;
 
                                 if (self.attendee_multiple) {
                                     _.each(e[self.color_field], function (a) {
@@ -418,13 +442,15 @@ CalendarView.include({
                                                 color: self.get_color(key),
                                                 avatar_model: (utils.toBoolElse(self.avatar_filter, true)
                                                                ? self.avatar_filter : false ),
-                                                is_checked: true
+                                                is_checked: true,
+                                                is_visible: true
                                             };
                                             self.all_filters.push(filter_item);
                                             self.res_ids_indexes[key] = self.all_filters.length - 1;
                                             new_filter_added = true
                                         }
-                                        if (! _.contains(self.now_filter_ids, key)) {
+                                        is_visible = self.all_filters[self.res_ids_indexes[key]].is_visible;
+                                        if (! _.contains(self.now_filter_ids, key) && is_visible) {
                                             self.now_filter_ids.push(key);
                                         }
                                     });
@@ -443,13 +469,15 @@ CalendarView.include({
                                             color: self.get_color(key),
                                             avatar_model: (utils.toBoolElse(self.avatar_filter, true)
                                                            ? self.avatar_filter : false ),
-                                            is_checked: true
+                                            is_checked: true,
+                                            is_visible: true
                                         };
                                         self.all_filters.push(filter_item);
                                         self.res_ids_indexes[key] = self.all_filters.length - 1;
                                         new_filter_added = true
                                     }
-                                    if (! _.contains(self.now_filter_ids, key)) {
+                                    is_visible = self.all_filters[self.res_ids_indexes[key]].is_visible;
+                                    if (! _.contains(self.now_filter_ids, key) && is_visible) {
                                         self.now_filter_ids.push(key);
                                     }
                                 }
@@ -478,7 +506,7 @@ CalendarView.include({
                             }
                         }else{
                             for (var ii=0; ii<self.all_filters.length; ii++) {
-                                if (self.all_filters[ii].is_checked) {
+                                if (self.all_filters[ii].is_checked && self.all_filters[ii].is_visible) {
                                     self.now_filter_ids.push(self.all_filters[ii].value);
                                 }
                             }
@@ -677,6 +705,10 @@ CalendarView.include({
         }
         fc.eventClick = function (event) { self.open_event(event); };
         return fc;
+    },
+    init_calendar: function() {
+        var self = this;
+        return $.when(this._super()).then(function(){self.view_inited = true;})
     },
     get_view_event_by_id: function(id) {
         var event;

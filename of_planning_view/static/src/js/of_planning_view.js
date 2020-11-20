@@ -93,6 +93,7 @@ var PlanningView = View.extend({
         // de synchroniser le dataset des autre vues du modèle pour ne pas partager les filtres de recherche
         // en passant de la vue calendar à la vue planning par exemple
         this.dataset = new data.DataSetSearch(this.ViewManager.action_manager, 'of.planning.intervention', this.dataset.context, [])
+        this.view_manager = this.getParent();
         this.fields = this.fields_view.fields;
         this.fields_keys = _.keys(this.fields_view.fields);
         this.name = this.fields_view.name || attrs.string;
@@ -123,6 +124,7 @@ var PlanningView = View.extend({
         this.on_today_clicked = _.debounce(this.on_today_clicked, 300, true);
         this.on_next_clicked = _.debounce(this.on_next_clicked, 300, true);
         this.on_prev_clicked = _.debounce(this.on_prev_clicked, 300, true);
+        this.on_attendee_mode_clicked = _.debounce(this.on_attendee_mode_clicked, 300, true);
     },
     /**
      *  Appel des fonction asynchrones qui doivent être terminées avant le lancement de la vue
@@ -178,6 +180,8 @@ var PlanningView = View.extend({
                 // affecter le mode de planning (com, tech ou comtech)
                 self.attendee_mode = attendee_mode || "comtech";
                 self.attendee_mode_name = ATTENDEE_MODES[self.attendee_mode];
+                // initialiser l'attendee_mode du view_manager
+                self.view_manager.attendee_mode = self.attendee_mode
                 // retirer les intervenants à ne pas montrer en vue planning
                 var excluded_ids = [], to_show_ids = [];
                 if (!!excluded) {
@@ -226,6 +230,16 @@ var PlanningView = View.extend({
 
                 return $.when(all_filters_def);
         });
+    },
+    do_push_state: function(state) {
+        if (this.getParent() && this.getParent().do_push_state) {
+            this.getParent().do_push_state(state);
+            // l'attendee mode a changé depuis l'intialisation (changement de vue après avoir changé l'attendee_mode)
+            // il faut recharger le bouton de filtrage supplémentaire
+            if (this.attendee_mode != this.view_manager.attendee_mode) {
+                this.reload_extra_buttons();
+            }
+        }
     },
     /**
      *  initialise les couleurs des créneaux dispos. 
@@ -453,7 +467,8 @@ var PlanningView = View.extend({
         this.context = context;
         this.group_by = group_by;
 
-        if (self.table_inited && self.first_search_done) {
+        // ne pas lancer la recherche si l'attendee_mode en mémoire est différent de l'attendee_mode du view_manager
+        if (self.table_inited && self.first_search_done && this.attendee_mode == this.view_manager.attendee_mode) {
             self._do_search(self.domain, self.context, self.group_by);
         }else{
             self.first_search_done = true;
@@ -708,11 +723,28 @@ var PlanningView = View.extend({
         ev.stopImmediatePropagation();
         this.attendee_mode = ev.currentTarget.id.substring(14);
         this.attendee_mode_name = ATTENDEE_MODES[this.attendee_mode];
+        // actualiser l'attendee_mode du view_manager
+        this.view_manager.attendee_mode = this.attendee_mode
 
         var ir_values_model = new Model("ir.values");
         ir_values_model.call("set_default", ["of.intervention.settings", "attendee_mode", this.attendee_mode, false]);
         this.$buttons.find("#now_attendee_mode_name").text(this.attendee_mode_name);
         this.apply_extra_filters();
+    },
+    reload_extra_buttons: function () {
+        var self = this;
+        var ir_values_model = new Model("ir.values");
+        var attendee_mode_def = ir_values_model.call("get_default",
+                                                     ["of.intervention.settings", "attendee_mode", false]);
+
+        return $.when(attendee_mode_def)
+        .then(function(attendee_mode) {
+            self.attendee_mode = attendee_mode;
+            self.attendee_mode_name = ATTENDEE_MODES[self.attendee_mode];
+            self.$buttons.find("#now_attendee_mode_name").text(self.attendee_mode_name);
+            self.apply_extra_filters();
+            return $.when();
+        })
     },
     /**
      *  Méthode pour appliquer le filtrage par société et mode de planning
@@ -1045,6 +1077,7 @@ PlanningView.Row = Widget.extend({
                 for (var i=0; i<self.column_nb; i++) {  // parcourir les colonnes
                     options = {col_offset: i};
                     if (isNullOrUndef(col_index) || i==col_index) {
+
                         for (var j=0; j<self.creneaux_dispo[i].length; j++) {  // parcourir les créneaux dispos
                             le_creneau = new PlanningCreneauDispo(self, self.view, self.creneaux_dispo[i][j], options);
                             self.columns[i].push(le_creneau);
@@ -1691,6 +1724,7 @@ var PlanningRecord = Widget.extend({
         this.address_city = record.address_city;
         this.address_zip = record.address_zip;
         this.secteur_name = record.secteur_id && record.secteur_id[1] || false;
+        this.name = record.name;
         this.partner_name = record.partner_name;
         this.tache_name = record.tache_name;
         this.state_int = record.state_int;

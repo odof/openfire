@@ -61,4 +61,38 @@
         </t>
     </t>
 
+    <t t-extend="CalendarView.buttons">
+        <t t-jquery="div[class='o_calendar_buttons']" t-operation="append">
+            <t t-if="widget.model == 'of.planning.intervention'">
+                <!-- Bouton de filtrage par type d'employé -->
+                <div class="btn-group btn-group-sm" name="attendee_mode_container">
+                    <button class="o_dropdown_toggler_btn btn btn-sm dropdown-toggle" data-toggle="dropdown">
+                        <span class="fa fa-filter"/>
+                        <span id="now_attendee_mode_name">
+                            <t t-esc="widget.attendee_mode_name"/>
+                        </span>
+                        <span class="caret"/>
+                    </button>
+                    <ul class="dropdown-menu of_filters_menu" role="menu">
+                        <li class="of_attendee_mode_filter" id="attendee_mode_tech">
+                            <a href="#">
+                                Technique
+                            </a>
+                        </li>
+                        <li class="of_attendee_mode_filter" id="attendee_mode_com">
+                            <a href="#">
+                                Commercial
+                            </a>
+                        </li>
+                        <li class="of_attendee_mode_filter" id="attendee_mode_comtech">
+                            <a href="#">
+                                Technique et Commercial
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </t>
+        </t>
+    </t>
+
 </templates>
