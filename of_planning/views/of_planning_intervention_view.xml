@@ -408,6 +408,7 @@
                       color_multiple="1" show_all_attendees="1" config_model="of.intervention.settings">
                 <field name="calendar_name"/>
                 <field name="state" invisible="1"/>
+                <field name="name" invisible="1"/>
                 <field name="tache_id" invisible="1"/>
                 <field name="tache_categ_id" invisible="1"/>
                 <field name="state_int" invisible="1"/>
@@ -436,6 +437,7 @@
                       color_is_attendee="1" jump_to="last">
                 <field name="calendar_name"/>
                 <field name="tache_id" invisible="1"/>
+                <field name="name" invisible="1"/>
                 <field name="tache_categ_id" invisible="1"/>
                 <field name="state" invisible="1"/>
                 <field name="state_int" invisible="1"/>
