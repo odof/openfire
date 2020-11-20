@@ -1645,6 +1645,9 @@ var PlanningRecord = Widget.extend({
      */
     isOverflown: function() {
         var el = this.$el.find('.of_planning_record_global_click')[0];
+        if (isNullOrUndef(el)) {
+            return false;
+        }
         return el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth;
     },
     /**
