@@ -3,6 +3,7 @@
 from odoo import models, fields, api
 import time
 
+
 class OfImpressionWizard(models.TransientModel):
     _name = "of.impression.wizard"
 

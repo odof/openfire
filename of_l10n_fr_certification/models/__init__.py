@@ -1,3 +1,3 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
-import of_l10n_fr_certification
+from . import of_l10n_fr_certification

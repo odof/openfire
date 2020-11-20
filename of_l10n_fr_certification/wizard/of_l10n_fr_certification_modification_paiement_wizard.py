@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from odoo import models, fields, api
 from odoo.tools.translate import _
 from odoo.exceptions import UserError
@@ -30,15 +30,18 @@ class OFAccountPaymentWizard(models.TransientModel):
     date_payment_mod = fields.Date(string='Date de modification', default=fields.Date.context_today, required=True)
     description = fields.Char(string='Motif', default=_get_description)
     state = fields.Char(string='state', default=_get_state, invisible="1", required=False)
-    type_modification_payment = fields.Selection([('cancel', 'Annuler'),('modify', 'Modifier'),('refund', 'Rembourser')],
-        default='cancel', string=u'Méthode', required=True, help=u"Choisissez le type de modification du paiement")
+    type_modification_payment = fields.Selection(
+        [('cancel', 'Annuler'), ('modify', 'Modifier'), ('refund', 'Rembourser')],
+        default='cancel', string=u'Méthode', required=True,
+        help=u"Choisissez le type de modification du paiement")
 
     @api.model
     def get_action_payment_form(self, payment, type_paiement):
         """Fenêtre pour saisir un nouveau paiement suite à demande de modification ou de remboursement d'un paiement"""
         # @param type: choix de type de formulaire demandé : 'refund' ou 'modif'
 
-        # On récupère les valeurs du paiement à modifier/à rembourser pour les proposer par défaut dans le nouveau paiement.
+        # On récupère les valeurs du paiement à modifier/à rembourser
+        # pour les proposer par défaut dans le nouveau paiement.
         values = []
 
         context = {
@@ -62,13 +65,14 @@ class OFAccountPaymentWizard(models.TransientModel):
 
         if type_paiement == 'refund':
             name = 'Remboursement de paiement'
-            # Si c'est un paiement client (à rembourser), on sélectionne recevoir de l'argent" dans la fenêtre de paiment.
+            # Si c'est un paiement client (à rembourser), on sélectionne recevoir de l'argent"
+            # dans la fenêtre de paiment.
             # Si c'est un paiement fournisseur (à rembourser), on sélection "Règlement".
             if payment.partner_type == 'customer':
                 context['default_payment_type'] = 'outbound'
             else:
                 context['default_payment_type'] = 'inbound'
-            context['of_default_partner_type'] = payment.partner_type or False # Permet d'outrepasser un onchange.
+            context['of_default_partner_type'] = payment.partner_type or False  # Permet d'outrepasser un onchange.
         else:
             name = 'Modification de paiement'
             context['default_payment_type'] = payment.payment_type
@@ -92,8 +96,12 @@ class OFAccountPaymentWizard(models.TransientModel):
         for form in self:
             for payment in payment_obj.browse(dict(self._context or {}).get('active_ids')):
 
-                if payment.state in ['draft']:  # Si paiement déjà en brouillon, pas la peine de passer par une contrepartie comptable pour modifier le paiement.
-                    raise UserError(_(u"Le paiement est en brouillon (non validé en comptabilité). Vous pouvez le modifier directement sans faire une extourne comptable."))
+                if payment.state in ['draft']:
+                    # Si paiement déjà en brouillon, pas la peine de passer par une contrepartie comptable
+                    # pour le modifier.
+                    raise UserError(_(
+                        u"Le paiement est en brouillon (non validé en comptabilité). "
+                        u"Vous pouvez le modifier directement sans faire une extourne comptable."))
 
                 # Remboursement
                 # Dans le cas d'un remboursement, Il n'y a aucun lettrage après.
@@ -105,14 +113,20 @@ class OFAccountPaymentWizard(models.TransientModel):
                 # On va lettrer ensuite les écritures, donc les écritures d'origine ne doivent pas l'être.
                 # On teste si c'est le cas.
 
-                # On vérifie si le module OF remise en banque (of_account_payment_bank_deposit) est installé (existence du champ of_deposit_id).
+                # On vérifie si le module OF remise en banque (of_account_payment_bank_deposit) est installé
+                # (existence du champ of_deposit_id).
                 # Si oui, on vérifie que le paiement n'est pas remis en banque.
                 if getattr(payment, 'of_deposit_id', False) and self.type_modification_payment != 'refund':
-                    raise UserError(_(u"Le paiement a été remis en banque. Vous ne pouvez pas modifier ou annuler un paiement remis en banque."))
+                    raise UserError(_(
+                        u"Le paiement a été remis en banque. "
+                        u"Vous ne pouvez pas modifier ou annuler un paiement remis en banque."))
                 # On vérifie s'il n'y a pas un autre lettrage.
                 for move_line in payment.move_line_ids:
                     if move_line.reconciled:
-                        raise UserError(_(u"Le paiement est lettré (lié à une facture par exemple). Vous ne pouvez modifier ou annuler qu'un paiement qui n'est pas lettré. Annulez le lettrage auparavant."))
+                        raise UserError(_(
+                            u"Le paiement est lettré (lié à une facture par exemple). "
+                            u"Vous ne pouvez modifier ou annuler un paiement que si il n'est pas lettré. "
+                            u"Annulez le lettrage auparavant."))
 
                 # Annulation
                 if self.type_modification_payment == 'cancel':
@@ -121,7 +135,8 @@ class OFAccountPaymentWizard(models.TransientModel):
                         rev_move = move.create_reversals(reconcile=True)
                         rev_move.ref = form.description or move.name
                     payment.active = False
-                    # L'annulation a été faite. On va à la liste des paiements clients ou fournisseurs (appel de l'action).
+                    # L'annulation a été faite.
+                    # On va à la liste des paiements clients ou fournisseurs (appel de l'action).
                     if payment.partner_type == 'supplier':
                         return self.env.ref('account.action_account_payments_payable').read()[0]
                     else:
